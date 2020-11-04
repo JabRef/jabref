@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" page-range-format="expanded">
   <info>
-    <title>American Psychological Association 7th edition (annotated bibliography)</title>
-    <title-short>APA (annotated bibliography)</title-short>
-    <id>http://www.zotero.org/styles/apa-annotated-bibliography</id>
-    <link href="http://www.zotero.org/styles/apa-annotated-bibliography" rel="self"/>
+    <title>American Psychological Association 7th edition (numeric, brackets)</title>
+    <title-short>APA (numeric, superscript, brackets)</title-short>
+    <summary>APA style, with numeric in-text citations in brackets</summary>
+    <id>http://www.zotero.org/styles/apa-numeric-superscript-brackets</id>
+    <link href="http://www.zotero.org/styles/apa-numeric-superscript-brackets" rel="self"/>
     <link href="http://www.zotero.org/styles/apa" rel="template"/>
     <link href="https://apastyle.apa.org/style-grammar-guidelines/references/examples" rel="documentation"/>
     <author>
       <name>Brenton M. Wiernik</name>
       <email>zotero@wiernik.org</email>
     </author>
-    <category citation-format="author-date"/>
+    <category citation-format="numeric"/>
     <category field="psychology"/>
     <category field="generic-base"/>
     <updated>2019-12-04T13:09:49+00:00</updated>
@@ -55,30 +56,6 @@
       <term name="letter" form="short">خطاب</term>
     </terms>
   </locale>
-  <locale xml:lang="bg">
-    <terms>
-      <term name="letter">лична комуникация</term>
-      <term name="letter" form="short">писмо</term>
-    </terms>
-  </locale>
-  <locale xml:lang="ca">
-    <terms>
-      <term name="letter">comunicació personal</term>
-      <term name="letter" form="short">carta</term>
-    </terms>
-  </locale>
-  <locale xml:lang="cs">
-    <terms>
-      <term name="letter">osobní komunikace</term>
-      <term name="letter" form="short">dopis</term>
-    </terms>
-  </locale>
-  <locale xml:lang="cy">
-    <terms>
-      <term name="letter">cyfathrebu personol</term>
-      <term name="letter" form="short">llythyr</term>
-    </terms>
-  </locale>
   <locale xml:lang="da">
     <terms>
       <term name="et-al">et al.</term>
@@ -93,41 +70,11 @@
       <term name="letter" form="short">Brief</term>
     </terms>
   </locale>
-  <locale xml:lang="el">
-    <terms>
-      <term name="letter">προσωπική επικοινωνία</term>
-      <term name="letter" form="short">επιστολή</term>
-    </terms>
-  </locale>
   <locale xml:lang="es">
     <terms>
       <term name="from">de</term>
       <term name="letter">comunicación personal</term>
       <term name="letter" form="short">carta</term>
-    </terms>
-  </locale>
-  <locale xml:lang="et">
-    <terms>
-      <term name="letter">isiklik suhtlus</term>
-      <term name="letter" form="short">kiri</term>
-    </terms>
-  </locale>
-  <locale xml:lang="eu">
-    <terms>
-      <term name="letter">komunikazio pertsonala</term>
-      <term name="letter" form="short">gutuna</term>
-    </terms>
-  </locale>
-  <locale xml:lang="fa">
-    <terms>
-      <term name="letter">ارتباط شخصی</term>
-      <term name="letter" form="short">نامه</term>
-    </terms>
-  </locale>
-  <locale xml:lang="fi">
-    <terms>
-      <term name="letter">henkilökohtainen viestintä</term>
-      <term name="letter" form="short">kirje</term>
     </terms>
   </locale>
   <locale xml:lang="fr">
@@ -138,78 +85,6 @@
         <single>éd.</single>
         <multiple>éds.</multiple>
       </term>
-    </terms>
-  </locale>
-  <locale xml:lang="he">
-    <terms>
-      <term name="letter">תקשורת אישית</term>
-      <term name="letter" form="short">מכתב</term>
-    </terms>
-  </locale>
-  <locale xml:lang="hr">
-    <terms>
-      <term name="letter">osobna komunikacija</term>
-      <term name="letter" form="short">pismo</term>
-    </terms>
-  </locale>
-  <locale xml:lang="hu">
-    <terms>
-      <term name="letter">személyes kommunikáció</term>
-      <term name="letter" form="short">levél</term>
-    </terms>
-  </locale>
-  <locale xml:lang="id">
-    <terms>
-      <term name="letter">komunikasi pribadi</term>
-      <term name="letter" form="short">surat</term>
-    </terms>
-  </locale>
-  <locale xml:lang="is">
-    <terms>
-      <term name="letter">persónuleg samskipti</term>
-      <term name="letter" form="short">bréf</term>
-    </terms>
-  </locale>
-  <locale xml:lang="it">
-    <terms>
-      <term name="letter">comunicazione personale</term>
-      <term name="letter" form="short">lettera</term>
-    </terms>
-  </locale>
-  <locale xml:lang="ja">
-    <terms>
-      <term name="letter">個人的なやり取り</term>
-      <term name="letter" form="short">手紙</term>
-    </terms>
-  </locale>
-  <locale xml:lang="ko">
-    <terms>
-      <term name="letter">개인 서신</term>
-      <term name="letter" form="short">편지</term>
-    </terms>
-  </locale>
-  <locale xml:lang="la">
-    <terms>
-      <term name="letter"/>
-      <term name="letter" form="short">epistula</term>
-    </terms>
-  </locale>
-  <locale xml:lang="lt">
-    <terms>
-      <term name="letter">communicationis personalis</term>
-      <term name="letter" form="short"/>
-    </terms>
-  </locale>
-  <locale xml:lang="lv">
-    <terms>
-      <term name="letter">personīga komunikācija</term>
-      <term name="letter" form="short">vēstule</term>
-    </terms>
-  </locale>
-  <locale xml:lang="mn">
-    <terms>
-      <term name="letter">хувийн харилцаа холбоо</term>
-      <term name="letter" form="short">захиа</term>
     </terms>
   </locale>
   <locale xml:lang="nb">
@@ -233,88 +108,16 @@
       <term name="letter" form="short">brev</term>
     </terms>
   </locale>
-  <locale xml:lang="pl">
-    <terms>
-      <term name="letter">osobista komunikacja</term>
-      <term name="letter" form="short">list</term>
-    </terms>
-  </locale>
-  <locale xml:lang="pt">
-    <terms>
-      <term name="letter">comunicação pessoal</term>
-      <term name="letter" form="short">carta</term>
-    </terms>
-  </locale>
-  <locale xml:lang="ro">
-    <terms>
-      <term name="letter">comunicare personală</term>
-      <term name="letter" form="short">scrisoare</term>
-    </terms>
-  </locale>
   <locale xml:lang="ru">
     <terms>
       <term name="letter">личная переписка</term>
       <term name="letter" form="short">письмо</term>
     </terms>
   </locale>
-  <locale xml:lang="sk">
-    <terms>
-      <term name="letter">osobná komunikácia</term>
-      <term name="letter" form="short">list</term>
-    </terms>
-  </locale>
-  <locale xml:lang="sl">
-    <terms>
-      <term name="letter">osebna komunikacija</term>
-      <term name="letter" form="short">pismo</term>
-    </terms>
-  </locale>
-  <locale xml:lang="sr">
-    <terms>
-      <term name="letter">лична комуникација</term>
-      <term name="letter" form="short">писмо</term>
-    </terms>
-  </locale>
-  <locale xml:lang="sv">
-    <terms>
-      <term name="letter">personlig kommunikation</term>
-      <term name="letter" form="short">brev</term>
-    </terms>
-  </locale>
-  <locale xml:lang="th">
-    <terms>
-      <term name="letter">การสื่อสารส่วนบุคคล</term>
-      <term name="letter" form="short">จดหมาย</term>
-    </terms>
-  </locale>
   <locale xml:lang="tr">
     <terms>
       <term name="letter">kişisel iletişim</term>
       <term name="letter" form="short">mektup</term>
-    </terms>
-  </locale>
-  <locale xml:lang="uk">
-    <terms>
-      <term name="letter">особисте спілкування</term>
-      <term name="letter" form="short">лист</term>
-    </terms>
-  </locale>
-  <locale xml:lang="vi">
-    <terms>
-      <term name="letter">giao tiếp cá nhân</term>
-      <term name="letter" form="short">thư</term>
-    </terms>
-  </locale>
-  <locale xml:lang="zh-CN">
-    <terms>
-      <term name="letter">的私人交流</term>
-      <term name="letter" form="short">信函</term>
-    </terms>
-  </locale>
-  <locale xml:lang="zh-TW">
-    <terms>
-      <term name="letter">私人通訊</term>
-      <term name="letter" form="short">信函</term>
     </terms>
   </locale>
   <!-- General categories of item types:
@@ -659,13 +462,13 @@
         <text macro="bracketed-intext" prefix="[" suffix="]"/>
       </if>
       <else-if type="bill">
-        <!-- If a bill has no number or container-title, assume it is a hearing; italic -->
+        <!-- If a bill has no number or container-title, assume it is a hearing; italic and title case -->
         <choose>
           <if variable="number container-title" match="none">
             <text variable="title" form="short" font-style="italic" text-case="title"/>
           </if>
           <else-if variable="title">
-            <text variable="title" form="short" text-case="title"/>
+            <text variable="title" form="short"/>
           </else-if>
           <else>
             <group delimiter=" ">
@@ -689,18 +492,18 @@
       </else-if>
       <else-if type="legislation treaty" match="any">
         <!-- Legislation and treaties not italicized or quoted -->
-        <text variable="title" form="short" text-case="title"/>
+        <text variable="title" form="short"/>
       </else-if>
       <else-if type="post webpage" match="any">
         <!-- Webpages are always italicized -->
-        <text variable="title" form="short" font-style="italic" text-case="title"/>
+        <text variable="title" form="short" font-style="italic"/>
       </else-if>
       <else-if variable="container-title" match="any">
         <!-- Other types are italicized or quoted based on presence of container-title. As in title macro. -->
-        <text variable="title" form="short" quotes="true" text-case="title"/>
+        <text variable="title" form="short" quotes="true"/>
       </else-if>
       <else>
-        <text variable="title" form="short" font-style="italic" text-case="title"/>
+        <text variable="title" form="short" font-style="italic"/>
       </else>
     </choose>
   </macro>
@@ -1325,11 +1128,11 @@
     <choose>
       <if variable="reviewed-title">
         <!-- Not possible to distinguish TV series episode from other reviewed works [Ex. 69] -->
-        <text variable="reviewed-title" form="short" font-style="italic" text-case="title"/>
+        <text variable="reviewed-title" form="short" font-style="italic"/>
       </if>
       <else>
         <!-- Assume title is title of reviewed work -->
-        <text variable="title" form="short" font-style="italic" text-case="title"/>
+        <text variable="title" form="short" font-style="italic"/>
       </else>
     </choose>
   </macro>
@@ -1860,58 +1663,49 @@
       <text variable="locator"/>
     </group>
   </macro>
-  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true" collapse="year" givenname-disambiguation-rule="primary-name">
+  <citation collapse="citation-number">
     <sort>
-      <key macro="author-bib" names-min="3" names-use-first="1"/>
-      <key macro="date-sort-group"/>
-      <key macro="date-sort-date" sort="ascending"/>
-      <key variable="status"/>
+      <key variable="citation-number"/>
     </sort>
-    <layout prefix="(" suffix=")" delimiter="; ">
-      <group delimiter=", ">
-        <text macro="author-intext"/>
-        <text macro="date-intext"/>
-        <text macro="citation-locator"/>
+    <layout delimiter="," prefix="[" suffix="]" vertical-align="sup">
+      <group>
+        <text variable="citation-number"/>
+        <text macro="citation-locator" prefix="(" suffix=")"/>
       </group>
     </layout>
   </citation>
   <bibliography hanging-indent="true" et-al-min="21" et-al-use-first="19" et-al-use-last="true" entry-spacing="0" line-spacing="2">
-    <sort>
-      <key macro="author-bib"/>
-      <key macro="date-sort-group"/>
-      <key macro="date-sort-date" sort="ascending"/>
-      <key variable="status"/>
-      <key macro="title"/>
-    </sort>
     <layout>
-      <choose>
-        <if type="bill legal_case legislation treaty" match="any">
-          <!-- Legal items have different orders and delimiters -->
-          <choose>
-            <if variable="DOI URL" match="any">
-              <text macro="legal-cites"/>
-            </if>
-            <else>
-              <text macro="legal-cites" suffix="."/>
-            </else>
-          </choose>
-        </if>
-        <else>
-          <group delimiter=" ">
-            <group delimiter=". " suffix=".">
-              <text macro="author-bib"/>
-              <text macro="date-bib"/>
-              <text macro="title-and-descriptions"/>
-              <text macro="container"/>
-              <text macro="event"/>
-              <text macro="publisher"/>
+      <group delimiter=". ">
+        <text variable="citation-number"/>
+        <choose>
+          <if type="bill legal_case legislation treaty" match="any">
+            <!-- Legal items have different orders and delimiters -->
+            <choose>
+              <if variable="DOI URL" match="any">
+                <text macro="legal-cites"/>
+              </if>
+              <else>
+                <text macro="legal-cites" suffix="."/>
+              </else>
+            </choose>
+          </if>
+          <else>
+            <group delimiter=" ">
+              <group delimiter=". " suffix=".">
+                <text macro="author-bib"/>
+                <text macro="date-bib"/>
+                <text macro="title-and-descriptions"/>
+                <text macro="container"/>
+                <text macro="event"/>
+                <text macro="publisher"/>
+              </group>
+              <text macro="access"/>
+              <text macro="publication-history"/>
             </group>
-            <text macro="access"/>
-            <text macro="publication-history"/>
-          </group>
-        </else>
-      </choose>
-      <text variable="note" display="block"/>
+          </else>
+        </choose>
+      </group>
     </layout>
   </bibliography>
 </style>
