@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleScholar.class);
 
+    private static final Pattern LINK_TO_SUBPAGE_PATTERN = Pattern.compile("data-clk-atid=\"([^\"]*)\"");
     private static final Pattern LINK_TO_BIB_PATTERN = Pattern.compile("(https:\\/\\/scholar.googleusercontent.com\\/scholar.bib[^\"]*)");
 
     private static final String BASIC_SEARCH_URL = "https://scholar.google.ch/scholar?";
@@ -128,11 +129,11 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(String query) throws FetcherException {
-        LOGGER.debug("Using URL {}", query);
+        LOGGER.debug("Using query {}", query);
         obtainAndModifyCookie();
         List<BibEntry> foundEntries = new ArrayList<>(20);
 
-        URIBuilder uriBuilder = null;
+        URIBuilder uriBuilder;
         try {
             uriBuilder = new URIBuilder(BASIC_SEARCH_URL);
         } catch (URISyntaxException e) {
@@ -143,6 +144,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
         uriBuilder.addParameter("btnG", "Search");
         uriBuilder.addParameter("q", query);
         String queryURL = uriBuilder.toString();
+        LOGGER.debug("Using URL {}", queryURL);
 
         try {
             addHitsFromQuery(foundEntries, queryURL);
@@ -150,7 +152,8 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
             // if there are too much requests from the same IP address google is answering with a 503 and redirecting to a captcha challenge
             // The caught IOException looks for example like this:
             // java.io.IOException: Server returned HTTP response code: 503 for URL: https://ipv4.google.com/sorry/index?continue=https://scholar.google.com/scholar%3Fhl%3Den%26btnG%3DSearch%26q%3Dbpmn&hl=en&q=CGMSBI0NBDkYuqy9wAUiGQDxp4NLQCWbIEY1HjpH5zFJhv4ANPGdWj0
-            if (e.getMessage().contains("Server returned HTTP response code: 503 for URL")) {
+            if (e.getMessage().contains("Server returned HTTP response code: 403 for URL") ||
+                    (e.getMessage().contains("Server returned HTTP response code: 503 for URL"))) {
                 throw new FetcherException("Fetching from Google Scholar at URL " + queryURL + " failed.",
                         Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), e);
             } else {
@@ -214,6 +217,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
     }
 
     private void addHitsFromQuery(List<BibEntry> entryList, String queryURL) throws IOException, FetcherException {
+        LOGGER.debug("Downloading from {}", queryURL);
         String content = new URLDownload(queryURL).asString();
 
         if (needsCaptcha(content)) {
@@ -221,15 +225,34 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
                     Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), null);
         }
 
-        Matcher matcher = LINK_TO_BIB_PATTERN.matcher(content);
+        Matcher matcher = LINK_TO_SUBPAGE_PATTERN.matcher(content);
+        if (!matcher.find()) {
+            LOGGER.debug("No data-clk-atid found in html {}", content);
+            return;
+        }
+
+        String infoPageUrl = BASIC_SEARCH_URL + "q=info:" + matcher.group(1) + ":scholar.google.com/&output=cite&scirp=0&hl=en";
+        LOGGER.debug("Using infoPageUrl {}", infoPageUrl);
+        URLDownload infoPageUrlDownload = new URLDownload(infoPageUrl);
+        LOGGER.debug("Downloading from {}", infoPageUrl);
+        String infoPageContent = infoPageUrlDownload.asString();
+
+        matcher = LINK_TO_BIB_PATTERN.matcher(infoPageContent);
+        boolean found = false;
         while (matcher.find()) {
+            found = true;
             String citationsPageURL = matcher.group().replace("&amp;", "&");
+            LOGGER.debug("Using citationsPageURL {}", citationsPageURL);
             BibEntry newEntry = downloadEntry(citationsPageURL);
             entryList.add(newEntry);
+        }
+        if (!found) {
+            LOGGER.debug("Did not found pattern in html {}", infoPageContent);
         }
     }
 
     private BibEntry downloadEntry(String link) throws IOException, FetcherException {
+        LOGGER.debug("Downloading from {}", link);
         String downloadedContent = new URLDownload(link).asString();
         BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
         ParserResult result = parser.parse(new StringReader(downloadedContent));

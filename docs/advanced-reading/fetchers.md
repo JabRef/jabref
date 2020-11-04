@@ -14,6 +14,17 @@ Fetchers are the implementation of the [search using online services](https://do
 
 On Windows, you have to log-off and log-on to let IntelliJ know about the environment variable change. Execute the gradle task "processResources" in the group "others" within IntelliJ to ensure the values have been correctly written. Now, the fetcher tests should run without issues.
 
+## Change the log levels to enable debugging
+
+1. Open `src/test/resources/log4j2-test.xml`
+2. Add following XML snippet
+
+   ```xml
+           <Logger name="org.jabref.logic.importer.fetcher" level="DEBUG">
+              <AppenderRef ref="CONSOLE"/>
+           </Logger>
+    ```
+
 ## Background on embedding the keys in JabRef
 
 The keys are placed into the `build.properties` file.
