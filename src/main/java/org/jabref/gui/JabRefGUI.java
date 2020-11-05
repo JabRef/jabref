@@ -17,7 +17,7 @@ import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
-import org.jabref.gui.keyboard.EditorKeyBindings;
+import org.jabref.gui.keyboard.TextInputKeyBindings;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.importer.OpenDatabase;
@@ -89,8 +89,8 @@ public class JabRefGUI {
         Scene scene = new Scene(root, 800, 800);
         Globals.prefs.getTheme().installCss(scene);
 
-        // Handle Emacs key bindings
-        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> EditorKeyBindings.call(scene, event, Globals.prefs));
+        // Handle TextEditor key bindings
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> TextInputKeyBindings.call(scene, event));
 
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
