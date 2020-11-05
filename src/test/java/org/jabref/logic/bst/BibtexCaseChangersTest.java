@@ -1,6 +1,6 @@
 package org.jabref.logic.bst;
 
-import org.jabref.logic.bst.BibtexCaseChanger.FormatMode;
+import org.jabref.logic.bst.BibtexCaseChanger.FORMAT_MODE;
 
 import org.junit.jupiter.api.Test;
 
@@ -121,14 +121,14 @@ public class BibtexCaseChangersTest {
     }
 
     private void assertCaseChangerTitleLowers(final String string, final String string2) {
-        assertEquals(string, BibtexCaseChanger.changeCase(string2, FormatMode.TITLE_LOWERS));
+        assertEquals(string, BibtexCaseChanger.changeCase(string2, FORMAT_MODE.TITLE_LOWERS));
     }
 
     private void assertCaseChangerAllLowers(final String string, final String string2) {
-        assertEquals(string, BibtexCaseChanger.changeCase(string2, FormatMode.ALL_LOWERS));
+        assertEquals(string, BibtexCaseChanger.changeCase(string2, FORMAT_MODE.ALL_LOWERS));
     }
 
     private void assertCaseChangerAllUppers(final String string, final String string2) {
-        assertEquals(string, BibtexCaseChanger.changeCase(string2, FormatMode.ALL_UPPERS));
+        assertEquals(string, BibtexCaseChanger.changeCase(string2, FORMAT_MODE.ALL_UPPERS));
     }
 }

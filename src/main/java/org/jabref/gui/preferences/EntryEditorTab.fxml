@@ -27,6 +27,7 @@
     </CheckBox>
     <CheckBox fx:id="enableLatexCitationsTab" text="%Show 'LaTeX Citations' tab"/>
     <CheckBox fx:id="enableValidation" text="%Show validation messages"/>
+
     <Label styleClass="sectionHeader" text="%Autocompletion"/>
     <CheckBox fx:id="enableAutoComplete" text="%Use autocompletion"/>
     <VBox spacing="10.0">
