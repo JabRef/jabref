@@ -91,8 +91,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         initialPreviewPreferences = preferences.getPreviewPreferences();
 
         sourceTextProperty.addListener((observable, oldValue, newValue) -> {
-            if (getCurrentLayout() instanceof TextBasedPreviewLayout) {
-                ((TextBasedPreviewLayout) getCurrentLayout()).setText(sourceTextProperty.getValue().replace("\n", "__NEWLINE__"));
+            var currentLayout = getCurrentLayout();
+            if (currentLayout instanceof TextBasedPreviewLayout) {
+                ((TextBasedPreviewLayout) currentLayout).setText(sourceTextProperty.getValue().replace("\n", "__NEWLINE__"));
             }
         });
 
@@ -112,6 +113,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         return showAsExtraTab;
     }
 
+    @Override
     public void setValues() {
         showAsExtraTab.set(initialPreviewPreferences.showPreviewAsExtraTab());
         chosenListProperty().getValue().clear();
@@ -164,9 +166,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     private PreviewLayout findLayoutByName(String name) {
-        return availableListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
+        return availableListProperty.getValue().stream().filter(layout -> layout.getInternalName().equals(name))
                                     .findAny()
-                                    .orElse(chosenListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
+                                    .orElse(chosenListProperty.getValue().stream().filter(layout -> layout.getInternalName().equals(name))
                                                               .findAny()
                                                               .orElse(null));
     }
@@ -174,13 +176,14 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private PreviewLayout getCurrentLayout() {
         if (!chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
             return chosenSelectionModelProperty.getValue().getSelectedItems().get(0);
+
         }
 
         if (!chosenListProperty.getValue().isEmpty()) {
             return chosenListProperty.getValue().get(0);
         }
 
-        PreviewLayout layout = findLayoutByName("Preview");
+        PreviewLayout layout = findLayoutByName(TextBasedPreviewLayout.NAME);
         if (layout == null) {
             layout = initialPreviewPreferences.getTextBasedPreviewLayout();
         }
@@ -196,7 +199,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
             chosenListProperty.add(previewPreferences.getTextBasedPreviewLayout());
         }
 
-        PreviewLayout previewStyle = findLayoutByName("Preview");
+        PreviewLayout previewStyle = findLayoutByName(TextBasedPreviewLayout.NAME);
         if (previewStyle == null) {
             previewStyle = previewPreferences.getTextBasedPreviewLayout();
         }

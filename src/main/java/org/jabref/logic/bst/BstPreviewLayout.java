@@ -80,4 +80,9 @@ public class BstPreviewLayout implements PreviewLayout {
     public String getName() {
         return name;
     }
+
+    @Override
+    public String getInternalName() {
+        return name;
+    }
 }

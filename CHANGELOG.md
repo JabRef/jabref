@@ -66,6 +66,7 @@ inserting new citations in a OpenOffic/LibreOffice document. [#6957](https://git
 - We fixed an issue, when pulling changes from shared database via shortcut caused creation of a new tech report [6867](https://github.com/JabRef/jabref/issues/6867)
 - We fixed an issue where the JabRef GUI does not highlight the "All entries" group on start-up [#6691](https://github.com/JabRef/jabref/issues/6691)
 - We fixed an issue where a custom dark theme was not applied to the entry preview tab [7068](https://github.com/JabRef/jabref/issues/7068)
+- We fixed an issue where modifications to the Custom preview layout in the preferences were not saved [#6447](https://github.com/JabRef/jabref/issues/6447)
 
 ### Removed
 
