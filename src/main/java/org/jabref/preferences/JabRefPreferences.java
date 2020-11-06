@@ -967,6 +967,7 @@ public class JabRefPreferences implements PreferencesService {
     public void clear() throws BackingStoreException {
         clearAllBibEntryTypes();
         clearCitationKeyPatterns();
+        this.previewPreferences = null;
         prefs.clear();
         new SharedDatabasePreferences().clear();
     }
