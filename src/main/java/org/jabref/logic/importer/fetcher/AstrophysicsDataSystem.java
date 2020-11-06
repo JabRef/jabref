@@ -91,12 +91,12 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
     }
 
     @Override
-    public URL getURLForQuery(String query, int size, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(String query, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder builder = new URIBuilder(API_SEARCH_URL);
         builder.addParameter("q", query);
         builder.addParameter("fl", "bibcode");
-        builder.addParameter("rows", String.valueOf(size));
-        builder.addParameter("start", String.valueOf(size * pageNumber));
+        builder.addParameter("rows", String.valueOf(getPageSize()));
+        builder.addParameter("start", String.valueOf(getPageSize() * pageNumber));
         return builder.build().toURL();
     }
 
@@ -105,7 +105,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
      * @return URL which points to a search request for given entry
      */
     @Override
-    public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException {
         StringBuilder stringBuilder = new StringBuilder();
 
         Optional<String> title = entry.getFieldOrAlias(StandardField.TITLE).map(t -> "title:\"" + t + "\"");
@@ -300,12 +300,11 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
 
     @Override
     public Page<BibEntry> performSearchPaged(String query, int pageNumber) throws FetcherException {
-
         if (StringUtil.isBlank(query)) {
             return new Page<>(query, pageNumber);
         }
         try {
-            List<String> bibcodes = fetchBibcodes(getURLForQuery(query, getPageSize(), pageNumber));
+            List<String> bibcodes = fetchBibcodes(getURLForQuery(query, pageNumber));
             Collection<BibEntry> results = performSearchByIds(bibcodes);
             return new Page<>(query, pageNumber, results);
         } catch (URISyntaxException e) {

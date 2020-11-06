@@ -13,6 +13,7 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.paging.Page;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -79,6 +81,21 @@ class GoogleScholarTest implements SearchBasedFetcherCapabilityTest {
         List<BibEntry> foundEntries = finder.performSearch("random test string");
 
         assertEquals(20, foundEntries.size());
+    }
+
+    /**
+     * Ensure that different page return different entries
+     */
+    @Test
+    @DisabledOnCIServer("CI server is blocked by Google")
+    public void pageSearchReturnsUniqueResultsPerPage() throws Exception {
+        String query = "Software";
+        Page<BibEntry> firstPage = finder.performSearchPaged(query, 0);
+        Page<BibEntry> secondPage = finder.performSearchPaged(query, 1);
+
+        for (BibEntry entry: firstPage.getContent()) {
+            assertFalse(secondPage.getContent().contains(entry));
+        }
     }
 
     @Override

@@ -9,10 +9,12 @@ import java.util.Optional;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.paging.Page;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +22,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -282,6 +285,20 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest {
 
         // There is only a single paper found by searching that contains the exact sequence "Taxonomy of Distributed" in the title.
         assertEquals(Collections.singletonList(expected), resultWithPhraseSearch);
+    }
+
+    /**
+     * Ensure that different page return different entries
+     */
+    @Test
+    public void pageSearchReturnsUniqueResultsPerPage() throws Exception {
+        String query = "Software";
+        Page<BibEntry> firstPage = fetcher.performSearchPaged(query, 0);
+        Page<BibEntry> secondPage = fetcher.performSearchPaged(query, 1);
+
+        for (BibEntry entry: firstPage.getContent()) {
+            assertFalse(secondPage.getContent().contains(entry));
+        }
     }
 
     @Test

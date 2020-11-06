@@ -9,6 +9,7 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.paging.Page;
 import org.jabref.testutils.category.FetcherTest;
 
 import kong.unirest.json.JSONObject;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @FetcherTest
@@ -130,6 +132,20 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest {
                           .map(bibEntry -> bibEntry.getField(StandardField.AUTHOR))
                           .filter(Optional::isPresent)
                           .map(Optional::get).forEach(authorField -> assertTrue(authorField.contains("Redmiles")));
+    }
+
+    /**
+     * Ensure that different page return different entries
+     */
+    @Test
+    public void pageSearchReturnsUniqueResultsPerPage() throws Exception {
+        String query = "Software";
+        Page<BibEntry> firstPage = fetcher.performSearchPaged(query, 0);
+        Page<BibEntry> secondPage = fetcher.performSearchPaged(query, 1);
+
+        for (BibEntry entry: firstPage.getContent()) {
+            assertFalse(secondPage.getContent().contains(entry));
+        }
     }
 
     @Override

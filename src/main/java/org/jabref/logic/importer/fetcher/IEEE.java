@@ -15,8 +15,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.net.URLDownload;
@@ -27,6 +29,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.paging.Page;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
@@ -41,7 +44,7 @@ import org.slf4j.LoggerFactory;
  *
  * @implNote <a href="https://developer.ieee.org/docs">API documentation</a>
  */
-public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
+public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IEEE.class);
     private static final String STAMP_BASE_STRING_DOCUMENT = "/stamp/stamp.jsp?tp=&arnumber=";
@@ -193,13 +196,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
 
     @Override
     public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException {
-        URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
-        uriBuilder.addParameter("apikey", API_KEY);
-        uriBuilder.addParameter("querytext", query);
-
-        URLDownload.bypassSSLVerification();
-
-        return uriBuilder.build().toURL();
+        return getURLForQuery(query, 0);
     }
 
     @Override
@@ -234,8 +231,31 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
 
     @Override
     public URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) throws URISyntaxException, MalformedURLException {
+        return getComplexQueryURL(complexSearchQuery, 0);
+    }
+
+    @Override
+    public URL getURLForQuery(String query, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
         uriBuilder.addParameter("apikey", API_KEY);
+        uriBuilder.addParameter("querytext", query);
+        uriBuilder.addParameter("max_records", String.valueOf(getPageSize()));
+        // Starts to index at 1 for the first entry
+        uriBuilder.addParameter("start_record", String.valueOf(getPageSize() * pageNumber) + 1);
+
+        URLDownload.bypassSSLVerification();
+
+        return uriBuilder.build().toURL();
+    }
+
+    @Override
+    public URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
+        URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
+        uriBuilder.addParameter("apikey", API_KEY);
+        uriBuilder.addParameter("max_records", String.valueOf(getPageSize()));
+        // Starts to index at 1 for the first entry
+        uriBuilder.addParameter("start_record", String.valueOf(getPageSize() * pageNumber) + 1);
+
         if (!complexSearchQuery.getDefaultFieldPhrases().isEmpty()) {
             uriBuilder.addParameter("querytext", String.join(" AND ", complexSearchQuery.getDefaultFieldPhrases()));
         }
@@ -256,4 +276,6 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
         URLDownload.bypassSSLVerification();
         return uriBuilder.build().toURL();
     }
+
+
 }

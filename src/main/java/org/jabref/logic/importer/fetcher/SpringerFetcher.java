@@ -11,8 +11,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
-import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  *
  * @implNote see <a href="https://dev.springernature.com/">API documentation</a> for more details
  */
-public class SpringerFetcher implements SearchBasedParserFetcher {
+public class SpringerFetcher implements PagedSearchBasedParserFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringerFetcher.class);
 
@@ -159,12 +159,7 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
 
     @Override
     public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException {
-        URIBuilder uriBuilder = new URIBuilder(API_URL);
-        uriBuilder.addParameter("q", query); // Search query
-        uriBuilder.addParameter("api_key", API_KEY); // API key
-        uriBuilder.addParameter("p", "20"); // Number of results to return
-        // uriBuilder.addParameter("s", "1"); // Start item (not needed at the moment)
-        return uriBuilder.build().toURL();
+        return getURLForQuery(query, 0);
     }
 
     @Override
@@ -201,5 +196,20 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
 
             return entries;
         };
+    }
+
+    @Override
+    public URL getURLForQuery(String query, int pageNumber) throws URISyntaxException, MalformedURLException {
+        URIBuilder uriBuilder = new URIBuilder(API_URL);
+        uriBuilder.addParameter("q", query); // Search query
+        uriBuilder.addParameter("api_key", API_KEY); // API key
+        uriBuilder.addParameter("s", String.valueOf(getPageSize() * pageNumber + 1)); // Start entry, starts indexing at 1
+        uriBuilder.addParameter("p", String.valueOf(getPageSize())); // Page size
+        return uriBuilder.build().toURL();
+    }
+
+    @Override
+    public URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
+        return getURLForQuery(constructComplexQueryString(complexSearchQuery), pageNumber);
     }
 }

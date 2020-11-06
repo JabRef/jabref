@@ -17,13 +17,14 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.paging.Page;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -38,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Search String infos: https://scholar.google.com/intl/en/scholar/help.html#searching
  */
-public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
+public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleScholar.class);
 
     private static final Pattern LINK_TO_BIB_PATTERN = Pattern.compile("(https:\\/\\/scholar.googleusercontent.com\\/scholar.bib[^\"]*)");
@@ -128,37 +129,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(String query) throws FetcherException {
-        LOGGER.debug("Using URL {}", query);
-        obtainAndModifyCookie();
-        List<BibEntry> foundEntries = new ArrayList<>(20);
-
-        URIBuilder uriBuilder = null;
-        try {
-            uriBuilder = new URIBuilder(BASIC_SEARCH_URL);
-        } catch (URISyntaxException e) {
-            throw new FetcherException("Error while fetching from " + getName() + " at URL " + BASIC_SEARCH_URL, e);
-        }
-
-        uriBuilder.addParameter("hl", "en");
-        uriBuilder.addParameter("btnG", "Search");
-        uriBuilder.addParameter("q", query);
-        String queryURL = uriBuilder.toString();
-
-        try {
-            addHitsFromQuery(foundEntries, queryURL);
-        } catch (IOException e) {
-            // if there are too much requests from the same IP address google is answering with a 503 and redirecting to a captcha challenge
-            // The caught IOException looks for example like this:
-            // java.io.IOException: Server returned HTTP response code: 503 for URL: https://ipv4.google.com/sorry/index?continue=https://scholar.google.com/scholar%3Fhl%3Den%26btnG%3DSearch%26q%3Dbpmn&hl=en&q=CGMSBI0NBDkYuqy9wAUiGQDxp4NLQCWbIEY1HjpH5zFJhv4ANPGdWj0
-            if (e.getMessage().contains("Server returned HTTP response code: 503 for URL")) {
-                throw new FetcherException("Fetching from Google Scholar at URL " + queryURL + " failed.",
-                        Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), e);
-            } else {
-                throw new FetcherException("Error while fetching from " + getName() + " at URL " + queryURL, e);
-            }
-        }
-
-        return foundEntries;
+        return new ArrayList<>(performSearchPaged(query, 0).getContent());
     }
 
     @Override
@@ -258,5 +229,47 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
         } catch (IOException e) {
             throw new FetcherException("Cookie configuration for Google Scholar failed.", e);
         }
+    }
+
+    @Override
+    public Page<BibEntry> performSearchPaged(String query, int pageNumber) throws FetcherException {
+        LOGGER.debug("Using URL {}", query);
+        obtainAndModifyCookie();
+        List<BibEntry> foundEntries = new ArrayList<>(20);
+
+        URIBuilder uriBuilder = null;
+        try {
+            uriBuilder = new URIBuilder(BASIC_SEARCH_URL);
+        } catch (URISyntaxException e) {
+            throw new FetcherException("Error while fetching from " + getName() + " at URL " + BASIC_SEARCH_URL, e);
+        }
+
+        uriBuilder.addParameter("hl", "en");
+        uriBuilder.addParameter("start", String.valueOf(pageNumber * getPageSize()));
+        uriBuilder.addParameter("num", String.valueOf(getPageSize()));
+        uriBuilder.addParameter("btnG", "Search");
+        uriBuilder.addParameter("q", query);
+        String queryURL = uriBuilder.toString();
+
+        try {
+            addHitsFromQuery(foundEntries, queryURL);
+        } catch (IOException e) {
+            // if there are too much requests from the same IP address google is answering with a 503 and redirecting to a captcha challenge
+            // The caught IOException looks for example like this:
+            // java.io.IOException: Server returned HTTP response code: 503 for URL: https://ipv4.google.com/sorry/index?continue=https://scholar.google.com/scholar%3Fhl%3Den%26btnG%3DSearch%26q%3Dbpmn&hl=en&q=CGMSBI0NBDkYuqy9wAUiGQDxp4NLQCWbIEY1HjpH5zFJhv4ANPGdWj0
+            if (e.getMessage().contains("Server returned HTTP response code: 503 for URL")) {
+                throw new FetcherException("Fetching from Google Scholar at URL " + queryURL + " failed.",
+                        Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), e);
+            } else {
+                throw new FetcherException("Error while fetching from " + getName() + " at URL " + queryURL, e);
+            }
+        }
+
+        return new Page<>(query, pageNumber, foundEntries);
+    }
+
+    @Override
+    public Page<BibEntry> performComplexSearchPaged(ComplexSearchQuery query, int pageNumber) throws FetcherException {
+        return null;
     }
 }
