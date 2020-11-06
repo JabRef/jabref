@@ -2409,7 +2409,7 @@ public class JabRefPreferences implements PreferencesService {
             if (layout instanceof CitationStylePreviewLayout) {
                 return ((CitationStylePreviewLayout) layout).getFilePath();
             } else {
-                return layout.getName();
+                return layout.getDisplayName();
             }
         }).collect(Collectors.toList()));
         putDouble(PREVIEW_PANEL_HEIGHT, previewPreferences.getPreviewPanelDividerPosition().doubleValue());
