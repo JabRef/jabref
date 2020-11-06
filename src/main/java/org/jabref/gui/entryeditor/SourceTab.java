@@ -18,6 +18,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.InputMethodRequests;
+import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
@@ -26,6 +27,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.keyboard.CodeAreaKeyBindings;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
@@ -85,18 +87,10 @@ public class SourceTab extends EntryEditorTab {
         @Override
         public void execute() {
             switch (command) {
-                case COPY:
-                    codeArea.copy();
-                    break;
-                case CUT:
-                    codeArea.cut();
-                    break;
-                case PASTE:
-                    codeArea.paste();
-                    break;
-                case SELECT_ALL:
-                    codeArea.selectAll();
-                    break;
+                case COPY -> codeArea.copy();
+                case CUT -> codeArea.cut();
+                case PASTE -> codeArea.paste();
+                case SELECT_ALL -> codeArea.selectAll();
             }
             codeArea.requestFocus();
         }
@@ -178,6 +172,7 @@ public class SourceTab extends EntryEditorTab {
             }
         });
         codeArea.setId("bibtexSourceCodeArea");
+        codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event));
 
         ActionFactory factory = new ActionFactory(keyBindingRepository);
         ContextMenu contextMenu = new ContextMenu();
