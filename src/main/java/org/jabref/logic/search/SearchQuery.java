@@ -182,7 +182,8 @@ public class SearchQuery implements SearchMatcher {
 
         // compile the words to a regular expression in the form (w1)|(w2)|(w3)
         Stream<String> joiner = words.stream();
-        if (regularExpression) {
+        if (!regularExpression) {
+            // Reformat string when we are looking for a literal match
             joiner = joiner.map(escapeMode::format);
         }
         String searchPattern = joiner.collect(Collectors.joining(")|(", "(", ")"));
