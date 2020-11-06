@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" default-locale="en-US">
-  <!-- This style was edited with the Visual CSL Editor (http://editor.citationstyles.org/visualEditor/) -->
   <info>
     <title>Advanced Functional Materials</title>
     <id>http://www.zotero.org/styles/advanced-functional-materials</id>
@@ -15,6 +14,9 @@
       <name>Ivan Bushmarinov</name>
       <email>ib@ineos.ac.ru</email>
     </contributor>
+    <contributor>
+      <name>Sebastian Karcher</name>
+    </contributor>
     <category citation-format="numeric"/>
     <category field="chemistry"/>
     <issn>1616-301X</issn>
@@ -24,19 +26,23 @@
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor">
-    <names variable="editor">
+    <names variable="editor" prefix="(" suffix=")">
+      <label form="short" suffix=": " text-case="capitalize-first"/>
       <name sort-separator=", " initialize-with=". " name-as-sort-order="all" delimiter="; " delimiter-precedes-last="always"/>
-      <label form="short" prefix=", " text-case="capitalize-first"/>
     </names>
   </macro>
   <macro name="author">
     <names variable="author">
       <name delimiter=", " delimiter-precedes-last="always" initialize-with=". "/>
       <label form="short" prefix=", " text-case="capitalize-first"/>
+      <substitute>
+        <names variable="editor"/>
+        <text variable="title"/>
+      </substitute>
     </names>
   </macro>
   <macro name="publisher">
-    <group delimiter=": ">
+    <group delimiter=", ">
       <text variable="publisher"/>
       <text variable="publisher-place"/>
     </group>
@@ -47,12 +53,16 @@
       <text variable="volume"/>
     </group>
   </macro>
-  <macro name="series">
-    <text variable="collection-title"/>
-  </macro>
   <macro name="pages">
-    <label variable="page" form="short" suffix=" "/>
-    <text variable="page"/>
+    <choose>
+      <if variable="page" match="any">
+        <label variable="page" form="short" suffix=" "/>
+        <text variable="page"/>
+      </if>
+      <else-if type="article-journal">
+        <text variable="DOI" prefix="DOI "/>
+      </else-if>
+    </choose>
   </macro>
   <macro name="book-container">
     <group delimiter=" ">
@@ -61,7 +71,7 @@
     </group>
   </macro>
   <macro name="issued">
-    <date variable="issued" delimiter=" ">
+    <date variable="issued" delimiter=" " font-weight="bold">
       <date-part name="year"/>
     </date>
   </macro>
@@ -119,58 +129,38 @@
             <text macro="pages"/>
           </group>
         </else-if>
-        <else-if type="bill book graphic legal_case motion_picture report song" match="any">
-          <group delimiter="; ">
-            <text variable="title" font-style="italic"/>
-            <text macro="editor" prefix=" "/>
-            <text macro="series"/>
-            <text macro="edition"/>
-            <group delimiter=", ">
-              <text macro="publisher"/>
-              <text macro="issued"/>
-            </group>
-            <group delimiter=", ">
-              <text macro="volume"/>
-              <text macro="pages"/>
-            </group>
-          </group>
-        </else-if>
         <else-if type="chapter paper-conference" match="any">
-          <group delimiter="; ">
-            <text macro="book-container"/>
-            <text macro="editor"/>
-            <text macro="series"/>
-            <group delimiter=", ">
-              <text macro="publisher"/>
-              <text macro="issued"/>
+          <group delimiter=", ">
+            <group delimiter=" ">
+              <text macro="book-container"/>
+              <text macro="editor"/>
             </group>
-            <group delimiter=", ">
-              <text macro="volume"/>
-              <text macro="pages"/>
-            </group>
+            <text macro="publisher"/>
+            <text macro="issued"/>
+            <text macro="pages"/>
           </group>
         </else-if>
-        <else-if type="article-journal">
+        <else-if type="article-journal article-magazine" match="any">
           <group delimiter=" ">
             <text variable="container-title" font-style="italic" form="short"/>
             <group delimiter=", ">
-              <text macro="issued" font-weight="bold"/>
+              <text macro="issued"/>
               <text variable="volume" font-style="italic"/>
               <text variable="page-first" form="long"/>
             </group>
           </group>
         </else-if>
         <else>
-          <group delimiter=" ">
-            <group delimiter=". ">
-              <text variable="title"/>
-              <text variable="container-title" font-style="italic" form="short"/>
+          <group delimiter=", ">
+            <group delimiter=" ">
+              <text variable="title" font-style="italic"/>
+              <text macro="editor"/>
             </group>
-            <group delimiter=", ">
-              <text macro="issued" font-weight="bold"/>
-              <text variable="volume" font-style="italic"/>
-              <text variable="page"/>
-            </group>
+            <text macro="edition"/>
+            <text macro="volume"/>
+            <text macro="publisher"/>
+            <text macro="issued"/>
+            <text macro="pages"/>
           </group>
         </else>
       </choose>
