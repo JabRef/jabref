@@ -1,22 +1,37 @@
 package org.jabref.gui.entryeditor;
 
+import java.util.EnumSet;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+
 import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.TextFlowLimited;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.fetcher.CitationRelationFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
+
+import com.tobiasdiez.easybind.EasyBind;
+import org.controlsfx.control.CheckListView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,8 +43,8 @@ public class CitationRelationsTab extends EntryEditorTab {
     private static final Logger LOGGER = LoggerFactory.getLogger(org.jabref.gui.entryeditor.CitationRelationsTab.class);
     private final EntryEditorPreferences preferences;
     private final DialogService dialogService;
-    private ListView<BibEntry> citingListView;
-    private ListView<BibEntry> citedByListView;
+    private CheckListView<BibEntry> citingListView;
+    private CheckListView<BibEntry> citedByListView;
     private StackPane citingStackPane;
     private StackPane citedByStackPane;
     private Button startCitingButton;
@@ -78,10 +93,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         styleLabel(citedByLabel);
 
         //Create ListViews
-        citingListView = new ListView<>();
-        citingListView.setCellFactory(listView -> new CitationRelationListCell(databaseContext, dialogService));
-        citedByListView = new ListView<>();
-        citedByListView.setCellFactory(listView -> new CitationRelationListCell(databaseContext, dialogService));
+        citingListView = new CheckListView<>();
+        citedByListView = new CheckListView<>();
 
         //Create Start Buttons
         startCitingButton = new Button();
@@ -131,11 +144,90 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         //Create SplitPane to hold all nodes above
         SplitPane container = new SplitPane(citingVBox, citedByVBox);
-        setContent(container);
 
         errorLabel = new Label();
 
+        citingListView.prefHeightProperty().bind(container.heightProperty().subtract(25));
+        citedByListView.prefHeightProperty().bind(container.heightProperty().subtract(25));
+
+        styleListView(citingListView);
+        styleListView(citedByListView);
+
         return container;
+    }
+
+    private void styleListView(CheckListView<BibEntry> listView) {
+        PseudoClass entrySelected = PseudoClass.getPseudoClass("entry-selected");
+        new ViewModelListCellFactory<BibEntry>()
+                .withGraphic(e -> {
+                    ToggleButton addToggle = IconTheme.JabRefIcons.ADD.asToggleButton();
+                    EasyBind.subscribe(addToggle.selectedProperty(), selected -> {
+                        if (selected) {
+                            addToggle.setGraphic(IconTheme.JabRefIcons.ADD_FILLED.withColor(IconTheme.SELECTED_COLOR).getGraphicNode());
+                        } else {
+                            addToggle.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
+                        }
+                    });
+                    addToggle.setPrefSize(25,25);
+                    addToggle.getStyleClass().add("addEntryButton");
+                    addToggle.selectedProperty().bindBidirectional(listView.getItemBooleanProperty(e));
+                    HBox separator = new HBox();
+                    HBox.setHgrow(separator, Priority.SOMETIMES);
+                    Node entryNode = getEntryNode(e);
+                    HBox.setHgrow(entryNode, Priority.ALWAYS);
+                    HBox hContainer = new HBox(entryNode, separator, addToggle);
+                    hContainer.getStyleClass().add("entry-container");
+
+                    /*if (citingListView.getItems().size() == 1) {
+                        selectAllNewEntries();
+                    }*/
+
+                    return hContainer;
+                })
+                .withOnMouseClickedEvent((e, event) -> listView.getCheckModel().toggleCheckState(e))
+                .withPseudoClass(entrySelected, listView::getItemBooleanProperty)
+                .install(listView);
+    }
+
+    private Node getEntryNode(BibEntry entry) {
+        Node entryType = getIcon(entry.getType()).getGraphicNode();
+        entryType.getStyleClass().add("type");
+        Label authors = new Label(entry.getFieldOrAliasLatexFree(StandardField.AUTHOR).orElse(""));
+        authors.getStyleClass().add("authors");
+        Label title = new Label(entry.getFieldOrAliasLatexFree(StandardField.TITLE).orElse(""));
+        title.getStyleClass().add("title");
+        Label year = new Label(entry.getFieldOrAliasLatexFree(StandardField.YEAR).orElse(""));
+        year.getStyleClass().add("year");
+        Label journal = new Label(entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse(""));
+        journal.getStyleClass().add("journal");
+
+        VBox entryContainer = new VBox(
+                new HBox(10, entryType, title),
+                new HBox(5, year, journal),
+                authors
+        );
+        entry.getFieldOrAliasLatexFree(StandardField.ABSTRACT).ifPresent(summaryText -> {
+            TextFlowLimited summary = new TextFlowLimited(new Text(summaryText));
+            summary.getStyleClass().add("summary");
+            entryContainer.getChildren().add(summary);
+        });
+
+        entryContainer.getStyleClass().add("bibEntry");
+        return entryContainer;
+    }
+
+    private IconTheme.JabRefIcons getIcon(EntryType type) {
+        EnumSet<StandardEntryType> crossRefTypes = EnumSet.of(StandardEntryType.InBook, StandardEntryType.InProceedings, StandardEntryType.InCollection);
+        if (type == StandardEntryType.Book) {
+            return IconTheme.JabRefIcons.BOOK;
+        } else if (crossRefTypes.contains(type)) {
+            return IconTheme.JabRefIcons.OPEN_LINK;
+        }
+        return IconTheme.JabRefIcons.ARTICLE;
+    }
+
+    public void unselectAll() {
+        citingListView.getCheckModel().clearChecks();
     }
 
     /**
@@ -164,6 +256,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         AnchorPane.setTopAnchor(button, 0.0);
         AnchorPane.setBottomAnchor(button, 0.0);
         AnchorPane.setRightAnchor(button, 20.0);
+        button.getStyleClass().add("icon-button");
     }
 
     /**
