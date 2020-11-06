@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.StringJoiner;
 
 import org.jabref.model.strings.StringUtil;
 
@@ -125,29 +126,23 @@ public class ComplexSearchQuery {
 
     @Override
     public int hashCode() {
-        int result = defaultField != null ? defaultField.hashCode() : 0;
-        result = 31 * result + (getAuthors() != null ? getAuthors().hashCode() : 0);
-        result = 31 * result + (getTitlePhrases() != null ? getTitlePhrases().hashCode() : 0);
-        result = 31 * result + (getAbstractPhrases() != null ? getTitlePhrases().hashCode() : 0);
-        result = 31 * result + (getFromYear().isPresent() ? getFromYear().hashCode() : 0);
-        result = 31 * result + (getToYear().isPresent() ? getToYear().hashCode() : 0);
-        result = 31 * result + (getSingleYear().isPresent() ? getSingleYear().hashCode() : 0);
-        result = 31 * result + (getJournal().isPresent() ? getJournal().hashCode() : 0);
-        return result;
+        return Objects.hash(defaultField, getAuthors(), getSingleYear(), getAbstractPhrases(), getFromYear(), getToYear(), getTitlePhrases(), getJournal());
     }
 
     @Override
     public String toString() {
-        StringBuilder stringRepresentation = new StringBuilder();
-        getSingleYear().ifPresent(singleYear -> stringRepresentation.append(singleYear).append(" "));
-        getFromYear().ifPresent(fromYear -> stringRepresentation.append(fromYear).append(" "));
-        getToYear().ifPresent(toYear -> stringRepresentation.append(toYear).append(" "));
-        getJournal().ifPresent(journal -> stringRepresentation.append(journal).append(" "));
-        stringRepresentation.append(String.join(" ", getTitlePhrases()))
-                            .append(String.join(" ", getDefaultFieldPhrases()))
-                            .append(String.join(" ", getAuthors()))
-                            .append(String.join(" ", getAbstractPhrases()));
-        return stringRepresentation.toString();
+        StringJoiner stringJoiner = new StringJoiner(" ");
+
+        getSingleYear().ifPresent(singleYear -> stringJoiner.add(singleYear.toString()));
+        getFromYear().ifPresent(fromYear -> stringJoiner.add(fromYear.toString()));
+        getToYear().ifPresent(toYear -> stringJoiner.add(toYear.toString()));
+        getJournal().ifPresent(stringJoiner::add);
+        stringJoiner.add(String.join(" ", getTitlePhrases()))
+                    .add(String.join(" ", getDefaultFieldPhrases()))
+                    .add(String.join(" ", getAuthors()))
+                    .add(String.join(" ", getAbstractPhrases()));
+
+        return stringJoiner.toString();
     }
 
     public static class ComplexSearchQueryBuilder {
