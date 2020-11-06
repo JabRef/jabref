@@ -232,7 +232,7 @@ public class GrammarBasedSearchRule implements SearchRule {
             if (fieldDescriptor.isPresent()) {
                 return comparison(fieldDescriptor.get().getText(), ComparisonOperator.build(context.operator.getText()), right);
             } else {
-                return new ContainBasedSearchRule(caseSensitive).applyRule(right, entry);
+                return SearchRules.getSearchRule(caseSensitive, regex).applyRule(right, entry);
             }
         }
 
