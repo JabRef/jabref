@@ -17,7 +17,7 @@ public class CitationStylePreviewLayout implements PreviewLayout {
     }
 
     @Override
-    public String getName() {
+    public String getDisplayName() {
         return citationStyle.getTitle();
     }
 
@@ -30,7 +30,7 @@ public class CitationStylePreviewLayout implements PreviewLayout {
     }
 
     @Override
-    public String getInternalName() {
+    public String getName() {
         return citationStyle.getTitle();
     }
 }

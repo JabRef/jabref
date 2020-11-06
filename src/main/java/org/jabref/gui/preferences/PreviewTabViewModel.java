@@ -166,9 +166,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     private PreviewLayout findLayoutByName(String name) {
-        return availableListProperty.getValue().stream().filter(layout -> layout.getInternalName().equals(name))
+        return availableListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
                                     .findAny()
-                                    .orElse(chosenListProperty.getValue().stream().filter(layout -> layout.getInternalName().equals(name))
+                                    .orElse(chosenListProperty.getValue().stream().filter(layout -> layout.getName().equals(name))
                                                               .findAny()
                                                               .orElse(null));
     }
@@ -260,7 +260,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         chosenSelectionModelProperty.getValue().clearSelection();
         chosenListProperty.removeAll(selected);
         availableListProperty.addAll(selected);
-        availableListProperty.sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+        availableListProperty.sort((a, b) -> a.getDisplayName().compareToIgnoreCase(b.getDisplayName()));
     }
 
     public void selectedInChosenUp() {
@@ -416,7 +416,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                 success = true;
 
                 if (targetList == availableListProperty) {
-                    targetList.getValue().sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+                    targetList.getValue().sort((a, b) -> a.getDisplayName().compareToIgnoreCase(b.getDisplayName()));
                 }
             }
         }

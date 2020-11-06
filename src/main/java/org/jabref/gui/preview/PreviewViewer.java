@@ -188,7 +188,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
         BackgroundTask
                 .wrap(() -> layout.generatePreview(entry.get(), database.getDatabase()))
-                .onRunning(() -> setPreviewText("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) + ": " + layout.getName() + " ..." + "</i>"))
+                .onRunning(() -> setPreviewText("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) + ": " + layout.getDisplayName() + " ..." + "</i>"))
                 .onSuccess(this::setPreviewText)
                 .onFailure(exception -> {
                     LOGGER.error("Error while generating citation style", exception);

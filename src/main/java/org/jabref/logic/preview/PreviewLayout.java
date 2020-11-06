@@ -10,7 +10,7 @@ public interface PreviewLayout {
 
     String generatePreview(BibEntry entry, BibDatabase database);
 
-    String getName();
+    String getDisplayName();
 
-    String getInternalName();
+    String getName();
 }
