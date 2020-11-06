@@ -1,6 +1,5 @@
 package org.jabref.gui.keyboard;
 
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -29,7 +28,6 @@ public class KeyBindingsDialogViewModel extends AbstractViewModel {
     private final OptionalObjectProperty<KeyBindingViewModel> selectedKeyBinding = OptionalObjectProperty.empty();
     private final ObjectProperty<KeyBindingViewModel> rootKeyBinding = new SimpleObjectProperty<>();
     private final ListProperty<KeyBindingPreset> keyBindingPresets = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final SimpleObjectProperty<KeyBindingPreset> selectedKeyBindingPreset = new SimpleObjectProperty<>();
 
     private final DialogService dialogService;
 
@@ -105,19 +103,16 @@ public class KeyBindingsDialogViewModel extends AbstractViewModel {
         });
     }
 
-    public void loadPreset() {
-        if (selectedKeyBindingPreset.isNotNull().get()) {
-            Map<KeyBinding, String> preset = selectedKeyBindingPreset.get().getKeyBindings();
-            preset.forEach(keyBindingRepository::put);
-            populateTable();
+    public void loadPreset(KeyBindingPreset preset) {
+        if (preset == null) {
+            return;
         }
+
+        preset.getKeyBindings().forEach(keyBindingRepository::put);
+        populateTable();
     }
 
     public ListProperty<KeyBindingPreset> keyBindingPresets() {
         return keyBindingPresets;
-    }
-
-    public SimpleObjectProperty<KeyBindingPreset> selectedKeyBindingPreset() {
-        return selectedKeyBindingPreset;
     }
 }
