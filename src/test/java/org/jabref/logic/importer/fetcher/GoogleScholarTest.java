@@ -93,7 +93,7 @@ class GoogleScholarTest implements SearchBasedFetcherCapabilityTest {
         Page<BibEntry> firstPage = finder.performSearchPaged(query, 0);
         Page<BibEntry> secondPage = finder.performSearchPaged(query, 1);
 
-        for (BibEntry entry: firstPage.getContent()) {
+        for (BibEntry entry : firstPage.getContent()) {
             assertFalse(secondPage.getContent().contains(entry));
         }
     }

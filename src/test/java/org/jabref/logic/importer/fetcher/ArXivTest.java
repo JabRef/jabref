@@ -9,7 +9,6 @@ import java.util.Optional;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
@@ -296,7 +295,7 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest {
         Page<BibEntry> firstPage = fetcher.performSearchPaged(query, 0);
         Page<BibEntry> secondPage = fetcher.performSearchPaged(query, 1);
 
-        for (BibEntry entry: firstPage.getContent()) {
+        for (BibEntry entry : firstPage.getContent()) {
             assertFalse(secondPage.getContent().contains(entry));
         }
     }

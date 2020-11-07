@@ -143,7 +143,7 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest {
         Page<BibEntry> firstPage = fetcher.performSearchPaged(query, 0);
         Page<BibEntry> secondPage = fetcher.performSearchPaged(query, 1);
 
-        for (BibEntry entry: firstPage.getContent()) {
+        for (BibEntry entry : firstPage.getContent()) {
             assertFalse(secondPage.getContent().contains(entry));
         }
     }
