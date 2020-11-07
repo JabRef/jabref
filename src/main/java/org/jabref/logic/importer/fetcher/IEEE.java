@@ -15,12 +15,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.help.HelpFile;
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
-import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
@@ -29,7 +27,6 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.paging.Page;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
@@ -279,6 +276,4 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
         URLDownload.bypassSSLVerification();
         return uriBuilder.build().toURL();
     }
-
-
 }
