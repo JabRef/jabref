@@ -33,7 +33,12 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ImportEntriesViewModel extends AbstractViewModel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImportAction.class);
 
     private final StringProperty message;
     private final TaskExecutor taskExecutor;
@@ -74,7 +79,11 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             this.parserResult = parserResult;
             // fill in the list for the user, where one can select the entries to import
             entries.addAll(parserResult.getDatabase().getEntries());
-        }).executeWith(taskExecutor);
+        }).onFailure(ex->{
+            LOGGER.error("Error importing", ex);
+            dialogService.showErrorDialogAndWait(ex);
+        })
+        .executeWith(taskExecutor);
     }
 
     public String getMessage() {
