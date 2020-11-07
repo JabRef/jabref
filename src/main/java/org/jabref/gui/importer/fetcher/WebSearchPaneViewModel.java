@@ -63,7 +63,7 @@ public class WebSearchPaneViewModel {
             preferences.putInt(JabRefPreferences.SELECTED_FETCHER_INDEX, newIndex);
         });
 
-        String allowedFields = "((author|journal|title|year|year-range):\\s?)?";
+        String allowedFields = "((author|abstract|journal|title|year|year-range):\\s?)?";
         // Either a single word, or a phrase with quotes, or a year-range
         String allowedTermText = "(((\\d{4}-\\d{4})|(\\w+)|(\"\\w+[^\"]*\"))\\s?)+";
         queryPattern = Pattern.compile("^(" + allowedFields + allowedTermText + ")+$");

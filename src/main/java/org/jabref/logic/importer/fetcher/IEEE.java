@@ -262,7 +262,10 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
         if (!complexSearchQuery.getAuthors().isEmpty()) {
             uriBuilder.addParameter("author", String.join(" AND ", complexSearchQuery.getAuthors()));
         }
-        if (!complexSearchQuery.getAuthors().isEmpty()) {
+        if (!complexSearchQuery.getAbstractPhrases().isEmpty()) {
+            uriBuilder.addParameter("abstract", String.join(" AND ", complexSearchQuery.getAbstractPhrases()));
+        }
+        if (!complexSearchQuery.getTitlePhrases().isEmpty()) {
             uriBuilder.addParameter("article_title", String.join(" AND ", complexSearchQuery.getTitlePhrases()));
         }
         complexSearchQuery.getJournal().ifPresent(journalTitle -> uriBuilder.addParameter("publication_title", journalTitle));
