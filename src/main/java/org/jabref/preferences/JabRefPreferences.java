@@ -257,6 +257,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
     public static final String SHOW_RECOMMENDATIONS = "showRecommendations";
+    public static final String SHOW_CITATIONRELATIONS = "showCitationRelation";
     public static final String ACCEPT_RECOMMENDATIONS = "acceptRecommendations";
     public static final String SHOW_LATEX_CITATIONS = "showLatexCitations";
     public static final String SEND_LANGUAGE_DATA = "sendLanguageData";
@@ -518,6 +519,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(MERGE_ENTRIES_DIFF_MODE, MergeEntries.DiffMode.WORD.name());
 
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
+        defaults.put(SHOW_CITATIONRELATIONS, Boolean.TRUE);
         defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
         defaults.put(SHOW_LATEX_CITATIONS, Boolean.TRUE);
         defaults.put(SEND_LANGUAGE_DATA, Boolean.FALSE);
@@ -1732,6 +1734,7 @@ public class JabRefPreferences implements PreferencesService {
         return new EntryEditorPreferences(getEntryEditorTabList(),
                 getBoolean(AUTO_OPEN_FORM),
                 getBoolean(SHOW_RECOMMENDATIONS),
+                getBoolean(SHOW_CITATIONRELATIONS),
                 getBoolean(ACCEPT_RECOMMENDATIONS),
                 getBoolean(SHOW_LATEX_CITATIONS),
                 getBoolean(DEFAULT_SHOW_SOURCE),
@@ -1744,6 +1747,7 @@ public class JabRefPreferences implements PreferencesService {
         storeEntryEditorTabList(preferences.getEntryEditorTabList());
         putBoolean(AUTO_OPEN_FORM, preferences.shouldOpenOnNewEntry());
         putBoolean(SHOW_RECOMMENDATIONS, preferences.shouldShowRecommendationsTab());
+        putBoolean(SHOW_CITATIONRELATIONS, preferences.shouldShowCitationRelationsTab());
         putBoolean(ACCEPT_RECOMMENDATIONS, preferences.isMrdlibAccepted());
         putBoolean(SHOW_LATEX_CITATIONS, preferences.shouldShowLatexCitationsTab());
         putBoolean(DEFAULT_SHOW_SOURCE, preferences.showSourceTabByDefault());
