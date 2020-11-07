@@ -194,19 +194,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
 
     @Override
     public List<BibEntry> performSearch(String query) throws FetcherException {
-
-        if (StringUtil.isBlank(query)) {
-            return Collections.emptyList();
-        }
-
-        try {
-            List<String> bibcodes = fetchBibcodes(getURLForQuery(query));
-            return performSearchByIds(bibcodes);
-        } catch (URISyntaxException e) {
-            throw new FetcherException("Search URI is malformed", e);
-        } catch (IOException e) {
-            throw new FetcherException("A network error occurred", e);
-        }
+        return new ArrayList<>(performSearchPaged(query, 0).getContent());
     }
 
     /**

@@ -154,10 +154,6 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
         return Collections.emptyList();
     }
 
-    private List<ArXivEntry> searchForEntries(String searchQuery) throws FetcherException {
-        return queryApi(searchQuery, Collections.emptyList(), 0, 10);
-    }
-
     private List<ArXivEntry> searchForEntries(String searchQuery, int pageNumber) throws FetcherException {
         return queryApi(searchQuery, Collections.emptyList(), getPageSize() * pageNumber, getPageSize());
     }
@@ -255,9 +251,7 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
 
     @Override
     public List<BibEntry> performSearch(String query) throws FetcherException {
-        return searchForEntries(query).stream().map(
-                (arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
-                                      .collect(Collectors.toList());
+        return new ArrayList<>(performSearchPaged(query, 0).getContent());
     }
 
     /**

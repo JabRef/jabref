@@ -164,7 +164,22 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
 
     @Override
     public URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) throws URISyntaxException, MalformedURLException {
-        return getURLForQuery(constructComplexQueryString(complexSearchQuery));
+        return getComplexQueryURL(complexSearchQuery, 0);
+    }
+
+    @Override
+    public URL getURLForQuery(String query, int pageNumber) throws URISyntaxException, MalformedURLException {
+        URIBuilder uriBuilder = new URIBuilder(API_URL);
+        uriBuilder.addParameter("q", query); // Search query
+        uriBuilder.addParameter("api_key", API_KEY); // API key
+        uriBuilder.addParameter("s", String.valueOf(getPageSize() * pageNumber + 1)); // Start entry, starts indexing at 1
+        uriBuilder.addParameter("p", String.valueOf(getPageSize())); // Page size
+        return uriBuilder.build().toURL();
+    }
+
+    @Override
+    public URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
+        return getURLForQuery(constructComplexQueryString(complexSearchQuery), pageNumber);
     }
 
     private String constructComplexQueryString(ComplexSearchQuery complexSearchQuery) {
@@ -196,20 +211,5 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
 
             return entries;
         };
-    }
-
-    @Override
-    public URL getURLForQuery(String query, int pageNumber) throws URISyntaxException, MalformedURLException {
-        URIBuilder uriBuilder = new URIBuilder(API_URL);
-        uriBuilder.addParameter("q", query); // Search query
-        uriBuilder.addParameter("api_key", API_KEY); // API key
-        uriBuilder.addParameter("s", String.valueOf(getPageSize() * pageNumber + 1)); // Start entry, starts indexing at 1
-        uriBuilder.addParameter("p", String.valueOf(getPageSize())); // Page size
-        return uriBuilder.build().toURL();
-    }
-
-    @Override
-    public URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
-        return getURLForQuery(constructComplexQueryString(complexSearchQuery), pageNumber);
     }
 }
