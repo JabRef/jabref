@@ -85,7 +85,7 @@ public class ImportAction {
             })
            .onFailure(ex-> {
                LOGGER.error("Error importing", ex);
-               dialogService.notify(Localization.lang("Error importing. See the error log for details"));
+               dialogService.notify(Localization.lang("Error importing. See the error log for details."));
            })
            .executeWith(taskExecutor);
         } else {
