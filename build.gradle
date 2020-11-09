@@ -155,7 +155,7 @@ dependencies {
         exclude module: "jsr305"
     }
 
-    implementation group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: '1.3.5'
+    implementation group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: '2.0.0'
 
     // JavaFX stuff
     implementation 'de.jensd:fontawesomefx-commons:11.0'
