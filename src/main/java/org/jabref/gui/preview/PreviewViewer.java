@@ -1,5 +1,6 @@
 package org.jabref.gui.preview;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Base64;
 import java.util.Objects;
@@ -119,12 +120,19 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     public void setTheme(Theme theme) {
         if (theme.getType() == Theme.Type.DARK) {
             // We need to load the css file manually, due to a bug in the jdk
-            // TODO: Remove this workaround as soon as https://github.com/openjdk/jfx/pull/22 is merged
+            // https://bugs.openjdk.java.net/browse/JDK-8240969
+            // TODO: Remove this workaround as soon as openjfx 16 is released
             URL url = JabRefFrame.class.getResource(theme.getPath().getFileName().toString());
             String dataUrl = "data:text/css;charset=utf-8;base64," +
                     Base64.getEncoder().encodeToString(StringUtil.getResourceFileAsString(url).getBytes());
 
             previewView.getEngine().setUserStyleSheetLocation(dataUrl);
+        } else if (theme.getType() != Theme.Type.LIGHT) {
+            try {
+                previewView.getEngine().setUserStyleSheetLocation(theme.getPath().toUri().toURL().toExternalForm());
+            } catch (MalformedURLException ex) {
+                LOGGER.error("Cannot set custom theme, invalid url", ex);
+            }
         }
     }
 
@@ -171,7 +179,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private void update() {
-        if (entry.isEmpty() || layout == null) {
+        if (entry.isEmpty() || (layout == null)) {
             // Nothing to do
             return;
         }
@@ -180,7 +188,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
         BackgroundTask
                 .wrap(() -> layout.generatePreview(entry.get(), database.getDatabase()))
-                .onRunning(() -> setPreviewText("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) + ": " + layout.getName() + " ..." + "</i>"))
+                .onRunning(() -> setPreviewText("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) + ": " + layout.getDisplayName() + " ..." + "</i>"))
                 .onSuccess(this::setPreviewText)
                 .onFailure(exception -> {
                     LOGGER.error("Error while generating citation style", exception);

@@ -25,19 +25,21 @@
     <issn>2364-3676</issn>
     <eissn>2197-649X</eissn>
     <summary>Author-date style meeting citation specifications provided by JNA. Based on the DAI style.</summary>
-    <updated>2019-11-10T12:54:34+00:00</updated>
+    <updated>2020-10-11T23:58:34+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
     <terms>
       <term name="reviewed-author" form="verb">rev. of</term>
       <term name="presented at">talk</term>
+      <term name="accessed">accessed: </term>
     </terms>
   </locale>
   <locale xml:lang="de">
     <terms>
       <term name="reviewed-author" form="verb">Rez. zu</term>
       <term name="presented at">Vortrag</term>
+      <term name="accessed">Zugriff: </term>
     </terms>
   </locale>
   <locale xml:lang="it">
@@ -111,25 +113,18 @@
     </choose>
   </macro>
   <macro name="contributors">
-    <choose>
-      <if variable="author">
-        <names variable="author">
-          <name delimiter="/" delimiter-precedes-et-al="never" delimiter-precedes-last="always" initialize-with=". "/>
-        </names>
-      </if>
-      <else-if variable="editor">
-        <text macro="editor"/>
-      </else-if>
-    </choose>
-    <choose>
-      <if match="any" variable="title">
-        <choose>
-          <if match="any" variable="editor author">
-            <text value=", "/>
-          </if>
-        </choose>
-      </if>
-    </choose>
+    <group suffix=", ">
+      <choose>
+        <if variable="author">
+          <names variable="author">
+            <name delimiter="/" delimiter-precedes-et-al="never" delimiter-precedes-last="always" initialize-with=". "/>
+          </names>
+        </if>
+        <else-if variable="editor">
+          <text macro="editor"/>
+        </else-if>
+      </choose>
+    </group>
   </macro>
   <macro name="contributors-short-citation">
     <choose>
@@ -317,11 +312,14 @@
   <macro name="url">
     <choose>
       <if match="any" variable="URL">
-        <group display="block" prefix=".&amp;#10;">
-          <text variable="URL" text-case="lowercase"/>
+        <group>
+          <text variable="URL" text-case="lowercase" prefix=". "/>
           <choose>
             <if match="none" is-uncertain-date="accessed">
-              <date form="text" variable="accessed" prefix=" [" suffix="]"/>
+              <group>
+                <text term="accessed" prefix=" ("/>
+                <date form="numeric" variable="accessed" suffix=")"/>
+              </group>
             </if>
           </choose>
         </group>
@@ -329,14 +327,7 @@
     </choose>
   </macro>
   <macro name="doi">
-    <choose>
-      <if match="any" variable="DOI">
-        <group display="block" prefix=".&amp;#10;">
-          <text value="doi: "/>
-          <text variable="DOI"/>
-        </group>
-      </if>
-    </choose>
+    <text variable="DOI" prefix=". DOI: https://doi.org/"/>
   </macro>
   <macro name="review">
     <choose>
@@ -408,7 +399,7 @@
     </sort>
     <layout>
       <group suffix=".">
-        <group display="left-margin" suffix=": ">
+        <group suffix=": ">
           <text macro="contributors-short-biblio" suffix=" "/>
           <text macro="date"/>
         </group>
@@ -437,8 +428,14 @@
               <text macro="locators-article"/>
             </else>
           </choose>
-          <text macro="url"/>
-          <text macro="doi"/>
+          <choose>
+            <if variable="DOI" match="any">
+              <text macro="doi"/>
+            </if>
+            <else>
+              <text macro="url"/>
+            </else>
+          </choose>
         </group>
       </group>
     </layout>

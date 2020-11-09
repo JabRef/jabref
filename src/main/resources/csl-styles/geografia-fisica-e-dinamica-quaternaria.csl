@@ -19,7 +19,7 @@
     <category field="geology"/>
     <issn>0391-9838</issn>
     <eissn>1724-4781</eissn>
-    <updated>2020-03-28T09:24:47+00:00</updated>
+    <updated>2020-10-26T14:17:34+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -117,6 +117,9 @@
         <text variable="container-title" text-case="capitalize-first" prefix=" " suffix="."/>
       </else>
     </choose>
+  </macro>
+  <macro name="DOI">
+    <text variable="DOI"/>
   </macro>
   <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year" cite-group-delimiter=",">
     <sort>
@@ -219,6 +222,7 @@
           </else>
         </choose>
       </group>
+      <text macro="DOI" prefix=" doi: "/>
     </layout>
   </bibliography>
 </style>
