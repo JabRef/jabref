@@ -83,7 +83,7 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
                     throw new FetcherException("No internet connection! Please try again.");
                 }
             } catch (IOException | JSONException e) {
-                e.printStackTrace();
+                 throw new FetcherException("Couldn't connect to opencitations.net! Please try again.");
             }
             return list;
         } else {

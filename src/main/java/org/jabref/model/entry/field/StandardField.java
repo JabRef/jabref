@@ -27,6 +27,8 @@ public enum StandardField implements Field {
     BOOKTITLE("booktitle", FieldProperty.BOOK_NAME),
     BOOKTITLEADDON("booktitleaddon"),
     CHAPTER("chapter"),
+    CITED("cited", FieldProperty.MULTIPLE_ENTRY_LINK),
+    CITEDBY("citedBy", FieldProperty.MULTIPLE_ENTRY_LINK),
     COMMENTATOR("commentator", FieldProperty.PERSON_NAMES),
     COMMENT("comment"),
     CROSSREF("crossref", FieldProperty.SINGLE_ENTRY_LINK),
