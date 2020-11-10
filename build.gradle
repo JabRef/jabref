@@ -88,12 +88,6 @@ repositories {
 
 configurations {
     libreoffice
-
-    // TODO: Remove the following workaround for split error messages such as
-    // error: module java.xml.bind reads package javax.annotation from both jsr305 and java.annotation
-    compile {
-        exclude group: "javax.activation"
-    }
 }
 
 javafx {
@@ -182,9 +176,8 @@ dependencies {
 
     implementation 'de.undercouch:citeproc-java:2.1.0-SNAPSHOT'
 
-    implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '1.2.1'
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.0'
-    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.2'
+    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.3'
 
     implementation ('com.github.tomtung:latex2unicode_2.12:0.2.6') {
         exclude module: 'fastparse_2.12'
