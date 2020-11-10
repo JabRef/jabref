@@ -162,7 +162,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
      */
     private static String createJavaScriptRegex(Pattern regex) {
         String pattern = regex.pattern();
-        // Create a JavaScript regex using the forward slash pattern
+        // Create a JavaScript regular expression literal (https://ecma-international.org/ecma-262/10.0/index.html#sec-literals-regular-expression-literals)
+        // Forward slashes are reserved to delimit the regular expression body. Hence, they must be escaped.
         pattern = UNESCAPED_FORWARD_SLASH.matcher(pattern).replaceAll("\\\\/");
         return "/" + pattern + "/gmi";
     }
