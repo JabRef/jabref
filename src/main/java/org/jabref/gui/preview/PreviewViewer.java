@@ -234,7 +234,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     public void copyPreviewToClipBoard() {
-        StringBuilder previewStringContent = new StringBuilder();
         Document document = previewView.getEngine().getDocument();
 
         ClipboardContent content = new ClipboardContent();
