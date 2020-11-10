@@ -13,7 +13,7 @@ plugins {
     id 'application'
     id "com.simonharrer.modernizer" version '2.1.0-1'
     id 'me.champeau.gradle.jmh' version '0.5.2'
-    id 'com.github.ben-manes.versions' version '0.33.0'
+    id 'com.github.ben-manes.versions' version '0.36.0'
     id 'org.javamodularity.moduleplugin' version '1.7.0'
     id 'org.openjfx.javafxplugin' version '0.0.9'
     id 'org.beryx.jlink' version '2.22.1'
@@ -88,6 +88,12 @@ repositories {
 
 configurations {
     libreoffice
+
+    // TODO: Remove the following workaround for split error messages such as
+    // error: module java.xml.bind reads package javax.annotation from both jsr305 and java.annotation
+    compile {
+        exclude group: "javax.activation"
+    }
 }
 
 javafx {
@@ -131,7 +137,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.8-1'
     implementation 'org.antlr:antlr4-runtime:4.8-1'
 
-    implementation (group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.6.3') {
+    implementation (group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.7.0') {
         exclude group: 'org.apache.lucene', module: 'lucene-sandbox'
     }
 
@@ -164,7 +170,7 @@ dependencies {
     implementation 'org.controlsfx:controlsfx:11.0.3'
 
     implementation 'org.jsoup:jsoup:1.13.1'
-    implementation 'com.konghq:unirest-java:3.11.03'
+    implementation 'com.konghq:unirest-java:3.11.05'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
@@ -176,8 +182,9 @@ dependencies {
 
     implementation 'de.undercouch:citeproc-java:2.1.0-SNAPSHOT'
 
+    implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '2.0-0'
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.0'
-    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.3'
+    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.0-M5'
 
     implementation ('com.github.tomtung:latex2unicode_2.12:0.2.6') {
         exclude module: 'fastparse_2.12'
@@ -210,7 +217,7 @@ dependencies {
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
     checkstyle 'com.puppycrawl.tools:checkstyle:8.37'
-    xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.3'
+    xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.0-M5'
     jython 'org.python:jython-standalone:2.7.2'
 }
 
@@ -707,7 +714,7 @@ if (OperatingSystem.current().isWindows()) {
     tasks.jpackageImage.doLast {
         copy {
             from("${projectDir}/buildres/windows") {
-                include "jabref.json", "jabref-chrome.json", "JabRefHost.bat", "JabRefHost.ps1"
+                include "jabref-firefox.json", "jabref-chrome.json", "JabRefHost.bat", "JabRefHost.ps1"
             }
             into "$buildDir/distribution/JabRef"
         }
