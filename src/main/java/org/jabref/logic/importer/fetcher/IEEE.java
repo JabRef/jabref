@@ -192,11 +192,6 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException {
-        return getURLForQuery(query, 0);
-    }
-
-    @Override
     public Parser getParser() {
         return inputStream -> {
             String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));
@@ -224,11 +219,6 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
     @Override
     public Optional<HelpFile> getHelpPage() {
         return Optional.of(HelpFile.FETCHER_IEEEXPLORE);
-    }
-
-    @Override
-    public URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) throws URISyntaxException, MalformedURLException {
-        return getComplexQueryURL(complexSearchQuery, 0);
     }
 
     @Override

@@ -9,11 +9,11 @@ import java.util.Optional;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.paging.Page;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -21,12 +21,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-class GoogleScholarTest implements SearchBasedFetcherCapabilityTest {
+class GoogleScholarTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
     private GoogleScholar finder;
     private BibEntry entry;
@@ -83,23 +82,13 @@ class GoogleScholarTest implements SearchBasedFetcherCapabilityTest {
         assertEquals(20, foundEntries.size());
     }
 
-    /**
-     * Ensure that different page return different entries
-     */
-    @Test
-    @DisabledOnCIServer("CI server is blocked by Google")
-    public void pageSearchReturnsUniqueResultsPerPage() throws Exception {
-        String query = "Software";
-        Page<BibEntry> firstPage = finder.performSearchPaged(query, 0);
-        Page<BibEntry> secondPage = finder.performSearchPaged(query, 1);
-
-        for (BibEntry entry : firstPage.getContent()) {
-            assertFalse(secondPage.getContent().contains(entry));
-        }
+    @Override
+    public SearchBasedFetcher getFetcher() {
+        return finder;
     }
 
     @Override
-    public SearchBasedFetcher getFetcher() {
+    public PagedSearchBasedFetcher getPagedFetcher() {
         return finder;
     }
 

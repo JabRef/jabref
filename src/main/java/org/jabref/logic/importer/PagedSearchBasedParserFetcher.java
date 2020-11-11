@@ -66,10 +66,30 @@ public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher,
     /**
      * Constructs a URL based on the query, size and page number.
      *
-     * @param complexSearchQuery      the search query
-     * @param pageNumber the number of the page indexed from 0
+     * @param complexSearchQuery the search query
+     * @param pageNumber         the number of the page indexed from 0
      */
     default URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
         return getURLForQuery(complexSearchQuery.toString(), pageNumber);
+    }
+
+    @Override
+    default List<BibEntry> performSearch(String query) throws FetcherException {
+        return SearchBasedParserFetcher.super.performSearch(query);
+    }
+
+    @Override
+    default List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
+        return SearchBasedParserFetcher.super.performComplexSearch(complexSearchQuery);
+    }
+
+    @Override
+    default URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
+        return getURLForQuery(query, 0);
+    }
+
+    @Override
+    default URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+        return getComplexQueryURL(complexSearchQuery, 0);
     }
 }

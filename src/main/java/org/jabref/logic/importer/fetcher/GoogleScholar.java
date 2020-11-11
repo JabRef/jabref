@@ -127,16 +127,6 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
         return Optional.of(HelpFile.FETCHER_GOOGLE_SCHOLAR);
     }
 
-    @Override
-    public List<BibEntry> performSearch(String query) throws FetcherException {
-        return new ArrayList<>(performSearchPaged(query, 0).getContent());
-    }
-
-    @Override
-    public List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
-        return new ArrayList<>(performComplexSearchPaged(complexSearchQuery, 0).getContent());
-    }
-
     private String constructComplexQueryString(ComplexSearchQuery complexSearchQuery) {
         List<String> searchTerms = new ArrayList<>();
         searchTerms.addAll(complexSearchQuery.getDefaultFieldPhrases());

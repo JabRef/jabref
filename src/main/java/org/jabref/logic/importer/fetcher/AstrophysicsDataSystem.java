@@ -83,14 +83,6 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
      * @return URL which points to a search request for given query
      */
     @Override
-    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder builder = new URIBuilder(API_SEARCH_URL);
-        builder.addParameter("q", query);
-        builder.addParameter("fl", "bibcode");
-        return builder.build().toURL();
-    }
-
-    @Override
     public URL getURLForQuery(String query, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder builder = new URIBuilder(API_SEARCH_URL);
         builder.addParameter("q", query);
@@ -190,11 +182,6 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
         } catch (IOException e) {
             throw new FetcherException("A network error occurred", e);
         }
-    }
-
-    @Override
-    public List<BibEntry> performSearch(String query) throws FetcherException {
-        return new ArrayList<>(performSearchPaged(query, 0).getContent());
     }
 
     /**

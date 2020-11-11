@@ -158,16 +158,6 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException {
-        return getURLForQuery(query, 0);
-    }
-
-    @Override
-    public URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) throws URISyntaxException, MalformedURLException {
-        return getComplexQueryURL(complexSearchQuery, 0);
-    }
-
-    @Override
     public URL getURLForQuery(String query, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
         uriBuilder.addParameter("q", query); // Search query

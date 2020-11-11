@@ -250,8 +250,11 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
     }
 
     @Override
-    public List<BibEntry> performSearch(String query) throws FetcherException {
-        return new ArrayList<>(performSearchPaged(query, 0).getContent());
+    public Page<BibEntry> performSearchPaged(String query, int pageNumber) throws FetcherException {
+        List<BibEntry> searchResult = searchForEntries(query, pageNumber).stream()
+                                                                         .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
+                                                                         .collect(Collectors.toList());
+        return new Page<>(query, pageNumber, searchResult);
     }
 
     /**
@@ -260,19 +263,6 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
      * @param complexSearchQuery the search query defining all fielded search parameters
      * @return A list of entries matching the complex query
      */
-    @Override
-    public List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
-        return new ArrayList<>(performComplexSearchPaged(complexSearchQuery, 0).getContent());
-    }
-
-    @Override
-    public Page<BibEntry> performSearchPaged(String query, int pageNumber) throws FetcherException {
-        List<BibEntry> searchResult = searchForEntries(query, pageNumber).stream()
-                                                                         .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
-                                                                         .collect(Collectors.toList());
-        return new Page<>(query, pageNumber, searchResult);
-    }
-
     @Override
     public Page<BibEntry> performComplexSearchPaged(ComplexSearchQuery complexSearchQuery, int pageNumber) throws FetcherException {
         List<String> searchTerms = new ArrayList<>();
