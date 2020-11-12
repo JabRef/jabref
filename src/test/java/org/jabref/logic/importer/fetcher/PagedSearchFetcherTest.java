@@ -19,8 +19,8 @@ public interface PagedSearchFetcherTest {
     @Test
     default void pageSearchReturnsUniqueResultsPerPage() throws Exception {
         String query = "Software";
-        Page<BibEntry> firstPage = getPagedFetcher().performSearchPaged(query, 0);
-        Page<BibEntry> secondPage = getPagedFetcher().performSearchPaged(query, 1);
+        Page<BibEntry> firstPage = getPagedFetcher().performComplexSearchPaged(query, 0);
+        Page<BibEntry> secondPage = getPagedFetcher().performComplexSearchPaged(query, 1);
 
         for (BibEntry entry : firstPage.getContent()) {
             assertFalse(secondPage.getContent().contains(entry));

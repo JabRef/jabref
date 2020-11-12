@@ -5,30 +5,24 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.importer.fetcher.ComplexSearchQuery;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.paging.Page;
-import org.jabref.model.strings.StringUtil;
 
 public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher, PagedSearchBasedFetcher {
 
     @Override
-    default Page<BibEntry> performSearchPaged(String query, int pageNumber) throws FetcherException {
-        if (StringUtil.isBlank(query)) {
-            return new Page<BibEntry>(query, pageNumber, Collections.emptyList());
-        }
-
+    default Page<BibEntry> performComplexSearchPaged(ComplexSearchQuery complexSearchQuery, int pageNumber) throws FetcherException {
         // ADR-0014
         URL urlForQuery;
         try {
-            urlForQuery = getURLForQuery(query, pageNumber);
+            urlForQuery = getComplexQueryURL(complexSearchQuery, pageNumber);
         } catch (URISyntaxException | MalformedURLException e) {
-            throw new FetcherException(String.format("Search URI crafted from query %s is malformed", query), e);
+            throw new FetcherException("Search URI crafted from complex search query is malformed", e);
         }
-        return new Page<>(query, pageNumber, getBibEntries(urlForQuery));
+        return new Page<>(complexSearchQuery.toString(), pageNumber, getBibEntries(urlForQuery));
     }
 
     private List<BibEntry> getBibEntries(URL urlForQuery) throws FetcherException {
@@ -41,18 +35,6 @@ public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher,
         } catch (ParseException e) {
             throw new FetcherException("An internal parser error occurred while fetching from " + urlForQuery, e);
         }
-    }
-
-    @Override
-    default Page<BibEntry> performComplexSearchPaged(ComplexSearchQuery complexSearchQuery, int pageNumber) throws FetcherException {
-        // ADR-0014
-        URL urlForQuery;
-        try {
-            urlForQuery = getComplexQueryURL(complexSearchQuery, pageNumber);
-        } catch (URISyntaxException | MalformedURLException e) {
-            throw new FetcherException("Search URI crafted from complex search query is malformed", e);
-        }
-        return new Page<>(complexSearchQuery.toString(), pageNumber, getBibEntries(urlForQuery));
     }
 
     /**

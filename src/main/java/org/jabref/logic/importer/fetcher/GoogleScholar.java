@@ -185,43 +185,6 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
     }
 
     @Override
-    public Page<BibEntry> performSearchPaged(String query, int pageNumber) throws FetcherException {
-        LOGGER.debug("Using URL {}", query);
-        obtainAndModifyCookie();
-        List<BibEntry> foundEntries = new ArrayList<>(20);
-
-        URIBuilder uriBuilder;
-        try {
-            uriBuilder = new URIBuilder(BASIC_SEARCH_URL);
-        } catch (URISyntaxException e) {
-            throw new FetcherException("Error while fetching from " + getName() + " at URL " + BASIC_SEARCH_URL, e);
-        }
-
-        uriBuilder.addParameter("hl", "en");
-        uriBuilder.addParameter("start", String.valueOf(pageNumber * getPageSize()));
-        uriBuilder.addParameter("q", query);
-        uriBuilder.addParameter("num", String.valueOf(getPageSize()));
-        uriBuilder.addParameter("btnG", "Search");
-        String queryURL = uriBuilder.toString();
-
-        try {
-            addHitsFromQuery(foundEntries, queryURL);
-        } catch (IOException e) {
-            // if there are too much requests from the same IP address google is answering with a 503 and redirecting to a captcha challenge
-            // The caught IOException looks for example like this:
-            // java.io.IOException: Server returned HTTP response code: 503 for URL: https://ipv4.google.com/sorry/index?continue=https://scholar.google.com/scholar%3Fhl%3Den%26btnG%3DSearch%26q%3Dbpmn&hl=en&q=CGMSBI0NBDkYuqy9wAUiGQDxp4NLQCWbIEY1HjpH5zFJhv4ANPGdWj0
-            if (e.getMessage().contains("Server returned HTTP response code: 503 for URL")) {
-                throw new FetcherException("Fetching from Google Scholar at URL " + queryURL + " failed.",
-                        Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), e);
-            } else {
-                throw new FetcherException("Error while fetching from " + getName() + " at URL " + queryURL, e);
-            }
-        }
-
-        return new Page<>(query, pageNumber, foundEntries);
-    }
-
-    @Override
     public Page<BibEntry> performComplexSearchPaged(ComplexSearchQuery complexSearchQuery, int pageNumber) throws FetcherException {
         try {
             obtainAndModifyCookie();

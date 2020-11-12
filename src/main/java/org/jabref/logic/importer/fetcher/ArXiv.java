@@ -249,14 +249,6 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
         return Optional.of(HelpFile.FETCHER_OAI2_ARXIV);
     }
 
-    @Override
-    public Page<BibEntry> performSearchPaged(String query, int pageNumber) throws FetcherException {
-        List<BibEntry> searchResult = searchForEntries(query, pageNumber).stream()
-                                                                         .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
-                                                                         .collect(Collectors.toList());
-        return new Page<>(query, pageNumber, searchResult);
-    }
-
     /**
      * Constructs a complex query string using the field prefixes specified at https://arxiv.org/help/api/user-manual
      *
@@ -274,7 +266,11 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
         complexSearchQuery.getToYear().ifPresent(year -> searchTerms.add(year.toString()));
         searchTerms.addAll(complexSearchQuery.getDefaultFieldPhrases());
         String complexQueryString = String.join(" AND ", searchTerms);
-        return performSearchPaged(complexQueryString, pageNumber);
+
+        List<BibEntry> searchResult = searchForEntries(complexQueryString, pageNumber).stream()
+                                                                                      .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
+                                                                                      .collect(Collectors.toList());
+        return new Page<>(complexQueryString, pageNumber, searchResult);
     }
 
     @Override
