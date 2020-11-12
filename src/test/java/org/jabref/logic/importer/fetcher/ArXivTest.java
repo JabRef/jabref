@@ -136,13 +136,13 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherT
     @Test
     void searchEntryByPartOfTitle() throws Exception {
         assertEquals(Collections.singletonList(sliceTheoremPaper),
-                fetcher.performSearch("ti:\"slice theorem for Frechet\""));
+                fetcher.performComplexSearch("title:\"slice theorem for Frechet\""));
     }
 
     @Test
     void searchEntryByPartOfTitleWithAcuteAccent() throws Exception {
         assertEquals(Collections.singletonList(sliceTheoremPaper),
-                fetcher.performSearch("ti:\"slice theorem for Fréchet\""));
+                fetcher.performComplexSearch("title:\"slice theorem for Fréchet\""));
     }
 
     @Test
@@ -256,8 +256,8 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherT
      */
     @Test
     public void supportsPhraseSearch() throws Exception {
-        List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("ti:\"Taxonomy of Distributed\"");
-        List<BibEntry> resultWithOutPhraseSearch = fetcher.performSearch("ti:Taxonomy AND ti:of AND ti:Distributed");
+        List<BibEntry> resultWithPhraseSearch = fetcher.performComplexSearch("title:\"Taxonomy of Distributed\"");
+        List<BibEntry> resultWithOutPhraseSearch = fetcher.performComplexSearch("title:Taxonomy AND title:of AND title:Distributed");
         // Phrase search result has to be subset of the default search result
         assertTrue(resultWithOutPhraseSearch.containsAll(resultWithPhraseSearch));
     }
@@ -279,7 +279,7 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherT
                 .withField(StandardField.EPRINTCLASS, "cs.DC")
                 .withField(StandardField.KEYWORDS, "cs.DC, cs.LG");
 
-        List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("ti:\"Taxonomy of Distributed\"");
+        List<BibEntry> resultWithPhraseSearch = fetcher.performComplexSearch("title:\"Taxonomy of Distributed\"");
 
         // There is only a single paper found by searching that contains the exact sequence "Taxonomy of Distributed" in the title.
         assertEquals(Collections.singletonList(expected), resultWithPhraseSearch);
@@ -305,7 +305,7 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherT
                 .withField(StandardField.EPRINTCLASS, "q-bio.TO")
                 .withField(StandardField.KEYWORDS, "q-bio.TO");
 
-        List<BibEntry> result = fetcher.performSearch("au:\"Tobias Büscher\" AND ti:\"Instability and fingering of interfaces\"");
+        List<BibEntry> result = fetcher.performComplexSearch("author:\"Tobias Büscher\" AND title:\"Instability and fingering of interfaces\"");
 
         // There is only one paper authored by Tobias Büscher with that phrase in the title
         assertEquals(Collections.singletonList(expected), result);

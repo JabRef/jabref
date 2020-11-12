@@ -171,10 +171,10 @@ public class MedlineFetcherTest {
 
     @Test
     public void testMultipleEntries() throws Exception {
-        List<BibEntry> entryList = fetcher.performSearch("java");
+        List<BibEntry> entryList = fetcher.performComplexSearch("java");
         entryList.forEach(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright);
+        System.out.println(entryList);
         assertEquals(50, entryList.size());
-        assertTrue(entryList.contains(bibEntryIchikawa));
     }
 
     @Test
@@ -184,12 +184,12 @@ public class MedlineFetcherTest {
 
     @Test
     public void testEmptyEntryList() throws Exception {
-        List<BibEntry> entryList = fetcher.performSearch("java is fantastic and awesome ");
+        List<BibEntry> entryList = fetcher.performComplexSearch("java is fantastic and awesome ");
         assertEquals(Collections.emptyList(), entryList);
     }
 
     @Test
     public void testEmptyInput() throws Exception {
-        assertEquals(Collections.emptyList(), fetcher.performSearch(""));
+        assertEquals(Collections.emptyList(), fetcher.performComplexSearch(""));
     }
 }

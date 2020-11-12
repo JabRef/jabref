@@ -33,11 +33,6 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
     }
 
     @Override
-    default List<BibEntry> performSearch(String query) throws FetcherException {
-        return new ArrayList<>(performSearchPaged(query, 0).getContent());
-    }
-
-    @Override
     default List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
         return new ArrayList<>(performComplexSearchPaged(complexSearchQuery, 0).getContent());
     }

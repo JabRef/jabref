@@ -74,11 +74,6 @@ public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher,
     }
 
     @Override
-    default List<BibEntry> performSearch(String query) throws FetcherException {
-        return SearchBasedParserFetcher.super.performSearch(query);
-    }
-
-    @Override
     default List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
         return SearchBasedParserFetcher.super.performComplexSearch(complexSearchQuery);
     }

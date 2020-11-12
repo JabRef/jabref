@@ -5,13 +5,11 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.importer.fetcher.ComplexSearchQuery;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.strings.StringUtil;
 
 /**
  * Provides a convenient interface for search-based fetcher, which follow the usual three-step procedure:
@@ -34,22 +32,6 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
      * Returns the parser used to convert the response to a list of {@link BibEntry}.
      */
     Parser getParser();
-
-    @Override
-    default List<BibEntry> performSearch(String query) throws FetcherException {
-        if (StringUtil.isBlank(query)) {
-            return Collections.emptyList();
-        }
-
-        // ADR-0014
-        URL urlForQuery;
-        try {
-            urlForQuery = getURLForQuery(query);
-        } catch (URISyntaxException | MalformedURLException | FetcherException e) {
-            throw new FetcherException(String.format("Search URI crafted from query %s is malformed", query), e);
-        }
-        return getBibEntries(urlForQuery);
-    }
 
     /**
      * This method is used to send queries with advanced URL parameters.
@@ -83,9 +65,8 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
     }
 
     default URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) throws URISyntaxException, MalformedURLException, FetcherException {
-        // Default implementation behaves as getURLForQuery using the default field phrases as query
-        List<String> defaultPhrases = complexSearchQuery.getDefaultFieldPhrases();
-        return this.getURLForQuery(String.join(" ", defaultPhrases));
+        // Default implementation behaves as getURLForQuery treating complex query as plain string query
+        return this.getURLForQuery(complexSearchQuery.toString());
     }
 
     /**

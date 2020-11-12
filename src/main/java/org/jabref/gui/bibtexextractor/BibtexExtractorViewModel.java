@@ -62,7 +62,7 @@ public class BibtexExtractorViewModel {
     }
 
     public void startParsing() {
-        BackgroundTask.wrap(() -> currentCitationfetcher.performSearch(inputTextProperty.getValue()))
+        BackgroundTask.wrap(() -> currentCitationfetcher.performComplexSearch(inputTextProperty.getValue()))
                       .onRunning(() -> dialogService.notify(Localization.lang("Your text is being parsed...")))
                       .onFailure((e) -> {
                           if (e instanceof FetcherException) {

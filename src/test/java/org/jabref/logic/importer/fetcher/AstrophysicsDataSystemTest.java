@@ -143,7 +143,7 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
 
     @Test
     public void searchByQueryFindsEntry() throws Exception {
-        List<BibEntry> fetchedEntries = fetcher.performSearch("Diez slice theorem Lie");
+        List<BibEntry> fetchedEntries = fetcher.performComplexSearch("Diez slice theorem Lie");
         assertTrue(fetchedEntries.contains(diezSliceTheoremEntry));
     }
 

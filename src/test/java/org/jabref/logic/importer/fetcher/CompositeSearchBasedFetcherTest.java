@@ -39,21 +39,21 @@ public class CompositeSearchBasedFetcherTest {
     }
 
     @Test
-    public void performSearchWithoutFetchers() {
+    public void performSearchWithoutFetchers() throws Exception {
         Set<SearchBasedFetcher> empty = new HashSet<>();
         CompositeSearchBasedFetcher fetcher = new CompositeSearchBasedFetcher(empty, Integer.MAX_VALUE);
 
-        List<BibEntry> result = fetcher.performSearch("quantum");
+        List<BibEntry> result = fetcher.performComplexSearch("quantum");
 
         Assertions.assertEquals(result, Collections.EMPTY_LIST);
     }
 
     @ParameterizedTest(name = "Perform Search on empty query.")
     @MethodSource("performSearchParameters")
-    public void performSearchOnEmptyQuery(Set<SearchBasedFetcher> fetchers) {
+    public void performSearchOnEmptyQuery(Set<SearchBasedFetcher> fetchers) throws Exception {
         CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, Integer.MAX_VALUE);
 
-        List<BibEntry> queryResult = compositeFetcher.performSearch("");
+        List<BibEntry> queryResult = compositeFetcher.performComplexSearch("");
 
         Assertions.assertEquals(queryResult, Collections.EMPTY_LIST);
     }
@@ -61,14 +61,14 @@ public class CompositeSearchBasedFetcherTest {
     @ParameterizedTest(name = "Perform search on query \"quantum\". Using the CompositeFetcher of the following " +
             "Fetchers: {arguments}")
     @MethodSource("performSearchParameters")
-    public void performSearchOnNonEmptyQuery(Set<SearchBasedFetcher> fetchers) {
+    public void performSearchOnNonEmptyQuery(Set<SearchBasedFetcher> fetchers) throws Exception {
         CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, Integer.MAX_VALUE);
         ImportCleanup cleanup = new ImportCleanup(BibDatabaseMode.BIBTEX);
 
-        List<BibEntry> compositeResult = compositeFetcher.performSearch("quantum");
+        List<BibEntry> compositeResult = compositeFetcher.performComplexSearch("quantum");
         for (SearchBasedFetcher fetcher : fetchers) {
             try {
-                List<BibEntry> fetcherResult = fetcher.performSearch("quantum");
+                List<BibEntry> fetcherResult = fetcher.performComplexSearch("quantum");
                 fetcherResult.forEach(cleanup::doPostCleanup);
                 Assertions.assertTrue(compositeResult.containsAll(fetcherResult));
             } catch (FetcherException e) {

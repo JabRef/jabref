@@ -32,8 +32,6 @@ public class QueryParser {
      */
     public Optional<ComplexSearchQuery> parseQueryStringIntoComplexQuery(String queryString) {
         try {
-            ComplexSearchQuery.ComplexSearchQueryBuilder builder = ComplexSearchQuery.builder();
-
             StandardQueryParser parser = new StandardQueryParser();
             Query luceneQuery = parser.parse(queryString, "default");
             Set<Term> terms = new HashSet<>();
