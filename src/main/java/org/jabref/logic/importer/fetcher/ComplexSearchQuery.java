@@ -34,7 +34,7 @@ public class ComplexSearchQuery {
         this.singleYear = singleYear;
     }
 
-    public static ComplexSearchQuery fromTerms(Collection<Term> terms) {
+    public static ComplexSearchQuery fromTerms(List<Term> terms) {
         ComplexSearchQueryBuilder builder = ComplexSearchQuery.builder();
         terms.forEach(term -> {
             String termText = term.text();
@@ -249,7 +249,7 @@ public class ComplexSearchQuery {
          * Instantiates the AdvancesSearchConfig from the provided Builder parameters
          * If all text fields are empty an empty optional is returned
          *
-         * @return AdvancedSearchConfig instance with the fields set to the values defined in the building instance.
+         * @return ComplexSearchQuery instance with the fields set to the values defined in the building instance.
          * @throws IllegalStateException An IllegalStateException is thrown in case all text search fields are empty.
          *                               See: https://softwareengineering.stackexchange.com/questions/241309/builder-pattern-when-to-fail/241320#241320
          */

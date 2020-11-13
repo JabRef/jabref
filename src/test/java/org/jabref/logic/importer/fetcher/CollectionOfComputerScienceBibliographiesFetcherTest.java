@@ -49,7 +49,7 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
 
     @Test
     public void performSearchReturnsMatchingMultipleEntries() throws FetcherException {
-        List<BibEntry> searchResult = fetcher.performComplexSearch("jabref");
+        List<BibEntry> searchResult = fetcher.performSearch("jabref");
 
         BibEntry firstBibEntry = new BibEntry(StandardEntryType.InProceedings)
                 .withCitationKey("conf/ecsa/OlssonEW17")
@@ -117,7 +117,7 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
 
     @Test
     public void performSearchReturnsEmptyListForEmptySearch() throws FetcherException {
-        List<BibEntry> searchResult = fetcher.performComplexSearch("");
+        List<BibEntry> searchResult = fetcher.performSearch("");
         assertEquals(Collections.emptyList(), searchResult);
     }
 }

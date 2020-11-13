@@ -106,7 +106,7 @@ public class WebSearchPaneViewModel {
         SearchBasedFetcher activeFetcher = getSelectedFetcher();
 
         BackgroundTask<ParserResult> task;
-        task = BackgroundTask.wrap(() -> new ParserResult(activeFetcher.performComplexSearch(getQuery().trim())))
+        task = BackgroundTask.wrap(() -> new ParserResult(activeFetcher.performSearch(getQuery().trim())))
                              .withInitialMessage(Localization.lang("Processing %0", getQuery().trim()));
         task.onFailure(dialogService::showErrorDialogAndWait);
 

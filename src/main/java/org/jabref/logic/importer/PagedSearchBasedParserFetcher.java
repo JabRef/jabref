@@ -14,7 +14,7 @@ import org.jabref.model.paging.Page;
 public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher, PagedSearchBasedFetcher {
 
     @Override
-    default Page<BibEntry> performComplexSearchPaged(ComplexSearchQuery complexSearchQuery, int pageNumber) throws FetcherException {
+    default Page<BibEntry> performSearchPaged(ComplexSearchQuery complexSearchQuery, int pageNumber) throws FetcherException {
         // ADR-0014
         URL urlForQuery;
         try {
@@ -56,8 +56,8 @@ public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher,
     }
 
     @Override
-    default List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
-        return SearchBasedParserFetcher.super.performComplexSearch(complexSearchQuery);
+    default List<BibEntry> performSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
+        return SearchBasedParserFetcher.super.performSearch(complexSearchQuery);
     }
 
     @Override
@@ -66,7 +66,7 @@ public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher,
     }
 
     @Override
-    default URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) throws URISyntaxException, MalformedURLException, FetcherException {
-        return getComplexQueryURL(complexSearchQuery, 0);
+    default URL getURLForQuery(ComplexSearchQuery query) throws URISyntaxException, MalformedURLException, FetcherException {
+        return getComplexQueryURL(query, 0);
     }
 }

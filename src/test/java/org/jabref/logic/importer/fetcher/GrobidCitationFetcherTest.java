@@ -84,26 +84,26 @@ public class GrobidCitationFetcherTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideExamplesForCorrectResultTest")
     public void grobidPerformSearchCorrectResultTest(String testName, BibEntry expectedBibEntry, String searchQuery) throws FetcherException {
-        List<BibEntry> entries = grobidCitationFetcher.performComplexSearch(searchQuery);
+        List<BibEntry> entries = grobidCitationFetcher.performSearch(searchQuery);
         assertEquals(List.of(expectedBibEntry), entries);
     }
 
     @Test
     public void grobidPerformSearchCorrectlySplitsStringTest() throws FetcherException {
-        List<BibEntry> entries = grobidCitationFetcher.performComplexSearch(example1 + "\n\n" + example2 + "\r\n\r\n" + example3 + "\r\r" + example4);
+        List<BibEntry> entries = grobidCitationFetcher.performSearch(example1 + "\n\n" + example2 + "\r\n\r\n" + example3 + "\r\r" + example4);
         assertEquals(List.of(example1AsBibEntry, example2AsBibEntry, example3AsBibEntry, example4AsBibEntry), entries);
     }
 
     @Test
     public void grobidPerformSearchWithEmptyStringsTest() throws FetcherException {
-        List<BibEntry> entries = grobidCitationFetcher.performComplexSearch("   \n   ");
+        List<BibEntry> entries = grobidCitationFetcher.performSearch("   \n   ");
         assertEquals(Collections.emptyList(), entries);
     }
 
     @ParameterizedTest
     @MethodSource("provideInvalidInput")
     public void grobidPerformSearchWithInvalidDataTest(String invalidInput) throws FetcherException {
-        List<BibEntry> entries = grobidCitationFetcher.performComplexSearch(invalidInput);
+        List<BibEntry> entries = grobidCitationFetcher.performSearch(invalidInput);
         assertEquals(Collections.emptyList(), entries);
     }
 
@@ -114,7 +114,7 @@ public class GrobidCitationFetcherTest {
         grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences, grobidServiceMock);
 
         assertThrows(FetcherException.class, () -> {
-            grobidCitationFetcher.performComplexSearch("any text");
+            grobidCitationFetcher.performSearch("any text");
         }, "performSearch should throw an FetcherException, when there are underlying IOException.");
     }
 }

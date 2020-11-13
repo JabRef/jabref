@@ -143,7 +143,7 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
 
     @Test
     public void searchByQueryFindsEntry() throws Exception {
-        List<BibEntry> fetchedEntries = fetcher.performComplexSearch("Diez slice theorem Lie");
+        List<BibEntry> fetchedEntries = fetcher.performSearch("Diez slice theorem Lie");
         assertTrue(fetchedEntries.contains(diezSliceTheoremEntry));
     }
 
@@ -203,14 +203,14 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
 
     @Test
     public void performSearchByQueryPaged_searchLimitsSize() throws Exception {
-        Page<BibEntry> page = fetcher.performComplexSearchPaged("author:\"A\"", 0);
+        Page<BibEntry> page = fetcher.performSearchPaged("author:\"A\"", 0);
         assertEquals(fetcher.getPageSize(), page.getSize(), "fetcher return wrong page size");
     }
 
     @Test
     public void performSearchByQueryPaged_invalidAuthorsReturnEmptyPages() throws Exception {
-        Page<BibEntry> page = fetcher.performComplexSearchPaged("author:\"ThisAuthorWillNotBeFound\"", 0);
-        Page<BibEntry> page5 = fetcher.performComplexSearchPaged("author:\"ThisAuthorWillNotBeFound\"", 5);
+        Page<BibEntry> page = fetcher.performSearchPaged("author:\"ThisAuthorWillNotBeFound\"", 0);
+        Page<BibEntry> page5 = fetcher.performSearchPaged("author:\"ThisAuthorWillNotBeFound\"", 5);
         assertEquals(0, page.getSize(), "fetcher doesnt return empty pages for invalid author");
         assertEquals(0, page5.getSize(), "fetcher doesnt return empty pages for invalid author");
     }

@@ -550,7 +550,7 @@ public class ArgumentProcessor {
             System.out.println(Localization.lang("Running query '%0' with fetcher '%1'.", query, engine));
             System.out.print(Localization.lang("Please wait..."));
             try {
-                List<BibEntry> matches = selectedFetcher.get().performComplexSearch(query);
+                List<BibEntry> matches = selectedFetcher.get().performSearch(query);
                 if (matches.isEmpty()) {
                     System.out.println("\r" + Localization.lang("No results found."));
                     return Optional.empty();

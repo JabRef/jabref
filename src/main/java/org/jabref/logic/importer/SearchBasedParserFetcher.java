@@ -22,18 +22,6 @@ import org.jabref.model.entry.BibEntry;
 public interface SearchBasedParserFetcher extends SearchBasedFetcher {
 
     /**
-     * Constructs a URL based on the query.
-     *
-     * @param query the search query
-     */
-    URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException;
-
-    /**
-     * Returns the parser used to convert the response to a list of {@link BibEntry}.
-     */
-    Parser getParser();
-
-    /**
      * This method is used to send queries with advanced URL parameters.
      * This method is necessary as the performSearch method does not support certain URL parameters that are used for
      * fielded search, such as a title, author, or year parameter.
@@ -41,11 +29,11 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
      * @param complexSearchQuery the search query defining all fielded search parameters
      */
     @Override
-    default List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
+    default List<BibEntry> performSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
         // ADR-0014
         URL urlForQuery;
         try {
-            urlForQuery = getComplexQueryURL(complexSearchQuery);
+            urlForQuery = getURLForQuery(complexSearchQuery);
         } catch (URISyntaxException | MalformedURLException | FetcherException e) {
             throw new FetcherException("Search URI crafted from complex search query is malformed", e);
         }
@@ -64,10 +52,22 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
         }
     }
 
-    default URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+    default URL getURLForQuery(ComplexSearchQuery query) throws URISyntaxException, MalformedURLException, FetcherException {
         // Default implementation behaves as getURLForQuery treating complex query as plain string query
-        return this.getURLForQuery(complexSearchQuery.toString());
+        return this.getURLForQuery(query.toString());
     }
+
+    /**
+     * Returns the parser used to convert the response to a list of {@link BibEntry}.
+     */
+    Parser getParser();
+
+    /**
+     * Constructs a URL based on the query.
+     *
+     * @param query the search query
+     */
+    URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException;
 
     /**
      * Performs a cleanup of the fetched entry.

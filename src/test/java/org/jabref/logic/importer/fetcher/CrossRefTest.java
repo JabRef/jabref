@@ -105,7 +105,7 @@ public class CrossRefTest {
 
     @Test
     public void findByAuthors() throws Exception {
-        assertEquals(Optional.of(barrosEntry), fetcher.performComplexSearch("\"Barros, Alistair\" AND \"Dumas, Marlon\" AND \"Arthur H.M. ter Hofstede\"").stream().findFirst());
+        assertEquals(Optional.of(barrosEntry), fetcher.performSearch("\"Barros, Alistair\" AND \"Dumas, Marlon\" AND \"Arthur H.M. ter Hofstede\"").stream().findFirst());
     }
 
     @Test
@@ -137,7 +137,7 @@ public class CrossRefTest {
 
     @Test
     public void performSearchByEmptyQuery() throws Exception {
-        assertEquals(Collections.emptyList(), fetcher.performComplexSearch(""));
+        assertEquals(Collections.emptyList(), fetcher.performSearch(""));
     }
 
     /**

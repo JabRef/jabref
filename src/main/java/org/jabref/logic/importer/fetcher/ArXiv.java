@@ -256,7 +256,7 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
      * @return A list of entries matching the complex query
      */
     @Override
-    public Page<BibEntry> performComplexSearchPaged(ComplexSearchQuery complexSearchQuery, int pageNumber) throws FetcherException {
+    public Page<BibEntry> performSearchPaged(ComplexSearchQuery complexSearchQuery, int pageNumber) throws FetcherException {
         List<String> searchTerms = new ArrayList<>();
         complexSearchQuery.getAuthors().forEach(author -> searchTerms.add("au:" + author));
         complexSearchQuery.getTitlePhrases().forEach(title -> searchTerms.add("ti:" + title));

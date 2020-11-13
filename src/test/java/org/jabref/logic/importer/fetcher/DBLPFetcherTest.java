@@ -51,7 +51,7 @@ public class DBLPFetcherTest {
     @Test
     public void findSingleEntry() throws FetcherException {
         String query = "Process Engine Benchmarking with Betsy in the Context of {ISO/IEC} Quality Standards";
-        List<BibEntry> result = dblpFetcher.performComplexSearch(query);
+        List<BibEntry> result = dblpFetcher.performSearch(query);
 
         assertEquals(Collections.singletonList(entry), result);
     }
@@ -59,13 +59,13 @@ public class DBLPFetcherTest {
     @Test
     public void findSingleEntryUsingComplexOperators() throws FetcherException {
         String query = "geiger harrer betsy$ softw.trends"; // -wirtz Negative operators do no longer work,  see issue https://github.com/JabRef/jabref/issues/2890
-        List<BibEntry> result = dblpFetcher.performComplexSearch(query);
+        List<BibEntry> result = dblpFetcher.performSearch(query);
 
         assertEquals(Collections.singletonList(entry), result);
     }
 
     @Test
     public void findNothing() throws Exception {
-        assertEquals(Collections.emptyList(), dblpFetcher.performComplexSearch(""));
+        assertEquals(Collections.emptyList(), dblpFetcher.performSearch(""));
     }
 }

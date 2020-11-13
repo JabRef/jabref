@@ -48,34 +48,34 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher {
     }
 
     @Override
-    public URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(ComplexSearchQuery query) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_HOST);
         StringBuilder stringBuilder = new StringBuilder();
-        if (!complexSearchQuery.getDefaultFieldPhrases().isEmpty()) {
-            stringBuilder.append(complexSearchQuery.getDefaultFieldPhrases());
+        if (!query.getDefaultFieldPhrases().isEmpty()) {
+            stringBuilder.append(query.getDefaultFieldPhrases());
         }
-        if (!complexSearchQuery.getAuthors().isEmpty()) {
-            for (String author : complexSearchQuery.getAuthors()) {
+        if (!query.getAuthors().isEmpty()) {
+            for (String author : query.getAuthors()) {
                 stringBuilder.append("au:").append(author);
             }
         }
-        if (!complexSearchQuery.getTitlePhrases().isEmpty()) {
-            for (String title : complexSearchQuery.getTitlePhrases()) {
+        if (!query.getTitlePhrases().isEmpty()) {
+            for (String title : query.getTitlePhrases()) {
                 stringBuilder.append("ti:").append(title);
             }
         }
-        if (complexSearchQuery.getJournal().isPresent()) {
-            stringBuilder.append("pt:").append(complexSearchQuery.getJournal().get());
+        if (query.getJournal().isPresent()) {
+            stringBuilder.append("pt:").append(query.getJournal().get());
         }
-        if (complexSearchQuery.getSingleYear().isPresent()) {
-            uriBuilder.addParameter("sd", String.valueOf(complexSearchQuery.getSingleYear().get()));
-            uriBuilder.addParameter("ed", String.valueOf(complexSearchQuery.getSingleYear().get()));
+        if (query.getSingleYear().isPresent()) {
+            uriBuilder.addParameter("sd", String.valueOf(query.getSingleYear().get()));
+            uriBuilder.addParameter("ed", String.valueOf(query.getSingleYear().get()));
         }
-        if (complexSearchQuery.getFromYear().isPresent()) {
-            uriBuilder.addParameter("sd", String.valueOf(complexSearchQuery.getFromYear().get()));
+        if (query.getFromYear().isPresent()) {
+            uriBuilder.addParameter("sd", String.valueOf(query.getFromYear().get()));
         }
-        if (complexSearchQuery.getToYear().isPresent()) {
-            uriBuilder.addParameter("ed", String.valueOf(complexSearchQuery.getToYear().get()));
+        if (query.getToYear().isPresent()) {
+            uriBuilder.addParameter("ed", String.valueOf(query.getToYear().get()));
         }
 
         uriBuilder.addParameter("Query", stringBuilder.toString());

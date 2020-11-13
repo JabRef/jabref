@@ -66,7 +66,7 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
+    public List<BibEntry> performSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
         List<BibEntry> bibEntries = null;
         // This just treats the complex query like a normal string query until it it implemented correctly
         String query = complexSearchQuery.toString();

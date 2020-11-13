@@ -274,7 +274,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
     }
 
     @Override
-    public Page<BibEntry> performComplexSearchPaged(ComplexSearchQuery complexSearchQuery, int pageNumber) throws FetcherException {
+    public Page<BibEntry> performSearchPaged(ComplexSearchQuery complexSearchQuery, int pageNumber) throws FetcherException {
         try {
             // This is currently just interpreting the complex query as a default string query
             List<String> bibcodes = fetchBibcodes(getComplexQueryURL(complexSearchQuery, pageNumber));

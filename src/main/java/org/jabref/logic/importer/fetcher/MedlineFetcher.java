@@ -158,7 +158,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
     }
 
     @Override
-    public List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
+    public List<BibEntry> performSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
         List<BibEntry> entryList;
         String query = complexSearchQuery.toString();
 

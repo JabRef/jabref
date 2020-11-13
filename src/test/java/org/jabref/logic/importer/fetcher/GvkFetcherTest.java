@@ -93,26 +93,26 @@ public class GvkFetcherTest {
 
     @Test
     public void testPerformSearchMatchingMultipleEntries() throws FetcherException {
-        List<BibEntry> searchResult = fetcher.performComplexSearch("title:\"effective java\"");
+        List<BibEntry> searchResult = fetcher.performSearch("title:\"effective java\"");
         assertTrue(searchResult.contains(bibEntryPPN591166003));
         assertTrue(searchResult.contains(bibEntryPPN66391437X));
     }
 
     @Test
     public void testPerformSearch591166003() throws FetcherException {
-        List<BibEntry> searchResult = fetcher.performComplexSearch("ppn:591166003");
+        List<BibEntry> searchResult = fetcher.performSearch("ppn:591166003");
         assertEquals(Collections.singletonList(bibEntryPPN591166003), searchResult);
     }
 
     @Test
     public void testPerformSearch66391437X() throws FetcherException {
-        List<BibEntry> searchResult = fetcher.performComplexSearch("ppn:66391437X");
+        List<BibEntry> searchResult = fetcher.performSearch("ppn:66391437X");
         assertEquals(Collections.singletonList(bibEntryPPN66391437X), searchResult);
     }
 
     @Test
     public void testPerformSearchEmpty() throws FetcherException {
-        List<BibEntry> searchResult = fetcher.performComplexSearch("");
+        List<BibEntry> searchResult = fetcher.performSearch("");
         assertEquals(Collections.emptyList(), searchResult);
     }
 }

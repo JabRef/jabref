@@ -43,7 +43,7 @@ public class CompositeSearchBasedFetcherTest {
         Set<SearchBasedFetcher> empty = new HashSet<>();
         CompositeSearchBasedFetcher fetcher = new CompositeSearchBasedFetcher(empty, Integer.MAX_VALUE);
 
-        List<BibEntry> result = fetcher.performComplexSearch("quantum");
+        List<BibEntry> result = fetcher.performSearch("quantum");
 
         Assertions.assertEquals(result, Collections.EMPTY_LIST);
     }
@@ -53,7 +53,7 @@ public class CompositeSearchBasedFetcherTest {
     public void performSearchOnEmptyQuery(Set<SearchBasedFetcher> fetchers) throws Exception {
         CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, Integer.MAX_VALUE);
 
-        List<BibEntry> queryResult = compositeFetcher.performComplexSearch("");
+        List<BibEntry> queryResult = compositeFetcher.performSearch("");
 
         Assertions.assertEquals(queryResult, Collections.EMPTY_LIST);
     }
@@ -65,10 +65,10 @@ public class CompositeSearchBasedFetcherTest {
         CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, Integer.MAX_VALUE);
         ImportCleanup cleanup = new ImportCleanup(BibDatabaseMode.BIBTEX);
 
-        List<BibEntry> compositeResult = compositeFetcher.performComplexSearch("quantum");
+        List<BibEntry> compositeResult = compositeFetcher.performSearch("quantum");
         for (SearchBasedFetcher fetcher : fetchers) {
             try {
-                List<BibEntry> fetcherResult = fetcher.performComplexSearch("quantum");
+                List<BibEntry> fetcherResult = fetcher.performSearch("quantum");
                 fetcherResult.forEach(cleanup::doPostCleanup);
                 Assertions.assertTrue(compositeResult.containsAll(fetcherResult));
             } catch (FetcherException e) {
