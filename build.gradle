@@ -16,7 +16,6 @@ plugins {
     id 'org.javamodularity.moduleplugin' version '1.7.0'
     id 'org.openjfx.javafxplugin' version '0.0.9'
     id 'org.beryx.jlink' version '2.22.1'
-
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
     id 'com.adarshr.test-logger' version '2.1.1'
@@ -86,8 +85,8 @@ repositories {
 
 configurations {
     libreoffice
-	antlr3
-	antlr4
+    antlr3
+    antlr4
     // TODO: Remove the following workaround for split error messages such as
     // error: module java.xml.bind reads package javax.annotation from both jsr305 and java.annotation
     compile {
@@ -305,27 +304,24 @@ task generateSource(dependsOn: ["generateBstGrammarSource",
 
 task generateBstGrammarSource(type: JavaExec) {	
 
-	main = "org.antlr.Tool"
-	classpath = configurations.antlr3
+    main = "org.antlr.Tool"
+    classpath = configurations.antlr3
     group = "JabRef"
     description = 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr3.'
 
     inputs.dir('src/main/antlr3/org/jabref/bst/')
-    //outputs.dir = '$projectDir/src/main/generated/org/jabref/logic/bst/'
-    
     args = ["-o", "$projectDir/src/main/generated/org/jabref/logic/bst/" , "$projectDir/src/main/antlr3/org/jabref/bst/Bst.g" ]
 }
 
 task generateSearchGrammarSource(type: JavaExec) {
 
-	main = "org.antlr.v4.Tool"
-	classpath = configurations.antlr4
+    main = "org.antlr.v4.Tool"
+    classpath = configurations.antlr4
     group = 'JabRef'
     description = "Generates java files for Search.g antlr4."
-  	
+
 
     inputs.dir("src/main/antlr4/org/jabref/search/")
-	//outputs.dir = "$projectDir/src/main/generated/org/jabref/search"
     args  = ["-o","$projectDir/src/main/generated/org/jabref/search" , "-visitor", "-no-listener", "-package", "org.jabref.search", "$projectDir/src/main/antlr4/org/jabref/search/Search.g4"]
 }
 
