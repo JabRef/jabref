@@ -304,7 +304,7 @@ task generateSource(dependsOn: ["generateBstGrammarSource",
     description 'Generates all necessary (Java) source files.'
 }
 
-task generateBstGrammarSource(type: JavaExec) {	
+task generateBstGrammarSource(type: JavaExec) {
     main = "org.antlr.Tool"
     classpath = configurations.antlr3
     group = "JabRef"
@@ -703,6 +703,8 @@ jlink {
             installerOptions = [
                     '--verbose',
                     '--vendor', 'JabRef',
+                    '--mac-package-identifier', "JabRef",
+                    '--mac-package-name', "JabRef",
                     '--app-version', "${project.version}",
                     '--file-associations', "${projectDir}/buildres/mac/bibtexAssociations.properties",
                     '--resource-dir', "${projectDir}/buildres/mac"
