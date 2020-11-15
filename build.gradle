@@ -9,6 +9,15 @@ import org.jabref.build.xjc.XjcTask
 // to update the gradle wrapper, execute
 // ./gradlew wrapper --gradle-version=6.0 --distribution-type=bin
 
+-buildscript {
+-    repositories {
+-        mavenCentral()
+-    }
+-    dependencies {
+-        classpath 'com.teamscale:teamscale-gradle-plugin:17.0.0'
+-    }
+-}
+
 plugins {
     id 'application'
     id "com.simonharrer.modernizer" version '2.1.0-1'
@@ -22,6 +31,26 @@ plugins {
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
     id 'com.adarshr.test-logger' version '2.1.1'
 }
+
+-apply plugin: 'teamscale'
+-
+-teamscale {
+-
+-    server {
+-        url = 'http://localhost:8080/'
+-        userName = 'admin'
+-        userAccessToken = 'q4tu9vfAAjQZ1peCpPvQHSrLi5CeIcGY'
+-        project = 'JabRef'
+-    }
+-
+-    report {
+-        partition = 'Unit Tests'
+-        testwiseCoverage()
+-    }
+-
+-}
+
+tasks.register('tiaTests', com.teamscale.TestImpacted)
 
 gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.ALWAYS
 
