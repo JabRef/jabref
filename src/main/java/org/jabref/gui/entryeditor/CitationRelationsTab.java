@@ -228,6 +228,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     public void unselectAll() {
         citingListView.getCheckModel().clearChecks();
+        citedByListView.getCheckModel().clearChecks();
     }
 
     /**
@@ -331,7 +332,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                     })
                     .executeWith(Globals.TASK_EXECUTOR);
         } else {
-            dialogService.showInformationDialogAndWait("DOI-Number required", "Please add DOI-Number to entry before searching.");
+            dialogService.notify("DOI-Number required, Please add DOI-Number to entry before searching.");
         }
     }
 }
