@@ -46,8 +46,10 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.CheckListView;
+
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,7 +94,6 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.preferencesService = preferencesService;
         setText(Localization.lang("Citation relations"));
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
-
     }
 
     /**
@@ -309,12 +310,10 @@ public class CitationRelationsTab extends EntryEditorTab {
         setContent(getPane(entry));
         searchForRelations(entry, citingListView, citingProgress, refreshCitingButton, CitationRelationFetcher.SearchType.CITING, citingStackPane, citingProgressLabel, importCitingButton);
         searchForRelations(entry, citedByListView, citedByProgress, refreshCitedByButton, CitationRelationFetcher.SearchType.CITEDBY, citedByStackPane, citedByProgressLabel, importCitedByButton);
-
     }
 
     /**
-     * Method to start search for relations and display them
-     * in the associated ListView
+     * Method to start search for relations and display them in the associated ListView
      *
      * @param entry         BibEntry currently selected in Jabref Database
      * @param listView      ListView to use
@@ -334,45 +333,47 @@ public class CitationRelationsTab extends EntryEditorTab {
             CitationRelationFetcher fetcher = new CitationRelationFetcher(searchType, listView, progressLabel);
 
             //Perform search in background and deal with success or failure
-            BackgroundTask
-                    .wrap(() -> fetcher.performSearch(entry))
-                    .onRunning(() -> {
-                        listView.getItems().clear();
-                        progress.setVisible(true);
-                        refreshButton.setVisible(false);
-                        importButton.setVisible(false);
-                        stackPane.getChildren().remove(errorLabel);
-                        progressLabel.setVisible(true);
-                    })
-                    .onSuccess(fetchedList -> {
-                        progress.setVisible(false);
-                        progressLabel.setVisible(false);
-                        observableList.addAll(fetchedList);
-                        if (observableList.isEmpty()) {
-                            Label placeholder = new Label("No articles found");
-                            listView.setPlaceholder(placeholder);
-                        }
-                        listView.setItems(observableList);
-                        refreshButton.setVisible(true);
-                        importButton.setVisible(true);
-                        BooleanBinding booleanBind = Bindings.isEmpty(listView.getCheckModel().getCheckedItems());
-                        importButton.disableProperty().bind(booleanBind);
+            BackgroundTask<List<BibEntry>> task = BackgroundTask.wrap(() -> fetcher.performSearch(entry));
 
-                        importButton.setOnMouseClicked(event -> importEntries(listView.getCheckModel().getCheckedItems()));
-                    })
-                    .onFailure(exception -> {
-                        LOGGER.error("Error while fetching citing Articles", exception);
-                        progress.setVisible(false);
-                        progressLabel.setVisible(false);
-                        errorLabel.setText(exception.getMessage());
-                        stackPane.getChildren().add(errorLabel);
-                        refreshButton.setVisible(true);
-                        importButton.setVisible(true);
-                    })
-                    .executeWith(Globals.TASK_EXECUTOR);
+            task.onRunning(() -> {
+                listView.getItems().clear();
+                progress.setVisible(true);
+                refreshButton.setVisible(false);
+                importButton.setVisible(false);
+                stackPane.getChildren().remove(errorLabel);
+                progressLabel.setVisible(true);
+            })
+                .onSuccess(fetchedList -> {
+                    progress.setVisible(false);
+                    progressLabel.setVisible(false);
+                    observableList.addAll(fetchedList);
+                    if (observableList.isEmpty()) {
+                        Label placeholder = new Label("No articles found");
+                        listView.setPlaceholder(placeholder);
+                    }
+                    listView.setItems(observableList);
+                    refreshButton.setVisible(true);
+                    importButton.setVisible(true);
+                    BooleanBinding booleanBind = Bindings.isEmpty(listView.getCheckModel().getCheckedItems());
+                    importButton.disableProperty().bind(booleanBind);
+
+                    importButton.setOnMouseClicked(event -> importEntries(listView.getCheckModel().getCheckedItems()));
+                })
+                .onFailure(exception -> {
+                    LOGGER.error("Error while fetching citing Articles", exception);
+                    progress.setVisible(false);
+                    progressLabel.setVisible(false);
+                    errorLabel.setText(exception.getMessage());
+                    stackPane.getChildren().add(errorLabel);
+                    refreshButton.setVisible(true);
+                    importButton.setVisible(true);
+                })
+                .executeWith(Globals.TASK_EXECUTOR);
         } else {
             dialogService.showInformationDialogAndWait("DOI-Number required", "Please add DOI-Number to entry before searching.");
         }
+
+
     }
 
     private void importEntries(List<BibEntry> entriesToImport) {
