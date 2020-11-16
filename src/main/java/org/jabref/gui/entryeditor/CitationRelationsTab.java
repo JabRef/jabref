@@ -29,6 +29,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.preferences.JabRefPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.CheckListView;
@@ -64,6 +65,28 @@ public class CitationRelationsTab extends EntryEditorTab {
         this.databaseContext = databaseContext;
         setText(Localization.lang("Citation relations"));
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
+    }
+
+    private StackPane getActivationPane(BibEntry entry) {
+        StackPane activation = new StackPane();
+        activation.setId("citation-relation-tab");
+        VBox alignment = new VBox();
+        alignment.setId("activation-alignment");
+        alignment.setFillWidth(true);
+        alignment.setSpacing(20.0);
+        Label infoLabel = new Label(Localization.lang("The search is currently deactivated"));
+        Button activate = new Button(Localization.lang("Activate"));
+        activate.setOnAction(
+            event -> {
+                JabRefPreferences prefs = JabRefPreferences.getInstance();
+                prefs.putBoolean(JabRefPreferences.ACTIVATE_CITATIONRELATIONS, true);
+                dialogService.notify(Localization.lang("Please restart JabRef for preferences to take effect."));
+                setContent(getPane(entry));
+            });
+        activate.setDefaultButton(true);
+        alignment.getChildren().addAll(infoLabel, activate);
+        activation.getChildren().add(alignment);
+        return activation;
     }
 
     /**
@@ -273,7 +296,12 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        setContent(getPane(entry));
+        if (preferences.isCitationRelationActivated()) {
+            setContent(getPane(entry));
+        } else {
+            setContent(getActivationPane(entry));
+        }
+
     }
 
     /**

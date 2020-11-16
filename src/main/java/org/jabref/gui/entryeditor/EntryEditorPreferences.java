@@ -11,6 +11,7 @@ public class EntryEditorPreferences {
     private boolean shouldOpenOnNewEntry;
     private final boolean shouldShowRecommendationsTab;
     private final boolean shouldShowCitationRelationsTab;
+    private final boolean isCitationRelationActivated;
     private final boolean isMrdlibAccepted;
     private final boolean shouldShowLatexCitationsTab;
     private boolean showSourceTabByDefault;
@@ -21,6 +22,7 @@ public class EntryEditorPreferences {
                                   boolean shouldOpenOnNewEntry,
                                   boolean shouldShowRecommendationsTab,
                                   boolean shouldShowCitationRelationsTab,
+                                  boolean isCitationRelationActivated,
                                   boolean isMrdlibAccepted,
                                   boolean shouldShowLatexCitationsTab,
                                   boolean showSourceTabByDefault,
@@ -31,6 +33,7 @@ public class EntryEditorPreferences {
         this.shouldOpenOnNewEntry = shouldOpenOnNewEntry;
         this.shouldShowRecommendationsTab = shouldShowRecommendationsTab;
         this.shouldShowCitationRelationsTab = shouldShowCitationRelationsTab;
+        this.isCitationRelationActivated = isCitationRelationActivated;
         this.isMrdlibAccepted = isMrdlibAccepted;
         this.shouldShowLatexCitationsTab = shouldShowLatexCitationsTab;
         this.showSourceTabByDefault = showSourceTabByDefault;
@@ -52,6 +55,10 @@ public class EntryEditorPreferences {
 
     public boolean shouldShowCitationRelationsTab() {
         return shouldShowCitationRelationsTab;
+    }
+
+    public boolean isCitationRelationActivated() {
+        return isCitationRelationActivated;
     }
 
     public boolean isMrdlibAccepted() {

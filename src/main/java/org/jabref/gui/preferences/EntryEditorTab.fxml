@@ -20,6 +20,7 @@
     <CheckBox fx:id="defaultSource" text="%Show BibTeX source by default"/>
     <CheckBox fx:id="enableRelatedArticlesTab" text="%Show 'Related Articles' tab"/>
     <CheckBox fx:id="enableCitationRelationsTab" text="%Show 'Citation relations' tab"/>
+    <CheckBox fx:id="enableCitationRelationSearch" text="%Activate Citation relations search"/>
     <CheckBox fx:id="acceptRecommendations" text="%Accept recommendations from Mr. DLib"
               disable="${!enableRelatedArticlesTab.selected}">
         <padding>
