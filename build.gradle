@@ -1,7 +1,6 @@
 import groovy.json.JsonSlurper
 import org.gradle.internal.os.OperatingSystem
 import org.jabref.build.JournalAbbreviationConverter
-import org.jabref.build.antlr.JabRefAntlrPlugin
 import org.jabref.build.localization.LocalizationPlugin
 import org.jabref.build.xjc.XjcPlugin
 import org.jabref.build.xjc.XjcTask
@@ -17,7 +16,6 @@ plugins {
     id 'org.javamodularity.moduleplugin' version '1.7.0'
     id 'org.openjfx.javafxplugin' version '0.0.9'
     id 'org.beryx.jlink' version '2.22.3'
-
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
     id 'com.adarshr.test-logger' version '2.1.1'
@@ -31,7 +29,6 @@ apply plugin: 'project-report'
 apply plugin: 'jacoco'
 apply plugin: 'me.champeau.gradle.jmh'
 apply plugin: 'checkstyle'
-apply plugin: JabRefAntlrPlugin
 apply plugin: XjcPlugin
 apply plugin: LocalizationPlugin
 
@@ -43,9 +40,11 @@ version = project.findProperty('projVersion') ?: '100.0.0'
 java {
     sourceCompatibility = JavaVersion.VERSION_14
     targetCompatibility = JavaVersion.VERSION_14
+    modularity.inferModulePath.set(true)
 }
 
 application {
+    mainModule = "org.jabref"
     mainClassName = "$moduleName/org.jabref.gui.JabRefLauncher"
 }
 
@@ -88,7 +87,8 @@ repositories {
 
 configurations {
     libreoffice
-
+    antlr3
+    antlr4
     // TODO: Remove the following workaround for split error messages such as
     // error: module java.xml.bind reads package javax.annotation from both jsr305 and java.annotation
     compile {
@@ -304,23 +304,24 @@ task generateSource(dependsOn: ["generateBstGrammarSource",
     description 'Generates all necessary (Java) source files.'
 }
 
-task generateBstGrammarSource(type: org.jabref.build.antlr.AntlrTask) {
+task generateBstGrammarSource(type: JavaExec) {
+    main = "org.antlr.Tool"
+    classpath = configurations.antlr3
     group = "JabRef"
     description = 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr3.'
 
-    antlr = ANTLR3
-    inputFile = 'src/main/antlr3/org/jabref/bst/Bst.g'
-    outputDir = 'src/main/generated/org/jabref/logic/bst/'
+    inputs.dir('src/main/antlr3/org/jabref/bst/')
+    args = ["-o", "$projectDir/src/main/generated/org/jabref/logic/bst/" , "$projectDir/src/main/antlr3/org/jabref/bst/Bst.g" ]
 }
 
-task generateSearchGrammarSource(type: org.jabref.build.antlr.AntlrTask) {
+task generateSearchGrammarSource(type: JavaExec) {
+    main = "org.antlr.v4.Tool"
+    classpath = configurations.antlr4
     group = 'JabRef'
     description = "Generates java files for Search.g antlr4."
 
-    antlr = ANTLR4
-    inputFile = "src/main/antlr4/org/jabref/search/Search.g4"
-    outputDir = "src/main/generated/org/jabref/search"
-    javaPackage = "org.jabref.search"
+    inputs.dir("src/main/antlr4/org/jabref/search/")
+    args  = ["-o","$projectDir/src/main/generated/org/jabref/search" , "-visitor", "-no-listener", "-package", "org.jabref.search", "$projectDir/src/main/antlr4/org/jabref/search/Search.g4"]
 }
 
 task generateMedlineSource(type: XjcTask) {
@@ -702,6 +703,8 @@ jlink {
             installerOptions = [
                     '--verbose',
                     '--vendor', 'JabRef',
+                    '--mac-package-identifier', "JabRef",
+                    '--mac-package-name', "JabRef",
                     '--app-version', "${project.version}",
                     '--file-associations', "${projectDir}/buildres/mac/bibtexAssociations.properties",
                     '--resource-dir', "${projectDir}/buildres/mac"
