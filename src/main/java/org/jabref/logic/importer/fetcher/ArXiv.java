@@ -22,7 +22,7 @@ import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.util.io.XMLUtil;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.entry.BibEntry;
@@ -31,6 +31,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.paging.Page;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
@@ -52,7 +53,7 @@ import org.xml.sax.SAXException;
  * <a href="https://github.com/nathangrigg/arxiv2bib">arxiv2bib</a> which is <a href="https://arxiv2bibtex.org/">live</a>
  * <a herf="https://gitlab.c3sl.ufpr.br/portalmec/dspace-portalmec/blob/aa209d15082a9870f9daac42c78a35490ce77b52/dspace-api/src/main/java/org/dspace/submit/lookup/ArXivService.java">dspace-portalmec</a>
  */
-public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetcher, IdFetcher<ArXivIdentifier> {
+public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedFetcher, IdFetcher<ArXivIdentifier> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArXiv.class);
 
@@ -153,8 +154,8 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         return Collections.emptyList();
     }
 
-    private List<ArXivEntry> searchForEntries(String searchQuery) throws FetcherException {
-        return queryApi(searchQuery, Collections.emptyList(), 0, 10);
+    private List<ArXivEntry> searchForEntries(String searchQuery, int pageNumber) throws FetcherException {
+        return queryApi(searchQuery, Collections.emptyList(), getPageSize() * pageNumber, getPageSize());
     }
 
     private List<ArXivEntry> queryApi(String searchQuery, List<ArXivIdentifier> ids, int start, int maxResults)
@@ -248,13 +249,6 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         return Optional.of(HelpFile.FETCHER_OAI2_ARXIV);
     }
 
-    @Override
-    public List<BibEntry> performSearch(String query) throws FetcherException {
-        return searchForEntries(query).stream().map(
-                (arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
-                                      .collect(Collectors.toList());
-    }
-
     /**
      * Constructs a complex query string using the field prefixes specified at https://arxiv.org/help/api/user-manual
      *
@@ -262,17 +256,21 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
      * @return A list of entries matching the complex query
      */
     @Override
-    public List<BibEntry> performComplexSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
+    public Page<BibEntry> performSearchPaged(ComplexSearchQuery complexSearchQuery, int pageNumber) throws FetcherException {
         List<String> searchTerms = new ArrayList<>();
         complexSearchQuery.getAuthors().forEach(author -> searchTerms.add("au:" + author));
         complexSearchQuery.getTitlePhrases().forEach(title -> searchTerms.add("ti:" + title));
-        complexSearchQuery.getTitlePhrases().forEach(abstr -> searchTerms.add("abs:" + abstr));
+        complexSearchQuery.getAbstractPhrases().forEach(abstr -> searchTerms.add("abs:" + abstr));
         complexSearchQuery.getJournal().ifPresent(journal -> searchTerms.add("jr:" + journal));
         // Since ArXiv API does not support year search, we ignore the year related terms
         complexSearchQuery.getToYear().ifPresent(year -> searchTerms.add(year.toString()));
         searchTerms.addAll(complexSearchQuery.getDefaultFieldPhrases());
         String complexQueryString = String.join(" AND ", searchTerms);
-        return performSearch(complexQueryString);
+
+        List<BibEntry> searchResult = searchForEntries(complexQueryString, pageNumber).stream()
+                                                                                      .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
+                                                                                      .collect(Collectors.toList());
+        return new Page<>(complexQueryString, pageNumber, searchResult);
     }
 
     @Override

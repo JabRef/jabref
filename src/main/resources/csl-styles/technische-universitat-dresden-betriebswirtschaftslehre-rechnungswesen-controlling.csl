@@ -1,56 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" page-range-format="expanded">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" page-range-format="expanded" default-locale="de-DE">
   <info>
-    <title>Norsk APA-manual - APA 7th edition (author-date)</title>
-    <title-short>Norsk APA</title-short>
-    <id>http://www.zotero.org/styles/norsk-apa-manual</id>
-    <link href="http://www.zotero.org/styles/norsk-apa-manual" rel="self"/>
+    <title>Technische Universität Dresden - Betriebswirtschaftslehre/Rechnungswesen/Controlling (German)</title>
+    <title-short>TUD BWL/BRW (APA)</title-short>
+    <id>http://www.zotero.org/styles/technische-universitat-dresden-betriebswirtschaftslehre-rechnungswesen-controlling</id>
+    <link href="http://www.zotero.org/styles/technische-universitat-dresden-betriebswirtschaftslehre-rechnungswesen-controlling" rel="self"/>
     <link href="http://www.zotero.org/styles/apa" rel="template"/>
-    <link href="https://www.unit.no/tjenester/norsk-apa-referansestil" rel="documentation"/>
+    <link href="https://tu-dresden.de/bu/wirtschaft/bwl/brw/ressourcen/dateien/studium/Richtlinien-wiss-Arbeiten-Stand-Januar-2020.pdf?lang=de" rel="documentation"/>
+    <author>
+      <name>Brenton M. Wiernik</name>
+      <email>zotero@wiernik.org</email>
+    </author>
     <category citation-format="author-date"/>
-    <category field="psychology"/>
-    <category field="generic-base"/>
-    <updated>2020-10-28T12:00:00+00:00</updated>
+    <category field="social_science"/>
+    <summary>Zitierstil entsprechend den Zitierrichtlinien des Lehrstuhls Betriebswirtschaftslehre, insbesondere betriebliches Rechnungwesen und Controlling, der Fakultät Wirtschaftswissenschaften, Technische Universität Dresden.</summary>
+    <updated>2020-10-15T12:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
-  <locale xml:lang="en">
+  <locale xml:lang="de">
     <terms>
-      <term name="editortranslator" form="short">
-        <single>ed. &amp; trans.</single>
-        <multiple>eds. &amp; trans.</multiple>
+      <term name="accessed">zuletzt abgerufen am</term>
+      <term name="et-al">et al.</term>
+      <term name="letter">persönliche Kommunikation</term>
+      <term name="letter" form="short">Brief</term>
+      <term name="editor" form="short">Hrsg.</term>
+      <term name="presented at">gehalten auf</term>
+      <term name="volume" form="symbol">
+        <single>Jg.</single>
+        <multiple>Jgs.</multiple>
       </term>
-      <term name="translator" form="short">trans.</term>
-      <term name="interviewer" form="short">
-        <single>interviewer</single>
-        <multiple>interviewers</multiple>
-      </term>
-      <term name="collection-editor" form="short">
-        <single>ed.</single>
-        <multiple>eds.</multiple>
-      </term>
-      <term name="circa" form="short">ca.</term>
-      <term name="bc"> B.C.E.</term>
-      <term name="ad"> C.E.</term>
-      <term name="letter">personal communication</term>
-      <term name="letter" form="short">letter</term>
       <term name="issue" form="long">
-        <single>issue</single>
-        <multiple>issues</multiple>
+        <single>Heft</single>
+        <multiple>Hefts</multiple>
       </term>
-    </terms>
-  </locale>
-  <locale xml:lang="nb">
-    <terms>
-      <term name="et-al">et al.</term>
-      <term name="letter">personlig kommunikasjon</term>
-      <term name="letter" form="short">brev</term>
-    </terms>
-  </locale>
-  <locale xml:lang="nn">
-    <terms>
-      <term name="et-al">et al.</term>
-      <term name="letter">personlig kommunikasjon</term>
-      <term name="letter" form="short">brev</term>
     </terms>
   </locale>
   <!-- General categories of item types:
@@ -64,12 +46,12 @@
   <!-- APA references contain four parts: author, date, title, source -->
   <macro name="author-bib">
     <names variable="composer" delimiter=", ">
-      <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
+      <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="always"/>
       <substitute>
         <names variable="author"/>
         <names variable="illustrator"/>
         <names variable="director">
-          <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
+          <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="always"/>
           <label form="long" prefix=" (" suffix=")" text-case="title"/>
         </names>
         <choose>
@@ -93,15 +75,15 @@
         </choose>
         <!-- Test for editortranslator and put that first as that becomes available -->
         <names variable="editor" delimiter=", ">
-          <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
+          <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="always"/>
           <label form="short" prefix=" (" suffix=")" text-case="title"/>
         </names>
         <names variable="editorial-director">
-          <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
+          <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="always"/>
           <label form="short" prefix=" (" suffix=")" text-case="title"/>
         </names>
         <names variable="collection-editor">
-          <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
+          <name name-as-sort-order="all" and="symbol" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="always"/>
           <label form="short" prefix=" (" suffix=")" text-case="title"/>
         </names>
         <choose>
@@ -123,7 +105,7 @@
       <if type="bill legal_case legislation treaty" match="any">
         <text macro="title-intext"/>
       </if>
-      <else-if type="interview personal_communication" match="any">
+      <else-if type="interview personal_communication">
         <choose>
           <!-- These variables indicate that the letter is retrievable by the reader. 
                 If not, then use the APA in-text-only personal communication format -->
@@ -279,7 +261,7 @@
             </choose>
             <group>
               <choose>
-                <if type="interview personal_communication" match="any">
+                <if type="interview personal_communication">
                   <choose>
                     <if variable="archive container-title DOI publisher URL" match="none">
                       <!-- These variables indicate that the communication is retrievable by the reader. 
@@ -347,7 +329,7 @@
       </else-if>
       <else>
         <choose>
-          <if type="article-journal article-magazine article-newspaper post-weblog review review-book" match="any">
+          <if type="article-journal article-magazine article-newspaper post-weblog review review-book">
             <text variable="title" font-style="italic"/>
           </if>
           <else-if type="paper-conference">
@@ -464,7 +446,7 @@
             </group>
           </group>
         </if>
-        <else-if type="post webpage" match="any">
+        <else-if type="post webpage">
           <!-- For post webpage, container-title is treated as publisher -->
           <group delimiter="; ">
             <text macro="secondary-contributors"/>
@@ -1166,25 +1148,25 @@
     <group delimiter=". ">
       <group delimiter=", ">
         <text variable="container-title" font-style="italic" text-case="title"/>
-        <choose>
-          <if variable="volume">
-            <group>
-              <text variable="volume" font-style="italic"/>
-              <text variable="issue" prefix="(" suffix=")"/>
-            </group>
-          </if>
-          <else>
-            <text variable="issue" font-style="italic"/>
-          </else>
-        </choose>
+        <group delimiter=". ">
+          <text variable="volume"/>
+          <label variable="volume" form="symbol"/>
+        </group>
+        <group delimiter=" ">
+          <label variable="issue" form="long"/>
+          <text variable="issue"/>
+        </group>
         <choose>
           <if variable="page">
-            <text variable="page"/>
+            <group delimiter=" ">
+              <label variable="page" form="short"/>
+              <text variable="page"/>
+            </group>
           </if>
           <else>
             <!-- Ex. 6: Journal article with article number or eLocator -->
             <!-- This should be localized -->
-            <text variable="number" prefix="Article "/>
+            <text variable="number" prefix="Beitrag "/>
           </else>
         </choose>
       </group>
@@ -1207,7 +1189,7 @@
           <group delimiter=", ">
             <names variable="editor translator" delimiter=", &amp; ">
               <!-- Change to editortranslator and move editor to substitute as that becomes available -->
-              <name and="symbol" initialize-with=". " delimiter=", " delimiter-precedes-last="never"/>
+              <name and="symbol" initialize-with=". " delimiter=", "/>
               <label form="short" text-case="title" prefix=" (" suffix=")"/>
               <substitute>
                 <names variable="editorial-director"/>
@@ -1244,7 +1226,7 @@
             </if>
           </choose>
         </if>
-        <else-if type="post webpage" match="any">
+        <else-if type="post webpage">
           <!-- For websites, treat container title like publisher -->
           <group delimiter="; ">
             <text variable="container-title" text-case="title"/>
@@ -1255,12 +1237,18 @@
           <!-- For paper-conference, don't print publisher if in a journal-like proceedings -->
           <choose>
             <if variable="collection-editor editor editorial-director" match="any">
-              <text variable="publisher"/>
+              <group delimiter=": ">
+                <text variable="publisher-place"/>
+                <text variable="publisher"/>
+              </group>
             </if>
           </choose>
         </else-if>
         <else-if type="article-journal article-magazine article-newspaper post-weblog" match="none">
-          <text variable="publisher"/>
+          <group delimiter=": ">
+            <text variable="publisher-place"/>
+            <text variable="publisher"/>
+          </group>
         </else-if>
       </choose>
       <group delimiter=", ">
@@ -1282,25 +1270,42 @@
       </group>
     </group>
   </macro>
+  <macro name="show-access">
+    <choose>
+      <if type="article-journal article-magazine article-newspaper paper-conference review review-book" match="any">
+        <choose>
+          <if variable="issue page number" match="none">
+            <text macro="access"/>
+          </if>
+        </choose>
+      </if>
+      <else-if type="article dataset figure interview manuscript personal_communication post post-weblog webpage">
+        <choose>
+          <if variable="issue page" match="none">
+            <text macro="access"/>
+          </if>
+        </choose>
+      </else-if>
+    </choose>
+  </macro>
   <macro name="access">
     <choose>
-      <if variable="DOI" match="any">
-        <text variable="DOI" prefix="https://doi.org/"/>
-      </if>
-      <else-if variable="URL">
-        <group delimiter=" ">
-          <choose>
-            <if variable="issued status" match="none">
-              <group delimiter=" ">
-                <text term="retrieved" text-case="capitalize-first"/>
-                <date variable="accessed" form="text" suffix=","/>
-                <text term="from"/>
+      <if type="post-weblog post webpage" match="any">
+        <choose>
+          <if variable="DOI" match="any">
+            <text variable="DOI" prefix="https://doi.org/"/>
+          </if>
+          <else-if variable="URL">
+            <group delimiter=", ">
+              <text variable="URL" prefix="URL: "/>
+              <group delimiter=": ">
+                <text term="accessed"/>
+                <date variable="accessed" form="numeric"/>
               </group>
-            </if>
-          </choose>
-          <text variable="URL"/>
-        </group>
-      </else-if>
+            </group>
+          </else-if>
+        </choose>
+      </if>
     </choose>
   </macro>
   <macro name="event">
@@ -1642,7 +1647,7 @@
               <text macro="event"/>
               <text macro="publisher"/>
             </group>
-            <text macro="access"/>
+            <text macro="show-access"/>
             <text macro="publication-history"/>
           </group>
         </else>

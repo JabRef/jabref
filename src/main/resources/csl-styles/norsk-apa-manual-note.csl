@@ -1,56 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" page-range-format="expanded">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="never" page-range-format="expanded">
   <info>
-    <title>Norsk APA-manual - APA 7th edition (author-date)</title>
-    <title-short>Norsk APA</title-short>
-    <id>http://www.zotero.org/styles/norsk-apa-manual</id>
-    <link href="http://www.zotero.org/styles/norsk-apa-manual" rel="self"/>
+    <title>Norsk APA-manual - APA 7th edition (note)</title>
+    <id>http://www.zotero.org/styles/norsk-apa-manual-note</id>
+    <link href="http://www.zotero.org/styles/norsk-apa-manual-note" rel="self"/>
     <link href="http://www.zotero.org/styles/apa" rel="template"/>
-    <link href="https://www.unit.no/tjenester/norsk-apa-referansestil" rel="documentation"/>
-    <category citation-format="author-date"/>
-    <category field="psychology"/>
+    <link href="https://kildekompasset.no/referansestiler/apa-7th-tilpasset-fotnoter" rel="documentation"/>
+    <author>
+      <name>Brenton M. Wiernik</name>
+      <email>zotero@wiernik.org</email>
+    </author>
+    <category citation-format="note"/>
     <category field="generic-base"/>
-    <updated>2020-10-28T12:00:00+00:00</updated>
+    <updated>2020-01-14T02:24:58+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
-  <locale xml:lang="en">
-    <terms>
-      <term name="editortranslator" form="short">
-        <single>ed. &amp; trans.</single>
-        <multiple>eds. &amp; trans.</multiple>
-      </term>
-      <term name="translator" form="short">trans.</term>
-      <term name="interviewer" form="short">
-        <single>interviewer</single>
-        <multiple>interviewers</multiple>
-      </term>
-      <term name="collection-editor" form="short">
-        <single>ed.</single>
-        <multiple>eds.</multiple>
-      </term>
-      <term name="circa" form="short">ca.</term>
-      <term name="bc"> B.C.E.</term>
-      <term name="ad"> C.E.</term>
-      <term name="letter">personal communication</term>
-      <term name="letter" form="short">letter</term>
-      <term name="issue" form="long">
-        <single>issue</single>
-        <multiple>issues</multiple>
-      </term>
-    </terms>
-  </locale>
   <locale xml:lang="nb">
     <terms>
       <term name="et-al">et al.</term>
-      <term name="letter">personlig kommunikasjon</term>
-      <term name="letter" form="short">brev</term>
     </terms>
   </locale>
   <locale xml:lang="nn">
     <terms>
       <term name="et-al">et al.</term>
-      <term name="letter">personlig kommunikasjon</term>
-      <term name="letter" form="short">brev</term>
     </terms>
   </locale>
   <!-- General categories of item types:
@@ -123,7 +95,7 @@
       <if type="bill legal_case legislation treaty" match="any">
         <text macro="title-intext"/>
       </if>
-      <else-if type="interview personal_communication" match="any">
+      <else-if type="interview personal_communication">
         <choose>
           <!-- These variables indicate that the letter is retrievable by the reader. 
                 If not, then use the APA in-text-only personal communication format -->
@@ -279,7 +251,7 @@
             </choose>
             <group>
               <choose>
-                <if type="interview personal_communication" match="any">
+                <if type="interview personal_communication">
                   <choose>
                     <if variable="archive container-title DOI publisher URL" match="none">
                       <!-- These variables indicate that the communication is retrievable by the reader. 
@@ -347,7 +319,7 @@
       </else-if>
       <else>
         <choose>
-          <if type="article-journal article-magazine article-newspaper post-weblog review review-book" match="any">
+          <if type="article-journal article-magazine article-newspaper post-weblog review review-book">
             <text variable="title" font-style="italic"/>
           </if>
           <else-if type="paper-conference">
@@ -395,13 +367,13 @@
         <text macro="bracketed-intext" prefix="[" suffix="]"/>
       </if>
       <else-if type="bill">
-        <!-- If a bill has no number or container-title, assume it is a hearing; italic -->
+        <!-- If a bill has no number or container-title, assume it is a hearing; italic and title case -->
         <choose>
           <if variable="number container-title" match="none">
             <text variable="title" form="short" font-style="italic" text-case="title"/>
           </if>
           <else-if variable="title">
-            <text variable="title" form="short" text-case="title"/>
+            <text variable="title" form="short"/>
           </else-if>
           <else>
             <group delimiter=" ">
@@ -425,18 +397,18 @@
       </else-if>
       <else-if type="legislation treaty" match="any">
         <!-- Legislation and treaties not italicized or quoted -->
-        <text variable="title" form="short" text-case="title"/>
+        <text variable="title" form="short"/>
       </else-if>
       <else-if type="post webpage" match="any">
         <!-- Webpages are always italicized -->
-        <text variable="title" form="short" font-style="italic" text-case="title"/>
+        <text variable="title" form="short" font-style="italic"/>
       </else-if>
       <else-if variable="container-title" match="any">
         <!-- Other types are italicized or quoted based on presence of container-title. As in title macro. -->
-        <text variable="title" form="short" quotes="true" text-case="title"/>
+        <text variable="title" form="short" quotes="true"/>
       </else-if>
       <else>
-        <text variable="title" form="short" font-style="italic" text-case="title"/>
+        <text variable="title" form="short" font-style="italic"/>
       </else>
     </choose>
   </macro>
@@ -464,7 +436,7 @@
             </group>
           </group>
         </if>
-        <else-if type="post webpage" match="any">
+        <else-if type="post webpage">
           <!-- For post webpage, container-title is treated as publisher -->
           <group delimiter="; ">
             <text macro="secondary-contributors"/>
@@ -1061,11 +1033,11 @@
     <choose>
       <if variable="reviewed-title">
         <!-- Not possible to distinguish TV series episode from other reviewed works [Ex. 69] -->
-        <text variable="reviewed-title" form="short" font-style="italic" text-case="title"/>
+        <text variable="reviewed-title" form="short" font-style="italic"/>
       </if>
       <else>
         <!-- Assume title is title of reviewed work -->
-        <text variable="title" form="short" font-style="italic" text-case="title"/>
+        <text variable="title" form="short" font-style="italic"/>
       </else>
     </choose>
   </macro>
@@ -1244,7 +1216,7 @@
             </if>
           </choose>
         </if>
-        <else-if type="post webpage" match="any">
+        <else-if type="post webpage">
           <!-- For websites, treat container title like publisher -->
           <group delimiter="; ">
             <text variable="container-title" text-case="title"/>
@@ -1586,12 +1558,9 @@
   <macro name="citation-locator">
     <group delimiter=" ">
       <choose>
-        <if locator="chapter">
-          <label variable="locator" text-case="capitalize-first"/>
-        </if>
-        <else>
+        <if locator="page" match="none">
           <label variable="locator" form="short"/>
-        </else>
+        </if>
       </choose>
       <text variable="locator"/>
     </group>
@@ -1603,10 +1572,12 @@
       <key macro="date-sort-date" sort="ascending"/>
       <key variable="status"/>
     </sort>
-    <layout prefix="(" suffix=")" delimiter="; ">
-      <group delimiter=", ">
-        <text macro="author-intext"/>
-        <text macro="date-intext"/>
+    <layout delimiter="; ">
+      <group delimiter=": ">
+        <group delimiter=" ">
+          <text macro="author-intext"/>
+          <text macro="date-intext"/>
+        </group>
         <text macro="citation-locator"/>
       </group>
     </layout>
