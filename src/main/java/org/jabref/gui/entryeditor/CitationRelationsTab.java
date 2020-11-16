@@ -73,7 +73,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         VBox alignment = new VBox();
         alignment.setId("activation-alignment");
         alignment.setFillWidth(true);
-        alignment.setSpacing(20.0);
+        alignment.setAlignment(Pos.BASELINE_CENTER);
         Label infoLabel = new Label(Localization.lang("The search is currently deactivated"));
         Button activate = new Button(Localization.lang("Activate"));
         activate.setOnAction(
@@ -301,7 +301,6 @@ public class CitationRelationsTab extends EntryEditorTab {
         } else {
             setContent(getActivationPane(entry));
         }
-
     }
 
     /**
