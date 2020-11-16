@@ -143,7 +143,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         refreshCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, startCitedByButton, citedByListView, citedByProgress, refreshCitedByButton, CitationRelationFetcher.SearchType.CITEDBY, citedByStackPane, citedByProgressLabel));
 
         //Create SplitPane to hold all nodes above
-        SplitPane container = new SplitPane(citingVBox, citedByVBox);
+        SplitPane container = new SplitPane(citedByVBox, citingVBox);
 
         errorLabel = new Label();
 
