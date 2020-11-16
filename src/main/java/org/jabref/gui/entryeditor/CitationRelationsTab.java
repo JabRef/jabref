@@ -1,7 +1,11 @@
 package org.jabref.gui.entryeditor;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -30,9 +34,12 @@ import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.TextFlowLimited;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.fetcher.CitationRelationFetcher;
+import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -56,10 +63,10 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final DialogService dialogService;
     private CheckListView<BibEntry> citingListView;
     private CheckListView<BibEntry> citedByListView;
+    private CheckListView<BibEntry> citingLocalListView;
+    private CheckListView<BibEntry> citedByLocalListView;
     private StackPane citingStackPane;
     private StackPane citedByStackPane;
-    private Button startCitingButton;
-    private Button startCitedByButton;
     private Button refreshCitingButton;
     private Button refreshCitedByButton;
     private Button importCitingButton;
@@ -105,6 +112,10 @@ public class CitationRelationsTab extends EntryEditorTab {
         citedByVBox.setAlignment(Pos.TOP_CENTER);
         AnchorPane citingHBox = new AnchorPane();
         AnchorPane citedByHBox = new AnchorPane();
+        ScrollPane citingScrollPane = new ScrollPane();
+        ScrollPane citedByScrollPane = new ScrollPane();
+        VBox citingScrollVBox = new VBox();
+        VBox citedByScrollVBox = new VBox();
         citingStackPane = new StackPane();
         citedByStackPane = new StackPane();
 
@@ -117,12 +128,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         //Create ListViews
         citingListView = new CheckListView<>();
         citedByListView = new CheckListView<>();
-
-        //Create Start Buttons
-        startCitingButton = new Button();
-        startCitingButton.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.SEARCH));
-        startCitedByButton = new Button();
-        startCitedByButton.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.SEARCH));
+        citingLocalListView = new CheckListView<>();
+        citedByLocalListView = new CheckListView<>();
 
         //Create refresh Buttons for both sides
         refreshCitingButton = IconTheme.JabRefIcons.REFRESH.asButton();
@@ -147,26 +154,32 @@ public class CitationRelationsTab extends EntryEditorTab {
         citedByProgressLabel = new Label();
 
         //Add nodes to parent layout containers
-        citedByStackPane.getChildren().addAll(citedByListView, startCitedByButton, citedByProgress, citedByProgressLabel);
-        citingStackPane.getChildren().addAll(citingListView, startCitingButton, citingProgress, citingProgressLabel);
+        citedByStackPane.getChildren().addAll(citedByListView, citedByProgress, citedByProgressLabel);
+        citingStackPane.getChildren().addAll(citingListView, citingProgress, citingProgressLabel);
         citingHBox.getChildren().addAll(citingLabel, refreshCitingButton, importCitingButton);
         citedByHBox.getChildren().addAll(citedByLabel, refreshCitedByButton, importCitedByButton);
-        citingVBox.getChildren().addAll(citingHBox, citingStackPane);
-        citedByVBox.getChildren().addAll(citedByHBox, citedByStackPane);
+        citingScrollPane.setContent(citingScrollVBox);
+        citedByScrollPane.setContent(citedByScrollVBox);
+        citingScrollVBox.getChildren().addAll(new HBox(new Label("Local")), citingLocalListView, new HBox(new Label("Online")), citingStackPane);
+        citedByScrollVBox.getChildren().addAll(new Label("Local"), citedByLocalListView, new Label("Online"), citedByStackPane);
+        citingVBox.getChildren().addAll(citingHBox, citingScrollPane);
+        citedByVBox.getChildren().addAll(citedByHBox, citedByScrollPane);
 
-        refreshCitingButton.setOnMouseClicked(event -> searchForRelations(entry, startCitingButton, citingListView, citingProgress, refreshCitingButton, CitationRelationFetcher.SearchType.CITING, citingStackPane, citingProgressLabel, importCitingButton));
-        refreshCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, startCitedByButton, citedByListView, citedByProgress, refreshCitedByButton, CitationRelationFetcher.SearchType.CITEDBY, citedByStackPane, citedByProgressLabel, importCitedByButton));
+        refreshCitingButton.setOnMouseClicked(event -> searchForRelations(entry, citingListView, citingProgress, refreshCitingButton, CitationRelationFetcher.SearchType.CITING, citingStackPane, citingProgressLabel, importCitingButton));
+        refreshCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, citedByListView, citedByProgress, refreshCitedByButton, CitationRelationFetcher.SearchType.CITEDBY, citedByStackPane, citedByProgressLabel, importCitedByButton));
 
         //Create SplitPane to hold all nodes above
         SplitPane container = new SplitPane(citedByVBox, citingVBox);
 
         errorLabel = new Label();
 
-        citingListView.prefHeightProperty().bind(container.heightProperty().subtract(25));
-        citedByListView.prefHeightProperty().bind(container.heightProperty().subtract(25));
+        citingScrollVBox.prefWidthProperty().bind(citingScrollPane.widthProperty());
+        citedByScrollVBox.prefWidthProperty().bind(citedByScrollPane.widthProperty());
 
         styleListView(citingListView);
         styleListView(citedByListView);
+        styleListView(citingLocalListView);
+        styleListView(citedByLocalListView);
 
         return container;
     }
@@ -294,8 +307,8 @@ public class CitationRelationsTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         setContent(getPane(entry));
-        searchForRelations(entry, startCitingButton, citingListView, citingProgress, refreshCitingButton, CitationRelationFetcher.SearchType.CITING, citingStackPane, citingProgressLabel, importCitingButton);
-        searchForRelations(entry, startCitedByButton, citedByListView, citedByProgress, refreshCitedByButton, CitationRelationFetcher.SearchType.CITEDBY, citedByStackPane, citedByProgressLabel, importCitedByButton);
+        searchForRelations(entry, citingListView, citingProgress, refreshCitingButton, CitationRelationFetcher.SearchType.CITING, citingStackPane, citingProgressLabel, importCitingButton);
+        searchForRelations(entry, citedByListView, citedByProgress, refreshCitedByButton, CitationRelationFetcher.SearchType.CITEDBY, citedByStackPane, citedByProgressLabel, importCitedByButton);
 
     }
 
@@ -304,23 +317,18 @@ public class CitationRelationsTab extends EntryEditorTab {
      * in the associated ListView
      *
      * @param entry         BibEntry currently selected in Jabref Database
-     * @param startButton   start button to use
      * @param listView      ListView to use
      * @param progress      ProgressIndicator to use
      * @param refreshButton refresh Button to use
      * @param searchType    type of search (CITING / CITEDBY)
      * @param stackPane     StackPane to use
      */
-    private void searchForRelations(BibEntry entry, Button startButton, CheckListView<BibEntry> listView, ProgressIndicator progress, Button refreshButton, CitationRelationFetcher.SearchType searchType, StackPane stackPane, Label progressLabel, Button importButton) {
+    private void searchForRelations(BibEntry entry, CheckListView<BibEntry> listView, ProgressIndicator progress, Button refreshButton, CitationRelationFetcher.SearchType searchType, StackPane stackPane, Label progressLabel, Button importButton) {
         //Check if current entry has DOI Number required for searching
         if (entry.getField(StandardField.DOI).isPresent()) {
-            if (entry.getField(StandardField.CITED).isPresent()) {
-
-            }
 
             //Create ObservableList to display in ListView
             ObservableList<BibEntry> observableList = FXCollections.observableArrayList();
-            startButton.setVisible(false);
 
             //New Instance of CitationRelationsFetcher with correct searchType
             CitationRelationFetcher fetcher = new CitationRelationFetcher(searchType, listView, progressLabel);
