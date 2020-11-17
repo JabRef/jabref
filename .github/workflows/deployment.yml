@@ -90,7 +90,7 @@ jobs:
       - name: Build runtime image
         run: ./gradlew -Dorg.gradle.jvmargs=-Xmx4g -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
       - name: Build installer
-        run: ./gradlew -Dorg.gradle.jvmargs=-Xmx4g -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage -Dorg.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=512m -XX:+HeapDumpOnOutOfMemoryError
+        run: ./gradlew -Dorg.gradle.jvmargs=-Xmx4g -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
         shell: bash
       - name: Resign app image for OSX and build dmg
         if: matrix.os == 'macos-latest'
