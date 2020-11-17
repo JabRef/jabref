@@ -145,7 +145,7 @@ public class BibEntry implements Cloneable {
             (targetField == StandardField.XREF) ||
             (targetField == StandardField.ENTRYSET) ||
             (targetField == StandardField.RELATED) ||
-            (targetField == StandardField.CITED) ||
+            (targetField == StandardField.CITING) ||
             (targetField == StandardField.CITEDBY) ||
             (targetField == StandardField.SORTKEY)) {
             return Optional.empty();
