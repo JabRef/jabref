@@ -26,7 +26,7 @@ import org.jabref.preferences.JabRefPreferences;
  */
 public class CitationRelationFetcher implements EntryBasedFetcher {
 
-    private String searchType = null;
+    private SearchType searchType = null;
     private Label progressLabel;
     private static final String BASIC_URL = "https://opencitations.net/index/api/v1/metadata/";
 
@@ -34,21 +34,24 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
      * Possible search methods
      */
     public enum SearchType {
-        CITING,
-        CITEDBY
+        CITING("reference"),
+        CITEDBY("citation");
+
+        public final String label;
+
+        private SearchType(String label) {
+            this.label = label;
+        }
     }
 
-    public CitationRelationFetcher(SearchType searchType, ListView<BibEntry> listView, Label progressLabel) {
-        if (searchType.equals(SearchType.CITING)) {
-            this.searchType = "reference";
-        } else if (searchType.equals(SearchType.CITEDBY)) {
-            this.searchType = "citation";
-        }
+    public CitationRelationFetcher(SearchType searchType, Label progressLabel) {
+        this.searchType = searchType;
         this.progressLabel = progressLabel;
     }
 
     /**
      * Executes the search method associated with searchType
+     *
      * @param entry Entry to search relations for
      * @return List of BibEntries found
      */
@@ -60,30 +63,31 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
             try {
                 System.out.println(BASIC_URL + doi);
                 JSONArray json = readJsonFromUrl(BASIC_URL + doi);
-                if (json != null) {
-                    System.out.println(json.toString());
-                    String[] items = json.getJSONObject(0).getString(searchType).split("; ");
-                    int i = 1;
-                    for (String item : items) {
-                        int finalI = i;
-                        Platform.runLater(() -> progressLabel.setText(finalI + "/" + items.length));
-                        System.out.println(item);
-                        if (!doi.equals(item) && !item.equals("")) {
-                            DoiFetcher doiFetcher = new DoiFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
-                            try {
-                                doiFetcher.performSearchById(item).ifPresent(list::add);
-                            } catch (FetcherException fetcherException) {
-                                // No information for doi found
-                            }
-                        }
-                        i++;
-                    }
-                    System.out.println("Finished.");
-                } else {
+                if (json == null) {
                     throw new FetcherException("No internet connection! Please try again.");
+                } else if (json.isEmpty()) {
+                    return null;
                 }
+                System.out.println(json.toString());
+                String[] items = json.getJSONObject(0).getString(searchType.label).split("; ");
+                int i = 1;
+                for (String item : items) {
+                    int finalI = i;
+                    Platform.runLater(() -> progressLabel.setText(finalI + "/" + items.length));
+                    System.out.println(item);
+                    if (!doi.equals(item) && !item.equals("")) {
+                        DoiFetcher doiFetcher = new DoiFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
+                        try {
+                            doiFetcher.performSearchById(item).ifPresent(list::add);
+                        } catch (FetcherException fetcherException) {
+                            // No information for doi found
+                        }
+                    }
+                    i++;
+                }
+                System.out.println("Finished.");
             } catch (IOException | JSONException e) {
-                e.printStackTrace();
+                throw new FetcherException("Couldn't connect to opencitations.net! Please try again.");
             }
             return list;
         } else {
@@ -93,6 +97,7 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
 
     /**
      * Method to read JSON files from URL
+     *
      * @param url API URL to search
      * @return JSONArray containing the response of the API
      */
@@ -119,5 +124,4 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
     public String getName() {
         return null;
     }
-
 }

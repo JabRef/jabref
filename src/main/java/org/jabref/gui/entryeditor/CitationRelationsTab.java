@@ -1,7 +1,10 @@
 package org.jabref.gui.entryeditor;
 
 import java.util.EnumSet;
+import java.util.List;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
@@ -17,9 +20,13 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.externalfiles.ImportHandler;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.TextFlowLimited;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.fetcher.CitationRelationFetcher;
@@ -33,8 +40,12 @@ import org.jabref.preferences.JabRefPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.CheckListView;
+import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.undo.UndoManager;
 
 /**
  * GUI for tab displaying an articles citation relations in two lists based on the currently selected BibEntry
@@ -52,19 +63,30 @@ public class CitationRelationsTab extends EntryEditorTab {
     private Button startCitedByButton;
     private Button refreshCitingButton;
     private Button refreshCitedByButton;
+    private Button importCitingButton;
+    private Button importCitedByButton;
     private Label errorLabel;
     private Label citingProgressLabel;
     private Label citedByProgressLabel;
     private ProgressIndicator citingProgress;
     private ProgressIndicator citedByProgress;
     private final BibDatabaseContext databaseContext;
+    private final UndoManager undoManager;
+    private final StateManager stateManager;
+    private final FileUpdateMonitor fileUpdateMonitor;
+    private final PreferencesService preferencesService;
 
-    public CitationRelationsTab(EntryEditorPreferences preferences, DialogService dialogService, BibDatabaseContext databaseContext) {
+    public CitationRelationsTab(EntryEditorPreferences preferences, DialogService dialogService, BibDatabaseContext databaseContext, UndoManager undoManager, StateManager stateManager, FileUpdateMonitor fileUpdateMonitor, PreferencesService preferencesService) {
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
+        this.undoManager = undoManager;
+        this.stateManager = stateManager;
+        this.fileUpdateMonitor = fileUpdateMonitor;
+        this.preferencesService = preferencesService;
         setText(Localization.lang("Citation relations"));
         setTooltip(new Tooltip(Localization.lang("Show articles related by citation")));
+
     }
 
     private StackPane getActivationPane(BibEntry entry) {
@@ -82,6 +104,8 @@ public class CitationRelationsTab extends EntryEditorTab {
                 prefs.putBoolean(JabRefPreferences.ACTIVATE_CITATIONRELATIONS, true);
                 dialogService.notify(Localization.lang("Please restart JabRef for preferences to take effect."));
                 setContent(getPane(entry));
+                searchForRelations(entry, startCitingButton, citingListView, citingProgress, refreshCitingButton, CitationRelationFetcher.SearchType.CITING, citingStackPane, citingProgressLabel, importCitingButton);
+                searchForRelations(entry, startCitedByButton, citedByListView, citedByProgress, refreshCitedByButton, CitationRelationFetcher.SearchType.CITEDBY, citedByStackPane, citedByProgressLabel, importCitedByButton);
             });
         activate.setDefaultButton(true);
         alignment.getChildren().addAll(infoLabel, activate);
@@ -126,10 +150,16 @@ public class CitationRelationsTab extends EntryEditorTab {
         startCitedByButton.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.SEARCH));
 
         //Create refresh Buttons for both sides
-        refreshCitingButton = new Button();
-        styleRefreshButton(refreshCitingButton);
-        refreshCitedByButton = new Button();
-        styleRefreshButton(refreshCitedByButton);
+        refreshCitingButton = IconTheme.JabRefIcons.REFRESH.asButton();
+        styleTopBarButton(refreshCitingButton, 15.0);
+        refreshCitedByButton = IconTheme.JabRefIcons.REFRESH.asButton();
+        styleTopBarButton(refreshCitedByButton, 15.0);
+
+        //Create refresh Buttons for both sides
+        importCitingButton = IconTheme.JabRefIcons.ADD_ENTRY.asButton();
+        styleTopBarButton(importCitingButton, 50.0);
+        importCitedByButton = IconTheme.JabRefIcons.ADD_ENTRY.asButton();
+        styleTopBarButton(importCitedByButton, 50.0);
 
         //Create Progress Indicators
         citingProgress = new ProgressIndicator();
@@ -142,28 +172,15 @@ public class CitationRelationsTab extends EntryEditorTab {
         citedByProgressLabel = new Label();
 
         //Add nodes to parent layout containers
-        citedByStackPane.getChildren().add(citedByListView);
-        citingStackPane.getChildren().add(citingListView);
-        citedByStackPane.getChildren().add(startCitedByButton);
-        citingStackPane.getChildren().add(startCitingButton);
-        citingStackPane.getChildren().add(citingProgress);
-        citedByStackPane.getChildren().add(citedByProgress);
-        citingStackPane.getChildren().add(citingProgressLabel);
-        citedByStackPane.getChildren().add(citedByProgressLabel);
-        citingHBox.getChildren().add(citingLabel);
-        citedByHBox.getChildren().add(citedByLabel);
-        citingHBox.getChildren().add(refreshCitingButton);
-        citedByHBox.getChildren().add(refreshCitedByButton);
-        citingVBox.getChildren().add(citingHBox);
-        citingVBox.getChildren().add(citingStackPane);
-        citedByVBox.getChildren().add(citedByHBox);
-        citedByVBox.getChildren().add(citedByStackPane);
+        citedByStackPane.getChildren().addAll(citedByListView, startCitedByButton, citedByProgress, citedByProgressLabel);
+        citingStackPane.getChildren().addAll(citingListView, startCitingButton, citingProgress, citingProgressLabel);
+        citingHBox.getChildren().addAll(citingLabel, refreshCitingButton, importCitingButton);
+        citedByHBox.getChildren().addAll(citedByLabel, refreshCitedByButton, importCitedByButton);
+        citingVBox.getChildren().addAll(citingHBox, citingStackPane);
+        citedByVBox.getChildren().addAll(citedByHBox, citedByStackPane);
 
-        //Specify click methods for buttons
-        startCitingButton.setOnMouseClicked(event -> searchForRelations(entry, startCitingButton, citingListView, citingProgress, refreshCitingButton, CitationRelationFetcher.SearchType.CITING, citingStackPane, citingProgressLabel));
-        startCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, startCitedByButton, citedByListView, citedByProgress, refreshCitedByButton, CitationRelationFetcher.SearchType.CITEDBY, citedByStackPane, citedByProgressLabel));
-        refreshCitingButton.setOnMouseClicked(event -> searchForRelations(entry, startCitingButton, citingListView, citingProgress, refreshCitingButton, CitationRelationFetcher.SearchType.CITING, citingStackPane, citingProgressLabel));
-        refreshCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, startCitedByButton, citedByListView, citedByProgress, refreshCitedByButton, CitationRelationFetcher.SearchType.CITEDBY, citedByStackPane, citedByProgressLabel));
+        refreshCitingButton.setOnMouseClicked(event -> searchForRelations(entry, startCitingButton, citingListView, citingProgress, refreshCitingButton, CitationRelationFetcher.SearchType.CITING, citingStackPane, citingProgressLabel, importCitingButton));
+        refreshCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, startCitedByButton, citedByListView, citedByProgress, refreshCitedByButton, CitationRelationFetcher.SearchType.CITEDBY, citedByStackPane, citedByProgressLabel, importCitedByButton));
 
         //Create SplitPane to hold all nodes above
         SplitPane container = new SplitPane(citedByVBox, citingVBox);
@@ -191,7 +208,6 @@ public class CitationRelationsTab extends EntryEditorTab {
                             addToggle.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
                         }
                     });
-                    addToggle.setPrefSize(25,25);
                     addToggle.getStyleClass().add("addEntryButton");
                     addToggle.selectedProperty().bindBidirectional(listView.getItemBooleanProperty(e));
                     HBox separator = new HBox();
@@ -201,15 +217,17 @@ public class CitationRelationsTab extends EntryEditorTab {
                     HBox hContainer = new HBox(entryNode, separator, addToggle);
                     hContainer.getStyleClass().add("entry-container");
 
-                    /*if (citingListView.getItems().size() == 1) {
-                        selectAllNewEntries();
-                    }*/
+                    if (citingListView.getItems().size() == 1) {
+                        selectAllNewEntries(listView);
+                    }
 
                     return hContainer;
                 })
-                .withOnMouseClickedEvent((e, event) -> listView.getCheckModel().toggleCheckState(e))
+                .withOnMouseClickedEvent((ee, event) -> listView.getCheckModel().toggleCheckState(ee))
                 .withPseudoClass(entrySelected, listView::getItemBooleanProperty)
                 .install(listView);
+
+        listView.setSelectionModel(new NoSelectionModel<>());
     }
 
     private Node getEntryNode(BibEntry entry) {
@@ -249,9 +267,15 @@ public class CitationRelationsTab extends EntryEditorTab {
         return IconTheme.JabRefIcons.ARTICLE;
     }
 
-    public void unselectAll() {
-        citingListView.getCheckModel().clearChecks();
-        citedByListView.getCheckModel().clearChecks();
+    public void unselectAll(CheckListView<BibEntry> listView) {
+        listView.getCheckModel().clearChecks();
+    }
+
+    public void selectAllNewEntries(CheckListView<BibEntry> listView) {
+        unselectAll(listView);
+        for (BibEntry entry : listView.getItems()) {
+            listView.getCheckModel().check(entry);
+        }
     }
 
     /**
@@ -273,14 +297,12 @@ public class CitationRelationsTab extends EntryEditorTab {
      *
      * @param button button to style
      */
-    private void styleRefreshButton(Button button) {
-        button.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.REFRESH));
+    private void styleTopBarButton(Button button, double offset) {
         button.setVisible(false);
-        button.setAlignment(Pos.CENTER_RIGHT);
+        button.setAlignment(Pos.CENTER);
         AnchorPane.setTopAnchor(button, 0.0);
         AnchorPane.setBottomAnchor(button, 0.0);
-        AnchorPane.setRightAnchor(button, 20.0);
-        button.getStyleClass().add("icon-button");
+        AnchorPane.setRightAnchor(button, offset);
     }
 
     /**
@@ -298,6 +320,8 @@ public class CitationRelationsTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         if (preferences.isCitationRelationActivated()) {
             setContent(getPane(entry));
+            searchForRelations(entry, startCitingButton, citingListView, citingProgress, refreshCitingButton, CitationRelationFetcher.SearchType.CITING, citingStackPane, citingProgressLabel, importCitingButton);
+            searchForRelations(entry, startCitedByButton, citedByListView, citedByProgress, refreshCitedByButton, CitationRelationFetcher.SearchType.CITEDBY, citedByStackPane, citedByProgressLabel, importCitedByButton);
         } else {
             setContent(getActivationPane(entry));
         }
@@ -306,25 +330,28 @@ public class CitationRelationsTab extends EntryEditorTab {
     /**
      * Method to start search for relations and display them
      * in the associated ListView
-     * @param entry BibEntry currently selected in Jabref Database
-     * @param startButton start button to use
-     * @param listView ListView to use
-     * @param progress ProgressIndicator to use
+     *
+     * @param entry         BibEntry currently selected in Jabref Database
+     * @param startButton   start button to use
+     * @param listView      ListView to use
+     * @param progress      ProgressIndicator to use
      * @param refreshButton refresh Button to use
-     * @param searchType type of search (CITING / CITEDBY)
-     * @param stackPane StackPane to use
+     * @param searchType    type of search (CITING / CITEDBY)
+     * @param stackPane     StackPane to use
      */
-    private void searchForRelations(BibEntry entry, Button startButton, ListView<BibEntry> listView, ProgressIndicator progress, Button refreshButton, CitationRelationFetcher.SearchType searchType, StackPane stackPane, Label progressLabel) {
-
+    private void searchForRelations(BibEntry entry, Button startButton, CheckListView<BibEntry> listView, ProgressIndicator progress, Button refreshButton, CitationRelationFetcher.SearchType searchType, StackPane stackPane, Label progressLabel, Button importButton) {
         //Check if current entry has DOI Number required for searching
         if (entry.getField(StandardField.DOI).isPresent()) {
+            if (entry.getField(StandardField.CITED).isPresent()) {
+
+            }
 
             //Create ObservableList to display in ListView
             ObservableList<BibEntry> observableList = FXCollections.observableArrayList();
             startButton.setVisible(false);
 
             //New Instance of CitationRelationsFetcher with correct searchType
-            CitationRelationFetcher fetcher = new CitationRelationFetcher(searchType, listView, progressLabel);
+            CitationRelationFetcher fetcher = new CitationRelationFetcher(searchType, progressLabel);
 
             //Perform search in background and deal with success or failure
             BackgroundTask
@@ -333,6 +360,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                         listView.getItems().clear();
                         progress.setVisible(true);
                         refreshButton.setVisible(false);
+                        importButton.setVisible(false);
                         stackPane.getChildren().remove(errorLabel);
                         progressLabel.setVisible(true);
                     })
@@ -341,13 +369,16 @@ public class CitationRelationsTab extends EntryEditorTab {
                         progressLabel.setVisible(false);
                         observableList.addAll(fetchedList);
                         if (observableList.isEmpty()) {
-                            BibEntry emptyEntry = new BibEntry();
-                            emptyEntry.setField(StandardField.TITLE, "No articles found");
-                            emptyEntry.setField(StandardField.AUTHOR, "-");
-                            observableList.add(emptyEntry);
+                            Label placeholder = new Label("No articles found");
+                            listView.setPlaceholder(placeholder);
                         }
                         listView.setItems(observableList);
                         refreshButton.setVisible(true);
+                        importButton.setVisible(true);
+                        BooleanBinding booleanBind = Bindings.isEmpty(listView.getCheckModel().getCheckedItems());
+                        importButton.disableProperty().bind(booleanBind);
+
+                        importButton.setOnMouseClicked(event -> importEntries(listView.getCheckModel().getCheckedItems()));
                     })
                     .onFailure(exception -> {
                         LOGGER.error("Error while fetching citing Articles", exception);
@@ -356,10 +387,25 @@ public class CitationRelationsTab extends EntryEditorTab {
                         errorLabel.setText(exception.getMessage());
                         stackPane.getChildren().add(errorLabel);
                         refreshButton.setVisible(true);
+                        importButton.setVisible(true);
                     })
                     .executeWith(Globals.TASK_EXECUTOR);
         } else {
-            dialogService.notify("DOI-Number required, Please add DOI-Number to entry before searching.");
+            dialogService.notify(Localization.lang("DOI-Number required, Please add DOI-Number to entry before searching."));
         }
     }
+
+    private void importEntries(List<BibEntry> entriesToImport) {
+        ImportHandler importHandler = new ImportHandler(
+                dialogService,
+                databaseContext,
+                ExternalFileTypes.getInstance(),
+                preferencesService,
+                fileUpdateMonitor,
+                undoManager,
+                stateManager);
+        importHandler.importEntries(entriesToImport);
+        dialogService.notify(Localization.lang("Number of entries successfully imported") + ": " + entriesToImport.size());
+    }
 }
+
