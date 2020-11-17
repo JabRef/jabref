@@ -43,7 +43,7 @@ java {
 }
 
 application {
-    mainClassName = "$moduleName/org.jabref.gui.JabRefLauncher"
+    mainClassName = "org.jabref.gui.JabRefLauncher"
 }
 
 // TODO: Ugly workaround to temporarily ignore build errors to dependencies of latex2unicode
