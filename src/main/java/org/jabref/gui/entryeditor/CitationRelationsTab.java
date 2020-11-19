@@ -211,7 +211,8 @@ public class CitationRelationsTab extends EntryEditorTab {
                     Button jumpTo = IconTheme.JabRefIcons.LINK.asButton();
 
                     jumpTo.getStyleClass().add("addEntryButton");
-                    jumpTo.setOnMouseClicked(event -> libraryTab.showAndEdit(e));
+                    jumpTo.setOnMouseClicked(event -> { libraryTab.showAndEdit(e);
+                                                        libraryTab.clearAndSelect(e);});
                     HBox separator = new HBox();
                     HBox.setHgrow(separator, Priority.SOMETIMES);
                     Node entryNode = getEntryNode(e);
