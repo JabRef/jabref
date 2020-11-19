@@ -447,16 +447,20 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     /**
      * Filters an Observable List for Entries, that are already in the operator Field of the Entry.
+     * If the entry is no duplicate, it also add the current entry to the negative operator of the entry in the List
      * @param ol        The List to Filter
      * @param operator  StandardField.CITING/CITED
      * @param entry     Current Entry Context
      */
     private void filterDifference(ObservableList<BibEntry> ol, CitationRelationFetcher.SearchType operator, BibEntry entry) {
         StandardField field;
+        StandardField nField;
         if (operator.equals(CitationRelationFetcher.SearchType.CITEDBY)) {
             field = StandardField.CITEDBY;
+            nField = StandardField.CITING;
         } else {
             field = StandardField.CITING;
+            nField = StandardField.CITEDBY;
         }
         CitationKeyGenerator ckg = new CitationKeyGenerator(databaseContext, Globals.prefs.getCitationKeyPatternPreferences());
         List<String> currentKeys = getFilteredKeys(entry, field);
@@ -466,6 +470,8 @@ public class CitationRelationsTab extends EntryEditorTab {
             if (key.isPresent() && currentKeys.contains(key.get())) {
                 ol.remove(b);
                 LOGGER.info(field.getName() + " Duplicate: " + b.getCitationKey().orElse("no key"));
+            } else {
+                b.setField(nField, entry.getCitationKey().orElse(""));
             }
         }
     }
