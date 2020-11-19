@@ -430,6 +430,7 @@ public class CitationRelationsTab extends EntryEditorTab {
      * @param field         The StandardField to work with
      */
     private void runOfflineTask(BibEntry entry, ListView<BibEntry> localListView, StandardField field) {
+        LOGGER.info("In Field, " + field.getName() + ": " + entry.getField(field).orElse("empty!"));
         List<String> keys = getFilteredKeys(entry, field);
         ObservableList<BibEntry> observableList = FXCollections.observableArrayList();
 
@@ -461,8 +462,10 @@ public class CitationRelationsTab extends EntryEditorTab {
         List<String> currentKeys = getFilteredKeys(entry, field);
         for (BibEntry b : ol) {
             ckg.generateAndSetKey(b);
-            if (currentKeys.contains(b.getCitationKey().orElse(""))) {
+            Optional<String> key = b.getCitationKey();
+            if (key.isPresent() && currentKeys.contains(key.get())) {
                 ol.remove(b);
+                LOGGER.info(field.getName() + " Duplicate: " + b.getCitationKey().orElse("no key"));
             }
         }
     }
@@ -472,13 +475,18 @@ public class CitationRelationsTab extends EntryEditorTab {
      * in Database, set the new existing keys and return them
      * @param entry The Current selected Entry
      * @param operator StandardField.CITING/CITED
-     * @return
+     * @return A List Containing the keys in the "operator"  field, theirs relations are in the Database
      */
     private List<String> getFilteredKeys(BibEntry entry, StandardField operator) {
-        String citingS = entry.getField(operator).orElse("");
-        ArrayList<String> keys = new ArrayList<>(Arrays.asList(citingS.split(",")));
+        Optional<String> citingS = entry.getField(operator);
+        if (citingS.isEmpty()) {
+            LOGGER.info("Entry: " + entry.getCitationKey().orElse("no key") + "--" + operator.getName() + " is empty!");
+            return new ArrayList<>();
+        }
+        ArrayList<String> keys = new ArrayList<>(Arrays.asList(citingS.get().split(",")));
         filterNonExisting(keys);
-        entry.setField(operator, keys.toString());
+        entry.setField(operator, String.join(",", keys));
+        LOGGER.info("Entry: " + entry.getCitationKey().orElse("no key") + "--" + operator.getName() + String.join(",", keys));
         return keys;
     }
 
