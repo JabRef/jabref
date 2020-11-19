@@ -505,7 +505,9 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     /**
-     * Returns a String Containing the CitationKeys of a List of Entries
+     * Returns a String Containing the CitationKeys of a List of Entries. Ignores Entries with no Citationkey
+     * @param be The List of BibEntries to serialize
+     * @return A Comma Separated List of CitationKeys(of the given List of Entries)
      */
     private String serialize(List<BibEntry> be) {
         List<String> ret = new ArrayList<>();
@@ -517,7 +519,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     /**
-     * Function to import selected Entries to the Database
+     * Function to import selected Entries to the Database. Also Writes the Entries to Import to the CITING/CITED Field
      * @param entriesToImport entries to import
      */
     private void importEntries(List<BibEntry> entriesToImport, CitationRelationFetcher.SearchType searchType, BibEntry entry) {
