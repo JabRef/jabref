@@ -144,8 +144,6 @@ public class CitationRelationsTab extends EntryEditorTab {
         AnchorPane citedByHBox = new AnchorPane();
         ScrollPane citingScrollPane = new ScrollPane();
         ScrollPane citedByScrollPane = new ScrollPane();
-        VBox citingScrollVBox = new VBox();
-        VBox citedByScrollVBox = new VBox();
         VBox citingInnerVbox = new VBox();
         VBox citedByInnerVbox = new VBox();
 
@@ -185,23 +183,19 @@ public class CitationRelationsTab extends EntryEditorTab {
         citingHBox.getChildren().addAll(abortCitingButton, citingLabel, refreshCitingButton, importCitingButton);
         citedByHBox.getChildren().addAll(abortCitedButton, citedByLabel, refreshCitedByButton, importCitedByButton);
 
-        citingScrollPane.setContent(citingScrollVBox);
-        citedByScrollPane.setContent(citedByScrollVBox);
-        citingScrollVBox.getChildren().addAll(citingInnerVbox,new Label("Online"));
-        citedByScrollVBox.getChildren().addAll(citedByInnerVbox, new Label("Online"));
+        citingScrollPane.setContent(citingInnerVbox);
+        citedByScrollPane.setContent(citedByInnerVbox);
         citingVBox.getChildren().addAll(citingHBox, citingScrollPane);
         citedByVBox.getChildren().addAll(citedByHBox, citedByScrollPane);
 
         refreshCitingButton.setOnMouseClicked(event -> searchForRelations(entry, citingListView, citingLocalListView, abortCitingButton, refreshCitingButton, CitationRelationFetcher.SearchType.CITING, importCitingButton));
         refreshCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, citedByListView, citedByLocalListView, abortCitedButton, refreshCitedByButton, CitationRelationFetcher.SearchType.CITEDBY, importCitedByButton));
-        abortCitingButton.setOnMouseClicked(event -> citingTask.cancel());
-        abortCitedButton.setOnMouseClicked(event -> citedByTask.cancel());
 
         //Create SplitPane to hold all nodes above
         SplitPane container = new SplitPane(citedByVBox, citingVBox);
 
-        citingScrollVBox.prefWidthProperty().bind(citingScrollPane.widthProperty());
-        citedByScrollVBox.prefWidthProperty().bind(citedByScrollPane.widthProperty());
+        citingInnerVbox.prefWidthProperty().bind(citingScrollPane.widthProperty());
+        citedByInnerVbox.prefWidthProperty().bind(citedByScrollPane.widthProperty());
 
         styleFetchedListView(citingListView);
         styleFetchedListView(citedByListView);
@@ -504,7 +498,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             Optional<String> s = b.getCitationKey();
             s.ifPresent(ret::add);
         }
-        return ret.toString();
+        return String.join(",", ret);
     }
 
     /**
