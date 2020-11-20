@@ -189,8 +189,10 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         //Create Import Buttons for both sides
         importCitingButton = IconTheme.JabRefIcons.ADD_ENTRY.asButton();
+        importCitingButton.setVisible(false);
         styleTopBarNode(importCitingButton, 50.0);
         importCitedByButton = IconTheme.JabRefIcons.ADD_ENTRY.asButton();
+        importCitedByButton.setVisible(false);
         styleTopBarNode(importCitedByButton, 50.0);
 
         citingHBox.getChildren().addAll(citingLabel, refreshCitingButton, importCitingButton, citingProgress, abortCitingButton);
@@ -332,7 +334,6 @@ public class CitationRelationsTab extends EntryEditorTab {
      * @param node node to style
      */
     private void styleTopBarNode(Node node, double offset) {
-        node.setVisible(true);
         AnchorPane.setTopAnchor(node, 0.0);
         AnchorPane.setBottomAnchor(node, 0.0);
         AnchorPane.setRightAnchor(node, offset);
@@ -487,16 +488,15 @@ public class CitationRelationsTab extends EntryEditorTab {
         for (BibEntry b : newEntries) {
             ckg.generateAndSetKey(b);
             Optional<String> key = b.getCitationKey();
-            LOGGER.info(key.orElse(""));
-            if (key.isPresent() && currentKeys.contains(key.get())) {
-                LOGGER.info("In current keys");
+            if ((key.isPresent() && currentKeys.contains(key.get().substring(0, key.get().length()-1)))) {
+                LOGGER.info(key.get().substring(0, key.get().length()-1) + "is in current keys");
                 if (!observableList.contains(new CitationRelationItem(b, true))) {
-                    b.setField(nField, entry.getCitationKey().orElse(""));
+                    b.setField(nField, b.getField(nField).orElse("") + "," + entry.getCitationKey().orElse(""));
                     observableList.add(new CitationRelationItem(b, true));
                 }
             } else {
-                LOGGER.info("Not in current keys");
-                b.setField(nField, entry.getCitationKey().orElse(""));
+                LOGGER.info(key.get() + "is not in current keys");
+                b.setField(nField, b.getField(nField).orElse("") + "," + entry.getCitationKey().orElse(""));
                 observableList.add(new CitationRelationItem(b, false));
             }
         }

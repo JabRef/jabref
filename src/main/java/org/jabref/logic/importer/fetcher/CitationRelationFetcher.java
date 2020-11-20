@@ -68,18 +68,20 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
                 }
                 LOGGER.info("API Answer: " + json.toString());
                 String[] items = json.getJSONObject(0).getString(searchType.label).split("; ");
-                int i = 1;
-                for (String item : items) {
-                    LOGGER.info("Current Item " + i + "/" + (items.length == 1 ? 0 : items.length));
-                    if (!doi.equals(item) && !item.equals("")) {
-                        DoiFetcher doiFetcher = new DoiFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
-                        try {
-                            doiFetcher.performSearchById(item).ifPresent(list::add);
-                        } catch (FetcherException fetcherException) {
-                            // No information for doi found
+                if (!Arrays.equals(items, new String[]{""})) {
+                    int i = 1;
+                    for (String item : items) {
+                        LOGGER.info("Current Item " + i + "/" + items.length);
+                        if (!doi.equals(item) && !item.equals("")) {
+                            DoiFetcher doiFetcher = new DoiFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
+                            try {
+                                doiFetcher.performSearchById(item).ifPresent(list::add);
+                            } catch (FetcherException fetcherException) {
+                                // No information for doi found
+                            }
                         }
+                        i++;
                     }
-                    i++;
                 }
             } catch (IOException | JSONException e) {
                 throw new FetcherException("Couldn't connect to opencitations.net! Please try again.");
