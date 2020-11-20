@@ -6,11 +6,8 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
-import javafx.application.Platform;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
@@ -20,12 +17,15 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class to fetch for an articles citation relations on opencitations.net's API
  */
 public class CitationRelationFetcher implements EntryBasedFetcher {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(org.jabref.logic.importer.fetcher.CitationRelationFetcher.class);
     private SearchType searchType = null;
     private static final String BASIC_URL = "https://opencitations.net/index/api/v1/metadata/";
 
@@ -59,18 +59,18 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
         if (searchType != null) {
             List<BibEntry> list = new ArrayList<>();
             try {
-                System.out.println(BASIC_URL + doi);
+                LOGGER.info("Search: " + BASIC_URL + doi);
                 JSONArray json = readJsonFromUrl(BASIC_URL + doi);
                 if (json == null) {
                     throw new FetcherException("No internet connection! Please try again.");
                 } else if (json.isEmpty()) {
                     return list;
                 }
-                System.out.println(json.toString());
+                LOGGER.info("API Answer: " + json.toString());
                 String[] items = json.getJSONObject(0).getString(searchType.label).split("; ");
                 int i = 1;
                 for (String item : items) {
-                    int finalI = i;
+                    LOGGER.info("Current Item " + i + "/" + (items.length == 1 ? 0 : items.length));
                     if (!doi.equals(item) && !item.equals("")) {
                         DoiFetcher doiFetcher = new DoiFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
                         try {
