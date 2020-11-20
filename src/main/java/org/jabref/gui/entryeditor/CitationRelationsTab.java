@@ -488,16 +488,16 @@ public class CitationRelationsTab extends EntryEditorTab {
         for (BibEntry b : newEntries) {
             ckg.generateAndSetKey(b);
             Optional<String> key = b.getCitationKey();
-            if ((key.isPresent() && currentKeys.contains(key.get().substring(0, key.get().length()-1)))) {
-                LOGGER.info(key.get().substring(0, key.get().length()-1) + "is in current keys");
-                if (!observableList.contains(new CitationRelationItem(b, true))) {
-                    b.setField(nField, b.getField(nField).orElse("") + "," + entry.getCitationKey().orElse(""));
-                    observableList.add(new CitationRelationItem(b, true));
-                }
-            } else {
-                LOGGER.info(key.get() + "is not in current keys");
+            if ((key.isPresent() && !currentKeys.contains(key.get().substring(0, key.get().length() - 1)))) {
                 b.setField(nField, b.getField(nField).orElse("") + "," + entry.getCitationKey().orElse(""));
                 observableList.add(new CitationRelationItem(b, false));
+            } else {
+                for (CitationRelationItem item : observableList) {
+                    if (item.bibEntry.getCitationKey().orElse("").equals(b.getCitationKey().orElse(""))) {
+                        b.setField(nField, b.getField(nField).orElse("") + "," + entry.getCitationKey().orElse(""));
+                        observableList.add(new CitationRelationItem(b, true));
+                    }
+                }
             }
         }
     }
