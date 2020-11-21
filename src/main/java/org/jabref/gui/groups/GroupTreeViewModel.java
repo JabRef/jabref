@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -132,8 +131,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             rootGroup.setValue(newRoot);
             if (stateManager.getSelectedGroup(newDatabase.get()).isEmpty()) {
-                // Groups panel has to initialize before selecting the all entries group
-                Platform.runLater(() -> stateManager.setSelectedGroups(newDatabase.get(), Collections.singletonList(newRoot.getGroupNode())));
+                stateManager.setSelectedGroups(newDatabase.get(), Collections.singletonList(newRoot.getGroupNode()));
             }
             selectedGroups.setAll(
                     stateManager.getSelectedGroup(newDatabase.get()).stream()
