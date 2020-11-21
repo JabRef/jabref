@@ -137,7 +137,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.JabRefPreferences;
-import org.jabref.preferences.LastFocusedTabPreferences;
 
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
@@ -342,18 +341,18 @@ public class JabRefFrame extends BorderPane {
      *                  set to true
      */
     private void tearDownJabRef(List<String> filenames) {
-        // prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, getExtendedState() == Frame.MAXIMIZED_BOTH);
-
-        if (prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)) {
-            // Here we store the names of all current files. If
-            // there is no current file, we remove any
+        if (prefs.getGuiPreferences().shouldOpenLastEdited()) {
+            // Here we store the names of all current files. If there is no current file, we remove any
             // previously stored filename.
             if (filenames.isEmpty()) {
-                prefs.remove(JabRefPreferences.LAST_EDITED);
+                prefs.clearEditedFiles();
             } else {
-                prefs.putStringList(JabRefPreferences.LAST_EDITED, filenames);
-                Path focusedDatabase = getCurrentLibraryTab().getBibDatabaseContext().getDatabasePath().orElse(null);
-                new LastFocusedTabPreferences(prefs).setLastFocusedTab(focusedDatabase);
+                Path focusedDatabase = getCurrentLibraryTab().getBibDatabaseContext()
+                                                             .getDatabasePath()
+                                                             .orElse(null);
+                prefs.storeGuiPreferences(prefs.getGuiPreferences()
+                                               .withLastFilesOpened(filenames)
+                                               .withLastFocusedFile(focusedDatabase));
             }
         }
 

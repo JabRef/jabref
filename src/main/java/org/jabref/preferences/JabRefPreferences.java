@@ -2443,6 +2443,44 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     //*************************************************************************************************************
+    // GuiPreferences
+    //*************************************************************************************************************
+
+    @Override
+    public GuiPreferences getGuiPreferences() {
+        return new GuiPreferences(
+                getDouble(JabRefPreferences.POS_X),
+                getDouble(JabRefPreferences.POS_Y),
+                getDouble(JabRefPreferences.SIZE_X),
+                getDouble(JabRefPreferences.SIZE_Y),
+                getBoolean(JabRefPreferences.WINDOW_MAXIMISED),
+                getBoolean(JabRefPreferences.OPEN_LAST_EDITED),
+                getStringList(JabRefPreferences.LAST_EDITED),
+                Path.of(get(JabRefPreferences.LAST_FOCUSED)));
+    }
+
+    @Override
+    public void storeGuiPreferences(GuiPreferences guiPreferences) {
+        putDouble(JabRefPreferences.POS_X, guiPreferences.getPositionX());
+        putDouble(JabRefPreferences.POS_Y, guiPreferences.getPositionY());
+        putDouble(JabRefPreferences.SIZE_X, guiPreferences.getSizeX());
+        putDouble(JabRefPreferences.SIZE_Y, guiPreferences.getSizeY());
+        putBoolean(JabRefPreferences.WINDOW_MAXIMISED, guiPreferences.isWindowMaximised());
+        putBoolean(JabRefPreferences.OPEN_LAST_EDITED, guiPreferences.shouldOpenLastEdited());
+        putStringList(JabRefPreferences.LAST_EDITED, guiPreferences.getLastFilesOpened());
+
+        if (guiPreferences.getLastFocusedFile() != null) {
+            String filePath = guiPreferences.getLastFocusedFile().toAbsolutePath().toString();
+            put(JabRefPreferences.LAST_FOCUSED, filePath);
+        }
+    }
+
+    @Override
+    public void clearEditedFiles() {
+        prefs.remove(JabRefPreferences.LAST_EDITED);
+    }
+
+    //*************************************************************************************************************
     // Misc preferences
     //*************************************************************************************************************
 

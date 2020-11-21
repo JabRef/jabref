@@ -295,6 +295,16 @@ public interface PreferencesService {
     void storeSidePanePreferences(SidePanePreferences sidePanePreferences);
 
     //*************************************************************************************************************
+    // GuiPreferences
+    //*************************************************************************************************************
+
+    GuiPreferences getGuiPreferences();
+
+    void storeGuiPreferences(GuiPreferences guiPreferences);
+
+    void clearEditedFiles();
+
+    //*************************************************************************************************************
     // Misc preferences
     //*************************************************************************************************************
 
