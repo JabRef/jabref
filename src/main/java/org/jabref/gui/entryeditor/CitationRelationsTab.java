@@ -498,12 +498,12 @@ public class CitationRelationsTab extends EntryEditorTab {
                 } else {
                     if (!currentKeys.contains(doi)) { // if in database but not in keys
                         entry.setField(field, entry.getField(field).orElse("") + "," + doi);
-                    }
-                    // Add negative Reference to existing Entry and add this entry as local reference
-                    BibEntry existing = getEntryByDOI(doi);
-                    if (existing != null) {
-                        existing.setField(nField, existing.getField(nField).orElse("") + "," + entryDoi);
-                        observableList.add(new CitationRelationItem(existing, true));
+                        // Add negative Reference to existing Entry and add this entry as local reference
+                        BibEntry existing = getEntryByDOI(doi);
+                        if (existing != null) {
+                            existing.setField(nField, existing.getField(nField).orElse("") + "," + entryDoi);
+                            observableList.add(0, new CitationRelationItem(existing, true));
+                        }
                     }
                 }
             }
