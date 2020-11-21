@@ -40,6 +40,9 @@ open module org.jabref {
     requires java.xml.bind;
     requires jdk.xml.dom;
 
+    // Annotations (@PostConstruct)
+    requires java.annotation;
+
     // Microsoft application insights
     requires applicationinsights.core;
 
