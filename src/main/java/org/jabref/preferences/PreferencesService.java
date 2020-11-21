@@ -287,6 +287,14 @@ public interface PreferencesService {
     void storePreviewPreferences(PreviewPreferences previewPreferences);
 
     //*************************************************************************************************************
+    // SidePanePreferences
+    //*************************************************************************************************************
+
+    SidePanePreferences getSidePanePreferences();
+
+    void storeSidePanePreferences(SidePanePreferences sidePanePreferences);
+
+    //*************************************************************************************************************
     // Misc preferences
     //*************************************************************************************************************
 

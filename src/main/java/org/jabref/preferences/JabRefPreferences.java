@@ -396,6 +396,7 @@ public class JabRefPreferences implements PreferencesService {
     private List<MainTableColumnModel> mainTableColumns;
     private List<MainTableColumnModel> mainTableColumnSortOrder;
     private PreviewPreferences previewPreferences;
+    private SidePanePreferences sidePanePreferences;
     private Theme globalTheme;
 
     // The constructor is made private to enforce this as a singleton class:
@@ -759,27 +760,6 @@ public class JabRefPreferences implements PreferencesService {
             storage.put(JabRefPreferences.CLEANUP + action.name(), !deactivatedJobs.contains(action));
         }
         storage.put(CLEANUP_FORMATTERS, convertListToString(Cleanups.DEFAULT_SAVE_ACTIONS.getAsStringList(OS.NEWLINE)));
-    }
-
-    public Map<SidePaneType, Integer> getSidePanePreferredPositions() {
-        Map<SidePaneType, Integer> preferredPositions = new HashMap<>();
-
-        List<String> componentNames = getStringList(SIDE_PANE_COMPONENT_NAMES);
-        List<String> componentPositions = getStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS);
-
-        for (int i = 0; i < componentNames.size(); ++i) {
-            String name = componentNames.get(i);
-            try {
-                SidePaneType type = Enum.valueOf(SidePaneType.class, name);
-                preferredPositions.put(type, Integer.parseInt(componentPositions.get(i)));
-            } catch (NumberFormatException e) {
-                LOGGER.debug("Invalid number format for side pane component '" + name + "'", e);
-            } catch (IllegalArgumentException e) {
-                LOGGER.debug("Following component is not a side pane: '" + name + "'", e);
-            }
-        }
-
-        return preferredPositions;
     }
 
     @Override
@@ -1318,20 +1298,6 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void storeJournalAbbreviationPreferences(JournalAbbreviationPreferences abbreviationsPreferences) {
         putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, abbreviationsPreferences.getExternalJournalLists());
-    }
-
-    public void storeSidePanePreferredPositions(Map<SidePaneType, Integer> preferredPositions) {
-        // Split the map into a pair of parallel String lists suitable for storage
-        List<String> names = preferredPositions.keySet().stream()
-                                               .map(Enum::toString)
-                                               .collect(Collectors.toList());
-
-        List<String> positions = preferredPositions.values().stream()
-                                                   .map(integer -> Integer.toString(integer))
-                                                   .collect(Collectors.toList());
-
-        putStringList(SIDE_PANE_COMPONENT_NAMES, names);
-        putStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, positions);
     }
 
     public void setPreviewStyle(String previewStyle) {
@@ -2411,6 +2377,69 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(PREVIEW_AS_TAB, previewPreferences.showPreviewAsExtraTab());
 
         updatePreviewPreferences();
+    }
+
+    //*************************************************************************************************************
+    // SidePanePreferences
+    //*************************************************************************************************************
+
+    @Override
+    public SidePanePreferences getSidePanePreferences() {
+        if (this.sidePanePreferences == null) {
+            updateSidePanePreferences();
+        }
+        return this.sidePanePreferences;
+    }
+
+    void updateSidePanePreferences() {
+        this.sidePanePreferences = new SidePanePreferences(
+                getBoolean(WEB_SEARCH_VISIBLE),
+                getBoolean(GROUP_SIDEPANE_VISIBLE),
+                getSidePanePreferredPositions(),
+                getInt(JabRefPreferences.SELECTED_FETCHER_INDEX));
+    }
+
+    @Override
+    public void storeSidePanePreferences(SidePanePreferences preferences) {
+        putBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE, preferences.isWebSearchPaneVisible());
+        putBoolean(JabRefPreferences.GROUP_SIDEPANE_VISIBLE, preferences.isGroupsPaneVisible());
+        storeSidePanePreferredPositions(preferences.getPreferredPositions());
+        putInt(JabRefPreferences.SELECTED_FETCHER_INDEX, preferences.getWebSearchFetcherSelected());
+    }
+
+    private Map<SidePaneType, Integer> getSidePanePreferredPositions() {
+        Map<SidePaneType, Integer> preferredPositions = new HashMap<>();
+
+        List<String> componentNames = getStringList(SIDE_PANE_COMPONENT_NAMES);
+        List<String> componentPositions = getStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS);
+
+        for (int i = 0; i < componentNames.size(); ++i) {
+            String name = componentNames.get(i);
+            try {
+                SidePaneType type = Enum.valueOf(SidePaneType.class, name);
+                preferredPositions.put(type, Integer.parseInt(componentPositions.get(i)));
+            } catch (NumberFormatException e) {
+                LOGGER.debug("Invalid number format for side pane component '" + name + "'", e);
+            } catch (IllegalArgumentException e) {
+                LOGGER.debug("Following component is not a side pane: '" + name + "'", e);
+            }
+        }
+
+        return preferredPositions;
+    }
+
+    private void storeSidePanePreferredPositions(Map<SidePaneType, Integer> preferredPositions) {
+        // Split the map into a pair of parallel String lists suitable for storage
+        List<String> names = preferredPositions.keySet().stream()
+                                               .map(Enum::toString)
+                                               .collect(Collectors.toList());
+
+        List<String> positions = preferredPositions.values().stream()
+                                                   .map(integer -> Integer.toString(integer))
+                                                   .collect(Collectors.toList());
+
+        putStringList(SIDE_PANE_COMPONENT_NAMES, names);
+        putStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, positions);
     }
 
     //*************************************************************************************************************
