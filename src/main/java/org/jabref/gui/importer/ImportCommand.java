@@ -17,7 +17,6 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.JabRefPreferences;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
@@ -52,7 +51,7 @@ public class ImportCommand extends SimpleCommand {
                 .addExtensionFilter(FileFilterConverter.ANY_FILE)
                 .addExtensionFilter(FileFilterConverter.forAllImporters(importers))
                 .addExtensionFilter(FileFilterConverter.importerToExtensionFilter(importers))
-                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY))
+                .withInitialDirectory(Globals.prefs.getImportExportPreferences().getImportWorkingDirectory())
                 .build();
         dialogService.showFileOpenDialog(fileDialogConfiguration)
                      .ifPresent(path -> doImport(path, importers, fileDialogConfiguration.getSelectedExtensionFilter()));
@@ -69,6 +68,6 @@ public class ImportCommand extends SimpleCommand {
         ImportAction importMenu = new ImportAction(frame, openInNew, format.orElse(null));
         importMenu.automatedImport(Collections.singletonList(file.toString()));
         // Set last working dir for import
-        Globals.prefs.put(JabRefPreferences.IMPORT_WORKING_DIRECTORY, file.getParent().toString());
+        Globals.prefs.storeImportExportPreferences(Globals.prefs.getImportExportPreferences().withImportWorkingDirectory(file.getParent()));
     }
 }

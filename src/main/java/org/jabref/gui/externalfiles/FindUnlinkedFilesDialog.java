@@ -102,11 +102,11 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Boolean> {
         buttonBrowse.getStyleClass().add("text-button");
         buttonBrowse.setOnAction(e -> {
             DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                    .withInitialDirectory(preferences.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+                    .withInitialDirectory(preferences.getWorkingDir()).build();
             dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
                          .ifPresent(selectedDirectory -> {
                              textfieldDirectoryPath.setText(selectedDirectory.toAbsolutePath().toString());
-                             preferences.put(JabRefPreferences.WORKING_DIRECTORY, selectedDirectory.toAbsolutePath().toString());
+                             preferences.setWorkingDirectory(selectedDirectory.toAbsolutePath());
                          });
         });
 
@@ -344,10 +344,10 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Boolean> {
         buttonApply.setVisible(false);
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .withInitialDirectory(preferences.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+                .withInitialDirectory(preferences.getWorkingDir()).build();
         Optional<Path> exportPath = dialogService.showFileSaveDialog(fileDialogConfiguration);
 
-        if (!exportPath.isPresent()) {
+        if (exportPath.isEmpty()) {
             buttonExport.setVisible(true);
             buttonApply.setVisible(true);
             return;

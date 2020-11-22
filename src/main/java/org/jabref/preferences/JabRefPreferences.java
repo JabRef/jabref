@@ -170,6 +170,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String LAST_FOCUSED = "lastFocused";
     public static final String AUTO_OPEN_FORM = "autoOpenForm";
     public static final String IMPORT_WORKING_DIRECTORY = "importWorkingDirectory";
+    public static final String LAST_USED_EXPORT = "lastUsedExport";
     public static final String EXPORT_WORKING_DIRECTORY = "exportWorkingDirectory";
     public static final String WORKING_DIRECTORY = "workingDirectory";
     public static final String GROUPS_DEFAULT_FIELD = "groupsDefaultField";
@@ -226,7 +227,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
     public static final String SHOW_FILE_LINKS_UPGRADE_WARNING = "showFileLinksUpgradeWarning";
     public static final String SIDE_PANE_WIDTH = "sidePaneWidthFX";
-    public static final String LAST_USED_EXPORT = "lastUsedExport";
     public static final String CITE_COMMAND = "citeCommand";
     public static final String GENERATE_KEYS_BEFORE_SAVING = "generateKeysBeforeSaving";
     public static final String EMAIL_SUBJECT = "emailSubject";
@@ -1373,16 +1373,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public String getExportWorkingDirectory() {
-        return get(EXPORT_WORKING_DIRECTORY);
-    }
-
-    @Override
-    public void setExportWorkingDirectory(String layoutFileDirString) {
-        put(EXPORT_WORKING_DIRECTORY, layoutFileDirString);
-    }
-
-    @Override
     public boolean shouldWarnAboutDuplicatesForImport() {
         return getBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION);
     }
@@ -2108,16 +2098,6 @@ public class JabRefPreferences implements PreferencesService {
     // File preferences
     //*************************************************************************************************************
 
-    @Override
-    public String getLastPreferencesExportPath() {
-        return get(PREFS_EXPORT_PATH);
-    }
-
-    @Override
-    public void storeLastPreferencesExportPath(Path exportFile) {
-        put(PREFS_EXPORT_PATH, exportFile.toString());
-    }
-
     // ToDo: Can this be disbanded?
     @Override
     public ImportFormatPreferences getImportFormatPreferences() {
@@ -2219,8 +2199,8 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public void setWorkingDir(Path dir) {
-        put(WORKING_DIRECTORY, dir.toString());
+    public void setWorkingDirectory(Path directory) {
+        put(WORKING_DIRECTORY, directory.toString());
     }
 
     @Override
@@ -2291,16 +2271,22 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS),
                 get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR),
                 getNewLineSeparator(),
-                getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT));
+                getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
+                Path.of(get(JabRefPreferences.IMPORT_WORKING_DIRECTORY)),
+                get(JabRefPreferences.LAST_USED_EXPORT),
+                Path.of(get(JabRefPreferences.EXPORT_WORKING_DIRECTORY)));
     }
 
     @Override
-    public void storeImportExportPreferences(ImportExportPreferences importExportPreferences) {
-        put(JabRefPreferences.NON_WRAPPABLE_FIELDS, importExportPreferences.getNonWrappableFields());
-        putBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS, importExportPreferences.shouldResolveStringsForAllStrings());
-        put(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR, importExportPreferences.getNonResolvableFields());
-        storeNewLineSeparator(importExportPreferences.getNewLineSeparator());
-        putBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT, importExportPreferences.shouldAlwaysReformatOnSave());
+    public void storeImportExportPreferences(ImportExportPreferences preferences) {
+        put(JabRefPreferences.NON_WRAPPABLE_FIELDS, preferences.getNonWrappableFields());
+        putBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS, preferences.shouldResolveStringsForAllStrings());
+        put(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR, preferences.getNonResolvableFields());
+        storeNewLineSeparator(preferences.getNewLineSeparator());
+        putBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT, preferences.shouldAlwaysReformatOnSave());
+        put(JabRefPreferences.IMPORT_WORKING_DIRECTORY, preferences.getImportWorkingDirectory().toString());
+        put(JabRefPreferences.LAST_USED_EXPORT, preferences.getLastExportExtension());
+        put(JabRefPreferences.EXPORT_WORKING_DIRECTORY, preferences.getExportWorkingDirectory().toString());
     }
 
     @Override
@@ -2405,6 +2391,8 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(JabRefPreferences.GROUP_SIDEPANE_VISIBLE, preferences.isGroupsPaneVisible());
         storeSidePanePreferredPositions(preferences.getPreferredPositions());
         putInt(JabRefPreferences.SELECTED_FETCHER_INDEX, preferences.getWebSearchFetcherSelected());
+
+        this.sidePanePreferences = preferences;
     }
 
     private Map<SidePaneType, Integer> getSidePanePreferredPositions() {
@@ -2443,7 +2431,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     //*************************************************************************************************************
-    // GuiPreferences
+    // GUI preferences
     //*************************************************************************************************************
 
     @Override
@@ -2478,6 +2466,33 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void clearEditedFiles() {
         prefs.remove(JabRefPreferences.LAST_EDITED);
+    }
+
+    //*************************************************************************************************************
+    // Search preferences
+    //*************************************************************************************************************
+
+    @Override
+    public SearchPreferences getSearchPreferences() {
+        SearchDisplayMode searchDisplayMode;
+        try {
+            searchDisplayMode = SearchDisplayMode.valueOf(get(SEARCH_DISPLAY_MODE));
+        } catch (IllegalArgumentException ex) {
+            // Should only occur when the searchmode is set directly via preferences.put and the enum was not used
+            searchDisplayMode = SearchDisplayMode.valueOf((String) defaults.get(SEARCH_DISPLAY_MODE));
+        }
+
+        return new SearchPreferences(
+                searchDisplayMode,
+                getBoolean(SEARCH_CASE_SENSITIVE),
+                getBoolean(SEARCH_REG_EXP));
+    }
+
+    @Override
+    public void storeSearchPreferences(SearchPreferences preferences) {
+        put(SEARCH_DISPLAY_MODE, Objects.requireNonNull(preferences.getSearchDisplayMode()).toString());
+        putBoolean(SEARCH_CASE_SENSITIVE, preferences.isCaseSensitive());
+        putBoolean(SEARCH_REG_EXP, preferences.isRegularExpression());
     }
 
     //*************************************************************************************************************
@@ -2562,25 +2577,12 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public SearchPreferences getSearchPreferences() {
-        SearchDisplayMode searchDisplayMode;
-        try {
-            searchDisplayMode = SearchDisplayMode.valueOf(get(SEARCH_DISPLAY_MODE));
-        } catch (IllegalArgumentException ex) {
-            // Should only occur when the searchmode is set directly via preferences.put and the enum was not used
-            searchDisplayMode = SearchDisplayMode.valueOf((String) defaults.get(SEARCH_DISPLAY_MODE));
-        }
-
-        return new SearchPreferences(
-                searchDisplayMode,
-                getBoolean(SEARCH_CASE_SENSITIVE),
-                getBoolean(SEARCH_REG_EXP));
+    public String getLastPreferencesExportPath() {
+        return get(PREFS_EXPORT_PATH);
     }
 
     @Override
-    public void storeSearchPreferences(SearchPreferences preferences) {
-        put(SEARCH_DISPLAY_MODE, Objects.requireNonNull(preferences.getSearchDisplayMode()).toString());
-        putBoolean(SEARCH_CASE_SENSITIVE, preferences.isCaseSensitive());
-        putBoolean(SEARCH_REG_EXP, preferences.isRegularExpression());
+    public void storeLastPreferencesExportPath(Path exportFile) {
+        put(PREFS_EXPORT_PATH, exportFile.toString());
     }
 }

@@ -69,10 +69,6 @@ public interface PreferencesService {
 
     FieldContentFormatterPreferences getFieldContentParserPreferences();
 
-    Path getWorkingDir();
-
-    void setWorkingDir(Path dir);
-
     OpenOfficePreferences getOpenOfficePreferences();
 
     void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences);
@@ -88,10 +84,6 @@ public interface PreferencesService {
     SavePreferences getSavePreferencesForExport();
 
     SavePreferences getSavePreferences();
-
-    String getExportWorkingDirectory();
-
-    void setExportWorkingDirectory(String layoutFileDirString);
 
     Charset getDefaultEncoding();
 
@@ -270,7 +262,7 @@ public interface PreferencesService {
 
     ImportExportPreferences getImportExportPreferences();
 
-    void storeImportExportPreferences(ImportExportPreferences importExportPreferences);
+    void storeImportExportPreferences(ImportExportPreferences preferences);
 
     boolean getShouldAutosave();
 
@@ -303,6 +295,10 @@ public interface PreferencesService {
     void storeGuiPreferences(GuiPreferences guiPreferences);
 
     void clearEditedFiles();
+
+    Path getWorkingDir();
+
+    void setWorkingDirectory(Path dir);
 
     //*************************************************************************************************************
     // Misc preferences

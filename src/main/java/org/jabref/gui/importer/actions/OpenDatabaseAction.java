@@ -30,7 +30,6 @@ import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -177,7 +176,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         dialogService.notify(Localization.lang("Opening") + ": '" + file + "'");
 
-        Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, fileToLoad.getParent().toString());
+        Globals.prefs.setWorkingDirectory(fileToLoad.getParent());
 
         if (BackupManager.backupFileDiffers(fileToLoad)) {
             BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad);

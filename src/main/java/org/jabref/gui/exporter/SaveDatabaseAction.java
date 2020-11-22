@@ -157,10 +157,10 @@ public class SaveDatabaseAction {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.BIBTEX_DB)
                 .withDefaultExtension(StandardFileType.BIBTEX_DB)
-                .withInitialDirectory(preferences.get(JabRefPreferences.WORKING_DIRECTORY))
+                .withInitialDirectory(preferences.getWorkingDir())
                 .build();
         Optional<Path> selectedPath = dialogService.showFileSaveDialog(fileDialogConfiguration);
-        selectedPath.ifPresent(path -> preferences.setWorkingDir(path.getParent()));
+        selectedPath.ifPresent(path -> preferences.setWorkingDirectory(path.getParent()));
         return selectedPath;
     }
 

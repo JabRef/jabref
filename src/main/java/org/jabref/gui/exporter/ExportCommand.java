@@ -64,8 +64,8 @@ public class ExportCommand extends SimpleCommand {
         Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(FileFilterConverter.exporterToExtensionFilter(exporters))
-                .withDefaultExtension(Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT))
-                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY))
+                .withDefaultExtension(Globals.prefs.getImportExportPreferences().getLastExportExtension())
+                .withInitialDirectory(Globals.prefs.getImportExportPreferences().getExportWorkingDirectory())
                 .build();
         dialogService.showFileSaveDialog(fileDialogConfiguration)
                      .ifPresent(path -> export(path, fileDialogConfiguration.getSelectedExtensionFilter(), exporters));
@@ -97,8 +97,9 @@ public class ExportCommand extends SimpleCommand {
 
         // Make sure we remember which filter was used, to set
         // the default for next time:
-        Globals.prefs.put(JabRefPreferences.LAST_USED_EXPORT, format.getName());
-        Globals.prefs.put(JabRefPreferences.EXPORT_WORKING_DIRECTORY, file.getParent().toString());
+        Globals.prefs.storeImportExportPreferences(Globals.prefs.getImportExportPreferences()
+                                                                .withLastExportExtension(format.getName())
+                                                                .withExportWorkingDirectory(file.getParent()));
 
         final List<BibEntry> finEntries = entries;
         BackgroundTask

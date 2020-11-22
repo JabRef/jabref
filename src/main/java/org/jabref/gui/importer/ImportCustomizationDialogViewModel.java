@@ -17,7 +17,6 @@ import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -62,7 +61,7 @@ public class ImportCustomizationDialogViewModel extends AbstractViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.CLASS, StandardFileType.JAR, StandardFileType.ZIP)
                 .withDefaultExtension(StandardFileType.CLASS)
-                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                .withInitialDirectory(Globals.prefs.getWorkingDir())
                 .build();
 
         Optional<Path> selectedFile = dialogService.showFileOpenDialog(fileDialogConfiguration);

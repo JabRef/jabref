@@ -105,7 +105,10 @@ public class FileTabViewModel implements PreferenceTabViewModel {
                 resolveStringsAllProperty.getValue(),
                 resolveStringsExceptProperty.getValue().trim(),
                 selectedNewLineSeparatorProperty.getValue(),
-                alwaysReformatBibProperty.getValue());
+                alwaysReformatBibProperty.getValue(),
+                initialImportExportPreferences.getImportWorkingDirectory(),
+                initialImportExportPreferences.getLastExportExtension(),
+                initialImportExportPreferences.getExportWorkingDirectory());
         preferences.storeImportExportPreferences(newImportExportPreferences);
 
         SaveOrderConfig newSaveOrderConfig = new SaveOrderConfig(
