@@ -64,7 +64,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         ProgressIndicator progress = new ProgressIndicator();
         progress.setMaxSize(100, 100);
 
-        MrDLibFetcher fetcher = new MrDLibFetcher(Globals.prefs.get(JabRefPreferences.LANGUAGE),
+        MrDLibFetcher fetcher = new MrDLibFetcher(Globals.prefs.getLanguage().name(),
                 Globals.BUILD_INFO.version);
         BackgroundTask
                 .wrap(() -> fetcher.performSearch(entry))

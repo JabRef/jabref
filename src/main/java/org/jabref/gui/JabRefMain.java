@@ -179,7 +179,7 @@ public class JabRefMain extends Application {
 
         // Override used newline character with the one stored in the preferences
         // The preferences return the system newline character sequence as default
-        OS.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
+        OS.NEWLINE = Globals.prefs.getNewLineSeparator().toString();
     }
 
     private static void configureProxy(ProxyPreferences proxyPreferences) {

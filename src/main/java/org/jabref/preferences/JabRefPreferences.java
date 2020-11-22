@@ -391,6 +391,7 @@ public class JabRefPreferences implements PreferencesService {
     /**
      * Cache variables
      */
+    private Language language;
     private GlobalCitationKeyPattern globalCitationKeyPattern;
     private Map<String, Set<Field>> entryEditorTabList;
     private List<MainTableColumnModel> mainTableColumns;
@@ -1406,8 +1407,15 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public Language getLanguage() {
+        if (language == null) {
+            updateLanguage();
+        }
+        return language;
+    }
+
+    private void updateLanguage() {
         String languageId = get(LANGUAGE);
-        return Stream.of(Language.values())
+        language = Stream.of(Language.values())
                      .filter(language -> language.getId().equalsIgnoreCase(languageId))
                      .findFirst()
                      .orElse(Language.ENGLISH);
@@ -1421,6 +1429,7 @@ public class JabRefPreferences implements PreferencesService {
             // Update any defaults that might be language dependent:
             setLanguageDependentDefaultValues();
         }
+        updateLanguage();
     }
 
     @Override
@@ -2157,13 +2166,12 @@ public class JabRefPreferences implements PreferencesService {
         return NewLineSeparator.parse(get(JabRefPreferences.NEWLINE));
     }
 
-    // ToDo: Can this be disbanded?
     @Override
     public void storeNewLineSeparator(NewLineSeparator newLineSeparator) {
         String escapeChars = newLineSeparator.toString();
         put(JabRefPreferences.NEWLINE, escapeChars);
 
-        // we also have to change Globals variable as globals is not a getter, but a constant
+        // We also have to change Globals variable as globals is not a getter, but a constant
         OS.NEWLINE = escapeChars;
     }
 

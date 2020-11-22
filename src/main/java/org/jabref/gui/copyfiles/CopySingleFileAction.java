@@ -12,16 +12,13 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.OptionalUtil;
-import org.jabref.preferences.JabRefPreferences;
 
 public class CopySingleFileAction {
 
     private final LinkedFile linkedFile;
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
-    private final BiFunction<Path, Path, Path> resolvePathFilename = (path, file) -> {
-        return path.resolve(file.getFileName());
-    };
+    private final BiFunction<Path, Path, Path> resolvePathFilename = (path, file) -> path.resolve(file.getFileName());
 
     public CopySingleFileAction(LinkedFile linkedFile, DialogService dialogService, BibDatabaseContext databaseContext) {
         this.linkedFile = linkedFile;
@@ -31,7 +28,7 @@ public class CopySingleFileAction {
 
     public void copyFile() {
         DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(Path.of(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY)))
+                .withInitialDirectory(Globals.prefs.getImportExportPreferences().getExportWorkingDirectory())
                 .build();
         Optional<Path> exportPath = dialogService.showDirectorySelectionDialog(dirDialogConfiguration);
         exportPath.ifPresent(this::copyFileToDestination);
