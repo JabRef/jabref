@@ -2603,4 +2603,14 @@ public class JabRefPreferences implements PreferencesService {
     public void storeExternalFileTypes(String externalFileTypes) {
         put(JabRefPreferences.EXTERNAL_FILE_TYPES, externalFileTypes);
     }
+
+    @Override
+    public Optional<String> getMergeDiffMode() {
+        return getAsOptional(JabRefPreferences.MERGE_ENTRIES_DIFF_MODE);
+    }
+
+    @Override
+    public void storeMergeDiffMode(String diffMode) {
+        put(JabRefPreferences.MERGE_ENTRIES_DIFF_MODE, diffMode);
+    }
 }

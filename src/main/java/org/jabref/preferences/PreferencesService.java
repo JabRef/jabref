@@ -328,4 +328,8 @@ public interface PreferencesService {
     Optional<String> getExternalFileTypes();
 
     void storeExternalFileTypes(String externalFileTypes);
+
+    Optional<String> getMergeDiffMode();
+
+    void storeMergeDiffMode(String diffMode);
 }
