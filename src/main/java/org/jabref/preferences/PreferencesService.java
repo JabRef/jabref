@@ -4,6 +4,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
@@ -323,4 +324,8 @@ public interface PreferencesService {
     SearchPreferences getSearchPreferences();
 
     void storeSearchPreferences(SearchPreferences preferences);
+
+    Optional<String> getExternalFileTypes();
+
+    void storeExternalFileTypes(String externalFileTypes);
 }

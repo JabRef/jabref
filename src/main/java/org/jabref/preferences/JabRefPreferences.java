@@ -2585,4 +2585,14 @@ public class JabRefPreferences implements PreferencesService {
     public void storeLastPreferencesExportPath(Path exportFile) {
         put(PREFS_EXPORT_PATH, exportFile.toString());
     }
+
+    @Override
+    public Optional<String> getExternalFileTypes() {
+        return Optional.ofNullable(get(JabRefPreferences.EXTERNAL_FILE_TYPES, null));
+    }
+
+    @Override
+    public void storeExternalFileTypes(String externalFileTypes) {
+        put(JabRefPreferences.EXTERNAL_FILE_TYPES, externalFileTypes);
+    }
 }
