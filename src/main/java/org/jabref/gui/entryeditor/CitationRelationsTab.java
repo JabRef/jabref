@@ -28,7 +28,6 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.TextFlowLimited;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.importer.fetcher.CitationRelationFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -39,6 +38,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.JabRefPreferences;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.CheckListView;
 
@@ -234,6 +234,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                         jumpTo.getStyleClass().add("addEntryButton");
                         jumpTo.setOnMouseClicked(event -> {
                             libraryTab.showAndEdit(e.getBibEntry());
+                            libraryTab.clearAndSelect(e.getBibEntry());
                             citingTask.cancel();
                             citedByTask.cancel();
                         });
@@ -455,7 +456,7 @@ public class CitationRelationsTab extends EntryEditorTab {
      * @param entry Current Entry Context
      * @param field The StandardField to work with
      */
-    private List<BibEntry> runOfflineTask(BibEntry entry, StandardField field) {
+    List<BibEntry> runOfflineTask(BibEntry entry, StandardField field) {
         List<String> keys = getFilteredKeys(entry, field);
         List<BibEntry> list = new ArrayList<>();
         LOGGER.info("Current Keys/DOI in " + field.getName() + ":" + keys.toString());
@@ -476,7 +477,7 @@ public class CitationRelationsTab extends EntryEditorTab {
      * @param operator StandardField.CITING/CITED
      * @param entry    Current Entry Context
      */
-    private void filterDifference(List<BibEntry> newEntries, ObservableList<CitationRelationItem> observableList, CitationRelationFetcher.SearchType operator, BibEntry entry) {
+   void filterDifference(List<BibEntry> newEntries, ObservableList<CitationRelationItem> observableList, CitationRelationFetcher.SearchType operator, BibEntry entry) {
         StandardField field, nField;
         if (operator.equals(CitationRelationFetcher.SearchType.CITEDBY)) {
             field = StandardField.CITEDBY;
@@ -492,7 +493,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             if (key.isPresent() && entryKey.isPresent()) { // Just Proceed if doi is present
                 String doi = key.get().getDOI();
                 String entryDoi = entryKey.get().getDOI();
-                if (!currentKeys.contains(doi) && !doi_exists(doi)) { // if its not in the already referenced keys and not in the database = new Article
+                if (!currentKeys.contains(doi) && !doiExists(doi)) { // if its not in the already referenced keys and not in the database = new Article
                     b.setField(nField, getFilteredKeys(b, nField) + "," + entryDoi);
                     observableList.add(new CitationRelationItem(b, false));
                 } else {
@@ -518,7 +519,7 @@ public class CitationRelationsTab extends EntryEditorTab {
      * @param operator StandardField.CITING/CITED
      * @return A List Containing the keys in the "operator"  field, theirs relations are in the Database
      */
-    private List<String> getFilteredKeys(BibEntry entry, StandardField operator) {
+    List<String> getFilteredKeys(BibEntry entry, StandardField operator) {
         Optional<String> citingS = entry.getField(operator);
         if (citingS.isEmpty()) {
             LOGGER.info(entry.getCitationKey().orElse("no doi") + ": " + operator.getName() + " is empty!");
@@ -536,8 +537,8 @@ public class CitationRelationsTab extends EntryEditorTab {
      *
      * @param toFilter The Arraylist to filter
      */
-    private void filterNonExisting(ArrayList<String> toFilter) {
-        toFilter.removeIf(s -> !this.doi_exists(s));
+    void filterNonExisting(ArrayList<String> toFilter) {
+        toFilter.removeIf(s -> !this.doiExists(s));
     }
 
     /**
@@ -545,7 +546,7 @@ public class CitationRelationsTab extends EntryEditorTab {
      * @param doi   The DOI to lookup as a String
      * @return DOI exists or not
      */
-    private boolean doi_exists(String doi) {
+    boolean doiExists(String doi) {
         return !(getEntryByDOI(doi) == null);
     }
 
@@ -554,7 +555,7 @@ public class CitationRelationsTab extends EntryEditorTab {
      * @param doi   doi TO LOOK for
      * @return null or found Entry
      */
-    private BibEntry getEntryByDOI(String doi) {
+    BibEntry getEntryByDOI(String doi) {
         for (BibEntry b : databaseContext.getEntries()) {
             Optional<DOI> o = b.getDOI();
             if (o.isPresent() && o.get().getDOI().equals(doi)) {
@@ -570,7 +571,7 @@ public class CitationRelationsTab extends EntryEditorTab {
      * @param be The List of BibEntries to serialize
      * @return A Comma Separated List of CitationKeys(of the given List of Entries)
      */
-    private String serialize(List<BibEntry> be) {
+    static String serialize(List<BibEntry> be) {
         List<String> ret = new ArrayList<>();
         for (BibEntry b : be) {
             Optional<DOI> s = b.getDOI();
