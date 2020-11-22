@@ -226,6 +226,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                     Node entryNode = getEntryNode(e.getBibEntry());
                     HBox.setHgrow(entryNode, Priority.ALWAYS);
                     HBox hContainer = new HBox();
+                    hContainer.prefWidthProperty().bind(listView.widthProperty().subtract(25));
 
                     if (e.isLocal()) {
                         Button jumpTo = IconTheme.JabRefIcons.LINK.asButton();
@@ -253,9 +254,9 @@ public class CitationRelationsTab extends EntryEditorTab {
                     }
                     hContainer.getStyleClass().add("entry-container");
 
-                    if (citingListView.getItems().size() == 1) {
+                    /*if (citingListView.getItems().size() == 1) {
                         selectAllNewEntries(listView);
-                    }
+                    }*/
 
                     return hContainer;
                 })
@@ -271,8 +272,10 @@ public class CitationRelationsTab extends EntryEditorTab {
         entryType.getStyleClass().add("type");
         Label authors = new Label(entry.getFieldOrAliasLatexFree(StandardField.AUTHOR).orElse(""));
         authors.getStyleClass().add("authors");
+        authors.setWrapText(true);
         Label title = new Label(entry.getFieldOrAliasLatexFree(StandardField.TITLE).orElse(""));
         title.getStyleClass().add("title");
+        title.setWrapText(true);
         Label year = new Label(entry.getFieldOrAliasLatexFree(StandardField.YEAR).orElse(""));
         year.getStyleClass().add("year");
         Label journal = new Label(entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse(""));
