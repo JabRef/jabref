@@ -1,23 +1,26 @@
 package org.jabref.logic.importer.fetcher;
 
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @FetcherTest
 public class CitationRelationFetcherTest {
     private CitationRelationFetcher citingFetcher;
-    private CitationRelationFetcher citedByFetchter;
+    private CitationRelationFetcher citedByFetcher;
 
     @BeforeEach
     public void setUp() {
         citingFetcher = new CitationRelationFetcher(CitationRelationFetcher.SearchType.CITING);
-        citedByFetchter = new CitationRelationFetcher(CitationRelationFetcher.SearchType.CITEDBY);
+        citedByFetcher = new CitationRelationFetcher(CitationRelationFetcher.SearchType.CITEDBY);
     }
 
     @Test
@@ -28,32 +31,41 @@ public class CitationRelationFetcherTest {
 
     @Test
     public void testPerformSearchNoDoiCitedBy() throws FetcherException {
-        assertTrue(true);
+        BibEntry noDoi = new BibEntry();
+        assertNull(citedByFetcher.performSearch(noDoi));
     }
 
     @Test
     public void testPerformSearchWithDoiEmptyCiting() throws FetcherException {
-        assertTrue(true);
+        BibEntry DoiEmptyCiting = new BibEntry();
+        DoiEmptyCiting.setField(StandardField.DOI, "10.1.1.19.4684");
+        assertTrue(citingFetcher.performSearch(DoiEmptyCiting).isEmpty());
     }
 
     @Test
     public void testPerformSearchWithDoiCiting() throws FetcherException {
-        assertTrue(true);
+        BibEntry DoiCiting = new BibEntry();
+        DoiCiting.setField(StandardField.DOI, "10.1017/s0074180900169669");
+        assertFalse(citingFetcher.performSearch(DoiCiting).isEmpty());
     }
 
     @Test
     public void testPerformSearchWithDoiEmptyCitedBy() throws FetcherException {
-        assertTrue(true);
+        BibEntry DoiEmptyCitedBy = new BibEntry();
+        DoiEmptyCitedBy.setField(StandardField.DOI, "10.1.1.19.4684");
+        assertTrue(citedByFetcher.performSearch(DoiEmptyCitedBy).isEmpty());
     }
 
     @Test
     public void testPerformSearchWithDoiCitedBy() throws FetcherException {
-        assertTrue(true);
+        BibEntry DoiCitedBy = new BibEntry();
+        DoiCitedBy.setField(StandardField.DOI, "10.1017/s0074180900169669");
+        assertFalse(citedByFetcher.performSearch(DoiCitedBy).isEmpty());
     }
 
     @Test
     public void testGetName() throws FetcherException {
-        assertTrue(true);
+        assertTrue(citedByFetcher.getName().equals("CitationRelationFetcher"));
     }
 
 

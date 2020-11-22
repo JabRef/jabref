@@ -119,6 +119,6 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
 
     @Override
     public String getName() {
-        return null;
+        return "CitationRelationFetcher";
     }
 }
