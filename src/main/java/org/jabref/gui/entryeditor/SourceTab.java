@@ -173,7 +173,7 @@ public class SourceTab extends EntryEditorTab {
         });
         codeArea.setId("bibtexSourceCodeArea");
         codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository));
-        codeArea.addEventFilter(KeyEvent.KEY_PRESSED, this::listenForSaveKeybinding );
+        codeArea.addEventFilter(KeyEvent.KEY_PRESSED, this::listenForSaveKeybinding);
 
         ActionFactory factory = new ActionFactory(keyBindingRepository);
         ContextMenu contextMenu = new ContextMenu();
