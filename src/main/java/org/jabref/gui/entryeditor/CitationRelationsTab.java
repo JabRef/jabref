@@ -28,12 +28,12 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.TextFlowLimited;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.importer.fetcher.CitationRelationFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.JabRefPreferences;
@@ -226,6 +226,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                     Node entryNode = getEntryNode(e.getBibEntry());
                     HBox.setHgrow(entryNode, Priority.ALWAYS);
                     HBox hContainer = new HBox();
+                    hContainer.prefWidthProperty().bind(listView.widthProperty().subtract(25));
 
                     if (e.isLocal()) {
                         Button jumpTo = IconTheme.JabRefIcons.LINK.asButton();
@@ -233,11 +234,11 @@ public class CitationRelationsTab extends EntryEditorTab {
                         jumpTo.getStyleClass().add("addEntryButton");
                         jumpTo.setOnMouseClicked(event -> {
                             libraryTab.showAndEdit(e.getBibEntry());
+                            libraryTab.clearAndSelect(e.getBibEntry());
                             citingTask.cancel();
                             citedByTask.cancel();
                         });
                         hContainer.getChildren().addAll(entryNode, separator, jumpTo);
-                        hContainer.getStyleClass().add("entry-container");
                     } else {
                         ToggleButton addToggle = IconTheme.JabRefIcons.ADD.asToggleButton();
                         EasyBind.subscribe(addToggle.selectedProperty(), selected -> {
@@ -250,12 +251,12 @@ public class CitationRelationsTab extends EntryEditorTab {
                         addToggle.getStyleClass().add("addEntryButton");
                         addToggle.selectedProperty().bindBidirectional(listView.getItemBooleanProperty(e));
                         hContainer.getChildren().addAll(entryNode, separator, addToggle);
-                        hContainer.getStyleClass().add("entry-container");
                     }
+                    hContainer.getStyleClass().add("entry-container");
 
-                    if (citingListView.getItems().size() == 1) {
+                    /*if (citingListView.getItems().size() == 1) {
                         selectAllNewEntries(listView);
-                    }
+                    }*/
 
                     return hContainer;
                 })
@@ -271,8 +272,10 @@ public class CitationRelationsTab extends EntryEditorTab {
         entryType.getStyleClass().add("type");
         Label authors = new Label(entry.getFieldOrAliasLatexFree(StandardField.AUTHOR).orElse(""));
         authors.getStyleClass().add("authors");
+        authors.setWrapText(true);
         Label title = new Label(entry.getFieldOrAliasLatexFree(StandardField.TITLE).orElse(""));
         title.getStyleClass().add("title");
+        title.setWrapText(true);
         Label year = new Label(entry.getFieldOrAliasLatexFree(StandardField.YEAR).orElse(""));
         year.getStyleClass().add("year");
         Label journal = new Label(entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse(""));
@@ -455,13 +458,15 @@ public class CitationRelationsTab extends EntryEditorTab {
      * @param entry Current Entry Context
      * @param field The StandardField to work with
      */
-    private List<BibEntry> runOfflineTask(BibEntry entry, StandardField field) {
+    List<BibEntry> runOfflineTask(BibEntry entry, StandardField field) {
         List<String> keys = getFilteredKeys(entry, field);
         List<BibEntry> list = new ArrayList<>();
-        System.out.println(keys);
+        LOGGER.info("Current Keys/DOI in " + field.getName() + ":" + keys.toString());
         for (String key : keys) {
-            Optional<BibEntry> o = databaseContext.getDatabase().getEntryByCitationKey(key);
-            o.ifPresent(list::add);
+            BibEntry toAdd = getEntryByDOI(key);
+            if (toAdd != null) {
+                list.add(toAdd);
+            }
         }
         return list;
     }
@@ -474,7 +479,7 @@ public class CitationRelationsTab extends EntryEditorTab {
      * @param operator StandardField.CITING/CITED
      * @param entry    Current Entry Context
      */
-    private void filterDifference(List<BibEntry> newEntries, ObservableList<CitationRelationItem> observableList, CitationRelationFetcher.SearchType operator, BibEntry entry) {
+   void filterDifference(List<BibEntry> newEntries, ObservableList<CitationRelationItem> observableList, CitationRelationFetcher.SearchType operator, BibEntry entry) {
         StandardField field, nField;
         if (operator.equals(CitationRelationFetcher.SearchType.CITEDBY)) {
             field = StandardField.CITEDBY;
@@ -483,19 +488,25 @@ public class CitationRelationsTab extends EntryEditorTab {
             field = StandardField.CITING;
             nField = StandardField.CITEDBY;
         }
-        CitationKeyGenerator ckg = new CitationKeyGenerator(databaseContext, Globals.prefs.getCitationKeyPatternPreferences());
-        List<String> currentKeys = getFilteredKeys(entry, field);
+        List<String> currentKeys = getFilteredKeys(entry, field); // Current existant Enty.DOIs in Field
         for (BibEntry b : newEntries) {
-            ckg.generateAndSetKey(b);
-            Optional<String> key = b.getCitationKey();
-            if ((key.isPresent() && !currentKeys.contains(key.get().substring(0, key.get().length() - 1)))) {
-                b.setField(nField, b.getField(nField).orElse("") + "," + entry.getCitationKey().orElse(""));
-                observableList.add(new CitationRelationItem(b, false));
-            } else {
-                for (CitationRelationItem item : observableList) {
-                    if (item.bibEntry.getCitationKey().orElse("").equals(b.getCitationKey().orElse(""))) {
-                        b.setField(nField, b.getField(nField).orElse("") + "," + entry.getCitationKey().orElse(""));
-                        observableList.add(new CitationRelationItem(b, true));
+            Optional<DOI> key = b.getDOI();
+            Optional<DOI> entryKey = entry.getDOI();
+            if (key.isPresent() && entryKey.isPresent()) { // Just Proceed if doi is present
+                String doi = key.get().getDOI();
+                String entryDoi = entryKey.get().getDOI();
+                if (!currentKeys.contains(doi) && !doiExists(doi)) { // if its not in the already referenced keys and not in the database = new Article
+                    b.setField(nField, getFilteredKeys(b, nField) + "," + entryDoi);
+                    observableList.add(new CitationRelationItem(b, false));
+                } else {
+                    if (!currentKeys.contains(doi)) { // if in database but not in keys
+                        entry.setField(field, entry.getField(field).orElse("") + "," + doi);
+                        // Add negative Reference to existing Entry and add this entry as local reference
+                        BibEntry existing = getEntryByDOI(doi);
+                        if (existing != null) {
+                            existing.setField(nField, existing.getField(nField).orElse("") + "," + entryDoi);
+                            observableList.add(0, new CitationRelationItem(existing, true));
+                        }
                     }
                 }
             }
@@ -510,39 +521,66 @@ public class CitationRelationsTab extends EntryEditorTab {
      * @param operator StandardField.CITING/CITED
      * @return A List Containing the keys in the "operator"  field, theirs relations are in the Database
      */
-    private List<String> getFilteredKeys(BibEntry entry, StandardField operator) {
+    List<String> getFilteredKeys(BibEntry entry, StandardField operator) {
         Optional<String> citingS = entry.getField(operator);
         if (citingS.isEmpty()) {
-            LOGGER.info(entry.getCitationKey().orElse("no key") + ": " + operator.getName() + " is empty!");
+            LOGGER.info(entry.getCitationKey().orElse("no doi") + ": " + operator.getName() + " is empty!");
             return new ArrayList<>();
         }
         ArrayList<String> keys = new ArrayList<>(Arrays.asList(citingS.get().split(",")));
         filterNonExisting(keys);
         entry.setField(operator, String.join(",", keys));
-        LOGGER.info(entry.getCitationKey().orElse("no key") + ": " + operator.getName() + ": " + String.join(",", keys));
+        LOGGER.info(entry.getCitationKey().orElse("no doi") + ": " + operator.getName() + ": " + String.join(",", keys));
         return keys;
     }
 
     /**
-     * Filters a given ArrayList of Citationkeys, whether they are in the Database
+     * Filters a given ArrayList of DOI's, whether they are in the Database
      *
      * @param toFilter The Arraylist to filter
      */
-    private void filterNonExisting(ArrayList<String> toFilter) {
-        toFilter.removeIf(s -> databaseContext.getDatabase().getEntryByCitationKey(s).isEmpty());
+    void filterNonExisting(ArrayList<String> toFilter) {
+        toFilter.removeIf(s -> !this.doiExists(s));
     }
 
     /**
-     * Returns a String Containing the CitationKeys of a List of Entries. Ignores Entries with no Citationkey
+     * Checks the current databasecontext whether an Entry with the given DOI exists
+     * @param doi   The DOI to lookup as a String
+     * @return DOI exists or not
+     */
+    boolean doiExists(String doi) {
+        return !(getEntryByDOI(doi) == null);
+    }
+
+    /**
+     * returns the Bibentry in the Database with the given DOI, or null if no such Entry exists
+     * @param doi   doi TO LOOK for
+     * @return null or found Entry
+     */
+    BibEntry getEntryByDOI(String doi) {
+        for (BibEntry b : databaseContext.getEntries()) {
+            Optional<DOI> o = b.getDOI();
+            if (o.isPresent() && o.get().getDOI().equals(doi)) {
+                return b;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns a String Containing the DOIs of a List of Entries. Ignores Entries with no DOI
      *
      * @param be The List of BibEntries to serialize
      * @return A Comma Separated List of CitationKeys(of the given List of Entries)
      */
-    private String serialize(List<BibEntry> be) {
+    static String serialize(List<BibEntry> be) {
         List<String> ret = new ArrayList<>();
         for (BibEntry b : be) {
-            Optional<String> s = b.getCitationKey();
-            s.ifPresent(ret::add);
+            Optional<DOI> s = b.getDOI();
+            if (s.isPresent()) {
+                String toAdd = s.get().getDOI(); // TODO: oder getNormalized() ?
+                ret.add(toAdd);
+            }
         }
         return String.join(",", ret);
     }
