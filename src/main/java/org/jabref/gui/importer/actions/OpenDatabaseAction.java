@@ -14,6 +14,7 @@ import java.util.Optional;
 import javafx.scene.Node;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.BorderPane;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
@@ -163,8 +164,9 @@ public class OpenDatabaseAction extends SimpleCommand {
      */
     private void openTheFile(Path file, boolean raisePanel) {
         Objects.requireNonNull(file);
-        if (!Files.exists(file))
+        if (!Files.exists(file)) {
             return;
+        }
 
         BackgroundTask<ParserResult> backgroundTask = BackgroundTask.wrap(() -> loadDatabase(file));
         LibraryTab libraryTab = LibraryTab.createNewEmptyLibraryTab(frame, file);
@@ -215,7 +217,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         return libraryTab;
     }
 
-    /*The layout to display in the tab when it's loading*/
+    /* The layout to display in the tab when it's loading*/
     public Node createLoadingLayout() {
         ProgressIndicator progressIndicator = new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS);
         BorderPane pane = new BorderPane();

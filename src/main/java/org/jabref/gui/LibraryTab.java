@@ -2,7 +2,13 @@ package org.jabref.gui;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -93,7 +99,8 @@ public class LibraryTab extends Tab {
 
     private BibEntry showing;
     private SuggestionProviders suggestionProviders;
-    @SuppressWarnings({"FieldCanBeLocal"}) private Subscription dividerPositionSubscription;
+    @SuppressWarnings({"FieldCanBeLocal"})
+    private Subscription dividerPositionSubscription;
     // the query the user searches when this BasePanel is active
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
@@ -155,7 +162,6 @@ public class LibraryTab extends Tab {
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
 
-
         this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, Globals.stateManager);
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
@@ -180,7 +186,6 @@ public class LibraryTab extends Tab {
             Globals.stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) c ->
                     updateTabTitle(changedProperty.getValue()));
         });
-
 
         if (isDatabaseReadyForAutoSave(bibDatabaseContext)) {
             AutosaveManager autoSaver = AutosaveManager.start(bibDatabaseContext);
@@ -210,13 +215,13 @@ public class LibraryTab extends Tab {
 
     /**
      * Sets the title of the tab
-     *   modification-asterisk filename – path-fragment
-     *
+     * modification-asterisk filename – path-fragment
+     * <p>
      * The modification-asterisk (*) is shown if the file was modified since last save
      * (path-fragment is only shown if filename is not (globally) unique)
-     *
+     * <p>
      * Example:
-     *   *jabref-authors.bib – testbib
+     * *jabref-authors.bib – testbib
      */
     public void updateTabTitle(boolean isChanged) {
         boolean isAutosaveEnabled = preferencesService.getShouldAutosave();
@@ -257,9 +262,9 @@ public class LibraryTab extends Tab {
             // Unique path fragment
             List<String> uniquePathParts = FileUtil.uniquePathSubstrings(collectAllDatabasePaths());
             Optional<String> uniquePathPart = uniquePathParts.stream()
-                                                         .filter(part -> databasePath.toString().contains(part)
-                                                                 && !part.equals(fileName) && part.contains(File.separator))
-                                                         .findFirst();
+                    .filter(part -> databasePath.toString().contains(part)
+                            && !part.equals(fileName) && part.contains(File.separator))
+                    .findFirst();
             if (uniquePathPart.isPresent()) {
                 String uniquePath = uniquePathPart.get();
                 // remove filename
@@ -310,10 +315,10 @@ public class LibraryTab extends Tab {
     private List<String> collectAllDatabasePaths() {
         List<String> list = new ArrayList<>();
         Globals.stateManager.getOpenDatabases().stream()
-                            .map(BibDatabaseContext::getDatabasePath)
-                            .forEachOrdered(pathOptional -> pathOptional.ifPresentOrElse(
-                                    path -> list.add(path.toAbsolutePath().toString()),
-                                    () -> list.add("")));
+                .map(BibDatabaseContext::getDatabasePath)
+                .forEachOrdered(pathOptional -> pathOptional.ifPresentOrElse(
+                        path -> list.add(path.toAbsolutePath().toString()),
+                        () -> list.add("")));
         return list;
     }
 
@@ -454,9 +459,9 @@ public class LibraryTab extends Tab {
 
         // Update entry editor and preview according to selected entries
         mainTable.addSelectionListener(event -> mainTable.getSelectedEntries()
-                                                         .stream()
-                                                         .findFirst()
-                                                         .ifPresent(entryEditor::setEntry));
+                .stream()
+                .findFirst()
+                .ifPresent(entryEditor::setEntry));
     }
 
     public void setupMainPanel() {
@@ -470,8 +475,8 @@ public class LibraryTab extends Tab {
         // Saves the divider position as soon as it changes
         // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
         dividerPositionSubscription = EasyBind.valueAt(splitPane.getDividers(), 0)
-                                              .mapObservable(SplitPane.Divider::positionProperty)
-                                              .subscribeToValues(this::saveDividerLocation);
+                .mapObservable(SplitPane.Divider::positionProperty)
+                .subscribeToValues(this::saveDividerLocation);
 
         // Add changePane in case a file is present - otherwise just add the splitPane to the panel
         Optional<Path> file = bibDatabaseContext.getDatabasePath();
