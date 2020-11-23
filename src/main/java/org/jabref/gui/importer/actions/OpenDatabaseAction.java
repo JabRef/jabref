@@ -242,7 +242,9 @@ public class OpenDatabaseAction extends SimpleCommand {
     }
 
     public void onDatabaseLoadingFailed(LibraryTab libraryTab, Exception ex) {
-        dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
-                ex.getMessage() + "\n\n" + Localization.lang("A local copy will be opened."));
+        String title = Localization.lang("Connection error");
+        String content = String.format("%s\n\n%s", ex.getMessage(), Localization.lang("A local copy will be opened."));
+
+        dialogService.showErrorDialogAndWait(title, content, ex);
     }
 }
