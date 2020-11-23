@@ -116,7 +116,7 @@ public class SourceTab extends EntryEditorTab {
     }
 
     private void highlightSearchPattern() {
-        if (searchHighlightPattern.isPresent() && codeArea != null) {
+        if (searchHighlightPattern.isPresent() && (codeArea != null)) {
             codeArea.setStyleClass(0, codeArea.getLength(), "text");
             Matcher matcher = searchHighlightPattern.get().matcher(codeArea.getText());
             while (matcher.find()) {
@@ -172,7 +172,8 @@ public class SourceTab extends EntryEditorTab {
             }
         });
         codeArea.setId("bibtexSourceCodeArea");
-        codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event));
+        codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository));
+        codeArea.addEventFilter(KeyEvent.KEY_PRESSED, this::listenForSaveKeybinding);
 
         ActionFactory factory = new ActionFactory(keyBindingRepository);
         ContextMenu contextMenu = new ContextMenu();
@@ -197,7 +198,7 @@ public class SourceTab extends EntryEditorTab {
         });
 
         codeArea.focusedProperty().addListener((obs, oldValue, onFocus) -> {
-            if (!onFocus && currentEntry != null) {
+            if (!onFocus && (currentEntry != null)) {
                 storeSource(currentEntry, codeArea.textProperty().getValue());
             }
         });
@@ -232,7 +233,7 @@ public class SourceTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        if (previousEntry != null && codeArea != null) {
+        if ((previousEntry != null) && (codeArea != null)) {
             storeSource(previousEntry, codeArea.textProperty().getValue());
         }
         this.previousEntry = entry;
@@ -321,4 +322,16 @@ public class SourceTab extends EntryEditorTab {
             LOGGER.debug("Incorrect source", ex);
         }
     }
+
+    private void listenForSaveKeybinding(KeyEvent event) {
+        keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {
+
+            switch (binding) {
+                case SAVE_DATABASE, SAVE_ALL, SAVE_DATABASE_AS -> {
+                    storeSource(currentEntry, codeArea.textProperty().getValue());
+                }
+            }
+        });
+    }
+
 }
