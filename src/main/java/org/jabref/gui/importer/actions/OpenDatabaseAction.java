@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import javafx.scene.Node;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.layout.BorderPane;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
@@ -30,6 +33,7 @@ import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
@@ -59,8 +63,8 @@ public class OpenDatabaseAction extends SimpleCommand {
     /**
      * Go through the list of post open actions, and perform those that need to be performed.
      *
-     * @param libraryTab  The BasePanel where the database is shown.
-     * @param result The result of the BIB file parse operation.
+     * @param libraryTab The BasePanel where the database is shown.
+     * @param result     The result of the BIB file parse operation.
      */
     public static void performPostOpenActions(LibraryTab libraryTab, ParserResult result) {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
@@ -159,17 +163,17 @@ public class OpenDatabaseAction extends SimpleCommand {
      */
     private void openTheFile(Path file, boolean raisePanel) {
         Objects.requireNonNull(file);
-        if (Files.exists(file)) {
+        if (!Files.exists(file))
+            return;
 
-            BackgroundTask.wrap(() -> loadDatabase(file))
-                          .onSuccess(result -> {
-                              LibraryTab libraryTab = addNewDatabase(result, file, raisePanel);
-                              OpenDatabaseAction.performPostOpenActions(libraryTab, result);
-                          })
-                          .onFailure(ex -> dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
-                                  ex.getMessage() + "\n\n" + Localization.lang("A local copy will be opened.")))
-                          .executeWith(Globals.TASK_EXECUTOR);
-        }
+        BackgroundTask<ParserResult> backgroundTask = BackgroundTask.wrap(() -> loadDatabase(file));
+        LibraryTab libraryTab = LibraryTab.createNewEmptyLibraryTab(frame, file);
+        onDatabaseLoadingStarted(libraryTab, backgroundTask);
+
+        backgroundTask.onSuccess(result -> onDatabaseLoadingSucceed(libraryTab, result))
+                .onFailure(ex -> onDatabaseLoadingFailed(libraryTab, ex))
+                .executeWith(Globals.TASK_EXECUTOR);
+
     }
 
     private ParserResult loadDatabase(Path file) throws Exception {
@@ -209,5 +213,34 @@ public class OpenDatabaseAction extends SimpleCommand {
         LibraryTab libraryTab = new LibraryTab(frame, Globals.prefs, result.getDatabaseContext(), ExternalFileTypes.getInstance());
         frame.addTab(libraryTab, raisePanel);
         return libraryTab;
+    }
+
+    /*The layout to display in the tab when it's loading*/
+    public Node createLoadingLayout() {
+        ProgressIndicator progressIndicator = new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS);
+        BorderPane pane = new BorderPane();
+        pane.setCenter(progressIndicator);
+
+        return pane;
+    }
+
+    public void onDatabaseLoadingStarted(LibraryTab libraryTab, BackgroundTask<?> backgroundTask) {
+        Node loadingLayout = createLoadingLayout();
+        libraryTab.setContent(loadingLayout);
+        libraryTab.setOnCloseRequest(e -> backgroundTask.cancel());
+
+        frame.addTab(libraryTab, true);
+    }
+
+    public void onDatabaseLoadingSucceed(LibraryTab libraryTab, ParserResult result) {
+        BibDatabaseContext context = result.getDatabaseContext();
+        libraryTab.feedData(context);
+
+        OpenDatabaseAction.performPostOpenActions(libraryTab, result);
+    }
+
+    public void onDatabaseLoadingFailed(LibraryTab libraryTab, Exception ex) {
+        dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
+                ex.getMessage() + "\n\n" + Localization.lang("A local copy will be opened."));
     }
 }
