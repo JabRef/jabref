@@ -2,17 +2,17 @@ name: Mark stale issues and pull requests
 
 on:
   schedule:
-  - cron: "0 0 * * *"
+  - cron: "20 19 * * *"
 
 jobs:
   stale:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/stale@master
+    - uses: actions/stale@v3
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
-        stale-issue-message: 'This issue will be closed in 7 days due to inactivity :zzz: Please provide the requested information if the problem persists.'
+        days-before-stale: 180
+        days-before-close: 14
+        stale-issue-message: 'The issue was incactive for half a year. Since the JabRef team cannot address all issues, it aims to focus on valid issues. May I ask whether the issue still persists? If yes, can more details be added? In case this issue is not valid anymore, no action is needed: We will auto-close it in two weeks if no action is taken.'
         stale-issue-label: 'status: stale'
-        days-before-stale: 30
-        only-labels: 'status: waiting-for-customer-feedback'
