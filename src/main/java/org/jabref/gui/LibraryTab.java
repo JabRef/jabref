@@ -2,11 +2,7 @@ package org.jabref.gui;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -23,6 +19,7 @@ import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.collab.DatabaseChangePane;
+import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.maintable.MainTable;
@@ -34,6 +31,8 @@ import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.logic.autosaveandbackup.AutosaveManager;
+import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
@@ -52,6 +51,7 @@ import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
@@ -64,11 +64,11 @@ public class LibraryTab extends Tab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
-    private final BibDatabaseContext bibDatabaseContext;
-    private final MainTableDataModel tableModel;
+    private BibDatabaseContext bibDatabaseContext;
+    private MainTableDataModel tableModel;
 
-    private final CitationStyleCache citationStyleCache;
-    private final FileAnnotationCache annotationCache;
+    private CitationStyleCache citationStyleCache;
+    private FileAnnotationCache annotationCache;
 
     private final JabRefFrame frame;
     private final CountingUndoManager undoManager;
@@ -76,7 +76,7 @@ public class LibraryTab extends Tab {
     private final SidePaneManager sidePaneManager;
     private final ExternalFileTypes externalFileTypes;
 
-    private final EntryEditor entryEditor;
+    private EntryEditor entryEditor;
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
 
@@ -138,6 +138,74 @@ public class LibraryTab extends Tab {
             Globals.stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) c ->
                     updateTabTitle(changedProperty.getValue()));
         });
+    }
+
+    public static LibraryTab createNewEmptyLibraryTab(JabRefFrame frame, Path file) {
+        BibDatabaseContext context = new BibDatabaseContext();
+        context.setDatabasePath(file);
+
+        return new LibraryTab(frame, frame.prefs(), context, ExternalFileTypes.getInstance());
+    }
+
+    public void feedData(BibDatabaseContext bibDatabaseContext) {
+        cleanUp();
+
+        this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
+
+        bibDatabaseContext.getDatabase().registerListener(this);
+        bibDatabaseContext.getMetaData().registerListener(this);
+
+
+        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferencesService, Globals.stateManager);
+        citationStyleCache = new CitationStyleCache(bibDatabaseContext);
+        annotationCache = new FileAnnotationCache(bibDatabaseContext, preferencesService.getFilePreferences());
+
+        setupMainPanel();
+        setupAutoCompletion();
+
+        this.getDatabase().registerListener(new SearchListener());
+        this.getDatabase().registerListener(new EntriesRemovedListener());
+
+        // ensure that at each addition of a new entry, the entry is added to the groups interface
+        this.bibDatabaseContext.getDatabase().registerListener(new GroupTreeListener());
+        // ensure that all entry changes mark the panel as changed
+        this.bibDatabaseContext.getDatabase().registerListener(this);
+
+        this.getDatabase().registerListener(new UpdateTimestampListener(preferencesService));
+
+        this.entryEditor = new EntryEditor(this, externalFileTypes);
+
+        Platform.runLater(() -> {
+            EasyBind.subscribe(changedProperty, this::updateTabTitle);
+            Globals.stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) c ->
+                    updateTabTitle(changedProperty.getValue()));
+        });
+
+
+        if (isDatabaseReadyForAutoSave(bibDatabaseContext)) {
+            AutosaveManager autoSaver = AutosaveManager.start(bibDatabaseContext);
+            autoSaver.registerListener(new AutosaveUiManager(this));
+        }
+
+        BackupManager.start(this.bibDatabaseContext, Globals.entryTypesManager, Globals.prefs);
+
+        trackOpenNewDatabase(this);
+
+    }
+
+    private boolean isDatabaseReadyForAutoSave(BibDatabaseContext context) {
+        return ((context.getLocation() == DatabaseLocation.SHARED) ||
+                ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)))
+                &&
+                context.getDatabasePath().isPresent();
+    }
+
+    private void trackOpenNewDatabase(LibraryTab libraryTab) {
+        Map<String, String> properties = new HashMap<>();
+        Map<String, Double> measurements = new HashMap<>();
+        measurements.put("NumberOfEntries", (double) libraryTab.getBibDatabaseContext().getDatabase().getEntryCount());
+
+        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("OpenNewDatabase", properties, measurements));
     }
 
     /**
@@ -585,6 +653,8 @@ public class LibraryTab extends Tab {
      */
     public void cleanUp() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
+        AutosaveManager.shutdown(bibDatabaseContext);
+        BackupManager.shutdown(bibDatabaseContext);
     }
 
     /**
