@@ -2,8 +2,8 @@ package org.jabref.gui.citationkeypattern;
 
 import java.util.List;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
@@ -68,15 +68,14 @@ public class GenerateCitationKeyAction extends SimpleCommand {
     private void checkOverwriteKeysChosen() {
         // We don't want to generate keys for entries which already have one thus remove the entries
         if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
-            entries.removeIf(BibEntry::hasCiteKey);
-            // if we're going to override some cite keys warn the user about it
-        } else if (entries.parallelStream().anyMatch(BibEntry::hasCiteKey)) {
+            entries.removeIf(BibEntry::hasCitationKey);
+            // if we're going to override some citation keys warn the user about it
+        } else if (entries.parallelStream().anyMatch(BibEntry::hasCitationKey)) {
             boolean overwriteKeys = confirmOverwriteKeys(dialogService);
 
-            // The user doesn't want to override cite keys
+            // The user doesn't want to override citation keys
             if (!overwriteKeys) {
                 isCanceled = true;
-                return;
             }
         }
     }
@@ -87,7 +86,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
         }
 
         stateManager.getActiveDatabase().ifPresent(databaseContext -> {
-            // generate the new cite keys for each entry
+            // generate the new citation keys for each entry
             final NamedCompound compound = new NamedCompound(Localization.lang("Autogenerate citation keys"));
             CitationKeyGenerator keyGenerator =
                     new CitationKeyGenerator(databaseContext, Globals.prefs.getCitationKeyPatternPreferences());
@@ -97,12 +96,12 @@ public class GenerateCitationKeyAction extends SimpleCommand {
             }
             compound.end();
 
-            // register the undo event only if new cite keys were generated
+            // register the undo event only if new citation keys were generated
             if (compound.hasEdits()) {
                 frame.getUndoManager().addEdit(compound);
             }
 
-            frame.getCurrentBasePanel().markBaseChanged();
+            frame.getCurrentLibraryTab().markBaseChanged();
             dialogService.notify(formatOutputMessage(Localization.lang("Generated citation key for"), entries.size()));
         });
     }

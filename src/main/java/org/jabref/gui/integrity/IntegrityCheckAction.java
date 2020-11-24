@@ -6,9 +6,9 @@ import java.util.List;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 
-import org.jabref.Globals;
 import org.jabref.gui.Dialog;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
@@ -72,11 +72,11 @@ public class IntegrityCheckAction extends SimpleCommand {
             if (messages.isEmpty()) {
                 dialogService.notify(Localization.lang("No problems found."));
             } else {
-                Dialog<Void> dialog = new IntegrityCheckDialog(messages, frame.getCurrentBasePanel());
+                Dialog<Void> dialog = new IntegrityCheckDialog(messages, frame.getCurrentLibraryTab());
                 dialog.showAndWait();
             }
         });
-        task.setOnFailed(event -> dialogService.showErrorDialogAndWait("Integrity check failed."));
+        task.setOnFailed(event -> dialogService.showErrorDialogAndWait("Integrity check failed.", task.getException()));
 
         dialogService.showProgressDialog(
                 Localization.lang("Checking integrity..."),

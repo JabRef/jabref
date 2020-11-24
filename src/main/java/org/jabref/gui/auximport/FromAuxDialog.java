@@ -11,16 +11,16 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.auxparser.AuxParser;
+import org.jabref.logic.auxparser.AuxParserResult;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.model.auxparser.AuxParser;
-import org.jabref.model.auxparser.AuxParserResult;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.PreferencesService;
@@ -32,7 +32,7 @@ import com.airhacks.afterburner.views.ViewLoader;
  */
 public class FromAuxDialog extends BaseDialog<Void> {
 
-    private final BasePanel basePanel;
+    private final LibraryTab libraryTab;
     @FXML private ButtonType generateButtonType;
     private final Button generateButton;
     @FXML private TextField auxFileField;
@@ -44,7 +44,7 @@ public class FromAuxDialog extends BaseDialog<Void> {
     @Inject private DialogService dialogService;
 
     public FromAuxDialog(JabRefFrame frame) {
-        basePanel = frame.getCurrentBasePanel();
+        libraryTab = frame.getCurrentLibraryTab();
         this.setTitle(Localization.lang("AUX file import"));
 
         ViewLoader.view(this)
@@ -67,7 +67,7 @@ public class FromAuxDialog extends BaseDialog<Void> {
     private void parseActionPerformed() {
         notFoundList.getItems().clear();
         statusInfos.setText("");
-        BibDatabase refBase = basePanel.getDatabase();
+        BibDatabase refBase = libraryTab.getDatabase();
         String auxName = auxFileField.getText();
 
         if ((auxName != null) && (refBase != null) && !auxName.isEmpty()) {

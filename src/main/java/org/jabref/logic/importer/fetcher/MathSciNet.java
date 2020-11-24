@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.cleanup.DoiCleanup;
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.importer.EntryBasedParserFetcher;
@@ -24,7 +25,6 @@ import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.util.OS;
-import org.jabref.model.cleanup.FieldFormatterCleanup;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;

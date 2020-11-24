@@ -144,7 +144,7 @@ public class BibTeXMLImporter extends Importer {
                 }
 
                 if (entry.getId() != null) {
-                    bibEntry.setCiteKey(entry.getId());
+                    bibEntry.setCitationKey(entry.getId());
                 }
                 bibEntry.setField(fields);
                 bibItems.add(bibEntry);

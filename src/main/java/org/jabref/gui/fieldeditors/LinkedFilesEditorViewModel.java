@@ -27,14 +27,14 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.importer.FulltextFetchers;
+import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FileFieldParser;
-import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.FileHelper;
@@ -94,11 +94,11 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 .getExternalFileTypeByExt(fileExtension)
                 .orElse(new UnknownExternalFileType(fileExtension));
         Path relativePath = FileUtil.relativize(file, fileDirectories);
-        return new LinkedFile("", relativePath.toString(), suggestedFileType.getName());
+        return new LinkedFile("", relativePath, suggestedFileType.getName());
     }
 
     public LinkedFileViewModel fromFile(Path file) {
-        List<Path> fileDirectories = databaseContext.getFileDirectoriesAsPaths(preferences.getFilePreferences());
+        List<Path> fileDirectories = databaseContext.getFileDirectories(preferences.getFilePreferences());
 
         LinkedFile linkedFile = fromFile(file, fileDirectories, externalFileTypes);
         return new LinkedFileViewModel(
@@ -107,7 +107,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 databaseContext,
                 taskExecutor,
                 dialogService,
-                preferences.getXMPPreferences(),
+                preferences.getXmpPreferences(),
                 preferences.getFilePreferences(),
                 externalFileTypes);
     }
@@ -128,7 +128,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                                       databaseContext,
                                       taskExecutor,
                                       dialogService,
-                                      preferences.getXMPPreferences(),
+                                      preferences.getXmpPreferences(),
                                       preferences.getFilePreferences(),
                                       externalFileTypes))
                               .collect(Collectors.toList());
@@ -150,7 +150,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 .withInitialDirectory(workingDirectory)
                 .build();
 
-        List<Path> fileDirectories = databaseContext.getFileDirectoriesAsPaths(preferences.getFilePreferences());
+        List<Path> fileDirectories = databaseContext.getFileDirectories(preferences.getFilePreferences());
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(newFile -> {
             LinkedFile newLinkedFile = fromFile(newFile, fileDirectories, externalFileTypes);
             files.add(new LinkedFileViewModel(
@@ -159,7 +159,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                     databaseContext,
                     taskExecutor,
                     dialogService,
-                    preferences.getXMPPreferences(),
+                    preferences.getXmpPreferences(),
                     preferences.getFilePreferences(),
                     externalFileTypes));
         });
@@ -197,7 +197,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                         databaseContext,
                         taskExecutor,
                         dialogService,
-                        preferences.getXMPPreferences(),
+                        preferences.getXmpPreferences(),
                         preferences.getFilePreferences(),
                         externalFileTypes);
                 newLinkedFile.markAsAutomaticallyFound();
@@ -248,7 +248,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 databaseContext,
                 taskExecutor,
                 dialogService,
-                preferences.getXMPPreferences(),
+                preferences.getXmpPreferences(),
                 preferences.getFilePreferences(),
                 externalFileTypes);
         files.add(onlineFile);

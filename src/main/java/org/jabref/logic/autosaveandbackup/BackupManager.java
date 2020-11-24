@@ -15,11 +15,11 @@ import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.DelayTaskThrottler;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
-import org.jabref.model.database.event.CoarseChangeFilter;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -156,7 +156,9 @@ public class BackupManager {
 
     @Subscribe
     public synchronized void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
-        startBackupTask();
+        if (!event.isFilteredOut()) {
+            startBackupTask();
+        }
     }
 
     private void startBackupTask() {

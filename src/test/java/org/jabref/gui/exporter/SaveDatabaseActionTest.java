@@ -10,19 +10,19 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.exporter.SavePreferences;
-import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
@@ -48,18 +48,18 @@ class SaveDatabaseActionTest {
     private Path file = Path.of(TEST_BIBTEX_LIBRARY_LOCATION);
     private DialogService dialogService = mock(DialogService.class);
     private JabRefPreferences preferences = mock(JabRefPreferences.class);
-    private BasePanel basePanel = mock(BasePanel.class);
+    private LibraryTab libraryTab = mock(LibraryTab.class);
     private JabRefFrame jabRefFrame = mock(JabRefFrame.class);
     private BibDatabaseContext dbContext = spy(BibDatabaseContext.class);
     private SaveDatabaseAction saveDatabaseAction;
 
     @BeforeEach
     public void setUp() {
-        when(basePanel.frame()).thenReturn(jabRefFrame);
-        when(basePanel.getBibDatabaseContext()).thenReturn(dbContext);
+        when(libraryTab.frame()).thenReturn(jabRefFrame);
+        when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
         when(jabRefFrame.getDialogService()).thenReturn(dialogService);
 
-        saveDatabaseAction = spy(new SaveDatabaseAction(basePanel, preferences, mock(BibEntryTypesManager.class)));
+        saveDatabaseAction = spy(new SaveDatabaseAction(libraryTab, preferences, mock(BibEntryTypesManager.class)));
     }
 
     @Test
@@ -106,7 +106,7 @@ class SaveDatabaseActionTest {
         SavePreferences savePreferences = mock(SavePreferences.class);
         // In case a "thenReturn" is modified, the whole mock has to be recreated
         dbContext = mock(BibDatabaseContext.class);
-        basePanel = mock(BasePanel.class);
+        libraryTab = mock(LibraryTab.class);
         MetaData metaData = mock(MetaData.class);
         when(savePreferences.withEncoding(any(Charset.class))).thenReturn(savePreferences);
         when(savePreferences.withSaveType(any(SavePreferences.DatabaseSaveType.class))).thenReturn(savePreferences);
@@ -125,11 +125,11 @@ class SaveDatabaseActionTest {
         when(preferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
         when(preferences.getFieldContentParserPreferences()).thenReturn(mock(FieldContentFormatterPreferences.class));
         when(preferences.getSavePreferences()).thenReturn(savePreferences);
-        when(basePanel.frame()).thenReturn(jabRefFrame);
-        when(basePanel.getBibDatabaseContext()).thenReturn(dbContext);
-        when(basePanel.getUndoManager()).thenReturn(mock(CountingUndoManager.class));
-        when(basePanel.getBibDatabaseContext()).thenReturn(dbContext);
-        saveDatabaseAction = new SaveDatabaseAction(basePanel, preferences, mock(BibEntryTypesManager.class));
+        when(libraryTab.frame()).thenReturn(jabRefFrame);
+        when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
+        when(libraryTab.getUndoManager()).thenReturn(mock(CountingUndoManager.class));
+        when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
+        saveDatabaseAction = new SaveDatabaseAction(libraryTab, preferences, mock(BibEntryTypesManager.class));
         return saveDatabaseAction;
     }
 

@@ -12,7 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.metadata.FilePreferences;
+import org.jabref.preferences.FilePreferences;
 
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.detect.Detector;
@@ -88,7 +88,7 @@ public class FileHelper {
      * @param fileName        The filename, may also be a relative path to the file
      */
     public static Optional<Path> find(final BibDatabaseContext databaseContext, String fileName, FilePreferences filePreferences) {
-        return find(fileName, databaseContext.getFileDirectoriesAsPaths(filePreferences));
+        return find(fileName, databaseContext.getFileDirectories(filePreferences));
     }
 
     /**

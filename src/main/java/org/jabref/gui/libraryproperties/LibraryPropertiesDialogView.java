@@ -11,8 +11,8 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
 import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel;
 import org.jabref.gui.util.BaseDialog;
@@ -38,11 +38,11 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
     @Inject private PreferencesService preferencesService;
     @Inject private DialogService dialogService;
 
-    private final BasePanel panel;
+    private final LibraryTab libraryTab;
     private LibraryPropertiesDialogViewModel viewModel;
 
-    public LibraryPropertiesDialogView(BasePanel panel) {
-        this.panel = panel;
+    public LibraryPropertiesDialogView(LibraryTab libraryTab) {
+        this.libraryTab = libraryTab;
 
         ViewLoader.view(this)
                   .load()
@@ -60,7 +60,7 @@ public class LibraryPropertiesDialogView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new LibraryPropertiesDialogViewModel(panel.getBibDatabaseContext(), dialogService, preferencesService);
+        viewModel = new LibraryPropertiesDialogViewModel(libraryTab.getBibDatabaseContext(), dialogService, preferencesService);
 
         encoding.disableProperty().bind(viewModel.encodingDisableProperty());
         encoding.itemsProperty().bind(viewModel.encodingsProperty());

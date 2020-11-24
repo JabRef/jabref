@@ -120,9 +120,9 @@ public class TableTabViewModel implements PreferenceTabViewModel {
         initialSpecialFieldsPreferences = preferences.getSpecialFieldsPreferences();
         MainTableNameFormatPreferences initialNameFormatPreferences = preferences.getMainTableNameFormatPreferences();
 
-        specialFieldsEnabledProperty.setValue(initialSpecialFieldsPreferences.getSpecialFieldsEnabled());
-        specialFieldsSyncKeywordsProperty.setValue(initialSpecialFieldsPreferences.getAutoSyncSpecialFieldsToKeyWords());
-        specialFieldsSerializeProperty.setValue(initialSpecialFieldsPreferences.getSerializeSpecialFields());
+        specialFieldsEnabledProperty.setValue(initialSpecialFieldsPreferences.isSpecialFieldsEnabled());
+        specialFieldsSyncKeywordsProperty.setValue(initialSpecialFieldsPreferences.shouldAutoSyncSpecialFieldsToKeyWords());
+        specialFieldsSerializeProperty.setValue(initialSpecialFieldsPreferences.shouldSerializeSpecialFields());
         extraFileColumnsEnabledProperty.setValue(initialMainTablePreferences.getExtraFileColumnsEnabled());
         autoResizeColumnsProperty.setValue(initialMainTablePreferences.getResizeColumnsToFit());
 
@@ -155,30 +155,16 @@ public class TableTabViewModel implements PreferenceTabViewModel {
         }
 
         switch (initialNameFormatPreferences.getDisplayStyle()) {
-            case NATBIB:
-                namesNatbibProperty.setValue(true);
-                break;
-            case AS_IS:
-                nameAsIsProperty.setValue(true);
-                break;
-            case FIRSTNAME_LASTNAME:
-                nameFirstLastProperty.setValue(true);
-                break;
-            case LASTNAME_FIRSTNAME:
-                nameLastFirstProperty.setValue(true);
-                break;
+            case NATBIB -> namesNatbibProperty.setValue(true);
+            case AS_IS -> nameAsIsProperty.setValue(true);
+            case FIRSTNAME_LASTNAME -> nameFirstLastProperty.setValue(true);
+            case LASTNAME_FIRSTNAME -> nameLastFirstProperty.setValue(true);
         }
 
         switch (initialNameFormatPreferences.getAbbreviationStyle()) {
-            case FULL:
-                abbreviationEnabledProperty.setValue(true);
-                break;
-            case LASTNAME_ONLY:
-                abbreviationLastNameOnlyProperty.setValue(true);
-                break;
-            case NONE:
-                abbreviationDisabledProperty.setValue(true);
-                break;
+            case FULL -> abbreviationEnabledProperty.setValue(true);
+            case LASTNAME_ONLY -> abbreviationLastNameOnlyProperty.setValue(true);
+            case NONE -> abbreviationDisabledProperty.setValue(true);
         }
     }
 
@@ -268,11 +254,11 @@ public class TableTabViewModel implements PreferenceTabViewModel {
                 specialFieldsSyncKeywordsProperty.getValue(),
                 specialFieldsSerializeProperty.getValue());
 
-        if (initialSpecialFieldsPreferences.getAutoSyncSpecialFieldsToKeyWords() != newSpecialFieldsPreferences.getAutoSyncSpecialFieldsToKeyWords()) {
+        if (initialSpecialFieldsPreferences.shouldAutoSyncSpecialFieldsToKeyWords() != newSpecialFieldsPreferences.shouldAutoSyncSpecialFieldsToKeyWords()) {
             restartWarnings.add(Localization.lang("Synchronize special fields to keywords"));
         }
 
-        if (initialSpecialFieldsPreferences.getSerializeSpecialFields() != newSpecialFieldsPreferences.getSerializeSpecialFields()) {
+        if (initialSpecialFieldsPreferences.shouldSerializeSpecialFields() != newSpecialFieldsPreferences.shouldSerializeSpecialFields()) {
             restartWarnings.add(Localization.lang("Serialize special fields"));
         }
 

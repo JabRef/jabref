@@ -2,7 +2,7 @@ package org.jabref.gui.util;
 
 import javafx.util.StringConverter;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
@@ -32,7 +32,7 @@ public class FieldsUtil {
 
     public static String getNameWithType(Field field) {
         if (field instanceof SpecialField) {
-            return new SpecialFieldViewModel((SpecialField) field, Globals.undoManager).getLocalization()
+            return new SpecialFieldViewModel((SpecialField) field, Globals.prefs, Globals.undoManager).getLocalization()
                     + " (" + Localization.lang("Special") + ")";
         } else if (field instanceof IEEEField) {
             return field.getDisplayName() + " (" + Localization.lang("IEEE") + ")";

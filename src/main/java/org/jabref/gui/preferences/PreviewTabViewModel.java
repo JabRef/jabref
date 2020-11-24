@@ -23,10 +23,10 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 
-import org.jabref.JabRefGUI;
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
+import org.jabref.gui.JabRefGUI;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -37,7 +37,7 @@ import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.PreviewPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -73,8 +73,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final StringProperty sourceTextProperty = new SimpleStringProperty("");
 
     private final DialogService dialogService;
-    private final JabRefPreferences preferences;
-    private final PreviewPreferences previewPreferences;
+    private final PreferencesService preferences;
+    private final PreviewPreferences initialPreviewPreferences;
     private final TaskExecutor taskExecutor;
 
     private final Validator chosenListValidator;
@@ -83,16 +83,17 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private ListProperty<PreviewLayout> dragSourceList = null;
     private ObjectProperty<MultipleSelectionModel<PreviewLayout>> dragSourceSelectionModel = null;
 
-    public PreviewTabViewModel(DialogService dialogService, JabRefPreferences preferences, TaskExecutor taskExecutor, StateManager stateManager) {
+    public PreviewTabViewModel(DialogService dialogService, PreferencesService preferences, TaskExecutor taskExecutor, StateManager stateManager) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.taskExecutor = taskExecutor;
         this.localDragboard = stateManager.getLocalDragboard();
-        previewPreferences = preferences.getPreviewPreferences();
+        initialPreviewPreferences = preferences.getPreviewPreferences();
 
         sourceTextProperty.addListener((observable, oldValue, newValue) -> {
-            if (getCurrentLayout() instanceof TextBasedPreviewLayout) {
-                ((TextBasedPreviewLayout) getCurrentLayout()).setText(sourceTextProperty.getValue().replace("\n", "__NEWLINE__"));
+            var currentLayout = getCurrentLayout();
+            if (currentLayout instanceof TextBasedPreviewLayout) {
+                ((TextBasedPreviewLayout) currentLayout).setText(sourceTextProperty.getValue().replace("\n", "__NEWLINE__"));
             }
         });
 
@@ -112,14 +113,15 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         return showAsExtraTab;
     }
 
+    @Override
     public void setValues() {
-        showAsExtraTab.set(previewPreferences.showPreviewAsExtraTab());
+        showAsExtraTab.set(initialPreviewPreferences.showPreviewAsExtraTab());
         chosenListProperty().getValue().clear();
-        chosenListProperty.getValue().addAll(previewPreferences.getPreviewCycle());
+        chosenListProperty.getValue().addAll(initialPreviewPreferences.getPreviewCycle());
 
         availableListProperty.clear();
         if (chosenListProperty.stream().noneMatch(layout -> layout instanceof TextBasedPreviewLayout)) {
-            availableListProperty.getValue().add(previewPreferences.getTextBasedPreviewLayout());
+            availableListProperty.getValue().add(initialPreviewPreferences.getTextBasedPreviewLayout());
         }
 
         BackgroundTask.wrap(CitationStyle::discoverCitationStyles)
@@ -174,15 +176,16 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private PreviewLayout getCurrentLayout() {
         if (!chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
             return chosenSelectionModelProperty.getValue().getSelectedItems().get(0);
+
         }
 
         if (!chosenListProperty.getValue().isEmpty()) {
             return chosenListProperty.getValue().get(0);
         }
 
-        PreviewLayout layout = findLayoutByName("Preview");
+        PreviewLayout layout = findLayoutByName(TextBasedPreviewLayout.NAME);
         if (layout == null) {
-            layout = previewPreferences.getTextBasedPreviewLayout();
+            layout = initialPreviewPreferences.getTextBasedPreviewLayout();
         }
 
         return layout;
@@ -196,7 +199,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
             chosenListProperty.add(previewPreferences.getTextBasedPreviewLayout());
         }
 
-        PreviewLayout previewStyle = findLayoutByName("Preview");
+        PreviewLayout previewStyle = findLayoutByName(TextBasedPreviewLayout.NAME);
         if (previewStyle == null) {
             previewStyle = previewPreferences.getTextBasedPreviewLayout();
         }
@@ -216,9 +219,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
         preferences.storePreviewPreferences(newPreviewPreferences);
 
-        for (BasePanel basePanel : JabRefGUI.getMainFrame().getBasePanelList()) {
+        for (LibraryTab libraryTab : JabRefGUI.getMainFrame().getLibraryTabs()) {
             // TODO: Find a better way to update preview
-            basePanel.closeBottomPane();
+            libraryTab.closeBottomPane();
             // basePanel.getPreviewPanel().updateLayout(preferences.getPreviewPreferences());
         }
     }
@@ -257,7 +260,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         chosenSelectionModelProperty.getValue().clearSelection();
         chosenListProperty.removeAll(selected);
         availableListProperty.addAll(selected);
-        availableListProperty.sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+        availableListProperty.sort((a, b) -> a.getDisplayName().compareToIgnoreCase(b.getDisplayName()));
     }
 
     public void selectedInChosenUp() {
@@ -413,7 +416,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                 success = true;
 
                 if (targetList == availableListProperty) {
-                    targetList.getValue().sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+                    targetList.getValue().sort((a, b) -> a.getDisplayName().compareToIgnoreCase(b.getDisplayName()));
                 }
             }
         }

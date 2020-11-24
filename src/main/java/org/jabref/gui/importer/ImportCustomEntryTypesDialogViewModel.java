@@ -6,7 +6,7 @@ import java.util.Optional;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;

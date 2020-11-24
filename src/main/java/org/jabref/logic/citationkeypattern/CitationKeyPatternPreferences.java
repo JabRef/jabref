@@ -1,7 +1,5 @@
 package org.jabref.logic.citationkeypattern;
 
-import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
-
 public class CitationKeyPatternPreferences {
 
     public enum KeySuffix {

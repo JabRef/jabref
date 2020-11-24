@@ -137,11 +137,11 @@ public class BibDatabase {
     }
 
     /**
-     * Returns the entry with the given bibtex key.
+     * Returns the entry with the given citation key.
      */
-    public synchronized Optional<BibEntry> getEntryByKey(String key) {
+    public synchronized Optional<BibEntry> getEntryByCitationKey(String key) {
         for (BibEntry entry : entries) {
-            if (key.equals(entry.getCiteKeyOptional().orElse(null))) {
+            if (key.equals(entry.getCitationKey().orElse(null))) {
                 return Optional.of(entry);
             }
         }
@@ -152,14 +152,13 @@ public class BibDatabase {
      * Collects entries having the specified citation key and returns these entries as list.
      * The order of the entries is the order they appear in the database.
      *
-     * @param key
      * @return list of entries that contains the given key
      */
-    public synchronized List<BibEntry> getEntriesByKey(String key) {
+    public synchronized List<BibEntry> getEntriesByCitationKey(String key) {
         List<BibEntry> result = new ArrayList<>();
 
         for (BibEntry entry : entries) {
-            entry.getCiteKeyOptional().ifPresent(entryKey -> {
+            entry.getCitationKey().ifPresent(entryKey -> {
                 if (key.equals(entryKey)) {
                     result.add(entry);
                 }
@@ -578,7 +577,7 @@ public class BibDatabase {
     }
 
     public Optional<BibEntry> getReferencedEntry(BibEntry entry) {
-        return entry.getField(StandardField.CROSSREF).flatMap(this::getEntryByKey);
+        return entry.getField(StandardField.CROSSREF).flatMap(this::getEntryByCitationKey);
     }
 
     public Optional<String> getSharedDatabaseID() {
@@ -608,19 +607,19 @@ public class BibDatabase {
     }
 
     /**
-     * Returns the number of occurrences of the given key in this database.
+     * Returns the number of occurrences of the given citation key in this database.
      */
-    public long getNumberOfKeyOccurrences(String citeKey) {
+    public long getNumberOfCitationKeyOccurrences(String key) {
         return entries.stream()
-                      .flatMap(entry -> entry.getCiteKeyOptional().stream())
-                      .filter(key -> key.equals(citeKey))
+                      .flatMap(entry -> entry.getCitationKey().stream())
+                      .filter(key::equals)
                       .count();
     }
 
     /**
-     * Checks if there is more than one occurrence of the cite key
+     * Checks if there is more than one occurrence of the citation key.
      */
-    public boolean isDuplicateCiteKeyExisting(String citeKey) {
-        return getNumberOfKeyOccurrences(citeKey) > 1;
+    public boolean isDuplicateCitationKeyExisting(String key) {
+        return getNumberOfCitationKeyOccurrences(key) > 1;
     }
 }

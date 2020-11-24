@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +43,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.util.FileHelper;
 
 import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,11 +63,13 @@ import org.slf4j.LoggerFactory;
 public class URLDownload {
 
     public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:79.0) Gecko/20100101 Firefox/79.0";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(URLDownload.class);
+    private static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(30);
+
     private final URL source;
     private final Map<String, String> parameters = new HashMap<>();
     private String postData = "";
+    private Duration connectTimeout = DEFAULT_CONNECT_TIMEOUT;
 
     /**
      * @param source the URL to download from
@@ -169,6 +173,19 @@ public class URLDownload {
         }
 
         return "";
+    }
+
+    /**
+     * Check the connection by using the HEAD request.
+     * UnirestException can be thrown for invalid request.
+     *
+     * @return the status code of the response
+     */
+    public boolean canBeReached() throws UnirestException {
+        Unirest.config().setDefaultHeader("User-Agent", "Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
+
+        int statusCode = Unirest.head(source.toString()).asString().getStatus();
+        return statusCode >= 200 && statusCode < 300;
     }
 
     public boolean isMimeType(String type) {
@@ -289,8 +306,7 @@ public class URLDownload {
     }
 
     private void copy(InputStream in, Writer out, Charset encoding) throws IOException {
-        InputStream monitoredInputStream = in;
-        Reader r = new InputStreamReader(monitoredInputStream, encoding);
+        Reader r = new InputStreamReader(in, encoding);
         try (BufferedReader read = new BufferedReader(r)) {
 
             String line;
@@ -303,6 +319,7 @@ public class URLDownload {
 
     private URLConnection openConnection() throws IOException {
         URLConnection connection = this.source.openConnection();
+        connection.setConnectTimeout((int) connectTimeout.toMillis());
         for (Entry<String, String> entry : this.parameters.entrySet()) {
             connection.setRequestProperty(entry.getKey(), entry.getValue());
         }
@@ -332,5 +349,15 @@ public class URLDownload {
         connection.connect();
 
         return connection;
+    }
+
+    public void setConnectTimeout(Duration connectTimeout) {
+        if (connectTimeout != null) {
+            this.connectTimeout = connectTimeout;
+        }
+    }
+
+    public Duration getConnectTimeout() {
+        return connectTimeout;
     }
 }

@@ -53,5 +53,7 @@
                              GridPane.rowIndex="5"/>
         <Label fx:id="proxyAttentionLabel" styleClass="warning-message"
                text="%Attention: Password is stored in plain text!" GridPane.columnIndex="2" GridPane.rowIndex="5"/>
+        <Button fx:id="checkConnectionButton" text="%Check connection" onAction="#checkConnection"
+                prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
     </GridPane>
 </fx:root>

@@ -19,7 +19,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.MouseButton;
 
-import org.jabref.Globals;
+import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.importer.FetcherException;
@@ -37,6 +37,7 @@ import org.jabref.model.util.OptionalUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@AllowedToUseAwt("Requires ava.awt.datatransfer.Clipboard")
 public class ClipBoardManager {
 
     public static final DataFormat XML = new DataFormat("application/xml");
@@ -72,7 +73,7 @@ public class ClipBoardManager {
                 // using InvalidationListener because of https://bugs.openjdk.java.net/browse/JDK-8176270
                 observable -> Platform.runLater(() -> {
                     String newValue = input.getSelectedText();
-                    if (!newValue.isEmpty() && primary != null) {
+                    if (!newValue.isEmpty() && (primary != null)) {
                         primary.setContents(new StringSelection(newValue), null);
                     }
                 }));
@@ -104,7 +105,7 @@ public class ClipBoardManager {
     public static String getContentsPrimary() {
         if (primary != null) {
             Transferable contents = primary.getContents(null);
-            if (contents != null && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+            if ((contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                 try {
                     return (String) contents.getTransferData(DataFlavor.stringFlavor);
                 } catch (UnsupportedFlavorException | IOException e) {
@@ -136,9 +137,10 @@ public class ClipBoardManager {
         }
     }
 
-    public void setHtmlContent(String html) {
+    public void setHtmlContent(String html, String fallbackPlain) {
         final ClipboardContent content = new ClipboardContent();
         content.putHtml(html);
+        content.putString(fallbackPlain);
         clipboard.setContent(content);
         setPrimaryClipboardContent(content);
     }
@@ -180,7 +182,7 @@ public class ClipBoardManager {
     }
 
     private List<BibEntry> handleStringData(String data) {
-        if (data == null || data.isEmpty()) {
+        if ((data == null) || data.isEmpty()) {
             return Collections.emptyList();
         }
 

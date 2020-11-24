@@ -24,4 +24,9 @@ public interface FileUpdateMonitor {
      * @return true is process is running; false otherwise.
      */
     boolean isActive();
+
+    /**
+     *  stops watching for changes
+     */
+    void shutdown();
 }

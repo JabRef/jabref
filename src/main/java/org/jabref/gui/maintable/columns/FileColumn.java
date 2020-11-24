@@ -10,8 +10,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
@@ -68,7 +68,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                                 entry.getEntry(),
                                 database, Globals.TASK_EXECUTOR,
                                 dialogService,
-                                preferencesService.getXMPPreferences(),
+                                preferencesService.getXmpPreferences(),
                                 preferencesService.getFilePreferences(),
                                 externalFileTypes);
                         linkedFileViewModel.open();
@@ -132,7 +132,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                     database,
                     Globals.TASK_EXECUTOR,
                     dialogService,
-                    preferencesService.getXMPPreferences(),
+                    preferencesService.getXmpPreferences(),
                     preferencesService.getFilePreferences(),
                     externalFileTypes);
 

@@ -29,10 +29,16 @@ CITATION_FORMAT_FILTER = %w{
 
 # These styles are ignored when checking for unused macros
 UNUSED_MACROS_FILTER = %w{
+  apa-annotated-bibliography
+  apa-cv
+  apa-numeric-superscript
+  apa-numeric-superscript-brackets
+  apa-with-abstract
   chicago-annotated-bibliography chicago-author-date chicago-author-date-16th-edition
   chicago-library-list chicago-note-bibliography-16th-edition
   chicago-note-bibliography-with-ibid
   chicago-note-bibliography taylor-and-francis-chicago-author-date
+  turabian-author-date
 }
 
 # These files and directories are ignored when checking for extra files

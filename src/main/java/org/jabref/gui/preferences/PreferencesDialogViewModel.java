@@ -8,13 +8,13 @@ import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.Globals;
-import org.jabref.JabRefException;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
@@ -143,22 +143,19 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         List<TemplateExporter> customExporters = preferences.getCustomExportFormats(Globals.journalAbbreviationRepository);
         LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository);
         SavePreferences savePreferences = preferences.getSavePreferencesForExport();
-        XmpPreferences xmpPreferences = preferences.getXMPPreferences();
+        XmpPreferences xmpPreferences = preferences.getXmpPreferences();
         Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
 
         ExternalApplicationsPreferences externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
         PushToApplicationsManager manager = frame.getPushToApplicationsManager();
         manager.updateApplicationAction(manager.getApplicationByName(externalApplicationsPreferences.getPushToApplicationName()));
 
-        frame.getBasePanelList().forEach(panel -> panel.getMainTable().getTableModel().refresh());
+        frame.getLibraryTabs().forEach(panel -> panel.getMainTable().getTableModel().refresh());
     }
 
     /**
      * Checks if all tabs are valid
-     * ToDo: After conversion of all tabs use mvvmfx-validator
-     * ToDo: should be observable for binding of OK-button in View
      */
-
     public boolean validSettings() {
         for (PreferencesTab tab : preferenceTabs) {
             if (!tab.validateSettings()) {

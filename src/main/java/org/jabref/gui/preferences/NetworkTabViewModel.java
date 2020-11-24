@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -9,12 +10,13 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.remote.JabRefMessageHandler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.model.strings.StringUtil;
@@ -25,6 +27,7 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
+import kong.unirest.UnirestException;
 
 public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty remoteServerProperty = new SimpleBooleanProperty();
@@ -44,16 +47,16 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
-    private final RemotePreferences remotePreferences;
-    private final ProxyPreferences proxyPreferences;
+    private final RemotePreferences initialRemotePreferences;
+    private final ProxyPreferences initialProxyPreferences;
 
     private final List<String> restartWarning = new ArrayList<>();
 
     public NetworkTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.remotePreferences = preferences.getRemotePreferences();
-        this.proxyPreferences = preferences.getProxyPreferences();
+        this.initialRemotePreferences = preferences.getRemotePreferences();
+        this.initialProxyPreferences = preferences.getProxyPreferences();
 
         remotePortValidator = new FunctionBasedValidator<>(
                 remotePortProperty,
@@ -104,15 +107,19 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     }
 
     public void setValues() {
-        remoteServerProperty.setValue(remotePreferences.useRemoteServer());
-        remotePortProperty.setValue(String.valueOf(remotePreferences.getPort()));
+        remoteServerProperty.setValue(initialRemotePreferences.useRemoteServer());
+        remotePortProperty.setValue(String.valueOf(initialRemotePreferences.getPort()));
 
-        proxyUseProperty.setValue(proxyPreferences.isUseProxy());
-        proxyHostnameProperty.setValue(proxyPreferences.getHostname());
-        proxyPortProperty.setValue(proxyPreferences.getPort());
-        proxyUseAuthenticationProperty.setValue(proxyPreferences.isUseAuthentication());
-        proxyUsernameProperty.setValue(proxyPreferences.getUsername());
-        proxyPasswordProperty.setValue(proxyPreferences.getPassword());
+        setProxyValues();
+    }
+
+    private void setProxyValues() {
+        proxyUseProperty.setValue(initialProxyPreferences.isUseProxy());
+        proxyHostnameProperty.setValue(initialProxyPreferences.getHostname());
+        proxyPortProperty.setValue(initialProxyPreferences.getPort());
+        proxyUseAuthenticationProperty.setValue(initialProxyPreferences.isUseAuthentication());
+        proxyUsernameProperty.setValue(initialProxyPreferences.getUsername());
+        proxyPasswordProperty.setValue(initialProxyPreferences.getPassword());
     }
 
     public void storeSettings() {
@@ -122,12 +129,12 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     private void storeRemoteSettings() {
         RemotePreferences newRemotePreferences = new RemotePreferences(
-                remotePreferences.getPort(),
+                initialRemotePreferences.getPort(),
                 remoteServerProperty.getValue()
         );
 
         getPortAsInt(remotePortProperty.getValue()).ifPresent(newPort -> {
-            if (remotePreferences.isDifferentPort(newPort)) {
+            if (initialRemotePreferences.isDifferentPort(newPort)) {
                 newRemotePreferences.setPort(newPort);
 
                 if (newRemotePreferences.useRemoteServer()) {
@@ -137,7 +144,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         });
 
         if (newRemotePreferences.useRemoteServer()) {
-            Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), remotePreferences.getPort());
+            Globals.REMOTE_LISTENER.openAndStart(new JabRefMessageHandler(), initialRemotePreferences.getPort());
         } else {
             Globals.REMOTE_LISTENER.stop();
         }
@@ -155,7 +162,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
                 proxyPasswordProperty.getValue()
         );
 
-        if (!newProxyPreferences.equals(proxyPreferences)) {
+        if (!newProxyPreferences.equals(initialProxyPreferences)) {
             ProxyRegisterer.register(newProxyPreferences);
         }
         preferences.storeProxyPreferences(newProxyPreferences);
@@ -213,6 +220,39 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Check the connection by using the given url. Used for validating the http proxy.
+     * The checking result will be appear when request finished.
+     * The checking result could be either success or fail, if fail, the cause will be displayed.
+     */
+    public void checkConnection() {
+        final String connectionSuccessText = Localization.lang("Connection successful!");
+        final String connectionFailedText = Localization.lang("Connection failed!");
+        final String dialogTitle = Localization.lang("Check Proxy Setting");
+
+        final String testUrl = "http://jabref.org";
+
+        // Workaround for testing, since the URLDownload uses stored proxy settings, see
+        // preferences.storeProxyPreferences(...) below.
+        storeProxySettings();
+
+        URLDownload urlDownload;
+        try {
+            urlDownload = new URLDownload(testUrl);
+            if (urlDownload.canBeReached()) {
+                dialogService.showInformationDialogAndWait(dialogTitle, connectionSuccessText);
+            } else {
+                dialogService.showErrorDialogAndWait(dialogTitle, connectionFailedText);
+            }
+        } catch (MalformedURLException e) {
+            // Why would that happen? Because one of developers inserted a failing url in testUrl...
+        } catch (UnirestException e) {
+            dialogService.showErrorDialogAndWait(dialogTitle, connectionFailedText);
+        }
+
+        preferences.storeProxyPreferences(initialProxyPreferences);
     }
 
     @Override

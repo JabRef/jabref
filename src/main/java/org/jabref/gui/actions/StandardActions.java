@@ -33,7 +33,7 @@ public enum StandardActions implements Action {
     OPEN_EXTERNAL_FILE(Localization.lang("Open file"), IconTheme.JabRefIcons.FILE, KeyBinding.OPEN_FILE),
     OPEN_URL(Localization.lang("Open URL or DOI"), IconTheme.JabRefIcons.WWW, KeyBinding.OPEN_URL_OR_DOI),
     SEARCH_SHORTSCIENCE(Localization.lang("Search ShortScience")),
-    MERGE_WITH_FETCHED_ENTRY(Localization.lang("Get BibTeX data from %0", "DOI/ISBN/...")),
+    MERGE_WITH_FETCHED_ENTRY(Localization.lang("Get bibliographic data from %0", "DOI/ISBN/...")),
     ATTACH_FILE(Localization.lang("Attach file"), IconTheme.JabRefIcons.ATTACH_FILE),
     PRIORITY(Localization.lang("Priority"), IconTheme.JabRefIcons.PRIORITY),
     CLEAR_PRIORITY(Localization.lang("Clear priority")),
@@ -104,7 +104,6 @@ public enum StandardActions implements Action {
     MANAGE_CUSTOM_IMPORTS(Localization.lang("Manage custom imports")),
     CUSTOMIZE_ENTRY_TYPES(Localization.lang("Customize entry types")),
     SETUP_GENERAL_FIELDS(Localization.lang("Set up general fields")),
-    MANAGE_EXTERNAL_FILETYPES(Localization.lang("Manage external file types")),
     MANAGE_PROTECTED_TERMS(Localization.lang("Manage protected terms")),
     CITATION_KEY_PATTERN(Localization.lang("Citation key patterns")),
     SHOW_PREFS(Localization.lang("Preferences")),
@@ -115,8 +114,8 @@ public enum StandardActions implements Action {
 
     EDIT_ENTRY(Localization.lang("Open entry editor"), IconTheme.JabRefIcons.EDIT_ENTRY, KeyBinding.EDIT_ENTRY),
     SHOW_PDF_VIEWER(Localization.lang("Open document viewer"), IconTheme.JabRefIcons.PDF_FILE),
-    NEXT_PREVIEW_STYLE(Localization.lang("Next citation style"), KeyBinding.NEXT_PREVIEW_LAYOUT),
-    PREVIOUS_PREVIEW_STYLE(Localization.lang("Previous citation style"), KeyBinding.PREVIOUS_PREVIEW_LAYOUT),
+    NEXT_PREVIEW_STYLE(Localization.lang("Next preview style"), KeyBinding.NEXT_PREVIEW_LAYOUT),
+    PREVIOUS_PREVIEW_STYLE(Localization.lang("Previous preview style"), KeyBinding.PREVIOUS_PREVIEW_LAYOUT),
     SELECT_ALL(Localization.lang("Select all"), KeyBinding.SELECT_ALL),
 
     NEW_ENTRY(Localization.lang("New entry"), IconTheme.JabRefIcons.ADD_ENTRY, KeyBinding.NEW_ENTRY),

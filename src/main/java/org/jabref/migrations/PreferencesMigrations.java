@@ -14,11 +14,10 @@ import java.util.stream.Collectors;
 
 import javafx.scene.control.TableColumn;
 
-import org.jabref.Globals;
-import org.jabref.JabRefMain;
+import org.jabref.gui.Globals;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
-import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
@@ -38,7 +37,7 @@ public class PreferencesMigrations {
      * Perform checks and changes for users with a preference set from an older JabRef version.
      */
     public static void runMigrations() {
-        Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
+        Preferences mainPrefsNode = Preferences.userRoot().node("/org/jabref");
 
         upgradePrefsToOrgJabRef(mainPrefsNode);
         upgradeSortOrder(Globals.prefs);
@@ -184,7 +183,7 @@ public class PreferencesMigrations {
     private static void upgradeLabelPatternToCitationKeyPattern(JabRefPreferences prefs) {
 
         try {
-            Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
+            Preferences mainPrefsNode = Preferences.userRoot().node("/org/jabref");
 
             // Migrate default pattern
             if (mainPrefsNode.get(JabRefPreferences.DEFAULT_CITATION_KEY_PATTERN, null) == null) {
@@ -248,13 +247,13 @@ public class PreferencesMigrations {
         // Check for prefs node for Version <= 4.0
         if (mainPrefsNode.get(JabRefPreferences.IMPORT_FILENAMEPATTERN, null) != null) {
 
-            String[] oldStylePatterns = new String[] {
+            String[] oldStylePatterns = new String[]{
                     "\\bibtexkey",
                     "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
-            String[] newStylePatterns = new String[] {"[bibtexkey]",
-                    "[bibtexkey] - [title]"};
+            String[] newStylePatterns = new String[]{"[citationkey]",
+                    "[citationkey] - [title]"};
 
-            String[] oldDisplayStylePattern = new String[] {"bibtexkey", "bibtexkey - title"};
+            String[] oldDisplayStylePattern = new String[]{"bibtexkey", "bibtexkey - title"};
 
             for (int i = 0; i < oldStylePatterns.length; i++) {
                 migrateFileImportPattern(oldStylePatterns[i], newStylePatterns[i], prefs, mainPrefsNode);
@@ -305,13 +304,18 @@ public class PreferencesMigrations {
 
     static void upgradePreviewStyleFromReviewToComment(JabRefPreferences prefs) {
         String currentPreviewStyle = prefs.getPreviewStyle();
-        String migratedStyle = currentPreviewStyle.replace("\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}", "\\begin{comment}<BR><BR><b>Comment: </b> \\format[HTMLChars]{\\comment} \\end{comment}");
+        String migratedStyle = currentPreviewStyle.replace("\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}", "\\begin{comment}<BR><BR><b>Comment: </b> \\format[HTMLChars]{\\comment} \\end{comment}")
+                                                  .replace("<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>", "<b><i>\\bibtextype</i><a name=\"\\citationkey\">\\begin{citationkey} (\\citationkey)</a>")
+                                                  .replace("\\end{bibtexkey}</b><br>__NEWLINE__", "\\end{citationkey}</b><br>__NEWLINE__");
         prefs.setPreviewStyle(migratedStyle);
     }
 
     static void upgradePreviewStyleAllowMarkdown(JabRefPreferences prefs) {
         String currentPreviewStyle = prefs.getPreviewStyle();
-        String migratedStyle = currentPreviewStyle.replace("\\format[HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars]{\\comment}");
+        String migratedStyle = currentPreviewStyle.replace("\\format[HTMLChars]{\\comment}", "\\format[Markdown,HTMLChars]{\\comment}")
+                                                  .replace("<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>", "<b><i>\\bibtextype</i><a name=\"\\citationkey\">\\begin{citationkey} (\\citationkey)</a>")
+                                                  .replace("\\end{bibtexkey}</b><br>__NEWLINE__", "\\end{citationkey}</b><br>__NEWLINE__");
+
         prefs.setPreviewStyle(migratedStyle);
     }
 

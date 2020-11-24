@@ -17,7 +17,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.AutoLinkPreferences;
-import org.jabref.model.metadata.FilePreferences;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -73,7 +73,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     public void setValues() {
         // External files preferences / Attached files preferences / File preferences
         mainFileDirectoryProperty.setValue(initialFilePreferences.getFileDirectory().orElse(Path.of("")).toString());
-        useBibLocationAsPrimaryProperty.setValue(initialFilePreferences.isBibLocationAsPrimary());
+        useBibLocationAsPrimaryProperty.setValue(initialFilePreferences.shouldStoreFilesRelativeToBib());
         searchFilesOnOpenProperty.setValue(initialFilePreferences.shouldSearchFilesOnOpen());
         openBrowseOnCreateProperty.setValue(initialFilePreferences.shouldOpenBrowseOnCreate());
         fileNamePatternProperty.setValue(initialFilePreferences.getFileNamePattern());

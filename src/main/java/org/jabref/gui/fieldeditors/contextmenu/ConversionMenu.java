@@ -6,9 +6,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.Tooltip;
 
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.cleanup.Formatter;
 
 /**
  * Menu to show up on right-click in a text field for converting text formats

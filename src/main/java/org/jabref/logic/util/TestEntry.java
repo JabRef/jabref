@@ -14,7 +14,7 @@ public class TestEntry {
     public static BibEntry getTestEntry() {
 
         BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.setCiteKey("Smith2016");
+        entry.setCitationKey("Smith2016");
         entry.setField(StandardField.AUTHOR, "Smith, Bill and Jones, Bob and Williams, Jeff");
         entry.setField(StandardField.EDITOR, "Taylor, Phil");
         entry.setField(StandardField.TITLE, "Title of the test entry");
@@ -43,7 +43,7 @@ public class TestEntry {
 
     public static BibEntry getTestEntryBook() {
         BibEntry entry = new BibEntry(StandardEntryType.Book);
-        entry.setCiteKey("Harrer2018");
+        entry.setCitationKey("Harrer2018");
         entry.setField(StandardField.AUTHOR, "Simon Harrer and Jörg Lenhard and Linus Dietz");
         entry.setField(StandardField.EDITOR, "Andrea Steward");
         entry.setField(StandardField.TITLE, "Java by Comparison");

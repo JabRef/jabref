@@ -3,7 +3,7 @@ package org.jabref.logic.shared;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.jabref.model.bibtexkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -39,7 +39,7 @@ public class SynchronizationTestSimulator {
                 .withField(StandardField.TITLE, "The nano processor: a low resource reconfigurable processor " + index)
                 .withField(StandardField.BOOKTITLE, "FPGAs for Custom Computing Machines, 1994. Proceedings. IEEE Workshop on " + index)
                 .withField(StandardField.YEAR, "199" + index)
-                .withCiteKey("nanoproc199" + index);
+                .withCitationKey("nanoproc199" + index);
     }
 
     @BeforeEach

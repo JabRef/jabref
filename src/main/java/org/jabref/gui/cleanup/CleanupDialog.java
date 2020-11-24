@@ -6,7 +6,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.metadata.FilePreferences;
+import org.jabref.preferences.FilePreferences;
 
 public class CleanupDialog extends BaseDialog<CleanupPreset> {
 
