@@ -36,6 +36,7 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
@@ -105,6 +106,8 @@ public class LibraryTab extends Tab {
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
 
+    private BackgroundTask<?> dataLoadingTask;
+
     public LibraryTab(JabRefFrame frame,
                       PreferencesService preferencesService,
                       BibDatabaseContext bibDatabaseContext,
@@ -147,11 +150,18 @@ public class LibraryTab extends Tab {
         });
     }
 
-    public static LibraryTab createNewEmptyLibraryTab(JabRefFrame frame, Path file) {
+    public void setDataLoadingTask(BackgroundTask<?> dataLoadingTask) {
+        this.dataLoadingTask = dataLoadingTask;
+    }
+
+    public static LibraryTab createNewEmptyLibraryTab(JabRefFrame frame, Path file, BackgroundTask<?> dataLoadingTask) {
         BibDatabaseContext context = new BibDatabaseContext();
         context.setDatabasePath(file);
 
-        return new LibraryTab(frame, frame.prefs(), context, ExternalFileTypes.getInstance());
+        LibraryTab tab = new LibraryTab(frame, frame.prefs(), context, ExternalFileTypes.getInstance());
+        tab.setDataLoadingTask(dataLoadingTask);
+
+        return tab;
     }
 
     public void feedData(BibDatabaseContext bibDatabaseContext) {
@@ -195,7 +205,6 @@ public class LibraryTab extends Tab {
         BackupManager.start(this.bibDatabaseContext, Globals.entryTypesManager, Globals.prefs);
 
         trackOpenNewDatabase(this);
-
     }
 
     private boolean isDatabaseReadyForAutoSave(BibDatabaseContext context) {
@@ -214,14 +223,11 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * Sets the title of the tab
-     * modification-asterisk filename – path-fragment
+     * Sets the title of the tab modification-asterisk filename – path-fragment
      * <p>
-     * The modification-asterisk (*) is shown if the file was modified since last save
-     * (path-fragment is only shown if filename is not (globally) unique)
+     * The modification-asterisk (*) is shown if the file was modified since last save (path-fragment is only shown if filename is not (globally) unique)
      * <p>
-     * Example:
-     * *jabref-authors.bib – testbib
+     * Example: *jabref-authors.bib – testbib
      */
     public void updateTabTitle(boolean isChanged) {
         boolean isAutosaveEnabled = preferencesService.getShouldAutosave();
@@ -262,9 +268,9 @@ public class LibraryTab extends Tab {
             // Unique path fragment
             List<String> uniquePathParts = FileUtil.uniquePathSubstrings(collectAllDatabasePaths());
             Optional<String> uniquePathPart = uniquePathParts.stream()
-                    .filter(part -> databasePath.toString().contains(part)
-                            && !part.equals(fileName) && part.contains(File.separator))
-                    .findFirst();
+                                                             .filter(part -> databasePath.toString().contains(part)
+                                                                     && !part.equals(fileName) && part.contains(File.separator))
+                                                             .findFirst();
             if (uniquePathPart.isPresent()) {
                 String uniquePath = uniquePathPart.get();
                 // remove filename
@@ -315,10 +321,10 @@ public class LibraryTab extends Tab {
     private List<String> collectAllDatabasePaths() {
         List<String> list = new ArrayList<>();
         Globals.stateManager.getOpenDatabases().stream()
-                .map(BibDatabaseContext::getDatabasePath)
-                .forEachOrdered(pathOptional -> pathOptional.ifPresentOrElse(
-                        path -> list.add(path.toAbsolutePath().toString()),
-                        () -> list.add("")));
+                            .map(BibDatabaseContext::getDatabasePath)
+                            .forEachOrdered(pathOptional -> pathOptional.ifPresentOrElse(
+                                    path -> list.add(path.toAbsolutePath().toString()),
+                                    () -> list.add("")));
         return list;
     }
 
@@ -349,8 +355,7 @@ public class LibraryTab extends Tab {
     /**
      * Removes the selected entries from the database
      *
-     * @param cut If false the user will get asked if he really wants to delete the entries, and it will be localized as
-     *            "deleted". If true the action will be localized as "cut"
+     * @param cut If false the user will get asked if he really wants to delete the entries, and it will be localized as "deleted". If true the action will be localized as "cut"
      */
     public void delete(boolean cut) {
         delete(cut, mainTable.getSelectedEntries());
@@ -359,8 +364,7 @@ public class LibraryTab extends Tab {
     /**
      * Removes the selected entries from the database
      *
-     * @param cut If false the user will get asked if he really wants to delete the entries, and it will be localized as
-     *            "deleted". If true the action will be localized as "cut"
+     * @param cut If false the user will get asked if he really wants to delete the entries, and it will be localized as "deleted". If true the action will be localized as "cut"
      */
     private void delete(boolean cut, List<BibEntry> entries) {
         if (entries.isEmpty()) {
@@ -403,9 +407,7 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * This method is called from JabRefFrame when the user wants to create a new entry or entries.
-     * It is necessary when the user would expect the added entry or one of the added entries
-     * to be selected in the entry editor
+     * This method is called from JabRefFrame when the user wants to create a new entry or entries. It is necessary when the user would expect the added entry or one of the added entries to be selected in the entry editor
      *
      * @param entries The new entries.
      */
@@ -459,9 +461,9 @@ public class LibraryTab extends Tab {
 
         // Update entry editor and preview according to selected entries
         mainTable.addSelectionListener(event -> mainTable.getSelectedEntries()
-                .stream()
-                .findFirst()
-                .ifPresent(entryEditor::setEntry));
+                                                         .stream()
+                                                         .findFirst()
+                                                         .ifPresent(entryEditor::setEntry));
     }
 
     public void setupMainPanel() {
@@ -475,8 +477,8 @@ public class LibraryTab extends Tab {
         // Saves the divider position as soon as it changes
         // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
         dividerPositionSubscription = EasyBind.valueAt(splitPane.getDividers(), 0)
-                .mapObservable(SplitPane.Divider::positionProperty)
-                .subscribeToValues(this::saveDividerLocation);
+                                              .mapObservable(SplitPane.Divider::positionProperty)
+                                              .subscribeToValues(this::saveDividerLocation);
 
         // Add changePane in case a file is present - otherwise just add the splitPane to the panel
         Optional<Path> file = bibDatabaseContext.getDatabasePath();
@@ -518,8 +520,7 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * Sets the entry editor as the bottom component in the split pane. If an entry editor already was shown, makes sure
-     * that the divider doesn't move. Updates the mode to SHOWING_EDITOR. Then shows the given entry.
+     * Sets the entry editor as the bottom component in the split pane. If an entry editor already was shown, makes sure that the divider doesn't move. Updates the mode to SHOWING_EDITOR. Then shows the given entry.
      *
      * @param entry The entry to edit.
      */
@@ -558,8 +559,7 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * This method selects the given entry, and scrolls it into view in the table. If an entryEditor is shown, it is
-     * given focus afterwards.
+     * This method selects the given entry, and scrolls it into view in the table. If an entryEditor is shown, it is given focus afterwards.
      */
     public void clearAndSelect(final BibEntry bibEntry) {
         mainTable.clearAndSelect(bibEntry);
@@ -574,8 +574,7 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * This method is called from an EntryEditor when it should be closed. We relay to the selection listener, which
-     * takes care of the rest.
+     * This method is called from an EntryEditor when it should be closed. We relay to the selection listener, which takes care of the rest.
      */
     public void entryEditorClosing() {
         closeBottomPane();
@@ -643,8 +642,7 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * Depending on whether a preview or an entry editor is showing, save the current divider location in the correct
-     * preference setting.
+     * Depending on whether a preview or an entry editor is showing, save the current divider location in the correct preference setting.
      */
     private void saveDividerLocation(Number position) {
         if (mode == BasePanelMode.SHOWING_EDITOR) {
@@ -663,8 +661,7 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * Get an array containing the currently selected entries. The array is stable and not changed if the selection
-     * changes
+     * Get an array containing the currently selected entries. The array is stable and not changed if the selection changes
      *
      * @return A list containing the selected entries. Is never null.
      */
@@ -796,8 +793,7 @@ public class LibraryTab extends Tab {
     }
 
     /**
-     * Ensures that the results of the current search are updated when a new entry is inserted into the database Actual
-     * methods for performing search must run in javafx thread
+     * Ensures that the results of the current search are updated when a new entry is inserted into the database Actual methods for performing search must run in javafx thread
      */
     private class SearchListener {
 

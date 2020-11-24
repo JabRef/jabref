@@ -169,13 +169,12 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
 
         BackgroundTask<ParserResult> backgroundTask = BackgroundTask.wrap(() -> loadDatabase(file));
-        LibraryTab libraryTab = LibraryTab.createNewEmptyLibraryTab(frame, file);
+        LibraryTab libraryTab = LibraryTab.createNewEmptyLibraryTab(frame, file, backgroundTask);
         onDatabaseLoadingStarted(libraryTab, backgroundTask);
 
         backgroundTask.onSuccess(result -> onDatabaseLoadingSucceed(libraryTab, result))
-                .onFailure(ex -> onDatabaseLoadingFailed(libraryTab, ex))
-                .executeWith(Globals.TASK_EXECUTOR);
-
+                      .onFailure(ex -> onDatabaseLoadingFailed(libraryTab, ex))
+                      .executeWith(Globals.TASK_EXECUTOR);
     }
 
     private ParserResult loadDatabase(Path file) throws Exception {
