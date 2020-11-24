@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
 
@@ -28,6 +30,7 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(org.jabref.logic.importer.fetcher.CitationRelationFetcher.class);
     private SearchType searchType = null;
     private static final String BASIC_URL = "https://opencitations.net/index/api/v1/metadata/";
+    private final DoubleProperty progress = new SimpleDoubleProperty(0);
 
     /**
      * Possible search methods
@@ -45,6 +48,7 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
 
     public CitationRelationFetcher(SearchType searchType) {
         this.searchType = searchType;
+        progress.set(0);
     }
 
     /**
@@ -72,6 +76,7 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
                     int i = 1;
                     for (String item : items) {
                         LOGGER.info("Current Item " + i + "/" + items.length);
+                        setProgress(i, items.length);
                         if (!doi.equals(item) && !item.equals("")) {
                             DoiFetcher doiFetcher = new DoiFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
                             try {
@@ -115,6 +120,14 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
             sb.append((char) cp);
         }
         return sb.toString();
+    }
+
+    private void setProgress(double i, double total) {
+        progress.set(i/total);
+    }
+
+    public DoubleProperty getProgress() {
+        return progress;
     }
 
     @Override

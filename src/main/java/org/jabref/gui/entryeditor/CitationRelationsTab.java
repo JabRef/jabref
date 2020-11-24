@@ -7,6 +7,7 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -175,15 +176,21 @@ public class CitationRelationsTab extends EntryEditorTab {
         styleTopBarNode(refreshCitedByButton, 15.0);
         //Create abort Buttons for both sides
         abortCitingButton = IconTheme.JabRefIcons.CLOSE.asButton();
+        abortCitingButton.getGraphic().resize(30,30);
         styleTopBarNode(abortCitingButton, 15.0);
         abortCitedButton = IconTheme.JabRefIcons.CLOSE.asButton();
+        abortCitedButton.getGraphic().resize(30,30);
         styleTopBarNode(abortCitedButton, 15.0);
 
         citingProgress = new ProgressIndicator();
         citingProgress.setMaxSize(25, 25);
+        citingProgress.getStyleClass().add("progress-indicator");
+        citingProgress.setPadding(new Insets(2, 0, -22, 0));
         styleTopBarNode(citingProgress, 50.0);
         citedByProgress = new ProgressIndicator();
         citedByProgress.setMaxSize(25, 25);
+        citedByProgress.getStyleClass().add("progress-indicator");
+        citedByProgress.setPadding(new Insets(2, 0, -22, 0));
         styleTopBarNode(citedByProgress, 50.0);
 
 
@@ -396,8 +403,12 @@ public class CitationRelationsTab extends EntryEditorTab {
                 citedByTask.cancel();
             }
 
+
             CitationRelationFetcher fetcher = new CitationRelationFetcher(searchType);
             BackgroundTask<List<BibEntry>> task = BackgroundTask.wrap(() -> fetcher.performSearch(entry));
+
+            progress.progressProperty().unbind();
+            progress.progressProperty().bind(fetcher.getProgress());
 
             if (searchType.equals(CitationRelationFetcher.SearchType.CITING)) {
                 citingTask = task;
