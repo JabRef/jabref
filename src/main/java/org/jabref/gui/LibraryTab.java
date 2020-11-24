@@ -184,6 +184,12 @@ public class LibraryTab extends Tab {
         OpenDatabaseAction.performPostOpenActions(this, result);
 
         feedData(context);
+        // a temporary workaround to update groups pane
+        Globals.stateManager.activeDatabaseProperty().bind(
+                EasyBind.map(frame.getTabbedPane().getSelectionModel().selectedItemProperty(),
+                        selectedTab -> Optional.ofNullable(selectedTab)
+                                               .map(tab -> (LibraryTab) tab)
+                                               .map(LibraryTab::getBibDatabaseContext)));
     }
 
     public void onDatabaseLoadingFailed(Exception ex) {
