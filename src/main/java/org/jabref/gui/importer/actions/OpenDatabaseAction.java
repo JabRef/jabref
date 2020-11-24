@@ -13,10 +13,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import javafx.scene.Node;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.layout.BorderPane;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
@@ -36,7 +32,6 @@ import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
@@ -171,12 +166,10 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
 
         BackgroundTask<ParserResult> backgroundTask = BackgroundTask.wrap(() -> loadDatabase(file));
-        LibraryTab libraryTab = LibraryTab.createNewEmptyLibraryTab(frame, file, backgroundTask);
-        onDatabaseLoadingStarted(libraryTab);
+        LibraryTab.Factory libraryTabCreator = new LibraryTab.Factory();
+        LibraryTab newTab = libraryTabCreator.createModernLibraryTab(frame, file, backgroundTask);
 
-        backgroundTask.onSuccess(result -> onDatabaseLoadingSucceed(libraryTab, result))
-                      .onFailure(ex -> onDatabaseLoadingFailed(libraryTab, ex))
-                      .executeWith(Globals.TASK_EXECUTOR);
+        backgroundTask.onFinished(() -> trackOpenNewDatabase(newTab));
     }
 
     private ParserResult loadDatabase(Path file) throws Exception {
@@ -224,36 +217,5 @@ public class OpenDatabaseAction extends SimpleCommand {
         measurements.put("NumberOfEntries", (double) libraryTab.getBibDatabaseContext().getDatabase().getEntryCount());
 
         Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("OpenNewDatabase", properties, measurements));
-    }
-
-    /* The layout to display in the tab when it's loading*/
-    public Node createLoadingLayout() {
-        ProgressIndicator progressIndicator = new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS);
-        BorderPane pane = new BorderPane();
-        pane.setCenter(progressIndicator);
-
-        return pane;
-    }
-
-    public void onDatabaseLoadingStarted(LibraryTab libraryTab) {
-        Node loadingLayout = createLoadingLayout();
-        libraryTab.setContent(loadingLayout);
-
-        frame.addTab(libraryTab, true);
-    }
-
-    public void onDatabaseLoadingSucceed(LibraryTab libraryTab, ParserResult result) {
-        BibDatabaseContext context = result.getDatabaseContext();
-        libraryTab.feedData(context);
-
-        OpenDatabaseAction.performPostOpenActions(libraryTab, result);
-        trackOpenNewDatabase(libraryTab);
-    }
-
-    public void onDatabaseLoadingFailed(LibraryTab libraryTab, Exception ex) {
-        String title = Localization.lang("Connection error");
-        String content = String.format("%s\n\n%s", ex.getMessage(), Localization.lang("A local copy will be opened."));
-
-        dialogService.showErrorDialogAndWait(title, content, ex);
     }
 }

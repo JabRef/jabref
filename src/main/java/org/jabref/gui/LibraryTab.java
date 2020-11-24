@@ -4,9 +4,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -16,9 +14,11 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.BorderPane;
 
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.autocompleter.PersonNameSuggestionProvider;
@@ -28,6 +28,7 @@ import org.jabref.gui.collab.DatabaseChangePane;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.specialfields.SpecialFieldDatabaseChangeListener;
@@ -41,6 +42,7 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.citationstyle.CitationStyleCache;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.search.SearchQuery;
@@ -106,7 +108,7 @@ public class LibraryTab extends Tab {
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
     // initializing it so we prevent NullPointerException
-    private BackgroundTask<?> dataLoadingTask = BackgroundTask.wrap(()-> { });
+    private BackgroundTask<ParserResult> dataLoadingTask = BackgroundTask.wrap(() -> null);
 
     public LibraryTab(JabRefFrame frame,
                       PreferencesService preferencesService,
@@ -150,7 +152,7 @@ public class LibraryTab extends Tab {
         });
     }
 
-    public void setDataLoadingTask(BackgroundTask<?> dataLoadingTask) {
+    public void setDataLoadingTask(BackgroundTask<ParserResult> dataLoadingTask) {
         this.dataLoadingTask = dataLoadingTask;
     }
 
@@ -161,14 +163,34 @@ public class LibraryTab extends Tab {
         return dataLoadingTask;
     }
 
-    public static LibraryTab createNewEmptyLibraryTab(JabRefFrame frame, Path file, BackgroundTask<?> dataLoadingTask) {
-        BibDatabaseContext context = new BibDatabaseContext();
-        context.setDatabasePath(file);
+    /* The layout to display in the tab when it's loading*/
+    public Node createLoadingLayout() {
+        ProgressIndicator progressIndicator = new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS);
+        BorderPane pane = new BorderPane();
+        pane.setCenter(progressIndicator);
 
-        LibraryTab tab = new LibraryTab(frame, frame.prefs(), context, ExternalFileTypes.getInstance());
-        tab.setDataLoadingTask(dataLoadingTask);
+        return pane;
+    }
 
-        return tab;
+    public void onDatabaseLoadingStarted() {
+        Node loadingLayout = createLoadingLayout();
+        getMainTable().placeholderProperty().setValue(loadingLayout);
+
+        frame.addTab(this, true);
+    }
+
+    public void onDatabaseLoadingSucceed(ParserResult result) {
+        BibDatabaseContext context = result.getDatabaseContext();
+        feedData(context);
+
+        OpenDatabaseAction.performPostOpenActions(this, result);
+    }
+
+    public void onDatabaseLoadingFailed(Exception ex) {
+        String title = Localization.lang("Connection error");
+        String content = String.format("%s\n\n%s", ex.getMessage(), Localization.lang("A local copy will be opened."));
+
+        dialogService.showErrorDialogAndWait(title, content, ex);
     }
 
     public void feedData(BibDatabaseContext bibDatabaseContext) {
@@ -210,7 +232,6 @@ public class LibraryTab extends Tab {
         }
 
         BackupManager.start(this.bibDatabaseContext, Globals.entryTypesManager, Globals.prefs);
-
     }
 
     private boolean isDatabaseReadyForAutoSave(BibDatabaseContext context) {
@@ -809,6 +830,30 @@ public class LibraryTab extends Tab {
         public void listen(EntriesRemovedEvent removedEntriesEvent) {
             // IMO only used to update the status (found X entries)
             DefaultTaskExecutor.runInJavaFXThread(() -> frame.getGlobalSearchBar().performSearch());
+        }
+    }
+
+    public static class Factory {
+        public LibraryTab createModernLibraryTab(JabRefFrame frame, Path file, BackgroundTask<ParserResult> dataLoadingTask) {
+            BibDatabaseContext context = new BibDatabaseContext();
+            context.setDatabasePath(file);
+
+            LibraryTab newTab = new LibraryTab(frame, frame.prefs(), context, ExternalFileTypes.getInstance());
+            newTab.setDataLoadingTask(dataLoadingTask);
+
+            dataLoadingTask.onRunning(newTab::onDatabaseLoadingStarted)
+                           .onSuccess(newTab::onDatabaseLoadingSucceed)
+                           .onFailure(newTab::onDatabaseLoadingFailed)
+                           .executeWith(Globals.TASK_EXECUTOR);
+
+            return newTab;
+        }
+
+        public LibraryTab createClassicLibraryTab(JabRefFrame frame,
+                                                  PreferencesService preferencesService,
+                                                  BibDatabaseContext bibDatabaseContext,
+                                                  ExternalFileTypes externalFileTypes) {
+            return new LibraryTab(frame, preferencesService, bibDatabaseContext, externalFileTypes);
         }
     }
 }
