@@ -154,6 +154,13 @@ public class LibraryTab extends Tab {
         this.dataLoadingTask = dataLoadingTask;
     }
 
+    public BackgroundTask<?> getDataLoadingTask() {
+        if (dataLoadingTask == null) {
+            return null;
+        }
+        return dataLoadingTask;
+    }
+
     public static LibraryTab createNewEmptyLibraryTab(JabRefFrame frame, Path file, BackgroundTask<?> dataLoadingTask) {
         BibDatabaseContext context = new BibDatabaseContext();
         context.setDatabasePath(file);
