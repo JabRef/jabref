@@ -170,7 +170,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         BackgroundTask<ParserResult> backgroundTask = BackgroundTask.wrap(() -> loadDatabase(file));
         LibraryTab libraryTab = LibraryTab.createNewEmptyLibraryTab(frame, file, backgroundTask);
-        onDatabaseLoadingStarted(libraryTab, backgroundTask);
+        onDatabaseLoadingStarted(libraryTab);
 
         backgroundTask.onSuccess(result -> onDatabaseLoadingSucceed(libraryTab, result))
                       .onFailure(ex -> onDatabaseLoadingFailed(libraryTab, ex))
@@ -225,10 +225,9 @@ public class OpenDatabaseAction extends SimpleCommand {
         return pane;
     }
 
-    public void onDatabaseLoadingStarted(LibraryTab libraryTab, BackgroundTask<?> backgroundTask) {
+    public void onDatabaseLoadingStarted(LibraryTab libraryTab) {
         Node loadingLayout = createLoadingLayout();
         libraryTab.setContent(loadingLayout);
-        libraryTab.setOnCloseRequest(e -> backgroundTask.cancel());
 
         frame.addTab(libraryTab, true);
     }

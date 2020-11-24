@@ -105,8 +105,8 @@ public class LibraryTab extends Tab {
     // the query the user searches when this BasePanel is active
     private Optional<SearchQuery> currentSearchQuery = Optional.empty();
     private Optional<DatabaseChangeMonitor> changeMonitor = Optional.empty();
-
-    private BackgroundTask<?> dataLoadingTask;
+    // initializing it so we prevent NullPointerException
+    private BackgroundTask<?> dataLoadingTask = BackgroundTask.wrap(()-> { });
 
     public LibraryTab(JabRefFrame frame,
                       PreferencesService preferencesService,

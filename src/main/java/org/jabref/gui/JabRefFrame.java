@@ -338,8 +338,7 @@ public class JabRefFrame extends BorderPane {
      * <p>
      * FIXME: Currently some threads remain and therefore hinder JabRef to be closed properly
      *
-     * @param filenames the filenames of all currently opened files - used for storing them if prefs openLastEdited is
-     *                  set to true
+     * @param filenames the filenames of all currently opened files - used for storing them if prefs openLastEdited is set to true
      */
     private void tearDownJabRef(List<String> filenames) {
         // prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, getExtendedState() == Frame.MAXIMIZED_BOTH);
@@ -362,9 +361,7 @@ public class JabRefFrame extends BorderPane {
     }
 
     /**
-     * General info dialog.  The MacAdapter calls this method when "Quit" is selected from the application menu, Cmd-Q
-     * is pressed, or "Quit" is selected from the Dock. The function returns a boolean indicating if quitting is ok or
-     * not.
+     * General info dialog.  The MacAdapter calls this method when "Quit" is selected from the application menu, Cmd-Q is pressed, or "Quit" is selected from the Dock. The function returns a boolean indicating if quitting is ok or not.
      * <p>
      * Non-OSX JabRef calls this when choosing "Quit" from the menu
      * <p>
@@ -989,10 +986,8 @@ public class JabRefFrame extends BorderPane {
     }
 
     /**
-     * This method causes all open LibraryTabs to set up their tables anew. When called from PreferencesDialogViewModel,
-     * this updates to the new settings.
-     * We need to notify all tabs about the changes to avoid problems when changing the column set.
-     * */
+     * This method causes all open LibraryTabs to set up their tables anew. When called from PreferencesDialogViewModel, this updates to the new settings. We need to notify all tabs about the changes to avoid problems when changing the column set.
+     */
     public void setupAllTables() {
         tabbedPane.getTabs().forEach(tab -> {
             LibraryTab libraryTab = (LibraryTab) tab;
@@ -1013,7 +1008,7 @@ public class JabRefFrame extends BorderPane {
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new OpenDatabaseFolder()),
                 factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(stateManager))
-                );
+        );
 
         return contextMenu;
     }
@@ -1023,6 +1018,7 @@ public class JabRefFrame extends BorderPane {
 
         libraryTab.setOnCloseRequest(event -> {
             closeTab(libraryTab);
+            libraryTab.getDataLoadingTask().cancel();
             event.consume();
         });
 
