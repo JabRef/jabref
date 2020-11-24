@@ -6,8 +6,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -216,6 +218,14 @@ public class OpenDatabaseAction extends SimpleCommand {
         return libraryTab;
     }
 
+    private void trackOpenNewDatabase(LibraryTab libraryTab) {
+        Map<String, String> properties = new HashMap<>();
+        Map<String, Double> measurements = new HashMap<>();
+        measurements.put("NumberOfEntries", (double) libraryTab.getBibDatabaseContext().getDatabase().getEntryCount());
+
+        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("OpenNewDatabase", properties, measurements));
+    }
+
     /* The layout to display in the tab when it's loading*/
     public Node createLoadingLayout() {
         ProgressIndicator progressIndicator = new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS);
@@ -237,6 +247,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         libraryTab.feedData(context);
 
         OpenDatabaseAction.performPostOpenActions(libraryTab, result);
+        trackOpenNewDatabase(libraryTab);
     }
 
     public void onDatabaseLoadingFailed(LibraryTab libraryTab, Exception ex) {

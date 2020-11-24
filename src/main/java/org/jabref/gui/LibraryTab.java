@@ -211,7 +211,6 @@ public class LibraryTab extends Tab {
 
         BackupManager.start(this.bibDatabaseContext, Globals.entryTypesManager, Globals.prefs);
 
-        trackOpenNewDatabase(this);
     }
 
     private boolean isDatabaseReadyForAutoSave(BibDatabaseContext context) {
@@ -219,14 +218,6 @@ public class LibraryTab extends Tab {
                 ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)))
                 &&
                 context.getDatabasePath().isPresent();
-    }
-
-    private void trackOpenNewDatabase(LibraryTab libraryTab) {
-        Map<String, String> properties = new HashMap<>();
-        Map<String, Double> measurements = new HashMap<>();
-        measurements.put("NumberOfEntries", (double) libraryTab.getBibDatabaseContext().getDatabase().getEntryCount());
-
-        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("OpenNewDatabase", properties, measurements));
     }
 
     /**
