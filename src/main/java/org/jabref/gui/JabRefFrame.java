@@ -136,7 +136,6 @@ import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.LastFocusedTabPreferences;
 
@@ -995,7 +994,7 @@ public class JabRefFrame extends BorderPane {
      * This method causes all open LibraryTabs to set up their tables anew. When called from PreferencesDialogViewModel,
      * this updates to the new settings.
      * We need to notify all tabs about the changes to avoid problems when changing the column set.
-     * */
+     */
     public void setupAllTables() {
         tabbedPane.getTabs().forEach(tab -> {
             LibraryTab libraryTab = (LibraryTab) tab;
@@ -1016,7 +1015,7 @@ public class JabRefFrame extends BorderPane {
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new OpenDatabaseFolder()),
                 factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(stateManager))
-                );
+        );
 
         return contextMenu;
     }

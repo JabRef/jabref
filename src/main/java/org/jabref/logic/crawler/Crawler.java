@@ -12,7 +12,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.study.Study;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 
