@@ -50,7 +50,7 @@ public class SystematicLiteratureReviewStudyEntryTypeDefinitions {
     private static final BibEntryType LIBRARY_ENTRY = new BibEntryTypeBuilder()
             .withType(SystematicLiteratureReviewStudyEntryType.STUDY_ENTRY)
             .withRequiredFields(new UnknownField("name"), new UnknownField("enabled"))
-            .withImportantFields(new UnknownField("comment"))
+            .withImportantFields(StandardField.COMMENT)
             .build();
 
     public static final List<BibEntryType> ALL = Arrays.asList(STUDY_ENTRY, SEARCH_QUERY_ENTRY, LIBRARY_ENTRY);

@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
@@ -49,6 +50,8 @@ class StudyRepository {
     // Tests work with study.bib
     private static final String STUDY_DEFINITION_FILE_NAME = "study.bib";
     private static final Logger LOGGER = LoggerFactory.getLogger(StudyRepository.class);
+    private static final Pattern MATCHCOLON = Pattern.compile(":");
+    private static final Pattern MATCHILLEGALCHARACTERS = Pattern.compile("[^A-Za-z0-9_.\\s=-]");
 
     private final Path repositoryPath;
     private final Path studyDefinitionBib;
@@ -74,7 +77,7 @@ class StudyRepository {
         try {
             gitHandler.updateLocalRepository();
         } catch (GitAPIException e) {
-            LOGGER.info("Updating repository from remote failed");
+            LOGGER.error("Updating repository from remote failed");
         }
         this.importFormatPreferences = importFormatPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -147,7 +150,7 @@ class StudyRepository {
         try {
             gitHandler.updateLocalRepository();
         } catch (GitAPIException e) {
-            LOGGER.info("Updating repository from remote failed");
+            LOGGER.error("Updating repository from remote failed");
         }
         persistResults(crawlResults);
         study.setLastSearchDate(LocalDate.now());
@@ -155,7 +158,7 @@ class StudyRepository {
         try {
             gitHandler.updateRemoteRepository("Conducted search " + LocalDate.now());
         } catch (GitAPIException e) {
-            LOGGER.info("Updating remote repository failed");
+            LOGGER.error("Updating remote repository failed");
         }
     }
 
@@ -191,11 +194,7 @@ class StudyRepository {
 
     private void createFolder(Path folder) throws IOException {
         if (Files.notExists(folder)) {
-            try {
-                Files.createDirectory(folder);
-            } catch (IOException e) {
-                throw new IOException("Error during creation of repository structure.", e);
-            }
+            Files.createDirectory(folder);
         }
     }
 
@@ -244,8 +243,8 @@ class StudyRepository {
      */
     private String trimNameAndAddID(String query) {
         // Replace all field: with field= for folder name
-        String trimmedNamed = query.replaceAll(":", "=");
-        trimmedNamed = trimmedNamed.replaceAll("[^A-Za-z0-9_.\\s=-]", "");
+        String trimmedNamed = MATCHCOLON.matcher(query).replaceAll("=");
+        trimmedNamed = MATCHILLEGALCHARACTERS.matcher(trimmedNamed).replaceAll("");
         if (query.length() > 240) {
             trimmedNamed = query.substring(0, 240);
         }
@@ -261,15 +260,16 @@ class StudyRepository {
      * @return ID of the query defined in the study definition.
      */
     private String findQueryIDByQueryString(String query) {
+        String queryField = "query";
         return study.getSearchQueryEntries()
                     .parallelStream()
-                    .filter(bibEntry -> bibEntry.getField(new UnknownField("query")).orElse("").equals(query))
+                    .filter(bibEntry -> bibEntry.getField(new UnknownField(queryField)).orElse("").equals(query))
                     .map(BibEntry::getCitationKey)
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .findFirst()
                     .orElseThrow()
-                    .replaceFirst("query", "");
+                    .replaceFirst(queryField, "");
     }
 
     /**
