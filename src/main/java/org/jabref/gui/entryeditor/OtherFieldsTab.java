@@ -25,6 +25,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
 
 public class OtherFieldsTab extends FieldsEditorTab {
@@ -69,6 +70,8 @@ public class OtherFieldsTab extends FieldsEditorTab {
             otherFields.removeAll(entryType.get().getDeprecatedFields());
             otherFields.removeAll(entryType.get().getOptionalFields().stream().map(BibField::getField).collect(Collectors.toSet()));
             otherFields.remove(InternalField.KEY_FIELD);
+            otherFields.remove(StandardField.CITING);
+            otherFields.remove(StandardField.CITEDBY);
             otherFields.removeAll(customTabFieldNames);
             return otherFields;
         } else {

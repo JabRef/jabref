@@ -41,7 +41,7 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
 
         public final String label;
 
-        private SearchType(String label) {
+        SearchType(String label) {
             this.label = label;
         }
     }
