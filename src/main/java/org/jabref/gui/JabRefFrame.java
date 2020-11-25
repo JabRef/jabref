@@ -818,7 +818,7 @@ public class JabRefFrame extends BorderPane {
                 factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsEMailAction(dialogService, stateManager)),
                 pushToApplicationMenuItem,
                 new SeparatorMenuItem(),
-                factory.createMenuItem(StandardActions.START_SYSTEMATIC_LITERATURE_REVIEW, new StartLiteratureReviewAction(this, Globals.getFileUpdateMonitor()))
+                factory.createMenuItem(StandardActions.START_SYSTEMATIC_LITERATURE_REVIEW, new StartLiteratureReviewAction(this, Globals.getFileUpdateMonitor(), Globals.prefs.getWorkingDir(), Globals.TASK_EXECUTOR))
         );
 
         SidePaneComponent webSearch = sidePaneManager.getComponent(SidePaneType.WEB_SEARCH);

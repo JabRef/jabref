@@ -8,6 +8,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.crawler.Crawler;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.l10n.Localization;
@@ -24,17 +25,21 @@ public class StartLiteratureReviewAction extends SimpleCommand {
     private final JabRefFrame frame;
     private final DialogService dialogService;
     private final FileUpdateMonitor fileUpdateMonitor;
+    private final Path workingDirectory;
+    private final TaskExecutor taskExecutor;
 
-    public StartLiteratureReviewAction(JabRefFrame frame, FileUpdateMonitor fileUpdateMonitor) {
+    public StartLiteratureReviewAction(JabRefFrame frame, FileUpdateMonitor fileUpdateMonitor, Path standardWorkingDirectory, TaskExecutor taskExecutor) {
         this.frame = frame;
         this.dialogService = frame.getDialogService();
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.workingDirectory = getInitialDirectory(standardWorkingDirectory);
+        this.taskExecutor = taskExecutor;
     }
 
     @Override
     public void execute() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .withInitialDirectory(getInitialDirectory())
+                .withInitialDirectory(workingDirectory)
                 .build();
 
         Optional<Path> studyDefinitionFile = dialogService.showFileOpenDialog(fileDialogConfiguration);
@@ -44,10 +49,10 @@ public class StartLiteratureReviewAction extends SimpleCommand {
         }
         final Crawler crawler;
         try {
-            crawler = new Crawler(studyDefinitionFile.get(), fileUpdateMonitor, JabRefPreferences.getInstance().getSavePreferences(), new BibEntryTypesManager());
+            crawler = new Crawler(studyDefinitionFile.get(), fileUpdateMonitor, JabRefPreferences.getInstance().getImportFormatPreferences(), JabRefPreferences.getInstance().getSavePreferences(), new BibEntryTypesManager());
         } catch (IOException | ParseException | GitAPIException e) {
-            LOGGER.info("Error during reading of study definition file.", e);
-            dialogService.showErrorDialogAndWait(Localization.lang("Error during reading of study definition file."));
+            LOGGER.error("Error during reading of study definition file.", e);
+            dialogService.showErrorDialogAndWait(Localization.lang("Error during reading of study definition file."), e);
             return;
         }
         BackgroundTask.wrap(() -> {
@@ -55,22 +60,22 @@ public class StartLiteratureReviewAction extends SimpleCommand {
             return 0; // Return any value to make this a callable instead of a runnable. This allows throwing exceptions.
         })
                       .onFailure(e -> {
-                          LOGGER.info("Error during persistence of crawling results.");
+                          LOGGER.error("Error during persistence of crawling results.");
                           dialogService.showErrorDialogAndWait(Localization.lang("Error during persistence of crawling results."), e);
                       })
                       .onSuccess(unused -> new OpenDatabaseAction(frame).openFile(Path.of(studyDefinitionFile.get().getParent().toString(), "studyResult.bib"), true))
-                      .executeWith(Globals.TASK_EXECUTOR);
+                      .executeWith(taskExecutor);
     }
 
     /**
-     * @return Path of current panel database directory or the working directory
+     * @return Path of current panel database directory or the standard working directory
      */
-    private Path getInitialDirectory() {
+    private Path getInitialDirectory(Path standardWorkingDirectory) {
         if (frame.getBasePanelCount() == 0) {
-            return Globals.prefs.getWorkingDir();
+            return standardWorkingDirectory;
         } else {
             Optional<Path> databasePath = frame.getCurrentLibraryTab().getBibDatabaseContext().getDatabasePath();
-            return databasePath.map(Path::getParent).orElse(Globals.prefs.getWorkingDir());
+            return databasePath.map(Path::getParent).orElse(standardWorkingDirectory);
         }
     }
 }
