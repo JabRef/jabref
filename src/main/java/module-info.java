@@ -91,4 +91,5 @@ open module org.jabref {
     requires com.h2database.mvstore;
     requires lucene.queryparser;
     requires lucene.core;
+    requires org.eclipse.jgit;
 }
