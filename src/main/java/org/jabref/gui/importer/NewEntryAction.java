@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.EntryTypeView;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
@@ -54,16 +54,16 @@ public class NewEntryAction extends SimpleCommand {
         }
 
         if (type.isPresent()) {
-            jabRefFrame.getCurrentBasePanel().insertEntry(new BibEntry(type.get()));
+            jabRefFrame.getCurrentLibraryTab().insertEntry(new BibEntry(type.get()));
         } else {
-            EntryTypeView typeChoiceDialog = new EntryTypeView(jabRefFrame.getCurrentBasePanel(), dialogService, preferences);
+            EntryTypeView typeChoiceDialog = new EntryTypeView(jabRefFrame.getCurrentLibraryTab(), dialogService, preferences);
             EntryType selectedType = typeChoiceDialog.showAndWait().orElse(null);
             if (selectedType == null) {
                 return;
             }
 
             trackNewEntry(selectedType);
-            jabRefFrame.getCurrentBasePanel().insertEntry(new BibEntry(selectedType));
+            jabRefFrame.getCurrentLibraryTab().insertEntry(new BibEntry(selectedType));
         }
     }
 

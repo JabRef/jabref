@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jabref.Globals;
+import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.JabRefDesktop;
@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
  * are opened. This feature is disabled by default and can be switched on at
  * preferences/external programs
  */
+@AllowedToUseAwt("Requires AWT to send an email")
 public class SendAsEMailAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SendAsEMailAction.class);
@@ -89,7 +90,7 @@ public class SendAsEMailAction extends SimpleCommand {
         //   the unofficial "mailto:attachment" property
         boolean openFolders = JabRefPreferences.getInstance().getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES);
 
-        List<Path> fileList = FileUtil.getListOfLinkedFiles(entries, databaseContext.getFileDirectoriesAsPaths(Globals.prefs.getFilePreferences()));
+        List<Path> fileList = FileUtil.getListOfLinkedFiles(entries, databaseContext.getFileDirectories(Globals.prefs.getFilePreferences()));
         for (Path path : fileList) {
             attachments.add(path.toAbsolutePath().toString());
             if (openFolders) {

@@ -2,7 +2,7 @@ package org.jabref.preferences;
 
 import java.util.List;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.preview.PreviewLayout;

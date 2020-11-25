@@ -68,7 +68,7 @@ public class MainTableColumnFactory {
         this.columnPreferences = preferencesService.getColumnPreferences();
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.dialogService = dialogService;
-        this.cellFactory = new CellFactory(externalFileTypes, undoManager);
+        this.cellFactory = new CellFactory(externalFileTypes, preferencesService, undoManager);
         this.undoManager = undoManager;
     }
 
@@ -130,6 +130,7 @@ public class MainTableColumnFactory {
     private TableColumn<BibEntryTableViewModel, String> createIndexColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, String> column = new MainTableColumn<>(columnModel);
         Node header = new Text("#");
+        header.getStyleClass().add("mainTable-header");
         Tooltip.install(header, new Tooltip(MainTableColumnModel.Type.INDEX.getDisplayName()));
         column.setGraphic(header);
         column.setStyle("-fx-alignment: CENTER-RIGHT;");
@@ -213,7 +214,7 @@ public class MainTableColumnFactory {
      * Creates a column that displays a {@link SpecialField}
      */
     private TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> createSpecialFieldColumn(MainTableColumnModel columnModel) {
-        return new SpecialFieldColumn(columnModel, undoManager);
+        return new SpecialFieldColumn(columnModel, preferencesService, undoManager);
     }
 
     /**

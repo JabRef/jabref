@@ -9,7 +9,7 @@ public class GeneralPreferences {
     private final BibDatabaseMode defaultBibDatabaseMode;
 
     private final boolean warnAboutDuplicatesInInspection;
-    private final boolean confirmDelete;
+    private boolean confirmDelete;
     private final boolean allowIntegerEditionBibtex;
     private final boolean memoryStickMode;
     private final boolean collectTelemetry;
@@ -45,11 +45,16 @@ public class GeneralPreferences {
         return warnAboutDuplicatesInInspection;
     }
 
-    public boolean isConfirmDelete() {
+    public boolean shouldConfirmDelete() {
         return confirmDelete;
     }
 
-    public boolean isAllowIntegerEditionBibtex() {
+    public GeneralPreferences withConfirmDelete(boolean confirmDelete) {
+        this.confirmDelete = confirmDelete;
+        return this;
+    }
+
+    public boolean shouldAllowIntegerEditionBibtex() {
         return allowIntegerEditionBibtex;
     }
 
@@ -57,7 +62,7 @@ public class GeneralPreferences {
         return memoryStickMode;
     }
 
-    public boolean isCollectTelemetry() {
+    public boolean shouldCollectTelemetry() {
         return collectTelemetry;
     }
 

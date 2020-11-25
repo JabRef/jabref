@@ -12,7 +12,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
     private final Field field;
     private final String newValue;
     private final String oldValue;
-    private int delta = 0;
+    private int majorCharacterChange = 0;
 
     /**
      * @param bibEntry Affected BibEntry object
@@ -27,7 +27,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
         this.field = field;
         this.newValue = newValue;
         this.oldValue = oldValue;
-        delta = computeDelta(oldValue, newValue);
+        this.majorCharacterChange = computeMajorCharacterChange(oldValue, newValue);
     }
 
     /**
@@ -40,7 +40,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
         this.field = field;
         this.newValue = newValue;
         this.oldValue = oldValue;
-        delta = computeDelta(oldValue, newValue);
+        this.majorCharacterChange = computeMajorCharacterChange(oldValue, newValue);
     }
 
     /**
@@ -51,20 +51,22 @@ public class FieldChangedEvent extends EntryChangedEvent {
         this.field = fieldChange.getField();
         this.newValue = fieldChange.getNewValue();
         this.oldValue = fieldChange.getOldValue();
-        delta = computeDelta(oldValue, newValue);
+        this.majorCharacterChange = computeMajorCharacterChange(oldValue, newValue);
     }
 
     public FieldChangedEvent(FieldChange fieldChange) {
         this(fieldChange, EntriesEventSource.LOCAL);
     }
 
-    private int computeDelta(String oldValue, String newValue) {
+    private int computeMajorCharacterChange(String oldValue, String newValue) {
         if (oldValue == newValue) {
             return 0;
-        } else if (oldValue == null && newValue != null) {
+        } else if ((oldValue == null) && (newValue != null)) {
             return newValue.length();
-        } else if (newValue == null && oldValue != null) {
+        } else if ((newValue == null) && (oldValue != null)) {
             return oldValue.length();
+        } else if ((oldValue.length() == newValue.length()) && !oldValue.equals(newValue)) {
+            return newValue.length();
         } else {
             return Math.abs(newValue.length() - oldValue.length());
         }
@@ -82,7 +84,7 @@ public class FieldChangedEvent extends EntryChangedEvent {
         return oldValue;
     }
 
-    public int getDelta() {
-        return delta;
+    public int getMajorCharacterChange() {
+        return majorCharacterChange;
     }
 }

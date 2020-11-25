@@ -9,7 +9,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.scene.control.SelectionModel;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;

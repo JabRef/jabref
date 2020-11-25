@@ -1,0 +1,36 @@
+name: Cleanup after PR
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check secrets presence
+        id: checksecrets
+        shell: bash
+        run: |
+          if [ -z "$BUILDJABREFPRIVATEKEY" ]; then
+            echo ::set-output name=secretspresent::false
+          else
+            echo ::set-output name=secretspresent::true
+          fi
+        env:
+          BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
+      - name: Extract branch name
+        id: extract_branch
+        if: ${{ steps.checksecrets.outputs.secretspresent }}
+        run: |
+          echo "##[set-output name=branch;]$(echo ${{ github.event.pull_request.head.ref }})"
+      - name: Delete folder on builds.jabref.org
+        if: ${{ steps.checksecrets.outputs.secretspresent }}
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          script: rm -rf /var/www/builds.jabref.org/www/${{ steps.extract_branch.outputs.branch }} || true
+          host: build-upload.jabref.org
+          port: 9922
+          username: jrrsync
+          key: ${{ secrets.buildJabRefPrivateKey }}

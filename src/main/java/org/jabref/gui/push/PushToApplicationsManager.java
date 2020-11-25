@@ -6,8 +6,8 @@ import java.util.List;
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.MenuItem;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.preferences.PreferencesService;

@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
@@ -84,12 +85,13 @@ public class GroupTreeView {
         dragExpansionHandler = new DragExpansionHandler();
 
         // Set-up bindings
-        BindingsHelper.bindContentBidirectional(
-                groupTree.getSelectionModel().getSelectedItems(),
-                viewModel.selectedGroupsProperty(),
-                (newSelectedGroups) -> newSelectedGroups.forEach(this::selectNode),
-                this::updateSelection
-        );
+        Platform.runLater(() ->
+                BindingsHelper.bindContentBidirectional(
+                        groupTree.getSelectionModel().getSelectedItems(),
+                        viewModel.selectedGroupsProperty(),
+                        (newSelectedGroups) -> newSelectedGroups.forEach(this::selectNode),
+                        this::updateSelection
+                ));
 
         // We try to to prevent publishing changes in the search field directly to the search task that takes some time
         // for larger group structures.

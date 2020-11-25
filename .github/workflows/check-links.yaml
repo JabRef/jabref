@@ -1,0 +1,22 @@
+name: Check external href links in the documentation
+
+on:
+  push:
+    paths:
+      - '**.md'
+  schedule:
+    # Run on the first of each month at 9:00 AM (See https://pubs.opengroup.org/onlinepubs/9699919799/utilities/crontab.html#tag_20_25_07)
+    - cron: "0 9 1 * *"
+
+jobs:
+  markdown-link-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-quiet-mode: 'yes'
+          use-verbose-mode: 'no'
+          config-file: 'mlc_config.json'
+          folder-path: 'docs/'
+          file-path: './CHANGELOG.md, ./README.md'

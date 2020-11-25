@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="de-AT">
-  <!-- This style was edited with the Visual CSL Editor (http://editor.citationstyles.org/visualEditor/) -->
+  <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
   <info>
-    <title>Ferdinand Porsche Fern-Fachhochschule (German - Austria)</title>
-    <title-short>Ferdinand Porsche FernFH (German - Austria)</title-short>
+    <title>Ferdinand Porsche Fernfachhochschule (German - Austria)</title>
+    <title-short>Ferdinand Porsche FFH (German - Austria)</title-short>
     <id>http://www.zotero.org/styles/ferdinand-porsche-fern-fachhochschule</id>
     <link href="http://www.zotero.org/styles/ferdinand-porsche-fern-fachhochschule" rel="self"/>
     <link href="http://www.zotero.org/styles/harvard-cite-them-right" rel="template"/>
-    <link href="https://onlinecampus.fernfh.ac.at/mod/resource/view.php?id=37791" rel="documentation"/>
-    <link href="https://github.com/citation-style-language/styles/files/73468/Richtlinien.wissenschaftliche.Arbeiten_04_2015.pdf" rel="documentation"/>
+    <link href="https://github.com/christoph425/ffh_csl_styles/raw/main/Richtlinien_wissenschaftliche_Arbeiten_WP.pdf" rel="documentation"/>
+    <link href="http://fernfh.ac.at/" rel="documentation"/>
+    <author>
+      <name>Christoph Jungbauer</name>
+      <email>christoph.jungbauer@fernfh.ac.at</email>
+    </author>
     <author>
       <name>Christian Focke</name>
       <email>christian.focke@mail.fernfh.ac.at</email>
@@ -19,8 +23,8 @@
     </contributor>
     <category citation-format="author-date"/>
     <category field="generic-base"/>
-    <summary>Based on the Harvard author-date style</summary>
-    <updated>2015-12-28T11:38:29+00:00</updated>
+    <summary>CSL Style definition based on author-date style</summary>
+    <updated>2020-10-20T07:09:15+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="de-AT">
@@ -35,12 +39,20 @@
         <single>vortrag auf der</single>
         <multiple>vorträge auf der</multiple>
       </term>
+      <term name="editor">
+        <single>Herausgeber</single>
+        <multiple>Herausgeber</multiple>
+      </term>
+      <term name="editor" form="short">
+        <single>Hrsg.</single>
+        <multiple>Hrsg.</multiple>
+      </term>
     </terms>
   </locale>
   <macro name="editor">
-    <names variable="editor" delimiter=", ">
-      <name and="symbol" initialize-with=". " delimiter=", "/>
-      <label form="short" prefix=", " text-case="lowercase"/>
+    <names variable="editor" delimiter=",">
+      <name delimiter="/" initialize="false" initialize-with=". " sort-separator=","/>
+      <label form="short" text-case="capitalize-first" prefix=" (" suffix=")."/>
     </names>
   </macro>
   <macro name="anon">
@@ -78,6 +90,11 @@
             <date-part name="month" form="numeric-leading-zeros" suffix="."/>
             <date-part name="year"/>
           </date>
+          <choose>
+            <if match="any" variable="medium">
+              <text variable="medium" prefix="; Gelesen mit "/>
+            </if>
+          </choose>
         </group>
       </if>
     </choose>
@@ -88,7 +105,7 @@
   <macro name="publisher">
     <group delimiter=": ">
       <text macro="ffh-place"/>
-      <text variable="publisher"/>
+      <text macro="ffh-publisher"/>
     </group>
   </macro>
   <macro name="year-date">
@@ -112,7 +129,7 @@
         </group>
       </if>
       <else>
-        <text variable="edition" suffix="."/>
+        <text variable="edition" prefix="(" suffix=")"/>
       </else>
     </choose>
   </macro>
@@ -128,11 +145,31 @@
         <text variable="publisher-place"/>
       </if>
       <else>
-        <text value="o. O."/>
+        <text value="unveröffentlicht"/>
       </else>
     </choose>
   </macro>
+  <macro name="ffh-publisher">
+    <choose>
+      <if match="any" variable="publisher">
+        <text variable="publisher"/>
+      </if>
+      <else>
+        <text value="o.V."/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="volume">
+    <choose>
+      <if match="any" variable="volume">
+        <text variable="volume" prefix="(" suffix=")"/>
+      </if>
+    </choose>
+  </macro>
   <citation et-al-min="6" et-al-use-first="1" et-al-subsequent-min="3" et-al-subsequent-use-first="1" disambiguate-add-names="true" disambiguate-add-givenname="true" disambiguate-add-year-suffix="true">
+    <sort>
+      <key variable="author"/>
+    </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
       <group delimiter=", ">
         <text macro="author-short"/>
@@ -154,8 +191,9 @@
       <text macro="year-date" prefix=" (" suffix=")."/>
       <choose>
         <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
-          <group prefix=" " delimiter=" " suffix=",">
+          <group delimiter=" " prefix=" " suffix=".">
             <text macro="title"/>
+            <text macro="volume"/>
             <text macro="edition"/>
             <text macro="editor"/>
           </group>
@@ -166,37 +204,42 @@
           <group prefix=" " delimiter=" ">
             <text term="in" text-case="capitalize-first"/>
             <text macro="editor"/>
-            <text variable="container-title" font-style="italic" suffix="."/>
+            <text variable="container-title" font-style="italic"/>
             <text variable="collection-title" suffix="."/>
+            <text macro="volume"/>
+            <text macro="edition"/>
+            <text macro="pages" prefix="(" suffix=")."/>
             <text variable="event" suffix=","/>
             <group suffix="." delimiter=", ">
               <text macro="publisher" prefix=" "/>
-              <text macro="pages"/>
             </group>
           </group>
         </else-if>
         <else-if type="paper-conference">
           <text macro="title" prefix=" " suffix="."/>
           <group prefix=" " delimiter=" ">
-            <text term="presented at" text-case="capitalize-first"/>
             <text variable="container-title" suffix="."/>
             <text variable="collection-title" suffix="."/>
             <text variable="event" suffix=","/>
             <group suffix="." delimiter=", ">
               <text macro="publisher"/>
-              <date variable="issued">
-                <date-part name="day" range-delimiter="-" suffix=". "/>
-                <date-part name="month" range-delimiter="-" suffix=" "/>
-                <date-part name="year" range-delimiter="-"/>
-              </date>
             </group>
           </group>
         </else-if>
         <else-if type="thesis">
-          <group prefix=" " suffix="." delimiter=". ">
-            <text macro="title"/>
+          <group prefix=" " suffix=".">
+            <text macro="title" suffix=". "/>
+            <text variable="genre" prefix="Unveröffentlichte " suffix=" an der "/>
+            <text variable="publisher"/>
+          </group>
+        </else-if>
+        <else-if type="speech" match="any">
+          <group delimiter=" " prefix=" " suffix=".">
+            <text variable="title" suffix="."/>
             <text variable="genre"/>
-            <text macro="publisher"/>
+            <text variable="event" prefix="auf der " suffix=", "/>
+            <text variable="event-place" suffix=", "/>
+            <date form="text" date-parts="year-month-day" variable="issued"/>
           </group>
         </else-if>
         <else>

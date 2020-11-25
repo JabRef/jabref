@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 
@@ -17,54 +18,44 @@ public class CoarseChangeFilter {
 
     private final BibDatabaseContext context;
     private final EventBus eventBus = new EventBus();
-    private final DelayTaskThrottler delayPost;
 
     private Optional<Field> lastFieldChanged;
+    private Optional<BibEntry> lastEntryChanged;
     private int totalDelta;
 
     public CoarseChangeFilter(BibDatabaseContext bibDatabaseContext) {
         // Listen for change events
-        bibDatabaseContext.getDatabase().registerListener(this);
-        bibDatabaseContext.getMetaData().registerListener(this);
         this.context = bibDatabaseContext;
-        // Delay event post by 5 seconds
-        this.delayPost = new DelayTaskThrottler(5000);
+        context.getDatabase().registerListener(this);
+        context.getMetaData().registerListener(this);
         this.lastFieldChanged = Optional.empty();
-        this.totalDelta = 0;
+        this.lastEntryChanged = Optional.empty();
     }
 
     @Subscribe
     public synchronized void listen(BibDatabaseContextChangedEvent event) {
-        Runnable eventPost = () -> {
-            // Reset total change delta
-            totalDelta = 0;
-            // Post event
-            eventBus.post(event);
-        };
 
-        if (!(event instanceof FieldChangedEvent)) {
-            eventPost.run();
-        } else {
+        if (event instanceof FieldChangedEvent) {
             // Only relay event if the field changes are more than one character or a new field is edited
             FieldChangedEvent fieldChange = (FieldChangedEvent) event;
-            // Sum up change delta
-            totalDelta += fieldChange.getDelta();
 
-            // If editing is started
-            boolean isNewEdit = lastFieldChanged.isEmpty();
-            // If other field is edited
-            boolean isEditOnOtherField = !isNewEdit && !lastFieldChanged.get().equals(fieldChange.getField());
-            // Only deltas of 1 registered by fieldChange, major change means editing much content
-            boolean isMajorChange = totalDelta >= 100;
+            // If editing has started
+            boolean isNewEdit = lastFieldChanged.isEmpty() || lastEntryChanged.isEmpty();
 
-            if ((isEditOnOtherField && !isNewEdit) || isMajorChange) {
-                // Submit old changes immediately
-                eventPost.run();
-            } else {
-                delayPost.schedule(eventPost);
-            }
-            // Set new last field
+            boolean isChangedField = lastFieldChanged.filter(f -> !f.equals(fieldChange.getField())).isPresent();
+            boolean isChangedEntry = lastEntryChanged.filter(e -> !e.equals(fieldChange.getBibEntry())).isPresent();
+            boolean isEditChanged = !isNewEdit && (isChangedField || isChangedEntry);
+            // Only deltas of 1 when typing in manually, major change means pasting something (more than one character)
+            boolean isMajorChange = fieldChange.getMajorCharacterChange() > 1;
+
+            fieldChange.setFilteredOut(!(isEditChanged || isMajorChange));
+            // Post each FieldChangedEvent - even the ones being marked as "filtered"
+            eventBus.post(fieldChange);
+
             lastFieldChanged = Optional.of(fieldChange.getField());
+            lastEntryChanged = Optional.of(fieldChange.getBibEntry());
+        } else {
+            eventBus.post(event);
         }
     }
 

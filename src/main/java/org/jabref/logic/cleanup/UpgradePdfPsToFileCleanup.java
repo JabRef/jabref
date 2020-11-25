@@ -1,6 +1,6 @@
 package org.jabref.logic.cleanup;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,16 +36,16 @@ public class UpgradePdfPsToFileCleanup implements CleanupJob {
         List<LinkedFile> fileList = new ArrayList<>(entry.getFiles());
         int oldItemCount = fileList.size();
         for (Map.Entry<Field, String> field : fields.entrySet()) {
-            entry.getField(field.getKey()).ifPresent(o -> {
-                if (o.trim().isEmpty()) {
+            entry.getField(field.getKey()).ifPresent(fieldContent -> {
+                if (fieldContent.trim().isEmpty()) {
                     return;
                 }
-                File f = new File(o);
-                LinkedFile flEntry = new LinkedFile(f.getName(), o, field.getValue());
+                Path path = Path.of(fieldContent);
+                LinkedFile flEntry = new LinkedFile(path.getFileName().toString(), path, field.getValue());
                 fileList.add(flEntry);
 
                 entry.clearField(field.getKey());
-                changes.add(new FieldChange(entry, field.getKey(), o, null));
+                changes.add(new FieldChange(entry, field.getKey(), fieldContent, null));
             });
         }
 

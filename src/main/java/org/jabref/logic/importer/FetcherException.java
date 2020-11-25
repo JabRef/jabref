@@ -1,6 +1,6 @@
 package org.jabref.logic.importer;
 
-import org.jabref.JabRefException;
+import org.jabref.logic.JabRefException;
 
 public class FetcherException extends JabRefException {
 

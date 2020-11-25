@@ -21,25 +21,23 @@ class BracketedPatternTest {
 
     @BeforeEach
     void setUp() {
-        bibentry = new BibEntry();
-        bibentry.setField(StandardField.AUTHOR, "O. Kitsune");
-        bibentry.setField(StandardField.YEAR, "2017");
-        bibentry.setField(StandardField.PAGES, "213--216");
+        bibentry = new BibEntry().withField(StandardField.AUTHOR, "O. Kitsune")
+                                 .withField(StandardField.YEAR, "2017")
+                                 .withField(StandardField.PAGES, "213--216");
 
-        dbentry = new BibEntry();
-        dbentry.setType(StandardEntryType.Article);
-        dbentry.setCiteKey("HipKro03");
-        dbentry.setField(StandardField.AUTHOR, "Eric von Hippel and Georg von Krogh");
-        dbentry.setField(StandardField.TITLE, "Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science");
-        dbentry.setField(StandardField.JOURNAL, "Organization Science");
-        dbentry.setField(StandardField.YEAR, "2003");
-        dbentry.setField(StandardField.VOLUME, "14");
-        dbentry.setField(StandardField.PAGES, "209--223");
-        dbentry.setField(StandardField.NUMBER, "2");
-        dbentry.setField(StandardField.ADDRESS, "Institute for Operations Research and the Management Sciences (INFORMS), Linthicum, Maryland, USA");
-        dbentry.setField(StandardField.DOI, "http://dx.doi.org/10.1287/orsc.14.2.209.14992");
-        dbentry.setField(StandardField.ISSN, "1526-5455");
-        dbentry.setField(StandardField.PUBLISHER, "INFORMS");
+        dbentry = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("HipKro03")
+                .withField(StandardField.AUTHOR, "Eric von Hippel and Georg von Krogh")
+                .withField(StandardField.TITLE, "Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science")
+                .withField(StandardField.JOURNAL, "Organization Science")
+                .withField(StandardField.YEAR, "2003")
+                .withField(StandardField.VOLUME, "14")
+                .withField(StandardField.PAGES, "209--223")
+                .withField(StandardField.NUMBER, "2")
+                .withField(StandardField.ADDRESS, "Institute for Operations Research and the Management Sciences (INFORMS), Linthicum, Maryland, USA")
+                .withField(StandardField.DOI, "http://dx.doi.org/10.1287/orsc.14.2.209.14992")
+                .withField(StandardField.ISSN, "1526-5455")
+                .withField(StandardField.PUBLISHER, "INFORMS");
 
         database = new BibDatabase();
         database.insertEntry(dbentry);
@@ -102,10 +100,10 @@ class BracketedPatternTest {
         BibDatabase another_database = new BibDatabase();
         BibtexString string = new BibtexString("sgr", "Saulius Gražulis");
         another_database.addString(string);
-        bibentry = new BibEntry();
-        bibentry.setField(StandardField.AUTHOR, "#sgr#");
-        bibentry.setField(StandardField.YEAR, "2017");
-        bibentry.setField(StandardField.PAGES, "213--216");
+        bibentry = new BibEntry()
+                .withField(StandardField.AUTHOR, "#sgr#")
+                .withField(StandardField.YEAR, "2017")
+                .withField(StandardField.PAGES, "213--216");
         BracketedPattern pattern = new BracketedPattern("[year]_[auth]_[firstpage]");
         assertEquals("2017_Gražulis_213", pattern.expand(bibentry,
                 another_database));
@@ -139,10 +137,10 @@ class BracketedPatternTest {
     void suppliedBibentryBracketExpansionTest() {
         BibDatabase another_database = null;
         BracketedPattern pattern = new BracketedPattern("[year]_[auth]_[firstpage]");
-        BibEntry another_bibentry = new BibEntry();
-        another_bibentry.setField(StandardField.AUTHOR, "Gražulis, Saulius");
-        another_bibentry.setField(StandardField.YEAR, "2017");
-        another_bibentry.setField(StandardField.PAGES, "213--216");
+        BibEntry another_bibentry = new BibEntry()
+                .withField(StandardField.AUTHOR, "Gražulis, Saulius")
+                .withField(StandardField.YEAR, "2017")
+                .withField(StandardField.PAGES, "213--216");
         assertEquals("2017_Gražulis_213", pattern.expand(another_bibentry, ';', another_database));
     }
 
@@ -178,14 +176,20 @@ class BracketedPatternTest {
     }
 
     @Test
-    void bibtexkeyPatternExpandsToBibTeXKey() {
+    void bibtexkeyPatternExpandsToCitationKey() {
         Character separator = ';';
         assertEquals("HipKro03", BracketedPattern.expandBrackets("[bibtexkey]", separator, dbentry, database));
     }
 
     @Test
-    void bibtexkeyPatternWithEmptyModifierExpandsToBibTeXKey() {
-        assertEquals("HipKro03", BracketedPattern.expandBrackets("[bibtexkey:]", ';', dbentry, database));
+    void citationKeyPatternExpandsToCitationKey() {
+        Character separator = ';';
+        assertEquals("HipKro03", BracketedPattern.expandBrackets("[citationkey]", separator, dbentry, database));
+    }
+
+    @Test
+    void citationKeyPatternWithEmptyModifierExpandsToBibTeXKey() {
+        assertEquals("HipKro03", BracketedPattern.expandBrackets("[citationkey:]", ';', dbentry, database));
     }
 
     @Test
@@ -202,8 +206,7 @@ class BracketedPatternTest {
 
     @Test
     void testResolvedFieldAndFormat() {
-        BibEntry child = new BibEntry();
-        child.setField(StandardField.CROSSREF, "HipKro03");
+        BibEntry child = new BibEntry().withField(StandardField.CROSSREF, "HipKro03");
         database.insertEntry(child);
 
         Character separator = ';';
@@ -219,16 +222,16 @@ class BracketedPatternTest {
         assertEquals("eric von hippel and georg von krogh",
                 BracketedPattern.expandBrackets("[author:lower]", separator, child, database));
 
-        // the bibtexkey is not inherited
-        assertEquals("", BracketedPattern.expandBrackets("[bibtexkey]", separator, child, database));
+        // the citation key is not inherited
+        assertEquals("", BracketedPattern.expandBrackets("[citationkey]", separator, child, database));
 
-        assertEquals("", BracketedPattern.expandBrackets("[bibtexkey:]", separator, child, database));
+        assertEquals("", BracketedPattern.expandBrackets("[citationkey:]", separator, child, database));
     }
 
     @Test
     void testResolvedParentNotInDatabase() {
-        BibEntry child = new BibEntry();
-        child.setField(StandardField.CROSSREF, "HipKro03");
+        BibEntry child = new BibEntry()
+                .withField(StandardField.CROSSREF, "HipKro03");
         database.removeEntry(dbentry);
         database.insertEntry(child);
 
@@ -266,5 +269,27 @@ class BracketedPatternTest {
     void expandBracketsDoesNotTruncateWithoutAnArgumentToTruncateModifier() {
         assertEquals("Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science",
                 BracketedPattern.expandBrackets("[fulltitle:truncate]", ';', dbentry, database));
+    }
+
+    @Test
+    void expandBracketsWithAuthorStartingWithBrackets() {
+        // Issue https://github.com/JabRef/jabref/issues/3920
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.AUTHOR, "Patrik {\\v{S}}pan{\\v{e}}l and Kseniya Dryahina and David Smith");
+        assertEquals("ŠpanělEtAl", BracketedPattern.expandBrackets("[authEtAl:latex_to_unicode]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsWithModifierContainingRegexCharacterCkass() {
+        BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Wickedness:Managing");
+
+        assertEquals("Wickedness.Managing", BracketedPattern.expandBrackets("[title:regex(\"[:]+\",\".\")]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsEmptyStringFromEmptyBrackets() {
+        BibEntry bibEntry = new BibEntry();
+
+        assertEquals("", BracketedPattern.expandBrackets("[]", null, bibEntry, null));
     }
 }

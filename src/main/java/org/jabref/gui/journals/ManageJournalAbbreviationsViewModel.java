@@ -20,7 +20,6 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.Abbreviation;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -109,7 +108,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
      */
     void addBuiltInList() {
         BackgroundTask
-                .wrap(JournalAbbreviationLoader::getBuiltInAbbreviations)
+                .wrap(journalAbbreviationRepository::getAllLoaded)
                 .onRunning(() -> isLoading.setValue(true))
                 .onSuccess(result -> {
                     isLoading.setValue(false);
@@ -271,10 +270,6 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
         shouldWriteLists = true;
     }
 
-    private void setCurrentAbbreviationNameAndAbbreviationIfValid(String name, String abbreviation) {
-        setCurrentAbbreviationNameAndAbbreviationIfValid(name, abbreviation, "");
-    }
-
     /**
      * Method to delete the abbreviation set in the currentAbbreviation property. The currentAbbreviationProperty will
      * be set to the previous or next abbreviation in the abbreviations property if applicable. Else it will be set to
@@ -336,7 +331,7 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     /**
      * This method first saves all external files to its internal list, then writes all abbreviations to their files and
      * finally updates the abbreviations auto complete. It basically calls {@link #saveExternalFilesList()}, {@link
-     * #saveJournalAbbreviationFiles() } and finally {@link JournalAbbreviationLoader#update(JournalAbbreviationPreferences)}.
+     * #saveJournalAbbreviationFiles() }}.
      */
     public void save() {
         BackgroundTask.wrap(() -> {

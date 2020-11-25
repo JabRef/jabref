@@ -255,7 +255,7 @@
       <else-if type="webpage" match="any">
         <group delimiter=". ">
           <text variable="container-title"/>
-          <text variable="URL" form="short"/>
+          <text variable="URL"/>
         </group>
       </else-if>
       <else-if type="manuscript">

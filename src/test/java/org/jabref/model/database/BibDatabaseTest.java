@@ -248,32 +248,32 @@ class BibDatabaseTest {
     @Test
     void correctKeyCountOne() {
         BibEntry entry = new BibEntry();
-        entry.setCiteKey("AAA");
+        entry.setCitationKey("AAA");
         database.insertEntry(entry);
-        assertEquals(1, database.getNumberOfKeyOccurrences("AAA"));
+        assertEquals(1, database.getNumberOfCitationKeyOccurrences("AAA"));
     }
 
     @Test
     void correctKeyCountTwo() {
         BibEntry entry = new BibEntry();
-        entry.setCiteKey("AAA");
+        entry.setCitationKey("AAA");
         database.insertEntry(entry);
         entry = new BibEntry();
-        entry.setCiteKey("AAA");
+        entry.setCitationKey("AAA");
         database.insertEntry(entry);
-        assertEquals(2, database.getNumberOfKeyOccurrences("AAA"));
+        assertEquals(2, database.getNumberOfCitationKeyOccurrences("AAA"));
     }
 
     @Test
     void correctKeyCountAfterRemoving() {
         BibEntry entry = new BibEntry();
-        entry.setCiteKey("AAA");
+        entry.setCitationKey("AAA");
         database.insertEntry(entry);
         entry = new BibEntry();
-        entry.setCiteKey("AAA");
+        entry.setCitationKey("AAA");
         database.insertEntry(entry);
         database.removeEntry(entry);
-        assertEquals(1, database.getNumberOfKeyOccurrences("AAA"));
+        assertEquals(1, database.getNumberOfCitationKeyOccurrences("AAA"));
     }
 
     @Test

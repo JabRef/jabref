@@ -26,28 +26,22 @@ import org.jabref.preferences.FilePreferences;
  */
 public class LinkedFile implements Serializable {
 
-    private static final LinkedFile NULL_OBJECT = new LinkedFile("", "", "");
+    private static final LinkedFile NULL_OBJECT = new LinkedFile("", Path.of(""), "");
     // We have to mark these properties as transient because they can't be serialized directly
     private transient StringProperty description = new SimpleStringProperty();
     private transient StringProperty link = new SimpleStringProperty();
     private transient StringProperty fileType = new SimpleStringProperty();
 
     public LinkedFile(String description, Path link, String fileType) {
-        this(description, link.toString(), fileType);
-    }
-
-    /**
-     * @deprecated use the other constructor {@link #LinkedFile(String, Path, String)}
-     */
-    @Deprecated
-    public LinkedFile(String description, String link, String fileType) {
         this.description.setValue(Objects.requireNonNull(description));
+        setLink(Objects.requireNonNull(link).toString());
         this.fileType.setValue(Objects.requireNonNull(fileType));
-        setLink(Objects.requireNonNull(link));
     }
 
     public LinkedFile(URL link, String fileType) {
-        this("", Objects.requireNonNull(link).toString(), fileType);
+        this.description.setValue("");
+        setLink(Objects.requireNonNull(link).toString());
+        this.fileType.setValue(Objects.requireNonNull(fileType));
     }
 
     public StringProperty descriptionProperty() {
@@ -139,7 +133,7 @@ public class LinkedFile implements Serializable {
      * @param toCheck The String to check
      * @return <code>true</code>, if it starts with "http://", "https://" or contains "www."; <code>false</code> otherwise
      */
-    private boolean isOnlineLink(String toCheck) {
+    public static boolean isOnlineLink(String toCheck) {
         String normalizedFilePath = toCheck.trim().toLowerCase();
         return normalizedFilePath.startsWith("http://") || normalizedFilePath.startsWith("https://") || normalizedFilePath.contains("www.");
     }
@@ -167,7 +161,7 @@ public class LinkedFile implements Serializable {
     }
 
     public Optional<Path> findIn(BibDatabaseContext databaseContext, FilePreferences filePreferences) {
-        List<Path> dirs = databaseContext.getFileDirectoriesAsPaths(filePreferences);
+        List<Path> dirs = databaseContext.getFileDirectories(filePreferences);
         return findIn(dirs);
     }
 

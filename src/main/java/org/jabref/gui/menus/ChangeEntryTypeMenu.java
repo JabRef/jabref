@@ -14,8 +14,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tooltip;
 
-import org.jabref.Globals;
 import org.jabref.gui.EntryTypeView;
+import org.jabref.gui.Globals;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;

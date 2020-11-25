@@ -37,7 +37,7 @@ public class AutoSetFileLinksUtil {
     private ExternalFileTypes externalFileTypes;
 
     public AutoSetFileLinksUtil(BibDatabaseContext databaseContext, FilePreferences filePreferences, AutoLinkPreferences autoLinkPreferences, ExternalFileTypes externalFileTypes) {
-        this(databaseContext.getFileDirectoriesAsPaths(filePreferences), autoLinkPreferences, externalFileTypes);
+        this(databaseContext.getFileDirectories(filePreferences), autoLinkPreferences, externalFileTypes);
     }
 
     private AutoSetFileLinksUtil(List<Path> directories, AutoLinkPreferences autoLinkPreferences, ExternalFileTypes externalFileTypes) {

@@ -94,11 +94,11 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 .getExternalFileTypeByExt(fileExtension)
                 .orElse(new UnknownExternalFileType(fileExtension));
         Path relativePath = FileUtil.relativize(file, fileDirectories);
-        return new LinkedFile("", relativePath.toString(), suggestedFileType.getName());
+        return new LinkedFile("", relativePath, suggestedFileType.getName());
     }
 
     public LinkedFileViewModel fromFile(Path file) {
-        List<Path> fileDirectories = databaseContext.getFileDirectoriesAsPaths(preferences.getFilePreferences());
+        List<Path> fileDirectories = databaseContext.getFileDirectories(preferences.getFilePreferences());
 
         LinkedFile linkedFile = fromFile(file, fileDirectories, externalFileTypes);
         return new LinkedFileViewModel(
@@ -150,7 +150,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                 .withInitialDirectory(workingDirectory)
                 .build();
 
-        List<Path> fileDirectories = databaseContext.getFileDirectoriesAsPaths(preferences.getFilePreferences());
+        List<Path> fileDirectories = databaseContext.getFileDirectories(preferences.getFilePreferences());
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(newFile -> {
             LinkedFile newLinkedFile = fromFile(newFile, fileDirectories, externalFileTypes);
             files.add(new LinkedFileViewModel(

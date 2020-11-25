@@ -212,7 +212,7 @@ public class PdfContentImporter extends Importer {
                 ParserResult parserResult = new ParserResult(result);
                 Optional<BibEntry> entry = new DoiFetcher(importFormatPreferences).performSearchById(doi.get().getDOI());
                 entry.ifPresent(parserResult.getDatabase()::insertEntry);
-                entry.ifPresent(bibEntry -> bibEntry.addFile(new LinkedFile("", filePath.toAbsolutePath().toString(), "PDF")));
+                entry.ifPresent(bibEntry -> bibEntry.addFile(new LinkedFile("", filePath.toAbsolutePath(), "PDF")));
                 return parserResult;
             }
 
@@ -226,7 +226,7 @@ public class PdfContentImporter extends Importer {
             return ParserResult.fromErrorMessage(e.getMessage());
         }
 
-        result.forEach(entry -> entry.addFile(new LinkedFile("", filePath.toAbsolutePath().toString(), "PDF")));
+        result.forEach(entry -> entry.addFile(new LinkedFile("", filePath.toAbsolutePath(), "PDF")));
         return new ParserResult(result);
     }
 

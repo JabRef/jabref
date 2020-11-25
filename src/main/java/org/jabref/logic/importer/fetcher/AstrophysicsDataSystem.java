@@ -24,15 +24,16 @@ import org.jabref.logic.importer.EntryBasedParserFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
-import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.paging.Page;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -44,7 +45,7 @@ import org.apache.http.client.utils.URIBuilder;
 /**
  * Fetches data from the SAO/NASA Astrophysics Data System (https://ui.adsabs.harvard.edu/)
  */
-public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBasedParserFetcher, EntryBasedParserFetcher {
+public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearchBasedParserFetcher, EntryBasedParserFetcher {
 
     private static final String API_SEARCH_URL = "https://api.adsabs.harvard.edu/v1/search/query";
     private static final String API_EXPORT_URL = "https://api.adsabs.harvard.edu/v1/export/bibtexabs";
@@ -74,7 +75,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
 
     @Override
     public String getName() {
-        return "SAO/NASA Astrophysics Data System";
+        return "SAO/NASA ADS";
     }
 
     /**
@@ -82,10 +83,12 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
      * @return URL which points to a search request for given query
      */
     @Override
-    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(String query, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder builder = new URIBuilder(API_SEARCH_URL);
         builder.addParameter("q", query);
         builder.addParameter("fl", "bibcode");
+        builder.addParameter("rows", String.valueOf(getPageSize()));
+        builder.addParameter("start", String.valueOf(getPageSize() * pageNumber));
         return builder.build().toURL();
     }
 
@@ -94,7 +97,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
      * @return URL which points to a search request for given entry
      */
     @Override
-    public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException {
         StringBuilder stringBuilder = new StringBuilder();
 
         Optional<String> title = entry.getFieldOrAlias(StandardField.TITLE).map(t -> "title:\"" + t + "\"");
@@ -173,23 +176,6 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
 
         try {
             List<String> bibcodes = fetchBibcodes(getURLForEntry(entry));
-            return performSearchByIds(bibcodes);
-        } catch (URISyntaxException e) {
-            throw new FetcherException("Search URI is malformed", e);
-        } catch (IOException e) {
-            throw new FetcherException("A network error occurred", e);
-        }
-    }
-
-    @Override
-    public List<BibEntry> performSearch(String query) throws FetcherException {
-
-        if (StringUtil.isBlank(query)) {
-            return Collections.emptyList();
-        }
-
-        try {
-            List<String> bibcodes = fetchBibcodes(getURLForQuery(query));
             return performSearchByIds(bibcodes);
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
@@ -284,6 +270,20 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
             throw new FetcherException("A network error occurred", e);
         } catch (ParseException e) {
             throw new FetcherException("An internal parser error occurred", e);
+        }
+    }
+
+    @Override
+    public Page<BibEntry> performSearchPaged(ComplexSearchQuery complexSearchQuery, int pageNumber) throws FetcherException {
+        try {
+            // This is currently just interpreting the complex query as a default string query
+            List<String> bibcodes = fetchBibcodes(getComplexQueryURL(complexSearchQuery, pageNumber));
+            Collection<BibEntry> results = performSearchByIds(bibcodes);
+            return new Page<>(complexSearchQuery.toString(), pageNumber, results);
+        } catch (URISyntaxException e) {
+            throw new FetcherException("Search URI is malformed", e);
+        } catch (IOException e) {
+            throw new FetcherException("A network error occurred", e);
         }
     }
 }
