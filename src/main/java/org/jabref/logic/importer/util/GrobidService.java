@@ -3,6 +3,7 @@ package org.jabref.logic.importer.util;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 
 import org.jabref.logic.net.URLDownload;
 
@@ -47,6 +48,7 @@ public class GrobidService {
         rawCitation = URLEncoder.encode(rawCitation, StandardCharsets.UTF_8);
         URLDownload urlDownload = new URLDownload(grobidServerURL
                 + "/api/processCitation");
+        urlDownload.setConnectTimeout(Duration.ofSeconds(5));
         urlDownload.addHeader("Accept", MediaTypes.APPLICATION_BIBTEX);
         urlDownload.setPostData("citations=" + rawCitation + "&consolidateCitations=" + consolidateCitations);
         String httpResponse = urlDownload.asString();

@@ -77,6 +77,11 @@ public class BstPreviewLayout implements PreviewLayout {
     }
 
     @Override
+    public String getDisplayName() {
+        return name;
+    }
+
+    @Override
     public String getName() {
         return name;
     }

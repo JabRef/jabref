@@ -108,8 +108,8 @@ public class CleanupAction extends SimpleCommand {
         }
 
         if (modifiedEntriesCount > 0) {
-            frame.getCurrentBasePanel().updateEntryEditorIfShowing();
-            frame.getCurrentBasePanel().markBaseChanged();
+            frame.getCurrentLibraryTab().updateEntryEditorIfShowing();
+            frame.getCurrentLibraryTab().markBaseChanged();
         }
 
         if (modifiedEntriesCount == 0) {

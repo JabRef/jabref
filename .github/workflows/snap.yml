@@ -31,6 +31,8 @@ jobs:
       - name: Build snap (1) Run build
         uses: snapcore/action-build@v1
         id: snapcraft
+        with:
+          snapcraft-args: "--debug"
       - name: Build snap (2) Upload snap
         if: ${{ steps.checksecrets.outputs.secretspresent }}
         uses: snapcore/action-publish@v1

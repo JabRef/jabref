@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -62,11 +63,13 @@ import org.slf4j.LoggerFactory;
 public class URLDownload {
 
     public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:79.0) Gecko/20100101 Firefox/79.0";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(URLDownload.class);
+    private static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofSeconds(30);
+
     private final URL source;
     private final Map<String, String> parameters = new HashMap<>();
     private String postData = "";
+    private Duration connectTimeout = DEFAULT_CONNECT_TIMEOUT;
 
     /**
      * @param source the URL to download from
@@ -316,6 +319,7 @@ public class URLDownload {
 
     private URLConnection openConnection() throws IOException {
         URLConnection connection = this.source.openConnection();
+        connection.setConnectTimeout((int) connectTimeout.toMillis());
         for (Entry<String, String> entry : this.parameters.entrySet()) {
             connection.setRequestProperty(entry.getKey(), entry.getValue());
         }
@@ -345,5 +349,15 @@ public class URLDownload {
         connection.connect();
 
         return connection;
+    }
+
+    public void setConnectTimeout(Duration connectTimeout) {
+        if (connectTimeout != null) {
+            this.connectTimeout = connectTimeout;
+        }
+    }
+
+    public Duration getConnectTimeout() {
+        return connectTimeout;
     }
 }

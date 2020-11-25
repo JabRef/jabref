@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ImportAction {
+// FixMe: Command pattern is broken, should extend SimpleCommand
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportAction.class);
 
@@ -82,11 +83,15 @@ public class ImportAction {
                 frame.addTab(parserResult.getDatabaseContext(), true);
                 dialogService.notify(Localization.lang("Imported entries") + ": " + parserResult.getDatabase().getEntries().size());
             })
-                .executeWith(taskExecutor);
+           .onFailure(ex-> {
+               LOGGER.error("Error importing", ex);
+               dialogService.notify(Localization.lang("Error importing. See the error log for details."));
+           })
+           .executeWith(taskExecutor);
         } else {
-            final BasePanel panel = frame.getCurrentBasePanel();
+            final LibraryTab libraryTab = frame.getCurrentLibraryTab();
 
-            ImportEntriesDialog dialog = new ImportEntriesDialog(panel.getBibDatabaseContext(), task);
+            ImportEntriesDialog dialog = new ImportEntriesDialog(libraryTab.getBibDatabaseContext(), task);
             dialog.setTitle(Localization.lang("Import"));
             dialog.showAndWait();
         }
@@ -97,7 +102,7 @@ public class ImportAction {
         List<ImportFormatReader.UnknownFormatImport> imports = new ArrayList<>();
         for (Path filename : files) {
             try {
-                if (!importer.isPresent()) {
+                if (importer.isEmpty()) {
                     // Unknown format:
                     DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().notify(Localization.lang("Importing in unknown format") + "..."));
                     // This import method never throws an IOException:

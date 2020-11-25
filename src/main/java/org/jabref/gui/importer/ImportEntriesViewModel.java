@@ -13,7 +13,6 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog;
@@ -28,12 +27,18 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.PreferencesService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ImportEntriesViewModel extends AbstractViewModel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImportAction.class);
 
     private final StringProperty message;
     private final TaskExecutor taskExecutor;
@@ -45,6 +50,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private ParserResult parserResult = null;
     private final ObservableList<BibEntry> entries;
     private final PreferencesService preferences;
+    private final BibEntryTypesManager entryTypesManager;
 
     /**
      * @param databaseContext the database to import into
@@ -57,6 +63,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                                   UndoManager undoManager,
                                   PreferencesService preferences,
                                   StateManager stateManager,
+                                  BibEntryTypesManager entryTypesManager,
                                   FileUpdateMonitor fileUpdateMonitor) {
         this.taskExecutor = taskExecutor;
         this.databaseContext = databaseContext;
@@ -64,6 +71,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         this.undoManager = undoManager;
         this.preferences = preferences;
         this.stateManager = stateManager;
+        this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entries = FXCollections.observableArrayList();
         this.message = new SimpleStringProperty();
@@ -74,6 +82,9 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             this.parserResult = parserResult;
             // fill in the list for the user, where one can select the entries to import
             entries.addAll(parserResult.getDatabase().getEntries());
+        }).onFailure(ex -> {
+            LOGGER.error("Error importing", ex);
+            dialogService.showErrorDialogAndWait(ex);
         }).executeWith(taskExecutor);
     }
 
@@ -91,7 +102,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
 
     public boolean hasDuplicate(BibEntry entry) {
         return findInternalDuplicate(entry).isPresent() ||
-                new DuplicateCheck(Globals.entryTypesManager)
+                new DuplicateCheck(entryTypesManager)
                 .containsDuplicate(databaseContext.getDatabase(), entry, databaseContext.getMode()).isPresent();
     }
 
@@ -122,7 +133,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 } else {
                     buildImportHandlerThenImportEntries(entriesToImport);
                 }
-            }).executeWith(Globals.TASK_EXECUTOR);
+            }).executeWith(taskExecutor);
         } else {
             buildImportHandlerThenImportEntries(entriesToImport);
         }
@@ -155,7 +166,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 parserResult.getFile().map(File::getName).orElse("unknown"),
                 parserResult.getDatabase().getEntries());
 
-        JabRefGUI.getMainFrame().getCurrentBasePanel().markBaseChanged();
+        JabRefGUI.getMainFrame().getCurrentLibraryTab().markBaseChanged();
     }
 
     private void buildImportHandlerThenImportEntries(List<BibEntry> entriesToImport) {
@@ -182,7 +193,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             if (othEntry.equals(entry)) {
                 continue; // Don't compare the entry to itself
             }
-            if (new DuplicateCheck(Globals.entryTypesManager).isDuplicate(entry, othEntry, databaseContext.getMode())) {
+            if (new DuplicateCheck(entryTypesManager).isDuplicate(entry, othEntry, databaseContext.getMode())) {
                 return Optional.of(othEntry);
             }
         }
@@ -191,7 +202,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
 
     public void resolveDuplicate(BibEntry entry) {
         // First, try to find duplicate in the existing library
-        Optional<BibEntry> other = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(databaseContext.getDatabase(), entry, databaseContext.getMode());
+        Optional<BibEntry> other = new DuplicateCheck(entryTypesManager).containsDuplicate(databaseContext.getDatabase(), entry, databaseContext.getMode());
         if (other.isPresent()) {
             DuplicateResolverDialog dialog = new DuplicateResolverDialog(other.get(),
                     entry, DuplicateResolverDialog.DuplicateResolverType.INSPECTION, databaseContext, stateManager);

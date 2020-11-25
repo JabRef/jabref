@@ -120,13 +120,15 @@ public class KeyBindingRepository {
         return Optional.empty();
     }
 
-    public KeyCombination getKeyCombination(KeyBinding bindName) {
+    public Optional<KeyCombination> getKeyCombination(KeyBinding bindName) {
         String binding = get(bindName.getConstant());
+        if (binding.isEmpty()) {
+            return Optional.empty();
+        }
         if (OS.OS_X) {
             binding = binding.replace("ctrl", "meta");
         }
-
-        return KeyCombination.valueOf(binding);
+        return Optional.of(KeyCombination.valueOf(binding));
     }
 
     /**
@@ -137,8 +139,11 @@ public class KeyBindingRepository {
      * @return true if matching, else false
      */
     public boolean checkKeyCombinationEquality(KeyBinding binding, KeyEvent keyEvent) {
-        KeyCombination keyCombination = getKeyCombination(binding);
-        return checkKeyCombinationEquality(keyCombination, keyEvent);
+        Optional<KeyCombination> keyCombination = getKeyCombination(binding);
+        if (!keyCombination.isPresent()) {
+            return false;
+        }
+        return checkKeyCombinationEquality(keyCombination.get(), keyEvent);
     }
 
     public List<String> getBindNames() {

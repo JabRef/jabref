@@ -46,13 +46,13 @@ public class EntryTypeViewModel {
     private final StringProperty idText = new SimpleStringProperty();
     private final BooleanProperty focusAndSelectAllProperty = new SimpleBooleanProperty();
     private Task<Optional<BibEntry>> fetcherWorker = new FetcherWorker();
-    private final BasePanel basePanel;
+    private final LibraryTab libraryTab;
     private final DialogService dialogService;
     private final Validator idFieldValidator;
     private final StateManager stateManager;
 
-    public EntryTypeViewModel(JabRefPreferences preferences, BasePanel basePanel, DialogService dialogService, StateManager stateManager) {
-        this.basePanel = basePanel;
+    public EntryTypeViewModel(JabRefPreferences preferences, LibraryTab libraryTab, DialogService dialogService, StateManager stateManager) {
+        this.libraryTab = libraryTab;
         this.prefs = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
@@ -147,22 +147,22 @@ public class EntryTypeViewModel {
             Optional<BibEntry> result = fetcherWorker.getValue();
             if (result.isPresent()) {
                 final BibEntry entry = result.get();
-                ImportCleanup cleanup = new ImportCleanup(basePanel.getBibDatabaseContext().getMode());
+                ImportCleanup cleanup = new ImportCleanup(libraryTab.getBibDatabaseContext().getMode());
                 cleanup.doPostCleanup(entry);
-                Optional<BibEntry> duplicate = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(basePanel.getDatabase(), entry, basePanel.getBibDatabaseContext().getMode());
+                Optional<BibEntry> duplicate = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(libraryTab.getDatabase(), entry, libraryTab.getBibDatabaseContext().getMode());
                 if ((duplicate.isPresent())) {
-                    DuplicateResolverDialog dialog = new DuplicateResolverDialog(entry, duplicate.get(), DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, basePanel.getBibDatabaseContext(), stateManager);
+                    DuplicateResolverDialog dialog = new DuplicateResolverDialog(entry, duplicate.get(), DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, libraryTab.getBibDatabaseContext(), stateManager);
                     switch (dialog.showAndWait().orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK)) {
                         case KEEP_LEFT:
-                            basePanel.getDatabase().removeEntry(duplicate.get());
-                            basePanel.getDatabase().insertEntry(entry);
+                            libraryTab.getDatabase().removeEntry(duplicate.get());
+                            libraryTab.getDatabase().insertEntry(entry);
                             break;
                         case KEEP_BOTH:
-                            basePanel.getDatabase().insertEntry(entry);
+                            libraryTab.getDatabase().insertEntry(entry);
                             break;
                         case KEEP_MERGE:
-                            basePanel.getDatabase().removeEntry(duplicate.get());
-                            basePanel.getDatabase().insertEntry(dialog.getMergedEntry());
+                            libraryTab.getDatabase().removeEntry(duplicate.get());
+                            libraryTab.getDatabase().insertEntry(dialog.getMergedEntry());
                             break;
                         default:
                             // Do nothing
@@ -170,12 +170,16 @@ public class EntryTypeViewModel {
                     }
                 } else {
                     // Regenerate CiteKey of imported BibEntry
-                    new CitationKeyGenerator(basePanel.getBibDatabaseContext(), prefs.getCitationKeyPatternPreferences()).generateAndSetKey(entry);
-                    basePanel.insertEntry(entry);
+                    new CitationKeyGenerator(libraryTab.getBibDatabaseContext(), prefs.getCitationKeyPatternPreferences()).generateAndSetKey(entry);
+                    libraryTab.insertEntry(entry);
                 }
                 searchSuccesfulProperty.set(true);
             } else if (StringUtil.isBlank(idText.getValue())) {
                 dialogService.showWarningDialogAndWait(Localization.lang("Empty search ID"), Localization.lang("The given search ID was empty."));
+            } else if (result.isEmpty()) {
+                String fetcher = selectedItemProperty().getValue().getName();
+                String searchId = idText.getValue();
+                dialogService.showErrorDialogAndWait(Localization.lang("Fetcher '%0' did not find an entry for id '%1'.", fetcher, searchId));
             }
             fetcherWorker = new FetcherWorker();
 

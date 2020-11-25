@@ -23,6 +23,7 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.IdBasedFetcher;
+import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
@@ -60,7 +61,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     @FXML private TitledPane customTitlePane;
     @FXML private TitledPane biblatexSoftwareTitlePane;
 
-    private final BasePanel basePanel;
+    private final LibraryTab libraryTab;
     private final DialogService dialogService;
     private final JabRefPreferences prefs;
 
@@ -68,8 +69,8 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     private EntryTypeViewModel viewModel;
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
-    public EntryTypeView(BasePanel basePanel, DialogService dialogService, JabRefPreferences preferences) {
-        this.basePanel = basePanel;
+    public EntryTypeView(LibraryTab libraryTab, DialogService dialogService, JabRefPreferences preferences) {
+        this.libraryTab = libraryTab;
         this.dialogService = dialogService;
         this.prefs = preferences;
 
@@ -120,7 +121,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     @FXML
     public void initialize() {
         visualizer.setDecoration(new IconValidationDecorator());
-        viewModel = new EntryTypeViewModel(prefs, basePanel, dialogService, stateManager);
+        viewModel = new EntryTypeViewModel(prefs, libraryTab, dialogService, stateManager);
 
         idBasedFetchers.itemsProperty().bind(viewModel.fetcherItemsProperty());
         idTextField.textProperty().bindBidirectional(viewModel.idTextProperty());
@@ -133,7 +134,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
             }
         });
 
-        new ViewModelListCellFactory<IdBasedFetcher>().withText(item -> item.getName()).install(idBasedFetchers);
+        new ViewModelListCellFactory<IdBasedFetcher>().withText(WebFetcher::getName).install(idBasedFetchers);
 
         // we set the managed property so that they will only be rendered when they are visble so that the Nodes only take the space when visible
         // avoids removing and adding from the scence graph
@@ -143,7 +144,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         customTitlePane.managedProperty().bind(customTitlePane.visibleProperty());
         biblatexSoftwareTitlePane.managedProperty().bind(biblatexSoftwareTitlePane.visibleProperty());
 
-        if (basePanel.getBibDatabaseContext().isBiblatexMode()) {
+        if (libraryTab.getBibDatabaseContext().isBiblatexMode()) {
             addEntriesToPane(biblatexPane, BiblatexEntryTypeDefinitions.ALL);
             addEntriesToPane(biblatexSoftwarePane, BiblatexSoftwareEntryTypeDefinitions.ALL);
 
