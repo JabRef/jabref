@@ -11,6 +11,8 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.crawler.Crawler;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -21,10 +23,12 @@ public class StartLiteratureReviewAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(StartLiteratureReviewAction.class);
     private final JabRefFrame frame;
     private final DialogService dialogService;
+    private final FileUpdateMonitor fileUpdateMonitor;
 
-    public StartLiteratureReviewAction(JabRefFrame frame) {
+    public StartLiteratureReviewAction(JabRefFrame frame, FileUpdateMonitor fileUpdateMonitor) {
         this.frame = frame;
         this.dialogService = frame.getDialogService();
+        this.fileUpdateMonitor = fileUpdateMonitor;
     }
 
     @Override
@@ -40,7 +44,7 @@ public class StartLiteratureReviewAction extends SimpleCommand {
         }
         final Crawler crawler;
         try {
-            crawler = new Crawler(studyDefinitionFile.get(), Globals.getFileUpdateMonitor(), JabRefPreferences.getInstance().getSavePreferences(), Globals.entryTypesManager);
+            crawler = new Crawler(studyDefinitionFile.get(), fileUpdateMonitor, JabRefPreferences.getInstance().getSavePreferences(), new BibEntryTypesManager());
         } catch (IOException | ParseException | GitAPIException e) {
             LOGGER.info("Error during reading of study definition file.", e);
             dialogService.showErrorDialogAndWait(Localization.lang("Error during reading of study definition file."));
