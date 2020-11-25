@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -26,7 +27,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-class ArXivTest implements SearchBasedFetcherCapabilityTest {
+class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
     private ArXiv fetcher;
     private BibEntry entry;
     private BibEntry sliceTheoremPaper;
@@ -135,13 +136,13 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest {
     @Test
     void searchEntryByPartOfTitle() throws Exception {
         assertEquals(Collections.singletonList(sliceTheoremPaper),
-                fetcher.performSearch("ti:\"slice theorem for Frechet\""));
+                fetcher.performSearch("title:\"slice theorem for Frechet\""));
     }
 
     @Test
     void searchEntryByPartOfTitleWithAcuteAccent() throws Exception {
         assertEquals(Collections.singletonList(sliceTheoremPaper),
-                fetcher.performSearch("ti:\"slice theorem for Fréchet\""));
+                fetcher.performSearch("title:\"slice theorem for Fréchet\""));
     }
 
     @Test
@@ -255,8 +256,8 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest {
      */
     @Test
     public void supportsPhraseSearch() throws Exception {
-        List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("ti:\"Taxonomy of Distributed\"");
-        List<BibEntry> resultWithOutPhraseSearch = fetcher.performSearch("ti:Taxonomy AND ti:of AND ti:Distributed");
+        List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("title:\"Taxonomy of Distributed\"");
+        List<BibEntry> resultWithOutPhraseSearch = fetcher.performSearch("title:Taxonomy AND title:of AND title:Distributed");
         // Phrase search result has to be subset of the default search result
         assertTrue(resultWithOutPhraseSearch.containsAll(resultWithPhraseSearch));
     }
@@ -278,10 +279,15 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest {
                 .withField(StandardField.EPRINTCLASS, "cs.DC")
                 .withField(StandardField.KEYWORDS, "cs.DC, cs.LG");
 
-        List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("ti:\"Taxonomy of Distributed\"");
+        List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("title:\"Taxonomy of Distributed\"");
 
         // There is only a single paper found by searching that contains the exact sequence "Taxonomy of Distributed" in the title.
         assertEquals(Collections.singletonList(expected), resultWithPhraseSearch);
+    }
+
+    @Override
+    public PagedSearchBasedFetcher getPagedFetcher() {
+        return fetcher;
     }
 
     @Test
@@ -299,7 +305,7 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest {
                 .withField(StandardField.EPRINTCLASS, "q-bio.TO")
                 .withField(StandardField.KEYWORDS, "q-bio.TO");
 
-        List<BibEntry> result = fetcher.performSearch("au:\"Tobias Büscher\" AND ti:\"Instability and fingering of interfaces\"");
+        List<BibEntry> result = fetcher.performSearch("author:\"Tobias Büscher\" AND title:\"Instability and fingering of interfaces\"");
 
         // There is only one paper authored by Tobias Büscher with that phrase in the title
         assertEquals(Collections.singletonList(expected), result);

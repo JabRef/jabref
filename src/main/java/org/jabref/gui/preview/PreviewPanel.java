@@ -111,7 +111,7 @@ public class PreviewPanel extends VBox {
         previewView.setLayout(currentPreviewStyle);
         preferences.storePreviewPreferences(previewPreferences);
         if (!init) {
-            dialogService.notify(Localization.lang("Preview style changed to: %0", currentPreviewStyle.getName()));
+            dialogService.notify(Localization.lang("Preview style changed to: %0", currentPreviewStyle.getDisplayName()));
         }
     }
 

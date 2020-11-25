@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml>
+    <records>
+        <record>
+            <database name="Some databases" path="/test/asdf">LASER Acu.1281 mapping conv .bdb</database>
+            <source-app name="Bookends" version="12.8.5">Bookends</source-app>
+            <rec-number>55549</rec-number>
+            <ref-type name="Journal Article">17</ref-type>
+            <contributors>
+                <authors>
+                    <author>
+                        <style face="normal" size="100%">Lim, RCH</style>
+                    </author>
+                </authors>
+            </contributors>
+            <auth-address>
+                <style face="normal" size="100%">Laser Acupuncture Centre, Singapore.</style>
+            </auth-address>
+            <titles>
+                <title>
+                    <style face="normal" size="100%">Painless Laser Acupuncture for Smoking Cessation.</style>
+                </title>
+                <secondary-title>
+                    <style face="normal" size="100%">Med Acupunct</style>
+                </secondary-title>
+            </titles>
+            <pages>
+                <style face="normal" size="100%">159-162</style>
+            </pages>
+            <number>
+                <style face="normal" size="100%">3</style>
+            </number>
+            <volume>
+                <style face="normal" size="100%">30</style>
+            </volume>
+            <dates>
+                <year>
+                    <style face="normal" size="100%">2018</style>
+                </year>
+                <pub-dates>
+                    <date>
+                        <style face="normal" size="100%">Jun 01</style>
+                    </date>
+                </pub-dates>
+            </dates>
+            <keywords>
+                <keyword />
+                <keyword>
+                    <style face="bold" size="12" />
+                    <style face="normal" size="12">anxiety; craving; dependency; destress; health restoration</style>
+                </keyword>
+                <keyword>
+                    <style face="normal" size="12" />
+                </keyword>
+            </keywords>
+            <notes>
+                <style face="normal" size="100%">FFT available, not read on 7/2/18</style>
+            </notes>
+            <label>
+                <style face="normal" size="12">29937971</style>
+            </label>
+            <urls>
+                <related-urls>
+                    <url>
+                        <style face="normal" size="100%">https://www.ncbi.nlm.nih.gov/pubmed/29937971</style>
+                    </url>
+                </related-urls>
+                <pdf-urls />
+            </urls>
+            <isbn>
+                <style face="normal" size="100%">1933-6586</style>
+            </isbn>
+            <user16>
+                <style face="normal" size="100%">PMC6011367</style>
+            </user16>
+            <electronic-resource-num>
+                <style face="normal" size="100%">10.1089/acu.2018.1295</style>
+            </electronic-resource-num>
+            <accession-num>
+                <style face="normal" size="100%">29937971</style>
+            </accession-num>
+        </record>
+    </records>
+</xml>

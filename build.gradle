@@ -1,7 +1,6 @@
 import groovy.json.JsonSlurper
 import org.gradle.internal.os.OperatingSystem
 import org.jabref.build.JournalAbbreviationConverter
-import org.jabref.build.antlr.JabRefAntlrPlugin
 import org.jabref.build.localization.LocalizationPlugin
 import org.jabref.build.xjc.XjcPlugin
 import org.jabref.build.xjc.XjcTask
@@ -13,11 +12,10 @@ plugins {
     id 'application'
     id "com.simonharrer.modernizer" version '2.1.0-1'
     id 'me.champeau.gradle.jmh' version '0.5.2'
-    id 'com.github.ben-manes.versions' version '0.33.0'
+    id 'com.github.ben-manes.versions' version '0.36.0'
     id 'org.javamodularity.moduleplugin' version '1.7.0'
     id 'org.openjfx.javafxplugin' version '0.0.9'
-    id 'org.beryx.jlink' version '2.22.1'
-
+    id 'org.beryx.jlink' version '2.22.3'
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
     id 'com.adarshr.test-logger' version '2.1.1'
@@ -31,7 +29,6 @@ apply plugin: 'project-report'
 apply plugin: 'jacoco'
 apply plugin: 'me.champeau.gradle.jmh'
 apply plugin: 'checkstyle'
-apply plugin: JabRefAntlrPlugin
 apply plugin: XjcPlugin
 apply plugin: LocalizationPlugin
 
@@ -46,7 +43,7 @@ java {
 }
 
 application {
-    mainClassName = "$moduleName/org.jabref.gui.JabRefLauncher"
+    mainClassName = "org.jabref.gui.JabRefLauncher"
 }
 
 // TODO: Ugly workaround to temporarily ignore build errors to dependencies of latex2unicode
@@ -88,7 +85,8 @@ repositories {
 
 configurations {
     libreoffice
-
+    antlr3
+    antlr4
     // TODO: Remove the following workaround for split error messages such as
     // error: module java.xml.bind reads package javax.annotation from both jsr305 and java.annotation
     compile {
@@ -137,7 +135,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.8-1'
     implementation 'org.antlr:antlr4-runtime:4.8-1'
 
-    implementation (group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.6.3') {
+    implementation (group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.7.0') {
         exclude group: 'org.apache.lucene', module: 'lucene-sandbox'
     }
 
@@ -170,7 +168,7 @@ dependencies {
     implementation 'org.controlsfx:controlsfx:11.0.3'
 
     implementation 'org.jsoup:jsoup:1.13.1'
-    implementation 'com.konghq:unirest-java:3.11.03'
+    implementation 'com.konghq:unirest-java:3.11.05'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
@@ -208,8 +206,8 @@ dependencies {
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
     testImplementation 'org.mockito:mockito-core:3.6.0'
-    testImplementation 'org.xmlunit:xmlunit-core:2.8.0'
-    testImplementation 'org.xmlunit:xmlunit-matchers:2.8.0'
+    testImplementation 'org.xmlunit:xmlunit-core:2.8.1'
+    testImplementation 'org.xmlunit:xmlunit-matchers:2.8.1'
     testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.14.1'
     testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.14.1'
     testImplementation "org.testfx:testfx-core:4.0.17-alpha-SNAPSHOT"
@@ -304,23 +302,24 @@ task generateSource(dependsOn: ["generateBstGrammarSource",
     description 'Generates all necessary (Java) source files.'
 }
 
-task generateBstGrammarSource(type: org.jabref.build.antlr.AntlrTask) {
+task generateBstGrammarSource(type: JavaExec) {
+    main = "org.antlr.Tool"
+    classpath = configurations.antlr3
     group = "JabRef"
     description = 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr3.'
 
-    antlr = ANTLR3
-    inputFile = 'src/main/antlr3/org/jabref/bst/Bst.g'
-    outputDir = 'src/main/generated/org/jabref/logic/bst/'
+    inputs.dir('src/main/antlr3/org/jabref/bst/')
+    args = ["-o", "$projectDir/src/main/generated/org/jabref/logic/bst/" , "$projectDir/src/main/antlr3/org/jabref/bst/Bst.g" ]
 }
 
-task generateSearchGrammarSource(type: org.jabref.build.antlr.AntlrTask) {
+task generateSearchGrammarSource(type: JavaExec) {
+    main = "org.antlr.v4.Tool"
+    classpath = configurations.antlr4
     group = 'JabRef'
     description = "Generates java files for Search.g antlr4."
 
-    antlr = ANTLR4
-    inputFile = "src/main/antlr4/org/jabref/search/Search.g4"
-    outputDir = "src/main/generated/org/jabref/search"
-    javaPackage = "org.jabref.search"
+    inputs.dir("src/main/antlr4/org/jabref/search/")
+    args  = ["-o","$projectDir/src/main/generated/org/jabref/search" , "-visitor", "-no-listener", "-package", "org.jabref.search", "$projectDir/src/main/antlr4/org/jabref/search/Search.g4"]
 }
 
 task generateMedlineSource(type: XjcTask) {
@@ -702,6 +701,8 @@ jlink {
             installerOptions = [
                     '--verbose',
                     '--vendor', 'JabRef',
+                    '--mac-package-identifier', "JabRef",
+                    '--mac-package-name', "JabRef",
                     '--app-version', "${project.version}",
                     '--file-associations', "${projectDir}/buildres/mac/bibtexAssociations.properties",
                     '--resource-dir', "${projectDir}/buildres/mac"
@@ -714,7 +715,7 @@ if (OperatingSystem.current().isWindows()) {
     tasks.jpackageImage.doLast {
         copy {
             from("${projectDir}/buildres/windows") {
-                include "jabref.json", "jabref-chrome.json", "JabRefHost.bat", "JabRefHost.ps1"
+                include "jabref-firefox.json", "jabref-chrome.json", "JabRefHost.bat", "JabRefHost.ps1"
             }
             into "$buildDir/distribution/JabRef"
         }
