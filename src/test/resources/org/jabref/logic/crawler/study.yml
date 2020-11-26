@@ -1,0 +1,18 @@
+authors:
+  - Jab Ref
+studyName: TestStudyName
+lastSearchDate: 2020-11-26
+researchQuestions:
+  - Question1
+  - Question2
+queries:
+  - query: Quantum
+  - query: Cloud Computing
+  - query: '"Software Engineering"'
+libraries:
+  - name: Springer
+    enabled: true
+  - name: ArXiv
+    enabled: true
+  - name: IEEEXplore
+    enabled: false
