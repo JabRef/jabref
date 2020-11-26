@@ -46,24 +46,20 @@ class CrawlerTest {
 
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "1 - Quantum")));
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "2 - Cloud Computing")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "3 - TestSearchQuery3")));
 
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "1 - Quantum", "ArXiv.bib")));
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "2 - Cloud Computing", "ArXiv.bib")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "3 - TestSearchQuery3", "ArXiv.bib")));
 
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "1 - Quantum", "Springer.bib")));
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "2 - Cloud Computing", "Springer.bib")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "3 - TestSearchQuery3", "Springer.bib")));
 
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "1 - Quantum", "result.bib")));
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "2 - Cloud Computing", "result.bib")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "3 - TestSearchQuery3", "result.bib")));
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "studyResult.bib")));
     }
 
     private Path getPathToStudyDefinitionFile() {
-        return tempRepositoryDirectory.resolve("study.bib");
+        return tempRepositoryDirectory.resolve("study.yml");
     }
 
     /**
@@ -98,8 +94,8 @@ class CrawlerTest {
     }
 
     private void setUpTestStudyDefinitionFile() throws Exception {
-        Path destination = tempRepositoryDirectory.resolve("study.bib");
-        URL studyDefinition = this.getClass().getResource("study.bib");
+        Path destination = tempRepositoryDirectory.resolve("study.yml");
+        URL studyDefinition = this.getClass().getResource("study.yml");
         FileUtil.copyFile(Path.of(studyDefinition.toURI()), destination, false);
     }
 }

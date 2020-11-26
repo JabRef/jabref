@@ -1,13 +1,7 @@
 package org.jabref.model.study;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.UnknownField;
 
 /**
  * This class represents a scientific study.
@@ -15,84 +9,125 @@ import org.jabref.model.entry.field.UnknownField;
  * This class defines all aspects of a scientific study relevant to the application. It is a proxy for the file based study definition.
  */
 public class Study {
-    private static final String SEARCH_QUERY_FIELD_NAME = "query";
+    private List<String> authors;
+    private String studyName;
+    private LocalDate lastSearchDate;
+    private List<String> researchQuestions;
+    private List<QueryEntry> queries;
+    private List<LibraryEntry> libraries;
 
-    private final BibEntry studyEntry;
-    private final List<BibEntry> queryEntries;
-    private final List<BibEntry> libraryEntries;
-
-    public Study(BibEntry studyEntry, List<BibEntry> queryEntries, List<BibEntry> libraryEntries) {
-        this.studyEntry = studyEntry;
-        this.queryEntries = queryEntries;
-        this.libraryEntries = libraryEntries;
-    }
-
-    public List<BibEntry> getAllEntries() {
-        List<BibEntry> allEntries = new ArrayList<>();
-        allEntries.add(studyEntry);
-        allEntries.addAll(queryEntries);
-        allEntries.addAll(libraryEntries);
-        return allEntries;
+    public Study(List<String> authors, String studyName, List<String> researchQuestions, List<QueryEntry> queryEntries, List<LibraryEntry> libraries) {
+        this.authors = authors;
+        this.studyName = studyName;
+        this.researchQuestions = researchQuestions;
+        this.queries = queryEntries;
+        this.libraries = libraries;
     }
 
     /**
-     * Returns all query strings
-     *
-     * @return List of all queries as Strings.
+     * Used for Jackson deserialization
      */
-    public List<String> getSearchQueryStrings() {
-        return queryEntries.parallelStream()
-                           .map(bibEntry -> bibEntry.getField(new UnknownField(SEARCH_QUERY_FIELD_NAME)))
-                           .filter(Optional::isPresent)
-                           .map(Optional::get)
-                           .collect(Collectors.toList());
+    public Study() {
     }
 
-    /**
-     * This method returns the SearchQuery entries.
-     * This is required when the BibKey of the search term entry is required in combination with the search query (e.g.
-     * for the creation of the study repository structure).
-     */
-    public List<BibEntry> getSearchQueryEntries() {
-        return queryEntries;
+    public List<String> getAuthors() {
+        return authors;
     }
 
-    /**
-     * Returns a meta data entry of the first study entry found in the study definition file of the provided type.
-     *
-     * @param metaDataField The type of requested meta-data
-     * @return returns the requested meta data type of the first found study entry
-     * @throws IllegalArgumentException If the study file does not contain a study entry.
-     */
-    public Optional<String> getStudyMetaDataField(StudyMetaDataField metaDataField) throws IllegalArgumentException {
-        return studyEntry.getField(metaDataField.toField());
+    public void setAuthors(List<String> authors) {
+        this.authors = authors;
     }
 
-    /**
-     * Sets the lastSearchDate field of the study entry
-     *
-     * @param date date the last time a search was conducted
-     */
+    public List<QueryEntry> getQueries() {
+        return queries;
+    }
+
+    public void setQueries(List<QueryEntry> queries) {
+        this.queries = queries;
+    }
+
+    public LocalDate getLastSearchDate() {
+        return lastSearchDate;
+    }
+
     public void setLastSearchDate(LocalDate date) {
-        studyEntry.setField(StudyMetaDataField.STUDY_LAST_SEARCH.toField(), date.toString());
+        lastSearchDate = date;
     }
 
-    /**
-     * Extracts all active LibraryEntries from the BibEntries.
-     *
-     * @return List of BibEntries of type Library
-     * @throws IllegalArgumentException If a transformation from Library entry to LibraryDefinition fails
-     */
-    public List<BibEntry> getActiveLibraryEntries() throws IllegalArgumentException {
-        return libraryEntries
-                .parallelStream()
-                .filter(bibEntry -> {
-                    // If enabled is not defined, the fetcher is active.
-                    return bibEntry.getField(new UnknownField("enabled"))
-                                   .map(enabled -> enabled.equals("true"))
-                                   .orElse(true);
-                })
-                .collect(Collectors.toList());
+    public List<LibraryEntry> getLibraries() {
+        return libraries;
+    }
+
+    public void setLibraries(List<LibraryEntry> libraries) {
+        this.libraries = libraries;
+    }
+
+    public String getStudyName() {
+        return studyName;
+    }
+
+    public void setStudyName(String studyName) {
+        this.studyName = studyName;
+    }
+
+    public List<String> getResearchQuestions() {
+        return researchQuestions;
+    }
+
+    public void setResearchQuestions(List<String> researchQuestions) {
+        this.researchQuestions = researchQuestions;
+    }
+
+    @Override
+    public String toString() {
+        return "Study{" +
+                "authors=" + authors +
+                ", studyName='" + studyName + '\'' +
+                ", lastSearchDate=" + lastSearchDate +
+                ", researchQuestions=" + researchQuestions +
+                ", queries=" + queries +
+                ", libraries=" + libraries +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Study study = (Study) o;
+
+        if (getAuthors() != null ? !getAuthors().equals(study.getAuthors()) : study.getAuthors() != null) {
+            return false;
+        }
+        if (getStudyName() != null ? !getStudyName().equals(study.getStudyName()) : study.getStudyName() != null) {
+            return false;
+        }
+        if (getLastSearchDate() != null ? !getLastSearchDate().equals(study.getLastSearchDate()) : study.getLastSearchDate() != null) {
+            return false;
+        }
+        if (getResearchQuestions() != null ? !getResearchQuestions().equals(study.getResearchQuestions()) : study.getResearchQuestions() != null) {
+            return false;
+        }
+        if (getQueries() != null ? !getQueries().equals(study.getQueries()) : study.getQueries() != null) {
+            return false;
+        }
+        return getLibraries() != null ? getLibraries().equals(study.getLibraries()) : study.getLibraries() == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getAuthors() != null ? getAuthors().hashCode() : 0;
+        result = 31 * result + (getStudyName() != null ? getStudyName().hashCode() : 0);
+        result = 31 * result + (getLastSearchDate() != null ? getLastSearchDate().hashCode() : 0);
+        result = 31 * result + (getResearchQuestions() != null ? getResearchQuestions().hashCode() : 0);
+        result = 31 * result + (getQueries() != null ? getQueries().hashCode() : 0);
+        result = 31 * result + (getLibraries() != null ? getLibraries().hashCode() : 0);
+        return result;
     }
 }
 

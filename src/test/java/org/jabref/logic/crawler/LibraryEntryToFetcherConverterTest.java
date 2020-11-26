@@ -13,7 +13,6 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrderConfig;
-import org.jabref.model.study.Study;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.junit.jupiter.api.Assertions;
@@ -50,11 +49,11 @@ class LibraryEntryToFetcherConverterTest {
 
     @Test
     public void getActiveFetcherInstances() throws Exception {
-        Path studyDefinition = tempRepositoryDirectory.resolve("study.bib");
+        Path studyDefinition = tempRepositoryDirectory.resolve("study.yml");
         copyTestStudyDefinitionFileIntoDirectory(studyDefinition);
 
-        Study study = new StudyRepository(tempRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, entryTypesManager).getStudy();
-        LibraryEntryToFetcherConverter converter = new LibraryEntryToFetcherConverter(study.getActiveLibraryEntries(), importFormatPreferences);
+        StudyRepository studyRepository = new StudyRepository(tempRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, entryTypesManager);
+        LibraryEntryToFetcherConverter converter = new LibraryEntryToFetcherConverter(studyRepository.getActiveLibraryEntries(), importFormatPreferences);
         List<SearchBasedFetcher> result = converter.getActiveFetchers();
 
         Assertions.assertEquals(2, result.size());
@@ -63,7 +62,7 @@ class LibraryEntryToFetcherConverterTest {
     }
 
     private void copyTestStudyDefinitionFileIntoDirectory(Path destination) throws Exception {
-        URL studyDefinition = this.getClass().getResource("study.bib");
+        URL studyDefinition = this.getClass().getResource("study.yml");
         FileUtil.copyFile(Path.of(studyDefinition.toURI()), destination, false);
     }
 }
