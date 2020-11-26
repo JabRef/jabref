@@ -11,8 +11,6 @@ queries:
   - query: '"Software Engineering"'
 libraries:
   - name: Springer
-    enabled: true
   - name: ArXiv
-    enabled: true
   - name: IEEEXplore
     enabled: false
