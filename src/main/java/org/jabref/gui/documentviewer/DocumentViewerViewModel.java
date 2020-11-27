@@ -61,8 +61,6 @@ public class DocumentViewerViewModel extends AbstractViewModel {
             maxPages.bindBidirectional(
                 EasyBind.wrapNullable(currentDocument).selectProperty(DocumentViewModel::maxPagesProperty));
         });
-
-
         setCurrentEntries(this.stateManager.getSelectedEntries());
     }
 

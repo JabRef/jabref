@@ -60,7 +60,7 @@ public class PdfDocumentPageViewModel extends DocumentPageViewModel {
 
     @Override
     public int getPageNumber() {
-        return pageNumber +1;
+        return pageNumber + 1;
     }
 
     @Override
