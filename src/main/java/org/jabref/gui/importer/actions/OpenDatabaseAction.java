@@ -166,8 +166,8 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
 
         BackgroundTask<ParserResult> backgroundTask = BackgroundTask.wrap(() -> loadDatabase(file));
-        LibraryTab.Factory libraryTabCreator = new LibraryTab.Factory();
-        LibraryTab newTab = libraryTabCreator.createModernLibraryTab(frame, file, backgroundTask);
+        LibraryTab.Factory libraryTabFactory = new LibraryTab.Factory();
+        LibraryTab newTab = libraryTabFactory.createModernLibraryTab(frame, file, backgroundTask);
 
         backgroundTask.onFinished(() -> trackOpenNewDatabase(newTab));
     }
@@ -199,16 +199,6 @@ public class OpenDatabaseAction extends SimpleCommand {
             }
         }
         return result;
-    }
-
-    private LibraryTab addNewDatabase(ParserResult result, final Path file, boolean raisePanel) {
-        if (result.hasWarnings()) {
-            ParserResultWarningDialog.showParserResultWarningDialog(result, frame);
-        }
-
-        LibraryTab libraryTab = new LibraryTab(frame, Globals.prefs, result.getDatabaseContext(), ExternalFileTypes.getInstance());
-        frame.addTab(libraryTab, raisePanel);
-        return libraryTab;
     }
 
     private void trackOpenNewDatabase(LibraryTab libraryTab) {

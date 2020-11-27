@@ -157,14 +157,11 @@ public class LibraryTab extends Tab {
     }
 
     public BackgroundTask<?> getDataLoadingTask() {
-        if (dataLoadingTask == null) {
-            return null;
-        }
         return dataLoadingTask;
     }
 
     /* The layout to display in the tab when it's loading*/
-    public Node createLoadingLayout() {
+    public Node createLoadingAnimationLayout() {
         ProgressIndicator progressIndicator = new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS);
         BorderPane pane = new BorderPane();
         pane.setCenter(progressIndicator);
@@ -173,7 +170,7 @@ public class LibraryTab extends Tab {
     }
 
     public void onDatabaseLoadingStarted() {
-        Node loadingLayout = createLoadingLayout();
+        Node loadingLayout = createLoadingAnimationLayout();
         getMainTable().placeholderProperty().setValue(loadingLayout);
 
         frame.addTab(this, true);
