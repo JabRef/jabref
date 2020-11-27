@@ -815,7 +815,9 @@ public class JabRefFrame extends BorderPane {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsEMailAction(dialogService, stateManager)),
-                pushToApplicationMenuItem
+                pushToApplicationMenuItem,
+                new SeparatorMenuItem(),
+                factory.createMenuItem(StandardActions.START_SYSTEMATIC_LITERATURE_REVIEW, new StartLiteratureReviewAction(this, Globals.getFileUpdateMonitor(), Globals.prefs.getWorkingDir(), Globals.TASK_EXECUTOR))
         );
 
         SidePaneComponent webSearch = sidePaneManager.getComponent(SidePaneType.WEB_SEARCH);
@@ -992,7 +994,7 @@ public class JabRefFrame extends BorderPane {
      * This method causes all open LibraryTabs to set up their tables anew. When called from PreferencesDialogViewModel,
      * this updates to the new settings.
      * We need to notify all tabs about the changes to avoid problems when changing the column set.
-     * */
+     */
     public void setupAllTables() {
         tabbedPane.getTabs().forEach(tab -> {
             LibraryTab libraryTab = (LibraryTab) tab;
@@ -1013,7 +1015,7 @@ public class JabRefFrame extends BorderPane {
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new OpenDatabaseFolder()),
                 factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(stateManager))
-                );
+        );
 
         return contextMenu;
     }
