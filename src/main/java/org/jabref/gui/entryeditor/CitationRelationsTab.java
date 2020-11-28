@@ -159,10 +159,10 @@ public class CitationRelationsTab extends EntryEditorTab {
         AnchorPane citedByHBox = new AnchorPane();
         citedByHBox.setPrefHeight(40);
 
-        //Create Heading Labels
-        Label citingLabel = new Label("Citing");
+        //Create Heading Lab
+        Label citingLabel = new Label(Localization.lang("Citing"));
         styleLabel(citingLabel);
-        Label citedByLabel = new Label("Cited By");
+        Label citedByLabel = new Label(Localization.lang("Cited By"));
         styleLabel(citedByLabel);
 
         //Create ListViews
@@ -423,7 +423,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                     task.cancel();
                     abort.setVisible(false);
                     progress.setVisible(false);
-                    dialogService.notify("Search aborted!");
+                    dialogService.notify(Localization.lang("Search aborted!"));
                     refreshButton.setVisible(true);
                     importButton.setVisible(false);
                 });
@@ -439,7 +439,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                         if (!observableList.isEmpty()) {
                             listView.refresh();
                         } else {
-                            Label placeholder = new Label("No articles found");
+                            Label placeholder = new Label(Localization.lang("No articles found"));
                             listView.setPlaceholder(placeholder);
                         }
                         BooleanBinding booleanBind = Bindings.isEmpty(listView.getCheckModel().getCheckedItems());
