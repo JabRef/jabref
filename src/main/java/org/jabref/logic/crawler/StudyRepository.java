@@ -23,10 +23,10 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.study.FetchResult;
-import org.jabref.model.study.LibraryEntry;
-import org.jabref.model.study.QueryEntry;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.study.Study;
+import org.jabref.model.study.StudyDatabase;
+import org.jabref.model.study.StudyQuery;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -129,7 +129,7 @@ class StudyRepository {
     public List<String> getSearchQueryStrings() {
         return study.getQueries()
                     .parallelStream()
-                    .map(QueryEntry::getQuery)
+                    .map(StudyQuery::getQuery)
                     .collect(Collectors.toList());
     }
 
@@ -139,10 +139,10 @@ class StudyRepository {
      * @return List of BibEntries of type Library
      * @throws IllegalArgumentException If a transformation from Library entry to LibraryDefinition fails
      */
-    public List<LibraryEntry> getActiveLibraryEntries() throws IllegalArgumentException {
-        return study.getLibraries()
+    public List<StudyDatabase> getActiveLibraryEntries() throws IllegalArgumentException {
+        return study.getDatabases()
                     .parallelStream()
-                    .filter(LibraryEntry::isEnabled)
+                    .filter(StudyDatabase::isEnabled)
                     .collect(Collectors.toList());
     }
 
@@ -175,7 +175,7 @@ class StudyRepository {
      */
     private void setUpRepositoryStructure() throws IOException {
         // Cannot use stream here since IOException has to be thrown
-        LibraryEntryToFetcherConverter converter = new LibraryEntryToFetcherConverter(this.getActiveLibraryEntries(), importFormatPreferences);
+        StudyDatabaseToFetcherConverter converter = new StudyDatabaseToFetcherConverter(this.getActiveLibraryEntries(), importFormatPreferences);
         for (String query : this.getSearchQueryStrings()) {
             createQueryResultFolder(query);
             converter.getActiveFetchers()

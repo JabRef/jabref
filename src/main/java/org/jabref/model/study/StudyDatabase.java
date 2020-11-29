@@ -1,10 +1,10 @@
 package org.jabref.model.study;
 
-public class LibraryEntry {
+public class StudyDatabase {
     private String name;
     private boolean enabled;
 
-    public LibraryEntry(String name, boolean enabled) {
+    public StudyDatabase(String name, boolean enabled) {
         this.name = name;
         this.enabled = enabled;
     }
@@ -12,7 +12,7 @@ public class LibraryEntry {
     /**
      * Used for Jackson deserialization
      */
-    public LibraryEntry() {
+    public StudyDatabase() {
         // Per default fetcher is activated
         this.enabled = true;
     }
@@ -42,7 +42,7 @@ public class LibraryEntry {
             return false;
         }
 
-        LibraryEntry that = (LibraryEntry) o;
+        StudyDatabase that = (StudyDatabase) o;
 
         if (isEnabled() != that.isEnabled()) {
             return false;

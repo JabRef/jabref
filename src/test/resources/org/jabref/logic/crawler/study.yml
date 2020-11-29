@@ -1,15 +1,15 @@
 authors:
   - Jab Ref
-studyName: TestStudyName
-lastSearchDate: 2020-11-26
-researchQuestions:
+title: TestStudyName
+last-search-date: 2020-11-26
+research-questions:
   - Question1
   - Question2
 queries:
   - query: Quantum
   - query: Cloud Computing
   - query: '"Software Engineering"'
-libraries:
+databases:
   - name: Springer
   - name: ArXiv
   - name: IEEEXplore

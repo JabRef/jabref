@@ -2,26 +2,34 @@ package org.jabref.model.study;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * This class represents a scientific study.
  *
  * This class defines all aspects of a scientific study relevant to the application. It is a proxy for the file based study definition.
  */
+
+@JsonPropertyOrder({"authors", "title", "last-search-date", "research-questions", "queries", "databases"})
 public class Study {
     private List<String> authors;
-    private String studyName;
+    private String title;
+    @JsonProperty("last-search-date")
     private LocalDate lastSearchDate;
+    @JsonProperty("research-questions")
     private List<String> researchQuestions;
-    private List<QueryEntry> queries;
-    private List<LibraryEntry> libraries;
+    private List<StudyQuery> queries;
+    private List<StudyDatabase> databases;
 
-    public Study(List<String> authors, String studyName, List<String> researchQuestions, List<QueryEntry> queryEntries, List<LibraryEntry> libraries) {
+    public Study(List<String> authors, String title, List<String> researchQuestions, List<StudyQuery> queryEntries, List<StudyDatabase> databases) {
         this.authors = authors;
-        this.studyName = studyName;
+        this.title = title;
         this.researchQuestions = researchQuestions;
         this.queries = queryEntries;
-        this.libraries = libraries;
+        this.databases = databases;
     }
 
     /**
@@ -38,11 +46,11 @@ public class Study {
         this.authors = authors;
     }
 
-    public List<QueryEntry> getQueries() {
+    public List<StudyQuery> getQueries() {
         return queries;
     }
 
-    public void setQueries(List<QueryEntry> queries) {
+    public void setQueries(List<StudyQuery> queries) {
         this.queries = queries;
     }
 
@@ -54,20 +62,20 @@ public class Study {
         lastSearchDate = date;
     }
 
-    public List<LibraryEntry> getLibraries() {
-        return libraries;
+    public List<StudyDatabase> getDatabases() {
+        return databases;
     }
 
-    public void setLibraries(List<LibraryEntry> libraries) {
-        this.libraries = libraries;
+    public void setDatabases(List<StudyDatabase> databases) {
+        this.databases = databases;
     }
 
-    public String getStudyName() {
-        return studyName;
+    public String getTitle() {
+        return title;
     }
 
-    public void setStudyName(String studyName) {
-        this.studyName = studyName;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public List<String> getResearchQuestions() {
@@ -82,11 +90,11 @@ public class Study {
     public String toString() {
         return "Study{" +
                 "authors=" + authors +
-                ", studyName='" + studyName + '\'' +
+                ", studyName='" + title + '\'' +
                 ", lastSearchDate=" + lastSearchDate +
                 ", researchQuestions=" + researchQuestions +
                 ", queries=" + queries +
-                ", libraries=" + libraries +
+                ", libraries=" + databases +
                 '}';
     }
 
@@ -104,7 +112,7 @@ public class Study {
         if (getAuthors() != null ? !getAuthors().equals(study.getAuthors()) : study.getAuthors() != null) {
             return false;
         }
-        if (getStudyName() != null ? !getStudyName().equals(study.getStudyName()) : study.getStudyName() != null) {
+        if (getTitle() != null ? !getTitle().equals(study.getTitle()) : study.getTitle() != null) {
             return false;
         }
         if (getLastSearchDate() != null ? !getLastSearchDate().equals(study.getLastSearchDate()) : study.getLastSearchDate() != null) {
@@ -116,18 +124,12 @@ public class Study {
         if (getQueries() != null ? !getQueries().equals(study.getQueries()) : study.getQueries() != null) {
             return false;
         }
-        return getLibraries() != null ? getLibraries().equals(study.getLibraries()) : study.getLibraries() == null;
+        return getDatabases() != null ? getDatabases().equals(study.getDatabases()) : study.getDatabases() == null;
     }
 
     @Override
     public int hashCode() {
-        int result = getAuthors() != null ? getAuthors().hashCode() : 0;
-        result = 31 * result + (getStudyName() != null ? getStudyName().hashCode() : 0);
-        result = 31 * result + (getLastSearchDate() != null ? getLastSearchDate().hashCode() : 0);
-        result = 31 * result + (getResearchQuestions() != null ? getResearchQuestions().hashCode() : 0);
-        result = 31 * result + (getQueries() != null ? getQueries().hashCode() : 0);
-        result = 31 * result + (getLibraries() != null ? getLibraries().hashCode() : 0);
-        return result;
+        return Objects.hashCode(this);
     }
 }
 

@@ -24,7 +24,7 @@ import org.mockito.Answers;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class LibraryEntryToFetcherConverterTest {
+class StudyDatabaseToFetcherConverterTest {
     ImportFormatPreferences importFormatPreferences;
     SavePreferences savePreferences;
     BibEntryTypesManager entryTypesManager;
@@ -53,7 +53,7 @@ class LibraryEntryToFetcherConverterTest {
         copyTestStudyDefinitionFileIntoDirectory(studyDefinition);
 
         StudyRepository studyRepository = new StudyRepository(tempRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, entryTypesManager);
-        LibraryEntryToFetcherConverter converter = new LibraryEntryToFetcherConverter(studyRepository.getActiveLibraryEntries(), importFormatPreferences);
+        StudyDatabaseToFetcherConverter converter = new StudyDatabaseToFetcherConverter(studyRepository.getActiveLibraryEntries(), importFormatPreferences);
         List<SearchBasedFetcher> result = converter.getActiveFetchers();
 
         Assertions.assertEquals(2, result.size());

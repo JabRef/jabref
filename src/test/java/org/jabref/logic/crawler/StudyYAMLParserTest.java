@@ -6,11 +6,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.study.LibraryEntry;
-import org.jabref.model.study.QueryEntry;
 import org.jabref.model.study.Study;
+import org.jabref.model.study.StudyDatabase;
+import org.jabref.model.study.StudyQuery;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -22,20 +21,17 @@ class StudyYAMLParserTest {
     static Path testDirectory;
     Study expectedStudy;
 
-    @BeforeAll
-    static void copyStudyYAMLIntoTestDirectory() throws Exception {
+    @BeforeEach
+    void setupStudy() throws Exception {
         Path destination = testDirectory.resolve("study.yml");
         URL studyDefinition = StudyYAMLParser.class.getResource("study.yml");
-        FileUtil.copyFile(Path.of(studyDefinition.toURI()), destination, false);
-    }
+        FileUtil.copyFile(Path.of(studyDefinition.toURI()), destination, true);
 
-    @BeforeEach
-    void setupStudy() {
         List<String> authors = List.of("Jab Ref");
         String studyName = "TestStudyName";
         List<String> researchQuestions = List.of("Question1", "Question2");
-        List<QueryEntry> queryEntries = List.of(new QueryEntry("Quantum"), new QueryEntry("Cloud Computing"), new QueryEntry("\"Software Engineering\""));
-        List<LibraryEntry> libraryEntries = List.of(new LibraryEntry("Springer", true), new LibraryEntry("ArXiv", true));
+        List<StudyQuery> queryEntries = List.of(new StudyQuery("Quantum"), new StudyQuery("Cloud Computing"), new StudyQuery("\"Software Engineering\""));
+        List<StudyDatabase> libraryEntries = List.of(new StudyDatabase("Springer", true), new StudyDatabase("ArXiv", true), new StudyDatabase("IEEEXplore", false));
 
         expectedStudy = new Study(authors, studyName, researchQuestions, queryEntries, libraryEntries);
         expectedStudy.setLastSearchDate(LocalDate.parse("2020-11-26"));
