@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
+import org.jabref.logic.crawler.git.GitHandler;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.io.FileUtil;
@@ -31,11 +32,13 @@ class CrawlerTest {
     ImportFormatPreferences importFormatPreferences;
     SavePreferences savePreferences;
     BibEntryTypesManager entryTypesManager;
+    GitHandler gitHandler = mock(GitHandler.class, Answers.RETURNS_DEFAULTS);
 
     @Test
     public void testWhetherAllFilesAreCreated() throws Exception {
         setUp();
         Crawler testCrawler = new Crawler(getPathToStudyDefinitionFile(),
+                gitHandler,
                 new DummyFileUpdateMonitor(),
                 importFormatPreferences,
                 savePreferences,
