@@ -13,6 +13,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.push.PushToApplicationsManager;
+import org.jabref.gui.push.PushToEmacs;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.exporter.ExporterFactory;
@@ -148,7 +149,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
         ExternalApplicationsPreferences externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
         PushToApplicationsManager manager = frame.getPushToApplicationsManager();
-        manager.updateApplicationAction(manager.getApplicationByName(externalApplicationsPreferences.getPushToApplicationName()));
+        manager.updateApplicationAction(manager.getApplicationByName(externalApplicationsPreferences.getPushToApplicationName())
+                                               .orElse(new PushToEmacs(dialogService, preferences)));
 
         frame.getLibraryTabs().forEach(panel -> panel.getMainTable().getTableModel().refresh());
     }

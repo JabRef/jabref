@@ -51,6 +51,12 @@ import org.jabref.gui.maintable.MainTableNameFormatPreferences.AbbreviationStyle
 import org.jabref.gui.maintable.MainTableNameFormatPreferences.DisplayStyle;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.mergeentries.MergeEntries;
+import org.jabref.gui.push.PushToEmacs;
+import org.jabref.gui.push.PushToLyx;
+import org.jabref.gui.push.PushToTeXstudio;
+import org.jabref.gui.push.PushToTexmaker;
+import org.jabref.gui.push.PushToVim;
+import org.jabref.gui.push.PushToWinEdt;
 import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.Theme;
@@ -113,16 +119,16 @@ public class JabRefPreferences implements PreferencesService {
     // Push to application preferences
     public static final String EMACS_PATH = "emacsPath";
     public static final String EMACS_ADDITIONAL_PARAMETERS = "emacsParameters";
-
-    /* contents of the defaults HashMap that are defined in this class.
-     * There are more default parameters in this map which belong to separate preference classes.
-     */
+    public static final String LYXPIPE = "lyxpipe";
     public static final String TEXSTUDIO_PATH = "TeXstudioPath";
     public static final String WIN_EDT_PATH = "winEdtPath";
     public static final String TEXMAKER_PATH = "texmakerPath";
     public static final String VIM_SERVER = "vimServer";
     public static final String VIM = "vim";
-    public static final String LYXPIPE = "lyxpipe";
+
+    /* contents of the defaults HashMap that are defined in this class.
+     * There are more default parameters in this map which belong to separate preference classes.
+     */
     public static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
     public static final String FX_THEME = "fxTheme";
     public static final String LANGUAGE = "language";
@@ -1877,6 +1883,34 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
     // ExternalApplicationsPreferences
     //*************************************************************************************************************
+
+    public PushToApplicationPreferences getPushToApplicationPreferences() {
+        Map<String, String> applicationCommands = new HashMap<>();
+        applicationCommands.put(PushToEmacs.NAME, get(EMACS_PATH));
+        applicationCommands.put(PushToLyx.NAME, get(LYXPIPE));
+        applicationCommands.put(PushToTexmaker.NAME, get(TEXMAKER_PATH));
+        applicationCommands.put(PushToTeXstudio.NAME, get(TEXSTUDIO_PATH));
+        applicationCommands.put(PushToVim.NAME, get(VIM));
+        applicationCommands.put(PushToWinEdt.NAME, get(WIN_EDT_PATH));
+
+        return new PushToApplicationPreferences(
+                applicationCommands,
+                get(EMACS_ADDITIONAL_PARAMETERS),
+                get(VIM_SERVER)
+        );
+    }
+
+    public void storePushToApplicationPreferences(PushToApplicationPreferences preferences) {
+        put(EMACS_PATH, preferences.getPushToApplicationCommandPaths().get(PushToEmacs.NAME));
+        put(LYXPIPE, preferences.getPushToApplicationCommandPaths().get(PushToLyx.NAME));
+        put(TEXMAKER_PATH, preferences.getPushToApplicationCommandPaths().get(PushToTexmaker.NAME));
+        put(TEXSTUDIO_PATH, preferences.getPushToApplicationCommandPaths().get(PushToTeXstudio.NAME));
+        put(VIM, preferences.getPushToApplicationCommandPaths().get(PushToVim.NAME));
+        put(WIN_EDT_PATH, preferences.getPushToApplicationCommandPaths().get(PushToWinEdt.NAME));
+
+        put(EMACS_ADDITIONAL_PARAMETERS, preferences.getEmacsArguments());
+        put(VIM_SERVER, preferences.getVimServer());
+    }
 
     @Override
     public ExternalApplicationsPreferences getExternalApplicationsPreferences() {

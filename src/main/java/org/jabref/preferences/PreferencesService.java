@@ -207,6 +207,10 @@ public interface PreferencesService {
     // ExternalApplicationsPreferences
     //*************************************************************************************************************
 
+    PushToApplicationPreferences getPushToApplicationPreferences();
+
+    void storePushToApplicationPreferences(PushToApplicationPreferences preferences);
+
     ExternalApplicationsPreferences getExternalApplicationsPreferences();
 
     void storeExternalApplicationsPreferences(ExternalApplicationsPreferences preferences);
