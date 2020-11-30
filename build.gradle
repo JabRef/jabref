@@ -141,7 +141,7 @@ dependencies {
 
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.9.0.202009080501-r'
 
-    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.0'
+    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.1'
 
     implementation 'org.postgresql:postgresql:42.2.18'
 
