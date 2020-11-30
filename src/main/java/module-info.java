@@ -92,4 +92,5 @@ open module org.jabref {
     requires lucene.queryparser;
     requires lucene.core;
     requires org.eclipse.jgit;
+    requires org.apache.commons.text;
 }
