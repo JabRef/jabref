@@ -129,7 +129,7 @@ public class SaveDatabaseAction {
             // we managed to successfully save the file
             // thus, we can store the store the path into the context
             context.setDatabasePath(file);
-            // FIXME: We need to refresh the tab titles
+            libraryTab.updateTabTitle(false);
 
             // Reinstall AutosaveManager and BackupManager for the new file name
             libraryTab.resetChangeMonitorAndChangePane();

@@ -290,7 +290,7 @@
             <choose>
               <if variable="container-title">
                 <choose>
-                  <if type="book entry entry-dictionary entry-encyclopedia">
+                  <if type="book entry entry-dictionary entry-encyclopedia" match="any">
                     <text macro="title"/>
                   </if>
                   <else>
@@ -401,7 +401,7 @@
             <choose>
               <if variable="container-title">
                 <choose>
-                  <if type="book entry entry-dictionary entry-encyclopedia">
+                  <if type="book entry entry-dictionary entry-encyclopedia" match="any">
                     <text variable="title" form="short" text-case="title" quotes="true"/>
                   </if>
                   <else>
@@ -1381,7 +1381,7 @@
       <if type="article article-journal article-magazine article-newspaper dataset" match="any">
         <text variable="container-title" font-style="italic" text-case="title"/>
       </if>
-      <else-if type="paper-conference speech">
+      <else-if type="paper-conference speech" match="any">
         <choose>
           <if variable="collection-editor container-author editor" match="any">
             <text variable="container-title" font-style="italic"/>

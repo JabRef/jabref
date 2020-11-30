@@ -21,6 +21,9 @@ to the page field for cases where the page numbers are missing. [#7019](https://
 - We added a new fetcher to enable users to search jstor.org [#6627](https://github.com/JabRef/jabref/issues/6627)
 - We added an error message in the New Entry dialog that is shown in case the fetcher did not find anything . [#7000](https://github.com/JabRef/jabref/issues/7000)
 - We added a new formatter to output shorthand month format. [#6579](https://github.com/JabRef/jabref/issues/6579)
+- We added support for the new Microsoft Edge browser in all platforms. [#7056](https://github.com/JabRef/jabref/pull/7056)
+- We reintroduced emacs/bash-like keybindings. [#6017](https://github.com/JabRef/jabref/issues/6017)
+- We added a feature to provide automated cross library search using a cross library query language. This provides support for the search step of systematic literature reviews (SLRs). [koppor#369](https://github.com/koppor/jabref/issues/369)
 
 ### Changed
 
@@ -45,6 +48,7 @@ inserting new citations in a OpenOffic/LibreOffice document. [#6957](https://git
 - We changed the way JabRef displays the title of a tab and of the window. [4161](https://github.com/JabRef/jabref/issues/4161)
 - We changed connect timeouts for server requests to 30 seconds in general and 5 seconds for GROBID server (special) and improved user notifications on connection issues. [7026](https://github.com/JabRef/jabref/pull/7026)
 - We changed the way linked files are opened on Linux to use the native openFile method, compatible with confined packages. [7037](https://github.com/JabRef/jabref/pull/7037)
+- We refined the entry preview to show the full names of authors and editors, to list the editor only if no author is present, have the year ealier. [#7083](https://github.com/JabRef/jabref/issues/7083)
 
 ### Fixed
 
@@ -66,6 +70,12 @@ inserting new citations in a OpenOffic/LibreOffice document. [#6957](https://git
 - We fixed an issue, when pulling changes from shared database via shortcut caused creation of a new tech report [6867](https://github.com/JabRef/jabref/issues/6867)
 - We fixed an issue where the JabRef GUI does not highlight the "All entries" group on start-up [#6691](https://github.com/JabRef/jabref/issues/6691)
 - We fixed an issue where a custom dark theme was not applied to the entry preview tab [7068](https://github.com/JabRef/jabref/issues/7068)
+- We fixed an issue where modifications to the Custom preview layout in the preferences were not saved [#6447](https://github.com/JabRef/jabref/issues/6447)
+- We fixed an issue where errors from imports were not shown to the user [#7084](https://github.com/JabRef/jabref/pull/7084)
+- We fixed an issue where the EndNote XML Import would fail on empty keywords tags [forum#2387](https://discourse.jabref.org/t/importing-in-unknown-format-fails-to-import-xml-library-from-bookends-export/2387)
+- We fixed an issue where the color of groups of type "free search expression" not persisting after restarting the application [#6999](https://github.com/JabRef/jabref/issues/6999)
+- We fixed an issue where modifications in the source tab where not saved without switching to another field before saving the library [#6622](https://github.com/JabRef/jabref/issues/6622)
+- We fixed an issue where the "Document Viewer" did not show the first page of the opened pdf document and did not show the correct total number of pages [#7108](https://github.com/JabRef/jabref/issues/7108)
 
 ### Removed
 

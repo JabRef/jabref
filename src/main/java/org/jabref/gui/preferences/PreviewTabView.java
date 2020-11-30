@@ -118,7 +118,7 @@ public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewMode
         availableListView.itemsProperty().bindBidirectional(viewModel.availableListProperty());
         viewModel.availableSelectionModelProperty().setValue(availableListView.getSelectionModel());
         new ViewModelListCellFactory<PreviewLayout>()
-                .withText(PreviewLayout::getName)
+                .withText(PreviewLayout::getDisplayName)
                 .install(availableListView);
         availableListView.setOnDragOver(this::dragOver);
         availableListView.setOnDragDetected(this::dragDetectedInAvailable);
@@ -129,7 +129,7 @@ public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewMode
         chosenListView.itemsProperty().bindBidirectional(viewModel.chosenListProperty());
         viewModel.chosenSelectionModelProperty().setValue(chosenListView.getSelectionModel());
         new ViewModelListCellFactory<PreviewLayout>()
-                .withText(PreviewLayout::getName)
+                .withText(PreviewLayout::getDisplayName)
                 .setOnDragDropped(this::dragDroppedInChosenCell)
                 .install(chosenListView);
         chosenListView.setOnDragOver(this::dragOver);
@@ -197,7 +197,7 @@ public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewMode
 
         lastKeyPressTime = System.currentTimeMillis();
 
-        list.getItems().stream().filter(item -> item.getName().toLowerCase().startsWith(listSearchTerm))
+        list.getItems().stream().filter(item -> item.getDisplayName().toLowerCase().startsWith(listSearchTerm))
             .findFirst().ifPresent(list::scrollTo);
     }
 
