@@ -25,15 +25,11 @@ import org.apache.http.client.utils.URIBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Fetcher for jstor.org
  **/
 public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, IdBasedParserFetcher {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(JstorFetcher.class);
 
     private static final String HOST = "https://www.jstor.org";
     private static final String SEARCH_HOST = HOST + "/open/search";
@@ -98,17 +94,18 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
         identifier = identifier.replaceAll(URL_QUERY_REGEX, "");
 
         try {
-            if (identifier.contains("/")) {//if identifier links to a entry with a valid doi
+            if (identifier.contains("/")) {
+                // if identifier links to a entry with a valid doi
                 return new URL(start + identifier);
             }
-            //else use default doi start.
+            // else use default doi start.
             return new URL(start + "10.2307/" + identifier);
         } catch (IOException e) {
             throw new FetcherException("could not construct url for jstor", e);
         }
     }
 
-    //overwriting default behaviour as that seems to always results in a 403
+    // overwriting default behaviour as that seems to always results in a 403
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         if (identifier.isBlank()) {
@@ -121,8 +118,9 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
         } catch (ParseException | IOException e) {
             e.printStackTrace();
         }
-        if (entries == null || entries.size() != 1)
+        if (entries == null || entries.size() != 1) {
             return Optional.empty();
+        }
         return Optional.of(entries.get(0));
     }
 
@@ -180,6 +178,6 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
 
     @Override
     public void doPostCleanup(BibEntry entry) {
-        //do nothing
+        // do nothing
     }
 }
