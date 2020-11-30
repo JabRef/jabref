@@ -18,7 +18,6 @@ Chosen option: "Keep study as DTO and use transformators", because comes out bes
 
 ### Keep study as DTO and use transformators
 
-* Good, because makes GUI implementation probably easier down the line
 * Good, because no need for custom serialization
 * Good, because deactivated fetchers can be documented (important for traceable Searching (SLRs))
 * Bad, because Entries for databases and queries needed
@@ -28,5 +27,4 @@ Chosen option: "Keep study as DTO and use transformators", because comes out bes
 * Good, because no need for database and query entries
 * Bad, because custom de-/serializers for fetchers and complex queries needed
 * Bad, because harder to maintain than using "vanilla" jackson de-/serialization
-* Bad, because makes the GUI implementation harder as study becomes a logic component instead of a simple data component
 * … <!-- numbers of pros and cons can vary -->
