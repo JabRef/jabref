@@ -123,7 +123,7 @@ dependencies {
     // DO NOT CHANGE THE libreoffice PREFIX
     libreoffice 'org.libreoffice:juh:6.4.3'
     libreoffice 'org.libreoffice:jurt:6.4.3'
-    libreoffice 'org.libreoffice:ridl:6.4.3'
+    libreoffice 'org.libreoffice:ridl:7.0.3'
     libreoffice 'org.libreoffice:unoil:6.4.3'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.9'
