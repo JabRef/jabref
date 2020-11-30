@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
+import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
@@ -24,15 +25,20 @@ import org.apache.http.client.utils.URIBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Fetcher for jstor.org
  **/
-public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher {
+public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, IdBasedParserFetcher {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JstorFetcher.class);
 
     private static final String HOST = "https://www.jstor.org";
     private static final String SEARCH_HOST = HOST + "/open/search";
-    private static final String CITE_HOST = HOST + "/citation/text";
+    private static final String CITE_HOST = HOST + "/citation/text/";
+    private static final String URL_QUERY_REGEX = "(?<=\\?).*";
 
     private final ImportFormatPreferences importFormatPreferences;
 
@@ -83,6 +89,44 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher {
     }
 
     @Override
+    public URL getUrlForIdentifier(String identifier) throws FetcherException {
+        String start = "https://www.jstor.org/citation/text/";
+        if (identifier.startsWith("http")) {
+            identifier = identifier.replace("https://www.jstor.org/stable", "");
+            identifier = identifier.replace("http://www.jstor.org/stable", "");
+        }
+        identifier = identifier.replaceAll(URL_QUERY_REGEX, "");
+
+        try {
+            if (identifier.contains("/")) {//if identifier links to a entry with a valid doi
+                return new URL(start + identifier);
+            }
+            //else use default doi start.
+            return new URL(start + "10.2307/" + identifier);
+        } catch (IOException e) {
+            throw new FetcherException("could not construct url for jstor", e);
+        }
+    }
+
+    //overwriting default behaviour as that seems to always results in a 403
+    @Override
+    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
+        if (identifier.isBlank()) {
+            return Optional.empty();
+        }
+        BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        List<BibEntry> entries = null;
+        try {
+            entries = parser.parseEntries(getUrlForIdentifier(identifier).openStream());
+        } catch (ParseException | IOException e) {
+            e.printStackTrace();
+        }
+        if (entries == null || entries.size() != 1)
+            return Optional.empty();
+        return Optional.of(entries.get(0));
+    }
+
+    @Override
     public Parser getParser() {
         return inputStream -> {
             List<BibEntry> entries;
@@ -111,7 +155,7 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher {
     }
 
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
+    public Optional<URL> findFullText(BibEntry entry) throws IOException {
         if (entry.getField(StandardField.URL).isEmpty()) {
             return Optional.empty();
         }
@@ -132,5 +176,10 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher {
     @Override
     public TrustLevel getTrustLevel() {
         return TrustLevel.META_SEARCH;
+    }
+
+    @Override
+    public void doPostCleanup(BibEntry entry) {
+        //do nothing
     }
 }
