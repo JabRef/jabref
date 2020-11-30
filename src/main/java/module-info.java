@@ -93,4 +93,6 @@ open module org.jabref {
     requires lucene.core;
     requires org.eclipse.jgit;
     requires org.apache.commons.text;
+    requires org.apache.commons.codec;
+    requires org.apache.fontbox;
 }
