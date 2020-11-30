@@ -1,12 +1,16 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
@@ -105,40 +109,30 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
         }
     }
 
-    // overwriting default behaviour as that seems to always results in a 403
-    @Override
-    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        if (identifier.isBlank()) {
-            return Optional.empty();
-        }
-        BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
-        List<BibEntry> entries = null;
-        try {
-            entries = parser.parseEntries(getUrlForIdentifier(identifier).openStream());
-        } catch (ParseException | IOException e) {
-            e.printStackTrace();
-        }
-        if (entries == null || entries.size() != 1) {
-            return Optional.empty();
-        }
-        return Optional.of(entries.get(0));
-    }
-
     @Override
     public Parser getParser() {
         return inputStream -> {
+            BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+            String text = new BufferedReader(
+                    new InputStreamReader(inputStream, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
+
+            // does the input stream contain bibtex ?
+            if (text.startsWith("@")) {
+                return parser.parseEntries(text);
+            }
+            // input stream contains html
             List<BibEntry> entries;
             try {
                 Document doc = Jsoup.parse(inputStream, null, HOST);
-                List<Element> elements = doc.body().getElementsByClass("cite-this-item");
+
                 StringBuilder stringBuilder = new StringBuilder();
+                List<Element> elements = doc.body().getElementsByClass("cite-this-item");
                 for (Element element : elements) {
                     String id = element.attr("href").replace("citation/info/", "");
 
                     String data = new URLDownload(CITE_HOST + id).asString();
                     stringBuilder.append(data);
                 }
-                BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
                 entries = new ArrayList<>(parser.parseEntries(stringBuilder.toString()));
             } catch (IOException e) {
                 throw new ParseException("Could not download data from jstor.org", e);
