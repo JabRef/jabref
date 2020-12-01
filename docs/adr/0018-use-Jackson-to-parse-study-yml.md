@@ -8,11 +8,11 @@ What parser should be used to parse YAML files?
 
 ## Considered Options
 
-* Jackson
-* SnakeYAML Engine
+* [Jackson](https://github.com/FasterXML/jackson-dataformat-yaml)
+* [SnakeYAML Engine](https://bitbucket.org/asomov/snakeyaml)
 * yamlbeans
 * eo-yaml
-* Own parser
+* Self-written parser
 
 ## Decision Outcome
 
@@ -49,3 +49,8 @@ Chosen option: Jackson, because as it is a dedicated library for parsing YAML. y
 * Good, because easily customizable
 * Bad, because high effort
 * Bad, because has to be tested extensively
+
+## Links
+
+* [Winery's ADR-0009](https://github.com/eclipse/winery/blob/master/docs/adr/0009-manual-tosca-yaml-serialisation.md)
+* [Winery's ADR-0010](https://github.com/eclipse/winery/blob/master/docs/adr/0010-tosca-yaml-deserialisation-using-snakeyaml.md)
