@@ -10,8 +10,8 @@ What parser should be used to parse YAML files?
 
 * [Jackson](https://github.com/FasterXML/jackson-dataformat-yaml)
 * [SnakeYAML Engine](https://bitbucket.org/asomov/snakeyaml)
-* yamlbeans
-* eo-yaml
+* [yamlbeans](https://github.com/EsotericSoftware/yamlbeans)
+* [eo-yaml](https://github.com/decorators-squad/eo-yaml)
 * Self-written parser
 
 ## Decision Outcome
