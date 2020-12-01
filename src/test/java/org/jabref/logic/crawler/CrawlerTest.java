@@ -33,6 +33,9 @@ class CrawlerTest {
     SavePreferences savePreferences;
     BibEntryTypesManager entryTypesManager;
     GitHandler gitHandler = mock(GitHandler.class, Answers.RETURNS_DEFAULTS);
+    String hashCodeQuantum = String.valueOf("Quantum".hashCode());
+    String hashCodeCloudComputing = String.valueOf("Cloud Computing".hashCode());
+    String hashCodeSoftwareEngineering = String.valueOf("\"Software Engineering\"".hashCode());
 
     @Test
     public void testWhetherAllFilesAreCreated() throws Exception {
@@ -47,17 +50,17 @@ class CrawlerTest {
 
         testCrawler.performCrawl();
 
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "1 - Quantum")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "2 - Cloud Computing")));
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum")));
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing")));
 
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "1 - Quantum", "ArXiv.bib")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "2 - Cloud Computing", "ArXiv.bib")));
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", "ArXiv.bib")));
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", "ArXiv.bib")));
 
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "1 - Quantum", "Springer.bib")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "2 - Cloud Computing", "Springer.bib")));
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", "Springer.bib")));
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", "Springer.bib")));
 
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "1 - Quantum", "result.bib")));
-        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "2 - Cloud Computing", "result.bib")));
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum", "result.bib")));
+        assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), hashCodeCloudComputing + " - Cloud Computing", "result.bib")));
         assertTrue(Files.exists(Path.of(tempRepositoryDirectory.toString(), "studyResult.bib")));
     }
 
