@@ -11,7 +11,7 @@
     </author>
     <author>
       <name>Raphael Grolimund</name>
-      <email>raphael.grolimund@epfl.ch</email>
+      <email>grolimur@protonmail.ch</email>
     </author>
     <author>
       <name>Michel Hardegger</name>
@@ -24,7 +24,7 @@
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>Style based on ISO 690:2010(F), V1.1</summary>
-    <updated>2013-05-31T20:00:00+01:00</updated>
+    <updated>2020-11-19T21:30:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -107,15 +107,19 @@
   </macro>
   <macro name="container-responsability">
     <choose>
-      <if variable="container-author">
-        <text macro="container-author"/>
+      <if variable="container-author editor translator" match="any">
+        <choose>
+          <if variable="container-author">
+            <text macro="container-author"/>
+          </if>
+          <else-if variable="editor">
+            <text macro="editor"/>
+          </else-if>
+          <else>
+            <text macro="translator"/>
+          </else>
+        </choose>
       </if>
-      <else-if variable="editor">
-        <text macro="editor"/>
-      </else-if>
-      <else>
-        <text macro="translator"/>
-      </else>
     </choose>
   </macro>
   <macro name="title">
@@ -147,7 +151,7 @@
           </if>
         </choose>
         <choose>
-          <if variable="container-author">
+          <if variable="container-author editor translator" match="any">
             <text macro="container-responsability"/>
             <choose>
               <if variable="container-title event" match="any">
@@ -168,11 +172,11 @@
       <else-if type="report">
         <choose>
           <if variable="author editor translator" match="any">
-            <text variable="number" suffix=": "/>
+            <text variable="number" suffix="&#160;: "/>
             <text variable="title" font-style="italic"/>
           </if>
           <else>
-            <text variable="number" suffix=": "/>
+            <text variable="number" suffix="&#160;: "/>
             <text variable="title" font-style="italic" suffix=", "/>
             <text macro="year-date" suffix=". "/>
           </else>

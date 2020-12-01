@@ -78,6 +78,9 @@
       </else>
     </choose>
   </macro>
+  <macro name="year">
+    <date date-parts="year" form="text" variable="issued"/>
+  </macro>
   <macro name="collection-title-number">
     <group delimiter=" " prefix="(= " suffix=")">
       <text variable="collection-title"/>
@@ -132,7 +135,7 @@
   <bibliography delimiter-precedes-et-al="never" et-al-min="3" et-al-use-first="2" hanging-indent="true">
     <sort>
       <key macro="creator-short"/>
-      <key macro="creator-year-short"/>
+      <key macro="year"/>
     </sort>
     <layout>
       <group delimiter=". " suffix=".">
