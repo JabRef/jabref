@@ -30,7 +30,8 @@ public class StudyYAMLParser {
      * Writes the given study instance into a yaml file to the given path
      */
     public void writeStudyYAMLFile(Study study, Path studyYAMLFile) throws IOException {
-        ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER).enable(YAMLGenerator.Feature.MINIMIZE_QUOTES));
+        ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
+                                                                    .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES));
         yamlMapper.registerModule(new JavaTimeModule());
         yamlMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         yamlMapper.writeValue(studyYAMLFile.toFile(), study);
