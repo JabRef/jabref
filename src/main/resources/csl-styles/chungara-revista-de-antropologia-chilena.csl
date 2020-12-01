@@ -1,31 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only">
-  <!-- Polyglot; journal publishes in English and Spanish -->
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" and="text" delimiter-precedes-et-al="never" delimiter-precedes-last="never" initialize-with="." demote-non-dropping-particle="sort-only" default-locale="es-CL">
   <info>
-    <title>Society for American Archaeology</title>
-    <title-short>SAA</title-short>
-    <id>http://www.zotero.org/styles/society-for-american-archaeology</id>
-    <link href="http://www.zotero.org/styles/society-for-american-archaeology" rel="self"/>
-    <link href="https://www.saa.org/publications" rel="documentation"/>
-    <link href="https://documents.saa.org/container/docs/default-source/doc-publications/style-guide/saa-style-guide_updated-july-2018c5062f7e55154959ab57564384bda7de.pdf?sfvrsn=8247640e_6" rel="documentation"/>
+    <title>Chungara Revista de Antropología Chilena (Spanish - Chile)</title>
+    <title-short>Chungara</title-short>
+    <id>http://www.zotero.org/styles/chungara-revista-de-antropologia-chilena</id>
+    <link href="http://www.zotero.org/styles/chungara-revista-de-antropologia-chilena" rel="self"/>
+    <link href="http://www.zotero.org/styles/society-for-american-archaeology" rel="template"/>
+    <link href="http://chungara.cl/index.php/es/instrucciones-para-autores" rel="documentation"/>
     <author>
-      <name>Michael Barton</name>
-      <email>michael.barton@asu.edu</email>
-    </author>
-    <contributor>
-      <name>Patrick O'Brien</name>
-    </contributor>
-    <contributor>
-      <name>Allison Grunwald</name>
-      <email>agrunwa1@uwyo.edu</email>
-    </contributor>
-    <contributor>
       <name>Erik Marsh</name>
       <email>erik.marsh@gmail.com</email>
-    </contributor>
+    </author>
     <category citation-format="author-date"/>
     <category field="anthropology"/>
-    <updated>2020-11-23T22:11:55+00:00</updated>
+    <issn>0716-1182</issn>
+    <eissn>0717-7356</eissn>
+    <updated>2020-11-23T21:29:01+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -39,7 +29,7 @@
       <if type="chapter paper-conference" match="none">
         <names variable="editor translator" delimiter=". ">
           <label form="verb" prefix=" " text-case="capitalize-first" suffix=" "/>
-          <name and="text" delimiter=", "/>
+          <name and="text" initialize-with="."/>
         </names>
       </if>
     </choose>
@@ -50,7 +40,7 @@
         <group prefix="," delimiter=", ">
           <names variable="editor">
             <label form="verb" prefix=" " suffix=" "/>
-            <name and="text" delimiter=", "/>
+            <name and="text" delimiter-precedes-last="never" initialize-with=". "/>
           </names>
           <choose>
             <if variable="author editor" match="any">
@@ -91,7 +81,7 @@
   </macro>
   <macro name="contributors">
     <names variable="author">
-      <name and="text" name-as-sort-order="first" sort-separator=", " delimiter=", " delimiter-precedes-last="always"/>
+      <name and="text" delimiter-precedes-last="never" initialize-with=". " name-as-sort-order="first"/>
       <label prefix=" (" suffix=")"/>
       <substitute>
         <names variable="editor"/>
@@ -135,7 +125,7 @@
             <text variable="DOI" prefix=" DOI:"/>
             <group delimiter=" ">
               <text term="accessed"/>
-              <date form="text" variable="accessed"/>
+              <date form="text" variable="accessed" prefix="el "/>
             </group>
           </group>
         </else-if>
@@ -178,7 +168,7 @@
         <choose>
           <if is-numeric="edition">
             <group delimiter=" ">
-              <number variable="edition" form="ordinal"/>
+              <number text-case="capitalize-first" variable="edition" form="long-ordinal"/>
               <text term="edition" form="short"/>
             </group>
           </if>
@@ -316,7 +306,7 @@
         <group prefix=". " delimiter=", ">
           <choose>
             <if type="thesis">
-              <text variable="genre" prefix="Unpublished "/>
+              <text variable="genre" suffix=" inédita"/>
             </if>
           </choose>
           <text macro="publisher"/>
@@ -325,7 +315,7 @@
     </choose>
   </macro>
   <macro name="rest-of-bib">
-    <text macro="title"/>
+    <text macro="title" suffix="."/>
     <text macro="description"/>
     <text macro="secondary-contributors" prefix=". "/>
     <text macro="container-title" prefix=". "/>
@@ -357,22 +347,16 @@
       </group>
     </layout>
   </citation>
-  <bibliography subsequent-author-substitute="" entry-spacing="0" line-spacing="2">
+  <bibliography delimiter-precedes-last="never" subsequent-author-substitute-rule="complete-each" entry-spacing="1">
     <sort>
       <key macro="contributors"/>
       <key variable="issued"/>
     </sort>
-    <layout>
-      <group display="block">
-        <text macro="contributors"/>
-      </group>
-      <group display="left-margin">
-        <text macro="date1" prefix=" "/>
-        <text macro="original-date" prefix=" [" suffix="]"/>
-      </group>
-      <group display="right-inline" suffix=".">
-        <text macro="rest-of-bib"/>
-      </group>
+    <layout suffix=".">
+      <text macro="contributors"/>
+      <text macro="date1" prefix=" " suffix=". "/>
+      <text macro="original-date" prefix=" [" suffix="]"/>
+      <text macro="rest-of-bib" suffix="."/>
     </layout>
   </bibliography>
 </style>
