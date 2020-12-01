@@ -12,7 +12,7 @@ What parser should be used to parse YAML files?
 * SnakeYAML Engine
 * yamlbeans
 * eo-yaml
-* Own parser
+* Self-written parser
 
 ## Decision Outcome
 
