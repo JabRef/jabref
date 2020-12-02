@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" default-locale="en-US">
+  <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
   <info>
     <title>La Trobe University - Harvard</title>
     <id>http://www.zotero.org/styles/la-trobe-university-harvard</id>
@@ -13,7 +14,7 @@
     <category citation-format="author-date"/>
     <category field="humanities"/>
     <category field="generic-base"/>
-    <updated>2019-05-24T14:25:01+10:00</updated>
+    <updated>2020-11-20T00:49:08+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="container">
@@ -181,7 +182,6 @@
     <choose>
       <if match="any" variable="URL">
         <group delimiter=", ">
-          <text variable="URL" prefix="&lt;" suffix="&gt;"/>
           <group delimiter=" ">
             <choose>
               <if type="report" match="any">
@@ -197,6 +197,7 @@
               <date-part name="year"/>
             </date>
           </group>
+          <text variable="URL" prefix="&lt;" suffix="&gt;"/>
         </group>
       </if>
       <else-if match="none" variable="URL">
