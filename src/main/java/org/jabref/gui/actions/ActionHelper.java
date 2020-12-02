@@ -12,6 +12,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.TabPane;
 
 import org.jabref.gui.StateManager;
+import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
@@ -24,6 +25,13 @@ public class ActionHelper {
 
     public static BooleanExpression needsDatabase(StateManager stateManager) {
         return stateManager.activeDatabaseProperty().isPresent();
+    }
+
+    public static BooleanExpression needsSharedDatabase(StateManager stateManager){
+        var binding = Bindings.createBooleanBinding(() ->
+                        stateManager.activeDatabaseProperty().getValue().filter(context -> context.getLocation() == DatabaseLocation.SHARED).isPresent(),
+                stateManager.activeDatabaseProperty());
+        return BooleanExpression.booleanExpression(binding);
     }
 
     public static BooleanExpression needsEntriesSelected(StateManager stateManager) {
