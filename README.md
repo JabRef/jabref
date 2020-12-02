@@ -1,4 +1,4 @@
-# JabRef Bibliography Management
+# JabRef Bibliography Management - Private fork used in the Software-Engineering class, Fall 2020
 
 JabRef is an open-source, cross-platform citation and reference management tool.
 
