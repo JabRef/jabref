@@ -1,7 +1,6 @@
 import groovy.json.JsonSlurper
 import org.gradle.internal.os.OperatingSystem
 import org.jabref.build.JournalAbbreviationConverter
-import org.jabref.build.localization.LocalizationPlugin
 import org.jabref.build.xjc.XjcPlugin
 import org.jabref.build.xjc.XjcTask
 
