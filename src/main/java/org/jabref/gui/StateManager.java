@@ -23,6 +23,7 @@ import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.OptionalUtil;
 
@@ -56,6 +57,7 @@ public class StateManager {
     private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.anyMatch(Task::isRunning));
     private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
+    private final OptionalObjectProperty<FieldChangedEvent> fieldChanged = OptionalObjectProperty.empty();
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
@@ -75,6 +77,10 @@ public class StateManager {
 
     public OptionalObjectProperty<SearchQuery> activeSearchQueryProperty() {
         return activeSearchQuery;
+    }
+
+    public OptionalObjectProperty<FieldChangedEvent> fieldChangedProperty() {
+        return fieldChanged;
     }
 
     public void setActiveSearchResultSize(BibDatabaseContext database, IntegerProperty resultSize) {

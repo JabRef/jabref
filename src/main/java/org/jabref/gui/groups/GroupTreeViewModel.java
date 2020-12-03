@@ -59,6 +59,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         // Register listener
         EasyBind.subscribe(stateManager.activeDatabaseProperty(), this::onActiveDatabaseChanged);
         EasyBind.subscribe(selectedGroups, this::onSelectedGroupChanged);
+        EasyBind.subscribe(stateManager.fieldChangedProperty(), changeEvent -> onActiveDatabaseChanged(stateManager.getActiveDatabase()));
 
         // Set-up bindings
         filterPredicate.bind(EasyBind.map(filterText, text -> group -> group.isMatchedBy(text)));

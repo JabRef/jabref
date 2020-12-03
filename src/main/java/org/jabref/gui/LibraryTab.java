@@ -50,6 +50,7 @@ import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
+import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.PreferencesService;
@@ -123,6 +124,7 @@ public class LibraryTab extends Tab {
 
         this.getDatabase().registerListener(new SearchListener());
         this.getDatabase().registerListener(new EntriesRemovedListener());
+        this.getDatabase().registerListener(new FieldChangedListener());
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
         this.bibDatabaseContext.getDatabase().registerListener(new GroupTreeListener());
@@ -709,6 +711,13 @@ public class LibraryTab extends Tab {
                 Globals.stateManager.getSelectedGroup(bibDatabaseContext).forEach(
                         selectedGroup -> selectedGroup.addEntriesToGroup(addedEntriesEvent.getBibEntries()));
             }
+        }
+    }
+
+    private class FieldChangedListener {
+        @Subscribe
+        public void listen(FieldChangedEvent fieldChangedEvent) {
+            Globals.stateManager.fieldChangedProperty().set(Optional.of(fieldChangedEvent));
         }
     }
 
