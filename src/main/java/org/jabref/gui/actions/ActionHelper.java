@@ -19,7 +19,6 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.PreferencesService;
-
 import com.tobiasdiez.easybind.EasyBind;
 
 public class ActionHelper {
@@ -29,8 +28,7 @@ public class ActionHelper {
     }
 
     public static BooleanExpression needsSharedDatabase(StateManager stateManager) {
-        EasyBinding<Boolean> binding = EasyBind.map(stateManager.activeDatabaseProperty(), context ->
-                context.filter( c -> c.getLocation() == DatabaseLocation.SHARED).isPresent());
+        EasyBinding<Boolean> binding = EasyBind.map(stateManager.activeDatabaseProperty(), context -> context.filter(c -> c.getLocation() == DatabaseLocation.SHARED).isPresent());
         return BooleanExpression.booleanExpression(binding);
     }
 
