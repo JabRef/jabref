@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import com.tobiasdiez.easybind.EasyBinding;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanExpression;
@@ -27,10 +28,9 @@ public class ActionHelper {
         return stateManager.activeDatabaseProperty().isPresent();
     }
 
-    public static BooleanExpression needsSharedDatabase(StateManager stateManager){
-        var binding = Bindings.createBooleanBinding(() ->
-                        stateManager.activeDatabaseProperty().getValue().filter(context -> context.getLocation() == DatabaseLocation.SHARED).isPresent(),
-                stateManager.activeDatabaseProperty());
+    public static BooleanExpression needsSharedDatabase(StateManager stateManager) {
+        EasyBinding<Boolean> binding = EasyBind.map(stateManager.activeDatabaseProperty(), context ->
+                context.filter( c -> c.getLocation() == DatabaseLocation.SHARED).isPresent());
         return BooleanExpression.booleanExpression(binding);
     }
 
