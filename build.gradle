@@ -30,7 +30,6 @@ apply plugin: 'jacoco'
 apply plugin: 'me.champeau.gradle.jmh'
 apply plugin: 'checkstyle'
 apply plugin: XjcPlugin
-apply plugin: LocalizationPlugin
 
 apply from: 'eclipse.gradle'
 
@@ -321,7 +320,6 @@ task generateMedlineSource(type: XjcTask) {
     description = "Generates java files for the medline importer."
 
     schemaFile = "src/main/resources/xjc/medline/medline.xsd"
-    outputDirectory = "src/main/generated/"
     javaPackage = "org.jabref.logic.importer.fileformat.medline"
 }
 
@@ -429,7 +427,6 @@ javadoc {
     }
 }
 
-localization.script = 'scripts/syncLang.py'
 
 test {
     useJUnitPlatform {
