@@ -90,3 +90,13 @@
 #preferencesContainer .tab-pane > .tab-header-area > .tab-header-background {
     -fx-background-color: -jr-background;
 }
+
+.mainToolbar .search-field .toggle-button .glyph-icon {
+    -fx-fill: -jr-search-text;
+    -fx-text-fill: -jr-search-text;
+}
+
+.mainToolbar .search-field .toggle-button:selected .glyph-icon {
+    -fx-fill: derive(-jr-search-text, 80%);
+    -fx-text-fill: derive(-jr-search-text, 80%);
+}
