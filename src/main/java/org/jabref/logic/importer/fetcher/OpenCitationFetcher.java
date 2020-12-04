@@ -6,6 +6,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javafx.beans.property.DoubleProperty;
@@ -29,7 +30,6 @@ public class OpenCitationFetcher implements CitationFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenCitationFetcher.class);
     private static final String BASIC_URL = "https://opencitations.net/index/api/v1/metadata/";
-    private final DoubleProperty progress = new SimpleDoubleProperty(0);
 
     /**
      * Possible search methods
@@ -46,7 +46,7 @@ public class OpenCitationFetcher implements CitationFetcher {
     }
 
     public OpenCitationFetcher() {
-        progress.set(0);
+
     }
 
     @Override
@@ -79,24 +79,29 @@ public class OpenCitationFetcher implements CitationFetcher {
                 }
                 LOGGER.debug("API Answer: " + json.toString());
                 String[] items = json.getJSONObject(0).getString(searchType.label).split("; ");
-                if (items.length > 0) {
-                    int i = 1;
-                    for (String item : items) {
-                        LOGGER.debug("Current Item " + i + "/" + items.length);
-                        setProgress(i, items.length);
-                        if (!doi.equals(item) && !item.equals("")) {
-                            DoiFetcher doiFetcher = new DoiFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
-                            try {
-                                doiFetcher.performSearchById(item).ifPresent(list::add);
-                            } catch (FetcherException fetcherException) {
-                                // No information for doi found
-                            }
-                        }
-                        i++;
+                if (!Arrays.equals(items, new String[]{""})) {
+                    LOGGER.debug("BibInfoSearch: {}" , BASIC_URL + String.join("__", items));
+                    JSONArray metaArray = readJsonFromUrl(BASIC_URL + String.join("__", items));
+                    if (metaArray == null) {
+                        throw new FetcherException("No internet connection! Please try again.");
+                    } else if (metaArray.isEmpty()) {
+                        return list;
+                    }
+                    LOGGER.debug("API Answer: " + metaArray.toString());
+                    for (int i = 0; i < metaArray.length(); i++) {
+                        BibEntry newEntry = new BibEntry();
+                        newEntry.setField(StandardField.TITLE, metaArray.getJSONObject(i).getString("title"));
+                        newEntry.setField(StandardField.AUTHOR, metaArray.getJSONObject(i).getString("author"));
+                        newEntry.setField(StandardField.YEAR, metaArray.getJSONObject(i).getString("year"));
+                        newEntry.setField(StandardField.PAGES, metaArray.getJSONObject(i).getString("page"));
+                        newEntry.setField(StandardField.VOLUME, metaArray.getJSONObject(i).getString("volume"));
+                        newEntry.setField(StandardField.ISSUE, metaArray.getJSONObject(i).getString("issue"));
+                        newEntry.setField(StandardField.DOI, metaArray.getJSONObject(i).getString("doi"));
+                        list.add(newEntry);
                     }
                 }
             } catch (IOException | JSONException e) {
-                throw new FetcherException("Couldn't connect to opencitations.net! Please try again.");
+                throw new FetcherException("Couldn't connect to opencitations.net! Please try again." + e);
             }
             return list;
         } else {
@@ -127,14 +132,6 @@ public class OpenCitationFetcher implements CitationFetcher {
             sb.append((char) cp);
         }
         return sb.toString();
-    }
-
-    private void setProgress(double i, double total) {
-        progress.set(i/total);
-    }
-
-    public DoubleProperty getProgress() {
-        return progress;
     }
 
     public String getName() {
