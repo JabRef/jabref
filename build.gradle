@@ -567,7 +567,6 @@ jlink {
     // Execute ./gradlew suggestMergedModuleInfo and include the suggested directives here.
     mergedModule {
         requires 'java.xml'
-        requires 'com.sun.xml.txw2'
         requires 'java.desktop'
         requires 'org.objectweb.asm'
         requires 'jdk.jfr'
@@ -596,6 +595,8 @@ jlink {
         requires 'java.transaction.xa'
         requires 'org.graalvm.sdk'
         requires 'org.slf4j'
+        requires 'jakarta.xml.bind';
+        requires 'jakarta.activation';
         uses 'org.apache.logging.log4j.util.PropertySource'
         uses 'org.apache.logging.log4j.core.util.WatchEventService'
         uses 'org.apache.logging.log4j.plugins.processor.PluginService'
@@ -609,7 +610,7 @@ jlink {
         uses 'org.mariadb.jdbc.credential.CredentialPlugin'
         uses 'org.mariadb.jdbc.tls.TlsSocketPlugin'
         uses 'org.mariadb.jdbc.LocalInfileInterceptor'
-        uses 'javax.xml.bind.JAXBContextFactory'
+        uses 'jakarta.xml.bind.JAXBContextFactory'
         provides 'javax.annotation.processing.Processor' with 'org.apache.logging.log4j.plugins.processor.PluginProcessor'
         provides 'org.controlsfx.glyphfont.GlyphFont' with 'org.controlsfx.glyphfont.FontAwesome'
         provides 'org.apache.logging.log4j.message.ThreadDumpMessage.ThreadInfoFactory' with 'org.apache.logging.log4j.core.message.ExtendedThreadInfoFactory'
