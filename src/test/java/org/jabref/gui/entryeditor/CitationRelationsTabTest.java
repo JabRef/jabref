@@ -23,7 +23,7 @@ public class CitationRelationsTabTest {
         b2 = new BibEntry();
         bList = new ArrayList<>();
 
-        b2.setField(StandardField.DOI, "12.3456/1");
+        b2.setField(StandardField.DOI, "10.1007/s11616-005-0142-4");
         b2.setField(StandardField.CITING, "test");
         b2.setField(StandardField.CITEDBY, "test");
         bList.add(b1);
@@ -31,21 +31,21 @@ public class CitationRelationsTabTest {
     }
 
     /**
-     * Testziel: CitationRelationsTabTest.serialize() auf Funktion testen.
-     * Input: Eine Liste von BibEntries
-     * Output: Kommagetrennter String der DOI's der BibEntries
-     * Hier wird eine Liste von 2 Entrie, davon einem mit DOI übergeben
+     * Testgoal: Test functionality CitationRelationsTabTest.serialize().
+     * Input: A list of BibEntries
+     * Output: A Comma-Seperated String, that contains the DOI's of the Articles if present.
+     * In this case a List of two BibEntries, one with a DOI, is given to the serialize()-Function
      */
     @Test
     void serializeNormalCaseTest() {
-        assertEquals("12.3456/1", serialize(bList));
+        assertEquals("10.1007/s11616-005-0142-4", serialize(bList));
     }
 
     /**
-     * Testziel: CitationRelationsTabTest.serialize() auf Funktion testen.
-     * Input: Eine Liste von BibEntries
-     * Output: Kommagetrennter String der DOI's der BibEntries
-     * Hier wird die Liste auf ein Element reduziert welches keine DOI besitzt
+     * Testgoal: Test functionality CitationRelationsTabTest.serialize().
+     * Input: A list of BibEntries
+     * Output: A Comma-Seperated String, that contains the DOI's of the Articles if present.
+     * In this case a List of one BibEntry, with no DOI is given to the serialize()-Function
      */
     @Test
     void serializeCornerCaseTest() {
@@ -54,9 +54,9 @@ public class CitationRelationsTabTest {
     }
 
     /**
-     * Testziel: Testet ob das StandartField CITING existiert
-     * Ein Entry wird auf die Existenz des CITING Field geprüft,
-     * dieses sollte vorher im setup gesetzt worden sein
+     * Testgoal: Test whether StandardField.CITING exists when set.
+     * Here, one BibEntry is tested. Its CITING Field has been set in the setup()
+     * function of the Test.
      */
     @Test
     void citingFieldExists() {
@@ -64,9 +64,9 @@ public class CitationRelationsTabTest {
     }
 
     /**
-     * Testziel: Testet ob das StandartField CITEDBY existiert
-     * Ein Entry wird auf die Existenz des CITEDBY Field geprüft,
-     * dieses sollte vorher im setup gesetzt worden sein
+     * Testgoal: Test whether StandardField.CITEDBY exists when set.
+     * Here, one BibEntry is tested. Its CITEDBY Field has been set in the setup()
+     * function of the Test.
      */
     @Test
     void citedByFieldExists() {
