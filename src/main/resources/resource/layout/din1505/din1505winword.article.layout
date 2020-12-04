@@ -7,7 +7,7 @@
 \end{volume}
  (\year)
 \begin{number}
-, Nr. {\number}
+, Nr. \number
 \end{number}
 \begin{pages}
 , S. \pages
