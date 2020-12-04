@@ -319,6 +319,7 @@ task generateMedlineSource(type: XjcTask) {
     description = "Generates java files for the medline importer."
 
     schemaFile = "src/main/resources/xjc/medline/medline.xsd"
+    outputDirectory = "src/main/generated"
     javaPackage = "org.jabref.logic.importer.fileformat.medline"
 }
 
