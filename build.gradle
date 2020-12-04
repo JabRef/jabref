@@ -175,7 +175,6 @@ dependencies {
 
     implementation 'de.undercouch:citeproc-java:2.1.0-SNAPSHOT'
 
-    implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '2.0.0'
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.0'
     implementation group: 'com.sun.xml.bind', name: 'jaxb-core', version: '3.0.0'
     implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '3.0.0'
