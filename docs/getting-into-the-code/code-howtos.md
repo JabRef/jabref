@@ -172,8 +172,9 @@ General hints:
 
 The tests check whether translation strings appear correctly in the resource bundles.
 
-1. Add new `Localization.lang("KEY")` to Java file. Run the `LocalizationConsistencyTest`under \(src/test/org.jabref.logic.l10n\)
-2. Tests fail. In the test output a snippet is generated which must be added to the English translation file. There is also a snippet generated for the non-English files, but this is irrelevant.
+1. Add new `Localization.lang("KEY")` to Java file. Run the `LocalizationConsistencyTest`under \(src/test/org.jabref.logic.
+\)
+2. Tests fail. In the test output a snippet is generated which must be added to the English translation file.
 3. Add snippet to English translation file located at `src/main/resources/l10n/JabRef_en.properties`
 4. Please do not add translations for other languages directly in the properties. They will be overwritten by [Crowdin](https://crowdin.com/project/jabref)
 
