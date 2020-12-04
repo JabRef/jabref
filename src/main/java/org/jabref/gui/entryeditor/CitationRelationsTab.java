@@ -114,28 +114,13 @@ public class CitationRelationsTab extends EntryEditorTab {
     /**
      * The Pane that is shown when the functionality is not activated
      *
-     * @param entry entry that is the context
      * @return StackPane that is the activation screen
      */
-    private StackPane getActivationPane(BibEntry entry) {
+    private StackPane getActivationPane() {
         StackPane activation = new StackPane();
         activation.setId("citation-relation-tab");
-        VBox alignment = new VBox();
-        alignment.setId("activation-alignment");
-        alignment.setFillWidth(true);
-        alignment.setAlignment(Pos.BASELINE_CENTER);
-        Label infoLabel = new Label(Localization.lang("The search is currently deactivated"));
-        Button activate = new Button(Localization.lang("Activate"));
-        activate.setOnAction(
-                event -> {
-                    JabRefPreferences prefs = JabRefPreferences.getInstance();
-                    prefs.putBoolean(JabRefPreferences.ACTIVATE_CITATIONRELATIONS, true);
-                    dialogService.notify(Localization.lang("Please restart JabRef for preferences to take effect."));
-                    bindToEntry(entry);
-                });
-        activate.setDefaultButton(true);
-        alignment.getChildren().addAll(infoLabel, activate);
-        activation.getChildren().add(alignment);
+        Label infoLabel = new Label(Localization.lang("The search is currently deactivated."));
+        activation.getChildren().add(infoLabel);
         return activation;
     }
 
@@ -367,7 +352,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             searchForRelations(entry, citingListView, abortCitingButton, refreshCitingButton, CitationRelationFetcher.SearchType.CITING, importCitingButton, citingProgress);
             searchForRelations(entry, citedByListView, abortCitedButton, refreshCitedByButton, CitationRelationFetcher.SearchType.CITEDBY, importCitedByButton, citedByProgress);
         } else {
-            setContent(getActivationPane(entry));
+            setContent(getActivationPane());
         }
     }
 

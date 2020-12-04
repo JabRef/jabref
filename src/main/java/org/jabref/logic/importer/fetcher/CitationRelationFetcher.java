@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
  */
 public class CitationRelationFetcher implements EntryBasedFetcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(org.jabref.logic.importer.fetcher.CitationRelationFetcher.class);
-    private SearchType searchType = null;
+    private static final Logger LOGGER = LoggerFactory.getLogger(CitationRelationFetcher.class);
+    private SearchType searchType;
     private static final String BASIC_URL = "https://opencitations.net/index/api/v1/metadata/";
     private final DoubleProperty progress = new SimpleDoubleProperty(0);
 
@@ -63,19 +63,19 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
         if (searchType != null) {
             List<BibEntry> list = new ArrayList<>();
             try {
-                LOGGER.info("Search: " + BASIC_URL + doi);
+                LOGGER.debug("Search: {}" , BASIC_URL + doi);
                 JSONArray json = readJsonFromUrl(BASIC_URL + doi);
                 if (json == null) {
                     throw new FetcherException("No internet connection! Please try again.");
                 } else if (json.isEmpty()) {
                     return list;
                 }
-                LOGGER.info("API Answer: " + json.toString());
+                LOGGER.debug("API Answer: " + json.toString());
                 String[] items = json.getJSONObject(0).getString(searchType.label).split("; ");
-                if (!Arrays.equals(items, new String[]{""})) {
+                if (items.length > 0) {
                     int i = 1;
                     for (String item : items) {
-                        LOGGER.info("Current Item " + i + "/" + items.length);
+                        LOGGER.debug("Current Item " + i + "/" + items.length);
                         setProgress(i, items.length);
                         if (!doi.equals(item) && !item.equals("")) {
                             DoiFetcher doiFetcher = new DoiFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
