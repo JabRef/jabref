@@ -148,14 +148,6 @@ local.properties
 .idea/**/uiDesigner.xml
 .idea/**/dbnavigator.xml
 
-# Emacs 
-*~
-.DS_Store
-*~
-*#
-.#*
-
-
 # Gradle
 .idea/**/gradle.xml
 .idea/**/libraries
