@@ -16,7 +16,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.DialogService;
@@ -27,16 +26,13 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.NoSelectionModel;
-import org.jabref.gui.util.TextFlowLimited;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.logic.importer.fetcher.CitationRelationFetcher;
+import org.jabref.logic.importer.fetcher.OpenCitationFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
-import org.jabref.model.entry.types.EntryType;
-import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.JabRefPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -208,8 +204,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         citingVBox.getChildren().addAll(citingHBox, citingListView);
         citedByVBox.getChildren().addAll(citedByHBox, citedByListView);
 
-        refreshCitingButton.setOnMouseClicked(event -> searchForRelations(entry, citingListView, abortCitingButton, refreshCitingButton, CitationRelationFetcher.SearchType.CITING, importCitingButton, citingProgress));
-        refreshCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, citedByListView, abortCitedButton, refreshCitedByButton, CitationRelationFetcher.SearchType.CITEDBY, importCitedByButton, citedByProgress));
+        refreshCitingButton.setOnMouseClicked(event -> searchForRelations(entry, citingListView, abortCitingButton, refreshCitingButton, OpenCitationFetcher.SearchType.CITING, importCitingButton, citingProgress));
+        refreshCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, citedByListView, abortCitedButton, refreshCitedByButton, OpenCitationFetcher.SearchType.CITEDBY, importCitedByButton, citedByProgress));
 
         //Create SplitPane to hold all nodes above
         SplitPane container = new SplitPane(citedByVBox, citingVBox);
@@ -325,8 +321,8 @@ public class CitationRelationsTab extends EntryEditorTab {
     protected void bindToEntry(BibEntry entry) {
         if (preferences.isCitationRelationActivated()) {
             setContent(getPane(entry));
-            searchForRelations(entry, citingListView, abortCitingButton, refreshCitingButton, CitationRelationFetcher.SearchType.CITING, importCitingButton, citingProgress);
-            searchForRelations(entry, citedByListView, abortCitedButton, refreshCitedByButton, CitationRelationFetcher.SearchType.CITEDBY, importCitedByButton, citedByProgress);
+            searchForRelations(entry, citingListView, abortCitingButton, refreshCitingButton, OpenCitationFetcher.SearchType.CITING, importCitingButton, citingProgress);
+            searchForRelations(entry, citedByListView, abortCitedButton, refreshCitedByButton, OpenCitationFetcher.SearchType.CITEDBY, importCitedByButton, citedByProgress);
         } else {
             setContent(getActivationPane(entry));
         }
@@ -341,7 +337,7 @@ public class CitationRelationsTab extends EntryEditorTab {
      * @param refreshButton refresh Button to use
      * @param searchType    type of search (CITING / CITEDBY)
      */
-    private void searchForRelations(BibEntry entry, CheckListView<CitationRelationItem> listView, Button abort, Button refreshButton, CitationRelationFetcher.SearchType searchType, Button importButton, ProgressIndicator progress) {
+    private void searchForRelations(BibEntry entry, CheckListView<CitationRelationItem> listView, Button abort, Button refreshButton, OpenCitationFetcher.SearchType searchType, Button importButton, ProgressIndicator progress) {
         //Check if current entry has DOI Number required for searching
         if (entry.getField(StandardField.DOI).isPresent()) {
 
@@ -350,7 +346,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             listView.getItems().clear();
 
             //Perform search in background and deal with success or failure
-            List<BibEntry> localList = runOfflineTask(entry, searchType.equals(CitationRelationFetcher.SearchType.CITING) ? StandardField.CITING : StandardField.CITEDBY);
+            List<BibEntry> localList = runOfflineTask(entry, searchType.equals(OpenCitationFetcher.SearchType.CITING) ? StandardField.CITING : StandardField.CITEDBY);
             if (!localList.isEmpty()) {
                 for (BibEntry localAdd : localList) {
                     observableList.add(new CitationRelationItem(localAdd, true));
@@ -358,24 +354,25 @@ public class CitationRelationsTab extends EntryEditorTab {
             }
             listView.setItems(observableList);
 
-            if (citingTask != null && !citingTask.isCanceled() && searchType.equals(CitationRelationFetcher.SearchType.CITING)) {
+            if (citingTask != null && !citingTask.isCanceled() && searchType.equals(OpenCitationFetcher.SearchType.CITING)) {
                 citingTask.cancel();
-            } else if (citedByTask != null && !citedByTask.isCanceled() && searchType.equals(CitationRelationFetcher.SearchType.CITEDBY)) {
+            } else if (citedByTask != null && !citedByTask.isCanceled() && searchType.equals(OpenCitationFetcher.SearchType.CITEDBY)) {
                 citedByTask.cancel();
             }
 
+            OpenCitationFetcher fetcher = new OpenCitationFetcher();
+            BackgroundTask<List<BibEntry>> task;
 
-            CitationRelationFetcher fetcher = new CitationRelationFetcher(searchType);
-            BackgroundTask<List<BibEntry>> task = BackgroundTask.wrap(() -> fetcher.performSearch(entry));
+            if (searchType.equals(OpenCitationFetcher.SearchType.CITING)) {
+                task = BackgroundTask.wrap(() -> fetcher.searchCiting(entry));
+                citingTask = task;
+            } else {
+                task = BackgroundTask.wrap(() -> fetcher.searchCitedBy(entry));
+                citedByTask = task;
+            }
 
             progress.progressProperty().unbind();
             progress.progressProperty().bind(fetcher.getProgress());
-
-            if (searchType.equals(CitationRelationFetcher.SearchType.CITING)) {
-                citingTask = task;
-            } else {
-                citedByTask = task;
-            }
 
             task.onRunning(() -> {
                 abort.setVisible(true);
@@ -451,9 +448,9 @@ public class CitationRelationsTab extends EntryEditorTab {
      * @param operator StandardField.CITING/CITED
      * @param entry    Current Entry Context
      */
-   void filterDifference(List<BibEntry> newEntries, ObservableList<CitationRelationItem> observableList, CitationRelationFetcher.SearchType operator, BibEntry entry) {
+   void filterDifference(List<BibEntry> newEntries, ObservableList<CitationRelationItem> observableList, OpenCitationFetcher.SearchType operator, BibEntry entry) {
         StandardField field, nField;
-        if (operator.equals(CitationRelationFetcher.SearchType.CITEDBY)) {
+        if (operator.equals(OpenCitationFetcher.SearchType.CITEDBY)) {
             field = StandardField.CITEDBY;
             nField = StandardField.CITING;
         } else {
@@ -562,7 +559,7 @@ public class CitationRelationsTab extends EntryEditorTab {
      *
      * @param entriesToImport entries to import
      */
-    private void importEntries(List<CitationRelationItem> entriesToImport, CitationRelationFetcher.SearchType searchType, BibEntry entry) {
+    private void importEntries(List<CitationRelationItem> entriesToImport, OpenCitationFetcher.SearchType searchType, BibEntry entry) {
         citingTask.cancel();
         citedByTask.cancel();
         List<BibEntry> list = new ArrayList<>();
@@ -578,7 +575,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                 undoManager,
                 stateManager);
         importHandler.importEntries(list);
-        if (searchType.equals(CitationRelationFetcher.SearchType.CITEDBY)) {
+        if (searchType.equals(OpenCitationFetcher.SearchType.CITEDBY)) {
             entry.setField(StandardField.CITEDBY, serialize(list));
         } else {
             entry.setField(StandardField.CITING, serialize(list));

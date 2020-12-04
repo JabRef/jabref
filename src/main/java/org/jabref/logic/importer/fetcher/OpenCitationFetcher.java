@@ -6,7 +6,6 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javafx.beans.property.DoubleProperty;
@@ -14,6 +13,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
 
+import org.jabref.logic.importer.CitationFetcher;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
@@ -25,10 +25,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Class to fetch for an articles citation relations on opencitations.net's API
  */
-public class CitationRelationFetcher implements EntryBasedFetcher {
+public class OpenCitationFetcher implements CitationFetcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CitationRelationFetcher.class);
-    private SearchType searchType;
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenCitationFetcher.class);
     private static final String BASIC_URL = "https://opencitations.net/index/api/v1/metadata/";
     private final DoubleProperty progress = new SimpleDoubleProperty(0);
 
@@ -46,9 +45,18 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
         }
     }
 
-    public CitationRelationFetcher(SearchType searchType) {
-        this.searchType = searchType;
+    public OpenCitationFetcher() {
         progress.set(0);
+    }
+
+    @Override
+    public List<BibEntry> searchCitedBy(BibEntry entry) throws FetcherException {
+        return performSearch(entry, SearchType.CITEDBY);
+    }
+
+    @Override
+    public List<BibEntry> searchCiting(BibEntry entry) throws FetcherException {
+        return performSearch(entry, SearchType.CITING);
     }
 
     /**
@@ -57,8 +65,7 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
      * @param entry Entry to search relations for
      * @return List of BibEntries found
      */
-    @Override
-    public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
+    public List<BibEntry> performSearch(BibEntry entry, SearchType searchType) throws FetcherException {
         String doi = entry.getField(StandardField.DOI).orElse("");
         if (searchType != null) {
             List<BibEntry> list = new ArrayList<>();
@@ -130,7 +137,6 @@ public class CitationRelationFetcher implements EntryBasedFetcher {
         return progress;
     }
 
-    @Override
     public String getName() {
         return "CitationRelationFetcher";
     }
