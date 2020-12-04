@@ -114,13 +114,28 @@ public class CitationRelationsTab extends EntryEditorTab {
     /**
      * The Pane that is shown when the functionality is not activated
      *
+     * @param entry entry that is the context
      * @return StackPane that is the activation screen
      */
-    private StackPane getActivationPane() {
+    private StackPane getActivationPane(BibEntry entry) {
         StackPane activation = new StackPane();
         activation.setId("citation-relation-tab");
-        Label infoLabel = new Label(Localization.lang("The search is currently deactivated."));
-        activation.getChildren().add(infoLabel);
+        VBox alignment = new VBox();
+        alignment.setId("activation-alignment");
+        alignment.setFillWidth(true);
+        alignment.setAlignment(Pos.BASELINE_CENTER);
+        Label infoLabel = new Label(Localization.lang("The search is currently deactivated"));
+        Button activate = new Button(Localization.lang("Activate"));
+        activate.setOnAction(
+                event -> {
+                    JabRefPreferences prefs = JabRefPreferences.getInstance();
+                    prefs.putBoolean(JabRefPreferences.ACTIVATE_CITATIONRELATIONS, true);
+                    dialogService.notify(Localization.lang("Please restart JabRef for preferences to take effect."));
+                    bindToEntry(entry);
+                });
+        activate.setDefaultButton(true);
+        alignment.getChildren().addAll(infoLabel, activate);
+        activation.getChildren().add(alignment);
         return activation;
     }
 
@@ -215,7 +230,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
                     HBox separator = new HBox();
                     HBox.setHgrow(separator, Priority.SOMETIMES);
-                    Node entryNode = getEntryNode(e.getBibEntry());
+                    Node entryNode = BibEntryView.getEntryNode(e.getBibEntry());
                     HBox.setHgrow(entryNode, Priority.ALWAYS);
                     HBox hContainer = new HBox();
                     hContainer.prefWidthProperty().bind(listView.widthProperty().subtract(25));
@@ -257,45 +272,6 @@ public class CitationRelationsTab extends EntryEditorTab {
                 .install(listView);
 
         listView.setSelectionModel(new NoSelectionModel<>());
-    }
-
-    private Node getEntryNode(BibEntry entry) {
-        Node entryType = getIcon(entry.getType()).getGraphicNode();
-        entryType.getStyleClass().add("type");
-        Label authors = new Label(entry.getFieldOrAliasLatexFree(StandardField.AUTHOR).orElse(""));
-        authors.getStyleClass().add("authors");
-        authors.setWrapText(true);
-        Label title = new Label(entry.getFieldOrAliasLatexFree(StandardField.TITLE).orElse(""));
-        title.getStyleClass().add("title");
-        title.setWrapText(true);
-        Label year = new Label(entry.getFieldOrAliasLatexFree(StandardField.YEAR).orElse(""));
-        year.getStyleClass().add("year");
-        Label journal = new Label(entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse(""));
-        journal.getStyleClass().add("journal");
-
-        VBox entryContainer = new VBox(
-                new HBox(10, entryType, title),
-                new HBox(5, year, journal),
-                authors
-        );
-        entry.getFieldOrAliasLatexFree(StandardField.ABSTRACT).ifPresent(summaryText -> {
-            TextFlowLimited summary = new TextFlowLimited(new Text(summaryText));
-            summary.getStyleClass().add("summary");
-            entryContainer.getChildren().add(summary);
-        });
-
-        entryContainer.getStyleClass().add("bibEntry");
-        return entryContainer;
-    }
-
-    private IconTheme.JabRefIcons getIcon(EntryType type) {
-        EnumSet<StandardEntryType> crossRefTypes = EnumSet.of(StandardEntryType.InBook, StandardEntryType.InProceedings, StandardEntryType.InCollection);
-        if (type == StandardEntryType.Book) {
-            return IconTheme.JabRefIcons.BOOK;
-        } else if (crossRefTypes.contains(type)) {
-            return IconTheme.JabRefIcons.OPEN_LINK;
-        }
-        return IconTheme.JabRefIcons.ARTICLE;
     }
 
     public void unselectAll(CheckListView<CitationRelationItem> listView) {
@@ -352,7 +328,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             searchForRelations(entry, citingListView, abortCitingButton, refreshCitingButton, CitationRelationFetcher.SearchType.CITING, importCitingButton, citingProgress);
             searchForRelations(entry, citedByListView, abortCitedButton, refreshCitedByButton, CitationRelationFetcher.SearchType.CITEDBY, importCitedByButton, citedByProgress);
         } else {
-            setContent(getActivationPane());
+            setContent(getActivationPane(entry));
         }
     }
 

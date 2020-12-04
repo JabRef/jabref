@@ -24,6 +24,7 @@ import javafx.scene.text.Text;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.entryeditor.BibEntryView;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BaseDialog;
@@ -117,7 +118,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                     addToggle.selectedProperty().bindBidirectional(entriesListView.getItemBooleanProperty(entry));
                     HBox separator = new HBox();
                     HBox.setHgrow(separator, Priority.SOMETIMES);
-                    Node entryNode = getEntryNode(entry);
+                    Node entryNode = BibEntryView.getEntryNode(entry);
                     HBox.setHgrow(entryNode, Priority.ALWAYS);
                     HBox container = new HBox(entryNode, separator, addToggle);
                     container.getStyleClass().add("entry-container");
@@ -148,43 +149,6 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         selectedItems.textProperty().bind(Bindings.size(entriesListView.getCheckModel().getCheckedItems()).asString());
         totalItems.textProperty().bind(Bindings.size(entriesListView.getItems()).asString());
         entriesListView.setSelectionModel(new NoSelectionModel<>());
-    }
-
-    private Node getEntryNode(BibEntry entry) {
-        Node entryType = getIcon(entry.getType()).getGraphicNode();
-        entryType.getStyleClass().add("type");
-        Label authors = new Label(entry.getFieldOrAliasLatexFree(StandardField.AUTHOR).orElse(""));
-        authors.getStyleClass().add("authors");
-        Label title = new Label(entry.getFieldOrAliasLatexFree(StandardField.TITLE).orElse(""));
-        title.getStyleClass().add("title");
-        Label year = new Label(entry.getFieldOrAliasLatexFree(StandardField.YEAR).orElse(""));
-        year.getStyleClass().add("year");
-        Label journal = new Label(entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse(""));
-        journal.getStyleClass().add("journal");
-
-        VBox entryContainer = new VBox(
-                new HBox(10, entryType, title),
-                new HBox(5, year, journal),
-                authors
-        );
-        entry.getFieldOrAliasLatexFree(StandardField.ABSTRACT).ifPresent(summaryText -> {
-            TextFlowLimited summary = new TextFlowLimited(new Text(summaryText));
-            summary.getStyleClass().add("summary");
-            entryContainer.getChildren().add(summary);
-        });
-
-        entryContainer.getStyleClass().add("bibEntry");
-        return entryContainer;
-    }
-
-    private IconTheme.JabRefIcons getIcon(EntryType type) {
-        EnumSet<StandardEntryType> crossRefTypes = EnumSet.of(StandardEntryType.InBook, StandardEntryType.InProceedings, StandardEntryType.InCollection);
-        if (type == StandardEntryType.Book) {
-            return IconTheme.JabRefIcons.BOOK;
-        } else if (crossRefTypes.contains(type)) {
-            return IconTheme.JabRefIcons.OPEN_LINK;
-        }
-        return IconTheme.JabRefIcons.ARTICLE;
     }
 
     public void unselectAll() {
