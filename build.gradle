@@ -175,11 +175,11 @@ dependencies {
 
     implementation 'de.undercouch:citeproc-java:2.1.0-SNAPSHOT'
 
-    implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '1.2.1'
+    implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '2.0.0'
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '3.0.0'
     implementation group: 'com.sun.xml.bind', name: 'jaxb-core', version: '3.0.0'
-	xjc group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '3.0.0'
-	
+    implementation group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '3.0.0'
+
     implementation ('com.github.tomtung:latex2unicode_2.12:0.2.6') {
         exclude module: 'fastparse_2.12'
     }
@@ -212,6 +212,7 @@ dependencies {
 
     checkstyle 'com.puppycrawl.tools:checkstyle:8.38'
     xjc group: 'com.sun.xml.bind', name: 'jaxb-xjc', version: '3.0.0'
+    xjc group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '3.0.0'
     jython 'org.python:jython-standalone:2.7.2'
 }
 
