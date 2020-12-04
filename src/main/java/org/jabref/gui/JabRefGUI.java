@@ -59,7 +59,7 @@ public class JabRefGUI {
     private void openWindow(Stage mainStage) {
         IconTheme.loadFonts();
 
-        LOGGER.debug(Localization.lang("Initializing frame"));
+        LOGGER.debug("Initializing frame");
         mainFrame.init();
 
         // Restore window location and/or maximised state
