@@ -51,7 +51,7 @@ import javax.swing.undo.UndoManager;
  */
 public class CitationRelationsTab extends EntryEditorTab {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(org.jabref.gui.entryeditor.CitationRelationsTab.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CitationRelationsTab.class);
     private final EntryEditorPreferences preferences;
     private final DialogService dialogService;
     private CheckListView<CitationRelationItem> citingListView;
@@ -180,15 +180,10 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         citingProgress = new ProgressIndicator();
         citingProgress.setMaxSize(25, 25);
-        citingProgress.getStyleClass().add("progress-indicator");
-        citingProgress.setPadding(new Insets(2, 0, -22, 0));
         styleTopBarNode(citingProgress, 50.0);
         citedByProgress = new ProgressIndicator();
         citedByProgress.setMaxSize(25, 25);
-        citedByProgress.getStyleClass().add("progress-indicator");
-        citedByProgress.setPadding(new Insets(2, 0, -22, 0));
         styleTopBarNode(citedByProgress, 50.0);
-
 
         //Create Import Buttons for both sides
         importCitingButton = IconTheme.JabRefIcons.ADD_ENTRY.asButton();
@@ -257,10 +252,6 @@ public class CitationRelationsTab extends EntryEditorTab {
                     }
                     hContainer.getStyleClass().add("entry-container");
 
-                    /*if (citingListView.getItems().size() == 1) {
-                        selectAllNewEntries(listView);
-                    }*/
-
                     return hContainer;
                 })
                 .withOnMouseClickedEvent((ee, event) -> listView.getCheckModel().toggleCheckState(ee))
@@ -272,13 +263,6 @@ public class CitationRelationsTab extends EntryEditorTab {
 
     public void unselectAll(CheckListView<CitationRelationItem> listView) {
         listView.getCheckModel().clearChecks();
-    }
-
-    public void selectAllNewEntries(CheckListView<CitationRelationItem> listView) {
-        unselectAll(listView);
-        for (CitationRelationItem entry : listView.getItems()) {
-            listView.getCheckModel().check(entry);
-        }
     }
 
     /**
@@ -371,9 +355,6 @@ public class CitationRelationsTab extends EntryEditorTab {
                 citedByTask = task;
             }
 
-            progress.progressProperty().unbind();
-            progress.progressProperty().bind(fetcher.getProgress());
-
             task.onRunning(() -> {
                 abort.setVisible(true);
                 progress.setVisible(true);
@@ -459,11 +440,11 @@ public class CitationRelationsTab extends EntryEditorTab {
         }
         List<String> currentKeys = getFilteredKeys(entry, field); // Current existant Enty.DOIs in Field
         for (BibEntry b : newEntries) {
-            Optional<DOI> key = b.getDOI();
-            Optional<DOI> entryKey = entry.getDOI();
+            Optional<String> key = b.getField(StandardField.DOI);
+            Optional<String> entryKey = entry.getField(StandardField.DOI);
             if (key.isPresent() && entryKey.isPresent()) { // Just Proceed if doi is present
-                String doi = key.get().getDOI();
-                String entryDoi = entryKey.get().getDOI();
+                String doi = key.get();
+                String entryDoi = entryKey.get();
                 if (!currentKeys.contains(doi) && !doiExists(doi)) { // if its not in the already referenced keys and not in the database = new Article
                     b.setField(nField, getFilteredKeys(b, nField) + "," + entryDoi);
                     observableList.add(new CitationRelationItem(b, false));
@@ -493,13 +474,13 @@ public class CitationRelationsTab extends EntryEditorTab {
     List<String> getFilteredKeys(BibEntry entry, StandardField operator) {
         Optional<String> citingS = entry.getField(operator);
         if (citingS.isEmpty()) {
-            LOGGER.info(entry.getCitationKey().orElse("no doi") + ": " + operator.getName() + " is empty!");
+            LOGGER.info(entry.getField(StandardField.TITLE).orElse("no title") + ": " + operator.getName() + " is empty!");
             return new ArrayList<>();
         }
         ArrayList<String> keys = new ArrayList<>(Arrays.asList(citingS.get().split(",")));
         filterNonExisting(keys);
         entry.setField(operator, String.join(",", keys));
-        LOGGER.info(entry.getCitationKey().orElse("no doi") + ": " + operator.getName() + ": " + String.join(",", keys));
+        LOGGER.info(entry.getField(StandardField.TITLE).orElse("no title") + ": " + operator.getName() + ": " + String.join(",", keys));
         return keys;
     }
 
@@ -528,8 +509,8 @@ public class CitationRelationsTab extends EntryEditorTab {
      */
     BibEntry getEntryByDOI(String doi) {
         for (BibEntry b : databaseContext.getEntries()) {
-            Optional<DOI> o = b.getDOI();
-            if (o.isPresent() && o.get().getDOI().equals(doi)) {
+            Optional<String> o = b.getField(StandardField.DOI);
+            if (o.isPresent() && o.get().equals(doi)) {
                 return b;
             }
         }
@@ -545,11 +526,8 @@ public class CitationRelationsTab extends EntryEditorTab {
     static String serialize(List<BibEntry> be) {
         List<String> ret = new ArrayList<>();
         for (BibEntry b : be) {
-            Optional<DOI> s = b.getDOI();
-            if (s.isPresent()) {
-                String toAdd = s.get().getDOI(); // TODO: oder getNormalized() ?
-                ret.add(toAdd);
-            }
+            Optional<String> s = b.getField(StandardField.DOI);
+            s.ifPresent(ret::add);
         }
         return String.join(",", ret);
     }
