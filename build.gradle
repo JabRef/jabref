@@ -328,7 +328,7 @@ task generateBibtexmlSource(type: XjcTask) {
     description = "Generates java files for the bibtexml importer."
 
     schemaFile = "src/main/resources/xjc/bibtexml/bibtexml.xsd"
-    outputDirectory = "src/main/generated"
+    outputDirectory = "src/main/generated/"
     javaPackage = "org.jabref.logic.importer.fileformat.bibtexml"
 }
 
