@@ -338,7 +338,8 @@ public class JabRefFrame extends BorderPane {
      * <p>
      * FIXME: Currently some threads remain and therefore hinder JabRef to be closed properly
      *
-     * @param filenames the filenames of all currently opened files - used for storing them if prefs openLastEdited is set to true
+     * @param filenames the filenames of all currently opened files - used for storing them if prefs openLastEdited is
+     *                  set to true
      */
     private void tearDownJabRef(List<String> filenames) {
         // prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, getExtendedState() == Frame.MAXIMIZED_BOTH);
@@ -361,7 +362,9 @@ public class JabRefFrame extends BorderPane {
     }
 
     /**
-     * General info dialog.  The MacAdapter calls this method when "Quit" is selected from the application menu, Cmd-Q is pressed, or "Quit" is selected from the Dock. The function returns a boolean indicating if quitting is ok or not.
+     * General info dialog.  The MacAdapter calls this method when "Quit" is selected from the application menu, Cmd-Q
+     * is pressed, or "Quit" is selected from the Dock. The function returns a boolean indicating if quitting is ok or
+     * not.
      * <p>
      * Non-OSX JabRef calls this when choosing "Quit" from the menu
      * <p>

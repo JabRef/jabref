@@ -19,8 +19,6 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.dialogs.BackupUIManager;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
