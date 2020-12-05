@@ -170,15 +170,19 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         // Create refresh Buttons for both sides
         refreshCitingButton = IconTheme.JabRefIcons.REFRESH.asButton();
+        refreshCitingButton.setTooltip(new Tooltip(Localization.lang("Restart search")));
         styleTopBarNode(refreshCitingButton, 15.0);
         refreshCitedByButton = IconTheme.JabRefIcons.REFRESH.asButton();
+        refreshCitedByButton.setTooltip(new Tooltip(Localization.lang("Restart search")));
         styleTopBarNode(refreshCitedByButton, 15.0);
         // Create abort Buttons for both sides
         abortCitingButton = IconTheme.JabRefIcons.CLOSE.asButton();
         abortCitingButton.getGraphic().resize(30, 30);
+        abortCitingButton.setTooltip(new Tooltip(Localization.lang("Abort search")));
         styleTopBarNode(abortCitingButton, 15.0);
         abortCitedButton = IconTheme.JabRefIcons.CLOSE.asButton();
         abortCitedButton.getGraphic().resize(30, 30);
+        abortCitedButton.setTooltip(new Tooltip(Localization.lang("Abort search")));
         styleTopBarNode(abortCitedButton, 15.0);
 
         citingProgress = new ProgressIndicator();
@@ -191,9 +195,11 @@ public class CitationRelationsTab extends EntryEditorTab {
         // Create Import Buttons for both sides
         importCitingButton = IconTheme.JabRefIcons.ADD_ENTRY.asButton();
         importCitingButton.setVisible(false);
+        importCitingButton.setTooltip(new Tooltip(Localization.lang("Add selected entries to database")));
         styleTopBarNode(importCitingButton, 50.0);
         importCitedByButton = IconTheme.JabRefIcons.ADD_ENTRY.asButton();
         importCitedByButton.setVisible(false);
+        importCitedByButton.setTooltip(new Tooltip(Localization.lang("Import selected entries")));
         styleTopBarNode(importCitedByButton, 50.0);
 
         citingHBox.getChildren().addAll(citingLabel, refreshCitingButton, importCitingButton, citingProgress, abortCitingButton);
@@ -231,7 +237,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
                     if (e.isLocal()) {
                         Button jumpTo = IconTheme.JabRefIcons.LINK.asButton();
-
+                        jumpTo.setTooltip(new Tooltip(Localization.lang("Jump to entry in database")));
                         jumpTo.getStyleClass().add("addEntryButton");
                         jumpTo.setOnMouseClicked(event -> {
                             libraryTab.showAndEdit(e.getBibEntry());
@@ -242,6 +248,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                         hContainer.getChildren().addAll(entryNode, separator, jumpTo);
                     } else {
                         ToggleButton addToggle = IconTheme.JabRefIcons.ADD.asToggleButton();
+                        addToggle.setTooltip(new Tooltip(Localization.lang("Select entry")));
                         EasyBind.subscribe(addToggle.selectedProperty(), selected -> {
                             if (selected) {
                                 addToggle.setGraphic(IconTheme.JabRefIcons.ADD_FILLED.withColor(IconTheme.SELECTED_COLOR).getGraphicNode());
