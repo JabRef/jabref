@@ -24,7 +24,7 @@ This document proposes a technical solution to the specification described in th
 * [Glossary](https://github.com/RaphaelKreft/jabref/blob/docs/docs/sweng/glossar.md)
 * [ADR-0018](https://github.com/RaphaelKreft/jabref/blob/docs/docs/sweng/0018-use-opencitationsApi-for-citationrelations.md)
 
-The Specification book describes the project, and specifies the requirements. It is the starting point for all following steps. The Glossary contains definitions of all important terms for the project. The architecture decisions document [MADR] (https://github.com/adr/madr) contains all important decisions about architecture and implementation of the project.
+The Specification book describes the project, and specifies the requirements. It is the starting point for all following steps. The Glossary contains definitions of all important terms for the project. The architecture decisions document [MADR] (<https://github.com/adr/madr>) contains all important decisions about architecture and implementation of the project.
 
 ## 2. System Overview
 
@@ -73,7 +73,7 @@ State Diagram of CitationRelationFetcher:
 
 ### 5.3 Logic
 
-The logical constraints are specified in this section 
+The logical constraints are specified in this section
 
 * **DOI Nummer benötigt für die Suche**
 

@@ -30,7 +30,7 @@ This specification book captures the requirements of the extension/modification 
 * /R30/ Runs unattended as part of JabRef
 * /R40/ Used Software on the target machines: JabRef, Java, OS: Windows/Linux/macOS
 * /R50/ Software on the development systems: JabRef, Java, OS: depending on the developer Windows/Linux oder macOS
-* /R60/ Organisational marginal conditions: Given by [Projektrichtlinien](https://unibas-marcelluethi.github.io/software-engineering/project/project-summary.html) 
+* /R60/ Organisational marginal conditions: Given by [Projektrichtlinien](https://unibas-marcelluethi.github.io/software-engineering/project/project-summary.html)
 * /R70/ Documentation of changes and operational intructions in the way set by the course
 * /R80/ Development-interface 1: The extension is part of JabRef and must adapt to its [Ecosystem](https://devdocs.jabref.org/getting-into-the-code/code-howtos)
 * /R90/ Development-interface 2: The API that is used to get the citations: [Opencitaions API](https://opencitations.net/index/api/v1)
@@ -104,7 +104,7 @@ This specification book captures the requirements of the extension/modification 
 * /A60/ The quality requirement /QT10/ is fulfilled
 * /A70/ The quality requirement /QT20/ is fulfilled
 
-# Appendix
+## 8. Appendix
 
 ## Appendix A. Use-cases
 
@@ -113,12 +113,12 @@ This specification book captures the requirements of the extension/modification 
 * Name: Finding the extension
 * Actors: *JabRef user, JabRef*
 * Preconditions:
-   * JabRef is running
-   * JabRef user has openned a database containing articles
+  * JabRef is running
+  * JabRef user has openned a database containing articles
 * Default procedure
-    * JabRef-user selects an articles
-    * The article menu opens in the lower part of JabRef
-    * The user selects the tab of the extension
+  * JabRef-user selects an articles
+  * The article menu opens in the lower part of JabRef
+  * The user selects the tab of the extension
 * Postcondition success: *The view of the extension in the article menu below the tab*
 * Postcondition failure: -
 
@@ -127,15 +127,15 @@ This specification book captures the requirements of the extension/modification 
 * Name: Search cited articles
 * Actors: *JabRef user, JabRef, API*
 * Preconditions:
-   * JabRef is running
-   * JabRef user has openned a database containing articles
-   * User has selected an article
-   * User is on the extension tab
-   * There are no problems connecting to the API
+  * JabRef is running
+  * JabRef user has openned a database containing articles
+  * User has selected an article
+  * User is on the extension tab
+  * There are no problems connecting to the API
 * Default procedure
-    * User presses the search button in the left section of the tab
-    * JabRef checks if enough information is available for the search
-    * JabRef sends a query to the API and waits for a response
+  * User presses the search button in the left section of the tab
+  * JabRef checks if enough information is available for the search
+  * JabRef sends a query to the API and waits for a response
 * Postcondition success: *The search results are displayed as a list in the result section*
 * Postcondition failure: *An error message is shown to the user if not enough information for a search*
 
@@ -144,15 +144,15 @@ This specification book captures the requirements of the extension/modification 
 * Name: Search citing articles
 * Actors: *JabRef user, JabRef, API*
 * Preconditions:
-    * JabRef is running
-    * JabRef user has openned a database containing articles
-    * User has selected an article
-    * User is on the extension tab
-    * There are no problems connecting to the API
+  * JabRef is running
+  * JabRef user has openned a database containing articles
+  * User has selected an article
+  * User is on the extension tab
+  * There are no problems connecting to the API
 * Default procedure:
-    * User presses the search button in the right section of the tab
-    * JabRef checks if enough information is available for the search
-    * JabRef sends a query to the API and waits for a response
+  * User presses the search button in the right section of the tab
+  * JabRef checks if enough information is available for the search
+  * JabRef sends a query to the API and waits for a response
 * Postcondition success: *The search results are displayed as a list in the result section*
 * Postcondition failure: *An error message is shown to the user if not enough information for a search*
 
@@ -161,11 +161,11 @@ This specification book captures the requirements of the extension/modification 
 * Name: Adding cited article
 * Actors: *JabRef user, JabRef*
 * Preconditions:
-    * List of cited articles must be present
+  * List of cited articles must be present
 * Default procedure:
-    * User selects at least one article from the list
-    * Add button is pressed
-    * Check if article is already in database
+  * User selects at least one article from the list
+  * Add button is pressed
+  * Check if article is already in database
 * Postcondition success: *Article is added to database*
 * Postcondition failure: *Article is not added to database*
 
@@ -174,11 +174,11 @@ This specification book captures the requirements of the extension/modification 
 * Name: Adding cited by article
 * Actors: *JabRef user, JabRef*
 * Preconditions:
-    * List of cited by articles must be present
+  * List of cited by articles must be present
 * Default procedure
-    * User selects at least one article from the list
-    * Add button is pressed
-    * Check if article is already in database
+  * User selects at least one article from the list
+  * Add button is pressed
+  * Check if article is already in database
 * Postcondition success: *Article is added to database*
 * Postcondition failure: *Article is not added to database*
 
@@ -187,11 +187,11 @@ This specification book captures the requirements of the extension/modification 
 * Name: Start search offline
 * Actors: *JabRef user, JabRef*
 * Preconditions:
-    * At least one article in database
-    * There is no internet connection
+  * At least one article in database
+  * There is no internet connection
 * Default procedure:
-    * Select article in database
-    * Open the extension tab in the article menu
+  * Select article in database
+  * Open the extension tab in the article menu
 * Postcondition success: *The user is informed about missing internet connection, search can be restarted*
 
 ### Use Case 7
@@ -199,11 +199,11 @@ This specification book captures the requirements of the extension/modification 
 * Name: Navigation to cited article
 * Actors: *JabRef user, JabRef*
 * Preconditions:
-    * Cited article has to be in database
-    * Article in the list has a different color (already in database)
+  * Cited article has to be in database
+  * Article in the list has a different color (already in database)
 * Default procedure:
-    * User is in the extension tab
-    * User clicks on the article
+  * User is in the extension tab
+  * User clicks on the article
 * Postcondition success: *User is moved to the entry editor, list is updated*
 
 ### Use Case 8
@@ -211,9 +211,9 @@ This specification book captures the requirements of the extension/modification 
 * Name: Navigation to citing article
 * Actors: *JabRef user, JabRef*
 * Preconditions:
-    * Citin article has to be in database
-    * Article in the list has a different color (already in database)
+  * Citin article has to be in database
+  * Article in the list has a different color (already in database)
 * Default procedure:
-    * User is in the extension tab
-    * User clicks on the article
+  * User is in the extension tab
+  * User clicks on the article
 * Postcondition success: *User is moved to the entry editor, list is updated*
