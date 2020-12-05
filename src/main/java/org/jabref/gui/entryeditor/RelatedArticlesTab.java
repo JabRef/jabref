@@ -30,6 +30,7 @@ import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,15 +42,15 @@ public class RelatedArticlesTab extends EntryEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RelatedArticlesTab.class);
     private final EntryEditorPreferences preferences;
-    private final EntryEditor entryEditor;
     private final DialogService dialogService;
+    private final PreferencesService prefs;
 
-    public RelatedArticlesTab(EntryEditor entryEditor, EntryEditorPreferences preferences, DialogService dialogService) {
+    public RelatedArticlesTab(EntryEditor entryEditor, EntryEditorPreferences preferences, PreferencesService preferencesService, DialogService dialogService) {
         setText(Localization.lang("Related articles"));
         setTooltip(new Tooltip(Localization.lang("Related articles")));
-        this.entryEditor = entryEditor;
         this.preferences = preferences;
         this.dialogService = dialogService;
+        this.prefs = preferencesService;
     }
 
     /**
@@ -64,8 +65,8 @@ public class RelatedArticlesTab extends EntryEditorTab {
         ProgressIndicator progress = new ProgressIndicator();
         progress.setMaxSize(100, 100);
 
-        MrDLibFetcher fetcher = new MrDLibFetcher(Globals.prefs.getLanguage().name(),
-                Globals.BUILD_INFO.version);
+        MrDLibFetcher fetcher = new MrDLibFetcher(prefs.getLanguage().name(),
+                Globals.BUILD_INFO.version, prefs);
         BackgroundTask
                 .wrap(() -> fetcher.performSearch(entry))
                 .onRunning(() -> progress.setVisible(true))

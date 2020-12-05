@@ -693,6 +693,11 @@ public class JabRefPreferences implements PreferencesService {
         setLanguageDependentDefaultValues();
     }
 
+    /**
+     * @deprecated Use {@link PreferencesService)} instead
+     * @return Instance of JaRefPreferences
+     */
+    @Deprecated
     public static JabRefPreferences getInstance() {
         if (JabRefPreferences.singleton == null) {
             JabRefPreferences.singleton = new JabRefPreferences();
@@ -1884,6 +1889,7 @@ public class JabRefPreferences implements PreferencesService {
     // ExternalApplicationsPreferences
     //*************************************************************************************************************
 
+    @Override
     public PushToApplicationPreferences getPushToApplicationPreferences() {
         Map<String, String> applicationCommands = new HashMap<>();
         applicationCommands.put(PushToEmacs.NAME, get(EMACS_PATH));
@@ -1900,6 +1906,7 @@ public class JabRefPreferences implements PreferencesService {
         );
     }
 
+    @Override
     public void storePushToApplicationPreferences(PushToApplicationPreferences preferences) {
         put(EMACS_PATH, preferences.getPushToApplicationCommandPaths().get(PushToEmacs.NAME));
         put(LYXPIPE, preferences.getPushToApplicationCommandPaths().get(PushToLyx.NAME));

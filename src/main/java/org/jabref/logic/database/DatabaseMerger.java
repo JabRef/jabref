@@ -15,14 +15,17 @@ import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.JabRefPreferences;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DatabaseMerger {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseMerger.class);
+    private final char keywordDelimiter;
+
+    public DatabaseMerger(char keywordDelimiter) {
+        this.keywordDelimiter = keywordDelimiter;
+    }
 
     /**
      * Merges all entries and strings of the other database into the target database. Any duplicates are ignored.
@@ -112,7 +115,7 @@ public class DatabaseMerger {
                     // There will be group where the two groups are merged
                     String newGroupName = otherFilename;
                     ExplicitGroup group = new ExplicitGroup("Imported " + newGroupName, GroupHierarchyType.INDEPENDENT,
-                            JabRefPreferences.getInstance().getKeywordDelimiter());
+                                                            keywordDelimiter);
                     newGroups.setGroup(group);
                     group.add(allOtherEntries);
                 } catch (IllegalArgumentException e) {

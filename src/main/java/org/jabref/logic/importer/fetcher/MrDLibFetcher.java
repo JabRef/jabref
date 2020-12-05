@@ -19,6 +19,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
@@ -38,10 +39,12 @@ public class MrDLibFetcher implements EntryBasedFetcher {
     private String heading;
     private String description;
     private String recommendationSetId;
+    private final PreferencesService prefs;
 
-    public MrDLibFetcher(String language, Version version) {
+    public MrDLibFetcher(String language, Version version, PreferencesService prefs) {
         LANGUAGE = language;
         VERSION = version;
+        this.prefs = prefs;
     }
 
     @Override
@@ -125,7 +128,6 @@ public class MrDLibFetcher implements EntryBasedFetcher {
         builder.addParameter("app_id", "jabref_desktop");
         builder.addParameter("app_version", VERSION.getFullVersion());
 
-        JabRefPreferences prefs = JabRefPreferences.getInstance();
         if (prefs.getBoolean(JabRefPreferences.SEND_LANGUAGE_DATA)) {
             builder.addParameter("app_lang", LANGUAGE);
         }

@@ -61,6 +61,7 @@ class StudyRepository {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final SavePreferences savePreferences;
     private final BibEntryTypesManager bibEntryTypesManager;
+    private final char keywordDelimiter;
 
     /**
      * Creates a study repository.
@@ -71,7 +72,7 @@ class StudyRepository {
      * @throws IOException              Thrown if the given repository does not exists, or the study definition file does not exist
      * @throws ParseException           Problem parsing the study definition file.
      */
-    public StudyRepository(Path pathToRepository, GitHandler gitHandler, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileUpdateMonitor, SavePreferences savePreferences, BibEntryTypesManager bibEntryTypesManager) throws IOException, ParseException, GitAPIException {
+    public StudyRepository(Path pathToRepository, GitHandler gitHandler, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileUpdateMonitor, SavePreferences savePreferences, BibEntryTypesManager bibEntryTypesManager, char keywordDelimiter) throws IOException, ParseException, GitAPIException {
         this.repositoryPath = pathToRepository;
         this.gitHandler = gitHandler;
         try {
@@ -92,6 +93,7 @@ class StudyRepository {
         }
         study = parseStudyFile();
         this.setUpRepositoryStructure();
+        this.keywordDelimiter = keywordDelimiter;
     }
 
     /**
@@ -278,7 +280,7 @@ class StudyRepository {
      * @param crawlResults The results that shall be persisted.
      */
     private void persistResults(List<QueryResult> crawlResults) throws IOException {
-        DatabaseMerger merger = new DatabaseMerger();
+        DatabaseMerger merger = new DatabaseMerger(keywordDelimiter);
         BibDatabase newStudyResultEntries = new BibDatabase();
 
         for (QueryResult result : crawlResults) {
