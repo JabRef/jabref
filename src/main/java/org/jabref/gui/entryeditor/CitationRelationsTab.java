@@ -1,24 +1,33 @@
 package org.jabref.gui.entryeditor;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import javax.swing.undo.UndoManager;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-import org.jabref.gui.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ImportHandler;
@@ -32,24 +41,23 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.CheckListView;
-
-import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.PreferencesService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.swing.undo.UndoManager;
 
 /**
  * GUI for tab displaying an articles citation relations in two lists based on the currently selected BibEntry
  */
 public class CitationRelationsTab extends EntryEditorTab {
+
+    // Tasks
+    private static BackgroundTask<List<BibEntry>> citingTask;
+    private static BackgroundTask<List<BibEntry>> citedByTask;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationRelationsTab.class);
     private final EntryEditorPreferences preferences;
@@ -71,10 +79,6 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final PreferencesService preferencesService;
     private final LibraryTab libraryTab;
 
-    //Tasks
-    private static BackgroundTask<List<BibEntry>> citingTask;
-    private static BackgroundTask<List<BibEntry>> citedByTask;
-
     public static class CitationRelationItem {
         private final BibEntry bibEntry;
         private final boolean local;
@@ -92,7 +96,6 @@ public class CitationRelationsTab extends EntryEditorTab {
             return local;
         }
     }
-
 
     public CitationRelationsTab(EntryEditorPreferences preferences, DialogService dialogService, BibDatabaseContext databaseContext, UndoManager undoManager, StateManager stateManager, FileUpdateMonitor fileUpdateMonitor, PreferencesService preferencesService, LibraryTab lTab) {
         this.preferences = preferences;
@@ -143,7 +146,7 @@ public class CitationRelationsTab extends EntryEditorTab {
      */
     private SplitPane getPane(BibEntry entry) {
 
-        //Create Layout Containers
+        // Create Layout Containers
         VBox citingVBox = new VBox();
         VBox citedByVBox = new VBox();
         citingVBox.setFillWidth(true);
@@ -155,27 +158,27 @@ public class CitationRelationsTab extends EntryEditorTab {
         AnchorPane citedByHBox = new AnchorPane();
         citedByHBox.setPrefHeight(40);
 
-        //Create Heading Lab
+        // Create Heading Lab
         Label citingLabel = new Label(Localization.lang("Citing"));
         styleLabel(citingLabel);
         Label citedByLabel = new Label(Localization.lang("Cited By"));
         styleLabel(citedByLabel);
 
-        //Create ListViews
+        // Create ListViews
         citingListView = new CheckListView<>();
         citedByListView = new CheckListView<>();
 
-        //Create refresh Buttons for both sides
+        // Create refresh Buttons for both sides
         refreshCitingButton = IconTheme.JabRefIcons.REFRESH.asButton();
         styleTopBarNode(refreshCitingButton, 15.0);
         refreshCitedByButton = IconTheme.JabRefIcons.REFRESH.asButton();
         styleTopBarNode(refreshCitedByButton, 15.0);
-        //Create abort Buttons for both sides
+        // Create abort Buttons for both sides
         abortCitingButton = IconTheme.JabRefIcons.CLOSE.asButton();
-        abortCitingButton.getGraphic().resize(30,30);
+        abortCitingButton.getGraphic().resize(30, 30);
         styleTopBarNode(abortCitingButton, 15.0);
         abortCitedButton = IconTheme.JabRefIcons.CLOSE.asButton();
-        abortCitedButton.getGraphic().resize(30,30);
+        abortCitedButton.getGraphic().resize(30, 30);
         styleTopBarNode(abortCitedButton, 15.0);
 
         citingProgress = new ProgressIndicator();
@@ -185,7 +188,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         citedByProgress.setMaxSize(25, 25);
         styleTopBarNode(citedByProgress, 50.0);
 
-        //Create Import Buttons for both sides
+        // Create Import Buttons for both sides
         importCitingButton = IconTheme.JabRefIcons.ADD_ENTRY.asButton();
         importCitingButton.setVisible(false);
         styleTopBarNode(importCitingButton, 50.0);
@@ -202,7 +205,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         refreshCitingButton.setOnMouseClicked(event -> searchForRelations(entry, citingListView, abortCitingButton, refreshCitingButton, OpenCitationFetcher.SearchType.CITING, importCitingButton, citingProgress));
         refreshCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, citedByListView, abortCitedButton, refreshCitedByButton, OpenCitationFetcher.SearchType.CITEDBY, importCitedByButton, citedByProgress));
 
-        //Create SplitPane to hold all nodes above
+        // Create SplitPane to hold all nodes above
         SplitPane container = new SplitPane(citedByVBox, citingVBox);
 
         citingListView.prefHeightProperty().bind(container.heightProperty());
@@ -322,14 +325,14 @@ public class CitationRelationsTab extends EntryEditorTab {
      * @param searchType    type of search (CITING / CITEDBY)
      */
     private void searchForRelations(BibEntry entry, CheckListView<CitationRelationItem> listView, Button abort, Button refreshButton, OpenCitationFetcher.SearchType searchType, Button importButton, ProgressIndicator progress) {
-        //Check if current entry has DOI Number required for searching
+        // Check if current entry has DOI Number required for searching
         if (entry.getField(StandardField.DOI).isPresent()) {
 
             ObservableList<CitationRelationItem> observableList = FXCollections.observableArrayList();
 
             listView.getItems().clear();
 
-            //Perform search in background and deal with success or failure
+            // Perform search in background and deal with success or failure
             List<BibEntry> localList = runOfflineTask(entry, searchType.equals(OpenCitationFetcher.SearchType.CITING) ? StandardField.CITING : StandardField.CITEDBY);
             if (!localList.isEmpty()) {
                 for (BibEntry localAdd : localList) {
@@ -430,7 +433,8 @@ public class CitationRelationsTab extends EntryEditorTab {
      * @param entry    Current Entry Context
      */
    void filterDifference(List<BibEntry> newEntries, ObservableList<CitationRelationItem> observableList, OpenCitationFetcher.SearchType operator, BibEntry entry) {
-        StandardField field, nField;
+        StandardField field;
+        StandardField nField;
         if (operator.equals(OpenCitationFetcher.SearchType.CITEDBY)) {
             field = StandardField.CITEDBY;
             nField = StandardField.CITING;

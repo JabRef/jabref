@@ -5,13 +5,13 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @FetcherTest
 public class OpenCitationFetcherTest {
@@ -23,47 +23,48 @@ public class OpenCitationFetcherTest {
     }
 
     @Test
-    public void testPerformSearchNoDoiCiting() throws FetcherException {
+    public void performSearchNoDoiCitingMode() throws FetcherException {
         BibEntry noDoi = new BibEntry();
         assertThrows(FetcherException.class, () -> openCitationFetcher.searchCiting(noDoi));
     }
 
     @Test
-    public void testPerformSearchNoDoiCitedBy() throws FetcherException {
+    public void performSearchNoDoiCitedByMode() throws FetcherException {
         BibEntry noDoi = new BibEntry();
         assertThrows(FetcherException.class, () -> openCitationFetcher.searchCitedBy(noDoi));
     }
 
     @Test
-    public void testPerformSearchWithDoiEmptyCiting() throws FetcherException {
+    public void performSearchWithDoiEmptyCitingMode() throws FetcherException {
         BibEntry doiEmptyCiting = new BibEntry();
         doiEmptyCiting.setField(StandardField.DOI, "10.1.1.19.4684");
         assertTrue(openCitationFetcher.searchCiting(doiEmptyCiting).isEmpty());
     }
 
     @Test
-    public void testPerformSearchWithDoiCiting() throws FetcherException {
+    public void performSearchWithDoiCitingMode() throws FetcherException {
         BibEntry doiCiting = new BibEntry();
         doiCiting.setField(StandardField.DOI, "10.1109/TCBB.2011.83");
         assertFalse(openCitationFetcher.searchCiting(doiCiting).isEmpty());
     }
 
     @Test
-    public void testPerformSearchWithDoiEmptyCitedBy() throws FetcherException {
+    public void performSearchWithDoiEmptyCitedByMode() throws FetcherException {
         BibEntry doiEmptyCitedBy = new BibEntry();
         doiEmptyCitedBy.setField(StandardField.DOI, "10.1.1.19.4684");
         assertTrue(openCitationFetcher.searchCitedBy(doiEmptyCitedBy).isEmpty());
     }
 
     @Test
-    public void testPerformSearchWithDoiCitedBy() throws FetcherException {
+    public void performSearchWithDoiCitedByMode() throws FetcherException {
         BibEntry doiCitedBy = new BibEntry();
         doiCitedBy.setField(StandardField.DOI, "10.1109/TCBB.2011.83");
         assertFalse(openCitationFetcher.searchCitedBy(doiCitedBy).isEmpty());
     }
 
     @Test
-    public void testGetName() throws FetcherException {
+    public void getName() throws FetcherException {
         assertEquals(openCitationFetcher.getName(), "CitationRelationFetcher");
     }
+
 }

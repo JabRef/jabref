@@ -1,6 +1,10 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.SocketException;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -9,17 +13,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import kong.unirest.json.JSONArray;
-import kong.unirest.json.JSONException;
-
 import org.jabref.logic.importer.CitationFetcher;
-import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.JabRefPreferences;
+
+import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +70,7 @@ public class OpenCitationFetcher implements CitationFetcher {
         if (searchType != null) {
             List<BibEntry> list = new ArrayList<>();
             try {
-                LOGGER.debug("Search: {}" , BASIC_URL + doi);
+                LOGGER.debug("Search: {}", BASIC_URL + doi);
                 JSONArray json = readJsonFromUrl(BASIC_URL + doi);
                 if (json == null) {
                     throw new FetcherException("No internet connection! Please try again.");
@@ -80,7 +80,7 @@ public class OpenCitationFetcher implements CitationFetcher {
                 LOGGER.debug("API Answer: " + json.toString());
                 String[] items = json.getJSONObject(0).getString(searchType.label).split("; ");
                 if (!Arrays.equals(items, new String[]{""})) {
-                    LOGGER.debug("BibInfoSearch: {}" , BASIC_URL + String.join("__", items));
+                    LOGGER.debug("BibInfoSearch: {}", BASIC_URL + String.join("__", items));
                     JSONArray metaArray = readJsonFromUrl(BASIC_URL + String.join("__", items));
                     if (metaArray == null) {
                         throw new FetcherException("No internet connection! Please try again.");
