@@ -6,11 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.binding.ObjectBinding;
 import javafx.beans.value.ObservableValue;
 
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
@@ -24,7 +25,9 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.event.GroupUpdatedEvent;
 
+import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
 import com.tobiasdiez.easybind.optional.OptionalBinding;
@@ -68,18 +71,29 @@ public class BibEntryTableViewModel {
     }
 
     private static ObservableValue<List<AbstractGroup>> createMatchedGroupsBinding(BibDatabaseContext database, BibEntry entry) {
-        Optional<GroupTreeNode> root = database.getMetaData().getGroups();
-        if (root.isPresent()) {
-            return EasyBind.map(entry.getFieldBinding(StandardField.GROUPS), field -> {
-                List<AbstractGroup> groups = root.get().getMatchingGroups(entry)
-                                                 .stream()
-                                                 .map(GroupTreeNode::getGroup)
-                                                 .collect(Collectors.toList());
-                groups.remove(root.get().getGroup());
-                return groups;
-            });
-        }
-        return new SimpleObjectProperty<>(Collections.emptyList());
+        ObservableValue<List<AbstractGroup>> groupsBinding = new ObjectBinding<List<AbstractGroup>>() {
+            {
+                bind(entry.getFieldsObservable(), entry.typeProperty());
+            }
+
+            @Override
+            protected List<AbstractGroup> computeValue() {
+                Optional<GroupTreeNode> rootGroup = database.getMetaData().getGroups();
+                return rootGroup.map(groupTreeNode ->
+                        groupTreeNode.getMatchingGroups(entry).stream()
+                                     .map(GroupTreeNode::getGroup)
+                                     .filter(Predicate.not(Predicate.isEqual(groupTreeNode.getGroup())))
+                                     .collect(Collectors.toList()))
+                                .orElse(Collections.emptyList());
+            }
+
+            @Subscribe
+            public void listen(GroupUpdatedEvent groupUpdatedEvent) {
+                this.invalidate();
+            }
+        };
+        database.getMetaData().registerListener(groupsBinding);
+        return groupsBinding;
     }
 
     public OptionalBinding<String> getField(Field field) {
