@@ -84,7 +84,6 @@ repositories {
 }
 
 configurations {
-    libreoffice
     antlr3
     antlr4
     // TODO: Remove the following workaround for split error messages such as
@@ -117,14 +116,8 @@ dependencies {
 
     implementation 'commons-cli:commons-cli:1.4'
 
-    // For Java 9+ compatibility, we include a bundled version of the libreoffice libraries
-    // See https://bugs.documentfoundation.org/show_bug.cgi?id=117331#c8 for background information
-    // Use the task bundleLibreOffice to update the bundled jar
-    // DO NOT CHANGE THE libreoffice PREFIX
-    libreoffice 'org.libreoffice:juh:6.4.3'
-    libreoffice 'org.libreoffice:jurt:6.4.3'
-    libreoffice 'org.libreoffice:ridl:6.4.3'
-    libreoffice 'org.libreoffice:unoil:6.4.3'
+    implementation 'org.libreoffice:libreoffice:7.0.3'
+    implementation 'org.libreoffice:unoloader:7.0.3'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.9'
     implementation 'info.debatty:java-string-similarity:2.0.0'
@@ -132,14 +125,16 @@ dependencies {
     antlr3 'org.antlr:antlr:3.5.2'
     implementation 'org.antlr:antlr-runtime:3.5.2'
 
-    antlr4 'org.antlr:antlr4:4.8-1'
-    implementation 'org.antlr:antlr4-runtime:4.8-1'
+    antlr4 'org.antlr:antlr4:4.9'
+    implementation 'org.antlr:antlr4-runtime:4.9'
 
     implementation (group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.7.0') {
         exclude group: 'org.apache.lucene', module: 'lucene-sandbox'
     }
 
-    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.0'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.9.0.202009080501-r'
+
+    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.1'
 
     implementation 'org.postgresql:postgresql:42.2.18'
 
@@ -197,7 +192,7 @@ dependencies {
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.62.2'
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.62.2'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.90'
+    testImplementation 'io.github.classgraph:classgraph:4.8.92'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.7.0'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.7.0'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.7.0'
@@ -205,7 +200,7 @@ dependencies {
     testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.18'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:3.6.0'
+    testImplementation 'org.mockito:mockito-core:3.6.28'
     testImplementation 'org.xmlunit:xmlunit-core:2.8.1'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.8.1'
     testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.14.1'
@@ -214,7 +209,7 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.37'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.38'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.3'
     jython 'org.python:jython-standalone:2.7.2'
 }
@@ -765,13 +760,4 @@ task downloadDependencies {
     }
 }
 
-task bundleLibreOffice(type: Jar) {
-    from configurations.libreoffice.collect { zipTree it }
 
-    manifest {
-        attributes 'Automatic-Module-Name': 'org.jabref.thirdparty.libreoffice'
-    }
-
-    destinationDir = file('lib')
-    archiveName = 'libreoffice.jar'
-}

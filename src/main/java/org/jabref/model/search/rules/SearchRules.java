@@ -31,7 +31,7 @@ public class SearchRules {
         return SIMPLE_EXPRESSION.matcher(query).matches();
     }
 
-    private static SearchRule getSearchRule(boolean caseSensitive, boolean regex) {
+    static SearchRule getSearchRule(boolean caseSensitive, boolean regex) {
         if (regex) {
             return new RegexBasedSearchRule(caseSensitive);
         } else {

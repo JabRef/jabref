@@ -47,7 +47,7 @@ open module org.jabref {
     requires applicationinsights.core;
 
     // Libre Office
-    requires org.jabref.thirdparty.libreoffice;
+    requires org.libreoffice.uno;
 
     // Other modules
     requires commons.logging;
@@ -91,4 +91,5 @@ open module org.jabref {
     requires com.h2database.mvstore;
     requires lucene.queryparser;
     requires lucene.core;
+    requires org.eclipse.jgit;
 }
