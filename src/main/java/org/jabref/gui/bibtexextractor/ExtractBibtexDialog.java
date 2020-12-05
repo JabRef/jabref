@@ -16,7 +16,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -34,6 +34,7 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
     @Inject private FileUpdateMonitor fileUpdateMonitor;
     @Inject private TaskExecutor taskExecutor;
     @Inject private UndoManager undoManager;
+    @Inject private PreferencesService preferencesService;
 
     public ExtractBibtexDialog() {
         ViewLoader.view(this)
@@ -52,7 +53,7 @@ public class ExtractBibtexDialog extends BaseDialog<Void> {
     @FXML
     private void initialize() {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
-        this.viewModel = new BibtexExtractorViewModel(database, dialogService, JabRefPreferences.getInstance(), fileUpdateMonitor, taskExecutor, undoManager, stateManager);
+        this.viewModel = new BibtexExtractorViewModel(database, dialogService, preferencesService, fileUpdateMonitor, taskExecutor, undoManager, stateManager);
         input.textProperty().bindBidirectional(viewModel.inputTextProperty());
     }
 }

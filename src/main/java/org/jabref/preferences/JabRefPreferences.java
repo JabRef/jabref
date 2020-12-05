@@ -2654,4 +2654,21 @@ public class JabRefPreferences implements PreferencesService {
     public void storeMergeDiffMode(String diffMode) {
         put(JabRefPreferences.MERGE_ENTRIES_DIFF_MODE, diffMode);
     }
+
+    @Override
+    public MrDlibPreferences getMrDlibPreferences() {
+        return new MrDlibPreferences(
+                getBoolean(ACCEPT_RECOMMENDATIONS),
+                getBoolean(SEND_LANGUAGE_DATA),
+                getBoolean(SEND_OS_DATA),
+                getBoolean(SEND_TIMEZONE_DATA));
+    }
+
+    @Override
+    public void storeMrDlibPreferences(MrDlibPreferences preferences) {
+        putBoolean(ACCEPT_RECOMMENDATIONS, preferences.shouldAcceptRecommendations());
+        putBoolean(SEND_LANGUAGE_DATA, preferences.shouldSendLanguage());
+        putBoolean(SEND_OS_DATA, preferences.shouldSendOs());
+        putBoolean(SEND_TIMEZONE_DATA, preferences.shouldSendTimezone());
+    }
 }

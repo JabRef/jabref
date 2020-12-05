@@ -29,11 +29,12 @@ public class Crawler {
     /**
      * Creates a crawler for retrieving studies from E-Libraries
      *
-     * @param studyDefinitionFile The path to the study definition file that contains the list of targeted E-Libraries and used cross-library queries
+     * @param studyDefinitionFile The path to the study definition file that contains the list of targeted E-Libraries
+     *                            and used cross-library queries
      */
-    public Crawler(Path studyDefinitionFile, GitHandler gitHandler, FileUpdateMonitor fileUpdateMonitor, ImportFormatPreferences importFormatPreferences, SavePreferences savePreferences, BibEntryTypesManager bibEntryTypesManager, char keywordDelimiter) throws IllegalArgumentException, IOException, ParseException, GitAPIException {
+    public Crawler(Path studyDefinitionFile, GitHandler gitHandler, FileUpdateMonitor fileUpdateMonitor, ImportFormatPreferences importFormatPreferences, SavePreferences savePreferences, BibEntryTypesManager bibEntryTypesManager) throws IllegalArgumentException, IOException, ParseException, GitAPIException {
         Path studyRepositoryRoot = studyDefinitionFile.getParent();
-        studyRepository = new StudyRepository(studyRepositoryRoot, gitHandler, importFormatPreferences, fileUpdateMonitor, savePreferences, bibEntryTypesManager, keywordDelimiter);
+        studyRepository = new StudyRepository(studyRepositoryRoot, gitHandler, importFormatPreferences, fileUpdateMonitor, savePreferences, bibEntryTypesManager);
         Study study = studyRepository.getStudy();
         LibraryEntryToFetcherConverter libraryEntryToFetcherConverter = new LibraryEntryToFetcherConverter(study.getActiveLibraryEntries(), importFormatPreferences);
         this.studyFetcher = new StudyFetcher(libraryEntryToFetcherConverter.getActiveFetchers(), study.getSearchQueryStrings());

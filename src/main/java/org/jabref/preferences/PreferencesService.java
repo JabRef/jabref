@@ -336,4 +336,8 @@ public interface PreferencesService {
     Optional<String> getMergeDiffMode();
 
     void storeMergeDiffMode(String diffMode);
+
+    MrDlibPreferences getMrDlibPreferences();
+
+    void storeMrDlibPreferences(MrDlibPreferences preferences);
 }
