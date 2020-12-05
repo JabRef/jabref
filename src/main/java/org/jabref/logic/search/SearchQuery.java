@@ -4,8 +4,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.StringJoiner;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -17,12 +18,6 @@ import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.search.rules.SentenceAnalyzer;
 
 public class SearchQuery implements SearchMatcher {
-
-    /**
-     * Regex pattern for escaping special characters in javascript regular expressions
-     */
-    public static final Pattern JAVASCRIPT_ESCAPED_CHARS_PATTERN = Pattern.compile("[\\.\\*\\+\\?\\^\\$\\{\\}\\(\\)\\|\\[\\]\\\\/]");
-
     /**
      * The mode of escaping special characters in regular expressions
      */
@@ -30,11 +25,34 @@ public class SearchQuery implements SearchMatcher {
         /**
          * using \Q and \E marks
          */
-        JAVA,
+        JAVA {
+            @Override
+            String format(String regex) {
+                return Pattern.quote(regex);
+            }
+        },
         /**
          * escaping all javascript regex special characters separately
          */
-        JAVASCRIPT
+        JAVASCRIPT {
+            @Override
+            String format(String regex) {
+                return JAVASCRIPT_ESCAPED_CHARS_PATTERN.matcher(regex).replaceAll("\\\\$0");
+            }
+        };
+
+        /**
+         * Regex pattern for escaping special characters in javascript regular expressions
+         */
+        private static final Pattern JAVASCRIPT_ESCAPED_CHARS_PATTERN = Pattern.compile("[.*+?^${}()|\\[\\]\\\\/]");
+
+        /**
+         * Attempt to escape all regex special characters.
+         *
+         * @param regex a string containing a regex expression
+         * @return a regex with all special characters escaped
+         */
+        abstract String format(String regex);
     }
 
     private final String query;
@@ -128,8 +146,7 @@ public class SearchQuery implements SearchMatcher {
     }
 
     /**
-     * Returns a list of words this query searches for.
-     * The returned strings can be a regular expression.
+     * Returns a list of words this query searches for. The returned strings can be a regular expression.
      */
     public List<String> getSearchWords() {
         if (isRegularExpression()) {
@@ -151,7 +168,9 @@ public class SearchQuery implements SearchMatcher {
         return joinWordsToPattern(EscapeMode.JAVASCRIPT);
     }
 
-    /** Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped if no regular expression search is enabled
+    /**
+     * Returns a regular expression pattern in the form (w1)|(w2)| ... wi are escaped if no regular expression search is enabled
+     *
      * @param escapeMode the mode of escaping special characters in wi
      */
     private Optional<Pattern> joinWordsToPattern(EscapeMode escapeMode) {
@@ -162,24 +181,12 @@ public class SearchQuery implements SearchMatcher {
         }
 
         // compile the words to a regular expression in the form (w1)|(w2)|(w3)
-        StringJoiner joiner = new StringJoiner(")|(", "(", ")");
-        for (String word : words) {
-            if (regularExpression) {
-                joiner.add(word);
-            } else {
-                switch (escapeMode) {
-                    case JAVA:
-                        joiner.add(Pattern.quote(word));
-                        break;
-                    case JAVASCRIPT:
-                        joiner.add(JAVASCRIPT_ESCAPED_CHARS_PATTERN.matcher(word).replaceAll("\\\\$0"));
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Unknown special characters escape mode: " + escapeMode);
-                }
-            }
+        Stream<String> joiner = words.stream();
+        if (!regularExpression) {
+            // Reformat string when we are looking for a literal match
+            joiner = joiner.map(escapeMode::format);
         }
-        String searchPattern = joiner.toString();
+        String searchPattern = joiner.collect(Collectors.joining(")|(", "(", ")"));
 
         if (caseSensitive) {
             return Optional.of(Pattern.compile(searchPattern));
