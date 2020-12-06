@@ -12,7 +12,7 @@ public class PullChangesFromSharedAction extends SimpleCommand {
     public PullChangesFromSharedAction(StateManager stateManager) {
         this.stateManager = stateManager;
 
-        this.executable.bind(ActionHelper.needsDatabase(stateManager));
+        this.executable.bind(ActionHelper.needsDatabase(stateManager).and(ActionHelper.needsSharedDatabase(stateManager)));
     }
 
     public void execute() {
