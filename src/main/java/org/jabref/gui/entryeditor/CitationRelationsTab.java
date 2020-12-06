@@ -116,7 +116,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         alignment.setId("activation-alignment");
         alignment.setFillWidth(true);
         alignment.setAlignment(Pos.BASELINE_CENTER);
-        Label infoLabel = new Label(Localization.lang("The search is currently deactivated"));
+        Label infoLabel = new Label(Localization.lang("The search is currently deactivated."));
         Button activate = new Button(Localization.lang("Activate"));
         activate.setOnAction(
                 event -> {
@@ -190,7 +190,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         importCitingButton.setTooltip(new Tooltip(Localization.lang("Add selected entries to database")));
         styleTopBarNode(importCitingButton, 50.0);
         Button importCitedByButton = IconTheme.JabRefIcons.ADD_ENTRY.asButton();
-        importCitedByButton.setTooltip(new Tooltip(Localization.lang("Import selected entries")));
+        importCitedByButton.setTooltip(new Tooltip(Localization.lang("Add selected entries to database")));
         styleTopBarNode(importCitedByButton, 50.0);
         setVisibility(false, importCitingButton, importCitedByButton);
 
