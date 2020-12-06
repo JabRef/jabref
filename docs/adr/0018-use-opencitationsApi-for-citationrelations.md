@@ -6,7 +6,6 @@ The JabRef-Software has an entry editor with multiple tabs. One of them is the "
 
 ## Considered Options
 
-* [Sematischolar](http://api.semantischolar.org/)
 * [OpenCitations](https://opencitations.net/index/api/v1)
 * [Citationgecko](http://citationgecko.com/)
 * [Yewno](https://www.yewno.com/discover)
