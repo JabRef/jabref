@@ -57,15 +57,14 @@ public class OpenCitationFetcher implements CitationBasedParserFetcher {
     @Override
     public BibEntry createNewEntry(JSONObject jsonObject) {
         LOGGER.debug("Paper found: {}", jsonObject.getString("doi"));
-        BibEntry newEntry = new BibEntry();
-        newEntry.setField(StandardField.TITLE, jsonObject.getString("title"));
-        newEntry.setField(StandardField.AUTHOR, jsonObject.getString("author"));
-        newEntry.setField(StandardField.YEAR, jsonObject.getString("year"));
-        newEntry.setField(StandardField.PAGES, jsonObject.getString("page"));
-        newEntry.setField(StandardField.VOLUME, jsonObject.getString("volume"));
-        newEntry.setField(StandardField.ISSUE, jsonObject.getString("issue"));
-        newEntry.setField(StandardField.DOI, jsonObject.getString("doi"));
-        return newEntry;
+        return new BibEntry()
+                .withField(StandardField.TITLE, jsonObject.getString("title"))
+                .withField(StandardField.AUTHOR, jsonObject.getString("author"))
+                .withField(StandardField.YEAR, jsonObject.getString("year"))
+                .withField(StandardField.PAGES, jsonObject.getString("page"))
+                .withField(StandardField.VOLUME, jsonObject.getString("volume"))
+                .withField(StandardField.ISSUE, jsonObject.getString("issue"))
+                .withField(StandardField.DOI, jsonObject.getString("doi"));
     }
 
     @Override
