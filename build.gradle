@@ -424,6 +424,10 @@ javadoc {
         encoding = 'UTF-8'
         version = true
         author = true
+         addMultilineStringsOption("-add-exports").setValue([
+            'javafx.controls/com.sun.javafx.scene.control=org.jabref',
+            'org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref'
+        ])
     }
 }
 
