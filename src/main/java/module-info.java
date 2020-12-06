@@ -47,7 +47,7 @@ open module org.jabref {
     requires applicationinsights.core;
 
     // Libre Office
-    requires org.jabref.thirdparty.libreoffice;
+    requires org.libreoffice.uno;
 
     // Other modules
     requires commons.logging;
