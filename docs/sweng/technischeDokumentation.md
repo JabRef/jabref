@@ -51,7 +51,7 @@ The following section describes the Mid-Level-Design of the extension using UML 
 
 Class Diagram of Citation Relations:
 
-![Image of Class Diagram of CitationRelations](images/classdiagram.png)
+![Image of Class Diagram of CitationRelations](images/ClassDiagram.png)
 
 ### 5.2 Dynamic
 
