@@ -44,16 +44,19 @@ public class OpenCitationFetcher implements CitationBasedParserFetcher {
 
     @Override
     public List<BibEntry> searchCitedBy(BibEntry entry) throws FetcherException {
+        LOGGER.debug("Search: {}", "Articles citing " + entry.getField(StandardField.DOI).orElse("'No DOI found'"));
         return performSearch(entry, SearchType.CITEDBY);
     }
 
     @Override
     public List<BibEntry> searchCiting(BibEntry entry) throws FetcherException {
+        LOGGER.debug("Search: {}", "Articles cited by " + entry.getField(StandardField.DOI).orElse("'No DOI found'"));
         return performSearch(entry, SearchType.CITING);
     }
 
     @Override
     public BibEntry createNewEntry(JSONObject jsonObject) {
+        LOGGER.debug("Paper found: {}", jsonObject.getString("doi"));
         BibEntry newEntry = new BibEntry();
         newEntry.setField(StandardField.TITLE, jsonObject.getString("title"));
         newEntry.setField(StandardField.AUTHOR, jsonObject.getString("author"));
@@ -67,6 +70,6 @@ public class OpenCitationFetcher implements CitationBasedParserFetcher {
 
     @Override
     public String getName() {
-        return "CitationRelationFetcher";
+        return "OpenCitationFetcher";
     }
 }
