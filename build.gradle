@@ -1,7 +1,6 @@
 import groovy.json.JsonSlurper
 import org.gradle.internal.os.OperatingSystem
 import org.jabref.build.JournalAbbreviationConverter
-import org.jabref.build.localization.LocalizationPlugin
 import org.jabref.build.xjc.XjcPlugin
 import org.jabref.build.xjc.XjcTask
 
@@ -30,7 +29,6 @@ apply plugin: 'jacoco'
 apply plugin: 'me.champeau.gradle.jmh'
 apply plugin: 'checkstyle'
 apply plugin: XjcPlugin
-apply plugin: LocalizationPlugin
 
 apply from: 'eclipse.gradle'
 
@@ -84,7 +82,6 @@ repositories {
 }
 
 configurations {
-    libreoffice
     antlr3
     antlr4
     // TODO: Remove the following workaround for split error messages such as
@@ -117,14 +114,8 @@ dependencies {
 
     implementation 'commons-cli:commons-cli:1.4'
 
-    // For Java 9+ compatibility, we include a bundled version of the libreoffice libraries
-    // See https://bugs.documentfoundation.org/show_bug.cgi?id=117331#c8 for background information
-    // Use the task bundleLibreOffice to update the bundled jar
-    // DO NOT CHANGE THE libreoffice PREFIX
-    libreoffice 'org.libreoffice:juh:6.4.3'
-    libreoffice 'org.libreoffice:jurt:6.4.3'
-    libreoffice 'org.libreoffice:ridl:6.4.3'
-    libreoffice 'org.libreoffice:unoil:6.4.3'
+    implementation 'org.libreoffice:libreoffice:7.0.3'
+    implementation 'org.libreoffice:unoloader:7.0.3'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.9'
     implementation 'info.debatty:java-string-similarity:2.0.0'
@@ -133,7 +124,7 @@ dependencies {
     implementation 'org.antlr:antlr-runtime:3.5.2'
 
     antlr4 'org.antlr:antlr4:4.9'
-    implementation 'org.antlr:antlr4-runtime:4.8-1'
+    implementation 'org.antlr:antlr4-runtime:4.9'
 
     implementation (group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.7.0') {
         exclude group: 'org.apache.lucene', module: 'lucene-sandbox'
@@ -221,7 +212,6 @@ dependencies {
 
     checkstyle 'com.puppycrawl.tools:checkstyle:8.38'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.3'
-    jython 'org.python:jython-standalone:2.7.2'
 }
 
 dependencyUpdates {
@@ -332,7 +322,7 @@ task generateMedlineSource(type: XjcTask) {
     description = "Generates java files for the medline importer."
 
     schemaFile = "src/main/resources/xjc/medline/medline.xsd"
-    outputDirectory = "src/main/generated/"
+    outputDirectory = "src/main/generated"
     javaPackage = "org.jabref.logic.importer.fileformat.medline"
 }
 
@@ -341,7 +331,7 @@ task generateBibtexmlSource(type: XjcTask) {
     description = "Generates java files for the bibtexml importer."
 
     schemaFile = "src/main/resources/xjc/bibtexml/bibtexml.xsd"
-    outputDirectory = "src/main/generated"
+    outputDirectory = "src/main/generated/"
     javaPackage = "org.jabref.logic.importer.fileformat.bibtexml"
 }
 
@@ -437,10 +427,13 @@ javadoc {
         encoding = 'UTF-8'
         version = true
         author = true
+         addMultilineStringsOption("-add-exports").setValue([
+            'javafx.controls/com.sun.javafx.scene.control=org.jabref',
+            'org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref'
+        ])
     }
 }
 
-localization.script = 'scripts/syncLang.py'
 
 test {
     useJUnitPlatform {
@@ -770,13 +763,4 @@ task downloadDependencies {
     }
 }
 
-task bundleLibreOffice(type: Jar) {
-    from configurations.libreoffice.collect { zipTree it }
 
-    manifest {
-        attributes 'Automatic-Module-Name': 'org.jabref.thirdparty.libreoffice'
-    }
-
-    destinationDir = file('lib')
-    archiveName = 'libreoffice.jar'
-}
