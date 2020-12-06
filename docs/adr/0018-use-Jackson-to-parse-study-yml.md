@@ -42,18 +42,13 @@ Chosen option: Jackson, because as it is a dedicated library for parsing YAML. y
 
 * Good, because established YAML parser library
 * Good, because supports YAML 1.2
-* Bad, because cannot parse YAML into Java DTOs?
+* Bad, because cannot parse YAML into Java DTOs
 
 ### Own parser
 
 * Good, because easily customizable
 * Bad, because high effort
 * Bad, because has to be tested extensively
-
-## Links
-
-* [Winery's ADR-0009](https://github.com/eclipse/winery/blob/master/docs/adr/0009-manual-tosca-yaml-serialisation.md)
-* [Winery's ADR-0010](https://github.com/eclipse/winery/blob/master/docs/adr/0010-tosca-yaml-deserialisation-using-snakeyaml.md)
 
 ## Links
 
