@@ -54,3 +54,8 @@ Chosen option: Jackson, because as it is a dedicated library for parsing YAML. y
 
 * [Winery's ADR-0009](https://github.com/eclipse/winery/blob/master/docs/adr/0009-manual-tosca-yaml-serialisation.md)
 * [Winery's ADR-0010](https://github.com/eclipse/winery/blob/master/docs/adr/0010-tosca-yaml-deserialisation-using-snakeyaml.md)
+
+## Links
+
+* [Winery's ADR-0009](https://github.com/eclipse/winery/blob/master/docs/adr/0009-manual-tosca-yaml-serialisation.md)
+* [Winery's ADR-0010](https://github.com/eclipse/winery/blob/master/docs/adr/0010-tosca-yaml-deserialisation-using-snakeyaml.md)
