@@ -17,8 +17,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added some basic functionality to customise the look of JabRef by importing a css theme file. [#5790](https://github.com/JabRef/jabref/issues/5790)
 - We added connection check function in network preference setting [#6560](https://github.com/JabRef/jabref/issues/6560)
 - We added support for exporting to YAML. [#6974](https://github.com/JabRef/jabref/issues/6974)
-- We added a DOI format and organization check to detect [American Physical Society](https://journals.aps.org/) journals to copy the article ID
-to the page field for cases where the page numbers are missing. [#7019](https://github.com/JabRef/jabref/issues/7019)
+- We added a DOI format and organization check to detect [American Physical Society](https://journals.aps.org/) journals to copy the article ID to the page field for cases where the page numbers are missing. [#7019](https://github.com/JabRef/jabref/issues/7019)
 - We added a new fetcher to enable users to search jstor.org [#6627](https://github.com/JabRef/jabref/issues/6627)
 - We added an error message in the New Entry dialog that is shown in case the fetcher did not find anything . [#7000](https://github.com/JabRef/jabref/issues/7000)
 - We added a new formatter to output shorthand month format. [#6579](https://github.com/JabRef/jabref/issues/6579)
@@ -28,8 +27,7 @@ to the page field for cases where the page numbers are missing. [#7019](https://
 
 ### Changed
 
-- We changed the default preferences for OpenOffice/LibreOffice integration to automatically sync the bibliography when
-inserting new citations in a OpenOffic/LibreOffice document. [#6957](https://github.com/JabRef/jabref/issues/6957)
+- We changed the default preferences for OpenOffice/LibreOffice integration to automatically sync the bibliography when inserting new citations in a OpenOffic/LibreOffice document. [#6957](https://github.com/JabRef/jabref/issues/6957)
 - We restructured the 'File' tab and extracted some parts into the 'Linked files' tab [#6779](https://github.com/JabRef/jabref/pull/6779)
 - JabRef now offers journal lists from <https://abbrv.jabref.org>. JabRef the lists which use a dot inside the abbreviations. [#5749](https://github.com/JabRef/jabref/pull/5749)
 - We removed two useless preferences in the groups preferences dialog. [#6836](https://github.com/JabRef/jabref/pull/6836)
