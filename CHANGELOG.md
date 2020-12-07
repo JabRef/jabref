@@ -49,8 +49,7 @@ inserting new citations in a OpenOffic/LibreOffice document. [#6957](https://git
 - We changed the way JabRef displays the title of a tab and of the window. [4161](https://github.com/JabRef/jabref/issues/4161)
 - We changed connect timeouts for server requests to 30 seconds in general and 5 seconds for GROBID server (special) and
   improved user notifications on connection issues. [7026](https://github.com/JabRef/jabref/pull/7026)
-- We changed the order of the library tab context menu items and added the library
-  properties [#7171](https://github.com/JabRef/jabref/issues/7171)
+- We changed the order of the library tab context menu items. [#7171](https://github.com/JabRef/jabref/issues/7171)
 - We changed the way linked files are opened on Linux to use the native openFile method, compatible with confined
   packages. [7037](https://github.com/JabRef/jabref/pull/7037)
 - We refined the entry preview to show the full names of authors and editors, to list the editor only if no author is present, have the year ealier. [#7083](https://github.com/JabRef/jabref/issues/7083)
