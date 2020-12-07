@@ -1011,6 +1011,7 @@ public class JabRefFrame extends BorderPane {
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.OPEN_DATABASE_FOLDER, new OpenDatabaseFolder()),
                 factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(stateManager)),
+                factory.createMenuItem(StandardActions.LIBRARY_PROPERTIES, new LibraryPropertiesAction(this, stateManager)),
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new CloseDatabaseAction()),
                 factory.createMenuItem(StandardActions.CLOSE_OTHER_LIBRARIES, new CloseOthersDatabaseAction()),
