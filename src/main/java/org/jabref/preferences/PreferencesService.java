@@ -269,7 +269,7 @@ public interface PreferencesService {
 
     void storeImportExportPreferences(ImportExportPreferences preferences);
 
-    boolean getShouldAutosave();
+    boolean shouldAutosave();
 
     void storeShouldAutosave(boolean shouldAutosave);
 

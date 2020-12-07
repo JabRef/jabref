@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.scene.control.TableColumn.SortType;
-import javafx.scene.paint.Color;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.SidePaneType;
@@ -114,17 +113,27 @@ import org.jabref.model.strings.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The {@code JabRefPreferences} class provides the preferences and their defaults using the JDK {@code java.util.prefs}
+ * class.
+ * <p>
+ * Internally it defines symbols used to pick a value from the {@code java.util.prefs} interface and keeps a hashmap
+ * with all the default values.
+ * <p>
+ * There are still some similar preferences classes (OpenOfficePreferences and SharedDatabasePreferences) which also use
+ * the {@code java.util.prefs} API.
+ */
 public class JabRefPreferences implements PreferencesService {
 
     // Push to application preferences
-    public static final String EMACS_PATH = "emacsPath";
-    public static final String EMACS_ADDITIONAL_PARAMETERS = "emacsParameters";
-    public static final String LYXPIPE = "lyxpipe";
-    public static final String TEXSTUDIO_PATH = "TeXstudioPath";
-    public static final String WIN_EDT_PATH = "winEdtPath";
-    public static final String TEXMAKER_PATH = "texmakerPath";
-    public static final String VIM_SERVER = "vimServer";
-    public static final String VIM = "vim";
+    public static final String PUSH_EMACS_PATH = "emacsPath";
+    public static final String PUSH_EMACS_ADDITIONAL_PARAMETERS = "emacsParameters";
+    public static final String PUSH_LYXPIPE = "lyxpipe";
+    public static final String PUSH_TEXSTUDIO_PATH = "TeXstudioPath";
+    public static final String PUSH_WINEDT_PATH = "winEdtPath";
+    public static final String PUSH_TEXMAKER_PATH = "texmakerPath";
+    public static final String PUSH_VIM_SERVER = "vimServer";
+    public static final String PUSH_VIM = "vim";
 
     /* contents of the defaults HashMap that are defined in this class.
      * There are more default parameters in this map which belong to separate preference classes.
@@ -164,7 +173,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SIDE_PANE_COMPONENT_NAMES = "sidePaneComponentNames";
     public static final String XMP_PRIVACY_FILTERS = "xmpPrivacyFilters";
     public static final String USE_XMP_PRIVACY_FILTER = "useXmpPrivacyFilter";
-    public static final String DEFAULT_AUTO_SORT = "defaultAutoSort";
     public static final String DEFAULT_SHOW_SOURCE = "defaultShowSource";
     // Window sizes
     public static final String SIZE_Y = "mainWindowSizeY";
@@ -179,7 +187,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String LAST_USED_EXPORT = "lastUsedExport";
     public static final String EXPORT_WORKING_DIRECTORY = "exportWorkingDirectory";
     public static final String WORKING_DIRECTORY = "workingDirectory";
-    public static final String GROUPS_DEFAULT_FIELD = "groupsDefaultField";
 
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
     public static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
@@ -189,7 +196,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String MAIN_FONT_SIZE = "mainFontSize";
 
     public static final String RECENT_DATABASES = "recentDatabases";
-    public static final String RENAME_ON_MOVE_FILE_TO_FILE_DIR = "renameOnMoveFileToFileDir";
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
     public static final String SHOW_ADVANCED_HINTS = "showAdvancedHints";
     public static final String DEFAULT_ENCODING = "defaultEncoding";
@@ -231,7 +237,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
     public static final String AVOID_OVERWRITING_KEY = "avoidOverwritingKey";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
-    public static final String SHOW_FILE_LINKS_UPGRADE_WARNING = "showFileLinksUpgradeWarning";
     public static final String SIDE_PANE_WIDTH = "sidePaneWidthFX";
     public static final String CITE_COMMAND = "citeCommand";
     public static final String GENERATE_KEYS_BEFORE_SAVING = "generateKeysBeforeSaving";
@@ -244,7 +249,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String RUN_AUTOMATIC_FILE_SEARCH = "runAutomaticFileSearch";
     public static final String AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY = "regExpSearchExpression";
     public static final String AUTOLINK_USE_REG_EXP_SEARCH_KEY = "useRegExpSearch";
-        // bibLocAsPrimaryDir is a misleading antique variable name, we keep it for reason of compatibility
+    // bibLocAsPrimaryDir is a misleading antique variable name, we keep it for reason of compatibility
     public static final String STORE_RELATIVE_TO_BIB = "bibLocAsPrimaryDir";
     public static final String SELECTED_FETCHER_INDEX = "selectedFetcherIndex";
     public static final String WEB_SEARCH_VISIBLE = "webSearchVisible";
@@ -346,12 +351,6 @@ public class JabRefPreferences implements PreferencesService {
     // Telemetry collection
     private static final String COLLECT_TELEMETRY = "collectTelemetry";
     private static final String ALREADY_ASKED_TO_COLLECT_TELEMETRY = "askedCollectTelemetry";
-    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefPreferences.class);
-    private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
-    private static final String DB_CONNECT_USERNAME = "dbConnectUsername";
-    private static final String DB_CONNECT_DATABASE = "dbConnectDatabase";
-    private static final String DB_CONNECT_HOSTNAME = "dbConnectHostname";
-    private static final String DB_CONNECT_SERVER_TYPE = "dbConnectServerType";
     private static final String PROTECTED_TERMS_ENABLED_EXTERNAL = "protectedTermsEnabledExternal";
     private static final String PROTECTED_TERMS_DISABLED_EXTERNAL = "protectedTermsDisabledExternal";
     private static final String PROTECTED_TERMS_ENABLED_INTERNAL = "protectedTermsEnabledInternal";
@@ -375,6 +374,9 @@ public class JabRefPreferences implements PreferencesService {
     // Remote
     private static final String USE_REMOTE_SERVER = "useRemoteServer";
     private static final String REMOTE_SERVER_PORT = "remoteServerPort";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefPreferences.class);
+    private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
 
     // The only instance of this class:
     private static JabRefPreferences singleton;
@@ -429,9 +431,13 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
 
-        defaults.put(TEXMAKER_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
-        defaults.put(WIN_EDT_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
-        defaults.put(TEXSTUDIO_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texstudio", "TeXstudio"));
+        defaults.put(PUSH_TEXMAKER_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
+        defaults.put(PUSH_WINEDT_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
+        defaults.put(PUSH_TEXSTUDIO_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texstudio", "TeXstudio"));
+        defaults.put(PUSH_LYXPIPE, USER_HOME + File.separator + ".lyx/lyxpipe");
+        defaults.put(PUSH_VIM, "vim");
+        defaults.put(PUSH_VIM_SERVER, "vim");
+        defaults.put(PUSH_EMACS_ADDITIONAL_PARAMETERS, "-n -e");
 
         defaults.put(BIBLATEX_DEFAULT_MODE, Boolean.FALSE);
 
@@ -440,16 +446,14 @@ public class JabRefPreferences implements PreferencesService {
 
         if (OS.OS_X) {
             defaults.put(FONT_FAMILY, "SansSerif");
-            defaults.put(EMACS_PATH, "emacsclient");
+            defaults.put(PUSH_EMACS_PATH, "emacsclient");
         } else if (OS.WINDOWS) {
-            defaults.put(EMACS_PATH, "emacsclient.exe");
+            defaults.put(PUSH_EMACS_PATH, "emacsclient.exe");
         } else {
             // Linux
             defaults.put(FONT_FAMILY, "SansSerif");
-            defaults.put(EMACS_PATH, "emacsclient");
+            defaults.put(PUSH_EMACS_PATH, "emacsclient");
         }
-
-        defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
 
         defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
 
@@ -466,9 +470,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PROXY_USERNAME, "");
         defaults.put(PROXY_PASSWORD, "");
 
-        defaults.put(LYXPIPE, USER_HOME + File.separator + ".lyx/lyxpipe");
-        defaults.put(VIM, "vim");
-        defaults.put(VIM_SERVER, "vim");
         defaults.put(POS_X, 0);
         defaults.put(POS_Y, 0);
         defaults.put(SIZE_X, 1024);
@@ -519,8 +520,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(LAST_FOCUSED, "");
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
 
-        defaults.put(DEFAULT_AUTO_SORT, Boolean.FALSE);
-
         defaults.put(MERGE_ENTRIES_DIFF_MODE, MergeEntries.DiffMode.WORD.name());
 
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
@@ -543,7 +542,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(DEFAULT_OWNER, System.getProperty("user.name"));
         defaults.put(MEMORY_STICK_MODE, Boolean.FALSE);
         defaults.put(SHOW_ADVANCED_HINTS, Boolean.TRUE);
-        defaults.put(RENAME_ON_MOVE_FILE_TO_FILE_DIR, Boolean.TRUE);
 
         defaults.put(EXTRA_FILE_COLUMNS, Boolean.FALSE);
 
@@ -611,7 +609,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(MAIN_FONT_SIZE, 9);
         defaults.put(OVERRIDE_DEFAULT_FONT_SIZE, false);
 
-        defaults.put(SHOW_FILE_LINKS_UPGRADE_WARNING, Boolean.TRUE);
         defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.FALSE);
         defaults.put(RUN_AUTOMATIC_FILE_SEARCH, Boolean.FALSE);
         defaults.put(LOCAL_AUTO_SAVE, Boolean.FALSE);
@@ -627,10 +624,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(GROUP_SIDEPANE_VISIBLE, Boolean.TRUE);
         defaults.put(SELECTED_FETCHER_INDEX, 0);
         defaults.put(STORE_RELATIVE_TO_BIB, Boolean.TRUE);
-        defaults.put(DB_CONNECT_SERVER_TYPE, "MySQL");
-        defaults.put(DB_CONNECT_HOSTNAME, "localhost");
-        defaults.put(DB_CONNECT_DATABASE, "jabref");
-        defaults.put(DB_CONNECT_USERNAME, "root");
         defaults.put(COLLECT_TELEMETRY, Boolean.FALSE);
         defaults.put(ALREADY_ASKED_TO_COLLECT_TELEMETRY, Boolean.FALSE);
 
@@ -924,27 +917,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     /**
-     * Set the default value for a key. This is useful for plugins that need to add default values for the prefs keys they use.
-     *
-     * @param key   The preferences key.
-     * @param value The default value.
-     */
-    public void putDefaultValue(String key, Object value) {
-        defaults.put(key, value);
-    }
-
-    /**
-     * Stores a color in preferences.
-     *
-     * @param key   The key for this setting.
-     * @param color The Color to store.
-     */
-    public void putColor(String key, Color color) {
-        String rgb = String.valueOf(color.getRed()) + ':' + color.getGreen() + ':' + color.getBlue();
-        put(key, rgb);
-    }
-
-    /**
      * Clear all preferences.
      *
      * @throws BackingStoreException if JabRef is unable to write to the registry/the preferences storage
@@ -1114,21 +1086,6 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    /**
-     * ONLY FOR TESTING!
-     * <p>
-     * Do not use in production code. Otherwise the singleton pattern is broken and preferences might get lost.
-     *
-     * @param owPrefs The custom preferences to overwrite the currently present
-     */
-    public void overwritePreferences(JabRefPreferences owPrefs) {
-        singleton = owPrefs;
-    }
-
-    public String getWrappedUsername() {
-        return '[' + get(DEFAULT_OWNER) + ']';
-    }
-
     private FileLinkPreferences getFileLinkPreferences() {
         return new FileLinkPreferences(
                 get(MAIN_FILE_DIRECTORY), // REALLY HERE?
@@ -1168,9 +1125,8 @@ public class JabRefPreferences implements PreferencesService {
         put(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE, openOfficePreferences.getCurrentStyle());
     }
 
-    public JabRefPreferences storeVersionPreferences(VersionPreferences versionPreferences) {
+    public void storeVersionPreferences(VersionPreferences versionPreferences) {
         put(VERSION_IGNORED_UPDATE, versionPreferences.getIgnoredVersion().toString());
-        return this;
     }
 
     public VersionPreferences getVersionPreferences() {
@@ -1320,14 +1276,6 @@ public class JabRefPreferences implements PreferencesService {
         return get(PREVIEW_STYLE);
     }
 
-    public Optional<Integer> getFontSize() {
-        if (getBoolean(OVERRIDE_DEFAULT_FONT_SIZE)) {
-            return Optional.of(getInt(MAIN_FONT_SIZE));
-        } else {
-            return Optional.empty();
-        }
-    }
-
     public void setIdBasedFetcherForEntryGenerator(String fetcherName) {
         put(ID_ENTRY_GENERATOR, fetcherName);
     }
@@ -1427,9 +1375,9 @@ public class JabRefPreferences implements PreferencesService {
     private void updateLanguage() {
         String languageId = get(LANGUAGE);
         language = Stream.of(Language.values())
-                     .filter(language -> language.getId().equalsIgnoreCase(languageId))
-                     .findFirst()
-                     .orElse(Language.ENGLISH);
+                         .filter(language -> language.getId().equalsIgnoreCase(languageId))
+                         .findFirst()
+                         .orElse(Language.ENGLISH);
     }
 
     @Override
@@ -1530,11 +1478,11 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public void storeTimestampPreferences(TimestampPreferences preferences) {
-        putBoolean(USE_TIME_STAMP, preferences.isUseTimestamps());
-        putBoolean(UPDATE_TIMESTAMP, preferences.isUpdateTimestamp());
+        putBoolean(USE_TIME_STAMP, preferences.shouldUseTimestamps());
+        putBoolean(UPDATE_TIMESTAMP, preferences.shouldUpdateTimestamp());
         put(TIME_STAMP_FIELD, preferences.getTimestampField().getName());
         put(TIME_STAMP_FORMAT, preferences.getTimestampFormat());
-        putBoolean(OVERWRITE_TIME_STAMP, preferences.isOverwriteTimestamp());
+        putBoolean(OVERWRITE_TIME_STAMP, preferences.shouldOverwriteTimestamp());
     }
 
     //*************************************************************************************************************
@@ -1717,7 +1665,7 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(ACCEPT_RECOMMENDATIONS, preferences.isMrdlibAccepted());
         putBoolean(SHOW_LATEX_CITATIONS, preferences.shouldShowLatexCitationsTab());
         putBoolean(DEFAULT_SHOW_SOURCE, preferences.showSourceTabByDefault());
-        putBoolean(VALIDATE_IN_ENTRY_EDITOR, preferences.isEnableValidation());
+        putBoolean(VALIDATE_IN_ENTRY_EDITOR, preferences.shouldEnableValidation());
         putDouble(ENTRY_EDITOR_HEIGHT, preferences.getDividerPosition());
     }
 
@@ -1892,31 +1840,31 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public PushToApplicationPreferences getPushToApplicationPreferences() {
         Map<String, String> applicationCommands = new HashMap<>();
-        applicationCommands.put(PushToEmacs.NAME, get(EMACS_PATH));
-        applicationCommands.put(PushToLyx.NAME, get(LYXPIPE));
-        applicationCommands.put(PushToTexmaker.NAME, get(TEXMAKER_PATH));
-        applicationCommands.put(PushToTeXstudio.NAME, get(TEXSTUDIO_PATH));
-        applicationCommands.put(PushToVim.NAME, get(VIM));
-        applicationCommands.put(PushToWinEdt.NAME, get(WIN_EDT_PATH));
+        applicationCommands.put(PushToEmacs.NAME, get(PUSH_EMACS_PATH));
+        applicationCommands.put(PushToLyx.NAME, get(PUSH_LYXPIPE));
+        applicationCommands.put(PushToTexmaker.NAME, get(PUSH_TEXMAKER_PATH));
+        applicationCommands.put(PushToTeXstudio.NAME, get(PUSH_TEXSTUDIO_PATH));
+        applicationCommands.put(PushToVim.NAME, get(PUSH_VIM));
+        applicationCommands.put(PushToWinEdt.NAME, get(PUSH_WINEDT_PATH));
 
         return new PushToApplicationPreferences(
                 applicationCommands,
-                get(EMACS_ADDITIONAL_PARAMETERS),
-                get(VIM_SERVER)
+                get(PUSH_EMACS_ADDITIONAL_PARAMETERS),
+                get(PUSH_VIM_SERVER)
         );
     }
 
     @Override
     public void storePushToApplicationPreferences(PushToApplicationPreferences preferences) {
-        put(EMACS_PATH, preferences.getPushToApplicationCommandPaths().get(PushToEmacs.NAME));
-        put(LYXPIPE, preferences.getPushToApplicationCommandPaths().get(PushToLyx.NAME));
-        put(TEXMAKER_PATH, preferences.getPushToApplicationCommandPaths().get(PushToTexmaker.NAME));
-        put(TEXSTUDIO_PATH, preferences.getPushToApplicationCommandPaths().get(PushToTeXstudio.NAME));
-        put(VIM, preferences.getPushToApplicationCommandPaths().get(PushToVim.NAME));
-        put(WIN_EDT_PATH, preferences.getPushToApplicationCommandPaths().get(PushToWinEdt.NAME));
+        put(PUSH_EMACS_PATH, preferences.getPushToApplicationCommandPaths().get(PushToEmacs.NAME));
+        put(PUSH_LYXPIPE, preferences.getPushToApplicationCommandPaths().get(PushToLyx.NAME));
+        put(PUSH_TEXMAKER_PATH, preferences.getPushToApplicationCommandPaths().get(PushToTexmaker.NAME));
+        put(PUSH_TEXSTUDIO_PATH, preferences.getPushToApplicationCommandPaths().get(PushToTeXstudio.NAME));
+        put(PUSH_VIM, preferences.getPushToApplicationCommandPaths().get(PushToVim.NAME));
+        put(PUSH_WINEDT_PATH, preferences.getPushToApplicationCommandPaths().get(PushToWinEdt.NAME));
 
-        put(EMACS_ADDITIONAL_PARAMETERS, preferences.getEmacsArguments());
-        put(VIM_SERVER, preferences.getVimServer());
+        put(PUSH_EMACS_ADDITIONAL_PARAMETERS, preferences.getEmacsArguments());
+        put(PUSH_VIM_SERVER, preferences.getVimServer());
     }
 
     @Override
@@ -2339,7 +2287,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public boolean getShouldAutosave() {
+    public boolean shouldAutosave() {
         return getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE);
     }
 

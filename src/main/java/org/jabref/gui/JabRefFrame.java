@@ -1071,7 +1071,7 @@ public class JabRefFrame extends BorderPane {
 
     private boolean readyForAutosave(BibDatabaseContext context) {
         return ((context.getLocation() == DatabaseLocation.SHARED) ||
-                ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)))
+                ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.shouldAutosave()))
                 &&
                 context.getDatabasePath().isPresent();
     }

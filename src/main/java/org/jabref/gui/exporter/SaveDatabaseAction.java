@@ -34,7 +34,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,14 +52,14 @@ public class SaveDatabaseAction {
     private final LibraryTab libraryTab;
     private final JabRefFrame frame;
     private final DialogService dialogService;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
     private final BibEntryTypesManager entryTypesManager;
 
     public enum SaveDatabaseMode {
         SILENT, NORMAL
     }
 
-    public SaveDatabaseAction(LibraryTab libraryTab, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager) {
+    public SaveDatabaseAction(LibraryTab libraryTab, PreferencesService preferences, BibEntryTypesManager entryTypesManager) {
         this.libraryTab = libraryTab;
         this.frame = libraryTab.frame();
         this.dialogService = frame.getDialogService();
@@ -266,7 +266,7 @@ public class SaveDatabaseAction {
     private boolean readyForAutosave(BibDatabaseContext context) {
         return ((context.getLocation() == DatabaseLocation.SHARED) ||
                 ((context.getLocation() == DatabaseLocation.LOCAL)
-                        && preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)))
+                        && preferences.shouldAutosave()))
                 &&
                 context.getDatabasePath().isPresent();
     }

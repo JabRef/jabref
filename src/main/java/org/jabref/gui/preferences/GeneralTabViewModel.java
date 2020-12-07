@@ -113,11 +113,11 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         markOwnerNameProperty.setValue(initialOwnerPreferences.getDefaultOwner());
         markOwnerOverwriteProperty.setValue(initialOwnerPreferences.isOverwriteOwner());
 
-        markTimestampProperty.setValue(initialTimestampPreferences.isUseTimestamps());
+        markTimestampProperty.setValue(initialTimestampPreferences.shouldUseTimestamps());
         markTimeStampFormatProperty.setValue(initialTimestampPreferences.getTimestampFormat());
-        markTimeStampOverwriteProperty.setValue(initialTimestampPreferences.isOverwriteTimestamp());
+        markTimeStampOverwriteProperty.setValue(initialTimestampPreferences.shouldOverwriteTimestamp());
         markTimeStampFieldNameProperty.setValue(initialTimestampPreferences.getTimestampField().getName());
-        updateTimeStampProperty.setValue(initialTimestampPreferences.isUpdateTimestamp());
+        updateTimeStampProperty.setValue(initialTimestampPreferences.shouldUpdateTimestamp());
     }
 
     public void storeSettings() {

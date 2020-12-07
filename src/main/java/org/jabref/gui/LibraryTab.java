@@ -238,7 +238,7 @@ public class LibraryTab extends Tab {
 
     private boolean isDatabaseReadyForAutoSave(BibDatabaseContext context) {
         return ((context.getLocation() == DatabaseLocation.SHARED) ||
-                ((context.getLocation() == DatabaseLocation.LOCAL) && preferencesService.getShouldAutosave()))
+                ((context.getLocation() == DatabaseLocation.LOCAL) && preferencesService.shouldAutosave()))
                 &&
                 context.getDatabasePath().isPresent();
     }
@@ -252,7 +252,7 @@ public class LibraryTab extends Tab {
      * Example: *jabref-authors.bib – testbib
      */
     public void updateTabTitle(boolean isChanged) {
-        boolean isAutosaveEnabled = preferencesService.getShouldAutosave();
+        boolean isAutosaveEnabled = preferencesService.shouldAutosave();
 
         DatabaseLocation databaseLocation = bibDatabaseContext.getLocation();
         Optional<Path> file = bibDatabaseContext.getDatabasePath();

@@ -50,7 +50,7 @@ public class FieldEditors {
                 databaseContext,
                 preferences.getFilePreferences(),
                 journalAbbreviationRepository,
-                preferences.getBoolean(JabRefPreferences.ALLOW_INTEGER_EDITION_BIBTEX));
+                preferences.getAllowIntegerEdition());
 
         boolean isMultiLine = FieldFactory.isMultiLineField(field, preferences.getFieldContentParserPreferences().getNonWrappableFields());
 

@@ -92,7 +92,7 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         saveSecondaryDescPropertySelected.setValue(initialExportOrder.getSortCriteria().get(1).descending);
         saveTertiaryDescPropertySelected.setValue(initialExportOrder.getSortCriteria().get(2).descending);
 
-        autosaveLocalLibraries.setValue(preferences.getShouldAutosave());
+        autosaveLocalLibraries.setValue(preferences.shouldAutosave());
     }
 
     @Override
