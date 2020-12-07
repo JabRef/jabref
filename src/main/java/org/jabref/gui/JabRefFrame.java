@@ -138,6 +138,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.TelemetryPreferences;
 
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
@@ -290,7 +291,7 @@ public class JabRefFrame extends BorderPane {
     }
 
     private void initShowTrackingNotification() {
-        if (!Globals.prefs.shouldAskToCollectTelemetry()) {
+        if (Globals.prefs.getTelemetryPreferences().shouldAskToCollectTelemetry()) {
             JabRefExecutorService.INSTANCE.submit(new TimerTask() {
 
                 @Override
@@ -301,19 +302,20 @@ public class JabRefFrame extends BorderPane {
         }
     }
 
-    private Void showTrackingNotification() {
-        if (!Globals.prefs.shouldCollectTelemetry()) {
-            boolean shouldCollect = dialogService.showConfirmationDialogAndWait(
+    private void showTrackingNotification() {
+        TelemetryPreferences telemetryPreferences = Globals.prefs.getTelemetryPreferences();
+        boolean shouldCollect = telemetryPreferences.shouldCollectTelemetry();
+
+        if (!telemetryPreferences.shouldCollectTelemetry()) {
+            shouldCollect = dialogService.showConfirmationDialogAndWait(
                     Localization.lang("Telemetry: Help make JabRef better"),
                     Localization.lang("To improve the user experience, we would like to collect anonymous statistics on the features you use. We will only record what features you access and how often you do it. We will neither collect any personal data nor the content of bibliographic items. If you choose to allow data collection, you can later disable it via Options -> Preferences -> General."),
                     Localization.lang("Share anonymous statistics"),
                     Localization.lang("Don't share"));
-            Globals.prefs.setShouldCollectTelemetry(shouldCollect);
         }
 
-        Globals.prefs.askedToCollectTelemetry();
-
-        return null;
+        Globals.prefs.storeTelemetryPreferences(telemetryPreferences.withCollectTelemetry(shouldCollect)
+                                                                    .withAskToCollectTelemetry(false));
     }
 
     /**

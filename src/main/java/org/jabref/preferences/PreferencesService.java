@@ -121,21 +121,13 @@ public interface PreferencesService {
 
     void setLanguage(Language language);
 
-    boolean shouldCollectTelemetry();
-
-    void setShouldCollectTelemetry(boolean value);
-
-    boolean shouldAskToCollectTelemetry();
-
-    void askedToCollectTelemetry();
-
-    String getUnwantedCharacters();
-
-    boolean getAllowIntegerEdition();
-
     GeneralPreferences getGeneralPreferences();
 
     void storeGeneralPreferences(GeneralPreferences preferences);
+
+    TelemetryPreferences getTelemetryPreferences();
+
+    void storeTelemetryPreferences(TelemetryPreferences preferences);
 
     OwnerPreferences getOwnerPreferences();
 

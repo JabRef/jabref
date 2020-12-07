@@ -1397,36 +1397,6 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public boolean shouldCollectTelemetry() {
-        return getBoolean(COLLECT_TELEMETRY);
-    }
-
-    @Override
-    public void setShouldCollectTelemetry(boolean value) {
-        putBoolean(COLLECT_TELEMETRY, value);
-    }
-
-    @Override
-    public boolean shouldAskToCollectTelemetry() {
-        return getBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY);
-    }
-
-    @Override
-    public void askedToCollectTelemetry() {
-        putBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY, true);
-    }
-
-    @Override
-    public String getUnwantedCharacters() {
-        return get(UNWANTED_CITATION_KEY_CHARACTERS);
-    }
-
-    @Override
-    public boolean getAllowIntegerEdition() {
-        return getBoolean(ALLOW_INTEGER_EDITION_BIBTEX);
-    }
-
-    @Override
     public GeneralPreferences getGeneralPreferences() {
         return new GeneralPreferences(
                 getDefaultEncoding(),
@@ -1435,7 +1405,6 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(CONFIRM_DELETE),
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
                 getBoolean(MEMORY_STICK_MODE),
-                shouldCollectTelemetry(),
                 getBoolean(SHOW_ADVANCED_HINTS));
     }
 
@@ -1447,8 +1416,21 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(CONFIRM_DELETE, preferences.shouldConfirmDelete());
         putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, preferences.shouldAllowIntegerEditionBibtex());
         putBoolean(MEMORY_STICK_MODE, preferences.isMemoryStickMode());
-        setShouldCollectTelemetry(preferences.shouldCollectTelemetry());
         putBoolean(SHOW_ADVANCED_HINTS, preferences.shouldShowAdvancedHints());
+    }
+
+    @Override
+    public TelemetryPreferences getTelemetryPreferences() {
+        return new TelemetryPreferences(
+                getBoolean(COLLECT_TELEMETRY),
+                !getBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY) // mind the !
+        );
+    }
+
+    @Override
+    public void storeTelemetryPreferences(TelemetryPreferences preferences) {
+        putBoolean(COLLECT_TELEMETRY, preferences.shouldCollectTelemetry());
+        putBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY, !preferences.shouldAskToCollectTelemetry()); // mind the !
     }
 
     @Override
