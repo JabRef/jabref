@@ -72,7 +72,12 @@ class StudyRepository {
      *                                  does not exist
      * @throws ParseException           Problem parsing the study definition file.
      */
-    public StudyRepository(Path pathToRepository, GitHandler gitHandler, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileUpdateMonitor, SavePreferences savePreferences, BibEntryTypesManager bibEntryTypesManager) throws IOException, ParseException {
+    public StudyRepository(Path pathToRepository,
+                           GitHandler gitHandler,
+                           ImportFormatPreferences importFormatPreferences,
+                           FileUpdateMonitor fileUpdateMonitor,
+                           SavePreferences savePreferences,
+                           BibEntryTypesManager bibEntryTypesManager) throws IOException, ParseException {
         this.repositoryPath = pathToRepository;
         this.gitHandler = gitHandler;
         try {
