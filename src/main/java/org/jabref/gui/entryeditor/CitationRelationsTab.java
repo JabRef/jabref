@@ -197,6 +197,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         citingHBox.getChildren().addAll(citingLabel, refreshCitingButton, importCitingButton, citingProgress, abortCitingButton);
         citedByHBox.getChildren().addAll(citedByLabel, refreshCitedByButton, importCitedByButton, citedByProgress, abortCitedButton);
 
+        VBox.setVgrow(citingListView, Priority.ALWAYS);
+        VBox.setVgrow(citedByListView, Priority.ALWAYS);
         citingVBox.getChildren().addAll(citingHBox, citingListView);
         citedByVBox.getChildren().addAll(citedByHBox, citedByListView);
 
@@ -205,9 +207,6 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         // Create SplitPane to hold all nodes above
         SplitPane container = new SplitPane(citedByVBox, citingVBox);
-
-        citingListView.prefHeightProperty().bind(container.heightProperty());
-        citedByListView.prefHeightProperty().bind(container.heightProperty());
 
         styleFetchedListView(citingListView);
         styleFetchedListView(citedByListView);
@@ -224,7 +223,7 @@ public class CitationRelationsTab extends EntryEditorTab {
      * @param listView CheckListView to style
      */
     private void styleFetchedListView(CheckListView<CitationRelationItem> listView) {
-        PseudoClass entrySelected = PseudoClass.getPseudoClass("entry-selected");
+        PseudoClass entrySelected = PseudoClass.getPseudoClass("selected");
         new ViewModelListCellFactory<CitationRelationItem>()
                 .withGraphic(e -> {
 
@@ -264,7 +263,11 @@ public class CitationRelationsTab extends EntryEditorTab {
 
                     return hContainer;
                 })
-                .withOnMouseClickedEvent((ee, event) -> listView.getCheckModel().toggleCheckState(ee))
+                .withOnMouseClickedEvent((ee, event) -> {
+                    if (!ee.isLocal()) {
+                        listView.getCheckModel().toggleCheckState(ee);
+                    }
+                })
                 .withPseudoClass(entrySelected, listView::getItemBooleanProperty)
                 .install(listView);
 
@@ -387,7 +390,8 @@ public class CitationRelationsTab extends EntryEditorTab {
                 })
                 .onFailure(exception -> {
                     LOGGER.error("Error while fetching citing Articles", exception);
-                    setVisibility(false, abort, progress, refreshButton, importButton);
+                    setVisibility(false, abort, progress, importButton);
+                    refreshButton.setVisible(true);
                     dialogService.notify(exception.getMessage());
                 })
                 .executeWith(Globals.TASK_EXECUTOR);
