@@ -230,7 +230,7 @@ class StudyRepositoryTest {
 
     private BibDatabase getNonDuplicateBibEntryResult() {
         BibDatabase mockResults = new BibDatabase(getSpringerCloudComputingMockResults());
-        DatabaseMerger merger = new DatabaseMerger();
+        DatabaseMerger merger = new DatabaseMerger(importFormatPreferences.getKeywordSeparator());
         merger.merge(mockResults, new BibDatabase(getSpringerQuantumMockResults()));
         merger.merge(mockResults, new BibDatabase(getArXivQuantumMockResults()));
         return mockResults;
