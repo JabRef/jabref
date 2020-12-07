@@ -92,7 +92,8 @@ open module org.jabref {
     requires lucene.queryparser;
     requires lucene.core;
     requires org.eclipse.jgit;
-    requires org.apache.commons.text;
-    requires org.apache.commons.codec;
+    requires com.fasterxml.jackson.databind;
+    requires com.fasterxml.jackson.dataformat.yaml;
+    requires com.fasterxml.jackson.datatype.jsr310;
     requires org.apache.fontbox;
 }
