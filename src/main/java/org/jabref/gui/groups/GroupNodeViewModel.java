@@ -290,10 +290,12 @@ public class GroupNodeViewModel {
     }
 
     /**
-     * Decides if the content stored in the given {@link Dragboard} can be droped on the given target row.
-     * Currently, the following sources are allowed:
-     *  - another group (will be added as subgroup on drop)
-     *  - entries if the group implements {@link GroupEntryChanger} (will be assigned to group on drop)
+     * Decides if the content stored in the given {@link Dragboard} can be dropped on the given target row. Currently,
+     * the following sources are allowed:
+     * <ul>
+     *     <li>another group (will be added as subgroup on drop)</li>
+     *     <li>entries if the group implements {@link GroupEntryChanger} (will be assigned to group on drop)</li>
+     * </ul>
      */
     public boolean acceptableDrop(Dragboard dragboard) {
         // TODO: we should also check isNodeDescendant
@@ -343,15 +345,9 @@ public class GroupNodeViewModel {
             // Bottom + top -> insert source row before / after this row
             // Center -> add as child
             switch (mouseLocation) {
-                case BOTTOM:
-                    this.moveTo(targetParent.get(), targetIndex + 1);
-                    break;
-                case CENTER:
-                    this.moveTo(target);
-                    break;
-                case TOP:
-                    this.moveTo(targetParent.get(), targetIndex);
-                    break;
+                case BOTTOM -> this.moveTo(targetParent.get(), targetIndex + 1);
+                case CENTER -> this.moveTo(target);
+                case TOP -> this.moveTo(targetParent.get(), targetIndex);
             }
         } else {
             // No parent = root -> just add

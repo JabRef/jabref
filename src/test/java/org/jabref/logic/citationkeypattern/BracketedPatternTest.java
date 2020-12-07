@@ -280,7 +280,7 @@ class BracketedPatternTest {
     }
 
     @Test
-    void expandBracketsWithModifierContainingRegexCharacterCkass() {
+    void expandBracketsWithModifierContainingRegexCharacterClass() {
         BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Wickedness:Managing");
 
         assertEquals("Wickedness.Managing", BracketedPattern.expandBrackets("[title:regex(\"[:]+\",\".\")]", null, bibEntry, null));

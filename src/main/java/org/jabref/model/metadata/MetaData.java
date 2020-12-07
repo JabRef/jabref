@@ -60,7 +60,7 @@ public class MetaData {
     private boolean isProtected;
     private String defaultFileDirectory;
     private final ContentSelectors contentSelectors = new ContentSelectors();
-    private final Map<String, List<String>> unkownMetaData = new HashMap<>();
+    private final Map<String, List<String>> unknownMetaData = new HashMap<>();
     private boolean isEventPropagationEnabled = true;
 
     /**
@@ -84,8 +84,7 @@ public class MetaData {
     }
 
     /**
-     * Sets a new group root node. <b>WARNING </b>: This invalidates everything
-     * returned by getGroups() so far!!!
+     * Sets a new group root node. <b>WARNING </b>: This invalidates everything returned by getGroups() so far!!!
      */
     public void setGroups(GroupTreeNode root) {
         groupsRoot = Objects.requireNonNull(root);
@@ -317,14 +316,14 @@ public class MetaData {
     }
 
     public Map<String, List<String>> getUnknownMetaData() {
-        return Collections.unmodifiableMap(unkownMetaData);
+        return Collections.unmodifiableMap(unknownMetaData);
     }
 
     public void putUnknownMetaDataItem(String key, List<String> value) {
         Objects.requireNonNull(key);
         Objects.requireNonNull(value);
 
-        unkownMetaData.put(key, value);
+        unknownMetaData.put(key, value);
     }
 
     @Override
