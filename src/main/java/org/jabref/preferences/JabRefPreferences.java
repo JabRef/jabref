@@ -694,8 +694,8 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     /**
-     * @deprecated Use {@link PreferencesService)} instead
      * @return Instance of JaRefPreferences
+     * @deprecated Use {@link PreferencesService} instead
      */
     @Deprecated
     public static JabRefPreferences getInstance() {
