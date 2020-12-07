@@ -313,13 +313,16 @@ public class LibraryTab extends Tab {
                 addSharedDbInformation(toolTipText, bibDatabaseContext);
             }
             addModeInfo(toolTipText, bibDatabaseContext);
-            if (databaseLocation == DatabaseLocation.LOCAL && bibDatabaseContext.getDatabase().hasEntries()) {
+            if ((databaseLocation == DatabaseLocation.LOCAL) && bibDatabaseContext.getDatabase().hasEntries()) {
                 addChangedInformation(toolTipText, Localization.lang("untitled"));
             }
         }
 
-        textProperty().setValue(tabTitle.toString());
-        setTooltip(new Tooltip(toolTipText.toString()));
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            textProperty().setValue(tabTitle.toString());
+            setTooltip(new Tooltip(toolTipText.toString()));
+        });
+
     }
 
     private static void addChangedInformation(StringBuilder text, String fileName) {
