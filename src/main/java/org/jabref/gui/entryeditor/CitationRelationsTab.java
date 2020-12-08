@@ -536,16 +536,15 @@ public class CitationRelationsTab extends EntryEditorTab {
     /**
      * Returns a String Containing the DOIs of a List of Entries. Ignores Entries with no DOI
      *
-     * @param be The List of BibEntries to serialize
+     * @param bibEntries The List of BibEntries to serialize
      * @return A Comma Separated List of CitationKeys(of the given List of Entries)
      */
-    static String serialize(List<BibEntry> be) {
-        List<String> ret = new ArrayList<>();
-        for (BibEntry b : be) {
-            Optional<String> s = b.getField(StandardField.DOI);
-            s.ifPresent(ret::add);
-        }
-        return String.join(",", ret);
+    static String serialize(List<BibEntry> bibEntries) {
+        return bibEntries.stream()
+                         .map(bibEntry -> bibEntry.getField(StandardField.DOI))
+                         .filter(Optional::isPresent)
+                         .map(Optional::get)
+                         .collect(Collectors.joining(","));
     }
 
     /**
