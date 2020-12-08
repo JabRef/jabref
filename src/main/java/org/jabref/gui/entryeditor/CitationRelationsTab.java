@@ -74,16 +74,16 @@ public class CitationRelationsTab extends EntryEditorTab {
      * Class to hold a BibEntry and a boolean value whether it's already in the current database or not.
      */
     public static class CitationRelationItem {
-        private final BibEntry bibEntry;
+        private final BibEntry entry;
         private final boolean local;
 
-        public CitationRelationItem(BibEntry bibEntry, boolean local) {
-            this.bibEntry = bibEntry;
+        public CitationRelationItem(BibEntry entry, boolean local) {
+            this.entry = entry;
             this.local = local;
         }
 
-        public BibEntry getBibEntry() {
-            return bibEntry;
+        public BibEntry getEntry() {
+            return entry;
         }
 
         public boolean isLocal() {
@@ -230,7 +230,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
                     HBox separator = new HBox();
                     HBox.setHgrow(separator, Priority.SOMETIMES);
-                    Node entryNode = BibEntryView.getEntryNode(entry.getBibEntry());
+                    Node entryNode = BibEntryView.getEntryNode(entry.getEntry());
                     HBox.setHgrow(entryNode, Priority.ALWAYS);
                     HBox hContainer = new HBox();
                     hContainer.prefWidthProperty().bind(listView.widthProperty().subtract(25));
@@ -240,8 +240,8 @@ public class CitationRelationsTab extends EntryEditorTab {
                         jumpTo.setTooltip(new Tooltip(Localization.lang("Jump to entry in database")));
                         jumpTo.getStyleClass().add("addEntryButton");
                         jumpTo.setOnMouseClicked(event -> {
-                            libraryTab.showAndEdit(entry.getBibEntry());
-                            libraryTab.clearAndSelect(entry.getBibEntry());
+                            libraryTab.showAndEdit(entry.getEntry());
+                            libraryTab.clearAndSelect(entry.getEntry());
                             citingTask.cancel();
                             citedByTask.cancel();
                         });
@@ -513,17 +513,17 @@ public class CitationRelationsTab extends EntryEditorTab {
      */
     Optional<BibEntry> getEntryByDOI(String doi) {
         return databaseContext.getEntries().stream().
-                filter(bibEntry -> doi.equals(bibEntry.getField(StandardField.DOI).orElse(""))).findFirst();
+                filter(entry -> doi.equals(entry.getField(StandardField.DOI).orElse(""))).findFirst();
     }
 
     /**
      * Returns a String Containing the DOIs of a List of Entries. Ignores Entries with no DOI
      *
-     * @param bibEntries The List of BibEntries to serialize
+     * @param entries The List of BibEntries to serialize
      * @return A Comma Separated List of CitationKeys(of the given List of Entries)
      */
-    static String serialize(List<BibEntry> bibEntries) {
-        return bibEntries.stream()
+    static String serialize(List<BibEntry> entries) {
+        return entries.stream()
                          .map(bibEntry -> bibEntry.getField(StandardField.DOI))
                          .filter(Optional::isPresent)
                          .map(Optional::get)
@@ -538,9 +538,9 @@ public class CitationRelationsTab extends EntryEditorTab {
     private void importEntries(List<CitationRelationItem> entriesToImport, OpenCitationFetcher.SearchType searchType, BibEntry entry) {
         citingTask.cancel();
         citedByTask.cancel();
-        List<BibEntry> list = new ArrayList<>();
+        List<BibEntry> entries = new ArrayList<>();
         for (CitationRelationItem item : entriesToImport) {
-            list.add(item.getBibEntry());
+            entries.add(item.getEntry());
         }
         ImportHandler importHandler = new ImportHandler(
                 dialogService,
@@ -550,11 +550,11 @@ public class CitationRelationsTab extends EntryEditorTab {
                 fileUpdateMonitor,
                 undoManager,
                 stateManager);
-        importHandler.importEntries(list);
+        importHandler.importEntries(entries);
         if (searchType.equals(OpenCitationFetcher.SearchType.CITEDBY)) {
-            entry.setField(StandardField.CITEDBY, serialize(list));
+            entry.setField(StandardField.CITEDBY, serialize(entries));
         } else {
-            entry.setField(StandardField.CITING, serialize(list));
+            entry.setField(StandardField.CITING, serialize(entries));
         }
         dialogService.notify(Localization.lang("Number of entries successfully imported") + ": " + entriesToImport.size());
     }
