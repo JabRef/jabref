@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Objects;
 
 import org.jabref.logic.cleanup.Formatter;
-import org.jabref.logic.importer.fetcher.OpenCitationFetcher;
 import org.jabref.model.entry.BibEntry;
 
 /**
@@ -30,12 +29,12 @@ public interface CitationBasedParserFetcher extends CitationFetcher {
      *
      * @param entries the entries to look information for
      */
-    URL getURLForEntries(List<BibEntry> entries) throws URISyntaxException, MalformedURLException, FetcherException;
+    URL getURLForEntries(List<BibEntry> entries, SearchType searchType) throws URISyntaxException, MalformedURLException, FetcherException;
 
     /**
      * Returns the parser used to convert the response to a list of {@link BibEntry}.
      */
-    Parser getParser(OpenCitationFetcher.SearchType searchType);
+    Parser getParser(SearchType searchType);
 
     /**
      * Performs a cleanup of the fetched entry.
@@ -58,13 +57,13 @@ public interface CitationBasedParserFetcher extends CitationFetcher {
     @Override
     default List<BibEntry> searchCitedBy(BibEntry entry) throws FetcherException {
         Objects.requireNonNull(entry);
-        return performSearch(entry, OpenCitationFetcher.SearchType.CITEDBY);
+        return performSearch(entry, SearchType.CITEDBY);
     }
 
     @Override
     default List<BibEntry> searchCiting(BibEntry entry) throws FetcherException {
         Objects.requireNonNull(entry);
-        return performSearch(entry, OpenCitationFetcher.SearchType.CITING);
+        return performSearch(entry, SearchType.CITING);
     }
 
     /**
@@ -76,26 +75,19 @@ public interface CitationBasedParserFetcher extends CitationFetcher {
      * @return a list of {@link BibEntry}, which are matched by the query (may be empty)
      * @throws FetcherException Error message passed to {@link org.jabref.gui.entryeditor.CitationRelationsTab}
      */
-    default List<BibEntry> performSearch(BibEntry entry, OpenCitationFetcher.SearchType searchType) throws FetcherException {
+    default List<BibEntry> performSearch(BibEntry entry, SearchType searchType) throws FetcherException {
         Objects.requireNonNull(entry);
         Objects.requireNonNull(searchType);
 
         List<BibEntry> entries = new ArrayList<>();
         entries.add(entry);
-        try (InputStream stream = new BufferedInputStream(getURLForEntries(entries).openStream())) {
+        try (InputStream stream = new BufferedInputStream(getURLForEntries(entries, searchType).openStream())) {
             List<BibEntry> fetchedEntries = getParser(searchType).parseEntries(stream);
 
-            if (fetchedEntries.isEmpty()) {
-                return fetchedEntries;
-            }
-
-            InputStream inputStream = new BufferedInputStream(getURLForEntries(fetchedEntries).openStream());
-            List<BibEntry> finalEntries = getParser(OpenCitationFetcher.SearchType.BIBINFO).parseEntries(inputStream);
-
             // Post-cleanup
-            finalEntries.forEach(this::doPostCleanup);
+            fetchedEntries.forEach(this::doPostCleanup);
 
-            return finalEntries;
+            return fetchedEntries;
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
         } catch (IOException e) {

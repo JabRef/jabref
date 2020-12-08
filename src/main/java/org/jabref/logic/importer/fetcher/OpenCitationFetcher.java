@@ -1,7 +1,9 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -13,6 +15,7 @@ import java.util.StringJoiner;
 
 import org.jabref.logic.importer.CitationBasedParserFetcher;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -31,27 +34,12 @@ public class OpenCitationFetcher implements CitationBasedParserFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenCitationFetcher.class);
     private static final String BASIC_URL = "https://opencitations.net/index/api/v1/metadata/";
 
-    /**
-     * Possible search methods
-     */
-    public enum SearchType {
-        CITING("reference"),
-        CITEDBY("citation"),
-        BIBINFO("info");
-
-        public final String label;
-
-        SearchType(String label) {
-            this.label = label;
-        }
-    }
-
     public OpenCitationFetcher() {
 
     }
 
     @Override
-    public URL getURLForEntries(List<BibEntry> entries) throws URISyntaxException, MalformedURLException {
+    public URL getURLForEntries(List<BibEntry> entries, SearchType searchType) throws URISyntaxException, MalformedURLException {
         StringJoiner stringJoiner = new StringJoiner("__");
         for (BibEntry entry : entries) {
             entry.getField(StandardField.DOI).ifPresent(stringJoiner::add);
@@ -61,38 +49,61 @@ public class OpenCitationFetcher implements CitationBasedParserFetcher {
     }
 
     @Override
-    public Parser getParser(OpenCitationFetcher.SearchType searchType) {
-        return inputStream -> {
-            List<BibEntry> entries = new ArrayList<>();
-            BufferedReader rd = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-            StringBuilder sb = new StringBuilder();
-            try {
-                int cp;
-                while ((cp = rd.read()) != -1) {
-                    sb.append((char) cp);
+    public Parser getParser(SearchType searchType) {
+        return new Parser() {
+
+            @Override
+            public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
+                List<BibEntry> entries = new ArrayList<>();
+
+                JSONArray json = parseJSONArray(inputStream);
+                if (json.isEmpty()) {
+                    return entries;
                 }
-            } catch (IOException e) {
-                return entries;
-            }
-            String jsonText = sb.toString();
-            JSONArray json = new JSONArray(jsonText);
-            if (json.isEmpty()) {
-                return entries;
-            }
-            if (searchType.equals(SearchType.BIBINFO)) {
-                for (int i = 0; i < json.length(); i++) {
-                    entries.add(createNewEntry(json.getJSONObject(i)));
-                }
-            } else {
+
                 String[] items = json.getJSONObject(0).getString(searchType.label).split("; ");
                 if (items[0].isEmpty()) {
                     return entries;
                 }
+                List<BibEntry> onlyDois = new ArrayList<>();
                 for (String doi : items) {
-                    entries.add(new BibEntry().withField(StandardField.DOI, doi));
+                    onlyDois.add(new BibEntry().withField(StandardField.DOI, doi));
                 }
+
+                try (InputStream partInputStream = new BufferedInputStream(getURLForEntries(onlyDois, searchType).openStream())) {
+                    JSONArray jsonArray = parseJSONArray(partInputStream);
+                    System.out.println(jsonArray);
+                    if (jsonArray.isEmpty()) {
+                        return entries;
+                    }
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        entries.add(createNewEntry(jsonArray.getJSONObject(i)));
+                    }
+                } catch (IOException | URISyntaxException e) {
+                    return entries;
+                }
+                return entries;
             }
-            return entries;
+
+            /**
+             * Reads from InputStream and parses JSONArray
+             * @param inputStream InputStream to use
+             * @return JSONArray parsed
+             */
+            private JSONArray parseJSONArray(InputStream inputStream) {
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+                StringBuilder stringBuilder = new StringBuilder();
+                try {
+                    int cp;
+                    while ((cp = bufferedReader.read()) != -1) {
+                        stringBuilder.append((char) cp);
+                    }
+                } catch (IOException e) {
+                    return new JSONArray();
+                }
+                String jsonText = stringBuilder.toString();
+                return new JSONArray(jsonText);
+            }
         };
     }
 
@@ -110,6 +121,7 @@ public class OpenCitationFetcher implements CitationBasedParserFetcher {
 
     /**
      * Creates a new BibEntry from JSONObject
+     *
      * @param jsonObject JSONObject
      * @return BibEntry created
      */

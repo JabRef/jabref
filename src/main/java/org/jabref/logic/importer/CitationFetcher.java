@@ -10,6 +10,20 @@ import org.jabref.model.entry.BibEntry;
 public interface CitationFetcher {
 
     /**
+     * Possible search methods
+     */
+    enum SearchType {
+        CITING("reference"),
+        CITEDBY("citation");
+
+        public final String label;
+
+        SearchType(String label) {
+            this.label = label;
+        }
+    }
+
+    /**
      * Looks for hits which are citing the given {@link BibEntry}.
      *
      * @param entry entry to search articles for
