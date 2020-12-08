@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,9 +16,11 @@ import org.jabref.logic.importer.CitationBasedParserFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
+import com.google.common.collect.Lists;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
@@ -70,13 +71,17 @@ public class OpenCitationFetcher implements CitationBasedParserFetcher {
                     onlyDois.add(new BibEntry().withField(StandardField.DOI, doi));
                 }
 
-                try (InputStream partInputStream = new BufferedInputStream(getURLForEntries(onlyDois, searchType).openStream())) {
-                    JSONArray jsonArray = parseJSONArray(partInputStream);
-                    if (jsonArray.isEmpty()) {
-                        return entries;
-                    }
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        entries.add(createNewEntry(jsonArray.getJSONObject(i)));
+                try {
+                    List<List<BibEntry>> partitions = Lists.partition(onlyDois, onlyDois.size() > 15 ? 10 : 2);
+                    for (List<BibEntry> partList : partitions) {
+                        URLDownload download = new URLDownload(getURLForEntries(partList, searchType));
+                        JSONArray jsonArray = new JSONArray(download.asString(StandardCharsets.UTF_8));
+                        if (jsonArray.isEmpty()) {
+                            return entries;
+                        }
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            entries.add(createNewEntry(jsonArray.getJSONObject(i)));
+                        }
                     }
                 } catch (IOException | URISyntaxException e) {
                     return entries;
