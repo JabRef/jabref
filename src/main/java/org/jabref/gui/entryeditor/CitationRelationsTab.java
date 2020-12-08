@@ -426,10 +426,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         List<BibEntry> list = new ArrayList<>();
         LOGGER.info("Current Keys/DOI in " + field.getName() + ":" + keys.toString());
         for (String key : keys) {
-            BibEntry toAdd = getEntryByDOI(key);
-            if (toAdd != null) {
-                list.add(toAdd);
-            }
+            Optional<BibEntry> toAdd = getEntryByDOI(key);
+            toAdd.ifPresent(list::add);
         }
         return list;
     }
@@ -459,18 +457,18 @@ public class CitationRelationsTab extends EntryEditorTab {
             if (key.isPresent() && entryKey.isPresent()) { // Just Proceed if doi is present
                 String doi = key.get();
                 String entryDoi = entryKey.get();
-                if (!currentKeys.contains(doi) && doiExists(doi)) { // if its not in the already referenced keys and not in the database = new Article
+                if (!currentKeys.contains(doi) && getEntryByDOI(doi).isEmpty()) { // if its not in the already referenced keys and not in the database = new Article
                     b.setField(nField, getFilteredKeys(b, nField) + "," + entryDoi);
                     observableList.add(new CitationRelationItem(b, false));
                 } else {
                     if (!currentKeys.contains(doi)) { // if in database but not in keys
                         entry.setField(field, entry.getField(field).orElse("") + "," + doi);
                         // Add negative Reference to existing Entry and add this entry as local reference
-                        BibEntry existing = getEntryByDOI(doi);
-                        if (existing != null) {
-                            existing.setField(nField, existing.getField(nField).orElse("") + "," + entryDoi);
-                            observableList.add(0, new CitationRelationItem(existing, true));
-                        }
+                        Optional<BibEntry> existing = getEntryByDOI(doi);
+                        existing.ifPresent(bibEntry -> {
+                            bibEntry.setField(nField, bibEntry.getField(nField).orElse("") + "," + entryDoi);
+                            observableList.add(0, new CitationRelationItem(bibEntry, true));
+                        });
                     }
                 }
             }
@@ -499,38 +497,23 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     /**
-     * Filters a given ArrayList of DOI's, whether they are in the Database
+     * Filters a given ArrayList of DOIs, whether they are in the Database
      *
      * @param toFilter The Arraylist to filter
      */
     void filterNonExisting(ArrayList<String> toFilter) {
-        toFilter.removeIf(this::doiExists);
+        toFilter.removeIf(doi -> getEntryByDOI(doi).isEmpty());
     }
 
     /**
-     * Checks the current databasecontext whether an Entry with the given DOI exists
-     *
-     * @param doi The DOI to lookup as a String
-     * @return DOI exists or not
-     */
-    boolean doiExists(String doi) {
-        return getEntryByDOI(doi) == null;
-    }
-
-    /**
-     * returns the Bibentry in the Database with the given DOI, or null if no such Entry exists
+     * Returns the BibEntry in the Database with the given DOI, or null if no such Entry exists
      *
      * @param doi doi TO LOOK for
      * @return null or found Entry
      */
-    BibEntry getEntryByDOI(String doi) {
-        for (BibEntry b : databaseContext.getEntries()) {
-            Optional<String> o = b.getField(StandardField.DOI);
-            if (o.isPresent() && o.get().equals(doi)) {
-                return b;
-            }
-        }
-        return null;
+    Optional<BibEntry> getEntryByDOI(String doi) {
+        return databaseContext.getEntries().stream().
+                filter(bibEntry -> doi.equals(bibEntry.getField(StandardField.DOI).orElse(""))).findFirst();
     }
 
     /**
