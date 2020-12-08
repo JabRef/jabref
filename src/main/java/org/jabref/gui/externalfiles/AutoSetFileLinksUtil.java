@@ -40,7 +40,7 @@ public class AutoSetFileLinksUtil {
         this(databaseContext.getFileDirectories(filePreferences), autoLinkPreferences, externalFileTypes);
     }
 
-    private AutoSetFileLinksUtil(List<Path> directories, AutoLinkPreferences autoLinkPreferences, ExternalFileTypes externalFileTypes) {
+    public AutoSetFileLinksUtil(List<Path> directories, AutoLinkPreferences autoLinkPreferences, ExternalFileTypes externalFileTypes) {
         this.directories = directories;
         this.autoLinkPreferences = autoLinkPreferences;
         this.externalFileTypes = externalFileTypes;

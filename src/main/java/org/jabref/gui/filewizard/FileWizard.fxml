@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import org.checkerframework.checker.units.qual.A?>
+<?import javafx.scene.text.Text?>
+<?import javafx.geometry.Insets?>
+<DialogPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.jabref.gui.filewizard.FileWizardView"
+            prefHeight="100.0" prefWidth="600.0">
+    <buttonTypes>
+        <ButtonType fx:constant="CANCEL"/>
+        <ButtonType fx:id="startButton" buttonData="OK_DONE" text="%Start"/>
+    </buttonTypes>
+    <content>
+        <VBox>
+            <padding>
+                <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+            </padding>
+            <GridPane hgap="10.0" vgap="4.0">
+                <Label text="%Choose the directory in which the Wizard will expect and into which it will try to download the files:"
+                        GridPane.columnSpan="3" GridPane.rowIndex="1"/>
+                <TextField fx:id="directoryTextField"
+                           GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                <Button text="%Browse" onAction="#browseDirectory"
+                        GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+                <CheckBox fx:id="openDirectoryCheckbox"
+                          text="%Open the directory after the wizard has terminated."
+                            GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+            </GridPane>
+
+        </VBox>
+    </content>
+
+</DialogPane>

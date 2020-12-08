@@ -84,6 +84,7 @@ import org.jabref.gui.externalfiles.AutoLinkFilesAction;
 import org.jabref.gui.externalfiles.DownloadFullTextAction;
 import org.jabref.gui.externalfiles.FindUnlinkedFilesAction;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.filewizard.FileWizardAction;
 import org.jabref.gui.help.AboutAction;
 import org.jabref.gui.help.ErrorConsoleAction;
 import org.jabref.gui.help.HelpAction;
@@ -815,6 +816,8 @@ public class JabRefFrame extends BorderPane {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsEMailAction(dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.FILE_WIZARD, new FileWizardAction(dialogService, stateManager)),
+
                 pushToApplicationMenuItem,
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.START_SYSTEMATIC_LITERATURE_REVIEW, new StartLiteratureReviewAction(this, Globals.getFileUpdateMonitor(), Globals.prefs.getWorkingDir(), Globals.TASK_EXECUTOR))

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<DialogPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.jabref.gui.filewizard.FileWizardProgressDialog"
+            prefHeight="150.0" prefWidth="400.0">
+    <content>
+        <VBox>
+            <GridPane hgap="10.0" vgap="4.0">
+                <Label text="%Please wait for the File Wizard to complete." GridPane.rowIndex="0"
+                       GridPane.columnIndex="0"/>
+                <Label fx:id="progressLabel" GridPane.rowIndex="1"
+                       GridPane.columnIndex="0"/>
+                <ProgressBar fx:id="progressBar" GridPane.rowIndex="2"
+                             GridPane.columnIndex="0" prefWidth="5000.0" progress="0.0"/>
+            </GridPane>
+        </VBox>
+    </content>
+    <ButtonType fx:id="cancelButton" text="%Cancel" />
+</DialogPane>
