@@ -138,7 +138,10 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener, Obser
     }
 
     private List<Path> getFileDirectoriesAsPaths() {
-        List<Path> fileDirs = new ArrayList<>();
+        return metaData.getLatexFileDirectory(user)
+                       .map(List::of)
+                       .orElse(Collections.emptyList());
+    }
 
     @Override
     public void addListener(InvalidationListener listener) {
