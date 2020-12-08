@@ -226,22 +226,22 @@ public class CitationRelationsTab extends EntryEditorTab {
     private void styleFetchedListView(CheckListView<CitationRelationItem> listView) {
         PseudoClass entrySelected = PseudoClass.getPseudoClass("selected");
         new ViewModelListCellFactory<CitationRelationItem>()
-                .withGraphic(e -> {
+                .withGraphic(entry -> {
 
                     HBox separator = new HBox();
                     HBox.setHgrow(separator, Priority.SOMETIMES);
-                    Node entryNode = BibEntryView.getEntryNode(e.getBibEntry());
+                    Node entryNode = BibEntryView.getEntryNode(entry.getBibEntry());
                     HBox.setHgrow(entryNode, Priority.ALWAYS);
                     HBox hContainer = new HBox();
                     hContainer.prefWidthProperty().bind(listView.widthProperty().subtract(25));
 
-                    if (e.isLocal()) {
+                    if (entry.isLocal()) {
                         Button jumpTo = IconTheme.JabRefIcons.LINK.asButton();
                         jumpTo.setTooltip(new Tooltip(Localization.lang("Jump to entry in database")));
                         jumpTo.getStyleClass().add("addEntryButton");
                         jumpTo.setOnMouseClicked(event -> {
-                            libraryTab.showAndEdit(e.getBibEntry());
-                            libraryTab.clearAndSelect(e.getBibEntry());
+                            libraryTab.showAndEdit(entry.getBibEntry());
+                            libraryTab.clearAndSelect(entry.getBibEntry());
                             citingTask.cancel();
                             citedByTask.cancel();
                         });
@@ -257,7 +257,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                             }
                         });
                         addToggle.getStyleClass().add("addEntryButton");
-                        addToggle.selectedProperty().bindBidirectional(listView.getItemBooleanProperty(e));
+                        addToggle.selectedProperty().bindBidirectional(listView.getItemBooleanProperty(entry));
                         hContainer.getChildren().addAll(entryNode, separator, addToggle);
                     }
                     hContainer.getStyleClass().add("entry-container");
