@@ -1,5 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.util.Collections;
+
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -24,35 +26,35 @@ public class OpenCitationFetcherTest {
 
     @Test
     public void performSearchNoDoiCitingMode() throws FetcherException {
-        assertThrows(FetcherException.class, () -> openCitationFetcher.searchCiting(new BibEntry()));
+        assertEquals(Collections.emptyList(), openCitationFetcher.searchCiting(new BibEntry()));
     }
 
     @Test
     public void performSearchNoDoiCitedByMode() throws FetcherException {
-        assertThrows(FetcherException.class, () -> openCitationFetcher.searchCitedBy(new BibEntry()));
+        assertEquals(Collections.emptyList(), openCitationFetcher.searchCitedBy(new BibEntry()));
     }
 
     @Test
     public void performSearchWithDoiEmptyCitingMode() throws FetcherException {
         BibEntry doiEmptyCiting = new BibEntry().withField(StandardField.DOI, "10.1.1.19.4684");
-        assertTrue(openCitationFetcher.searchCiting(doiEmptyCiting).isEmpty());
+        assertEquals(Collections.emptyList(), openCitationFetcher.searchCitedBy(doiEmptyCiting));
     }
 
     @Test
     public void performSearchWithDoiCitingMode() throws FetcherException {
-        BibEntry doiCiting = new BibEntry().withField(StandardField.DOI, "10.1109/TCBB.2011.83");
+        BibEntry doiCiting = new BibEntry().withField(StandardField.DOI, "10.1109/pesc.1988.18187");
         assertFalse(openCitationFetcher.searchCiting(doiCiting).isEmpty());
     }
 
     @Test
     public void performSearchWithDoiEmptyCitedByMode() throws FetcherException {
         BibEntry doiEmptyCitedBy = new BibEntry().withField(StandardField.DOI, "10.1.1.19.4684");
-        assertTrue(openCitationFetcher.searchCitedBy(doiEmptyCitedBy).isEmpty());
+        assertEquals(Collections.emptyList(), openCitationFetcher.searchCitedBy(doiEmptyCitedBy));
     }
 
     @Test
     public void performSearchWithDoiCitedByMode() throws FetcherException {
-        BibEntry doiCitedBy = new BibEntry().withField(StandardField.DOI, "10.1109/TCBB.2011.83");
+        BibEntry doiCitedBy = new BibEntry().withField(StandardField.DOI, "10.1109/pesc.1988.18187");
         assertFalse(openCitationFetcher.searchCitedBy(doiCitedBy).isEmpty());
     }
 

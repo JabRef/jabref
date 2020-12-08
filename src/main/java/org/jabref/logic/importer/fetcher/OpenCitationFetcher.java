@@ -72,7 +72,6 @@ public class OpenCitationFetcher implements CitationBasedParserFetcher {
 
                 try (InputStream partInputStream = new BufferedInputStream(getURLForEntries(onlyDois, searchType).openStream())) {
                     JSONArray jsonArray = parseJSONArray(partInputStream);
-                    System.out.println(jsonArray);
                     if (jsonArray.isEmpty()) {
                         return entries;
                     }
@@ -98,11 +97,11 @@ public class OpenCitationFetcher implements CitationBasedParserFetcher {
                     while ((cp = bufferedReader.read()) != -1) {
                         stringBuilder.append((char) cp);
                     }
+                    String jsonText = stringBuilder.toString();
+                    return new JSONArray(jsonText);
                 } catch (IOException e) {
                     return new JSONArray();
                 }
-                String jsonText = stringBuilder.toString();
-                return new JSONArray(jsonText);
             }
         };
     }
