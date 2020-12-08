@@ -31,8 +31,6 @@ public enum StandardField implements Field {
     BOOKTITLE("booktitle", FieldProperty.BOOK_NAME),
     BOOKTITLEADDON("booktitleaddon"),
     CHAPTER("chapter"),
-    CITING("citing", FieldProperty.MULTIPLE_ENTRY_LINK),
-    CITEDBY("citedBy", FieldProperty.MULTIPLE_ENTRY_LINK),
     COMMENTATOR("commentator", FieldProperty.PERSON_NAMES),
     COMMENT("comment"),
     CROSSREF("crossref", FieldProperty.SINGLE_ENTRY_LINK),
@@ -141,6 +139,8 @@ public enum StandardField implements Field {
     XREF("xref", FieldProperty.SINGLE_ENTRY_LINK),
 
     // JabRef-specific fields
+    CITING("citing", FieldProperty.MULTIPLE_ENTRY_LINK),
+    CITEDBY("citedBy", FieldProperty.MULTIPLE_ENTRY_LINK),
     GROUPS("groups"),
     OWNER("owner"),
     TIMESTAMP("timestamp", FieldProperty.DATE);
