@@ -13,21 +13,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CitationRelationsTabTest {
-    BibEntry b1;
-    BibEntry b2;
+    BibEntry bibEntry;
     ArrayList<BibEntry> bList;
 
     @BeforeEach
     void setup() {
-        b1 = new BibEntry();
-        b2 = new BibEntry();
+        bibEntry = new BibEntry().withField(StandardField.DOI, "10.1007/s11616-005-0142-4")
+                                 .withField(StandardField.CITING, "test")
+                                 .withField(StandardField.CITEDBY, "test");
         bList = new ArrayList<>();
-
-        b2.setField(StandardField.DOI, "10.1007/s11616-005-0142-4");
-        b2.setField(StandardField.CITING, "test");
-        b2.setField(StandardField.CITEDBY, "test");
-        bList.add(b1);
-        bList.add(b2);
+        bList.add(new BibEntry());
+        bList.add(bibEntry);
     }
 
     /**
@@ -49,7 +45,7 @@ public class CitationRelationsTabTest {
      */
     @Test
     void serializeCornerCaseTest() {
-        bList.remove(b2);
+        bList.remove(bibEntry);
         assertEquals("", serialize(bList));
     }
 
@@ -60,7 +56,7 @@ public class CitationRelationsTabTest {
      */
     @Test
     void citingFieldExists() {
-        assertTrue(b2.hasField(StandardField.CITING));
+        assertTrue(bibEntry.hasField(StandardField.CITING));
     }
 
     /**
@@ -70,6 +66,6 @@ public class CitationRelationsTabTest {
      */
     @Test
     void citedByFieldExists() {
-        assertTrue(b2.hasField(StandardField.CITEDBY));
+        assertTrue(bibEntry.hasField(StandardField.CITEDBY));
     }
 }

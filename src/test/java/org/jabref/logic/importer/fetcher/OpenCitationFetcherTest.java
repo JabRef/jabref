@@ -24,47 +24,41 @@ public class OpenCitationFetcherTest {
 
     @Test
     public void performSearchNoDoiCitingMode() throws FetcherException {
-        BibEntry noDoi = new BibEntry();
-        assertThrows(FetcherException.class, () -> openCitationFetcher.searchCiting(noDoi));
+        assertThrows(FetcherException.class, () -> openCitationFetcher.searchCiting(new BibEntry()));
     }
 
     @Test
     public void performSearchNoDoiCitedByMode() throws FetcherException {
-        BibEntry noDoi = new BibEntry();
-        assertThrows(FetcherException.class, () -> openCitationFetcher.searchCitedBy(noDoi));
+        assertThrows(FetcherException.class, () -> openCitationFetcher.searchCitedBy(new BibEntry()));
     }
 
     @Test
     public void performSearchWithDoiEmptyCitingMode() throws FetcherException {
-        BibEntry doiEmptyCiting = new BibEntry();
-        doiEmptyCiting.setField(StandardField.DOI, "10.1.1.19.4684");
+        BibEntry doiEmptyCiting = new BibEntry().withField(StandardField.DOI, "10.1.1.19.4684");
         assertTrue(openCitationFetcher.searchCiting(doiEmptyCiting).isEmpty());
     }
 
     @Test
     public void performSearchWithDoiCitingMode() throws FetcherException {
-        BibEntry doiCiting = new BibEntry();
-        doiCiting.setField(StandardField.DOI, "10.1109/TCBB.2011.83");
+        BibEntry doiCiting = new BibEntry().withField(StandardField.DOI, "10.1109/TCBB.2011.83");
         assertFalse(openCitationFetcher.searchCiting(doiCiting).isEmpty());
     }
 
     @Test
     public void performSearchWithDoiEmptyCitedByMode() throws FetcherException {
-        BibEntry doiEmptyCitedBy = new BibEntry();
-        doiEmptyCitedBy.setField(StandardField.DOI, "10.1.1.19.4684");
+        BibEntry doiEmptyCitedBy = new BibEntry().withField(StandardField.DOI, "10.1.1.19.4684");
         assertTrue(openCitationFetcher.searchCitedBy(doiEmptyCitedBy).isEmpty());
     }
 
     @Test
     public void performSearchWithDoiCitedByMode() throws FetcherException {
-        BibEntry doiCitedBy = new BibEntry();
-        doiCitedBy.setField(StandardField.DOI, "10.1109/TCBB.2011.83");
+        BibEntry doiCitedBy = new BibEntry().withField(StandardField.DOI, "10.1109/TCBB.2011.83");
         assertFalse(openCitationFetcher.searchCitedBy(doiCitedBy).isEmpty());
     }
 
     @Test
     public void getName() throws FetcherException {
-        assertEquals(openCitationFetcher.getName(), "CitationRelationFetcher");
+        assertEquals(openCitationFetcher.getName(), "OpenCitationFetcher");
     }
 
 }
