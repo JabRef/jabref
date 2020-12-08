@@ -8,6 +8,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.beans.Observable;
+
 import org.jabref.model.FieldChange;
 import org.jabref.model.TreeNode;
 import org.jabref.model.database.BibDatabase;
@@ -32,6 +34,9 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     public GroupTreeNode(AbstractGroup group) {
         super(GroupTreeNode.class);
         this.group = Objects.requireNonNull(group);
+        if (group instanceof Observable) {
+            ((Observable) group).addListener((listener) -> notifyAboutDescendantChange(this));
+        }
     }
 
     public static GroupTreeNode fromGroup(AbstractGroup group) {

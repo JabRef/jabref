@@ -4,9 +4,13 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.auxparser.AuxParser;
@@ -21,12 +25,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @AllowedToUseLogic("because it needs access to aux parser")
-public class TexGroup extends AbstractGroup implements FileUpdateListener {
+public class TexGroup extends AbstractGroup implements FileUpdateListener, Observable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TexGroup.class);
 
     private final Path filePath;
-    private Set<String> keysUsedInAux = null;
+    private Set<String> keysUsedInAux;
+    private final List<InvalidationListener> listeners = new ArrayList<>();
     private final FileUpdateMonitor fileMonitor;
     private final AuxParser auxParser;
     private final MetaData metaData;
@@ -119,6 +124,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     public void fileUpdated() {
         // Reset previous parse result
         keysUsedInAux = null;
+        listeners.forEach(listener -> listener.invalidated(this));
     }
 
     private Path relativize(Path path) {
@@ -134,9 +140,13 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     private List<Path> getFileDirectoriesAsPaths() {
         List<Path> fileDirs = new ArrayList<>();
 
-        metaData.getLatexFileDirectory(user)
-                .ifPresent(fileDirs::add);
+    @Override
+    public void addListener(InvalidationListener listener) {
+        listeners.add(listener);
+    }
 
-        return fileDirs;
+    @Override
+    public void removeListener(InvalidationListener listener) {
+        listeners.remove(listener);
     }
 }
