@@ -15,8 +15,16 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 
+/**
+ * Class to unify the display method of BibEntries in ListViews.
+ */
 public class BibEntryView {
 
+    /**
+     * Creates a layout for a given {@link BibEntry} to be displayed in a List
+     * @param entry {@link BibEntry} to display
+     * @return layout container displaying the entry
+     */
     public static Node getEntryNode(BibEntry entry) {
         Node entryType = getIcon(entry.getType()).getGraphicNode();
         entryType.getStyleClass().add("type");
@@ -46,6 +54,11 @@ public class BibEntryView {
         return entryContainer;
     }
 
+    /**
+     * Gets the correct Icon for a given {@link EntryType}
+     * @param type {@link EntryType} to get Icon for
+     * @return Icon corresponding to {@link EntryType}
+     */
     private static IconTheme.JabRefIcons getIcon(EntryType type) {
         EnumSet<StandardEntryType> crossRefTypes = EnumSet.of(StandardEntryType.InBook, StandardEntryType.InProceedings, StandardEntryType.InCollection);
         if (type == StandardEntryType.Book) {
