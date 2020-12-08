@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -171,11 +172,11 @@ public class CitationRelationsTab extends EntryEditorTab {
         // Create abort Buttons for both sides
         Button abortCitingButton = IconTheme.JabRefIcons.CLOSE.asButton();
         abortCitingButton.getGraphic().resize(30, 30);
-        abortCitingButton.setTooltip(new Tooltip(Localization.lang("Abort search")));
+        abortCitingButton.setTooltip(new Tooltip(Localization.lang("Cancel search")));
         styleTopBarNode(abortCitingButton, 15.0);
         Button abortCitedButton = IconTheme.JabRefIcons.CLOSE.asButton();
         abortCitedButton.getGraphic().resize(30, 30);
-        abortCitedButton.setTooltip(new Tooltip(Localization.lang("Abort search")));
+        abortCitedButton.setTooltip(new Tooltip(Localization.lang("Cancel search")));
         styleTopBarNode(abortCitedButton, 15.0);
 
         ProgressIndicator citingProgress = new ProgressIndicator();
@@ -396,7 +397,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                 })
                 .executeWith(Globals.TASK_EXECUTOR);
         } else {
-            dialogService.notify(Localization.lang("DOI-Number required, Please add DOI-Number to entry before searching."));
+            dialogService.notify(Localization.lang("DOI required, Please add DOI to entry before searching."));
         }
     }
 
