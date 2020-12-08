@@ -26,6 +26,7 @@ import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
@@ -73,10 +74,6 @@ public interface PreferencesService {
     OpenOfficePreferences getOpenOfficePreferences();
 
     void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences);
-
-    List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository repository);
-
-    void storeCustomExportFormats(List<TemplateExporter> exporters);
 
     LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationRepository repository);
 
@@ -249,21 +246,29 @@ public interface PreferencesService {
 
     void storeNewLineSeparator(NewLineSeparator newLineSeparator);
 
-    void storeLastPreferencesExportPath(Path exportFile);
-
-    String getLastPreferencesExportPath();
-
     AutoLinkPreferences getAutoLinkPreferences();
 
     void storeAutoLinkPreferences(AutoLinkPreferences autoLinkPreferences);
+
+    boolean shouldAutosave();
+
+    void storeShouldAutosave(boolean shouldAutosave);
+
+    //*************************************************************************************************************
+    // Import/Export preferences
+    //*************************************************************************************************************
 
     ImportExportPreferences getImportExportPreferences();
 
     void storeImportExportPreferences(ImportExportPreferences preferences);
 
-    boolean shouldAutosave();
+    List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository repository);
 
-    void storeShouldAutosave(boolean shouldAutosave);
+    void storeCustomExportFormats(List<TemplateExporter> exporters);
+
+    Set<CustomImporter> getCustomImportFormats();
+
+    void storeCustomImportFormats(Set<CustomImporter> customImporters);
 
     //*************************************************************************************************************
     // Preview preferences
@@ -320,6 +325,10 @@ public interface PreferencesService {
     SearchPreferences getSearchPreferences();
 
     void storeSearchPreferences(SearchPreferences preferences);
+
+    String getLastPreferencesExportPath();
+
+    void storeLastPreferencesExportPath(Path exportFile);
 
     Optional<String> getExternalFileTypes();
 

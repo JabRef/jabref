@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
@@ -74,6 +75,7 @@ import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
+import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
@@ -384,10 +386,7 @@ public class JabRefPreferences implements PreferencesService {
      * HashMap that contains all preferences which are set by default
      */
     public final Map<String, Object> defaults = new HashMap<>();
-    /**
-     * Set with all custom {@link org.jabref.logic.importer.Importer}s
-     */
-    public final CustomImportList customImports;
+
     // The following field is used as a global variable during the export of a database.
     // By setting this field to the path of the database's default file directory, formatters
     // that should resolve external file paths can access this field. This is an ugly hack
@@ -407,6 +406,7 @@ public class JabRefPreferences implements PreferencesService {
     private PreviewPreferences previewPreferences;
     private SidePanePreferences sidePanePreferences;
     private Theme globalTheme;
+    private Set<CustomImporter> customImporters;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -636,8 +636,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(IMPORT_FILEDIRPATTERN, "");
         // Download files by default
         defaults.put(DOWNLOAD_LINKED_FILES, true);
-
-        customImports = new CustomImportList(this);
 
         String defaultExpression = "**/.*[citationkey].*\\\\.[extension]";
         defaults.put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
@@ -1282,54 +1280,6 @@ public class JabRefPreferences implements PreferencesService {
 
     public String getIdBasedFetcherForEntryGenerator() {
         return get(ID_ENTRY_GENERATOR);
-    }
-
-    @Override
-    public List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository abbreviationRepository) {
-        int i = 0;
-        List<TemplateExporter> formats = new ArrayList<>();
-        String exporterName;
-        String filename;
-        String extension;
-        LayoutFormatterPreferences layoutPreferences = getLayoutFormatterPreferences(abbreviationRepository);
-        SavePreferences savePreferences = getSavePreferencesForExport();
-        List<String> formatData;
-        while (!((formatData = getStringList(CUSTOM_EXPORT_FORMAT + i)).isEmpty())) {
-            exporterName = formatData.get(EXPORTER_NAME_INDEX);
-            filename = formatData.get(EXPORTER_FILENAME_INDEX);
-            extension = formatData.get(EXPORTER_EXTENSION_INDEX);
-            TemplateExporter format = new TemplateExporter(exporterName, filename, extension,
-                    layoutPreferences, savePreferences);
-            format.setCustomExport(true);
-            formats.add(format);
-            i++;
-        }
-        return formats;
-    }
-
-    @Override
-    public void storeCustomExportFormats(List<TemplateExporter> exporters) {
-        if (exporters.isEmpty()) {
-            purgeCustomExportFormats(0);
-        } else {
-            for (int i = 0; i < exporters.size(); i++) {
-                List<String> exporterData = new ArrayList<>();
-                exporterData.add(EXPORTER_NAME_INDEX, exporters.get(i).getName());
-                exporterData.add(EXPORTER_FILENAME_INDEX, exporters.get(i).getLayoutFileName());
-                // Only stores the first extension associated with FileType
-                exporterData.add(EXPORTER_EXTENSION_INDEX, exporters.get(i).getFileType().getExtensions().get(0));
-                putStringList(CUSTOM_EXPORT_FORMAT + i, exporterData);
-            }
-            purgeCustomExportFormats(exporters.size());
-        }
-    }
-
-    private void purgeCustomExportFormats(int from) {
-        int i = from;
-        while (!getStringList(CUSTOM_EXPORT_FORMAT + i).isEmpty()) {
-            remove(CUSTOM_EXPORT_FORMAT + i);
-            i++;
-        }
     }
 
     @Override
@@ -2082,7 +2032,7 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public ImportFormatPreferences getImportFormatPreferences() {
         return new ImportFormatPreferences(
-                customImports,
+                getCustomImportFormats(),
                 getDefaultEncoding(),
                 getKeywordDelimiter(),
                 getCitationKeyPatternPreferences(),
@@ -2243,6 +2193,20 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
+    public boolean shouldAutosave() {
+        return getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE);
+    }
+
+    @Override
+    public void storeShouldAutosave(boolean shouldAutosave) {
+        putBoolean(JabRefPreferences.LOCAL_AUTO_SAVE, shouldAutosave);
+    }
+
+    //*************************************************************************************************************
+    // Import/Export preferences
+    //*************************************************************************************************************
+
+    @Override
     public ImportExportPreferences getImportExportPreferences() {
         return new ImportExportPreferences(
                 get(JabRefPreferences.NON_WRAPPABLE_FIELDS),
@@ -2269,13 +2233,99 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public boolean shouldAutosave() {
-        return getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE);
+    public Set<CustomImporter> getCustomImportFormats() {
+        if (this.customImporters == null) {
+            updateCustomImportFormats();
+        }
+        return this.customImporters;
+    }
+
+    private void updateCustomImportFormats() {
+        Set<CustomImporter> importers = new TreeSet<>();
+        int i = 0;
+
+        List<String> importerString;
+        while (!((importerString = getStringList(CUSTOM_IMPORT_FORMAT + i)).isEmpty())) {
+            try {
+                if (importerString.size() == 2) {
+                    // New format: basePath, className
+                    importers.add(new CustomImporter(importerString.get(0), importerString.get(1)));
+                } else {
+                    // Old format: name, cliId, className, basePath
+                    importers.add(new CustomImporter(importerString.get(3), importerString.get(2)));
+                }
+            } catch (Exception e) {
+                LOGGER.warn("Could not load " + importerString.get(0) + " from preferences. Will ignore.", e);
+            }
+            i++;
+        }
+
+        this.customImporters = importers;
     }
 
     @Override
-    public void storeShouldAutosave(boolean shouldAutosave) {
-        putBoolean(JabRefPreferences.LOCAL_AUTO_SAVE, shouldAutosave);
+    public void storeCustomImportFormats(Set<CustomImporter> importers) {
+        purgeCustomImportFormats();
+        CustomImporter[] importersArray = importers.toArray(new CustomImporter[0]);
+        for (int i = 0; i < importersArray.length; i++) {
+            putStringList(CUSTOM_IMPORT_FORMAT + i, importersArray[i].getAsStringList());
+        }
+
+        this.customImporters = importers;
+    }
+
+    private void purgeCustomImportFormats() {
+        for (int i = 0; !(getStringList(CUSTOM_IMPORT_FORMAT + i).isEmpty()); i++) {
+            remove(CUSTOM_IMPORT_FORMAT + i);
+        }
+    }
+
+    @Override
+    public List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository abbreviationRepository) {
+        int i = 0;
+        List<TemplateExporter> formats = new ArrayList<>();
+        String exporterName;
+        String filename;
+        String extension;
+        LayoutFormatterPreferences layoutPreferences = getLayoutFormatterPreferences(abbreviationRepository);
+        SavePreferences savePreferences = getSavePreferencesForExport();
+        List<String> formatData;
+        while (!((formatData = getStringList(CUSTOM_EXPORT_FORMAT + i)).isEmpty())) {
+            exporterName = formatData.get(EXPORTER_NAME_INDEX);
+            filename = formatData.get(EXPORTER_FILENAME_INDEX);
+            extension = formatData.get(EXPORTER_EXTENSION_INDEX);
+            TemplateExporter format = new TemplateExporter(exporterName, filename, extension,
+                    layoutPreferences, savePreferences);
+            format.setCustomExport(true);
+            formats.add(format);
+            i++;
+        }
+        return formats;
+    }
+
+    @Override
+    public void storeCustomExportFormats(List<TemplateExporter> exporters) {
+        if (exporters.isEmpty()) {
+            purgeCustomExportFormats(0);
+        } else {
+            for (int i = 0; i < exporters.size(); i++) {
+                List<String> exporterData = new ArrayList<>();
+                exporterData.add(EXPORTER_NAME_INDEX, exporters.get(i).getName());
+                exporterData.add(EXPORTER_FILENAME_INDEX, exporters.get(i).getLayoutFileName());
+                // Only stores the first extension associated with FileType
+                exporterData.add(EXPORTER_EXTENSION_INDEX, exporters.get(i).getFileType().getExtensions().get(0));
+                putStringList(CUSTOM_EXPORT_FORMAT + i, exporterData);
+            }
+            purgeCustomExportFormats(exporters.size());
+        }
+    }
+
+    private void purgeCustomExportFormats(int from) {
+        int i = from;
+        while (!getStringList(CUSTOM_EXPORT_FORMAT + i).isEmpty()) {
+            remove(CUSTOM_EXPORT_FORMAT + i);
+            i++;
+        }
     }
 
     //*************************************************************************************************************
