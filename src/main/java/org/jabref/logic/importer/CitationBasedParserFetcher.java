@@ -7,11 +7,13 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 
 /**
  * Provides a convenient interface for citation-based fetcher, which follow the usual four-step procedure:
@@ -80,6 +82,9 @@ public interface CitationBasedParserFetcher extends CitationFetcher {
         Objects.requireNonNull(searchType);
 
         List<BibEntry> entries = new ArrayList<>();
+        if (entry.getField(StandardField.DOI).isEmpty()) {
+            return Collections.emptyList();
+        }
         entries.add(entry);
         try (InputStream stream = new BufferedInputStream(getURLForEntries(entries, searchType).openStream())) {
             List<BibEntry> fetchedEntries = getParser(searchType).parseEntries(stream);
