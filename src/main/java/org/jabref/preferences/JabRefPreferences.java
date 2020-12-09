@@ -1132,43 +1132,6 @@ public class JabRefPreferences implements PreferencesService {
         return new VersionPreferences(ignoredVersion);
     }
 
-    public ProtectedTermsPreferences getProtectedTermsPreferences() {
-        return new ProtectedTermsPreferences(
-                getStringList(PROTECTED_TERMS_ENABLED_INTERNAL),
-                getStringList(PROTECTED_TERMS_ENABLED_EXTERNAL),
-                getStringList(PROTECTED_TERMS_DISABLED_INTERNAL),
-                getStringList(PROTECTED_TERMS_DISABLED_EXTERNAL));
-    }
-
-    @Override
-    public void setProtectedTermsPreferences(ProtectedTermsLoader loader) {
-        List<String> enabledExternalList = new ArrayList<>();
-        List<String> disabledExternalList = new ArrayList<>();
-        List<String> enabledInternalList = new ArrayList<>();
-        List<String> disabledInternalList = new ArrayList<>();
-
-        for (ProtectedTermsList list : loader.getProtectedTermsLists()) {
-            if (list.isInternalList()) {
-                if (list.isEnabled()) {
-                    enabledInternalList.add(list.getLocation());
-                } else {
-                    disabledInternalList.add(list.getLocation());
-                }
-            } else {
-                if (list.isEnabled()) {
-                    enabledExternalList.add(list.getLocation());
-                } else {
-                    disabledExternalList.add(list.getLocation());
-                }
-            }
-        }
-
-        putStringList(PROTECTED_TERMS_ENABLED_EXTERNAL, enabledExternalList);
-        putStringList(PROTECTED_TERMS_DISABLED_EXTERNAL, disabledExternalList);
-        putStringList(PROTECTED_TERMS_ENABLED_INTERNAL, enabledInternalList);
-        putStringList(PROTECTED_TERMS_DISABLED_INTERNAL, disabledInternalList);
-    }
-
     @Override
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
         return new JournalAbbreviationPreferences(getStringList(EXTERNAL_JOURNAL_LISTS), getDefaultEncoding());
@@ -2650,5 +2613,32 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(SEND_LANGUAGE_DATA, preferences.shouldSendLanguage());
         putBoolean(SEND_OS_DATA, preferences.shouldSendOs());
         putBoolean(SEND_TIMEZONE_DATA, preferences.shouldSendTimezone());
+    }
+
+    @Override
+    public String getIdBasedFetcherForEntryGenerator() {
+        return get(ID_ENTRY_GENERATOR);
+    }
+
+    @Override
+    public void storeIdBasedFetcherForEntryGenerator(String fetcherName) {
+        put(ID_ENTRY_GENERATOR, fetcherName);
+    }
+
+    @Override
+    public ProtectedTermsPreferences getProtectedTermsPreferences() {
+        return new ProtectedTermsPreferences(
+                getStringList(PROTECTED_TERMS_ENABLED_INTERNAL),
+                getStringList(PROTECTED_TERMS_ENABLED_EXTERNAL),
+                getStringList(PROTECTED_TERMS_DISABLED_INTERNAL),
+                getStringList(PROTECTED_TERMS_DISABLED_EXTERNAL));
+    }
+
+    @Override
+    public void storeProtectedTermsPreferences(ProtectedTermsPreferences preferences) {
+        putStringList(PROTECTED_TERMS_ENABLED_EXTERNAL, preferences.getEnabledExternalTermLists());
+        putStringList(PROTECTED_TERMS_DISABLED_EXTERNAL, preferences.getDisabledExternalTermLists());
+        putStringList(PROTECTED_TERMS_ENABLED_INTERNAL, preferences.getEnabledInternalTermLists());
+        putStringList(PROTECTED_TERMS_DISABLED_INTERNAL, preferences.getDisabledInternalTermLists());
     }
 }
