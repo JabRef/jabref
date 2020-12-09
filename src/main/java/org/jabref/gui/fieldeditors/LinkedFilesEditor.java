@@ -281,7 +281,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                         case DOWNLOAD_FILE -> Bindings.createBooleanBinding(
                                 () -> linkedFile.getFile().isOnlineLink(),
                                 linkedFile.getFile().linkProperty());
-                        case OPEN_FILE,  OPEN_FOLDER,  RENAME_FILE_TO_NAME, DELETE_FILE -> Bindings.createBooleanBinding(
+                        case OPEN_FILE, OPEN_FOLDER, RENAME_FILE_TO_NAME, DELETE_FILE -> Bindings.createBooleanBinding(
                                 () -> !linkedFile.getFile().isOnlineLink()
                                         && linkedFile.getFile().findIn(databaseContext, preferencesService.getFilePreferences()).isPresent(),
                                 linkedFile.getFile().linkProperty());
