@@ -36,7 +36,7 @@ import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
-import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileHistory;
@@ -48,8 +48,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.metadata.SaveOrderConfig;
 
 public interface PreferencesService {
-
-    void setProtectedTermsPreferences(ProtectedTermsLoader loader);
 
     JournalAbbreviationPreferences getJournalAbbreviationPreferences();
 

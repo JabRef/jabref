@@ -25,6 +25,7 @@ import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
@@ -159,27 +160,27 @@ public class JabRefMain extends Application {
         return true;
     }
 
-    private static void applyPreferences(JabRefPreferences preferences) {
+    private static void applyPreferences(PreferencesService preferences) {
         // Read list(s) of journal names and abbreviations
-        Globals.journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(Globals.prefs.getJournalAbbreviationPreferences());
+        Globals.journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
 
         // Build list of Import and Export formats
-        Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
-                Globals.prefs.getXmpPreferences(), Globals.getFileUpdateMonitor());
+        Globals.IMPORT_FORMAT_READER.resetImportFormats(preferences.getImportFormatPreferences(),
+                preferences.getXmpPreferences(), Globals.getFileUpdateMonitor());
         Globals.entryTypesManager.addCustomOrModifiedTypes(preferences.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
                 preferences.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
         Globals.exportFactory = ExporterFactory.create(
-                Globals.prefs.getCustomExportFormats(Globals.journalAbbreviationRepository),
-                Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository),
-                Globals.prefs.getSavePreferencesForExport(),
-                Globals.prefs.getXmpPreferences());
+                preferences.getCustomExportFormats(Globals.journalAbbreviationRepository),
+                preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository),
+                preferences.getSavePreferencesForExport(),
+                preferences.getXmpPreferences());
 
         // Initialize protected terms loader
-        Globals.protectedTermsLoader = new ProtectedTermsLoader(Globals.prefs.getProtectedTermsPreferences());
+        Globals.protectedTermsLoader = new ProtectedTermsLoader(preferences.getProtectedTermsPreferences());
 
         // Override used newline character with the one stored in the preferences
         // The preferences return the system newline character sequence as default
-        OS.NEWLINE = Globals.prefs.getNewLineSeparator().toString();
+        OS.NEWLINE = preferences.getNewLineSeparator().toString();
     }
 
     private static void configureProxy(ProxyPreferences proxyPreferences) {

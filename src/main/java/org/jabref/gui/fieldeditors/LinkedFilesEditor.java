@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -41,7 +40,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -60,7 +59,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                              TaskExecutor taskExecutor,
                              SuggestionProvider<?> suggestionProvider,
                              FieldCheckers fieldCheckers,
-                             JabRefPreferences preferences) {
+                             PreferencesService preferences) {
         this.viewModel = new LinkedFilesEditorViewModel(field, suggestionProvider, dialogService, databaseContext, taskExecutor, fieldCheckers, preferences);
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
@@ -202,17 +201,17 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     }
 
     @FXML
-    private void addNewFile(ActionEvent event) {
+    private void addNewFile() {
         viewModel.addNewFile();
     }
 
     @FXML
-    private void fetchFulltext(ActionEvent event) {
+    private void fetchFulltext() {
         viewModel.fetchFulltext();
     }
 
     @FXML
-    private void addFromURL(ActionEvent event) {
+    private void addFromURL() {
         viewModel.addFromURL();
     }
 
