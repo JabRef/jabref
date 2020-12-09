@@ -901,23 +901,11 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     /**
-     * Returns the default BibDatabase mode, which can be either BIBTEX or BIBLATEX.
-     *
-     * @return the default BibDatabaseMode
-     */
-    public BibDatabaseMode getDefaultBibDatabaseMode() {
-        if (getBoolean(BIBLATEX_DEFAULT_MODE)) {
-            return BibDatabaseMode.BIBLATEX;
-        } else {
-            return BibDatabaseMode.BIBTEX;
-        }
-    }
-
-    /**
      * Clear all preferences.
      *
      * @throws BackingStoreException if JabRef is unable to write to the registry/the preferences storage
      */
+    @Override
     public void clear() throws BackingStoreException {
         clearAllBibEntryTypes();
         clearCitationKeyPatterns();
@@ -933,6 +921,7 @@ public class JabRefPreferences implements PreferencesService {
     /**
      * Calling this method will write all preferences into the preference store.
      */
+    @Override
     public void flush() {
         if (getBoolean(MEMORY_STICK_MODE)) {
             try {
@@ -948,54 +937,7 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    public void storeBibEntryTypes(Collection<BibEntryType> bibEntryTypes, BibDatabaseMode bibDatabaseMode) {
-        Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
-
-        try {
-            // clear old custom types
-            clearBibEntryTypes(bibDatabaseMode);
-
-            // store current custom types
-            bibEntryTypes.forEach(type -> prefsNode.put(type.getType().getName(), BibEntryTypesManager.serialize(type)));
-
-            prefsNode.flush();
-        } catch (BackingStoreException e) {
-            LOGGER.info("Updating stored custom entry types failed.", e);
-        }
-    }
-
     @Override
-    public List<BibEntryType> loadBibEntryTypes(BibDatabaseMode bibDatabaseMode) {
-        List<BibEntryType> storedEntryTypes = new ArrayList<>();
-        Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
-        try {
-            Arrays.stream(prefsNode.keys())
-                  .map(key -> prefsNode.get(key, null))
-                  .filter(Objects::nonNull)
-                  .forEach(typeString -> BibEntryTypesManager.parse(typeString).ifPresent(storedEntryTypes::add));
-        } catch (BackingStoreException e) {
-            LOGGER.info("Parsing customized entry types failed.", e);
-        }
-        return storedEntryTypes;
-    }
-
-    public void clearAllBibEntryTypes() {
-        for (BibDatabaseMode mode : BibDatabaseMode.values()) {
-            clearBibEntryTypes(mode);
-        }
-    }
-
-    @Override
-    public void clearBibEntryTypes(BibDatabaseMode mode) {
-        try {
-            Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(mode);
-            prefsNode.clear();
-            prefsNode.flush();
-        } catch (BackingStoreException e) {
-            LOGGER.error("Resetting customized entry types failed.", e);
-        }
-    }
-
     public Map<String, Object> getPreferences() {
         Map<String, Object> result = new HashMap<>();
 
@@ -1005,6 +947,11 @@ public class JabRefPreferences implements PreferencesService {
             LOGGER.info("could not retrieve preference keys", e);
         }
         return result;
+    }
+
+    @Override
+    public Map<String, Object> getDefaults() {
+        return defaults;
     }
 
     private void addPrefsRecursively(Preferences prefs, Map<String, Object> result) throws BackingStoreException {
@@ -1054,6 +1001,7 @@ public class JabRefPreferences implements PreferencesService {
         exportPreferences(Path.of(filename));
     }
 
+    @Override
     public void exportPreferences(Path file) throws JabRefException {
         LOGGER.debug("Exporting preferences {}", file.toAbsolutePath());
         try (OutputStream os = Files.newOutputStream(file)) {
@@ -1074,6 +1022,7 @@ public class JabRefPreferences implements PreferencesService {
         importPreferences(Path.of(filename));
     }
 
+    @Override
     public void importPreferences(Path file) throws JabRefException {
         try (InputStream is = Files.newInputStream(file)) {
             Preferences.importPreferences(is);
@@ -1122,13 +1071,15 @@ public class JabRefPreferences implements PreferencesService {
         put(OO_BIBLIOGRAPHY_STYLE_FILE, openOfficePreferences.getCurrentStyle());
     }
 
-    public void storeVersionPreferences(VersionPreferences versionPreferences) {
-        put(VERSION_IGNORED_UPDATE, versionPreferences.getIgnoredVersion().toString());
-    }
-
+    @Override
     public VersionPreferences getVersionPreferences() {
         Version ignoredVersion = Version.parse(get(VERSION_IGNORED_UPDATE));
         return new VersionPreferences(ignoredVersion);
+    }
+
+    @Override
+    public void storeVersionPreferences(VersionPreferences versionPreferences) {
+        put(VERSION_IGNORED_UPDATE, versionPreferences.getIgnoredVersion().toString());
     }
 
     @Override
@@ -1247,21 +1198,77 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public void saveCustomEntryTypes(BibEntryTypesManager entryTypesManager) {
-        saveCustomEntryTypes(BibDatabaseMode.BIBTEX, entryTypesManager);
-        saveCustomEntryTypes(BibDatabaseMode.BIBLATEX, entryTypesManager);
+    @Deprecated
+    public String getDefaultsDefaultCitationKeyPattern() {
+        return (String) defaults.get(DEFAULT_CITATION_KEY_PATTERN);
     }
 
-    private void saveCustomEntryTypes(BibDatabaseMode bibDatabaseMode, BibEntryTypesManager entryTypesManager) {
+    //*************************************************************************************************************
+    // CustomEntryTypes
+    //
+    // Note that here the pattern is broken: getBibEntryTypes returns something different than storeCustomEntryTypes
+    // stores. The proper opposite part would be storeBibEntryTypes, which is private, as it is called only by the
+    // latter method.
+    //*************************************************************************************************************
+
+    @Override
+    public List<BibEntryType> getBibEntryTypes(BibDatabaseMode bibDatabaseMode) {
+        List<BibEntryType> storedEntryTypes = new ArrayList<>();
+        Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
+        try {
+            Arrays.stream(prefsNode.keys())
+                  .map(key -> prefsNode.get(key, null))
+                  .filter(Objects::nonNull)
+                  .forEach(typeString -> BibEntryTypesManager.parse(typeString).ifPresent(storedEntryTypes::add));
+        } catch (BackingStoreException e) {
+            LOGGER.info("Parsing customized entry types failed.", e);
+        }
+        return storedEntryTypes;
+    }
+
+    private void clearAllBibEntryTypes() {
+        for (BibDatabaseMode mode : BibDatabaseMode.values()) {
+            clearBibEntryTypes(mode);
+        }
+    }
+
+    @Override
+    public void clearBibEntryTypes(BibDatabaseMode mode) {
+        try {
+            Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(mode);
+            prefsNode.clear();
+            prefsNode.flush();
+        } catch (BackingStoreException e) {
+            LOGGER.error("Resetting customized entry types failed.", e);
+        }
+    }
+
+    @Override
+    public void storeCustomEntryTypes(BibEntryTypesManager entryTypesManager) {
+        storeBibEntryTypes(BibDatabaseMode.BIBTEX, entryTypesManager);
+        storeBibEntryTypes(BibDatabaseMode.BIBLATEX, entryTypesManager);
+    }
+
+    private void storeBibEntryTypes(BibDatabaseMode bibDatabaseMode, BibEntryTypesManager entryTypesManager) {
         Collection<BibEntryType> customBiblatexBibTexTypes = entryTypesManager.getAllTypes(bibDatabaseMode);
 
         storeBibEntryTypes(customBiblatexBibTexTypes, bibDatabaseMode);
     }
 
-    @Override
-    @Deprecated
-    public String getDefaultsDefaultCitationKeyPattern() {
-        return (String) defaults.get(DEFAULT_CITATION_KEY_PATTERN);
+    private void storeBibEntryTypes(Collection<BibEntryType> bibEntryTypes, BibDatabaseMode bibDatabaseMode) {
+        Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
+
+        try {
+            // clear old custom types
+            clearBibEntryTypes(bibDatabaseMode);
+
+            // store current custom types
+            bibEntryTypes.forEach(type -> prefsNode.put(type.getType().getName(), BibEntryTypesManager.serialize(type)));
+
+            prefsNode.flush();
+        } catch (BackingStoreException e) {
+            LOGGER.info("Updating stored custom entry types failed.", e);
+        }
     }
 
     //*************************************************************************************************************
@@ -1298,6 +1305,20 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public Charset getDefaultEncoding() {
         return Charset.forName(get(DEFAULT_ENCODING));
+    }
+
+    /**
+     * Returns the default BibDatabase mode, which can be either BIBTEX or BIBLATEX.
+     *
+     * @return the default BibDatabaseMode
+     */
+    @Override
+    public BibDatabaseMode getDefaultBibDatabaseMode() {
+        if (getBoolean(BIBLATEX_DEFAULT_MODE)) {
+            return BibDatabaseMode.BIBLATEX;
+        } else {
+            return BibDatabaseMode.BIBTEX;
+        }
     }
 
     @Override
@@ -2125,6 +2146,7 @@ public class JabRefPreferences implements PreferencesService {
         return new AutoLinkPreferences(
                 citationKeyDependency,
                 get(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY),
+                getBoolean(ASK_AUTO_NAMING_PDFS_AGAIN),
                 getKeywordDelimiter());
     }
 
@@ -2145,6 +2167,7 @@ public class JabRefPreferences implements PreferencesService {
                 putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, true);
             }
         }
+        putBoolean(ASK_AUTO_NAMING_PDFS_AGAIN, preferences.shouldAskAutoNamingPdfs());
         put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, preferences.getRegularExpression());
     }
 
@@ -2431,7 +2454,8 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(WINDOW_MAXIMISED),
                 getBoolean(OPEN_LAST_EDITED),
                 getStringList(LAST_EDITED),
-                Path.of(get(LAST_FOCUSED)));
+                Path.of(get(LAST_FOCUSED)),
+                getDouble(SIDE_PANE_WIDTH));
     }
 
     @Override
@@ -2448,6 +2472,8 @@ public class JabRefPreferences implements PreferencesService {
             String filePath = preferences.getLastFocusedFile().toAbsolutePath().toString();
             put(LAST_FOCUSED, filePath);
         }
+
+        putDouble(SIDE_PANE_WIDTH, preferences.getSidePaneWidth());
     }
 
     @Override

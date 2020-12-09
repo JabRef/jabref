@@ -30,6 +30,7 @@ import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,11 +49,13 @@ public class OpenDatabaseAction extends SimpleCommand {
             new CheckForNewEntryTypesAction());
 
     private final JabRefFrame frame;
+    private final PreferencesService preferencesService;
     private final DialogService dialogService;
 
-    public OpenDatabaseAction(JabRefFrame frame) {
+    public OpenDatabaseAction(JabRefFrame frame, PreferencesService preferencesService, DialogService dialogService) {
         this.frame = frame;
-        this.dialogService = frame.getDialogService();
+        this.preferencesService = preferencesService;
+        this.dialogService = dialogService;
     }
 
     /**
@@ -164,7 +167,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         BackgroundTask<ParserResult> backgroundTask = BackgroundTask.wrap(() -> loadDatabase(file));
         LibraryTab.Factory libraryTabFactory = new LibraryTab.Factory();
-        LibraryTab newTab = libraryTabFactory.createLibraryTab(frame, file, backgroundTask);
+        LibraryTab newTab = libraryTabFactory.createLibraryTab(frame, preferencesService, file, backgroundTask);
 
         backgroundTask.onFinished(() -> trackOpenNewDatabase(newTab));
     }

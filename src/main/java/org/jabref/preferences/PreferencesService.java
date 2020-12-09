@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.prefs.BackingStoreException;
 
 import org.jabref.gui.autocompleter.AutoCompletePreferences;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
@@ -17,6 +18,7 @@ import org.jabref.gui.maintable.MainTableNameFormatPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.Theme;
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -49,6 +51,10 @@ import org.jabref.model.metadata.SaveOrderConfig;
 
 public interface PreferencesService {
 
+    VersionPreferences getVersionPreferences();
+
+    void storeVersionPreferences(VersionPreferences versionPreferences);
+
     JournalAbbreviationPreferences getJournalAbbreviationPreferences();
 
     void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository);
@@ -73,6 +79,14 @@ public interface PreferencesService {
 
     void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences);
 
+    Map<String, Object> getPreferences();
+
+    Map<String, Object> getDefaults();
+
+    void exportPreferences(Path file) throws JabRefException;
+
+    void importPreferences(Path file) throws JabRefException;
+
     LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationRepository repository);
 
     ImportFormatPreferences getImportFormatPreferences();
@@ -93,11 +107,15 @@ public interface PreferencesService {
 
     void setShouldWarnAboutDuplicatesForImport(boolean value);
 
-    void saveCustomEntryTypes(BibEntryTypesManager entryTypesManager);
+    void clear() throws BackingStoreException;
+
+    void flush();
+
+    List<BibEntryType> getBibEntryTypes(BibDatabaseMode mode);
+
+    void storeCustomEntryTypes(BibEntryTypesManager entryTypesManager);
 
     void clearBibEntryTypes(BibDatabaseMode mode);
-
-    List<BibEntryType> loadBibEntryTypes(BibDatabaseMode mode);
 
     CleanupPreferences getCleanupPreferences(JournalAbbreviationRepository repository);
 
@@ -115,6 +133,8 @@ public interface PreferencesService {
     Language getLanguage();
 
     void setLanguage(Language language);
+
+    BibDatabaseMode getDefaultBibDatabaseMode();
 
     GeneralPreferences getGeneralPreferences();
 

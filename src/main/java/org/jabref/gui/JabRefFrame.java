@@ -137,7 +137,7 @@ import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.TelemetryPreferences;
 
 import com.google.common.eventbus.Subscribe;
@@ -159,7 +159,7 @@ public class JabRefFrame extends BorderPane {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrame.class);
 
     private final SplitPane splitPane = new SplitPane();
-    private final JabRefPreferences prefs = Globals.prefs;
+    private final PreferencesService prefs = Globals.prefs;
     private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this, Globals.stateManager, prefs);
 
     private final FileHistoryMenu fileHistory;
@@ -334,10 +334,6 @@ public class JabRefFrame extends BorderPane {
         HelpAction.getMainHelpPageCommand().execute();
     }
 
-    public JabRefPreferences prefs() {
-        return prefs;
-    }
-
     /**
      * Tears down all things started by JabRef
      * <p>
@@ -463,10 +459,11 @@ public class JabRefFrame extends BorderPane {
     }
 
     private void setDividerPosition() {
-        splitPane.setDividerPositions(prefs.getDouble(JabRefPreferences.SIDE_PANE_WIDTH));
+        splitPane.setDividerPositions(prefs.getGuiPreferences().getSidePaneWidth());
         if (!splitPane.getDividers().isEmpty()) {
             EasyBind.subscribe(splitPane.getDividers().get(0).positionProperty(),
-                    position -> prefs.putDouble(JabRefPreferences.SIDE_PANE_WIDTH, position.doubleValue()));
+                    position -> prefs.storeGuiPreferences(prefs.getGuiPreferences()
+                                                               .withSidePaneWidth(position.doubleValue())));
         }
     }
 
@@ -484,7 +481,7 @@ public class JabRefFrame extends BorderPane {
 
                 new HBox(
                         factory.createIconButton(StandardActions.NEW_LIBRARY, new NewDatabaseAction(this, prefs)),
-                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(this)),
+                        factory.createIconButton(StandardActions.OPEN_LIBRARY, new OpenDatabaseAction(this, prefs, dialogService)),
                         factory.createIconButton(StandardActions.SAVE_LIBRARY, new SaveAction(SaveAction.SaveMethod.SAVE, this, stateManager))),
 
                 leftSpacer,
@@ -800,7 +797,7 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(this, stateManager))
+                factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(dialogService, prefs, undoManager, stateManager))
         );
 
         // PushToApplication
@@ -823,7 +820,8 @@ public class JabRefFrame extends BorderPane {
                 pushToApplicationMenuItem,
                 new SeparatorMenuItem(),
                 factory.createMenuItem(StandardActions.START_SYSTEMATIC_LITERATURE_REVIEW,
-                        new StartLiteratureReviewAction(this, Globals.getFileUpdateMonitor(), prefs.getWorkingDir(), taskExecutor, prefs.getImportFormatPreferences(), prefs.getSavePreferences()))
+                        new StartLiteratureReviewAction(this, Globals.getFileUpdateMonitor(), prefs.getWorkingDir(),
+                                taskExecutor, prefs, prefs.getImportFormatPreferences(), prefs.getSavePreferences()))
         );
 
         SidePaneComponent webSearch = sidePaneManager.getComponent(SidePaneType.WEB_SEARCH);
@@ -1175,7 +1173,7 @@ public class JabRefFrame extends BorderPane {
     }
 
     public OpenDatabaseAction getOpenDatabaseAction() {
-        return new OpenDatabaseAction(this);
+        return new OpenDatabaseAction(this, prefs, dialogService);
     }
 
     public SidePaneManager getSidePaneManager() {

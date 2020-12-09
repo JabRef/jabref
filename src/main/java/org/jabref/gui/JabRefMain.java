@@ -167,8 +167,8 @@ public class JabRefMain extends Application {
         // Build list of Import and Export formats
         Globals.IMPORT_FORMAT_READER.resetImportFormats(preferences.getImportFormatPreferences(),
                 preferences.getXmpPreferences(), Globals.getFileUpdateMonitor());
-        Globals.entryTypesManager.addCustomOrModifiedTypes(preferences.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
-                preferences.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
+        Globals.entryTypesManager.addCustomOrModifiedTypes(preferences.getBibEntryTypes(BibDatabaseMode.BIBTEX),
+                preferences.getBibEntryTypes(BibDatabaseMode.BIBLATEX));
         Globals.exportFactory = ExporterFactory.create(
                 preferences.getCustomExportFormats(Globals.journalAbbreviationRepository),
                 preferences.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository),

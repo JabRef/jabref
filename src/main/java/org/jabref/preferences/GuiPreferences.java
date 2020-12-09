@@ -14,6 +14,7 @@ public class GuiPreferences {
     private final boolean shouldOpenLastEdited;
     private List<String> lastFilesOpened;
     private Path lastFocusedFile;
+    private double sidePaneWidth;
 
     public GuiPreferences(double positionX,
                           double positionY,
@@ -22,7 +23,7 @@ public class GuiPreferences {
                           boolean windowMaximised,
                           boolean shouldOpenLastEdited,
                           List<String> lastFilesOpened,
-                          Path lastFocusedFile) {
+                          Path lastFocusedFile, double sidePaneWidth) {
         this.positionX = positionX;
         this.positionY = positionY;
         this.sizeX = sizeX;
@@ -31,6 +32,7 @@ public class GuiPreferences {
         this.shouldOpenLastEdited = shouldOpenLastEdited;
         this.lastFilesOpened = lastFilesOpened;
         this.lastFocusedFile = lastFocusedFile;
+        this.sidePaneWidth = sidePaneWidth;
     }
 
     public double getPositionX() {
@@ -72,6 +74,15 @@ public class GuiPreferences {
 
     public GuiPreferences withLastFocusedFile(Path lastFocusedFile) {
         this.lastFocusedFile = lastFocusedFile;
+        return this;
+    }
+
+    public double getSidePaneWidth() {
+        return sidePaneWidth;
+    }
+
+    public GuiPreferences withSidePaneWidth(double sidePaneWidth) {
+        this.sidePaneWidth = sidePaneWidth;
         return this;
     }
 }

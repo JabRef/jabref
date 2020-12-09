@@ -17,6 +17,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
@@ -29,15 +30,17 @@ public class StartLiteratureReviewAction extends SimpleCommand {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final Path workingDirectory;
     private final TaskExecutor taskExecutor;
+    private final PreferencesService preferencesService;
     private final ImportFormatPreferences importFormatPreferneces;
     private final SavePreferences savePreferences;
 
-    public StartLiteratureReviewAction(JabRefFrame frame, FileUpdateMonitor fileUpdateMonitor, Path standardWorkingDirectory, TaskExecutor taskExecutor, ImportFormatPreferences importFormatPreferences, SavePreferences savePreferences) {
+    public StartLiteratureReviewAction(JabRefFrame frame, FileUpdateMonitor fileUpdateMonitor, Path standardWorkingDirectory, TaskExecutor taskExecutor, PreferencesService preferencesService, ImportFormatPreferences importFormatPreferences, SavePreferences savePreferences) {
         this.frame = frame;
         this.dialogService = frame.getDialogService();
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.workingDirectory = getInitialDirectory(standardWorkingDirectory);
         this.taskExecutor = taskExecutor;
+        this.preferencesService = preferencesService;
         this.importFormatPreferneces = importFormatPreferences;
         this.savePreferences = savePreferences;
     }
@@ -69,7 +72,7 @@ public class StartLiteratureReviewAction extends SimpleCommand {
                           LOGGER.error("Error during persistence of crawling results.");
                           dialogService.showErrorDialogAndWait(Localization.lang("Error during persistence of crawling results."), e);
                       })
-                      .onSuccess(unused -> new OpenDatabaseAction(frame).openFile(Path.of(studyDefinitionFile.get().getParent().toString(), "studyResult.bib"), true))
+                      .onSuccess(unused -> new OpenDatabaseAction(frame, preferencesService, dialogService).openFile(Path.of(studyDefinitionFile.get().getParent().toString(), "studyResult.bib"), true))
                       .executeWith(taskExecutor);
     }
 

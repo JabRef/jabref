@@ -223,7 +223,8 @@ public class JabRefGUI {
                 mainStage.isMaximized(),
                 preferences.shouldOpenLastEdited(),
                 preferences.getLastFilesOpened(),
-                preferences.getLastFocusedFile()));
+                preferences.getLastFocusedFile(),
+                preferences.getSidePaneWidth()));
         debugLogWindowState(mainStage);
     }
 

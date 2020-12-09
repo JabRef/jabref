@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.swing.undo.UndoManager;
+
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -40,7 +42,6 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.UnlinkedFilesCrawler;
-import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
@@ -51,7 +52,7 @@ import org.jabref.gui.util.ViewModelTreeCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +65,7 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Boolean> {
     private static final Logger LOGGER = LoggerFactory.getLogger(FindUnlinkedFilesDialog.class);
     private final BibDatabaseContext databaseContext;
     private final ImportHandler importHandler;
-    private final JabRefPreferences preferences = Globals.prefs;
+    private final PreferencesService preferences;
     private final DialogService dialogService;
     private Button buttonScan;
     private Button buttonExport;
@@ -75,10 +76,11 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Boolean> {
     private VBox panelSearchProgress;
     private BackgroundTask findUnlinkedFilesTask;
 
-    public FindUnlinkedFilesDialog(BibDatabaseContext database, DialogService dialogService, CountingUndoManager undoManager) {
+    public FindUnlinkedFilesDialog(BibDatabaseContext database, DialogService dialogService, PreferencesService preferencesService, UndoManager undoManager) {
         super();
         this.setTitle(Localization.lang("Search for unlinked local files"));
         this.dialogService = dialogService;
+        this.preferences = preferencesService;
 
         databaseContext = database;
         importHandler = new ImportHandler(
@@ -227,13 +229,6 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Boolean> {
         panelSearchProgress = new VBox(5, labelSearchingDirectoryInfo, progressBarSearching);
         panelSearchProgress.toFront();
         panelSearchProgress.setVisible(false);
-
-//        panelDirectory.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
-//                Localization.lang("Select directory")));
-//        panelFiles.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
-//                Localization.lang("Select files")));
-//        panelEntryTypesSelection.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(),
-//                Localization.lang("BibTeX entry creation")));
 
         VBox panelDirectory = new VBox(5);
         panelDirectory.getChildren().setAll(
