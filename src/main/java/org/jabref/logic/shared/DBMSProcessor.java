@@ -256,7 +256,7 @@ public abstract class DBMSProcessor {
             }
 
             if (numFields == 0) {
-                return; //Prevent SQL Exception
+                return; // Prevent SQL Exception
             }
 
             // Number of commas is fields.size() - 1
