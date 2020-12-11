@@ -78,7 +78,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the "Document Viewer" did not show the first page of the opened pdf document and did not show the correct total number of pages [#7108](https://github.com/JabRef/jabref/issues/7108)
 - We fixed an issue where the context menu was not updated after a file link was changed. [#5777](https://github.com/JabRef/jabref/issues/5777)
 - We fixed an issue where the password for a shared SQL database was not remembered [#6869](https://github.com/JabRef/jabref/issues/6869)
-- We fixed an issue where newly added entires where not synced to a shared SQL database [#7176](https://github.com/JabRef/jabref/issues/7176)
+- We fixed an issue where newly added entires were not synced to a shared SQL database [#7176](https://github.com/JabRef/jabref/issues/7176)
 
 ### Removed
 
