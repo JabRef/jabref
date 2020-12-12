@@ -37,6 +37,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.PreferencesService;
@@ -109,7 +110,16 @@ public class MainTableColumnFactory {
                 default:
                 case NORMALFIELD:
                     if (!column.getQualifier().isBlank()) {
-                        columns.add(createFieldColumn(column));
+                        TableColumn<BibEntryTableViewModel, ?> fieldColumn = createFieldColumn(column);
+                        columns.add(fieldColumn);
+                        if (column.getQualifier().equalsIgnoreCase(StandardField.YEAR.getName())) {
+                            // We adjust the min width and the current width, but not the max width to allow the user to enlarge this field
+                            // 75 is chosen, because of the optimal width of a four digit field
+                            fieldColumn.setMinWidth(60);
+                            fieldColumn.setPrefWidth(60);
+                        } else {
+                            fieldColumn.setMinWidth(ColumnPreferences.DEFAULT_COLUMN_WIDTH);
+                        }
                     }
                     break;
             }
@@ -125,7 +135,7 @@ public class MainTableColumnFactory {
     }
 
     /**
-     * Creates a column with a continous number
+     * Creates a column with a continuous number
      */
     private TableColumn<BibEntryTableViewModel, String> createIndexColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, String> column = new MainTableColumn<>(columnModel);

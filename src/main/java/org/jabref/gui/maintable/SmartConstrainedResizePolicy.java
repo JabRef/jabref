@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import javafx.scene.control.ResizeFeaturesBase;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
@@ -25,80 +26,36 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
     @Override
     public Boolean call(TableView.ResizeFeatures prop) {
         if (prop.getColumn() == null) {
-            return initColumnSize(prop.getTable());
+            // table is initialized
+            // no need to adjust
+            return false;
         } else {
             return constrainedResize(prop);
-        }
-    }
-
-    private Boolean initColumnSize(TableView<?> table) {
-        double tableWidth = getContentWidth(table);
-        List<? extends TableColumnBase<?, ?>> visibleLeafColumns = table.getVisibleLeafColumns();
-        double totalWidth = visibleLeafColumns.stream().mapToDouble(TableColumnBase::getWidth).sum();
-
-        if (Math.abs(totalWidth - tableWidth) > 1) {
-            double totalPrefWidth = visibleLeafColumns.stream().mapToDouble(TableColumnBase::getPrefWidth).sum();
-            if (totalPrefWidth > 0) {
-                for (TableColumnBase col : visibleLeafColumns) {
-                    double share = col.getPrefWidth() / totalPrefWidth;
-                    double newSize = tableWidth * share;
-
-                    // Just to make sure that we are staying under the total table width (due to rounding errors)
-                    newSize -= 2;
-
-                    resize(col, newSize - col.getWidth());
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private void resize(TableColumnBase column, double delta) {
-        // We have to use reflection since TableUtil is not visible to us
-        try {
-            // TODO: reflective access, should be removed
-            Class<?> clazz = Class.forName("javafx.scene.control.TableUtil");
-            Method constrainedResize = clazz.getDeclaredMethod("resize", TableColumnBase.class, double.class);
-            constrainedResize.setAccessible(true);
-            constrainedResize.invoke(null, column, delta);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException e) {
-            LOGGER.error("Could not invoke resize in TableUtil", e);
         }
     }
 
     private Boolean constrainedResize(TableView.ResizeFeatures<?> prop) {
         TableView<?> table = prop.getTable();
         List<? extends TableColumnBase<?, ?>> visibleLeafColumns = table.getVisibleLeafColumns();
-        return constrainedResize(prop,
-                false,
-                getContentWidth(table) - 2,
-                visibleLeafColumns);
-    }
+        Double delta = prop.getDelta();
+        TableColumn<?, ?> userChosenColumnToResize = prop.getColumn();
 
-    private Boolean constrainedResize(TableView.ResizeFeatures prop, Boolean isFirstRun, Double contentWidth, List<? extends TableColumnBase<?, ?>> visibleLeafColumns) {
-        // We have to use reflection since TableUtil is not visible to us
-        try {
-            // TODO: reflective access, should be removed
-            Class<?> clazz = Class.forName("javafx.scene.control.TableUtil");
-            Method constrainedResize = clazz.getDeclaredMethod("constrainedResize", ResizeFeaturesBase.class, Boolean.TYPE, Double.TYPE, List.class);
-            constrainedResize.setAccessible(true);
-            Object returnValue = constrainedResize.invoke(null, prop, isFirstRun, contentWidth, visibleLeafColumns);
-            return (Boolean) returnValue;
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException e) {
-            LOGGER.error("Could not invoke constrainedResize in TableUtil", e);
+        double oldWidth = userChosenColumnToResize.getWidth();
+        double newWidth;
+        if (delta < 0) {
+            double minWidth = userChosenColumnToResize.getMinWidth();
+            LOGGER.trace("MinWidth {}", minWidth);
+            newWidth = Math.max(minWidth, oldWidth + delta);
+        } else {
+            double maxWidth = userChosenColumnToResize.getMaxWidth();
+            LOGGER.trace("MaxWidth {}", maxWidth);
+            newWidth = Math.min(maxWidth, oldWidth + delta);
+        }
+        LOGGER.trace("Size: {} -> {}", oldWidth, newWidth);
+        if (oldWidth == newWidth) {
             return false;
         }
-    }
-
-    private Double getContentWidth(TableView<?> table) {
-        try {
-            // TODO: reflective access, should be removed
-            Field privateStringField = TableView.class.getDeclaredField("contentWidth");
-            privateStringField.setAccessible(true);
-            return (Double) privateStringField.get(table);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            return 0d;
-        }
+        userChosenColumnToResize.setPrefWidth(newWidth);
+        return true;
     }
 }
