@@ -31,8 +31,8 @@ public class AutoLinkFilesAction extends SimpleCommand {
     private final DialogService dialogService;
     private final JabRefPreferences preferences;
     private final StateManager stateManager;
-    private UndoManager undoManager;
-    private TaskExecutor taskExecutor;
+    private final UndoManager undoManager;
+    private final TaskExecutor taskExecutor;
 
     public AutoLinkFilesAction(JabRefFrame frame, JabRefPreferences preferences, StateManager stateManager, UndoManager undoManager, TaskExecutor taskExecutor) {
         this.dialogService = frame.getDialogService();
@@ -66,14 +66,19 @@ public class AutoLinkFilesAction extends SimpleCommand {
 
             @Override
             protected void succeeded() {
-                if (!getValue().isEmpty()) {
-                    if (nc.hasEdits()) {
-                        nc.end();
-                        undoManager.addEdit(nc);
+                if (util.returnFileExceptions().isEmpty()) { //change
+                    if (!getValue().isEmpty()) {
+                        if (nc.hasEdits()) {
+                            nc.end();
+                            undoManager.addEdit(nc);
+                        }
+                        dialogService.notify(Localization.lang("Finished automatically setting external links."));
+                    } else {
+                        dialogService.notify(Localization.lang("Finished automatically setting external links.") + " " + Localization.lang("No files found."));
                     }
-                    dialogService.notify(Localization.lang("Finished automatically setting external links."));
                 } else {
-                    dialogService.notify(Localization.lang("Finished automatically setting external links.") + " " + Localization.lang("No files found."));
+
+                    dialogService.notify(Localization.lang("Problem finding files")); //change
                 }
             }
         };

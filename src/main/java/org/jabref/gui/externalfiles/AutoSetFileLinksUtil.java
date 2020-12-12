@@ -32,9 +32,12 @@ import org.slf4j.LoggerFactory;
 public class AutoSetFileLinksUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AutoSetFileLinksUtil.class);
-    private List<Path> directories;
-    private AutoLinkPreferences autoLinkPreferences;
-    private ExternalFileTypes externalFileTypes;
+    private final List<Path> directories;
+    private final AutoLinkPreferences autoLinkPreferences;
+    private final ExternalFileTypes externalFileTypes;
+
+    ArrayList<IOException> fileExceptions = new ArrayList<>(); //change
+
 
     public AutoSetFileLinksUtil(BibDatabaseContext databaseContext, FilePreferences filePreferences, AutoLinkPreferences autoLinkPreferences, ExternalFileTypes externalFileTypes) {
         this(databaseContext.getFileDirectories(filePreferences), autoLinkPreferences, externalFileTypes);
@@ -48,16 +51,21 @@ public class AutoSetFileLinksUtil {
 
     public List<BibEntry> linkAssociatedFiles(List<BibEntry> entries, NamedCompound ce) {
         List<BibEntry> changedEntries = new ArrayList<>();
+        fileExceptions.clear(); //change
+        //change
         for (BibEntry entry : entries) {
 
             List<LinkedFile> linkedFiles = new ArrayList<>();
             try {
                 linkedFiles = findAssociatedNotLinkedFiles(entry);
             } catch (IOException e) {
+                fileExceptions.add(e); //change
                 LOGGER.error("Problem finding files", e);
+
             }
 
             if (ce != null) {
+
                 for (LinkedFile linkedFile : linkedFiles) {
                     // store undo information
                     String newVal = FileFieldWriter.getStringRepresentation(linkedFile);
@@ -76,6 +84,11 @@ public class AutoSetFileLinksUtil {
             }
         }
         return changedEntries;
+    }
+
+    public ArrayList<IOException> returnFileExceptions() { //change
+
+        return fileExceptions;
     }
 
     public List<LinkedFile> findAssociatedNotLinkedFiles(BibEntry entry) throws IOException {
