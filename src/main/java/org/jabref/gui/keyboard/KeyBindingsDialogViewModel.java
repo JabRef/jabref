@@ -3,8 +3,11 @@ package org.jabref.gui.keyboard;
 import java.util.Objects;
 import java.util.Optional;
 
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -12,6 +15,8 @@ import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.keyboard.presets.BashKeyBindingPreset;
+import org.jabref.gui.keyboard.presets.KeyBindingPreset;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
@@ -22,6 +27,8 @@ public class KeyBindingsDialogViewModel extends AbstractViewModel {
     private final PreferencesService preferences;
     private final OptionalObjectProperty<KeyBindingViewModel> selectedKeyBinding = OptionalObjectProperty.empty();
     private final ObjectProperty<KeyBindingViewModel> rootKeyBinding = new SimpleObjectProperty<>();
+    private final ListProperty<KeyBindingPreset> keyBindingPresets = new SimpleListProperty<>(FXCollections.observableArrayList());
+
     private final DialogService dialogService;
 
     public KeyBindingsDialogViewModel(KeyBindingRepository keyBindingRepository, DialogService dialogService, PreferencesService preferences) {
@@ -29,6 +36,7 @@ public class KeyBindingsDialogViewModel extends AbstractViewModel {
         this.dialogService = Objects.requireNonNull(dialogService);
         this.preferences = Objects.requireNonNull(preferences);
         populateTable();
+        keyBindingPresets.add(new BashKeyBindingPreset());
     }
 
     public OptionalObjectProperty<KeyBindingViewModel> selectedKeyBindingProperty() {
@@ -93,5 +101,18 @@ public class KeyBindingsDialogViewModel extends AbstractViewModel {
                 populateTable();
             }
         });
+    }
+
+    public void loadPreset(KeyBindingPreset preset) {
+        if (preset == null) {
+            return;
+        }
+
+        preset.getKeyBindings().forEach(keyBindingRepository::put);
+        populateTable();
+    }
+
+    public ListProperty<KeyBindingPreset> keyBindingPresets() {
+        return keyBindingPresets;
     }
 }

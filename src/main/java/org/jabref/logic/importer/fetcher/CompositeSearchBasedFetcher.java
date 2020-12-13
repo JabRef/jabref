@@ -36,13 +36,13 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(String query) {
+    public List<BibEntry> performSearch(ComplexSearchQuery complexSearchQuery) {
         ImportCleanup cleanup = new ImportCleanup(BibDatabaseMode.BIBTEX);
         // All entries have to be converted into one format, this is necessary for the format conversion
         return fetchers.parallelStream()
                        .flatMap(searchBasedFetcher -> {
                            try {
-                               return searchBasedFetcher.performSearch(query).stream();
+                               return searchBasedFetcher.performSearch(complexSearchQuery).stream();
                            } catch (FetcherException e) {
                                LOGGER.warn(String.format("%s API request failed", searchBasedFetcher.getName()), e);
                                return Stream.empty();
