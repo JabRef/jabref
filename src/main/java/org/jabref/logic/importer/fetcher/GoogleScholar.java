@@ -140,7 +140,9 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
 
     private void addHitsFromQuery(List<BibEntry> entryList, String queryURL) throws IOException, FetcherException {
         LOGGER.debug("Downloading from {}", queryURL);
-        String content = new URLDownload(queryURL).asString();
+        URLDownload urlDownload = new URLDownload(queryURL);
+        obtainAndModifyCookie(urlDownload);
+        String content = urlDownload.asString();
 
         if (needsCaptcha(content)) {
             throw new FetcherException("Fetching from Google Scholar failed: Captacha hit at " + queryURL + ".",
@@ -192,9 +194,8 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
         }
     }
 
-    private void obtainAndModifyCookie() throws FetcherException {
+    private void obtainAndModifyCookie(URLDownload downloader) throws FetcherException {
         try {
-            URLDownload downloader = new URLDownload("https://scholar.google.com");
             List<HttpCookie> cookies = downloader.getCookieFromUrl();
             for (HttpCookie cookie : cookies) {
                 // append "CF=4" which represents "Citation format bibtex"
@@ -208,7 +209,6 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
     @Override
     public Page<BibEntry> performSearchPaged(ComplexSearchQuery complexSearchQuery, int pageNumber) throws FetcherException {
         LOGGER.debug("Using query {}", complexSearchQuery);
-        obtainAndModifyCookie();
         List<BibEntry> foundEntries = new ArrayList<>(10);
 
         String complexQueryString = constructComplexQueryString(complexSearchQuery);
