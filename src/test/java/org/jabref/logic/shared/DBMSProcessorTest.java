@@ -95,6 +95,37 @@ class DBMSProcessorTest {
         assertEquals(expectedFieldMap, actualFieldMap);
     }
 
+    @Test
+    void testInsertEntryWithEmptyFields() throws SQLException {
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Article);
+
+        dbmsProcessor.insertEntry(expectedEntry);
+
+        BibEntry emptyEntry = getBibEntryExample();
+        emptyEntry.getSharedBibEntryData().setSharedID(1);
+        dbmsProcessor.insertEntry(emptyEntry); // does not insert, due to same sharedID.
+
+        Map<String, String> actualFieldMap = new HashMap<>();
+
+        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
+            assertTrue(entryResultSet.next());
+            assertEquals(1, entryResultSet.getInt("SHARED_ID"));
+            assertEquals("article", entryResultSet.getString("TYPE"));
+            assertEquals(1, entryResultSet.getInt("VERSION"));
+            assertFalse(entryResultSet.next());
+
+            try (ResultSet fieldResultSet = selectFrom("FIELD", dbmsConnection, dbmsProcessor)) {
+                while (fieldResultSet.next()) {
+                    actualFieldMap.put(fieldResultSet.getString("NAME"), fieldResultSet.getString("VALUE"));
+                }
+            }
+        }
+
+        Map<String, String> expectedFieldMap = expectedEntry.getFieldMap().entrySet().stream().collect(Collectors.toMap((entry) -> entry.getKey().getName(), Map.Entry::getValue));
+
+        assertEquals(expectedFieldMap, actualFieldMap);
+    }
+
     private static BibEntry getBibEntryExample() {
         return new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.AUTHOR, "Wirthlin, Michael J and Hutchings, Brad L and Gilson, Kent L")
@@ -113,6 +144,19 @@ class DBMSProcessorTest {
         expectedEntry.setField(StandardField.AUTHOR, "Michael J and Hutchings");
         expectedEntry.setField(new UnknownField("customField"), "custom value");
         expectedEntry.clearField(StandardField.BOOKTITLE);
+        dbmsProcessor.updateEntry(expectedEntry);
+
+        Optional<BibEntry> actualEntry = dbmsProcessor.getSharedEntry(expectedEntry.getSharedBibEntryData().getSharedID());
+        assertEquals(Optional.of(expectedEntry), actualEntry);
+    }
+
+    @Test
+    void testUpdateEmptyEntry() throws Exception {
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Article);
+        dbmsProcessor.insertEntry(expectedEntry);
+
+        expectedEntry.setField(StandardField.AUTHOR, "Michael J and Hutchings");
+        expectedEntry.setField(new UnknownField("customField"), "custom value");
         dbmsProcessor.updateEntry(expectedEntry);
 
         Optional<BibEntry> actualEntry = dbmsProcessor.getSharedEntry(expectedEntry.getSharedBibEntryData().getSharedID());
