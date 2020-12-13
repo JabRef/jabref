@@ -818,10 +818,11 @@ public class JabRefFrame extends BorderPane {
 
                 factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsEMailAction(dialogService, prefs, stateManager)),
                 pushToApplicationMenuItem,
-                new SeparatorMenuItem(),
-                factory.createMenuItem(StandardActions.START_SYSTEMATIC_LITERATURE_REVIEW,
-                        new StartLiteratureReviewAction(this, Globals.getFileUpdateMonitor(), prefs.getWorkingDir(),
-                                taskExecutor, prefs, prefs.getImportFormatPreferences(), prefs.getSavePreferences()))
+                // Disabled until PR #7126 can be merged
+                // new SeparatorMenuItem(),
+                //factory.createMenuItem(StandardActions.START_SYSTEMATIC_LITERATURE_REVIEW,
+                //        new StartLiteratureReviewAction(this, Globals.getFileUpdateMonitor(), prefs.getWorkingDir(),
+                //                taskExecutor, prefs, prefs.getImportFormatPreferences(), prefs.getSavePreferences()))
         );
 
         SidePaneComponent webSearch = sidePaneManager.getComponent(SidePaneType.WEB_SEARCH);
