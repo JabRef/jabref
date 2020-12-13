@@ -236,11 +236,13 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
             addHitsFromQuery(foundEntries, queryURL);
         } catch (IOException e) {
             LOGGER.info("IOException for URL {}", queryURL);
-            // if there are too much requests from the same IP address google is answering with a 403 or 503 and redirecting to a captcha challenge
+            // If there are too much requests from the same IP address google is answering with a 403, 429, or 503 and redirecting to a captcha challenge
+            // Example URL: https://www.google.com/sorry/index?continue=https://scholar.google.ch/scholar%3Fhl%3Den%26btnG%3DSearch%26q%3D%2522in%2522%2B%2522and%2522%2B%2522Process%2522%2B%2522Models%2522%2B%2522Issues%2522%2B%2522Interoperability%2522%2B%2522Detecting%2522%2B%2522Correctness%2522%2B%2522BPMN%2522%2B%25222.0%2522%2Ballintitle%253A%26start%3D0%26num%3D20&hl=en&q=EgTZGO7HGOuK2P4FIhkA8aeDSwDHMafs3bst5vlLM-Sk4TtpMrOtMgFy
             // The caught IOException looks for example like this:
             // java.io.IOException: Server returned HTTP response code: 503 for URL: https://ipv4.google.com/sorry/index?continue=https://scholar.google.com/scholar%3Fhl%3Den%26btnG%3DSearch%26q%3Dbpmn&hl=en&q=CGMSBI0NBDkYuqy9wAUiGQDxp4NLQCWbIEY1HjpH5zFJhv4ANPGdWj0
             if (e.getMessage().contains("Server returned HTTP response code: 403 for URL") ||
-                    (e.getMessage().contains("Server returned HTTP response code: 503 for URL"))) {
+                    e.getMessage().contains("Server returned HTTP response code: 429 for URL") ||
+                    e.getMessage().contains("Server returned HTTP response code: 503 for URL")) {
                 throw new FetcherException("Fetching from Google Scholar failed.",
                         Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), e);
             } else {
