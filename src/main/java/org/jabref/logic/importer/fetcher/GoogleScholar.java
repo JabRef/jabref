@@ -185,7 +185,7 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
         } else {
             Collection<BibEntry> entries = result.getDatabase().getEntries();
             if (entries.size() != 1) {
-                LOGGER.debug(entries.size() + " entries found! (" + link + ")");
+                LOGGER.debug("{} entries found ({})", entries.size(), link);
                 throw new FetcherException("Parsing entries from Google Scholar bib file failed.");
             } else {
                 BibEntry entry = entries.iterator().next();
@@ -209,7 +209,7 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
     @Override
     public Page<BibEntry> performSearchPaged(ComplexSearchQuery complexSearchQuery, int pageNumber) throws FetcherException {
         LOGGER.debug("Using query {}", complexSearchQuery);
-        List<BibEntry> foundEntries = new ArrayList<>(10);
+        List<BibEntry> foundEntries = new ArrayList<>(getPageSize());
 
         String complexQueryString = constructComplexQueryString(complexSearchQuery);
         final URIBuilder uriBuilder;
