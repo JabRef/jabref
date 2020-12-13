@@ -207,46 +207,48 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
 
     @Override
     public Page<BibEntry> performSearchPaged(ComplexSearchQuery complexSearchQuery, int pageNumber) throws FetcherException {
+        LOGGER.debug("Using query {}", complexSearchQuery);
+        obtainAndModifyCookie();
+        List<BibEntry> foundEntries = new ArrayList<>(10);
+
+        String complexQueryString = constructComplexQueryString(complexSearchQuery);
+        final URIBuilder uriBuilder;
         try {
-            obtainAndModifyCookie();
-            List<BibEntry> foundEntries = new ArrayList<>(10);
-
-            String complexQueryString = constructComplexQueryString(complexSearchQuery);
-            URIBuilder uriBuilder = new URIBuilder(BASIC_SEARCH_URL);
-            uriBuilder.addParameter("hl", "en");
-            uriBuilder.addParameter("btnG", "Search");
-            uriBuilder.addParameter("q", complexQueryString);
-            uriBuilder.addParameter("start", String.valueOf(pageNumber * getPageSize()));
-            uriBuilder.addParameter("num", String.valueOf(getPageSize()));
-            complexSearchQuery.getFromYear().ifPresent(year -> uriBuilder.addParameter("as_ylo", year.toString()));
-            complexSearchQuery.getToYear().ifPresent(year -> uriBuilder.addParameter("as_yhi", year.toString()));
-            complexSearchQuery.getSingleYear().ifPresent(year -> {
-                uriBuilder.addParameter("as_ylo", year.toString());
-                uriBuilder.addParameter("as_yhi", year.toString());
-            });
-
-            try {
-                addHitsFromQuery(foundEntries, uriBuilder.toString());
-
-                if (foundEntries.size() == 10) {
-                    uriBuilder.addParameter("start", "10");
-                    addHitsFromQuery(foundEntries, uriBuilder.toString());
-                }
-            } catch (IOException e) {
-                LOGGER.info("IOException for URL {}", uriBuilder.toString());
-                // if there are too much requests from the same IP adress google is answering with a 503 and redirecting to a captcha challenge
-                // The caught IOException looks for example like this:
-                // java.io.IOException: Server returned HTTP response code: 503 for URL: https://ipv4.google.com/sorry/index?continue=https://scholar.google.com/scholar%3Fhl%3Den%26btnG%3DSearch%26q%3Dbpmn&hl=en&q=CGMSBI0NBDkYuqy9wAUiGQDxp4NLQCWbIEY1HjpH5zFJhv4ANPGdWj0
-                if (e.getMessage().contains("Server returned HTTP response code: 503 for URL")) {
-                    throw new FetcherException("Fetching from Google Scholar failed.",
-                            Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), e);
-                } else {
-                    throw new FetcherException("Error while fetching from " + getName(), e);
-                }
-            }
-            return new Page<>(complexQueryString, pageNumber, foundEntries);
+            uriBuilder = new URIBuilder(BASIC_SEARCH_URL);
         } catch (URISyntaxException e) {
             throw new FetcherException("Error while fetching from " + getName(), e);
         }
+        uriBuilder.addParameter("hl", "en");
+        uriBuilder.addParameter("btnG", "Search");
+        uriBuilder.addParameter("q", complexQueryString);
+        uriBuilder.addParameter("start", String.valueOf(pageNumber * getPageSize()));
+        uriBuilder.addParameter("num", String.valueOf(getPageSize()));
+        complexSearchQuery.getFromYear().ifPresent(year -> uriBuilder.addParameter("as_ylo", year.toString()));
+        complexSearchQuery.getToYear().ifPresent(year -> uriBuilder.addParameter("as_yhi", year.toString()));
+        complexSearchQuery.getSingleYear().ifPresent(year -> {
+            uriBuilder.addParameter("as_ylo", year.toString());
+            uriBuilder.addParameter("as_yhi", year.toString());
+        });
+
+        try {
+            addHitsFromQuery(foundEntries, uriBuilder.toString());
+
+            if (foundEntries.size() == 10) {
+                uriBuilder.addParameter("start", "10");
+                addHitsFromQuery(foundEntries, uriBuilder.toString());
+            }
+        } catch (IOException e) {
+            LOGGER.info("IOException for URL {}", uriBuilder.toString());
+            // if there are too much requests from the same IP adress google is answering with a 503 and redirecting to a captcha challenge
+            // The caught IOException looks for example like this:
+            // java.io.IOException: Server returned HTTP response code: 503 for URL: https://ipv4.google.com/sorry/index?continue=https://scholar.google.com/scholar%3Fhl%3Den%26btnG%3DSearch%26q%3Dbpmn&hl=en&q=CGMSBI0NBDkYuqy9wAUiGQDxp4NLQCWbIEY1HjpH5zFJhv4ANPGdWj0
+            if (e.getMessage().contains("Server returned HTTP response code: 503 for URL")) {
+                throw new FetcherException("Fetching from Google Scholar failed.",
+                        Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), e);
+            } else {
+                throw new FetcherException("Error while fetching from " + getName(), e);
+            }
+        }
+        return new Page<>(complexQueryString, pageNumber, foundEntries);
     }
 }
