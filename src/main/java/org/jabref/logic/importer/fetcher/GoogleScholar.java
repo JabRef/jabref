@@ -220,7 +220,7 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
                     throw new FetcherException("Fetching from Google Scholar failed.",
                             Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), e);
                 } else {
-                    //throw new FetcherException("Error while fetching from " + getName(), e);
+                    // throw new FetcherException("Error while fetching from " + getName(), e);
                     LOGGER.warn("Error while fetching from " + getName(), e);
                 }
             }

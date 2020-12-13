@@ -1,2 +1,4 @@
-package org.jabref.logic.importer.fileformat;public class ACMPortalParser {
+package org.jabref.logic.importer.fileformat;
+
+public class ACMPortalParser {
 }
