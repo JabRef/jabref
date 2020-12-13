@@ -132,7 +132,9 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
         List<String> searchTerms = new ArrayList<>();
         searchTerms.addAll(complexSearchQuery.getDefaultFieldPhrases());
         complexSearchQuery.getAuthors().forEach(author -> searchTerms.add("author:" + author));
-        searchTerms.add("allintitle:" + String.join(" ", complexSearchQuery.getTitlePhrases()));
+        if (!complexSearchQuery.getTitlePhrases().isEmpty()) {
+            searchTerms.add("allintitle:" + String.join(" ", complexSearchQuery.getTitlePhrases()));
+        }
         complexSearchQuery.getJournal().ifPresent(journal -> searchTerms.add("source:" + journal));
         // API automatically ANDs the terms
         return String.join(" ", searchTerms);
