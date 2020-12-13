@@ -236,10 +236,11 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
             addHitsFromQuery(foundEntries, queryURL);
         } catch (IOException e) {
             LOGGER.info("IOException for URL {}", queryURL);
-            // if there are too much requests from the same IP address google is answering with a 503 and redirecting to a captcha challenge
+            // if there are too much requests from the same IP address google is answering with a 403 or 503 and redirecting to a captcha challenge
             // The caught IOException looks for example like this:
             // java.io.IOException: Server returned HTTP response code: 503 for URL: https://ipv4.google.com/sorry/index?continue=https://scholar.google.com/scholar%3Fhl%3Den%26btnG%3DSearch%26q%3Dbpmn&hl=en&q=CGMSBI0NBDkYuqy9wAUiGQDxp4NLQCWbIEY1HjpH5zFJhv4ANPGdWj0
-            if (e.getMessage().contains("Server returned HTTP response code: 503 for URL")) {
+            if (e.getMessage().contains("Server returned HTTP response code: 403 for URL") ||
+                    (e.getMessage().contains("Server returned HTTP response code: 503 for URL"))) {
                 throw new FetcherException("Fetching from Google Scholar failed.",
                         Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), e);
             } else {
