@@ -230,16 +230,13 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
             uriBuilder.addParameter("as_yhi", year.toString());
         });
 
+        String queryURL = uriBuilder.toString();
+        LOGGER.debug("Using URL {}", queryURL);
         try {
-            addHitsFromQuery(foundEntries, uriBuilder.toString());
-
-            if (foundEntries.size() == 10) {
-                uriBuilder.addParameter("start", "10");
-                addHitsFromQuery(foundEntries, uriBuilder.toString());
-            }
+            addHitsFromQuery(foundEntries, queryURL);
         } catch (IOException e) {
-            LOGGER.info("IOException for URL {}", uriBuilder.toString());
-            // if there are too much requests from the same IP adress google is answering with a 503 and redirecting to a captcha challenge
+            LOGGER.info("IOException for URL {}", queryURL);
+            // if there are too much requests from the same IP address google is answering with a 503 and redirecting to a captcha challenge
             // The caught IOException looks for example like this:
             // java.io.IOException: Server returned HTTP response code: 503 for URL: https://ipv4.google.com/sorry/index?continue=https://scholar.google.com/scholar%3Fhl%3Den%26btnG%3DSearch%26q%3Dbpmn&hl=en&q=CGMSBI0NBDkYuqy9wAUiGQDxp4NLQCWbIEY1HjpH5zFJhv4ANPGdWj0
             if (e.getMessage().contains("Server returned HTTP response code: 503 for URL")) {
