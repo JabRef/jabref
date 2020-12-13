@@ -89,7 +89,7 @@ class GoogleScholarTest implements SearchBasedFetcherCapabilityTest, PagedSearch
 
     @Override
     public PagedSearchBasedFetcher getPagedFetcher() {
-        return finder;
+        return fetcher;
     }
 
     @Override
