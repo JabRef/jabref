@@ -114,7 +114,7 @@ public class MainTableColumnFactory {
                         columns.add(fieldColumn);
                         if (column.getQualifier().equalsIgnoreCase(StandardField.YEAR.getName())) {
                             // We adjust the min width and the current width, but not the max width to allow the user to enlarge this field
-                            // 75 is chosen, because of the optimal width of a four digit field
+                            // 60 is chosen, because of the optimal width of a four digit field
                             fieldColumn.setMinWidth(60);
                             fieldColumn.setPrefWidth(60);
                         } else {
