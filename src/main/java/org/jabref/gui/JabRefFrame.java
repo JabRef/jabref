@@ -820,7 +820,7 @@ public class JabRefFrame extends BorderPane {
                 pushToApplicationMenuItem
                 // Disabled until PR #7126 can be merged
                 // new SeparatorMenuItem(),
-                //factory.createMenuItem(StandardActions.START_SYSTEMATIC_LITERATURE_REVIEW,
+                // factory.createMenuItem(StandardActions.START_SYSTEMATIC_LITERATURE_REVIEW,
                 //        new StartLiteratureReviewAction(this, Globals.getFileUpdateMonitor(), prefs.getWorkingDir(),
                 //                taskExecutor, prefs, prefs.getImportFormatPreferences(), prefs.getSavePreferences()))
         );
