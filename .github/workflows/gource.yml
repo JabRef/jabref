@@ -19,7 +19,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: 'Gource Action'
-        uses: nbprojekt/gource-action@v1
+        uses: nbprojekt/gource-action@v1.0.1
         with:
           gource_title: 'JabRef'
           logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
