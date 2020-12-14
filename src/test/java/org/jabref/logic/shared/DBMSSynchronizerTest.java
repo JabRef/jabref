@@ -1,6 +1,5 @@
 package org.jabref.logic.shared;
 
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -69,7 +68,7 @@ public class DBMSSynchronizerTest {
     }
 
     @AfterEach
-    public void clear() throws SQLException {
+    public void clear() {
         dbmsSynchronizer.closeSharedDatabase();
     }
 
