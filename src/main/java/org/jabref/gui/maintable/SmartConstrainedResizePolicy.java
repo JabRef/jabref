@@ -1,11 +1,7 @@
 package org.jabref.gui.maintable;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 
-import javafx.scene.control.ResizeFeaturesBase;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TableView;
