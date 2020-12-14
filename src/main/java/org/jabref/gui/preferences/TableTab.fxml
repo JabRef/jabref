@@ -98,8 +98,8 @@
                              text="%Write values of special fields as separate fields to BibTeX"
                              toggleGroup="$specialFieldsStoreMode"/>
             </VBox>
-            <CheckBox fx:id="extraFileColumnsEnable" text="%Show extra columns"/>
-            <CheckBox fx:id="autoResizeColumns" text="%Fit table horizontally on screen"/>
+            <CheckBox fx:id="dedicatedFileColumnsEnable"
+                      text="%Show dedicated file columns"/>
         </VBox>
     </HBox>
 

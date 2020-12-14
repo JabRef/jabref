@@ -36,8 +36,7 @@ public class TableTabView extends AbstractPreferenceTabView<TableTabViewModel> i
     @FXML private Button specialFieldsHelp;
     @FXML private RadioButton specialFieldsSyncKeywords;
     @FXML private RadioButton specialFieldsSerialize;
-    @FXML private CheckBox extraFileColumnsEnable;
-    @FXML private CheckBox autoResizeColumns;
+    @FXML private CheckBox dedicatedFileColumnsEnable;
 
     @FXML private RadioButton namesNatbib;
     @FXML private RadioButton nameAsIs;
@@ -121,8 +120,7 @@ public class TableTabView extends AbstractPreferenceTabView<TableTabViewModel> i
         specialFieldsEnable.selectedProperty().bindBidirectional(viewModel.specialFieldsEnabledProperty());
         specialFieldsSyncKeywords.selectedProperty().bindBidirectional(viewModel.specialFieldsSyncKeywordsProperty());
         specialFieldsSerialize.selectedProperty().bindBidirectional(viewModel.specialFieldsSerializeProperty());
-        extraFileColumnsEnable.selectedProperty().bindBidirectional(viewModel.extraFileColumnsEnabledProperty());
-        autoResizeColumns.selectedProperty().bindBidirectional(viewModel.autoResizeColumnsProperty());
+        dedicatedFileColumnsEnable.selectedProperty().bindBidirectional(viewModel.extraFileColumnsEnabledProperty());
 
         namesNatbib.selectedProperty().bindBidirectional(viewModel.namesNatbibProperty());
         nameAsIs.selectedProperty().bindBidirectional(viewModel.nameAsIsProperty());

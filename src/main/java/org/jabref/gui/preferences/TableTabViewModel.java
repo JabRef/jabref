@@ -20,7 +20,6 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences;
-import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.logic.l10n.Localization;
@@ -63,8 +62,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty specialFieldsEnabledProperty = new SimpleBooleanProperty();
     private final BooleanProperty specialFieldsSyncKeywordsProperty = new SimpleBooleanProperty();
     private final BooleanProperty specialFieldsSerializeProperty = new SimpleBooleanProperty();
-    private final BooleanProperty extraFileColumnsEnabledProperty = new SimpleBooleanProperty();
-    private final BooleanProperty autoResizeColumnsProperty = new SimpleBooleanProperty();
+    private final BooleanProperty dedicatedFileColumnsEnabledProperty = new SimpleBooleanProperty();
 
     private final BooleanProperty namesNatbibProperty = new SimpleBooleanProperty();
     private final BooleanProperty nameAsIsProperty = new SimpleBooleanProperty();
@@ -96,7 +94,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
             }
         });
 
-        extraFileColumnsEnabledProperty.addListener((observable, oldValue, newValue) -> {
+        dedicatedFileColumnsEnabledProperty.addListener((observable, oldValue, newValue) -> {
             if (newValue) {
                 insertExtraFileColumns();
             } else {
@@ -115,16 +113,14 @@ public class TableTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        MainTablePreferences initialMainTablePreferences = preferences.getMainTablePreferences();
-        initialColumnPreferences = initialMainTablePreferences.getColumnPreferences();
+        initialColumnPreferences = preferences.getColumnPreferences();
         initialSpecialFieldsPreferences = preferences.getSpecialFieldsPreferences();
         MainTableNameFormatPreferences initialNameFormatPreferences = preferences.getMainTableNameFormatPreferences();
 
         specialFieldsEnabledProperty.setValue(initialSpecialFieldsPreferences.isSpecialFieldsEnabled());
         specialFieldsSyncKeywordsProperty.setValue(initialSpecialFieldsPreferences.shouldAutoSyncSpecialFieldsToKeyWords());
         specialFieldsSerializeProperty.setValue(initialSpecialFieldsPreferences.shouldSerializeSpecialFields());
-        extraFileColumnsEnabledProperty.setValue(initialMainTablePreferences.getExtraFileColumnsEnabled());
-        autoResizeColumnsProperty.setValue(initialMainTablePreferences.getResizeColumnsToFit());
+        dedicatedFileColumnsEnabledProperty.setValue(initialColumnPreferences.isDedicatedFileColumnsEnabled());
 
         fillColumnList();
 
@@ -150,7 +146,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
             insertSpecialFieldColumns();
         }
 
-        if (extraFileColumnsEnabledProperty.getValue()) {
+        if (dedicatedFileColumnsEnabledProperty.getValue()) {
             insertExtraFileColumns();
         }
 
@@ -240,13 +236,11 @@ public class TableTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        MainTablePreferences newMainTablePreferences = preferences.getMainTablePreferences();
-        preferences.storeMainTablePreferences(new MainTablePreferences(
+        preferences.storeColumnPreferences(
                 new ColumnPreferences(
                         columnsListProperty.getValue(),
-                        newMainTablePreferences.getColumnPreferences().getColumnSortOrder()),
-                autoResizeColumnsProperty.getValue(),
-                extraFileColumnsEnabledProperty.getValue()
+                        initialColumnPreferences.getColumnSortOrder(),
+                dedicatedFileColumnsEnabledProperty.getValue()
         ));
 
         SpecialFieldsPreferences newSpecialFieldsPreferences = new SpecialFieldsPreferences(
@@ -332,11 +326,7 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     }
 
     public BooleanProperty extraFileColumnsEnabledProperty() {
-        return this.extraFileColumnsEnabledProperty;
-    }
-
-    public BooleanProperty autoResizeColumnsProperty() {
-        return autoResizeColumnsProperty;
+        return this.dedicatedFileColumnsEnabledProperty;
     }
 
     public BooleanProperty namesNatbibProperty() {

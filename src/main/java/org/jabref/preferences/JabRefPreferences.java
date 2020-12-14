@@ -49,7 +49,6 @@ import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences.AbbreviationStyle;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences.DisplayStyle;
-import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.mergeentries.MergeEntries;
 import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
@@ -177,7 +176,10 @@ public class JabRefPreferences implements PreferencesService {
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
     public static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
     public static final String DISPLAY_GROUP_COUNT = "displayGroupCount";
-    public static final String EXTRA_FILE_COLUMNS = "extraFileColumns";
+
+    // different content of the constant because of backwards compatibility
+    public static final String DEDICATED_FILE_COLUMNS = "extraFileColumns";
+
     public static final String OVERRIDE_DEFAULT_FONT_SIZE = "overrideDefaultFontSize";
     public static final String MAIN_FONT_SIZE = "mainFontSize";
 
@@ -537,7 +539,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SHOW_ADVANCED_HINTS, Boolean.TRUE);
         defaults.put(RENAME_ON_MOVE_FILE_TO_FILE_DIR, Boolean.TRUE);
 
-        defaults.put(EXTRA_FILE_COLUMNS, Boolean.FALSE);
+        defaults.put(DEDICATED_FILE_COLUMNS, Boolean.FALSE);
 
         defaults.put(PROTECTED_TERMS_ENABLED_INTERNAL, convertListToString(ProtectedTermsLoader.getInternalLists()));
         defaults.put(PROTECTED_TERMS_DISABLED_INTERNAL, "");
@@ -2026,7 +2028,8 @@ public class JabRefPreferences implements PreferencesService {
     public ColumnPreferences getColumnPreferences() {
         return new ColumnPreferences(
                 createMainTableColumns(),
-                createMainTableColumnSortOrder());
+                createMainTableColumnSortOrder(),
+                getBoolean(DEDICATED_FILE_COLUMNS, false));
     }
 
     /**
@@ -2053,22 +2056,10 @@ public class JabRefPreferences implements PreferencesService {
                 .map(MainTableColumnModel::getName)
                 .collect(Collectors.toList()));
 
+        putBoolean(DEDICATED_FILE_COLUMNS, columnPreferences.isDedicatedFileColumnsEnabled());
+
         // Update cache
         mainTableColumns = columnPreferences.getColumns();
-    }
-
-    @Override
-    public MainTablePreferences getMainTablePreferences() {
-        return new MainTablePreferences(getColumnPreferences(),
-                getBoolean(AUTO_RESIZE_MODE),
-                getBoolean(EXTRA_FILE_COLUMNS));
-    }
-
-    @Override
-    public void storeMainTablePreferences(MainTablePreferences mainTablePreferences) {
-        storeColumnPreferences(mainTablePreferences.getColumnPreferences());
-        putBoolean(AUTO_RESIZE_MODE, mainTablePreferences.getResizeColumnsToFit());
-        putBoolean(EXTRA_FILE_COLUMNS, mainTablePreferences.getExtraFileColumnsEnabled());
     }
 
     @Override
