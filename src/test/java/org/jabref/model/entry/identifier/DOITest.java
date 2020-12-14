@@ -236,12 +236,33 @@ public class DOITest {
 
     @Test
     public void findShortDoiInsideArbitraryText() {
-        assertEquals("10/gf4gqc", DOI.findInText("other stuff 10/gf4gqc end").get().getDOI());
+        assertEquals("10/12ab", DOI.findInText("other stuff doi:10/12ab end").get().getDOI());
+        assertEquals("10/12ab", DOI.findInText("other stuff /urn:doi:10/12ab end").get().getDOI());
+        assertEquals("10%12ab", DOI.findInText("other stuff doi:10%12ab end").get().getDOI());
+        assertEquals("10%12ab", DOI.findInText("other stuff /doi:10%12ab end").get().getDOI());
+        assertEquals("10/1234", DOI.findInText("10/B(C)/15 \n" +
+                " \n" +
+                "10:51 \n" +
+                " \n" +
+                " \n" +
+                "doi.org/10/1234 ").get().getDOI());
     }
+
+    @Test
+    public void findShortcutDoiInsideArbitraryText() {
+        assertEquals("10/ab123", DOI.findInText("other stuff doi.org/ab123 end").get().getDOI());
+        assertEquals("10/76543", DOI.findInText("other stuff www.doi.org/76543 end").get().getDOI());
+        assertEquals("10/abcde", DOI.findInText("other stuff https://www.doi.org/abcde end").get().getDOI());
+        assertEquals("10/abcde", DOI.findInText("other stuff https://doi.org/abcde end").get().getDOI());
+    }
+
 
     @Test
     public void noDOIFoundInsideArbitraryText() {
         assertEquals(Optional.empty(), DOI.findInText("text without 28282 a doi"));
+        assertEquals(Optional.empty(), DOI.findInText("It's 10:30 o'clock"));
+        assertEquals(Optional.empty(), DOI.findInText("...archive number 10/XYZ/123..."));
+        assertEquals(Optional.empty(), DOI.findInText("some website poi.org/ab123 end"));
     }
 
     @Test
