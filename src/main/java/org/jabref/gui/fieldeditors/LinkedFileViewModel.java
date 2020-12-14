@@ -461,6 +461,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public BackgroundTask<Path> prepareDownloadTask(Path targetDirectory, URLDownload urlDownload) {
+        StringBuilder messageError = new StringBuilder();
         BackgroundTask<Path> downloadTask = BackgroundTask
                 .wrap(() -> {
                     Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
@@ -469,11 +470,18 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     linkedFile.setFileType(suggestedTypeName);
                     String suggestedName = linkedFileHandler.getSuggestedFileName(externalFileType.getExtension());
                     String fulltextDir = FileUtil.createDirNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileDirectoryPattern());
-                    suggestedName = FileNameUniqueness.getNonOverWritingFileName(targetDirectory.resolve(fulltextDir), suggestedName);
-                    return targetDirectory.resolve(fulltextDir).resolve(suggestedName);
+                    String finalName = FileNameUniqueness.getNonOverWritingFileName(targetDirectory.resolve(fulltextDir), suggestedName);
+                    if (!suggestedName.equals(finalName)) {
+                        messageError.append("File: \"");
+                        messageError.append(suggestedName);
+                        messageError.append("\" already exists");
+                        // return null to stop the download process
+                        return null;
+                    }
+                    return targetDirectory.resolve(fulltextDir).resolve(finalName);
                 })
                 .then(destination -> new FileDownloadTask(urlDownload.getSource(), destination))
-                .onFailure(exception -> dialogService.showErrorDialogAndWait("Download failed", exception));
+                .onFailure(exception -> handleDownloadError(messageError, exception));
         return downloadTask;
     }
 
@@ -509,5 +517,13 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public ValidationStatus fileExistsValidationStatus() {
         return fileExistsValidator.getValidationStatus();
+    }
+
+    private void handleDownloadError(StringBuilder messageError, Exception exception) {
+        if (messageError.toString().equals("")) {
+            dialogService.showErrorDialogAndWait("Download Failed", exception);
+        } else {
+            dialogService.showErrorDialogAndWait(messageError.toString());
+        }
     }
 }
