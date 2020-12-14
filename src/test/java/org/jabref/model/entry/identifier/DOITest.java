@@ -203,6 +203,21 @@ public class DOITest {
     }
 
     @Test
+    public void noDOIFoundInsideArbitraryText() {
+        assertEquals(Optional.empty(), DOI.findInText("text without 28282 a doi"));
+        assertEquals(Optional.empty(), DOI.findInText("It's 10:30 o'clock"));
+        assertEquals(Optional.empty(), DOI.findInText("...archive number 10/XYZ/123..."));
+        assertEquals(Optional.empty(), DOI.findInText("some website poi.org/ab123 end"));
+    }
+
+    @Test
+    public void rejectURLShortDoi() {
+        assertThrows(IllegalArgumentException.class, () -> new DOI("http://www.cs.utexas.edu/users/kaufmann/itp-trusted-extensions-aug-2010/summary/summary.pdf"));
+        assertThrows(IllegalArgumentException.class, () -> new DOI("http://www.cs.utexas.edu/users/kaufmann/itp-trusted-extensions-aug-20/10/summary/summary.pdf"));
+        assertThrows(IllegalArgumentException.class, () -> new DOI("http://www.boi.org/10/2010bingbong"));
+    }
+
+    @Test
     public void isShortDoiShouldReturnFalseWhenItIsDoi() {
         assertFalse(new DOI("10.1006/jmbi.1998.2354").isShortDoi());
     }
