@@ -130,7 +130,7 @@ dependencies {
         exclude group: 'org.apache.lucene', module: 'lucene-sandbox'
     }
 
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.9.0.202009080501-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.10.0.202012080955-r'
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.1'
 
