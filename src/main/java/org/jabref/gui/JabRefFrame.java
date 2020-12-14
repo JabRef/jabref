@@ -817,7 +817,7 @@ public class JabRefFrame extends BorderPane {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsEMailAction(dialogService, prefs, stateManager)),
-                pushToApplicationMenuItem,
+                pushToApplicationMenuItem
                 // Disabled until PR #7126 can be merged
                 // new SeparatorMenuItem(),
                 //factory.createMenuItem(StandardActions.START_SYSTEMATIC_LITERATURE_REVIEW,
