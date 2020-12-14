@@ -101,12 +101,6 @@ class DBMSProcessorTest {
 
         dbmsProcessor.insertEntry(expectedEntry);
 
-        BibEntry emptyEntry = getBibEntryExample();
-        emptyEntry.getSharedBibEntryData().setSharedID(1);
-        dbmsProcessor.insertEntry(emptyEntry); // does not insert, due to same sharedID.
-
-        Map<String, String> actualFieldMap = new HashMap<>();
-
         try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
             assertTrue(entryResultSet.next());
             assertEquals(1, entryResultSet.getInt("SHARED_ID"));
@@ -114,16 +108,11 @@ class DBMSProcessorTest {
             assertEquals(1, entryResultSet.getInt("VERSION"));
             assertFalse(entryResultSet.next());
 
+            // Adding an empty entry should not create an entry in field table, only in entry table
             try (ResultSet fieldResultSet = selectFrom("FIELD", dbmsConnection, dbmsProcessor)) {
-                while (fieldResultSet.next()) {
-                    actualFieldMap.put(fieldResultSet.getString("NAME"), fieldResultSet.getString("VALUE"));
-                }
+                assertFalse(fieldResultSet.next());
             }
         }
-
-        Map<String, String> expectedFieldMap = expectedEntry.getFieldMap().entrySet().stream().collect(Collectors.toMap((entry) -> entry.getKey().getName(), Map.Entry::getValue));
-
-        assertEquals(expectedFieldMap, actualFieldMap);
     }
 
     private static BibEntry getBibEntryExample() {
@@ -157,6 +146,7 @@ class DBMSProcessorTest {
 
         expectedEntry.setField(StandardField.AUTHOR, "Michael J and Hutchings");
         expectedEntry.setField(new UnknownField("customField"), "custom value");
+        // Update field should now find the entry
         dbmsProcessor.updateEntry(expectedEntry);
 
         Optional<BibEntry> actualEntry = dbmsProcessor.getSharedEntry(expectedEntry.getSharedBibEntryData().getSharedID());
