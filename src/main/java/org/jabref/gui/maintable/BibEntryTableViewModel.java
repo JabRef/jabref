@@ -73,7 +73,7 @@ public class BibEntryTableViewModel {
     private static ObservableValue<List<AbstractGroup>> createMatchedGroupsBinding(BibDatabaseContext database, BibEntry entry) {
         ObservableValue<List<AbstractGroup>> groupsBinding = new ObjectBinding<List<AbstractGroup>>() {
             {
-                bind(entry.getFieldsObservable(), entry.typeProperty());
+                bind(entry.getFieldBinding(StandardField.GROUPS));
             }
 
             @Override
