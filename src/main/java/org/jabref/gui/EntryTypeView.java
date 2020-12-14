@@ -34,7 +34,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -63,16 +63,16 @@ public class EntryTypeView extends BaseDialog<EntryType> {
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
-    private final JabRefPreferences prefs;
+    private final PreferencesService preferencesService;
 
     private EntryType type;
     private EntryTypeViewModel viewModel;
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
-    public EntryTypeView(LibraryTab libraryTab, DialogService dialogService, JabRefPreferences preferences) {
+    public EntryTypeView(LibraryTab libraryTab, DialogService dialogService, PreferencesService preferences) {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
-        this.prefs = preferences;
+        this.preferencesService = preferences;
 
         this.setTitle(Localization.lang("Select entry type"));
         ViewLoader.view(this)
@@ -121,7 +121,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     @FXML
     public void initialize() {
         visualizer.setDecoration(new IconValidationDecorator());
-        viewModel = new EntryTypeViewModel(prefs, libraryTab, dialogService, stateManager);
+        viewModel = new EntryTypeViewModel(preferencesService, libraryTab, dialogService, stateManager);
 
         idBasedFetchers.itemsProperty().bind(viewModel.fetcherItemsProperty());
         idTextField.textProperty().bindBidirectional(viewModel.idTextProperty());

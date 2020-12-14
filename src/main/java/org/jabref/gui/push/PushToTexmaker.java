@@ -3,20 +3,22 @@ package org.jabref.gui.push;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 /**
  * Class for pushing entries into TexMaker.
  */
 public class PushToTexmaker extends AbstractPushToApplication implements PushToApplication {
 
-    public PushToTexmaker(DialogService dialogService) {
-        super(dialogService);
+    public static final String NAME = "Texmaker";
+
+    public PushToTexmaker(DialogService dialogService, PreferencesService preferencesService) {
+        super(dialogService, preferencesService);
     }
 
     @Override
-    public String getApplicationName() {
-        return "Texmaker";
+    public String getDisplayName() {
+        return NAME;
     }
 
     @Override
@@ -27,10 +29,5 @@ public class PushToTexmaker extends AbstractPushToApplication implements PushToA
     @Override
     protected String[] getCommandLine(String keyString) {
         return new String[] {commandPath, "-insert", getCiteCommand() + "{" + keyString + "}"};
-    }
-
-    @Override
-    protected void initParameters() {
-        commandPathPreferenceKey = JabRefPreferences.TEXMAKER_PATH;
     }
 }
