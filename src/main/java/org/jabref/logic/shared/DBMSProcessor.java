@@ -499,6 +499,7 @@ public abstract class DBMSProcessor {
              .append("F.").append(escape("VALUE"))
              .append(" FROM ")
              .append(escape("ENTRY"))
+             // Handle special case if entry does not have any fields (yet)
              .append(" left outer join ")
              .append(escape("FIELD"))
              .append(" F on ")
