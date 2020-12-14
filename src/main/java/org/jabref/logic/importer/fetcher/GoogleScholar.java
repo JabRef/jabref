@@ -13,6 +13,11 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javafx.application.Platform;
+import javafx.scene.control.ButtonType;
+import javafx.scene.web.WebView;
+
+import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
@@ -27,6 +32,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.paging.Page;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
+import com.sun.star.sheet.XSolver;
 import org.apache.http.client.utils.URIBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -50,10 +56,12 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
     private static final int NUM_RESULTS = 10;
 
     private final ImportFormatPreferences importFormatPreferences;
+    private CaptchaSolver captchaSolver;
 
-    public GoogleScholar(ImportFormatPreferences importFormatPreferences) {
+    public GoogleScholar(ImportFormatPreferences importFormatPreferences, CaptchaSolver solver) {
         Objects.requireNonNull(importFormatPreferences);
         this.importFormatPreferences = importFormatPreferences;
+        this.captchaSolver = solver;
     }
 
     @Override
@@ -144,13 +152,23 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
         LOGGER.debug("Downloading from {}", queryURL);
         URLDownload urlDownload = new URLDownload(queryURL);
         obtainAndModifyCookie(urlDownload);
-        String content = urlDownload.asString();
+
+        // We need JSOUP directly to read the content when 429 is returned
+
+        String content;
+        try {
+            content = urlDownload.asString();
+        }
 
         if (needsCaptcha(content)) {
             throw new FetcherException("Fetching from Google Scholar failed: Captcha hit at " + queryURL + ".",
                     Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), null);
         }
 
+        extractEntriesFromContent(content, entryList);
+    }
+
+    private void extractEntriesFromContent(String content, List<BibEntry> entryList) throws IOException, FetcherException {
         Matcher matcher = LINK_TO_SUBPAGE_PATTERN.matcher(content);
         if (!matcher.find()) {
             LOGGER.debug("No data-clk-atid found in html {}", content);
@@ -159,6 +177,7 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
 
         String infoPageUrl = BASIC_SEARCH_URL + "q=info:" + matcher.group(1) + ":scholar.google.com/&output=cite&scirp=0&hl=en";
         LOGGER.debug("Using infoPageUrl {}", infoPageUrl);
+        // FIXME: Existing cookies should be reused.
         URLDownload infoPageUrlDownload = new URLDownload(infoPageUrl);
         LOGGER.debug("Downloading from {}", infoPageUrl);
         String infoPageContent = infoPageUrlDownload.asString();
@@ -245,6 +264,10 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
             if (e.getMessage().contains("Server returned HTTP response code: 403 for URL") ||
                     e.getMessage().contains("Server returned HTTP response code: 429 for URL") ||
                     e.getMessage().contains("Server returned HTTP response code: 503 for URL")) {
+                LOGGER.debug("Captcha found. Calling the CaptchaSolver");
+                String content = captchaSolver.solve(queryURL);
+                extractEntriesFromContent(content, foundEntries);
+
                 throw new FetcherException("Fetching from Google Scholar failed.",
                         Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), e);
             } else {
@@ -253,4 +276,32 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
         }
         return new Page<>(complexQueryString, pageNumber, foundEntries);
     }
+
+    public void displayCaptchaDialog(String link) {
+        Platform.runLater(() -> new CaptchaDialog(link).showAndWait());
+        /*
+        if (dialog.retry()) {
+            displayCaptchaDialog(link);
+        }
+        */
+    }
+
+    private static final class CaptchaDialog extends BaseDialog<Void> {
+        public CaptchaDialog(String content) {
+            super();
+            this.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+            this.getDialogPane().lookupButton(ButtonType.CLOSE).setVisible(true);
+            WebView webView = new WebView();
+
+            // webView.getEngine().setJavaScriptEnabled(true);
+            webView.getEngine().setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:79.0) Gecko/20100101 Firefox/79.0");
+            this.getDialogPane().setContent(webView);
+            webView.getEngine().loadContent(content);
+        }
+
+        public boolean retry() {
+            return false;
+        }
+    }
+
 }

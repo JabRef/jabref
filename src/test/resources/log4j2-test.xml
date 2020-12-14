@@ -6,6 +6,9 @@
         </Console>
     </Appenders>
     <Loggers>
+        <Logger name="org.jabref.logic.importer.fetcher" level="DEBUG">
+            <AppenderRef ref="CONSOLE"/>
+        </Logger>
         <Root level="INFO">
             <AppenderRef ref="CONSOLE"/>
         </Root>
