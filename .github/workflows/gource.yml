@@ -1,0 +1,31 @@
+name: Gource
+
+on:
+  push:
+    branches:
+      - gource
+  schedule:
+    - cron:  '15 3 1 * *'
+  release:
+    types:
+      - created
+
+jobs:
+  action:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: 'Gource Action'
+        uses: nbprojekt/gource-action@v1
+        with:
+          gource_title: 'JabRef'
+          logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
+          gource_seconds_per_day: 0.01
+      - name: 'Upload gource video'
+        uses: actions/upload-artifact@v2
+        with:
+          name: Gource
+          path: ./gource/gource.mp4
