@@ -92,7 +92,7 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         saveSecondaryDescPropertySelected.setValue(initialExportOrder.getSortCriteria().get(1).descending);
         saveTertiaryDescPropertySelected.setValue(initialExportOrder.getSortCriteria().get(2).descending);
 
-        autosaveLocalLibraries.setValue(preferences.getShouldAutosave());
+        autosaveLocalLibraries.setValue(preferences.shouldAutosave());
     }
 
     @Override
@@ -105,7 +105,10 @@ public class FileTabViewModel implements PreferenceTabViewModel {
                 resolveStringsAllProperty.getValue(),
                 resolveStringsExceptProperty.getValue().trim(),
                 selectedNewLineSeparatorProperty.getValue(),
-                alwaysReformatBibProperty.getValue());
+                alwaysReformatBibProperty.getValue(),
+                initialImportExportPreferences.getImportWorkingDirectory(),
+                initialImportExportPreferences.getLastExportExtension(),
+                initialImportExportPreferences.getExportWorkingDirectory());
         preferences.storeImportExportPreferences(newImportExportPreferences);
 
         SaveOrderConfig newSaveOrderConfig = new SaveOrderConfig(

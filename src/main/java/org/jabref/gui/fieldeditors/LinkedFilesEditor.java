@@ -43,7 +43,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -64,7 +63,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                              TaskExecutor taskExecutor,
                              SuggestionProvider<?> suggestionProvider,
                              FieldCheckers fieldCheckers,
-                             JabRefPreferences preferences) {
+                             PreferencesService preferences) {
         this.viewModel = new LinkedFilesEditorViewModel(field, suggestionProvider, dialogService, databaseContext, taskExecutor, fieldCheckers, preferences);
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;

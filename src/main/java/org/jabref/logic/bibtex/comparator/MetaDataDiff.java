@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 public class MetaDataDiff {
 
@@ -32,7 +32,7 @@ public class MetaDataDiff {
     /**
      * @implNote Should be kept in sync with {@link MetaData#equals(Object)}
      */
-    public List<String> getDifferences(JabRefPreferences preferences) {
+    public List<String> getDifferences(PreferencesService preferences) {
         List<String> changes = new ArrayList<>();
 
         if (originalMetaData.isProtected() != newMetaData.isProtected()) {

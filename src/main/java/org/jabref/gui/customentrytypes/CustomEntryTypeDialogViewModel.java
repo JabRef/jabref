@@ -178,8 +178,8 @@ public class CustomEntryTypeDialogViewModel {
     public void resetAllCustomEntryTypes() {
         entryTypesManager.clearAllCustomEntryTypes(mode);
         preferencesService.clearBibEntryTypes(mode);
-        entryTypesManager.addCustomOrModifiedTypes(preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
-                                                   preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
+        entryTypesManager.addCustomOrModifiedTypes(preferencesService.getBibEntryTypes(BibDatabaseMode.BIBTEX),
+                                                   preferencesService.getBibEntryTypes(BibDatabaseMode.BIBLATEX));
     }
 
     public void apply() {
@@ -199,9 +199,9 @@ public class CustomEntryTypeDialogViewModel {
             entryTypesManager.removeCustomOrModifiedEntryType(entryType, mode);
         }
 
-        preferencesService.saveCustomEntryTypes(entryTypesManager);
+        preferencesService.storeCustomEntryTypes(entryTypesManager);
         // Reload types from preferences to make sure any modifications are present when reopening the dialog
-        entryTypesManager.addCustomOrModifiedTypes(preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
-                                                   preferencesService.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
+        entryTypesManager.addCustomOrModifiedTypes(preferencesService.getBibEntryTypes(BibDatabaseMode.BIBTEX),
+                                                   preferencesService.getBibEntryTypes(BibDatabaseMode.BIBLATEX));
     }
 }

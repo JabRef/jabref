@@ -20,11 +20,13 @@ import org.jabref.gui.externalfiletype.EditExternalFileTypesAction;
 import org.jabref.gui.push.PushToApplication;
 import org.jabref.gui.push.PushToApplicationSettings;
 import org.jabref.gui.push.PushToApplicationsManager;
+import org.jabref.gui.push.PushToEmacs;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.ExternalApplicationsPreferences;
 import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.PushToApplicationPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.CompositeValidator;
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
@@ -53,10 +55,15 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     private final FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder().build();
 
+    private final ExternalApplicationsPreferences initialPreferences;
+    private final ObjectProperty<PushToApplicationPreferences> workingPushToApplicationPreferences;
+
     public ExternalTabViewModel(DialogService dialogService, PreferencesService preferencesService, PushToApplicationsManager pushToApplicationsManager) {
         this.dialogService = dialogService;
         this.preferences = preferencesService;
         this.pushToApplicationsManager = pushToApplicationsManager;
+        this.initialPreferences = preferences.getExternalApplicationsPreferences();
+        this.workingPushToApplicationPreferences = new SimpleObjectProperty<>(preferencesService.getPushToApplicationPreferences());
 
         terminalCommandValidator = new FunctionBasedValidator<>(
                 customTerminalCommandProperty,
@@ -76,16 +83,14 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     }
 
     public void setValues() {
-        ExternalApplicationsPreferences initialPreferences =
-                preferences.getExternalApplicationsPreferences();
-
         eMailReferenceSubjectProperty.setValue(initialPreferences.getEmailSubject());
         autoOpenAttachedFoldersProperty.setValue(initialPreferences.shouldAutoOpenEmailAttachmentsFolder());
 
         pushToApplicationsListProperty.setValue(
                 FXCollections.observableArrayList(pushToApplicationsManager.getApplications()));
         selectedPushToApplicationProperty.setValue(
-                pushToApplicationsManager.getApplicationByName(initialPreferences.getPushToApplicationName()));
+                pushToApplicationsManager.getApplicationByName(initialPreferences.getPushToApplicationName())
+                                         .orElse(new PushToEmacs(dialogService, preferences)));
 
         citeCommandProperty.setValue(initialPreferences.getCiteCommand());
         useCustomTerminalProperty.setValue(initialPreferences.useCustomTerminal());
@@ -98,12 +103,14 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         preferences.storeExternalApplicationsPreferences(new ExternalApplicationsPreferences(
                 eMailReferenceSubjectProperty.getValue(),
                 autoOpenAttachedFoldersProperty.getValue(),
-                selectedPushToApplicationProperty.getValue().getApplicationName(),
+                selectedPushToApplicationProperty.getValue().getDisplayName(),
                 citeCommandProperty.getValue(),
                 useCustomTerminalProperty.getValue(),
                 customTerminalCommandProperty.getValue(),
                 useCustomFileBrowserProperty.getValue(),
                 customFileBrowserCommandProperty.getValue()));
+
+        preferences.storePushToApplicationPreferences(workingPushToApplicationPreferences.get());
 
         pushToApplicationsManager.updateApplicationAction(selectedPushToApplicationProperty.getValue());
     }
@@ -143,7 +150,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     public void pushToApplicationSettings() {
         PushToApplication selectedApplication = selectedPushToApplicationProperty.getValue();
-        PushToApplicationSettings settings = pushToApplicationsManager.getSettings(selectedApplication);
+        PushToApplicationSettings settings = selectedApplication.getSettings(selectedApplication, workingPushToApplicationPreferences);
 
         DialogPane dialogPane = new DialogPane();
         dialogPane.setContent(settings.getSettingsPane());
