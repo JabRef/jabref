@@ -28,7 +28,6 @@ import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
 import org.jabref.model.study.StudyQuery;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
@@ -62,11 +61,18 @@ class StudyRepository {
      *
      * @param pathToRepository Where the repository root is located.
      * @param gitHandler       The git handler that managages any interaction with the remote repository
-     * @throws IllegalArgumentException If the repository root directory does not exist, or the root directory does not contain the study definition file.
-     * @throws IOException              Thrown if the given repository does not exists, or the study definition file does not exist
+     * @throws IllegalArgumentException If the repository root directory does not exist, or the root directory does not
+     *                                  contain the study definition file.
+     * @throws IOException              Thrown if the given repository does not exists, or the study definition file
+     *                                  does not exist
      * @throws ParseException           Problem parsing the study definition file.
      */
-    public StudyRepository(Path pathToRepository, GitHandler gitHandler, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileUpdateMonitor, SavePreferences savePreferences, BibEntryTypesManager bibEntryTypesManager) throws IOException, ParseException, GitAPIException {
+    public StudyRepository(Path pathToRepository,
+                           GitHandler gitHandler,
+                           ImportFormatPreferences importFormatPreferences,
+                           FileUpdateMonitor fileUpdateMonitor,
+                           SavePreferences savePreferences,
+                           BibEntryTypesManager bibEntryTypesManager) throws IOException, ParseException {
         this.repositoryPath = pathToRepository;
         this.gitHandler = gitHandler;
         try {
@@ -271,7 +277,7 @@ class StudyRepository {
      * @param crawlResults The results that shall be persisted.
      */
     private void persistResults(List<QueryResult> crawlResults) throws IOException {
-        DatabaseMerger merger = new DatabaseMerger();
+        DatabaseMerger merger = new DatabaseMerger(importFormatPreferences.getKeywordSeparator());
         BibDatabase newStudyResultEntries = new BibDatabase();
 
         for (QueryResult result : crawlResults) {
@@ -308,7 +314,7 @@ class StudyRepository {
     }
 
     private void generateCiteKeys(BibDatabaseContext existingEntries, BibDatabase targetEntries) {
-        CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(existingEntries, JabRefPreferences.getInstance().getCitationKeyPatternPreferences());
+        CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(existingEntries, savePreferences.getCitationKeyPatternPreferences());
         targetEntries.getEntries().stream().filter(bibEntry -> !bibEntry.hasCitationKey()).forEach(citationKeyGenerator::generateAndSetKey);
     }
 

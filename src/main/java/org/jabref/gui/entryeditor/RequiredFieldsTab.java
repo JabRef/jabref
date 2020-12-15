@@ -9,6 +9,7 @@ import javax.swing.undo.UndoManager;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
@@ -22,14 +23,24 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 public class RequiredFieldsTab extends FieldsEditorTab {
 
     private final BibEntryTypesManager entryTypesManager;
 
-    public RequiredFieldsTab(BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, DialogService dialogService, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager, ExternalFileTypes externalFileTypes, TaskExecutor taskExecutor, JournalAbbreviationRepository journalAbbreviationRepository) {
-        super(false, databaseContext, suggestionProviders, undoManager, dialogService, preferences, externalFileTypes, taskExecutor, journalAbbreviationRepository);
+    public RequiredFieldsTab(BibDatabaseContext databaseContext,
+                             SuggestionProviders suggestionProviders,
+                             UndoManager undoManager,
+                             DialogService dialogService,
+                             PreferencesService preferences,
+                             StateManager stateManager,
+                             BibEntryTypesManager entryTypesManager,
+                             ExternalFileTypes externalFileTypes,
+                             TaskExecutor taskExecutor,
+                             JournalAbbreviationRepository journalAbbreviationRepository) {
+        super(false, databaseContext, suggestionProviders, undoManager, dialogService,
+                preferences, stateManager, externalFileTypes, taskExecutor, journalAbbreviationRepository);
         this.entryTypesManager = entryTypesManager;
 
         setText(Localization.lang("Required fields"));

@@ -15,7 +15,7 @@ import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -24,11 +24,11 @@ import com.airhacks.afterburner.views.ViewLoader;
  */
 public class GroupSidePane extends SidePaneComponent {
 
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
     private final DialogService dialogService;
     private final Button intersectionUnionToggle = IconTheme.JabRefIcons.GROUP_INTERSECTION.asButton();
 
-    public GroupSidePane(SidePaneManager manager, JabRefPreferences preferences, DialogService dialogService) {
+    public GroupSidePane(SidePaneManager manager, PreferencesService preferences, DialogService dialogService) {
         super(manager, IconTheme.JabRefIcons.TOGGLE_GROUPS, Localization.lang("Groups"));
         this.preferences = preferences;
         this.dialogService = dialogService;
@@ -41,19 +41,19 @@ public class GroupSidePane extends SidePaneComponent {
     }
 
     @Override
-    public void afterOpening() {
-        preferences.putBoolean(JabRefPreferences.GROUP_SIDEPANE_VISIBLE, Boolean.TRUE);
-        setGraphicsAndTooltipForButton(preferences.getGroupViewMode());
-    }
-
-    @Override
     public Priority getResizePolicy() {
         return Priority.ALWAYS;
     }
 
     @Override
     public void beforeClosing() {
-        preferences.putBoolean(JabRefPreferences.GROUP_SIDEPANE_VISIBLE, Boolean.FALSE);
+        preferences.storeSidePanePreferences(preferences.getSidePanePreferences().withGroupsPaneVisible(false));
+    }
+
+    @Override
+    public void afterOpening() {
+        preferences.storeSidePanePreferences(preferences.getSidePanePreferences().withGroupsPaneVisible(true));
+        setGraphicsAndTooltipForButton(preferences.getGroupViewMode());
     }
 
     @Override

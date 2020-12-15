@@ -95,6 +95,26 @@ class DBMSProcessorTest {
         assertEquals(expectedFieldMap, actualFieldMap);
     }
 
+    @Test
+    void testInsertEntryWithEmptyFields() throws SQLException {
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Article);
+
+        dbmsProcessor.insertEntry(expectedEntry);
+
+        try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
+            assertTrue(entryResultSet.next());
+            assertEquals(1, entryResultSet.getInt("SHARED_ID"));
+            assertEquals("article", entryResultSet.getString("TYPE"));
+            assertEquals(1, entryResultSet.getInt("VERSION"));
+            assertFalse(entryResultSet.next());
+
+            // Adding an empty entry should not create an entry in field table, only in entry table
+            try (ResultSet fieldResultSet = selectFrom("FIELD", dbmsConnection, dbmsProcessor)) {
+                assertFalse(fieldResultSet.next());
+            }
+        }
+    }
+
     private static BibEntry getBibEntryExample() {
         return new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.AUTHOR, "Wirthlin, Michael J and Hutchings, Brad L and Gilson, Kent L")
@@ -113,6 +133,20 @@ class DBMSProcessorTest {
         expectedEntry.setField(StandardField.AUTHOR, "Michael J and Hutchings");
         expectedEntry.setField(new UnknownField("customField"), "custom value");
         expectedEntry.clearField(StandardField.BOOKTITLE);
+        dbmsProcessor.updateEntry(expectedEntry);
+
+        Optional<BibEntry> actualEntry = dbmsProcessor.getSharedEntry(expectedEntry.getSharedBibEntryData().getSharedID());
+        assertEquals(Optional.of(expectedEntry), actualEntry);
+    }
+
+    @Test
+    void testUpdateEmptyEntry() throws Exception {
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Article);
+        dbmsProcessor.insertEntry(expectedEntry);
+
+        expectedEntry.setField(StandardField.AUTHOR, "Michael J and Hutchings");
+        expectedEntry.setField(new UnknownField("customField"), "custom value");
+        // Update field should now find the entry
         dbmsProcessor.updateEntry(expectedEntry);
 
         Optional<BibEntry> actualEntry = dbmsProcessor.getSharedEntry(expectedEntry.getSharedBibEntryData().getSharedID());

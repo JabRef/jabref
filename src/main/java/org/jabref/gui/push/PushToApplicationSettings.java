@@ -1,5 +1,8 @@
 package org.jabref.gui.push;
 
+import java.util.Map;
+
+import javafx.beans.property.ObjectProperty;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -9,41 +12,43 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.PushToApplicationPreferences;
 
 public class PushToApplicationSettings {
 
     protected final Label commandLabel;
     protected final TextField path;
     protected final GridPane settingsPane;
-    private final AbstractPushToApplication application;
-    private final DialogService dialogService;
-    private final Button browse;
+    protected final ObjectProperty<PushToApplicationPreferences> preferences;
+    protected final AbstractPushToApplication application;
 
-    public PushToApplicationSettings(PushToApplication application, DialogService dialogService) {
+    public PushToApplicationSettings(PushToApplication application,
+                                     DialogService dialogService,
+                                     PreferencesService preferencesService,
+                                     ObjectProperty<PushToApplicationPreferences> preferences) {
         this.application = (AbstractPushToApplication) application;
-        this.dialogService = dialogService;
+        this.preferences = preferences;
+
         settingsPane = new GridPane();
+        commandLabel = new Label();
+        path = new TextField();
+        Button browse = new Button();
+
         settingsPane.setHgap(4.0);
         settingsPane.setVgap(4.0);
 
-        commandLabel = new Label();
-        path = new TextField();
-        browse = new Button();
         browse.setTooltip(new Tooltip(Localization.lang("Browse")));
         browse.setGraphic(IconTheme.JabRefIcons.OPEN.getGraphicNode());
         browse.getStyleClass().addAll("icon-button", "narrow");
         browse.setPrefHeight(20.0);
         browse.setPrefWidth(20.0);
 
-        this.application.initParameters();
-
         // In case the application name and the actual command is not the same, add the command in brackets
-        StringBuilder commandLine = new StringBuilder(Localization.lang("Path to %0", application.getApplicationName()));
+        StringBuilder commandLine = new StringBuilder(Localization.lang("Path to %0", application.getDisplayName()));
         if (this.application.getCommandName() == null) {
             commandLine.append(':');
         } else {
@@ -52,11 +57,11 @@ public class PushToApplicationSettings {
         commandLabel.setText(commandLine.toString());
         settingsPane.add(commandLabel, 0, 0);
 
-        path.setText(Globals.prefs.get(this.application.commandPathPreferenceKey));
+        path.setText(preferences.get().getPushToApplicationCommandPaths().get(this.application.getDisplayName()));
         settingsPane.add(path, 1, 0);
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)).build();
+                .withInitialDirectory(preferencesService.getWorkingDir()).build();
         browse.setOnAction(e -> dialogService.showFileOpenDialog(fileDialogConfiguration)
                                              .ifPresent(f -> path.setText(f.toAbsolutePath().toString())));
         settingsPane.add(browse, 2, 0);
@@ -75,10 +80,12 @@ public class PushToApplicationSettings {
      * state of the widgets in the settings panel to Globals.prefs.
      */
     public void storeSettings() {
-        Globals.prefs.put(application.commandPathPreferenceKey, path.getText());
+        Map<String, String> commandPaths = preferences.get().getPushToApplicationCommandPaths();
+        commandPaths.put(application.getDisplayName(), path.getText());
+        preferences.setValue(preferences.get().withPushToApplicationCommandPaths(commandPaths));
     }
 
     public GridPane getSettingsPane() {
-        return settingsPane;
+        return this.settingsPane;
     }
 }

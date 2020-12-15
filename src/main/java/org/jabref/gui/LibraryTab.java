@@ -238,7 +238,7 @@ public class LibraryTab extends Tab {
 
     private boolean isDatabaseReadyForAutoSave(BibDatabaseContext context) {
         return ((context.getLocation() == DatabaseLocation.SHARED) ||
-                ((context.getLocation() == DatabaseLocation.LOCAL) && preferencesService.getShouldAutosave()))
+                ((context.getLocation() == DatabaseLocation.LOCAL) && preferencesService.shouldAutosave()))
                 &&
                 context.getDatabasePath().isPresent();
     }
@@ -252,7 +252,7 @@ public class LibraryTab extends Tab {
      * Example: *jabref-authors.bib – testbib
      */
     public void updateTabTitle(boolean isChanged) {
-        boolean isAutosaveEnabled = preferencesService.getShouldAutosave();
+        boolean isAutosaveEnabled = preferencesService.shouldAutosave();
 
         DatabaseLocation databaseLocation = bibDatabaseContext.getLocation();
         Optional<Path> file = bibDatabaseContext.getDatabasePath();
@@ -313,13 +313,16 @@ public class LibraryTab extends Tab {
                 addSharedDbInformation(toolTipText, bibDatabaseContext);
             }
             addModeInfo(toolTipText, bibDatabaseContext);
-            if (databaseLocation == DatabaseLocation.LOCAL && bibDatabaseContext.getDatabase().hasEntries()) {
+            if ((databaseLocation == DatabaseLocation.LOCAL) && bibDatabaseContext.getDatabase().hasEntries()) {
                 addChangedInformation(toolTipText, Localization.lang("untitled"));
             }
         }
 
-        textProperty().setValue(tabTitle.toString());
-        setTooltip(new Tooltip(toolTipText.toString()));
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            textProperty().setValue(tabTitle.toString());
+            setTooltip(new Tooltip(toolTipText.toString()));
+        });
+
     }
 
     private static void addChangedInformation(StringBuilder text, String fileName) {
@@ -752,7 +755,7 @@ public class LibraryTab extends Tab {
 
     public void resetChangeMonitorAndChangePane() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
-        changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR));
+        changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext, Globals.getFileUpdateMonitor(), Globals.TASK_EXECUTOR, preferencesService));
 
         changePane = new DatabaseChangePane(splitPane, bibDatabaseContext, changeMonitor.get());
 
@@ -846,11 +849,11 @@ public class LibraryTab extends Tab {
     }
 
     public static class Factory {
-        public LibraryTab createLibraryTab(JabRefFrame frame, Path file, BackgroundTask<ParserResult> dataLoadingTask) {
+        public LibraryTab createLibraryTab(JabRefFrame frame, PreferencesService preferencesService, Path file, BackgroundTask<ParserResult> dataLoadingTask) {
             BibDatabaseContext context = new BibDatabaseContext();
             context.setDatabasePath(file);
 
-            LibraryTab newTab = new LibraryTab(frame, frame.prefs(), context, ExternalFileTypes.getInstance());
+            LibraryTab newTab = new LibraryTab(frame, preferencesService, context, ExternalFileTypes.getInstance());
             newTab.setDataLoadingTask(dataLoadingTask);
 
             dataLoadingTask.onRunning(newTab::onDatabaseLoadingStarted)

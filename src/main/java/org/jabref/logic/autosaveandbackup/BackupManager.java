@@ -21,7 +21,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
 import org.slf4j.Logger;
@@ -43,12 +43,12 @@ public class BackupManager {
     private static Set<BackupManager> runningInstances = new HashSet<>();
 
     private final BibDatabaseContext bibDatabaseContext;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
     private final DelayTaskThrottler throttler;
     private final CoarseChangeFilter changeFilter;
     private final BibEntryTypesManager entryTypesManager;
 
-    private BackupManager(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, JabRefPreferences preferences) {
+    private BackupManager(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, PreferencesService preferences) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
@@ -68,7 +68,7 @@ public class BackupManager {
      *
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
-    public static BackupManager start(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, JabRefPreferences preferences) {
+    public static BackupManager start(BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, PreferencesService preferences) {
         BackupManager backupManager = new BackupManager(bibDatabaseContext, entryTypesManager, preferences);
         backupManager.startBackupTask();
         runningInstances.add(backupManager);

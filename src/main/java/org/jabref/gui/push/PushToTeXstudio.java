@@ -3,17 +3,19 @@ package org.jabref.gui.push;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 public class PushToTeXstudio extends AbstractPushToApplication implements PushToApplication {
 
-    public PushToTeXstudio(DialogService dialogService) {
-        super(dialogService);
+    public static final String NAME = "TeXstudio";
+
+    public PushToTeXstudio(DialogService dialogService, PreferencesService preferencesService) {
+        super(dialogService, preferencesService);
     }
 
     @Override
-    public String getApplicationName() {
-        return "TeXstudio";
+    public String getDisplayName() {
+        return NAME;
     }
 
     @Override
@@ -24,10 +26,5 @@ public class PushToTeXstudio extends AbstractPushToApplication implements PushTo
     @Override
     protected String[] getCommandLine(String keyString) {
         return new String[] {commandPath, "--insert-cite", String.format("%s{%s}", getCiteCommand(), keyString)};
-    }
-
-    @Override
-    protected void initParameters() {
-        commandPathPreferenceKey = JabRefPreferences.TEXSTUDIO_PATH;
     }
 }

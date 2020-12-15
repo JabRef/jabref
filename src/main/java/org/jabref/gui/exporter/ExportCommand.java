@@ -23,7 +23,7 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,13 +36,13 @@ public class ExportCommand extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExportCommand.class);
     private final JabRefFrame frame;
     private final boolean selectedOnly;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
     private final DialogService dialogService;
 
     /**
      * @param selectedOnly true if only the selected entries should be exported, otherwise all entries are exported
      */
-    public ExportCommand(JabRefFrame frame, boolean selectedOnly, JabRefPreferences preferences) {
+    public ExportCommand(JabRefFrame frame, boolean selectedOnly, PreferencesService preferences) {
         this.frame = frame;
         this.selectedOnly = selectedOnly;
         this.preferences = preferences;
@@ -64,8 +64,8 @@ public class ExportCommand extends SimpleCommand {
         Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(FileFilterConverter.exporterToExtensionFilter(exporters))
-                .withDefaultExtension(Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT))
-                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY))
+                .withDefaultExtension(preferences.getImportExportPreferences().getLastExportExtension())
+                .withInitialDirectory(preferences.getImportExportPreferences().getExportWorkingDirectory())
                 .build();
         dialogService.showFileSaveDialog(fileDialogConfiguration)
                      .ifPresent(path -> export(path, fileDialogConfiguration.getSelectedExtensionFilter(), exporters));
@@ -93,12 +93,13 @@ public class ExportCommand extends SimpleCommand {
         // (This is an ugly hack!)
         Globals.prefs.fileDirForDatabase = frame.getCurrentLibraryTab()
                                                 .getBibDatabaseContext()
-                                                .getFileDirectories(Globals.prefs.getFilePreferences());
+                                                .getFileDirectories(preferences.getFilePreferences());
 
         // Make sure we remember which filter was used, to set
         // the default for next time:
-        Globals.prefs.put(JabRefPreferences.LAST_USED_EXPORT, format.getName());
-        Globals.prefs.put(JabRefPreferences.EXPORT_WORKING_DIRECTORY, file.getParent().toString());
+        preferences.storeImportExportPreferences(preferences.getImportExportPreferences()
+                                                            .withLastExportExtension(format.getName())
+                                                            .withExportWorkingDirectory(file.getParent()));
 
         final List<BibEntry> finEntries = entries;
         BackgroundTask
@@ -109,7 +110,7 @@ public class ExportCommand extends SimpleCommand {
                                  .getBibDatabaseContext()
                                  .getMetaData()
                                  .getEncoding()
-                                 .orElse(Globals.prefs.getDefaultEncoding()),
+                                 .orElse(preferences.getDefaultEncoding()),
                             finEntries);
                     return null; // can not use BackgroundTask.wrap(Runnable) because Runnable.run() can't throw Exceptions
                 })
