@@ -7,7 +7,6 @@ import javax.swing.undo.UndoManager;
 import javafx.concurrent.Task;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -34,8 +33,8 @@ public class AutoLinkFilesAction extends SimpleCommand {
     private final UndoManager undoManager;
     private final TaskExecutor taskExecutor;
 
-    public AutoLinkFilesAction(JabRefFrame frame, PreferencesService preferences, StateManager stateManager, UndoManager undoManager, TaskExecutor taskExecutor) {
-        this.dialogService = frame.getDialogService();
+    public AutoLinkFilesAction(DialogService dialogService, PreferencesService preferences, StateManager stateManager, UndoManager undoManager, TaskExecutor taskExecutor) {
+        this.dialogService = dialogService;
         this.preferences = preferences;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
@@ -43,43 +42,53 @@ public class AutoLinkFilesAction extends SimpleCommand {
 
         this.executable.bind(needsDatabase(this.stateManager).and(needsEntriesSelected(stateManager)));
         this.statusMessage.bind(BindingsHelper.ifThenElse(executable, "", Localization.lang("This operation requires one or more entries to be selected.")));
-
     }
 
     @Override
     public void execute() {
-        BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
-        List<BibEntry> entries = stateManager.getSelectedEntries();
-
-        final NamedCompound nc = new NamedCompound(Localization.lang("Automatically set file links"));
-        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
+        final BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
+        final List<BibEntry> entries = stateManager.getSelectedEntries();
+        final AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
                 database,
                 preferences.getFilePreferences(),
                 preferences.getAutoLinkPreferences(),
                 ExternalFileTypes.getInstance());
-        Task<List<BibEntry>> linkFilesTask = new Task<>() {
+        final NamedCompound nc = new NamedCompound(Localization.lang("Automatically set file links"));
 
+        if (entries.stream().mapToInt(entry -> entry.getFiles().size()).sum() == 0) {
+            dialogService.notify(Localization.lang("The selected entries do not have any file links attached."));
+            return;
+        }
+
+        Task<AutoSetFileLinksUtil.LinkFilesResult> linkFilesTask = new Task<>() {
             @Override
-            protected List<BibEntry> call() {
+            protected AutoSetFileLinksUtil.LinkFilesResult call() {
                 return util.linkAssociatedFiles(entries, nc);
             }
 
             @Override
             protected void succeeded() {
-                if (util.returnFileExceptions().isEmpty()) { //change
-                    if (!getValue().isEmpty()) {
-                        if (nc.hasEdits()) {
-                            nc.end();
-                            undoManager.addEdit(nc);
-                        }
-                        dialogService.notify(Localization.lang("Finished automatically setting external links."));
-                    } else {
-                        dialogService.notify(Localization.lang("Finished automatically setting external links.") + " " + Localization.lang("No files found."));
-                    }
-                } else {
+                AutoSetFileLinksUtil.LinkFilesResult result = getValue();
 
-                    dialogService.notify(Localization.lang("Problem finding files")); //change
+                if (!result.getFileExceptions().isEmpty()) {
+                    dialogService.notify(Localization.lang("Problem finding files. See error log for details."));
+                    return;
                 }
+
+                if (result.getBibEntries().isEmpty()) {
+                    dialogService.notify(Localization.lang("Finished automatically setting external links.")
+                            + " " + Localization.lang("No files found."));
+                    return;
+                }
+
+                if (nc.hasEdits()) {
+                    nc.end();
+                    undoManager.addEdit(nc);
+                }
+
+                dialogService.notify(Localization.lang(
+                        "Finished automatically setting external links. Changed %0 entries.",
+                        String.valueOf(result.getBibEntries().size())));
             }
         };
 
