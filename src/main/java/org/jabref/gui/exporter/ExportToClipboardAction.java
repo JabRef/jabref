@@ -28,7 +28,6 @@ import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +81,7 @@ public class ExportToClipboardAction extends SimpleCommand {
 
         // Find default choice, if any
         Exporter defaultChoice = exporters.stream()
-                                          .filter(exporter -> exporter.getName().equals(Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT)))
+                                          .filter(exporter -> exporter.getName().equals(Globals.prefs.getImportExportPreferences().getLastExportExtension()))
                                           .findAny()
                                           .orElse(null);
 
@@ -106,8 +105,9 @@ public class ExportToClipboardAction extends SimpleCommand {
         Globals.prefs.fileDirForDatabase = panel.getBibDatabaseContext()
                                                 .getFileDirectories(Globals.prefs.getFilePreferences());
 
-        // Add chosen export type to last used pref, to become default
-        Globals.prefs.put(JabRefPreferences.LAST_USED_EXPORT, exporter.getName());
+        // Add chosen export type to last used preference, to become default
+        Globals.prefs.storeImportExportPreferences(
+                Globals.prefs.getImportExportPreferences().withLastExportExtension(exporter.getName()));
 
         Path tmp = null;
         try {

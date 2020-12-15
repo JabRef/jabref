@@ -1,10 +1,16 @@
 package org.jabref.logic.crawler;
 
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.crawler.git.GitHandler;
 import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrderConfig;
@@ -15,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
+import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -25,15 +32,19 @@ import static org.mockito.Mockito.when;
 class CrawlerTest {
     @TempDir
     Path tempRepositoryDirectory;
-    SavePreferences preferences;
+    ImportFormatPreferences importFormatPreferences;
+    SavePreferences savePreferences;
     BibEntryTypesManager entryTypesManager;
+    GitHandler gitHandler = mock(GitHandler.class, Answers.RETURNS_DEFAULTS);
 
     @Test
     public void testWhetherAllFilesAreCreated() throws Exception {
         setUp();
         Crawler testCrawler = new Crawler(getPathToStudyDefinitionFile(),
+                gitHandler,
                 new DummyFileUpdateMonitor(),
-                preferences,
+                importFormatPreferences,
+                savePreferences,
                 entryTypesManager
         );
 
@@ -66,10 +77,28 @@ class CrawlerTest {
      */
     private void setUp() throws Exception {
         setUpRepository();
-        preferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(preferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
-        when(preferences.getEncoding()).thenReturn(null);
-        when(preferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
+
+        CitationKeyPatternPreferences citationKeyPatternPreferences = new CitationKeyPatternPreferences(
+                false,
+                false,
+                false,
+                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+                "",
+                "",
+                DEFAULT_UNWANTED_CHARACTERS,
+                GlobalCitationKeyPattern.fromPattern("[auth][year]"),
+                ',');
+
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
+        when(savePreferences.getEncoding()).thenReturn(null);
+        when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
+        when(savePreferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
+        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
+        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
+        when(importFormatPreferences.isKeywordSyncEnabled()).thenReturn(false);
+        when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
         entryTypesManager = new BibEntryTypesManager();
     }
 

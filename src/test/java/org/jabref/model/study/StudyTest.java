@@ -8,11 +8,12 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.SystematicLiteratureReviewStudyEntryType;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class StudyTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class StudyTest {
     Study testStudy;
 
     @BeforeEach
@@ -61,33 +62,33 @@ class StudyTest {
     @Test
     void getSearchTermsAsStrings() {
         List<String> expectedSearchTerms = List.of("TestSearchQuery1", "TestSearchQuery2", "TestSearchQuery3");
-        Assertions.assertEquals(expectedSearchTerms, testStudy.getSearchQueryStrings());
+        assertEquals(expectedSearchTerms, testStudy.getSearchQueryStrings());
     }
 
     @Test
     void setLastSearchTime() {
         LocalDate date = LocalDate.now();
         testStudy.setLastSearchDate(date);
-        Assertions.assertEquals(date.toString(), testStudy.getStudyMetaDataField(StudyMetaDataField.STUDY_LAST_SEARCH).get());
+        assertEquals(date.toString(), testStudy.getStudyMetaDataField(StudyMetaDataField.STUDY_LAST_SEARCH).get());
     }
 
     @Test
     void getStudyName() {
-        Assertions.assertEquals("TestStudyName", testStudy.getStudyMetaDataField(StudyMetaDataField.STUDY_NAME).get());
+        assertEquals("TestStudyName", testStudy.getStudyMetaDataField(StudyMetaDataField.STUDY_NAME).get());
     }
 
     @Test
     void getStudyAuthor() {
-        Assertions.assertEquals("Jab Ref", testStudy.getStudyMetaDataField(StudyMetaDataField.STUDY_AUTHORS).get());
+        assertEquals("Jab Ref", testStudy.getStudyMetaDataField(StudyMetaDataField.STUDY_AUTHORS).get());
     }
 
     @Test
     void getResearchQuestions() {
-        Assertions.assertEquals("Question1; Question2", testStudy.getStudyMetaDataField(StudyMetaDataField.STUDY_RESEARCH_QUESTIONS).get());
+        assertEquals("Question1; Question2", testStudy.getStudyMetaDataField(StudyMetaDataField.STUDY_RESEARCH_QUESTIONS).get());
     }
 
     @Test
     void getGitRepositoryURL() {
-        Assertions.assertEquals("https://github.com/eclipse/jgit.git", testStudy.getStudyMetaDataField(StudyMetaDataField.STUDY_GIT_REPOSITORY).get());
+        assertEquals("https://github.com/eclipse/jgit.git", testStudy.getStudyMetaDataField(StudyMetaDataField.STUDY_GIT_REPOSITORY).get());
     }
 }

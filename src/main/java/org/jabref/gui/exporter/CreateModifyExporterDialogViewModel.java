@@ -57,7 +57,8 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         Path layoutFileDir = Path.of(layoutFile.get()).getParent();
         if (layoutFileDir != null) {
             String layoutFileDirString = layoutFileDir.toString();
-            preferences.setExportWorkingDirectory(layoutFileDirString);
+            preferences.storeImportExportPreferences(
+                    preferences.getImportExportPreferences().withExportWorkingDirectory(Path.of(layoutFileDirString)));
         }
 
         // Check that there are no empty strings.
@@ -77,15 +78,11 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         return new ExporterViewModel(format);
     }
 
-    public String getExportWorkingDirectory() {
-        return preferences.getExportWorkingDirectory();
-    }
-
     public void browse() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(Localization.lang("Custom layout file"), StandardFileType.LAYOUT)
                 .withDefaultExtension(Localization.lang("Custom layout file"), StandardFileType.LAYOUT)
-                .withInitialDirectory(getExportWorkingDirectory()).build();
+                .withInitialDirectory(preferences.getImportExportPreferences().getExportWorkingDirectory()).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(f -> layoutFile.set(f.toAbsolutePath().toString()));
     }
 

@@ -127,6 +127,7 @@ public class WebFetchers {
         set.add(new IacrEprintFetcher(importFormatPreferences));
         set.add(new RfcFetcher(importFormatPreferences));
         set.add(new Medra());
+        set.add(new JstorFetcher(importFormatPreferences));
         return set;
     }
 

@@ -11,6 +11,8 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.UnknownField;
 
+import static org.jabref.model.entry.types.SystematicLiteratureReviewStudyEntryType.LIBRARY_ENTRY;
+
 /**
  * Converts library entries from the given study into their corresponding fetchers.
  */
@@ -42,7 +44,7 @@ class LibraryEntryToFetcherConverter {
      */
     private List<SearchBasedFetcher> getFetchersFromLibraryEntries(List<BibEntry> libraryEntries) {
         return libraryEntries.parallelStream()
-                             .filter(bibEntry -> bibEntry.getType().getName().equals("library"))
+                             .filter(bibEntry -> bibEntry.getType().getName().equals(LIBRARY_ENTRY.getName()))
                              .map(this::createFetcherFromLibraryEntry)
                              .filter(Objects::nonNull)
                              .collect(Collectors.toList());

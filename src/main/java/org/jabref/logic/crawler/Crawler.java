@@ -6,12 +6,12 @@ import java.util.List;
 
 import org.jabref.logic.crawler.git.GitHandler;
 import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.study.Study;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 
@@ -29,13 +29,14 @@ public class Crawler {
     /**
      * Creates a crawler for retrieving studies from E-Libraries
      *
-     * @param studyDefinitionFile The path to the study definition file that contains the list of targeted E-Libraries and used cross-library queries
+     * @param studyDefinitionFile The path to the study definition file that contains the list of targeted E-Libraries
+     *                            and used cross-library queries
      */
-    public Crawler(Path studyDefinitionFile, FileUpdateMonitor fileUpdateMonitor, SavePreferences savePreferences, BibEntryTypesManager bibEntryTypesManager) throws IllegalArgumentException, IOException, ParseException, GitAPIException {
+    public Crawler(Path studyDefinitionFile, GitHandler gitHandler, FileUpdateMonitor fileUpdateMonitor, ImportFormatPreferences importFormatPreferences, SavePreferences savePreferences, BibEntryTypesManager bibEntryTypesManager) throws IllegalArgumentException, IOException, ParseException, GitAPIException {
         Path studyRepositoryRoot = studyDefinitionFile.getParent();
-        studyRepository = new StudyRepository(studyRepositoryRoot, new GitHandler(studyRepositoryRoot), JabRefPreferences.getInstance().getImportFormatPreferences(), fileUpdateMonitor, savePreferences, bibEntryTypesManager);
+        studyRepository = new StudyRepository(studyRepositoryRoot, gitHandler, importFormatPreferences, fileUpdateMonitor, savePreferences, bibEntryTypesManager);
         Study study = studyRepository.getStudy();
-        LibraryEntryToFetcherConverter libraryEntryToFetcherConverter = new LibraryEntryToFetcherConverter(study.getActiveLibraryEntries(), JabRefPreferences.getInstance().getImportFormatPreferences());
+        LibraryEntryToFetcherConverter libraryEntryToFetcherConverter = new LibraryEntryToFetcherConverter(study.getActiveLibraryEntries(), importFormatPreferences);
         this.studyFetcher = new StudyFetcher(libraryEntryToFetcherConverter.getActiveFetchers(), study.getSearchQueryStrings());
     }
 

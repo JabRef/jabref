@@ -1,8 +1,8 @@
 package org.jabref.logic.crawler;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -12,10 +12,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.crawler.git.GitHandler;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -30,12 +34,13 @@ import org.jabref.model.study.QueryResult;
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyMetaDataField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.preferences.JabRefPreferences;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
+import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -44,23 +49,53 @@ import static org.mockito.Mockito.when;
 
 class StudyRepositoryTest {
     private static final String NON_EXISTING_DIRECTORY = "nonExistingTestRepositoryDirectory";
-    SavePreferences preferences;
+    CitationKeyPatternPreferences citationKeyPatternPreferences;
+    ImportFormatPreferences importFormatPreferences;
+    SavePreferences savePreferences;
     BibEntryTypesManager entryTypesManager;
     @TempDir
     Path tempRepositoryDirectory;
     StudyRepository studyRepository;
     GitHandler gitHandler = mock(GitHandler.class, Answers.RETURNS_DEFAULTS);
 
+    /**
+     * Set up mocks
+     */
+    @BeforeEach
+    public void setUpMocks() {
+        savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        citationKeyPatternPreferences = new CitationKeyPatternPreferences(
+                false,
+                false,
+                false,
+                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+                "",
+                "",
+                DEFAULT_UNWANTED_CHARACTERS,
+                GlobalCitationKeyPattern.fromPattern("[auth][year]"),
+                ',');
+        when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
+        when(savePreferences.getEncoding()).thenReturn(null);
+        when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
+        when(savePreferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
+        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
+        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
+        when(importFormatPreferences.isKeywordSyncEnabled()).thenReturn(false);
+        when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
+        entryTypesManager = new BibEntryTypesManager();
+    }
+
     @Test
     void providePathToNonExistentRepositoryThrowsException() {
         Path nonExistingRepositoryDirectory = tempRepositoryDirectory.resolve(NON_EXISTING_DIRECTORY);
 
-        assertThrows(IOException.class, () -> new StudyRepository(nonExistingRepositoryDirectory, gitHandler, JabRefPreferences.getInstance().getImportFormatPreferences(), new DummyFileUpdateMonitor(), preferences, entryTypesManager));
+        assertThrows(IOException.class, () -> new StudyRepository(nonExistingRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, entryTypesManager));
     }
 
     @Test
     void providePathToExistentRepositoryWithOutStudyDefinitionFileThrowsException() {
-        assertThrows(IOException.class, () -> new StudyRepository(tempRepositoryDirectory, gitHandler, JabRefPreferences.getInstance().getImportFormatPreferences(), new DummyFileUpdateMonitor(), preferences, entryTypesManager));
+        assertThrows(IOException.class, () -> new StudyRepository(tempRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, entryTypesManager));
     }
 
     /**
@@ -68,11 +103,11 @@ class StudyRepositoryTest {
      */
     @Test
     void studyFileCorrectlyImported() throws Exception {
-        setUpTestRepository();
+        setUpTestStudyDefinitionFile();
         List<String> expectedSearchterms = List.of("Quantum", "Cloud Computing", "TestSearchQuery3");
         List<String> expectedActiveFetchersByName = List.of("Springer", "ArXiv");
 
-        Study study = new StudyRepository(tempRepositoryDirectory, gitHandler, JabRefPreferences.getInstance().getImportFormatPreferences(), new DummyFileUpdateMonitor(), preferences, entryTypesManager).getStudy();
+        Study study = new StudyRepository(tempRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, entryTypesManager).getStudy();
 
         assertEquals(expectedSearchterms, study.getSearchQueryStrings());
         assertEquals("TestStudyName", study.getStudyMetaDataField(StudyMetaDataField.STUDY_NAME).get());
@@ -165,25 +200,16 @@ class StudyRepositoryTest {
 
     private StudyRepository getTestStudyRepository() throws Exception {
         if (Objects.isNull(studyRepository)) {
-            setUpTestRepository();
-            studyRepository = new StudyRepository(tempRepositoryDirectory, gitHandler, JabRefPreferences.getInstance().getImportFormatPreferences(), new DummyFileUpdateMonitor(), preferences, entryTypesManager);
+            setUpTestStudyDefinitionFile();
+            studyRepository = new StudyRepository(tempRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, entryTypesManager);
         }
         return studyRepository;
     }
 
     /**
-     * Set up mocks and copies the study definition file into the test repository
+     * Copies the study definition file into the test repository
      */
-    private void setUpTestRepository() throws URISyntaxException {
-        setUpTestStudyDefinitionFile();
-        preferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(preferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
-        when(preferences.getEncoding()).thenReturn(null);
-        when(preferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
-        entryTypesManager = new BibEntryTypesManager();
-    }
-
-    private void setUpTestStudyDefinitionFile() throws URISyntaxException {
+    private void setUpTestStudyDefinitionFile() throws Exception {
         Path destination = tempRepositoryDirectory.resolve("study.bib");
         URL studyDefinition = this.getClass().getResource("study.bib");
         FileUtil.copyFile(Path.of(studyDefinition.toURI()), destination, false);
@@ -193,7 +219,7 @@ class StudyRepositoryTest {
      * This overwrites the existing result file in the repository with a result file containing multiple BibEntries.
      * The repository has to exist before this method is called.
      */
-    private void setUpTestResultFile() throws URISyntaxException {
+    private void setUpTestResultFile() throws Exception {
         Path queryDirectory = Path.of(tempRepositoryDirectory.toString(), "1 - Quantum");
         Path resultFileLocation = Path.of(queryDirectory.toString(), "ArXiv" + ".bib");
         URL resultFile = this.getClass().getResource("ArXivQuantumMock.bib");
@@ -205,7 +231,7 @@ class StudyRepositoryTest {
 
     private BibDatabase getNonDuplicateBibEntryResult() {
         BibDatabase mockResults = new BibDatabase(getSpringerCloudComputingMockResults());
-        DatabaseMerger merger = new DatabaseMerger();
+        DatabaseMerger merger = new DatabaseMerger(importFormatPreferences.getKeywordSeparator());
         merger.merge(mockResults, new BibDatabase(getSpringerQuantumMockResults()));
         merger.merge(mockResults, new BibDatabase(getArXivQuantumMockResults()));
         return mockResults;
@@ -265,7 +291,7 @@ class StudyRepositoryTest {
                 .withField(StandardField.TITLE, "Automatic Control, Robotics, and Information Processing");
         entry3.setType(StandardEntryType.Article);
 
-        CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(new BibDatabaseContext(), JabRefPreferences.getInstance().getCitationKeyPatternPreferences());
+        CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(new BibDatabaseContext(), citationKeyPatternPreferences);
         citationKeyGenerator.generateAndSetKey(entry3);
 
         return List.of(entry1, entry2, entry3);

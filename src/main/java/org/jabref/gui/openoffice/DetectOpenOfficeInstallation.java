@@ -15,7 +15,7 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 /**
  * Tools for automatically detecting OpenOffice or LibreOffice installations.
@@ -24,12 +24,12 @@ public class DetectOpenOfficeInstallation {
 
     private final OpenOfficePreferences ooPrefs;
     private final DialogService dialogService;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferencesService;
 
-    public DetectOpenOfficeInstallation(JabRefPreferences preferences, DialogService dialogService) {
-        this.preferences = preferences;
+    public DetectOpenOfficeInstallation(PreferencesService preferencesService, DialogService dialogService) {
+        this.preferencesService = preferencesService;
         this.dialogService = dialogService;
-        this.ooPrefs = preferences.getOpenOfficePreferences();
+        this.ooPrefs = preferencesService.getOpenOfficePreferences();
     }
 
     public boolean isInstalled() {
@@ -94,7 +94,7 @@ public class DetectOpenOfficeInstallation {
             ooPrefs.setInstallationPath(installDir.toString());
             ooPrefs.setExecutablePath(execPath.get().toString());
             ooPrefs.setJarsPath(jarFilePath.get().getParent().toString());
-            preferences.setOpenOfficePreferences(ooPrefs);
+            preferencesService.setOpenOfficePreferences(ooPrefs);
             return true;
         }
 

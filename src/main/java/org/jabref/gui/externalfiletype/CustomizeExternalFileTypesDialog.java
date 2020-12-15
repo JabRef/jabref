@@ -67,7 +67,7 @@ public class CustomizeExternalFileTypesDialog extends BaseDialog<Void> {
                 .withOnMouseClickedEvent((type, none) -> event -> viewModel.edit(type))
                 .install(fileTypesTableEditColumn);
         new ValueTableCellFactory<ExternalFileType, Boolean>()
-                .withGraphic(none -> IconTheme.JabRefIcons.REMOVE.getGraphicNode())
+                .withGraphic(none -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withOnMouseClickedEvent((type, none) -> event -> viewModel.remove(type))
                 .install(fileTypesTableDeleteColumn);
     }

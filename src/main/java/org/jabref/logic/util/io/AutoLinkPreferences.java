@@ -10,15 +10,16 @@ public class AutoLinkPreferences {
 
     private final CitationKeyDependency citationKeyDependency;
     private final String regularExpression;
-
+    private boolean askAutoNamingPdfs;
     private final Character keywordDelimiter;
 
     public AutoLinkPreferences(CitationKeyDependency citationKeyDependency,
                                String regularExpression,
-
+                               boolean askAutoNamingPdfs,
                                Character keywordDelimiter) {
         this.citationKeyDependency = citationKeyDependency;
         this.regularExpression = regularExpression;
+        this.askAutoNamingPdfs = askAutoNamingPdfs;
         this.keywordDelimiter = keywordDelimiter;
     }
 
@@ -28,6 +29,15 @@ public class AutoLinkPreferences {
 
     public String getRegularExpression() {
         return regularExpression;
+    }
+
+    public boolean shouldAskAutoNamingPdfs() {
+        return askAutoNamingPdfs;
+    }
+
+    public AutoLinkPreferences withAskAutoNamingPdfs(boolean shouldAskAutoNamingPdfs) {
+        this.askAutoNamingPdfs = shouldAskAutoNamingPdfs;
+        return this;
     }
 
     public Character getKeywordDelimiter() {

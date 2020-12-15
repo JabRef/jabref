@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
@@ -32,7 +33,6 @@ import org.jabref.model.study.FetchResult;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.study.Study;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
@@ -49,6 +49,8 @@ class StudyRepository {
     // Tests work with study.bib
     private static final String STUDY_DEFINITION_FILE_NAME = "study.bib";
     private static final Logger LOGGER = LoggerFactory.getLogger(StudyRepository.class);
+    private static final Pattern MATCHCOLON = Pattern.compile(":");
+    private static final Pattern MATCHILLEGALCHARACTERS = Pattern.compile("[^A-Za-z0-9_.\\s=-]");
 
     private final Path repositoryPath;
     private final Path studyDefinitionBib;
@@ -64,17 +66,24 @@ class StudyRepository {
      *
      * @param pathToRepository Where the repository root is located.
      * @param gitHandler       The git handler that managages any interaction with the remote repository
-     * @throws IllegalArgumentException If the repository root directory does not exist, or the root directory does not contain the study definition file.
-     * @throws IOException              Thrown if the given repository does not exists, or the study definition file does not exist
+     * @throws IllegalArgumentException If the repository root directory does not exist, or the root directory does not
+     *                                  contain the study definition file.
+     * @throws IOException              Thrown if the given repository does not exists, or the study definition file
+     *                                  does not exist
      * @throws ParseException           Problem parsing the study definition file.
      */
-    public StudyRepository(Path pathToRepository, GitHandler gitHandler, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileUpdateMonitor, SavePreferences savePreferences, BibEntryTypesManager bibEntryTypesManager) throws IOException, ParseException, GitAPIException {
+    public StudyRepository(Path pathToRepository,
+                           GitHandler gitHandler,
+                           ImportFormatPreferences importFormatPreferences,
+                           FileUpdateMonitor fileUpdateMonitor,
+                           SavePreferences savePreferences,
+                           BibEntryTypesManager bibEntryTypesManager) throws IOException, ParseException {
         this.repositoryPath = pathToRepository;
         this.gitHandler = gitHandler;
         try {
             gitHandler.updateLocalRepository();
         } catch (GitAPIException e) {
-            LOGGER.info("Updating repository from remote failed");
+            LOGGER.error("Updating repository from remote failed");
         }
         this.importFormatPreferences = importFormatPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -147,7 +156,7 @@ class StudyRepository {
         try {
             gitHandler.updateLocalRepository();
         } catch (GitAPIException e) {
-            LOGGER.info("Updating repository from remote failed");
+            LOGGER.error("Updating repository from remote failed");
         }
         persistResults(crawlResults);
         study.setLastSearchDate(LocalDate.now());
@@ -155,7 +164,7 @@ class StudyRepository {
         try {
             gitHandler.updateRemoteRepository("Conducted search " + LocalDate.now());
         } catch (GitAPIException e) {
-            LOGGER.info("Updating remote repository failed");
+            LOGGER.error("Updating remote repository failed");
         }
     }
 
@@ -191,11 +200,7 @@ class StudyRepository {
 
     private void createFolder(Path folder) throws IOException {
         if (Files.notExists(folder)) {
-            try {
-                Files.createDirectory(folder);
-            } catch (IOException e) {
-                throw new IOException("Error during creation of repository structure.", e);
-            }
+            Files.createDirectory(folder);
         }
     }
 
@@ -244,8 +249,8 @@ class StudyRepository {
      */
     private String trimNameAndAddID(String query) {
         // Replace all field: with field= for folder name
-        String trimmedNamed = query.replaceAll(":", "=");
-        trimmedNamed = trimmedNamed.replaceAll("[^A-Za-z0-9_.\\s=-]", "");
+        String trimmedNamed = MATCHCOLON.matcher(query).replaceAll("=");
+        trimmedNamed = MATCHILLEGALCHARACTERS.matcher(trimmedNamed).replaceAll("");
         if (query.length() > 240) {
             trimmedNamed = query.substring(0, 240);
         }
@@ -261,15 +266,16 @@ class StudyRepository {
      * @return ID of the query defined in the study definition.
      */
     private String findQueryIDByQueryString(String query) {
+        String queryField = "query";
         return study.getSearchQueryEntries()
                     .parallelStream()
-                    .filter(bibEntry -> bibEntry.getField(new UnknownField("query")).orElse("").equals(query))
+                    .filter(bibEntry -> bibEntry.getField(new UnknownField(queryField)).orElse("").equals(query))
                     .map(BibEntry::getCitationKey)
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .findFirst()
                     .orElseThrow()
-                    .replaceFirst("query", "");
+                    .replaceFirst(queryField, "");
     }
 
     /**
@@ -278,7 +284,7 @@ class StudyRepository {
      * @param crawlResults The results that shall be persisted.
      */
     private void persistResults(List<QueryResult> crawlResults) throws IOException {
-        DatabaseMerger merger = new DatabaseMerger();
+        DatabaseMerger merger = new DatabaseMerger(importFormatPreferences.getKeywordSeparator());
         BibDatabase newStudyResultEntries = new BibDatabase();
 
         for (QueryResult result : crawlResults) {
@@ -315,7 +321,7 @@ class StudyRepository {
     }
 
     private void generateCiteKeys(BibDatabaseContext existingEntries, BibDatabase targetEntries) {
-        CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(existingEntries, JabRefPreferences.getInstance().getCitationKeyPatternPreferences());
+        CitationKeyGenerator citationKeyGenerator = new CitationKeyGenerator(existingEntries, savePreferences.getCitationKeyPatternPreferences());
         targetEntries.getEntries().stream().filter(bibEntry -> !bibEntry.hasCitationKey()).forEach(citationKeyGenerator::generateAndSetKey);
     }
 

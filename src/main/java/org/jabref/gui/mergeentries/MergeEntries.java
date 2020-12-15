@@ -40,7 +40,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.preferences.JabRefPreferences;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -309,13 +308,13 @@ public class MergeEntries extends BorderPane {
         new ViewModelListCellFactory<DiffMode>()
                 .withText(MergeEntries::getDisplayText)
                 .install(diffMode);
-        DiffMode diffModePref = Globals.prefs.getAsOptional(JabRefPreferences.MERGE_ENTRIES_DIFF_MODE)
+        DiffMode diffModePref = Globals.prefs.getMergeDiffMode()
                                              .flatMap(DiffMode::parse)
                                              .orElse(DiffMode.WORD);
         diffMode.setValue(diffModePref);
         EasyBind.subscribe(this.diffMode.valueProperty(), mode -> {
             updateFieldValues(differentFields);
-            Globals.prefs.put(JabRefPreferences.MERGE_ENTRIES_DIFF_MODE, mode.name());
+            Globals.prefs.storeMergeDiffMode(mode.name());
         });
 
         HBox heading = new HBox(10);

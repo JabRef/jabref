@@ -17,16 +17,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -35,21 +34,20 @@ public class WebSearchPaneViewModel {
     private final ObjectProperty<SearchBasedFetcher> selectedFetcher = new SimpleObjectProperty<>();
     private final ListProperty<SearchBasedFetcher> fetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StringProperty query = new SimpleStringProperty();
-    private final JabRefFrame frame;
     private final DialogService dialogService;
+    private final StateManager stateManager;
     private final Pattern queryPattern;
     private final Pattern laxQueryPattern;
 
-    public WebSearchPaneViewModel(ImportFormatPreferences importPreferences, JabRefFrame frame, JabRefPreferences preferences, DialogService dialogService) {
-        // TODO: Rework so that we don't rely on JabRefFrame and not the complete preferences
-        this.frame = frame;
+    public WebSearchPaneViewModel(PreferencesService preferencesService, DialogService dialogService, StateManager stateManager) {
         this.dialogService = dialogService;
+        this.stateManager = stateManager;
 
-        SortedSet<SearchBasedFetcher> allFetchers = WebFetchers.getSearchBasedFetchers(importPreferences);
+        SortedSet<SearchBasedFetcher> allFetchers = WebFetchers.getSearchBasedFetchers(preferencesService.getImportFormatPreferences());
         fetchers.setAll(allFetchers);
 
         // Choose last-selected fetcher as default
-        int defaultFetcherIndex = preferences.getInt(JabRefPreferences.SELECTED_FETCHER_INDEX);
+        int defaultFetcherIndex = preferencesService.getSidePanePreferences().getWebSearchFetcherSelected();
         if ((defaultFetcherIndex <= 0) || (defaultFetcherIndex >= fetchers.size())) {
             selectedFetcherProperty().setValue(fetchers.get(0));
         } else {
@@ -57,7 +55,7 @@ public class WebSearchPaneViewModel {
         }
         EasyBind.subscribe(selectedFetcherProperty(), newFetcher -> {
             int newIndex = fetchers.indexOf(newFetcher);
-            preferences.putInt(JabRefPreferences.SELECTED_FETCHER_INDEX, newIndex);
+            preferencesService.storeSidePanePreferences(preferencesService.getSidePanePreferences().withWebSearchFetcherSelected(newIndex));
         });
 
         String allowedFields = "((author|abstract|journal|title|year|year-range):\\s?)?";
@@ -98,7 +96,7 @@ public class WebSearchPaneViewModel {
             return;
         }
 
-        if (frame.getCurrentLibraryTab() == null) {
+        if (stateManager.getActiveDatabase().isEmpty()) {
             dialogService.notify(Localization.lang("Please open or start a new library before searching"));
             return;
         }
@@ -110,7 +108,7 @@ public class WebSearchPaneViewModel {
                              .withInitialMessage(Localization.lang("Processing %0", getQuery().trim()));
         task.onFailure(dialogService::showErrorDialogAndWait);
 
-        ImportEntriesDialog dialog = new ImportEntriesDialog(frame.getCurrentLibraryTab().getBibDatabaseContext(), task);
+        ImportEntriesDialog dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task);
         dialog.setTitle(activeFetcher.getName());
         dialog.showAndWait();
     }

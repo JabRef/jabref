@@ -172,8 +172,9 @@ General hints:
 
 The tests check whether translation strings appear correctly in the resource bundles.
 
-1. Add new `Localization.lang("KEY")` to Java file. Run the `LocalizationConsistencyTest`under \(src/test/org.jabref.logic.l10n\)
-2. Tests fail. In the test output a snippet is generated which must be added to the English translation file. There is also a snippet generated for the non-English files, but this is irrelevant.
+1. Add new `Localization.lang("KEY")` to Java file. Run the `LocalizationConsistencyTest`under \(src/test/org.jabref.logic.
+\)
+2. Tests fail. In the test output a snippet is generated which must be added to the English translation file.
 3. Add snippet to English translation file located at `src/main/resources/l10n/JabRef_en.properties`
 4. Please do not add translations for other languages directly in the properties. They will be overwritten by [Crowdin](https://crowdin.com/project/jabref)
 
@@ -210,7 +211,7 @@ Optional<Path> file = FileHelper.expandFilename(database, fileText, preferences.
 
 ## How to work with Preferences
 
-`model` and `logic` must not know JabRefPreferences. See `ProxyPreferences` for encapsulated preferences and [https://github.com/JabRef/jabref/pull/658](https://github.com/JabRef/jabref/pull/658) for a detailed discussion.
+`model` and `logic` must not know `JabRefPreferences`. See `ProxyPreferences` for encapsulated preferences and [https://github.com/JabRef/jabref/pull/658](https://github.com/JabRef/jabref/pull/658) for a detailed discussion.
 
 See [https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/preferences/TimestampPreferences.java](https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/preferences/TimestampPreferences.java) \(via [https://github.com/JabRef/jabref/pull/3092](https://github.com/JabRef/jabref/pull/3092)\) for the current way how to deal with preferences.
 
@@ -290,9 +291,12 @@ Or even better, try to mock the preferences and insert them via dependency injec
 @Test
 public void getTypeReturnsBibLatexArticleInBibLatexMode() {
      // Mock preferences
-     JabrefPreferences mockedPrefs = mock(JabrefPreferences.class);
+     PreferencesService mockedPrefs = mock(PreferencesService.class);
+     GeneralPreferences mockedGeneralPrefs = mock(GeneralPReferences.class);
      // Switch to BibLatex mode
-     when(mockedPrefs.getBoolean("BiblatexMode")).thenReturn(true);
+     when(mockedPrefs.getGeneralPrefs()).thenReturn(mockedGeneralPrefs);
+     when(mockedGeneralPrefs.getDefaultBibDatabaseMode())
+        .thenReturn(BibDatabaseMode.BIBLATEX);
 
      // Now test
      EntryTypes biblatexentrytypes = new EntryTypes(mockedPrefs);

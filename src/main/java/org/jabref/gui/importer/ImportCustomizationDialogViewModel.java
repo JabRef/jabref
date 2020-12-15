@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
@@ -17,7 +19,6 @@ import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -27,8 +28,8 @@ public class ImportCustomizationDialogViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportCustomizationDialogViewModel.class);
 
-    private final ListProperty<CustomImporter> importers;
-    private final ListProperty<CustomImporter> selectedImporters = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<ImporterViewModel> importers = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<ImporterViewModel> selectedImporters = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final PreferencesService preferences;
     private final DialogService dialogService;
@@ -36,7 +37,14 @@ public class ImportCustomizationDialogViewModel extends AbstractViewModel {
     public ImportCustomizationDialogViewModel(PreferencesService preferences, DialogService dialogService) {
         this.preferences = preferences;
         this.dialogService = dialogService;
-        this.importers = new SimpleListProperty<>(FXCollections.observableArrayList(Globals.prefs.customImports));
+        loadImporters();
+    }
+
+    private void loadImporters() {
+        Set<CustomImporter> importersLogic = preferences.getCustomImportFormats();
+        for (CustomImporter importer : importersLogic) {
+            importers.add(new ImporterViewModel(importer));
+        }
     }
 
     /**
@@ -62,7 +70,7 @@ public class ImportCustomizationDialogViewModel extends AbstractViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.CLASS, StandardFileType.JAR, StandardFileType.ZIP)
                 .withDefaultExtension(StandardFileType.CLASS)
-                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                .withInitialDirectory(preferences.getWorkingDir())
                 .build();
 
         Optional<Path> selectedFile = dialogService.showFileOpenDialog(fileDialogConfiguration);
@@ -79,7 +87,7 @@ public class ImportCustomizationDialogViewModel extends AbstractViewModel {
                         String className = selectedFileInArchive.get().toString().substring(0, selectedFileInArchive.get().toString().lastIndexOf('.')).replace(
                                 "/", ".");
                         CustomImporter importer = new CustomImporter(selectedFile.get().toAbsolutePath().toString(), className);
-                        importers.add(importer);
+                        importers.add(new ImporterViewModel(importer));
                     }
                 } catch (IOException exc) {
                     LOGGER.error("Could not open ZIP-archive.", exc);
@@ -99,7 +107,7 @@ public class ImportCustomizationDialogViewModel extends AbstractViewModel {
                     String className = pathToClass(basePath, selectedFile.get());
                     CustomImporter importer = new CustomImporter(basePath, className);
 
-                    importers.add(importer);
+                    importers.add(new ImporterViewModel(importer));
                 } catch (Exception exc) {
                     LOGGER.error("Could not instantiate importer", exc);
                     dialogService.showErrorDialogAndWait(Localization.lang("Could not instantiate %0", selectedFile.get().toString()), exc);
@@ -118,19 +126,20 @@ public class ImportCustomizationDialogViewModel extends AbstractViewModel {
     }
 
     public void saveToPrefs() {
-        Globals.prefs.customImports.clear();
-        Globals.prefs.customImports.addAll(importers);
+        preferences.storeCustomImportFormats(importers.stream()
+                                                        .map(ImporterViewModel::getLogic)
+                                                        .collect(Collectors.toSet()));
         Globals.IMPORT_FORMAT_READER.resetImportFormats(
-                Globals.prefs.getImportFormatPreferences(),
-                Globals.prefs.getXmpPreferences(),
+                preferences.getImportFormatPreferences(),
+                preferences.getXmpPreferences(),
                 Globals.getFileUpdateMonitor());
     }
 
-    public ListProperty<CustomImporter> selectedImportersProperty() {
+    public ListProperty<ImporterViewModel> selectedImportersProperty() {
         return selectedImporters;
     }
 
-    public ListProperty<CustomImporter> importersProperty() {
+    public ListProperty<ImporterViewModel> importersProperty() {
         return importers;
     }
 }

@@ -126,13 +126,16 @@ public class GlobalSearchBar extends HBox {
         // searchModeButton = new Button();
         initSearchModifierButtons();
 
-        BooleanBinding focusBinding = searchField.focusedProperty()
-                                                 .or(regularExpressionButton.focusedProperty()
-                                                                            .or(caseSensitiveButton.focusedProperty()));
+        BooleanBinding focusedOrActive = searchField.focusedProperty()
+                                                    .or(regularExpressionButton.focusedProperty())
+                                                    .or(caseSensitiveButton.focusedProperty())
+                                                    .or(searchField.textProperty()
+                                                                   .isNotEmpty());
+
         regularExpressionButton.visibleProperty().unbind();
-        regularExpressionButton.visibleProperty().bind(focusBinding);
+        regularExpressionButton.visibleProperty().bind(focusedOrActive);
         caseSensitiveButton.visibleProperty().unbind();
-        caseSensitiveButton.visibleProperty().bind(focusBinding);
+        caseSensitiveButton.visibleProperty().bind(focusedOrActive);
 
         StackPane modifierButtons = new StackPane(new HBox(regularExpressionButton, caseSensitiveButton));
         modifierButtons.setAlignment(Pos.CENTER);
