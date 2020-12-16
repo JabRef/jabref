@@ -8,7 +8,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.WeakInvalidationListener;
 
 import org.jabref.model.FieldChange;
 import org.jabref.model.TreeNode;
@@ -25,6 +27,8 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
 
     private static final String PATH_DELIMITER = " > ";
     private AbstractGroup group;
+    private final InvalidationListener invalidationListener = (listener) -> this.notifyAboutDescendantChange(this);
+    private final WeakInvalidationListener weakInvalidationListener = new WeakInvalidationListener(invalidationListener);
 
     /**
      * Creates this node and associates the specified group with it.
@@ -33,10 +37,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
      */
     public GroupTreeNode(AbstractGroup group) {
         super(GroupTreeNode.class);
-        this.group = Objects.requireNonNull(group);
-        if (group instanceof Observable) {
-            ((Observable) group).addListener((listener) -> notifyAboutDescendantChange(this));
-        }
+        setGroup(group, false, false, null);
     }
 
     public static GroupTreeNode fromGroup(AbstractGroup group) {
@@ -77,7 +78,13 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     public List<FieldChange> setGroup(AbstractGroup newGroup, boolean shouldKeepPreviousAssignments,
                                       boolean shouldRemovePreviousAssignments, List<BibEntry> entriesInDatabase) {
         AbstractGroup oldGroup = getGroup();
-        setGroup(newGroup);
+        group = Objects.requireNonNull(newGroup);
+        if (group instanceof Observable) {
+            ((Observable) group).addListener(weakInvalidationListener);
+        }
+        if (oldGroup instanceof Observable) {
+            ((Observable) oldGroup).removeListener(weakInvalidationListener);
+        }
 
         List<FieldChange> changes = new ArrayList<>();
         boolean shouldRemove = shouldRemovePreviousAssignments && (oldGroup instanceof GroupEntryChanger);
