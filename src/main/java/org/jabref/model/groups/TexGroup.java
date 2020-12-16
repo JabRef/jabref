@@ -13,6 +13,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 
 import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.auxparser.AuxParser;
 import org.jabref.logic.auxparser.AuxParserResult;
 import org.jabref.model.entry.BibEntry;
@@ -124,7 +125,8 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener, Obser
     public void fileUpdated() {
         // Reset previous parse result
         keysUsedInAux = null;
-        listeners.forEach(listener -> listener.invalidated(this));
+        DefaultTaskExecutor.runInJavaFXThread(() ->
+                listeners.forEach(listener -> listener.invalidated(this)));
     }
 
     private Path relativize(Path path) {
