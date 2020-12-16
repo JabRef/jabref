@@ -35,10 +35,10 @@ class GroupChangeViewModel extends DatabaseChangeViewModel {
         root.removeAllChildren();
         if (changedGroups == null) {
             // I think setting root to null is not possible
-            root.setGroup(DefaultGroupsFactory.getAllEntriesGroup());
+            root.setGroup(DefaultGroupsFactory.getAllEntriesGroup(), false, false, null);
         } else {
             // change root group, even though it'll be AllEntries anyway
-            root.setGroup(changedGroups.getGroup());
+            root.setGroup(changedGroups.getGroup(), false, false, null);
             for (GroupTreeNode child : changedGroups.getChildren()) {
                 child.copySubtree().moveTo(root);
             }
