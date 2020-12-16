@@ -3,8 +3,8 @@ package org.jabref.model.groups;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -31,7 +31,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener, Obser
 
     private final Path filePath;
     private Set<String> keysUsedInAux;
-    private final List<InvalidationListener> listeners = new ArrayList<>();
+    private final List<InvalidationListener> listeners = Collections.synchronizedList(new LinkedList<>());
     private final FileUpdateMonitor fileMonitor;
     private final AuxParser auxParser;
     private final MetaData metaData;
@@ -145,6 +145,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener, Obser
 
     @Override
     public void addListener(InvalidationListener listener) {
+        Objects.requireNonNull(listener);
         listeners.add(listener);
     }
 
