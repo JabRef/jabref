@@ -24,11 +24,12 @@ class GroupChangeViewModel extends DatabaseChangeViewModel {
 
     @Override
     public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
-        GroupTreeNode root = database.getMetaData().getGroups().orElse(null);
-        if (root == null) {
-            root = new GroupTreeNode(DefaultGroupsFactory.getAllEntriesGroup());
-            database.getMetaData().setGroups(root);
-        }
+        GroupTreeNode root = database.getMetaData().getGroups().orElseGet(() -> {
+            GroupTreeNode groupTreeNode = new GroupTreeNode(DefaultGroupsFactory.getAllEntriesGroup());
+            database.getMetaData().setGroups(groupTreeNode);
+            return groupTreeNode;
+        });
+
         final UndoableModifySubtree undo = new UndoableModifySubtree(
                 new GroupTreeNodeViewModel(database.getMetaData().getGroups().orElse(null)),
                 new GroupTreeNodeViewModel(root), Localization.lang("Modified groups"));
