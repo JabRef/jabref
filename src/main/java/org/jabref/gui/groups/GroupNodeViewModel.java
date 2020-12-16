@@ -6,6 +6,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.IntegerBinding;
@@ -58,6 +61,7 @@ public class GroupNodeViewModel {
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragBoard;
     private final ObservableList<BibEntry> entriesList;
+    private final InvalidationListener invalidateEntriesListener = (listener) -> updateMatchedEntries();
     private final PreferencesService preferencesService;
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard, PreferencesService preferencesService) {
@@ -80,6 +84,9 @@ public class GroupNodeViewModel {
                                      .collect(Collectors.toCollection(FXCollections::observableArrayList));
         } else {
             children = EasyBind.mapBacked(groupNode.getChildren(), this::toViewModel);
+        }
+        if (groupNode.getGroup() instanceof Observable) {
+            ((Observable) groupNode.getGroup()).addListener(new WeakInvalidationListener(invalidateEntriesListener));
         }
         hasChildren = new SimpleBooleanProperty();
         hasChildren.bind(Bindings.isNotEmpty(children));
