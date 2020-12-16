@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -32,7 +33,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener, Obser
 
     private final Path filePath;
     private Set<String> keysUsedInAux;
-    private final List<InvalidationListener> listeners = Collections.synchronizedList(new LinkedList<>());
+    private final Queue<InvalidationListener> listeners = new ConcurrentLinkedQueue<>();
     private final FileUpdateMonitor fileMonitor;
     private final AuxParser auxParser;
     private final MetaData metaData;
