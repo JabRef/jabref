@@ -130,7 +130,7 @@ dependencies {
         exclude group: 'org.apache.lucene', module: 'lucene-sandbox'
     }
 
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.9.0.202009080501-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.10.0.202012080955-r'
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.1'
 
@@ -161,7 +161,7 @@ dependencies {
     implementation 'org.controlsfx:controlsfx:11.0.3'
 
     implementation 'org.jsoup:jsoup:1.13.1'
-    implementation 'com.konghq:unirest-java:3.11.05'
+    implementation 'com.konghq:unirest-java:3.11.06'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
@@ -190,7 +190,7 @@ dependencies {
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.62.2'
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.62.2'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.93'
+    testImplementation 'io.github.classgraph:classgraph:4.8.94'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.7.0'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.7.0'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.7.0'

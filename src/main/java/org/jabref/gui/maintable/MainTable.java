@@ -158,9 +158,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         // Store visual state
         new PersistenceVisualStateTable(this, preferencesService);
 
-        // TODO: Float marked entries
-        // model.updateMarkingState(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
-
         setupKeyBindings(keyBindingRepository);
 
         this.setOnKeyTyped(key -> {

@@ -58,7 +58,7 @@ public class PushToApplicationAction extends SimpleCommand {
 
             @Override
             public String getText() {
-                return Localization.lang("Push entries to external application (%0)", application.getApplicationName());
+                return Localization.lang("Push entries to external application (%0)", application.getDisplayName());
             }
 
             @Override
@@ -95,7 +95,7 @@ public class PushToApplicationAction extends SimpleCommand {
             for (BibEntry entry : stateManager.getSelectedEntries()) {
                 if (StringUtil.isBlank(entry.getCitationKey())) {
                     dialogService.showErrorDialogAndWait(
-                            application.getApplicationName(),
+                            application.getDisplayName(),
                             Localization.lang("This operation requires all selected entries to have citation keys defined."));
 
                     return;

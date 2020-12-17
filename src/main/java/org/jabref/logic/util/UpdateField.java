@@ -96,7 +96,7 @@ public class UpdateField {
         String timestamp = DateTimeFormatter.ofPattern(timestampPreferences.getTimestampFormat()).format(LocalDateTime.now());
         Field timeStampField = timestampPreferences.getTimestampField();
         boolean setOwner = ownerPreferences.isUseOwner() && (overwriteOwner || (!entry.hasField(StandardField.OWNER)));
-        boolean setTimeStamp = timestampPreferences.isUseTimestamps() && (overwriteTimestamp || (!entry.hasField(timeStampField)));
+        boolean setTimeStamp = timestampPreferences.shouldUseTimestamps() && (overwriteTimestamp || (!entry.hasField(timeStampField)));
 
         setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
     }
@@ -105,7 +105,7 @@ public class UpdateField {
                                           OwnerPreferences ownerPreferences, TimestampPreferences timestampPreferences) {
         UpdateField.setAutomaticFields(entry,
                 ownerPreferences.isOverwriteOwner(),
-                timestampPreferences.isOverwriteTimestamp(),
+                timestampPreferences.shouldOverwriteTimestamp(),
                 ownerPreferences,
                 timestampPreferences);
     }
@@ -134,7 +134,7 @@ public class UpdateField {
                                           OwnerPreferences ownerPreferences, TimestampPreferences timestampPreferences) {
 
         boolean globalSetOwner = ownerPreferences.isUseOwner();
-        boolean globalSetTimeStamp = timestampPreferences.isUseTimestamps();
+        boolean globalSetTimeStamp = timestampPreferences.shouldUseTimestamps();
 
         // Do not need to do anything if all options are disabled
         if (!(globalSetOwner || globalSetTimeStamp)) {
@@ -157,7 +157,7 @@ public class UpdateField {
                                           OwnerPreferences ownerPreferences, TimestampPreferences timestampPreferences) {
         UpdateField.setAutomaticFields(bibs,
                 ownerPreferences.isOverwriteOwner(),
-                timestampPreferences.isOverwriteTimestamp(),
+                timestampPreferences.shouldOverwriteTimestamp(),
                 ownerPreferences,
                 timestampPreferences);
     }

@@ -29,7 +29,8 @@ public class Crawler {
     /**
      * Creates a crawler for retrieving studies from E-Libraries
      *
-     * @param studyDefinitionFile The path to the study definition file that contains the list of targeted E-Libraries and used cross-library queries
+     * @param studyDefinitionFile The path to the study definition file that contains the list of targeted E-Libraries
+     *                            and used cross-library queries
      */
     public Crawler(Path studyDefinitionFile, GitHandler gitHandler, FileUpdateMonitor fileUpdateMonitor, ImportFormatPreferences importFormatPreferences, SavePreferences savePreferences, BibEntryTypesManager bibEntryTypesManager) throws IllegalArgumentException, IOException, ParseException, GitAPIException {
         Path studyRepositoryRoot = studyDefinitionFile.getParent();
