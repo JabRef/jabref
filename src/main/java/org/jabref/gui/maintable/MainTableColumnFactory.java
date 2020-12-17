@@ -36,6 +36,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
@@ -113,10 +114,15 @@ public class MainTableColumnFactory {
                         TableColumn<BibEntryTableViewModel, ?> fieldColumn = createFieldColumn(column);
                         columns.add(fieldColumn);
                         if (column.getQualifier().equalsIgnoreCase(StandardField.YEAR.getName())) {
-                            // We adjust the min width and the current width, but not the max width to allow the user to enlarge this field
                             // 60 is chosen, because of the optimal width of a four digit field
-                            fieldColumn.setMinWidth(60);
-                            fieldColumn.setPrefWidth(60);
+                            setExactWidth(fieldColumn, 60);
+                        } else if (column.getQualifier().equalsIgnoreCase(InternalField.TYPE_HEADER.getName())) {
+                            // 80 is chosen, because of the optimal width of the entry type
+                            setExactWidth(fieldColumn, 90);
+                        } else if (column.getQualifier().equalsIgnoreCase(StandardField.KEY.getName())) {
+                            // The citation key is smaller than the other fields
+                            // The other option is to set a max width. However, we think that some users have loooooong keys, they want to see
+                            fieldColumn.setMinWidth(ColumnPreferences.DEFAULT_COLUMN_WIDTH / 2);
                         } else {
                             fieldColumn.setMinWidth(ColumnPreferences.DEFAULT_COLUMN_WIDTH);
                         }
