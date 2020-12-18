@@ -292,4 +292,29 @@ class BracketedPatternTest {
 
         assertEquals("", BracketedPattern.expandBrackets("[]", null, bibEntry, null));
     }
+
+    @Test
+    void expandBracketsInstitutionAbbreviationFromProvidedAbbreviation() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.AUTHOR, "{European Union Aviation Safety Agency ({EUASABracket})}");
+
+        assertEquals("EUASABracket", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsInstitutionAbbreviationFromShortAuthor() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.AUTHOR, "{European Union Aviation Safety Agency}")
+                .withField(StandardField.SHORTAUTHOR, "EUASAShort");
+
+        assertEquals("EUASAShort", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsInstitutionAbbreviationForAuthorContainingUnion() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.AUTHOR, "{European Union Aviation Safety Agency}");
+
+        assertEquals("EUASA", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
+    }
 }
