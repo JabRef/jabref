@@ -61,7 +61,7 @@ public class BracketedPattern {
     /**
      * Matches with "({[A-Z]}+)", which should be used to abbreviate the name of an institution
      */
-    private static final Pattern ABBREVIATIONS = Pattern.compile(".*\\(\\{[A-Z]+}\\).*");
+    private static final Pattern ABBREVIATIONS = Pattern.compile("(?<=\\(\\{)[A-Z]+(?=}\\))");
     /**
      * Matches with "dep"/"dip", case insensitive
      */
@@ -1252,8 +1252,8 @@ public class BracketedPattern {
         result = unifyDiacritics(result);
         result = result.replaceAll("^\\{", "").replaceAll("}$", "");
         Matcher matcher = ABBREVIATIONS.matcher(result);
-        if (matcher.matches()) {
-            return matcher.group(1);
+        if (matcher.find()) {
+            return matcher.group();
         }
 
         result = removeDiacritics(result);
