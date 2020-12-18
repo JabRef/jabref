@@ -55,11 +55,6 @@ public class AutoLinkFilesAction extends SimpleCommand {
                 ExternalFileTypes.getInstance());
         final NamedCompound nc = new NamedCompound(Localization.lang("Automatically set file links"));
 
-        if (entries.stream().mapToInt(entry -> entry.getFiles().size()).sum() == 0) {
-            dialogService.notify(Localization.lang("The selected entries do not have any file links attached."));
-            return;
-        }
-
         Task<AutoSetFileLinksUtil.LinkFilesResult> linkFilesTask = new Task<>() {
             @Override
             protected AutoSetFileLinksUtil.LinkFilesResult call() {
@@ -71,13 +66,16 @@ public class AutoLinkFilesAction extends SimpleCommand {
                 AutoSetFileLinksUtil.LinkFilesResult result = getValue();
 
                 if (!result.getFileExceptions().isEmpty()) {
-                    dialogService.notify(Localization.lang("Problem finding files. See error log for details."));
+                    dialogService.showWarningDialogAndWait(
+                            Localization.lang("Automatically set file links"),
+                            Localization.lang("Problem finding files. See error log for details."));
                     return;
                 }
 
-                if (result.getBibEntries().isEmpty()) {
-                    dialogService.notify(Localization.lang("Finished automatically setting external links.")
-                            + " " + Localization.lang("No files found."));
+                if (result.getChangedEntries().isEmpty()) {
+                    dialogService.showWarningDialogAndWait("Automatically set file links",
+                            Localization.lang("Finished automatically setting external links.") + "\n"
+                                    + Localization.lang("No files found."));
                     return;
                 }
 
@@ -86,9 +84,8 @@ public class AutoLinkFilesAction extends SimpleCommand {
                     undoManager.addEdit(nc);
                 }
 
-                dialogService.notify(Localization.lang(
-                        "Finished automatically setting external links. Changed %0 entries.",
-                        String.valueOf(result.getBibEntries().size())));
+                dialogService.notify(Localization.lang("Finished automatically setting external links.") + " "
+                        + Localization.lang("Changed %0 entries.", String.valueOf(result.getChangedEntries().size())));
             }
         };
 

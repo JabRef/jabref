@@ -43,7 +43,7 @@ public class AutoSetFileLinksUtil {
             fileExceptions.add(exception);
         }
 
-        public List<BibEntry> getBibEntries() {
+        public List<BibEntry> getChangedEntries() {
             return changedEntries;
         }
 
