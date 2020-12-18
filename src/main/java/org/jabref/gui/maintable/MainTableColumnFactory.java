@@ -78,7 +78,6 @@ public class MainTableColumnFactory {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
         columnPreferences.getColumns().forEach(column -> {
-
             switch (column.getType()) {
                 case INDEX:
                     columns.add(createIndexColumn(column));
@@ -113,18 +112,16 @@ public class MainTableColumnFactory {
                     if (!column.getQualifier().isBlank()) {
                         TableColumn<BibEntryTableViewModel, ?> fieldColumn = createFieldColumn(column);
                         columns.add(fieldColumn);
+                        fieldColumn.setPrefWidth(ColumnPreferences.DEFAULT_COLUMN_WIDTH);
                         if (column.getQualifier().equalsIgnoreCase(StandardField.YEAR.getName())) {
-                            // 60 is chosen, because of the optimal width of a four digit field
-                            setExactWidth(fieldColumn, 60);
+                            // 60 is chosen, because of the optimal width of a four digit number
+                            fieldColumn.setPrefWidth(60);
                         } else if (column.getQualifier().equalsIgnoreCase(InternalField.TYPE_HEADER.getName())) {
-                            // 80 is chosen, because of the optimal width of the entry type
-                            setExactWidth(fieldColumn, 90);
-                        } else if (column.getQualifier().equalsIgnoreCase(StandardField.KEY.getName())) {
-                            // The citation key is smaller than the other fields
-                            // The other option is to set a max width. However, we think that some users have loooooong keys, they want to see
-                            fieldColumn.setMinWidth(ColumnPreferences.DEFAULT_COLUMN_WIDTH / 2);
+                            // 90 is chosen, because of the optimal width of the entry type
+                            fieldColumn.setPrefWidth(90);
                         } else {
-                            fieldColumn.setMinWidth(ColumnPreferences.DEFAULT_COLUMN_WIDTH);
+                            fieldColumn.setMinWidth(ColumnPreferences.DEFAULT_COLUMN_MIN_WIDTH);
+                            fieldColumn.setPrefWidth(ColumnPreferences.DEFAULT_COLUMN_WIDTH);
                         }
                     }
                     break;

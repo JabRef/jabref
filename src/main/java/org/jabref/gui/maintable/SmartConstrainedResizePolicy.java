@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
@@ -24,49 +25,68 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
     private static final Logger LOGGER = LoggerFactory.getLogger(SmartConstrainedResizePolicy.class);
 
     private Map<TableColumnBase, Double> expansionShare = new HashMap<>();
+    List<? extends TableColumn<?, ?>> resizableColumns;
+    private TableColumn lastModifiedColumn = null;
 
     @Override
     public Boolean call(TableView.ResizeFeatures prop) {
-        if (prop.getColumn() == null) {
+        TableColumn column = prop.getColumn();
+        if (column == null) {
             // happens at initialization and at window resize
             LOGGER.debug("Table is fully rendered");
+            TableView<?> table = prop.getTable();
+            resizableColumns = table.getVisibleLeafColumns().stream()
+                                    .filter(TableColumnBase::isResizable)
+                                    .collect(Collectors.toList());
             // This way, the proportions of the columns are kept during resize of the window
-            determineWidthShare(prop.getTable());
-            return rearrangeColumns(prop.getTable());
+            determineExpansionShare();
+
+            // Rearrange columns if content fits into displayed table
+            // Otherwise, the default is good enough
+            if (contentFitsIntoTable(table)) {
+                return rearrangeColumns(table);
+            }
+            return false;
         } else {
+            if (!column.equals(lastModifiedColumn)) {
+                lastModifiedColumn = column;
+                // This way, the proportions of the columns are kept during resize of the window
+                determineExpansionShare();
+            }
             return constrainedResize(prop);
         }
+    }
+
+    private boolean contentFitsIntoTable(TableView<?> table) {
+        Double tableWidth = getContentWidth(table);
+        List<? extends TableColumnBase<?, ?>> visibleLeafColumns = table.getVisibleLeafColumns();
+        Double currentTableContentWidth = visibleLeafColumns.stream().mapToDouble(TableColumnBase::getWidth).sum();
+        return tableWidth >= currentTableContentWidth;
     }
 
     /**
      * Determines the share of the total width each column has
      */
-    private void determineWidthShare(TableView table) {
+    private void determineExpansionShare() {
         // We need to store the initial preferred width, because "setWidth()" does not exist
         // There is only "setMinWidth", "setMaxWidth", and "setPrefWidth
-
-        Double totalInitialPreferredWidths;
-        List<? extends TableColumnBase<?, ?>> visibleLeafColumns = table.getVisibleLeafColumns();
-        totalInitialPreferredWidths = visibleLeafColumns.stream()
-                                                        .filter(TableColumnBase::isResizable)
-                                                        .mapToDouble(TableColumnBase::getPrefWidth).sum();
-        for (TableColumnBase<?, ?> column : visibleLeafColumns) {
-            if (column.isResizable()) {
-                expansionShare.put(column, column.getPrefWidth() / totalInitialPreferredWidths);
-            } else {
-                expansionShare.put(column, 0d);
-            }
+        Double allResizableColumnsWidth = resizableColumns.stream().mapToDouble(TableColumnBase::getPrefWidth).sum();
+        for (TableColumnBase<?, ?> column : resizableColumns) {
+            expansionShare.put(column, column.getPrefWidth() / allResizableColumnsWidth);
         }
     }
 
     /**
      * Determines the new width of the column based on the requested delta. It respects the min and max width of the column.
+     * <br>
+     * This method is also called if the table content is wider than the window. Thus, it does not respect the overall table width;
+     * "just" the width constraints of the given column
      *
      * @param column The column the resize is requested
      * @param delta  The delta requested
      * @return the new size, Optional.empty() if no resize is possible
      */
-    private Optional<Double> determineNewWidth(TableColumn<?, ?> column, Double delta) {
+    private Optional<Double> determineNewWidth(TableColumnBase<?, ?> column, Double delta) {
         // This is com.sun.javafx.scene.control.skin.Utils.boundedSize with more comments and Optionals
 
         // Calculate newWidth based on delta and constraint of the column
@@ -98,71 +118,95 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
         TableView<?> table = prop.getTable();
         Double tableWidth = getContentWidth(table);
         List<? extends TableColumnBase<?, ?>> visibleLeafColumns = table.getVisibleLeafColumns();
-        Double requiredWidth = visibleLeafColumns.stream().mapToDouble(TableColumnBase::getWidth).sum();
+        // The current able content width contains all visible columns: the resizable ones and the non-resizable ones
+        Double currentTableContentWidth = visibleLeafColumns.stream().mapToDouble(TableColumnBase::getWidth).sum();
         Double delta = prop.getDelta();
 
         TableColumn<?, ?> userChosenColumnToResize = prop.getColumn();
 
-        boolean columnsCanFitTable = requiredWidth + delta < tableWidth;
+        boolean columnsCanFitTable = currentTableContentWidth + delta < tableWidth;
         if (columnsCanFitTable) {
-            LOGGER.debug("User shrunk column in that way thus that window can contain all the columns");
-            if (requiredWidth >= tableWidth) {
-                LOGGER.debug("Before, the content did not fit. Rearrange everything.");
+            LOGGER.debug("User window size in that way thus that window can contain all the columns");
+            if (currentTableContentWidth >= tableWidth) {
+                LOGGER.debug("Before, the content did not fit. Now it fits. Rearrange everything.");
                 return rearrangeColumns(table);
             }
             LOGGER.debug("Everything already fit. We distribute the delta now.");
 
             // Content does already fit
             // We "just" need to readjust the column widths
-            determineNewWidth(userChosenColumnToResize, delta)
-                    .ifPresent(newWidth -> {
-                        double currentWidth = userChosenColumnToResize.getWidth();
-                        Double deltaToApply = newWidth - currentWidth;
-                        for (TableColumnBase<?, ?> col : visibleLeafColumns) {
-                            Double share = expansionShare.get(col);
-                            Double newSize;
-                            if (col.equals(prop.getColumn())) {
-                                // The column resized by the user gets the delta;
-                                newSize = newWidth;
-                            } else {
-                                // The columns not explicitly resized by the user get the negative delta
-                                newSize = col.getWidth() - share * deltaToApply;
-                            }
-                            newSize = Math.min(newSize, col.getMaxWidth());
-                            col.setPrefWidth(newSize);
-                        }
-                    });
-            return true;
+            Optional<Double> newWidthOptional = determineNewWidth(userChosenColumnToResize, delta);
+            newWidthOptional.ifPresent(newWidth -> {
+                distributeDelta(table, userChosenColumnToResize, newWidth);
+            });
+            return newWidthOptional.isPresent();
         }
 
         LOGGER.debug("Window smaller than content");
 
-        determineNewWidth(userChosenColumnToResize, delta).ifPresent(newWidth ->
-                userChosenColumnToResize.setPrefWidth(newWidth));
-        return true;
+        Optional<Double> newWidth = determineNewWidth(userChosenColumnToResize, delta);
+        newWidth.ifPresent(userChosenColumnToResize::setPrefWidth);
+        return newWidth.isPresent();
+    }
+
+    private void distributeDelta(TableView<?> table, TableColumnBase userChosenColumnToResize, Double newWidth) {
+        userChosenColumnToResize.setPrefWidth(newWidth);
+
+        List<? extends TableColumn<?, ?>> columnsToResize = resizableColumns.stream().filter(col -> !col.equals(userChosenColumnToResize)).collect(Collectors.toList());
+
+        Double tableWidth = table.getWidth();
+        Double newContentWidth;
+
+        do
+        {
+            // in case the userChosenColumnToResize got bigger, the remaining available width will get below 0 --> other columns need to be shrunk
+            Double remainingAvailableWidth = tableWidth - getContentWidth(table);
+            LOGGER.debug("Distributing delta {}", remainingAvailableWidth);
+            for (TableColumnBase<?, ?> col : columnsToResize) {
+                double share = expansionShare.get(col);
+                determineNewWidth(col, share * remainingAvailableWidth)
+                        // in case we can do something, do it
+                        // otherwise, the next loop iteration will distribute it
+                        .ifPresent(col::setPrefWidth);
+            }
+            newContentWidth = getContentWidth(table);
+        } while (Math.abs(tableWidth - newContentWidth) > 5d);
     }
 
     /**
      * Rearranges the widths of all columns according to their shares (proportional to their preferred widths)
      */
     private Boolean rearrangeColumns(TableView<?> table) {
-        Double tableWidth = getContentWidth(table);
-        List<? extends TableColumnBase<?, ?>> visibleLeafColumns = table.getVisibleLeafColumns();
+        Double initialContentWidth = getContentWidth(table);
 
-        Double remainingAvailableWidth = tableWidth - getSumMinWidthOfColumns(table);
+        // Implementation idea:
+        // Each column has to have at least the minimum width
+        // First, set the minimum width of all columns
+        // Then, there is available non-assigned space
+        // Distribute this space in a fair way to all resizable columns
 
-        for (TableColumnBase<?, ?> col : visibleLeafColumns) {
-            double share = expansionShare.get(col);
-            double newSize = col.getMinWidth() + share * remainingAvailableWidth;
-
-            // Just to make sure that we are staying under the total table width (due to rounding errors)
-            newSize -= 2;
-
-            newSize = Math.min(newSize, col.getMaxWidth());
-
-            col.setPrefWidth(newSize);
+        for (TableColumnBase<?, ?> col : resizableColumns) {
+            col.setPrefWidth(col.getMinWidth());
         }
-        return true;
+
+        Double tableWidth = table.getWidth();
+        Double newContentWidth;
+        do
+        {
+            Double remainingAvailableWidth = Math.max(0, tableWidth - getContentWidth(table));
+            LOGGER.debug("Distributing delta {}", remainingAvailableWidth);
+            for (TableColumnBase<?, ?> col : resizableColumns) {
+                double share = expansionShare.get(col);
+                // Precondition in our case: col has to have minimum width
+                determineNewWidth(col, share * remainingAvailableWidth)
+                        // in case we can do something, do it
+                        // otherwise, the next loop iteration will distribute it
+                        .ifPresent(col::setPrefWidth);
+            }
+            newContentWidth = getContentWidth(table);
+        } while (Math.abs(tableWidth - newContentWidth) > 5d);
+
+        return (Math.floor(initialContentWidth - newContentWidth) != 0d);
     }
 
     /**
