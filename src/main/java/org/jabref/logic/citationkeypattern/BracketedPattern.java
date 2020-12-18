@@ -76,7 +76,7 @@ public class BracketedPattern {
         /**
          * Matches "uni" at the start of a string or after a space, case insensitive
          */
-        private static final Pattern UNIVERSITIES = Pattern.compile("^uni.*", Pattern.CASE_INSENSITIVE);
+        private static final Pattern UNIVERSITIES = Pattern.compile("^uni(v|b|$).*", Pattern.CASE_INSENSITIVE);
         /**
          * Matches with "tech", case insensitive
          */
