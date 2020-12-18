@@ -296,9 +296,9 @@ class BracketedPatternTest {
     @Test
     void expandBracketsInstitutionAbbreviationFromProvidedAbbreviation() {
         BibEntry bibEntry = new BibEntry()
-                .withField(StandardField.AUTHOR, "{European Union Aviation Safety Agency ({EUASABracket})}");
+                .withField(StandardField.AUTHOR, "{European Union Aviation Safety Agency ({EUASABRACKET})}");
 
-        assertEquals("EUASABracket", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
+        assertEquals("EUASABRACKET", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
     }
 
     @Test
