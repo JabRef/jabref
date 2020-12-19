@@ -14,6 +14,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 
+import org.jabref.architecture.ApacheCommonsLang3Allowed;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
 import org.jabref.logic.l10n.Localization;
@@ -99,6 +100,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
      * @param fetchReferenceMetadataTask general task for fetching reference metadata
      * @return <code>false</code>if the the process has been completed successfully, <code>true</code> otherwise
      */
+    @ApacheCommonsLang3Allowed("random(): Nothing equivalent exists with this compactness")
     public boolean fetchFor(BibDatabaseContext database, ObservableList<BibEntry> entries, DialogService dialogService, ExtendedTask<List<BibEntry>> fetchReferenceMetadataTask) {
         fetchReferenceMetadataTask.updateMessage("Fetching data from Google Scholar...");
 
