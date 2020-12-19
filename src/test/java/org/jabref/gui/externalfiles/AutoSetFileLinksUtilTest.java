@@ -26,8 +26,11 @@ import static org.mockito.Mockito.when;
 public class AutoSetFileLinksUtilTest {
 
     private final FilePreferences fileDirPrefs = mock(FilePreferences.class);
-    private final AutoLinkPreferences autoLinkPrefs =
-            new AutoLinkPreferences(AutoLinkPreferences.CitationKeyDependency.START, "", ';');
+    private final AutoLinkPreferences autoLinkPrefs = new AutoLinkPreferences(
+            AutoLinkPreferences.CitationKeyDependency.START,
+            "",
+            false,
+            ';');
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
     private final ExternalFileTypes externalFileTypes = mock(ExternalFileTypes.class);
     private final BibEntry entry = new BibEntry(StandardEntryType.Article);
@@ -44,8 +47,8 @@ public class AutoSetFileLinksUtilTest {
     @Test
     public void testFindAssociatedNotLinkedFilesSuccess() throws Exception {
         // Due to mocking the externalFileType class, the file extension will not be found
-        when(databaseContext.getFileDirectoriesAsPaths(any())).thenReturn(Collections.singletonList(path.getParent()));
-        List<LinkedFile> expected = Collections.singletonList(new LinkedFile("", "CiteKey.pdf", ""));
+        when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(path.getParent()));
+        List<LinkedFile> expected = Collections.singletonList(new LinkedFile("", Path.of("CiteKey.pdf"), ""));
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, fileDirPrefs, autoLinkPrefs, externalFileTypes);
         List<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
         assertEquals(expected, actual);
@@ -53,7 +56,7 @@ public class AutoSetFileLinksUtilTest {
 
     @Test
     public void testFindAssociatedNotLinkedFilesForEmptySearchDir() throws Exception {
-        when(fileDirPrefs.isBibLocationAsPrimary()).thenReturn(false);
+        when(fileDirPrefs.shouldStoreFilesRelativeToBib()).thenReturn(false);
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, fileDirPrefs, autoLinkPrefs, externalFileTypes);
         List<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
         assertEquals(Collections.emptyList(), actual);

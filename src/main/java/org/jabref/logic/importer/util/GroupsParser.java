@@ -84,7 +84,7 @@ public class GroupsParser {
     /**
      * Re-create a group instance from a textual representation.
      *
-     * @param s           The result from the group's toString() method.
+     * @param s The result from the group's toString() method.
      * @return New instance of the encoded group.
      * @throws ParseException If an error occurred and a group could not be created, e.g. due to a malformed regular expression.
      */
@@ -278,9 +278,11 @@ public class GroupsParser {
         boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
         // version 0 contained 4 additional booleans to specify search
         // fields; these are ignored now, all fields are always searched
-        return new SearchGroup(name,
+        SearchGroup searchGroup = new SearchGroup(name,
                 GroupHierarchyType.getByNumberOrDefault(context), expression, caseSensitive, regExp
         );
+        addGroupDetails(tok, searchGroup);
+        return searchGroup;
     }
 
     private static void addGroupDetails(QuotedStringTokenizer tokenizer, AbstractGroup group) {

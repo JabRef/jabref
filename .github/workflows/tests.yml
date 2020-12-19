@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.5.0
+        uses: styfle/cancel-workflow-action@0.6.0
         with:
           access_token: ${{ github.token }}
       - name: Checkout source
@@ -41,7 +41,12 @@ jobs:
         with:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-      - name: Run checkstyle
+      - name: Run check style reporter
+        uses: nikitasavinov/checkstyle-action@master
+        with:
+          reporter: github-pr-check
+          checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
+      - name: Run checkstyle gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
       - name: Run markdown-lint
         uses: avto-dev/markdown-lint@v1
@@ -86,7 +91,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:10.8
+        image: postgres:13-alpine
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -235,7 +240,7 @@ jobs:
         with:
           # full checkout needed for authors generation
           fetch-depth: 0
-      - name: "Check AUTHORS"
+      - name: "All authors of this PR listed in AUTHORS"
         id: authors_check
         shell: bash
         run: |
@@ -245,19 +250,17 @@ jobs:
           set +o pipefail
           added=$(git diff HEAD --no-ext-diff --unified=0 -a --no-prefix | egrep "^\+[^+]" | sed "s/^\+//")
           if [ -z "$added" ]; then
-            echo "::set-output name=newauthor::false"
             echo "No authors added"
             exit 0
           fi
-          message="The JabRef maintainers will add the following name to the [AUTHORS file](https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md#author-credits). In case you want to use a different one, please comment here and [adjust your name in your git configuration](https://docs.github.com/en/github/using-git/setting-your-username-in-git) for future commits.%0A%0A\`\`\`%0A${added//$'\n'/'%0A'}%0A\`\`\`%0A"
-          echo "::set-output name=message::$message"
-          echo "::set-output name=newauthor::true"
-          echo "New authors found"
-      - name: Comment PR
-        uses: unsplash/comment-on-pr@master
-        if: steps.authors_check.outputs.newauthor == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN_COMMENT_ON_PR }}
-        with:
-          msg: "${{ steps.authors_check.outputs.message }}"
-          check_for_duplicate_msg: true
+          echo "Authors found in this PR not listed in the AUTHORS file."
+          echo
+          echo "The JabRef maintainers will add the following name to the AUTHORS file"
+          echo
+          echo -e "$added"
+          echo
+          echo "In case you want to use a different one, please comment here and adjust your name in your git configuration for future commits"
+          echo
+          echo "Just adding yourself into the AUHTORS file does not help as it is overwritten by our script ./scripts/generate-authors."
+          echo "Read more on the AUTHORS file at found at https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md#author-credits"
+          exit 1

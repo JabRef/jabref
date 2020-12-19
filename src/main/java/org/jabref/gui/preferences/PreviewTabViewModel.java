@@ -23,10 +23,10 @@ import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.JabRefGUI;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -91,8 +91,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         initialPreviewPreferences = preferences.getPreviewPreferences();
 
         sourceTextProperty.addListener((observable, oldValue, newValue) -> {
-            if (getCurrentLayout() instanceof TextBasedPreviewLayout) {
-                ((TextBasedPreviewLayout) getCurrentLayout()).setText(sourceTextProperty.getValue().replace("\n", "__NEWLINE__"));
+            var currentLayout = getCurrentLayout();
+            if (currentLayout instanceof TextBasedPreviewLayout) {
+                ((TextBasedPreviewLayout) currentLayout).setText(sourceTextProperty.getValue().replace("\n", "__NEWLINE__"));
             }
         });
 
@@ -112,6 +113,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         return showAsExtraTab;
     }
 
+    @Override
     public void setValues() {
         showAsExtraTab.set(initialPreviewPreferences.showPreviewAsExtraTab());
         chosenListProperty().getValue().clear();
@@ -174,13 +176,14 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private PreviewLayout getCurrentLayout() {
         if (!chosenSelectionModelProperty.getValue().getSelectedItems().isEmpty()) {
             return chosenSelectionModelProperty.getValue().getSelectedItems().get(0);
+
         }
 
         if (!chosenListProperty.getValue().isEmpty()) {
             return chosenListProperty.getValue().get(0);
         }
 
-        PreviewLayout layout = findLayoutByName("Preview");
+        PreviewLayout layout = findLayoutByName(TextBasedPreviewLayout.NAME);
         if (layout == null) {
             layout = initialPreviewPreferences.getTextBasedPreviewLayout();
         }
@@ -196,7 +199,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
             chosenListProperty.add(previewPreferences.getTextBasedPreviewLayout());
         }
 
-        PreviewLayout previewStyle = findLayoutByName("Preview");
+        PreviewLayout previewStyle = findLayoutByName(TextBasedPreviewLayout.NAME);
         if (previewStyle == null) {
             previewStyle = previewPreferences.getTextBasedPreviewLayout();
         }
@@ -216,9 +219,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
         preferences.storePreviewPreferences(newPreviewPreferences);
 
-        for (BasePanel basePanel : JabRefGUI.getMainFrame().getBasePanelList()) {
+        for (LibraryTab libraryTab : JabRefGUI.getMainFrame().getLibraryTabs()) {
             // TODO: Find a better way to update preview
-            basePanel.closeBottomPane();
+            libraryTab.closeBottomPane();
             // basePanel.getPreviewPanel().updateLayout(preferences.getPreviewPreferences());
         }
     }
@@ -257,7 +260,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         chosenSelectionModelProperty.getValue().clearSelection();
         chosenListProperty.removeAll(selected);
         availableListProperty.addAll(selected);
-        availableListProperty.sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+        availableListProperty.sort((a, b) -> a.getDisplayName().compareToIgnoreCase(b.getDisplayName()));
     }
 
     public void selectedInChosenUp() {
@@ -413,7 +416,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
                 success = true;
 
                 if (targetList == availableListProperty) {
-                    targetList.getValue().sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+                    targetList.getValue().sort((a, b) -> a.getDisplayName().compareToIgnoreCase(b.getDisplayName()));
                 }
             }
         }

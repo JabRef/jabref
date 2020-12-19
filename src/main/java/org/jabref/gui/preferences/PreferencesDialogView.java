@@ -17,6 +17,7 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -35,6 +36,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     @FXML private ButtonType saveButton;
 
     @Inject private DialogService dialogService;
+    @Inject private PreferencesService preferencesService;
     @Inject private TaskExecutor taskExecutor;
 
     private final JabRefFrame frame;
@@ -61,7 +63,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @FXML
     private void initialize() {
-        viewModel = new PreferencesDialogViewModel(dialogService, frame);
+        viewModel = new PreferencesDialogViewModel(dialogService, preferencesService, frame);
 
         preferenceTabList.itemsProperty().setValue(viewModel.getPreferenceTabs());
 

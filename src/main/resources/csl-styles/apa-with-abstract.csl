@@ -387,7 +387,7 @@
       <if type="bill legal_case legislation treaty" match="any">
         <text macro="title-intext"/>
       </if>
-      <else-if type="interview personal_communication">
+      <else-if type="interview personal_communication" match="any">
         <choose>
           <!-- These variables indicate that the letter is retrievable by the reader. 
                 If not, then use the APA in-text-only personal communication format -->
@@ -543,7 +543,7 @@
             </choose>
             <group>
               <choose>
-                <if type="interview personal_communication">
+                <if type="interview personal_communication" match="any">
                   <choose>
                     <if variable="archive container-title DOI publisher URL" match="none">
                       <!-- These variables indicate that the communication is retrievable by the reader. 
@@ -611,7 +611,7 @@
       </else-if>
       <else>
         <choose>
-          <if type="article-journal article-magazine article-newspaper post-weblog review review-book">
+          <if type="article-journal article-magazine article-newspaper post-weblog review review-book" match="any">
             <text variable="title" font-style="italic"/>
           </if>
           <else-if type="paper-conference">
@@ -728,7 +728,7 @@
             </group>
           </group>
         </if>
-        <else-if type="post webpage">
+        <else-if type="post webpage" match="any">
           <!-- For post webpage, container-title is treated as publisher -->
           <group delimiter="; ">
             <text macro="secondary-contributors"/>
@@ -1508,7 +1508,7 @@
             </if>
           </choose>
         </if>
-        <else-if type="post webpage">
+        <else-if type="post webpage" match="any">
           <!-- For websites, treat container title like publisher -->
           <group delimiter="; ">
             <text variable="container-title" text-case="title"/>

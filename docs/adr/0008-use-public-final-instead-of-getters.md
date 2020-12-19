@@ -19,4 +19,4 @@ Chosen option: "Offer public static field", because getters used to be a convent
 
 ### Negative Consequences
 
-* new comers could get confused, because getters/setters are still teached
+* newcomers could get confused, because getters/setters are still taught

@@ -25,7 +25,7 @@ We are very happy that JabRef is part of [Software Engineering](https://en.wikip
 
 The package `org.jabref.cli` is responsible for handling the command line options.
 
-During development, one can configure IntelliJ to pass command line paramters:
+During development, one can configure IntelliJ to pass command line parameters:
 
 ![IntelliJ-run-configuration](.gitbook/assets/intellij-run-configuration-command-line%20%282%29.png)
 

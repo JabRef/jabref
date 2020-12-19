@@ -11,15 +11,18 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.StringJoiner;
 import java.util.StringTokenizer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.formatter.casechanger.Word;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
@@ -27,45 +30,65 @@ import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.strings.StringUtil;
+import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.logic.citationkeypattern.CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS;
-
 /**
- * The BracketedExpressionExpander provides methods to expand bracketed expressions,
- * such as [year]_[author]_[firstpage], using information from a provided BibEntry.
- * The above-mentioned expression would yield 2017_Kitsune_123 when expanded using the
- * BibTeX entry "@Article{ authors = {O. Kitsune}, year = {2017}, pages={123-6}}".
+ * The BracketedExpressionExpander provides methods to expand bracketed expressions, such as
+ * [year]_[author]_[firstpage], using information from a provided BibEntry. The above-mentioned expression would yield
+ * 2017_Kitsune_123 when expanded using the BibTeX entry "@Article{ authors = {O. Kitsune}, year = {2017},
+ * pages={123-6}}".
  */
 public class BracketedPattern {
     private static final Logger LOGGER = LoggerFactory.getLogger(BracketedPattern.class);
 
+    /**
+     * The maximum number of characters in the first author's last name.
+     */
     private static final int CHARS_OF_FIRST = 5;
+    /**
+     * The maximum number of name abbreviations that can be used. If there are more authors, {@code MAX_ALPHA_AUTHORS -
+     * 1} name abbreviations will be displayed, and a + sign will be appended at the end.
+     */
+    private static final int MAX_ALPHA_AUTHORS = 4;
 
-    /** Matches everything that is not an uppercase ASCII letter */
-    private static final Pattern NOT_CAPITAL_FIRST_CHARACTER = Pattern.compile("[^A-Z]");
-    /** Matches with "({[A-Z]}+)", which should be used to abbreviate the name of an institution */
+    /**
+     * Matches everything that is not an uppercase ASCII letter. The intended use is to remove all lowercase letters
+     */
+    private static final Pattern NOT_CAPITAL_CHARACTER = Pattern.compile("[^A-Z]");
+    /**
+     * Matches with "({[A-Z]}+)", which should be used to abbreviate the name of an institution
+     */
     private static final Pattern ABBREVIATIONS = Pattern.compile(".*\\(\\{[A-Z]+}\\).*");
-    /** Matches with "dep"/"dip", case insensitive */
+    /**
+     * Matches with "dep"/"dip", case insensitive
+     */
     private static final Pattern DEPARTMENTS = Pattern.compile("^d[ei]p.*", Pattern.CASE_INSENSITIVE);
+
     private enum Institution {
         SCHOOL,
         DEPARTMENT,
         UNIVERSITY,
         TECHNOLOGY;
 
-        /** Matches "uni" at the start of a string or after a space, case insensitive */
+        /**
+         * Matches "uni" at the start of a string or after a space, case insensitive
+         */
         private static final Pattern UNIVERSITIES = Pattern.compile("^uni.*", Pattern.CASE_INSENSITIVE);
-        /** Matches with "tech", case insensitive */
+        /**
+         * Matches with "tech", case insensitive
+         */
         private static final Pattern TECHNOLOGICAL_INSTITUTES = Pattern.compile("^tech.*", Pattern.CASE_INSENSITIVE);
-        /** Matches with "dep"/"dip"/"lab", case insensitive */
+        /**
+         * Matches with "dep"/"dip"/"lab", case insensitive
+         */
         private static final Pattern DEPARTMENTS_OR_LABS = Pattern.compile("^(d[ei]p|lab).*", Pattern.CASE_INSENSITIVE);
 
         /**
          * Find which types of institutions have words in common with the given name parts.
+         *
          * @param nameParts a list of words that constitute parts of an institution's name.
          * @return set containing all types that matches
          */
@@ -108,8 +131,7 @@ public class BracketedPattern {
     }
 
     public String expand(BibEntry bibentry) {
-        BibDatabase null_database = null;
-        return expand(bibentry, null_database);
+        return expand(bibentry, null);
     }
 
     /**
@@ -150,197 +172,227 @@ public class BracketedPattern {
     public static String expandBrackets(String pattern, Character keywordDelimiter, BibEntry entry, BibDatabase database) {
         Objects.requireNonNull(pattern);
         Objects.requireNonNull(entry);
-        StringBuilder sb = new StringBuilder();
-        StringTokenizer st = new StringTokenizer(pattern, "\\[]\"", true);
-
-        while (st.hasMoreTokens()) {
-            String token = st.nextToken();
-            if ("\"".equals(token)) {
-                sb.append(token);
-                while (st.hasMoreTokens()) {
-                    token = st.nextToken();
-                    sb.append(token);
-                    if ("\"".equals(token)) {
-                        break;
-                    }
-                }
-            } else {
-                if ("\\".equals(token)) {
-                    if (st.hasMoreTokens()) {
-                        sb.append(st.nextToken());
-                    }
-                    // FIXME: else -> raise exception or log? (S.G.)
-                } else {
-                    if ("[".equals(token)) {
-                        Boolean foundClosingBracket = false;
-                        // Fetch the next token after the '[':
-                        token = st.nextToken();
-                        if ("]".equals(token)) {
-                            LOGGER.warn("Found empty brackets \"[]\" in '" + pattern + "'");
-                            foundClosingBracket = true;
-                        }
-                        // make sure to read until the next ']'
-                        while (st.hasMoreTokens() && !foundClosingBracket) {
-                            String subtoken = st.nextToken();
-                            // I the beginning of a quote is found, include the content in the original token
-                            if ("\"".equals(subtoken)) {
-                                token = token + subtoken;
-                                while (st.hasMoreTokens()) {
-                                    subtoken = st.nextToken();
-                                    token = token + subtoken;
-                                    if ("\"".equals(subtoken)) {
-                                        break;
-                                    }
-                                }
-                            } else {
-                                if ("]".equals(subtoken)) {
-                                    foundClosingBracket = true;
-                                    break;
-                                } else {
-                                    token = token + subtoken;
-                                }
-                            }
-                        }
-                        if (!foundClosingBracket) {
-                            LOGGER.warn("Missing closing bracket ']' in '" + pattern + "'");
-                        }
-                        List<String> fieldParts = parseFieldMarker(token);
-                        // check whether there is a modifier on the end such as
-                        // ":lower":
-                        if (fieldParts.size() <= 1) {
-                            sb.append(getFieldValue(entry, token, keywordDelimiter, database));
-                        } else {
-                            // apply modifiers:
-                            String fieldValue = getFieldValue(entry, fieldParts.get(0), keywordDelimiter, database);
-                            sb.append(applyModifiers(fieldValue, fieldParts, 1));
-                        }
-                    } else {
-                        sb.append(token);
-                    }
-                }
-            }
-        }
-
-        return sb.toString();
+        return expandBrackets(pattern, expandBracketContent(keywordDelimiter, entry, database));
     }
 
     /**
-     * Evaluates the given pattern ("value") to the given bibentry and database
+     * Utility method creating a function taking the string representation of the content of a bracketed expression and
+     * expanding it.
+     *
+     * @param keywordDelimiter The keyword delimiter to use
+     * @param entry            The {@link BibEntry} to use for expansion
+     * @param database         The {@link BibDatabase} for field resolving. May be null.
+     * @return a function accepting a bracketed expression and returning the result of expanding it
+     */
+    private static Function<String, String> expandBracketContent(Character keywordDelimiter, BibEntry entry, BibDatabase database) {
+        return (String bracket) -> {
+            String expandedPattern;
+            List<String> fieldParts = parseFieldAndModifiers(bracket);
+            // check whether there is a modifier on the end such as
+            // ":lower":
+            expandedPattern = getFieldValue(entry, fieldParts.get(0), keywordDelimiter, database);
+            if (fieldParts.size() > 1) {
+                // apply modifiers:
+                expandedPattern = applyModifiers(expandedPattern, fieldParts, 1);
+            }
+            return expandedPattern;
+        };
+    }
+
+    /**
+     * Expands a pattern.
+     *
+     * @param pattern               The pattern to expand
+     * @param bracketContentHandler A function taking the string representation of the content of a bracketed pattern
+     *                              and expanding it
+     * @return The expanded pattern. Not null.
+     */
+    public static String expandBrackets(String pattern, Function<String, String> bracketContentHandler) {
+        Objects.requireNonNull(pattern);
+        StringBuilder expandedPattern = new StringBuilder();
+        StringTokenizer parsedPattern = new StringTokenizer(pattern, "\\[]\"", true);
+
+        while (parsedPattern.hasMoreTokens()) {
+            String token = parsedPattern.nextToken();
+            switch (token) {
+                case "\"" -> appendQuote(expandedPattern, parsedPattern);
+                case "[" -> {
+                    String fieldMarker = contentBetweenBrackets(parsedPattern, pattern);
+                    expandedPattern.append(bracketContentHandler.apply(fieldMarker));
+                }
+                case "\\" -> {
+                    if (parsedPattern.hasMoreTokens()) {
+                        expandedPattern.append(parsedPattern.nextToken());
+                    } else {
+                        LOGGER.warn("Found a \"\\\" that is not part of an escape sequence");
+                    }
+                }
+                default -> expandedPattern.append(token);
+            }
+        }
+
+        return expandedPattern.toString();
+    }
+
+    /**
+     * Returns the content enclosed between brackets, including enclosed quotes, and excluding the enclosing brackets.
+     * Intended to be used by {@link BracketedPattern#expandBrackets(String, Character, BibEntry, BibDatabase)} when a [
+     * is encountered, and has been consumed, by the {@code StringTokenizer}.
+     *
+     * @param pattern   pattern used by {@code expandBrackets}, used for logging
+     * @param tokenizer the tokenizer producing the tokens
+     * @return the content enclosed by brackets
+     */
+    private static String contentBetweenBrackets(StringTokenizer tokenizer, final String pattern) {
+        StringBuilder bracketContent = new StringBuilder();
+        boolean foundClosingBracket = false;
+        // make sure to read until the next ']'
+        while (tokenizer.hasMoreTokens() && !foundClosingBracket) {
+            String token = tokenizer.nextToken();
+            // If the beginning of a quote is found, append the content
+            switch (token) {
+                case "\"" -> appendQuote(bracketContent, tokenizer);
+                case "]" -> foundClosingBracket = true;
+                default -> bracketContent.append(token);
+            }
+        }
+
+        if (!foundClosingBracket) {
+            LOGGER.warn("Missing closing bracket ']' in '{}'", pattern);
+        } else if (bracketContent.length() == 0) {
+            LOGGER.warn("Found empty brackets \"[]\" in '{}'", pattern);
+        }
+        return bracketContent.toString();
+    }
+
+    /**
+     * Appends the content between, and including, two \" to the provided <code>StringBuilder</code>. Intended to be
+     * used by {@link BracketedPattern#expandBrackets(String, Character, BibEntry, BibDatabase)} when a \" is
+     * encountered by the StringTokenizer.
+     *
+     * @param stringBuilder the <code>StringBuilder</code> to which tokens will be appended
+     * @param tokenizer     the tokenizer producing the tokens
+     */
+    private static void appendQuote(StringBuilder stringBuilder, StringTokenizer tokenizer) {
+        stringBuilder.append("\"");  // We know that the previous token was \"
+        String token = "";
+        while (tokenizer.hasMoreTokens() && !"\"".equals(token)) {
+            token = tokenizer.nextToken();
+            stringBuilder.append(token);
+        }
+    }
+
+    /**
+     * Evaluates the given pattern to the given bibentry and database
      *
      * @param entry            The entry to get the field value from
-     * @param value            A pattern string (such as auth, pureauth, authorLast)
+     * @param pattern          A pattern string (such as auth, pureauth, authorLast)
      * @param keywordDelimiter The de
      * @param database         The database to use for field resolving. May be null.
      * @return String containing the evaluation result. Empty string if the pattern cannot be resolved.
      */
-    public static String getFieldValue(BibEntry entry, String value, Character keywordDelimiter, BibDatabase database) {
-
-        String val = value;
+    public static String getFieldValue(BibEntry entry, String pattern, Character keywordDelimiter, BibDatabase database) {
         try {
-            if (val.startsWith("auth") || val.startsWith("pureauth")) {
+            if (pattern.startsWith("auth") || pattern.startsWith("pureauth")) {
                 // result the author
-                String authString;
-                if (database != null) {
-                    authString = entry.getResolvedFieldOrAlias(StandardField.AUTHOR, database)
-                                      .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
-                } else {
-                    authString = entry.getResolvedFieldOrAlias(StandardField.AUTHOR, database).orElse("");
-                }
+                String unparsedAuthors = entry.getResolvedFieldOrAlias(StandardField.AUTHOR, database).orElse("");
 
-                if (val.startsWith("pure")) {
+                if (pattern.startsWith("pure")) {
                     // "pure" is used in the context of authors to resolve to authors only and not fallback to editors
                     // The other functionality of the pattern "ForeIni", ... is the same
                     // Thus, remove the "pure" prefix so the remaining code in this section functions correctly
                     //
-                    val = val.substring(4);
-                } else {
+                    pattern = pattern.substring(4);
+                } else if (unparsedAuthors.isEmpty()) {
                     // special feature: A pattern starting with "auth" falls back to the editor
-                    if (authString.isEmpty()) {
-                        if (database != null) {
-                            authString = entry.getResolvedFieldOrAlias(StandardField.EDITOR, database)
-                                              .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
-                        } else {
-                            authString = entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse("");
-                        }
-                    }
+                    unparsedAuthors = entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse("");
                 }
+
+                AuthorList authorList = createAuthorList(unparsedAuthors);
 
                 // Gather all author-related checks, so we don't
                 // have to check all the time.
-                if ("auth".equals(val)) {
-                    return firstAuthor(authString);
-                } else if ("authForeIni".equals(val)) {
-                    return firstAuthorForenameInitials(authString);
-                } else if ("authFirstFull".equals(val)) {
-                    return firstAuthorVonAndLast(authString);
-                } else if ("authors".equals(val)) {
-                    return allAuthors(authString);
-                } else if ("authorsAlpha".equals(val)) {
-                    return authorsAlpha(authString);
-                } else if ("authorLast".equals(val)) {
-                    // Last author's last name
-                    return lastAuthor(authString);
-                } else if ("authorLastForeIni".equals(val)) {
-                    return lastAuthorForenameInitials(authString);
-                } else if ("authorIni".equals(val)) {
-                    return oneAuthorPlusIni(authString);
-                } else if (val.matches("authIni[\\d]+")) {
-                    int num = Integer.parseInt(val.substring(7));
-                    return authIniN(authString, num);
-                } else if ("auth.auth.ea".equals(val)) {
-                    return authAuthEa(authString);
-                } else if ("auth.etal".equals(val)) {
-                    return authEtal(authString, ".", ".etal");
-                } else if ("authEtAl".equals(val)) {
-                    return authEtal(authString, "", "EtAl");
-                } else if ("authshort".equals(val)) {
-                    return authshort(authString);
-                } else if (val.matches("auth[\\d]+_[\\d]+")) {
-                    String[] nums = val.substring(4).split("_");
-                    return authNofMth(authString, Integer.parseInt(nums[0]),
+                switch (pattern) {
+                    case "auth":
+                        return firstAuthor(authorList);
+                    case "authForeIni":
+                        return firstAuthorForenameInitials(authorList);
+                    case "authFirstFull":
+                        return firstAuthorVonAndLast(authorList);
+                    case "authors":
+                        return allAuthors(authorList);
+                    case "authorsAlpha":
+                        return authorsAlpha(authorList);
+                    case "authorLast":
+                        return lastAuthor(authorList);
+                    case "authorLastForeIni":
+                        return lastAuthorForenameInitials(authorList);
+                    case "authorIni":
+                        return oneAuthorPlusInitials(authorList);
+                    case "auth.auth.ea":
+                        return authAuthEa(authorList);
+                    case "auth.etal":
+                        return authEtal(authorList, ".", ".etal");
+                    case "authEtAl":
+                        return authEtal(authorList, "", "EtAl");
+                    case "authshort":
+                        return authshort(authorList);
+                }
+
+                if (pattern.matches("authIni[\\d]+")) {
+                    int num = Integer.parseInt(pattern.substring(7));
+                    return authIniN(authorList, num);
+                } else if (pattern.matches("auth[\\d]+_[\\d]+")) {
+                    String[] nums = pattern.substring(4).split("_");
+                    return authNofMth(authorList, Integer.parseInt(nums[0]),
                             Integer.parseInt(nums[1]));
-                } else if (val.matches("auth\\d+")) {
+                } else if (pattern.matches("auth\\d+")) {
                     // authN. First N chars of the first author's last name.
-                    int num = Integer.parseInt(val.substring(4));
-                    return authN(authString, num);
-                } else if (val.matches("authors\\d+")) {
-                    return nAuthors(authString, Integer.parseInt(val.substring(7)));
+                    int num = Integer.parseInt(pattern.substring(4));
+                    return authN(authorList, num);
+                } else if (pattern.matches("authors\\d+")) {
+                    return nAuthors(authorList, Integer.parseInt(pattern.substring(7)));
                 } else {
                     // This "auth" business was a dead end, so just
                     // use it literally:
-                    return entry.getResolvedFieldOrAlias(FieldFactory.parseField(val), database).orElse("");
+                    return entry.getResolvedFieldOrAlias(FieldFactory.parseField(pattern), database).orElse("");
                 }
-            } else if (val.startsWith("ed")) {
+            } else if (pattern.startsWith("ed")) {
                 // Gather all markers starting with "ed" here, so we
                 // don't have to check all the time.
-                if ("edtr".equals(val)) {
-                    return firstAuthor(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
-                } else if ("edtrForeIni".equals(val)) {
-                    return firstAuthorForenameInitials(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
-                } else if ("editors".equals(val)) {
-                    return allAuthors(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
-                    // Last author's last name
-                } else if ("editorLast".equals(val)) {
-                    return lastAuthor(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
-                } else if ("editorLastForeIni".equals(val)) {
-                    return lastAuthorForenameInitials(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
-                } else if ("editorIni".equals(val)) {
-                    return oneAuthorPlusIni(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
-                } else if (val.matches("edtrIni[\\d]+")) {
-                    int num = Integer.parseInt(val.substring(7));
-                    return authIniN(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""), num);
-                } else if (val.matches("edtr[\\d]+_[\\d]+")) {
-                    String[] nums = val.substring(4).split("_");
-                    return authNofMth(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""),
+                String unparsedEditors = entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse("");
+                AuthorList editorList = createAuthorList(unparsedEditors);
+
+                switch (pattern) {
+                    case "edtr":
+                        return firstAuthor(editorList);
+                    case "edtrForeIni":
+                        return firstAuthorForenameInitials(editorList);
+                    case "editors":
+                        return allAuthors(editorList);
+                    case "editorLast":
+                        return lastAuthor(editorList); // Last author's last name
+                    case "editorLastForeIni":
+                        return lastAuthorForenameInitials(editorList);
+                    case "editorIni":
+                        return oneAuthorPlusInitials(editorList);
+                    case "edtr.edtr.ea":
+                        return authAuthEa(editorList);
+                    case "edtrshort":
+                        return authshort(editorList);
+                }
+
+                if (pattern.matches("edtrIni[\\d]+")) {
+                    int num = Integer.parseInt(pattern.substring(7));
+                    return authIniN(editorList, num);
+                } else if (pattern.matches("edtr[\\d]+_[\\d]+")) {
+                    String[] nums = pattern.substring(4).split("_");
+                    return authNofMth(editorList,
                             Integer.parseInt(nums[0]),
                             Integer.parseInt(nums[1]) - 1);
-                } else if ("edtr.edtr.ea".equals(val)) {
-                    return authAuthEa(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
-                } else if ("edtrshort".equals(val)) {
-                    return authshort(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
-                } else if (val.matches("edtr\\d+")) {
-                    String fa = firstAuthor(entry.getResolvedFieldOrAlias(StandardField.EDITOR, database).orElse(""));
-                    int num = Integer.parseInt(val.substring(4));
+                } else if (pattern.matches("edtr\\d+")) {
+                    String fa = firstAuthor(editorList);
+                    int num = Integer.parseInt(pattern.substring(4));
                     if (num > fa.length()) {
                         num = fa.length();
                     }
@@ -348,31 +400,31 @@ public class BracketedPattern {
                 } else {
                     // This "ed" business was a dead end, so just
                     // use it literally:
-                    return entry.getResolvedFieldOrAlias(FieldFactory.parseField(val), database).orElse("");
+                    return entry.getResolvedFieldOrAlias(FieldFactory.parseField(pattern), database).orElse("");
                 }
-            } else if ("firstpage".equals(val)) {
+            } else if ("firstpage".equals(pattern)) {
                 return firstPage(entry.getResolvedFieldOrAlias(StandardField.PAGES, database).orElse(""));
-            } else if ("pageprefix".equals(val)) {
+            } else if ("pageprefix".equals(pattern)) {
                 return pagePrefix(entry.getResolvedFieldOrAlias(StandardField.PAGES, database).orElse(""));
-            } else if ("lastpage".equals(val)) {
+            } else if ("lastpage".equals(pattern)) {
                 return lastPage(entry.getResolvedFieldOrAlias(StandardField.PAGES, database).orElse(""));
-            } else if ("title".equals(val)) {
+            } else if ("title".equals(pattern)) {
                 return camelizeSignificantWordsInTitle(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse(""));
-            } else if ("fulltitle".equals(val)) {
+            } else if ("fulltitle".equals(pattern)) {
                 return entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("");
-            } else if ("shorttitle".equals(val)) {
+            } else if ("shorttitle".equals(pattern)) {
                 return getTitleWords(3,
                         removeSmallWords(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")));
-            } else if ("shorttitleINI".equals(val)) {
+            } else if ("shorttitleINI".equals(pattern)) {
                 return keepLettersAndDigitsOnly(
                         applyModifiers(getTitleWordsWithSpaces(3, entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")),
                                 Collections.singletonList("abbr"), 0));
-            } else if ("veryshorttitle".equals(val)) {
+            } else if ("veryshorttitle".equals(pattern)) {
                 return getTitleWords(1,
                         removeSmallWords(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")));
-            } else if ("camel".equals(val)) {
+            } else if ("camel".equals(pattern)) {
                 return getCamelizedTitle(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse(""));
-            } else if ("shortyear".equals(val)) {
+            } else if ("shortyear".equals(pattern)) {
                 String yearString = entry.getResolvedFieldOrAlias(StandardField.YEAR, database).orElse("");
                 if (yearString.isEmpty()) {
                     return yearString;
@@ -384,11 +436,11 @@ public class BracketedPattern {
                 } else {
                     return yearString;
                 }
-            } else if ("entrytype".equals(val)) {
+            } else if ("entrytype".equals(pattern)) {
                 return entry.getResolvedFieldOrAlias(InternalField.TYPE_HEADER, database).orElse("");
-            } else if (val.matches("keyword\\d+")) {
+            } else if (pattern.matches("keyword\\d+")) {
                 // according to LabelPattern.php, it returns keyword number n
-                int num = Integer.parseInt(val.substring(7));
+                int num = Integer.parseInt(pattern.substring(7));
                 KeywordList separatedKeywords = entry.getResolvedKeywords(keywordDelimiter, database);
                 if (separatedKeywords.size() < num) {
                     // not enough keywords
@@ -397,11 +449,11 @@ public class BracketedPattern {
                     // num counts from 1 to n, but index in arrayList count from 0 to n-1
                     return separatedKeywords.get(num - 1).toString();
                 }
-            } else if (val.matches("keywords\\d*")) {
+            } else if (pattern.matches("keywords\\d*")) {
                 // return all keywords, not separated
                 int num;
-                if (val.length() > 8) {
-                    num = Integer.parseInt(val.substring(8));
+                if (pattern.length() > 8) {
+                    num = Integer.parseInt(pattern.substring(8));
                 } else {
                     num = Integer.MAX_VALUE;
                 }
@@ -420,12 +472,50 @@ public class BracketedPattern {
                 return sb.toString();
             } else {
                 // we haven't seen any special demands
-                return entry.getResolvedFieldOrAlias(FieldFactory.parseField(val), database).orElse("");
+                return entry.getResolvedFieldOrAlias(FieldFactory.parseField(pattern), database).orElse("");
             }
         } catch (NullPointerException ex) {
             LOGGER.debug("Problem making expanding bracketed expression", ex);
             return "";
         }
+    }
+
+    /**
+     * Parses the provided string to an {@link AuthorList}, which are then formatted by {@link LatexToUnicodeAdapter}.
+     * Afterward, any institutions are formatted into an institution key.
+     *
+     * @param unparsedAuthors a string representation of authors or editors
+     * @return an {@link AuthorList} consisting of authors and institution keys with resolved latex.
+     */
+    private static AuthorList createAuthorList(String unparsedAuthors) {
+        AuthorList authorList = new AuthorList();
+        for (Author author : AuthorList.parse(unparsedAuthors).getAuthors()) {
+            // If the author is an institution, use an institution key instead of the full name
+            String lastName = author.getLast()
+                                    .map(LatexToUnicodeAdapter::format)
+                                    .map(isInstitution(author) ?
+                                            BracketedPattern::generateInstitutionKey : Function.identity())
+                                    .orElse(null);
+            authorList.addAuthor(
+                    author.getFirst().map(LatexToUnicodeAdapter::format).orElse(null),
+                    author.getFirstAbbr().map(LatexToUnicodeAdapter::format).orElse(null),
+                    author.getVon().map(LatexToUnicodeAdapter::format).orElse(null),
+                    lastName,
+                    author.getJr().map(LatexToUnicodeAdapter::format).orElse(null)
+            );
+        }
+        return authorList;
+    }
+
+    /**
+     * Checks if an author is an institution by verifying that only the last name is present.
+     *
+     * @param author the checked author
+     * @return true if only the last name is present
+     */
+    private static boolean isInstitution(Author author) {
+        return author.getFirst().isEmpty() && author.getFirstAbbr().isEmpty() && author.getJr().isEmpty()
+                && author.getVon().isEmpty() && author.getLast().isPresent();
     }
 
     /**
@@ -462,7 +552,7 @@ public class BracketedPattern {
                         resultingLabel = modifier.substring(1, modifier.length() - 1);
                     }
                 } else {
-                    LOGGER.warn("Key generator warning: unknown modifier '" + modifier + "'.");
+                    LOGGER.warn("Key generator warning: unknown modifier '{}'.", modifier);
                 }
             }
         }
@@ -545,20 +635,14 @@ public class BracketedPattern {
     public static String camelizeSignificantWordsInTitle(String title) {
         StringJoiner stringJoiner = new StringJoiner(" ");
         String formattedTitle = formatTitle(title);
-        Boolean camelize;
 
         try (Scanner titleScanner = new Scanner(formattedTitle)) {
             while (titleScanner.hasNext()) {
                 String word = titleScanner.next();
-                camelize = true;
 
                 // Camelize the word if it is significant
-                for (String smallWord : Word.SMALLER_WORDS) {
-                    if (word.equalsIgnoreCase(smallWord)) {
-                        camelize = false;
-                        continue;
-                    }
-                }
+                boolean camelize = !Word.SMALLER_WORDS.contains(word.toLowerCase(Locale.ROOT));
+
                 // We want to capitalize significant words and the first word of the title
                 if (camelize || (stringJoiner.length() == 0)) {
                     word = word.substring(0, 1).toUpperCase(Locale.ROOT) + word.substring(1);
@@ -625,78 +709,64 @@ public class BracketedPattern {
     /**
      * Gets the last name of the first author/editor
      *
-     * @param authorField a <code>String</code>
-     * @return the surname of an author/editor or "" if no author was found This method is guaranteed to never return null.
-     * @throws NullPointerException if authorField == null
+     * @param authorList an {@link AuthorList}
+     * @return the surname of an author/editor or "" if no author was found This method is guaranteed to never return
+     * null.
      */
-    public static String firstAuthor(String authorField) {
-        AuthorList authorList = AuthorList.parse(authorField);
-        if (authorList.isEmpty()) {
-            return "";
-        }
-        return authorList.getAuthor(0).getLast().orElse("");
+    private static String firstAuthor(AuthorList authorList) {
+        return authorList.getAuthors().stream()
+                         .findFirst()
+                         .flatMap(Author::getLast).orElse("");
     }
 
     /**
      * Gets the first name initials of the first author/editor
      *
-     * @param authorField a <code>String</code>
-     * @return the first name initial of an author/editor or "" if no author was found This method is guaranteed to never return null.
-     * @throws NullPointerException if authorField == null
+     * @param authorList an {@link AuthorList}
+     * @return the first name initial of an author/editor or "" if no author was found This method is guaranteed to
+     * never return null.
      */
-    public static String firstAuthorForenameInitials(String authorField) {
-        AuthorList authorList = AuthorList.parse(authorField);
-        if (authorList.isEmpty()) {
-            return "";
-        }
-        return authorList.getAuthor(0).getFirstAbbr().map(s -> s.substring(0, 1)).orElse("");
+    private static String firstAuthorForenameInitials(AuthorList authorList) {
+        return authorList.getAuthors().stream()
+                         .findFirst()
+                         .flatMap(Author::getFirstAbbr)
+                         .map(s -> s.substring(0, 1))
+                         .orElse("");
     }
 
     /**
-     * Gets the von part and the last name of the first author/editor No spaces are returned
+     * Gets the von part and the last name of the first author/editor. No spaces are returned.
      *
-     * @param authorField a <code>String</code>
-     * @return the von part and surname of an author/editor or "" if no author was found. This method is guaranteed to never return null.
-     * @throws NullPointerException if authorField == null
+     * @param authorList an {@link AuthorList}
+     * @return the von part and surname of an author/editor or "" if no author was found. This method is guaranteed to
+     * never return null.
      */
-    public static String firstAuthorVonAndLast(String authorField) {
-        AuthorList authorList = AuthorList.parse(authorField);
-        if (authorList.isEmpty()) {
-            return "";
-        }
-
-        StringBuilder stringBuilder = new StringBuilder();
-        authorList.getAuthor(0).getVon().ifPresent(vonAuthor -> stringBuilder.append(vonAuthor.replaceAll(" ", "")));
-        authorList.getAuthor(0).getLast().ifPresent(stringBuilder::append);
-        return stringBuilder.toString();
+    private static String firstAuthorVonAndLast(AuthorList authorList) {
+        return authorList.isEmpty() ? "" :
+                authorList.getAuthor(0).getLastOnly().replaceAll(" ", "");
     }
 
     /**
      * Gets the last name of the last author/editor
      *
-     * @param authorField a <code>String</code>
+     * @param authorList an {@link AuthorList}
      * @return the surname of an author/editor
      */
-    public static String lastAuthor(String authorField) {
-        String[] tokens = AuthorList.fixAuthorForAlphabetization(authorField).split("\\s+\\band\\b\\s+");
-        if (tokens.length > 0) {
-            String[] lastAuthor = tokens[tokens.length - 1].split(",");
-            return lastAuthor[0];
-        } else {
-            // if author is empty
+    private static String lastAuthor(AuthorList authorList) {
+        if (authorList.isEmpty()) {
             return "";
         }
+        return authorList.getAuthors().get(authorList.getNumberOfAuthors() - 1).getLast().orElse("");
     }
 
     /**
      * Gets the forename initials of the last author/editor
      *
-     * @param authorField a <code>String</code>
-     * @return the forename initial of an author/editor or "" if no author was found This method is guaranteed to never return null.
-     * @throws NullPointerException if authorField == null
+     * @param authorList an {@link AuthorList}
+     * @return the forename initial of an author/editor or "" if no author was found This method is guaranteed to never
+     * return null.
      */
-    public static String lastAuthorForenameInitials(String authorField) {
-        AuthorList authorList = AuthorList.parse(authorField);
+    private static String lastAuthorForenameInitials(AuthorList authorList) {
         if (authorList.isEmpty()) {
             return "";
         }
@@ -707,243 +777,199 @@ public class BracketedPattern {
     /**
      * Gets the last name of all authors/editors
      *
-     * @param authorField a <code>String</code>
+     * @param authorList an {@link AuthorList}
      * @return the sur name of all authors/editors
      */
-    public static String allAuthors(String authorField) {
-        // Quick hack to use NAuthors to avoid code duplication
-        return nAuthors(authorField, Integer.MAX_VALUE);
+    private static String allAuthors(AuthorList authorList) {
+        return joinAuthorsOnLastName(authorList, authorList.getNumberOfAuthors(), "", "");
     }
 
     /**
      * Returns the authors according to the BibTeX-alpha-Style
      *
-     * @param authorField string containing the value of the author field
-     * @return the initials of all authornames
+     * @param authorList an {@link AuthorList}
+     * @return the initials of all authors' names
      */
-    public static String authorsAlpha(String authorField) {
-        String authors = "";
+    private static String authorsAlpha(AuthorList authorList) {
+        StringBuilder alphaStyle = new StringBuilder();
+        int maxAuthors = authorList.getNumberOfAuthors() <= MAX_ALPHA_AUTHORS ?
+                authorList.getNumberOfAuthors() : (MAX_ALPHA_AUTHORS - 1);
 
-        String fixedAuthors = AuthorList.fixAuthorLastNameOnlyCommas(authorField, false);
-
-        // drop the "and" before the last author
-        // -> makes processing easier
-        fixedAuthors = fixedAuthors.replace(" and ", ", ");
-
-        String[] tokens = fixedAuthors.split(",");
-        int max = tokens.length > 4 ? 3 : tokens.length;
-        if (max == 1) {
-            String[] firstAuthor = tokens[0].replaceAll("\\s+", " ").trim().split(" ");
+        if (authorList.getNumberOfAuthors() == 1) {
+            String[] firstAuthor = authorList.getAuthor(0).getLastOnly()
+                                             .replaceAll("\\s+", " ").trim().split(" ");
             // take first letter of any "prefixes" (e.g. van der Aalst -> vd)
             for (int j = 0; j < (firstAuthor.length - 1); j++) {
-                authors = authors.concat(firstAuthor[j].substring(0, 1));
+                alphaStyle.append(firstAuthor[j], 0, 1);
             }
             // append last part of last name completely
-            authors = authors.concat(firstAuthor[firstAuthor.length - 1].substring(0,
-                    Math.min(3, firstAuthor[firstAuthor.length - 1].length())));
+            alphaStyle.append(firstAuthor[firstAuthor.length - 1], 0,
+                    Math.min(3, firstAuthor[firstAuthor.length - 1].length()));
         } else {
-            for (int i = 0; i < max; i++) {
+            List<String> vonAndLastNames = authorList.getAuthors().stream()
+                                                     .limit(maxAuthors).map(Author::getLastOnly)
+                                                     .collect(Collectors.toList());
+            for (String vonAndLast : vonAndLastNames) {
                 // replace all whitespaces by " "
                 // split the lastname at " "
-                String[] curAuthor = tokens[i].replaceAll("\\s+", " ").trim().split(" ");
-                for (String aCurAuthor : curAuthor) {
+                String[] nameParts = vonAndLast.replaceAll("\\s+", " ").trim().split(" ");
+                for (String part : nameParts) {
                     // use first character of each part of lastname
-                    authors = authors.concat(aCurAuthor.substring(0, 1));
+                    alphaStyle.append(part, 0, 1);
                 }
             }
-            if (tokens.length > 4) {
-                authors = authors.concat("+");
+            if (authorList.getNumberOfAuthors() > MAX_ALPHA_AUTHORS) {
+                alphaStyle.append("+");
             }
         }
-        return authors;
+        return alphaStyle.toString();
+    }
+
+    /**
+     * Creates a string with all last names separated by a `delimiter`. If the number of authors are larger than
+     * `maxAuthors`, replace all excess authors with `suffix`.
+     *
+     * @param authorList the list of authors
+     * @param maxAuthors the maximum number of authors in the string
+     * @param delimiter  delimiter separating the last names of the authors
+     * @param suffix     to replace excess authors with
+     * @return a string consisting of authors' last names separated by a `delimiter` and with any authors excess of
+     * `maxAuthors` replaced with `suffix`
+     */
+    private static String joinAuthorsOnLastName(AuthorList authorList, int maxAuthors, String delimiter, String suffix) {
+        suffix = authorList.getNumberOfAuthors() > maxAuthors ? suffix : "";
+        return authorList.getAuthors().stream()
+                         .map(Author::getLast).flatMap(Optional::stream)
+                         .limit(maxAuthors).collect(Collectors.joining(delimiter, "", suffix));
     }
 
     /**
      * Gets the surnames of the first N authors and appends EtAl if there are more than N authors
      *
-     * @param authorField a <code>String</code>
-     * @param n           the number of desired authors
+     * @param authorList an {@link AuthorList}
+     * @param n          the number of desired authors
      * @return Gets the surnames of the first N authors and appends EtAl if there are more than N authors
      */
-    public static String nAuthors(String authorField, int n) {
-        String[] tokens = AuthorList.fixAuthorForAlphabetization(authorField).split("\\s+\\band\\b\\s+");
-        int i = 0;
-        StringBuilder authorSB = new StringBuilder();
-        while ((tokens.length > i) && (i < n)) {
-            String lastName = tokens[i].replaceAll(",\\s+.*", "");
-            authorSB.append(lastName);
-            i++;
-        }
-        if (tokens.length > n) {
-            authorSB.append("EtAl");
-        }
-        return authorSB.toString();
+    private static String nAuthors(AuthorList authorList, int n) {
+        return joinAuthorsOnLastName(authorList, n, "", "EtAl");
     }
 
     /**
-     * Gets the first part of the last name of the first
-     * author/editor, and appends the last name initial of the
-     * remaining authors/editors.
-     * Maximum 5 characters
-     * @param authorField a <code>String</code>
+     * Gets the first part of the last name of the first author/editor, and appends the last name initial of the
+     * remaining authors/editors. Maximum 5 characters
+     *
+     * @param authorList an <{@link AuthorList}
      * @return the surname of all authors/editors
      */
-    public static String oneAuthorPlusIni(String authorField) {
-        String fixedAuthorField = AuthorList.fixAuthorForAlphabetization(authorField);
-        String[] tokens = fixedAuthorField.split("\\s+\\band\\b\\s+");
-        if (tokens.length == 0) {
+    private static String oneAuthorPlusInitials(AuthorList authorList) {
+        if (authorList.isEmpty()) {
             return "";
         }
 
-        String firstAuthor = tokens[0].split(",")[0];
         StringBuilder authorSB = new StringBuilder();
-        authorSB.append(firstAuthor, 0, Math.min(CHARS_OF_FIRST, firstAuthor.length()));
-        int i = 1;
-        while (tokens.length > i) {
-            // convert lastname, firstname to firstname lastname
-            authorSB.append(tokens[i].charAt(0));
-            i++;
+        // authNofMth start index at 1 instead of 0
+        authorSB.append(authNofMth(authorList, CHARS_OF_FIRST, 1));
+        for (int i = 2; i <= authorList.getNumberOfAuthors(); i++) {
+            authorSB.append(authNofMth(authorList, 1, i));
         }
         return authorSB.toString();
     }
 
     /**
      * auth.auth.ea format:
-     * Isaac Newton and James Maxwell and Albert Einstein (1960)
-     * Isaac Newton and James Maxwell (1960)
-     *  give:
-     * Newton.Maxwell.ea
-     * Newton.Maxwell
+     * <ol>
+     * <li>Isaac Newton and James Maxwell and Albert Einstein (1960)</li>
+     * <li>Isaac Newton and James Maxwell (1960)</li>
+     * </ol>
+     * give:
+     * <ol>
+     * <li>Newton.Maxwell.ea</li>
+     * <li>Newton.Maxwell</li>
+     * </ol>
      */
-    public static String authAuthEa(String authorField) {
-        String fixedAuthorField = AuthorList.fixAuthorForAlphabetization(authorField);
-
-        String[] tokens = fixedAuthorField.split("\\s+\\band\\b\\s+");
-        if (tokens.length == 0) {
-            return "";
-        }
-
-        StringBuilder author = new StringBuilder();
-        // append first author
-        author.append((tokens[0].split(","))[0]);
-        if (tokens.length >= 2) {
-            // append second author
-            author.append('.').append((tokens[1].split(","))[0]);
-        }
-        if (tokens.length > 2) {
-            // append ".ea" if more than 2 authors
-            author.append(".ea");
-        }
-
-        return author.toString();
+    private static String authAuthEa(AuthorList authorList) {
+        return joinAuthorsOnLastName(authorList, 2, ".", ".ea");
     }
 
     /**
      * auth.etal, authEtAl, ... format:
-     * Isaac Newton and James Maxwell and Albert Einstein (1960)
-     * Isaac Newton and James Maxwell (1960)
-     *
-     *  auth.etal give (delim=".", append=".etal"):
-     * Newton.etal
-     * Newton.Maxwell
-     *
-     *  authEtAl give (delim="", append="EtAl"):
-     * NewtonEtAl
-     * NewtonMaxwell
-     *
+     * <ol>
+     * <li>Isaac Newton and James Maxwell and Albert Einstein (1960)</li>
+     * <li>Isaac Newton and James Maxwell (1960)</li>
+     * </ol>
+     * <p>
+     * auth.etal give (delim=".", append=".etal"):
+     * <ol>
+     * <li>Newton.etal</li>
+     * <li>Newton.Maxwell</li>
+     * </ol>
+     * </p>
+     * <p>
+     * authEtAl give (delim="", append="EtAl"):
+     * <ol>
+     * <li>NewtonEtAl</li>
+     * <li>NewtonMaxwell</li>
+     * </ol>
+     * </p>
      * Note that [authEtAl] equals [authors2]
      */
-    public static String authEtal(String authorField, String delim,
-                                  String append) {
-        String fixedAuthorField = AuthorList.fixAuthorForAlphabetization(authorField);
-
-        String[] tokens = fixedAuthorField.split("\\s*\\band\\b\\s*");
-        if (tokens.length == 0) {
-            return "";
+    private static String authEtal(AuthorList authorList, String delim, String append) {
+        if (authorList.getNumberOfAuthors() <= 2) {
+            return joinAuthorsOnLastName(authorList, 2, delim, "");
+        } else {
+            return authorList.getAuthor(0).getLast().orElse("") + append;
         }
-        StringBuilder author = new StringBuilder();
-        author.append((tokens[0].split(","))[0]);
-        if (tokens.length == 2) {
-            author.append(delim).append((tokens[1].split(","))[0]);
-        } else if (tokens.length > 2) {
-            author.append(append);
-        }
-
-        return author.toString();
     }
 
     /**
-     * The first N characters of the Mth author/editor.
-     * M starts counting from 1
+     * The first N characters of the Mth author's or editor's last name. M starts counting from 1
      */
-    public static String authNofMth(String authorField, int n, int m) {
+    private static String authNofMth(AuthorList authorList, int n, int m) {
         // have m counting from 0
         int mminusone = m - 1;
 
-        String fixedAuthorField = AuthorList.fixAuthorForAlphabetization(authorField);
-
-        String[] tokens = fixedAuthorField.split("\\s+\\band\\b\\s+");
-        if ((tokens.length <= mminusone) || (n < 0) || (mminusone < 0)) {
+        if ((authorList.getNumberOfAuthors() <= mminusone) || (n < 0) || (mminusone < 0)) {
             return "";
         }
-        String lastName = (tokens[mminusone].split(","))[0];
-        if (lastName.length() <= n) {
-            return lastName;
-        } else {
-            return lastName.substring(0, n);
-        }
+
+        String lastName = authorList.getAuthor(mminusone).getLast()
+                                    .map(CitationKeyGenerator::removeDefaultUnwantedCharacters).orElse("");
+        return lastName.length() > n ? lastName.substring(0, n) : lastName;
     }
 
     /**
      * First N chars of the first author's last name.
      */
-    public static String authN(String authString, int num) {
-        String fa = firstAuthor(authString);
-        fa = CitationKeyGenerator.removeUnwantedCharacters(fa, DEFAULT_UNWANTED_CHARACTERS);
-        if (num > fa.length()) {
-            num = fa.length();
-        }
-        return fa.substring(0, num);
+    private static String authN(AuthorList authorList, int num) {
+        return authNofMth(authorList, num, 1);
     }
 
     /**
      * authshort format:
-     * added by Kolja Brix, kbx@users.sourceforge.net
-     *
+     * <p>
      * given author names
-     *
-     *   Isaac Newton and James Maxwell and Albert Einstein and N. Bohr
-     *
-     *   Isaac Newton and James Maxwell and Albert Einstein
-     *
-     *   Isaac Newton and James Maxwell
-     *
-     *   Isaac Newton
-     *
+     * <ol><li>Isaac Newton and James Maxwell and Albert Einstein and N. Bohr</li>
+     * <li>Isaac Newton and James Maxwell and Albert Einstein</li>
+     * <li>Isaac Newton and James Maxwell</li>
+     * <li>Isaac Newton</li></ol>
      * yield
-     *
-     *   NME+
-     *
-     *   NME
-     *
-     *   NM
-     *
-     *   Newton
+     * <ol><li>NME+</li>
+     * <li>NME</li>
+     * <li>NM</li>
+     * <li>Newton</li></ol></p>
+     * {@author added by Kolja Brix, kbx@users.sourceforge.net}
      */
-    public static String authshort(String authorField) {
-        String fixedAuthorField = AuthorList.fixAuthorForAlphabetization(authorField);
+    private static String authshort(AuthorList authorList) {
         StringBuilder author = new StringBuilder();
-        String[] tokens = fixedAuthorField.split("\\band\\b");
-        int i = 0;
+        final int numberOfAuthors = authorList.getNumberOfAuthors();
 
-        if (tokens.length == 1) {
-            author.append(authNofMth(fixedAuthorField, fixedAuthorField.length(), 1));
-        } else if (tokens.length >= 2) {
-            while ((tokens.length > i) && (i < 3)) {
-                author.append(authNofMth(fixedAuthorField, 1, i + 1));
-                i++;
+        if (numberOfAuthors == 1) {
+            author.append(authorList.getAuthor(0).getLast().orElse(""));
+        } else if (numberOfAuthors >= 2) {
+            for (int i = 0; i < numberOfAuthors && i < 3; i++) {
+                author.append(authNofMth(authorList, 1, i + 1));
             }
-            if (tokens.length > 3) {
+            if (numberOfAuthors > 3) {
                 author.append('+');
             }
         }
@@ -953,75 +979,58 @@ public class BracketedPattern {
 
     /**
      * authIniN format:
-     *
-     * Each author gets (N div #authors) chars, the remaining (N mod #authors)
-     * chars are equally distributed to the authors first in the row.
-     *
-     * If (N < #authors), only the first N authors get mentioned.
-     *
+     * <p>
+     * Each author gets (N div #authors) chars, the remaining (N mod #authors) chars are equally distributed to the
+     * authors first in the row. If (N < #authors), only the first N authors get mentioned.
+     * <p>
      * For example if
+     * <ol>
+     * <li> I. Newton and J. Maxwell and A. Einstein and N. Bohr (..) </li>
+     * <li> I. Newton and J. Maxwell and A. Einstein </li>
+     * <li> I. Newton and J. Maxwell </li>
+     * <li> I. Newton </li>
+     * </ol>
+     * authIni4 gives:
+     * <ol>
+     * <li> NMEB </li>
+     * <li> NeME </li>
+     * <li> NeMa </li>
+     * <li> Newt </li>
+     * </ol>
      *
-     * a) I. Newton and J. Maxwell and A. Einstein and N. Bohr (..)
-     *
-     * b) I. Newton and J. Maxwell and A. Einstein
-     *
-     * c) I. Newton and J. Maxwell
-     *
-     * d) I. Newton
-     *
-     * authIni4 gives: a) NMEB, b) NeME, c) NeMa, d) Newt
-     *
-     * @param authorField
-     *            The authors to format.
-     *
-     * @param n
-     *            The maximum number of characters this string will be long. A
-     *            negative number or zero will lead to "" be returned.
-     *
-     * @throws NullPointerException
-     *             if authorField is null and n > 0
+     * @param authorList The authors to format.
+     * @param n          The maximum number of characters this string will be long. A negative number or zero will lead
+     *                   to "" be returned.
      */
-    public static String authIniN(String authorField, int n) {
-
-        if (n <= 0) {
+    private static String authIniN(AuthorList authorList, int n) {
+        if (n <= 0 || authorList.isEmpty()) {
             return "";
         }
 
-        String fixedAuthorField = AuthorList.fixAuthorForAlphabetization(authorField);
         StringBuilder author = new StringBuilder();
-        String[] tokens = fixedAuthorField.split("\\band\\b");
+        final int numberOfAuthors = authorList.getNumberOfAuthors();
 
-        if (tokens.length == 0) {
-            return author.toString();
-        }
-
-        int i = 0;
-        int charsAll = n / tokens.length;
-        while (tokens.length > i) {
-            if (i < (n % tokens.length)) {
-                author.append(authNofMth(fixedAuthorField, charsAll + 1, i + 1));
+        int charsAll = n / numberOfAuthors;
+        for (int i = 0; i < numberOfAuthors; i++) {
+            if (i < (n % numberOfAuthors)) {
+                author.append(authNofMth(authorList, charsAll + 1, i + 1));
             } else {
-                author.append(authNofMth(fixedAuthorField, charsAll, i + 1));
+                author.append(authNofMth(authorList, charsAll, i + 1));
             }
-            i++;
         }
 
         if (author.length() <= n) {
             return author.toString();
         } else {
-            return author.toString().substring(0, n);
+            return author.substring(0, n);
         }
     }
 
     /**
      * Split the pages field into separate numbers and return the lowest
      *
-     * @param pages
-     *            (may not be null) a pages string such as 42--111 or
-     *            7,41,73--97 or 43+
-     *
+     * @param pages (may not be null) a pages string such as 42--111 or 7,41,73--97 or 43+
      * @return the first page number or "" if no number is found in the string
-     *
      * @throws NullPointerException if pages is null
      */
     public static String firstPage(String pages) {
@@ -1046,14 +1055,9 @@ public class BracketedPattern {
     /**
      * Return the non-digit prefix of pages
      *
-     * @param pages
-     *            a pages string such as L42--111 or L7,41,73--97 or L43+
-     *
-     * @return the non-digit prefix of pages (like "L" of L7)
-     *         or "" if no non-digit prefix is found in the string
-     *
-     * @throws NullPointerException
-     *             if pages is null.
+     * @param pages a pages string such as L42--111 or L7,41,73--97 or L43+
+     * @return the non-digit prefix of pages (like "L" of L7) or "" if no non-digit prefix is found in the string
+     * @throws NullPointerException if pages is null.
      */
     public static String pagePrefix(String pages) {
         if (pages.matches("^\\D+.*$")) {
@@ -1087,13 +1091,13 @@ public class BracketedPattern {
     }
 
     /**
-     * Parse a field marker with modifiers, possibly containing a parenthesised modifier,
-     * as well as escaped colons and parentheses.
+     * Parse a field marker with modifiers, possibly containing a parenthesised modifier, as well as escaped colons and
+     * parentheses.
      *
      * @param arg The argument string.
      * @return An array of strings representing the parts of the marker
      */
-    protected static List<String> parseFieldMarker(String arg) {
+    protected static List<String> parseFieldAndModifiers(String arg) {
         List<String> parts = new ArrayList<>();
         StringBuilder current = new StringBuilder();
         boolean escaped = false;
@@ -1127,57 +1131,12 @@ public class BracketedPattern {
         return parts;
     }
 
-    private static String normalize(String content) {
-        List<String> tokens = new ArrayList<>();
-        int b = 0;
-        StringBuilder and = new StringBuilder();
-        StringBuilder token = new StringBuilder();
-        for (int p = 0; p < content.length(); p++) {
-            if (b == 0) {
-                String andString = and.toString(); // Avoid lots of calls
-                if (((andString.isEmpty()) && (content.charAt(p) == ' '))
-                        || (" ".equals(andString) && (content.charAt(p) == 'a'))
-                        || (" a".equals(andString) && (content.charAt(p) == 'n'))
-                        || (" an".equals(andString) && (content.charAt(p) == 'd'))) {
-                    and.append(content.charAt(p));
-                } else if (" and".equals(and.toString()) && (content.charAt(p) == ' ')) {
-                    and = new StringBuilder();
-                    tokens.add(token.toString().trim());
-                    token = new StringBuilder();
-                } else {
-                    if (content.charAt(p) == '{') {
-                        b++;
-                    }
-                    if (content.charAt(p) == '}') {
-                        b--;
-                    }
-                    token.append(and);
-                    and = new StringBuilder();
-                    token.append(content.charAt(p));
-                }
-            } else {
-                token.append(content.charAt(p));
-            }
-        }
-        tokens.add(token.toString());
-        StringBuilder normalized = new StringBuilder();
-
-        for (int i = 0; i < tokens.size(); i++) {
-            if (i > 0) {
-                normalized.append(" and ");
-            }
-
-            normalized.append(isInstitution(tokens.get(i)) ? generateInstitutionKey(tokens.get(i)) : removeDiacritics(
-                    tokens.get(i)));
-        }
-        return normalized.toString();
-    }
-
     /**
      * Will remove diacritics from the content.
-     *
-     * Replaces umlaut: \"x with xe, e.g. \"o -> oe, \"u -> ue, etc.
-     * Removes all other diacritics: \?x -> x, e.g. \'a -> a, etc.
+     * <ul>
+     * <li>Replaces umlaut: \"x with xe, e.g. \"o -> oe, \"u -> ue, etc.</li>
+     * <li>Removes all other diacritics: \?x -> x, e.g. \'a -> a, etc.</li>
+     * </ul>
      *
      * @param content The content.
      * @return The content without diacritics.
@@ -1201,9 +1160,10 @@ public class BracketedPattern {
 
     /**
      * Unifies umlauts.
-     *
-     * Replaces: $\ddot{\mathrm{X}}$ (an alternative umlaut) with: {\"X}
-     * Replaces: \?{X} and \?X with {\?X}, where ? is a diacritic symbol
+     * <ul>
+     * <li>Replaces: $\ddot{\mathrm{X}}$ (an alternative umlaut) with: {\"X}</li>
+     * <li>Replaces: \?{X} and \?X with {\?X}, where ? is a diacritic symbol</li>
+     * </ul>
      *
      * @param content The content.
      * @return The content with unified diacritics.
@@ -1217,72 +1177,43 @@ public class BracketedPattern {
     }
 
     /**
-     * Check if a value is institution.
-     *
-     * This is usable for distinguishing between persons and institutions in
-     * the author or editor fields.
-     *
-     * A person:
-     *   - "John Doe"
-     *   - "Doe, John"
-     *
-     * An institution:
-     *   - "{The Big Company or Institution Inc.}"
-     *   - "{The Big Company or Institution Inc. (BCI)}"
-     *
-     * @param author Author or editor.
-     * @return True if the author or editor is an institution.
-     */
-    private static boolean isInstitution(String author) {
-        return StringUtil.isInCurlyBrackets(author);
-    }
-
-    /**
      * <p>
-     * An author or editor may be and institution not a person. In that case the
-     * key generator builds very long keys, e.g.: for &ldquo;The Attributed
-     * Graph Grammar System (AGG)&rdquo; ->
-     * &ldquo;TheAttributedGraphGrammarSystemAGG&rdquo;.
+     * An author or editor may be and institution not a person. In that case the key generator builds very long keys,
+     * e.g.: for &ldquo;The Attributed Graph Grammar System (AGG)&rdquo; -> &ldquo;TheAttributedGraphGrammarSystemAGG&rdquo;.
      * </p>
      *
      * <p>
-     * An institution name should be inside <code>{}</code> brackets. If the
-     * institution name includes its abbreviation this abbreviation should
-     * be in <code>{}</code> brackets. For the previous example the value
-     * should look like:
+     * An institution name should be inside <code>{}</code> brackets. If the institution name includes its abbreviation
+     * this abbreviation should be in <code>{}</code> brackets. For the previous example the value should look like:
      * <code>{The Attributed Graph Grammar System ({AGG})}</code>.
      * </p>
      *
      * <p>
-     * If an institution includes its abbreviation, i.e. "...({XYZ})", first
-     * such abbreviation should be used as the key value part of such author.
+     * If an institution includes its abbreviation, i.e. "...({XYZ})", first such abbreviation should be used as the key
+     * value part of such author.
      * </p>
      *
      * <p>
-     * If an institution does not include its abbreviation the key should be
-     * generated from its name in the following way:
+     * If an institution does not include its abbreviation the key should be generated from its name in the following
+     * way:
      * </p>
      *
      * <p>
-     * The institution value can contain: institution name, part of the
-     * institution, address, etc. These values should be comma separated.
-     * Institution name and possible part of the institution
-     * should be in the beginning, while address and secondary information
-     * should be in the end.
+     * The institution value can contain: institution name, part of the institution, address, etc. These values should
+     * be comma separated. Institution name and possible part of the institution should be in the beginning, while
+     * address and secondary information should be in the end.
      * </p>
-     *
+     * <p>
      * Each part is examined separately:
      * <ol>
-     * <li>We remove all tokens of a part which are one of the defined ignore
-     * words (the, press), which end with a dot (ltd., co., ...) and which first
-     * character is lowercase (of, on, di, ...).</li>
+     * <li>We remove all tokens of a part which are one of the defined ignore words (the, press), which end with a dot
+     * (ltd., co., ...) and which first character is lowercase (of, on, di, ...).</li>
      * <li>We detect the types of the part: university, technology institute,
      * department, school, rest
      * <ul>
      * <li>University: <code>"Uni[NameOfTheUniversity]"</code></li>
-     * <li>Department: If the institution value contains more than one comma
-     * separated part, the department will be an abbreviation of all words
-     * beginning with the uppercase letter except of words:
+     * <li>Department: If the institution value contains more than one comma separated part, the department will be an
+     * abbreviation of all words beginning with the uppercase letter except of words:
      * <code>d[ei]p.*</code>, school, faculty</li>
      * <li>School: same as department</li>
      * <li>Rest: If there are less than 3 tokens in such part than the result
@@ -1363,11 +1294,11 @@ public class BracketedPattern {
                 for (String k : tokenParts) {
                     if (noOtherInstitutionKeyWord(k)) {
                         if (tokenTypes.contains(Institution.SCHOOL)) {
-                            schoolSB.append(NOT_CAPITAL_FIRST_CHARACTER.matcher(k).replaceAll(""));
+                            schoolSB.append(NOT_CAPITAL_CHARACTER.matcher(k).replaceAll(""));
                         }
                         // Explicitly defined department part is build the same way as school
                         if (tokenTypes.contains(Institution.DEPARTMENT)) {
-                            departmentSB.append(NOT_CAPITAL_FIRST_CHARACTER.matcher(k).replaceAll(""));
+                            departmentSB.append(NOT_CAPITAL_CHARACTER.matcher(k).replaceAll(""));
                         }
                     }
                 }
@@ -1400,7 +1331,9 @@ public class BracketedPattern {
     }
 
     /**
-     * Checks that this is not an institution keyword and has an uppercase first letter, except univ/tech key word.
+     * Helper method for {@link BracketedPattern#generateInstitutionKey(String)}. Checks that the word is not an
+     * institution keyword and has an uppercase first letter, except univ/tech key word.
+     *
      * @param word to check
      * @return
      */
@@ -1408,7 +1341,7 @@ public class BracketedPattern {
         return !DEPARTMENTS.matcher(word).matches()
                 && !StandardField.SCHOOL.getName().equalsIgnoreCase(word)
                 && !"faculty".equalsIgnoreCase(word)
-                && !NOT_CAPITAL_FIRST_CHARACTER.matcher(word).replaceAll("").isEmpty();
+                && !NOT_CAPITAL_CHARACTER.matcher(word).replaceAll("").isEmpty();
     }
 
     private static List<String> getValidInstitutionNameParts(String name) {

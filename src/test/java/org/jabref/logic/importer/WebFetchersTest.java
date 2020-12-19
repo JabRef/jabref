@@ -85,6 +85,9 @@ class WebFetchersTest {
             // Remove ACM, because it doesn't work currently
             expected.remove(ACMPortalFetcher.class);
 
+            expected.remove(PagedSearchBasedParserFetcher.class);
+            expected.remove(PagedSearchBasedFetcher.class);
+
             // Remove GROBID, because we don't want to show this to the user
             expected.remove(GrobidCitationFetcher.class);
 

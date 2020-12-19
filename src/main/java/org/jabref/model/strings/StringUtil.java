@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -587,7 +588,12 @@ public class StringUtil {
      * accept. The basis for replacement is the HashMap UnicodeToReadableCharMap.
      */
     public static String replaceSpecialCharacters(String s) {
-        String result = s;
+        /* Some unicode characters can be encoded in multiple ways. This uses <a href="https://docs.oracle.com/en/java/javase/14/docs/api/java.base/java/text/Normalizer.Form.html#NFC">NFC</a>
+         * to re-encode the characters so that these characters can be found.
+         * Most people expect Unicode to work similar to NFC, i.e., if characters looks the same, it is likely that they are equivalent.
+         * Hence, if someone debugs issues in the `UNICODE_CHAR_MAP`, they will expect NFC.
+         * A more holistic approach should likely start with the <a href="http://unicode.org/reports/tr15/#Compatibility_Equivalence_Figure">compatibility equivalence</a>. */
+        String result = Normalizer.normalize(s, Normalizer.Form.NFC);
         for (Map.Entry<String, String> chrAndReplace : UNICODE_CHAR_MAP.entrySet()) {
             result = result.replace(chrAndReplace.getKey(), chrAndReplace.getValue());
         }
@@ -718,6 +724,15 @@ public class StringUtil {
      */
     public static List<String> getStringAsWords(String text) {
         return Arrays.asList(text.split("[\\s,;]+"));
+    }
+
+    /**
+     * Returns a list of sentences contained in the given text.
+     */
+    public static List<String> getStringAsSentences(String text) {
+        // A sentence ends with a .?!;, but not in the case of "Mr.", "Ms.", "Mrs.", "Dr.", "st.", "jr.", "co.", "inc.", and "ltd."
+        Pattern splitTextPattern = Pattern.compile("(?<=[\\.!;\\?])(?<![Mm](([Rr]|[Rr][Ss])|[Ss])\\.|[Dd][Rr]\\.|[Ss][Tt]\\.|[Jj][Rr]\\.|[Cc][Oo]\\.|[Ii][Nn][Cc]\\.|[Ll][Tt][Dd]\\.)\\s+");
+        return Arrays.asList(splitTextPattern.split(text));
     }
 
     @ApacheCommonsLang3Allowed("No direct Guava equivalent existing - see https://stackoverflow.com/q/16560635/873282")

@@ -15,19 +15,19 @@ import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class CitationKeyEditor extends HBox implements FieldEditorFX {
 
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
     @FXML private final CitationKeyEditorViewModel viewModel;
     @FXML private Button generateCitationKeyButton;
     @FXML private EditorTextField textField;
 
     public CitationKeyEditor(Field field,
-                             JabRefPreferences preferences,
+                             PreferencesService preferences,
                              SuggestionProvider<?> suggestionProvider,
                              FieldCheckers fieldCheckers,
                              BibDatabaseContext databaseContext,

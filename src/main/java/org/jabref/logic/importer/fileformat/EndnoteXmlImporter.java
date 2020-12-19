@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +23,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
-import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.endnote.Abstract;
@@ -158,23 +159,14 @@ public class EndnoteXmlImporter extends Importer implements Parser {
     }
 
     private static EntryType convertRefNameToType(String refName) {
-        switch (refName.toLowerCase().trim()) {
-            case "artwork":
-                return StandardEntryType.Misc;
-            case "generic":
-                return StandardEntryType.Misc;
-            case "electronic article":
-                return IEEETranEntryType.Electronic;
-            case "book section":
-                return StandardEntryType.InBook;
-            case "book":
-                return StandardEntryType.Book;
-            case "journal article":
-                return StandardEntryType.Article;
-
-            default:
-                return StandardEntryType.Article;
-        }
+        return switch (refName.toLowerCase().trim()) {
+            case "artwork", "generic" -> StandardEntryType.Misc;
+            case "electronic article" -> IEEETranEntryType.Electronic;
+            case "book section" -> StandardEntryType.InBook;
+            case "book" -> StandardEntryType.Book;
+            // case "journal article" -> StandardEntryType.Article;
+            default -> StandardEntryType.Article;
+        };
     }
 
     private BibEntry parseRecord(Record record) {
@@ -247,7 +239,14 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         return OptionalUtil.toStream(urls)
                            .flatMap(pdfUrls -> pdfUrls.getUrl().stream())
                            .flatMap(url -> OptionalUtil.toStream(getUrlValue(url)))
-                           .map(url -> new LinkedFile("", url, "PDF"))
+                           .map(url -> {
+                               try {
+                                   return new LinkedFile(new URL(url), "PDF");
+                               } catch (MalformedURLException e) {
+                                   LOGGER.info("Unable to parse {}", url);
+                                   return null;
+                               }
+                           })
                            .collect(Collectors.toList());
     }
 
@@ -270,9 +269,12 @@ public class EndnoteXmlImporter extends Importer implements Parser {
     private List<String> getKeywords(Record record) {
         Keywords keywords = record.getKeywords();
         if (keywords != null) {
+
             return keywords.getKeyword()
                            .stream()
-                           .map(keyword -> keyword.getStyle().getContent())
+                           .map(keyword -> keyword.getStyle())
+                           .filter(Objects::nonNull)
+                           .map(style->style.getContent())
                            .collect(Collectors.toList());
         } else {
             return Collections.emptyList();
@@ -295,7 +297,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
     }
 
     @Override
-    public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
+    public List<BibEntry> parseEntries(InputStream inputStream) {
         try {
             return importDatabase(
                     new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))).getDatabase().getEntries();

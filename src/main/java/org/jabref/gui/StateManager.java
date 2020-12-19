@@ -44,6 +44,7 @@ import com.tobiasdiez.easybind.EasyBinding;
 public class StateManager {
 
     private final CustomLocalDragboard localDragboard = new CustomLocalDragboard();
+    private final ObservableList<BibDatabaseContext> openDatabases = FXCollections.observableArrayList();
     private final OptionalObjectProperty<BibDatabaseContext> activeDatabase = OptionalObjectProperty.empty();
     private final ReadOnlyListWrapper<GroupTreeNode> activeGroups = new ReadOnlyListWrapper<>(FXCollections.observableArrayList());
     private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
@@ -51,9 +52,7 @@ public class StateManager {
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final ObservableMap<BibDatabaseContext, IntegerProperty> searchResultMap = FXCollections.observableHashMap();
     private final OptionalObjectProperty<Node> focusOwner = OptionalObjectProperty.empty();
-    private final ObservableList<Task<?>> backgroundTasks = FXCollections.observableArrayList(task -> {
-        return new Observable[]{task.progressProperty(), task.runningProperty()};
-    });
+    private final ObservableList<Task<?>> backgroundTasks = FXCollections.observableArrayList(task -> new Observable[]{task.progressProperty(), task.runningProperty()});
     private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.anyMatch(Task::isRunning));
     private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
@@ -64,6 +63,10 @@ public class StateManager {
 
     public CustomLocalDragboard getLocalDragboard() {
         return localDragboard;
+    }
+
+    public ObservableList<BibDatabaseContext> getOpenDatabases() {
+        return openDatabases;
     }
 
     public OptionalObjectProperty<BibDatabaseContext> activeDatabaseProperty() {

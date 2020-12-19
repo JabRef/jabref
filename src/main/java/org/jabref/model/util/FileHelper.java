@@ -88,7 +88,7 @@ public class FileHelper {
      * @param fileName        The filename, may also be a relative path to the file
      */
     public static Optional<Path> find(final BibDatabaseContext databaseContext, String fileName, FilePreferences filePreferences) {
-        return find(fileName, databaseContext.getFileDirectoriesAsPaths(filePreferences));
+        return find(fileName, databaseContext.getFileDirectories(filePreferences));
     }
 
     /**

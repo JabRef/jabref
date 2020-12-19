@@ -57,7 +57,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         enableRelatedArticlesTabProperty.setValue(initialEntryEditorPreferences.shouldShowRecommendationsTab());
         acceptRecommendationsProperty.setValue(initialEntryEditorPreferences.isMrdlibAccepted());
         enableLatexCitationsTabProperty.setValue(initialEntryEditorPreferences.shouldShowLatexCitationsTab());
-        enableValidationProperty.setValue(initialEntryEditorPreferences.isEnableValidation());
+        enableValidationProperty.setValue(initialEntryEditorPreferences.shouldEnableValidation());
 
         enableAutoCompleteProperty.setValue(initialAutoCompletePreferences.shouldAutoComplete());
         autoCompleteFieldsProperty.setValue(initialAutoCompletePreferences.getCompleteNamesAsString());
@@ -71,15 +71,9 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         }
 
         switch (initialAutoCompletePreferences.getFirstNameMode()) {
-            case ONLY_ABBREVIATED:
-                firstNameModeAbbreviatedProperty.setValue(true);
-                break;
-            case ONLY_FULL:
-                firstNameModeFullProperty.setValue(true);
-                break;
-            default:
-                firstNameModeBothProperty.setValue(true);
-                break;
+            case ONLY_ABBREVIATED -> firstNameModeAbbreviatedProperty.setValue(true);
+            case ONLY_FULL -> firstNameModeFullProperty.setValue(true);
+            default -> firstNameModeBothProperty.setValue(true);
         }
     }
 
@@ -92,7 +86,8 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
                 acceptRecommendationsProperty.getValue(),
                 enableLatexCitationsTabProperty.getValue(),
                 defaultSourceProperty.getValue(),
-                enableValidationProperty.getValue()));
+                enableValidationProperty.getValue(),
+                initialEntryEditorPreferences.getDividerPosition()));
 
         // default
         AutoCompletePreferences.NameFormat nameFormat = AutoCompletePreferences.NameFormat.BOTH;

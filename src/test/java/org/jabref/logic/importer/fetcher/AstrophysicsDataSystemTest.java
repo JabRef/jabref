@@ -5,9 +5,11 @@ import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.paging.Page;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-public class AstrophysicsDataSystemTest {
+public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
 
     private AstrophysicsDataSystem fetcher;
     private BibEntry diezSliceTheoremEntry;
@@ -197,5 +199,24 @@ public class AstrophysicsDataSystemTest {
     public void testPerformSearchByLuceyPaulEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("2000JGR...10520297L");
         assertEquals(Optional.of(luceyPaulEntry), fetchedEntry);
+    }
+
+    @Test
+    public void performSearchByQueryPaged_searchLimitsSize() throws Exception {
+        Page<BibEntry> page = fetcher.performSearchPaged("author:\"A\"", 0);
+        assertEquals(fetcher.getPageSize(), page.getSize(), "fetcher return wrong page size");
+    }
+
+    @Test
+    public void performSearchByQueryPaged_invalidAuthorsReturnEmptyPages() throws Exception {
+        Page<BibEntry> page = fetcher.performSearchPaged("author:\"ThisAuthorWillNotBeFound\"", 0);
+        Page<BibEntry> page5 = fetcher.performSearchPaged("author:\"ThisAuthorWillNotBeFound\"", 5);
+        assertEquals(0, page.getSize(), "fetcher doesnt return empty pages for invalid author");
+        assertEquals(0, page5.getSize(), "fetcher doesnt return empty pages for invalid author");
+    }
+
+    @Override
+    public PagedSearchBasedFetcher getPagedFetcher() {
+        return fetcher;
     }
 }

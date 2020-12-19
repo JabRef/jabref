@@ -50,18 +50,10 @@ public class AbbreviateAction extends SimpleCommand {
         this.stateManager = stateManager;
 
         switch (action) {
-            case ABBREVIATE_DEFAULT:
-                abbreviationType = AbbreviationType.DEFAULT;
-                break;
-            case ABBREVIATE_MEDLINE:
-                abbreviationType = AbbreviationType.MEDLINE;
-                break;
-            case ABBREVIATE_SHORTEST_UNIQUE:
-                abbreviationType = AbbreviationType.SHORTEST_UNIQUE;
-                break;
-            default:
-                LOGGER.debug("Unknown action: " + action.name());
-                break;
+            case ABBREVIATE_DEFAULT -> abbreviationType = AbbreviationType.DEFAULT;
+            case ABBREVIATE_MEDLINE -> abbreviationType = AbbreviationType.MEDLINE;
+            case ABBREVIATE_SHORTEST_UNIQUE -> abbreviationType = AbbreviationType.SHORTEST_UNIQUE;
+            default -> LOGGER.debug("Unknown action: " + action.name());
         }
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
@@ -120,7 +112,7 @@ public class AbbreviateAction extends SimpleCommand {
         if (count > 0) {
             ce.end();
             frame.getUndoManager().addEdit(ce);
-            frame.getCurrentBasePanel().markBaseChanged();
+            frame.getCurrentLibraryTab().markBaseChanged();
             return Localization.lang("Abbreviated %0 journal names.", String.valueOf(count));
         }
         return Localization.lang("No journal names could be abbreviated.");
@@ -136,7 +128,7 @@ public class AbbreviateAction extends SimpleCommand {
         if (count > 0) {
             ce.end();
             frame.getUndoManager().addEdit(ce);
-            frame.getCurrentBasePanel().markBaseChanged();
+            frame.getCurrentLibraryTab().markBaseChanged();
             return Localization.lang("Unabbreviated %0 journal names.", String.valueOf(count));
         }
         return Localization.lang("No journal names could be unabbreviated.");

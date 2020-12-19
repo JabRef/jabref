@@ -12,7 +12,7 @@
     <category citation-format="author-date"/>
     <category field="medicine"/>
     <summary>Harvard house style for the Royal College of Nursing</summary>
-    <updated>2017-05-17T00:00:00+00:00</updated>
+    <updated>2019-11-15T03:49:16+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en-GB">
@@ -66,6 +66,9 @@
           <if type="article-newspaper article-magazine" match="any">
             <text variable="container-title" text-case="title" font-style="italic"/>
           </if>
+          <else-if type="webpage" match="any">
+            <text variable="container-title"/>
+          </else-if>
           <else>
             <text macro="title"/>
           </else>
@@ -101,9 +104,9 @@
           </if>
         </choose>
       </if>
-      <else>
+      <else-if type="book chapter" match="none">
         <text macro="DOI-URL"/>
-      </else>
+      </else-if>
     </choose>
   </macro>
   <macro name="DOI-URL">
@@ -150,7 +153,7 @@
           <text macro="edition"/>
         </group>
       </if>
-      <else-if type="article-journal" match="any">
+      <else-if type="article-journal article-newspaper post-weblog" match="any">
         <text variable="title"/>
       </else-if>
       <else>
@@ -178,7 +181,7 @@
           </group>
         </group>
       </else-if>
-      <else-if type="article-newspaper article-magazine" match="none">
+      <else-if type="article-journal article-newspaper article-magazine legislation" match="none">
         <group delimiter=" ">
           <group delimiter=", ">
             <choose>
@@ -190,10 +193,6 @@
               <text variable="publisher-place"/>
               <text variable="publisher"/>
             </group>
-          </group>
-          <group prefix="(" suffix=")" delimiter=", ">
-            <text variable="collection-title"/>
-            <text variable="collection-number"/>
           </group>
         </group>
       </else-if>

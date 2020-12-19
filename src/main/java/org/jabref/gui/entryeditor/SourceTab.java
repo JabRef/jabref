@@ -18,6 +18,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.InputMethodRequests;
+import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
@@ -26,6 +27,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.keyboard.CodeAreaKeyBindings;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
@@ -85,18 +87,10 @@ public class SourceTab extends EntryEditorTab {
         @Override
         public void execute() {
             switch (command) {
-                case COPY:
-                    codeArea.copy();
-                    break;
-                case CUT:
-                    codeArea.cut();
-                    break;
-                case PASTE:
-                    codeArea.paste();
-                    break;
-                case SELECT_ALL:
-                    codeArea.selectAll();
-                    break;
+                case COPY -> codeArea.copy();
+                case CUT -> codeArea.cut();
+                case PASTE -> codeArea.paste();
+                case SELECT_ALL -> codeArea.selectAll();
             }
             codeArea.requestFocus();
         }
@@ -122,7 +116,7 @@ public class SourceTab extends EntryEditorTab {
     }
 
     private void highlightSearchPattern() {
-        if (searchHighlightPattern.isPresent() && codeArea != null) {
+        if (searchHighlightPattern.isPresent() && (codeArea != null)) {
             codeArea.setStyleClass(0, codeArea.getLength(), "text");
             Matcher matcher = searchHighlightPattern.get().matcher(codeArea.getText());
             while (matcher.find()) {
@@ -133,7 +127,7 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 
-    private static String getSourceString(BibEntry entry, BibDatabaseMode type, FieldWriterPreferences fieldWriterPreferences) throws IOException {
+    private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldWriterPreferences fieldWriterPreferences) throws IOException {
         StringWriter stringWriter = new StringWriter(200);
         FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldWriterPreferences);
         new BibEntryWriter(fieldWriter, Globals.entryTypesManager).writeWithoutPrependedNewlines(entry, stringWriter, type);
@@ -178,6 +172,8 @@ public class SourceTab extends EntryEditorTab {
             }
         });
         codeArea.setId("bibtexSourceCodeArea");
+        codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository));
+        codeArea.addEventFilter(KeyEvent.KEY_PRESSED, this::listenForSaveKeybinding);
 
         ActionFactory factory = new ActionFactory(keyBindingRepository);
         ContextMenu contextMenu = new ContextMenu();
@@ -202,7 +198,7 @@ public class SourceTab extends EntryEditorTab {
         });
 
         codeArea.focusedProperty().addListener((obs, oldValue, onFocus) -> {
-            if (!onFocus && currentEntry != null) {
+            if (!onFocus && (currentEntry != null)) {
                 storeSource(currentEntry, codeArea.textProperty().getValue());
             }
         });
@@ -224,6 +220,7 @@ public class SourceTab extends EntryEditorTab {
             codeArea.clear();
             try {
                 codeArea.appendText(getSourceString(currentEntry, mode, fieldWriterPreferences));
+                codeArea.setEditable(true);
                 highlightSearchPattern();
             } catch (IOException ex) {
                 codeArea.setEditable(false);
@@ -236,7 +233,7 @@ public class SourceTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        if (previousEntry != null && codeArea != null) {
+        if ((previousEntry != null) && (codeArea != null)) {
             storeSource(previousEntry, codeArea.textProperty().getValue());
         }
         this.previousEntry = entry;
@@ -325,4 +322,16 @@ public class SourceTab extends EntryEditorTab {
             LOGGER.debug("Incorrect source", ex);
         }
     }
+
+    private void listenForSaveKeybinding(KeyEvent event) {
+        keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {
+
+            switch (binding) {
+                case SAVE_DATABASE, SAVE_ALL, SAVE_DATABASE_AS -> {
+                    storeSource(currentEntry, codeArea.textProperty().getValue());
+                }
+            }
+        });
+    }
+
 }

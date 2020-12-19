@@ -17,7 +17,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,12 +38,12 @@ public class ReferenceMetadataFetcherAction extends SimpleCommand {
     private static boolean USE_REFERENCE_METADATA_FETCHER_OPEN_CITATIONS = true;
 
     private final DialogService dialogService;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
     private final StateManager stateManager;
     private UndoManager undoManager;
     private TaskExecutor taskExecutor;
 
-    public ReferenceMetadataFetcherAction(JabRefFrame frame, JabRefPreferences preferences, StateManager stateManager, UndoManager undoManager, TaskExecutor taskExecutor) {
+    public ReferenceMetadataFetcherAction(JabRefFrame frame, PreferencesService preferences, StateManager stateManager, UndoManager undoManager, TaskExecutor taskExecutor) {
         this.dialogService = frame.getDialogService();
         this.preferences = preferences;
         this.stateManager = stateManager;
