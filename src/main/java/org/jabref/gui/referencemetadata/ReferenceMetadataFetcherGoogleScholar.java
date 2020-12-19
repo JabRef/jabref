@@ -154,6 +154,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
                 try {
                     HandlerInfoGoogleScholarCitationCounts.MESSAGE_SYNC_OBJECT.wait();
                 } catch (InterruptedException e) {
+                    LOGGER.warn("InterruptedException occurred: " + e.getMessage(), e);
                 }
 
                 // process response object
@@ -294,6 +295,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
                     try {
                         Thread.sleep(randomDwellTimeAfterRequest);
                     } catch (InterruptedException e) {
+                        LOGGER.warn("InterruptedException occurred: " + e.getMessage(), e);
                     }
                 }
             }
@@ -302,6 +304,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
                 try {
                     Thread.sleep(STATIC_DWELL_TIME_AFTER_REQUEST);
                 } catch (InterruptedException e) {
+                    LOGGER.warn("InterruptedException occurred: " + e.getMessage(), e);
                 }
             }
 
@@ -453,6 +456,7 @@ public class ReferenceMetadataFetcherGoogleScholar {
             try {
                 ATOMIC_INTEGER_DIALOG_RESULT.wait();
             } catch (InterruptedException e) {
+                LOGGER.warn("InterruptedException occurred: " + e.getMessage(), e);
             }
 
             return ATOMIC_INTEGER_DIALOG_RESULT.get();

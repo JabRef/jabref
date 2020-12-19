@@ -119,7 +119,8 @@ public class JabRefWebsocketServer extends WebSocketServer {
 
             try {
                 port = Integer.parseInt(args[0]);
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                LOGGER.warn("Exception occurred while parsing the port number: " + e.getMessage(), e);
             }
 
             jabRefWebsocketServer = JabRefWebsocketServer.getInstance(port);
