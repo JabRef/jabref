@@ -15,8 +15,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-
-<DialogPane xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<DialogPane xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.externalfiles.ExternalFilesDialogView">
    <content>
       <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0">
          <top>
@@ -28,7 +27,7 @@
                         <TextField fx:id="directoryPathField" HBox.hgrow="ALWAYS" />
                         <Button mnemonicParsing="false" onAction="#browseFileDirectory" text="%Browse">
                            <tooltip>
-                              <Tooltip text="Opens the file browser." />
+                              <Tooltip text="%Opens the file browser." />
                            </tooltip>
                         </Button>
                      </children>
@@ -39,9 +38,9 @@
                         <ComboBox fx:id="fileTypeSelection" prefHeight="27.0" prefWidth="144.0" />
                      </children>
                   </HBox>
-                  <Button mnemonicParsing="false" text="Scan files">
+                  <Button mnemonicParsing="false" onAction="#scanFiles" text="%Scan files">
                      <tooltip>
-                        <Tooltip text="%Searches the selected directory for unlinked files.&quot;Searches the selected directory for unlinked files.&quot;" />
+                        <Tooltip text="%Searches the selected directory for unlinked files" />
                      </tooltip>
                   </Button>
                </children>
@@ -52,7 +51,7 @@
                <children>
                   <ScrollPane fitToWidth="true" prefHeight="200.0" prefWidth="200.0">
                      <content>
-                        <TreeView prefHeight="200.0" prefWidth="583.0" />
+                        <TreeView fx:id="tree" prefHeight="200.0" prefWidth="583.0" />
                      </content>
                   </ScrollPane>
                   <VBox prefHeight="200.0" prefWidth="100.0" />
@@ -62,10 +61,10 @@
          <bottom>
             <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
               <buttons>
-                <Button mnemonicParsing="false" text="%Expand all" />
-                  <Button mnemonicParsing="false" text="%Select all" />
-                  <Button mnemonicParsing="false" text="Collapse all" />
-                  <Button mnemonicParsing="false" text="Button" />
+                  <Button mnemonicParsing="false" onAction="#selectAll" text="%Select all" />
+                  <Button mnemonicParsing="false" onAction="#unselectAll" text="%Unselect all" />
+                  <Button mnemonicParsing="false" onAction="#collapseAll" text="%Collapse all" />
+                <Button mnemonicParsing="false" onAction="#expandAll" text="%Expand all" />
               </buttons>
             </ButtonBar>
          </bottom>
