@@ -312,7 +312,7 @@ class BracketedPatternTest {
     @Test
     void expandBracketsLastNameForAuthorStartingWithOnlyLastNameStartingWithLowerCase() {
         BibEntry bibEntry = new BibEntry()
-                .withField(StandardField.AUTHOR, "eBay");
+                .withField(StandardField.AUTHOR, "{eBay}");
 
         assertEquals("eBay", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
     }
