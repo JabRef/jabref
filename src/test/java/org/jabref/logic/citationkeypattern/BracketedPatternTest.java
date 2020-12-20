@@ -320,7 +320,7 @@ class BracketedPatternTest {
     @Test
     void expandBracketsUniversityAbbreviationWithLatex() {
         BibEntry bibEntry = new BibEntry()
-                .withField(StandardField.AUTHOR, "{{\"O}rebro universitet}");
+                .withField(StandardField.AUTHOR, "{{\\\"O}rebro universitet}");
 
         assertEquals("UniÖrebro", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
     }
