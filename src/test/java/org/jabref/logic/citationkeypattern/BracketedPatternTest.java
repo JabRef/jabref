@@ -316,4 +316,12 @@ class BracketedPatternTest {
 
         assertEquals("eBay", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
     }
+
+    @Test
+    void expandBracketsUniversityAbbreviationWithLatex() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.AUTHOR, "{{\"O}rebro universitet}");
+
+        assertEquals("UniÖrebro", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
+    }
 }
