@@ -84,6 +84,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Removed
 
 - We removed the menu entry "Manage external file types" because it's already in 'Preferences' dialog [#6991](https://github.com/JabRef/jabref/issues/6991)
+- We removed the integrity check "Abbreviation detected" for the field journal/journaltitle in the entry editor [#3925](https://github.com/JabRef/jabref/issues/3925)
 
 ## [5.1] – 2020-08-30
 
