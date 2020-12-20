@@ -74,7 +74,7 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Boolean> {
     private TreeView<FileNodeWrapper> tree;
     private ComboBox<FileChooser.ExtensionFilter> comboBoxFileTypeSelection;
     private VBox panelSearchProgress;
-    private BackgroundTask findUnlinkedFilesTask;
+    private BackgroundTask<CheckBoxTreeItem<FileNodeWrapper>> findUnlinkedFilesTask;
 
     public FindUnlinkedFilesDialog(BibDatabaseContext database, DialogService dialogService, PreferencesService preferencesService, UndoManager undoManager) {
         super();
@@ -259,7 +259,7 @@ public class FindUnlinkedFilesDialog extends BaseDialog<Boolean> {
      * Expands or collapses the specified tree according to the <code>expand</code>-parameter.
      */
     private void expandTree(TreeItem<?> item, boolean expand) {
-        if (item != null && !item.isLeaf()) {
+        if ((item != null) && !item.isLeaf()) {
             item.setExpanded(expand);
             for (TreeItem<?> child : item.getChildren()) {
                 expandTree(child, expand);

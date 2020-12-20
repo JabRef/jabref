@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+
+<DialogPane xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <content>
+      <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0">
+         <top>
+            <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Label text="%Select a directory where the search shall start" />
+                  <HBox prefHeight="35.0" prefWidth="600.0" spacing="10.0">
+                     <children>
+                        <TextField fx:id="directoryPathField" HBox.hgrow="ALWAYS" />
+                        <Button mnemonicParsing="false" onAction="#browseFileDirectory" text="%Browse">
+                           <tooltip>
+                              <Tooltip text="Opens the file browser." />
+                           </tooltip>
+                        </Button>
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="47.0" prefWidth="600.0" spacing="15.0">
+                     <children>
+                        <Label prefHeight="17.0" prefWidth="105.0" text="%Select file type:" />
+                        <ComboBox fx:id="fileTypeSelection" prefHeight="27.0" prefWidth="144.0" />
+                     </children>
+                  </HBox>
+                  <Button mnemonicParsing="false" text="Scan files">
+                     <tooltip>
+                        <Tooltip text="%Searches the selected directory for unlinked files.&quot;Searches the selected directory for unlinked files.&quot;" />
+                     </tooltip>
+                  </Button>
+               </children>
+            </VBox>
+         </top>
+         <center>
+            <StackPane prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <children>
+                  <ScrollPane fitToWidth="true" prefHeight="200.0" prefWidth="200.0">
+                     <content>
+                        <TreeView prefHeight="200.0" prefWidth="583.0" />
+                     </content>
+                  </ScrollPane>
+                  <VBox prefHeight="200.0" prefWidth="100.0" />
+               </children>
+            </StackPane>
+         </center>
+         <bottom>
+            <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+              <buttons>
+                <Button mnemonicParsing="false" text="%Expand all" />
+                  <Button mnemonicParsing="false" text="%Select all" />
+                  <Button mnemonicParsing="false" text="Collapse all" />
+                  <Button mnemonicParsing="false" text="Button" />
+              </buttons>
+            </ButtonBar>
+         </bottom>
+      </BorderPane>
+   </content>
+   <buttonTypes>
+      <ButtonType fx:constant="CANCEL" />
+      <ButtonType fx:constant="APPLY" />
+   </buttonTypes>
+</DialogPane>
