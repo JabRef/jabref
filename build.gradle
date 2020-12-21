@@ -267,10 +267,7 @@ processResources {
                 "azureInstrumentationKey": System.getenv('AzureInstrumentationKey'),
                 "springerNatureAPIKey": System.getenv('SpringerNatureAPIKey'),
                 "astrophysicsDataSystemAPIKey": System.getenv('AstrophysicsDataSystemAPIKey'),
-                "ieeeAPIKey": System.getenv('IEEEAPIKey'),
-                "minRequiredJavaVersion": minRequiredJavaVersion,
-                "allowJava9": allowJava9
-
+                "ieeeAPIKey": System.getenv('IEEEAPIKey')
         )
         filteringCharset = 'UTF-8'
     }
