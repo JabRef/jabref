@@ -263,7 +263,7 @@ clean {
 processResources {
     filteringCharset = 'UTF-8'
 
-    filesMatching("build.properties") {
+    filesMatching("./build.properties") {
         expand(version: project.findProperty('projVersionInfo') ?: '100.0.0',
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
                 "authors": new File('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
@@ -279,7 +279,7 @@ processResources {
         filteringCharset = 'UTF-8'
     }
 
-    filesMatching("resource/**/meta.xml") {
+    filesMatching(["resources/resource/ods/meta.xml", "resources/resource/openoffice/meta.xml"]) {
         expand version: project.version
     }
 }
