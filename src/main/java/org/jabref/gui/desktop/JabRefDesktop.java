@@ -212,7 +212,7 @@ public class JabRefDesktop {
         try {
             openBrowser(url);
         } catch (IOException exception) {
-            Globals.clipboardManager.setContent(url);
+            Globals.getClipboardManager().setContent(url);
             LOGGER.error("Could not open browser", exception);
             String couldNotOpenBrowser = Localization.lang("Could not open browser.");
             String openManually = Localization.lang("Please open %0 manually.", url);
