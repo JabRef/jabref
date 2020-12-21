@@ -104,7 +104,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     public PreviewViewer(BibDatabaseContext database, DialogService dialogService, StateManager stateManager) {
         this.database = Objects.requireNonNull(database);
         this.dialogService = dialogService;
-        this.clipBoardManager = Globals.clipboardManager;
+        this.clipBoardManager = Globals.getClipboardManager();
 
         setFitToHeight(true);
         setFitToWidth(true);

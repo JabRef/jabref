@@ -123,7 +123,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
         sj.add(Localization.lang("Content") + ": " + getCurrentAnnotation().getContent());
         sj.add(Localization.lang("Marking") + ": " + getCurrentAnnotation().markingProperty().get());
 
-        Globals.clipboardManager.setContent(sj.toString());
+        Globals.getClipboardManager().setContent(sj.toString());
     }
 
     private FileAnnotationViewModel getCurrentAnnotation() {
