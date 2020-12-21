@@ -73,7 +73,11 @@ public class Globals {
     public static ExporterFactory exportFactory;
     public static CountingUndoManager undoManager = new CountingUndoManager();
     public static BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
-    public static ClipBoardManager clipboardManager = new ClipBoardManager(prefs);
+
+    /**
+     *  Can be injected using @Inject ClipboardManager clipboardManager
+     */
+    public static ClipBoardManager clipboardManager = new ClipBoardManager();
 
     // Key binding preferences
     private static KeyBindingRepository keyBindingRepository;

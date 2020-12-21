@@ -33,8 +33,6 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.util.OptionalUtil;
-import org.jabref.preferences.PreferencesService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,18 +46,15 @@ public class ClipBoardManager {
     private static Clipboard clipboard;
     private static java.awt.datatransfer.Clipboard primary;
     private static ImportFormatReader importFormatReader;
-    private final PreferencesService preferencesService;
 
-    public ClipBoardManager(PreferencesService preferencesService) {
-        this(Clipboard.getSystemClipboard(), Toolkit.getDefaultToolkit().getSystemSelection(), Globals.IMPORT_FORMAT_READER, preferencesService);
+    public ClipBoardManager() {
+        this(Clipboard.getSystemClipboard(), Toolkit.getDefaultToolkit().getSystemSelection(), Globals.IMPORT_FORMAT_READER);
     }
 
-    public ClipBoardManager(Clipboard clipboard, java.awt.datatransfer.Clipboard primary, ImportFormatReader importFormatReader, PreferencesService preferencesService) {
+    public ClipBoardManager(Clipboard clipboard, java.awt.datatransfer.Clipboard primary, ImportFormatReader importFormatReader) {
         ClipBoardManager.clipboard = clipboard;
         ClipBoardManager.primary = primary;
         ClipBoardManager.importFormatReader = importFormatReader;
-
-        this.preferencesService = preferencesService;
     }
 
     /**
@@ -158,7 +153,7 @@ public class ClipBoardManager {
 
     public void setContent(List<BibEntry> entries) throws IOException {
         final ClipboardContent content = new ClipboardContent();
-        BibEntryWriter writer = new BibEntryWriter(new FieldWriter(preferencesService.getFieldWriterPreferences()), Globals.entryTypesManager);
+        BibEntryWriter writer = new BibEntryWriter(new FieldWriter(Globals.prefs.getFieldWriterPreferences()), Globals.entryTypesManager);
         String serializedEntries = writer.serializeAll(entries, BibDatabaseMode.BIBTEX);
         content.put(DragAndDropDataFormats.ENTRIES, serializedEntries);
         content.putString(serializedEntries);
@@ -176,7 +171,7 @@ public class ClipBoardManager {
     }
 
     private List<BibEntry> handleBibTeXData(String entries) {
-        BibtexParser parser = new BibtexParser(preferencesService.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+        BibtexParser parser = new BibtexParser(Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
         try {
             return parser.parseEntries(new ByteArrayInputStream(entries.getBytes(StandardCharsets.UTF_8)));
         } catch (ParseException ex) {
@@ -210,7 +205,7 @@ public class ClipBoardManager {
     private List<BibEntry> fetchByDOI(DOI doi) {
         LOGGER.info("Found DOI in clipboard");
         try {
-            Optional<BibEntry> entry = new DoiFetcher(preferencesService.getImportFormatPreferences()).performSearchById(doi.getDOI());
+            Optional<BibEntry> entry = new DoiFetcher(Globals.prefs.getImportFormatPreferences()).performSearchById(doi.getDOI());
             return OptionalUtil.toList(entry);
         } catch (FetcherException ex) {
             LOGGER.error("Error while fetching", ex);
