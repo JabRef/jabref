@@ -27,9 +27,6 @@ public class FieldCheckers {
     private static Multimap<Field, ValueChecker> getAllMap(BibDatabaseContext databaseContext, FilePreferences filePreferences, JournalAbbreviationRepository abbreviationRepository, boolean allowIntegerEdition) {
         ArrayListMultimap<Field, ValueChecker> fieldCheckers = ArrayListMultimap.create(50, 10);
 
-        for (Field field : FieldFactory.getJournalNameFields()) {
-            fieldCheckers.put(field, new AbbreviationChecker(abbreviationRepository));
-        }
         for (Field field : FieldFactory.getBookNameFields()) {
             fieldCheckers.put(field, new AbbreviationChecker(abbreviationRepository));
         }
