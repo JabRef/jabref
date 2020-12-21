@@ -31,6 +31,7 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
+import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1113,51 +1114,6 @@ public class BracketedPattern {
     }
 
     /**
-     * Will remove diacritics from the content.
-     * <ul>
-     * <li>Replaces umlaut: \"x with xe, e.g. \"o -> oe, \"u -> ue, etc.</li>
-     * <li>Removes all other diacritics: \?x -> x, e.g. \'a -> a, etc.</li>
-     * </ul>
-     *
-     * @param content The content.
-     * @return The content without diacritics.
-     */
-    private static String removeDiacritics(String content) {
-        if (content.isEmpty()) {
-            return content;
-        }
-
-        String result = content;
-        // Replace umlaut with '?e'
-        result = result.replaceAll("\\{\\\\\"([a-zA-Z])\\}", "$1e");
-        result = result.replaceAll("\\\\\"\\{([a-zA-Z])\\}", "$1e");
-        result = result.replaceAll("\\\\\"([a-zA-Z])", "$1e");
-        // Remove diacritics
-        result = result.replaceAll("\\{\\\\.([a-zA-Z])\\}", "$1");
-        result = result.replaceAll("\\\\.\\{([a-zA-Z])\\}", "$1");
-        result = result.replaceAll("\\\\.([a-zA-Z])", "$1");
-        return result;
-    }
-
-    /**
-     * Unifies umlauts.
-     * <ul>
-     * <li>Replaces: $\ddot{\mathrm{X}}$ (an alternative umlaut) with: {\"X}</li>
-     * <li>Replaces: \?{X} and \?X with {\?X}, where ? is a diacritic symbol</li>
-     * </ul>
-     *
-     * @param content The content.
-     * @return The content with unified diacritics.
-     */
-    private static String unifyDiacritics(String content) {
-        return content.replaceAll(
-                "\\$\\\\ddot\\{\\\\mathrm\\{([^\\}])\\}\\}\\$",
-                "{\\\"$1}").replaceAll(
-                "(\\\\[^\\-a-zA-Z])\\{?([a-zA-Z])\\}?",
-                "{$1$2}");
-    }
-
-    /**
      * <p>
      * An author or editor may be and institution not a person. In that case the key generator builds very long keys,
      * e.g.: for &ldquo;The Attributed Graph Grammar System (AGG)&rdquo; -> &ldquo;TheAttributedGraphGrammarSystemAGG&rdquo;.
@@ -1240,6 +1196,8 @@ public class BracketedPattern {
         } catch (IllegalArgumentException e) {
             LOGGER.warn(content + " could not be converted to unicode. This can result in an incorrect or missing institute citation key");
         }
+        // Special characters can't be allowed past this point because the citation key generator might replace them with multiple mixed-case characters
+        result = StringUtil.replaceSpecialCharacters(result);
 
         String[] institutionNameTokens = result.split(",");
 
