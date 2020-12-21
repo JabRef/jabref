@@ -1249,6 +1249,10 @@ public class BracketedPattern {
             EnumSet<Institution> tokenTypes = Institution.findTypes(tokenParts);
 
             if (tokenTypes.contains(Institution.UNIVERSITY)) {
+                if (tokenParts.size() == 1) {
+                    LOGGER.warn("Attempting to generate an institution key from " + institutionNameTokens[index] +
+                            " but only one name part were found. Are the brackets balanced?");
+                }
                 StringBuilder universitySB = new StringBuilder();
                 // University part looks like: Uni[NameOfTheUniversity]
                 universitySB.append("Uni");
