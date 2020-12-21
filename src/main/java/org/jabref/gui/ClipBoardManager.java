@@ -33,6 +33,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.util.OptionalUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
