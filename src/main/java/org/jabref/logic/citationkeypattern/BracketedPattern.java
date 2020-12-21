@@ -660,52 +660,31 @@ public class BracketedPattern {
     }
 
     public static String removeSmallWords(String title) {
-        StringJoiner stringJoiner = new StringJoiner(" ");
         String formattedTitle = formatTitle(title);
 
         try (Scanner titleScanner = new Scanner(formattedTitle)) {
-            mainl:
-            while (titleScanner.hasNext()) {
-                String word = titleScanner.next();
-
-                for (String smallWord : Word.SMALLER_WORDS) {
-                    if (word.equalsIgnoreCase(smallWord)) {
-                        continue mainl;
-                    }
-                }
-
-                stringJoiner.add(word);
-            }
+            return titleScanner.tokens()
+                               .filter(Predicate.not(
+                                       Word::isSmallerWord))
+                               .collect(Collectors.joining(" "));
         }
-
-        return stringJoiner.toString();
     }
 
     private static String getTitleWordsWithSpaces(int number, String title) {
-        StringJoiner stringJoiner = new StringJoiner(" ");
         String formattedTitle = formatTitle(title);
-        int words = 0;
 
         try (Scanner titleScanner = new Scanner(formattedTitle)) {
-            while (titleScanner.hasNext() && (words < number)) {
-                String word = titleScanner.next();
-
-                stringJoiner.add(word);
-                words++;
-            }
+            return titleScanner.tokens()
+                               .limit(number)
+                               .collect(Collectors.joining(" "));
         }
-
-        return stringJoiner.toString();
     }
 
     private static String keepLettersAndDigitsOnly(String in) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < in.length(); i++) {
-            if (Character.isLetterOrDigit(in.charAt(i))) {
-                stringBuilder.append(in.charAt(i));
-            }
-        }
-        return stringBuilder.toString();
+        return in.codePoints()
+                 .filter(Character::isLetterOrDigit)
+                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                 .toString();
     }
 
     /**
