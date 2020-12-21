@@ -61,11 +61,12 @@ public class BracketedPattern {
     /**
      * Matches with "({[A-Z]}+)", which should be used to abbreviate the name of an institution
      */
-    private static final Pattern ABBREVIATIONS = Pattern.compile("(?<=\\(\\{)[A-Z]+(?=}\\))");
+    private static final Pattern INLINE_ABBREVIATION = Pattern.compile("(?<=\\(\\{)[A-Z]+(?=}\\))");
     /**
      * Matches with "dep"/"dip", case insensitive
      */
     private static final Pattern DEPARTMENTS = Pattern.compile("^d[ei]p.*", Pattern.CASE_INSENSITIVE);
+    private static final Pattern WHITESPACE = Pattern.compile("\\p{javaWhitespace}");
 
     private enum Institution {
         SCHOOL,
@@ -492,9 +493,9 @@ public class BracketedPattern {
         for (Author author : AuthorList.parse(unparsedAuthors).getAuthors()) {
             // If the author is an institution, use an institution key instead of the full name
             String lastName = author.getLast()
-                                    .map(LatexToUnicodeAdapter::format)
-                                    .map(isInstitution(author) ?
-                                            BracketedPattern::generateInstitutionKey : Function.identity())
+                                    .map(lastPart -> isInstitution(author) ?
+                                            generateInstitutionKey(lastPart) :
+                                            LatexToUnicodeAdapter.format(lastPart))
                                     .orElse(null);
             authorList.addAuthor(
                     author.getFirst().map(LatexToUnicodeAdapter::format).orElse(null),
@@ -515,7 +516,8 @@ public class BracketedPattern {
      */
     private static boolean isInstitution(Author author) {
         return author.getFirst().isEmpty() && author.getFirstAbbr().isEmpty() && author.getJr().isEmpty()
-                && author.getVon().isEmpty() && author.getLast().isPresent();
+                && author.getVon().isEmpty() && author.getLast().isPresent()
+                && WHITESPACE.matcher(author.getLast().get()).find();
     }
 
     /**
@@ -1248,15 +1250,13 @@ public class BracketedPattern {
             return "";
         }
 
-        String result = content;
-        result = unifyDiacritics(result);
-        result = result.replaceAll("^\\{", "").replaceAll("}$", "");
-        Matcher matcher = ABBREVIATIONS.matcher(result);
+        Matcher matcher = INLINE_ABBREVIATION.matcher(content);
         if (matcher.find()) {
-            return matcher.group();
+            return LatexToUnicodeAdapter.format(matcher.group());
         }
 
-        result = removeDiacritics(result);
+        String result = LatexToUnicodeAdapter.format(content);
+
         String[] institutionNameTokens = result.split(",");
 
         // Key parts
