@@ -1234,7 +1234,12 @@ public class BracketedPattern {
             return LatexToUnicodeAdapter.format(matcher.group());
         }
 
-        String result = LatexToUnicodeAdapter.format(content);
+        String result = content;
+        try {
+            result = LatexToUnicodeAdapter.format(content);
+        } catch (IllegalArgumentException e) {
+            LOGGER.warn(content + " could not be converted to unicode. This can result in an incorrect or missing institute citation key");
+        }
 
         String[] institutionNameTokens = result.split(",");
 
@@ -1249,10 +1254,6 @@ public class BracketedPattern {
             EnumSet<Institution> tokenTypes = Institution.findTypes(tokenParts);
 
             if (tokenTypes.contains(Institution.UNIVERSITY)) {
-                if (tokenParts.size() == 1) {
-                    LOGGER.warn("Attempting to generate an institution key from " + institutionNameTokens[index] +
-                            " but only one name part were found. Are the brackets balanced?");
-                }
                 StringBuilder universitySB = new StringBuilder();
                 // University part looks like: Uni[NameOfTheUniversity]
                 universitySB.append("Uni");
