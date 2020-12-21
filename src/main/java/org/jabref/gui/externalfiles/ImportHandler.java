@@ -12,10 +12,13 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.importer.ImportFilesResultItemViewModel;
 import org.jabref.gui.undo.UndoableInsertEntries;
+import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.externalfiles.ExternalFilesContentImporter;
 import org.jabref.logic.importer.ImportCleanup;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
@@ -62,40 +65,64 @@ public class ImportHandler {
         return linker;
     }
 
-    public void importAsNewEntries(List<Path> files) {
-        CompoundEdit ce = new CompoundEdit();
-        for (Path file : files) {
-            List<BibEntry> entriesToAdd;
-            if (FileUtil.getFileExtension(file).filter("pdf"::equals).isPresent()) {
-                List<BibEntry> pdfResult = contentImporter.importPDFContent(file);
-                List<BibEntry> xmpEntriesInFile = contentImporter.importXMPContent(file);
+    public BackgroundTask<ImportFilesResultItemViewModel> importFilesInBackground(List<Path> files)
+    {
+        return new BackgroundTask<>() {
 
-                // First try xmp import, if empty try pdf import, otherwise create empty entry
-                if (!xmpEntriesInFile.isEmpty()) {
-                    if (!pdfResult.isEmpty()) {
-                        // FIXME: Show merge dialog?
-                        entriesToAdd = xmpEntriesInFile;
-                    } else {
-                        entriesToAdd = xmpEntriesInFile;
+            @Override
+            protected ImportFilesResultItemViewModel call() throws Exception {
+
+                CompoundEdit ce = new CompoundEdit();
+                for (int i=0; i< files.size(); i++) {
+
+                    if (isCanceled()) {
+                        break;
                     }
-                } else {
-                    if (!pdfResult.isEmpty()) {
-                        entriesToAdd = pdfResult;
+
+                    updateMessage(Localization.lang("Processing file %0 of %1", i, files.size()));
+
+                    var file = files.get(0);
+                    List<BibEntry> entriesToAdd;
+                    if (FileUtil.getFileExtension(file).filter("pdf"::equals).isPresent()) {
+                        List<BibEntry> pdfResult = contentImporter.importPDFContent(file);
+                        List<BibEntry> xmpEntriesInFile = contentImporter.importXMPContent(file);
+
+                        // First try xmp import, if empty try pdf import, otherwise create empty entry
+                        if (!xmpEntriesInFile.isEmpty()) {
+                            if (!pdfResult.isEmpty()) {
+                                // FIXME: Show merge dialog?
+                                entriesToAdd = xmpEntriesInFile;
+                            } else {
+                                entriesToAdd = xmpEntriesInFile;
+                            }
+                        } else {
+                            if (!pdfResult.isEmpty()) {
+                                entriesToAdd = pdfResult;
+                            } else {
+                                entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
+                            }
+                        }
+                    } else if (FileUtil.isBibFile(file)) {
+                        entriesToAdd = contentImporter.importFromBibFile(file, fileUpdateMonitor);
                     } else {
                         entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
                     }
-                }
-            } else if (FileUtil.isBibFile(file)) {
-                entriesToAdd = contentImporter.importFromBibFile(file, fileUpdateMonitor);
-            } else {
-                entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
-            }
+                    updateProgress(i, files.size());
+                    importEntries(entriesToAdd);
 
-            importEntries(entriesToAdd);
-            ce.addEdit(new UndoableInsertEntries(database.getDatabase(), entriesToAdd));
-        }
-        ce.end();
-        undoManager.addEdit(ce);
+                    ce.addEdit(new UndoableInsertEntries(database.getDatabase(), entriesToAdd));
+                }
+                ce.end();
+                undoManager.addEdit(ce);
+
+                return null;
+            }
+        };
+    }
+
+
+    public void importAsNewEntries(List<Path> files) {
+        // Will be replaced
     }
 
     private BibEntry createEmptyEntryWithLink(Path file) {

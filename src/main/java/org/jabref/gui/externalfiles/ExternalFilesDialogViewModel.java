@@ -84,7 +84,14 @@ public class ExternalFilesDialogViewModel {
     }
 
     public void startImport() {
-        this.importHandler.importAsNewEntries(null);
+
+        CheckBoxTreeItem<FileNodeWrapper> root = (CheckBoxTreeItem<FileNodeWrapper>) treeRoot.getValue();
+        final List<Path> fileList = getFileListFromNode(root);
+
+        if (fileList.isEmpty()) {
+            return;
+        }
+        this.importHandler.importAsNewEntries(fileList);
 
     }
 

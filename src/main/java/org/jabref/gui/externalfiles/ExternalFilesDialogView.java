@@ -50,7 +50,6 @@ public class ExternalFilesDialogView extends BaseDialog<Boolean> {
 
     private ExternalFilesDialogViewModel viewModel;
 
-
     public ExternalFilesDialogView() {
         this.setTitle(Localization.lang("Search for unlinked local files"));
 
