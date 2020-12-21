@@ -44,7 +44,7 @@ public class DefaultInjector implements PresenterFactory {
         } else if (clazz == ProtectedTermsLoader.class) {
             return Globals.protectedTermsLoader;
         } else if (clazz == ClipBoardManager.class) {
-            return Globals.clipboardManager;
+            return Globals.getClipboardManager();
         } else if (clazz == UndoManager.class) {
             return Globals.undoManager;
         } else if (clazz == BibEntryTypesManager.class) {
