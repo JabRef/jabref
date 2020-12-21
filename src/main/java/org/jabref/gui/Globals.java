@@ -73,7 +73,8 @@ public class Globals {
     public static ExporterFactory exportFactory;
     public static CountingUndoManager undoManager = new CountingUndoManager();
     public static BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
-    public static ClipBoardManager clipboardManager = new ClipBoardManager();
+
+    private static ClipBoardManager clipBoardManager = null;
 
     // Key binding preferences
     private static KeyBindingRepository keyBindingRepository;
@@ -92,12 +93,19 @@ public class Globals {
         return keyBindingRepository;
     }
 
+    public static synchronized ClipBoardManager getClipboardManager() {
+        if (clipBoardManager == null) {
+            clipBoardManager = new ClipBoardManager(prefs);
+        }
+        return clipBoardManager;
+    }
+
     // Background tasks
     public static void startBackgroundTasks() {
         Globals.fileUpdateMonitor = new DefaultFileUpdateMonitor();
         JabRefExecutorService.INSTANCE.executeInterruptableTask(Globals.fileUpdateMonitor, "FileUpdateMonitor");
 
-        if (Globals.prefs.shouldCollectTelemetry() && !GraphicsEnvironment.isHeadless()) {
+        if (Globals.prefs.getTelemetryPreferences().shouldCollectTelemetry() && !GraphicsEnvironment.isHeadless()) {
             startTelemetryClient();
         }
     }
@@ -112,7 +120,7 @@ public class Globals {
     private static void startTelemetryClient() {
         TelemetryConfiguration telemetryConfiguration = TelemetryConfiguration.getActive();
         telemetryConfiguration.setInstrumentationKey(Globals.BUILD_INFO.azureInstrumentationKey);
-        telemetryConfiguration.setTrackingIsDisabled(!Globals.prefs.shouldCollectTelemetry());
+        telemetryConfiguration.setTrackingIsDisabled(!Globals.prefs.getTelemetryPreferences().shouldCollectTelemetry());
         telemetryClient = new TelemetryClient(telemetryConfiguration);
         telemetryClient.getContext().getProperties().put("JabRef version", Globals.BUILD_INFO.version.toString());
         telemetryClient.getContext().getProperties().put("Java version", StandardSystemProperty.JAVA_VERSION.value());

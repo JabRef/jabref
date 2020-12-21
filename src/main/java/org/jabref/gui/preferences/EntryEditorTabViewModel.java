@@ -57,7 +57,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
         enableRelatedArticlesTabProperty.setValue(initialEntryEditorPreferences.shouldShowRecommendationsTab());
         acceptRecommendationsProperty.setValue(initialEntryEditorPreferences.isMrdlibAccepted());
         enableLatexCitationsTabProperty.setValue(initialEntryEditorPreferences.shouldShowLatexCitationsTab());
-        enableValidationProperty.setValue(initialEntryEditorPreferences.isEnableValidation());
+        enableValidationProperty.setValue(initialEntryEditorPreferences.shouldEnableValidation());
 
         enableAutoCompleteProperty.setValue(initialAutoCompletePreferences.shouldAutoComplete());
         autoCompleteFieldsProperty.setValue(initialAutoCompletePreferences.getCompleteNamesAsString());

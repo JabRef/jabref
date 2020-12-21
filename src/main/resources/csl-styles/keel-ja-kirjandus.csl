@@ -63,6 +63,9 @@
       <date date-parts="year" form="text" variable="issued"/>
     </group>
   </macro>
+  <macro name="year">
+    <date date-parts="year" form="text" variable="issued"/>
+  </macro>
   <macro name="edition">
     <choose>
       <if match="any" is-numeric="edition">
@@ -138,7 +141,7 @@
   <bibliography et-al-min="4" et-al-use-first="1">
     <sort>
       <key macro="creator-short"/>
-      <key macro="creator-year-short"/>
+      <key macro="year"/>
     </sort>
     <layout>
       <group delimiter=". " suffix=".">

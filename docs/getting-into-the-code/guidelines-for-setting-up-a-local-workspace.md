@@ -55,7 +55,7 @@ It is strongly recommend that you have git installed.
 
 ### IDE
 
-We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/).
+We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/?from=jabref).
 For advanced users, [Eclipse](https://eclipse.org/) \(`2020-09` or newer\) is also possible.
 
 #### IntelliJ

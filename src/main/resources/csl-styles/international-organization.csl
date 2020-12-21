@@ -429,9 +429,8 @@
   <bibliography hanging-indent="true" et-al-min="11" et-al-use-first="7" entry-spacing="0">
     <sort>
       <key macro="contributors-sort"/>
-      <key variable="title"/>
-      <key variable="genre"/>
       <key variable="issued"/>
+      <key variable="title"/>
     </sort>
     <layout suffix=".">
       <group delimiter=". ">

@@ -115,7 +115,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         stateManager,
                         preferencesService,
                         undoManager,
-                        Globals.clipboardManager))
+                        Globals.getClipboardManager()))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)
@@ -159,9 +159,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         // Store visual state
         new PersistenceVisualStateTable(this, preferencesService);
-
-        // TODO: Float marked entries
-        // model.updateMarkingState(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
 
         setupKeyBindings(keyBindingRepository);
 
@@ -227,7 +224,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         if (!selectedEntries.isEmpty()) {
             try {
-                Globals.clipboardManager.setContent(selectedEntries);
+                Globals.getClipboardManager().setContent(selectedEntries);
                 dialogService.notify(libraryTab.formatOutputMessage(Localization.lang("Copied"), selectedEntries.size()));
             } catch (IOException e) {
                 LOGGER.error("Error while copying selected entries to clipboard", e);
@@ -296,7 +293,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     public void paste(BibDatabaseMode bibDatabaseMode) {
         // Find entries in clipboard
-        List<BibEntry> entriesToAdd = Globals.clipboardManager.extractData();
+        List<BibEntry> entriesToAdd = Globals.getClipboardManager().extractData();
         ImportCleanup cleanup = new ImportCleanup(bibDatabaseMode);
         cleanup.doPostCleanup(entriesToAdd);
         libraryTab.insertEntries(entriesToAdd);

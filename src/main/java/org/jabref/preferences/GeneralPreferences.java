@@ -7,12 +7,10 @@ import org.jabref.model.database.BibDatabaseMode;
 public class GeneralPreferences {
     private final Charset defaultEncoding;
     private final BibDatabaseMode defaultBibDatabaseMode;
-
     private final boolean warnAboutDuplicatesInInspection;
     private boolean confirmDelete;
     private final boolean allowIntegerEditionBibtex;
     private final boolean memoryStickMode;
-    private final boolean collectTelemetry;
     private final boolean showAdvancedHints;
 
     public GeneralPreferences(Charset defaultEncoding,
@@ -21,7 +19,6 @@ public class GeneralPreferences {
                               boolean confirmDelete,
                               boolean allowIntegerEditionBibtex,
                               boolean memoryStickMode,
-                              boolean collectTelemetry,
                               boolean showAdvancedHints) {
         this.defaultEncoding = defaultEncoding;
         this.defaultBibDatabaseMode = defaultBibDatabaseMode;
@@ -29,7 +26,6 @@ public class GeneralPreferences {
         this.confirmDelete = confirmDelete;
         this.allowIntegerEditionBibtex = allowIntegerEditionBibtex;
         this.memoryStickMode = memoryStickMode;
-        this.collectTelemetry = collectTelemetry;
         this.showAdvancedHints = showAdvancedHints;
     }
 
@@ -60,10 +56,6 @@ public class GeneralPreferences {
 
     public boolean isMemoryStickMode() {
         return memoryStickMode;
-    }
-
-    public boolean shouldCollectTelemetry() {
-        return collectTelemetry;
     }
 
     public boolean shouldShowAdvancedHints() {

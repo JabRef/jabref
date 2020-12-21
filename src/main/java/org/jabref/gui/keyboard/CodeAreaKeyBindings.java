@@ -2,7 +2,6 @@ package org.jabref.gui.keyboard;
 
 import javafx.scene.input.KeyEvent;
 
-import org.jabref.gui.Globals;
 import org.jabref.logic.util.strings.StringManipulator;
 import org.jabref.model.util.ResultingStringState;
 
@@ -11,8 +10,7 @@ import org.fxmisc.richtext.NavigationActions;
 
 public class CodeAreaKeyBindings {
 
-    public static void call(CodeArea codeArea, KeyEvent event) {
-        KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
+    public static void call(CodeArea codeArea, KeyEvent event, KeyBindingRepository keyBindingRepository) {
         keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {
             switch (binding) {
                 case EDITOR_DELETE -> {
