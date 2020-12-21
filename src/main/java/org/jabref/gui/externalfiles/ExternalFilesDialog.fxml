@@ -6,6 +6,7 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Tooltip?>
@@ -15,7 +16,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<DialogPane xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.externalfiles.ExternalFilesDialogView">
+<DialogPane xmlns="http://javafx.com/javafx/15" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.externalfiles.ExternalFilesDialogView">
    <content>
       <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0">
          <top>
@@ -38,7 +39,7 @@
                         <ComboBox fx:id="fileTypeSelection" prefHeight="27.0" prefWidth="144.0" />
                      </children>
                   </HBox>
-                  <Button mnemonicParsing="false" onAction="#scanFiles" text="%Scan files">
+                  <Button fx:id="buttonScan" mnemonicParsing="false" onAction="#scanFiles" text="%Scan files">
                      <tooltip>
                         <Tooltip text="%Searches the selected directory for unlinked files" />
                      </tooltip>
@@ -54,7 +55,12 @@
                         <TreeView fx:id="tree" prefHeight="200.0" prefWidth="583.0" />
                      </content>
                   </ScrollPane>
-                  <VBox prefHeight="200.0" prefWidth="100.0" />
+                  <VBox fx:id="panelSearchProgress" visible="false" prefHeight="200.0" prefWidth="100.0" spacing="5.0" StackPane.alignment="CENTER">
+                     <children>
+                        <Label text="%Searching the file system...." />
+                        <ProgressIndicator maxHeight="50.0" maxWidth="50.0" progress="0.0" />
+                     </children>
+                     </VBox>
                </children>
             </StackPane>
          </center>
@@ -72,6 +78,6 @@
    </content>
    <buttonTypes>
       <ButtonType fx:constant="CANCEL" />
-      <ButtonType fx:constant="APPLY" />
+      <ButtonType fx:constant="OK"/>
    </buttonTypes>
 </DialogPane>
