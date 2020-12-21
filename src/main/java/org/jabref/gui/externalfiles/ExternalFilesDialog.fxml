@@ -3,7 +3,6 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.ButtonType?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressIndicator?>
@@ -16,7 +15,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<DialogPane xmlns="http://javafx.com/javafx/15" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.externalfiles.ExternalFilesDialogView">
+<DialogPane xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.externalfiles.ExternalFilesDialogView">
    <content>
       <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0">
          <top>
@@ -39,7 +38,7 @@
                         <ComboBox fx:id="fileTypeSelection" prefHeight="27.0" prefWidth="144.0" />
                      </children>
                   </HBox>
-                  <Button fx:id="buttonScan" mnemonicParsing="false" onAction="#scanFiles" text="%Scan files">
+                  <Button fx:id="buttonScan" defaultButton="true" disable="true" mnemonicParsing="false" onAction="#scanFiles" text="%Scan files">
                      <tooltip>
                         <Tooltip text="%Searches the selected directory for unlinked files" />
                      </tooltip>
@@ -55,7 +54,7 @@
                         <TreeView fx:id="tree" prefHeight="200.0" prefWidth="583.0" />
                      </content>
                   </ScrollPane>
-                  <VBox fx:id="panelSearchProgress" visible="false" prefHeight="200.0" prefWidth="100.0" spacing="5.0" StackPane.alignment="CENTER">
+                  <VBox fx:id="panelSearchProgress" prefHeight="200.0" prefWidth="100.0" spacing="5.0" visible="false" StackPane.alignment="CENTER">
                      <children>
                         <Label text="%Searching the file system...." />
                         <ProgressIndicator maxHeight="50.0" maxWidth="50.0" progress="0.0" />
@@ -71,6 +70,7 @@
                   <Button mnemonicParsing="false" onAction="#unselectAll" text="%Unselect all" />
                   <Button mnemonicParsing="false" onAction="#collapseAll" text="%Collapse all" />
                 <Button mnemonicParsing="false" onAction="#expandAll" text="%Expand all" />
+                <Button fx:id="buttonExport" mnemonicParsing="false" onAction="#exportSelected" text="%Export selected entries" />
               </buttons>
             </ButtonBar>
          </bottom>
@@ -78,6 +78,6 @@
    </content>
    <buttonTypes>
       <ButtonType fx:constant="CANCEL" />
-      <ButtonType fx:constant="OK"/>
+      <ButtonType fx:id="importButton" buttonData="OK_DONE" text="%Import" />
    </buttonTypes>
 </DialogPane>
