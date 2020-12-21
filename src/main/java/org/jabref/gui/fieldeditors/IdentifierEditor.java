@@ -2,7 +2,6 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.Optional;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -18,7 +17,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -30,7 +29,12 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @FXML private Button lookupIdentifierButton;
     private Optional<BibEntry> entry;
 
-    public IdentifierEditor(Field field, TaskExecutor taskExecutor, DialogService dialogService, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, JabRefPreferences preferences) {
+    public IdentifierEditor(Field field,
+                            TaskExecutor taskExecutor,
+                            DialogService dialogService,
+                            SuggestionProvider<?> suggestionProvider,
+                            FieldCheckers fieldCheckers,
+                            PreferencesService preferences) {
         this.viewModel = new IdentifierEditorViewModel(field, suggestionProvider, taskExecutor, dialogService, fieldCheckers);
 
         ViewLoader.view(this)
@@ -69,17 +73,17 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     }
 
     @FXML
-    private void fetchInformationByIdentifier(ActionEvent event) {
+    private void fetchInformationByIdentifier() {
         entry.ifPresent(bibEntry -> viewModel.fetchInformationByIdentifier(bibEntry));
     }
 
     @FXML
-    private void lookupIdentifier(ActionEvent event) {
+    private void lookupIdentifier() {
         entry.ifPresent(bibEntry -> viewModel.lookupIdentifier(bibEntry));
     }
 
     @FXML
-    private void openExternalLink(ActionEvent event) {
+    private void openExternalLink() {
         viewModel.openExternalLink();
     }
 }

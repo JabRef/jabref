@@ -10,10 +10,11 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.SidePaneComponent;
 import org.jabref.gui.SidePaneManager;
 import org.jabref.gui.SidePaneType;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -23,19 +24,19 @@ import org.jabref.gui.search.SearchTextField;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 
 public class WebSearchPane extends SidePaneComponent {
 
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
     private final WebSearchPaneViewModel viewModel;
 
-    public WebSearchPane(SidePaneManager sidePaneManager, JabRefPreferences preferences, JabRefFrame frame) {
+    public WebSearchPane(SidePaneManager sidePaneManager, PreferencesService preferences, DialogService dialogService, StateManager stateManager) {
         super(sidePaneManager, IconTheme.JabRefIcons.WWW, Localization.lang("Web search"));
         this.preferences = preferences;
-        this.viewModel = new WebSearchPaneViewModel(preferences.getImportFormatPreferences(), frame, preferences, frame.getDialogService());
+        this.viewModel = new WebSearchPaneViewModel(preferences, dialogService, stateManager);
     }
 
     @Override
@@ -101,12 +102,12 @@ public class WebSearchPane extends SidePaneComponent {
 
     @Override
     public void beforeClosing() {
-        preferences.putBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE, Boolean.FALSE);
+        preferences.storeSidePanePreferences(preferences.getSidePanePreferences().withWebSearchPaneVisible(false));
     }
 
     @Override
     public void afterOpening() {
-        preferences.putBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE, Boolean.TRUE);
+        preferences.storeSidePanePreferences(preferences.getSidePanePreferences().withWebSearchPaneVisible(true));
     }
 
     @Override

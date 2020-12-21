@@ -7,16 +7,16 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class JabRefPreferencesFilter {
+public class PreferencesFilter {
 
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
 
-    public JabRefPreferencesFilter(JabRefPreferences preferences) {
+    public PreferencesFilter(PreferencesService preferences) {
         this.preferences = preferences;
     }
 
     public List<PreferenceOption> getPreferenceOptions() {
-        Map<String, Object> defaults = new HashMap<>(preferences.defaults);
+        Map<String, Object> defaults = new HashMap<>(preferences.getDefaults());
         Map<String, Object> prefs = preferences.getPreferences();
 
         return prefs.entrySet().stream()

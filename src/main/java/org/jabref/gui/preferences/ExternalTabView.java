@@ -55,7 +55,7 @@ public class ExternalTabView extends AbstractPreferenceTabView<ExternalTabViewMo
         this.viewModel = new ExternalTabViewModel(dialogService, preferences, pushToApplicationsManager);
 
         new ViewModelListCellFactory<PushToApplication>()
-                .withText(PushToApplication::getApplicationName)
+                .withText(PushToApplication::getDisplayName)
                 .withIcon(PushToApplication::getIcon)
                 .install(pushToApplicationCombo);
 

@@ -21,7 +21,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,20 +38,20 @@ public class BibtexExtractorViewModel {
 
     public BibtexExtractorViewModel(BibDatabaseContext bibdatabaseContext,
                                     DialogService dialogService,
-                                    JabRefPreferences jabRefPreferences,
+                                    PreferencesService preferencesService,
                                     FileUpdateMonitor fileUpdateMonitor,
                                     TaskExecutor taskExecutor,
                                     UndoManager undoManager,
                                     StateManager stateManager) {
 
         this.dialogService = dialogService;
-        currentCitationfetcher = new GrobidCitationFetcher(jabRefPreferences.getImportFormatPreferences());
+        currentCitationfetcher = new GrobidCitationFetcher(preferencesService.getImportFormatPreferences());
         this.taskExecutor = taskExecutor;
         this.importHandler = new ImportHandler(
                 dialogService,
                 bibdatabaseContext,
                 ExternalFileTypes.getInstance(),
-                jabRefPreferences,
+                preferencesService,
                 fileUpdateMonitor,
                 undoManager,
                 stateManager);

@@ -24,6 +24,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,11 +41,14 @@ public class ImportAction {
     private Exception importError;
     private final TaskExecutor taskExecutor = Globals.TASK_EXECUTOR;
 
-    public ImportAction(JabRefFrame frame, boolean openInNew, Importer importer) {
+    private final PreferencesService prefs;
+
+    public ImportAction(JabRefFrame frame, boolean openInNew, Importer importer, PreferencesService prefs) {
         this.importer = Optional.ofNullable(importer);
         this.frame = frame;
         this.dialogService = frame.getDialogService();
         this.openInNew = openInNew;
+        this.prefs = prefs;
     }
 
     /**
@@ -139,7 +143,7 @@ public class ImportAction {
 
             if (ImportFormatReader.BIBTEX_FORMAT.equals(importResult.format)) {
                 // additional treatment of BibTeX
-                new DatabaseMerger().mergeMetaData(
+                new DatabaseMerger(prefs.getKeywordDelimiter()).mergeMetaData(
                         result.getMetaData(),
                         parserResult.getMetaData(),
                         importResult.parserResult.getFile().map(File::getName).orElse("unknown"),
@@ -149,7 +153,7 @@ public class ImportAction {
         }
 
         // set timestamp and owner
-        UpdateField.setAutomaticFields(resultDatabase.getEntries(), Globals.prefs.getOwnerPreferences(), Globals.prefs.getTimestampPreferences()); // set timestamp and owner
+        UpdateField.setAutomaticFields(resultDatabase.getEntries(), prefs.getOwnerPreferences(), prefs.getTimestampPreferences()); // set timestamp and owner
 
         return result;
     }
