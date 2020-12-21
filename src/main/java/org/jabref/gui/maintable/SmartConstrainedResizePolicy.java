@@ -51,6 +51,7 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
             return false;
         } else {
             if (!column.equals(lastModifiedColumn)) {
+                LOGGER.debug("Column changed");
                 lastModifiedColumn = column;
                 // This way, the proportions of the columns are kept during resize of the window
                 determineExpansionShareWithoutColumn(column);
@@ -138,15 +139,18 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
         boolean columnsCanFitTable = currentTableContentWidth + delta < tableWidth;
         if (columnsCanFitTable) {
             LOGGER.debug("User window size in that way thus that window can contain all the columns");
+            Optional<Double> newWidthOptional;
             if (currentTableContentWidth >= tableWidth) {
                 LOGGER.debug("Before, the content did not fit. Now it fits. Rearrange everything.");
-                return rearrangeColumns(table);
+                newWidthOptional = determineNewWidth(userChosenColumnToResize, delta);
+                newWidthOptional.ifPresent(newWidth -> userChosenColumnToResize.setPrefWidth(newWidth));
+                return newWidthOptional.isPresent();
             }
             LOGGER.debug("Everything already fit. We distribute the delta now.");
 
             // Content does already fit
             // We "just" need to readjust the column widths
-            Optional<Double> newWidthOptional = determineNewWidth(userChosenColumnToResize, delta);
+            newWidthOptional = determineNewWidth(userChosenColumnToResize, delta);
             newWidthOptional.ifPresent(newWidth -> {
                 distributeDelta(table, userChosenColumnToResize, newWidth);
             });
@@ -175,7 +179,7 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
             LOGGER.debug("Distributing delta {}", remainingAvailableWidth);
             for (TableColumnBase<?, ?> col : columnsToResize) {
                 double share = expansionShare.get(col);
-                determineNewWidth(col, share * remainingAvailableWidth)
+                determineNewWidth(col, Math.floor(share * remainingAvailableWidth))
                         // in case we can do something, do it
                         // otherwise, the next loop iteration will distribute it
                         .ifPresent(col::setPrefWidth);
@@ -209,7 +213,7 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
             for (TableColumnBase<?, ?> col : resizableColumns) {
                 double share = expansionShare.get(col);
                 // Precondition in our case: col has to have minimum width
-                determineNewWidth(col, share * remainingAvailableWidth)
+                determineNewWidth(col, Math.floor(share * remainingAvailableWidth))
                         // in case we can do something, do it
                         // otherwise, the next loop iteration will distribute it
                         .ifPresent(col::setPrefWidth);
