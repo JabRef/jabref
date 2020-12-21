@@ -279,7 +279,7 @@ processResources {
         filteringCharset = 'UTF-8'
     }
 
-    filesMatching("resource/**/meta.xml") {
+    filesMatching(["resources/resource/ods/meta.xml", "resources/resource/openoffice/meta.xml"]) {
         expand version: project.version
     }
 }
