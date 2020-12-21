@@ -127,6 +127,8 @@ public class JabRefMain extends Application {
                 versionError.append(Localization.lang("Note that currently, JabRef does not run with Java 9."));
             }
 
+            LOGGER.error(versionError.toString());
+
             FXDialog alert = new FXDialog(Alert.AlertType.ERROR, Localization.lang("Error"), true);
             alert.setHeaderText(null);
             alert.setContentText(versionError.toString());
