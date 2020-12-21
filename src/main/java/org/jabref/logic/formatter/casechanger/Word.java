@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  */
 public final class Word {
     /**
-     * Set containing common function words
+     * Set containing common lowercase function words
      */
     public static final Set<String> SMALLER_WORDS;
     private final char[] chars;

@@ -59,7 +59,7 @@ public class BracketedPattern {
      */
     private static final Pattern NOT_CAPITAL_CHARACTER = Pattern.compile("[^A-Z]");
     /**
-     * Matches with "({[A-Z]}+)", which should be used to abbreviate the name of an institution
+     * Matches uppercase english letters between "({" and "})", which should be used to abbreviate the name of an institution
      */
     private static final Pattern INLINE_ABBREVIATION = Pattern.compile("(?<=\\(\\{)[A-Z]+(?=}\\))");
     /**
@@ -75,7 +75,7 @@ public class BracketedPattern {
         TECHNOLOGY;
 
         /**
-         * Matches "uni" at the start of a string or after a space, case insensitive
+         * Matches "uni" followed by "v" or "b", at the start of a string or after a space, case insensitive
          */
         private static final Pattern UNIVERSITIES = Pattern.compile("^uni(v|b|$).*", Pattern.CASE_INSENSITIVE);
         /**
@@ -509,10 +509,10 @@ public class BracketedPattern {
     }
 
     /**
-     * Checks if an author is an institution by verifying that only the last name is present.
+     * Checks if an author is an institution which can get a citation key from {@link #generateInstitutionKey(String)}.
      *
      * @param author the checked author
-     * @return true if only the last name is present
+     * @return true if only the last name is present and it contains at least one whitespace character.
      */
     private static boolean isInstitution(Author author) {
         return author.getFirst().isEmpty() && author.getFirstAbbr().isEmpty() && author.getJr().isEmpty()
@@ -1318,7 +1318,6 @@ public class BracketedPattern {
      * institution keyword and has an uppercase first letter, except univ/tech key word.
      *
      * @param word to check
-     * @return
      */
     private static boolean noOtherInstitutionKeyWord(String word) {
         return !DEPARTMENTS.matcher(word).matches()
