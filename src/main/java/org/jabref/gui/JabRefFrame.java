@@ -802,7 +802,7 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.FETCH_REFERENCE_METADATA, new ReferenceMetadataFetcherAction(dialogService, prefs, stateManager, undoManager, Globals.TASK_EXECUTOR))
+                factory.createMenuItem(StandardActions.FETCH_REFERENCE_METADATA, new ReferenceMetadataFetcherAction(dialogService, prefs, stateManager, undoManager))
         );
 
         // PushToApplication

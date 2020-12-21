@@ -8,12 +8,11 @@ import javax.swing.undo.UndoManager;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.BindingsHelper;
-import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -41,14 +40,12 @@ public class ReferenceMetadataFetcherAction extends SimpleCommand {
     private final PreferencesService preferences;
     private final StateManager stateManager;
     private UndoManager undoManager;
-    private TaskExecutor taskExecutor;
 
-    public ReferenceMetadataFetcherAction(DialogService dialogService, PreferencesService preferences, StateManager stateManager, UndoManager undoManager, TaskExecutor taskExecutor) {
+    public ReferenceMetadataFetcherAction(DialogService dialogService, PreferencesService preferences, StateManager stateManager, UndoManager undoManager) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
-        this.taskExecutor = taskExecutor;
 
         this.executable.bind(needsDatabase(this.stateManager).and(needsEntriesSelected(stateManager)));
         this.statusMessage.bind(BindingsHelper.ifThenElse(executable, Localization.lang("This operation fetches " +
@@ -121,6 +118,6 @@ public class ReferenceMetadataFetcherAction extends SimpleCommand {
                 Localization.lang("Fetching reference metadata online"),
                 Localization.lang("Querying reference metadata") + ":",
                 fetchReferenceMetadataTask);
-        taskExecutor.execute(fetchReferenceMetadataTask);
+        Globals.TASK_EXECUTOR.execute(fetchReferenceMetadataTask);
     }
 }
