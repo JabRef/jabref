@@ -43,8 +43,8 @@ public class ReferenceMetadataFetcherAction extends SimpleCommand {
     private UndoManager undoManager;
     private TaskExecutor taskExecutor;
 
-    public ReferenceMetadataFetcherAction(JabRefFrame frame, PreferencesService preferences, StateManager stateManager, UndoManager undoManager, TaskExecutor taskExecutor) {
-        this.dialogService = frame.getDialogService();
+    public ReferenceMetadataFetcherAction(DialogService dialogService, PreferencesService preferences, StateManager stateManager, UndoManager undoManager, TaskExecutor taskExecutor) {
+        this.dialogService = dialogService;
         this.preferences = preferences;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
