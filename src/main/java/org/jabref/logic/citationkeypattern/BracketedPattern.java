@@ -1194,7 +1194,7 @@ public class BracketedPattern {
         try {
             result = LatexToUnicodeAdapter.format(content);
         } catch (IllegalArgumentException e) {
-            LOGGER.warn(content + " could not be converted to unicode. This can result in an incorrect or missing institute citation key");
+            LOGGER.warn("{} could not be converted to unicode. This can result in an incorrect or missing institute citation key", content);
         }
         // Special characters can't be allowed past this point because the citation key generator might replace them with multiple mixed-case characters
         result = StringUtil.replaceSpecialCharacters(result);
