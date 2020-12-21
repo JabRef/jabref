@@ -12,11 +12,11 @@ import fastparse.core.Parsed;
  */
 public class LatexToUnicodeAdapter {
 
-    private static Pattern underscoreMatcher = Pattern.compile("_(?!\\{)");
+    private static final Pattern UNDERSCORE_MATCHER = Pattern.compile("_(?!\\{)");
 
-    private static String replacementChar = "\uFFFD";
+    private static final String REPLACEMENT_CHAR = "\uFFFD";
 
-    private static Pattern underscorePlaceholderMatcher = Pattern.compile(replacementChar);
+    private static final Pattern UNDERSCORE_PLACEHOLDER_MATCHER = Pattern.compile(REPLACEMENT_CHAR);
 
     /**
      * Attempts to resolve all LaTeX in the String.
@@ -43,13 +43,13 @@ public class LatexToUnicodeAdapter {
      */
     public static String parse(String inField) throws IllegalArgumentException {
         Objects.requireNonNull(inField);
-        String toFormat = underscoreMatcher.matcher(inField).replaceAll(replacementChar);
+        String toFormat = UNDERSCORE_MATCHER.matcher(inField).replaceAll(REPLACEMENT_CHAR);
         try {
             var parsingResult = LaTeX2Unicode.parse(toFormat);
             if (parsingResult instanceof Parsed.Success) {
                 String text = parsingResult.get().value();
                 toFormat = Normalizer.normalize(text, Normalizer.Form.NFC);
-                return underscorePlaceholderMatcher.matcher(toFormat).replaceAll("_");
+                return UNDERSCORE_PLACEHOLDER_MATCHER.matcher(toFormat).replaceAll("_");
             } else {
                 throw new IllegalArgumentException("Parsing of latex failed.");
             }
