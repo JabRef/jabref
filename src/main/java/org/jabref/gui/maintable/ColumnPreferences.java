@@ -4,7 +4,7 @@ import java.util.List;
 
 public class ColumnPreferences {
 
-    public static final double DEFAULT_COLUMN_MIN_WIDTH = 10;
+    public static final double DEFAULT_COLUMN_MIN_WIDTH = 80;
     public static final double DEFAULT_COLUMN_WIDTH = 100;
     public static final double ICON_COLUMN_WIDTH = 16 + 12; // add some additional space to improve appearance
 
