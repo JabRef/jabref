@@ -1,6 +1,8 @@
 package org.jabref.gui.externalfiles;
 
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -30,8 +32,12 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ImportHandler {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImportHandler.class);
     private final BibDatabaseContext database;
     private final PreferencesService preferencesService;
     private final DialogService dialogService;
@@ -40,6 +46,7 @@ public class ImportHandler {
     private final ExternalFilesContentImporter contentImporter;
     private final UndoManager undoManager;
     private final StateManager stateManager;
+    private  List<ImportFilesResultItemViewModel> results;
 
     public ImportHandler(DialogService dialogService,
                          BibDatabaseContext database,
@@ -65,13 +72,12 @@ public class ImportHandler {
         return linker;
     }
 
-    public BackgroundTask<ImportFilesResultItemViewModel> importFilesInBackground(List<Path> files)
-    {
+    public BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesInBackground(List<Path> files) {
         return new BackgroundTask<>() {
 
             @Override
-            protected ImportFilesResultItemViewModel call() throws Exception {
-
+            protected List<ImportFilesResultItemViewModel> call() throws Exception {
+                results = new ArrayList<>();
                 CompoundEdit ce = new CompoundEdit();
                 for (int i = 0; i < files.size(); i++) {
 
@@ -88,8 +94,18 @@ public class ImportHandler {
 
                         if (FileUtil.getFileExtension(file).filter("pdf"::equals).isPresent()) {
 
-                            List<BibEntry> pdfResult = contentImporter.importPDFContent(file);
-                            List<BibEntry> xmpEntriesInFile = contentImporter.importXMPContent(file);
+                            var pdfImporterResult = contentImporter.importPDFContent(file);
+                            if (pdfImporterResult.hasWarnings()) {
+                                addResultToList(file, false, pdfImporterResult.getErrorMessage());
+                            }
+                            List<BibEntry> pdfResult = pdfImporterResult.getDatabase().getEntries();
+
+                            var xmpParserResult = contentImporter.importXMPContent(file);
+                            if (xmpParserResult.hasWarnings()) {
+                                addResultToList(file, false, xmpParserResult.getErrorMessage());
+
+                            }
+                            List<BibEntry> xmpEntriesInFile = xmpParserResult.getDatabase().getEntries();
 
                             // First try xmp import, if empty try pdf import, otherwise create empty entry
                             if (!xmpEntriesInFile.isEmpty()) {
@@ -107,15 +123,23 @@ public class ImportHandler {
                                 }
                             }
                         } else if (FileUtil.isBibFile(file)) {
-                            entriesToAdd = contentImporter.importFromBibFile(file, fileUpdateMonitor);
+                            var bibtexParserResult = contentImporter.importFromBibFile(file, fileUpdateMonitor);
+                            if (bibtexParserResult.hasWarnings()) {
+                                addResultToList(file, false, bibtexParserResult.getErrorMessage());
+                            }
+
+                            entriesToAdd = bibtexParserResult.getDatabaseContext().getEntries();
+
                         } else {
                             entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
                         }
 
-                    } catch (Exception ex) {
+                    } catch (IOException ex) {
+                        LOGGER.error("Error importing", ex);
+                        addResultToList(file, false, "Error importing " + ex.getLocalizedMessage());
 
+                        updateMessage(null);
                     }
-                    updateProgress(i, files.size());
 
                     importEntries(entriesToAdd);
 
@@ -125,11 +149,16 @@ public class ImportHandler {
                 ce.end();
                 undoManager.addEdit(ce);
 
-                return null;
+                return results;
             }
         };
     }
 
+
+    private void addResultToList(Path newFile, boolean success, String logMessage) {
+        var result = new ImportFilesResultItemViewModel(newFile, success, logMessage);
+        results.add(result);
+    }
 
     public void importAsNewEntries(List<Path> files) {
         // Will be replaced
