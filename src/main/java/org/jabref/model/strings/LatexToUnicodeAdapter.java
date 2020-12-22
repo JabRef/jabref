@@ -41,7 +41,7 @@ public class LatexToUnicodeAdapter {
      * @return a String with LaTeX resolved into Unicode
      * @throws IllegalArgumentException if the LaTeX could not be parsed
      */
-    public static String parse(String inField) throws IllegalArgumentException {
+    public static Optional<String> parse(String inField) throws IllegalArgumentException {
         Objects.requireNonNull(inField);
         String toFormat = UNDERSCORE_MATCHER.matcher(inField).replaceAll(REPLACEMENT_CHAR);
         try {
