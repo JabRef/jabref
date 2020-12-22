@@ -11,6 +11,7 @@ import org.jabref.logic.importer.fetcher.ACS;
 import org.jabref.logic.importer.fetcher.ApsFetcher;
 import org.jabref.logic.importer.fetcher.ArXiv;
 import org.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
+import org.jabref.logic.importer.fetcher.CaptchaSolver;
 import org.jabref.logic.importer.fetcher.CiteSeer;
 import org.jabref.logic.importer.fetcher.CollectionOfComputerScienceBibliographiesFetcher;
 import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
@@ -31,6 +32,7 @@ import org.jabref.logic.importer.fetcher.LibraryOfCongress;
 import org.jabref.logic.importer.fetcher.MathSciNet;
 import org.jabref.logic.importer.fetcher.MedlineFetcher;
 import org.jabref.logic.importer.fetcher.Medra;
+import org.jabref.logic.importer.fetcher.NoneCaptchaSolver;
 import org.jabref.logic.importer.fetcher.OpenAccessDoi;
 import org.jabref.logic.importer.fetcher.RfcFetcher;
 import org.jabref.logic.importer.fetcher.ScienceDirect;
@@ -49,6 +51,13 @@ import static org.jabref.model.entry.field.StandardField.ISBN;
 public class WebFetchers {
 
     private WebFetchers() {
+    }
+
+    // Default CaptchaSolver is the useless one (which just does not through an exception)
+    private static CaptchaSolver captchaSolver = new NoneCaptchaSolver();
+
+    public static void setCaptchaSolver(CaptchaSolver captchaSolver) {
+        WebFetchers.captchaSolver = captchaSolver;
     }
 
     public static Optional<IdBasedFetcher> getIdBasedFetcherForField(Field field, ImportFormatPreferences preferences) {
@@ -96,7 +105,7 @@ public class WebFetchers {
         set.add(new ZbMATH(importFormatPreferences));
         // see https://github.com/JabRef/jabref/issues/5804
         // set.add(new ACMPortalFetcher(importFormatPreferences));
-        set.add(new GoogleScholar(importFormatPreferences));
+        set.add(new GoogleScholar(importFormatPreferences, captchaSolver));
         set.add(new DBLPFetcher(importFormatPreferences));
         set.add(new SpringerFetcher());
         set.add(new CrossRef());
@@ -170,7 +179,7 @@ public class WebFetchers {
         fetchers.add(new ApsFetcher());
         // Meta search
         fetchers.add(new JstorFetcher(importFormatPreferences));
-        fetchers.add(new GoogleScholar(importFormatPreferences));
+        fetchers.add(new GoogleScholar(importFormatPreferences, captchaSolver));
         fetchers.add(new OpenAccessDoi());
 
         return fetchers;

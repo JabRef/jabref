@@ -172,8 +172,12 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
                     e.getMessage().contains("Server returned HTTP response code: 503 for URL")) {
                 LOGGER.debug("Captcha found. Calling the CaptchaSolver");
                 String content = captchaSolver.solve(queryURL);
-                extractEntriesFromContent(content, foundEntries);
-
+                LOGGER.debug("Returned result {}", content);
+                try {
+                    extractEntriesFromContent(content, foundEntries);
+                } catch (IOException ioException) {
+                    LOGGER.error("Still failing at Google Scholar", ioException);
+                }
                 throw new FetcherException("Fetching from Google Scholar failed.",
                         Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), e);
             } else {
@@ -199,13 +203,7 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
         URLDownload urlDownload = new URLDownload(queryURL);
         obtainAndModifyCookie(urlDownload);
 
-        // We need JSOUP directly to read the content when 429 is returned
-
-        String content;
-        try {
-            content = urlDownload.asString();
-        }
-
+        String content = urlDownload.asString();
         if (needsCaptcha(content)) {
             throw new FetcherException("Fetching from Google Scholar failed: Captcha hit at " + queryURL + ".",
                     Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), null);

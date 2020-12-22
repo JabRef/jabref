@@ -34,7 +34,7 @@ class GoogleScholarTest implements SearchBasedFetcherCapabilityTest, PagedSearch
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(
                 mock(FieldContentFormatterPreferences.class));
-        fetcher = new GoogleScholar(importFormatPreferences);
+        fetcher = new GoogleScholar(importFormatPreferences, new NoneCaptchaSolver());
     }
 
     @Test
