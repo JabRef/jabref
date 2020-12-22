@@ -73,7 +73,7 @@ public class ImportHandler {
             protected ImportFilesResultItemViewModel call() throws Exception {
 
                 CompoundEdit ce = new CompoundEdit();
-                for (int i=0; i< files.size(); i++) {
+                for (int i = 0; i < files.size(); i++) {
 
                     if (isCanceled()) {
                         break;
@@ -82,36 +82,46 @@ public class ImportHandler {
                     updateMessage(Localization.lang("Processing file %0 of %1", i, files.size()));
 
                     var file = files.get(0);
-                    List<BibEntry> entriesToAdd;
-                    if (FileUtil.getFileExtension(file).filter("pdf"::equals).isPresent()) {
-                        List<BibEntry> pdfResult = contentImporter.importPDFContent(file);
-                        List<BibEntry> xmpEntriesInFile = contentImporter.importXMPContent(file);
+                    List<BibEntry> entriesToAdd = Collections.emptyList();
 
-                        // First try xmp import, if empty try pdf import, otherwise create empty entry
-                        if (!xmpEntriesInFile.isEmpty()) {
-                            if (!pdfResult.isEmpty()) {
-                                // FIXME: Show merge dialog?
-                                entriesToAdd = xmpEntriesInFile;
+                    try {
+
+                        if (FileUtil.getFileExtension(file).filter("pdf"::equals).isPresent()) {
+
+                            List<BibEntry> pdfResult = contentImporter.importPDFContent(file);
+                            List<BibEntry> xmpEntriesInFile = contentImporter.importXMPContent(file);
+
+                            // First try xmp import, if empty try pdf import, otherwise create empty entry
+                            if (!xmpEntriesInFile.isEmpty()) {
+                                if (!pdfResult.isEmpty()) {
+                                    // FIXME: Show merge dialog?
+                                    entriesToAdd = xmpEntriesInFile;
+                                } else {
+                                    entriesToAdd = xmpEntriesInFile;
+                                }
                             } else {
-                                entriesToAdd = xmpEntriesInFile;
+                                if (!pdfResult.isEmpty()) {
+                                    entriesToAdd = pdfResult;
+                                } else {
+                                    entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
+                                }
                             }
+                        } else if (FileUtil.isBibFile(file)) {
+                            entriesToAdd = contentImporter.importFromBibFile(file, fileUpdateMonitor);
                         } else {
-                            if (!pdfResult.isEmpty()) {
-                                entriesToAdd = pdfResult;
-                            } else {
-                                entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
-                            }
+                            entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
                         }
-                    } else if (FileUtil.isBibFile(file)) {
-                        entriesToAdd = contentImporter.importFromBibFile(file, fileUpdateMonitor);
-                    } else {
-                        entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
+
+                    } catch (Exception ex) {
+
                     }
                     updateProgress(i, files.size());
+
                     importEntries(entriesToAdd);
 
                     ce.addEdit(new UndoableInsertEntries(database.getDatabase(), entriesToAdd));
                 }
+
                 ce.end();
                 undoManager.addEdit(ce);
 
