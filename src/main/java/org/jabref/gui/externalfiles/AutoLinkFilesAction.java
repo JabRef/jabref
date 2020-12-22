@@ -17,7 +17,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
@@ -29,12 +29,12 @@ import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 public class AutoLinkFilesAction extends SimpleCommand {
 
     private final DialogService dialogService;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
     private final StateManager stateManager;
-    private UndoManager undoManager;
-    private TaskExecutor taskExecutor;
+    private final UndoManager undoManager;
+    private final TaskExecutor taskExecutor;
 
-    public AutoLinkFilesAction(JabRefFrame frame, JabRefPreferences preferences, StateManager stateManager, UndoManager undoManager, TaskExecutor taskExecutor) {
+    public AutoLinkFilesAction(JabRefFrame frame, PreferencesService preferences, StateManager stateManager, UndoManager undoManager, TaskExecutor taskExecutor) {
         this.dialogService = frame.getDialogService();
         this.preferences = preferences;
         this.stateManager = stateManager;

@@ -17,7 +17,7 @@ class UpdateTimestampListener {
 
     @Subscribe
     public void listen(EntryChangedEvent event) {
-        if (preferencesService.getTimestampPreferences().includeTimestamps()) {
+        if (preferencesService.getTimestampPreferences().shouldIncludeTimestamps()) {
             event.getBibEntry().setField(preferencesService.getTimestampPreferences().getTimestampField(),
                     preferencesService.getTimestampPreferences().now());
         }

@@ -21,8 +21,9 @@ public class CopySingleFileAction extends SimpleCommand {
     private final LinkedFile linkedFile;
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
-    private final BiFunction<Path, Path, Path> resolvePathFilename = (path, file) -> path.resolve(file.getFileName());
     private final PreferencesService preferencesService;
+
+    private final BiFunction<Path, Path, Path> resolvePathFilename = (path, file) -> path.resolve(file.getFileName());
 
     public CopySingleFileAction(LinkedFile linkedFile, DialogService dialogService, BibDatabaseContext databaseContext, PreferencesService preferencesService) {
         this.linkedFile = linkedFile;

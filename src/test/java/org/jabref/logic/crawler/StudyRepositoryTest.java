@@ -78,6 +78,7 @@ class StudyRepositoryTest {
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
         when(savePreferences.getEncoding()).thenReturn(null);
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
+        when(savePreferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
         when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
         when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
         when(importFormatPreferences.isKeywordSyncEnabled()).thenReturn(false);
@@ -230,7 +231,7 @@ class StudyRepositoryTest {
 
     private BibDatabase getNonDuplicateBibEntryResult() {
         BibDatabase mockResults = new BibDatabase(getSpringerCloudComputingMockResults());
-        DatabaseMerger merger = new DatabaseMerger();
+        DatabaseMerger merger = new DatabaseMerger(importFormatPreferences.getKeywordSeparator());
         merger.merge(mockResults, new BibDatabase(getSpringerQuantumMockResults()));
         merger.merge(mockResults, new BibDatabase(getArXivQuantumMockResults()));
         return mockResults;

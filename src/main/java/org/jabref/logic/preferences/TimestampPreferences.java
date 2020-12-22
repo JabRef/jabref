@@ -20,11 +20,11 @@ public class TimestampPreferences {
         this.overwriteTimestamp = overwriteTimestamp;
     }
 
-    public boolean isUseTimestamps() {
+    public boolean shouldUseTimestamps() {
         return useTimestamps;
     }
 
-    public boolean isUpdateTimestamp() {
+    public boolean shouldUpdateTimestamp() {
         return updateTimestamp;
     }
 
@@ -36,11 +36,11 @@ public class TimestampPreferences {
         return timestampFormat;
     }
 
-    public boolean isOverwriteTimestamp() {
+    public boolean shouldOverwriteTimestamp() {
         return overwriteTimestamp;
     }
 
-    public boolean includeTimestamps() {
+    public boolean shouldIncludeTimestamps() {
         return useTimestamps && updateTimestamp;
     }
 

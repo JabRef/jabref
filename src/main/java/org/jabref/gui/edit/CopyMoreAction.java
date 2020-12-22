@@ -20,7 +20,6 @@ import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
@@ -52,24 +51,12 @@ public class CopyMoreAction extends SimpleCommand {
         }
 
         switch (action) {
-            case COPY_TITLE:
-                copyTitle();
-                break;
-            case COPY_KEY:
-                copyKey();
-                break;
-            case COPY_CITE_KEY:
-                copyCiteKey();
-                break;
-            case COPY_KEY_AND_TITLE:
-                copyKeyAndTitle();
-                break;
-            case COPY_KEY_AND_LINK:
-                copyKeyAndLink();
-                break;
-            default:
-                LOGGER.info("Unknown copy command.");
-                break;
+            case COPY_TITLE -> copyTitle();
+            case COPY_KEY -> copyKey();
+            case COPY_CITE_KEY -> copyCiteKey();
+            case COPY_KEY_AND_TITLE -> copyKeyAndTitle();
+            case COPY_KEY_AND_LINK -> copyKeyAndLink();
+            default -> LOGGER.info("Unknown copy command.");
         }
     }
 
@@ -140,7 +127,7 @@ public class CopyMoreAction extends SimpleCommand {
             return;
         }
 
-        String citeCommand = Optional.ofNullable(Globals.prefs.get(JabRefPreferences.CITE_COMMAND))
+        String citeCommand = Optional.ofNullable(Globals.prefs.getExternalApplicationsPreferences().getCiteCommand())
                                      .filter(cite -> cite.contains("\\")) // must contain \
                                      .orElse("\\cite");
 

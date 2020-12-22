@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
@@ -33,7 +34,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javafx.scene.control.TableColumn.SortType;
-import javafx.scene.paint.Color;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.SidePaneType;
@@ -51,6 +51,12 @@ import org.jabref.gui.maintable.MainTableNameFormatPreferences.AbbreviationStyle
 import org.jabref.gui.maintable.MainTableNameFormatPreferences.DisplayStyle;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.mergeentries.MergeEntries;
+import org.jabref.gui.push.PushToEmacs;
+import org.jabref.gui.push.PushToLyx;
+import org.jabref.gui.push.PushToTeXstudio;
+import org.jabref.gui.push.PushToTexmaker;
+import org.jabref.gui.push.PushToVim;
+import org.jabref.gui.push.PushToWinEdt;
 import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.Theme;
@@ -69,6 +75,7 @@ import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
+import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
@@ -83,7 +90,6 @@ import org.jabref.logic.openoffice.StyleLoader;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.preview.PreviewLayout;
-import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.remote.RemotePreferences;
@@ -108,21 +114,31 @@ import org.jabref.model.strings.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The {@code JabRefPreferences} class provides the preferences and their defaults using the JDK {@code java.util.prefs}
+ * class.
+ * <p>
+ * Internally it defines symbols used to pick a value from the {@code java.util.prefs} interface and keeps a hashmap
+ * with all the default values.
+ * <p>
+ * There are still some similar preferences classes (OpenOfficePreferences and SharedDatabasePreferences) which also use
+ * the {@code java.util.prefs} API.
+ */
 public class JabRefPreferences implements PreferencesService {
 
     // Push to application preferences
-    public static final String EMACS_PATH = "emacsPath";
-    public static final String EMACS_ADDITIONAL_PARAMETERS = "emacsParameters";
+    public static final String PUSH_EMACS_PATH = "emacsPath";
+    public static final String PUSH_EMACS_ADDITIONAL_PARAMETERS = "emacsParameters";
+    public static final String PUSH_LYXPIPE = "lyxpipe";
+    public static final String PUSH_TEXSTUDIO_PATH = "TeXstudioPath";
+    public static final String PUSH_WINEDT_PATH = "winEdtPath";
+    public static final String PUSH_TEXMAKER_PATH = "texmakerPath";
+    public static final String PUSH_VIM_SERVER = "vimServer";
+    public static final String PUSH_VIM = "vim";
 
     /* contents of the defaults HashMap that are defined in this class.
      * There are more default parameters in this map which belong to separate preference classes.
      */
-    public static final String TEXSTUDIO_PATH = "TeXstudioPath";
-    public static final String WIN_EDT_PATH = "winEdtPath";
-    public static final String TEXMAKER_PATH = "texmakerPath";
-    public static final String VIM_SERVER = "vimServer";
-    public static final String VIM = "vim";
-    public static final String LYXPIPE = "lyxpipe";
     public static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
     public static final String FX_THEME = "fxTheme";
     public static final String LANGUAGE = "language";
@@ -158,7 +174,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SIDE_PANE_COMPONENT_NAMES = "sidePaneComponentNames";
     public static final String XMP_PRIVACY_FILTERS = "xmpPrivacyFilters";
     public static final String USE_XMP_PRIVACY_FILTER = "useXmpPrivacyFilter";
-    public static final String DEFAULT_AUTO_SORT = "defaultAutoSort";
     public static final String DEFAULT_SHOW_SOURCE = "defaultShowSource";
     // Window sizes
     public static final String SIZE_Y = "mainWindowSizeY";
@@ -170,9 +185,9 @@ public class JabRefPreferences implements PreferencesService {
     public static final String LAST_FOCUSED = "lastFocused";
     public static final String AUTO_OPEN_FORM = "autoOpenForm";
     public static final String IMPORT_WORKING_DIRECTORY = "importWorkingDirectory";
+    public static final String LAST_USED_EXPORT = "lastUsedExport";
     public static final String EXPORT_WORKING_DIRECTORY = "exportWorkingDirectory";
     public static final String WORKING_DIRECTORY = "workingDirectory";
-    public static final String GROUPS_DEFAULT_FIELD = "groupsDefaultField";
 
     public static final String KEYWORD_SEPARATOR = "groupKeywordSeparator";
     public static final String AUTO_ASSIGN_GROUP = "autoAssignGroup";
@@ -182,7 +197,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String MAIN_FONT_SIZE = "mainFontSize";
 
     public static final String RECENT_DATABASES = "recentDatabases";
-    public static final String RENAME_ON_MOVE_FILE_TO_FILE_DIR = "renameOnMoveFileToFileDir";
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
     public static final String SHOW_ADVANCED_HINTS = "showAdvancedHints";
     public static final String DEFAULT_ENCODING = "defaultEncoding";
@@ -224,9 +238,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
     public static final String AVOID_OVERWRITING_KEY = "avoidOverwritingKey";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
-    public static final String SHOW_FILE_LINKS_UPGRADE_WARNING = "showFileLinksUpgradeWarning";
     public static final String SIDE_PANE_WIDTH = "sidePaneWidthFX";
-    public static final String LAST_USED_EXPORT = "lastUsedExport";
     public static final String CITE_COMMAND = "citeCommand";
     public static final String GENERATE_KEYS_BEFORE_SAVING = "generateKeysBeforeSaving";
     public static final String EMAIL_SUBJECT = "emailSubject";
@@ -238,7 +250,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String RUN_AUTOMATIC_FILE_SEARCH = "runAutomaticFileSearch";
     public static final String AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY = "regExpSearchExpression";
     public static final String AUTOLINK_USE_REG_EXP_SEARCH_KEY = "useRegExpSearch";
-        // bibLocAsPrimaryDir is a misleading antique variable name, we keep it for reason of compatibility
+    // bibLocAsPrimaryDir is a misleading antique variable name, we keep it for reason of compatibility
     public static final String STORE_RELATIVE_TO_BIB = "bibLocAsPrimaryDir";
     public static final String SELECTED_FETCHER_INDEX = "selectedFetcherIndex";
     public static final String WEB_SEARCH_VISIBLE = "webSearchVisible";
@@ -340,12 +352,6 @@ public class JabRefPreferences implements PreferencesService {
     // Telemetry collection
     private static final String COLLECT_TELEMETRY = "collectTelemetry";
     private static final String ALREADY_ASKED_TO_COLLECT_TELEMETRY = "askedCollectTelemetry";
-    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefPreferences.class);
-    private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
-    private static final String DB_CONNECT_USERNAME = "dbConnectUsername";
-    private static final String DB_CONNECT_DATABASE = "dbConnectDatabase";
-    private static final String DB_CONNECT_HOSTNAME = "dbConnectHostname";
-    private static final String DB_CONNECT_SERVER_TYPE = "dbConnectServerType";
     private static final String PROTECTED_TERMS_ENABLED_EXTERNAL = "protectedTermsEnabledExternal";
     private static final String PROTECTED_TERMS_DISABLED_EXTERNAL = "protectedTermsDisabledExternal";
     private static final String PROTECTED_TERMS_ENABLED_INTERNAL = "protectedTermsEnabledInternal";
@@ -370,16 +376,16 @@ public class JabRefPreferences implements PreferencesService {
     private static final String USE_REMOTE_SERVER = "useRemoteServer";
     private static final String REMOTE_SERVER_PORT = "remoteServerPort";
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefPreferences.class);
+    private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
+
     // The only instance of this class:
     private static JabRefPreferences singleton;
     /**
      * HashMap that contains all preferences which are set by default
      */
     public final Map<String, Object> defaults = new HashMap<>();
-    /**
-     * Set with all custom {@link org.jabref.logic.importer.Importer}s
-     */
-    public final CustomImportList customImports;
+
     // The following field is used as a global variable during the export of a database.
     // By setting this field to the path of the database's default file directory, formatters
     // that should resolve external file paths can access this field. This is an ugly hack
@@ -391,12 +397,15 @@ public class JabRefPreferences implements PreferencesService {
     /**
      * Cache variables
      */
+    private Language language;
     private GlobalCitationKeyPattern globalCitationKeyPattern;
     private Map<String, Set<Field>> entryEditorTabList;
     private List<MainTableColumnModel> mainTableColumns;
     private List<MainTableColumnModel> mainTableColumnSortOrder;
     private PreviewPreferences previewPreferences;
+    private SidePanePreferences sidePanePreferences;
     private Theme globalTheme;
+    private Set<CustomImporter> customImporters;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -421,9 +430,13 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
 
-        defaults.put(TEXMAKER_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
-        defaults.put(WIN_EDT_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
-        defaults.put(TEXSTUDIO_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texstudio", "TeXstudio"));
+        defaults.put(PUSH_TEXMAKER_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
+        defaults.put(PUSH_WINEDT_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
+        defaults.put(PUSH_TEXSTUDIO_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texstudio", "TeXstudio"));
+        defaults.put(PUSH_LYXPIPE, USER_HOME + File.separator + ".lyx/lyxpipe");
+        defaults.put(PUSH_VIM, "vim");
+        defaults.put(PUSH_VIM_SERVER, "vim");
+        defaults.put(PUSH_EMACS_ADDITIONAL_PARAMETERS, "-n -e");
 
         defaults.put(BIBLATEX_DEFAULT_MODE, Boolean.FALSE);
 
@@ -432,16 +445,14 @@ public class JabRefPreferences implements PreferencesService {
 
         if (OS.OS_X) {
             defaults.put(FONT_FAMILY, "SansSerif");
-            defaults.put(EMACS_PATH, "emacsclient");
+            defaults.put(PUSH_EMACS_PATH, "emacsclient");
         } else if (OS.WINDOWS) {
-            defaults.put(EMACS_PATH, "emacsclient.exe");
+            defaults.put(PUSH_EMACS_PATH, "emacsclient.exe");
         } else {
             // Linux
             defaults.put(FONT_FAMILY, "SansSerif");
-            defaults.put(EMACS_PATH, "emacsclient");
+            defaults.put(PUSH_EMACS_PATH, "emacsclient");
         }
-
-        defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
 
         defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
 
@@ -458,9 +469,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PROXY_USERNAME, "");
         defaults.put(PROXY_PASSWORD, "");
 
-        defaults.put(LYXPIPE, USER_HOME + File.separator + ".lyx/lyxpipe");
-        defaults.put(VIM, "vim");
-        defaults.put(VIM_SERVER, "vim");
         defaults.put(POS_X, 0);
         defaults.put(POS_Y, 0);
         defaults.put(SIZE_X, 1024);
@@ -511,8 +519,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(LAST_FOCUSED, "");
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
 
-        defaults.put(DEFAULT_AUTO_SORT, Boolean.FALSE);
-
         defaults.put(MERGE_ENTRIES_DIFF_MODE, MergeEntries.DiffMode.WORD.name());
 
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
@@ -535,7 +541,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(DEFAULT_OWNER, System.getProperty("user.name"));
         defaults.put(MEMORY_STICK_MODE, Boolean.FALSE);
         defaults.put(SHOW_ADVANCED_HINTS, Boolean.TRUE);
-        defaults.put(RENAME_ON_MOVE_FILE_TO_FILE_DIR, Boolean.TRUE);
 
         defaults.put(EXTRA_FILE_COLUMNS, Boolean.FALSE);
 
@@ -603,7 +608,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(MAIN_FONT_SIZE, 9);
         defaults.put(OVERRIDE_DEFAULT_FONT_SIZE, false);
 
-        defaults.put(SHOW_FILE_LINKS_UPGRADE_WARNING, Boolean.TRUE);
         defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.FALSE);
         defaults.put(RUN_AUTOMATIC_FILE_SEARCH, Boolean.FALSE);
         defaults.put(LOCAL_AUTO_SAVE, Boolean.FALSE);
@@ -619,10 +623,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(GROUP_SIDEPANE_VISIBLE, Boolean.TRUE);
         defaults.put(SELECTED_FETCHER_INDEX, 0);
         defaults.put(STORE_RELATIVE_TO_BIB, Boolean.TRUE);
-        defaults.put(DB_CONNECT_SERVER_TYPE, "MySQL");
-        defaults.put(DB_CONNECT_HOSTNAME, "localhost");
-        defaults.put(DB_CONNECT_DATABASE, "jabref");
-        defaults.put(DB_CONNECT_USERNAME, "root");
         defaults.put(COLLECT_TELEMETRY, Boolean.FALSE);
         defaults.put(ALREADY_ASKED_TO_COLLECT_TELEMETRY, Boolean.FALSE);
 
@@ -635,8 +635,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(IMPORT_FILEDIRPATTERN, "");
         // Download files by default
         defaults.put(DOWNLOAD_LINKED_FILES, true);
-
-        customImports = new CustomImportList(this);
 
         String defaultExpression = "**/.*[citationkey].*\\\\.[extension]";
         defaults.put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
@@ -663,16 +661,17 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PREVIEW_STYLE,
                 "<font face=\"sans-serif\">" +
                         "<b>\\bibtextype</b><a name=\"\\citationkey\">\\begin{citationkey} (\\citationkey)</a>\\end{citationkey}__NEWLINE__" +
-                        "\\begin{author}<BR><BR>\\format[Authors(LastFirst, FullName,Sep= / ,Sep= / ),HTMLChars]{\\author}\\end{author}__NEWLINE__" +
-                        "\\begin{editor & !author}<BR><BR>\\format[Authors(LastFirst,FullName,Sep= / ,Sep= / ),HTMLChars]{\\editor} (\\format[IfPlural(Eds.,Ed.)]{\\editor})\\end{editor & !author}__NEWLINE__" +
+                        "\\begin{author}<BR><BR>\\format[Authors(LastFirst, FullName,Sep= / ,LastSep= / ),HTMLChars]{\\author}\\end{author}__NEWLINE__" +
+                        "\\begin{editor & !author}<BR><BR>\\format[Authors(LastFirst,FullName,Sep= / ,LastSep= / ),HTMLChars]{\\editor} (\\format[IfPlural(Eds.,Ed.)]{\\editor})\\end{editor & !author}__NEWLINE__" +
                         "\\begin{title}<BR><b>\\format[HTMLChars]{\\title}</b> \\end{title}__NEWLINE__" +
-                        "\\begin{year}<BR>\\year\\end{year}__NEWLINE__" +
-                        "\\begin{booktitle}<BR><i>\\format[HTMLChars]{\\booktitle}</i>, \\end{booktitle}__NEWLINE__" +
+                        "<BR>\\begin{date}\\date\\end{date}\\begin{edition}, \\edition. edition\\end{edition}__NEWLINE__" +
+                        "\\begin{editor & author}<BR><BR>\\format[Authors(LastFirst,FullName,Sep= / ,LastSep= / ),HTMLChars]{\\editor} (\\format[IfPlural(Eds.,Ed.)]{\\editor})\\end{editor & author}__NEWLINE__" +
+                        "\\begin{booktitle}<BR><i>\\format[HTMLChars]{\\booktitle}</i>\\end{booktitle}__NEWLINE__" +
                         "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}" +
-                        "\\begin{journal}<BR><BR><i>\\format[HTMLChars]{\\journal}</i> \\end{journal} \\begin{volume}, Vol. \\volume\\end{volume}\\begin{series}<BR> \\format[HTMLChars]{\\series}\\end{series}\\begin{number}, No. \\format[HTMLChars]{\\number}\\end{number}__NEWLINE__" +
+                        "\\begin{editor & !author}<BR>\\end{editor & !author}\\begin{!editor}<BR>\\end{!editor}\\begin{journal}<BR><i>\\format[HTMLChars]{\\journal}</i> \\end{journal} \\begin{volume}, Vol. \\volume\\end{volume}\\begin{series}<BR>\\format[HTMLChars]{\\series}\\end{series}\\begin{number}, No. \\format[HTMLChars]{\\number}\\end{number}__NEWLINE__" +
                         "\\begin{school} \\format[HTMLChars]{\\school}, \\end{school}__NEWLINE__" +
                         "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__" +
-                        "\\begin{publisher}<BR><BR>\\format[HTMLChars]{\\publisher}\\end{publisher}\\begin{location}: \\format[HTMLChars]{\\location} \\end{location}__NEWLINE__" +
+                        "\\begin{publisher}<BR>\\format[HTMLChars]{\\publisher}\\end{publisher}\\begin{location}: \\format[HTMLChars]{\\location} \\end{location}__NEWLINE__" +
                         "\\begin{pages}<BR> p. \\format[FormatPagesForHTML]{\\pages}\\end{pages}__NEWLINE__" +
                         "\\begin{abstract}<BR><BR><b>Abstract: </b>\\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__" +
                         "\\begin{owncitation}<BR><BR><b>Own citation: </b>\\format[HTMLChars]{\\owncitation} \\end{owncitation}__NEWLINE__" +
@@ -680,11 +679,16 @@ public class JabRefPreferences implements PreferencesService {
                         "</font>__NEWLINE__");
 
         // set default theme
-        defaults.put(JabRefPreferences.FX_THEME, Theme.BASE_CSS);
+        defaults.put(FX_THEME, Theme.BASE_CSS);
 
         setLanguageDependentDefaultValues();
     }
 
+    /**
+     * @return Instance of JaRefPreferences
+     * @deprecated Use {@link PreferencesService} instead
+     */
+    @Deprecated
     public static JabRefPreferences getInstance() {
         if (JabRefPreferences.singleton == null) {
             JabRefPreferences.singleton = new JabRefPreferences();
@@ -756,30 +760,9 @@ public class JabRefPreferences implements PreferencesService {
                 CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX);
 
         for (CleanupPreset.CleanupStep action : EnumSet.allOf(CleanupPreset.CleanupStep.class)) {
-            storage.put(JabRefPreferences.CLEANUP + action.name(), !deactivatedJobs.contains(action));
+            storage.put(CLEANUP + action.name(), !deactivatedJobs.contains(action));
         }
         storage.put(CLEANUP_FORMATTERS, convertListToString(Cleanups.DEFAULT_SAVE_ACTIONS.getAsStringList(OS.NEWLINE)));
-    }
-
-    public Map<SidePaneType, Integer> getSidePanePreferredPositions() {
-        Map<SidePaneType, Integer> preferredPositions = new HashMap<>();
-
-        List<String> componentNames = getStringList(SIDE_PANE_COMPONENT_NAMES);
-        List<String> componentPositions = getStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS);
-
-        for (int i = 0; i < componentNames.size(); ++i) {
-            String name = componentNames.get(i);
-            try {
-                SidePaneType type = Enum.valueOf(SidePaneType.class, name);
-                preferredPositions.put(type, Integer.parseInt(componentPositions.get(i)));
-            } catch (NumberFormatException e) {
-                LOGGER.debug("Invalid number format for side pane component '" + name + "'", e);
-            } catch (IllegalArgumentException e) {
-                LOGGER.debug("Following component is not a side pane: '" + name + "'", e);
-            }
-        }
-
-        return preferredPositions;
     }
 
     @Override
@@ -919,44 +902,11 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     /**
-     * Returns the default BibDatabase mode, which can be either BIBTEX or BIBLATEX.
-     *
-     * @return the default BibDatabaseMode
-     */
-    public BibDatabaseMode getDefaultBibDatabaseMode() {
-        if (getBoolean(BIBLATEX_DEFAULT_MODE)) {
-            return BibDatabaseMode.BIBLATEX;
-        } else {
-            return BibDatabaseMode.BIBTEX;
-        }
-    }
-
-    /**
-     * Set the default value for a key. This is useful for plugins that need to add default values for the prefs keys they use.
-     *
-     * @param key   The preferences key.
-     * @param value The default value.
-     */
-    public void putDefaultValue(String key, Object value) {
-        defaults.put(key, value);
-    }
-
-    /**
-     * Stores a color in preferences.
-     *
-     * @param key   The key for this setting.
-     * @param color The Color to store.
-     */
-    public void putColor(String key, Color color) {
-        String rgb = String.valueOf(color.getRed()) + ':' + color.getGreen() + ':' + color.getBlue();
-        put(key, rgb);
-    }
-
-    /**
      * Clear all preferences.
      *
      * @throws BackingStoreException if JabRef is unable to write to the registry/the preferences storage
      */
+    @Override
     public void clear() throws BackingStoreException {
         clearAllBibEntryTypes();
         clearCitationKeyPatterns();
@@ -972,6 +922,7 @@ public class JabRefPreferences implements PreferencesService {
     /**
      * Calling this method will write all preferences into the preference store.
      */
+    @Override
     public void flush() {
         if (getBoolean(MEMORY_STICK_MODE)) {
             try {
@@ -987,54 +938,7 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    public void storeBibEntryTypes(Collection<BibEntryType> bibEntryTypes, BibDatabaseMode bibDatabaseMode) {
-        Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
-
-        try {
-            // clear old custom types
-            clearBibEntryTypes(bibDatabaseMode);
-
-            // store current custom types
-            bibEntryTypes.forEach(type -> prefsNode.put(type.getType().getName(), BibEntryTypesManager.serialize(type)));
-
-            prefsNode.flush();
-        } catch (BackingStoreException e) {
-            LOGGER.info("Updating stored custom entry types failed.", e);
-        }
-    }
-
     @Override
-    public List<BibEntryType> loadBibEntryTypes(BibDatabaseMode bibDatabaseMode) {
-        List<BibEntryType> storedEntryTypes = new ArrayList<>();
-        Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
-        try {
-            Arrays.stream(prefsNode.keys())
-                  .map(key -> prefsNode.get(key, null))
-                  .filter(Objects::nonNull)
-                  .forEach(typeString -> BibEntryTypesManager.parse(typeString).ifPresent(storedEntryTypes::add));
-        } catch (BackingStoreException e) {
-            LOGGER.info("Parsing customized entry types failed.", e);
-        }
-        return storedEntryTypes;
-    }
-
-    public void clearAllBibEntryTypes() {
-        for (BibDatabaseMode mode : BibDatabaseMode.values()) {
-            clearBibEntryTypes(mode);
-        }
-    }
-
-    @Override
-    public void clearBibEntryTypes(BibDatabaseMode mode) {
-        try {
-            Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(mode);
-            prefsNode.clear();
-            prefsNode.flush();
-        } catch (BackingStoreException e) {
-            LOGGER.error("Resetting customized entry types failed.", e);
-        }
-    }
-
     public Map<String, Object> getPreferences() {
         Map<String, Object> result = new HashMap<>();
 
@@ -1044,6 +948,11 @@ public class JabRefPreferences implements PreferencesService {
             LOGGER.info("could not retrieve preference keys", e);
         }
         return result;
+    }
+
+    @Override
+    public Map<String, Object> getDefaults() {
+        return defaults;
     }
 
     private void addPrefsRecursively(Preferences prefs, Map<String, Object> result) throws BackingStoreException {
@@ -1093,6 +1002,7 @@ public class JabRefPreferences implements PreferencesService {
         exportPreferences(Path.of(filename));
     }
 
+    @Override
     public void exportPreferences(Path file) throws JabRefException {
         LOGGER.debug("Exporting preferences {}", file.toAbsolutePath());
         try (OutputStream os = Files.newOutputStream(file)) {
@@ -1113,6 +1023,7 @@ public class JabRefPreferences implements PreferencesService {
         importPreferences(Path.of(filename));
     }
 
+    @Override
     public void importPreferences(Path file) throws JabRefException {
         try (InputStream is = Files.newInputStream(file)) {
             Preferences.importPreferences(is);
@@ -1120,21 +1031,6 @@ public class JabRefPreferences implements PreferencesService {
             throw new JabRefException("Could not import preferences", Localization.lang("Could not import preferences"),
                     ex);
         }
-    }
-
-    /**
-     * ONLY FOR TESTING!
-     * <p>
-     * Do not use in production code. Otherwise the singleton pattern is broken and preferences might get lost.
-     *
-     * @param owPrefs The custom preferences to overwrite the currently present
-     */
-    public void overwritePreferences(JabRefPreferences owPrefs) {
-        singleton = owPrefs;
-    }
-
-    public String getWrappedUsername() {
-        return '[' + get(DEFAULT_OWNER) + ']';
     }
 
     private FileLinkPreferences getFileLinkPreferences() {
@@ -1154,73 +1050,37 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public OpenOfficePreferences getOpenOfficePreferences() {
         return new OpenOfficePreferences(
-                get(JabRefPreferences.OO_JARS_PATH),
-                get(JabRefPreferences.OO_EXECUTABLE_PATH),
-                get(JabRefPreferences.OO_PATH),
-                getBoolean(JabRefPreferences.OO_USE_ALL_OPEN_BASES),
-                getBoolean(JabRefPreferences.OO_SYNC_WHEN_CITING),
-                getBoolean(JabRefPreferences.OO_SHOW_PANEL),
-                getStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES),
-                get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE));
+                get(OO_JARS_PATH),
+                get(OO_EXECUTABLE_PATH),
+                get(OO_PATH),
+                getBoolean(OO_USE_ALL_OPEN_BASES),
+                getBoolean(OO_SYNC_WHEN_CITING),
+                getBoolean(OO_SHOW_PANEL),
+                getStringList(OO_EXTERNAL_STYLE_FILES),
+                get(OO_BIBLIOGRAPHY_STYLE_FILE));
     }
 
     @Override
     public void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences) {
-        put(JabRefPreferences.OO_JARS_PATH, openOfficePreferences.getJarsPath());
-        put(JabRefPreferences.OO_EXECUTABLE_PATH, openOfficePreferences.getExecutablePath());
-        put(JabRefPreferences.OO_PATH, openOfficePreferences.getInstallationPath());
-        putBoolean(JabRefPreferences.OO_USE_ALL_OPEN_BASES, openOfficePreferences.getUseAllDatabases());
-        putBoolean(JabRefPreferences.OO_SYNC_WHEN_CITING, openOfficePreferences.getSyncWhenCiting());
-        putBoolean(JabRefPreferences.OO_SHOW_PANEL, openOfficePreferences.getShowPanel());
-        putStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalStyles());
-        put(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE, openOfficePreferences.getCurrentStyle());
+        put(OO_JARS_PATH, openOfficePreferences.getJarsPath());
+        put(OO_EXECUTABLE_PATH, openOfficePreferences.getExecutablePath());
+        put(OO_PATH, openOfficePreferences.getInstallationPath());
+        putBoolean(OO_USE_ALL_OPEN_BASES, openOfficePreferences.getUseAllDatabases());
+        putBoolean(OO_SYNC_WHEN_CITING, openOfficePreferences.getSyncWhenCiting());
+        putBoolean(OO_SHOW_PANEL, openOfficePreferences.getShowPanel());
+        putStringList(OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalStyles());
+        put(OO_BIBLIOGRAPHY_STYLE_FILE, openOfficePreferences.getCurrentStyle());
     }
 
-    public JabRefPreferences storeVersionPreferences(VersionPreferences versionPreferences) {
-        put(VERSION_IGNORED_UPDATE, versionPreferences.getIgnoredVersion().toString());
-        return this;
-    }
-
+    @Override
     public VersionPreferences getVersionPreferences() {
         Version ignoredVersion = Version.parse(get(VERSION_IGNORED_UPDATE));
         return new VersionPreferences(ignoredVersion);
     }
 
-    public ProtectedTermsPreferences getProtectedTermsPreferences() {
-        return new ProtectedTermsPreferences(
-                getStringList(PROTECTED_TERMS_ENABLED_INTERNAL),
-                getStringList(PROTECTED_TERMS_ENABLED_EXTERNAL),
-                getStringList(PROTECTED_TERMS_DISABLED_INTERNAL),
-                getStringList(PROTECTED_TERMS_DISABLED_EXTERNAL));
-    }
-
     @Override
-    public void setProtectedTermsPreferences(ProtectedTermsLoader loader) {
-        List<String> enabledExternalList = new ArrayList<>();
-        List<String> disabledExternalList = new ArrayList<>();
-        List<String> enabledInternalList = new ArrayList<>();
-        List<String> disabledInternalList = new ArrayList<>();
-
-        for (ProtectedTermsList list : loader.getProtectedTermsLists()) {
-            if (list.isInternalList()) {
-                if (list.isEnabled()) {
-                    enabledInternalList.add(list.getLocation());
-                } else {
-                    disabledInternalList.add(list.getLocation());
-                }
-            } else {
-                if (list.isEnabled()) {
-                    enabledExternalList.add(list.getLocation());
-                } else {
-                    disabledExternalList.add(list.getLocation());
-                }
-            }
-        }
-
-        putStringList(PROTECTED_TERMS_ENABLED_EXTERNAL, enabledExternalList);
-        putStringList(PROTECTED_TERMS_DISABLED_EXTERNAL, disabledExternalList);
-        putStringList(PROTECTED_TERMS_ENABLED_INTERNAL, enabledInternalList);
-        putStringList(PROTECTED_TERMS_DISABLED_INTERNAL, disabledInternalList);
+    public void storeVersionPreferences(VersionPreferences versionPreferences) {
+        put(VERSION_IGNORED_UPDATE, versionPreferences.getIgnoredVersion().toString());
     }
 
     @Override
@@ -1240,12 +1100,12 @@ public class JabRefPreferences implements PreferencesService {
         Set<CleanupPreset.CleanupStep> activeJobs = EnumSet.noneOf(CleanupPreset.CleanupStep.class);
 
         for (CleanupPreset.CleanupStep action : EnumSet.allOf(CleanupPreset.CleanupStep.class)) {
-            if (getBoolean(JabRefPreferences.CLEANUP + action.name())) {
+            if (getBoolean(CLEANUP + action.name())) {
                 activeJobs.add(action);
             }
         }
 
-        FieldFormatterCleanups formatterCleanups = Cleanups.parse(getStringList(JabRefPreferences.CLEANUP_FORMATTERS));
+        FieldFormatterCleanups formatterCleanups = Cleanups.parse(getStringList(CLEANUP_FORMATTERS));
 
         return new CleanupPreset(activeJobs, formatterCleanups);
     }
@@ -1253,10 +1113,10 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void setCleanupPreset(CleanupPreset cleanupPreset) {
         for (CleanupPreset.CleanupStep action : EnumSet.allOf(CleanupPreset.CleanupStep.class)) {
-            putBoolean(JabRefPreferences.CLEANUP + action.name(), cleanupPreset.isActive(action));
+            putBoolean(CLEANUP + action.name(), cleanupPreset.isActive(action));
         }
 
-        putStringList(JabRefPreferences.CLEANUP_FORMATTERS, cleanupPreset.getFormatterCleanups().getAsStringList(OS.NEWLINE));
+        putStringList(CLEANUP_FORMATTERS, cleanupPreset.getFormatterCleanups().getAsStringList(OS.NEWLINE));
     }
 
     @Override
@@ -1306,8 +1166,8 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public void storeKeyBindingRepository(KeyBindingRepository keyBindingRepository) {
-        putStringList(JabRefPreferences.BIND_NAMES, keyBindingRepository.getBindNames());
-        putStringList(JabRefPreferences.BINDINGS, keyBindingRepository.getBindings());
+        putStringList(BIND_NAMES, keyBindingRepository.getBindNames());
+        putStringList(BINDINGS, keyBindingRepository.getBindings());
     }
 
     @Override
@@ -1317,21 +1177,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public void storeJournalAbbreviationPreferences(JournalAbbreviationPreferences abbreviationsPreferences) {
-        putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, abbreviationsPreferences.getExternalJournalLists());
-    }
-
-    public void storeSidePanePreferredPositions(Map<SidePaneType, Integer> preferredPositions) {
-        // Split the map into a pair of parallel String lists suitable for storage
-        List<String> names = preferredPositions.keySet().stream()
-                                               .map(Enum::toString)
-                                               .collect(Collectors.toList());
-
-        List<String> positions = preferredPositions.values().stream()
-                                                   .map(integer -> Integer.toString(integer))
-                                                   .collect(Collectors.toList());
-
-        putStringList(SIDE_PANE_COMPONENT_NAMES, names);
-        putStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, positions);
+        putStringList(EXTERNAL_JOURNAL_LISTS, abbreviationsPreferences.getExternalJournalLists());
     }
 
     public void setPreviewStyle(String previewStyle) {
@@ -1342,100 +1188,14 @@ public class JabRefPreferences implements PreferencesService {
         return get(PREVIEW_STYLE);
     }
 
-    public Optional<Integer> getFontSize() {
-        if (getBoolean(OVERRIDE_DEFAULT_FONT_SIZE)) {
-            return Optional.of(getInt(MAIN_FONT_SIZE));
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    public void setIdBasedFetcherForEntryGenerator(String fetcherName) {
-        put(ID_ENTRY_GENERATOR, fetcherName);
-    }
-
-    public String getIdBasedFetcherForEntryGenerator() {
-        return get(ID_ENTRY_GENERATOR);
-    }
-
-    @Override
-    public List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository abbreviationRepository) {
-        int i = 0;
-        List<TemplateExporter> formats = new ArrayList<>();
-        String exporterName;
-        String filename;
-        String extension;
-        LayoutFormatterPreferences layoutPreferences = getLayoutFormatterPreferences(abbreviationRepository);
-        SavePreferences savePreferences = getSavePreferencesForExport();
-        List<String> formatData;
-        while (!((formatData = getStringList(CUSTOM_EXPORT_FORMAT + i)).isEmpty())) {
-            exporterName = formatData.get(EXPORTER_NAME_INDEX);
-            filename = formatData.get(EXPORTER_FILENAME_INDEX);
-            extension = formatData.get(EXPORTER_EXTENSION_INDEX);
-            TemplateExporter format = new TemplateExporter(exporterName, filename, extension,
-                    layoutPreferences, savePreferences);
-            format.setCustomExport(true);
-            formats.add(format);
-            i++;
-        }
-        return formats;
-    }
-
-    @Override
-    public void storeCustomExportFormats(List<TemplateExporter> exporters) {
-        if (exporters.isEmpty()) {
-            purgeCustomExportFormats(0);
-        } else {
-            for (int i = 0; i < exporters.size(); i++) {
-                List<String> exporterData = new ArrayList<>();
-                exporterData.add(EXPORTER_NAME_INDEX, exporters.get(i).getName());
-                exporterData.add(EXPORTER_FILENAME_INDEX, exporters.get(i).getLayoutFileName());
-                // Only stores the first extension associated with FileType
-                exporterData.add(EXPORTER_EXTENSION_INDEX, exporters.get(i).getFileType().getExtensions().get(0));
-                putStringList(CUSTOM_EXPORT_FORMAT + i, exporterData);
-            }
-            purgeCustomExportFormats(exporters.size());
-        }
-    }
-
-    private void purgeCustomExportFormats(int from) {
-        int i = from;
-        while (!getStringList(CUSTOM_EXPORT_FORMAT + i).isEmpty()) {
-            remove(CUSTOM_EXPORT_FORMAT + i);
-            i++;
-        }
-    }
-
-    @Override
-    public String getExportWorkingDirectory() {
-        return get(EXPORT_WORKING_DIRECTORY);
-    }
-
-    @Override
-    public void setExportWorkingDirectory(String layoutFileDirString) {
-        put(EXPORT_WORKING_DIRECTORY, layoutFileDirString);
-    }
-
     @Override
     public boolean shouldWarnAboutDuplicatesForImport() {
-        return getBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION);
+        return getBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION);
     }
 
     @Override
     public void setShouldWarnAboutDuplicatesForImport(boolean value) {
-        putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, value);
-    }
-
-    @Override
-    public void saveCustomEntryTypes(BibEntryTypesManager entryTypesManager) {
-        saveCustomEntryTypes(BibDatabaseMode.BIBTEX, entryTypesManager);
-        saveCustomEntryTypes(BibDatabaseMode.BIBLATEX, entryTypesManager);
-    }
-
-    private void saveCustomEntryTypes(BibDatabaseMode bibDatabaseMode, BibEntryTypesManager entryTypesManager) {
-        Collection<BibEntryType> customBiblatexBibTexTypes = entryTypesManager.getAllTypes(bibDatabaseMode);
-
-        storeBibEntryTypes(customBiblatexBibTexTypes, bibDatabaseMode);
+        putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, value);
     }
 
     @Override
@@ -1445,16 +1205,91 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     //*************************************************************************************************************
+    // CustomEntryTypes
+    //
+    // Note that here the pattern is broken: getBibEntryTypes returns something different than storeCustomEntryTypes
+    // stores. The proper opposite part would be storeBibEntryTypes, which is private, as it is called only by the
+    // latter method.
+    //*************************************************************************************************************
+
+    @Override
+    public List<BibEntryType> getBibEntryTypes(BibDatabaseMode bibDatabaseMode) {
+        List<BibEntryType> storedEntryTypes = new ArrayList<>();
+        Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
+        try {
+            Arrays.stream(prefsNode.keys())
+                  .map(key -> prefsNode.get(key, null))
+                  .filter(Objects::nonNull)
+                  .forEach(typeString -> BibEntryTypesManager.parse(typeString).ifPresent(storedEntryTypes::add));
+        } catch (BackingStoreException e) {
+            LOGGER.info("Parsing customized entry types failed.", e);
+        }
+        return storedEntryTypes;
+    }
+
+    private void clearAllBibEntryTypes() {
+        for (BibDatabaseMode mode : BibDatabaseMode.values()) {
+            clearBibEntryTypes(mode);
+        }
+    }
+
+    @Override
+    public void clearBibEntryTypes(BibDatabaseMode mode) {
+        try {
+            Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(mode);
+            prefsNode.clear();
+            prefsNode.flush();
+        } catch (BackingStoreException e) {
+            LOGGER.error("Resetting customized entry types failed.", e);
+        }
+    }
+
+    @Override
+    public void storeCustomEntryTypes(BibEntryTypesManager entryTypesManager) {
+        storeBibEntryTypes(BibDatabaseMode.BIBTEX, entryTypesManager);
+        storeBibEntryTypes(BibDatabaseMode.BIBLATEX, entryTypesManager);
+    }
+
+    private void storeBibEntryTypes(BibDatabaseMode bibDatabaseMode, BibEntryTypesManager entryTypesManager) {
+        Collection<BibEntryType> customBiblatexBibTexTypes = entryTypesManager.getAllTypes(bibDatabaseMode);
+
+        storeBibEntryTypes(customBiblatexBibTexTypes, bibDatabaseMode);
+    }
+
+    private void storeBibEntryTypes(Collection<BibEntryType> bibEntryTypes, BibDatabaseMode bibDatabaseMode) {
+        Preferences prefsNode = getPrefsNodeForCustomizedEntryTypes(bibDatabaseMode);
+
+        try {
+            // clear old custom types
+            clearBibEntryTypes(bibDatabaseMode);
+
+            // store current custom types
+            bibEntryTypes.forEach(type -> prefsNode.put(type.getType().getName(), BibEntryTypesManager.serialize(type)));
+
+            prefsNode.flush();
+        } catch (BackingStoreException e) {
+            LOGGER.info("Updating stored custom entry types failed.", e);
+        }
+    }
+
+    //*************************************************************************************************************
     // GeneralPreferences
     //*************************************************************************************************************
 
     @Override
     public Language getLanguage() {
+        if (language == null) {
+            updateLanguage();
+        }
+        return language;
+    }
+
+    private void updateLanguage() {
         String languageId = get(LANGUAGE);
-        return Stream.of(Language.values())
-                     .filter(language -> language.getId().equalsIgnoreCase(languageId))
-                     .findFirst()
-                     .orElse(Language.ENGLISH);
+        language = Stream.of(Language.values())
+                         .filter(language -> language.getId().equalsIgnoreCase(languageId))
+                         .findFirst()
+                         .orElse(Language.ENGLISH);
     }
 
     @Override
@@ -1465,6 +1300,7 @@ public class JabRefPreferences implements PreferencesService {
             // Update any defaults that might be language dependent:
             setLanguageDependentDefaultValues();
         }
+        updateLanguage();
     }
 
     @Override
@@ -1472,34 +1308,18 @@ public class JabRefPreferences implements PreferencesService {
         return Charset.forName(get(DEFAULT_ENCODING));
     }
 
+    /**
+     * Returns the default BibDatabase mode, which can be either BIBTEX or BIBLATEX.
+     *
+     * @return the default BibDatabaseMode
+     */
     @Override
-    public boolean shouldCollectTelemetry() {
-        return getBoolean(COLLECT_TELEMETRY);
-    }
-
-    @Override
-    public void setShouldCollectTelemetry(boolean value) {
-        putBoolean(COLLECT_TELEMETRY, value);
-    }
-
-    @Override
-    public boolean shouldAskToCollectTelemetry() {
-        return getBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY);
-    }
-
-    @Override
-    public void askedToCollectTelemetry() {
-        putBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY, true);
-    }
-
-    @Override
-    public String getUnwantedCharacters() {
-        return get(UNWANTED_CITATION_KEY_CHARACTERS);
-    }
-
-    @Override
-    public boolean getAllowIntegerEdition() {
-        return getBoolean(ALLOW_INTEGER_EDITION_BIBTEX);
+    public BibDatabaseMode getDefaultBibDatabaseMode() {
+        if (getBoolean(BIBLATEX_DEFAULT_MODE)) {
+            return BibDatabaseMode.BIBLATEX;
+        } else {
+            return BibDatabaseMode.BIBTEX;
+        }
     }
 
     @Override
@@ -1511,7 +1331,6 @@ public class JabRefPreferences implements PreferencesService {
                 getBoolean(CONFIRM_DELETE),
                 getBoolean(ALLOW_INTEGER_EDITION_BIBTEX),
                 getBoolean(MEMORY_STICK_MODE),
-                shouldCollectTelemetry(),
                 getBoolean(SHOW_ADVANCED_HINTS));
     }
 
@@ -1523,8 +1342,21 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(CONFIRM_DELETE, preferences.shouldConfirmDelete());
         putBoolean(ALLOW_INTEGER_EDITION_BIBTEX, preferences.shouldAllowIntegerEditionBibtex());
         putBoolean(MEMORY_STICK_MODE, preferences.isMemoryStickMode());
-        setShouldCollectTelemetry(preferences.shouldCollectTelemetry());
         putBoolean(SHOW_ADVANCED_HINTS, preferences.shouldShowAdvancedHints());
+    }
+
+    @Override
+    public TelemetryPreferences getTelemetryPreferences() {
+        return new TelemetryPreferences(
+                getBoolean(COLLECT_TELEMETRY),
+                !getBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY) // mind the !
+        );
+    }
+
+    @Override
+    public void storeTelemetryPreferences(TelemetryPreferences preferences) {
+        putBoolean(COLLECT_TELEMETRY, preferences.shouldCollectTelemetry());
+        putBoolean(ALREADY_ASKED_TO_COLLECT_TELEMETRY, !preferences.shouldAskToCollectTelemetry()); // mind the !
     }
 
     @Override
@@ -1554,11 +1386,11 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public void storeTimestampPreferences(TimestampPreferences preferences) {
-        putBoolean(USE_TIME_STAMP, preferences.isUseTimestamps());
-        putBoolean(UPDATE_TIMESTAMP, preferences.isUpdateTimestamp());
+        putBoolean(USE_TIME_STAMP, preferences.shouldUseTimestamps());
+        putBoolean(UPDATE_TIMESTAMP, preferences.shouldUpdateTimestamp());
         put(TIME_STAMP_FIELD, preferences.getTimestampField().getName());
         put(TIME_STAMP_FORMAT, preferences.getTimestampFormat());
-        putBoolean(OVERWRITE_TIME_STAMP, preferences.isOverwriteTimestamp());
+        putBoolean(OVERWRITE_TIME_STAMP, preferences.shouldOverwriteTimestamp());
     }
 
     //*************************************************************************************************************
@@ -1575,15 +1407,15 @@ public class JabRefPreferences implements PreferencesService {
         return new GroupsPreferences(
                 GroupViewMode.valueOf(get(GROUP_INTERSECT_UNION_VIEW_MODE)),
                 getBoolean(AUTO_ASSIGN_GROUP),
-                getBoolean(JabRefPreferences.DISPLAY_GROUP_COUNT),
-                get(JabRefPreferences.KEYWORD_SEPARATOR).charAt(0));
+                getBoolean(DISPLAY_GROUP_COUNT),
+                get(KEYWORD_SEPARATOR).charAt(0));
     }
 
     @Override
     public void storeGroupsPreferences(GroupsPreferences preferences) {
         put(GROUP_INTERSECT_UNION_VIEW_MODE, preferences.getGroupViewMode().name());
-        putBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP, preferences.shouldAutoAssignGroup());
-        putBoolean(JabRefPreferences.DISPLAY_GROUP_COUNT, preferences.shouldDisplayGroupCount());
+        putBoolean(AUTO_ASSIGN_GROUP, preferences.shouldAutoAssignGroup());
+        putBoolean(DISPLAY_GROUP_COUNT, preferences.shouldDisplayGroupCount());
         put(KEYWORD_SEPARATOR, String.valueOf(preferences.getKeywordDelimiter()));
     }
 
@@ -1599,7 +1431,7 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public boolean getDisplayGroupCount() {
-        return getBoolean(JabRefPreferences.DISPLAY_GROUP_COUNT);
+        return getBoolean(DISPLAY_GROUP_COUNT);
     }
 
     //*************************************************************************************************************
@@ -1637,8 +1469,8 @@ public class JabRefPreferences implements PreferencesService {
             }
         } else {
             // Nothing set, so we use the default values:
-            while (get(JabRefPreferences.CUSTOM_TAB_NAME + "_def" + i) != null) {
-                name = get(JabRefPreferences.CUSTOM_TAB_NAME + "_def" + i);
+            while (get(CUSTOM_TAB_NAME + "_def" + i) != null) {
+                name = get(CUSTOM_TAB_NAME + "_def" + i);
                 Set<Field> entry = FieldFactory.parseFieldList(get(CUSTOM_TAB_FIELDS + "_def" + i));
                 tabs.put(name, entry);
                 i++;
@@ -1741,7 +1573,7 @@ public class JabRefPreferences implements PreferencesService {
         putBoolean(ACCEPT_RECOMMENDATIONS, preferences.isMrdlibAccepted());
         putBoolean(SHOW_LATEX_CITATIONS, preferences.shouldShowLatexCitationsTab());
         putBoolean(DEFAULT_SHOW_SOURCE, preferences.showSourceTabByDefault());
-        putBoolean(VALIDATE_IN_ENTRY_EDITOR, preferences.isEnableValidation());
+        putBoolean(VALIDATE_IN_ENTRY_EDITOR, preferences.shouldEnableValidation());
         putDouble(ENTRY_EDITOR_HEIGHT, preferences.getDividerPosition());
     }
 
@@ -1755,30 +1587,30 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public void storeRemotePreferences(RemotePreferences remotePreferences) {
-        putInt(REMOTE_SERVER_PORT, remotePreferences.getPort());
-        putBoolean(USE_REMOTE_SERVER, remotePreferences.useRemoteServer());
+    public void storeRemotePreferences(RemotePreferences preferences) {
+        putInt(REMOTE_SERVER_PORT, preferences.getPort());
+        putBoolean(USE_REMOTE_SERVER, preferences.useRemoteServer());
     }
 
     @Override
     public ProxyPreferences getProxyPreferences() {
-        Boolean useProxy = getBoolean(PROXY_USE);
-        String hostname = get(PROXY_HOSTNAME);
-        String port = get(PROXY_PORT);
-        Boolean useAuthentication = getBoolean(PROXY_USE_AUTHENTICATION);
-        String username = get(PROXY_USERNAME);
-        String password = get(PROXY_PASSWORD);
-        return new ProxyPreferences(useProxy, hostname, port, useAuthentication, username, password);
+        return new ProxyPreferences(
+                getBoolean(PROXY_USE),
+                get(PROXY_HOSTNAME),
+                get(PROXY_PORT),
+                getBoolean(PROXY_USE_AUTHENTICATION),
+                get(PROXY_USERNAME),
+                get(PROXY_PASSWORD));
     }
 
     @Override
-    public void storeProxyPreferences(ProxyPreferences proxyPreferences) {
-        putBoolean(PROXY_USE, proxyPreferences.isUseProxy());
-        put(PROXY_HOSTNAME, proxyPreferences.getHostname());
-        put(PROXY_PORT, proxyPreferences.getPort());
-        putBoolean(PROXY_USE_AUTHENTICATION, proxyPreferences.isUseAuthentication());
-        put(PROXY_USERNAME, proxyPreferences.getUsername());
-        put(PROXY_PASSWORD, proxyPreferences.getPassword());
+    public void storeProxyPreferences(ProxyPreferences preferences) {
+        putBoolean(PROXY_USE, preferences.isUseProxy());
+        put(PROXY_HOSTNAME, preferences.getHostname());
+        put(PROXY_PORT, preferences.getPort());
+        putBoolean(PROXY_USE_AUTHENTICATION, preferences.isUseAuthentication());
+        put(PROXY_USERNAME, preferences.getUsername());
+        put(PROXY_PASSWORD, preferences.getPassword());
     }
 
     //*************************************************************************************************************
@@ -1912,6 +1744,36 @@ public class JabRefPreferences implements PreferencesService {
     //*************************************************************************************************************
     // ExternalApplicationsPreferences
     //*************************************************************************************************************
+
+    @Override
+    public PushToApplicationPreferences getPushToApplicationPreferences() {
+        Map<String, String> applicationCommands = new HashMap<>();
+        applicationCommands.put(PushToEmacs.NAME, get(PUSH_EMACS_PATH));
+        applicationCommands.put(PushToLyx.NAME, get(PUSH_LYXPIPE));
+        applicationCommands.put(PushToTexmaker.NAME, get(PUSH_TEXMAKER_PATH));
+        applicationCommands.put(PushToTeXstudio.NAME, get(PUSH_TEXSTUDIO_PATH));
+        applicationCommands.put(PushToVim.NAME, get(PUSH_VIM));
+        applicationCommands.put(PushToWinEdt.NAME, get(PUSH_WINEDT_PATH));
+
+        return new PushToApplicationPreferences(
+                applicationCommands,
+                get(PUSH_EMACS_ADDITIONAL_PARAMETERS),
+                get(PUSH_VIM_SERVER)
+        );
+    }
+
+    @Override
+    public void storePushToApplicationPreferences(PushToApplicationPreferences preferences) {
+        put(PUSH_EMACS_PATH, preferences.getPushToApplicationCommandPaths().get(PushToEmacs.NAME));
+        put(PUSH_LYXPIPE, preferences.getPushToApplicationCommandPaths().get(PushToLyx.NAME));
+        put(PUSH_TEXMAKER_PATH, preferences.getPushToApplicationCommandPaths().get(PushToTexmaker.NAME));
+        put(PUSH_TEXSTUDIO_PATH, preferences.getPushToApplicationCommandPaths().get(PushToTeXstudio.NAME));
+        put(PUSH_VIM, preferences.getPushToApplicationCommandPaths().get(PushToVim.NAME));
+        put(PUSH_WINEDT_PATH, preferences.getPushToApplicationCommandPaths().get(PushToWinEdt.NAME));
+
+        put(PUSH_EMACS_ADDITIONAL_PARAMETERS, preferences.getEmacsArguments());
+        put(PUSH_VIM_SERVER, preferences.getVimServer());
+    }
 
     @Override
     public ExternalApplicationsPreferences getExternalApplicationsPreferences() {
@@ -2073,37 +1935,35 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public MainTableNameFormatPreferences getMainTableNameFormatPreferences() {
-        DisplayStyle displayStyle =
-                DisplayStyle.LASTNAME_FIRSTNAME;
-
-        if (getBoolean(JabRefPreferences.NAMES_NATBIB)) {
+        DisplayStyle displayStyle = DisplayStyle.LASTNAME_FIRSTNAME; // default
+        if (getBoolean(NAMES_NATBIB)) {
             displayStyle = DisplayStyle.NATBIB;
-        } else if (getBoolean(JabRefPreferences.NAMES_AS_IS)) {
+        } else if (getBoolean(NAMES_AS_IS)) {
             displayStyle = DisplayStyle.AS_IS;
-        } else if (getBoolean(JabRefPreferences.NAMES_FIRST_LAST)) {
+        } else if (getBoolean(NAMES_FIRST_LAST)) {
             displayStyle = DisplayStyle.FIRSTNAME_LASTNAME;
         }
 
-        AbbreviationStyle abbreviationStyle =
-                AbbreviationStyle.NONE;
-
-        if (getBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES)) {
+        AbbreviationStyle abbreviationStyle = AbbreviationStyle.NONE; // default
+        if (getBoolean(ABBR_AUTHOR_NAMES)) {
             abbreviationStyle = AbbreviationStyle.FULL;
-        } else if (getBoolean(JabRefPreferences.NAMES_LAST_ONLY)) {
+        } else if (getBoolean(NAMES_LAST_ONLY)) {
             abbreviationStyle = AbbreviationStyle.LASTNAME_ONLY;
         }
 
-        return new MainTableNameFormatPreferences(displayStyle, abbreviationStyle);
+        return new MainTableNameFormatPreferences(
+                displayStyle,
+                abbreviationStyle);
     }
 
     @Override
     public void storeMainTableNameFormatPreferences(MainTableNameFormatPreferences preferences) {
-        putBoolean(JabRefPreferences.NAMES_NATBIB, preferences.getDisplayStyle() == DisplayStyle.NATBIB);
-        putBoolean(JabRefPreferences.NAMES_AS_IS, preferences.getDisplayStyle() == DisplayStyle.AS_IS);
-        putBoolean(JabRefPreferences.NAMES_FIRST_LAST, preferences.getDisplayStyle() == DisplayStyle.FIRSTNAME_LASTNAME);
+        putBoolean(NAMES_NATBIB, preferences.getDisplayStyle() == DisplayStyle.NATBIB);
+        putBoolean(NAMES_AS_IS, preferences.getDisplayStyle() == DisplayStyle.AS_IS);
+        putBoolean(NAMES_FIRST_LAST, preferences.getDisplayStyle() == DisplayStyle.FIRSTNAME_LASTNAME);
 
-        putBoolean(JabRefPreferences.ABBR_AUTHOR_NAMES, preferences.getAbbreviationStyle() == AbbreviationStyle.FULL);
-        putBoolean(JabRefPreferences.NAMES_LAST_ONLY, preferences.getAbbreviationStyle() == AbbreviationStyle.LASTNAME_ONLY);
+        putBoolean(ABBR_AUTHOR_NAMES, preferences.getAbbreviationStyle() == AbbreviationStyle.FULL);
+        putBoolean(NAMES_LAST_ONLY, preferences.getAbbreviationStyle() == AbbreviationStyle.LASTNAME_ONLY);
     }
 
     //*************************************************************************************************************
@@ -2142,21 +2002,11 @@ public class JabRefPreferences implements PreferencesService {
     // File preferences
     //*************************************************************************************************************
 
-    @Override
-    public String getLastPreferencesExportPath() {
-        return get(PREFS_EXPORT_PATH);
-    }
-
-    @Override
-    public void storeLastPreferencesExportPath(Path exportFile) {
-        put(PREFS_EXPORT_PATH, exportFile.toString());
-    }
-
     // ToDo: Can this be disbanded?
     @Override
     public ImportFormatPreferences getImportFormatPreferences() {
         return new ImportFormatPreferences(
-                customImports,
+                getCustomImportFormats(),
                 getDefaultEncoding(),
                 getKeywordDelimiter(),
                 getCitationKeyPatternPreferences(),
@@ -2167,10 +2017,10 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public SavePreferences getSavePreferencesForExport() {
-        Boolean saveInOriginalOrder = this.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
+        Boolean saveInOriginalOrder = this.getBoolean(EXPORT_IN_ORIGINAL_ORDER);
         SaveOrderConfig saveOrder = null;
         if (!saveInOriginalOrder) {
-            if (this.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER)) {
+            if (this.getBoolean(EXPORT_IN_SPECIFIED_ORDER)) {
                 saveOrder = this.loadExportSaveOrder();
             } else {
                 saveOrder = this.loadTableSaveOrder();
@@ -2191,7 +2041,7 @@ public class JabRefPreferences implements PreferencesService {
                 this.getDefaultEncoding(),
                 SavePreferences.DatabaseSaveType.ALL,
                 true,
-                this.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT),
+                this.getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),
                 this.getFieldWriterPreferences(),
                 getCitationKeyPatternPreferences());
     }
@@ -2208,16 +2058,15 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public NewLineSeparator getNewLineSeparator() {
-        return NewLineSeparator.parse(get(JabRefPreferences.NEWLINE));
+        return NewLineSeparator.parse(get(NEWLINE));
     }
 
-    // ToDo: Can this be disbanded?
     @Override
     public void storeNewLineSeparator(NewLineSeparator newLineSeparator) {
         String escapeChars = newLineSeparator.toString();
-        put(JabRefPreferences.NEWLINE, escapeChars);
+        put(NEWLINE, escapeChars);
 
-        // we also have to change Globals variable as globals is not a getter, but a constant
+        // We also have to change Globals variable as globals is not a getter, but a constant
         OS.NEWLINE = escapeChars;
     }
 
@@ -2243,7 +2092,11 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void storeFileHistory(FileHistory history) {
         if (!history.isEmpty()) {
-            putStringList(RECENT_DATABASES, history.getHistory().stream().map(Path::toAbsolutePath).map(Path::toString).collect(Collectors.toList()));
+            putStringList(RECENT_DATABASES, history.getHistory()
+                                                   .stream()
+                                                   .map(Path::toAbsolutePath)
+                                                   .map(Path::toString)
+                                                   .collect(Collectors.toList()));
         }
     }
 
@@ -2253,8 +2106,8 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public void setWorkingDir(Path dir) {
-        put(WORKING_DIRECTORY, dir.toString());
+    public void setWorkingDirectory(Path directory) {
+        put(WORKING_DIRECTORY, directory.toString());
     }
 
     @Override
@@ -2271,14 +2124,14 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public void storeFilePreferences(FilePreferences filePreferences) {
-        put(MAIN_FILE_DIRECTORY, filePreferences.getFileDirectory().map(Path::toString).orElse(""));
-        putBoolean(STORE_RELATIVE_TO_BIB, filePreferences.shouldStoreFilesRelativeToBib());
-        put(IMPORT_FILENAMEPATTERN, filePreferences.getFileNamePattern());
-        put(IMPORT_FILEDIRPATTERN, filePreferences.getFileDirectoryPattern());
-        putBoolean(DOWNLOAD_LINKED_FILES, filePreferences.shouldDownloadLinkedFiles());
-        putBoolean(RUN_AUTOMATIC_FILE_SEARCH, filePreferences.shouldSearchFilesOnOpen());
-        putBoolean(ALLOW_FILE_AUTO_OPEN_BROWSE, filePreferences.shouldOpenBrowseOnCreate());
+    public void storeFilePreferences(FilePreferences preferences) {
+        put(MAIN_FILE_DIRECTORY, preferences.getFileDirectory().map(Path::toString).orElse(""));
+        putBoolean(STORE_RELATIVE_TO_BIB, preferences.shouldStoreFilesRelativeToBib());
+        put(IMPORT_FILENAMEPATTERN, preferences.getFileNamePattern());
+        put(IMPORT_FILEDIRPATTERN, preferences.getFileDirectoryPattern());
+        putBoolean(DOWNLOAD_LINKED_FILES, preferences.shouldDownloadLinkedFiles());
+        putBoolean(RUN_AUTOMATIC_FILE_SEARCH, preferences.shouldSearchFilesOnOpen());
+        putBoolean(ALLOW_FILE_AUTO_OPEN_BROWSE, preferences.shouldOpenBrowseOnCreate());
     }
 
     @Override
@@ -2294,13 +2147,14 @@ public class JabRefPreferences implements PreferencesService {
         return new AutoLinkPreferences(
                 citationKeyDependency,
                 get(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY),
+                getBoolean(ASK_AUTO_NAMING_PDFS_AGAIN),
                 getKeywordDelimiter());
     }
 
     @Override
-    public void storeAutoLinkPreferences(AutoLinkPreferences autoLinkPreferences) {
+    public void storeAutoLinkPreferences(AutoLinkPreferences preferences) {
         // Starts bibtex only omitted, as it is not being saved
-        switch (autoLinkPreferences.getCitationKeyDependency()) {
+        switch (preferences.getCitationKeyDependency()) {
             case START -> {
                 putBoolean(AUTOLINK_EXACT_KEY_ONLY, false);
                 putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, false);
@@ -2314,37 +2168,144 @@ public class JabRefPreferences implements PreferencesService {
                 putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, true);
             }
         }
-        put(JabRefPreferences.AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, autoLinkPreferences.getRegularExpression());
+        putBoolean(ASK_AUTO_NAMING_PDFS_AGAIN, preferences.shouldAskAutoNamingPdfs());
+        put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, preferences.getRegularExpression());
     }
 
     @Override
-    public ImportExportPreferences getImportExportPreferences() {
-        return new ImportExportPreferences(
-                get(JabRefPreferences.NON_WRAPPABLE_FIELDS),
-                !getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS),
-                getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS),
-                get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR),
-                getNewLineSeparator(),
-                getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT));
-    }
-
-    @Override
-    public void storeImportExportPreferences(ImportExportPreferences importExportPreferences) {
-        put(JabRefPreferences.NON_WRAPPABLE_FIELDS, importExportPreferences.getNonWrappableFields());
-        putBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS, importExportPreferences.shouldResolveStringsForAllStrings());
-        put(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR, importExportPreferences.getNonResolvableFields());
-        storeNewLineSeparator(importExportPreferences.getNewLineSeparator());
-        putBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT, importExportPreferences.shouldAlwaysReformatOnSave());
-    }
-
-    @Override
-    public boolean getShouldAutosave() {
-        return getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE);
+    public boolean shouldAutosave() {
+        return getBoolean(LOCAL_AUTO_SAVE);
     }
 
     @Override
     public void storeShouldAutosave(boolean shouldAutosave) {
-        putBoolean(JabRefPreferences.LOCAL_AUTO_SAVE, shouldAutosave);
+        putBoolean(LOCAL_AUTO_SAVE, shouldAutosave);
+    }
+
+    //*************************************************************************************************************
+    // Import/Export preferences
+    //*************************************************************************************************************
+
+    @Override
+    public ImportExportPreferences getImportExportPreferences() {
+        return new ImportExportPreferences(
+                get(NON_WRAPPABLE_FIELDS),
+                !getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
+                getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
+                get(DO_NOT_RESOLVE_STRINGS_FOR),
+                getNewLineSeparator(),
+                getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),
+                Path.of(get(IMPORT_WORKING_DIRECTORY)),
+                get(LAST_USED_EXPORT),
+                Path.of(get(EXPORT_WORKING_DIRECTORY)));
+    }
+
+    @Override
+    public void storeImportExportPreferences(ImportExportPreferences preferences) {
+        put(NON_WRAPPABLE_FIELDS, preferences.getNonWrappableFields());
+        putBoolean(RESOLVE_STRINGS_ALL_FIELDS, preferences.shouldResolveStringsForAllStrings());
+        put(DO_NOT_RESOLVE_STRINGS_FOR, preferences.getNonResolvableFields());
+        storeNewLineSeparator(preferences.getNewLineSeparator());
+        putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, preferences.shouldAlwaysReformatOnSave());
+        put(IMPORT_WORKING_DIRECTORY, preferences.getImportWorkingDirectory().toString());
+        put(LAST_USED_EXPORT, preferences.getLastExportExtension());
+        put(EXPORT_WORKING_DIRECTORY, preferences.getExportWorkingDirectory().toString());
+    }
+
+    @Override
+    public Set<CustomImporter> getCustomImportFormats() {
+        if (this.customImporters == null) {
+            updateCustomImportFormats();
+        }
+        return this.customImporters;
+    }
+
+    private void updateCustomImportFormats() {
+        Set<CustomImporter> importers = new TreeSet<>();
+        int i = 0;
+
+        List<String> importerString;
+        while (!((importerString = getStringList(CUSTOM_IMPORT_FORMAT + i)).isEmpty())) {
+            try {
+                if (importerString.size() == 2) {
+                    // New format: basePath, className
+                    importers.add(new CustomImporter(importerString.get(0), importerString.get(1)));
+                } else {
+                    // Old format: name, cliId, className, basePath
+                    importers.add(new CustomImporter(importerString.get(3), importerString.get(2)));
+                }
+            } catch (Exception e) {
+                LOGGER.warn("Could not load " + importerString.get(0) + " from preferences. Will ignore.", e);
+            }
+            i++;
+        }
+
+        this.customImporters = importers;
+    }
+
+    @Override
+    public void storeCustomImportFormats(Set<CustomImporter> importers) {
+        purgeCustomImportFormats();
+        CustomImporter[] importersArray = importers.toArray(new CustomImporter[0]);
+        for (int i = 0; i < importersArray.length; i++) {
+            putStringList(CUSTOM_IMPORT_FORMAT + i, importersArray[i].getAsStringList());
+        }
+
+        this.customImporters = importers;
+    }
+
+    private void purgeCustomImportFormats() {
+        for (int i = 0; !(getStringList(CUSTOM_IMPORT_FORMAT + i).isEmpty()); i++) {
+            remove(CUSTOM_IMPORT_FORMAT + i);
+        }
+    }
+
+    @Override
+    public List<TemplateExporter> getCustomExportFormats(JournalAbbreviationRepository abbreviationRepository) {
+        int i = 0;
+        List<TemplateExporter> formats = new ArrayList<>();
+        String exporterName;
+        String filename;
+        String extension;
+        LayoutFormatterPreferences layoutPreferences = getLayoutFormatterPreferences(abbreviationRepository);
+        SavePreferences savePreferences = getSavePreferencesForExport();
+        List<String> formatData;
+        while (!((formatData = getStringList(CUSTOM_EXPORT_FORMAT + i)).isEmpty())) {
+            exporterName = formatData.get(EXPORTER_NAME_INDEX);
+            filename = formatData.get(EXPORTER_FILENAME_INDEX);
+            extension = formatData.get(EXPORTER_EXTENSION_INDEX);
+            TemplateExporter format = new TemplateExporter(exporterName, filename, extension,
+                    layoutPreferences, savePreferences);
+            format.setCustomExport(true);
+            formats.add(format);
+            i++;
+        }
+        return formats;
+    }
+
+    @Override
+    public void storeCustomExportFormats(List<TemplateExporter> exporters) {
+        if (exporters.isEmpty()) {
+            purgeCustomExportFormats(0);
+        } else {
+            for (int i = 0; i < exporters.size(); i++) {
+                List<String> exporterData = new ArrayList<>();
+                exporterData.add(EXPORTER_NAME_INDEX, exporters.get(i).getName());
+                exporterData.add(EXPORTER_FILENAME_INDEX, exporters.get(i).getLayoutFileName());
+                // Only stores the first extension associated with FileType
+                exporterData.add(EXPORTER_EXTENSION_INDEX, exporters.get(i).getFileType().getExtensions().get(0));
+                putStringList(CUSTOM_EXPORT_FORMAT + i, exporterData);
+            }
+            purgeCustomExportFormats(exporters.size());
+        }
+    }
+
+    private void purgeCustomExportFormats(int from) {
+        int i = from;
+        while (!getStringList(CUSTOM_EXPORT_FORMAT + i).isEmpty()) {
+            remove(CUSTOM_EXPORT_FORMAT + i);
+            i++;
+        }
     }
 
     //*************************************************************************************************************
@@ -2397,20 +2358,155 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public void storePreviewPreferences(PreviewPreferences previewPreferences) {
-        putInt(CYCLE_PREVIEW_POS, previewPreferences.getPreviewCyclePosition());
-        putStringList(CYCLE_PREVIEW, previewPreferences.getPreviewCycle().stream().map(layout -> {
-            if (layout instanceof CitationStylePreviewLayout) {
-                return ((CitationStylePreviewLayout) layout).getFilePath();
-            } else {
-                return layout.getDisplayName();
-            }
-        }).collect(Collectors.toList()));
-        putDouble(PREVIEW_PANEL_HEIGHT, previewPreferences.getPreviewPanelDividerPosition().doubleValue());
-        put(PREVIEW_STYLE, previewPreferences.getPreviewStyle());
-        putBoolean(PREVIEW_AS_TAB, previewPreferences.showPreviewAsExtraTab());
+    public void storePreviewPreferences(PreviewPreferences preferences) {
+        putInt(CYCLE_PREVIEW_POS, preferences.getPreviewCyclePosition());
+        putStringList(CYCLE_PREVIEW, preferences.getPreviewCycle()
+                                                .stream()
+                                                .map(layout -> {
+                                                    if (layout instanceof CitationStylePreviewLayout) {
+                                                        return ((CitationStylePreviewLayout) layout).getFilePath();
+                                                    } else {
+                                                        return layout.getDisplayName();
+                                                    }
+                                                }).collect(Collectors.toList()));
+        putDouble(PREVIEW_PANEL_HEIGHT, preferences.getPreviewPanelDividerPosition().doubleValue());
+        put(PREVIEW_STYLE, preferences.getPreviewStyle());
+        putBoolean(PREVIEW_AS_TAB, preferences.showPreviewAsExtraTab());
 
         updatePreviewPreferences();
+    }
+
+    //*************************************************************************************************************
+    // SidePanePreferences
+    //*************************************************************************************************************
+
+    @Override
+    public SidePanePreferences getSidePanePreferences() {
+        if (this.sidePanePreferences == null) {
+            updateSidePanePreferences();
+        }
+        return this.sidePanePreferences;
+    }
+
+    void updateSidePanePreferences() {
+        this.sidePanePreferences = new SidePanePreferences(
+                getBoolean(WEB_SEARCH_VISIBLE),
+                getBoolean(GROUP_SIDEPANE_VISIBLE),
+                getSidePanePreferredPositions(),
+                getInt(SELECTED_FETCHER_INDEX));
+    }
+
+    @Override
+    public void storeSidePanePreferences(SidePanePreferences preferences) {
+        putBoolean(WEB_SEARCH_VISIBLE, preferences.isWebSearchPaneVisible());
+        putBoolean(GROUP_SIDEPANE_VISIBLE, preferences.isGroupsPaneVisible());
+        storeSidePanePreferredPositions(preferences.getPreferredPositions());
+        putInt(SELECTED_FETCHER_INDEX, preferences.getWebSearchFetcherSelected());
+
+        this.sidePanePreferences = preferences;
+    }
+
+    private Map<SidePaneType, Integer> getSidePanePreferredPositions() {
+        Map<SidePaneType, Integer> preferredPositions = new HashMap<>();
+
+        List<String> componentNames = getStringList(SIDE_PANE_COMPONENT_NAMES);
+        List<String> componentPositions = getStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS);
+
+        for (int i = 0; i < componentNames.size(); ++i) {
+            String name = componentNames.get(i);
+            try {
+                SidePaneType type = Enum.valueOf(SidePaneType.class, name);
+                preferredPositions.put(type, Integer.parseInt(componentPositions.get(i)));
+            } catch (NumberFormatException e) {
+                LOGGER.debug("Invalid number format for side pane component '" + name + "'", e);
+            } catch (IllegalArgumentException e) {
+                LOGGER.debug("Following component is not a side pane: '" + name + "'", e);
+            }
+        }
+
+        return preferredPositions;
+    }
+
+    private void storeSidePanePreferredPositions(Map<SidePaneType, Integer> preferredPositions) {
+        // Split the map into a pair of parallel String lists suitable for storage
+        List<String> names = preferredPositions.keySet().stream()
+                                               .map(Enum::toString)
+                                               .collect(Collectors.toList());
+
+        List<String> positions = preferredPositions.values().stream()
+                                                   .map(integer -> Integer.toString(integer))
+                                                   .collect(Collectors.toList());
+
+        putStringList(SIDE_PANE_COMPONENT_NAMES, names);
+        putStringList(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, positions);
+    }
+
+    //*************************************************************************************************************
+    // GUI preferences
+    //*************************************************************************************************************
+
+    @Override
+    public GuiPreferences getGuiPreferences() {
+        return new GuiPreferences(
+                getDouble(POS_X),
+                getDouble(POS_Y),
+                getDouble(SIZE_X),
+                getDouble(SIZE_Y),
+                getBoolean(WINDOW_MAXIMISED),
+                getBoolean(OPEN_LAST_EDITED),
+                getStringList(LAST_EDITED),
+                Path.of(get(LAST_FOCUSED)),
+                getDouble(SIDE_PANE_WIDTH));
+    }
+
+    @Override
+    public void storeGuiPreferences(GuiPreferences preferences) {
+        putDouble(POS_X, preferences.getPositionX());
+        putDouble(POS_Y, preferences.getPositionY());
+        putDouble(SIZE_X, preferences.getSizeX());
+        putDouble(SIZE_Y, preferences.getSizeY());
+        putBoolean(WINDOW_MAXIMISED, preferences.isWindowMaximised());
+        putBoolean(OPEN_LAST_EDITED, preferences.shouldOpenLastEdited());
+        putStringList(LAST_EDITED, preferences.getLastFilesOpened());
+
+        if (preferences.getLastFocusedFile() != null) {
+            String filePath = preferences.getLastFocusedFile().toAbsolutePath().toString();
+            put(LAST_FOCUSED, filePath);
+        }
+
+        putDouble(SIDE_PANE_WIDTH, preferences.getSidePaneWidth());
+    }
+
+    @Override
+    public void clearEditedFiles() {
+        prefs.remove(LAST_EDITED);
+    }
+
+    //*************************************************************************************************************
+    // Search preferences
+    //*************************************************************************************************************
+
+    @Override
+    public SearchPreferences getSearchPreferences() {
+        SearchDisplayMode searchDisplayMode;
+        try {
+            searchDisplayMode = SearchDisplayMode.valueOf(get(SEARCH_DISPLAY_MODE));
+        } catch (IllegalArgumentException ex) {
+            // Should only occur when the searchmode is set directly via preferences.put and the enum was not used
+            searchDisplayMode = SearchDisplayMode.valueOf((String) defaults.get(SEARCH_DISPLAY_MODE));
+        }
+
+        return new SearchPreferences(
+                searchDisplayMode,
+                getBoolean(SEARCH_CASE_SENSITIVE),
+                getBoolean(SEARCH_REG_EXP));
+    }
+
+    @Override
+    public void storeSearchPreferences(SearchPreferences preferences) {
+        put(SEARCH_DISPLAY_MODE, Objects.requireNonNull(preferences.getSearchDisplayMode()).toString());
+        putBoolean(SEARCH_CASE_SENSITIVE, preferences.isCaseSensitive());
+        putBoolean(SEARCH_REG_EXP, preferences.isRegularExpression());
     }
 
     //*************************************************************************************************************
@@ -2495,25 +2591,76 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public SearchPreferences getSearchPreferences() {
-        SearchDisplayMode searchDisplayMode;
-        try {
-            searchDisplayMode = SearchDisplayMode.valueOf(get(SEARCH_DISPLAY_MODE));
-        } catch (IllegalArgumentException ex) {
-            // Should only occur when the searchmode is set directly via preferences.put and the enum was not used
-            searchDisplayMode = SearchDisplayMode.valueOf((String) defaults.get(SEARCH_DISPLAY_MODE));
-        }
-
-        return new SearchPreferences(
-                searchDisplayMode,
-                getBoolean(SEARCH_CASE_SENSITIVE),
-                getBoolean(SEARCH_REG_EXP));
+    public String getLastPreferencesExportPath() {
+        return get(PREFS_EXPORT_PATH);
     }
 
     @Override
-    public void storeSearchPreferences(SearchPreferences preferences) {
-        put(SEARCH_DISPLAY_MODE, Objects.requireNonNull(preferences.getSearchDisplayMode()).toString());
-        putBoolean(SEARCH_CASE_SENSITIVE, preferences.isCaseSensitive());
-        putBoolean(SEARCH_REG_EXP, preferences.isRegularExpression());
+    public void storeLastPreferencesExportPath(Path exportFile) {
+        put(PREFS_EXPORT_PATH, exportFile.toString());
+    }
+
+    @Override
+    public Optional<String> getExternalFileTypes() {
+        return Optional.ofNullable(get(EXTERNAL_FILE_TYPES, null));
+    }
+
+    @Override
+    public void storeExternalFileTypes(String externalFileTypes) {
+        put(EXTERNAL_FILE_TYPES, externalFileTypes);
+    }
+
+    @Override
+    public Optional<String> getMergeDiffMode() {
+        return getAsOptional(MERGE_ENTRIES_DIFF_MODE);
+    }
+
+    @Override
+    public void storeMergeDiffMode(String diffMode) {
+        put(MERGE_ENTRIES_DIFF_MODE, diffMode);
+    }
+
+    @Override
+    public MrDlibPreferences getMrDlibPreferences() {
+        return new MrDlibPreferences(
+                getBoolean(ACCEPT_RECOMMENDATIONS),
+                getBoolean(SEND_LANGUAGE_DATA),
+                getBoolean(SEND_OS_DATA),
+                getBoolean(SEND_TIMEZONE_DATA));
+    }
+
+    @Override
+    public void storeMrDlibPreferences(MrDlibPreferences preferences) {
+        putBoolean(ACCEPT_RECOMMENDATIONS, preferences.shouldAcceptRecommendations());
+        putBoolean(SEND_LANGUAGE_DATA, preferences.shouldSendLanguage());
+        putBoolean(SEND_OS_DATA, preferences.shouldSendOs());
+        putBoolean(SEND_TIMEZONE_DATA, preferences.shouldSendTimezone());
+    }
+
+    @Override
+    public String getIdBasedFetcherForEntryGenerator() {
+        return get(ID_ENTRY_GENERATOR);
+    }
+
+    @Override
+    public void storeIdBasedFetcherForEntryGenerator(String fetcherName) {
+        put(ID_ENTRY_GENERATOR, fetcherName);
+    }
+
+    @Override
+    public ProtectedTermsPreferences getProtectedTermsPreferences() {
+        return new ProtectedTermsPreferences(
+                getStringList(PROTECTED_TERMS_ENABLED_INTERNAL),
+                getStringList(PROTECTED_TERMS_ENABLED_EXTERNAL),
+                getStringList(PROTECTED_TERMS_DISABLED_INTERNAL),
+                getStringList(PROTECTED_TERMS_DISABLED_EXTERNAL));
+    }
+
+    @Override
+    public void storeProtectedTermsPreferences(ProtectedTermsPreferences preferences) {
+        putStringList(PROTECTED_TERMS_ENABLED_EXTERNAL, preferences.getEnabledExternalTermLists());
+        putStringList(PROTECTED_TERMS_DISABLED_EXTERNAL, preferences.getDisabledExternalTermLists());
+        putStringList(PROTECTED_TERMS_ENABLED_INTERNAL, preferences.getEnabledInternalTermLists());
+        putStringList(PROTECTED_TERMS_DISABLED_INTERNAL, preferences.getDisabledInternalTermLists());
     }
 }

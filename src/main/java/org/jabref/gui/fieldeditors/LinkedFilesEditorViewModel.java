@@ -115,10 +115,6 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
         return fulltextLookupInProgress.get();
     }
 
-    public BooleanProperty fulltextLookupInProgressProperty() {
-        return fulltextLookupInProgress;
-    }
-
     private List<LinkedFileViewModel> parseToFileViewModel(String stringValue) {
         return FileFieldParser.parse(stringValue).stream()
                               .map(linkedFile -> new LinkedFileViewModel(

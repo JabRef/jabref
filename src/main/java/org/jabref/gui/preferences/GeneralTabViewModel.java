@@ -25,6 +25,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.GeneralPreferences;
 import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.TelemetryPreferences;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -59,6 +60,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final GeneralPreferences initialGeneralPreferences;
+    private final TelemetryPreferences initialTelemetryPreferences;
     private final OwnerPreferences initialOwnerPreferences;
     private final TimestampPreferences initialTimestampPreferences;
 
@@ -69,6 +71,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.initialGeneralPreferences = preferencesService.getGeneralPreferences();
+        this.initialTelemetryPreferences = preferencesService.getTelemetryPreferences();
         this.initialOwnerPreferences = preferencesService.getOwnerPreferences();
         this.initialTimestampPreferences = preferencesService.getTimestampPreferences();
 
@@ -106,18 +109,18 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         confirmDeleteProperty.setValue(initialGeneralPreferences.shouldConfirmDelete());
         allowIntegerEditionProperty.setValue(initialGeneralPreferences.shouldAllowIntegerEditionBibtex());
         memoryStickModeProperty.setValue(initialGeneralPreferences.isMemoryStickMode());
-        collectTelemetryProperty.setValue(preferencesService.shouldCollectTelemetry());
+        collectTelemetryProperty.setValue(initialTelemetryPreferences.shouldCollectTelemetry());
         showAdvancedHintsProperty.setValue(initialGeneralPreferences.shouldShowAdvancedHints());
 
         markOwnerProperty.setValue(initialOwnerPreferences.isUseOwner());
         markOwnerNameProperty.setValue(initialOwnerPreferences.getDefaultOwner());
         markOwnerOverwriteProperty.setValue(initialOwnerPreferences.isOverwriteOwner());
 
-        markTimestampProperty.setValue(initialTimestampPreferences.isUseTimestamps());
+        markTimestampProperty.setValue(initialTimestampPreferences.shouldUseTimestamps());
         markTimeStampFormatProperty.setValue(initialTimestampPreferences.getTimestampFormat());
-        markTimeStampOverwriteProperty.setValue(initialTimestampPreferences.isOverwriteTimestamp());
+        markTimeStampOverwriteProperty.setValue(initialTimestampPreferences.shouldOverwriteTimestamp());
         markTimeStampFieldNameProperty.setValue(initialTimestampPreferences.getTimestampField().getName());
-        updateTimeStampProperty.setValue(initialTimestampPreferences.isUpdateTimestamp());
+        updateTimeStampProperty.setValue(initialTimestampPreferences.shouldUpdateTimestamp());
     }
 
     public void storeSettings() {
@@ -141,8 +144,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                 confirmDeleteProperty.getValue(),
                 allowIntegerEditionProperty.getValue(),
                 memoryStickModeProperty.getValue(),
-                collectTelemetryProperty.getValue(),
                 showAdvancedHintsProperty.getValue()));
+
+        preferencesService.storeTelemetryPreferences(
+                initialTelemetryPreferences.withCollectTelemetry(collectTelemetryProperty.getValue()));
 
         preferencesService.storeOwnerPreferences(new OwnerPreferences(
                 markOwnerProperty.getValue(),

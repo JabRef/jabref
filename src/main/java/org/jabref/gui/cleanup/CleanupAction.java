@@ -18,7 +18,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class CleanupAction extends SimpleCommand {
@@ -31,7 +30,7 @@ public class CleanupAction extends SimpleCommand {
     private boolean isCanceled;
     private int modifiedEntriesCount;
 
-    public CleanupAction(JabRefFrame frame, JabRefPreferences preferences, DialogService dialogService, StateManager stateManager) {
+    public CleanupAction(JabRefFrame frame, PreferencesService preferences, DialogService dialogService, StateManager stateManager) {
         this.frame = frame;
         this.preferences = preferences;
         this.dialogService = dialogService;
@@ -63,14 +62,14 @@ public class CleanupAction extends SimpleCommand {
                 preferences.getFilePreferences()).showAndWait();
 
         chosenPreset.ifPresent(preset -> {
-            if (preset.isRenamePDFActive() && Globals.prefs.getBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN)) {
+            if (preset.isRenamePDFActive() && preferences.getAutoLinkPreferences().shouldAskAutoNamingPdfs()) {
                 boolean confirmed = dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Autogenerate PDF Names"),
                         Localization.lang("Auto-generating PDF-Names does not support undo. Continue?"),
                         Localization.lang("Autogenerate PDF Names"),
                         Localization.lang("Cancel"),
                         Localization.lang("Disable this confirmation dialog"),
-                        optOut -> Globals.prefs.putBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN, !optOut));
-
+                        optOut -> preferences.storeAutoLinkPreferences(preferences.getAutoLinkPreferences()
+                                                                                  .withAskAutoNamingPdfs(!optOut)));
                 if (!confirmed) {
                     isCanceled = true;
                     return;

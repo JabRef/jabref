@@ -27,7 +27,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Eprint;
 import org.jabref.model.util.FileHelper;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -157,19 +156,19 @@ public class JabRefDesktop {
      * Opens a file browser of the folder of the given file. If possible, the file is selected
      *
      * @param fileLink the location of the file
-     * @throws IOException
+     * @throws IOException if the default file browser cannot be opened
      */
     public static void openFolderAndSelectFile(Path fileLink) throws IOException {
         if (fileLink == null) {
             return;
         }
-        boolean usingDefault = Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_FILE_BROWSER_APPLICATION);
 
-        if (usingDefault) {
+        boolean useCustomFileBrowser = Globals.prefs.getExternalApplicationsPreferences().useCustomFileBrowser();
+        if (!useCustomFileBrowser) {
             NATIVE_DESKTOP.openFolderAndSelectFile(fileLink);
         } else {
             String absolutePath = fileLink.toAbsolutePath().getParent().toString();
-            String command = Globals.prefs.get(JabRefPreferences.FILE_BROWSER_COMMAND);
+            String command = Globals.prefs.getExternalApplicationsPreferences().getCustomFileBrowserCommand();
             if (!command.isEmpty()) {
                 command = command.replaceAll("\\s+", " "); // normalize white spaces
 
@@ -213,7 +212,7 @@ public class JabRefDesktop {
         try {
             openBrowser(url);
         } catch (IOException exception) {
-            Globals.clipboardManager.setContent(url);
+            Globals.getClipboardManager().setContent(url);
             LOGGER.error("Could not open browser", exception);
             String couldNotOpenBrowser = Localization.lang("Could not open browser.");
             String openManually = Localization.lang("Please open %0 manually.", url);
@@ -236,12 +235,12 @@ public class JabRefDesktop {
         }
 
         String absolutePath = file.toPath().toAbsolutePath().getParent().toString();
-        boolean usingDefault = Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION);
 
-        if (usingDefault) {
+        boolean useCustomTerminal = Globals.prefs.getExternalApplicationsPreferences().useCustomTerminal();
+        if (!useCustomTerminal) {
             NATIVE_DESKTOP.openConsole(absolutePath);
         } else {
-            String command = Globals.prefs.get(JabRefPreferences.CONSOLE_COMMAND);
+            String command = Globals.prefs.getExternalApplicationsPreferences().getCustomTerminalCommand();
             command = command.trim();
 
             if (!command.isEmpty()) {
