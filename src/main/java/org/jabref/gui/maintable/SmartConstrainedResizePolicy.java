@@ -25,13 +25,13 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SmartConstrainedResizePolicy.class);
 
-    private Map<TableColumnBase, Double> expansionShare = new HashMap<>();
+    private Map<TableColumnBase<?, ?>, Double> expansionShare = new HashMap<>();
     List<? extends TableColumn<?, ?>> resizableColumns;
-    private TableColumn lastModifiedColumn = null;
+    private TableColumn<?, ?> lastModifiedColumn = null;
 
     @Override
     public Boolean call(TableView.ResizeFeatures prop) {
-        TableColumn column = prop.getColumn();
+        TableColumn<?, ?> column = prop.getColumn();
         if (column == null) {
             // happens at initialization and at window resize
             LOGGER.debug("Table is fully rendered");
@@ -61,10 +61,7 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
     }
 
     private boolean contentFitsIntoTable(TableView<?> table) {
-        Double tableWidth = getContentWidth(table);
-        List<? extends TableColumnBase<?, ?>> visibleLeafColumns = table.getVisibleLeafColumns();
-        Double currentTableContentWidth = visibleLeafColumns.stream().mapToDouble(TableColumnBase::getWidth).sum();
-        return tableWidth >= currentTableContentWidth;
+        return table.getWidth() >= getContentWidth(table);
     }
 
     /**
@@ -129,22 +126,18 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
     private Boolean constrainedResize(TableView.ResizeFeatures<?> prop) {
         TableView<?> table = prop.getTable();
         Double tableWidth = getContentWidth(table);
-        List<? extends TableColumnBase<?, ?>> visibleLeafColumns = table.getVisibleLeafColumns();
-        // The current able content width contains all visible columns: the resizable ones and the non-resizable ones
-        Double currentTableContentWidth = visibleLeafColumns.stream().mapToDouble(TableColumnBase::getWidth).sum();
+        Double currentTableContentWidth = getContentWidth(table);
         Double delta = prop.getDelta();
 
         TableColumn<?, ?> userChosenColumnToResize = prop.getColumn();
 
         boolean columnsCanFitTable = currentTableContentWidth + delta < tableWidth;
         if (columnsCanFitTable) {
-            LOGGER.debug("User window size in that way thus that window can contain all the columns");
+            LOGGER.debug("User changed window size in a way that window can contain all the columns");
             Optional<Double> newWidthOptional;
             if (currentTableContentWidth >= tableWidth) {
                 LOGGER.debug("Before, the content did not fit. Now it fits. Rearrange everything.");
-                newWidthOptional = determineNewWidth(userChosenColumnToResize, delta);
-                newWidthOptional.ifPresent(newWidth -> userChosenColumnToResize.setPrefWidth(newWidth));
-                return newWidthOptional.isPresent();
+                return rearrangeColumns(table);
             }
             LOGGER.debug("Everything already fit. We distribute the delta now.");
 
@@ -166,26 +159,8 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
 
     private void distributeDelta(TableView<?> table, TableColumnBase userChosenColumnToResize, Double newWidth) {
         userChosenColumnToResize.setPrefWidth(newWidth);
-
         List<? extends TableColumn<?, ?>> columnsToResize = resizableColumns.stream().filter(col -> !col.equals(userChosenColumnToResize)).collect(Collectors.toList());
-
-        Double tableWidth = table.getWidth();
-        Double newContentWidth;
-
-        do
-        {
-            // in case the userChosenColumnToResize got bigger, the remaining available width will get below 0 --> other columns need to be shrunk
-            Double remainingAvailableWidth = tableWidth - getContentWidth(table);
-            LOGGER.debug("Distributing delta {}", remainingAvailableWidth);
-            for (TableColumnBase<?, ?> col : columnsToResize) {
-                double share = expansionShare.get(col);
-                determineNewWidth(col, Math.floor(share * remainingAvailableWidth))
-                        // in case we can do something, do it
-                        // otherwise, the next loop iteration will distribute it
-                        .ifPresent(col::setPrefWidth);
-            }
-            newContentWidth = getContentWidth(table);
-        } while (Math.abs(tableWidth - newContentWidth) > 20d);
+        rearrangeColumns(table, columnsToResize);
     }
 
     /**
@@ -204,24 +179,34 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
             col.setPrefWidth(col.getMinWidth());
         }
 
+        return (initialContentWidth - getContentWidth(table)) != 0d;
+    }
+
+    private void rearrangeColumns(TableView<?> table, List<? extends TableColumn<?, ?>> columnsToResize) {
         Double tableWidth = table.getWidth();
         Double newContentWidth;
+
         do
         {
-            Double remainingAvailableWidth = Math.max(0, tableWidth - getContentWidth(table));
-            LOGGER.debug("Distributing delta {}", remainingAvailableWidth);
-            for (TableColumnBase<?, ?> col : resizableColumns) {
+            // in case the userChosenColumnToResize got bigger, the remaining available width will get below 0 --> other columns need to be shrunk
+            LOGGER.debug("tableWidth {}", tableWidth);
+            Double contentWidth = getContentWidth(table);
+            LOGGER.debug("contentWidth {}", contentWidth);
+            Double remainingAvailableWidth = tableWidth - contentWidth;
+            // Double remainingAvailableWidth = Math.max(0, tableWidth - contentWidth);
+            LOGGER.debug("Distributing remainingAvailableWidth {}", remainingAvailableWidth);
+            for (TableColumnBase<?, ?> col : columnsToResize) {
                 double share = expansionShare.get(col);
                 // Precondition in our case: col has to have minimum width
-                determineNewWidth(col, Math.floor(share * remainingAvailableWidth))
+                determineNewWidth(col, share * remainingAvailableWidth)
                         // in case we can do something, do it
                         // otherwise, the next loop iteration will distribute it
                         .ifPresent(col::setPrefWidth);
             }
             newContentWidth = getContentWidth(table);
-        } while (Math.abs(tableWidth - newContentWidth) > 20d);
-
-        return (Math.floor(initialContentWidth - newContentWidth) != 0d);
+            LOGGER.debug("newContentWidth {}", newContentWidth);
+            LOGGER.debug("tableWidth - newContentWidth = {}", tableWidth - newContentWidth);
+        } while (tableWidth - newContentWidth > 20d);
     }
 
     /**
@@ -235,13 +220,7 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
      * Computes and returns the width required by the content of the table
      */
     private Double getContentWidth(TableView<?> table) {
-        try {
-            // TODO: reflective access, should be removed
-            Field privateStringField = TableView.class.getDeclaredField("contentWidth");
-            privateStringField.setAccessible(true);
-            return (Double) privateStringField.get(table);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            return 0d;
-        }
+        // The current table content width contains all visible columns: the resizable ones and the non-resizable ones
+        return table.getVisibleLeafColumns().stream().mapToDouble(TableColumnBase::getWidth).sum();
     }
 }
