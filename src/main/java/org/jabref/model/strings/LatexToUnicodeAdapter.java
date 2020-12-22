@@ -28,7 +28,7 @@ public class LatexToUnicodeAdapter {
         Objects.requireNonNull(inField);
 
         try {
-            return parse(inField);
+            return parse(inField).orElse(Normalizer.normalize(inField, Normalizer.Form.NFC));
         } catch (IllegalArgumentException ignored) {
             return Normalizer.normalize(inField, Normalizer.Form.NFC);
         }
