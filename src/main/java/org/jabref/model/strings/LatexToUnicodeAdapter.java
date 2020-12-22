@@ -51,7 +51,7 @@ public class LatexToUnicodeAdapter {
                 toFormat = Normalizer.normalize(text, Normalizer.Form.NFC);
                 return Optional.of(UNDERSCORE_PLACEHOLDER_MATCHER.matcher(toFormat).replaceAll("_"));
             } else {
-                throw new IllegalArgumentException("Parsing of latex failed.");
+ return Optional.empty()
             }
         } catch (Throwable throwable) {
             throw new IllegalArgumentException("An error occurred while attempting to parse latex.");
