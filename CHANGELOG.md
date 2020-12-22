@@ -18,7 +18,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added connection check function in network preference setting [#6560](https://github.com/JabRef/jabref/issues/6560)
 - We added support for exporting to YAML. [#6974](https://github.com/JabRef/jabref/issues/6974)
 - We added a DOI format and organization check to detect [American Physical Society](https://journals.aps.org/) journals to copy the article ID to the page field for cases where the page numbers are missing. [#7019](https://github.com/JabRef/jabref/issues/7019)
-- We added a new fetcher to enable users to search jstor.org [#6627](https://github.com/JabRef/jabref/issues/6627)
 - We added an error message in the New Entry dialog that is shown in case the fetcher did not find anything . [#7000](https://github.com/JabRef/jabref/issues/7000)
 - We added a new formatter to output shorthand month format. [#6579](https://github.com/JabRef/jabref/issues/6579)
 - We added support for the new Microsoft Edge browser in all platforms. [#7056](https://github.com/JabRef/jabref/pull/7056)
@@ -83,6 +82,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Removed
 
+- We removed the Google Scholar fetcher and the ACM fetcher do not work due to traffic limitations [#6369](https://github.com/JabRef/jabref/issues/6369)
 - We removed the menu entry "Manage external file types" because it's already in 'Preferences' dialog [#6991](https://github.com/JabRef/jabref/issues/6991)
 - We removed the integrity check "Abbreviation detected" for the field journal/journaltitle in the entry editor [#3925](https://github.com/JabRef/jabref/issues/3925)
 
