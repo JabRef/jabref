@@ -1,5 +1,9 @@
 package org.jabref.model.groups;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -9,11 +13,12 @@ import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.util.OptionalUtil;
+import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 public class AutomaticPersonsGroup extends AutomaticGroup {
 
-    private Field field;
+    private static final Map<String, List<String>> CACHED_LASTNAMES = new HashMap<>();
+    private final Field field;
 
     public AutomaticPersonsGroup(String name, GroupHierarchyType context, Field field) {
         super(name, context);
@@ -44,16 +49,48 @@ public class AutomaticPersonsGroup extends AutomaticGroup {
 
     @Override
     public Set<GroupTreeNode> createSubgroups(BibEntry entry) {
-        Optional<AuthorList> authorList = entry.getLatexFreeField(field)
-                                               .map(AuthorList::parse);
-        return OptionalUtil.flatMap(authorList, AuthorList::getAuthors)
-                           .map(Author::getLast)
-                           .filter(Optional::isPresent)
-                           .map(Optional::get)
-                           .filter(lastName -> !lastName.isEmpty())
-                           .map(lastName -> new WordKeywordGroup(lastName, GroupHierarchyType.INDEPENDENT, field, lastName, true, ' ', true))
-                           .map(GroupTreeNode::new)
-                           .collect(Collectors.toSet());
+        return getAsLastNamesLatexFree(field, entry).stream()
+                                                    .map(lastName -> new WordKeywordGroup(lastName, GroupHierarchyType.INDEPENDENT,
+                                                            field, lastName, true, ' ', new LastNameSearchStrategy(lastName, field)))
+                                                    .map(GroupTreeNode::new)
+                                                    .collect(Collectors.toSet());
+    }
+
+    private static List<String> getAsLastNamesLatexFree(Field field, BibEntry bibEntry) {
+        final String unparsedAuthorList = bibEntry.getField(field).orElse(null);
+        List<String> lastNames = CACHED_LASTNAMES.get(unparsedAuthorList);
+        if (lastNames != null) {
+            return lastNames;
+        }
+
+        lastNames = bibEntry.getField(field)
+                            .map(AuthorList::parse)
+                            .map(AuthorList::getAuthors)
+                            .map(authors ->
+                                    authors.stream()
+                                           .map(Author::getLast)
+                                           .flatMap(Optional::stream)
+                                           .map(LatexToUnicodeAdapter::format)
+                                           .collect(Collectors.toList()))
+                            .orElse(Collections.emptyList());
+
+        CACHED_LASTNAMES.put(unparsedAuthorList, lastNames);
+        return lastNames;
+    }
+
+    private static class LastNameSearchStrategy implements WordKeywordGroup.SearchStrategy {
+        private final Field field;
+        private final String lastName;
+
+        public LastNameSearchStrategy(String lastName, Field field) {
+            this.field = field;
+            this.lastName = lastName;
+        }
+
+        @Override
+        public boolean contains(BibEntry entry) {
+            return getAsLastNamesLatexFree(field, entry).stream().anyMatch(name -> name.equals(lastName));
+        }
     }
 
     public Field getField() {
