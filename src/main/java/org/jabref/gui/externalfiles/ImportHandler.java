@@ -177,8 +177,6 @@ public class ImportHandler {
     }
 
     public void importEntries(List<BibEntry> entries) {
-        // TODO: Add undo/redo
-        undoManager.addEdit(new UndoableInsertEntries(bibdatabasecontext.getDatabase(), entries));
         ImportCleanup cleanup = new ImportCleanup(bibdatabasecontext.getMode());
         cleanup.doPostCleanup(entries);
         bibdatabasecontext.getDatabase().insertEntries(entries);
