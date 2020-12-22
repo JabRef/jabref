@@ -17,6 +17,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.ImportFilesResultItemViewModel;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.externalfiles.ExternalFilesContentImporter;
 import org.jabref.logic.importer.ImportCleanup;
@@ -38,7 +39,7 @@ import org.slf4j.LoggerFactory;
 public class ImportHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportHandler.class);
-    private final BibDatabaseContext database;
+    private final BibDatabaseContext bibdatabasecontext;
     private final PreferencesService preferencesService;
     private final DialogService dialogService;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -47,6 +48,8 @@ public class ImportHandler {
     private final UndoManager undoManager;
     private final StateManager stateManager;
     private  List<ImportFilesResultItemViewModel> results;
+    private int counter;
+    private List<BibEntry> entriesToAdd;
 
     public ImportHandler(DialogService dialogService,
                          BibDatabaseContext database,
@@ -57,7 +60,7 @@ public class ImportHandler {
                          StateManager stateManager) {
 
         this.dialogService = dialogService;
-        this.database = database;
+        this.bibdatabasecontext = database;
 
         this.preferencesService = preferencesService;
         this.fileUpdateMonitor = fileupdateMonitor;
@@ -78,21 +81,22 @@ public class ImportHandler {
             @Override
             protected List<ImportFilesResultItemViewModel> call() throws Exception {
                 results = new ArrayList<>();
+                counter = 1;
                 CompoundEdit ce = new CompoundEdit();
                 for (int i = 0; i < files.size(); i++) {
 
                     if (isCanceled()) {
                         break;
                     }
-
-                    updateMessage(Localization.lang("Processing file %0 of %1", i, files.size()));
-                    updateProgress(i,files.size());
+                    DefaultTaskExecutor.runInJavaFXThread(() -> {
+                        updateMessage(Localization.lang("Processing file %0 of %1", counter, files.size() - 1));
+                        updateProgress(counter, files.size() - 1);
+                    });
 
                     var file = files.get(0);
-                    List<BibEntry> entriesToAdd = Collections.emptyList();
+                    entriesToAdd = Collections.emptyList();
 
                     try {
-
                         if (FileUtil.getFileExtension(file).filter("pdf"::equals).isPresent()) {
 
                             var pdfImporterResult = contentImporter.importPDFContent(file);
@@ -139,22 +143,22 @@ public class ImportHandler {
                         LOGGER.error("Error importing", ex);
                         addResultToList(file, false, "Error importing " + ex.getLocalizedMessage());
 
-                        updateMessage(null);
+                        DefaultTaskExecutor.runInJavaFXThread(() -> updateMessage("Error"));
                     }
 
-                    importEntries(entriesToAdd);
+                    // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
+                    DefaultTaskExecutor.runInJavaFXThread(() -> importEntries(entriesToAdd));
 
-                    ce.addEdit(new UndoableInsertEntries(database.getDatabase(), entriesToAdd));
+                    ce.addEdit(new UndoableInsertEntries(bibdatabasecontext.getDatabase(), entriesToAdd));
+                    ce.end();
+                    undoManager.addEdit(ce);
+
+                    counter++;
                 }
-
-                ce.end();
-                undoManager.addEdit(ce);
-
                 return results;
             }
         };
     }
-
 
     private void addResultToList(Path newFile, boolean success, String logMessage) {
         var result = new ImportFilesResultItemViewModel(newFile, success, logMessage);
@@ -174,21 +178,21 @@ public class ImportHandler {
 
     public void importEntries(List<BibEntry> entries) {
         // TODO: Add undo/redo
-        // undoManager.addEdit(new UndoableInsertEntries(panel.getDatabase(), entries));
-        ImportCleanup cleanup = new ImportCleanup(database.getMode());
+        undoManager.addEdit(new UndoableInsertEntries(bibdatabasecontext.getDatabase(), entries));
+        ImportCleanup cleanup = new ImportCleanup(bibdatabasecontext.getMode());
         cleanup.doPostCleanup(entries);
-        database.getDatabase().insertEntries(entries);
+        bibdatabasecontext.getDatabase().insertEntries(entries);
 
         // Set owner/timestamp
         UpdateField.setAutomaticFields(entries,
-                preferencesService.getOwnerPreferences(),
-                preferencesService.getTimestampPreferences());
+                                       preferencesService.getOwnerPreferences(),
+                                       preferencesService.getTimestampPreferences());
 
         // Generate citation keys
         generateKeys(entries);
 
         // Add to group
-        addToGroups(entries, stateManager.getSelectedGroup(database));
+        addToGroups(entries, stateManager.getSelectedGroup(bibdatabasecontext));
     }
 
     private void addToGroups(List<BibEntry> entries, Collection<GroupTreeNode> groups) {
@@ -212,8 +216,8 @@ public class ImportHandler {
      */
     private void generateKeys(List<BibEntry> entries) {
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
-                database.getMetaData().getCiteKeyPattern(Globals.prefs.getCitationKeyPatternPreferences().getKeyPattern()),
-                database.getDatabase(),
+                bibdatabasecontext.getMetaData().getCiteKeyPattern(Globals.prefs.getCitationKeyPatternPreferences().getKeyPattern()),
+                bibdatabasecontext.getDatabase(),
                 Globals.prefs.getCitationKeyPatternPreferences());
 
         for (BibEntry entry : entries) {

@@ -105,6 +105,7 @@ public class ExternalFilesDialogView extends BaseDialog<Void> {
 
        viewModel.scanButtonDefaultButton().setValue(true);
        viewModel.scanButtonDisabled().setValue(true);
+       viewModel.applyButtonDisabled().setValue(true);
        fileTypeSelection.getSelectionModel().selectFirst();
     }
 

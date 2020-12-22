@@ -60,7 +60,7 @@ public class ExternalFilesDialogViewModel {
     private final ObjectProperty<TreeItem<FileNodeWrapper>> treeRoot =  new SimpleObjectProperty<>();
     private final BooleanProperty treeExpanded = new SimpleBooleanProperty();
     private final BooleanProperty scanButtonDefaultButton = new SimpleBooleanProperty();
-    private final DoubleProperty progress = new SimpleDoubleProperty();
+    private final DoubleProperty progress = new SimpleDoubleProperty(0);
     private final StringProperty progressText = new SimpleStringProperty("");
 
     private final List<FileChooser.ExtensionFilter> fileFilterList = List.of(
@@ -102,9 +102,12 @@ public class ExternalFilesDialogViewModel {
             return;
         }
 
+
         importFilesBackgroundTask = importHandler.importFilesInBackground(fileList)
         .onRunning(() -> {
-            progressText.setValue(Localization.lang("Importing"));
+           // progressText.setValue(Localization.lang("Importing"));
+            progress.bind(importFilesBackgroundTask.workDonePercentageProperty());
+            progressText.bind(importFilesBackgroundTask.messageProperty());
 
             searchProgressPaneVisible.setValue(true);
             scanButtonDisabled.setValue(true);
@@ -119,8 +122,6 @@ public class ExternalFilesDialogViewModel {
            exportButtonDisabled.setValue(false);
            scanButtonDefaultButton.setValue(false);
         });
-        progress.unbind();
-        progress.bind(importFilesBackgroundTask.workDonePercentageProperty());
         importFilesBackgroundTask.executeWith(taskExecutor);
 
     }
@@ -179,6 +180,7 @@ public class ExternalFilesDialogViewModel {
                 .onFinished(() -> {
                     searchProgressPaneVisible.setValue(false);
                     scanButtonDisabled.setValue(false);
+                    applyButtonDisabled.setValue(false);
                 })
                 .onSuccess(root -> {
                     treeRoot.setValue(root);
