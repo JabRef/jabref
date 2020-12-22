@@ -49,7 +49,7 @@ public class LatexToUnicodeAdapter {
             if (parsingResult instanceof Parsed.Success) {
                 String text = parsingResult.get().value();
                 toFormat = Normalizer.normalize(text, Normalizer.Form.NFC);
-                return UNDERSCORE_PLACEHOLDER_MATCHER.matcher(toFormat).replaceAll("_");
+                return Optional.of(UNDERSCORE_PLACEHOLDER_MATCHER.matcher(toFormat).replaceAll("_"));
             } else {
                 throw new IllegalArgumentException("Parsing of latex failed.");
             }
