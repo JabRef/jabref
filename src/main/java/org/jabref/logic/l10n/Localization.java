@@ -52,7 +52,7 @@ public class Localization {
     public static <T> String lang(String key, T... params) {
         if (localizedMessages == null) {
             // I'm logging this because it should never happen
-            LOGGER.error("Messages are not initialized before accessing key: " + key);
+            LOGGER.error("Messages are not initialized before accessing key: {}", key);
             setLanguage(Language.ENGLISH);
         }
         var stringParams = Arrays.stream(params).map(T::toString).toArray(String[]::new);
@@ -70,7 +70,7 @@ public class Localization {
         Optional<Locale> knownLanguage = Language.convertToSupportedLocale(language);
         final Locale defaultLocale = Locale.getDefault();
         if (knownLanguage.isEmpty()) {
-            LOGGER.warn("Language " + language + " is not supported by JabRef (Default:" + defaultLocale + ")");
+            LOGGER.warn("Language {} is not supported by JabRef (Default: {})", language, defaultLocale);
             setLanguage(Language.ENGLISH);
             return;
         }
@@ -146,7 +146,7 @@ public class Localization {
 
         String translation = bundle.containsKey(key) ? bundle.getString(key) : "";
         if (translation.isEmpty()) {
-            LOGGER.warn("Warning: could not get translation for \"" + key + "\" for locale " + Locale.getDefault());
+            LOGGER.warn("Warning: could not get translation for \"{}\" for locale {}", key, Locale.getDefault());
             translation = key;
         }
         return new LocalizationKeyParams(translation, params).replacePlaceholders();
