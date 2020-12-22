@@ -12,6 +12,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.VBox;
@@ -23,6 +25,7 @@ import org.jabref.gui.externalfiles.FindUnlinkedFilesDialog.FileNodeWrapper;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.ViewModelTreeCellFactory;
@@ -32,7 +35,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class ExternalFilesDialogView extends BaseDialog<Boolean> {
+public class ExternalFilesDialogView extends BaseDialog<Void> {
 
     @FXML private TextField directoryPathField;
     @FXML private ComboBox<FileChooser.ExtensionFilter> fileTypeSelection;
@@ -41,6 +44,8 @@ public class ExternalFilesDialogView extends BaseDialog<Boolean> {
     @FXML private Button buttonScan;
     @FXML private ButtonType importButton;
     @FXML private Button buttonExport;
+    @FXML private Label progressText;
+    @FXML private ProgressIndicator progressDisplay;
     @Inject private PreferencesService preferencesService;
     @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;
@@ -53,26 +58,13 @@ public class ExternalFilesDialogView extends BaseDialog<Boolean> {
     public ExternalFilesDialogView() {
         this.setTitle(Localization.lang("Search for unlinked local files"));
 
-        setResultConverter(buttonPressed -> {
-            if (buttonPressed == ButtonType.OK) {
-                startImport();
-            } else {
-                 cancelImport();
-            }
-            return false;
-        });
-
         ViewLoader.view(this)
                   .load()
-                  .setAsContent(this.getDialogPane());
+                  .setAsDialogPane(this);
 
-        // TODO: Does not work yet
-        // Button btnImport = (Button) this.getDialogPane().lookupButton(importButton);
-        // btnImport.disableProperty().bindBidirectional(viewModel.applyButtonDisabled());
-    }
-
-    private void startImport() {
-        viewModel.startImport();
+        Button btnImport = (Button) this.getDialogPane().lookupButton(importButton);
+        ControlHelper.setAction(importButton, getDialogPane(), evt-> viewModel.startImport());
+        btnImport.disableProperty().bindBidirectional(viewModel.applyButtonDisabled());
     }
 
     @FXML
@@ -107,6 +99,9 @@ public class ExternalFilesDialogView extends BaseDialog<Boolean> {
        viewModel.scanButtonDefaultButton().bindBidirectional(buttonScan.defaultButtonProperty());
        viewModel.exportButtonDisabled().bindBidirectional(buttonExport.disableProperty());
        viewModel.selectedExtension().bind(fileTypeSelection.valueProperty());
+
+       progressDisplay.progressProperty().bind(viewModel.progress());
+       progressText.textProperty().bind(viewModel.progressText());
 
        viewModel.scanButtonDefaultButton().setValue(true);
        viewModel.scanButtonDisabled().setValue(true);

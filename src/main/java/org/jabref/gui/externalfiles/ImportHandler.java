@@ -86,6 +86,7 @@ public class ImportHandler {
                     }
 
                     updateMessage(Localization.lang("Processing file %0 of %1", i, files.size()));
+                    updateProgress(i,files.size());
 
                     var file = files.get(0);
                     List<BibEntry> entriesToAdd = Collections.emptyList();
