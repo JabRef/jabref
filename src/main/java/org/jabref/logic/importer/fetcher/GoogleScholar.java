@@ -13,6 +13,11 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javafx.application.Platform;
+import javafx.scene.control.ButtonType;
+import javafx.scene.web.WebView;
+
+import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
@@ -27,6 +32,8 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.paging.Page;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
+import com.sun.star.sheet.XSolver;
+import kong.unirest.Unirest;
 import org.apache.http.client.utils.URIBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -42,6 +49,7 @@ import org.slf4j.LoggerFactory;
 public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleScholar.class);
 
+    private static final Pattern LINK_TO_SUBPAGE_PATTERN = Pattern.compile("data-clk-atid=\"([^\"]*)\"");
     private static final Pattern LINK_TO_BIB_PATTERN = Pattern.compile("(https:\\/\\/scholar.googleusercontent.com\\/scholar.bib[^\"]*)");
 
     private static final String BASIC_SEARCH_URL = "https://scholar.google.ch/scholar?";
@@ -49,10 +57,12 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
     private static final int NUM_RESULTS = 10;
 
     private final ImportFormatPreferences importFormatPreferences;
+    private CaptchaSolver captchaSolver;
 
-    public GoogleScholar(ImportFormatPreferences importFormatPreferences) {
+    public GoogleScholar(ImportFormatPreferences importFormatPreferences, CaptchaSolver solver) {
         Objects.requireNonNull(importFormatPreferences);
         this.importFormatPreferences = importFormatPreferences;
+        this.captchaSolver = solver;
     }
 
     @Override
@@ -77,11 +87,6 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
         } catch (URISyntaxException e) {
             throw new FetcherException("Building URI failed.", e);
         }
-    }
-
-    @Override
-    public TrustLevel getTrustLevel() {
-        return TrustLevel.META_SEARCH;
     }
 
     private Optional<URL> search(String url) throws IOException {
@@ -113,8 +118,9 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
         return pdfLink;
     }
 
-    private boolean needsCaptcha(String body) {
-        return body.contains("id=\"gs_captcha_ccl\"");
+    @Override
+    public TrustLevel getTrustLevel() {
+        return TrustLevel.META_SEARCH;
     }
 
     @Override
@@ -127,33 +133,115 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
         return Optional.of(HelpFile.FETCHER_GOOGLE_SCHOLAR);
     }
 
+    @Override
+    public Page<BibEntry> performSearchPaged(ComplexSearchQuery complexSearchQuery, int pageNumber) throws FetcherException {
+        LOGGER.debug("Using query {}", complexSearchQuery);
+        List<BibEntry> foundEntries = new ArrayList<>(getPageSize());
+
+        String complexQueryString = constructComplexQueryString(complexSearchQuery);
+        final URIBuilder uriBuilder;
+        try {
+            uriBuilder = new URIBuilder(BASIC_SEARCH_URL);
+        } catch (URISyntaxException e) {
+            throw new FetcherException("Error while fetching from " + getName(), e);
+        }
+        uriBuilder.addParameter("hl", "en");
+        uriBuilder.addParameter("btnG", "Search");
+        uriBuilder.addParameter("q", complexQueryString);
+        uriBuilder.addParameter("start", String.valueOf(pageNumber * getPageSize()));
+        uriBuilder.addParameter("num", String.valueOf(getPageSize()));
+        complexSearchQuery.getFromYear().ifPresent(year -> uriBuilder.addParameter("as_ylo", year.toString()));
+        complexSearchQuery.getToYear().ifPresent(year -> uriBuilder.addParameter("as_yhi", year.toString()));
+        complexSearchQuery.getSingleYear().ifPresent(year -> {
+            uriBuilder.addParameter("as_ylo", year.toString());
+            uriBuilder.addParameter("as_yhi", year.toString());
+        });
+
+        String queryURL = uriBuilder.toString();
+        LOGGER.debug("Using URL {}", queryURL);
+        try {
+            addHitsFromQuery(foundEntries, queryURL);
+        } catch (IOException e) {
+            LOGGER.info("IOException for URL {}", queryURL);
+            // If there are too much requests from the same IP address google is answering with a 403, 429, or 503 and redirecting to a captcha challenge
+            // Example URL: https://www.google.com/sorry/index?continue=https://scholar.google.ch/scholar%3Fhl%3Den%26btnG%3DSearch%26q%3D%2522in%2522%2B%2522and%2522%2B%2522Process%2522%2B%2522Models%2522%2B%2522Issues%2522%2B%2522Interoperability%2522%2B%2522Detecting%2522%2B%2522Correctness%2522%2B%2522BPMN%2522%2B%25222.0%2522%2Ballintitle%253A%26start%3D0%26num%3D20&hl=en&q=EgTZGO7HGOuK2P4FIhkA8aeDSwDHMafs3bst5vlLM-Sk4TtpMrOtMgFy
+            // The caught IOException looks for example like this:
+            // java.io.IOException: Server returned HTTP response code: 503 for URL: https://ipv4.google.com/sorry/index?continue=https://scholar.google.com/scholar%3Fhl%3Den%26btnG%3DSearch%26q%3Dbpmn&hl=en&q=CGMSBI0NBDkYuqy9wAUiGQDxp4NLQCWbIEY1HjpH5zFJhv4ANPGdWj0
+            if (e.getMessage().contains("Server returned HTTP response code: 403 for URL") ||
+                    e.getMessage().contains("Server returned HTTP response code: 429 for URL") ||
+                    e.getMessage().contains("Server returned HTTP response code: 503 for URL")) {
+                LOGGER.debug("Captcha found. Calling the CaptchaSolver");
+                String content = captchaSolver.solve(queryURL);
+                LOGGER.debug("Returned result {}", content);
+                try {
+                    extractEntriesFromContent(content, foundEntries);
+                } catch (IOException ioException) {
+                    LOGGER.error("Still failing at Google Scholar", ioException);
+                }
+                throw new FetcherException("Fetching from Google Scholar failed.",
+                        Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), e);
+            } else {
+                throw new FetcherException("Error while fetching from " + getName(), e);
+            }
+        }
+        return new Page<>(complexQueryString, pageNumber, foundEntries);
+    }
+
     private String constructComplexQueryString(ComplexSearchQuery complexSearchQuery) {
-        List<String> searchTerms = new ArrayList<>();
-        searchTerms.addAll(complexSearchQuery.getDefaultFieldPhrases());
+        List<String> searchTerms = new ArrayList<>(complexSearchQuery.getDefaultFieldPhrases());
         complexSearchQuery.getAuthors().forEach(author -> searchTerms.add("author:" + author));
-        searchTerms.add("allintitle:" + String.join(" ", complexSearchQuery.getTitlePhrases()));
+        if (!complexSearchQuery.getTitlePhrases().isEmpty()) {
+            searchTerms.add("allintitle:" + String.join(" ", complexSearchQuery.getTitlePhrases()));
+        }
         complexSearchQuery.getJournal().ifPresent(journal -> searchTerms.add("source:" + journal));
         // API automatically ANDs the terms
         return String.join(" ", searchTerms);
     }
 
     private void addHitsFromQuery(List<BibEntry> entryList, String queryURL) throws IOException, FetcherException {
-        String content = new URLDownload(queryURL).asString();
+        LOGGER.debug("Downloading from {}", queryURL);
+        URLDownload urlDownload = new URLDownload(queryURL);
+        obtainAndModifyCookie(urlDownload);
 
+        String content = urlDownload.asString();
         if (needsCaptcha(content)) {
-            throw new FetcherException("Fetching from Google Scholar failed: Captacha hit at " + queryURL + ".",
+            throw new FetcherException("Fetching from Google Scholar failed: Captcha hit at " + queryURL + ".",
                     Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), null);
         }
 
-        Matcher matcher = LINK_TO_BIB_PATTERN.matcher(content);
+        extractEntriesFromContent(content, entryList);
+    }
+
+    private void extractEntriesFromContent(String content, List<BibEntry> entryList) throws IOException, FetcherException {
+        Matcher matcher = LINK_TO_SUBPAGE_PATTERN.matcher(content);
+        if (!matcher.find()) {
+            LOGGER.debug("No data-clk-atid found in html {}", content);
+            return;
+        }
+
+        String infoPageUrl = BASIC_SEARCH_URL + "q=info:" + matcher.group(1) + ":scholar.google.com/&output=cite&scirp=0&hl=en";
+        LOGGER.debug("Using infoPageUrl {}", infoPageUrl);
+        // FIXME: Existing cookies should be reused.
+        URLDownload infoPageUrlDownload = new URLDownload(infoPageUrl);
+        LOGGER.debug("Downloading from {}", infoPageUrl);
+        String infoPageContent = infoPageUrlDownload.asString();
+
+        matcher = LINK_TO_BIB_PATTERN.matcher(infoPageContent);
+        boolean found = false;
         while (matcher.find()) {
+            found = true;
             String citationsPageURL = matcher.group().replace("&amp;", "&");
+            LOGGER.debug("Using citationsPageURL {}", citationsPageURL);
             BibEntry newEntry = downloadEntry(citationsPageURL);
             entryList.add(newEntry);
+        }
+        if (!found) {
+            LOGGER.debug("Did not found pattern in html {}", infoPageContent);
         }
     }
 
     private BibEntry downloadEntry(String link) throws IOException, FetcherException {
+        LOGGER.debug("Downloading from {}", link);
         String downloadedContent = new URLDownload(link).asString();
         BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
         ParserResult result = parser.parse(new StringReader(downloadedContent));
@@ -162,7 +250,7 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
         } else {
             Collection<BibEntry> entries = result.getDatabase().getEntries();
             if (entries.size() != 1) {
-                LOGGER.debug(entries.size() + " entries found! (" + link + ")");
+                LOGGER.debug("{} entries found ({})", entries.size(), link);
                 throw new FetcherException("Parsing entries from Google Scholar bib file failed.");
             } else {
                 BibEntry entry = entries.iterator().next();
@@ -171,9 +259,8 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
         }
     }
 
-    private void obtainAndModifyCookie() throws FetcherException {
+    private void obtainAndModifyCookie(URLDownload downloader) throws FetcherException {
         try {
-            URLDownload downloader = new URLDownload("https://scholar.google.com");
             List<HttpCookie> cookies = downloader.getCookieFromUrl();
             for (HttpCookie cookie : cookies) {
                 // append "CF=4" which represents "Citation format bibtex"
@@ -184,48 +271,34 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
         }
     }
 
-    @Override
-    public Page<BibEntry> performSearchPaged(ComplexSearchQuery complexSearchQuery, int pageNumber) throws FetcherException {
-        try {
-            obtainAndModifyCookie();
-            List<BibEntry> foundEntries = new ArrayList<>(10);
+    public void displayCaptchaDialog(String link) {
+        Platform.runLater(() -> new CaptchaDialog(link).showAndWait());
+        /*
+        if (dialog.retry()) {
+            displayCaptchaDialog(link);
+        }
+        */
+    }
 
-            String complexQueryString = constructComplexQueryString(complexSearchQuery);
-            URIBuilder uriBuilder = new URIBuilder(BASIC_SEARCH_URL);
-            uriBuilder.addParameter("hl", "en");
-            uriBuilder.addParameter("btnG", "Search");
-            uriBuilder.addParameter("q", complexQueryString);
-            uriBuilder.addParameter("start", String.valueOf(pageNumber * getPageSize()));
-            uriBuilder.addParameter("num", String.valueOf(getPageSize()));
-            complexSearchQuery.getFromYear().ifPresent(year -> uriBuilder.addParameter("as_ylo", year.toString()));
-            complexSearchQuery.getToYear().ifPresent(year -> uriBuilder.addParameter("as_yhi", year.toString()));
-            complexSearchQuery.getSingleYear().ifPresent(year -> {
-                uriBuilder.addParameter("as_ylo", year.toString());
-                uriBuilder.addParameter("as_yhi", year.toString());
-            });
+    private boolean needsCaptcha(String body) {
+        return body.contains("id=\"gs_captcha_ccl\"");
+    }
 
-            try {
-                addHitsFromQuery(foundEntries, uriBuilder.toString());
+    private static final class CaptchaDialog extends BaseDialog<Void> {
+        public CaptchaDialog(String content) {
+            super();
+            this.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+            this.getDialogPane().lookupButton(ButtonType.CLOSE).setVisible(true);
+            WebView webView = new WebView();
 
-                if (foundEntries.size() == 10) {
-                    uriBuilder.addParameter("start", "10");
-                    addHitsFromQuery(foundEntries, uriBuilder.toString());
-                }
-            } catch (IOException e) {
-                LOGGER.info("IOException for URL {}", uriBuilder.toString());
-                // if there are too much requests from the same IP adress google is answering with a 503 and redirecting to a captcha challenge
-                // The caught IOException looks for example like this:
-                // java.io.IOException: Server returned HTTP response code: 503 for URL: https://ipv4.google.com/sorry/index?continue=https://scholar.google.com/scholar%3Fhl%3Den%26btnG%3DSearch%26q%3Dbpmn&hl=en&q=CGMSBI0NBDkYuqy9wAUiGQDxp4NLQCWbIEY1HjpH5zFJhv4ANPGdWj0
-                if (e.getMessage().contains("Server returned HTTP response code: 503 for URL")) {
-                    throw new FetcherException("Fetching from Google Scholar failed.",
-                            Localization.lang("This might be caused by reaching the traffic limitation of Google Scholar (see 'Help' for details)."), e);
-                } else {
-                    throw new FetcherException("Error while fetching from " + getName(), e);
-                }
-            }
-            return new Page<>(complexQueryString, pageNumber, foundEntries);
-        } catch (URISyntaxException e) {
-            throw new FetcherException("Error while fetching from " + getName(), e);
+            // webView.getEngine().setJavaScriptEnabled(true);
+            webView.getEngine().setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:79.0) Gecko/20100101 Firefox/79.0");
+            this.getDialogPane().setContent(webView);
+            webView.getEngine().loadContent(content);
+        }
+
+        public boolean retry() {
+            return false;
         }
     }
 }

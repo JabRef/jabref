@@ -18,11 +18,13 @@ import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.dialogs.CaptchaSolverDialog;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.importer.fetcher.GoogleScholar;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
@@ -43,6 +45,7 @@ public class WebSearchPaneViewModel {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
 
+        WebFetchers.setCaptchaSolver(new CaptchaSolverDialog());
         SortedSet<SearchBasedFetcher> allFetchers = WebFetchers.getSearchBasedFetchers(preferencesService.getImportFormatPreferences());
         fetchers.setAll(allFetchers);
 
@@ -107,6 +110,9 @@ public class WebSearchPaneViewModel {
         task = BackgroundTask.wrap(() -> new ParserResult(activeFetcher.performSearch(getQuery().trim())))
                              .withInitialMessage(Localization.lang("Processing %0", getQuery().trim()));
         task.onFailure(dialogService::showErrorDialogAndWait);
+        if (activeFetcher instanceof GoogleScholar) {
+            task.showToUser(true);
+        }
 
         ImportEntriesDialog dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task);
         dialog.setTitle(activeFetcher.getName());

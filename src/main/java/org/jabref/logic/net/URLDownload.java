@@ -235,6 +235,10 @@ public class URLDownload {
         return asString(StandardCharsets.UTF_8);
     }
 
+    /**
+     * Returns a modifiable list of cookies related to the URL of this URLDownload.
+     * Any modifications will be used at later calls
+     */
     public List<HttpCookie> getCookieFromUrl() throws IOException {
         CookieManager cookieManager = new CookieManager();
         CookieHandler.setDefault(cookieManager);

@@ -101,7 +101,7 @@ public class CompositeSearchBasedFetcherTest {
         list.add(new AstrophysicsDataSystem(importFormatPreferences));
         list.add(new MathSciNet(importFormatPreferences));
         list.add(new ZbMATH(importFormatPreferences));
-        list.add(new GoogleScholar(importFormatPreferences));
+        list.add(new GoogleScholar(importFormatPreferences, new NoneCaptchaSolver()));
         list.add(new DBLPFetcher(importFormatPreferences));
         list.add(new SpringerFetcher());
         list.add(new CrossRef());
