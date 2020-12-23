@@ -9,7 +9,10 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.WeakInvalidationListener;
+import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.value.ObservableValue;
@@ -25,9 +28,8 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.groups.event.GroupInvalidatedEvent;
+import org.jabref.model.metadata.MetaData;
 
-import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
 import com.tobiasdiez.easybind.optional.OptionalBinding;
@@ -39,7 +41,8 @@ public class BibEntryTableViewModel {
     private final Map<SpecialField, OptionalBinding<SpecialFieldValueViewModel>> specialFieldValues = new HashMap<>();
     private final EasyBinding<List<LinkedFile>> linkedFiles;
     private final EasyBinding<Map<Field, String>> linkedIdentifiers;
-    private final ObservableValue<List<AbstractGroup>> matchedGroups;
+    private final Binding<List<AbstractGroup>> matchedGroups;
+    private final InvalidationListener invalidateGroupsBinding;
 
     public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
         this.entry = entry;
@@ -48,6 +51,8 @@ public class BibEntryTableViewModel {
         this.linkedFiles = getField(StandardField.FILE).map(FileFieldParser::parse).orElse(Collections.emptyList());
         this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);
         this.matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);
+        this.invalidateGroupsBinding = (listener) -> this.matchedGroups.invalidate();
+        registerListener(new WeakInvalidationListener(invalidateGroupsBinding), bibDatabaseContext.getMetaData(), entry);
     }
 
     private static EasyBinding<Map<Field, String>> createLinkedIdentifiersBinding(BibEntry entry) {
@@ -70,12 +75,13 @@ public class BibEntryTableViewModel {
         return entry;
     }
 
-    private static ObservableValue<List<AbstractGroup>> createMatchedGroupsBinding(BibDatabaseContext database, BibEntry entry) {
-        ObservableValue<List<AbstractGroup>> groupsBinding = new ObjectBinding<List<AbstractGroup>>() {
-            {
-                bind(entry.getFieldBinding(StandardField.GROUPS));
-            }
+    private static void registerListener(WeakInvalidationListener listener, MetaData metaData, BibEntry bibEntry) {
+        bibEntry.getFieldBinding(StandardField.GROUPS).addListener(listener);
+        metaData.registerListener(listener);
+    }
 
+    private static Binding<List<AbstractGroup>> createMatchedGroupsBinding(BibDatabaseContext database, BibEntry entry) {
+        return new ObjectBinding<>() {
             @Override
             protected List<AbstractGroup> computeValue() {
                 Optional<GroupTreeNode> rootGroup = database.getMetaData().getGroups();
@@ -86,14 +92,7 @@ public class BibEntryTableViewModel {
                                      .collect(Collectors.toList()))
                                 .orElse(Collections.emptyList());
             }
-
-            @Subscribe
-            public void listen(GroupInvalidatedEvent groupInvalidatedEvent) {
-                this.invalidate();
-            }
         };
-        database.getMetaData().registerListener(groupsBinding);
-        return groupsBinding;
     }
 
     public OptionalBinding<String> getField(Field field) {
