@@ -152,7 +152,6 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener, Obser
 
     @Override
     public void addListener(InvalidationListener listener) {
-        Objects.requireNonNull(listener);
         listeners.add(listener);
     }
 

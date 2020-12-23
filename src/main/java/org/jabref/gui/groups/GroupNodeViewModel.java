@@ -88,9 +88,9 @@ public class GroupNodeViewModel {
         if (groupNode.getGroup() instanceof Observable) {
             this.invalidateEntriesListener = (listener) -> {
                 updateMatchedEntries();
-                // "Re-add" to the selected groups if it were selected
+                // "Re-add" to the selected groups if it were selected, this refreshes the entries the user views
                 ObservableList<GroupTreeNode> selectedGroups = this.stateManager.getSelectedGroup(this.databaseContext);
-                if (selectedGroups.removeAll(this.groupNode)) {
+                if (selectedGroups.remove(this.groupNode)) {
                     selectedGroups.add(this.groupNode);
                 }
             };
