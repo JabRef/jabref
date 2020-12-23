@@ -22,6 +22,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.CheckBoxTreeItem;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TreeItem;
 import javafx.stage.FileChooser;
 
@@ -115,10 +116,12 @@ public class ExternalFilesDialogViewModel {
             searchProgressPaneVisible.setValue(false);
             scanButtonDisabled.setValue(false);
         })
-        .onSuccess(viewMOdel -> {
+        .onSuccess(results -> {
            applyButtonDisabled.setValue(false);
            exportButtonDisabled.setValue(false);
            scanButtonDefaultButton.setValue(false);
+
+           new ImportResultsDialogView(results).showAndWait();
         });
         importFilesBackgroundTask.executeWith(taskExecutor);
 
@@ -168,11 +171,10 @@ public class ExternalFilesDialogViewModel {
         Path directory = this.getSearchDirectory();
         FileFilter selectedFileFilter = FileFilterConverter.toFileFilter(selectedExtension.getValue());
 
+
         findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, bibDatabasecontext)
                 .onRunning(() -> {
-                    progress.bind(findUnlinkedFilesTask.workDonePercentageProperty());
-                    progressText.bind(findUnlinkedFilesTask.messageProperty());
-
+                    progress.set(ProgressBar.INDETERMINATE_PROGRESS);
                     progressText.setValue(Localization.lang("Searching the file system...."));
                     searchProgressPaneVisible.setValue(true);
                     scanButtonDisabled.setValue(true);
