@@ -21,7 +21,7 @@ import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.groups.event.GroupInvalidatedEvent;
+import org.jabref.model.groups.event.GroupInvalidatedEventBase;
 import org.jabref.model.groups.event.GroupInvalidatedEventBusAdapter;
 import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
@@ -92,8 +92,8 @@ public class MetaData {
      */
     public void setGroups(GroupTreeNode root) {
         groupsRoot = Objects.requireNonNull(root);
-        groupsRoot.subscribeToDescendantChanged(groupTreeNode -> postGroupChange());
-        postGroupChange();
+        groupsRoot.subscribeToDescendantChanged(groupTreeNode -> eventBus.post(new GroupUpdatedEvent(this)));
+        eventBus.post(new GroupUpdatedEvent(this));
         postChange();
     }
 
@@ -264,12 +264,7 @@ public class MetaData {
     }
 
     public void postGroupInvalidation() {
-        eventBus.post(new GroupInvalidatedEvent());
-    }
-
-    private void postGroupChange() {
-        eventBus.post(new GroupUpdatedEvent(this));
-        postGroupInvalidation();
+        eventBus.post(new GroupInvalidatedEventBase());
     }
 
     /**
