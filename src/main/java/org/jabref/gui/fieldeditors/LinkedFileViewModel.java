@@ -472,9 +472,11 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     String fulltextDir = FileUtil.createDirNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileDirectoryPattern());
                     String finalName = FileNameUniqueness.getNonOverWritingFileName(targetDirectory.resolve(fulltextDir), suggestedName);
                     if (!suggestedName.equals(finalName)) {
-                        messageError.append("File: \"");
+                        messageError.append(Localization.lang("File"));
+                        messageError.append(": \"");
                         messageError.append(suggestedName);
-                        messageError.append("\" already exists");
+                        messageError.append("\"");
+                        messageError.append(Localization.lang(" already exists"));
                         // return null to stop the download process
                         return null;
                     }
