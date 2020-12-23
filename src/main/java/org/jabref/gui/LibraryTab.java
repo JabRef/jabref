@@ -355,7 +355,9 @@ public class LibraryTab extends Tab {
 
     @Subscribe
     public void listen(BibDatabaseContextChangedEvent event) {
-        this.changedProperty.setValue(true);
+        if (!event.isFilteredOut()) {
+            this.changedProperty.setValue(true);
+        }
     }
 
     /**

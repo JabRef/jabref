@@ -8,10 +8,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.WeakInvalidationListener;
-
 import org.jabref.model.FieldChange;
 import org.jabref.model.TreeNode;
 import org.jabref.model.database.BibDatabase;
@@ -27,8 +23,6 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
 
     private static final String PATH_DELIMITER = " > ";
     private AbstractGroup group;
-    private final InvalidationListener invalidationListener = (listener) -> this.notifyAboutDescendantChange(this);
-    private final WeakInvalidationListener weakInvalidationListener = new WeakInvalidationListener(invalidationListener);
 
     /**
      * Creates this node and associates the specified group with it.
@@ -79,12 +73,6 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
                                       boolean shouldRemovePreviousAssignments, List<BibEntry> entriesInDatabase) {
         AbstractGroup oldGroup = getGroup();
         group = Objects.requireNonNull(newGroup);
-        if (group instanceof Observable) {
-            ((Observable) group).addListener(weakInvalidationListener);
-        }
-        if (oldGroup instanceof Observable) {
-            ((Observable) oldGroup).removeListener(weakInvalidationListener);
-        }
 
         List<FieldChange> changes = new ArrayList<>();
         boolean shouldRemove = shouldRemovePreviousAssignments && (oldGroup instanceof GroupEntryChanger);

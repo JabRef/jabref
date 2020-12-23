@@ -88,8 +88,8 @@ public class MetaData {
      */
     public void setGroups(GroupTreeNode root) {
         groupsRoot = Objects.requireNonNull(root);
-        groupsRoot.subscribeToDescendantChanged(groupTreeNode -> eventBus.post(new GroupUpdatedEvent(this)));
-        eventBus.post(new GroupUpdatedEvent(this));
+        groupsRoot.subscribeToDescendantChanged(groupTreeNode -> postGroupUpdate(false));
+        postGroupUpdate(false);
         postChange();
     }
 
@@ -257,6 +257,10 @@ public class MetaData {
         if (isEventPropagationEnabled) {
             eventBus.post(new MetaDataChangedEvent(this));
         }
+    }
+
+    public void postGroupUpdate(boolean filteredOut) {
+        eventBus.post(new GroupUpdatedEvent(this, filteredOut));
     }
 
     /**
