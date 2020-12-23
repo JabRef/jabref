@@ -25,7 +25,7 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.groups.event.GroupUpdatedEvent;
+import org.jabref.model.groups.event.GroupInvalidatedEvent;
 
 import com.google.common.eventbus.Subscribe;
 import com.tobiasdiez.easybind.EasyBind;
@@ -88,7 +88,7 @@ public class BibEntryTableViewModel {
             }
 
             @Subscribe
-            public void listen(GroupUpdatedEvent groupUpdatedEvent) {
+            public void listen(GroupInvalidatedEvent groupInvalidatedEvent) {
                 this.invalidate();
             }
         };

@@ -14,11 +14,6 @@ public class GroupUpdatedEvent extends BibDatabaseContextChangedEvent {
         this.metaData = metaData;
     }
 
-    public GroupUpdatedEvent(MetaData metaData, boolean filteredOut) {
-        super(filteredOut);
-        this.metaData = metaData;
-    }
-
     public MetaData getMetaData() {
         return this.metaData;
     }
