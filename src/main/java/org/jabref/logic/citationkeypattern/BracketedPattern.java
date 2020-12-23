@@ -1,5 +1,6 @@
 package org.jabref.logic.citationkeypattern;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1194,7 +1195,7 @@ public class BracketedPattern {
         if (unicodeFormattedName.isEmpty()) {
             LOGGER.warn("{} could not be converted to unicode. This can result in an incorrect or missing institute citation key", content);
         }
-        String result = unicodeFormattedName.orElse(content);
+        String result = unicodeFormattedName.orElse(Normalizer.normalize(content, Normalizer.Form.NFC));
 
         // Special characters can't be allowed past this point because the citation key generator might replace them with multiple mixed-case characters
         result = StringUtil.replaceSpecialCharacters(result);
