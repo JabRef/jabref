@@ -16,11 +16,11 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<DialogPane xmlns="http://javafx.com/javafx/15" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.externalfiles.ExternalFilesDialogView">
+<DialogPane minHeight="300.0" prefHeight="601.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.externalfiles.ExternalFilesDialogView">
    <content>
-      <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0">
+      <BorderPane prefHeight="600.0" prefWidth="600.0">
          <top>
-            <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0" BorderPane.alignment="CENTER">
+            <VBox prefHeight="100.0" prefWidth="579.0" spacing="5.0" BorderPane.alignment="CENTER">
                <children>
                   <Label text="%Select a directory where the search shall start" />
                   <HBox prefHeight="35.0" prefWidth="600.0" spacing="10.0">
@@ -48,33 +48,40 @@
             </VBox>
          </top>
          <center>
-            <StackPane prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-               <children>
-                  <ScrollPane fitToWidth="true" prefHeight="200.0" prefWidth="200.0">
-                     <content>
-                        <TreeView fx:id="tree" prefHeight="200.0" prefWidth="583.0" />
-                     </content>
-                  </ScrollPane>
-                  <VBox fx:id="panelSearchProgress" prefHeight="200.0" prefWidth="100.0" spacing="5.0" visible="false" StackPane.alignment="CENTER">
+            <BorderPane BorderPane.alignment="CENTER">
+               <center>
+                  <StackPane prefHeight="500.0" prefWidth="250.0">
                      <children>
-                        <Label fx:id="progressText" text="%Searching the file system...." />
-                        <ProgressIndicator fx:id="progressDisplay" maxHeight="50.0" maxWidth="50.0" progress="0.0" />
+                        <ScrollPane fitToWidth="true" minHeight="300.0" prefHeight="351.0" prefWidth="579.0">
+                           <content>
+                              <TreeView fx:id="tree" minHeight="305.0" prefHeight="305.0" prefWidth="561.0" />
+                           </content>
+                        </ScrollPane>
+                        <VBox fx:id="panelSearchProgress" prefHeight="200.0" prefWidth="100.0" spacing="5.0" visible="false" StackPane.alignment="CENTER">
+                           <children>
+                              <Label fx:id="progressText" text="%Searching the file system...." />
+                              <ProgressIndicator fx:id="progressDisplay" maxHeight="50.0" maxWidth="50.0" progress="0.0" />
+                           </children>
+                           </VBox>
                      </children>
-                     </VBox>
-               </children>
-            </StackPane>
+                  </StackPane>
+               </center>
+               <top>
+                  <Label text="%These files are not linked in the active library." BorderPane.alignment="TOP_LEFT" />
+               </top>
+               <bottom>
+                  <ButtonBar prefHeight="108.0" prefWidth="579.0" BorderPane.alignment="CENTER">
+                    <buttons>
+                        <Button mnemonicParsing="false" onAction="#selectAll" text="%Select all" />
+                        <Button mnemonicParsing="false" onAction="#unselectAll" text="%Unselect all" />
+                        <Button mnemonicParsing="false" onAction="#collapseAll" text="%Collapse all" />
+                      <Button mnemonicParsing="false" onAction="#expandAll" text="%Expand all" />
+                      <Button fx:id="buttonExport" mnemonicParsing="false" onAction="#exportSelected" text="%Export selected entries" />
+                    </buttons>
+                  </ButtonBar>
+               </bottom>
+            </BorderPane>
          </center>
-         <bottom>
-            <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-              <buttons>
-                  <Button mnemonicParsing="false" onAction="#selectAll" text="%Select all" />
-                  <Button mnemonicParsing="false" onAction="#unselectAll" text="%Unselect all" />
-                  <Button mnemonicParsing="false" onAction="#collapseAll" text="%Collapse all" />
-                <Button mnemonicParsing="false" onAction="#expandAll" text="%Expand all" />
-                <Button fx:id="buttonExport" mnemonicParsing="false" onAction="#exportSelected" text="%Export selected entries" />
-              </buttons>
-            </ButtonBar>
-         </bottom>
       </BorderPane>
    </content>
    <buttonTypes>

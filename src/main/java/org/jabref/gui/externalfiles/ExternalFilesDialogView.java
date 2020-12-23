@@ -93,6 +93,7 @@ public class ExternalFilesDialogView extends BaseDialog<Void> {
                 })
                 .install(tree);
 
+       tree.setPrefWidth(Double.POSITIVE_INFINITY);
        viewModel.treeRoot().bindBidirectional(tree.rootProperty());
        viewModel.searchProgressPaneVisible().bindBidirectional(panelSearchProgress.visibleProperty());
        viewModel.scanButtonDisabled().bindBidirectional(buttonScan.disableProperty());
@@ -107,6 +108,8 @@ public class ExternalFilesDialogView extends BaseDialog<Void> {
        viewModel.scanButtonDisabled().setValue(true);
        viewModel.applyButtonDisabled().setValue(true);
        fileTypeSelection.getSelectionModel().selectFirst();
+
+       panelSearchProgress.toFront();
     }
 
     void cancelImport() {
@@ -120,12 +123,12 @@ public class ExternalFilesDialogView extends BaseDialog<Void> {
 
     @FXML
     void collapseAll(ActionEvent event) {
-
+        viewModel.collapseAll();
     }
 
     @FXML
     void expandAll(ActionEvent event) {
-
+        viewModel.expandAll();
     }
 
     @FXML
@@ -135,12 +138,12 @@ public class ExternalFilesDialogView extends BaseDialog<Void> {
 
     @FXML
     void selectAll(ActionEvent event) {
-
+        viewModel.selectAll();
     }
 
     @FXML
     void unselectAll(ActionEvent event) {
-
+        viewModel.unselectAll();
     }
     @FXML
     void exportSelected(ActionEvent event) {

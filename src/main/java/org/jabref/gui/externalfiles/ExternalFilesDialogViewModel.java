@@ -75,8 +75,6 @@ public class ExternalFilesDialogViewModel {
     private final BibDatabaseContext bibDatabasecontext;
     private final TaskExecutor taskExecutor;
 
-
-
     public ExternalFilesDialogViewModel(DialogService dialogService, ExternalFileTypes externalFileTypes, UndoManager undoManager,
                                         FileUpdateMonitor fileUpdateMonitor, PreferencesService preferences, StateManager stateManager, TaskExecutor taskExecutor) {
         this.preferences = preferences;
@@ -172,6 +170,9 @@ public class ExternalFilesDialogViewModel {
 
         findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, bibDatabasecontext)
                 .onRunning(() -> {
+                    progress.bind(findUnlinkedFilesTask.workDonePercentageProperty());
+                    progressText.bind(findUnlinkedFilesTask.messageProperty());
+
                     progressText.setValue(Localization.lang("Searching the file system...."));
                     searchProgressPaneVisible.setValue(true);
                     scanButtonDisabled.setValue(true);
@@ -289,5 +290,44 @@ public class ExternalFilesDialogViewModel {
             }
         }
         return filesList;
+    }
+
+    public void selectAll() {
+        CheckBoxTreeItem<FileNodeWrapper> root = (CheckBoxTreeItem<FileNodeWrapper>) treeRoot.getValue();
+        // Need to toggle a twice to make sure everything is selected
+        root.setSelected(true);
+        root.setSelected(false);
+        root.setSelected(true);
+    }
+
+    public void unselectAll() {
+        // TODO Auto-generated method stub
+        CheckBoxTreeItem<FileNodeWrapper> root = (CheckBoxTreeItem<FileNodeWrapper>) treeRoot.getValue();
+        // Need to toggle a twice to make sure nothing is selected
+        root.setSelected(false);
+        root.setSelected(true);
+        root.setSelected(false);
+    }
+
+    public void expandAll() {
+        expandTree(treeRoot.getValue(), true);
+        treeRoot.getValue().setExpanded(true);
+    }
+
+    public void collapseAll() {
+        expandTree(treeRoot.getValue(), false);
+        treeRoot.getValue().setExpanded(false);
+    }
+
+    /**
+     * Expands or collapses the specified tree according to the <code>expand</code>-parameter.
+     */
+    private void expandTree(TreeItem<?> item, boolean expand) {
+        if ((item != null) && !item.isLeaf()) {
+            item.setExpanded(expand);
+            for (TreeItem<?> child : item.getChildren()) {
+                expandTree(child, expand);
+            }
+        }
     }
 }
