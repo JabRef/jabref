@@ -3,7 +3,7 @@ package org.jabref.model.groups.event;
 import org.jabref.model.database.event.BibDatabaseContextChangedEvent;
 import org.jabref.model.metadata.MetaData;
 
-public class GroupUpdatedEvent extends BibDatabaseContextChangedEvent {
+public class GroupUpdatedEvent extends BibDatabaseContextChangedEvent implements GroupInvalidatedEvent {
 
     private final MetaData metaData;
 

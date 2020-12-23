@@ -24,11 +24,6 @@ public class GroupInvalidatedEventBusAdapter extends EventBus implements Observa
         notifyAllListeners();
     }
 
-    @Subscribe
-    public void listen(GroupUpdatedEvent groupUpdatedEvent) {
-        notifyAllListeners();
-    }
-
     private void notifyAllListeners() {
         DefaultTaskExecutor.runInJavaFXThread(() -> listeners.forEach(listener -> listener.invalidated(this)));
     }
