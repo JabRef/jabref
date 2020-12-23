@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import javafx.beans.InvalidationListener;
+
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
@@ -20,6 +22,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.event.GroupInvalidatedEvent;
+import org.jabref.model.groups.event.GroupInvalidatedEventBusAdapter;
 import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
 
@@ -48,7 +51,7 @@ public class MetaData {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MetaData.class);
 
-    private final EventBus eventBus = new EventBus();
+    private final GroupInvalidatedEventBusAdapter eventBus = new GroupInvalidatedEventBusAdapter();
     private final Map<EntryType, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
     private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
     private final Map<String, Path> laTexFileDirectory = new HashMap<>(); // <User, FilePath>
@@ -298,14 +301,22 @@ public class MetaData {
     }
 
     public void registerListener(Object listener) {
-        this.eventBus.register(listener);
+        if (listener instanceof InvalidationListener) {
+            this.eventBus.addListener((InvalidationListener) listener);
+        } else {
+            this.eventBus.register(listener);
+        }
     }
 
     public void unregisterListener(Object listener) {
-        try {
-            this.eventBus.unregister(listener);
-        } catch (IllegalArgumentException e) {
-            // occurs if the event source has not been registered, should not prevent shutdown
+        if (listener instanceof InvalidationListener) {
+            this.eventBus.removeListener((InvalidationListener) listener);
+        } else {
+            try {
+                this.eventBus.unregister(listener);
+            } catch (IllegalArgumentException e) {
+                // occurs if the event source has not been registered, should not prevent shutdown
+            }
         }
     }
 
