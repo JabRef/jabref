@@ -62,7 +62,7 @@ public class GroupNodeViewModel {
     private final CustomLocalDragboard localDragBoard;
     private final ObservableList<BibEntry> entriesList;
     private final PreferencesService preferencesService;
-    private InvalidationListener invalidateEntriesListener;
+    private InvalidationListener onInvalidatedGroup;
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard, PreferencesService preferencesService) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
@@ -86,7 +86,7 @@ public class GroupNodeViewModel {
             children = EasyBind.mapBacked(groupNode.getChildren(), this::toViewModel);
         }
         if (groupNode.getGroup() instanceof Observable) {
-            this.invalidateEntriesListener = (listener) -> {
+            this.onInvalidatedGroup = (listener) -> {
                 updateMatchedEntries();
                 // "Re-add" to the selected groups if it were selected, this refreshes the entries the user views
                 ObservableList<GroupTreeNode> selectedGroups = this.stateManager.getSelectedGroup(this.databaseContext);
@@ -94,7 +94,7 @@ public class GroupNodeViewModel {
                     selectedGroups.add(this.groupNode);
                 }
             };
-            ((Observable) groupNode.getGroup()).addListener(new WeakInvalidationListener(invalidateEntriesListener));
+            ((Observable) groupNode.getGroup()).addListener(new WeakInvalidationListener(onInvalidatedGroup));
         }
         hasChildren = new SimpleBooleanProperty();
         hasChildren.bind(Bindings.isNotEmpty(children));

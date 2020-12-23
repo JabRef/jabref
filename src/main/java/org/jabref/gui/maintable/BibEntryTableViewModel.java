@@ -28,7 +28,6 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.metadata.MetaData;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
@@ -42,7 +41,7 @@ public class BibEntryTableViewModel {
     private final EasyBinding<List<LinkedFile>> linkedFiles;
     private final EasyBinding<Map<Field, String>> linkedIdentifiers;
     private final Binding<List<AbstractGroup>> matchedGroups;
-    private final InvalidationListener invalidateGroupsBinding;
+    private final InvalidationListener invalidateMatchedGroupsBinding;
 
     public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
         this.entry = entry;
@@ -51,8 +50,8 @@ public class BibEntryTableViewModel {
         this.linkedFiles = getField(StandardField.FILE).map(FileFieldParser::parse).orElse(Collections.emptyList());
         this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);
         this.matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);
-        this.invalidateGroupsBinding = (listener) -> this.matchedGroups.invalidate();
-        registerListener(new WeakInvalidationListener(invalidateGroupsBinding), bibDatabaseContext.getMetaData(), entry);
+        this.invalidateMatchedGroupsBinding = (listener) -> this.matchedGroups.invalidate();
+        registerListener(invalidateMatchedGroupsBinding, bibDatabaseContext, entry);
     }
 
     private static EasyBinding<Map<Field, String>> createLinkedIdentifiersBinding(BibEntry entry) {
@@ -75,9 +74,10 @@ public class BibEntryTableViewModel {
         return entry;
     }
 
-    private static void registerListener(WeakInvalidationListener listener, MetaData metaData, BibEntry bibEntry) {
+    private static void registerListener(InvalidationListener strongListener, BibDatabaseContext database, BibEntry bibEntry) {
+        WeakInvalidationListener listener = new WeakInvalidationListener(strongListener);
         bibEntry.getFieldBinding(StandardField.GROUPS).addListener(listener);
-        metaData.registerListener(listener);
+        database.getMetaData().registerListener(listener);
     }
 
     private static Binding<List<AbstractGroup>> createMatchedGroupsBinding(BibDatabaseContext database, BibEntry entry) {

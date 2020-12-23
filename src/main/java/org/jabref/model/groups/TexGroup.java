@@ -127,7 +127,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener, Obser
         // Reset previous parse result
         keysUsedInAux = null;
         DefaultTaskExecutor.runInJavaFXThread(() -> {
-            // Update listeners for invalidation in this specific group
+            // Update listeners for invalidation of this specific group
             listeners.forEach(listener -> listener.invalidated(this));
             // Update listeners for group updates that doesn't require a save action
             metaData.postGroupInvalidation();
