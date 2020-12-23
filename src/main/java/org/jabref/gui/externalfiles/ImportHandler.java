@@ -101,13 +101,13 @@ public class ImportHandler {
 
                             var pdfImporterResult = contentImporter.importPDFContent(file);
                             if (pdfImporterResult.hasWarnings()) {
-                                addResultToList(file, false, pdfImporterResult.getErrorMessage());
+                                addResultToList(file, false,  "Error reading PDF content: " + pdfImporterResult.getErrorMessage());
                             }
                             List<BibEntry> pdfResult = pdfImporterResult.getDatabase().getEntries();
 
                             var xmpParserResult = contentImporter.importXMPContent(file);
                             if (xmpParserResult.hasWarnings()) {
-                                addResultToList(file, false, xmpParserResult.getErrorMessage());
+                                addResultToList(file, false, "Error reading XMP content: " + xmpParserResult.getErrorMessage());
 
                             }
                             List<BibEntry> xmpEntriesInFile = xmpParserResult.getDatabase().getEntries();
@@ -124,6 +124,7 @@ public class ImportHandler {
                                 if (!pdfResult.isEmpty()) {
                                     entriesToAdd = pdfResult;
                                 } else {
+                                    addResultToList(file, false, "No entry found. Creating empty entry with file link");
                                     entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
                                 }
                             }
