@@ -2,6 +2,7 @@ package org.jabref.model.strings;
 
 import java.text.Normalizer;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import com.github.tomtung.latex2unicode.LaTeX2Unicode;
@@ -26,35 +27,24 @@ public class LatexToUnicodeAdapter {
      */
     public static String format(String inField) {
         Objects.requireNonNull(inField);
-
-        try {
-            return parse(inField).orElse(Normalizer.normalize(inField, Normalizer.Form.NFC));
-        } catch (IllegalArgumentException ignored) {
-            return Normalizer.normalize(inField, Normalizer.Form.NFC);
-        }
+        return parse(inField).orElse(Normalizer.normalize(inField, Normalizer.Form.NFC));
     }
 
     /**
      * Attempts to resolve all LaTeX in the String.
      *
      * @param inField a String containing LaTeX
-     * @return a String with LaTeX resolved into Unicode
-     * @throws IllegalArgumentException if the LaTeX could not be parsed
+     * @return an {@code Optional<String>} with LaTeX resolved into Unicode or {@code empty} on failure.
      */
-    public static Optional<String> parse(String inField) throws IllegalArgumentException {
+    public static Optional<String> parse(String inField) {
         Objects.requireNonNull(inField);
         String toFormat = UNDERSCORE_MATCHER.matcher(inField).replaceAll(REPLACEMENT_CHAR);
-        try {
-            var parsingResult = LaTeX2Unicode.parse(toFormat);
-            if (parsingResult instanceof Parsed.Success) {
-                String text = parsingResult.get().value();
-                toFormat = Normalizer.normalize(text, Normalizer.Form.NFC);
-                return Optional.of(UNDERSCORE_PLACEHOLDER_MATCHER.matcher(toFormat).replaceAll("_"));
-            } else {
- return Optional.empty()
-            }
-        } catch (Throwable throwable) {
-            throw new IllegalArgumentException("An error occurred while attempting to parse latex.");
+        var parsingResult = LaTeX2Unicode.parse(toFormat);
+        if (parsingResult instanceof Parsed.Success) {
+            String text = parsingResult.get().value();
+            toFormat = Normalizer.normalize(text, Normalizer.Form.NFC);
+            return Optional.of(UNDERSCORE_PLACEHOLDER_MATCHER.matcher(toFormat).replaceAll("_"));
         }
+        return Optional.empty();
     }
 }
