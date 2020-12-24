@@ -1,4 +1,4 @@
-package org.jabref.gui.importer;
+package org.jabref.gui.externalfiles;
 
 import java.io.File;
 import java.io.FileFilter;

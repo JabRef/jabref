@@ -100,29 +100,34 @@ public class ImportHandler {
                         if (FileUtil.getFileExtension(file).filter("pdf"::equals).isPresent()) {
 
                             var pdfImporterResult = contentImporter.importPDFContent(file);
+                            List<BibEntry> pdfEntriesInFile = pdfImporterResult.getDatabase().getEntries();
+
                             if (pdfImporterResult.hasWarnings()) {
                                 addResultToList(file, false,  "Error reading PDF content: " + pdfImporterResult.getErrorMessage());
                             }
-                            List<BibEntry> pdfResult = pdfImporterResult.getDatabase().getEntries();
 
                             var xmpParserResult = contentImporter.importXMPContent(file);
+                            List<BibEntry> xmpEntriesInFile = xmpParserResult.getDatabase().getEntries();
+
                             if (xmpParserResult.hasWarnings()) {
                                 addResultToList(file, false, "Error reading XMP content: " + xmpParserResult.getErrorMessage());
+                            }
+                            else
+                            {
 
                             }
-                            List<BibEntry> xmpEntriesInFile = xmpParserResult.getDatabase().getEntries();
 
                             // First try xmp import, if empty try pdf import, otherwise create empty entry
                             if (!xmpEntriesInFile.isEmpty()) {
-                                if (!pdfResult.isEmpty()) {
+                                if (!pdfEntriesInFile.isEmpty()) {
                                     // FIXME: Show merge dialog?
                                     entriesToAdd = xmpEntriesInFile;
                                 } else {
                                     entriesToAdd = xmpEntriesInFile;
                                 }
                             } else {
-                                if (!pdfResult.isEmpty()) {
-                                    entriesToAdd = pdfResult;
+                                if (!pdfEntriesInFile.isEmpty()) {
+                                    entriesToAdd = pdfEntriesInFile;
                                 } else {
                                     addResultToList(file, false, "No entry found. Creating empty entry with file link");
                                     entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));

@@ -1,4 +1,4 @@
-package org.jabref.gui.importer;
+package org.jabref.gui.externalfiles;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -9,7 +9,6 @@ import java.util.List;
 
 import javafx.scene.control.CheckBoxTreeItem;
 
-import org.jabref.gui.externalfiles.FindUnlinkedFilesDialog.FileNodeWrapper;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;

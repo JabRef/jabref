@@ -27,6 +27,6 @@ public class FindUnlinkedFilesAction extends SimpleCommand {
 
     @Override
     public void execute() {
-         new ExternalFilesDialogView().showAndWait();
+         new UnlinkedFilesDialogView().showAndWait();
     }
 }

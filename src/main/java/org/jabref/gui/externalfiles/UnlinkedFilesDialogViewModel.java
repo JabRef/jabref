@@ -28,10 +28,8 @@ import javafx.stage.FileChooser;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.externalfiles.FindUnlinkedFilesDialog.FileNodeWrapper;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.importer.ImportFilesResultItemViewModel;
-import org.jabref.gui.importer.UnlinkedFilesCrawler;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -46,20 +44,19 @@ import org.jabref.preferences.PreferencesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ExternalFilesDialogViewModel {
+public class UnlinkedFilesDialogViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExternalFilesDialogViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UnlinkedFilesDialogViewModel.class);
 
     private final ImportHandler importHandler;
     private final StringProperty directoryPath = new SimpleStringProperty("");
     private final ObjectProperty<FileChooser.ExtensionFilter> selectedExtension = new SimpleObjectProperty<>();
 
-    private final BooleanProperty searchProgressPaneVisible = new SimpleBooleanProperty();
+    private final BooleanProperty searchProgressVisible = new SimpleBooleanProperty(false);
     private final BooleanProperty applyButtonDisabled = new SimpleBooleanProperty();
     private final BooleanProperty scanButtonDisabled = new SimpleBooleanProperty(true);
     private final BooleanProperty exportButtonDisabled = new SimpleBooleanProperty();
-    private final ObjectProperty<TreeItem<FileNodeWrapper>> treeRoot =  new SimpleObjectProperty<>();
-    private final BooleanProperty treeExpanded = new SimpleBooleanProperty();
+    private final ObjectProperty<TreeItem<FileNodeWrapper>> treeRoot = new SimpleObjectProperty<>();
     private final BooleanProperty scanButtonDefaultButton = new SimpleBooleanProperty();
     private final DoubleProperty progress = new SimpleDoubleProperty(0);
     private final StringProperty progressText = new SimpleStringProperty("");
@@ -76,7 +73,7 @@ public class ExternalFilesDialogViewModel {
     private final BibDatabaseContext bibDatabasecontext;
     private final TaskExecutor taskExecutor;
 
-    public ExternalFilesDialogViewModel(DialogService dialogService, ExternalFileTypes externalFileTypes, UndoManager undoManager,
+    public UnlinkedFilesDialogViewModel(DialogService dialogService, ExternalFileTypes externalFileTypes, UndoManager undoManager,
                                         FileUpdateMonitor fileUpdateMonitor, PreferencesService preferences, StateManager stateManager, TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.dialogService = dialogService;
@@ -108,12 +105,12 @@ public class ExternalFilesDialogViewModel {
             progress.bind(importFilesBackgroundTask.workDonePercentageProperty());
             progressText.bind(importFilesBackgroundTask.messageProperty());
 
-            searchProgressPaneVisible.setValue(true);
+            searchProgressVisible.setValue(true);
             scanButtonDisabled.setValue(true);
             applyButtonDisabled.setValue(true);
          })
         .onFinished(() -> {
-            searchProgressPaneVisible.setValue(false);
+            searchProgressVisible.setValue(false);
             scanButtonDisabled.setValue(false);
         })
         .onSuccess(results -> {
@@ -121,6 +118,7 @@ public class ExternalFilesDialogViewModel {
            exportButtonDisabled.setValue(false);
            scanButtonDefaultButton.setValue(false);
 
+           searchProgressVisible.setValue(false);
            new ImportResultsDialogView(results).showAndWait();
         });
         importFilesBackgroundTask.executeWith(taskExecutor);
@@ -171,17 +169,16 @@ public class ExternalFilesDialogViewModel {
         Path directory = this.getSearchDirectory();
         FileFilter selectedFileFilter = FileFilterConverter.toFileFilter(selectedExtension.getValue());
 
-
         findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, bibDatabasecontext)
                 .onRunning(() -> {
                     progress.set(ProgressBar.INDETERMINATE_PROGRESS);
                     progressText.setValue(Localization.lang("Searching the file system...."));
-                    searchProgressPaneVisible.setValue(true);
+                    searchProgressVisible.setValue(true);
                     scanButtonDisabled.setValue(true);
                     treeRoot.setValue(null);
                 })
                 .onFinished(() -> {
-                    searchProgressPaneVisible.setValue(false);
+                    searchProgressVisible.setValue(false);
                     scanButtonDisabled.setValue(false);
                     applyButtonDisabled.setValue(false);
                 })
@@ -211,7 +208,7 @@ public class ExternalFilesDialogViewModel {
     }
 
     public BooleanProperty searchProgressPaneVisible() {
-        return this.searchProgressPaneVisible;
+        return this.searchProgressVisible;
     }
 
     public BooleanProperty applyButtonDisabled() {
@@ -242,7 +239,7 @@ public class ExternalFilesDialogViewModel {
         return this.treeRoot;
     }
 
-    public void cancelImport() {
+    public void cancelTasks() {
         if (findUnlinkedFilesTask != null) {
             findUnlinkedFilesTask.cancel();
         }
