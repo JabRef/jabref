@@ -112,7 +112,9 @@ public class DownloadFullTextAction extends SimpleCommand {
                 Optional<Path> dir = databaseContext.getFirstExistingFileDir(Globals.prefs.getFilePreferences());
                 if (dir.isEmpty()) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Directory not found"),
-                            Localization.lang("Main file directory not set!\n"));
+                            Localization.lang("Main file directory not set!\n")
+                                    + Localization.lang("Check the Preferences (Linked files)")
+                                    + Localization.lang(" or the Library properties."));
                     return;
                 }
 
