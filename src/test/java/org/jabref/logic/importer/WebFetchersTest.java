@@ -131,7 +131,6 @@ class WebFetchersTest {
             expected.remove(ACMPortalFetcher.class);
             expected.remove(GoogleScholar.class);
 
-
             assertEquals(expected, getClasses(idFetchers));
         }
     }
