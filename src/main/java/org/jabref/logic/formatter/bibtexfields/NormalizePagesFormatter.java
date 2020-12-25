@@ -22,8 +22,9 @@ public class NormalizePagesFormatter extends Formatter {
 
     // "startpage" and "endpage" are named groups. See http://stackoverflow.com/a/415635/873282 for a documentation
     private static final Pattern PAGES_DETECT_PATTERN = Pattern.compile("\\A(?<startpage>(\\d+:)?\\d+)(?:-{1,2}(?<endpage>(\\d+:)?\\d+))?\\Z");
+    private static final Pattern EM_EN_DASH_PATTERN = Pattern.compile("\u2013|\u2014");
+    private static final Pattern REJECT_LITERALS_PATTERN = Pattern.compile("[^a-zA-Z0-9,\\-\\+,:]");
 
-    private static final String REJECT_LITERALS = "[^a-zA-Z0-9,\\-\\+,:]";
     private static final String PAGES_REPLACE_PATTERN = "${startpage}--${endpage}";
     private static final String SINGLE_PAGE_REPLACE_PATTERN = "$1";
 
@@ -63,7 +64,8 @@ public class NormalizePagesFormatter extends Formatter {
         // Remove pages prefix
         String cleanValue = value.replace("pp.", "").replace("p.", "");
         // remove unwanted literals including en dash, em dash, and whitespace
-        cleanValue = cleanValue.replaceAll("\u2013|\u2014", "-").replaceAll(REJECT_LITERALS, "");
+        cleanValue = EM_EN_DASH_PATTERN.matcher(cleanValue).replaceAll("-");
+        cleanValue = REJECT_LITERALS_PATTERN.matcher(cleanValue).replaceAll("");
         // try to find pages pattern
         Matcher matcher = PAGES_DETECT_PATTERN.matcher(cleanValue);
         if (matcher.matches()) {
@@ -74,8 +76,7 @@ public class NormalizePagesFormatter extends Formatter {
                 return matcher.replaceFirst(PAGES_REPLACE_PATTERN);
             }
         }
-        // no replacement
-        return value;
+        return cleanValue;
     }
 
     @Override
