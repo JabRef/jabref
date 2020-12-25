@@ -173,10 +173,20 @@ General hints:
 The tests check whether translation strings appear correctly in the resource bundles.
 
 1. Add new `Localization.lang("KEY")` to Java file. Run the `LocalizationConsistencyTest`under \(src/test/org.jabref.logic.
-\)
+
+   \)
+
 2. Tests fail. In the test output a snippet is generated which must be added to the English translation file.
 3. Add snippet to English translation file located at `src/main/resources/l10n/JabRef_en.properties`
 4. Please do not add translations for other languages directly in the properties. They will be overwritten by [Crowdin](https://crowdin.com/project/jabref)
+
+## Adding a new Language
+
+1. Add the new Language to the Language enum in [https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/l10n/Language.java](https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/l10n/Language.java)
+2. Create an empty &lt;locale code&gt;.properties file
+3. Configure the new language in [https://crowdin.com/project/jabref ](https://crowdin.com/project/jabref)
+
+If the language is a variant of a language `zh_CN` or `pt_BR`  it is necessary to add a language mapping for Crowdin to the crowdin.yml file in the root. Of course the properties file also has to be named according to the language code and locale.
 
 ## Cleanup and Formatters
 
