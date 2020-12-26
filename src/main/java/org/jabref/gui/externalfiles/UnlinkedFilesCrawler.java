@@ -10,6 +10,7 @@ import java.util.List;
 import javafx.scene.control.CheckBoxTreeItem;
 
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -97,11 +98,14 @@ public class UnlinkedFilesCrawler extends BackgroundTask<CheckBoxTreeItem<FileNo
             root.getChildren().add(new CheckBoxTreeItem<>(new FileNodeWrapper(file.toPath())));
 
             counter++;
-            if (counter == 1) {
-                updateMessage(Localization.lang("One file found"));
-            } else {
-                updateMessage(Localization.lang("%0 files found", Integer.toString(counter)));
-            }
+            DefaultTaskExecutor.runInJavaFXThread(() -> {
+                if (counter == 1) {
+                    updateMessage(Localization.lang("One file found"));
+                } else {
+                    updateMessage(Localization.lang("%0 files found", Integer.toString(counter)));
+                }
+            });
+
         }
 
         return root;

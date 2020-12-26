@@ -173,6 +173,8 @@ public class UnlinkedFilesDialogViewModel {
                 .onRunning(() -> {
                     progress.set(ProgressIndicator.INDETERMINATE_PROGRESS);
                     progressText.setValue(Localization.lang("Searching the file system...."));
+                    progressText.bind(findUnlinkedFilesTask.messageProperty());
+
                     searchProgressVisible.setValue(true);
                     scanButtonDisabled.setValue(true);
                     applyButtonDisabled.set(true);
@@ -182,14 +184,12 @@ public class UnlinkedFilesDialogViewModel {
                     scanButtonDisabled.setValue(false);
                     applyButtonDisabled.setValue(false);
                     searchProgressVisible.set(false);
-                    progressText.set("");
                     progress.set(0);
                 })
                 .onSuccess(root -> {
                     treeRoot.setValue(root);
                     root.setSelected(true);
                     root.setExpanded(true);
-                    progressText.set("");
                     progress.set(0);
 
                     applyButtonDisabled.setValue(false);

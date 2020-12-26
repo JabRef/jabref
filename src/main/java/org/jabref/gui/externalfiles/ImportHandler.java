@@ -99,14 +99,14 @@ public class ImportHandler {
                             List<BibEntry> pdfEntriesInFile = pdfImporterResult.getDatabase().getEntries();
 
                             if (pdfImporterResult.hasWarnings()) {
-                                addResultToList(file, false, "Error reading PDF content: " + pdfImporterResult.getErrorMessage());
+                                addResultToList(file, false, Localization.lang("Error reading PDF content: %0 ", pdfImporterResult.getErrorMessage()));
                             }
 
                             var xmpParserResult = contentImporter.importXMPContent(file);
                             List<BibEntry> xmpEntriesInFile = xmpParserResult.getDatabase().getEntries();
 
                             if (xmpParserResult.hasWarnings()) {
-                                addResultToList(file, false, "Error reading XMP content: " + xmpParserResult.getErrorMessage());
+                                addResultToList(file, false, Localization.lang("Error reading XMP content: %0 ", xmpParserResult.getErrorMessage()));
                             }
 
                             // First try xmp import, if empty try pdf import, otherwise create empty entry
@@ -117,13 +117,13 @@ public class ImportHandler {
                                 } else {
                                     entriesToAdd = xmpEntriesInFile;
                                 }
-                                addResultToList(file, true, "Importing using XMP data");
+                                addResultToList(file, true, Localization.lang("Importing using XMP data..."));
                             } else {
                                 if (!pdfEntriesInFile.isEmpty()) {
                                     entriesToAdd = pdfEntriesInFile;
-                                    addResultToList(file, true, "Importing using extracted PDF data");
+                                    addResultToList(file, true, Localization.lang("Importing using extracted PDF data"));
                                 } else {
-                                    addResultToList(file, false, "No entry found. Creating empty entry with file link");
+                                    addResultToList(file, false, Localization.lang("No metadata found. Creating empty entry with file link"));
                                     entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
                                 }
                             }
@@ -133,20 +133,19 @@ public class ImportHandler {
                                 addResultToList(file, false, bibtexParserResult.getErrorMessage());
                             }
 
-                            addResultToList(file, false, "Importing bib entry");
+                            addResultToList(file, false, Localization.lang("Importing bib entry"));
                             entriesToAdd = bibtexParserResult.getDatabaseContext().getEntries();
 
                         } else {
-                            addResultToList(file, false, "Importing bib entry");
-                            addResultToList(file, false, "No entry found. Creating empty entry with file link");
+                            addResultToList(file, false, Localization.lang("No bibtex data found. Creating empty entry with file link"));
                             entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
                         }
 
                     } catch (IOException ex) {
                         LOGGER.error("Error importing", ex);
-                        addResultToList(file, false, "Error importing " + ex.getLocalizedMessage());
+                        addResultToList(file, false, Localization.lang("Error from import: %0", ex.getLocalizedMessage()));
 
-                        DefaultTaskExecutor.runInJavaFXThread(() -> updateMessage("Error"));
+                        DefaultTaskExecutor.runInJavaFXThread(() -> updateMessage(Localization.lang("Error")));
                     }
 
                     // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
