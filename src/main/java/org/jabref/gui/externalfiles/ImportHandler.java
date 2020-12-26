@@ -41,13 +41,12 @@ public class ImportHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportHandler.class);
     private final BibDatabaseContext bibdatabasecontext;
     private final PreferencesService preferencesService;
-    private final DialogService dialogService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final ExternalFilesEntryLinker linker;
     private final ExternalFilesContentImporter contentImporter;
     private final UndoManager undoManager;
     private final StateManager stateManager;
-    private  List<ImportFilesResultItemViewModel> results;
+    private List<ImportFilesResultItemViewModel> results;
     private int counter;
     private List<BibEntry> entriesToAdd;
 
@@ -59,9 +58,7 @@ public class ImportHandler {
                          UndoManager undoManager,
                          StateManager stateManager) {
 
-        this.dialogService = dialogService;
         this.bibdatabasecontext = database;
-
         this.preferencesService = preferencesService;
         this.fileUpdateMonitor = fileupdateMonitor;
         this.stateManager = stateManager;
@@ -103,7 +100,7 @@ public class ImportHandler {
                             List<BibEntry> pdfEntriesInFile = pdfImporterResult.getDatabase().getEntries();
 
                             if (pdfImporterResult.hasWarnings()) {
-                                addResultToList(file, false,  "Error reading PDF content: " + pdfImporterResult.getErrorMessage());
+                                addResultToList(file, false, "Error reading PDF content: " + pdfImporterResult.getErrorMessage());
                             }
 
                             var xmpParserResult = contentImporter.importXMPContent(file);
@@ -111,10 +108,6 @@ public class ImportHandler {
 
                             if (xmpParserResult.hasWarnings()) {
                                 addResultToList(file, false, "Error reading XMP content: " + xmpParserResult.getErrorMessage());
-                            }
-                            else
-                            {
-
                             }
 
                             // First try xmp import, if empty try pdf import, otherwise create empty entry
@@ -125,9 +118,11 @@ public class ImportHandler {
                                 } else {
                                     entriesToAdd = xmpEntriesInFile;
                                 }
+                                addResultToList(file, true, "Importing using XMP data");
                             } else {
                                 if (!pdfEntriesInFile.isEmpty()) {
                                     entriesToAdd = pdfEntriesInFile;
+                                    addResultToList(file, true, "Importing using extracted PDF data");
                                 } else {
                                     addResultToList(file, false, "No entry found. Creating empty entry with file link");
                                     entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
@@ -139,9 +134,12 @@ public class ImportHandler {
                                 addResultToList(file, false, bibtexParserResult.getErrorMessage());
                             }
 
+                            addResultToList(file, false, "Importing bib entry");
                             entriesToAdd = bibtexParserResult.getDatabaseContext().getEntries();
 
                         } else {
+                            addResultToList(file, false, "Importing bib entry");
+                            addResultToList(file, false, "No entry found. Creating empty entry with file link");
                             entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
                         }
 
@@ -220,9 +218,9 @@ public class ImportHandler {
      */
     private void generateKeys(List<BibEntry> entries) {
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
-                bibdatabasecontext.getMetaData().getCiteKeyPattern(Globals.prefs.getCitationKeyPatternPreferences().getKeyPattern()),
-                bibdatabasecontext.getDatabase(),
-                Globals.prefs.getCitationKeyPatternPreferences());
+                                                                     bibdatabasecontext.getMetaData().getCiteKeyPattern(Globals.prefs.getCitationKeyPatternPreferences().getKeyPattern()),
+                                                                     bibdatabasecontext.getDatabase(),
+                                                                     Globals.prefs.getCitationKeyPatternPreferences());
 
         for (BibEntry entry : entries) {
             keyGenerator.generateAndSetKey(entry);

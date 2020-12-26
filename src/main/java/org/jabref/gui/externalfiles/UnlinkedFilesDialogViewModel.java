@@ -98,7 +98,6 @@ public class UnlinkedFilesDialogViewModel {
             return;
         }
 
-
         importFilesBackgroundTask = importHandler.importFilesInBackground(fileList)
         .onRunning(() -> {
            // progressText.setValue(Localization.lang("Importing"));
@@ -161,7 +160,6 @@ public class UnlinkedFilesDialogViewModel {
 
         exportButtonDisabled.setValue(false);
         applyButtonDisabled.setValue(false);
-
     }
 
     public void startSearch() {
@@ -169,7 +167,7 @@ public class UnlinkedFilesDialogViewModel {
         Path directory = this.getSearchDirectory();
         FileFilter selectedFileFilter = FileFilterConverter.toFileFilter(selectedExtension.getValue());
 
-        findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, bibDatabasecontext)
+        findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, bibDatabasecontext, preferences.getFilePreferences())
                 .onRunning(() -> {
                     progress.set(ProgressBar.INDETERMINATE_PROGRESS);
                     progressText.setValue(Localization.lang("Searching the file system...."));

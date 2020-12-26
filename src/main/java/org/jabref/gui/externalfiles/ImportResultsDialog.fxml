@@ -12,8 +12,8 @@
             <center>
                 <TableView fx:id="tvResult">
                     <columns>
-                        <TableColumn fx:id="colStatus" prefWidth="60.0" text="%Status" />
-                        <TableColumn fx:id="colMessage" prefWidth="230.0" text="%Message" />
+                        <TableColumn fx:id="colStatus" prefWidth="100.0" text="%Status" />
+                        <TableColumn fx:id="colMessage" prefWidth="300.0" text="%Message" />
                         <TableColumn fx:id="colFile" prefWidth="500.0" text="%File" />
                     </columns>
                     <columnResizePolicy>

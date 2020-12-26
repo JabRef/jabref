@@ -2,7 +2,6 @@ package org.jabref.gui.externalfiles;
 
 import java.nio.file.Path;
 
-
 public class FileNodeWrapper {
 
     public final Path path;

@@ -13,6 +13,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.preferences.FilePreferences;
 
 /**
  * Util class for searching files on the file system which are not linked to a provided {@link BibDatabase}.
@@ -23,16 +24,18 @@ public class UnlinkedFilesCrawler extends BackgroundTask<CheckBoxTreeItem<FileNo
     private final FileFilter fileFilter;
     private int counter;
     private final BibDatabaseContext databaseContext;
+    private final FilePreferences filePreferences;
 
-    public UnlinkedFilesCrawler(Path directory, FileFilter fileFilter, BibDatabaseContext databaseContext) {
+    public UnlinkedFilesCrawler(Path directory, FileFilter fileFilter, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         this.directory = directory;
         this.fileFilter = fileFilter;
         this.databaseContext = databaseContext;
+        this.filePreferences = filePreferences;
     }
 
     @Override
     protected CheckBoxTreeItem<FileNodeWrapper> call() {
-        UnlinkedPDFFileFilter unlinkedPDFFileFilter = new UnlinkedPDFFileFilter(fileFilter, databaseContext);
+        UnlinkedPDFFileFilter unlinkedPDFFileFilter = new UnlinkedPDFFileFilter(fileFilter, databaseContext, filePreferences);
         return searchDirectory(directory.toFile(), unlinkedPDFFileFilter);
     }
 

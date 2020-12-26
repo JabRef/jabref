@@ -46,6 +46,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     @FXML private Label progressText;
     @FXML private Label treeDesc;
     @FXML private ProgressIndicator progressDisplay;
+
     @Inject private PreferencesService preferencesService;
     @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;

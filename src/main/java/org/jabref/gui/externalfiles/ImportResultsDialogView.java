@@ -27,7 +27,6 @@ public class ImportResultsDialogView extends BaseDialog<Void> {
     public ImportResultsDialogView(List<ImportFilesResultItemViewModel> results) {
         this.setTitle(Localization.lang("Result"));
 
-
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
@@ -55,7 +54,6 @@ public class ImportResultsDialogView extends BaseDialog<Void> {
             }
             return item.getGraphicNode();
         }));
-
 
         tvResult.setColumnResizePolicy((param) -> true);
     }

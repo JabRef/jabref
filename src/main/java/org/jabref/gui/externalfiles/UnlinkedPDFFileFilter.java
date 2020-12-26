@@ -3,11 +3,11 @@ package org.jabref.gui.externalfiles;
 import java.io.File;
 import java.io.FileFilter;
 
-import org.jabref.gui.Globals;
 import org.jabref.logic.util.io.DatabaseFileLookup;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.FilePreferences;
 
 /**
  * {@link FileFilter} implementation, that allows only files which are not
@@ -23,9 +23,9 @@ public class UnlinkedPDFFileFilter implements FileFilter {
     private final DatabaseFileLookup lookup;
     private final FileFilter fileFilter;
 
-    public UnlinkedPDFFileFilter(FileFilter fileFilter, BibDatabaseContext databaseContext) {
+    public UnlinkedPDFFileFilter(FileFilter fileFilter, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         this.fileFilter = fileFilter;
-        this.lookup = new DatabaseFileLookup(databaseContext, Globals.prefs.getFilePreferences());
+        this.lookup = new DatabaseFileLookup(databaseContext, filePreferences);
     }
 
     @Override
