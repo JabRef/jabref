@@ -181,7 +181,7 @@ The tests check whether translation strings appear correctly in the resource bun
 
 ## Cleanup and Formatters
 
-We try to build a cleanup mechanism based on formatters. The idea is that we can register these actions in arbitrary places, e.g., onSave, onImport, onExport, cleanup, etc. and apply them to different fields. The formatters themself are independent of any logic and therefore easy to test.
+We try to build a cleanup mechanism based on formatters. The idea is that we can register these actions in arbitrary places, e.g., onSave, onImport, onExport, cleanup, etc. and apply them to different fields. The formatters themselves are independent of any logic and therefore easy to test.
 
 Example: [NormalizePagesFormatter](https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/formatter/bibtexfields/NormalizePagesFormatter.java)
 
