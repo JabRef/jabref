@@ -99,14 +99,14 @@ public class ImportHandler {
                             List<BibEntry> pdfEntriesInFile = pdfImporterResult.getDatabase().getEntries();
 
                             if (pdfImporterResult.hasWarnings()) {
-                                addResultToList(file, false, Localization.lang("Error reading PDF content: %0 ", pdfImporterResult.getErrorMessage()));
+                                addResultToList(file, false, Localization.lang("Error reading PDF content: %0", pdfImporterResult.getErrorMessage()));
                             }
 
                             var xmpParserResult = contentImporter.importXMPContent(file);
                             List<BibEntry> xmpEntriesInFile = xmpParserResult.getDatabase().getEntries();
 
                             if (xmpParserResult.hasWarnings()) {
-                                addResultToList(file, false, Localization.lang("Error reading XMP content: %0 ", xmpParserResult.getErrorMessage()));
+                                addResultToList(file, false, Localization.lang("Error reading XMP content: %0", xmpParserResult.getErrorMessage()));
                             }
 
                             // First try xmp import, if empty try pdf import, otherwise create empty entry
