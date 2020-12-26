@@ -15,6 +15,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeView;
 import javafx.stage.FileChooser;
 
@@ -64,6 +65,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         Button btnImport = (Button) this.getDialogPane().lookupButton(importButton);
         ControlHelper.setAction(importButton, getDialogPane(), evt-> viewModel.startImport());
         btnImport.disableProperty().bindBidirectional(viewModel.applyButtonDisabled());
+        btnImport.setTooltip(new Tooltip("Starts the import of BibTeX entries."));
 
         setResultConverter(button -> {
             if (button == ButtonType.CANCEL) {
