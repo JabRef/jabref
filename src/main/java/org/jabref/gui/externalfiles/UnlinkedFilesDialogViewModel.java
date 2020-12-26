@@ -172,7 +172,7 @@ public class UnlinkedFilesDialogViewModel {
         findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, bibDatabasecontext, preferences.getFilePreferences())
                 .onRunning(() -> {
                     progress.set(ProgressIndicator.INDETERMINATE_PROGRESS);
-                    progressText.setValue(Localization.lang("Searching file system...."));
+                    progressText.setValue(Localization.lang("Searching file system..."));
                     progressText.bind(findUnlinkedFilesTask.messageProperty());
 
                     searchProgressVisible.setValue(true);
