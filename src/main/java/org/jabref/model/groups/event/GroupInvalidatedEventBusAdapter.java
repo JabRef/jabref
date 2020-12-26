@@ -11,6 +11,9 @@ import org.jabref.gui.util.DefaultTaskExecutor;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 
+/**
+ * Adapter class for the MetaData EventBus when dealing with changes and modifications of groups. Unlike the EventBus, that notifies all listeners on any changes, this adapter is intended to be used only for changes that require GUI updates.
+ */
 public class GroupInvalidatedEventBusAdapter extends EventBus implements Observable {
     private final Queue<InvalidationListener> listeners = new ConcurrentLinkedQueue<>();
 
