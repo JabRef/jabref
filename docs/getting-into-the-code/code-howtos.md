@@ -184,7 +184,7 @@ The tests check whether translation strings appear correctly in the resource bun
 
 1. Add the new Language to the Language enum in [https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/l10n/Language.java](https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/l10n/Language.java)
 2. Create an empty &lt;locale code&gt;.properties file
-3. Configure the new language in [https://crowdin.com/project/jabref ](https://crowdin.com/project/jabref)
+3. Configure the new language in [Crowdin](https://crowdin.com/project/jabref)
 
 If the language is a variant of a language `zh_CN` or `pt_BR`  it is necessary to add a language mapping for Crowdin to the crowdin.yml file in the root. Of course the properties file also has to be named according to the language code and locale.
 
