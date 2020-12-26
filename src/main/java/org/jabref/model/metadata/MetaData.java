@@ -21,7 +21,7 @@ import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.groups.event.GroupInvalidatedEventBase;
+import org.jabref.model.groups.event.GroupInvalidatedEvent;
 import org.jabref.model.groups.event.GroupInvalidatedEventBusAdapter;
 import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
@@ -114,8 +114,7 @@ public class MetaData {
     /**
      * Updates the stored key patterns to the given key patterns.
      *
-     * @param bibtexKeyPattern the key patterns to update to. <br /> A reference to this object is stored internally and
-     *                         is returned at getCiteKeyPattern();
+     * @param bibtexKeyPattern the key patterns to update to. <br /> A reference to this object is stored internally and is returned at getCiteKeyPattern();
      */
     public void setCiteKeyPattern(AbstractCitationKeyPattern bibtexKeyPattern) {
         Objects.requireNonNull(bibtexKeyPattern);
@@ -264,7 +263,8 @@ public class MetaData {
     }
 
     public void postGroupInvalidation() {
-        eventBus.post(new GroupInvalidatedEventBase());
+        eventBus.post(new GroupInvalidatedEvent() {
+        });
     }
 
     /**
