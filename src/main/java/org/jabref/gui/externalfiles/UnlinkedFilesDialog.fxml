@@ -38,12 +38,12 @@
                         <ComboBox fx:id="fileTypeSelection" prefHeight="27.0" prefWidth="144.0" />
                      </children>
                   </HBox>
-                  <Button fx:id="buttonScan" defaultButton="true" disable="true" mnemonicParsing="false" onAction="#scanFiles" text="%Scan files">
+                  <Button fx:id="buttonScan" defaultButton="true" disable="true" mnemonicParsing="false" onAction="#scanFiles" text="%Scan directory">
                      <tooltip>
                         <Tooltip text="%Searches the selected directory for unlinked files." />
                      </tooltip>
                   </Button>
-                  <Label fx:id="progressText" text="%Searching the file system..." />
+                  <Label fx:id="progressText" text="%Searching file system..." />
                   <ProgressIndicator fx:id="progressDisplay" maxHeight="50.0" maxWidth="50.0" prefHeight="50.0" prefWidth="50.0" progress="0.0" VBox.vgrow="ALWAYS" />
                   <Label fx:id="treeDesc" text="%These files are not linked in the active library." />
                </children>

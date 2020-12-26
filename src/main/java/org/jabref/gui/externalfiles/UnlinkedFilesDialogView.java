@@ -65,7 +65,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         Button btnImport = (Button) this.getDialogPane().lookupButton(importButton);
         ControlHelper.setAction(importButton, getDialogPane(), evt-> viewModel.startImport());
         btnImport.disableProperty().bindBidirectional(viewModel.applyButtonDisabled());
-        btnImport.setTooltip(new Tooltip("Starts the import of BibTeX entries."));
+        btnImport.setTooltip(new Tooltip(Localization.lang("Starts the import of BibTeX entries.")));
 
         setResultConverter(button -> {
             if (button == ButtonType.CANCEL) {
