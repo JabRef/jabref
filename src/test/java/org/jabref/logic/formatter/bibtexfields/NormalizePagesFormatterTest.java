@@ -111,6 +111,6 @@ public class NormalizePagesFormatterTest {
 
     @Test
     public void replaceDashWithMinus() {
-        assertEquals("R404-R405", formatter.format("R404–R405"));
+        assertEquals("R404--R405", formatter.format("R404–R405"));
     }
 }
