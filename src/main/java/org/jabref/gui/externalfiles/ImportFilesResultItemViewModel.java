@@ -1,4 +1,4 @@
-package org.jabref.gui.importer;
+package org.jabref.gui.externalfiles;
 
 import java.nio.file.Path;
 
@@ -24,16 +24,16 @@ public class ImportFilesResultItemViewModel {
         }
     }
 
-    public StringProperty getFile() {
-        return file;
-    }
-
-    public StringProperty getMessage() {
-        return message;
-    }
-
     public ObjectProperty<JabRefIcon> getIcon() {
         return icon;
+    }
+
+    public StringProperty file() {
+        return this.file;
+    }
+
+    public StringProperty message() {
+        return this.message;
     }
 
     @Override

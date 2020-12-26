@@ -19,7 +19,7 @@
    <content>
       <BorderPane prefWidth="600.0">
          <top>
-            <VBox prefHeight="100.0" prefWidth="579.0" spacing="5.0" BorderPane.alignment="CENTER">
+            <VBox spacing="5.0" BorderPane.alignment="CENTER">
                <children>
                   <Label text="%Select a directory where the search shall start" />
                   <HBox prefHeight="35.0" prefWidth="600.0" spacing="10.0">
@@ -43,20 +43,14 @@
                         <Tooltip text="%Searches the selected directory for unlinked files" />
                      </tooltip>
                   </Button>
+                  <Label fx:id="progressText" text="%Searching the file system...." />
+                  <ProgressIndicator fx:id="progressDisplay" maxHeight="50.0" maxWidth="50.0" prefHeight="50.0" prefWidth="50.0" progress="0.0" VBox.vgrow="ALWAYS" />
+                  <Label fx:id="treeDesc" text="%These files are not linked in the active library." />
                </children>
             </VBox>
          </top>
          <center>
             <BorderPane BorderPane.alignment="CENTER">
-               <top>
-                  <VBox fx:id="panelSearchProgress" prefHeight="100.0" prefWidth="579.0" spacing="5.0" BorderPane.alignment="CENTER">
-                     <children>
-                        <Label fx:id="progressText" text="%Searching the file system...." />
-                        <ProgressIndicator fx:id="progressDisplay" maxHeight="50.0" maxWidth="50.0" prefHeight="50.0" prefWidth="50.0" progress="0.0" />
-                        <Label fx:id="treeDesc" text="%These files are not linked in the active library." />
-                     </children>
-                     </VBox>
-               </top>
                <bottom>
                   <ButtonBar buttonMinWidth="80.0" prefHeight="0.0" prefWidth="579.0" BorderPane.alignment="CENTER_LEFT">
                     <buttons>

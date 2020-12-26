@@ -22,14 +22,13 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.CheckBoxTreeItem;
-import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TreeItem;
 import javafx.stage.FileChooser;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.importer.ImportFilesResultItemViewModel;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -59,7 +58,7 @@ public class UnlinkedFilesDialogViewModel {
     private final ObjectProperty<TreeItem<FileNodeWrapper>> treeRoot = new SimpleObjectProperty<>();
     private final BooleanProperty scanButtonDefaultButton = new SimpleBooleanProperty();
     private final DoubleProperty progress = new SimpleDoubleProperty(0);
-    private final StringProperty progressText = new SimpleStringProperty("");
+    private final StringProperty progressText = new SimpleStringProperty();
 
     private final List<FileChooser.ExtensionFilter> fileFilterList = List.of(
                                                                              FileFilterConverter.ANY_FILE,
@@ -100,7 +99,6 @@ public class UnlinkedFilesDialogViewModel {
 
         importFilesBackgroundTask = importHandler.importFilesInBackground(fileList)
         .onRunning(() -> {
-           // progressText.setValue(Localization.lang("Importing"));
             progress.bind(importFilesBackgroundTask.workDonePercentageProperty());
             progressText.bind(importFilesBackgroundTask.messageProperty());
 
@@ -111,6 +109,8 @@ public class UnlinkedFilesDialogViewModel {
         .onFinished(() -> {
             searchProgressVisible.setValue(false);
             scanButtonDisabled.setValue(false);
+            progress.unbind();
+            progressText.unbind();
         })
         .onSuccess(results -> {
            applyButtonDisabled.setValue(false);
@@ -118,6 +118,8 @@ public class UnlinkedFilesDialogViewModel {
            scanButtonDefaultButton.setValue(false);
 
            searchProgressVisible.setValue(false);
+           progress.unbind();
+           progressText.unbind();
            new ImportResultsDialogView(results).showAndWait();
         });
         importFilesBackgroundTask.executeWith(taskExecutor);
@@ -169,26 +171,31 @@ public class UnlinkedFilesDialogViewModel {
 
         findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, bibDatabasecontext, preferences.getFilePreferences())
                 .onRunning(() -> {
-                    progress.set(ProgressBar.INDETERMINATE_PROGRESS);
+                    progress.set(ProgressIndicator.INDETERMINATE_PROGRESS);
                     progressText.setValue(Localization.lang("Searching the file system...."));
                     searchProgressVisible.setValue(true);
                     scanButtonDisabled.setValue(true);
+                    applyButtonDisabled.set(true);
                     treeRoot.setValue(null);
                 })
                 .onFinished(() -> {
-                    searchProgressVisible.setValue(false);
                     scanButtonDisabled.setValue(false);
                     applyButtonDisabled.setValue(false);
+                    searchProgressVisible.set(false);
+                    progressText.set("");
+                    progress.set(0);
                 })
                 .onSuccess(root -> {
                     treeRoot.setValue(root);
                     root.setSelected(true);
                     root.setExpanded(true);
+                    progressText.set("");
+                    progress.set(0);
 
-                   applyButtonDisabled.setValue(false);
-                   exportButtonDisabled.setValue(false);
-                   scanButtonDefaultButton.setValue(false);
-
+                    applyButtonDisabled.setValue(false);
+                    exportButtonDisabled.setValue(false);
+                    scanButtonDefaultButton.setValue(false);
+                    searchProgressVisible.set(false);
                 });
         findUnlinkedFilesTask.executeWith(taskExecutor);
     }
@@ -205,7 +212,7 @@ public class UnlinkedFilesDialogViewModel {
         return this.selectedExtension;
     }
 
-    public BooleanProperty searchProgressPaneVisible() {
+    public BooleanProperty searchProgressVisible() {
         return this.searchProgressVisible;
     }
 

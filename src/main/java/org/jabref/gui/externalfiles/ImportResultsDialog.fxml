@@ -16,9 +16,9 @@
                         <TableColumn fx:id="colMessage" prefWidth="300.0" text="%Message" />
                         <TableColumn fx:id="colFile" prefWidth="500.0" text="%File" />
                     </columns>
-                    <columnResizePolicy>
-                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                    </columnResizePolicy>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
                 </TableView>
             </center>
         </BorderPane>

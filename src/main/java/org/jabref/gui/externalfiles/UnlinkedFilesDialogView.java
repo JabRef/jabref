@@ -16,7 +16,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeView;
-import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
 import org.jabref.gui.DialogService;
@@ -39,7 +38,6 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     @FXML private TextField directoryPathField;
     @FXML private ComboBox<FileChooser.ExtensionFilter> fileTypeSelection;
     @FXML private TreeView<FileNodeWrapper> tree;
-    @FXML private VBox panelSearchProgress;
     @FXML private Button buttonScan;
     @FXML private ButtonType importButton;
     @FXML private Button buttonExport;
@@ -103,14 +101,13 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
        tree.setPrefWidth(Double.POSITIVE_INFINITY);
        viewModel.treeRoot().bindBidirectional(tree.rootProperty());
-       viewModel.searchProgressPaneVisible().bindBidirectional(panelSearchProgress.visibleProperty());
        viewModel.scanButtonDisabled().bindBidirectional(buttonScan.disableProperty());
        viewModel.scanButtonDefaultButton().bindBidirectional(buttonScan.defaultButtonProperty());
        viewModel.exportButtonDisabled().bindBidirectional(buttonExport.disableProperty());
        viewModel.selectedExtension().bind(fileTypeSelection.valueProperty());
 
        progressDisplay.progressProperty().bind(viewModel.progress());
-       progressDisplay.visibleProperty().bind(viewModel.searchProgressPaneVisible());
+       progressDisplay.managedProperty().bind(viewModel.searchProgressVisible());
        progressText.textProperty().bind(viewModel.progressText());
 
        viewModel.scanButtonDefaultButton().setValue(true);

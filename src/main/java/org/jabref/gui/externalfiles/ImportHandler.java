@@ -14,7 +14,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.importer.ImportFilesResultItemViewModel;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
@@ -86,7 +85,7 @@ public class ImportHandler {
                         break;
                     }
                     DefaultTaskExecutor.runInJavaFXThread(() -> {
-                        updateMessage(Localization.lang("Processing file %0 of %1", counter, files.size() - 1));
+                        updateMessage(Localization.lang("Processing file %0 of %1", counter, files.size()));
                         updateProgress(counter, files.size() - 1);
                     });
 

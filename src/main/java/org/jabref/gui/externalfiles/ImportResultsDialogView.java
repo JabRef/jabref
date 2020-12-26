@@ -10,7 +10,6 @@ import javafx.scene.paint.Color;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.importer.ImportFilesResultItemViewModel;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -40,11 +39,18 @@ public class ImportResultsDialogView extends BaseDialog<Void> {
     }
 
     private void setupTable() {
-        colFile.setCellValueFactory(cellData -> cellData.getValue().getFile());
-        colMessage.setCellValueFactory(cellData -> cellData.getValue().getMessage());
+        colFile.setCellValueFactory(cellData -> cellData.getValue().file());
+        new ValueTableCellFactory<ImportFilesResultItemViewModel, String>()
+        .withText(item -> item).withTooltip(item -> item)
+        .install(colFile);
+
+        colMessage.setCellValueFactory(cellData -> cellData.getValue().message());
+        new ValueTableCellFactory<ImportFilesResultItemViewModel, String>()
+        .withText(item->item).withTooltip(item->item)
+        .install(colMessage);
+
         colStatus.setCellValueFactory(cellData -> cellData.getValue().getIcon());
 
-        colFile.setCellFactory(new ValueTableCellFactory<ImportFilesResultItemViewModel, String>().withText(item -> item).withTooltip(item -> item));
         colStatus.setCellFactory(new ValueTableCellFactory<ImportFilesResultItemViewModel, JabRefIcon>().withGraphic(item -> {
             if (item == IconTheme.JabRefIcons.CHECK) {
                 item = item.withColor(Color.GREEN);
