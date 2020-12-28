@@ -37,6 +37,7 @@ import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.TexGroup;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 
@@ -85,7 +86,9 @@ public class GroupNodeViewModel {
         } else {
             children = EasyBind.mapBacked(groupNode.getChildren(), this::toViewModel);
         }
-        databaseContext.getMetaData().groupsBinding().addListener(new WeakInvalidationListener(onInvalidatedGroup));
+        if (groupNode.getGroup() instanceof TexGroup) {
+            databaseContext.getMetaData().groupsBinding().addListener(new WeakInvalidationListener(onInvalidatedGroup));
+        }
         hasChildren = new SimpleBooleanProperty();
         hasChildren.bind(Bindings.isNotEmpty(children));
         updateMatchedEntries();
