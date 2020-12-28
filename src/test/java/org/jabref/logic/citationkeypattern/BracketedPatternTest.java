@@ -316,4 +316,12 @@ class BracketedPatternTest {
 
         assertEquals("eBay", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
     }
+
+    @Test
+    void expandBracketsLastNameWithChineseCharacters() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.AUTHOR, "杨秀群");
+
+        assertEquals("杨秀群", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
+    }
 }
