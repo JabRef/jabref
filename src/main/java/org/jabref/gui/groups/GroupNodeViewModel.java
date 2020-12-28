@@ -25,7 +25,6 @@ import org.jabref.gui.icon.InternalMaterialDesignIcon;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DroppingMouseLocation;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.groups.DefaultGroupsFactory;
@@ -63,7 +62,7 @@ public class GroupNodeViewModel {
     private final CustomLocalDragboard localDragBoard;
     private final ObservableList<BibEntry> entriesList;
     private final PreferencesService preferencesService;
-    private final InvalidationListener onInvalidatedGroup = (listener) -> refreshGroupInJavaFXThread();
+    private final InvalidationListener onInvalidatedGroup = (listener) -> refreshGroup();
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard, PreferencesService preferencesService) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
@@ -258,15 +257,13 @@ public class GroupNodeViewModel {
         }
     }
 
-    private void refreshGroupInJavaFXThread() {
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
-            updateMatchedEntries(); // Update the entries matched by the group
-            // "Re-add" to the selected groups if it were selected, this refreshes the entries the user views
-            ObservableList<GroupTreeNode> selectedGroups = this.stateManager.getSelectedGroup(this.databaseContext);
-            if (selectedGroups.remove(this.groupNode)) {
-                selectedGroups.add(this.groupNode);
-            }
-        });
+    private void refreshGroup() {
+        updateMatchedEntries(); // Update the entries matched by the group
+        // "Re-add" to the selected groups if it were selected, this refreshes the entries the user views
+        ObservableList<GroupTreeNode> selectedGroups = this.stateManager.getSelectedGroup(this.databaseContext);
+        if (selectedGroups.remove(this.groupNode)) {
+            selectedGroups.add(this.groupNode);
+        }
     }
 
     private void updateMatchedEntries() {
