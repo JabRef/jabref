@@ -8,76 +8,94 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
 <DialogPane xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.externalfiles.UnlinkedFilesDialogView">
-   <content>
-      <BorderPane prefWidth="600.0">
-         <top>
-            <VBox spacing="5.0" BorderPane.alignment="CENTER">
-               <children>
-                  <Label text="%Select a directory where the search shall start." />
-                  <HBox prefHeight="35.0" prefWidth="600.0" spacing="10.0">
-                     <children>
-                        <TextField fx:id="directoryPathField" HBox.hgrow="ALWAYS" />
-                        <Button mnemonicParsing="false" onAction="#browseFileDirectory" text="%Browse">
-                           <tooltip>
-                              <Tooltip text="%Opens the file browser." />
-                           </tooltip>
-                        </Button>
-                     </children>
-                  </HBox>
-                  <HBox prefHeight="47.0" prefWidth="600.0" spacing="15.0">
-                     <children>
-                        <Label prefHeight="17.0" prefWidth="105.0" text="%Select file type:" />
-                        <ComboBox fx:id="fileTypeSelection" prefHeight="27.0" prefWidth="144.0" />
-                     </children>
-                  </HBox>
-                  <Button fx:id="buttonScan" defaultButton="true" disable="true" mnemonicParsing="false" onAction="#scanFiles" text="%Scan directory">
-                     <tooltip>
-                        <Tooltip text="%Searches the selected directory for unlinked files." />
-                     </tooltip>
-                  </Button>
-                  <Label fx:id="progressText" text="%Searching file system..." />
-                  <ProgressIndicator fx:id="progressDisplay" maxHeight="50.0" maxWidth="50.0" prefHeight="50.0" prefWidth="50.0" progress="0.0" VBox.vgrow="ALWAYS" />
-                  <Label fx:id="treeDesc" text="%These files are not linked in the active library." />
-               </children>
-            </VBox>
-         </top>
-         <center>
-            <BorderPane BorderPane.alignment="CENTER">
-               <bottom>
-                  <ButtonBar buttonMinWidth="80.0" prefHeight="0.0" prefWidth="579.0" BorderPane.alignment="CENTER_LEFT">
-                    <buttons>
-                        <Button mnemonicParsing="false" onAction="#selectAll" text="%Select all" />
-                        <Button mnemonicParsing="false" onAction="#unselectAll" text="%Unselect all" />
-                        <Button mnemonicParsing="false" onAction="#collapseAll" text="%Collapse all" />
-                      <Button mnemonicParsing="false" onAction="#expandAll" text="%Expand all" />
-                      <Button fx:id="buttonExport" mnemonicParsing="false" onAction="#exportSelected" text="%Export selected">
-                           <tooltip>
-                              <Tooltip text="%Export to text file." />
-                           </tooltip></Button>
-                    </buttons>
-                  </ButtonBar>
-               </bottom>
-               <center>
-                  <ScrollPane fitToWidth="true" minHeight="222.0" prefHeight="222.0" prefWidth="579.0" BorderPane.alignment="CENTER">
-                     <content>
-                        <TreeView fx:id="tree" minHeight="222.0" prefHeight="222.0" prefWidth="576.0" />
-                     </content>
-                  </ScrollPane>
-               </center>
-            </BorderPane>
-         </center>
-      </BorderPane>
-   </content>
-   <buttonTypes>
-      <ButtonType fx:constant="CANCEL" />
-      <ButtonType fx:id="importButton" buttonData="OK_DONE" text="%Import" />
-   </buttonTypes>
+	<content>
+		<BorderPane prefWidth="600.0">
+			<top>
+				<VBox spacing="5.0" BorderPane.alignment="CENTER">
+					<children>
+						<Label text="%Select a directory where the search shall start." />
+						<HBox prefHeight="35.0" prefWidth="600.0" spacing="10.0">
+							<children>
+								<TextField fx:id="directoryPathField" HBox.hgrow="ALWAYS" />
+								<Button mnemonicParsing="false" onAction="#browseFileDirectory" text="%Browse">
+									<tooltip>
+										<Tooltip text="%Opens the file browser." />
+									</tooltip>
+								</Button>
+							</children>
+						</HBox>
+						<HBox prefHeight="47.0" prefWidth="600.0" spacing="15.0">
+							<children>
+								<Label prefHeight="17.0" prefWidth="105.0" text="%Select file type:" />
+								<ComboBox fx:id="fileTypeSelection" prefHeight="27.0" prefWidth="144.0" />
+							</children>
+						</HBox>
+						<Button fx:id="buttonScan" defaultButton="true" disable="true" mnemonicParsing="false" onAction="#scanFiles" text="%Scan directory">
+							<tooltip>
+								<Tooltip text="%Searches the selected directory for unlinked files." />
+							</tooltip>
+						</Button>
+						<Label fx:id="progressText" text="%Searching file system..." />
+						<ProgressIndicator fx:id="progressDisplay" maxHeight="50.0" maxWidth="50.0" prefHeight="50.0" prefWidth="50.0" progress="0.0" VBox.vgrow="ALWAYS" />
+						<Label fx:id="treeDesc" text="%These files are not linked in the active library." />
+					</children>
+				</VBox>
+			</top>
+			<center>
+				<BorderPane BorderPane.alignment="CENTER">
+					<bottom>
+						<ButtonBar buttonMinWidth="80.0" prefHeight="0.0" prefWidth="579.0" BorderPane.alignment="CENTER_LEFT">
+							<buttons>
+								<Button mnemonicParsing="false" onAction="#selectAll" text="%Select all" />
+								<Button mnemonicParsing="false" onAction="#unselectAll" text="%Unselect all" />
+								<Button mnemonicParsing="false" onAction="#collapseAll" text="%Collapse all" />
+								<Button mnemonicParsing="false" onAction="#expandAll" text="%Expand all" />
+								<Button fx:id="buttonExport" mnemonicParsing="false" onAction="#exportSelected" text="%Export selected">
+									<tooltip>
+										<Tooltip text="%Export to text file." />
+									</tooltip>
+								</Button>
+							</buttons>
+						</ButtonBar>
+					</bottom>
+					<top>
+						<StackPane prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+							<children>
+								<ScrollPane fitToWidth="true" minHeight="222.0" prefHeight="222.0" prefWidth="579.0">
+									<content>
+										<TreeView fx:id="tree" minHeight="222.0" prefHeight="222.0" prefWidth="576.0" />
+									</content>
+								</ScrollPane>
+								<TableView fx:id="tvResult" visible="false">
+									<columns>
+										<TableColumn fx:id="colStatus" prefWidth="100.0" text="%Status" />
+										<TableColumn fx:id="colMessage" prefWidth="300.0" text="%Message" />
+										<TableColumn fx:id="colFile" prefWidth="500.0" text="%File" />
+									</columns>
+									<columnResizePolicy>
+										<TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+									</columnResizePolicy>
+								</TableView>
+							</children>
+						</StackPane>
+					</top>
+				</BorderPane>
+			</center>
+		</BorderPane>
+	</content>
+	<buttonTypes>
+		<ButtonType fx:constant="CANCEL" />
+		<ButtonType fx:id="importButton" buttonData="OK_DONE" text="%Import" />
+	</buttonTypes>
 </DialogPane>

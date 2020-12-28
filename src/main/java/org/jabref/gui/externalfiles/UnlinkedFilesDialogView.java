@@ -14,18 +14,24 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeView;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.ViewModelTreeCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -45,6 +51,11 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     @FXML private Label progressText;
     @FXML private Label treeDesc;
     @FXML private ProgressIndicator progressDisplay;
+
+    @FXML private TableView<ImportFilesResultItemViewModel> tvResult;
+    @FXML private TableColumn<ImportFilesResultItemViewModel, JabRefIcon> colStatus;
+    @FXML private TableColumn<ImportFilesResultItemViewModel, String> colMessage;
+    @FXML private TableColumn<ImportFilesResultItemViewModel, String> colFile;
 
     @Inject private PreferencesService preferencesService;
     @Inject private DialogService dialogService;
@@ -108,6 +119,9 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
        viewModel.exportButtonDisabled().bindBidirectional(buttonExport.disableProperty());
        viewModel.selectedExtension().bind(fileTypeSelection.valueProperty());
 
+       tvResult.visibleProperty().bind(viewModel.resultsTableVisible());
+       tvResult.setItems(viewModel.resultTableItems());
+
        progressDisplay.progressProperty().bind(viewModel.progress());
        progressDisplay.managedProperty().bind(viewModel.searchProgressVisible());
        progressText.textProperty().bind(viewModel.progressText());
@@ -117,6 +131,35 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
        viewModel.applyButtonDisabled().setValue(true);
        fileTypeSelection.getSelectionModel().selectFirst();
 
+       setupResultTable();
+
+    }
+
+    private void setupResultTable() {
+
+        colFile.setCellValueFactory(cellData -> cellData.getValue().file());
+        new ValueTableCellFactory<ImportFilesResultItemViewModel, String>()
+        .withText(item -> item).withTooltip(item -> item)
+        .install(colFile);
+
+        colMessage.setCellValueFactory(cellData -> cellData.getValue().message());
+        new ValueTableCellFactory<ImportFilesResultItemViewModel, String>()
+        .withText(item->item).withTooltip(item->item)
+        .install(colMessage);
+
+        colStatus.setCellValueFactory(cellData -> cellData.getValue().getIcon());
+
+        colStatus.setCellFactory(new ValueTableCellFactory<ImportFilesResultItemViewModel, JabRefIcon>().withGraphic(item -> {
+            if (item == IconTheme.JabRefIcons.CHECK) {
+                item = item.withColor(Color.GREEN);
+            }
+            if (item == IconTheme.JabRefIcons.WARNING) {
+                item = item.withColor(Color.RED);
+            }
+            return item.getGraphicNode();
+        }));
+
+        tvResult.setColumnResizePolicy((param) -> true);
     }
 
     @FXML

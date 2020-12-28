@@ -21,6 +21,8 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TreeItem;
@@ -59,6 +61,8 @@ public class UnlinkedFilesDialogViewModel {
     private final BooleanProperty scanButtonDefaultButton = new SimpleBooleanProperty();
     private final DoubleProperty progress = new SimpleDoubleProperty(0);
     private final StringProperty progressText = new SimpleStringProperty();
+    private final BooleanProperty resultsTableVisible = new SimpleBooleanProperty();
+    private final ObservableList<ImportFilesResultItemViewModel>  resultList = FXCollections.observableArrayList();
 
     private final List<FileChooser.ExtensionFilter> fileFilterList = List.of(
                                                                              FileFilterConverter.ANY_FILE,
@@ -93,6 +97,9 @@ public class UnlinkedFilesDialogViewModel {
         CheckBoxTreeItem<FileNodeWrapper> root = (CheckBoxTreeItem<FileNodeWrapper>) treeRoot.getValue();
         final List<Path> fileList = getFileListFromNode(root);
 
+        resultList.clear();
+        resultsTableVisible.set(false);
+
         if (fileList.isEmpty()) {
             return;
         }
@@ -107,20 +114,24 @@ public class UnlinkedFilesDialogViewModel {
             applyButtonDisabled.setValue(true);
          })
         .onFinished(() -> {
-            searchProgressVisible.setValue(false);
-            scanButtonDisabled.setValue(false);
             progress.unbind();
             progressText.unbind();
+            searchProgressVisible.setValue(false);
+            scanButtonDisabled.setValue(false);
+
         })
         .onSuccess(results -> {
            applyButtonDisabled.setValue(false);
            exportButtonDisabled.setValue(false);
            scanButtonDefaultButton.setValue(false);
 
-           searchProgressVisible.setValue(false);
            progress.unbind();
            progressText.unbind();
-           new ImportResultsDialogView(results).showAndWait();
+           searchProgressVisible.setValue(false);
+
+           resultList.addAll(results);
+           resultsTableVisible.set(true);
+
         });
         importFilesBackgroundTask.executeWith(taskExecutor);
 
@@ -136,6 +147,7 @@ public class UnlinkedFilesDialogViewModel {
         if (fileList.isEmpty()) {
             return;
         }
+        resultsTableVisible.setValue(false);
 
         exportButtonDisabled.setValue(true);
         applyButtonDisabled.setValue(true);
@@ -169,8 +181,13 @@ public class UnlinkedFilesDialogViewModel {
         Path directory = this.getSearchDirectory();
         FileFilter selectedFileFilter = FileFilterConverter.toFileFilter(selectedExtension.getValue());
 
+        resultsTableVisible.setValue(false);
+        progress.unbind();
+        progressText.unbind();
+
         findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, bibDatabasecontext, preferences.getFilePreferences())
                 .onRunning(() -> {
+
                     progress.set(ProgressIndicator.INDETERMINATE_PROGRESS);
                     progressText.setValue(Localization.lang("Searching file system..."));
                     progressText.bind(findUnlinkedFilesTask.messageProperty());
@@ -185,6 +202,8 @@ public class UnlinkedFilesDialogViewModel {
                     applyButtonDisabled.setValue(false);
                     searchProgressVisible.set(false);
                     progress.set(0);
+                    searchProgressVisible.set(false);
+
                 })
                 .onSuccess(root -> {
                     treeRoot.setValue(root);
@@ -305,7 +324,6 @@ public class UnlinkedFilesDialogViewModel {
     }
 
     public void unselectAll() {
-        // TODO Auto-generated method stub
         CheckBoxTreeItem<FileNodeWrapper> root = (CheckBoxTreeItem<FileNodeWrapper>) treeRoot.getValue();
         // Need to toggle a twice to make sure nothing is selected
         root.setSelected(false);
@@ -333,5 +351,13 @@ public class UnlinkedFilesDialogViewModel {
                 expandTree(child, expand);
             }
         }
+    }
+
+    public BooleanProperty resultsTableVisible() {
+        return this.resultsTableVisible;
+    }
+
+    public ObservableList<ImportFilesResultItemViewModel> resultTableItems() {
+        return this.resultList;
     }
 }
