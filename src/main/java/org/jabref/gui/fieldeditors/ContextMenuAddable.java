@@ -11,5 +11,5 @@ public interface ContextMenuAddable {
      * to be instantiated at this point. They are populated when the user needs them which prevents many unnecessary
      * allocations when the main table is just scrolled with the entry editor open.
      */
-    void addToContextMenu(final Supplier<List<MenuItem>> items);
+    void initContextMenu(final Supplier<List<MenuItem>> items);
 }

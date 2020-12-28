@@ -11,6 +11,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 
 import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.Globals;
 
 public class EditorTextArea extends javafx.scene.control.TextArea implements Initializable, ContextMenuAddable {
 
@@ -36,9 +37,9 @@ public class EditorTextArea extends javafx.scene.control.TextArea implements Ini
     }
 
     @Override
-    public void addToContextMenu(final Supplier<List<MenuItem>> items) {
+    public void initContextMenu(final Supplier<List<MenuItem>> items) {
         setOnContextMenuRequested(event -> {
-            contextMenu.getItems().setAll(TextInputControlBehavior.getDefaultContextMenuItems(this));
+            contextMenu.getItems().setAll(TextInputControlBehavior.getDefaultContextMenuItems(this, Globals.getKeyPrefs()));
             contextMenu.getItems().addAll(0, items.get());
 
             TextInputControlBehavior.showContextMenu(this, contextMenu, event);

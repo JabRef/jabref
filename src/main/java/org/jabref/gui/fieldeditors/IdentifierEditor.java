@@ -49,9 +49,9 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                 new Tooltip(Localization.lang("Look up %0", field.getDisplayName())));
 
         if (field.equals(StandardField.DOI)) {
-            textArea.addToContextMenu(EditorMenus.getDOIMenu(textArea));
+            textArea.initContextMenu(EditorMenus.getDOIMenu(textArea));
         } else {
-            textArea.addToContextMenu(EditorMenus.getDefaultMenu(textArea));
+            textArea.initContextMenu(EditorMenus.getDefaultMenu(textArea));
         }
 
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
