@@ -9,12 +9,9 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.ObjectBinding;
 import javafx.beans.value.ObservableValue;
 
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
@@ -41,7 +38,6 @@ public class BibEntryTableViewModel {
     private final EasyBinding<List<LinkedFile>> linkedFiles;
     private final EasyBinding<Map<Field, String>> linkedIdentifiers;
     private final Binding<List<AbstractGroup>> matchedGroups;
-    private final InvalidationListener invalidateMatchedGroupsBinding;
 
     public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
         this.entry = entry;
@@ -50,8 +46,6 @@ public class BibEntryTableViewModel {
         this.linkedFiles = getField(StandardField.FILE).map(FileFieldParser::parse).orElse(Collections.emptyList());
         this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);
         this.matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);
-        this.invalidateMatchedGroupsBinding = (listener) -> this.matchedGroups.invalidate();
-        registerListener(invalidateMatchedGroupsBinding, bibDatabaseContext, entry);
     }
 
     private static EasyBinding<Map<Field, String>> createLinkedIdentifiersBinding(BibEntry entry) {
@@ -74,25 +68,15 @@ public class BibEntryTableViewModel {
         return entry;
     }
 
-    private static void registerListener(InvalidationListener strongListener, BibDatabaseContext database, BibEntry bibEntry) {
-        WeakInvalidationListener listener = new WeakInvalidationListener(strongListener);
-        bibEntry.getFieldBinding(StandardField.GROUPS).addListener(listener);
-        database.getMetaData().registerListener(listener);
-    }
-
     private static Binding<List<AbstractGroup>> createMatchedGroupsBinding(BibDatabaseContext database, BibEntry entry) {
-        return new ObjectBinding<>() {
-            @Override
-            protected List<AbstractGroup> computeValue() {
-                Optional<GroupTreeNode> rootGroup = database.getMetaData().getGroups();
-                return rootGroup.map(groupTreeNode ->
-                        groupTreeNode.getMatchingGroups(entry).stream()
-                                     .map(GroupTreeNode::getGroup)
-                                     .filter(Predicate.not(Predicate.isEqual(groupTreeNode.getGroup())))
-                                     .collect(Collectors.toList()))
-                                .orElse(Collections.emptyList());
-            }
-        };
+        return EasyBind.combine(entry.getFieldBinding(StandardField.GROUPS), database.getMetaData().groupsBinding(),
+                (a, b) ->
+                        database.getMetaData().getGroups().map(groupTreeNode ->
+                                groupTreeNode.getMatchingGroups(entry).stream()
+                                             .map(GroupTreeNode::getGroup)
+                                             .filter(Predicate.not(Predicate.isEqual(groupTreeNode.getGroup())))
+                                             .collect(Collectors.toList()))
+                                .orElse(Collections.emptyList()));
     }
 
     public OptionalBinding<String> getField(Field field) {

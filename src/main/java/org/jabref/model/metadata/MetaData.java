@@ -9,7 +9,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import javafx.beans.InvalidationListener;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
@@ -21,12 +22,12 @@ import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.groups.GroupTreeNode;
-import org.jabref.model.groups.event.GroupInvalidatedEvent;
-import org.jabref.model.groups.event.GroupInvalidatedEventBusAdapter;
 import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
 
 import com.google.common.eventbus.EventBus;
+import com.tobiasdiez.easybind.optional.OptionalBinding;
+import com.tobiasdiez.easybind.optional.OptionalWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,11 +52,12 @@ public class MetaData {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MetaData.class);
 
-    private final GroupInvalidatedEventBusAdapter eventBus = new GroupInvalidatedEventBusAdapter();
+    private final EventBus eventBus = new EventBus();
     private final Map<EntryType, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
     private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
     private final Map<String, Path> laTexFileDirectory = new HashMap<>(); // <User, FilePath>
-    private GroupTreeNode groupsRoot;
+    private final ObjectProperty<GroupTreeNode> groupsRoot = new SimpleObjectProperty<>(null);
+    private final OptionalBinding<GroupTreeNode> groupsRootBinding = new OptionalWrapper<>(groupsRoot);
     private Charset encoding;
     private SaveOrderConfig saveOrderConfig;
     private String defaultCiteKeyPattern;
@@ -84,15 +86,21 @@ public class MetaData {
     }
 
     public Optional<GroupTreeNode> getGroups() {
-        return Optional.ofNullable(groupsRoot);
+        return groupsRootBinding.getValue();
+    }
+
+    public OptionalBinding<GroupTreeNode> groupsBinding() {
+        return groupsRootBinding;
     }
 
     /**
      * Sets a new group root node. <b>WARNING </b>: This invalidates everything returned by getGroups() so far!!!
      */
     public void setGroups(GroupTreeNode root) {
-        groupsRoot = Objects.requireNonNull(root);
-        groupsRoot.subscribeToDescendantChanged(groupTreeNode -> eventBus.post(new GroupUpdatedEvent(this)));
+        Objects.requireNonNull(root);
+        groupsRoot.setValue(root);
+        root.subscribeToDescendantChanged(groupTreeNode -> groupsRootBinding.invalidate());
+        root.subscribeToDescendantChanged(groupTreeNode -> eventBus.post(new GroupUpdatedEvent(this)));
         eventBus.post(new GroupUpdatedEvent(this));
         postChange();
     }
@@ -262,11 +270,6 @@ public class MetaData {
         }
     }
 
-    public void postGroupInvalidation() {
-        eventBus.post(new GroupInvalidatedEvent() {
-        });
-    }
-
     /**
      * Returns the encoding used during parsing.
      */
@@ -296,22 +299,14 @@ public class MetaData {
     }
 
     public void registerListener(Object listener) {
-        if (listener instanceof InvalidationListener) {
-            this.eventBus.addListener((InvalidationListener) listener);
-        } else {
-            this.eventBus.register(listener);
-        }
+        this.eventBus.register(listener);
     }
 
     public void unregisterListener(Object listener) {
-        if (listener instanceof InvalidationListener) {
-            this.eventBus.removeListener((InvalidationListener) listener);
-        } else {
-            try {
-                this.eventBus.unregister(listener);
-            } catch (IllegalArgumentException e) {
-                // occurs if the event source has not been registered, should not prevent shutdown
-            }
+        try {
+            this.eventBus.unregister(listener);
+        } catch (IllegalArgumentException e) {
+            // occurs if the event source has not been registered, should not prevent shutdown
         }
     }
 
@@ -352,7 +347,7 @@ public class MetaData {
         }
         MetaData metaData = (MetaData) o;
         return (isProtected == metaData.isProtected)
-                && Objects.equals(groupsRoot, metaData.groupsRoot)
+                && Objects.equals(groupsRoot.getValue(), metaData.groupsRoot.getValue())
                 && Objects.equals(encoding, metaData.encoding)
                 && Objects.equals(saveOrderConfig, metaData.saveOrderConfig)
                 && Objects.equals(citeKeyPatterns, metaData.citeKeyPatterns)
@@ -367,7 +362,7 @@ public class MetaData {
 
     @Override
     public int hashCode() {
-        return Objects.hash(groupsRoot, encoding, saveOrderConfig, citeKeyPatterns, userFileDirectory,
+        return Objects.hash(groupsRoot.getValue(), encoding, saveOrderConfig, citeKeyPatterns, userFileDirectory,
                 defaultCiteKeyPattern, saveActions, mode, isProtected, defaultFileDirectory);
     }
 }

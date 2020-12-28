@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -26,6 +25,7 @@ import org.jabref.gui.icon.InternalMaterialDesignIcon;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DroppingMouseLocation;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.groups.DefaultGroupsFactory;
@@ -62,7 +62,7 @@ public class GroupNodeViewModel {
     private final CustomLocalDragboard localDragBoard;
     private final ObservableList<BibEntry> entriesList;
     private final PreferencesService preferencesService;
-    private InvalidationListener onInvalidatedGroup;
+    private final InvalidationListener onInvalidatedGroup = (listener) -> refreshGroup();
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard, PreferencesService preferencesService) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
@@ -85,17 +85,7 @@ public class GroupNodeViewModel {
         } else {
             children = EasyBind.mapBacked(groupNode.getChildren(), this::toViewModel);
         }
-        if (groupNode.getGroup() instanceof Observable) {
-            this.onInvalidatedGroup = (listener) -> {
-                updateMatchedEntries();
-                // "Re-add" to the selected groups if it were selected, this refreshes the entries the user views
-                ObservableList<GroupTreeNode> selectedGroups = this.stateManager.getSelectedGroup(this.databaseContext);
-                if (selectedGroups.remove(this.groupNode)) {
-                    selectedGroups.add(this.groupNode);
-                }
-            };
-            ((Observable) groupNode.getGroup()).addListener(new WeakInvalidationListener(onInvalidatedGroup));
-        }
+        databaseContext.getMetaData().groupsBinding().addListener(new WeakInvalidationListener(onInvalidatedGroup));
         hasChildren = new SimpleBooleanProperty();
         hasChildren.bind(Bindings.isNotEmpty(children));
         updateMatchedEntries();
@@ -263,6 +253,17 @@ public class GroupNodeViewModel {
                 }
             }
         }
+    }
+
+    private void refreshGroup() {
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            updateMatchedEntries(); // Update the entries matched by the group
+            // "Re-add" to the selected groups if it were selected, this refreshes the entries the user views
+            ObservableList<GroupTreeNode> selectedGroups = this.stateManager.getSelectedGroup(this.databaseContext);
+            if (selectedGroups.remove(this.groupNode)) {
+                selectedGroups.add(this.groupNode);
+            }
+        });
     }
 
     private void updateMatchedEntries() {

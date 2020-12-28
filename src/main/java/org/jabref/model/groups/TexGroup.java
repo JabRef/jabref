@@ -6,15 +6,9 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.auxparser.AuxParser;
 import org.jabref.logic.auxparser.AuxParserResult;
 import org.jabref.model.entry.BibEntry;
@@ -27,13 +21,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @AllowedToUseLogic("because it needs access to aux parser")
-public class TexGroup extends AbstractGroup implements FileUpdateListener, Observable {
+public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TexGroup.class);
 
     private final Path filePath;
     private Set<String> keysUsedInAux;
-    private final Queue<InvalidationListener> listeners = new ConcurrentLinkedQueue<>();
     private final FileUpdateMonitor fileMonitor;
     private final AuxParser auxParser;
     private final MetaData metaData;
@@ -126,12 +119,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener, Obser
     public void fileUpdated() {
         // Reset previous parse result
         keysUsedInAux = null;
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
-            // Update listeners for invalidation of this specific group
-            listeners.forEach(listener -> listener.invalidated(this));
-            // Update listeners for group updates that doesn't require a save action
-            metaData.postGroupInvalidation();
-        });
+        metaData.groupsBinding().invalidate();
     }
 
     private Path relativize(Path path) {
@@ -148,15 +136,5 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener, Obser
         return metaData.getLatexFileDirectory(user)
                        .map(List::of)
                        .orElse(Collections.emptyList());
-    }
-
-    @Override
-    public void addListener(InvalidationListener listener) {
-        listeners.add(listener);
-    }
-
-    @Override
-    public void removeListener(InvalidationListener listener) {
-        listeners.remove(listener);
     }
 }
