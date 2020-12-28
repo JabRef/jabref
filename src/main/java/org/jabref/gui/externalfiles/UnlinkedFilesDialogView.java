@@ -124,6 +124,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
        progressDisplay.progressProperty().bind(viewModel.progress());
        progressDisplay.managedProperty().bind(viewModel.searchProgressVisible());
+       progressDisplay.visibleProperty().bind(viewModel.searchProgressVisible());
        progressText.textProperty().bind(viewModel.progressText());
 
        viewModel.scanButtonDefaultButton().setValue(true);
