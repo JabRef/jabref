@@ -62,7 +62,7 @@ public class UnlinkedFilesDialogViewModel {
     private final DoubleProperty progress = new SimpleDoubleProperty(0);
     private final StringProperty progressText = new SimpleStringProperty();
     private final BooleanProperty resultsTableVisible = new SimpleBooleanProperty();
-    private final ObservableList<ImportFilesResultItemViewModel>  resultList = FXCollections.observableArrayList();
+    private final ObservableList<ImportFilesResultItemViewModel> resultList = FXCollections.observableArrayList();
 
     private final List<FileChooser.ExtensionFilter> fileFilterList = List.of(
                                                                              FileFilterConverter.ANY_FILE,
