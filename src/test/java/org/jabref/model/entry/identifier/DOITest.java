@@ -174,7 +174,6 @@ public class DOITest {
                 Arguments.of("10.1007/s10549-018-4743-9.1234",
                         DOI.findInText("bla doi:10.1007/s10549-018-4743-9.1234 with . in doi").get().getDOI()),
 
-
                 // findShortDoiInsideArbitraryText
                 Arguments.of("10/12ab", DOI.findInText("other stuff doi:10/12ab end").get().getDOI()),
                 Arguments.of("10/12ab", DOI.findInText("other stuff /urn:doi:10/12ab end").get().getDOI()),
