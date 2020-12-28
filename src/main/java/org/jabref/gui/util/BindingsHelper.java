@@ -72,8 +72,7 @@ public class BindingsHelper {
     }
 
     /**
-     * Binds propertyA bidirectional to propertyB using updateB to update propertyB when propertyA changed and similar
-     * for updateA.
+     * Binds propertyA bidirectional to propertyB using updateB to update propertyB when propertyA changed and similar for updateA.
      */
     public static <A, B> void bindBidirectional(ObservableValue<A> propertyA, ObservableValue<B> propertyB, Consumer<B> updateA, Consumer<A> updateB) {
         final BidirectionalBinding<A, B> binding = new BidirectionalBinding<>(propertyA, propertyB, updateA, updateB);
@@ -186,8 +185,7 @@ public class BindingsHelper {
      * @param observable observable value to subscribe to
      * @param subscriber action to invoke for values of {@code observable}.
      * @return a subscription that can be used to stop invoking subscriber for any further {@code observable} changes.
-     * @apiNote {@link EasyBind#subscribe(ObservableValue, Consumer)} is similar but also invokes the {@code subscriber}
-     * for the current value
+     * @apiNote {@link EasyBind#subscribe(ObservableValue, Consumer)} is similar but also invokes the {@code subscriber} for the current value
      */
     public static <T> Subscription subscribeFuture(ObservableValue<T> observable, Consumer<? super T> subscriber) {
         ChangeListener<? super T> listener = (obs, oldValue, newValue) -> subscriber.accept(newValue);

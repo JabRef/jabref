@@ -305,8 +305,7 @@ public class GroupNodeViewModel {
     }
 
     /**
-     * Decides if the content stored in the given {@link Dragboard} can be dropped on the given target row. Currently,
-     * the following sources are allowed:
+     * Decides if the content stored in the given {@link Dragboard} can be dropped on the given target row. Currently, the following sources are allowed:
      * <ul>
      *     <li>another group (will be added as subgroup on drop)</li>
      *     <li>entries if the group implements {@link GroupEntryChanger} (will be assigned to group on drop)</li>

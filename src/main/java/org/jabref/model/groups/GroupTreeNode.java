@@ -59,14 +59,11 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /**
-     * Associates the specified group with this node while also providing the possibility to modify previous matched
-     * entries so that they are now matched by the new group.
+     * Associates the specified group with this node while also providing the possibility to modify previous matched entries so that they are now matched by the new group.
      *
      * @param newGroup                        the new group (has to be non-null)
-     * @param shouldKeepPreviousAssignments   specifies whether previous matched entries should be added to the new
-     *                                        group
-     * @param shouldRemovePreviousAssignments specifies whether previous matched entries should be removed from the old
-     *                                        group
+     * @param shouldKeepPreviousAssignments   specifies whether previous matched entries should be added to the new group
+     * @param shouldRemovePreviousAssignments specifies whether previous matched entries should be removed from the old group
      * @param entriesInDatabase               list of entries in the database
      */
     public List<FieldChange> setGroup(AbstractGroup newGroup, boolean shouldKeepPreviousAssignments,
@@ -94,10 +91,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /**
-     * Creates a {@link SearchMatcher} that matches entries of this group and that takes the hierarchical information
-     * into account. I.e., it finds elements contained in this nodes group, or the union of those elements in its own
-     * group and its children's groups (recursively), or the intersection of the elements in its own group and its
-     * parent's group (depending on the hierarchical settings stored in the involved groups)
+     * Creates a {@link SearchMatcher} that matches entries of this group and that takes the hierarchical information into account. I.e., it finds elements contained in this nodes group, or the union of those elements in its own group and its children's groups (recursively), or the intersection of the elements in its own group and its parent's group (depending on the hierarchical settings stored in the involved groups)
      */
     public SearchMatcher getSearchMatcher() {
         return getSearchMatcher(group.getHierarchicalContext());
@@ -242,8 +236,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /**
-     * Returns whether this group matches the specified {@link BibEntry} while taking the hierarchical information into
-     * account.
+     * Returns whether this group matches the specified {@link BibEntry} while taking the hierarchical information into account.
      */
     public boolean matches(BibEntry entry) {
         return getSearchMatcher().isMatch(entry);
@@ -292,8 +285,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /**
-     * Adds the specified entries to this group. If the group does not support explicit adding of entries (i.e., does
-     * not implement {@link GroupEntryChanger}), then no action is performed.
+     * Adds the specified entries to this group. If the group does not support explicit adding of entries (i.e., does not implement {@link GroupEntryChanger}), then no action is performed.
      */
     public List<FieldChange> addEntriesToGroup(Collection<BibEntry> entries) {
         if (getGroup() instanceof GroupEntryChanger) {
@@ -304,8 +296,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /**
-     * Removes the given entries from this group. If the group does not support the explicit removal of entries (i.e.,
-     * does not implement {@link GroupEntryChanger}), then no action is performed.
+     * Removes the given entries from this group. If the group does not support the explicit removal of entries (i.e., does not implement {@link GroupEntryChanger}), then no action is performed.
      */
     public List<FieldChange> removeEntriesFromGroup(List<BibEntry> entries) {
         if (getGroup() instanceof GroupEntryChanger) {
