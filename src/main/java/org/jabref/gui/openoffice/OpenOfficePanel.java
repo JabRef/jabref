@@ -341,6 +341,7 @@ public class OpenOfficePanel {
                 protected Void call() {
                     updateProgress(ProgressBar.INDETERMINATE_PROGRESS, ProgressBar.INDETERMINATE_PROGRESS);
 
+                    //TODO put manually afterwards return boolean?
                     boolean installed = officeInstallation.isInstalled();
                     if (!installed) {
                         throw new IllegalStateException("OpenOffice Installation could not be detected.");
