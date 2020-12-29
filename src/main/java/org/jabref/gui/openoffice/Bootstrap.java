@@ -254,7 +254,6 @@ public class Bootstrap {
      * @since UDK 3.1.0
      */
     public static final XComponentContext bootstrap(Path ooPath) throws BootstrapException {
-
         String[] defaultArgArray = getDefaultOptions();
         return bootstrap(defaultArgArray, ooPath);
     }
