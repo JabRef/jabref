@@ -5,7 +5,7 @@ This file is manually kept in sync with build.gradle and the binary jars contain
 
 One can list all dependencies by using Gradle task `dependencyReport`.
 It generates the file [build/reports/project/dependencies.txt](build/reports/project/dependencies.txt).
-There, [one can use](https://stackoverflow.com/a/49727249/873282) `sed 's/^.* //' | sort | uniq` to flatten the dependencies.
+Below, there is a howto to generate the content at "Sorted list of runtime dependencies output by gradle".
 
 ## Legend
 
@@ -75,6 +75,13 @@ License: Apache-2.0
 Id:      com.google.j2objc:j2objc-annotations
 Project: j2objc-annotations
 URL:     https://github.com/google/j2objc
+License: Apache-2.0
+```
+
+```yaml
+Id:      com.googlecode.javaewah:JavaEWAH
+Project: JavaEWAH
+URL:     https://github.com/lemire/javaewah
 License: Apache-2.0
 ```
 
@@ -302,6 +309,27 @@ License: Apache-2.0
 ```
 
 ```yaml
+Id:      org.apache.lucene:lucene-core
+Project: Apache Lucene
+URL:     https://lucene.apache.org/
+License: Apache-2.0
+```
+
+```yaml
+Id:      org.apache.lucene:lucene-queries
+Project: Apache Lucene
+URL:     https://lucene.apache.org/
+License: Apache-2.0
+```
+
+```yaml
+Id:      org.apache.lucene:lucene-ueryparser
+Project: Apache Lucene
+URL:     https://lucene.apache.org/
+License: Apache-2.0
+```
+
+```yaml
 Id:      org.apache.pdfbox:fontbox
 Project: Apache PDFBox
 URL:     http://pdfbox.apache.org
@@ -354,6 +382,13 @@ Licence: CC-BY-SA-3.0
 Id:      org.controlsfx:controlsfx
 Project: ControlsFX
 URL:     http://fxexperience.com/controlsfx/
+License: BSD-3-Clause
+```
+
+```yaml
+Id:      org.eclipse.jgit:org.eclipse.jgit
+Project: Eclipse JGit
+URL:     https://www.eclipse.org/jgit/
 License: BSD-3-Clause
 ```
 
@@ -435,31 +470,17 @@ License: GPL-2.0 WITH Classpath-exception-2.0
 ```
 
 ```yaml
-Id:      org.openoffice:juh
-Project: OpenOffice.org
-URL:     http://www.openoffice.org/api/SDK
-License: LGPL 3.0
+Id:      org.libreoffice:libreoffice
+Project: LibreOffice
+URL:     https://api.libreoffice.org/
+License: MPL-2.0 OR LGPL 3.0+
 ```
 
 ```yaml
-Id:      org.openoffice:jurt
-Project: OpenOffice.org
-URL:     http://www.openoffice.org/api/SDK
-License: Apache-2.0
-```
-
-```yaml
-Id:      org.openoffice:ridl
-Project: OpenOffice.org
-URL:     http://www.openoffice.org/api/SDK
-License: Apache-2.0
-```
-
-```yaml
-Id:      org.openoffice:unoil
-Project: OpenOffice.org
-URL:     http://www.openoffice.org/api/SDK
-License: Apache-2.0
+Id:      org.libreoffice:unloader
+Project: LibreOffice UNO Loader
+URL:     https://api.libreoffice.org/
+License: MPL-2.0 AND Apache-2.0
 ```
 
 ```yaml
@@ -473,20 +494,21 @@ License: BSD-3-Clause
 
 1. `gradlew dependencies > build\reports\project\dependencies.txt`
 2. Manually edit depedencies.txt to contain the tree of "compileClasspath" and "implementation" only
-3. sed 's/^.* //' < dependencies.txt | sort | uniq
+3. `sed 's/^.* //' < build/reports/project/dependencies.txt | sort | uniq > build/dependencies-for-external-libraries.txt`
 
 ```text
 com.github.tomtung:latex2unicode_2.12:0.2.6
 com.google.code.gson:gson:2.8.6
 com.google.errorprone:error_prone_annotations:2.3.4
 com.google.guava:failureaccess:1.0.1
-com.google.guava:guava:29.0-jre
+com.google.guava:guava:30.1-jre
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava
 com.google.j2objc:j2objc-annotations:1.3
+com.googlecode.javaewah:JavaEWAH:1.1.7
 com.h2database:h2-mvstore:1.4.200
 com.ibm.icu:icu4j:62.1
 com.jfoenix:jfoenix:9.0.10
-com.konghq:unirest-java:3.10.00
+com.konghq:unirest-java:3.11.06
 com.microsoft.azure:applicationinsights-core:2.4.1
 com.microsoft.azure:applicationinsights-logging-log4j2:2.4.1
 com.oracle.ojdbc:ojdbc10:19.3.0.0
@@ -498,10 +520,8 @@ com.oracle.ojdbc:ucp:19.3.0.0
 com.sun.istack:istack-commons-runtime:3.0.8
 com.sun.xml.fastinfoset:FastInfoset:1.2.16
 com.tobiasdiez:easybind:2.1.0
-com.vladsch.flexmark:flexmark:0.62.2
 com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.62.2
 com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.62.2
-com.vladsch.flexmark:flexmark-util:0.62.2
 com.vladsch.flexmark:flexmark-util-ast:0.62.2
 com.vladsch.flexmark:flexmark-util-builder:0.62.2
 com.vladsch.flexmark:flexmark-util-collection:0.62.2
@@ -513,46 +533,52 @@ com.vladsch.flexmark:flexmark-util-misc:0.62.2
 com.vladsch.flexmark:flexmark-util-options:0.62.2
 com.vladsch.flexmark:flexmark-util-sequence:0.62.2
 com.vladsch.flexmark:flexmark-util-visitor:0.62.2
+com.vladsch.flexmark:flexmark-util:0.62.2
+com.vladsch.flexmark:flexmark:0.62.2
 commons-cli:commons-cli:1.4
 commons-codec:commons-codec:1.11
 commons-logging:commons-logging:1.2
 de.jensd:fontawesomefx-commons:11.0
 de.jensd:fontawesomefx-materialdesignfont:1.7.22-11
-de.saxsys:mvvmfx:1.8.0
 de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT
+de.saxsys:mvvmfx:1.8.0
 de.undercouch:citeproc-java:2.1.0-SNAPSHOT
 eu.lestard:doc-annotations:0.2
 info.debatty:java-string-similarity:2.0.0
-io.github.java-diff-utils:java-diff-utils:4.7
+io.github.java-diff-utils:java-diff-utils:4.9
 jakarta.activation:jakarta.activation-api:1.2.1
 jakarta.annotation:jakarta.annotation-api:1.3.5
 jakarta.xml.bind:jakarta.xml.bind-api:2.3.2
 net.jcip:jcip-annotations:1.0
 net.jodah:typetools:0.6.1
-org.antlr:antlr4-runtime:4.8-1
 org.antlr:antlr-runtime:3.5.2
+org.antlr:antlr4-runtime:4.9
 org.apache.commons:commons-csv:1.8
 org.apache.commons:commons-lang3:3.9
 org.apache.commons:commons-text:1.8
 org.apache.httpcomponents:httpasyncclient:4.1.4
-org.apache.httpcomponents:httpclient:4.5.12
-org.apache.httpcomponents:httpcore:4.4.13
+org.apache.httpcomponents:httpclient:4.5.13
 org.apache.httpcomponents:httpcore-nio:4.4.13
-org.apache.httpcomponents:httpmime:4.5.12
+org.apache.httpcomponents:httpcore:4.4.13
+org.apache.httpcomponents:httpmime:4.5.13
 org.apache.logging.log4j:log4j-api:3.0.0-SNAPSHOT
 org.apache.logging.log4j:log4j-core:3.0.0-SNAPSHOT
 org.apache.logging.log4j:log4j-jcl:3.0.0-SNAPSHOT
 org.apache.logging.log4j:log4j-plugins:3.0.0-SNAPSHOT
 org.apache.logging.log4j:log4j-slf4j18-impl:3.0.0-SNAPSHOT
-org.apache.pdfbox:fontbox:2.0.20
-org.apache.pdfbox:pdfbox:2.0.20
-org.apache.pdfbox:xmpbox:2.0.20
-org.apache.tika:tika-core:1.24.1
-org.bouncycastle:bcprov-jdk15on:1.66
-org.checkerframework:checker-qual:2.11.1
-org.controlsfx:controlsfx:11.0.2
-org.fxmisc.flowless:flowless:0.6.1
-org.fxmisc.richtext:richtextfx:0.10.5
+org.apache.lucene:lucene-core:8.7.0
+org.apache.lucene:lucene-queries:8.7.0
+org.apache.lucene:lucene-queryparser:8.7.0
+org.apache.pdfbox:fontbox:2.0.22
+org.apache.pdfbox:pdfbox:2.0.22
+org.apache.pdfbox:xmpbox:2.0.22
+org.apache.tika:tika-core:1.25
+org.bouncycastle:bcprov-jdk15on:1.67
+org.checkerframework:checker-qual:3.5.0
+org.controlsfx:controlsfx:11.0.3
+org.eclipse.jgit:org.eclipse.jgit:5.10.0.202012080955-r
+org.fxmisc.flowless:flowless:0.6.2
+org.fxmisc.richtext:richtextfx:0.10.4
 org.fxmisc.undo:undofx:2.1.0
 org.fxmisc.wellbehaved:wellbehavedfx:0.3.3
 org.glassfish.hk2.external:jakarta.inject:2.6.1
@@ -566,20 +592,22 @@ org.jbibtex:jbibtex:1.0.17
 org.jetbrains:annotations:15.0
 org.jsoup:jsoup:1.13.1
 org.jvnet.staxex:stax-ex:1.8.1
-org.mariadb.jdbc:mariadb-java-client:2.6.2
-org.openjfx:javafx-base:14
-org.openjfx:javafx-controls:14
-org.openjfx:javafx-fxml:14
-org.openjfx:javafx-graphics:14
-org.openjfx:javafx-media:14
-org.openjfx:javafx-swing:14
-org.openjfx:javafx-web:14
-org.ow2.asm:asm:6.2.1
+org.libreoffice:libreoffice:7.0.3
+org.libreoffice:unoloader:7.0.4
+org.mariadb.jdbc:mariadb-java-client:2.7.1
+org.openjfx:javafx-base:15
+org.openjfx:javafx-controls:15
+org.openjfx:javafx-fxml:15
+org.openjfx:javafx-graphics:15
+org.openjfx:javafx-media:15
+org.openjfx:javafx-swing:15
+org.openjfx:javafx-web:15
 org.ow2.asm:asm-analysis:6.2.1
 org.ow2.asm:asm-commons:6.2.1
 org.ow2.asm:asm-tree:6.2.1
 org.ow2.asm:asm-util:6.2.1
-org.postgresql:postgresql:42.2.16
+org.ow2.asm:asm:6.2.1
+org.postgresql:postgresql:42.2.18
 org.reactfx:reactfx:2.0-M5
 org.scala-lang:scala-library:2.12.8
 org.slf4j:slf4j-api:2.0.0-alpha1

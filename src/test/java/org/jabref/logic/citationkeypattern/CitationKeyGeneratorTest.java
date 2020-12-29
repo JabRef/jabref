@@ -377,7 +377,7 @@ class CitationKeyGeneratorTest {
                 .withField(StandardField.CROSSREF, "entry2");
         BibEntry entry2 = new BibEntry()
                 .withCitationKey("entry2")
-                .withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University}}");
+                .withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
@@ -403,7 +403,7 @@ class CitationKeyGeneratorTest {
                 .withField(StandardField.CROSSREF, "entry2");
         BibEntry entry2 = new BibEntry()
                 .withCitationKey("entry2")
-                .withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University, Department of Electrical Engineering}}");
+                .withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University, Department of Electrical Engineering}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
@@ -449,7 +449,7 @@ class CitationKeyGeneratorTest {
                 .withField(StandardField.CROSSREF, "entry2");
         BibEntry entry2 = new BibEntry()
                 .withCitationKey("entry2")
-                .withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University, School of Computer Engineering}}");
+                .withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University, School of Computer Engineering}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
