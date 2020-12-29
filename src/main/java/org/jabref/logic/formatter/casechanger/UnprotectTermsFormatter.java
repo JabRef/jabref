@@ -6,7 +6,7 @@ import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 
 /**
- * Remove {} brackets around words
+ * Remove {} braces around words in case they appear balanced
  *
  * Related formatter: {@link ProtectTermsFormatter}
  */
@@ -43,7 +43,7 @@ public class UnprotectTermsFormatter extends Formatter {
     @Override
     public String getDescription() {
         return Localization.lang(
-                "Removes all {} brackets around words.");
+                "Removes all balanced {} braces around words.");
     }
 
     @Override
