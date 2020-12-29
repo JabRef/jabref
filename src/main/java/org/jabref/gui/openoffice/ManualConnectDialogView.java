@@ -12,7 +12,6 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.OS;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -54,20 +53,9 @@ public class ManualConnectDialogView extends BaseDialog<Boolean> {
     private void initialize() {
 
         viewModel = new ManualConnectDialogViewModel(preferencesService, dialogService);
-
-        ooPath.textProperty().bindBidirectional(viewModel.ooPathProperty());
         ooExec.textProperty().bindBidirectional(viewModel.ooExecProperty());
         ooJars.textProperty().bind(viewModel.ooJarsProperty());
 
-        if (OS.WINDOWS || OS.OS_X) {
-            ooPath.setVisible(true);
-            ooExec.setVisible(false);
-            ooJars.setVisible(false);
-        } else {
-            ooPath.setVisible(false);
-            ooExec.setVisible(false);
-            ooJars.setVisible(true);
-        }
     }
 
     @FXML

@@ -3,13 +3,10 @@ package org.jabref.gui.openoffice;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
@@ -48,8 +45,6 @@ import org.jabref.logic.openoffice.OOBibStyle;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.StyleLoader;
 import org.jabref.logic.openoffice.UndefinedParagraphFormatException;
-import org.jabref.logic.util.OS;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -370,9 +365,9 @@ public class OpenOfficePanel {
             @Override
             protected OOBibBase call() throws Exception {
                 updateProgress(ProgressBar.INDETERMINATE_PROGRESS, ProgressBar.INDETERMINATE_PROGRESS);
-                List<URL> jarUrls = findOpenOfficeJars(Path.of(ooPrefs.getInstallationPath()));
 
-                return createBibBase(jarUrls);
+                var path = Path.of(ooPrefs.getExecutablePath());
+                return createBibBase(path);
             }
         };
 
@@ -425,27 +420,11 @@ public class OpenOfficePanel {
         taskExecutor.execute(connectTask);
     }
 
-    private List<URL> findOpenOfficeJars(Path configurationPath) throws IOException {
-        List<Optional<Path>> filePaths = OpenOfficePreferences.OO_JARS.stream().map(jar -> FileUtil.find(jar, configurationPath)).collect(Collectors.toList());
 
-        if (!filePaths.stream().allMatch(Optional::isPresent)) {
-            throw new IOException("(Not all) required Open Office Jars were found inside installation path. Searched for " + OpenOfficePreferences.OO_JARS + " in " + configurationPath);
-        }
 
-        List<URL> jarURLs = new ArrayList<>(OpenOfficePreferences.OO_JARS.size() + 1);
-        for (Optional<Path> jarPath : filePaths) {
-            jarURLs.add((jarPath.get().toUri().toURL()));
-            // For Mac OSX we need to add the "Contents/MacOS", because otherwise we cannot connect to LO
-            if (OS.OS_X) {
-                jarURLs.add(configurationPath.resolve("Contents/MacOS/").toUri().toURL());
-            }
-        }
-        return jarURLs;
-    }
-
-    private OOBibBase createBibBase(List<URL> jarUrls) throws IOException, InvocationTargetException, IllegalAccessException,
+    private OOBibBase createBibBase(Path loPath) throws IOException, InvocationTargetException, IllegalAccessException,
             BootstrapException, CreationException, ClassNotFoundException {
-        return new OOBibBase(jarUrls, true, dialogService);
+        return new OOBibBase(loPath, true, dialogService);
     }
 
     private Optional<Boolean> showManualConnectionDialog() {
