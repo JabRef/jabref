@@ -155,7 +155,7 @@ class LinkedFileViewModelTest {
         linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "");
 
         databaseContext = mock(BibDatabaseContext.class);
-        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]"); // use this variant, as we cannot mock the linkedFileHandler cause it's initialized inside the viewModel
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, xmpPreferences, filePreferences, externalFileType);
 
@@ -173,11 +173,10 @@ class LinkedFileViewModelTest {
     void isNotSamePath() {
         linkedFile = new LinkedFile("desc", tempFile, "pdf");
         databaseContext = mock(BibDatabaseContext.class);
-        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]"); // use this variant, as we cannot mock the linkedFileHandler cause it's initialized inside the viewModel
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(databaseContext.getFirstExistingFileDir(filePreferences)).thenReturn(Optional.of(Path.of("/home")));
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, xmpPreferences, filePreferences, externalFileType);
-
         assertFalse(viewModel.isGeneratedPathSameAsOriginal());
     }
 
@@ -185,11 +184,10 @@ class LinkedFileViewModelTest {
     void isSamePath() {
         linkedFile = new LinkedFile("desc", tempFile, "pdf");
         databaseContext = mock(BibDatabaseContext.class);
-        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]"); // use this variant, as we cannot mock the linkedFileHandler cause it's initialized inside the viewModel
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(databaseContext.getFirstExistingFileDir(filePreferences)).thenReturn(Optional.of(tempFile.getParent()));
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, xmpPreferences, filePreferences, externalFileType);
-
         assertTrue(viewModel.isGeneratedPathSameAsOriginal());
     }
 }
