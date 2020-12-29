@@ -59,8 +59,11 @@ public class NormalizePagesFormatterTest {
                 // formatPageNumbersRegexNotMatching
                 Arguments.of("12", "12"),
 
+                // special case, where -- is also put into
+                Arguments.of("some--text", "some-text"),
+                Arguments.of("pages 1--50", "pages 1-50"),
+
                 // keep arbitrary text
-                Arguments.of("pages 1-50", "pages 1-50"),
                 Arguments.of("some-text-with-dashes", "some-text-with-dashes"),
                 Arguments.of("{A}", "{A}"),
                 Arguments.of("43+", "43+"),
