@@ -318,24 +318,6 @@ public class UnlinkedFilesDialogViewModel {
         return filesList;
     }
 
-    private List<Path> getFileListFromNode(CheckBoxTreeItem<FileNodeWrapper> node) {
-        List<Path> filesList = new ArrayList<>();
-        for (TreeItem<FileNodeWrapper> childNode : node.getChildren()) {
-            CheckBoxTreeItem<FileNodeWrapper> child = (CheckBoxTreeItem<FileNodeWrapper>) childNode;
-            if (child.isLeaf()) {
-                if (child.isSelected()) {
-                    Path nodeFile = child.getValue().path;
-                    if ((nodeFile != null) && Files.isRegularFile(nodeFile)) {
-                        filesList.add(nodeFile);
-                    }
-                }
-            } else {
-                filesList.addAll(getFileListFromNode(child));
-            }
-        }
-        return filesList;
-    }
-
     public void selectAll() {
         CheckBoxTreeItem<FileNodeWrapper> root = (CheckBoxTreeItem<FileNodeWrapper>) treeRoot.getValue();
         // Need to toggle a twice to make sure everything is selected
