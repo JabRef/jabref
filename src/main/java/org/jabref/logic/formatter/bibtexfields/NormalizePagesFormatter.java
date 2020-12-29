@@ -1,6 +1,7 @@
 package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.Objects;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.cleanup.Formatter;
@@ -9,6 +10,11 @@ import org.jabref.logic.l10n.Localization;
 
 /**
  * This class includes sensible defaults for consistent formatting of BibTeX page numbers.
+ * <p>
+ * Format page numbers, separated either by commas or double-hyphens.
+ * Converts the range number format of the <code>pages</code> field to page_number--page_number.
+ * Removes unwanted literals except letters, numbers and -+ signs.
+ * Keeps the existing String if the resulting field does not match the expected Regex.
  * <p>
  * From BibTeX manual:
  * One or more page numbers or range of numbers, such as 42--111 or 7,41,73--97 or 43+
@@ -19,13 +25,19 @@ import org.jabref.logic.l10n.Localization;
  * Examples:
  *
  * <ul>
- *     <li><code>1-2</code> <code>1--2</code></li>
- *     <li><code>1---2</code> <code>1--2</code></li>
+ *     <li><code>1-2 -> 1--2</code></li>
+ *     <li><code>1---2 -> 1--2</code></li>
+ *     <li><code>1-2 -> 1--2</code></li>
+ *     <li><code>1,2,3 -> 1,2,3</code></li>
+ *     <li><code>{1}-{2} -> 1--2</code></li>
+ *     <li><code>43+ -> 43+</code></li>
+ *     <li>Invalid -> Invalid</li>
  * </ul>
  */
 public class NormalizePagesFormatter extends Formatter {
 
     private static final Pattern EM_EN_DASH_PATTERN = Pattern.compile("\u2013|\u2014");
+    private static final Pattern DASHES_DETECT_PATTERN = Pattern.compile("[ ]*-+[ ]*");
 
     private final Formatter unprotectTermsFormatter = new UnprotectTermsFormatter();
 
@@ -39,35 +51,32 @@ public class NormalizePagesFormatter extends Formatter {
         return "normalize_page_numbers";
     }
 
-    /**
-     * Format page numbers, separated either by commas or double-hyphens.
-     * Converts the range number format of the <code>pages</code> field to page_number--page_number.
-     * Removes unwanted literals except letters, numbers and -+ signs.
-     * Keeps the existing String if the resulting field does not match the expected Regex.
-     *
-     * <example>
-     * 1-2 -> 1--2
-     * 1,2,3 -> 1,2,3
-     * {1}-{2} -> 1--2
-     * 43+ -> 43+
-     * Invalid -> Invalid
-     * </example>
-     */
     @Override
     public String format(String value) {
         Objects.requireNonNull(value);
-
         if (value.isEmpty()) {
-            // nothing to do
             return value;
         }
 
+        value = value.trim();
+
         // Remove pages prefix
-        String cleanValue = value.replace("pp.", "").replace("p.", "");
-        // remove unwanted literals including en dash, em dash, and whitespace
-        value = EM_EN_DASH_PATTERN.matcher(cleanValue).replaceAll("-")
-                                  .replaceAll("[ ]*[-]+[ ]*", "--");
-        return unprotectTermsFormatter.format(value.trim());
+        value = value.replace("pp.", "").replace("p.", "").trim();
+
+        // replace em and en dashes by --
+        value = EM_EN_DASH_PATTERN.matcher(value).replaceAll("--");
+
+        Matcher matcher = DASHES_DETECT_PATTERN.matcher(value);
+        if (matcher.find() && matcher.start() >= 0) {
+            String fixedValue = matcher.replaceFirst("--");
+            if (matcher.find()) {
+                // multiple occurrences --> better do no replacement
+                return value;
+            }
+            return unprotectTermsFormatter.format(fixedValue);
+        }
+
+        return value;
     }
 
     @Override

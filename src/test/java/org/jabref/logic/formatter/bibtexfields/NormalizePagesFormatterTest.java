@@ -50,6 +50,9 @@ public class NormalizePagesFormatterTest {
                 // keepCorrectlyFormattedPageNumbers
                 Arguments.of("1--2", "1--2"),
 
+                // three dashes get two dashes
+                Arguments.of("1--2", "1---2"),
+
                 // formatPageNumbersRemoveUnexpectedLiterals
                 Arguments.of("1--2", "{1}-{2}"),
 
@@ -60,6 +63,8 @@ public class NormalizePagesFormatterTest {
                 Arguments.of("pages 1-50", "pages 1-50"),
                 Arguments.of("some-text-with-dashes", "some-text-with-dashes"),
                 Arguments.of("{A}", "{A}"),
+                Arguments.of("43+", "43+"),
+                Arguments.of("Invalid", "Invalid"),
 
                 // doNotRemoveLetters
                 Arguments.of("R1--R50", "R1-R50"),
