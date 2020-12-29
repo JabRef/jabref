@@ -165,12 +165,23 @@ public class DOITest {
                 // findDoiInsideArbitraryText
                 Arguments.of("10.1006/jmbi.1998.2354",
                         DOI.findInText("other stuff 10.1006/jmbi.1998.2354 end").get().getDOI()),
+                Arguments.of("10.1007/s10549-018-4743-9",
+                        DOI.findInText("Breast Cancer Res Treat. 2018 July ; 170(1): 77–87. doi:10.1007/s10549-018-4743-9. ").get().getDOI()),
+                Arguments.of("10.1007/s10549-018-4743-9",
+                        DOI.findInText("Breast Cancer Res Treat. 2018 July ; 170(1): 77–87. doi:10.1007/s10549-018-4743-9, ").get().getDOI()),
+                Arguments.of("10.1007/s10549-018-4743-9",
+                        DOI.findInText("Breast Cancer Res Treat. 2018 July ; 170(1): 77–87. doi:10.1007/s10549-018-4743-9;something else").get().getDOI()),
+                Arguments.of("10.1007/s10549-018-4743-9.1234",
+                        DOI.findInText("bla doi:10.1007/s10549-018-4743-9.1234 with . in doi").get().getDOI()),
 
                 // findShortDoiInsideArbitraryText
                 Arguments.of("10/12ab", DOI.findInText("other stuff doi:10/12ab end").get().getDOI()),
                 Arguments.of("10/12ab", DOI.findInText("other stuff /urn:doi:10/12ab end").get().getDOI()),
                 Arguments.of("10%12ab", DOI.findInText("other stuff doi:10%12ab end").get().getDOI()),
                 Arguments.of("10%12ab", DOI.findInText("other stuff /doi:10%12ab end").get().getDOI()),
+                Arguments.of("10%12ab", DOI.findInText("other stuff /doi:10%12ab, end").get().getDOI()),
+                Arguments.of("10%12ab", DOI.findInText("other stuff /doi:10%12ab. end").get().getDOI()),
+                Arguments.of("10%12ab", DOI.findInText("other stuff /doi:10%12ab; end").get().getDOI()),
                 Arguments.of("10/1234", DOI.findInText("10/B(C)/15 \n" +
                         " \n" +
                         "10:51 \n" +
