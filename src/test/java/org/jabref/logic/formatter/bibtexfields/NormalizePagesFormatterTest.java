@@ -25,6 +25,12 @@ public class NormalizePagesFormatterTest {
                 // formatPageNumbers
                 Arguments.of("1--2", "1-2"),
 
+                // endash
+                Arguments.of("1--2", "1\u20132"),
+
+                // emdash
+                Arguments.of("1--2", "1\u20142"),
+
                 // formatPageNumbersCommaSeparated
                 Arguments.of("1,2,3", "1,2,3"),
 
@@ -51,6 +57,11 @@ public class NormalizePagesFormatterTest {
 
                 // formatPageNumbersRegexNotMatching
                 Arguments.of("12", "12"),
+
+                // keep arbitrary text
+                Arguments.of("pages 1-50", "pages 1-50"),
+                Arguments.of("some-text-with-dashes", "some-text-with-dashes"),
+                Arguments.of("{A}", "{A}"),
 
                 // doNotRemoveLetters
                 Arguments.of("R1--R50", "R1-R50"),
@@ -84,7 +95,7 @@ public class NormalizePagesFormatterTest {
 
     @ParameterizedTest
     @MethodSource("tests")
-    public void test(String expected, String toFormat) {
-        assertEquals(expected, formatter.format(toFormat));
+    public void test(String expected, String input) {
+        assertEquals(expected, formatter.format(input));
     }
 }
