@@ -17,8 +17,10 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeView;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 
@@ -49,13 +51,16 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     @FXML private ButtonType importButton;
     @FXML private Button buttonExport;
     @FXML private Label progressText;
-    @FXML private Label treeDesc;
     @FXML private ProgressIndicator progressDisplay;
+    @FXML private VBox progressPane;
 
     @FXML private TableView<ImportFilesResultItemViewModel> tvResult;
     @FXML private TableColumn<ImportFilesResultItemViewModel, JabRefIcon> colStatus;
     @FXML private TableColumn<ImportFilesResultItemViewModel, String> colMessage;
     @FXML private TableColumn<ImportFilesResultItemViewModel, String> colFile;
+
+    @FXML private TitledPane filePane;
+    @FXML private TitledPane resultPane;
 
     @Inject private PreferencesService preferencesService;
     @Inject private DialogService dialogService;
@@ -119,13 +124,16 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
        viewModel.exportButtonDisabled().bindBidirectional(buttonExport.disableProperty());
        viewModel.selectedExtension().bind(fileTypeSelection.valueProperty());
 
-       tvResult.visibleProperty().bind(viewModel.resultsTableVisible());
        tvResult.setItems(viewModel.resultTableItems());
 
        progressDisplay.progressProperty().bind(viewModel.progress());
-       progressDisplay.managedProperty().bind(viewModel.searchProgressVisible());
-       progressDisplay.visibleProperty().bind(viewModel.searchProgressVisible());
        progressText.textProperty().bind(viewModel.progressText());
+
+       progressPane.managedProperty().bind(viewModel.searchProgressVisible());
+       progressPane.visibleProperty().bind(viewModel.searchProgressVisible());
+
+       viewModel.filePaneExpanded().bindBidirectional(filePane.expandedProperty());
+       viewModel.resultPaneExpanded().bindBidirectional(resultPane.expandedProperty());
 
        viewModel.scanButtonDefaultButton().setValue(true);
        viewModel.scanButtonDisabled().setValue(true);

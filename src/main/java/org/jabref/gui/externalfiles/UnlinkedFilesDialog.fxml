@@ -11,8 +11,9 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.Tooltip?>
-<?import javafx.scene.control.TreeView?> 
+<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
@@ -46,38 +47,34 @@
                                 <Tooltip text="%Searches the selected directory for unlinked files." />
                             </tooltip>
                         </Button>
-                        <Label fx:id="progressText" text="%Searching file system..." />
-                        <ProgressIndicator fx:id="progressDisplay" maxHeight="50.0" maxWidth="50.0" prefHeight="50.0" prefWidth="50.0" progress="0.0" VBox.vgrow="ALWAYS" />
-                        <Label fx:id="treeDesc" text="%These files are not linked in the active library." />
                     </children>
                 </VBox>
             </top>
             <center>
-                <BorderPane BorderPane.alignment="CENTER">
-                    <bottom>
-                        <ButtonBar buttonMinWidth="80.0" prefHeight="0.0" prefWidth="579.0" BorderPane.alignment="CENTER_LEFT">
-                            <buttons>
-                                <Button mnemonicParsing="false" onAction="#selectAll" text="%Select all" />
-                                <Button mnemonicParsing="false" onAction="#unselectAll" text="%Unselect all" />
-                                <Button mnemonicParsing="false" onAction="#collapseAll" text="%Collapse all" />
-                                <Button mnemonicParsing="false" onAction="#expandAll" text="%Expand all" />
-                                <Button fx:id="buttonExport" mnemonicParsing="false" onAction="#exportSelected" text="%Export selected">
-                                    <tooltip>
-                                        <Tooltip text="%Export to text file." />
-                                    </tooltip>
-                                </Button>
-                            </buttons>
-                        </ButtonBar>
-                    </bottom>
-                    <top>
-                        <StackPane prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                            <children>
-                                <ScrollPane fitToWidth="true" minHeight="222.0" prefHeight="222.0" prefWidth="579.0">
-                                    <content>
-                                        <TreeView fx:id="tree" minHeight="222.0" prefHeight="222.0" prefWidth="576.0" />
-                                    </content>
-                                </ScrollPane>
-                                <TableView fx:id="tvResult" visible="false">
+            <VBox BorderPane.alignment="CENTER">
+               <children>
+                        <StackPane VBox.vgrow="ALWAYS">
+                     <children>
+                        <TitledPane fx:id="filePane" text="%These files are not linked in the active library.">
+                           <content>
+                                      <ScrollPane fitToWidth="true" minHeight="222.0" prefHeight="222.0" prefWidth="579.0">
+                                          <content>
+                                              <TreeView fx:id="tree" minHeight="222.0" prefHeight="222.0" prefWidth="576.0" />
+                                          </content>
+                                      </ScrollPane>
+                           </content>
+                        </TitledPane>
+                        <VBox fx:id="progressPane" alignment="CENTER" StackPane.alignment="CENTER">
+                           <children>
+                                    <ProgressIndicator fx:id="progressDisplay" maxHeight="50.0" maxWidth="50.0" prefHeight="50.0" prefWidth="50.0" progress="0.0" />
+                                    <Label fx:id="progressText" text="%Searching file system..." />
+                           </children>
+                        </VBox>
+                     </children>
+                        </StackPane>
+                  <TitledPane fx:id="resultPane" text="Result" expanded="false">
+                     <content>
+                                <TableView fx:id="tvResult" editable="true" visible="false">
                                     <columns>
                                         <TableColumn fx:id="colStatus" prefWidth="100.0" text="%Status" />
                                         <TableColumn fx:id="colMessage" prefWidth="300.0" text="%Message" />
@@ -87,11 +84,26 @@
                                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                     </columnResizePolicy>
                                 </TableView>
-                            </children>
-                        </StackPane>
-                    </top>
-                </BorderPane>
+                     </content>
+                  </TitledPane>
+               </children>
+            </VBox>
             </center>
+         <bottom>
+                  <ButtonBar buttonMinWidth="80.0" prefHeight="0.0" prefWidth="579.0" BorderPane.alignment="CENTER">
+                      <buttons>
+                          <Button mnemonicParsing="false" onAction="#selectAll" text="%Select all" />
+                          <Button mnemonicParsing="false" onAction="#unselectAll" text="%Unselect all" />
+                          <Button mnemonicParsing="false" onAction="#collapseAll" text="%Collapse all" />
+                          <Button mnemonicParsing="false" onAction="#expandAll" text="%Expand all" />
+                          <Button fx:id="buttonExport" mnemonicParsing="false" onAction="#exportSelected" text="%Export selected">
+                              <tooltip>
+                                  <Tooltip text="%Export to text file." />
+                              </tooltip>
+                          </Button>
+                      </buttons>
+                  </ButtonBar>
+         </bottom>
         </BorderPane>
     </content>
     <buttonTypes>

@@ -61,7 +61,11 @@ public class UnlinkedFilesDialogViewModel {
     private final BooleanProperty scanButtonDefaultButton = new SimpleBooleanProperty();
     private final DoubleProperty progress = new SimpleDoubleProperty(0);
     private final StringProperty progressText = new SimpleStringProperty();
-    private final BooleanProperty resultsTableVisible = new SimpleBooleanProperty();
+
+    private final BooleanProperty filePaneExpanded = new SimpleBooleanProperty();
+    private final BooleanProperty resultPaneExpanded = new SimpleBooleanProperty();
+
+
     private final ObservableList<ImportFilesResultItemViewModel> resultList = FXCollections.observableArrayList();
 
     private final List<FileChooser.ExtensionFilter> fileFilterList = List.of(
@@ -94,11 +98,12 @@ public class UnlinkedFilesDialogViewModel {
 
     public void startImport() {
 
+
+
         CheckBoxTreeItem<FileNodeWrapper> root = (CheckBoxTreeItem<FileNodeWrapper>) treeRoot.getValue();
         final List<Path> fileList = getFileListFromNode(root);
 
         resultList.clear();
-        resultsTableVisible.set(false);
 
         if (fileList.isEmpty()) {
             return;
@@ -129,8 +134,9 @@ public class UnlinkedFilesDialogViewModel {
            progressText.unbind();
            searchProgressVisible.setValue(false);
 
+           filePaneExpanded.setValue(false);
+           resultPaneExpanded.setValue(true);
            resultList.addAll(results);
-           resultsTableVisible.set(true);
 
         });
         importFilesBackgroundTask.executeWith(taskExecutor);
@@ -147,7 +153,6 @@ public class UnlinkedFilesDialogViewModel {
         if (fileList.isEmpty()) {
             return;
         }
-        resultsTableVisible.setValue(false);
 
         exportButtonDisabled.setValue(true);
         applyButtonDisabled.setValue(true);
@@ -181,7 +186,9 @@ public class UnlinkedFilesDialogViewModel {
         Path directory = this.getSearchDirectory();
         FileFilter selectedFileFilter = FileFilterConverter.toFileFilter(selectedExtension.getValue());
 
-        resultsTableVisible.setValue(false);
+        filePaneExpanded.setValue(true);
+        resultPaneExpanded.setValue(false);
+
         progress.unbind();
         progressText.unbind();
 
@@ -353,11 +360,15 @@ public class UnlinkedFilesDialogViewModel {
         }
     }
 
-    public BooleanProperty resultsTableVisible() {
-        return this.resultsTableVisible;
-    }
-
     public ObservableList<ImportFilesResultItemViewModel> resultTableItems() {
         return this.resultList;
+    }
+
+    public BooleanProperty filePaneExpanded() {
+        return this.filePaneExpanded;
+    }
+
+    public BooleanProperty resultPaneExpanded() {
+        return this.resultPaneExpanded;
     }
 }
