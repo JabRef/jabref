@@ -892,7 +892,7 @@ public class JabRefFrame extends BorderPane {
                         factory.createMenuItem(StandardActions.OPEN_DEV_VERSION_LINK, new OpenBrowserAction("https://builds.jabref.org/master/")),
                         factory.createMenuItem(StandardActions.OPEN_CHANGELOG, new OpenBrowserAction("https://github.com/JabRef/jabref/blob/master/CHANGELOG.md"))
                 ),
-                factory.createMenuItem(StandardActions.ABOUT, new AboutAction())
+                factory.createMenuItem(StandardActions.ABOUT, new AboutAction(mainStage))
         );
 
         // @formatter:on
