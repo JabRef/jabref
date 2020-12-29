@@ -61,10 +61,8 @@ public class UnlinkedFilesDialogViewModel {
     private final BooleanProperty scanButtonDefaultButton = new SimpleBooleanProperty();
     private final DoubleProperty progress = new SimpleDoubleProperty(0);
     private final StringProperty progressText = new SimpleStringProperty();
-
     private final BooleanProperty filePaneExpanded = new SimpleBooleanProperty();
     private final BooleanProperty resultPaneExpanded = new SimpleBooleanProperty();
-
 
     private final ObservableList<ImportFilesResultItemViewModel> resultList = FXCollections.observableArrayList();
 
@@ -97,8 +95,6 @@ public class UnlinkedFilesDialogViewModel {
     }
 
     public void startImport() {
-
-
 
         CheckBoxTreeItem<FileNodeWrapper> root = (CheckBoxTreeItem<FileNodeWrapper>) treeRoot.getValue();
         final List<Path> fileList = getFileListFromNode(root);
@@ -302,6 +298,24 @@ public class UnlinkedFilesDialogViewModel {
             directoryPath.setValue(directory.toAbsolutePath().toString());
         }
         return directory;
+    }
+
+    private List<Path> getFileListFromNode(CheckBoxTreeItem<FileNodeWrapper> node) {
+        List<Path> filesList = new ArrayList<>();
+        for (TreeItem<FileNodeWrapper> childNode : node.getChildren()) {
+            CheckBoxTreeItem<FileNodeWrapper> child = (CheckBoxTreeItem<FileNodeWrapper>) childNode;
+            if (child.isLeaf()) {
+                if (child.isSelected()) {
+                    Path nodeFile = child.getValue().path;
+                    if ((nodeFile != null) && Files.isRegularFile(nodeFile)) {
+                        filesList.add(nodeFile);
+                    }
+                }
+            } else {
+                filesList.addAll(getFileListFromNode(child));
+            }
+        }
+        return filesList;
     }
 
     private List<Path> getFileListFromNode(CheckBoxTreeItem<FileNodeWrapper> node) {
