@@ -36,6 +36,7 @@ import javafx.util.Duration;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.ZipFileChooser;
@@ -384,5 +385,11 @@ public class JabRefDialogService implements DialogService {
         } catch (NoClassDefFoundError exc) {
             throw new IOException("Could not instantiate ZIP-archive reader.", exc);
         }
+    }
+
+    @Override
+    public void show(BaseDialog<Void> aboutDialogView) {
+        aboutDialogView.initOwner(mainWindow);
+        aboutDialogView.show();
     }
 }

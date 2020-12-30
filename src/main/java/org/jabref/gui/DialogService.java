@@ -15,6 +15,7 @@ import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextInputDialog;
 
+import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
@@ -272,4 +273,6 @@ public interface DialogService {
      * @return the selected file or an empty {@link Optional} if no file has been selected
      */
     Optional<Path> showFileOpenFromArchiveDialog(Path archivePath) throws IOException;
+
+    void show(BaseDialog<Void> aboutDialogView);
 }

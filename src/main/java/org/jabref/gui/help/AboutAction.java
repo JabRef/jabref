@@ -1,21 +1,15 @@
 package org.jabref.gui.help;
 
-import javafx.stage.Stage;
-
+import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
 
+import com.airhacks.afterburner.injection.Injector;
+
 public class AboutAction extends SimpleCommand {
-
-    private final Stage primaryStage;
-
-    public AboutAction(Stage primaryState) {
-        this.primaryStage = primaryState;
-    }
-
     @Override
     public void execute() {
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
         AboutDialogView aboutDialogView = new AboutDialogView();
-        aboutDialogView.initOwner(primaryStage);
-        aboutDialogView.show();
+        dialogService.show(aboutDialogView);
     }
 }
