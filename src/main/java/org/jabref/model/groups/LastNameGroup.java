@@ -13,7 +13,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 /**
- * Matches entries based on the last name of a list of authors in a specified field.
+ * Matches based on a latex free last name in a specified field. The field is parsed as an author list and the last names are resolved of latex.
  */
 public class LastNameGroup extends KeywordGroup {
     public LastNameGroup(String groupName, GroupHierarchyType context, Field searchField, String lastName) {
@@ -34,26 +34,26 @@ public class LastNameGroup extends KeywordGroup {
 
     @Override
     public boolean contains(BibEntry entry) {
-        return getAsLastNamesLatexFree(searchField, entry).stream().anyMatch(name -> name.equals(searchExpression));
+        return getAsLastNamesLatexFree(getSearchField(), entry).stream().anyMatch(name -> name.equals(getSearchExpression()));
     }
 
     @Override
     public AbstractGroup deepCopy() {
-        return new LastNameGroup(getName(), context, searchField, searchExpression);
+        return new LastNameGroup(getName(), getHierarchicalContext(), getSearchField(), getSearchExpression());
     }
 
     @Override
     public boolean equals(Object other) {
         if (super.equals(other)) {
             LastNameGroup otherGroup = (LastNameGroup) other;
-            return (this.searchField.equals(otherGroup.searchField) &&
-                    this.searchExpression.equals(otherGroup.searchExpression));
+            return (getSearchField().equals(otherGroup.getSearchField()) &&
+                    getSearchExpression().equals(otherGroup.getSearchExpression()));
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), searchField, searchExpression);
+        return Objects.hash(super.hashCode(), getSearchField(), getSearchExpression());
     }
 }
