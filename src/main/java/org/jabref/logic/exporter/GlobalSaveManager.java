@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Future;
-import java.util.function.Consumer;
-
 import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.logic.l10n.Localization;
@@ -29,7 +27,7 @@ public class GlobalSaveManager {
     private static Set<GlobalSaveManager> runningInstances = new HashSet<>();
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalSaveManager.class);
 
-    private final DelayTaskThrottler<Set<Character>> throttler = new DelayTaskThrottler<>(1500);
+    private final DelayTaskThrottler<SaveResult> throttler = new DelayTaskThrottler<>(1500);
     private final BibDatabaseContext bibDatabaseContext;
 
     private final StateManager stateManager;
@@ -51,9 +49,8 @@ public class GlobalSaveManager {
     public static GlobalSaveManager start(StateManager stateManager, PreferencesService preferencesService, BibEntryTypesManager entryTypesManager) {
         GlobalSaveManager saveAction = new GlobalSaveManager(stateManager, preferencesService, entryTypesManager);
 
-        if(runningInstances.contains(saveAction))
-        {
-           LOGGER.debug("I have an instance "+saveAction);
+        if (runningInstances.contains(saveAction)) {
+            LOGGER.debug("I have an instance " + saveAction);
         }
         runningInstances.add(saveAction);
         return saveAction;
@@ -64,11 +61,11 @@ public class GlobalSaveManager {
 
     }
 
-    public Future<Set<Character>> save(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType, Consumer<List<FieldChange>> consumeFieldChanges) {
-        return throttler.scheduleTask(() -> saveThrottled(file, selectedOnly, encoding, saveType, consumeFieldChanges));
+    public Future<SaveResult> save(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType) {
+        return throttler.scheduleTask(() -> saveThrottled(file, selectedOnly, encoding, saveType));
     }
 
-    private Set<Character> saveThrottled(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType, Consumer<List<FieldChange>> consumeFieldChanges) throws SaveException {
+    private SaveResult saveThrottled(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType) throws SaveException {
 
         SavePreferences savePrefs = this.preferencesService.getSavePreferences()
                                                            .withEncoding(encoding)
@@ -83,18 +80,15 @@ public class GlobalSaveManager {
                 databaseWriter.saveDatabase(this.bibDatabaseContext);
             }
 
-            consumeFieldChanges.accept(databaseWriter.getSaveActionsFieldChanges());
+            var saveResult = new SaveResult(fileWriter.getEncodingProblems(), databaseWriter.getSaveActionsFieldChanges());
+            return saveResult;
 
-            if (fileWriter.hasEncodingProblems()) {
-                return fileWriter.getEncodingProblems();
-            }
         } catch (UnsupportedCharsetException ex) {
             throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()), ex);
         } catch (IOException ex) {
             throw new SaveException("Problems saving: " + ex, ex);
         }
 
-        return Collections.emptySet();
     }
 
     @Override
@@ -104,9 +98,8 @@ public class GlobalSaveManager {
 
     @Override
     public int hashCode() {
-       return Objects.hash(bibDatabaseContext);
+        return Objects.hash(bibDatabaseContext);
     }
-
 
     @Override
     public boolean equals(Object o) {
@@ -120,5 +113,24 @@ public class GlobalSaveManager {
         return Objects.equals(bibDatabaseContext, other.bibDatabaseContext);
     }
 
+    public class SaveResult {
 
+        boolean success;
+        Set<Character> encodingProblems = new HashSet<>();
+        List<FieldChange> fieldChanges = new ArrayList<>();
+
+        public SaveResult(Set<Character> encodingProlems, List<FieldChange> fieldChanges) {
+            this.encodingProblems = encodingProblems;
+            this.fieldChanges = fieldChanges;
+        }
+
+        Set<Character> getEncodingProblems() {
+            return this.encodingProblems;
+        }
+
+        List<FieldChange> getFieldChanges() {
+            return this.fieldChanges;
+        }
+
+    }
 }
