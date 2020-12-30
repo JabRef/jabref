@@ -105,7 +105,7 @@ public class CrossRefTest {
 
     @Test
     public void findByAuthors() throws Exception {
-        assertEquals(Optional.of(barrosEntry), fetcher.performSearch("Barros, Alistair and Dumas, Marlon and Arthur H.M. ter Hofstede").stream().findFirst());
+        assertEquals(Optional.of(barrosEntry), fetcher.performSearch("\"Barros, Alistair\" AND \"Dumas, Marlon\" AND \"Arthur H.M. ter Hofstede\"").stream().findFirst());
     }
 
     @Test

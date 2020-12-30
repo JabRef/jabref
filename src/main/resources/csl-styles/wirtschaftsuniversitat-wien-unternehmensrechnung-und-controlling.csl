@@ -220,6 +220,36 @@
       </else>
     </choose>
   </macro>
+  <macro name="author-sort">
+    <choose>
+      <if type="legislation" match="any">
+        <group delimiter=" ">
+          <text variable="title"/>
+          <text variable="title-short" prefix="(" suffix=")"/>
+        </group>
+      </if>
+      <else>
+        <choose>
+          <if type="bill" match="any">
+            <choose>
+              <if match="none" variable="author editor">
+                <text variable="title-short"/>
+              </if>
+              <else>
+                <text macro="u__author"/>
+              </else>
+            </choose>
+          </if>
+          <else-if type="article-newspaper" match="any">
+            <text variable="container-title"/>
+          </else-if>
+          <else>
+            <text macro="u__author"/>
+          </else>
+        </choose>
+      </else>
+    </choose>
+  </macro>
   <macro name="b__container">
     <choose>
       <if type="chapter report paper-conference" match="any">
@@ -389,7 +419,9 @@
   </citation>
   <bibliography entry-spacing="0" hanging-indent="true">
     <sort>
-      <key macro="b__author-year-title"/>
+      <key macro="author-sort"/>
+      <key macro="u__issued"/>
+      <key macro="u__title"/>
     </sort>
     <layout suffix=".">
       <choose>

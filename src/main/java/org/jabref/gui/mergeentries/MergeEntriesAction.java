@@ -59,7 +59,7 @@ public class MergeEntriesAction extends SimpleCommand {
             // ToDo: BibDatabase::insertEntry does not contain logic to mark the BasePanel as changed and to mark
             //  entries with a timestamp, only BasePanel::insertEntry does. Workaround for the moment is to get the
             //  BasePanel from the constructor injected JabRefFrame. Should be refactored and extracted!
-            frame.getCurrentBasePanel().insertEntry(mergedEntry.get());
+            frame.getCurrentLibraryTab().insertEntry(mergedEntry.get());
 
             // Create a new entry and add it to the undo stack
             // Remove the other two entries and add them to the undo stack (which is not working...)

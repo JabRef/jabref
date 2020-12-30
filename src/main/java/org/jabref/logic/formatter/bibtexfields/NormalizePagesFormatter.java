@@ -62,7 +62,7 @@ public class NormalizePagesFormatter extends Formatter {
 
         // Remove pages prefix
         String cleanValue = value.replace("pp.", "").replace("p.", "");
-        // remove unwanted literals incl. whitespace
+        // remove unwanted literals including en dash, em dash, and whitespace
         cleanValue = cleanValue.replaceAll("\u2013|\u2014", "-").replaceAll(REJECT_LITERALS, "");
         // try to find pages pattern
         Matcher matcher = PAGES_DETECT_PATTERN.matcher(cleanValue);

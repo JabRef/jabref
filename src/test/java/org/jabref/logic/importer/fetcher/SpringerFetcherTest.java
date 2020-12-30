@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -21,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @FetcherTest
-class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest {
+class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
     SpringerFetcher fetcher;
 
@@ -108,8 +109,8 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest {
                 .withField(StandardField.FILE, ":http\\://link.springer.com/openurl/pdf?id=doi\\:10.1007/978-3-319-78105-1_75:PDF")
                 .withField(StandardField.ABSTRACT, "The iSchool Inclusion Institute (i3) is a Research Experience for Undergraduates (REU) program in the US designed to address underrepresentation in the information sciences. i3 is a year-long, cohort-based program that prepares undergraduate students for graduate school in information science and is rooted in a research and leadership development curriculum. Using data from six years of i3 cohorts, we present in this paper a qualitative and quantitative evaluation of the program in terms of student learning, research production, and graduate school enrollment. We find that students who participate in i3 report significant learning gains in information-science- and graduate-school-related areas and that 52% of i3 participants enroll in graduate school, over 2 $$\\times $$ × the national average. Based on these and additional results, we distill recommendations for future implementations of similar programs to address underrepresentation in information science.");
 
-        List<BibEntry> resultPhrase = fetcher.performSearch("name:\"Redmiles David\"");
-        List<BibEntry> result = fetcher.performSearch("name:Redmiles David");
+        List<BibEntry> resultPhrase = fetcher.performSearch("author:\"Redmiles David\"");
+        List<BibEntry> result = fetcher.performSearch("author:Redmiles David");
 
         // Phrase search should be a subset of the normal search result.
         Assertions.assertTrue(result.containsAll(resultPhrase));
@@ -119,8 +120,8 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest {
 
     @Test
     public void supportsBooleanANDSearch() throws Exception {
-        List<BibEntry> resultJustByAuthor = fetcher.performSearch("name:\"Redmiles, David\"");
-        List<BibEntry> result = fetcher.performSearch("name:\"Redmiles, David\" AND journal:Computer Supported Cooperative Work");
+        List<BibEntry> resultJustByAuthor = fetcher.performSearch("author:\"Redmiles, David\"");
+        List<BibEntry> result = fetcher.performSearch("author:\"Redmiles, David\" AND journal:\"Computer Supported Cooperative Work\"");
 
         Assertions.assertTrue(resultJustByAuthor.containsAll(result));
         List<BibEntry> allEntriesFromCSCW = result.stream()
@@ -145,5 +146,10 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest {
     @Override
     public String getTestJournal() {
         return "\"Clinical Research in Cardiology\"";
+    }
+
+    @Override
+    public PagedSearchBasedFetcher getPagedFetcher() {
+        return fetcher;
     }
 }

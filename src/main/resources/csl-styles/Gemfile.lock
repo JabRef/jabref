@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/citation-style-language/Sheldon.git
-  revision: 7822dbda11e229cbd933f84a3a1cfdbe8e75dfaf
+  revision: 1962fad73610a3e0b1610e0c24c16669d584196b
   specs:
     sheldon (1.0.2)
       citeproc-ruby

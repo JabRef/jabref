@@ -20,8 +20,8 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.AbstractViewModel;
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -33,7 +33,7 @@ class ContentSelectorDialogViewModel extends AbstractViewModel {
 
     private static final List<Field> DEFAULT_FIELD_NAMES = Arrays.asList(StandardField.AUTHOR, StandardField.JOURNAL, StandardField.KEYWORDS, StandardField.PUBLISHER);
 
-    private final BasePanel basePanel;
+    private final LibraryTab libraryTab;
     private final MetaData metaData;
     private final DialogService dialogService;
     private final Map<Field, List<String>> fieldKeywordsMap = new HashMap<>();
@@ -43,9 +43,9 @@ class ContentSelectorDialogViewModel extends AbstractViewModel {
     private ObjectProperty<Field> selectedField = new SimpleObjectProperty<>();
     private StringProperty selectedKeyword = new SimpleStringProperty();
 
-    ContentSelectorDialogViewModel(BasePanel basePanel, DialogService dialogService) {
-        this.basePanel = basePanel;
-        this.metaData = basePanel.getBibDatabaseContext().getMetaData();
+    ContentSelectorDialogViewModel(LibraryTab libraryTab, DialogService dialogService) {
+        this.libraryTab = libraryTab;
+        this.metaData = libraryTab.getBibDatabaseContext().getMetaData();
         this.dialogService = dialogService;
         populateFieldNameKeywordsMapWithExistingValues();
         populateFieldNamesListWithValues();
@@ -177,8 +177,8 @@ class ContentSelectorDialogViewModel extends AbstractViewModel {
         List<Field> fieldNamesToRemove = filterFieldsToRemove();
         fieldNamesToRemove.forEach(metaData::clearContentSelectors);
 
-        basePanel.setupMainPanel();
-        basePanel.markNonUndoableBaseChanged();
+        libraryTab.setupMainPanel();
+        libraryTab.markNonUndoableBaseChanged();
     }
 
     private List<Field> filterFieldsToRemove() {

@@ -15,7 +15,7 @@
     <category field="medicine"/>
     <issn>1413-9596</issn>
     <eissn>1678-4456</eissn>
-    <updated>2020-03-30T16:23:02+00:00</updated>
+    <updated>2020-11-03T17:03:19+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -305,6 +305,10 @@
     </layout>
   </citation>
   <bibliography>
+    <sort>
+      <key macro="author"/>
+      <key variable="issued"/>
+    </sort>
     <layout>
       <group delimiter=". " suffix=". ">
         <text macro="author"/>

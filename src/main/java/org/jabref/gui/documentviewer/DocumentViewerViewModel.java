@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
@@ -55,9 +56,11 @@ public class DocumentViewerViewModel extends AbstractViewModel {
             }
         });
 
-        maxPages.bindBidirectional(
+        // we need to wrap this in run later so that the max pages number is correctly shown
+        Platform.runLater(() -> {
+            maxPages.bindBidirectional(
                 EasyBind.wrapNullable(currentDocument).selectProperty(DocumentViewModel::maxPagesProperty));
-
+        });
         setCurrentEntries(this.stateManager.getSelectedEntries());
     }
 

@@ -11,11 +11,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.duplicationFinder.DuplicateResolverDialog.DuplicateResolverResult;
@@ -131,7 +131,7 @@ public class DuplicateSearch extends SimpleCommand {
     }
 
     private void askResolveStrategy(DuplicateSearchResult result, BibEntry first, BibEntry second, DuplicateResolverType resolverType) {
-        DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, frame.getCurrentBasePanel().getBibDatabaseContext(), stateManager);
+        DuplicateResolverDialog dialog = new DuplicateResolverDialog(first, second, resolverType, frame.getCurrentLibraryTab().getBibDatabaseContext(), stateManager);
 
         DuplicateResolverResult resolverResult = dialog.showAndWait().orElse(DuplicateResolverResult.BREAK);
 
@@ -156,25 +156,25 @@ public class DuplicateSearch extends SimpleCommand {
             return;
         }
 
-        BasePanel panel = frame.getCurrentBasePanel();
+        LibraryTab libraryTab = frame.getCurrentLibraryTab();
         final NamedCompound compoundEdit = new NamedCompound(Localization.lang("duplicate removal"));
         // Now, do the actual removal:
         if (!result.getToRemove().isEmpty()) {
-            compoundEdit.addEdit(new UndoableRemoveEntries(panel.getDatabase(), result.getToRemove()));
-            panel.getDatabase().removeEntries(result.getToRemove());
-            panel.markBaseChanged();
+            compoundEdit.addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), result.getToRemove()));
+            libraryTab.getDatabase().removeEntries(result.getToRemove());
+            libraryTab.markBaseChanged();
         }
         // and adding merged entries:
         if (!result.getToAdd().isEmpty()) {
-            compoundEdit.addEdit(new UndoableInsertEntries(panel.getDatabase(), result.getToAdd()));
-            panel.getDatabase().insertEntries(result.getToAdd());
-            panel.markBaseChanged();
+            compoundEdit.addEdit(new UndoableInsertEntries(libraryTab.getDatabase(), result.getToAdd()));
+            libraryTab.getDatabase().insertEntries(result.getToAdd());
+            libraryTab.markBaseChanged();
         }
 
         dialogService.notify(Localization.lang("Duplicates found") + ": " + duplicateCount.get() + ' '
                 + Localization.lang("pairs processed") + ": " + result.getDuplicateCount());
         compoundEdit.end();
-        panel.getUndoManager().addEdit(compoundEdit);
+        libraryTab.getUndoManager().addEdit(compoundEdit);
     }
 
     /**

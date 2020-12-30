@@ -11,7 +11,7 @@ import org.jabref.gui.util.uithreadaware.UiThreadStringProperty;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 public class PersonsEditor extends HBox implements FieldEditorFX {
 
@@ -21,7 +21,7 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
 
     public PersonsEditor(final Field field,
                          final SuggestionProvider<?> suggestionProvider,
-                         final JabRefPreferences preferences,
+                         final PreferencesService preferences,
                          final FieldCheckers fieldCheckers,
                          final boolean isMultiLine) {
         this.viewModel = new PersonsEditorViewModel(field, suggestionProvider, preferences.getAutoCompletePreferences(), fieldCheckers);

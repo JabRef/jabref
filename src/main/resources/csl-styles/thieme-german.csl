@@ -41,11 +41,11 @@
   <macro name="editor">
     <names suffix=". " variable="editor">
       <name sort-separator=" " name-as-sort-order="all" initialize-with="" delimiter-precedes-last="always" delimiter=", "/>
-      <label prefix=" (" form="short" suffix=")"/>
+      <label prefix=", " form="short"/>
     </names>
   </macro>
   <macro name="publisher">
-    <group delimiter=", ">
+    <group delimiter="; ">
       <group delimiter=": ">
         <text variable="publisher-place"/>
         <text variable="publisher"/>
@@ -58,10 +58,20 @@
     </group>
   </macro>
   <macro name="access">
-    <group>
-      <text value=" Im Internet: "/>
-      <text variable="URL"/>
-    </group>
+    <choose>
+      <if variable="DOI">
+        <text variable="DOI" prefix="doi:"/>
+      </if>
+      <else>
+        <group delimiter="; ">
+          <group>
+            <text value="Im Internet: "/>
+            <text variable="URL"/>
+          </group>
+          <date variable="accessed" form="numeric" prefix="Stand: "/>
+        </group>
+      </else>
+    </choose>
   </macro>
   <macro name="journal-title">
     <text form="short" variable="container-title" strip-periods="true"/>
@@ -114,15 +124,15 @@
         <else>
           <group delimiter=" ">
             <text macro="journal-title"/>
-            <date suffix=";" variable="issued">
-              <date-part name="year"/>
-            </date>
-            <text variable="volume"/>
+            <group delimiter="; ">
+              <date variable="issued" form="numeric" date-parts="year"/>
+              <text variable="volume"/>
+            </group>
           </group>
           <text prefix=": " variable="page"/>
         </else>
       </choose>
-      <text macro="access"/>
+      <text macro="access" prefix=". "/>
     </layout>
   </bibliography>
 </style>

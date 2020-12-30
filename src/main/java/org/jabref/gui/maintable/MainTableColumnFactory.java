@@ -68,7 +68,7 @@ public class MainTableColumnFactory {
         this.columnPreferences = preferencesService.getColumnPreferences();
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.dialogService = dialogService;
-        this.cellFactory = new CellFactory(externalFileTypes, undoManager);
+        this.cellFactory = new CellFactory(externalFileTypes, preferencesService, undoManager);
         this.undoManager = undoManager;
     }
 
@@ -214,7 +214,7 @@ public class MainTableColumnFactory {
      * Creates a column that displays a {@link SpecialField}
      */
     private TableColumn<BibEntryTableViewModel, Optional<SpecialFieldValueViewModel>> createSpecialFieldColumn(MainTableColumnModel columnModel) {
-        return new SpecialFieldColumn(columnModel, undoManager);
+        return new SpecialFieldColumn(columnModel, preferencesService, undoManager);
     }
 
     /**

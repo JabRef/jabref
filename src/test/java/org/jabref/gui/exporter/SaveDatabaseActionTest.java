@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -46,42 +46,42 @@ class SaveDatabaseActionTest {
 
     private static final String TEST_BIBTEX_LIBRARY_LOCATION = "C:\\Users\\John_Doe\\Jabref\\literature.bib";
     private Path file = Path.of(TEST_BIBTEX_LIBRARY_LOCATION);
-    private final DialogService dialogService = mock(DialogService.class);
-    private final JabRefPreferences preferences = mock(JabRefPreferences.class);
-    private BasePanel basePanel = mock(BasePanel.class);
-    private final JabRefFrame jabRefFrame = mock(JabRefFrame.class);
+    private DialogService dialogService = mock(DialogService.class);
+    private JabRefPreferences preferences = mock(JabRefPreferences.class);
+    private LibraryTab libraryTab = mock(LibraryTab.class);
+    private JabRefFrame jabRefFrame = mock(JabRefFrame.class);
     private BibDatabaseContext dbContext = spy(BibDatabaseContext.class);
     private SaveDatabaseAction saveDatabaseAction;
 
     @BeforeEach
     public void setUp() {
-        when(basePanel.frame()).thenReturn(jabRefFrame);
-        when(basePanel.getBibDatabaseContext()).thenReturn(dbContext);
+        when(libraryTab.frame()).thenReturn(jabRefFrame);
+        when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
         when(jabRefFrame.getDialogService()).thenReturn(dialogService);
 
-        saveDatabaseAction = spy(new SaveDatabaseAction(basePanel, preferences, mock(BibEntryTypesManager.class)));
+        saveDatabaseAction = spy(new SaveDatabaseAction(libraryTab, preferences, mock(BibEntryTypesManager.class)));
     }
 
     @Test
     public void saveAsShouldSetWorkingDirectory() {
-        when(preferences.get(JabRefPreferences.WORKING_DIRECTORY)).thenReturn(TEST_BIBTEX_LIBRARY_LOCATION);
+        when(preferences.getWorkingDir()).thenReturn(Path.of(TEST_BIBTEX_LIBRARY_LOCATION));
         when(dialogService.showFileSaveDialog(any(FileDialogConfiguration.class))).thenReturn(Optional.of(file));
         doReturn(true).when(saveDatabaseAction).saveAs(any());
 
         saveDatabaseAction.saveAs();
 
-        verify(preferences, times(1)).setWorkingDir(file.getParent());
+        verify(preferences, times(1)).setWorkingDirectory(file.getParent());
     }
 
     @Test
     public void saveAsShouldNotSetWorkingDirectoryIfNotSelected() {
-        when(preferences.get(JabRefPreferences.WORKING_DIRECTORY)).thenReturn(TEST_BIBTEX_LIBRARY_LOCATION);
+        when(preferences.getWorkingDir()).thenReturn(Path.of(TEST_BIBTEX_LIBRARY_LOCATION));
         when(dialogService.showFileSaveDialog(any(FileDialogConfiguration.class))).thenReturn(Optional.empty());
         doReturn(false).when(saveDatabaseAction).saveAs(any());
 
         saveDatabaseAction.saveAs();
 
-        verify(preferences, times(0)).setWorkingDir(file.getParent());
+        verify(preferences, times(0)).setWorkingDirectory(file.getParent());
     }
 
     @Test
@@ -106,7 +106,7 @@ class SaveDatabaseActionTest {
         SavePreferences savePreferences = mock(SavePreferences.class);
         // In case a "thenReturn" is modified, the whole mock has to be recreated
         dbContext = mock(BibDatabaseContext.class);
-        basePanel = mock(BasePanel.class);
+        libraryTab = mock(LibraryTab.class);
         MetaData metaData = mock(MetaData.class);
         when(savePreferences.withEncoding(any(Charset.class))).thenReturn(savePreferences);
         when(savePreferences.withSaveType(any(SavePreferences.DatabaseSaveType.class))).thenReturn(savePreferences);
@@ -125,11 +125,11 @@ class SaveDatabaseActionTest {
         when(preferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
         when(preferences.getFieldContentParserPreferences()).thenReturn(mock(FieldContentFormatterPreferences.class));
         when(preferences.getSavePreferences()).thenReturn(savePreferences);
-        when(basePanel.frame()).thenReturn(jabRefFrame);
-        when(basePanel.getBibDatabaseContext()).thenReturn(dbContext);
-        when(basePanel.getUndoManager()).thenReturn(mock(CountingUndoManager.class));
-        when(basePanel.getBibDatabaseContext()).thenReturn(dbContext);
-        saveDatabaseAction = new SaveDatabaseAction(basePanel, preferences, mock(BibEntryTypesManager.class));
+        when(libraryTab.frame()).thenReturn(jabRefFrame);
+        when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
+        when(libraryTab.getUndoManager()).thenReturn(mock(CountingUndoManager.class));
+        when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
+        saveDatabaseAction = new SaveDatabaseAction(libraryTab, preferences, mock(BibEntryTypesManager.class));
         return saveDatabaseAction;
     }
 
@@ -145,9 +145,9 @@ class SaveDatabaseActionTest {
         saveDatabaseAction.save();
 
         assertEquals(database
-                             .getEntries().stream()
-                             .map(BibEntry::hasChanged).filter(changed -> false).collect(Collectors.toList()),
-                     Collections.emptyList());
+                        .getEntries().stream()
+                        .map(BibEntry::hasChanged).filter(changed -> false).collect(Collectors.toList()),
+                Collections.emptyList());
     }
 
     @Test

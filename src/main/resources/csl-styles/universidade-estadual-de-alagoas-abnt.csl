@@ -9,13 +9,13 @@
     <link href="http://www.uneal.edu.br/pro-reitorias/prograd/regulamento-do-tcc-uneal.pdf" rel="documentation"/>
     <author>
       <name>Wellyngton Chaves Monteiro da Silva</name>
-      <email>wellyngton.silva@uneal.edu.br</email>
+      <email>wellyngton@uneal.edu.br</email>
       <uri>http://www.uneal.edu.br</uri>
     </author>
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>De acordo com ABNT-NBR 10520.2002 e ABNT-NBR 6023.2018</summary>
-    <updated>2020-06-30T16:31:59+00:00</updated>
+    <updated>2020-10-29T19:02:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="pt-BR">
@@ -139,8 +139,10 @@ do autor. Na regra da ABNT o sobrenome deve aparecer com todas as letras em caix
   </macro>
   <!--A macro 'access' é utilizada em arquivos de páginas da web. Ela é responsável por exibir a URL do site pesquisado e a data do acesso, além do DOI -->
   <macro name="access">
+    <text variable="ISSN" prefix=" ISSN: " suffix="."/>
+    <text variable="ISBN" prefix=" ISBN: " suffix="."/>
     <text variable="DOI" prefix=" DOI: " suffix="."/>
-    <text variable="URL" prefix=" Disponível em: &lt;" suffix="&gt;."/>
+    <text variable="URL" prefix=" Disponível em: " suffix="."/>
     <date variable="accessed" prefix=". Acesso em: " suffix=".">
       <date-part name="day" suffix=" "/>
       <date-part name="month" form="short" suffix=". " text-case="lowercase"/>
@@ -334,6 +336,8 @@ em caixa alta. Utiliza-se antes do nome da conferencia a expressao "In". Segundo
             <text variable="page" prefix="p. "/>
             <!--Inseri este campo 'extra' caso queira colocar alguma observacao, como 'nome da coleção', 'nome da série' etc. -->
             <!-- <text variable="note" prefix=". " suffix=""/> -->
+            <text macro="collection-title" prefix=". (" suffix=")."/>
+            <!-- AQUI INSERE A COLEÇÃO OU SÉRIE DA OBRA -->
           </group>
         </group>
       </else-if>
@@ -449,6 +453,8 @@ em caixa alta. Utiliza-se antes do nome da conferencia a expressao "In". Segundo
             <text macro="publisher" suffix=". "/>
             <!--Inseri este campo 'extra' caso queira colocar alguma observacao-->
             <text variable="note" suffix=". "/>
+            <text macro="collection-title" prefix="(" suffix=")."/>
+            <!-- AQUI INSERE A COLEÇÃO OU SÉRIE DA OBRA -->
             <!--Dados complementares "pagina, volume"-->
             <text macro="locators"/>
             <text macro="access"/>
@@ -471,7 +477,7 @@ em caixa alta. Utiliza-se antes do nome da conferencia a expressao "In". Segundo
             <text macro="container-title" suffix=". "/>
             <!--Traducao INSERI DA ABNT (ver como funciona) -->
             <text macro="translator" suffix=". "/>
-            <text variable="collection-title" suffix=" "/>
+            <!--            <text variable="collection-title" suffix=" "/>  AQUI INSERIA A SÉRIE OU COLEÇÃO DENTRO DO TEXTO -->
             <!--Edicao-->
             <text macro="edition" suffix=". "/>
             <!--Local, data, etc-->

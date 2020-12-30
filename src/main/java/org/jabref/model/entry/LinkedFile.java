@@ -133,7 +133,7 @@ public class LinkedFile implements Serializable {
      * @param toCheck The String to check
      * @return <code>true</code>, if it starts with "http://", "https://" or contains "www."; <code>false</code> otherwise
      */
-    private boolean isOnlineLink(String toCheck) {
+    public static boolean isOnlineLink(String toCheck) {
         String normalizedFilePath = toCheck.trim().toLowerCase();
         return normalizedFilePath.startsWith("http://") || normalizedFilePath.startsWith("https://") || normalizedFilePath.contains("www.");
     }

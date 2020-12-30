@@ -2,8 +2,8 @@ package org.jabref.gui.citationkeypattern;
 
 import javafx.scene.control.ButtonType;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.Globals;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
 import org.jabref.logic.l10n.Localization;
@@ -12,13 +12,13 @@ import org.jabref.model.metadata.MetaData;
 public class CitationKeyPatternDialog extends BaseDialog<Void> {
 
     private final MetaData metaData;
-    private final BasePanel panel;
+    private final LibraryTab libraryTab;
     private final CitationKeyPatternPanel citationKeyPatternPanel;
 
-    public CitationKeyPatternDialog(BasePanel panel) {
-        this.citationKeyPatternPanel = new CitationKeyPatternPanel(panel);
-        this.panel = panel;
-        this.metaData = panel.getBibDatabaseContext().getMetaData();
+    public CitationKeyPatternDialog(LibraryTab libraryTab) {
+        this.citationKeyPatternPanel = new CitationKeyPatternPanel(libraryTab.getBibDatabaseContext());
+        this.libraryTab = libraryTab;
+        this.metaData = libraryTab.getBibDatabaseContext().getMetaData();
         AbstractCitationKeyPattern keyPattern = metaData.getCiteKeyPattern(Globals.prefs.getGlobalCitationKeyPattern());
         citationKeyPatternPanel.setValues(keyPattern);
         init();
@@ -34,7 +34,7 @@ public class CitationKeyPatternDialog extends BaseDialog<Void> {
         this.setResultConverter(button -> {
             if (button == ButtonType.APPLY) {
                 metaData.setCiteKeyPattern(citationKeyPatternPanel.getKeyPatternAsDatabaseKeyPattern());
-                panel.markNonUndoableBaseChanged();
+                libraryTab.markNonUndoableBaseChanged();
             }
 
             return null;

@@ -4,14 +4,12 @@ import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tooltip;
@@ -28,10 +26,14 @@ import javafx.scene.text.Text;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.Globals;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.copyfiles.CopySingleFileAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.uithreadaware.UiThreadObservableList;
@@ -41,7 +43,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -53,6 +55,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
     private final UiThreadObservableList<LinkedFileViewModel> decoratedModelList;
+    private final PreferencesService preferencesService;
 
     public LinkedFilesEditor(Field field,
                              DialogService dialogService,
@@ -60,10 +63,11 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                              TaskExecutor taskExecutor,
                              SuggestionProvider<?> suggestionProvider,
                              FieldCheckers fieldCheckers,
-                             JabRefPreferences preferences) {
+                             PreferencesService preferences) {
         this.viewModel = new LinkedFilesEditorViewModel(field, suggestionProvider, dialogService, databaseContext, taskExecutor, fieldCheckers, preferences);
         this.dialogService = dialogService;
         this.databaseContext = databaseContext;
+        this.preferencesService = preferences;
 
         ViewLoader.view(this)
                   .root(this)
@@ -202,72 +206,18 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     }
 
     @FXML
-    private void addNewFile(ActionEvent event) {
+    private void addNewFile() {
         viewModel.addNewFile();
     }
 
     @FXML
-    private void fetchFulltext(ActionEvent event) {
+    private void fetchFulltext() {
         viewModel.fetchFulltext();
     }
 
     @FXML
-    private void addFromURL(ActionEvent event) {
+    private void addFromURL() {
         viewModel.addFromURL();
-    }
-
-    private ContextMenu createContextMenuForFile(LinkedFileViewModel linkedFile) {
-        ContextMenu menu = new ContextMenu();
-
-        MenuItem edit = new MenuItem(Localization.lang("Edit"));
-        edit.setOnAction(event -> linkedFile.edit());
-
-        MenuItem openFile = new MenuItem(Localization.lang("Open"));
-        openFile.setOnAction(event -> linkedFile.open());
-
-        MenuItem openFolder = new MenuItem(Localization.lang("Open folder"));
-        openFolder.setOnAction(event -> linkedFile.openFolder());
-
-        MenuItem download = new MenuItem(Localization.lang("Download file"));
-        download.setOnAction(event -> linkedFile.download());
-
-        MenuItem renameFile = new MenuItem(Localization.lang("Rename file to defined pattern"));
-        renameFile.setOnAction(event -> linkedFile.renameToSuggestion());
-        renameFile.setDisable(linkedFile.getFile().isOnlineLink() || linkedFile.isGeneratedNameSameAsOriginal());
-
-        MenuItem renameFileName = new MenuItem(Localization.lang("Rename file to a given name"));
-        renameFileName.setOnAction(event -> linkedFile.askForNameAndRename());
-        renameFileName.setDisable(linkedFile.getFile().isOnlineLink());
-
-        MenuItem moveFile = new MenuItem(Localization.lang("Move file to file directory"));
-        moveFile.setOnAction(event -> linkedFile.moveToDefaultDirectory());
-        moveFile.setDisable(linkedFile.getFile().isOnlineLink() || linkedFile.isGeneratedPathSameAsOriginal());
-
-        MenuItem renameAndMoveFile = new MenuItem(Localization.lang("Move file to file directory and rename file"));
-        renameAndMoveFile.setOnAction(event -> linkedFile.moveToDefaultDirectoryAndRename());
-        renameAndMoveFile.setDisable(linkedFile.getFile().isOnlineLink() || linkedFile.isGeneratedPathSameAsOriginal());
-
-        MenuItem copyLinkedFile = new MenuItem(Localization.lang("Copy linked file to folder..."));
-        copyLinkedFile.setOnAction(event -> new CopySingleFileAction(linkedFile.getFile(), dialogService, databaseContext).copyFile());
-        copyLinkedFile.setDisable(linkedFile.getFile().isOnlineLink());
-
-        MenuItem deleteFile = new MenuItem(Localization.lang("Permanently delete local file"));
-        deleteFile.setOnAction(event -> viewModel.deleteFile(linkedFile));
-        deleteFile.setDisable(linkedFile.getFile().isOnlineLink());
-
-        MenuItem deleteLink = new MenuItem(Localization.lang("Remove link"));
-        deleteLink.setOnAction(event -> viewModel.removeFileLink(linkedFile));
-
-        menu.getItems().add(edit);
-        menu.getItems().add(new SeparatorMenuItem());
-        menu.getItems().addAll(openFile, openFolder);
-        menu.getItems().add(new SeparatorMenuItem());
-        if (linkedFile.getFile().isOnlineLink()) {
-            menu.getItems().add(download);
-        }
-        menu.getItems().addAll(renameFile, renameFileName, moveFile, renameAndMoveFile, copyLinkedFile, deleteLink, deleteFile);
-
-        return menu;
     }
 
     private void handleItemMouseClick(LinkedFileViewModel linkedFile, MouseEvent event) {
@@ -281,5 +231,77 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     @Override
     public double getWeight() {
         return 2;
+    }
+
+    private ContextMenu createContextMenuForFile(LinkedFileViewModel linkedFile) {
+        ContextMenu menu = new ContextMenu();
+        ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
+
+        menu.getItems().addAll(
+                factory.createMenuItem(StandardActions.EDIT_FILE_LINK, new ContextAction(StandardActions.EDIT_FILE_LINK, linkedFile, preferencesService)),
+                new SeparatorMenuItem(),
+                factory.createMenuItem(StandardActions.OPEN_FILE, new ContextAction(StandardActions.OPEN_FILE, linkedFile, preferencesService)),
+                factory.createMenuItem(StandardActions.OPEN_FOLDER, new ContextAction(StandardActions.OPEN_FOLDER, linkedFile, preferencesService)),
+                new SeparatorMenuItem(),
+                factory.createMenuItem(StandardActions.DOWNLOAD_FILE, new ContextAction(StandardActions.DOWNLOAD_FILE, linkedFile, preferencesService)),
+                factory.createMenuItem(StandardActions.RENAME_FILE_TO_PATTERN, new ContextAction(StandardActions.RENAME_FILE_TO_PATTERN, linkedFile, preferencesService)),
+                factory.createMenuItem(StandardActions.RENAME_FILE_TO_NAME, new ContextAction(StandardActions.RENAME_FILE_TO_NAME, linkedFile, preferencesService)),
+                factory.createMenuItem(StandardActions.MOVE_FILE_TO_FOLDER, new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER, linkedFile, preferencesService)),
+                factory.createMenuItem(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, linkedFile, preferencesService)),
+                factory.createMenuItem(StandardActions.COPY_FILE_TO_FOLDER, new CopySingleFileAction(linkedFile.getFile(), dialogService, databaseContext, preferencesService)),
+                factory.createMenuItem(StandardActions.REMOVE_LINK, new ContextAction(StandardActions.REMOVE_LINK, linkedFile, preferencesService)),
+                factory.createMenuItem(StandardActions.DELETE_FILE, new ContextAction(StandardActions.DELETE_FILE, linkedFile, preferencesService))
+        );
+
+        return menu;
+    }
+
+    private class ContextAction extends SimpleCommand {
+
+        private final StandardActions command;
+        private final LinkedFileViewModel linkedFile;
+
+        public ContextAction(StandardActions command, LinkedFileViewModel linkedFile, PreferencesService preferencesService) {
+            this.command = command;
+            this.linkedFile = linkedFile;
+
+            this.executable.bind(
+                    switch (command) {
+                        case RENAME_FILE_TO_PATTERN, MOVE_FILE_TO_FOLDER_AND_RENAME -> Bindings.createBooleanBinding(
+                                () -> !linkedFile.getFile().isOnlineLink()
+                                        && linkedFile.getFile().findIn(databaseContext, preferencesService.getFilePreferences()).isPresent()
+                                        && !linkedFile.isGeneratedNameSameAsOriginal(),
+                                linkedFile.getFile().linkProperty());
+                        case MOVE_FILE_TO_FOLDER -> Bindings.createBooleanBinding(
+                                () -> !linkedFile.getFile().isOnlineLink()
+                                        && linkedFile.getFile().findIn(databaseContext, preferencesService.getFilePreferences()).isPresent()
+                                        && !linkedFile.isGeneratedPathSameAsOriginal(),
+                                linkedFile.getFile().linkProperty());
+                        case DOWNLOAD_FILE -> Bindings.createBooleanBinding(
+                                () -> linkedFile.getFile().isOnlineLink(),
+                                linkedFile.getFile().linkProperty());
+                        case OPEN_FILE, OPEN_FOLDER, RENAME_FILE_TO_NAME, DELETE_FILE -> Bindings.createBooleanBinding(
+                                () -> !linkedFile.getFile().isOnlineLink()
+                                        && linkedFile.getFile().findIn(databaseContext, preferencesService.getFilePreferences()).isPresent(),
+                                linkedFile.getFile().linkProperty());
+                        default -> BindingsHelper.constantOf(true);
+                    });
+        }
+
+        @Override
+        public void execute() {
+            switch (command) {
+                case EDIT_FILE_LINK -> linkedFile.edit();
+                case OPEN_FILE -> linkedFile.open();
+                case OPEN_FOLDER -> linkedFile.openFolder();
+                case DOWNLOAD_FILE -> linkedFile.download();
+                case RENAME_FILE_TO_PATTERN -> linkedFile.renameToSuggestion();
+                case RENAME_FILE_TO_NAME -> linkedFile.askForNameAndRename();
+                case MOVE_FILE_TO_FOLDER -> linkedFile.moveToDefaultDirectory();
+                case MOVE_FILE_TO_FOLDER_AND_RENAME -> linkedFile.moveToDefaultDirectoryAndRename();
+                case DELETE_FILE -> viewModel.deleteFile(linkedFile);
+                case REMOVE_LINK -> viewModel.removeFileLink(linkedFile);
+            }
+        }
     }
 }

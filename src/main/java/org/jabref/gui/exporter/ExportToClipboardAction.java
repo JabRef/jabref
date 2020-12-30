@@ -13,11 +13,11 @@ import java.util.stream.Collectors;
 
 import javafx.scene.input.ClipboardContent;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
@@ -28,7 +28,6 @@ import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +41,7 @@ public class ExportToClipboardAction extends SimpleCommand {
 
     private JabRefFrame frame;
     private final DialogService dialogService;
-    private BasePanel panel;
+    private LibraryTab panel;
     private final List<BibEntry> entries = new ArrayList<>();
     private final ExporterFactory exporterFactory;
     private final ClipBoardManager clipBoardManager;
@@ -56,7 +55,7 @@ public class ExportToClipboardAction extends SimpleCommand {
         this.taskExecutor = taskExecutor;
     }
 
-    public ExportToClipboardAction(BasePanel panel, DialogService dialogService, ExporterFactory exporterFactory, ClipBoardManager clipBoardManager, TaskExecutor taskExecutor) {
+    public ExportToClipboardAction(LibraryTab panel, DialogService dialogService, ExporterFactory exporterFactory, ClipBoardManager clipBoardManager, TaskExecutor taskExecutor) {
         this.panel = panel;
         this.dialogService = dialogService;
         this.exporterFactory = exporterFactory;
@@ -67,7 +66,7 @@ public class ExportToClipboardAction extends SimpleCommand {
     @Override
     public void execute() {
         if (panel == null) {
-            panel = frame.getCurrentBasePanel();
+            panel = frame.getCurrentLibraryTab();
         }
 
         if (panel.getSelectedEntries().isEmpty()) {
@@ -82,7 +81,7 @@ public class ExportToClipboardAction extends SimpleCommand {
 
         // Find default choice, if any
         Exporter defaultChoice = exporters.stream()
-                                          .filter(exporter -> exporter.getName().equals(Globals.prefs.get(JabRefPreferences.LAST_USED_EXPORT)))
+                                          .filter(exporter -> exporter.getName().equals(Globals.prefs.getImportExportPreferences().getLastExportExtension()))
                                           .findAny()
                                           .orElse(null);
 
@@ -106,8 +105,9 @@ public class ExportToClipboardAction extends SimpleCommand {
         Globals.prefs.fileDirForDatabase = panel.getBibDatabaseContext()
                                                 .getFileDirectories(Globals.prefs.getFilePreferences());
 
-        // Add chosen export type to last used pref, to become default
-        Globals.prefs.put(JabRefPreferences.LAST_USED_EXPORT, exporter.getName());
+        // Add chosen export type to last used preference, to become default
+        Globals.prefs.storeImportExportPreferences(
+                Globals.prefs.getImportExportPreferences().withLastExportExtension(exporter.getName()));
 
         Path tmp = null;
         try {

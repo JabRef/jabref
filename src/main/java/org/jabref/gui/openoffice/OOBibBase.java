@@ -1267,7 +1267,7 @@ class OOBibBase {
             throws NoSuchElementException, WrappedTargetException {
         BibDatabase resultDatabase = new BibDatabase();
         List<String> cited = findCitedKeys();
-        List<BibEntry> entriesToInsert = new ArrayList<BibEntry>();
+        List<BibEntry> entriesToInsert = new ArrayList<>();
 
         // For each cited key
         for (String key : cited) {

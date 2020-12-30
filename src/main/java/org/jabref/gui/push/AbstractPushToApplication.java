@@ -3,13 +3,15 @@ package org.jabref.gui.push;
 import java.io.IOException;
 import java.util.List;
 
+import javafx.beans.property.ObjectProperty;
+
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.PushToApplicationPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,22 +28,18 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     protected boolean notDefined; // Set to true if the corresponding path is not defined in the preferences
 
     protected String commandPath;
-    protected String commandPathPreferenceKey;
 
-    protected DialogService dialogService;
+    protected final DialogService dialogService;
+    protected final PreferencesService preferencesService;
 
-    public AbstractPushToApplication(DialogService dialogService) {
+    public AbstractPushToApplication(DialogService dialogService, PreferencesService preferencesService) {
         this.dialogService = dialogService;
-    }
-
-    @Override
-    public String getName() {
-        return Localization.lang("Push entries to external application (%0)", getApplicationName());
+        this.preferencesService = preferencesService;
     }
 
     @Override
     public String getTooltip() {
-        return Localization.lang("Push to %0", getApplicationName());
+        return Localization.lang("Push entries to external application (%0)", getDisplayName());
     }
 
     @Override
@@ -50,8 +48,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         couldNotCall = false;
         notDefined = false;
 
-        initParameters();
-        commandPath = Globals.prefs.get(commandPathPreferenceKey);
+        commandPath = preferencesService.getPushToApplicationPreferences().getPushToApplicationCommandPaths().get(this.getDisplayName());
 
         // Check if a path to the command has been specified
         if ((commandPath == null) || commandPath.trim().isEmpty()) {
@@ -92,7 +89,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         if (notDefined) {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Error pushing entries"),
-                    Localization.lang("Path to %0 not defined", getApplicationName()) + ".");
+                    Localization.lang("Path to %0 not defined", getDisplayName()) + ".");
         } else if (couldNotCall) {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Error pushing entries"),
@@ -100,9 +97,9 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         } else if (couldNotConnect) {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("Error pushing entries"),
-                    Localization.lang("Could not connect to %0", getApplicationName()) + ".");
+                    Localization.lang("Could not connect to %0", getDisplayName()) + ".");
         } else {
-            dialogService.notify(Localization.lang("Pushed citations to %0", getApplicationName()) + ".");
+            dialogService.notify(Localization.lang("Pushed citations to %0", getDisplayName()) + ".");
         }
     }
 
@@ -131,13 +128,11 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         return null;
     }
 
-    /**
-     * Function to initialize parameters. Currently it is expected that commandPathPreferenceKey is set to the path of
-     * the application.
-     */
-    protected abstract void initParameters();
-
     protected String getCiteCommand() {
-        return Globals.prefs.get(JabRefPreferences.CITE_COMMAND);
+        return preferencesService.getExternalApplicationsPreferences().getCiteCommand();
+    }
+
+    public PushToApplicationSettings getSettings(PushToApplication application, ObjectProperty<PushToApplicationPreferences> preferences) {
+        return new PushToApplicationSettings(application, dialogService, preferencesService, preferences);
     }
 }

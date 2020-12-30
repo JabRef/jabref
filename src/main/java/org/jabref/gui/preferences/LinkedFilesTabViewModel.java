@@ -113,6 +113,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         preferences.storeAutoLinkPreferences(new AutoLinkPreferences(
                 citationKeyDependency,
                 autolinkRegexKeyProperty.getValue(),
+                initialAutoLinkPreferences.shouldAskAutoNamingPdfs(),
                 preferences.getKeywordDelimiter()));
     }
 

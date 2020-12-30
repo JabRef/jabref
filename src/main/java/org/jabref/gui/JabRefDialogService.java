@@ -40,7 +40,7 @@ import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.ZipFileChooser;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.jfoenix.controls.JFXSnackbar;
 import com.jfoenix.controls.JFXSnackbar.SnackbarEvent;
@@ -67,12 +67,12 @@ public class JabRefDialogService implements DialogService {
 
     private static final Duration TOAST_MESSAGE_DISPLAY_TIME = Duration.millis(3000);
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDialogService.class);
-    private static JabRefPreferences preferences;
+    private static PreferencesService preferences;
 
     private final Window mainWindow;
     private final JFXSnackbar statusLine;
 
-    public JabRefDialogService(Window mainWindow, Pane mainPane, JabRefPreferences preferences) {
+    public JabRefDialogService(Window mainWindow, Pane mainPane, PreferencesService preferences) {
         this.mainWindow = mainWindow;
         this.statusLine = new JFXSnackbar(mainPane);
         JabRefDialogService.preferences = preferences;

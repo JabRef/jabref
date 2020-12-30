@@ -1,9 +1,9 @@
 package org.jabref.gui.exporter;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.l10n.Localization;
 
@@ -21,8 +21,8 @@ public class SaveAllAction extends SimpleCommand {
     public void execute() {
         dialogService.notify(Localization.lang("Saving all libraries..."));
 
-        for (BasePanel panel : frame.getBasePanelList()) {
-            SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction(panel, Globals.prefs, Globals.entryTypesManager);
+        for (LibraryTab libraryTab : frame.getLibraryTabs()) {
+            SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction(libraryTab, Globals.prefs, Globals.entryTypesManager);
             boolean saveResult = saveDatabaseAction.save();
             if (!saveResult) {
                 dialogService.notify(Localization.lang("Could not save file."));

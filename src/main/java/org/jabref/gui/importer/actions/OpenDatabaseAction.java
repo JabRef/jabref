@@ -6,20 +6,19 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.gui.BasePanel;
-import org.jabref.gui.BasePanelPreferences;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.dialogs.BackupUIManager;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -31,7 +30,7 @@ import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,24 +49,26 @@ public class OpenDatabaseAction extends SimpleCommand {
             new CheckForNewEntryTypesAction());
 
     private final JabRefFrame frame;
+    private final PreferencesService preferencesService;
     private final DialogService dialogService;
 
-    public OpenDatabaseAction(JabRefFrame frame) {
+    public OpenDatabaseAction(JabRefFrame frame, PreferencesService preferencesService, DialogService dialogService) {
         this.frame = frame;
-        this.dialogService = frame.getDialogService();
+        this.preferencesService = preferencesService;
+        this.dialogService = dialogService;
     }
 
     /**
      * Go through the list of post open actions, and perform those that need to be performed.
      *
-     * @param panel  The BasePanel where the database is shown.
-     * @param result The result of the BIB file parse operation.
+     * @param libraryTab The BasePanel where the database is shown.
+     * @param result     The result of the BIB file parse operation.
      */
-    public static void performPostOpenActions(BasePanel panel, ParserResult result) {
+    public static void performPostOpenActions(LibraryTab libraryTab, ParserResult result) {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
             if (action.isActionNecessary(result)) {
-                action.performAction(panel, result);
-                panel.frame().showBasePanel(panel);
+                action.performAction(libraryTab, result);
+                libraryTab.frame().showLibraryTab(libraryTab);
             }
         }
     }
@@ -91,7 +92,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         if (frame.getBasePanelCount() == 0) {
             return Globals.prefs.getWorkingDir();
         } else {
-            Optional<Path> databasePath = frame.getCurrentBasePanel().getBibDatabaseContext().getDatabasePath();
+            Optional<Path> databasePath = frame.getCurrentLibraryTab().getBibDatabaseContext().getDatabasePath();
             return databasePath.map(Path::getParent).orElse(Globals.prefs.getWorkingDir());
         }
     }
@@ -111,7 +112,7 @@ public class OpenDatabaseAction extends SimpleCommand {
      * @param filesToOpen the filesToOpen, may be null or not existing
      */
     public void openFiles(List<Path> filesToOpen, boolean raisePanel) {
-        BasePanel toRaise = null;
+        LibraryTab toRaise = null;
         int initialCount = filesToOpen.size();
         int removed = 0;
 
@@ -119,17 +120,17 @@ public class OpenDatabaseAction extends SimpleCommand {
         for (Iterator<Path> iterator = filesToOpen.iterator(); iterator.hasNext(); ) {
             Path file = iterator.next();
             for (int i = 0; i < frame.getTabbedPane().getTabs().size(); i++) {
-                BasePanel basePanel = frame.getBasePanelAt(i);
-                if ((basePanel.getBibDatabaseContext().getDatabasePath().isPresent())
-                        && basePanel.getBibDatabaseContext().getDatabasePath().get().equals(file)) {
+                LibraryTab libraryTab = frame.getLibraryTabAt(i);
+                if ((libraryTab.getBibDatabaseContext().getDatabasePath().isPresent())
+                        && libraryTab.getBibDatabaseContext().getDatabasePath().get().equals(file)) {
                     iterator.remove();
                     removed++;
                     // See if we removed the final one. If so, we must perhaps
-                    // raise the BasePanel in question:
+                    // raise the LibraryTab in question:
                     if (removed == initialCount) {
-                        toRaise = basePanel;
+                        toRaise = libraryTab;
                     }
-                    // no more bps to check, we found a matching one
+                    // no more LibraryTabs to check, we found a matching one
                     break;
                 }
             }
@@ -151,7 +152,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         } else if (toRaise != null) {
             // If no files are remaining to open, this could mean that a file was
             // already open. If so, we may have to raise the correct tab:
-            frame.showBasePanel(toRaise);
+            frame.showLibraryTab(toRaise);
         }
     }
 
@@ -160,17 +161,15 @@ public class OpenDatabaseAction extends SimpleCommand {
      */
     private void openTheFile(Path file, boolean raisePanel) {
         Objects.requireNonNull(file);
-        if (Files.exists(file)) {
-
-            BackgroundTask.wrap(() -> loadDatabase(file))
-                          .onSuccess(result -> {
-                              BasePanel panel = addNewDatabase(result, file, raisePanel);
-                              OpenDatabaseAction.performPostOpenActions(panel, result);
-                          })
-                          .onFailure(ex -> dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
-                                  ex.getMessage() + "\n\n" + Localization.lang("A local copy will be opened.")))
-                          .executeWith(Globals.TASK_EXECUTOR);
+        if (!Files.exists(file)) {
+            return;
         }
+
+        BackgroundTask<ParserResult> backgroundTask = BackgroundTask.wrap(() -> loadDatabase(file));
+        LibraryTab.Factory libraryTabFactory = new LibraryTab.Factory();
+        LibraryTab newTab = libraryTabFactory.createLibraryTab(frame, preferencesService, file, backgroundTask);
+
+        backgroundTask.onFinished(() -> trackOpenNewDatabase(newTab));
     }
 
     private ParserResult loadDatabase(Path file) throws Exception {
@@ -178,7 +177,7 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         dialogService.notify(Localization.lang("Opening") + ": '" + file + "'");
 
-        Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, fileToLoad.getParent().toString());
+        Globals.prefs.setWorkingDirectory(fileToLoad.getParent());
 
         if (BackupManager.backupFileDiffers(fileToLoad)) {
             BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad);
@@ -202,13 +201,11 @@ public class OpenDatabaseAction extends SimpleCommand {
         return result;
     }
 
-    private BasePanel addNewDatabase(ParserResult result, final Path file, boolean raisePanel) {
-        if (result.hasWarnings()) {
-            ParserResultWarningDialog.showParserResultWarningDialog(result, frame);
-        }
+    private void trackOpenNewDatabase(LibraryTab libraryTab) {
+        Map<String, String> properties = new HashMap<>();
+        Map<String, Double> measurements = new HashMap<>();
+        measurements.put("NumberOfEntries", (double) libraryTab.getBibDatabaseContext().getDatabase().getEntryCount());
 
-        BasePanel basePanel = new BasePanel(frame, BasePanelPreferences.from(Globals.prefs), result.getDatabaseContext(), ExternalFileTypes.getInstance());
-        frame.addTab(basePanel, raisePanel);
-        return basePanel;
+        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("OpenNewDatabase", properties, measurements));
     }
 }

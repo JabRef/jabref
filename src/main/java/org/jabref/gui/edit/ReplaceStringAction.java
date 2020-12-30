@@ -16,7 +16,7 @@ public class ReplaceStringAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        ReplaceStringView dialog = new ReplaceStringView(frame.getCurrentBasePanel());
+        ReplaceStringView dialog = new ReplaceStringView(frame.getCurrentLibraryTab());
         dialog.showAndWait();
     }
 }
