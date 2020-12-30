@@ -282,7 +282,7 @@ public class Author {
         if (latexFreeLastPart == null && lastPart != null) {
             latexFreeLastPart = LatexToUnicodeAdapter.format(lastPart);
         }
-        return Optional.ofNullable(lastPart);
+        return Optional.ofNullable(latexFreeLastPart);
     }
 
     /**
