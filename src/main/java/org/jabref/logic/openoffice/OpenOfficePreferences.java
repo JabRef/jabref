@@ -15,6 +15,7 @@ public class OpenOfficePreferences {
 
     public static final String DEFAULT_LINUX_PATH = "/usr/lib/libreoffice";
     public static final String DEFAULT_LINUX_EXEC_PATH = "/usr/lib/libreoffice/program/soffice";
+    public static final String DEFAULT_LINUX_FLATPAK_EXEC_PATH = "/app/bin/soffice";
     public static final String LINUX_EXECUTABLE = "soffice";
 
     private String executablePath = "";
