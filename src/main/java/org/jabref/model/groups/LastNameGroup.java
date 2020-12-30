@@ -10,13 +10,14 @@ import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 /**
  * Matches entries based on the last name of a list of authors in a specified field.
  */
 public class LastNameGroup extends KeywordGroup {
-    public LastNameGroup(String name, GroupHierarchyType context, Field searchField, String searchExpression) {
-        super(name, context, searchField, searchExpression, true);
+    public LastNameGroup(String groupName, GroupHierarchyType context, Field searchField, String lastName) {
+        super(groupName, context, searchField, LatexToUnicodeAdapter.format(lastName), true);
     }
 
     static List<String> getAsLastNamesLatexFree(Field field, BibEntry bibEntry) {
