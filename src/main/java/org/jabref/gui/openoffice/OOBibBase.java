@@ -155,7 +155,7 @@ class OOBibBase {
 
     public XTextDocument selectComponent(List<XTextDocument> list) {
         List<DocumentTitleViewModel> viewModel = list.stream().map(DocumentTitleViewModel::new).collect(Collectors.toList());
-        // this whole method is part of a background task when autodecting instances, so we need to show dialog in FX thread
+        // this whole method is part of a background task when auto-detecting instances, so we need to show dialog in FX thread
         Optional<DocumentTitleViewModel> selectedDocument = dialogService.showChoiceDialogAndWait(Localization.lang("Select document"), Localization.lang("Found documents:"), Localization.lang("Use selected document"), viewModel);
         return selectedDocument.map(DocumentTitleViewModel::getXtextDocument).orElse(null);
     }

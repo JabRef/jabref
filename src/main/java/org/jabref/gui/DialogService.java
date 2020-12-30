@@ -185,7 +185,7 @@ public interface DialogService {
      * @param dialog dialog to show
      * @param <R>    type of result
      */
-    <R> Optional<R> showCustomDialogAndWait(Dialog<R> dialog);
+    <R> Optional<R> showCustomDialogAndWait(javafx.scene.control.Dialog<R> dialog);
 
     /**
      * Constructs and shows a canceable {@link ProgressDialog}. Clicking cancel will cancel the underlying service and close the dialog
@@ -274,5 +274,5 @@ public interface DialogService {
      */
     Optional<Path> showFileOpenFromArchiveDialog(Path archivePath) throws IOException;
 
-    void show(BaseDialog<Void> aboutDialogView);
+    void show(BaseDialog<?> aboutDialogView);
 }
