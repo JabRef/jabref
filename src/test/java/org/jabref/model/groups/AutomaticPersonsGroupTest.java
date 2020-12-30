@@ -6,15 +6,17 @@ import java.util.stream.Collectors;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AutomaticPersonsGroupTest {
     private static Set<GroupTreeNode> createPersonSubGroupFrom(String... lastNames) {
-        return Arrays.stream(lastNames).distinct()
+        return Arrays.stream(lastNames)
+                     .distinct()
+                     .map(LatexToUnicodeAdapter::format)
                      .map(lastName ->
                              new LastNameGroup(lastName, GroupHierarchyType.INDEPENDENT, StandardField.AUTHOR, lastName))
                      .map(GroupTreeNode::new)
@@ -32,20 +34,26 @@ class AutomaticPersonsGroupTest {
     @Test
     void createSubgroupsContainingCommaSeparatedLastNames() {
         BibEntry bibEntry = new BibEntry().withField(StandardField.AUTHOR, "Turing, Alan and Hopper, Grace");
-        BibEntry turingEntry = new BibEntry().withField(StandardField.AUTHOR, "Turing, Alan");
-        BibEntry hopperEntry = new BibEntry().withField(StandardField.AUTHOR, "Hopper, Grace");
         var subgroups = new AutomaticPersonsGroup("", GroupHierarchyType.INDEPENDENT, StandardField.AUTHOR).createSubgroups(bibEntry);
         var expectedSubgroups = createPersonSubGroupFrom("Turing", "Hopper");
         assertEquals(expectedSubgroups, subgroups);
     }
 
     @Test
-    void createSubgroupContainingLatexAndUnicodeLastNames() {
+    void createSubgroupFromLatexAndCheckForUnicodeLastName() {
         BibEntry bibEntry = new BibEntry().withField(StandardField.AUTHOR, "Kurt G{\\\"{o}}del");
         BibEntry godelEntry = new BibEntry().withField(StandardField.AUTHOR, "Kurt Gödel");
         var subgroup = new AutomaticPersonsGroup("", GroupHierarchyType.INDEPENDENT, StandardField.AUTHOR).createSubgroups(bibEntry);
-        for (GroupTreeNode group : subgroup) { // There should only be one subgroup
-            assertTrue(group.matches(godelEntry));
-        }
+        var expectedSubgroup = createPersonSubGroupFrom("Gödel");
+        assertEquals(expectedSubgroup, subgroup);
+    }
+
+    @Test
+    void createSubgroupFromUnicodeAndCheckForLatexLastName() {
+        BibEntry bibEntry = new BibEntry().withField(StandardField.AUTHOR, "Kurt Gödel");
+        BibEntry godelEntry = new BibEntry().withField(StandardField.AUTHOR, "Kurt G{\\\"{o}}del");
+        var subgroup = new AutomaticPersonsGroup("", GroupHierarchyType.INDEPENDENT, StandardField.AUTHOR).createSubgroups(bibEntry);
+        var expectedSubgroup = createPersonSubGroupFrom("G{\\\"{o}}del");
+        assertEquals(expectedSubgroup, subgroup);
     }
 }
