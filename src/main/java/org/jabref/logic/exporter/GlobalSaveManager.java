@@ -58,7 +58,6 @@ public class GlobalSaveManager {
 
     private void shutdown() {
         this.throttler.shutdown();
-
     }
 
     public Future<SaveResult> save(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType) {
