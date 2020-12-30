@@ -46,14 +46,6 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
         }
     }
 
-    public WordKeywordGroup(String name, GroupHierarchyType context, Field searchField,
-                            String searchExpression, boolean caseSensitive, Character keywordSeparator, SearchStrategy searchStrategy) {
-        super(name, context, searchField, searchExpression, caseSensitive);
-        this.keywordSeparator = keywordSeparator;
-        onlySplitWordsAtSeparator = false;
-        this.searchStrategy = searchStrategy;
-    }
-
     private static boolean containsCaseInsensitive(Set<String> searchIn, Collection<String> searchFor) {
         for (String searchWord : searchFor) {
             if (!containsCaseInsensitive(searchIn, searchWord)) {

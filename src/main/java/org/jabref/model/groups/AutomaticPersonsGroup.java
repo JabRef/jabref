@@ -49,14 +49,14 @@ public class AutomaticPersonsGroup extends AutomaticGroup {
 
     @Override
     public Set<GroupTreeNode> createSubgroups(BibEntry entry) {
-        return getAsLastNamesLatexFree(field, entry).stream()
-                                                    .map(lastName -> new WordKeywordGroup(lastName, GroupHierarchyType.INDEPENDENT,
-                                                            field, lastName, true, ' ', new LastNameSearchStrategy(lastName, field)))
-                                                    .map(GroupTreeNode::new)
-                                                    .collect(Collectors.toSet());
+        return getAsLastNamesLatexFree(field, entry)
+                .stream()
+                .map(lastName -> new LastNameGroup(lastName, GroupHierarchyType.INDEPENDENT, field, lastName))
+                .map(GroupTreeNode::new)
+                .collect(Collectors.toSet());
     }
 
-    private static List<String> getAsLastNamesLatexFree(Field field, BibEntry bibEntry) {
+    static List<String> getAsLastNamesLatexFree(Field field, BibEntry bibEntry) {
         final String unparsedAuthorList = bibEntry.getField(field).orElse(null);
         List<String> lastNames = CACHED_LASTNAMES.get(unparsedAuthorList);
         if (lastNames != null) {
@@ -76,21 +76,6 @@ public class AutomaticPersonsGroup extends AutomaticGroup {
 
         CACHED_LASTNAMES.put(unparsedAuthorList, lastNames);
         return lastNames;
-    }
-
-    private static class LastNameSearchStrategy implements WordKeywordGroup.SearchStrategy {
-        private final Field field;
-        private final String lastName;
-
-        public LastNameSearchStrategy(String lastName, Field field) {
-            this.field = field;
-            this.lastName = lastName;
-        }
-
-        @Override
-        public boolean contains(BibEntry entry) {
-            return getAsLastNamesLatexFree(field, entry).stream().anyMatch(name -> name.equals(lastName));
-        }
     }
 
     public Field getField() {
