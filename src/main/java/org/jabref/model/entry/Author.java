@@ -3,6 +3,7 @@ package org.jabref.model.entry;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jabref.model.strings.StringUtil;
 
 /**
@@ -13,14 +14,11 @@ import org.jabref.model.strings.StringUtil;
 public class Author {
 
     private final String firstPart;
-
     private final String firstAbbr;
-
     private final String vonPart;
-
     private final String lastPart;
-
     private final String jrPart;
+    private String latexFreeLastPart;
 
     /**
      * Creates the Author object. If any part of the name is absent, <CODE>null</CODE> must be passed; otherwise other methods may return erroneous results.
@@ -276,8 +274,19 @@ public class Author {
     }
 
     /**
-     * Returns the junior part of the author's name stored in this object
-     * ("Jr").
+     * Returns the last name of the author stored in this object with resolved latex.
+     *
+     * @return last name of the author (may consist of several tokens)
+     */
+    public Optional<String> getLastLatexFree() {
+        if (latexFreeLastPart == null && lastPart != null) {
+            latexFreeLastPart = LatexToUnicodeAdapter.format(lastPart);
+        }
+        return Optional.ofNullable(lastPart);
+    }
+
+    /**
+     * Returns the junior part of the author's name stored in this object ("Jr").
      *
      * @return junior part of the author's name (may consist of several tokens) or null if the author does not have a Jr. Part
      */
