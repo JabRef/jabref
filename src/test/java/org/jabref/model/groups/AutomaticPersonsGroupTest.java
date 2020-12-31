@@ -42,7 +42,6 @@ class AutomaticPersonsGroupTest {
     @Test
     void createSubgroupFromLatexAndCheckForUnicodeLastName() {
         BibEntry bibEntry = new BibEntry().withField(StandardField.AUTHOR, "Kurt G{\\\"{o}}del");
-        BibEntry godelEntry = new BibEntry().withField(StandardField.AUTHOR, "Kurt Gödel");
         var subgroup = new AutomaticPersonsGroup("", GroupHierarchyType.INDEPENDENT, StandardField.AUTHOR).createSubgroups(bibEntry);
         var expectedSubgroup = createPersonSubGroupFrom("Gödel");
         assertEquals(expectedSubgroup, subgroup);
@@ -51,7 +50,6 @@ class AutomaticPersonsGroupTest {
     @Test
     void createSubgroupFromUnicodeAndCheckForLatexLastName() {
         BibEntry bibEntry = new BibEntry().withField(StandardField.AUTHOR, "Kurt Gödel");
-        BibEntry godelEntry = new BibEntry().withField(StandardField.AUTHOR, "Kurt G{\\\"{o}}del");
         var subgroup = new AutomaticPersonsGroup("", GroupHierarchyType.INDEPENDENT, StandardField.AUTHOR).createSubgroups(bibEntry);
         var expectedSubgroup = createPersonSubGroupFrom("G{\\\"{o}}del");
         assertEquals(expectedSubgroup, subgroup);
