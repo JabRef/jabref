@@ -1,37 +1,16 @@
 package org.jabref.gui.fieldeditors;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.IndexRange;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputControl;
 import javafx.scene.control.skin.TextAreaSkin;
 import javafx.scene.control.skin.TextFieldSkin;
-import javafx.scene.input.Clipboard;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.stage.Screen;
 import javafx.stage.Window;
-
-import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.keyboard.KeyBindingRepository;
-import org.jabref.gui.util.BindingsHelper;
-import org.jabref.logic.util.OS;
 
 import com.sun.javafx.scene.control.Properties;
 
@@ -42,102 +21,6 @@ import com.sun.javafx.scene.control.Properties;
  * reported at https://github.com/javafxports/openjdk-jfx/issues/583
  */
 public class TextInputControlBehavior {
-
-    private static final boolean SHOW_HANDLES = Properties.IS_TOUCH_SUPPORTED && !OS.OS_X;
-
-    private static class EditAction extends SimpleCommand {
-
-        private final StandardActions command;
-        private final TextInputControl textInputControl;
-
-        public EditAction(StandardActions command, TextInputControl textInputControl) {
-            this.command = command;
-            this.textInputControl = textInputControl;
-
-            BooleanProperty editableBinding = textInputControl.editableProperty();
-            BooleanBinding hasTextBinding = Bindings.createBooleanBinding(() -> textInputControl.getLength() > 0, textInputControl.textProperty());
-            BooleanProperty hasStringInClipboardBinding = new SimpleBooleanProperty(Clipboard.getSystemClipboard().hasString());
-            BooleanBinding hasSelectionBinding = Bindings.createBooleanBinding(() -> textInputControl.getSelection().getLength() > 0, textInputControl.selectionProperty());
-            BooleanBinding allSelectedBinding = Bindings.createBooleanBinding(() -> textInputControl.getSelection().getLength() == textInputControl.getLength());
-            BooleanBinding maskTextBinding = Bindings.createBooleanBinding(() -> textInputControl instanceof PasswordField, BindingsHelper.constantOf(true)); // (maskText("A") != "A");
-
-            if (SHOW_HANDLES) {
-                this.executable.bind(
-                        switch (command) {
-                            case COPY -> editableBinding.and(maskTextBinding.not()).and(hasSelectionBinding);
-                            case CUT -> maskTextBinding.not().and(hasSelectionBinding);
-                            case PASTE -> editableBinding.and(hasStringInClipboardBinding);
-                            case DELETE -> editableBinding.and(hasSelectionBinding);
-                            case SELECT_ALL -> hasTextBinding.and(allSelectedBinding.not());
-                            default -> BindingsHelper.constantOf(true);
-                        });
-            } else {
-                this.executable.bind(
-                        switch (command) {
-                            case COPY -> editableBinding.and(maskTextBinding.not()).and(hasSelectionBinding);
-                            case CUT -> maskTextBinding.not().and(hasSelectionBinding);
-                            case PASTE -> editableBinding.and(hasStringInClipboardBinding);
-                            case DELETE -> editableBinding.and(hasSelectionBinding);
-                            case SELECT_ALL -> hasTextBinding.and(allSelectedBinding.not()); // why was this disabled before?
-                            default -> BindingsHelper.constantOf(true);
-                        });
-            }
-        }
-
-        @Override
-        public void execute() {
-            switch (command) {
-                case COPY -> textInputControl.copy();
-                case CUT -> textInputControl.cut();
-                case PASTE -> textInputControl.paste();
-                case DELETE -> {
-                    IndexRange selection = textInputControl.getSelection();
-                    textInputControl.deleteText(selection);
-                }
-                case SELECT_ALL -> textInputControl.selectAll();
-            }
-            textInputControl.requestFocus();
-        }
-    }
-
-    /**
-     * Returns the default context menu items (except undo/redo)
-     */
-    public static List<MenuItem> getDefaultContextMenuItems(TextInputControl textInputControl,
-                                                            KeyBindingRepository keyBindingRepository) {
-        ActionFactory factory = new ActionFactory(keyBindingRepository);
-
-        MenuItem cutMenuItem = factory.createMenuItem(
-                StandardActions.CUT,
-                new EditAction(StandardActions.CUT, textInputControl));
-        MenuItem copyMenuItem = factory.createMenuItem(
-                StandardActions.COPY,
-                new EditAction(StandardActions.COPY, textInputControl));
-        MenuItem pasteMenuItem = factory.createMenuItem(
-                StandardActions.PASTE,
-                new EditAction(StandardActions.PASTE, textInputControl));
-        MenuItem deleteMenuItem = factory.createMenuItem(
-                StandardActions.DELETE,
-                new EditAction(StandardActions.DELETE, textInputControl));
-        MenuItem selectAllMenuItem = factory.createMenuItem(
-                StandardActions.SELECT_ALL,
-                new EditAction(StandardActions.SELECT_ALL, textInputControl));
-
-        ArrayList<MenuItem> items = new ArrayList<>(Arrays.asList(
-                cutMenuItem,
-                copyMenuItem,
-                pasteMenuItem,
-                deleteMenuItem, // should be disabled
-                new SeparatorMenuItem(),
-                selectAllMenuItem
-        ));
-
-        if (SHOW_HANDLES) {
-            selectAllMenuItem.getProperties().put("refreshMenu", Boolean.TRUE); // what does that mean?
-        }
-
-        return items;
-    }
 
     /**
      * @implNote taken from {@link com.sun.javafx.scene.control.behavior.TextFieldBehavior#contextMenuRequested(javafx.scene.input.ContextMenuEvent)}

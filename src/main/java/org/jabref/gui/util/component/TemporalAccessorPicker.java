@@ -9,6 +9,7 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalQueries;
+import java.util.Objects;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -18,6 +19,7 @@ import javafx.util.StringConverter;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.fieldeditors.TextInputControlBehavior;
+import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
 import org.jabref.gui.util.BindingsHelper;
 
 /**
@@ -50,9 +52,9 @@ public class TemporalAccessorPicker extends DatePicker {
                 TemporalAccessorPicker::addCurrentTime,
                 TemporalAccessorPicker::getDate);
 
-        ContextMenu contextMenu = new ContextMenu();
         getEditor().setOnContextMenuRequested(event -> {
-            contextMenu.getItems().setAll(TextInputControlBehavior.getDefaultContextMenuItems(getEditor(), Globals.getKeyPrefs()));
+            ContextMenu contextMenu = new ContextMenu();
+            contextMenu.getItems().setAll(EditorContextAction.getDefaultContextMenuItems(getEditor(), Globals.getKeyPrefs()));
             TextInputControlBehavior.showContextMenu(getEditor(), contextMenu, event);
         });
     }
@@ -91,22 +93,17 @@ public class TemporalAccessorPicker extends DatePicker {
     }
 
     public final StringConverter<TemporalAccessor> getStringConverter() {
-        StringConverter<TemporalAccessor> converter = stringConverterProperty().get();
-        if (converter != null) {
-            return converter;
-        } else {
-            return new StringConverter<TemporalAccessor>() {
-                @Override
-                public String toString(TemporalAccessor value) {
-                    return defaultFormatter.format(value);
-                }
+        return Objects.requireNonNullElseGet(stringConverterProperty().get(), () -> new StringConverter<>() {
+            @Override
+            public String toString(TemporalAccessor value) {
+                return defaultFormatter.format(value);
+            }
 
-                @Override
-                public TemporalAccessor fromString(String value) {
-                    return LocalDateTime.parse(value, defaultFormatter);
-                }
-            };
-        }
+            @Override
+            public TemporalAccessor fromString(String value) {
+                return LocalDateTime.parse(value, defaultFormatter);
+            }
+        });
     }
 
     public final void setStringConverter(StringConverter<TemporalAccessor> value) {

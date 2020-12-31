@@ -29,25 +29,6 @@ import org.jabref.logic.l10n.Localization;
 public class EditorMenus {
 
     /**
-     * The default menu that contains functions for changing the case of text and doing several conversions.
-     *
-     * @param textInput text-input-control that this menu will be connected to
-     * @return default context menu available for most text fields
-     */
-    public static Supplier<List<MenuItem>> getDefaultMenu(final TextInputControl textInput) {
-        return () -> {
-            List<MenuItem> menuItems = new ArrayList<>(6);
-            menuItems.add(new CaseChangeMenu(textInput.textProperty()));
-            menuItems.add(new ConversionMenu(textInput.textProperty()));
-            menuItems.add(new SeparatorMenuItem());
-            menuItems.add(new ProtectedTermsMenu(textInput));
-            menuItems.add(new SeparatorMenuItem());
-            menuItems.add(new ClearField(textInput));
-            return menuItems;
-        };
-    }
-
-    /**
      * The default context menu with a specific menu for normalizing person names regarding to BibTex rules.
      *
      * @param textInput text-input-control that this menu will be connected to
@@ -61,7 +42,7 @@ public class EditorMenus {
             Tooltip.install(normalizeNames.getContent(), toolTip);
             List<MenuItem> menuItems = new ArrayList<>(6);
             menuItems.add(normalizeNames);
-            menuItems.addAll(getDefaultMenu(textInput).get());
+            menuItems.addAll(new DefaultMenu(textInput).get());
             return menuItems;
         };
     }
@@ -80,7 +61,7 @@ public class EditorMenus {
             List<MenuItem> menuItems = new ArrayList<>();
             menuItems.add(copyDoiUrlMenuItem);
             menuItems.add(new SeparatorMenuItem());
-            menuItems.addAll(getDefaultMenu(textArea).get());
+            menuItems.addAll(new DefaultMenu(textArea).get());
             return menuItems;
         };
     }
