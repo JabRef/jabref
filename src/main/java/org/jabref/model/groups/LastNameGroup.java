@@ -1,6 +1,6 @@
 package org.jabref.model.groups;
 
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -21,15 +21,13 @@ public class LastNameGroup extends KeywordGroup {
     }
 
     static List<String> getAsLastNamesLatexFree(Field field, BibEntry bibEntry) {
-        return bibEntry.getField(field)
+        return bibEntry.getField(field).stream()
                        .map(AuthorList::parse)
                        .map(AuthorList::getAuthors)
-                       .map(authors ->
-                               authors.stream()
-                                      .map(Author::getLastLatexFree)
-                                      .flatMap(Optional::stream)
-                                      .collect(Collectors.toList()))
-                       .orElse(Collections.emptyList());
+                       .flatMap(Collection::stream)
+                       .map(Author::getLastLatexFree)
+                       .flatMap(Optional::stream)
+                       .collect(Collectors.toList());
     }
 
     @Override
