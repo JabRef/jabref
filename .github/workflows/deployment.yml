@@ -10,11 +10,6 @@ on:
       - 'docs/**'
       - 'src/test/**'
       - 'README.md'
-  pull_request:
-    paths-ignore:
-      - 'docs/**'
-      - 'src/test/**'
-      - 'README.md'
 
 env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
