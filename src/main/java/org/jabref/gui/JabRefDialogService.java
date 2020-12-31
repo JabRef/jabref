@@ -70,16 +70,16 @@ public class JabRefDialogService implements DialogService {
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDialogService.class);
     private static PreferencesService preferences;
 
-    private static Window mainWindow;
+    private final Window mainWindow;
     private final JFXSnackbar statusLine;
 
     public JabRefDialogService(Window mainWindow, Pane mainPane, PreferencesService preferences) {
-        JabRefDialogService.mainWindow = mainWindow;
+        this.mainWindow = mainWindow;
         this.statusLine = new JFXSnackbar(mainPane);
         JabRefDialogService.preferences = preferences;
     }
 
-    private static FXDialog createDialog(AlertType type, String title, String content) {
+    private FXDialog createDialog(AlertType type, String title, String content) {
         FXDialog alert = new FXDialog(type, title, true);
         preferences.getTheme().installCss(alert.getDialogPane().getScene());
         alert.setHeaderText(null);
@@ -89,8 +89,8 @@ public class JabRefDialogService implements DialogService {
         return alert;
     }
 
-    private static FXDialog createDialogWithOptOut(AlertType type, String title, String content,
-                                                   String optOutMessage, Consumer<Boolean> optOutAction) {
+    private FXDialog createDialogWithOptOut(AlertType type, String title, String content,
+                                            String optOutMessage, Consumer<Boolean> optOutAction) {
         FXDialog alert = new FXDialog(type, title, true);
         // Need to force the alert to layout in order to grab the graphic as we are replacing the dialog pane with a custom pane
         alert.getDialogPane().applyCss();
@@ -397,7 +397,7 @@ public class JabRefDialogService implements DialogService {
     }
 
     @Override
-    public void show(BaseDialog<?> aboutDialogView) {
+    public void showCustomDialog(BaseDialog<?> aboutDialogView) {
         aboutDialogView.initOwner(mainWindow);
         aboutDialogView.show();
     }

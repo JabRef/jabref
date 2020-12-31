@@ -162,6 +162,13 @@ public interface DialogService {
                                                     String optOutMessage, Consumer<Boolean> optOutAction);
 
     /**
+     * Shows a custom dialog without returning any results.
+     *
+     * @param dialog dialog to show
+     */
+    void showCustomDialog(BaseDialog<?> dialog);
+
+    /**
      * This will create and display a new dialog of the specified
      * {@link Alert.AlertType} but with user defined buttons as optional
      * {@link ButtonType}s.
@@ -273,6 +280,4 @@ public interface DialogService {
      * @return the selected file or an empty {@link Optional} if no file has been selected
      */
     Optional<Path> showFileOpenFromArchiveDialog(Path archivePath) throws IOException;
-
-    void show(BaseDialog<?> aboutDialogView);
 }

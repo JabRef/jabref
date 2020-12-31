@@ -20,6 +20,6 @@ public class ShowPreferencesAction extends SimpleCommand {
     @Override
     public void execute() {
         DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-        dialogService.show(new PreferencesDialogView(jabRefFrame));
+        dialogService.showCustomDialog(new PreferencesDialogView(jabRefFrame));
     }
 }

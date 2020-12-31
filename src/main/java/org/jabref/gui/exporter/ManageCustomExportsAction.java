@@ -10,6 +10,6 @@ public class ManageCustomExportsAction extends SimpleCommand {
     @Override
     public void execute() {
         DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-        dialogService.show(new ExportCustomizationDialogView());
+        dialogService.showCustomDialog(new ExportCustomizationDialogView());
     }
 }

@@ -13,6 +13,6 @@ public class ManageCustomImportsAction extends SimpleCommand {
     @Override
     public void execute() {
         DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-        dialogService.show(new ImportCustomizationDialog());
+        dialogService.showCustomDialog(new ImportCustomizationDialog());
     }
 }

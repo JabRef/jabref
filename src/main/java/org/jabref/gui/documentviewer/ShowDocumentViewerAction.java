@@ -19,6 +19,6 @@ public class ShowDocumentViewerAction extends SimpleCommand {
     @Override
     public void execute() {
         DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-        dialogService.show(new DocumentViewerView());
+        dialogService.showCustomDialog(new DocumentViewerView());
     }
 }
