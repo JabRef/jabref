@@ -3,51 +3,81 @@ package org.jabref.logic.l10n;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class LocalizationParserTest {
 
-    @Test
-    public void testKeyParsingCode() {
-        assertLocalizationKeyParsing("Localization.lang(\"one per line\")", "one\\ per\\ line");
-        assertLocalizationKeyParsing("Localization.lang(\n            \"Copy \\\\cite{citation key}\")", "Copy\\ \\cite{citation\\ key}");
-        assertLocalizationKeyParsing("Localization.lang(\"two per line\") Localization.lang(\"two per line\")", Arrays.asList("two\\ per\\ line", "two\\ per\\ line"));
-        assertLocalizationKeyParsing("Localization.lang(\"multi \" + \n\"line\")", "multi\\ line");
-        assertLocalizationKeyParsing("Localization.lang(\"one per line with var\", var)", "one\\ per\\ line\\ with\\ var");
-        assertLocalizationKeyParsing("Localization.lang(\"Search %0\", \"Springer\")", "Search\\ %0");
-        assertLocalizationKeyParsing("Localization.lang(\"Reset preferences (key1,key2,... or 'all')\")", "Reset\\ preferences\\ (key1,key2,...\\ or\\ 'all')");
-        assertLocalizationKeyParsing("Localization.lang(\"Multiple entries selected. Do you want to change the type of all these to '%0'?\")",
-                "Multiple\\ entries\\ selected.\\ Do\\ you\\ want\\ to\\ change\\ the\\ type\\ of\\ all\\ these\\ to\\ '%0'?");
-        assertLocalizationKeyParsing("Localization.lang(\"Run fetcher, e.g. \\\"--fetch=Medline:cancer\\\"\");",
-                "Run\\ fetcher,\\ e.g.\\ \"--fetch\\=Medline\\:cancer\"");
+    public static Stream<Arguments> singleLineChecks() {
+        return Stream.of(
+                Arguments.of("Localization.lang(\"one per line\")", "one\\ per\\ line"),
+                Arguments.of("Localization.lang(\n            \"Copy \\\\cite{citation key}\")", "Copy\\ \\cite{citation\\ key}"),
+                Arguments.of("Localization.lang(\"multi \" + \n\"line\")", "multi\\ line"),
+                Arguments.of("Localization.lang(\"one per line with var\", var)", "one\\ per\\ line\\ with\\ var"),
+                Arguments.of("Localization.lang(\"Search %0\", \"Springer\")", "Search\\ %0"),
+                Arguments.of("Localization.lang(\"Reset preferences (key1,key2,... or 'all')\")", "Reset\\ preferences\\ (key1,key2,...\\ or\\ 'all')"),
+                Arguments.of("Localization.lang(\"Multiple entries selected. Do you want to change the type of all these to '%0'?\")",
+                        "Multiple\\ entries\\ selected.\\ Do\\ you\\ want\\ to\\ change\\ the\\ type\\ of\\ all\\ these\\ to\\ '%0'?"),
+                Arguments.of("Localization.lang(\"Run fetcher, e.g. \\\"--fetch=Medline:cancer\\\"\");",
+                        "Run\\ fetcher,\\ e.g.\\ \"--fetch\\=Medline\\:cancer\"")
+
+        );
     }
 
-    @Test
-    public void testParameterParsingCode() {
-        assertLocalizationParameterParsing("Localization.lang(\"one per line\")", "\"one per line\"");
-        assertLocalizationParameterParsing("Localization.lang(\"one per line\" + var)", "\"one per line\" + var");
-        assertLocalizationParameterParsing("Localization.lang(var + \"one per line\")", "var + \"one per line\"");
-        assertLocalizationParameterParsing("Localization.lang(\"Search %0\", \"Springer\")", "\"Search %0\", \"Springer\"");
+    public static Stream<Arguments> multiLineChecks() {
+        return Stream.of(
+                Arguments.of("Localization.lang(\"two per line\") Localization.lang(\"two per line\")", Arrays.asList("two\\ per\\ line", "two\\ per\\ line"))
+        );
     }
 
-    private void assertLocalizationKeyParsing(String code, String expectedLanguageKeys) {
-        assertLocalizationKeyParsing(code, Collections.singletonList(expectedLanguageKeys));
+    public static Stream<Arguments> singleLineParameterChecks() {
+        return Stream.of(
+                Arguments.of("Localization.lang(\"one per line\")", "\"one per line\""),
+                Arguments.of("Localization.lang(\"one per line\" + var)", "\"one per line\" + var"),
+                Arguments.of("Localization.lang(var + \"one per line\")", "var + \"one per line\""),
+                Arguments.of("Localization.lang(\"Search %0\", \"Springer\")", "\"Search %0\", \"Springer\"")
+        );
     }
 
-    private void assertLocalizationKeyParsing(String code, List<String> expectedLanguageKeys) {
+    public static Stream<String> causesRuntimeExceptions() {
+        return Stream.of(
+                "Localization.lang(\"Ends with a space \")",
+                "Localization.lang(\"Newline\nthere\")",
+                "Localization.lang(\"Newline\\nthere\")"
+        );
+    }
+
+
+    @ParameterizedTest
+    @MethodSource("singleLineChecks")
+    public void testLocalizationKeyParsing(String code, String expectedLanguageKeys) {
+        testLocalizationKeyParsing(code, List.of(expectedLanguageKeys));
+    }
+
+    @ParameterizedTest
+    @MethodSource("multiLineChecks")
+    public void testLocalizationKeyParsing(String code, List<String> expectedLanguageKeys) {
         List<String> languageKeysInString = LocalizationParser.JavaLocalizationEntryParser.getLanguageKeysInString(code, LocalizationBundleForTest.LANG);
         assertEquals(expectedLanguageKeys, languageKeysInString);
     }
 
-    private void assertLocalizationParameterParsing(String code, List<String> expectedParameter) {
+    @ParameterizedTest
+    @MethodSource("singleLineParameterChecks")
+    public void testLocalizationParameterParsing(String code, String expectedParameter) {
         List<String> languageKeysInString = LocalizationParser.JavaLocalizationEntryParser.getLocalizationParameter(code, LocalizationBundleForTest.LANG);
-        assertEquals(expectedParameter, languageKeysInString);
+        assertEquals(List.of(expectedParameter), languageKeysInString);
     }
 
-    private void assertLocalizationParameterParsing(String code, String expectedParameter) {
-        assertLocalizationParameterParsing(code, Collections.singletonList(expectedParameter));
+    @ParameterizedTest
+    @MethodSource("causesRuntimeExceptions")
+    public void throwsRuntimeException(String code) {
+        assertThrows(RuntimeException.class, () -> LocalizationParser.JavaLocalizationEntryParser.getLanguageKeysInString(code, LocalizationBundleForTest.LANG));
     }
 }

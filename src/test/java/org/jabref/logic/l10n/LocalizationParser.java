@@ -226,6 +226,10 @@ public class LocalizationParser {
 
     private static void setStaticLoad(FXMLLoader loader) {
         // Somebody decided to make "setStaticLoad" package-private, so let's use reflection
+        //
+        // Issues in JFX:
+        //   - https://bugs.openjdk.java.net/browse/JDK-8159005 "SceneBuilder needs public access to FXMLLoader setStaticLoad" --> call for "request from community users with use cases"
+        //   - https://bugs.openjdk.java.net/browse/JDK-8127532 "FXMLLoader#setStaticLoad is deprecated"
         try {
             Method method = FXMLLoader.class.getDeclaredMethod("setStaticLoad", boolean.class);
             method.setAccessible(true);
@@ -283,7 +287,7 @@ public class LocalizationParser {
                     throw new RuntimeException(languageKey + " ends with a space. As this is a localization key, this is illegal!");
                 }
 
-                if (languagePropertyKey.contains("\\n")) {
+                if (languagePropertyKey.contains("\n") || languagePropertyKey.contains("\\n")) {
                     throw new RuntimeException(languageKey + " contains a new line character. As this is a localization key, this is illegal!");
                 }
 
