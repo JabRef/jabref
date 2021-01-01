@@ -59,12 +59,12 @@ jobs:
       - name: Set up JDK 16 for linux and mac
         uses: actions/setup-java@v1
         with:
-          java-version: 16-ea
+          java-version: 15
         if: matrix.os != 'windows-latest'
       - name: Set up JDK 14 for windows
         uses: actions/setup-java@v1
         with:
-          java-version: 16-ea
+          java-version: 14
         if: matrix.os == 'windows-latest'
       - name: Restore gradle cache
         uses: actions/cache@master
