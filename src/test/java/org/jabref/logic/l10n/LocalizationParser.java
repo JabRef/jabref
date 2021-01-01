@@ -244,7 +244,6 @@ public class LocalizationParser {
             List<String> result = new ArrayList<>();
 
             for (String param : parameters) {
-
                 String parsedContentsOfLangMethod = ESCAPED_QUOTATION_SYMBOL.matcher(param).replaceAll("QUOTATIONPLACEHOLDER");
 
                 // only retain what is within quotation
@@ -275,14 +274,14 @@ public class LocalizationParser {
                     throw new RuntimeException(languageKey + " ends with a space. As this is a localization key, this is illegal!");
                 }
 
-                if (languagePropertyKey.contains("\\\\n")) {
+                // \n (newline character) in the language key is stored as text "\n" in the .properties file
+                // This needs to be undone
+                languagePropertyKey = languagePropertyKey.replace("\\n", "\n");
+
+                if (languagePropertyKey.contains("\\n")) {
                     // see also https://stackoverflow.com/a/10285687/873282
                     throw new RuntimeException(languageKey + " contains an escaped new line character. The newline character has to be written with a single backslash, not with a double one.");
                 }
-
-                // \n (newline character) in the language key is stored as text "\n" in the .properties file
-                // This
-                languagePropertyKey = languagePropertyKey.replace("\n", "\\n");
 
                 if (!languagePropertyKey.trim().isEmpty()) {
                     result.add(languagePropertyKey);
