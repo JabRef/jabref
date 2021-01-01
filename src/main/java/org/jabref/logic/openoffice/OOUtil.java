@@ -120,7 +120,7 @@ public class OOUtil {
 
         try {
             props.setPropertyValue(PARA_STYLE_NAME, parStyle);
-        } catch (IllegalArgumentException ex) {
+        } catch (com.sun.star.lang.IllegalArgumentException ex) {
             throw new UndefinedParagraphFormatException(parStyle);
         }
 

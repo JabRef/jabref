@@ -1,4 +1,4 @@
-<biblioentry xreflabel="\bibtexkey" id="\bibtexkey">
+<biblioentry xreflabel="\citationkey" id="\citationkey">
    <authorgroup>
 \begin{author}       \format[CreateDocBook4Authors]{\author} \end{author}
    </authorgroup>

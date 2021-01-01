@@ -12,6 +12,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.TabPane;
 
 import org.jabref.gui.StateManager;
+import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
@@ -19,11 +20,17 @@ import org.jabref.model.util.FileHelper;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBinding;
 
 public class ActionHelper {
 
     public static BooleanExpression needsDatabase(StateManager stateManager) {
         return stateManager.activeDatabaseProperty().isPresent();
+    }
+
+    public static BooleanExpression needsSharedDatabase(StateManager stateManager) {
+        EasyBinding<Boolean> binding = EasyBind.map(stateManager.activeDatabaseProperty(), context -> context.filter(c -> c.getLocation() == DatabaseLocation.SHARED).isPresent());
+        return BooleanExpression.booleanExpression(binding);
     }
 
     public static BooleanExpression needsEntriesSelected(StateManager stateManager) {

@@ -54,6 +54,18 @@ class DoiResolutionTest {
     }
 
     @Test
+    void notReturnAnythingWhenDOILeadsToSpringerLink() throws IOException {
+        entry.setField(StandardField.DOI, "https://doi.org/10.1007/978-3-319-89963-3_28");
+        assertEquals(Optional.empty(), finder.findFullText(entry));
+    }
+
+    @Test
+    void notReturnAnythingWhenDOILeadsToIEEE() throws IOException {
+        entry.setField(StandardField.DOI, "https://doi.org/10.1109/TTS.2020.2992669");
+        assertEquals(Optional.empty(), finder.findFullText(entry));
+    }
+
+    @Test
     void notFoundByDOI() throws IOException {
         entry.setField(StandardField.DOI, "10.1186/unknown-doi");
 

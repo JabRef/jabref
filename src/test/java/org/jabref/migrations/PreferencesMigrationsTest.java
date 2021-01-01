@@ -22,8 +22,8 @@ class PreferencesMigrationsTest {
 
     private final String[] oldStylePatterns = new String[]{"\\bibtexkey",
             "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}"};
-    private final String[] newStylePatterns = new String[]{"[bibtexkey]",
-            "[bibtexkey] - [title]"};
+    private final String[] newStylePatterns = new String[]{"[citationkey]",
+            "[citationkey] - [title]"};
 
     @BeforeEach
     void setUp() {
@@ -92,8 +92,8 @@ class PreferencesMigrationsTest {
                 + "</dd>__NEWLINE__<p></p></font>";
 
         String newPreviewStyle = "<font face=\"sans-serif\">"
-                + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
-                + "\\end{bibtexkey}</b><br>__NEWLINE__"
+                + "<b><i>\\bibtextype</i><a name=\"\\citationkey\">\\begin{citationkey} (\\citationkey)</a>"
+                + "\\end{citationkey}</b><br>__NEWLINE__"
                 + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
                 + "\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} "
                 + "<i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}__NEWLINE__"
@@ -142,8 +142,8 @@ class PreferencesMigrationsTest {
                 + "</dd>__NEWLINE__<p></p></font>";
 
         String newPreviewStyle = "<font face=\"sans-serif\">"
-                + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
-                + "\\end{bibtexkey}</b><br>__NEWLINE__"
+                + "<b><i>\\bibtextype</i><a name=\"\\citationkey\">\\begin{citationkey} (\\citationkey)</a>"
+                + "\\end{citationkey}</b><br>__NEWLINE__"
                 + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
                 + "\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} "
                 + "<i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}__NEWLINE__"
@@ -191,7 +191,7 @@ class PreferencesMigrationsTest {
 
     @Test
     void testUpgradeColumnPreferencesAlreadyMigrated() {
-        List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "bibtexkey", "printed");
+        List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "citationkey", "printed");
         List<String> columnWidths = Arrays.asList("75", "300", "470", "60", "130", "100", "30");
 
         when(prefs.getStringList(JabRefPreferences.COLUMN_NAMES)).thenReturn(columnNames);
@@ -205,9 +205,9 @@ class PreferencesMigrationsTest {
 
     @Test
     void testUpgradeColumnPreferencesFromWithoutTypes() {
-        List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "bibtexkey", "printed");
+        List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "citationkey", "printed");
         List<String> columnWidths = Arrays.asList("75", "300", "470", "60", "130", "100", "30");
-        List<String> updatedNames = Arrays.asList("groups", "files", "linked_id", "field:entrytype", "field:author/editor", "field:title", "field:year", "field:journal/booktitle", "field:bibtexkey", "special:printed");
+        List<String> updatedNames = Arrays.asList("groups", "files", "linked_id", "field:entrytype", "field:author/editor", "field:title", "field:year", "field:journal/booktitle", "field:citationkey", "special:printed");
         List<String> updatedWidths = Arrays.asList("28", "28", "28", "75", "300", "470", "60", "130", "100", "30");
         List<String> newSortTypes = Arrays.asList("ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING", "ASCENDING");
 
@@ -223,7 +223,7 @@ class PreferencesMigrationsTest {
 
     @Test
     void testChangeColumnPreferencesVariableNamesFor51() {
-        List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "bibtexkey", "printed");
+        List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "citationkey", "printed");
         List<String> columnWidths = Arrays.asList("75", "300", "470", "60", "130", "100", "30");
 
         // The variable names have to be hardcoded, because they have changed between 5.0 and 5.1
@@ -247,7 +247,7 @@ class PreferencesMigrationsTest {
 
     @Test
     void testChangeColumnPreferencesVariableNamesBackwardsCompatibility() {
-        List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "bibtexkey", "printed");
+        List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "citationkey", "printed");
         List<String> columnWidths = Arrays.asList("75", "300", "470", "60", "130", "100", "30");
 
         // The variable names have to be hardcoded, because they have changed between 5.0 and 5.1
@@ -271,8 +271,8 @@ class PreferencesMigrationsTest {
 
     @Test
     void testRestoreColumnVariablesForBackwardCompatibility() {
-        List<String> updatedNames = Arrays.asList("groups", "files", "linked_id", "field:entrytype", "field:author/editor", "field:title", "field:year", "field:journal/booktitle", "field:bibtexkey", "special:printed");
-        List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "bibtexkey", "printed");
+        List<String> updatedNames = Arrays.asList("groups", "files", "linked_id", "field:entrytype", "field:author/editor", "field:title", "field:year", "field:journal/booktitle", "field:citationkey", "special:printed");
+        List<String> columnNames = Arrays.asList("entrytype", "author/editor", "title", "year", "journal/booktitle", "citationkey", "printed");
         List<String> columnWidths = Arrays.asList("100", "100", "100", "100", "100", "100", "100");
 
         when(prefs.getStringList(JabRefPreferences.COLUMN_NAMES)).thenReturn(updatedNames);

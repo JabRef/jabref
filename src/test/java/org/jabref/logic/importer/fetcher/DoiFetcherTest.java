@@ -24,6 +24,7 @@ public class DoiFetcherTest {
     private BibEntry bibEntryBurd2011;
     private BibEntry bibEntryDecker2007;
     private BibEntry bibEntryIannarelli2019;
+    private BibEntry bibEntryStenzel2020;
 
     @BeforeEach
     public void setUp() {
@@ -31,7 +32,7 @@ public class DoiFetcherTest {
 
         bibEntryBurd2011 = new BibEntry();
         bibEntryBurd2011.setType(StandardEntryType.Book);
-        bibEntryBurd2011.setCiteKey("Burd_2011");
+        bibEntryBurd2011.setCitationKey("Burd_2011");
         bibEntryBurd2011.setField(StandardField.TITLE, "Java{\\textregistered} For Dummies{\\textregistered}");
         bibEntryBurd2011.setField(StandardField.PUBLISHER, "Wiley Publishing, Inc.");
         bibEntryBurd2011.setField(StandardField.YEAR, "2011");
@@ -41,7 +42,7 @@ public class DoiFetcherTest {
 
         bibEntryDecker2007 = new BibEntry();
         bibEntryDecker2007.setType(StandardEntryType.InProceedings);
-        bibEntryDecker2007.setCiteKey("Decker_2007");
+        bibEntryDecker2007.setCitationKey("Decker_2007");
         bibEntryDecker2007.setField(StandardField.AUTHOR, "Gero Decker and Oliver Kopp and Frank Leymann and Mathias Weske");
         bibEntryDecker2007.setField(StandardField.BOOKTITLE, "{IEEE} International Conference on Web Services ({ICWS} 2007)");
         bibEntryDecker2007.setField(StandardField.MONTH, "jul");
@@ -68,6 +69,20 @@ public class DoiFetcherTest {
                                                                         .withField(StandardField.JOURNAL, "Chemical Engineering Transactions")
                                                                         .withField(StandardField.PAGES, "871-876")
                                                                         .withField(StandardField.VOLUME, "77");
+        bibEntryStenzel2020 = new BibEntry();
+        bibEntryStenzel2020.setType(StandardEntryType.Article);
+        bibEntryStenzel2020.setCitationKey("Stenzel_2020");
+        bibEntryStenzel2020.setField(StandardField.AUTHOR, "L. Stenzel and A. L. C. Hayward and U. Schollwöck and F. Heidrich-Meisner");
+        bibEntryStenzel2020.setField(StandardField.JOURNAL, "Physical Review A");
+        bibEntryStenzel2020.setField(StandardField.TITLE, "Topological phases in the Fermi-Hofstadter-Hubbard model on hybrid-space ladders");
+        bibEntryStenzel2020.setField(StandardField.YEAR, "2020");
+        bibEntryStenzel2020.setField(StandardField.MONTH, "aug");
+        bibEntryStenzel2020.setField(StandardField.VOLUME, "102");
+        bibEntryStenzel2020.setField(StandardField.DOI, "10.1103/physreva.102.023315");
+        bibEntryStenzel2020.setField(StandardField.PUBLISHER, "American Physical Society ({APS})");
+        bibEntryStenzel2020.setField(StandardField.PAGES, "023315");
+        bibEntryStenzel2020.setField(StandardField.NUMBER, "2");
+
     }
 
     @Test
@@ -107,5 +122,11 @@ public class DoiFetcherTest {
     public void testPerformSearchNonTrimmedDOI() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("http s://doi.org/ 10.1109 /ICWS .2007.59 ");
         assertEquals(Optional.of(bibEntryDecker2007), fetchedEntry);
+    }
+
+    @Test
+    public void testAPSJournalCopiesArticleIdToPageField() throws FetcherException {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1103/physreva.102.023315");
+        assertEquals(Optional.of(bibEntryStenzel2020), fetchedEntry);
     }
 }

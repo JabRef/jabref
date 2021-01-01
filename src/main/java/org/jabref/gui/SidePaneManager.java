@@ -11,7 +11,7 @@ import org.jabref.gui.groups.GroupSidePane;
 import org.jabref.gui.importer.fetcher.WebSearchPane;
 import org.jabref.gui.openoffice.OpenOfficeSidePanel;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 /**
  * Manages which {@link SidePaneComponent}s are shown.
@@ -21,20 +21,20 @@ public class SidePaneManager {
     private final SidePane sidePane;
     private final Map<SidePaneType, SidePaneComponent> components = new LinkedHashMap<>();
     private final List<SidePaneComponent> visibleComponents = new LinkedList<>();
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferencesService;
 
-    public SidePaneManager(JabRefPreferences preferences, JabRefFrame frame) {
-        this.preferences = preferences;
+    public SidePaneManager(PreferencesService preferencesService, JabRefFrame frame, DialogService dialogService, StateManager stateManager) {
+        this.preferencesService = preferencesService;
         this.sidePane = new SidePane();
 
-        OpenOfficePreferences openOfficePreferences = preferences.getOpenOfficePreferences();
+        OpenOfficePreferences openOfficePreferences = preferencesService.getOpenOfficePreferences();
         Stream.of(
-                new GroupSidePane(this, preferences, frame.getDialogService()),
-                new WebSearchPane(this, preferences, frame),
-                new OpenOfficeSidePanel(this, preferences, frame))
+                new GroupSidePane(this, preferencesService, dialogService),
+                new WebSearchPane(this, preferencesService, dialogService, stateManager),
+                new OpenOfficeSidePanel(this, preferencesService, frame))
               .forEach(pane -> components.put(pane.getType(), pane));
 
-        if (preferences.getBoolean(JabRefPreferences.GROUP_SIDEPANE_VISIBLE)) {
+        if (preferencesService.getSidePanePreferences().isGroupsPaneVisible()) {
             show(SidePaneType.GROUPS);
         }
 
@@ -42,7 +42,7 @@ public class SidePaneManager {
             show(SidePaneType.OPEN_OFFICE);
         }
 
-        if (preferences.getBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE)) {
+        if (preferencesService.getSidePanePreferences().isWebSearchPaneVisible()) {
             show(SidePaneType.WEB_SEARCH);
         }
 
@@ -87,7 +87,7 @@ public class SidePaneManager {
             visibleComponents.add(component);
 
             // Sort the visible components by their preferred position
-            visibleComponents.sort(new PreferredIndexSort());
+            visibleComponents.sort(new PreferredIndexSort(preferencesService));
 
             updateView();
 
@@ -114,7 +114,7 @@ public class SidePaneManager {
      * so that we show components at the preferred position next time.
      */
     private void updatePreferredPositions() {
-        Map<SidePaneType, Integer> preferredPositions = preferences.getSidePanePreferredPositions();
+        Map<SidePaneType, Integer> preferredPositions = preferencesService.getSidePanePreferences().getPreferredPositions();
 
         // Use the currently shown positions of all visible components
         int index = 0;
@@ -122,7 +122,7 @@ public class SidePaneManager {
             preferredPositions.put(comp.getType(), index);
             index++;
         }
-        preferences.storeSidePanePreferredPositions(preferredPositions);
+        preferencesService.storeSidePanePreferences(preferencesService.getSidePanePreferences().withPreferredPositions(preferredPositions));
     }
 
     /**
@@ -164,12 +164,7 @@ public class SidePaneManager {
      */
     private void updateView() {
         sidePane.setComponents(visibleComponents);
-
-        if (visibleComponents.isEmpty()) {
-            sidePane.setVisible(false);
-        } else {
-            sidePane.setVisible(true);
-        }
+        sidePane.setVisible(!visibleComponents.isEmpty());
     }
 
     /**
@@ -179,8 +174,8 @@ public class SidePaneManager {
 
         private final Map<SidePaneType, Integer> preferredPositions;
 
-        public PreferredIndexSort() {
-            preferredPositions = Globals.prefs.getSidePanePreferredPositions();
+        public PreferredIndexSort(PreferencesService preferencesService) {
+            preferredPositions = preferencesService.getSidePanePreferences().getPreferredPositions();
         }
 
         @Override

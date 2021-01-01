@@ -79,7 +79,7 @@ class ModsExporter extends Exporter {
             ModsCollectionDefinition modsCollection = new ModsCollectionDefinition();
             for (BibEntry bibEntry : entries) {
                 ModsDefinition mods = new ModsDefinition();
-                bibEntry.getCiteKeyOptional().ifPresent(citeKey -> addIdentifier(new UnknownField("citekey"), citeKey, mods));
+                bibEntry.getCitationKey().ifPresent(citeKey -> addIdentifier(new UnknownField("citekey"), citeKey, mods));
 
                 Map<Field, String> fieldMap = new TreeMap<>(Comparator.comparing(Field::getName));
                 fieldMap.putAll(bibEntry.getFieldMap());

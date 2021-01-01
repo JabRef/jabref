@@ -166,7 +166,7 @@
               <else>
                 <text variable="number"/>
               </else>
-            </choose>          
+            </choose>
           </group>
         </else-if>
         <else-if type="dataset interview manuscript pamphlet personal_communication post post-weblog speech webpage">
@@ -187,7 +187,7 @@
             </choose>
           </group>
         </else-if>
-        <else> 
+        <else>
           <!--article-journal article-magazine article-newspaper review review-book-->
           <group delimiter=", ">
             <text variable="title" text-case="title" font-style="italic"/>

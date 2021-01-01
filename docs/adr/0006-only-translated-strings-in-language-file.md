@@ -2,7 +2,7 @@
 
 ## Context and Problem Statement
 
-JabRef has translation files `JabRef_it.properties`, ... There are translated and unstranslated strings. Which ones should be in the translation file?
+JabRef has translation files `JabRef_it.properties`, ... There are translated and untranslated strings. Which ones should be in the translation file?
 
 ## Decision Drivers
 
@@ -31,8 +31,8 @@ Chosen option: "Only translated strings in language file", because comes out bes
 ### Translated and untranslated strings in language file, have value the untranslated string to indicate untranslated
 
 * Good, because no issues with FXML
-* Good, because Crowin supports it
-* Bad, because untranslated strings cannot be identified easily in latin languages
+* Good, because Crowdin supports it
+* Bad, because untranslated strings cannot be identified easily in Latin languages
 
 ### Translated and untranslated strings in language file, have empty to indicate untranslated
 

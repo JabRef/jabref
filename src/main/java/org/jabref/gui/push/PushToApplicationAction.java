@@ -58,7 +58,7 @@ public class PushToApplicationAction extends SimpleCommand {
 
             @Override
             public String getText() {
-                return Localization.lang("Push entries to external application (%0)", application.getApplicationName());
+                return Localization.lang("Push entries to external application (%0)", application.getDisplayName());
             }
 
             @Override
@@ -73,7 +73,7 @@ public class PushToApplicationAction extends SimpleCommand {
         Optional<String> citeKey;
         boolean first = true;
         for (BibEntry bes : entries) {
-            citeKey = bes.getCiteKeyOptional();
+            citeKey = bes.getCitationKey();
             if (citeKey.isEmpty() || citeKey.get().isEmpty()) {
                 // Should never occur, because we made sure that all entries have keys
                 continue;
@@ -93,9 +93,9 @@ public class PushToApplicationAction extends SimpleCommand {
         // If required, check that all entries have citation keys defined:
         if (application.requiresCitationKeys()) {
             for (BibEntry entry : stateManager.getSelectedEntries()) {
-                if (StringUtil.isBlank(entry.getCiteKeyOptional())) {
+                if (StringUtil.isBlank(entry.getCitationKey())) {
                     dialogService.showErrorDialogAndWait(
-                            application.getApplicationName(),
+                            application.getDisplayName(),
                             Localization.lang("This operation requires all selected entries to have citation keys defined."));
 
                     return;

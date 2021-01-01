@@ -17,7 +17,7 @@ public class LibraryPropertiesAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        LibraryPropertiesDialogView propertiesDialog = new LibraryPropertiesDialogView(frame.getCurrentBasePanel());
+        LibraryPropertiesDialogView propertiesDialog = new LibraryPropertiesDialogView(frame.getCurrentLibraryTab());
         propertiesDialog.showAndWait();
     }
 }

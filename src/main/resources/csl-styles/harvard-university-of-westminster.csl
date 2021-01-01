@@ -17,7 +17,7 @@
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>Harvard - University of Westminster</summary>
-    <updated>2020-03-11T11:07:38+00:00</updated>
+    <updated>2020-09-26T16:50:41+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en-GB">
@@ -27,8 +27,8 @@
   </locale>
   <macro name="editor">
     <names variable="editor" delimiter=" ">
-      <name delimiter=" " suffix="," and="text" delimiter-precedes-last="never" initialize-with="." name-as-sort-order="all"/>
-      <label form="short" prefix=" "/>
+      <name delimiter=" " and="text" delimiter-precedes-last="never" initialize-with="." name-as-sort-order="all"/>
+      <label form="short" prefix=" (" suffix=")"/>
     </names>
   </macro>
   <macro name="author">
@@ -96,6 +96,12 @@
       <else-if type="graphic" match="any">
         <text variable="title"/>
         <text value="image" prefix=" [" suffix="]"/>
+      </else-if>
+      <else-if type="thesis" match="any">
+        <group delimiter=" ">
+          <text variable="title"/>
+          <text variable="genre" prefix="[" suffix="]"/>
+        </group>
       </else-if>
       <else>
         <text variable="title"/>
@@ -203,7 +209,7 @@
               </group>
             </group>
           </if>
-          <else-if type="report book" match="any">
+          <else-if type="report book thesis" match="any">
             <group delimiter=". ">
               <text macro="publisher"/>
             </group>
@@ -255,6 +261,21 @@
           </else-if>
           <else-if type="webpage post post-weblog" match="any">
             <text variable="container-title" font-style="italic"/>
+          </else-if>
+          <else-if type="manuscript" match="any">
+            <group delimiter=": ">
+              <group delimiter=". ">
+                <group delimiter=", ">
+                  <text variable="archive_location"/>
+                  <group delimiter=" ">
+                    <label text-case="capitalize-first" variable="number" form="short"/>
+                    <text variable="call-number"/>
+                  </group>
+                </group>
+                <text variable="archive-place"/>
+              </group>
+              <text variable="archive"/>
+            </group>
           </else-if>
           <else>
             <group delimiter=", ">

@@ -16,26 +16,23 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.QueryVisitor;
 
 /**
- * This class converts a query string written in lucene syntax into a complex search query.
+ * This class converts a query string written in lucene syntax into a complex  query.
  *
- * For simplicity this is limited to fielded data and the boolean AND operator.
+ * For simplicity this is currently limited to fielded data and the boolean AND operator.
  */
 public class QueryParser {
 
     /**
      * Parses the given query string into a complex query using lucene.
-     * Note: For unique fields, the alphabetically first instance in the query string is used in the complex query.
+     * Note: For unique fields, the alphabetically and numerically first instance in the query string is used in the complex query.
      *
-     * @param queryString The given query string
+     * @param query The given query string
      * @return A complex query containing all fields of the query string
-     * @throws QueryNodeException Error during parsing
      */
-    public Optional<ComplexSearchQuery> parseQueryStringIntoComplexQuery(String queryString) {
+    public Optional<ComplexSearchQuery> parseQueryStringIntoComplexQuery(String query) {
         try {
-            ComplexSearchQuery.ComplexSearchQueryBuilder builder = ComplexSearchQuery.builder();
-
             StandardQueryParser parser = new StandardQueryParser();
-            Query luceneQuery = parser.parse(queryString, "default");
+            Query luceneQuery = parser.parse(query, "default");
             Set<Term> terms = new HashSet<>();
             // This implementation collects all terms from the leaves of the query tree independent of the internal boolean structure
             // If further capabilities are required in the future the visitor and ComplexSearchQuery has to be adapted accordingly.
@@ -44,7 +41,7 @@ public class QueryParser {
 
             List<Term> sortedTerms = new ArrayList<>(terms);
             sortedTerms.sort(Comparator.comparing(Term::text).reversed());
-            return Optional.of(ComplexSearchQuery.fromTerms(terms));
+            return Optional.of(ComplexSearchQuery.fromTerms(sortedTerms));
         } catch (QueryNodeException | IllegalStateException | IllegalArgumentException ex) {
             return Optional.empty();
         }

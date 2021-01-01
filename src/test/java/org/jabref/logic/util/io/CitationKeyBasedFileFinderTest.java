@@ -28,7 +28,7 @@ class CitationKeyBasedFileFinderTest {
     @BeforeEach
     void setUp(@TempDir Path temporaryFolder) throws IOException {
         entry = new BibEntry(StandardEntryType.Article);
-        entry.setCiteKey("HipKro03");
+        entry.setCitationKey("HipKro03");
 
         rootDir = temporaryFolder;
 

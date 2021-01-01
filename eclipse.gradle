@@ -26,7 +26,7 @@ eclipse {
 
                 def javafxcontrols = entries.find { isJavafxControls(it) };
                 javafxcontrols.entryAttributes['add-exports'] = 'javafx.controls/com.sun.javafx.scene.control=org.jabref:javafx.controls/com.sun.javafx.scene.control.behavior=org.jabref:javafx.controls/javafx.scene.control=org.jabref';
-                javafxcontrols.entryAttributes['add-opens'] = 'javafx.controls/com.sun.javafx.scene.control=org.jabref:javafx.controls/com.sun.javafx.scene.control.behavior=org.jabref:javafx.controls/javafx.scene.control=org.jabref';
+                javafxcontrols.entryAttributes['add-opens'] = 'javafx.controls/com.sun.javafx.scene.control=org.jabref:javafx.controls/com.sun.javafx.scene.control.behavior=org.jabref:javafx.controls/javafx.scene.control=org.jabref:javafx.controls/javafx.scene.control.skin=org.controlsfx.controls';
 
                 def javafxgraphics = entries.find { isJavafxGraphics(it) };
                 javafxgraphics.entryAttributes['add-opens'] = 'javafx.graphics/javafx.scene=org.controlsfx.controls';

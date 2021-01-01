@@ -53,7 +53,7 @@ TODO: Usage of status bar and Swing Dialogs
 
 ### What the EventSystem is used for
 
-Many times there is a need to provide an object on many locations simultaneously. This design pattern is quite similar to Java's Observer, but it is much simplier and readable while having the same functional sense.
+Many times there is a need to provide an object on many locations simultaneously. This design pattern is quite similar to Java's Observer, but it is much simpler and readable while having the same functional sense.
 
 ### Main principle
 
@@ -61,7 +61,7 @@ Many times there is a need to provide an object on many locations simultaneously
 
 ### Register to the `EventBus`
 
-Any listening method has to be annotated with `@Subscribe` keyword and must have only one accepting parameter. Furthermore the object which contains such listening method\(s\) has to be registered using the `register(Object)` method provided by `EventBus`. The listening methods can be overloaded by using differnt parameter types.
+Any listening method has to be annotated with `@Subscribe` keyword and must have only one accepting parameter. Furthermore the object which contains such listening method\(s\) has to be registered using the `register(Object)` method provided by `EventBus`. The listening methods can be overloaded by using different parameter types.
 
 ### Posting an object
 
@@ -111,7 +111,7 @@ public class Main {
 
 ### Event handling in JabRef
 
-The `event` package contains some specific events which occure in JabRef.
+The `event` package contains some specific events which occur in JabRef.
 
 For example: Every time an entry was added to the database a new `EntryAddedEvent` is sent through the `eventBus` which is located in `BibDatabase`.
 
@@ -172,10 +172,21 @@ General hints:
 
 The tests check whether translation strings appear correctly in the resource bundles.
 
-1. Add new `Localization.lang("KEY")` to Java file. Run the `LocalizationConsistencyTest`under \(src/test/org.jabref.logic.l10n\)
-2. Tests fail. In the test output a snippet is generated which must be added to the English translation file. There is also a snippet generated for the non-English files, but this is irrelevant.
+1. Add new `Localization.lang("KEY")` to Java file. Run the `LocalizationConsistencyTest`under \(src/test/org.jabref.logic.
+
+   \)
+
+2. Tests fail. In the test output a snippet is generated which must be added to the English translation file.
 3. Add snippet to English translation file located at `src/main/resources/l10n/JabRef_en.properties`
-4. Please do not add tranlsations for other languages direclty in the properties. They will be overwritten by [Crowdin](https://crowdin.com/project/jabref)
+4. Please do not add translations for other languages directly in the properties. They will be overwritten by [Crowdin](https://crowdin.com/project/jabref)
+
+## Adding a new Language
+
+1. Add the new Language to the Language enum in [https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/l10n/Language.java](https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/l10n/Language.java)
+2. Create an empty &lt;locale code&gt;.properties file
+3. Configure the new language in [Crowdin](https://crowdin.com/project/jabref)
+
+If the language is a variant of a language `zh_CN` or `pt_BR`  it is necessary to add a language mapping for Crowdin to the crowdin.yml file in the root. Of course the properties file also has to be named according to the language code and locale.
 
 ## Cleanup and Formatters
 
@@ -210,7 +221,7 @@ Optional<Path> file = FileHelper.expandFilename(database, fileText, preferences.
 
 ## How to work with Preferences
 
-`model` and `logic` must not know JabRefPreferences. See `ProxyPreferences` for encapsulated preferences and [https://github.com/JabRef/jabref/pull/658](https://github.com/JabRef/jabref/pull/658) for a detailed discussion.
+`model` and `logic` must not know `JabRefPreferences`. See `ProxyPreferences` for encapsulated preferences and [https://github.com/JabRef/jabref/pull/658](https://github.com/JabRef/jabref/pull/658) for a detailed discussion.
 
 See [https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/preferences/TimestampPreferences.java](https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/preferences/TimestampPreferences.java) \(via [https://github.com/JabRef/jabref/pull/3092](https://github.com/JabRef/jabref/pull/3092)\) for the current way how to deal with preferences.
 
@@ -290,9 +301,12 @@ Or even better, try to mock the preferences and insert them via dependency injec
 @Test
 public void getTypeReturnsBibLatexArticleInBibLatexMode() {
      // Mock preferences
-     JabrefPreferences mockedPrefs = mock(JabrefPreferences.class);
+     PreferencesService mockedPrefs = mock(PreferencesService.class);
+     GeneralPreferences mockedGeneralPrefs = mock(GeneralPReferences.class);
      // Switch to BibLatex mode
-     when(mockedPrefs.getBoolean("BiblatexMode")).thenReturn(true);
+     when(mockedPrefs.getGeneralPrefs()).thenReturn(mockedGeneralPrefs);
+     when(mockedGeneralPrefs.getDefaultBibDatabaseMode())
+        .thenReturn(BibDatabaseMode.BIBLATEX);
 
      // Now test
      EntryTypes biblatexentrytypes = new EntryTypes(mockedPrefs);
@@ -300,7 +314,7 @@ public void getTypeReturnsBibLatexArticleInBibLatexMode() {
 }
 ```
 
-To test that a preferences migration works succesfully, use the mockito method `verify`. See `PreferencesMigrationsTest` for an example.
+To test that a preferences migration works successfully, use the mockito method `verify`. See `PreferencesMigrationsTest` for an example.
 
 ## UI
 

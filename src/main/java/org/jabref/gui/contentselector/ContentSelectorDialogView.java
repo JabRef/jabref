@@ -12,8 +12,8 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionModel;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
@@ -41,14 +41,14 @@ public class ContentSelectorDialogView extends BaseDialog<Void> {
 
     @Inject
     private DialogService dialogService;
-    private final BasePanel basePanel;
+    private final LibraryTab libraryTab;
     private ContentSelectorDialogViewModel viewModel;
 
-    public ContentSelectorDialogView(BasePanel basePanel) {
+    public ContentSelectorDialogView(LibraryTab libraryTab) {
         this.setTitle(Localization.lang("Manage content selectors"));
         this.getDialogPane().setPrefSize(375, 475);
 
-        this.basePanel = basePanel;
+        this.libraryTab = libraryTab;
 
         ViewLoader.view(this)
                   .load()
@@ -59,7 +59,7 @@ public class ContentSelectorDialogView extends BaseDialog<Void> {
 
     @FXML
     public void initialize() {
-        viewModel = new ContentSelectorDialogViewModel(basePanel, dialogService);
+        viewModel = new ContentSelectorDialogViewModel(libraryTab, dialogService);
 
         initFieldNameComponents();
         initKeywordsComponents();

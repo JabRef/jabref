@@ -15,19 +15,19 @@ import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class CitationKeyEditor extends HBox implements FieldEditorFX {
 
-    private final JabRefPreferences preferences;
-    @FXML private CitationKeyEditorViewModel viewModel;
-    @FXML private Button generateCiteKeyButton;
+    private final PreferencesService preferences;
+    @FXML private final CitationKeyEditorViewModel viewModel;
+    @FXML private Button generateCitationKeyButton;
     @FXML private EditorTextField textField;
 
     public CitationKeyEditor(Field field,
-                             JabRefPreferences preferences,
+                             PreferencesService preferences,
                              SuggestionProvider<?> suggestionProvider,
                              FieldCheckers fieldCheckers,
                              BibDatabaseContext databaseContext,
@@ -61,12 +61,12 @@ public class CitationKeyEditor extends HBox implements FieldEditorFX {
     public void bindToEntry(BibEntry entry) {
         viewModel.bindToEntry(entry);
 
-        // Configure cite key button
+        // Configure button to generate citation key
         new ActionFactory(preferences.getKeyBindingRepository())
                 .configureIconButton(
                         StandardActions.GENERATE_CITE_KEY,
                         viewModel.getGenerateCiteKeyCommand(),
-                        generateCiteKeyButton);
+                        generateCitationKeyButton);
     }
 
     @Override

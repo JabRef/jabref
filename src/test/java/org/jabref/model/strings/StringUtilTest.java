@@ -20,7 +20,7 @@ class StringUtilTest {
         Path path = Path.of("src", "main", "java", StringUtil.class.getName().replace('.', '/') + ".java");
         int lineCount = Files.readAllLines(path, StandardCharsets.UTF_8).size();
 
-        assertTrue(lineCount <= 756, "StringUtil increased in size to " + lineCount + ". "
+        assertTrue(lineCount <= 761, "StringUtil increased in size to " + lineCount + ". "
                 + "We try to keep this class as small as possible. "
                 + "Thus think twice if you add something to StringUtil.");
     }
@@ -297,6 +297,11 @@ class StringUtilTest {
     void testReplaceSpecialCharacters() {
         assertEquals("Hallo Arger", StringUtil.replaceSpecialCharacters("Hallo Arger"));
         assertEquals("aaAeoeeee", StringUtil.replaceSpecialCharacters("åÄöéèë"));
+    }
+
+    @Test
+    void replaceSpecialCharactersWithNonNormalizedUnicode() {
+        assertEquals("Modele", StringUtil.replaceSpecialCharacters("Modèle"));
     }
 
     @Test

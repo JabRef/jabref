@@ -63,7 +63,7 @@ public class LatexParserResult {
      * Return a collection of citations using a BibEntry as reference.
      */
     public Collection<Citation> getCitationsByKey(BibEntry entry) {
-        return entry.getCiteKeyOptional().map(this::getCitationsByKey).orElse(Collections.emptyList());
+        return entry.getCitationKey().map(this::getCitationsByKey).orElse(Collections.emptyList());
     }
 
     /**

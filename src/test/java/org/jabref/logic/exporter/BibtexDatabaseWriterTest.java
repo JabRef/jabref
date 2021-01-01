@@ -371,7 +371,7 @@ class BibtexDatabaseWriterTest {
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
 
-        BibEntry entry = result.getDatabase().getEntryByKey("1137631").get();
+        BibEntry entry = result.getDatabase().getEntryByCitationKey("1137631").get();
         entry.setField(StandardField.AUTHOR, "Mr. Author");
 
         when(preferences.getEncoding()).thenReturn(encoding);

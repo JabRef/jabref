@@ -52,7 +52,7 @@ public class XmpExporter extends Exporter {
         // or write every entry to a separate file.
         if (file.getFileName().toString().trim().equals(XMP_SPLIT_DIRECTORY_INDICATOR)) {
             for (BibEntry entry : entries) {
-                // Avoid situations, where two cite keys are null
+                // Avoid situations, where two citation keys are null
                 Path entryFile;
                 String suffix = entry.getId() + "_" + entry.getField(InternalField.KEY_FIELD).orElse("null") + ".xmp";
                 if (file.getParent() == null) {

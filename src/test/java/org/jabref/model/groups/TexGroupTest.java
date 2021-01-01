@@ -31,7 +31,7 @@ public class TexGroupTest {
         Path auxFile = Path.of(TexGroupTest.class.getResource("paper.aux").toURI());
         TexGroup group = new TexGroup("paper", GroupHierarchyType.INDEPENDENT, auxFile, new DefaultAuxParser(new BibDatabase()), new DummyFileUpdateMonitor(), metaData);
         BibEntry inAux = new BibEntry();
-        inAux.setCiteKey("Darwin1888");
+        inAux.setCitationKey("Darwin1888");
 
         assertTrue(group.contains(inAux));
     }
@@ -41,7 +41,7 @@ public class TexGroupTest {
         Path auxFile = Path.of(TexGroupTest.class.getResource("paper.aux").toURI());
         TexGroup group = new TexGroup("paper", GroupHierarchyType.INDEPENDENT, auxFile, new DefaultAuxParser(new BibDatabase()), new DummyFileUpdateMonitor(), metaData);
         BibEntry notInAux = new BibEntry();
-        notInAux.setCiteKey("NotInAux2017");
+        notInAux.setCitationKey("NotInAux2017");
 
         assertFalse(group.contains(notInAux));
     }

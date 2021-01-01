@@ -307,7 +307,7 @@ public class VM implements Warn {
             if (context == null) {
                 throw new VMException("Must have an entry to cite$");
             }
-            stack.push(context.entry.getCiteKeyOptional().orElse(null));
+            stack.push(context.entry.getCitationKey().orElse(null));
         });
 
         /*

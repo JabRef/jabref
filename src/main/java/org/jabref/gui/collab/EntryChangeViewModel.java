@@ -25,7 +25,7 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
         this.oldEntry = entry;
         this.newEntry = newEntry;
 
-        name = entry.getCiteKeyOptional()
+        name = entry.getCitationKey()
                     .map(key -> Localization.lang("Modified entry") + ": '" + key + '\'')
                     .orElse(Localization.lang("Modified entry"));
     }

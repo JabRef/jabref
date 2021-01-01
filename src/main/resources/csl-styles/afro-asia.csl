@@ -146,7 +146,7 @@
   <!-- principais -->
   <macro name="producers">
     <names variable="author">
-      <name form="long" sort-separator=", "></name>
+      <name form="long" sort-separator=", "/>
       <et-al term="et-al" prefix=" " font-style="italic"/>
       <substitute>
         <text macro="container-producers"/>
@@ -155,7 +155,7 @@
   </macro>
   <macro name="producers-short">
     <names variable="author">
-      <name form="short"></name>
+      <name form="short"/>
       <et-al term="et-al" prefix=" " suffix="." font-style="italic"/>
       <substitute>
         <text macro="container-producers-short"/>
@@ -177,7 +177,7 @@
   <!-- da obra principal, em caso de parte -->
   <macro name="container-producers">
     <names variable="editor">
-      <name form="long" sort-separator=", "></name>
+      <name form="long" sort-separator=", "/>
       <et-al term="et-al" prefix=" " font-style="italic"/>
       <label form="short" prefix=" (" suffix=")" text-case="lowercase"/>
       <substitute>
@@ -187,7 +187,7 @@
   </macro>
   <macro name="container-producers-short">
     <names variable="editor">
-      <name form="short"></name>
+      <name form="short"/>
       <et-al term="et-al" prefix=" " font-style="italic"/>
       <label form="short" prefix=" (" suffix=")" text-case="lowercase"/>
       <substitute>

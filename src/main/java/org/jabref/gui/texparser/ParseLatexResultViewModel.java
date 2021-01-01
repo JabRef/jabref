@@ -34,7 +34,7 @@ public class ParseLatexResultViewModel extends AbstractViewModel {
         this.referenceList = FXCollections.observableArrayList();
         this.citationList = FXCollections.observableArrayList();
 
-        Set<String> newEntryKeys = resolverResult.getNewEntries().stream().map(entry -> entry.getCiteKeyOptional().orElse("")).collect(Collectors.toSet());
+        Set<String> newEntryKeys = resolverResult.getNewEntries().stream().map(entry -> entry.getCitationKey().orElse("")).collect(Collectors.toSet());
         for (Map.Entry<String, Collection<Citation>> entry : resolverResult.getCitations().asMap().entrySet()) {
             String key = entry.getKey();
             referenceList.add(new ReferenceViewModel(key, newEntryKeys.contains(key), entry.getValue()));

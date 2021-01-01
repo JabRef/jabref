@@ -4,6 +4,7 @@
   "path": "/Applications/JabRef.app/Contents/Resources/jabrefHost.py",
   "type": "stdio",
   "allowed_origins": [
-    "chrome-extension://bifehkofibaamoeaopjglfkddgkijdlh/"
+    "chrome-extension://bifehkofibaamoeaopjglfkddgkijdlh/",
+    "chrome-extension://pgkajmkfgbehiomipedjhoddkejohfna/"
   ]
 }

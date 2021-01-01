@@ -1,7 +1,7 @@
 package org.jabref.gui.contentselector;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 
@@ -19,7 +19,7 @@ public class ManageContentSelectorAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        BasePanel basePanel = jabRefFrame.getCurrentBasePanel();
-        new ContentSelectorDialogView(basePanel).showAndWait();
+        LibraryTab libraryTab = jabRefFrame.getCurrentLibraryTab();
+        new ContentSelectorDialogView(libraryTab).showAndWait();
     }
 }

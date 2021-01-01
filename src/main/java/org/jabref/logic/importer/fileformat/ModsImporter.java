@@ -134,7 +134,7 @@ public class ModsImporter extends Importer implements Parser {
         BibEntry entry = new BibEntry();
         Map<Field, String> fields = new HashMap<>();
         if (modsDefinition.getID() != null) {
-            entry.setCiteKey(modsDefinition.getID());
+            entry.setCitationKey(modsDefinition.getID());
         }
         if (modsDefinition.getModsGroup() != null) {
             parseModsGroup(fields, modsDefinition.getModsGroup(), entry);
@@ -222,8 +222,8 @@ public class ModsImporter extends Importer implements Parser {
 
     private void parseIdentifier(Map<Field, String> fields, IdentifierDefinition identifier, BibEntry entry) {
         String type = identifier.getType();
-        if ("citekey".equals(type) && !entry.getCiteKeyOptional().isPresent()) {
-            entry.setCiteKey(identifier.getValue());
+        if ("citekey".equals(type) && !entry.getCitationKey().isPresent()) {
+            entry.setCitationKey(identifier.getValue());
         } else if (!"local".equals(type) && !"citekey".equals(type)) {
             // put all identifiers (doi, issn, isbn,...) except of local and citekey
             putIfValueNotNull(fields, FieldFactory.parseField(identifier.getType()), identifier.getValue());

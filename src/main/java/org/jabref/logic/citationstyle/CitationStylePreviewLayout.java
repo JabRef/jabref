@@ -5,7 +5,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 
 public class CitationStylePreviewLayout implements PreviewLayout {
-    private CitationStyle citationStyle;
+    private final CitationStyle citationStyle;
 
     public CitationStylePreviewLayout(CitationStyle citationStyle) {
         this.citationStyle = citationStyle;
@@ -17,7 +17,7 @@ public class CitationStylePreviewLayout implements PreviewLayout {
     }
 
     @Override
-    public String getName() {
+    public String getDisplayName() {
         return citationStyle.getTitle();
     }
 
@@ -27,5 +27,10 @@ public class CitationStylePreviewLayout implements PreviewLayout {
 
     public String getFilePath() {
         return citationStyle.getFilePath();
+    }
+
+    @Override
+    public String getName() {
+        return citationStyle.getTitle();
     }
 }

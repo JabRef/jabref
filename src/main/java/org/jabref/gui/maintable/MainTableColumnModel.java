@@ -138,7 +138,7 @@ public class MainTableColumnModel {
 
     public String getDisplayName() {
         if ((Type.ICON_COLUMNS.contains(typeProperty.getValue()) && qualifierProperty.getValue().isBlank())
-                || typeProperty.getValue() == Type.INDEX) {
+                || (typeProperty.getValue() == Type.INDEX)) {
             return typeProperty.getValue().getDisplayName();
         } else {
             return FieldsUtil.getNameWithType(FieldFactory.parseField(qualifierProperty.getValue()));
@@ -165,23 +165,25 @@ public class MainTableColumnModel {
         return sortTypeProperty;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
 
-        if (o == null || getClass() != o.getClass()) {
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
 
         MainTableColumnModel that = (MainTableColumnModel) o;
 
-        if (typeProperty != that.typeProperty) {
+        if (typeProperty.getValue() != that.typeProperty.getValue()) {
             return false;
         }
-        return Objects.equals(qualifierProperty, that.qualifierProperty);
+        return Objects.equals(qualifierProperty.getValue(), that.qualifierProperty.getValue());
     }
 
+    @Override
     public int hashCode() {
         return Objects.hash(typeProperty.getValue(), qualifierProperty.getValue());
     }
@@ -199,9 +201,9 @@ public class MainTableColumnModel {
         Type type = Type.fromString(splittedName[0]);
         String qualifier = "";
 
-        if (type == Type.NORMALFIELD
-                || type == Type.SPECIALFIELD
-                || type == Type.EXTRAFILE) {
+        if ((type == Type.NORMALFIELD)
+                || (type == Type.SPECIALFIELD)
+                || (type == Type.EXTRAFILE)) {
             if (splittedName.length == 1) {
                 qualifier = splittedName[0]; // By default the rawColumnName is parsed as NORMALFIELD
             } else {

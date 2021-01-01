@@ -44,7 +44,7 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
         );
 
         validIdentifierIsNotPresent.bind(
-                EasyBind.map(identifier, parsedIdentifier -> !parsedIdentifier.isPresent())
+                EasyBind.map(identifier, parsedIdentifier -> parsedIdentifier.isEmpty())
         );
 
         idFetcherAvailable.setValue(WebFetchers.getIdFetcherForField(field).isPresent());
@@ -87,7 +87,7 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void fetchInformationByIdentifier(BibEntry entry) {
-        new FetchAndMergeEntry(JabRefGUI.getMainFrame().getCurrentBasePanel(), taskExecutor).fetchAndMerge(entry, field);
+        new FetchAndMergeEntry(JabRefGUI.getMainFrame().getCurrentLibraryTab(), taskExecutor).fetchAndMerge(entry, field);
     }
 
     public void lookupIdentifier(BibEntry entry) {

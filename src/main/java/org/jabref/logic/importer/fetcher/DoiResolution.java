@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -31,6 +32,11 @@ import org.slf4j.LoggerFactory;
 public class DoiResolution implements FulltextFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(DoiResolution.class);
 
+    /**
+     * Hosts for which tailored fetchers exist, so this fetcher is not needed.
+     */
+    private final List<String> excludedHosts = Arrays.asList("link.springer.com", "ieeexplore.ieee.org");
+
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
@@ -57,7 +63,12 @@ public class DoiResolution implements FulltextFetcher {
             // some publishers are quite slow (default is 3s)
             connection.timeout(10000);
 
-            Document html = connection.get();
+            Connection.Response response = connection.execute();
+            if (excludedHosts.contains(response.url().getHost())) {
+                return Optional.empty();
+            }
+
+            Document html = response.parse();
             // scan for PDF
             Elements hrefElements = html.body().select("a[href]");
 

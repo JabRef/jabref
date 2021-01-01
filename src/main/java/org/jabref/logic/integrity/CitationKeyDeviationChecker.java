@@ -24,7 +24,7 @@ public class CitationKeyDeviationChecker implements EntryChecker {
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
-        Optional<String> valuekey = entry.getCiteKeyOptional();
+        Optional<String> valuekey = entry.getCitationKey();
         if (valuekey.isEmpty()) {
             return Collections.emptyList();
         }

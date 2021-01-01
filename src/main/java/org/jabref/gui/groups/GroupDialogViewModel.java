@@ -170,20 +170,20 @@ public class GroupDialogViewModel {
                     }
                 },
                 ValidationMessage.error(String.format("%s > %n %s %n %n %s",
-                        Localization.lang("Searching for keywords"),
+                        Localization.lang("Searching for a keyword"),
                         Localization.lang("Keywords"),
                         Localization.lang("Invalid regular expression."))));
 
         keywordFieldEmptyValidator = new FunctionBasedValidator<>(
                 keywordGroupSearchFieldProperty,
                 StringUtil::isNotBlank,
-                ValidationMessage.error(Localization.lang("Please enter a field name to search for keywords.")));
+                ValidationMessage.error(Localization.lang("Please enter a field name to search for a keyword.")));
 
         keywordSearchTermEmptyValidator = new FunctionBasedValidator<>(
                 keywordGroupSearchTermProperty,
                 input -> !StringUtil.isNullOrEmpty(input),
                 ValidationMessage.error(String.format("%s > %n %s %n %n %s",
-                        Localization.lang("Searching for keywords"),
+                        Localization.lang("Searching for a keyword"),
                         Localization.lang("Keywords"),
                         Localization.lang("Search term is empty.")
                 )));

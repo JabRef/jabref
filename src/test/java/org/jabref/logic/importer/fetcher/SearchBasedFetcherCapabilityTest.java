@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Defines the set of capability tests that each tests a given search capability, e.g. author based search.
  * The idea is to code the capabilities of a fetcher into Java code.
- * This way, a) the capbilities of a fetcher are checked automatically (because they can change from time-to-time by the provider)
+ * This way, a) the capabilities of a fetcher are checked automatically (because they can change from time-to-time by the provider)
  * and b) the queries sent to the fetchers can be debugged directly without a route through to some fetcher code.
  */
 interface SearchBasedFetcherCapabilityTest {
@@ -34,7 +34,7 @@ interface SearchBasedFetcherCapabilityTest {
         ComplexSearchQuery.ComplexSearchQueryBuilder builder = ComplexSearchQuery.builder();
         getTestAuthors().forEach(builder::author);
 
-        List<BibEntry> result = getFetcher().performComplexSearch(builder.build());
+        List<BibEntry> result = getFetcher().performSearch(builder.build());
         new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
 
         assertFalse(result.isEmpty());
@@ -56,7 +56,7 @@ interface SearchBasedFetcherCapabilityTest {
                 .singleYear(getTestYear())
                 .build();
 
-        List<BibEntry> result = getFetcher().performComplexSearch(complexSearchQuery);
+        List<BibEntry> result = getFetcher().performSearch(complexSearchQuery);
         new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
         List<String> differentYearsInResult = result.stream()
                                                     .map(bibEntry -> bibEntry.getField(StandardField.YEAR))
@@ -77,7 +77,7 @@ interface SearchBasedFetcherCapabilityTest {
         List<String> yearsInYearRange = List.of("2018", "2019", "2020");
         builder.fromYearAndToYear(2018, 2020);
 
-        List<BibEntry> result = getFetcher().performComplexSearch(builder.build());
+        List<BibEntry> result = getFetcher().performSearch(builder.build());
         new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
         List<String> differentYearsInResult = result.stream()
                                                     .map(bibEntry -> bibEntry.getField(StandardField.YEAR))
@@ -96,7 +96,7 @@ interface SearchBasedFetcherCapabilityTest {
     default void supportsJournalSearch() throws Exception {
         ComplexSearchQuery.ComplexSearchQueryBuilder builder = ComplexSearchQuery.builder();
         builder.journal(getTestJournal());
-        List<BibEntry> result = getFetcher().performComplexSearch(builder.build());
+        List<BibEntry> result = getFetcher().performSearch(builder.build());
         new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
 
         assertFalse(result.isEmpty());

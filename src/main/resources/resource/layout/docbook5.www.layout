@@ -1,4 +1,4 @@
-<biblioentry xreflabel="\format[Authors(3,LastName,EtAl= et al.)]{\author} (\year)" xml:id="\bibtexkey">
+<biblioentry xreflabel="\format[Authors(3,LastName,EtAl= et al.)]{\author} (\year)" xml:id="\citationkey">
    <authorgroup>
 <!--AUTHORS-->
 \begin{author}\format[CreateDocBook5Authors]{\author} \end{author}
@@ -15,7 +15,7 @@
     <bibliomisc><link xlink:href="\format[XMLChars]{\url}">\format[XMLChars]{\url}</link></bibliomisc>
     \end{url}
 <!--ABSTRACT-->
-    \begin{abstract}   
+    \begin{abstract}
     <abstract>
       <para>\format[XMLChars,RemoveLatexCommands]{\abstract}</para>
     </abstract>

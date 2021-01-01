@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ ! -d /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts ]; then
+if [ ! -d /etc/chromium/native-messaging-hosts ]; then
     echo "Missing directory, create it manually then try again:"
     echo "sudo mkdir -p /etc/chromium/native-messaging-hosts"
     exit 1

@@ -46,7 +46,8 @@
       <name name-as-sort-order="all" sort-separator=", " delimiter="; " delimiter-precedes-last="always" form="long"/>
       <label form="short" prefix=" (" suffix=")"/>
       <substitute>
-        <text macro="editor"/>
+        <names variable="editor"/>
+        <names variable="translator"/>
         <text macro="anon"/>
       </substitute>
     </names>

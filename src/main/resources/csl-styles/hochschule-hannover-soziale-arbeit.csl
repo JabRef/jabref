@@ -129,7 +129,7 @@
   <bibliography>
     <sort>
       <key macro="creator-short"/>
-      <key macro="creator-year-short"/>
+      <key macro="year"/>
     </sort>
     <layout>
       <group delimiter=". " suffix=".">

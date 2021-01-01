@@ -2,6 +2,7 @@ package org.jabref.logic.layout.format;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collections;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -97,7 +98,7 @@ class WrapFileLinksTest {
     @Test
     void testPath() throws IOException {
         FileLinkPreferences preferences = new FileLinkPreferences("",
-                Collections.singletonList("src/test/resources/pdfs/"));
+                Collections.singletonList(Path.of("src/test/resources/pdfs/")));
         formatter = new WrapFileLinks(preferences);
         formatter.setArgument("\\p");
         assertEquals(new File("src/test/resources/pdfs/encrypted.pdf").getCanonicalPath(),
@@ -117,7 +118,7 @@ class WrapFileLinksTest {
     @Test
     void testPathReturnsRelativePathIfNotFound() {
         FileLinkPreferences preferences = new FileLinkPreferences("",
-                Collections.singletonList("src/test/resources/pdfs/"));
+                Collections.singletonList(Path.of("src/test/resources/pdfs/")));
         formatter = new WrapFileLinks(preferences);
         formatter.setArgument("\\p");
         assertEquals("test.pdf", formatter.format("Preferences:test.pdf:PDF"));

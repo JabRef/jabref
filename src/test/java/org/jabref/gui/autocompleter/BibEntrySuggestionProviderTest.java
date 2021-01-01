@@ -43,7 +43,7 @@ class BibEntrySuggestionProviderTest {
     @Test
     void completeKeyReturnsKey() {
         BibEntry entry = new BibEntry();
-        entry.setCiteKey("testKey");
+        entry.setCitationKey("testKey");
         database.insertEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.provideSuggestions(getRequest(("testKey")));
@@ -53,7 +53,7 @@ class BibEntrySuggestionProviderTest {
     @Test
     void completeBeginningOfKeyReturnsKey() {
         BibEntry entry = new BibEntry();
-        entry.setCiteKey("testKey");
+        entry.setCitationKey("testKey");
         database.insertEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.provideSuggestions(getRequest(("test")));
@@ -63,7 +63,7 @@ class BibEntrySuggestionProviderTest {
     @Test
     void completeLowercaseKeyReturnsKey() {
         BibEntry entry = new BibEntry();
-        entry.setCiteKey("testKey");
+        entry.setCitationKey("testKey");
         database.insertEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.provideSuggestions(getRequest(("testkey")));
@@ -73,7 +73,7 @@ class BibEntrySuggestionProviderTest {
     @Test
     void completeNullThrowsException() {
         BibEntry entry = new BibEntry();
-        entry.setCiteKey("testKey");
+        entry.setCitationKey("testKey");
         database.insertEntry(entry);
 
         assertThrows(NullPointerException.class, () -> autoCompleter.provideSuggestions(getRequest((null))));
@@ -82,7 +82,7 @@ class BibEntrySuggestionProviderTest {
     @Test
     void completeEmptyStringReturnsNothing() {
         BibEntry entry = new BibEntry();
-        entry.setCiteKey("testKey");
+        entry.setCitationKey("testKey");
         database.insertEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.provideSuggestions(getRequest(("")));
@@ -92,10 +92,10 @@ class BibEntrySuggestionProviderTest {
     @Test
     void completeReturnsMultipleResults() {
         BibEntry entryOne = new BibEntry();
-        entryOne.setCiteKey("testKeyOne");
+        entryOne.setCitationKey("testKeyOne");
         database.insertEntry(entryOne);
         BibEntry entryTwo = new BibEntry();
-        entryTwo.setCiteKey("testKeyTwo");
+        entryTwo.setCitationKey("testKeyTwo");
         database.insertEntry(entryTwo);
 
         Collection<BibEntry> result = autoCompleter.provideSuggestions(getRequest(("testKey")));
@@ -105,7 +105,7 @@ class BibEntrySuggestionProviderTest {
     @Test
     void completeShortKeyReturnsKey() {
         BibEntry entry = new BibEntry();
-        entry.setCiteKey("key");
+        entry.setCitationKey("key");
         database.insertEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.provideSuggestions(getRequest(("k")));

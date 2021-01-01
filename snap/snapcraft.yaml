@@ -15,11 +15,8 @@ architectures:
   - build-on: amd64
 
 plugs:
-  desktop:
-  desktop-legacy:
-  wayland:
-  unity7:
   home:
+  unity7:
   opengl:
   network-bind:
   removable-media:
@@ -31,6 +28,10 @@ plugs:
     interface: system-files
     write:
     - /etc/opt/chrome/native-messaging-hosts/org.jabref.jabref.json
+  etc-opt-edge-native-messaging-jabref:
+    interface: system-files
+    write:
+      - /etc/opt/edge/native-messaging-hosts/org.jabref.jabref.json
   etc-chromium-native-messaging-jabref:
     interface: system-files
     write:
@@ -46,18 +47,17 @@ apps:
 
 environment:
   _JAVA_OPTIONS: "-Duser.home=$SNAP_USER_DATA"
+  GTK_USE_PORTAL: "1"
 
 parts:
   jabref:
     plugin: dump
-    # source: build/distribution/JabRef-5.1-portable_linux.tar.gz
-    # Use this source for debug purposes:
-    source: https://builds.jabref.org/master/JabRef-5.1-portable_linux.tar.gz
+    source: https://builds.jabref.org/master/JabRef-5.2-portable_linux.tar.gz
     stage-packages:
       - x11-utils
     override-build: |
       snapcraftctl build
-      snapcraftctl set-version "$(cat $SNAPCRAFT_PART_INSTALL/lib/app/JabRef.cfg | grep "app.version=" | cut -d'=' -f2)"
+      snapcraftctl set-version "$(cat $SNAPCRAFT_PART_INSTALL/lib/app/.jpackage.xml | grep "app-version" | cut -d">" -f2 | cut -d"<" -f1)"
       sed -i 's|/opt/jabref/lib/jabrefHost.py|/snap/bin/jabref.browser-proxy|g' $SNAPCRAFT_PART_INSTALL/lib/native-messaging-host/*/org.jabref.jabref.json
       rm $SNAPCRAFT_PART_INSTALL/bin/JabRef
   jabref-launcher:

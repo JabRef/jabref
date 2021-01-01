@@ -3,9 +3,9 @@ package org.jabref.gui.undo;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -35,26 +35,26 @@ public class UndoRedoAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        BasePanel panel = frame.getCurrentBasePanel();
+        LibraryTab libraryTab = frame.getCurrentLibraryTab();
         if (action == StandardActions.UNDO) {
             try {
-                panel.getUndoManager().undo();
-                panel.markBaseChanged();
+                libraryTab.getUndoManager().undo();
+                libraryTab.markBaseChanged();
                 dialogService.notify(Localization.lang("Undo"));
             } catch (CannotUndoException ex) {
                 dialogService.notify(Localization.lang("Nothing to undo") + '.');
             }
-            frame.getCurrentBasePanel().markChangedOrUnChanged();
+            frame.getCurrentLibraryTab().markChangedOrUnChanged();
         } else if (action == StandardActions.REDO) {
             try {
-                panel.getUndoManager().redo();
-                panel.markBaseChanged();
+                libraryTab.getUndoManager().redo();
+                libraryTab.markBaseChanged();
                 dialogService.notify(Localization.lang("Redo"));
             } catch (CannotRedoException ex) {
                 dialogService.notify(Localization.lang("Nothing to redo") + '.');
             }
 
-            panel.markChangedOrUnChanged();
+            libraryTab.markChangedOrUnChanged();
         } else {
             LOGGER.debug("No undo/redo action: " + action.name());
         }

@@ -6,15 +6,14 @@
     <id>http://www.zotero.org/styles/international-energy-agency-organisation-for-economic-co-operation-and-development</id>
     <link href="http://www.zotero.org/styles/international-energy-agency-organisation-for-economic-co-operation-and-development" rel="self"/>
     <link href="http://www.zotero.org/styles/deutsche-gesellschaft-fur-psychologie" rel="template"/>
-    <link href="https://www.iea.org/publications/freepublications/publication/iea-oecd-style-guide.html" rel="documentation"/>
+    <link href="https://www.oecd.org/about/publishing/OECD-Style-Guide-Third-Edition.pdf" rel="documentation"/>
     <author>
       <name>Patrick O'Brien</name>
-      <email>obrienpat86@gmail.com</email>
     </author>
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>The IEA-OECD Style Guide: Rules and Conventions, 3rd Edition, style.</summary>
-    <updated>2018-04-04T11:15:18+00:00</updated>
+    <updated>2020-08-30T20:37:14+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="container-contributors">
@@ -40,7 +39,7 @@
   </macro>
   <macro name="author">
     <names variable="author">
-      <name and="text" delimiter-precedes-last="never" initialize-with=". " name-as-sort-order="all"/>
+      <name and="text" delimiter-precedes-last="never" initialize-with=". "/>
       <label form="short" prefix=" (" suffix=")"/>
       <substitute>
         <names variable="editor"/>
@@ -265,7 +264,7 @@
       <group>
         <group delimiter=", ">
           <group delimiter=". ">
-            <text macro="author" suffix="."/>
+            <text macro="author"/>
             <text macro="issued" prefix="(" suffix=")"/>
           </group>
           <text macro="title"/>

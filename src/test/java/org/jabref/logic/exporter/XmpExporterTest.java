@@ -74,7 +74,7 @@ public class XmpExporterTest {
 
         BibEntry entryArmbrust = new BibEntry();
         entryArmbrust.setField(StandardField.AUTHOR, "Michael Armbrust");
-        entryArmbrust.setCiteKey("Armbrust2010");
+        entryArmbrust.setCitationKey("Armbrust2010");
 
         exporter.export(databaseContext, file, encoding, Arrays.asList(entryTuring, entryArmbrust));
 
@@ -102,7 +102,7 @@ public class XmpExporterTest {
                 "      </dc:creator>\n" +
                 "      <dc:relation>\n" +
                 "        <rdf:Bag>\n" +
-                "          <rdf:li>bibtex/bibtexkey/Armbrust2010</rdf:li>\n" +
+                "          <rdf:li>bibtex/citationkey/Armbrust2010</rdf:li>\n" +
                 "        </rdf:Bag>\n" +
                 "      </dc:relation>\n" +
                 "      <dc:format>application/pdf</dc:format>\n" +
@@ -127,7 +127,7 @@ public class XmpExporterTest {
 
         BibEntry entryArmbrust = new BibEntry()
                 .withField(StandardField.AUTHOR, "Michael Armbrust")
-                .withCiteKey("Armbrust2010");
+                .withCitationKey("Armbrust2010");
 
         exporter.export(databaseContext, file, encoding, List.of(entryTuring, entryArmbrust));
 
@@ -167,7 +167,7 @@ public class XmpExporterTest {
                 "      </dc:creator>\n" +
                 "      <dc:relation>\n" +
                 "        <rdf:Bag>\n" +
-                "          <rdf:li>bibtex/bibtexkey/Armbrust2010</rdf:li>\n" +
+                "          <rdf:li>bibtex/citationkey/Armbrust2010</rdf:li>\n" +
                 "        </rdf:Bag>\n" +
                 "      </dc:relation>\n" +
                 "      <dc:format>application/pdf</dc:format>\n" +

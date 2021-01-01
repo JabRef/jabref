@@ -117,7 +117,7 @@ public class LinkedFileHandler {
     }
 
     private String relativize(Path path) {
-        List<Path> fileDirectories = databaseContext.getFileDirectoriesAsPaths(filePreferences);
+        List<Path> fileDirectories = databaseContext.getFileDirectories(filePreferences);
         return FileUtil.relativize(path, fileDirectories).toString();
     }
 

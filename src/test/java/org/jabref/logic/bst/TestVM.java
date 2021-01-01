@@ -366,10 +366,10 @@ public class TestVM {
         vm.run(v);
 
         List<BstEntry> v2 = vm.getEntries();
-        assertEquals(Optional.of("a"), v2.get(0).entry.getCiteKeyOptional());
-        assertEquals(Optional.of("b"), v2.get(1).entry.getCiteKeyOptional());
-        assertEquals(Optional.of("c"), v2.get(2).entry.getCiteKeyOptional());
-        assertEquals(Optional.of("d"), v2.get(3).entry.getCiteKeyOptional());
+        assertEquals(Optional.of("a"), v2.get(0).entry.getCitationKey());
+        assertEquals(Optional.of("b"), v2.get(1).entry.getCitationKey());
+        assertEquals(Optional.of("c"), v2.get(2).entry.getCitationKey());
+        assertEquals(Optional.of("d"), v2.get(3).entry.getCitationKey());
     }
 
     @Test

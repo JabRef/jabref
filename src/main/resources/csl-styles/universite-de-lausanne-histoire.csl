@@ -5,7 +5,7 @@
     <id>http://www.zotero.org/styles/universite-de-lausanne-histoire</id>
     <link href="http://www.zotero.org/styles/universite-de-lausanne-histoire" rel="self"/>
     <link href="http://www.zotero.org/styles/infoclio-fr-smallcaps" rel="template"/>
-    <link href="https://github.com/LausanneCitationStyle/Lausanne" rel="documentation"/>
+    <link href="https://lausannecitationstyle.github.io/support/" rel="documentation"/>
     <author>
       <name>Nicolas Chachereau</name>
       <email>nicolas.chachereau@unil.ch</email>
@@ -35,6 +35,7 @@
       <term name="number-of-volumes" form="short">vol.</term>
       <term name="et-al">et alii</term>
       <term name="issue" form="short">nᵒ</term>
+      <term name="no date" form="short">s.d.</term>
     </terms>
   </locale>
   <citation>
@@ -113,7 +114,7 @@
   </macro>
   <macro name="creator">
     <names variable="author">
-      <name sort-separator=", " name-as-sort-order="all" et-al-min="3" et-al-use-first="1">
+      <name sort-separator=" " name-as-sort-order="all" et-al-min="3" et-al-use-first="1">
         <name-part name="family" font-variant="small-caps"/>
       </name>
       <et-al font-style="italic"/>
@@ -238,7 +239,7 @@
   </macro>
   <macro name="scientific-editor-name">
     <names variable="editor">
-      <name sort-separator=", " name-as-sort-order="all" et-al-min="3" et-al-use-first="1">
+      <name sort-separator=" " name-as-sort-order="all" et-al-min="3" et-al-use-first="1">
         <name-part name="family" font-variant="small-caps"/>
       </name>
       <et-al font-style="italic"/>
@@ -248,7 +249,7 @@
   </macro>
   <macro name="translator">
     <names variable="translator">
-      <name sort-separator=", " name-as-sort-order="all" et-al-min="3" et-al-use-first="1">
+      <name sort-separator=" " name-as-sort-order="all" et-al-min="3" et-al-use-first="1">
         <name-part name="family" font-variant="small-caps"/>
       </name>
       <et-al font-style="italic"/>
@@ -266,7 +267,7 @@
     <choose>
       <if type="chapter paper-conference" match="any">
         <names variable="container-author">
-          <name sort-separator=", " name-as-sort-order="all" et-al-min="3" et-al-use-first="1">
+          <name sort-separator=" " name-as-sort-order="all" et-al-min="3" et-al-use-first="1">
             <name-part name="family" font-variant="small-caps"/>
           </name>
           <et-al font-style="italic"/>
@@ -425,7 +426,7 @@
             <date variable="issued" form="numeric" date-parts="year"/>
           </if>
           <else>
-            <text term="no date" form="short"/>
+            <text term="no date" form="short" prefix=" [" suffix="]"/>
           </else>
         </choose>
       </if>
@@ -435,7 +436,7 @@
             <date variable="issued" form="numeric" date-parts="year-month-day"/>
           </if>
           <else>
-            <text term="no date" form="short"/>
+            <text term="no date" form="short" prefix=" [" suffix="]"/>
           </else>
         </choose>
       </else-if>

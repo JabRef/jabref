@@ -4,7 +4,7 @@ This page lists some software we consider useful.
 
 ## Browser plugins
 
-* [Refined GitHub](https://github.com/sindresorhus/refined-github) - GitHub on stereoids
+* [Refined GitHub](https://github.com/sindresorhus/refined-github) - GitHub on steroids
 * [GitHub Issue Link Status](https://github.com/fregante/github-issue-link-status) - proper coloring of linked issues and PRs.
 * [Codecov Browser Extension](https://github.com/codecov/browser-extension) - displaying code coverage directly when browsing GitHub
 * [Sourcegraph Browser Extension](https://docs.sourcegraph.com/integration/browser_extension) - Navigate through source on github

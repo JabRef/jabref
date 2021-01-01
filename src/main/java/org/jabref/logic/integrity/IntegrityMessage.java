@@ -18,7 +18,7 @@ public final class IntegrityMessage implements Cloneable {
 
     @Override
     public String toString() {
-        return "[" + getEntry().getCiteKeyOptional().orElse("") + "] in " + field.getDisplayName() + ": " + getMessage();
+        return "[" + getEntry().getCitationKey().orElse("") + "] in " + field.getDisplayName() + ": " + getMessage();
     }
 
     public String getMessage() {

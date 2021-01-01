@@ -24,7 +24,7 @@ public class CitationKeyChecker implements EntryChecker {
             return Collections.emptyList();
         }
 
-        if (StringUtil.isBlank(entry.getCiteKeyOptional())) {
+        if (StringUtil.isBlank(entry.getCitationKey())) {
             String authorTitleYear = entry.getAuthorTitleYear(100);
             return Collections.singletonList(new IntegrityMessage(
                     Localization.lang("empty citation key") + ": " + authorTitleYear, entry, InternalField.KEY_FIELD));

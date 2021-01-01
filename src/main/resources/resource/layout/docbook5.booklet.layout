@@ -1,4 +1,4 @@
-<biblioentry xreflabel="\format[Authors(3,LastName,EtAl= et al.)]{\author} (\year)" xml:id="\bibtexkey">
+<biblioentry xreflabel="\format[Authors(3,LastName,EtAl= et al.)]{\author} (\year)" xml:id="\citationkey">
    <authorgroup>
 <!--AUTHORS-->
 \begin{author}\format[CreateDocBook5Authors]{\author}\end{author}

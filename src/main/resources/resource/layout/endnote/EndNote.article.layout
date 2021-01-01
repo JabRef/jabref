@@ -3,23 +3,23 @@
 %A \format[AuthorLastFirst,RemoveBracketsAddComma,AuthorAndsReplacer]{\author}
 %D \year
 %T \format[RemoveLatexCommands]{\title}
-%E 
+%E
 %B \journal
-%C 
+%C
 %I \publisher
 %V \volume
 %6
 %N \number
 %P \format[FormatPagesForHTML]{\pages}
-%& 
-%Y 
-%S 
+%&
+%Y
+%S
 %7
 %8 \month
 %9
-%? 
+%?
 %! \shorttitle
-%Z 
+%Z
 %@ \issn
 %(
 %)
@@ -32,7 +32,7 @@
 %4 \crossref
 %# \owner
 %$ \key
-%F \bibtexkey
+%F \citationkey
 %K \keywords
 %X \abstract
 %Z \note

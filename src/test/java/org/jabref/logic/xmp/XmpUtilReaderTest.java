@@ -77,8 +77,8 @@ class XmpUtilReaderTest {
         String bibString = Resources.toString(XmpUtilShared.class.getResource("article_dublinCore.bib"), StandardCharsets.UTF_8);
         Optional<BibEntry> entryFromBibFile = parser.parseSingleEntry(bibString);
         entryFromBibFile.get().setFiles(Arrays.asList(
-                new LinkedFile("", "paper.pdf", "PDF"),
-                new LinkedFile("", pathPdf.toAbsolutePath().toString(), "PDF"))
+                new LinkedFile("", Path.of("paper.pdf"), "PDF"),
+                new LinkedFile("", pathPdf.toAbsolutePath(), "PDF"))
         );
 
         assertEquals(entryFromBibFile.get(), entry);
@@ -104,7 +104,7 @@ class XmpUtilReaderTest {
         String bibString = Resources.toString(XmpUtilShared.class.getResource("PD_metadata.bib"), StandardCharsets.UTF_8);
         Optional<BibEntry> entryFromBibFile = parser.parseSingleEntry(bibString);
         entryFromBibFile.get().setFiles(Collections.singletonList(
-                new LinkedFile("", pathPdf.toAbsolutePath().toString(), "PDF"))
+                new LinkedFile("", pathPdf.toAbsolutePath(), "PDF"))
         );
 
         assertEquals(entryFromBibFile.get(), entries.get(0));

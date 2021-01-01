@@ -10,7 +10,6 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -159,16 +158,15 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
     }
 
     @Override
-    public List<BibEntry> performSearch(String query) throws FetcherException {
-        List<BibEntry> entryList = new LinkedList<>();
+    public List<BibEntry> performSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
+        List<BibEntry> entryList;
+        String query = complexSearchQuery.toString();
 
-        if (query.isEmpty()) {
+        if (query.isBlank()) {
             return Collections.emptyList();
         } else {
-            String searchTerm = replaceCommaWithAND(query);
-
             // searching for pubmed ids matching the query
-            List<String> idList = getPubMedIdsFromQuery(searchTerm);
+            List<String> idList = getPubMedIdsFromQuery(query);
 
             if (idList.isEmpty()) {
                 LOGGER.info("No results found.");
@@ -186,13 +184,12 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
         }
     }
 
-    private URL createSearchUrl(String term) throws URISyntaxException, MalformedURLException {
-        term = replaceCommaWithAND(term);
+    private URL createSearchUrl(String query) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
         uriBuilder.addParameter("db", "pubmed");
         uriBuilder.addParameter("sort", "relevance");
         uriBuilder.addParameter("retmax", String.valueOf(NUMBER_TO_FETCH));
-        uriBuilder.addParameter("term", term);
+        uriBuilder.addParameter("term", replaceCommaWithAND(query));
         return uriBuilder.build().toURL();
     }
 

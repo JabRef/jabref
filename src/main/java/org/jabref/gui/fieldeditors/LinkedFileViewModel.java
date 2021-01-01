@@ -29,9 +29,9 @@ import org.jabref.gui.externalfiles.FileDownloadTask;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.StandardExternalFileType;
-import org.jabref.gui.filelist.LinkedFileEditDialogView;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.linkedfile.LinkedFileEditDialogView;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
@@ -187,7 +187,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         observables.add(downloadOngoing);
         observables.add(downloadProgress);
         observables.add(isAutomaticallyFound);
-        return observables.toArray(new Observable[observables.size()]);
+        return observables.toArray(new Observable[0]);
     }
 
     public void open() {
@@ -230,7 +230,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
     public void askForNameAndRename() {
         String oldFile = this.linkedFile.getLink();
         Path oldFilePath = Path.of(oldFile);
-        Optional<String> askedFileName = dialogService.showInputDialogWithDefaultAndWait(Localization.lang("Rename file"), Localization.lang("New Filename"), oldFilePath.getFileName().toString());
+        Optional<String> askedFileName = dialogService.showInputDialogWithDefaultAndWait(
+                Localization.lang("Rename file"),
+                Localization.lang("New Filename"),
+                oldFilePath.getFileName().toString());
         askedFileName.ifPresent(this::renameFileToName);
     }
 
@@ -314,14 +317,14 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     /**
-     * Compares suggested filepath of current linkedFile with existing filepath.
+     * Compares suggested directory of current linkedFile with existing filepath directory.
      *
      * @return true if suggested filepath is same as existing filepath.
      */
     public boolean isGeneratedPathSameAsOriginal() {
         Optional<Path> newDir = databaseContext.getFirstExistingFileDir(filePreferences);
 
-        Optional<Path> currentDir = linkedFile.findIn(databaseContext, filePreferences);
+        Optional<Path> currentDir = linkedFile.findIn(databaseContext, filePreferences).map(Path::getParent);
 
         BiPredicate<Path, Path> equality = (fileA, fileB) -> {
             try {
@@ -426,12 +429,12 @@ public class LinkedFileViewModel extends AbstractViewModel {
             URLDownload urlDownload = new URLDownload(linkedFile.getLink());
             BackgroundTask<Path> downloadTask = prepareDownloadTask(targetDirectory.get(), urlDownload);
             downloadTask.onSuccess(destination -> {
-                LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectoriesAsPaths(filePreferences), externalFileTypes);
+                LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectories(filePreferences), externalFileTypes);
 
                 List<LinkedFile> linkedFiles = entry.getFiles();
                 int oldFileIndex = -1;
                 int i = 0;
-                while (i < linkedFiles.size() && oldFileIndex == -1) {
+                while ((i < linkedFiles.size()) && (oldFileIndex == -1)) {
                     LinkedFile file = linkedFiles.get(i);
                     // The file type changes as part of download process (see prepareDownloadTask), thus we only compare by link
                     if (file.getLink().equalsIgnoreCase(linkedFile.getLink())) {
@@ -449,7 +452,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             downloadProgress.bind(downloadTask.workDonePercentageProperty());
             downloadTask.titleProperty().set(Localization.lang("Downloading"));
             downloadTask.messageProperty().set(
-                    Localization.lang("Fulltext for") + ": " + entry.getCiteKeyOptional().orElse(Localization.lang("New entry")));
+                    Localization.lang("Fulltext for") + ": " + entry.getCitationKey().orElse(Localization.lang("New entry")));
             downloadTask.showToUser(true);
             taskExecutor.execute(downloadTask);
         } catch (MalformedURLException exception) {

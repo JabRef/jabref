@@ -80,7 +80,7 @@ class OpenDatabaseTest {
 
         // Entry
         assertEquals(1, db.getEntryCount());
-        assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getField(StandardField.YEAR));
+        assertEquals(Optional.of("2014"), db.getEntryByCitationKey("1").get().getField(StandardField.YEAR));
     }
 
     @Test
@@ -90,7 +90,7 @@ class OpenDatabaseTest {
 
         // Entry
         assertEquals(1, db.getEntryCount());
-        assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getField(StandardField.YEAR));
+        assertEquals(Optional.of("2014"), db.getEntryByCitationKey("1").get().getField(StandardField.YEAR));
     }
 
     @Test
@@ -100,7 +100,7 @@ class OpenDatabaseTest {
 
         // Entry
         assertEquals(1, db.getEntryCount());
-        assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getField(StandardField.YEAR));
+        assertEquals(Optional.of("2014"), db.getEntryByCitationKey("1").get().getField(StandardField.YEAR));
     }
 
     /**
@@ -118,6 +118,6 @@ class OpenDatabaseTest {
         assertEquals(1, entries.size());
 
         BibEntry entry = entries.iterator().next();
-        assertEquals(Optional.of("testArticle"), entry.getCiteKeyOptional());
+        assertEquals(Optional.of("testArticle"), entry.getCitationKey());
     }
 }

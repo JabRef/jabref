@@ -11,11 +11,12 @@ public enum KeyBindingCategory {
     VIEW(Localization.lang("View")),
     BIBTEX(BibDatabaseMode.BIBTEX.getFormattedName()),
     QUALITY(Localization.lang("Quality")),
-    TOOLS(Localization.lang("Tools"));
+    TOOLS(Localization.lang("Tools")),
+    EDITOR(Localization.lang("Text editor"));
 
     private final String name;
 
-    private KeyBindingCategory(String name) {
+    KeyBindingCategory(String name) {
         this.name = name;
     }
 

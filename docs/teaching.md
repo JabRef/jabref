@@ -2,7 +2,7 @@
 
 With JabRef students can level-up their coding and GitHub skills. When taking part in JabRef development, one will learn modern Java coding practices, how code reviews work and how to properly address reviewing feedback.
 
-JabRef tries to achieve high code quality. This ultimately leads to improved software engineering knowledge of contributors. After contributing for JabRef, both coding and general software engienering skills will have increased. Our [development strategy](getting-into-the-code/development-strategy.md) provides more details.
+JabRef tries to achieve high code quality. This ultimately leads to improved software engineering knowledge of contributors. After contributing for JabRef, both coding and general software engineering skills will have increased. Our [development strategy](getting-into-the-code/development-strategy.md) provides more details.
 
 We recommend to start early and constantly, since students working earlier and more often produce projects that are more correct and completed earlier at the same overall invested time [1](teaching.md#Ayaankazerouni).
 
@@ -17,8 +17,8 @@ We recommend to start early and constantly, since students working earlier and m
    * Feature Board: [https://github.com/JabRef/jabref/projects/7](https://github.com/JabRef/jabref/projects/7)
      * This is a general feature board. Recommended, if the board above is empty or you did not find something suitable
    * Bug Board: [https://github.com/JabRef/jabref/projects/5](https://github.com/JabRef/jabref/projects/5)
-     * This is an excellent board to find issues training the maintainance knowledge which is essential for industry work
-   * General "good first issues". The JabRef team tags issues as [good first issues](https://github.com/jabref/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to indicate open tasks offering a good start into the JabRef code. These issues are more a list of random bugs and features. For a more structured comparison of the opened tasks, we recommend the projectd boards listed above.
+     * This is an excellent board to find issues training the maintenance knowledge which is essential for industry work
+   * General "good first issues". The JabRef team tags issues as [good first issues](https://github.com/jabref/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to indicate open tasks offering a good start into the JabRef code. These issues are more a list of random bugs and features. For a more structured comparison of the opened tasks, we recommend the project boards listed above.
 5. Be aware that the difficulty of bugs and feature vary. A task should be chosen with care. The JabRef team can help here: The majority of the team has experiences in teaching
 6. Get in touch with the JabRef team to discuss details. We offer email, skype, [gitter.im](https://gitter.im/JabRef/jabref), discord. Get in touch with [@koppor](https://github.com/koppor/) to find the right channel and to start forming the success of your course.
 
@@ -38,7 +38,7 @@ The process for accepting contributions is as below. The syntax is [BPMN](https:
 
 In short, the contribution is **reviewed by two JabRef developers**. Typically, they have constructive feedback on their contribution. This means, that the contributors get comments on their contribution enabling them to level-up their coding skill. Incorporating improvements takes time, too. The benefit is two-fold: a\) contributors improve their coding skills and b\) JabRef's code quality improves. All in all, we ask to respect the aims of the JabRef team and to reserve time to incorporate the reviewer's comments.
 
-GitHub describes that in their page [Unterstanding the GitHub flow](https://guides.github.com/introduction/flow/):
+GitHub describes that in their page [Understanding the GitHub flow](https://guides.github.com/introduction/flow/):
 
 [![GitHub flow](.gitbook/assets/github-flow%20%281%29.png)](https://github.com/JabRef/jabref/tree/ed275b62fe7dac57a086e43802e36deb93c63e31/docs/images/github-flow.png)
 

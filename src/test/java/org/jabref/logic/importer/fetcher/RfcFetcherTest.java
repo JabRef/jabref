@@ -39,7 +39,7 @@ public class RfcFetcherTest {
         bibEntry.setField(StandardField.YEAR, "1996");
         bibEntry.setField(StandardField.MONTH, "#may#");
         bibEntry.setField(StandardField.ABSTRACT, "The Hypertext Transfer Protocol (HTTP) is an application-level protocol with the lightness and speed necessary for distributed, collaborative, hypermedia information systems. This memo provides information for the Internet community. This memo does not specify an Internet standard of any kind.");
-        bibEntry.setCiteKey("rfc1945");
+        bibEntry.setCitationKey("rfc1945");
     }
 
     @Test

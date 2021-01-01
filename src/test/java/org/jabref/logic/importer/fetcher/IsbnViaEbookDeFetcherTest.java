@@ -24,7 +24,7 @@ public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
     public void setUp() {
         bibEntry = new BibEntry();
         bibEntry.setType(StandardEntryType.Book);
-        bibEntry.setCiteKey("9780134685991");
+        bibEntry.setCitationKey("9780134685991");
         bibEntry.setField(StandardField.TITLE, "Effective Java");
         bibEntry.setField(StandardField.PUBLISHER, "Addison Wesley");
         bibEntry.setField(StandardField.YEAR, "2018");
@@ -62,7 +62,7 @@ public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
     public void authorsAreCorrectlyFormatted() throws Exception {
         BibEntry bibEntry = new BibEntry();
         bibEntry.setType(StandardEntryType.Book);
-        bibEntry.setCiteKey("9783662585856");
+        bibEntry.setCitationKey("9783662585856");
         bibEntry.setField(StandardField.TITLE, "Fundamentals of Business Process Management");
         bibEntry.setField(StandardField.PUBLISHER, "Springer Berlin Heidelberg");
         bibEntry.setField(StandardField.YEAR, "2019");

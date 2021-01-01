@@ -169,7 +169,7 @@
             <else>
               <text variable="number"/>
             </else>
-          </choose>    
+          </choose>
         </else-if>
         <else-if type="dataset interview manuscript pamphlet personal_communication post post-weblog speech webpage">
           <!-- unpublished materials; guidelines call for 'enough information to be retrievable' -->

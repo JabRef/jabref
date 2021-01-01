@@ -71,7 +71,7 @@
                         </tooltip>
                     </RadioButton>
                     <RadioButton fx:id="keywordsRadioButton" toggleGroup="$type" wrapText="true"
-                                 text="%Searching for keywords">
+                                 text="%Searching for a keyword">
                         <tooltip>
                             <Tooltip text="%Dynamically group entries by searching a field for a keyword"/>
                         </tooltip>
@@ -107,8 +107,8 @@
                             <TextField fx:id="keywordGroupSearchTerm"/>
                         </VBox>
                         <HBox spacing="10.0">
-                            <CheckBox fx:id="keywordGroupCaseSensitive" text="Case sensitive"/>
-                            <CheckBox fx:id="keywordGroupRegex" text="Regular expression"/>
+                            <CheckBox fx:id="keywordGroupCaseSensitive" text="%Case sensitive"/>
+                            <CheckBox fx:id="keywordGroupRegex" text="%Regular expression"/>
                         </HBox>
                     </VBox>
                     <VBox visible="${searchRadioButton.selected}" spacing="10.0">
@@ -117,13 +117,13 @@
                             <TextField fx:id="searchGroupSearchTerm"/>
                         </VBox>
                         <HBox spacing="10.0">
-                            <CheckBox fx:id="searchGroupCaseSensitive" text="Case sensitive"/>
-                            <CheckBox fx:id="searchGroupRegex" text="Regular expression"/>
+                            <CheckBox fx:id="searchGroupCaseSensitive" text="%Case sensitive"/>
+                            <CheckBox fx:id="searchGroupRegex" text="%Regular expression"/>
                         </HBox>
                     </VBox>
                     <VBox visible="${autoRadioButton.selected}" spacing="10.0">
                         <RadioButton fx:id="autoGroupKeywordsOption" toggleGroup="$autoGroupOptions"
-                                     text="Generate groups from keywords in a BibTeX field"/>
+                                     text="%Generate groups from keywords in the following field"/>
                         <VBox spacing="10.0">
                             <padding>
                                 <Insets left="20.0"/>
@@ -154,7 +154,7 @@
                             </HBox>
                         </VBox>
                         <RadioButton fx:id="autoGroupPersonsOption" toggleGroup="$autoGroupOptions"
-                                     text="Generate groups for author last names"/>
+                                     text="%Generate groups for author last names"/>
                         <VBox>
                             <padding>
                                 <Insets left="20.0"/>

@@ -55,7 +55,7 @@ public class Benchmarks {
         Random randomizer = new Random();
         for (int i = 0; i < 1000; i++) {
             BibEntry entry = new BibEntry();
-            entry.setCiteKey("id" + i);
+            entry.setCitationKey("id" + i);
             entry.setField(StandardField.TITLE, "This is my title " + i);
             entry.setField(StandardField.AUTHOR, "Firstname Lastname and FirstnameA LastnameA and FirstnameB LastnameB" + i);
             entry.setField(StandardField.JOURNAL, "Journal Title " + i);

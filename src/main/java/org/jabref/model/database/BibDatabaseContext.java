@@ -27,9 +27,9 @@ public class BibDatabaseContext {
     private MetaData metaData;
 
     /**
-     * The file where this database was last saved to.
+     * The path where this database was last saved to.
      */
-    private Optional<Path> file;
+    private Optional<Path> path;
 
     private DatabaseSynchronizer dbmsSynchronizer;
     private CoarseChangeFilter dbmsListener;
@@ -47,17 +47,17 @@ public class BibDatabaseContext {
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
         this.location = DatabaseLocation.LOCAL;
-        this.file = Optional.empty();
+        this.path = Optional.empty();
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path file) {
-        this(database, metaData, file, DatabaseLocation.LOCAL);
+    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path path) {
+        this(database, metaData, path, DatabaseLocation.LOCAL);
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path file, DatabaseLocation location) {
+    public BibDatabaseContext(BibDatabase database, MetaData metaData, Path path, DatabaseLocation location) {
         this(database, metaData);
         Objects.requireNonNull(location);
-        this.file = Optional.ofNullable(file);
+        this.path = Optional.ofNullable(path);
 
         if (location == DatabaseLocation.LOCAL) {
             convertToLocalDatabase();
@@ -73,20 +73,20 @@ public class BibDatabaseContext {
     }
 
     public void setDatabasePath(Path file) {
-        this.file = Optional.ofNullable(file);
+        this.path = Optional.ofNullable(file);
     }
 
     /**
-     * Get the file where this database was last saved to or loaded from, if any.
+     * Get the path where this database was last saved to or loaded from, if any.
      *
-     * @return Optional of the relevant File, or Optional.empty() if none is defined.
+     * @return Optional of the relevant Path, or Optional.empty() if none is defined.
      */
     public Optional<Path> getDatabasePath() {
-        return file;
+        return path;
     }
 
-    public void clearDatabaseFile() {
-        this.file = Optional.empty();
+    public void clearDatabasePath() {
+        this.path = Optional.empty();
     }
 
     public BibDatabase getDatabase() {
@@ -120,7 +120,7 @@ public class BibDatabaseContext {
      *
      * @param preferences The fileDirectory preferences
      */
-    public List<Path> getFileDirectoriesAsPaths(FilePreferences preferences) {
+    public List<Path> getFileDirectories(FilePreferences preferences) {
         List<Path> fileDirs = new ArrayList<>();
 
         // 1. Metadata user-specific directory
@@ -135,19 +135,16 @@ public class BibDatabaseContext {
         preferences.getFileDirectory().ifPresent(fileDirs::add);
 
         // 4. BIB file directory
-        getDatabasePath().ifPresent(dbPath -> {
-            Objects.requireNonNull(dbPath, "dbPath is null");
-            Path parentPath = dbPath.getParent();
-            if (parentPath == null) {
-                parentPath = Path.of(System.getProperty("user.dir"));
-            }
-            Objects.requireNonNull(parentPath, "BibTeX database parent path is null");
-
-            // Check if we should add it as primary file dir (first in the list) or not:
-            if (preferences.isBibLocationAsPrimary()) {
+        if (preferences.shouldStoreFilesRelativeToBib()) {
+            getDatabasePath().ifPresent(dbPath -> {
+                Path parentPath = dbPath.getParent();
+                if (parentPath == null) {
+                    parentPath = Path.of(System.getProperty("user.dir"));
+                }
+                Objects.requireNonNull(parentPath, "BibTeX database parent path is null");
                 fileDirs.add(0, parentPath);
-            }
-        });
+            });
+        }
 
         return fileDirs.stream().map(Path::toAbsolutePath).collect(Collectors.toList());
     }
@@ -159,17 +156,7 @@ public class BibDatabaseContext {
      * @return Optional of Path
      */
     public Optional<Path> getFirstExistingFileDir(FilePreferences preferences) {
-        return getFileDirectoriesAsPaths(preferences).stream().filter(Files::exists).findFirst();
-    }
-
-    /**
-     * @deprecated use {@link #getFileDirectoriesAsPaths(FilePreferences)} instead
-     */
-    @Deprecated
-    public List<String> getFileDirectories(FilePreferences preferences) {
-        return getFileDirectoriesAsPaths(preferences).stream()
-                                                     .map(directory -> directory.toAbsolutePath().toString())
-                                                     .collect(Collectors.toList());
+        return getFileDirectories(preferences).stream().filter(Files::exists).findFirst();
     }
 
     private Path getFileDirectoryPath(String directoryName) {
@@ -207,7 +194,7 @@ public class BibDatabaseContext {
     @Override
     public String toString() {
         return "BibDatabaseContext{" +
-                "file=" + file +
+                "path=" + path +
                 ", location=" + location +
                 '}';
     }

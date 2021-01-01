@@ -1,5 +1,6 @@
 package org.jabref.gui.preview;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Base64;
 import java.util.Objects;
@@ -67,6 +68,14 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                     "function(){function n(e){t(this,n),this.ctx=e,this.ie=!1;var r=window.navigator.userAgent;(r.indexOf(\"MSIE\")>-1||r.indexOf(\"Trident\")>-1)&&(this.ie=!0)}return r(n,[{key:\"log\",value:function(t){var n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:\"debug\",r=this.opt.log;this.opt.debug&&\"object\"===e(r)&&\"function\"==typeof r[n]&&r[n](\"mark.js: \".concat(t))}},{key:\"getSeparatedKeywords\",value:function(e){var t=this,n=[];return e.forEach(function(e){t.opt.separateWordSearch?e.split(\" \").forEach(function(e){e.trim()&&-1===n.indexOf(e)&&n.push(e)}):e.trim()&&-1===n.indexOf(e)&&n.push(e)}),{keywords:n.sort(function(e,t){return t.length-e.length}),length:n.length}}},{key:\"isNumeric\",value:function(e){return Number(parseFloat(e))==e}},{key:\"checkRanges\",value:function(e){var t=this;if(!Array.isArray(e)||\"[object Object]\"!==Object.prototype.toString.call(e[0]))return this.log(\"markRanges() will only accept an array of objects\"),this.opt.noMatch(e),[];var n=[],r=0;return e.sort(function(e,t){return e.start-t.start}).forEach(function(e){var o=t.callNoMatchOnInvalidRanges(e,r),i=o.start,a=o.end;o.valid&&(e.start=i,e.length=a-i,n.push(e),r=a)}),n}},{key:\"callNoMatchOnInvalidRanges\",value:function(e,t){var n,r,o=!1;return e&&void 0!==e.start?(r=(n=parseInt(e.start,10))+parseInt(e.length,10),this.isNumeric(e.start)&&this.isNumeric(e.length)&&r-t>0&&r-n>0?o=!0:(this.log(\"Ignoring invalid or overlapping range: \"+\"\".concat(JSON.stringify(e))),this.opt.noMatch(e))):(this.log(\"Ignoring invalid range: \".concat(JSON.stringify(e))),this.opt.noMatch(e)),{start:n,end:r,valid:o}}},{key:\"checkWhitespaceRanges\",value:function(e,t,n){var r,o=!0,i=n.length,a=t-i,s=parseInt(e.start,10)-a;return(r=(s=s>i?i:s)+parseInt(e.length,10))>i&&(r=i,this.log(\"End range automatically set to the max value of \".concat(i))),s<0||r-s<0||s>i||r>i?(o=!1,this.log(\"Invalid range: \".concat(JSON.stringify(e))),this.opt.noMatch(e)):\"\"===n.substring(s,r).replace(/\\s+/g,\"\")&&(o=!1,this.log(\"Skipping whitespace only range: \"+JSON.stringify(e)),this.opt.noMatch(e)),{start:s,end:r,valid:o}}},{key:\"getTextNodes\",value:function(e){var t=this,n=\"\",r=[];this.iterator.forEachNode(NodeFilter.SHOW_TEXT,function(e){r.push({start:n.length,end:(n+=e.textContent).length,node:e})},function(e){return t.matchesExclude(e.parentNode)?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT},function(){e({value:n,nodes:r})})}},{key:\"matchesExclude\",value:function(e){return i.matches(e,this.opt.exclude.concat([\"script\",\"style\",\"title\",\"head\",\"html\"]))}},{key:\"wrapRangeInTextNode\",value:function(e,t,n){var r=this.opt.element?this.opt.element:\"mark\",o=e.splitText(t),i=o.splitText(n-t),a=document.createElement(r);return a.setAttribute(\"data-markjs\",\"true\"),this.opt.className&&a.setAttribute(\"class\",this.opt.className),a.textContent=o.textContent,o.parentNode.replaceChild(a,o),i}},{key:\"wrapRangeInMappedTextNode\",value:function(e,t,n,r,o){var i=this;e.nodes.every(function(a,s){var c=e.nodes[s+1];if(void 0===c||c.start>t){if(!r(a.node))return!1;var u=t-a.start,l=(n>a.end?a.end:n)-a.start,h=e.value.substr(0,a.start),f=e.value.substr(l+a.start);if(a.node=i.wrapRangeInTextNode(a.node,u,l),e.value=h+f,e.nodes.forEach(function(t,n){n>=s&&(e.nodes[n].start>0&&n!==s&&(e.nodes[n].start-=l),e.nodes[n].end-=l)}),n-=l,o(a.node.previousSibling,a.start),!(n>a.end))return!1;t=a.end}return!0})}},{key:\"wrapGroups\",value:function(e,t,n,r){return r((e=this.wrapRangeInTextNode(e,t,t+n)).previousSibling),e}},{key:\"separateGroups\",value:function(e,t,n,r,o){for(var i=t.length,a=1;a<i;a++){var s=e.textContent.indexOf(t[a]);t[a]&&s>-1&&r(t[a],e)&&(e=this.wrapGroups(e,s,t[a].length,o))}return e}},{key:\"wrapMatches\",value:function(e,t,n,r,o){var i=this,a=0===t?0:t+1;this.getTextNodes(function(t){t.nodes.forEach(function(t){var o;for(t=t.node;null!==(o=e.exec(t.textContent))&&\"\"!==o[a];){if(i.opt.separateGroups)t=i.separateGroups(t,o,a,n,r);else{if(!n(o[a],t))continue;var s=o.index;if(0!==a)for(var c=1;c<a;c++)s+=o[c].length;t=i.wrapGroups(t,s,o[a].length,r)}e.lastIndex=0}}),o()})}},{key:\"wrapMatchesAcrossElements\",value:function(e,t,n,r,o){var i=this,a=0===t?0:t+1;this.getTextNodes(function(t){for(var s;null!==(s=e.exec(t.value))&&\"\"!==s[a];){var c=s.index;if(0!==a)for(var u=1;u<a;u++)c+=s[u].length;var l=c+s[a].length;i.wrapRangeInMappedTextNode(t,c,l,function(e){return n(s[a],e)},function(t,n){e.lastIndex=n,r(t)})}o()})}},{key:\"wrapRangeFromIndex\",value:function(e,t,n,r){var o=this;this.getTextNodes(function(i){var a=i.value.length;e.forEach(function(e,r){var s=o.checkWhitespaceRanges(e,a,i.value),c=s.start,u=s.end;s.valid&&o.wrapRangeInMappedTextNode(i,c,u,function(n){return t(n,e,i.value.substring(c,u),r)},function(t){n(t,e)})}),r()})}},{key:\"unwrapMatches\",value:function(e){for(var t=e.parentNode,n=document.createDocumentFragment();e.firstChild;)n.appendChild(e.removeChild(e.firstChild));t.replaceChild(n,e),this.ie?this.normalizeTextNode(t):t.normalize()}},{key:\"normalizeTextNode\",value:function(e){if(e){if(3===e.nodeType)for(;e.nextSibling&&3===e.nextSibling.nodeType;)e.nodeValue+=e.nextSibling.nodeValue,e.parentNode.removeChild(e.nextSibling);else this.normalizeTextNode(e.firstChild);this.normalizeTextNode(e.nextSibling)}}},{key:\"markRegExp\",value:function(e,t){var n=this;this.opt=t,this.log('Searching with expression \"'.concat(e,'\"'));var r=0,o=\"wrapMatches\";this.opt.acrossElements&&(o=\"wrapMatchesAcrossElements\"),this[o](e,this.opt.ignoreGroups,function(e,t){return n.opt.filter(t,e,r)},function(e){r++,n.opt.each(e)},function(){0===r&&n.opt.noMatch(e),n.opt.done(r)})}},{key:\"mark\",value:function(e,t){var n=this;this.opt=t;var r=0,o=\"wrapMatches\",i=this.getSeparatedKeywords(\"string\"==typeof e?[e]:e),s=i.keywords,c=i.length;this.opt.acrossElements&&(o=\"wrapMatchesAcrossElements\"),0===c?this.opt.done(r):function e(t){var i=new a(n.opt).create(t),u=0;n.log('Searching with expression \"'.concat(i,'\"')),n[o](i,1,function(e,o){return n.opt.filter(o,t,r,u)},function(e){u++,r++,n.opt.each(e)},function(){0===u&&n.opt.noMatch(t),s[c-1]===t?n.opt.done(r):e(s[s.indexOf(t)+1])})}(s[0])}},{key:\"markRanges\",value:function(e,t){var n=this;this.opt=t;var r=0,o=this.checkRanges(e);o&&o.length?(this.log(\"Starting to mark with the following ranges: \"+JSON.stringify(o)),this.wrapRangeFromIndex(o,function(e,t,r,o){return n.opt.filter(e,t,r,o)},function(e,t){r++,n.opt.each(e,t)},function(){n.opt.done(r)})):this.opt.done(r)}},{key:\"unmark\",value:function(e){var t=this;this.opt=e;var n=this.opt.element?this.opt.element:\"*\";n+=\"[data-markjs]\",this.opt.className&&(n+=\".\".concat(this.opt.className)),this.log('Removal selector \"'.concat(n,'\"')),this.iterator.forEachNode(NodeFilter.SHOW_ELEMENT,function(e){t.unwrapMatches(e)},function(e){var r=i.matches(e,n),o=t.matchesExclude(e);return!r||o?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT},this.opt.done)}},{key:\"opt\",set:function(e){this._opt=o({},{element:\"\",className:\"\",exclude:[],iframes:!1,iframesTimeout:5e3,separateWordSearch:!0,acrossElements:!1,ignoreGroups:0,each:function(){},noMatch:function(){},filter:function(){return!0},done:function(){},debug:!1,log:window.console},e)},get:function(){return this._opt}},{key:\"iterator\",get:function(){return new i(this.ctx,this.opt.iframes,this.opt.exclude,this.opt.iframesTimeout)}}]),n}();return function(e){var t=this,n=new s(e);return this.mark=function(e,r){return n.mark(e,r),t},this.markRegExp=function(e,r){return n.markRegExp(e,r),t},this.markRanges=function(e,r){return n.markRanges(e,r),t},this.unmark=function(e){return n.unmark(e),t},this}});\n" +
                     "   </script>\n" +
                     "</head>";
+    private static final String JS_MARK_REG_EXP_CALLBACK = "" +
+            "{done: function(){" +
+            "    markInstance.markRegExp(%s);}" +
+            "}";
+    private static final String JS_UNMARK_WITH_CALLBACK = "" +
+            "var markInstance = new Mark(document.getElementById(\"content\"));" +
+            "markInstance.unmark(%s);";
+    private static final Pattern UNESCAPED_FORWARD_SLASH = Pattern.compile("\"(?<!\\\\\\\\)/\"");
 
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
@@ -81,10 +90,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private Optional<BibEntry> entry = Optional.empty();
     private Optional<Pattern> searchHighlightPattern = Optional.empty();
 
-    private BibDatabaseContext database;
+    private final BibDatabaseContext database;
     private boolean registered;
 
-    private ChangeListener<Optional<SearchQuery>> listener = (queryObservable, queryOldValue, queryNewValue) -> {
+    private final ChangeListener<Optional<SearchQuery>> listener = (queryObservable, queryOldValue, queryNewValue) -> {
         searchHighlightPattern = queryNewValue.flatMap(SearchQuery::getJavaScriptPatternForWords);
         highlightSearchPattern();
     };
@@ -95,7 +104,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     public PreviewViewer(BibDatabaseContext database, DialogService dialogService, StateManager stateManager) {
         this.database = Objects.requireNonNull(database);
         this.dialogService = dialogService;
-        this.clipBoardManager = Globals.clipboardManager;
+        this.clipBoardManager = Globals.getClipboardManager();
 
         setFitToHeight(true);
         setFitToWidth(true);
@@ -119,33 +128,44 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     public void setTheme(Theme theme) {
         if (theme.getType() == Theme.Type.DARK) {
             // We need to load the css file manually, due to a bug in the jdk
-            // TODO: Remove this workaround as soon as https://github.com/openjdk/jfx/pull/22 is merged
+            // https://bugs.openjdk.java.net/browse/JDK-8240969
+            // TODO: Remove this workaround as soon as openjfx 16 is released
             URL url = JabRefFrame.class.getResource(theme.getPath().getFileName().toString());
             String dataUrl = "data:text/css;charset=utf-8;base64," +
                     Base64.getEncoder().encodeToString(StringUtil.getResourceFileAsString(url).getBytes());
 
             previewView.getEngine().setUserStyleSheetLocation(dataUrl);
+        } else if (theme.getType() != Theme.Type.LIGHT) {
+            try {
+                previewView.getEngine().setUserStyleSheetLocation(theme.getPath().toUri().toURL().toExternalForm());
+            } catch (MalformedURLException ex) {
+                LOGGER.error("Cannot set custom theme, invalid url", ex);
+            }
         }
     }
 
     private void highlightSearchPattern() {
+        String callbackForUnmark = "";
         if (searchHighlightPattern.isPresent()) {
-            String pattern = searchHighlightPattern.get().pattern();
-
-            previewView.getEngine().executeScript(
-                    "var markInstance = new Mark(document.getElementById(\"content\"));" +
-                            "markInstance.unmark({" +
-                            "  done: function(){" +
-                            "    markInstance.markRegExp(/" + pattern + "/gmi);" +
-                            "    }" +
-                            "  });"
-            );
-        } else {
-            previewView.getEngine().executeScript(
-                    "var markInstance = new Mark(document.getElementById(\"content\"));" +
-                            "markInstance.unmark()"
-            );
+            String javaScriptRegex = createJavaScriptRegex(searchHighlightPattern.get());
+            callbackForUnmark = String.format(JS_MARK_REG_EXP_CALLBACK, javaScriptRegex);
         }
+        String unmarkInstance = String.format(JS_UNMARK_WITH_CALLBACK, callbackForUnmark);
+        previewView.getEngine().executeScript(unmarkInstance);
+    }
+
+    /**
+     * Returns the String representation of a JavaScript regex object. The method does not take into account differences between the regex implementations in Java and JavaScript.
+     *
+     * @param regex Java regex to print as a JavaScript regex
+     * @return JavaScript regex object
+     */
+    private static String createJavaScriptRegex(Pattern regex) {
+        String pattern = regex.pattern();
+        // Create a JavaScript regular expression literal (https://ecma-international.org/ecma-262/10.0/index.html#sec-literals-regular-expression-literals)
+        // Forward slashes are reserved to delimit the regular expression body. Hence, they must be escaped.
+        pattern = UNESCAPED_FORWARD_SLASH.matcher(pattern).replaceAll("\\\\/");
+        return "/" + pattern + "/gmi";
     }
 
     public void setLayout(PreviewLayout newLayout) {
@@ -171,7 +191,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private void update() {
-        if (entry.isEmpty() || layout == null) {
+        if (entry.isEmpty() || (layout == null)) {
             // Nothing to do
             return;
         }
@@ -180,7 +200,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
         BackgroundTask
                 .wrap(() -> layout.generatePreview(entry.get(), database.getDatabase()))
-                .onRunning(() -> setPreviewText("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) + ": " + layout.getName() + " ..." + "</i>"))
+                .onRunning(() -> setPreviewText("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) + ": " + layout.getDisplayName() + " ..." + "</i>"))
                 .onSuccess(this::setPreviewText)
                 .onFailure(exception -> {
                     LOGGER.error("Error while generating citation style", exception);
@@ -206,7 +226,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
         BackgroundTask
                 .wrap(() -> {
-                    job.getJobSettings().setJobName(entry.flatMap(BibEntry::getCiteKeyOptional).orElse("NO ENTRY"));
+                    job.getJobSettings().setJobName(entry.flatMap(BibEntry::getCitationKey).orElse("NO ENTRY"));
                     previewView.getEngine().print(job);
                     job.endJob();
                 })
@@ -215,7 +235,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     public void copyPreviewToClipBoard() {
-        StringBuilder previewStringContent = new StringBuilder();
         Document document = previewView.getEngine().getDocument();
 
         ClipboardContent content = new ClipboardContent();

@@ -36,7 +36,7 @@ public class DiVATest {
     public void testPerformSearchById() throws Exception {
         BibEntry entry = new BibEntry();
         entry.setType(StandardEntryType.Article);
-        entry.setCiteKey("Gustafsson260746");
+        entry.setCitationKey("Gustafsson260746");
         entry.setField(StandardField.AUTHOR, "Gustafsson, Oscar");
         entry.setField(StandardField.INSTITUTION, "Linköping University, The Institute of Technology");
         entry.setField(StandardField.JOURNAL,

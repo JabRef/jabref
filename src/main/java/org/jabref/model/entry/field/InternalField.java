@@ -10,7 +10,7 @@ import java.util.Set;
  * JabRef internal fields. These are not normal fields but mostly place holders with special functions.
  */
 public enum InternalField implements Field {
-    KEY_FIELD("bibtexkey"),
+    KEY_FIELD("citationkey"),
     /**
      * field which indicates the entrytype
      */
@@ -37,6 +37,11 @@ public enum InternalField implements Field {
     }
 
     public static Optional<InternalField> fromName(String name) {
+        if (name.equalsIgnoreCase("bibtexkey")) {
+            // For backwards compatibility
+            return Optional.of(InternalField.KEY_FIELD);
+        }
+
         return Arrays.stream(InternalField.values())
                      .filter(field -> field.getName().equalsIgnoreCase(name))
                      .findAny();

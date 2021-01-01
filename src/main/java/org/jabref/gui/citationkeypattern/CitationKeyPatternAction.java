@@ -18,6 +18,6 @@ public class CitationKeyPatternAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        new CitationKeyPatternDialog(frame.getCurrentBasePanel()).showAndWait();
+        new CitationKeyPatternDialog(frame.getCurrentLibraryTab()).showAndWait();
     }
 }

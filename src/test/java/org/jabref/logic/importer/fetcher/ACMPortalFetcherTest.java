@@ -34,7 +34,7 @@ class ACMPortalFetcherTest {
     @Test
     void searchByQueryFindsEntry() throws Exception {
         BibEntry expected = new BibEntry(StandardEntryType.InProceedings);
-        expected.setCiteKey("Olsson:2017:RCC:3129790.3129810");
+        expected.setCitationKey("Olsson:2017:RCC:3129790.3129810");
         expected.setField(new UnknownField("acmid"), "3129810");
         expected.setField(StandardField.ADDRESS, "New York, NY, USA");
         expected.setField(StandardField.AUTHOR, "Olsson, Tobias and Ericsson, Morgan and Wingkvist, Anna");

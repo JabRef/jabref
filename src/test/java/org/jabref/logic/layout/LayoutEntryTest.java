@@ -41,7 +41,7 @@ public class LayoutEntryTest {
         mBTE.setField(StandardField.KEYWORDS, "android, mobile devices, security");
         mBTE.setField(new UnknownField("posted-at"), "2010-08-11 15:00:49");
         mBTE.setField(StandardField.LOCATION, "Dublin, Ireland");
-        mBTE.setCiteKey("chaudhuri-plas09");
+        mBTE.setCitationKey("chaudhuri-plas09");
         mBTE.setField(StandardField.PAGES, "1--7");
         mBTE.setField(StandardField.BOOKTITLE, "PLAS '09: Proceedings of the ACM SIGPLAN Fourth Workshop on Programming Languages and Analysis for Security");
         mBTE.setField(new UnknownField("citeulike-article-id"), "7615801");

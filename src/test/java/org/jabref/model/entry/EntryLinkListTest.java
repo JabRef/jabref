@@ -33,7 +33,7 @@ public class EntryLinkListTest {
 
     private BibEntry create(String citeKey) {
         BibEntry entry = new BibEntry();
-        entry.setCiteKey(citeKey);
+        entry.setCitationKey(citeKey);
         database.insertEntry(entry);
         return entry;
     }
@@ -73,7 +73,7 @@ public class EntryLinkListTest {
 
     private void assertSourceCrossrefsTarget(BibEntry target, BibEntry source) {
         Optional<String> sourceCrossref = source.getField(StandardField.CROSSREF);
-        Optional<String> targetCiteKey = target.getCiteKeyOptional();
+        Optional<String> targetCiteKey = target.getCitationKey();
         assertEquals(sourceCrossref, targetCiteKey);
     }
 }

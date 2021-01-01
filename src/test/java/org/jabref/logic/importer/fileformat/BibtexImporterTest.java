@@ -51,13 +51,13 @@ public class BibtexImporterTest {
 
         for (BibEntry entry : bibEntries) {
 
-            if (entry.getCiteKeyOptional().get().equals("aksin")) {
+            if (entry.getCitationKey().get().equals("aksin")) {
                 assertEquals(
                         Optional.of(
                                 "Aks{\\i}n, {\\\"O}zge and T{\\\"u}rkmen, Hayati and Artok, Levent and {\\c{C}}etinkaya, "
                                         + "Bekir and Ni, Chaoying and B{\\\"u}y{\\\"u}kg{\\\"u}ng{\\\"o}r, Orhan and {\\\"O}zkal, Erhan"),
                         entry.getField(StandardField.AUTHOR));
-                assertEquals(Optional.of("aksin"), entry.getCiteKeyOptional());
+                assertEquals(Optional.of("aksin"), entry.getCitationKey());
                 assertEquals(Optional.of("2006"), entry.getField(StandardField.DATE));
                 assertEquals(Optional.of("Effect of immobilization on catalytic characteristics"), entry.getField(new UnknownField("indextitle")));
                 assertEquals(Optional.of("#jomch#"), entry.getField(StandardField.JOURNAL));
@@ -68,26 +68,26 @@ public class BibtexImporterTest {
                                         + "carbenes in {Mizoroki-Heck} reactions"),
                         entry.getField(StandardField.TITLE));
                 assertEquals(Optional.of("691"), entry.getField(StandardField.VOLUME));
-            } else if (entry.getCiteKeyOptional().get().equals("stdmodel")) {
+            } else if (entry.getCitationKey().get().equals("stdmodel")) {
                 assertEquals(Optional
                                 .of("A \\texttt{set} with three members discussing the standard model of particle physics. "
                                         + "The \\texttt{crossref} field in the \\texttt{@set} entry and the \\texttt{entryset} field in "
                                         + "each set member entry is needed only when using BibTeX as the backend"),
                         entry.getField(StandardField.ANNOTATION));
-                assertEquals(Optional.of("stdmodel"), entry.getCiteKeyOptional());
+                assertEquals(Optional.of("stdmodel"), entry.getCitationKey());
                 assertEquals(Optional.of("glashow,weinberg,salam"), entry.getField(StandardField.ENTRYSET));
-            } else if (entry.getCiteKeyOptional().get().equals("set")) {
+            } else if (entry.getCitationKey().get().equals("set")) {
                 assertEquals(Optional
                                 .of("A \\texttt{set} with three members. The \\texttt{crossref} field in the \\texttt{@set} "
                                         + "entry and the \\texttt{entryset} field in each set member entry is needed only when using "
                                         + "BibTeX as the backend"),
                         entry.getField(StandardField.ANNOTATION));
-                assertEquals(Optional.of("set"), entry.getCiteKeyOptional());
+                assertEquals(Optional.of("set"), entry.getCitationKey());
                 assertEquals(Optional.of("herrmann,aksin,yoon"), entry.getField(StandardField.ENTRYSET));
-            } else if (entry.getCiteKeyOptional().get().equals("Preissel2016")) {
+            } else if (entry.getCitationKey().get().equals("Preissel2016")) {
                 assertEquals(Optional.of("Heidelberg"), entry.getField(StandardField.ADDRESS));
                 assertEquals(Optional.of("Preißel, René"), entry.getField(StandardField.AUTHOR));
-                assertEquals(Optional.of("Preissel2016"), entry.getCiteKeyOptional());
+                assertEquals(Optional.of("Preissel2016"), entry.getCitationKey());
                 assertEquals(Optional.of("3., aktualisierte und erweiterte Auflage"),
                         entry.getField(StandardField.EDITION));
                 assertEquals(Optional.of("978-3-86490-311-3"), entry.getField(StandardField.ISBN));

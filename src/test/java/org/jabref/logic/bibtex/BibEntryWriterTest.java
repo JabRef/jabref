@@ -3,6 +3,7 @@ package org.jabref.logic.bibtex;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Set;
 
@@ -79,7 +80,7 @@ class BibEntryWriterTest {
 
         BibEntry entry = new BibEntry(new UnknownEntryType("other"));
         entry.setField(StandardField.COMMENT, "testentry");
-        entry.setCiteKey("test");
+        entry.setCitationKey("test");
 
         // write out bibtex string
         StringWriter stringWriter = new StringWriter();
@@ -92,7 +93,7 @@ class BibEntryWriterTest {
     @Test
     void writeEntryWithFile() throws Exception {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
-        LinkedFile file = new LinkedFile("test", "/home/uers/test.pdf", "PDF");
+        LinkedFile file = new LinkedFile("test", Path.of("/home/uers/test.pdf"), "PDF");
         entry.addFile(file);
 
         StringWriter stringWriter = new StringWriter();
@@ -173,7 +174,7 @@ class BibEntryWriterTest {
         BibEntry entry = new BibEntry();
         entry.setType(new UnknownEntryType("ReallyUnknownType"));
         entry.setField(StandardField.COMMENT, "testentry");
-        entry.setCiteKey("test");
+        entry.setCitationKey("test");
 
         // write out bibtex string
         StringWriter stringWriter = new StringWriter();

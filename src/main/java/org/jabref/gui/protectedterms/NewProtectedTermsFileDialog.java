@@ -14,7 +14,6 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.preferences.JabRefPreferences;
 
 public class NewProtectedTermsFileDialog extends BaseDialog<Void> {
 
@@ -29,7 +28,7 @@ public class NewProtectedTermsFileDialog extends BaseDialog<Void> {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(Localization.lang("Protected terms file"), StandardFileType.TERMS)
                 .withDefaultExtension(Localization.lang("Protected terms file"), StandardFileType.TERMS)
-                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY))
+                .withInitialDirectory(Globals.prefs.getWorkingDir())
                 .build();
 
         Button browse = new Button(Localization.lang("Browse"));

@@ -24,6 +24,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
@@ -35,7 +36,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
@@ -46,16 +47,26 @@ abstract class FieldsEditorTab extends EntryEditorTab {
     private final boolean isCompressed;
     private final SuggestionProviders suggestionProviders;
     private final DialogService dialogService;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
     private final ExternalFileTypes externalFileTypes;
     private final TaskExecutor taskExecutor;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final StateManager stateManager;
     private PreviewPanel previewPanel;
     private final UndoManager undoManager;
     private Collection<Field> fields = new ArrayList<>();
     private GridPane gridPane;
 
-    public FieldsEditorTab(boolean compressed, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager, DialogService dialogService, JabRefPreferences preferences, ExternalFileTypes externalFileTypes, TaskExecutor taskExecutor, JournalAbbreviationRepository journalAbbreviationRepository) {
+    public FieldsEditorTab(boolean compressed,
+                           BibDatabaseContext databaseContext,
+                           SuggestionProviders suggestionProviders,
+                           UndoManager undoManager,
+                           DialogService dialogService,
+                           PreferencesService preferences,
+                           StateManager stateManager,
+                           ExternalFileTypes externalFileTypes,
+                           TaskExecutor taskExecutor,
+                           JournalAbbreviationRepository journalAbbreviationRepository) {
         this.isCompressed = compressed;
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.suggestionProviders = Objects.requireNonNull(suggestionProviders);
@@ -65,10 +76,11 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
+        this.stateManager = stateManager;
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {
-        gridPane.addColumn(columnIndex, nodes.toArray(new Node[nodes.size()]));
+        gridPane.addColumn(columnIndex, nodes.toArray(new Node[0]));
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, Stream<Parent> nodes) {
@@ -217,7 +229,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
             SplitPane container = new SplitPane(scrollPane);
             if (!preferences.getPreviewPreferences().showPreviewAsExtraTab()) {
-                previewPanel = new PreviewPanel(databaseContext, dialogService, externalFileTypes, preferences.getKeyBindingRepository(), preferences);
+                previewPanel = new PreviewPanel(databaseContext, dialogService, externalFileTypes, preferences.getKeyBindingRepository(), preferences, stateManager);
                 container.getItems().add(previewPanel);
             }
 

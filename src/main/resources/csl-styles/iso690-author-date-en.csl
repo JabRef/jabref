@@ -12,7 +12,7 @@
     </author>
     <author>
       <name>Raphael Grolimund</name>
-      <email>raphael.grolimund@epfl.ch</email>
+      <email>grolimur@protonmail.ch</email>
     </author>
     <author>
       <name>Michel Hardegger</name>
@@ -21,7 +21,7 @@
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>Style based on ISO 690:2010(E), v1.1</summary>
-    <updated>2016-12-26T11:30:00+01:00</updated>
+    <updated>2020-11-19T21:30:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -142,7 +142,7 @@
           </if>
         </choose>
         <choose>
-          <if variable="container-author">
+          <if variable="container-author editor translator" match="any">
             <text macro="container-responsability"/>
             <choose>
               <if variable="container-title event" match="any">

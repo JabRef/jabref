@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -20,7 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-class IEEETest implements SearchBasedFetcherCapabilityTest {
+class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
     private IEEE fetcher;
     private BibEntry entry;
@@ -138,5 +139,10 @@ class IEEETest implements SearchBasedFetcherCapabilityTest {
     @Override
     public String getTestJournal() {
         return "IET Renewable Power Generation";
+    }
+
+    @Override
+    public PagedSearchBasedFetcher getPagedFetcher() {
+        return fetcher;
     }
 }

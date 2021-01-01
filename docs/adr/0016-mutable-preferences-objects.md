@@ -12,5 +12,5 @@ To create an immutable preferences object every time seems to be a waste of time
 ## Decision Outcome
 
 Chosen option: "Alter the exiting object", because the preferences objects are just wrappers around the basic preferences framework of JDK. They
-should be mutable on-the-fly similar to objects with a Builder inside and to be stored immediatly again in the
+should be mutable on-the-fly similar to objects with a Builder inside and to be stored immediately again in the
 preferences.
