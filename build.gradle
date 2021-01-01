@@ -37,8 +37,8 @@ version = project.findProperty('projVersion') ?: '100.0.0'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_14
-    targetCompatibility = JavaVersion.VERSION_14
-    
+    targetCompatibility = JavaVersion.VERSION_16
+
 }
 
 application {
@@ -147,12 +147,12 @@ dependencies {
     implementation group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: '1.3.5'
 
     // JavaFX stuff
-    
+
     // https://mvnrepository.com/artifact/org.openjfx/javafx-controls
 	implementation group: 'org.openjfx', name: 'javafx-controls', version: '15.0.1'
 	implementation group: 'org.openjfx', name: 'javafx-fxml', version: '15.0.1'
 	implementation group: 'org.openjfx', name: 'javafx-web', version: '15.0.1'
-    
+
     implementation 'de.jensd:fontawesomefx-commons:11.0'
     implementation 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-11'
     implementation 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
