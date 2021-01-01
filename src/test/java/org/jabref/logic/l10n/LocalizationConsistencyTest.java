@@ -93,11 +93,26 @@ class LocalizationConsistencyTest {
                 .stream()
                 .filter(key -> key.getKey().contains("_") && key.getKey().equals(new LocalizationKey(key.getKey()).getPropertiesKey()))
                 .collect(Collectors.toList());
-
         assertEquals(Collections.emptyList(), quotedEntries,
                 "Language keys must not be used quoted in code! Use \"This is a message\" instead of \"This_is_a_message\".\n" +
                         "Please correct the following entries:\n" +
                         quotedEntries
+                                .stream()
+                                .map(key -> String.format("\n%s (%s)\n", key.getKey(), key.getPath()))
+                                .collect(Collectors.toList()));
+    }
+
+    @Test
+    void languageKeysShouldNotContainHtmlBrAndHtmlP() throws IOException {
+        final List<LocalizationEntry> entriesWithHtml = LocalizationParser
+                .findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.LANG)
+                .stream()
+                .filter(key -> key.getKey().contains("<br>") || key.getKey().contains("<p>"))
+                .collect(Collectors.toList());
+        assertEquals(Collections.emptyList(), entriesWithHtml,
+                "Language keys must not contain HTML <br> or <p>. Use \\n for a line break.\n" +
+                        "Please correct the following entries:\n" +
+                        entriesWithHtml
                                 .stream()
                                 .map(key -> String.format("\n%s (%s)\n", key.getKey(), key.getPath()))
                                 .collect(Collectors.toList()));
@@ -110,7 +125,6 @@ class LocalizationConsistencyTest {
                                                                 .sorted()
                                                                 .distinct()
                                                                 .collect(Collectors.toList());
-
         assertEquals(Collections.emptyList(), missingKeys,
                 "DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE\n" +
                         "PASTE THESE INTO THE ENGLISH LANGUAGE FILE\n" +
@@ -122,7 +136,6 @@ class LocalizationConsistencyTest {
     @Test
     void findObsoleteLocalizationKeys() throws IOException {
         Set<String> obsoleteKeys = LocalizationParser.findObsolete(LocalizationBundleForTest.LANG);
-
         assertEquals(Collections.emptySet(), obsoleteKeys,
                 "Obsolete keys found in language properties file: \n" +
                         obsoleteKeys.stream().collect(Collectors.joining("\n")) +

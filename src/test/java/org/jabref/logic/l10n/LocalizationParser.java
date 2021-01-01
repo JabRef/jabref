@@ -145,41 +145,29 @@ public class LocalizationParser {
     }
 
     private static List<LocalizationEntry> getLanguageKeysInJavaFile(Path path, LocalizationBundleForTest type) {
-        List<LocalizationEntry> result = new ArrayList<>();
-
+        List<String> lines;
         try {
-            List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
-            String content = String.join("\n", lines);
-
-            List<String> keys = JavaLocalizationEntryParser.getLanguageKeysInString(content, type);
-
-            for (String key : keys) {
-                result.add(new LocalizationEntry(path, key, type));
-            }
+            lines = Files.readAllLines(path, StandardCharsets.UTF_8);
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
-
-        return result;
+        String content = String.join("\n", lines);
+        return JavaLocalizationEntryParser.getLanguageKeysInString(content, type).stream()
+                                          .map(key -> new LocalizationEntry(path, key, type))
+                                          .collect(Collectors.toList());
     }
 
     private static List<LocalizationEntry> getLocalizationParametersInJavaFile(Path path, LocalizationBundleForTest type) {
-        List<LocalizationEntry> result = new ArrayList<>();
-
+        List<String> lines;
         try {
-            List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
-            String content = String.join("\n", lines);
-
-            List<String> keys = JavaLocalizationEntryParser.getLocalizationParameter(content, type);
-
-            for (String key : keys) {
-                result.add(new LocalizationEntry(path, key, type));
-            }
+            lines = Files.readAllLines(path, StandardCharsets.UTF_8);
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
-
-        return result;
+        String content = String.join("\n", lines);
+        return JavaLocalizationEntryParser.getLocalizationParameter(content, type).stream()
+                                          .map(key -> new LocalizationEntry(path, key, type))
+                                          .collect(Collectors.toList());
     }
 
     /**
@@ -287,10 +275,14 @@ public class LocalizationParser {
                     throw new RuntimeException(languageKey + " ends with a space. As this is a localization key, this is illegal!");
                 }
 
-                if (languagePropertyKey.contains("\\n")) {
+                if (languagePropertyKey.contains("\\\\n")) {
                     // see also https://stackoverflow.com/a/10285687/873282
                     throw new RuntimeException(languageKey + " contains an escaped new line character. The newline character has to be written with a single backslash, not with a double one.");
                 }
+
+                // \n (newline character) in the language key is stored as text "\n" in the .properties file
+                // This
+                languagePropertyKey = languagePropertyKey.replace("\n", "\\n");
 
                 if (!languagePropertyKey.trim().isEmpty()) {
                     result.add(languagePropertyKey);

@@ -48,7 +48,8 @@ public class LocalizationParserTest {
     public static Stream<String> causesRuntimeExceptions() {
         return Stream.of(
                 "Localization.lang(\"Ends with a space \")",
-                "Localization.lang(\"Escaped newline\\nthere\")"
+                // "\\n" in the properties file
+                "Localization.lang(\"Escaped newline\\\\nthere\")"
         );
     }
 
