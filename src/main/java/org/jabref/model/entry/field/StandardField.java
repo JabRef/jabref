@@ -141,7 +141,10 @@ public enum StandardField implements Field {
     // JabRef-specific fields
     GROUPS("groups"),
     OWNER("owner"),
-    TIMESTAMP("timestamp", FieldProperty.DATE);
+    TIMESTAMP("timestamp", FieldProperty.DATE),
+    CREATIONDATE("creationdate", FieldProperty.DATE_TIME),
+    MODIFICATIONDATE("modificationdate", FieldProperty.DATE_TIME);
+
 
     private final String name;
     private final String displayName;
