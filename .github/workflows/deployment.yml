@@ -56,16 +56,30 @@ jobs:
       - name: Run GitVersion
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.9.7
-      - name: Set up JDK 15 for linux and mac
-        uses: actions/setup-java@v1
-        with:
-          java-version: 15
+      - uses: sdkman/sdkman-action@master
         if: matrix.os != 'windows-latest'
-      - name: Set up JDK 14 for windows
-        uses: actions/setup-java@v1
+        id: sdkman
         with:
-          java-version: 14
+          candidate: java
+          version: 15.0.1.j9-adpt
+      - uses: actions/setup-java@v1
+        if: matrix.os != 'windows-latest'
+        id: setup-java
+        with:
+          java-version: 15.0.1
+          jdkFile: ${{ steps.sdkman.outputs.file }}
+      - uses: sdkman/sdkman-action@master
         if: matrix.os == 'windows-latest'
+        id: sdkman14
+        with:
+          candidate: java
+          version: 14.0.2.j9-adpt
+      - uses: actions/setup-java@v1
+        if: matrix.os == 'windows-latest'
+        id: setup-java
+        with:
+          java-version: 14.0.2
+          jdkFile: ${{ steps.sdkman14.outputs.file }}
       - name: Restore gradle cache
         uses: actions/cache@master
         with:

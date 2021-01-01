@@ -23,10 +23,16 @@ jobs:
           access_token: ${{ github.token }}
       - name: Checkout source
         uses: actions/checkout@v2
-      - name: Set up JDK
-        uses: actions/setup-java@v1
+      - uses: sdkman/sdkman-action@master
+        id: sdkman
         with:
-          java-version: 14
+          candidate: java
+          version: 15.0.1.j9-adpt
+      - uses: actions/setup-java@v1
+        id: setup-java
+        with:
+          java-version: 15.0.1
+          jdkFile: ${{ steps.sdkman.outputs.file }}
       - uses: actions/cache@v1
         name: Restore gradle cache
         with:
@@ -59,10 +65,16 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
-      - name: Set up JDK
-        uses: actions/setup-java@v1
+      - uses: sdkman/sdkman-action@master
+        id: sdkman
         with:
-          java-version: 14
+          candidate: java
+          version: 15.0.1.j9-adpt
+      - uses: actions/setup-java@v1
+        id: setup-java
+        with:
+          java-version: 15.0.1
+          jdkFile: ${{ steps.sdkman.outputs.file }}
       - uses: actions/cache@v1
         name: Restore gradle chache
         with:
@@ -103,10 +115,16 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
-      - name: Set up JDK
-        uses: actions/setup-java@v1
+      - uses: sdkman/sdkman-action@master
+        id: sdkman
         with:
-          java-version: 14
+          candidate: java
+          version: 15.0.1.j9-adpt
+      - uses: actions/setup-java@v1
+        id: setup-java
+        with:
+          java-version: 15.0.1
+          jdkFile: ${{ steps.sdkman.outputs.file }}
       - uses: actions/cache@v1
         name: Restore gradle chache
         with:
@@ -149,10 +167,16 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
-      - name: Set up JDK
-        uses: actions/setup-java@v1
+      - uses: sdkman/sdkman-action@master
+        id: sdkman
         with:
-          java-version: 14
+          candidate: java
+          version: 15.0.1.j9-adpt
+      - uses: actions/setup-java@v1
+        id: setup-java
+        with:
+          java-version: 15.0.1
+          jdkFile: ${{ steps.sdkman.outputs.file }}
       - uses: actions/cache@v1
         name: Restore gradle chache
         with:
@@ -199,10 +223,16 @@ jobs:
           SNAPCRAFT_LOGIN_FILE: ${{ secrets.CODECOV_TOKEN }}
       - name: Checkout source
         uses: actions/checkout@v2
-      - name: Set up JDK
-        uses: actions/setup-java@v1
+      - uses: sdkman/sdkman-action@master
+        id: sdkman
         with:
-          java-version: 14
+          candidate: java
+          version: 15.0.1.j9-adpt
+      - uses: actions/setup-java@v1
+        id: setup-java
+        with:
+          java-version: 15.0.1
+          jdkFile: ${{ steps.sdkman.outputs.file }}
       - uses: actions/cache@v1
         name: Restore gradle chache
         with:
