@@ -126,22 +126,25 @@ class LocalizationConsistencyTest {
                                                                 .distinct()
                                                                 .collect(Collectors.toList());
         assertEquals(Collections.emptyList(), missingKeys,
-                "DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE\n" +
-                        "PASTE THESE INTO THE ENGLISH LANGUAGE FILE\n" +
-                        missingKeys.parallelStream()
-                                   .map(key -> String.format("%s=%s", key.getKey(), key.getKey().replaceAll("\\\\ ", " ")))
-                                   .collect(Collectors.joining("\n", "\n", "\n")));
+                missingKeys.parallelStream()
+                           .map(key -> String.format("%s=%s", key.getKey(), key.getKey().replaceAll("\\\\ ", " ")))
+                           .collect(Collectors.joining("\n",
+                                   "DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE\n" +
+                                           "PASTE THESE INTO THE ENGLISH LANGUAGE FILE\n\n",
+                                   "\n")));
     }
 
     @Test
     void findObsoleteLocalizationKeys() throws IOException {
         Set<String> obsoleteKeys = LocalizationParser.findObsolete(LocalizationBundleForTest.LANG);
         assertEquals(Collections.emptySet(), obsoleteKeys,
-                "Obsolete keys found in language properties file: \n" +
-                        obsoleteKeys.stream().collect(Collectors.joining("\n")) +
-                        "\n" +
-                        "1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE\n" +
-                        "2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE\n");
+                obsoleteKeys
+                        .stream()
+                        .collect(Collectors.joining("\n",
+                                "Obsolete keys found in language properties file: \n",
+                                "\n1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE\n" +
+                                        "2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE\n"))
+        );
     }
 
     @Test
