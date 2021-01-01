@@ -151,6 +151,7 @@ dependencies {
 	implementation group: 'org.openjfx', name: 'javafx-controls', version: '15.0.1'
 	implementation group: 'org.openjfx', name: 'javafx-fxml', version: '15.0.1'
 	implementation group: 'org.openjfx', name: 'javafx-web', version: '15.0.1'
+	implementation group: 'org.openjfx', name: 'javafx-swing', version: '15.0.1'
 
     implementation 'de.jensd:fontawesomefx-commons:11.0'
     implementation 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-11'
