@@ -36,7 +36,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 16-ea
+          java-version: 15
       - uses: actions/cache@v1
         name: Restore gradle chache
         with:
