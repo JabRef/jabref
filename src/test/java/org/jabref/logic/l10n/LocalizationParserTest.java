@@ -53,7 +53,6 @@ public class LocalizationParserTest {
         );
     }
 
-
     @ParameterizedTest
     @MethodSource("singleLineChecks")
     public void testLocalizationKeyParsing(String code, String expectedLanguageKeys) {
