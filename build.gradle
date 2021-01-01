@@ -38,10 +38,6 @@ version = project.findProperty('projVersion') ?: '100.0.0'
 java {
     sourceCompatibility = JavaVersion.VERSION_14
     targetCompatibility = JavaVersion.VERSION_14
-
-  toolchain {
-    languageVersion = JavaLanguageVersion.of(16)
-  }
 }
 
 application {
