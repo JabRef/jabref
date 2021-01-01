@@ -1,11 +1,9 @@
 package org.jabref.logic.l10n;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -26,8 +24,9 @@ public class LocalizationParserTest {
                 Arguments.of("Localization.lang(\"Multiple entries selected. Do you want to change the type of all these to '%0'?\")",
                         "Multiple\\ entries\\ selected.\\ Do\\ you\\ want\\ to\\ change\\ the\\ type\\ of\\ all\\ these\\ to\\ '%0'?"),
                 Arguments.of("Localization.lang(\"Run fetcher, e.g. \\\"--fetch=Medline:cancer\\\"\");",
-                        "Run\\ fetcher,\\ e.g.\\ \"--fetch\\=Medline\\:cancer\"")
-
+                        "Run\\ fetcher,\\ e.g.\\ \"--fetch\\=Medline\\:cancer\""),
+                // \n is allowed. See // see also https://stackoverflow.com/a/10285687/873282
+                Arguments.of("Localization.lang(\"First line\nSecond line\")", "First\\ line\nSecond\\ line")
         );
     }
 
@@ -49,8 +48,7 @@ public class LocalizationParserTest {
     public static Stream<String> causesRuntimeExceptions() {
         return Stream.of(
                 "Localization.lang(\"Ends with a space \")",
-                "Localization.lang(\"Newline\nthere\")",
-                "Localization.lang(\"Newline\\nthere\")"
+                "Localization.lang(\"Escaped newline\\nthere\")"
         );
     }
 

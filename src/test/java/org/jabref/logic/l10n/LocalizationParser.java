@@ -287,8 +287,9 @@ public class LocalizationParser {
                     throw new RuntimeException(languageKey + " ends with a space. As this is a localization key, this is illegal!");
                 }
 
-                if (languagePropertyKey.contains("\n") || languagePropertyKey.contains("\\n")) {
-                    throw new RuntimeException(languageKey + " contains a new line character. As this is a localization key, this is illegal!");
+                if (languagePropertyKey.contains("\\n")) {
+                    // see also https://stackoverflow.com/a/10285687/873282
+                    throw new RuntimeException(languageKey + " contains an escaped new line character. The newline character has to be written with a single backslash, not with a double one.");
                 }
 
                 if (!languagePropertyKey.trim().isEmpty()) {
