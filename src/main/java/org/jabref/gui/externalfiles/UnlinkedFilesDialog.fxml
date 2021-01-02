@@ -36,9 +36,9 @@
                                 </Button>
                             </children>
                         </HBox>
-                        <HBox prefHeight="47.0" prefWidth="600.0" spacing="15.0">
+                        <HBox alignment="BASELINE_LEFT" prefHeight="47.0" prefWidth="600.0" spacing="15.0">
                             <children>
-                                <Label prefHeight="17.0" prefWidth="105.0" text="%Select file type:" />
+                                <Label alignment="BASELINE_LEFT" prefHeight="17.0" prefWidth="105.0" text="%Select file type:" />
                                 <ComboBox fx:id="fileTypeSelection" prefHeight="27.0" prefWidth="144.0" />
                             </children>
                         </HBox>
