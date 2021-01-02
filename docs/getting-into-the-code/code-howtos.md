@@ -399,6 +399,7 @@ All radio buttons that should be grouped together need to have a ToggleGroup def
 ```
 
 ### JavaFX Dialogs
+
 All dialogs should be displayed to the user via `DialogService` interface methods.
 `DialogService` provides methods to display various dialogs (including custom ones) to the user. 
 It also ensures the displayed dialog opens on the correct window via `initOwner()` (for cases where the user has multiple screens).
