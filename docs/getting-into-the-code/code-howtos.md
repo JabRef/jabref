@@ -398,3 +398,19 @@ All radio buttons that should be grouped together need to have a ToggleGroup def
 </VBox>
 ```
 
+### JavaFX Dialogs
+All dialogs should be displayed to the user via `DialogService` interface methods.
+`DialogService` provides methods to display various dialogs (including custom ones) to the user. 
+It also ensures the displayed dialog opens on the correct window via `initOwner()` (for cases where the user has multiple screens).
+The following code snippet demonstrates how a custom dialog is displayed to the user:
+
+```java
+dialogService.showCustomDialog(new DocumentViewerView());
+```
+
+If an instance of `DialogService` is unavailable within current class/scope in which the dialog needs to be displayed, 
+`DialogService` can be instantiated via the code snippet shown as follows:
+
+```java
+DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+```
