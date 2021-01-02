@@ -48,18 +48,15 @@ public class LocalizationParser {
     }
 
     public static SortedSet<String> findObsolete(LocalizationBundleForTest type) throws IOException {
-        Set<String> keysInFiles = findLocalizationEntriesInFiles(type)
-                .stream().map(LocalizationEntry::getKey).collect(Collectors.toSet());
-
         Set<String> englishKeys;
         if (type == LocalizationBundleForTest.LANG) {
             englishKeys = getKeysInPropertiesFileAsJavaKeys("/l10n/JabRef_en.properties");
         } else {
             englishKeys = getKeysInPropertiesFileAsJavaKeys("/l10n/Menu_en.properties");
         }
-
+        Set<String> keysInFiles = findLocalizationEntriesInFiles(type)
+                .stream().map(LocalizationEntry::getKey).collect(Collectors.toSet());
         englishKeys.removeAll(keysInFiles);
-
         return new TreeSet<>(englishKeys);
     }
 
