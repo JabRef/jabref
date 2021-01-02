@@ -124,8 +124,8 @@ public class Localization {
         final ArrayList<String> baseKeys = Collections.list(baseBundle.getKeys());
         return new HashMap<>(baseKeys.stream().collect(
                 Collectors.toMap(
-                        key -> new LocalizationKey(key).getTranslationValue(),
-                        key -> new LocalizationKey(baseBundle.getString(key)).getTranslationValue())
+                        key -> LocalizationKey.fromPropertyKey(key).getTranslationValue(),
+                        key -> LocalizationKey.fromPropertyKey(baseBundle.getString(key)).getTranslationValue())
         ));
     }
 

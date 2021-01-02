@@ -10,7 +10,7 @@ public class LocalizationKeyParams {
     private final List<String> params;
 
     public LocalizationKeyParams(String key, String... params) {
-        this.key = new LocalizationKey(key);
+        this.key = LocalizationKey.fromPropertyKey(key);
         this.params = Arrays.asList(params);
         if (this.params.size() > 10) {
             throw new IllegalStateException("Translations can only have at most 10 parameters");

@@ -11,8 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class LocalizationParserTest {
-
+public class JavaLocalizationEntryParserTest {
     public static Stream<Arguments> singleLineChecks() {
         return Stream.of(
                 Arguments.of("Localization.lang(\"one per line\")", "one\\ per\\ line"),
@@ -75,20 +74,20 @@ public class LocalizationParserTest {
     @ParameterizedTest
     @MethodSource("multiLineChecks")
     public void testLocalizationKeyParsing(String code, List<String> expectedLanguageKeys) {
-        List<String> languageKeysInString = LocalizationParser.JavaLocalizationEntryParser.getLanguageKeysInString(code, LocalizationBundleForTest.LANG);
+        List<String> languageKeysInString = JavaLocalizationEntryParser.getLanguageKeysInString(code, LocalizationBundleForTest.LANG);
         assertEquals(expectedLanguageKeys, languageKeysInString);
     }
 
     @ParameterizedTest
     @MethodSource("singleLineParameterChecks")
     public void testLocalizationParameterParsing(String code, String expectedParameter) {
-        List<String> languageKeysInString = LocalizationParser.JavaLocalizationEntryParser.getLocalizationParameter(code, LocalizationBundleForTest.LANG);
+        List<String> languageKeysInString = JavaLocalizationEntryParser.getLocalizationParameter(code, LocalizationBundleForTest.LANG);
         assertEquals(List.of(expectedParameter), languageKeysInString);
     }
 
     @ParameterizedTest
     @MethodSource("causesRuntimeExceptions")
     public void throwsRuntimeException(String code) {
-        assertThrows(RuntimeException.class, () -> LocalizationParser.JavaLocalizationEntryParser.getLanguageKeysInString(code, LocalizationBundleForTest.LANG));
+        assertThrows(RuntimeException.class, () -> JavaLocalizationEntryParser.getLanguageKeysInString(code, LocalizationBundleForTest.LANG));
     }
 }

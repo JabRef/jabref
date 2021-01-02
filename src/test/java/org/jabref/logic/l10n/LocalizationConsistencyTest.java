@@ -87,14 +87,14 @@ class LocalizationConsistencyTest {
     }
 
     @Test
-    void languageKeysShouldNotBeQuotedInFiles() throws IOException {
+    void languageKeysShouldNotContainUnderscoresForSpaces() throws IOException {
         final List<LocalizationEntry> quotedEntries = LocalizationParser
                 .findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.LANG)
                 .stream()
-                .filter(key -> key.getKey().contains("_") && key.getKey().equals(new LocalizationKey(key.getKey()).getPropertiesKey()))
+                .filter(key -> key.getKey().contains("\\_"))
                 .collect(Collectors.toList());
         assertEquals(Collections.emptyList(), quotedEntries,
-                "Language keys must not be used quoted in code! Use \"This is a message\" instead of \"This_is_a_message\".\n" +
+                "Language keys must not use underscores for spaces! Use \"This is a message\" instead of \"This_is_a_message\".\n" +
                         "Please correct the following entries:\n" +
                         quotedEntries
                                 .stream()
@@ -124,17 +124,11 @@ class LocalizationConsistencyTest {
                                                                 .stream()
                                                                 .collect(Collectors.toList());
         assertEquals(Collections.emptyList(), missingKeys,
-                missingKeys.parallelStream()
+                missingKeys.stream()
+                           .map(key -> LocalizationKey.fromPropertyKey(key.getKey()))
                            .map(key -> String.format("%s=%s",
-                                   key.getKey()
-                                      // unescape all characters
-                                      .replaceAll("\\\\([^\\\\])", "$1")
-                                      .replace("\\\\\\\\", "\\\\"),
-                                   key.getKey()
-                                      // unescape all characters
-                                      .replaceAll("\\\\([^\\\\])", "$1")
-                                      .replace("\\\\\\\\", "\\\\")
-                           ))
+                                   key.getPropertiesKey(),
+                                   key.getJavaCodeKey()))
                            .collect(Collectors.joining("\n",
                                    "DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE\n" +
                                            "PASTE THESE INTO THE ENGLISH LANGUAGE FILE\n\n",
@@ -145,12 +139,10 @@ class LocalizationConsistencyTest {
     void findObsoleteLocalizationKeys() throws IOException {
         Set<String> obsoleteKeys = LocalizationParser.findObsolete(LocalizationBundleForTest.LANG);
         assertEquals(Collections.emptySet(), obsoleteKeys,
-                obsoleteKeys
-                        .stream()
-                        .collect(Collectors.joining("\n",
-                                "Obsolete keys found in language properties file: \n\n",
-                                "\n\n1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE\n" +
-                                        "2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE\n"))
+                obsoleteKeys.stream().collect(Collectors.joining("\n",
+                        "Obsolete keys found in language properties file: \n\n",
+                        "\n\n1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE\n" +
+                                "2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE\n"))
         );
     }
 
