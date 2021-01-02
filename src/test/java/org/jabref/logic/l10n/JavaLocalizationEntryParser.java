@@ -29,9 +29,9 @@ class JavaLocalizationEntryParser {
                 throw new RuntimeException("\"" + languageKey + "\" contains an escaped new line character. The newline character has to be written with a single backslash, not with a double one.");
             }
 
-            // escape chars which are not allowed in property file keys
+            // Java escape chars which are not used in property file keys
             // The call to `getPropertiesKey` escapes them
-            String languagePropertyKey = LocalizationKey.fromJavaKey(languageKey).getPropertiesKey();
+            String languagePropertyKey = LocalizationKey.fromPropertyKey(languageKey).getJavaCodeKey();
 
             if (languagePropertyKey.endsWith(" ")) {
                 throw new RuntimeException("\"" + languageKey + "\" ends with a space. As this is a localization key, this is illegal!");

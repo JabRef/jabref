@@ -19,7 +19,7 @@ public class JavaLocalizationEntryParserTest {
                 // '\c' is an escaped character, thus "\cite" is wrong as lookup text. It has to be "\\cite" in the .properties file
                 Arguments.of("Localization.lang(\"Copy \\\\cite{citation key}\")", "Copy\\ \\\\cite{citation\\ key}"),
 
-                // \" is kept
+                // " is kept unescaped
                 Arguments.of("Localization.lang(\"\\\"Hey\\\"\")", "\"Hey\""),
 
                 // \n is a "real" newline character in the simulated read read Java source code

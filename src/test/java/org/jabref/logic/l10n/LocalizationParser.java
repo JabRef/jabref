@@ -35,9 +35,9 @@ public class LocalizationParser {
 
         Set<String> englishKeys;
         if (type == LocalizationBundleForTest.LANG) {
-            englishKeys = getKeysInPropertiesFileAsJavaKeys("/l10n/JabRef_en.properties");
+            englishKeys = getKeysInPropertiesFile("/l10n/JabRef_en.properties");
         } else {
-            englishKeys = getKeysInPropertiesFileAsJavaKeys("/l10n/Menu_en.properties");
+            englishKeys = getKeysInPropertiesFile("/l10n/Menu_en.properties");
         }
         List<String> missingKeys = new ArrayList<>(keysInJavaFiles);
         missingKeys.removeAll(englishKeys);
@@ -50,13 +50,13 @@ public class LocalizationParser {
     public static SortedSet<String> findObsolete(LocalizationBundleForTest type) throws IOException {
         Set<String> englishKeys;
         if (type == LocalizationBundleForTest.LANG) {
-            englishKeys = getKeysInPropertiesFileAsJavaKeys("/l10n/JabRef_en.properties");
+            englishKeys = getKeysInPropertiesFile("/l10n/JabRef_en.properties");
         } else {
-            englishKeys = getKeysInPropertiesFileAsJavaKeys("/l10n/Menu_en.properties");
+            englishKeys = getKeysInPropertiesFile("/l10n/Menu_en.properties");
         }
-        Set<String> keysInFiles = findLocalizationEntriesInFiles(type)
+        Set<String> keysInSourceFiles = findLocalizationEntriesInFiles(type)
                 .stream().map(LocalizationEntry::getKey).collect(Collectors.toSet());
-        englishKeys.removeAll(keysInFiles);
+        englishKeys.removeAll(keysInSourceFiles);
         return new TreeSet<>(englishKeys);
     }
 
@@ -107,13 +107,19 @@ public class LocalizationParser {
         }
     }
 
-    public static SortedSet<String> getKeysInPropertiesFileAsJavaKeys(String path) {
+    /**
+     * Returns the trimmed key set of the given property file. Each key is already unescaped.
+     */
+    public static SortedSet<String> getKeysInPropertiesFile(String path) {
         Properties properties = getProperties(path);
         return properties.keySet().stream()
-                         .sorted()
                          .map(Object::toString)
                          .map(String::trim)
-                         .map(e -> LocalizationKey.fromPropertyKey(e).getJavaCodeKey())
+                         .map(key -> key
+                                 // escape keys to make them comparable
+                                 .replace("\\", "\\\\")
+                                 .replace("\n", "\\n")
+                         )
                          .collect(Collectors.toCollection(TreeSet::new));
     }
 
@@ -200,7 +206,7 @@ public class LocalizationParser {
         }
 
         return result.stream()
-                     .map(key -> new LocalizationEntry(path, LocalizationKey.fromJavaKey(key).getPropertiesKey(), type))
+                     .map(key -> new LocalizationEntry(path, LocalizationKey.fromPropertyKey(key).getJavaCodeKey(), type))
                      .collect(Collectors.toList());
     }
 
