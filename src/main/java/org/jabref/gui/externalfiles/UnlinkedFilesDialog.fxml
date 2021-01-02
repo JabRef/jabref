@@ -26,10 +26,10 @@
                 <VBox spacing="5.0" BorderPane.alignment="CENTER">
                     <children>
                         <Label text="%Select a directory where the search shall start." />
-                        <HBox prefHeight="35.0" prefWidth="600.0" spacing="10.0">
+                        <HBox alignment="BASELINE_CENTER" spacing="10.0">
                             <children>
                                 <TextField fx:id="directoryPathField" HBox.hgrow="ALWAYS" />
-                                <Button mnemonicParsing="false" onAction="#browseFileDirectory" text="%Browse">
+                                <Button alignment="TOP_CENTER" mnemonicParsing="false" onAction="#browseFileDirectory" text="%Browse">
                                     <tooltip>
                                         <Tooltip text="%Opens the file browser." />
                                     </tooltip>
@@ -72,7 +72,7 @@
                         </VBox>
                      </children>
                         </StackPane>
-                  <TitledPane fx:id="resultPane" text="Result" expanded="false">
+                  <TitledPane fx:id="resultPane" expanded="false" text="Result">
                      <content>
                                 <TableView fx:id="tvResult" editable="true" visible="false">
                                     <columns>
