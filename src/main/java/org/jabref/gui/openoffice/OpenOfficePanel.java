@@ -89,13 +89,12 @@ public class OpenOfficePanel {
     private final Button settingsB = new Button(Localization.lang("Settings"));
     private final Button help;
     private final VBox vbox = new VBox();
-
-    private OOBibBase ooBase;
     private final JabRefFrame frame;
-    private OOBibStyle style;
     private final PreferencesService preferencesService;
     private final TaskExecutor taskExecutor;
     private final StyleLoader loader;
+    private OOBibBase ooBase;
+    private OOBibStyle style;
     private OpenOfficePreferences ooPrefs;
 
     public OpenOfficePanel(JabRefFrame frame, PreferencesService preferencesService, OpenOfficePreferences ooPrefs, KeyBindingRepository keyBindingRepository) {
@@ -161,9 +160,7 @@ public class OpenOfficePanel {
 
         setStyleFile.setMaxWidth(Double.MAX_VALUE);
         setStyleFile.setOnAction(event -> {
-
-            StyleSelectDialogView styleDialog = new StyleSelectDialogView(loader);
-            styleDialog.showAndWait().ifPresent(selectedStyle -> {
+            dialogService.showCustomDialogAndWait(new StyleSelectDialogView(loader)).ifPresent(selectedStyle -> {
                 style = selectedStyle;
                 try {
                     style.ensureUpToDate();
@@ -247,8 +244,7 @@ public class OpenOfficePanel {
         settingsB.setOnAction(e -> settingsMenu.show(settingsB, Side.BOTTOM, 0, 0));
         manageCitations.setMaxWidth(Double.MAX_VALUE);
         manageCitations.setOnAction(e -> {
-            ManageCitationsDialogView dlg = new ManageCitationsDialogView(ooBase);
-            dlg.showAndWait();
+            dialogService.showCustomDialogAndWait(new ManageCitationsDialogView(ooBase));
         });
 
         exportCitations.setMaxWidth(Double.MAX_VALUE);
@@ -448,7 +444,7 @@ public class OpenOfficePanel {
     }
 
     private Optional<Boolean> showManualConnectionDialog() {
-        return new ManualConnectDialogView(dialogService).showAndWait();
+        return dialogService.showCustomDialogAndWait(new ManualConnectDialogView(dialogService));
     }
 
     private void pushEntries(boolean inParenthesisIn, boolean withText, boolean addPageInfo) {
@@ -460,9 +456,7 @@ public class OpenOfficePanel {
         Boolean inParenthesis = inParenthesisIn;
         String pageInfo = null;
         if (addPageInfo) {
-
-            AdvancedCiteDialogView citeDialog = new AdvancedCiteDialogView();
-            Optional<AdvancedCiteDialogViewModel> citeDialogViewModel = citeDialog.showAndWait();
+            Optional<AdvancedCiteDialogViewModel> citeDialogViewModel = dialogService.showCustomDialogAndWait(new AdvancedCiteDialogView());
 
             if (citeDialogViewModel.isPresent()) {
 
