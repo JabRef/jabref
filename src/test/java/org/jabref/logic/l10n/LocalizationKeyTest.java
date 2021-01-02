@@ -19,4 +19,10 @@ class LocalizationKeyTest {
         LocalizationKey localizationKey = new LocalizationKey("test_with_underscore");
         assertEquals("test_with_underscore", localizationKey.getPropertiesKey());
     }
+
+    @Test
+    void backslashEscaped() {
+        LocalizationKey localizationKey = new LocalizationKey("Copy \\cite{citation key}");
+        assertEquals("Copy\\ \\\\cite{citation\\ key}", localizationKey.getPropertiesKey());
+    }
 }

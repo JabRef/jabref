@@ -80,8 +80,8 @@ class LocalizationConsistencyTest {
     void keyValueShouldBeEqualForEnglishPropertiesMessages() {
         Properties englishKeys = LocalizationParser.getProperties(String.format("/l10n/%s_%s.properties", "JabRef", "en"));
         for (Map.Entry<Object, Object> entry : englishKeys.entrySet()) {
-            String expectedKeyEqualsKey = String.format("%s=%s", entry.getKey(), entry.getKey());
-            String actualKeyEqualsValue = String.format("%s=%s", entry.getKey(), entry.getValue());
+            String expectedKeyEqualsKey = String.format("%s=%s", entry.getKey(), entry.getKey().toString().replace("\n", "\\n"));
+            String actualKeyEqualsValue = String.format("%s=%s", entry.getKey(), entry.getValue().toString().replace("\n", "\\n"));
             assertEquals(expectedKeyEqualsKey, actualKeyEqualsValue);
         }
     }
@@ -120,14 +120,21 @@ class LocalizationConsistencyTest {
 
     @Test
     void findMissingLocalizationKeys() throws IOException {
-        List<LocalizationEntry> missingKeys = LocalizationParser.find(LocalizationBundleForTest.LANG)
+        List<LocalizationEntry> missingKeys = LocalizationParser.findMissingKeys(LocalizationBundleForTest.LANG)
                                                                 .stream()
-                                                                .sorted()
-                                                                .distinct()
                                                                 .collect(Collectors.toList());
         assertEquals(Collections.emptyList(), missingKeys,
                 missingKeys.parallelStream()
-                           .map(key -> String.format("%s=%s", key.getKey(), key.getKey().replaceAll("\\\\ ", " ")))
+                           .map(key -> String.format("%s=%s",
+                                   key.getKey()
+                                      // unescape all characters
+                                      .replaceAll("\\\\([^\\\\])", "$1")
+                                      .replace("\\\\\\\\", "\\\\"),
+                                   key.getKey()
+                                      // unescape all characters
+                                      .replaceAll("\\\\([^\\\\])", "$1")
+                                      .replace("\\\\\\\\", "\\\\")
+                           ))
                            .collect(Collectors.joining("\n",
                                    "DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE\n" +
                                            "PASTE THESE INTO THE ENGLISH LANGUAGE FILE\n\n",
@@ -141,8 +148,8 @@ class LocalizationConsistencyTest {
                 obsoleteKeys
                         .stream()
                         .collect(Collectors.joining("\n",
-                                "Obsolete keys found in language properties file: \n",
-                                "\n1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE\n" +
+                                "Obsolete keys found in language properties file: \n\n",
+                                "\n\n1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE\n" +
                                         "2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE\n"))
         );
     }

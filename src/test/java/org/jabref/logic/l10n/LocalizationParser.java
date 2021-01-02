@@ -29,13 +29,11 @@ import org.mockito.Mockito;
 
 public class LocalizationParser {
 
-    public static SortedSet<LocalizationEntry> find(LocalizationBundleForTest type) throws IOException {
+    public static SortedSet<LocalizationEntry> findMissingKeys(LocalizationBundleForTest type) throws IOException {
         Set<LocalizationEntry> entries = findLocalizationEntriesInFiles(type);
 
         Set<String> keysInJavaFiles = entries.stream()
                                              .map(LocalizationEntry::getKey)
-                                             .distinct()
-                                             .sorted()
                                              .collect(Collectors.toSet());
 
         Set<String> englishKeys;
@@ -47,14 +45,14 @@ public class LocalizationParser {
         List<String> missingKeys = new ArrayList<>(keysInJavaFiles);
         missingKeys.removeAll(englishKeys);
 
-        return entries.stream().filter(e -> missingKeys.contains(e.getKey())).collect(
-                Collectors.toCollection(TreeSet::new));
+        return entries.stream()
+                      .filter(e -> missingKeys.contains(e.getKey()))
+                      .collect(Collectors.toCollection(TreeSet::new));
     }
 
     public static SortedSet<String> findObsolete(LocalizationBundleForTest type) throws IOException {
-        Set<LocalizationEntry> entries = findLocalizationEntriesInFiles(type);
-
-        Set<String> keysInFiles = entries.stream().map(LocalizationEntry::getKey).collect(Collectors.toSet());
+        Set<String> keysInFiles = findLocalizationEntriesInFiles(type)
+                .stream().map(LocalizationEntry::getKey).collect(Collectors.toSet());
 
         Set<String> englishKeys;
         if (type == LocalizationBundleForTest.LANG) {
@@ -62,6 +60,7 @@ public class LocalizationParser {
         } else {
             englishKeys = getKeysInPropertiesFile("/l10n/Menu_en.properties");
         }
+
         englishKeys.removeAll(keysInFiles);
 
         return new TreeSet<>(englishKeys);
@@ -116,7 +115,6 @@ public class LocalizationParser {
 
     public static SortedSet<String> getKeysInPropertiesFile(String path) {
         Properties properties = getProperties(path);
-
         return properties.keySet().stream()
                          .sorted()
                          .map(Object::toString)
@@ -266,22 +264,22 @@ public class LocalizationParser {
                 }
 
                 String languageKey = QUOTATION_SYMBOL.matcher(b.toString()).replaceAll("\\\"");
+                if (languageKey.contains("\\\\n")) {
+                    // see also https://stackoverflow.com/a/10285687/873282
+                    throw new RuntimeException("\"" + languageKey + "\" contains an escaped new line character. The newline character has to be written with a single backslash, not with a double one.");
+                }
 
                 // escape chars which are not allowed in property file keys
+                // The call to `getPropertiesKey` escapes them
                 String languagePropertyKey = new LocalizationKey(languageKey).getPropertiesKey();
 
                 if (languagePropertyKey.endsWith(" ")) {
-                    throw new RuntimeException(languageKey + " ends with a space. As this is a localization key, this is illegal!");
+                    throw new RuntimeException("\"" + languageKey + "\" ends with a space. As this is a localization key, this is illegal!");
                 }
 
-                // \n (newline character) in the language key is stored as text "\n" in the .properties file
+                // '\n' (newline character) in the language key is stored as text "\n" in the .properties file
                 // This needs to be undone
-                languagePropertyKey = languagePropertyKey.replace("\\n", "\n");
-
-                if (languagePropertyKey.contains("\\n")) {
-                    // see also https://stackoverflow.com/a/10285687/873282
-                    throw new RuntimeException(languageKey + " contains an escaped new line character. The newline character has to be written with a single backslash, not with a double one.");
-                }
+                //languagePropertyKey = languagePropertyKey.replace("\\n", "\n");
 
                 if (!languagePropertyKey.trim().isEmpty()) {
                     result.add(languagePropertyKey);

@@ -41,8 +41,7 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
 
         textList.add(getCaseSensitiveDescription());
         textList.add(TooltipTextUtil.createText("\n\n" +
-                Localization.lang("Hint: To search specific fields only, enter for example:")));
-        textList.add(TooltipTextUtil.createText(" author=smith and title=electrical", TooltipTextUtil.TextType.MONOSPACED));
+                        Localization.lang("Hint: To search specific fields only, enter for example:\n<tt>author=smith and title=electrical</tt>")));
 
         TextFlow searchDescription = new TextFlow();
         searchDescription.getChildren().setAll(textList);

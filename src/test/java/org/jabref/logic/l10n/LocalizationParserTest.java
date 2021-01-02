@@ -16,8 +16,17 @@ public class LocalizationParserTest {
     public static Stream<Arguments> singleLineChecks() {
         return Stream.of(
                 Arguments.of("Localization.lang(\"one per line\")", "one\\ per\\ line"),
-                Arguments.of("Localization.lang(\n            \"Copy \\\\cite{citation key}\")", "Copy\\ \\cite{citation\\ key}"),
+
+                // '\c' is an escaped character, thus "\cite" is wrong as lookup text. It has to be "\\cite" in the .properties file
+                Arguments.of("Localization.lang(\"Copy \\\\cite{citation key}\")", "Copy\\ \\\\cite{citation\\ key}"),
+
+                // \" is kept
+                Arguments.of("Localization.lang(\"\\\"Hey\\\"\")", "\"Hey\""),
+
+                // \n is a "real" newline character in the simulated read read Java source code
                 Arguments.of("Localization.lang(\"multi \" + \n\"line\")", "multi\\ line"),
+                Arguments.of("Localization.lang(\n            \"A string\")", "A\\ string"),
+
                 Arguments.of("Localization.lang(\"one per line with var\", var)", "one\\ per\\ line\\ with\\ var"),
                 Arguments.of("Localization.lang(\"Search %0\", \"Springer\")", "Search\\ %0"),
                 Arguments.of("Localization.lang(\"Reset preferences (key1,key2,... or 'all')\")", "Reset\\ preferences\\ (key1,key2,...\\ or\\ 'all')"),
@@ -25,8 +34,12 @@ public class LocalizationParserTest {
                         "Multiple\\ entries\\ selected.\\ Do\\ you\\ want\\ to\\ change\\ the\\ type\\ of\\ all\\ these\\ to\\ '%0'?"),
                 Arguments.of("Localization.lang(\"Run fetcher, e.g. \\\"--fetch=Medline:cancer\\\"\");",
                         "Run\\ fetcher,\\ e.g.\\ \"--fetch\\=Medline\\:cancer\""),
+
                 // \n is allowed. See // see also https://stackoverflow.com/a/10285687/873282
-                Arguments.of("Localization.lang(\"First line\nSecond line\")", "First\\ line\nSecond\\ line")
+                // It appears as "\n" literally in the source code
+                // It appears as "\n" as key of the localization, too
+                // To mirror that, we have to write \\n here
+                Arguments.of("Localization.lang(\"First line\\nSecond line\")", "First\\ line\\nSecond\\ line")
         );
     }
 
@@ -48,7 +61,7 @@ public class LocalizationParserTest {
     public static Stream<String> causesRuntimeExceptions() {
         return Stream.of(
                 "Localization.lang(\"Ends with a space \")",
-                // "\\n" in the properties file
+                // "\\n" in the *.java source file
                 "Localization.lang(\"Escaped newline\\\\nthere\")"
         );
     }
