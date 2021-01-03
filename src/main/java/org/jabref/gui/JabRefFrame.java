@@ -773,7 +773,7 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction(this, prefs, stateManager, undoManager, Globals.TASK_EXECUTOR)),
+                factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction(dialogService, prefs, stateManager, undoManager, Globals.TASK_EXECUTOR)),
 
                 new SeparatorMenuItem(),
 
@@ -1089,7 +1089,7 @@ public class JabRefFrame extends BorderPane {
         cleanup.doPostCleanup(parserResult.getDatabase().getEntries());
         ImportEntriesDialog dialog = new ImportEntriesDialog(panel.getBibDatabaseContext(), task);
         dialog.setTitle(Localization.lang("Import"));
-        dialog.showAndWait();
+        dialogService.showCustomDialogAndWait(dialog);
     }
 
     public FileHistoryMenu getFileHistory() {
