@@ -9,7 +9,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.auxparser.AuxParser;
 import org.jabref.logic.auxparser.AuxParserResult;
 import org.jabref.model.entry.BibEntry;
@@ -120,7 +119,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     public void fileUpdated() {
         // Reset previous parse result
         keysUsedInAux = null;
-        DefaultTaskExecutor.runInJavaFXThread(() -> metaData.groupsBinding().invalidate());
+        metaData.groupsBinding().invalidate();
     }
 
     private Path relativize(Path path) {
