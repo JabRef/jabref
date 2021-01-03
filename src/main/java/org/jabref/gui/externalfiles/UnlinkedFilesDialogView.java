@@ -13,6 +13,7 @@ import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
@@ -134,6 +135,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
        progressPane.managedProperty().bind(viewModel.searchProgressVisible());
        progressPane.visibleProperty().bind(viewModel.searchProgressVisible());
        accordion.disableProperty().bind(viewModel.searchProgressVisible());
+       tree.maxHeightProperty().bind(((Control) filePane.contentProperty().get()).heightProperty());
 
        viewModel.filePaneExpanded().bindBidirectional(filePane.expandedProperty());
        viewModel.resultPaneExpanded().bindBidirectional(resultPane.expandedProperty());
@@ -144,7 +146,6 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
        fileTypeSelection.getSelectionModel().selectFirst();
 
        setupResultTable();
-
     }
 
     private void setupResultTable() {

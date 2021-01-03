@@ -19,6 +19,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.icon.JabRefIconView?>
 <DialogPane xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.jabref.gui.externalfiles.UnlinkedFilesDialogView">
     <content>
@@ -26,10 +27,13 @@
             <Label text="%Select a directory where the search shall start."/>
             <HBox alignment="BASELINE_CENTER" spacing="10.0">
                 <TextField fx:id="directoryPathField" HBox.hgrow="ALWAYS"/>
-                <Button alignment="TOP_CENTER" mnemonicParsing="false" onAction="#browseFileDirectory"
-                        text="%Browse">
+                <Button onAction="#browseFileDirectory" styleClass="icon-button,narrow"
+                        prefHeight="20.0" prefWidth="20.0">
+                    <graphic>
+                        <JabRefIconView glyph="OPEN"/>
+                    </graphic>
                     <tooltip>
-                        <Tooltip text="%Opens the file browser."/>
+                        <Tooltip text="%Browse"/>
                     </tooltip>
                 </Button>
             </HBox>
@@ -45,16 +49,14 @@
                 </Button>
             </HBox>
             <StackPane VBox.vgrow="ALWAYS">
-                <Accordion fx:id="accordion">
+                <Accordion fx:id="accordion" minHeight="300.0" prefHeight="300.0" maxHeight="300.0">
                     <panes>
-                        <TitledPane fx:id="filePane" text="%These files are not linked in the active library.">
-                            <ScrollPane fitToWidth="true" minHeight="222.0" prefHeight="222.0"
-                                        prefWidth="579.0">
-                                <TreeView fx:id="tree" minHeight="222.0" prefHeight="222.0"
-                                          prefWidth="576.0"/>
+                        <TitledPane fx:id="filePane" text="%Currently unlinked files">
+                            <ScrollPane fitToWidth="true">
+                                <TreeView fx:id="tree" />
                             </ScrollPane>
                         </TitledPane>
-                        <TitledPane fx:id="resultPane" expanded="false" text="Result">
+                        <TitledPane fx:id="resultPane" text="%Import result">
                             <TableView fx:id="tvResult" editable="true" visible="false">
                                 <columns>
                                     <TableColumn fx:id="colStatus" prefWidth="100.0" text="%Status"/>
