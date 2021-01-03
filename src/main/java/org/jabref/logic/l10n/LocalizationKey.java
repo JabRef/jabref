@@ -34,11 +34,9 @@ public class LocalizationKey {
     }
 
     public static LocalizationKey fromEscapedJavaString(String key) {
-        key = Objects.requireNonNull(key)
-                     // "\n" in the string needs to be replaced by a real newline
-                     // "\\" in the string can stay --> needs to be kept
-                     .replace("\\n", "\n");
-        return new LocalizationKey(key);
+        // "\n" in the string is an escaped newline. That needs to be kept.
+        // "\\" in the string can stay --> needs to be kept
+        return new LocalizationKey(Objects.requireNonNull(key));
     }
 
     /*
