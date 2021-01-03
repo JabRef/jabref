@@ -329,8 +329,6 @@ public class GlobalSearchBar extends HBox {
 
     private void setHintTooltip(TextFlow description) {
         if (preferencesService.getGeneralPreferences().shouldShowAdvancedHints()) {
-            Localization.lang("Just a newline\ntest - with \\cite{entry}");
-            Localization.lang("Just a newline\ntest");
             String genericDescription = Localization.lang("Hint: To search specific fields only, enter for example:\n<tt>author=smith and title=electrical</tt>");
             List<Text> genericDescriptionTexts = TooltipTextUtil.formatToTexts(genericDescription, new TooltipTextUtil.TextReplacement("<tt>author=smith and title=electrical</tt>", "author=smith and title=electrical", TooltipTextUtil.TextType.MONOSPACED));
 
