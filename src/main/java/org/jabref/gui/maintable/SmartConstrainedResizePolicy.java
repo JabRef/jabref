@@ -128,10 +128,6 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SmartConstrainedResizePolicy.class);
 
-    // Stores the share of the resizable columns.
-    // Invariant: sum(shares) = 100%
-    private Map<TableColumn<?, ?>, Double> expansionShare = new HashMap<>();
-
     private List<? extends TableColumn<?, ?>> resizableColumns;
 
     private TableColumn<?, ?> lastModifiedColumn = null;
@@ -157,8 +153,12 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
         this.thresholdPercent = thresholdPercent;
     }
 
-    public Double getThreshold(TableColumn column) {
-        return desiredColumnWidths.getOrDefault(column, column.getPrefWidth()) * thresholdPercent;
+    public Double getMinWidthThreshold(TableColumn column) {
+        return getDesiredColumnWidth(column) * thresholdPercent;
+    }
+
+    private Double getDesiredColumnWidth(TableColumn column) {
+        return desiredColumnWidths.getOrDefault(column, column.getPrefWidth());
     }
 
     @Override
@@ -168,6 +168,11 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
                 LOGGER.debug("Table width is 0. Returning false");
                 return false;
             }
+
+            firstTimeGlobalVariablesInitializations(prop.getTable());
+
+
+
             // case I0
             LOGGER.debug("Table is rendered the first time");
             doInitialTableRendering(prop.getTable());
@@ -189,8 +194,25 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
         return result;
     }
 
-    private void doInitialTableRendering(TableView table) {
+    private void firstTimeGlobalVariablesInitializations(TableView<?> table) {
+        resizableColumns = table.getVisibleLeafColumns().stream()
+                                .filter(TableColumn::isResizable)
+                                .collect(Collectors.toList());
+    }
 
+    private void doInitialTableRendering(TableView table) {
+        // case I1
+        resizableColumns.forEach(column -> column.setPrefWidth(getDesiredColumnWidth(column)));
+
+        if (contentFitsIntoTable(table)) {
+            // case I2
+            Map<TableColumn<?, ?>, Double> expansionRatio = determineExpansionRatio(resizableColumns);
+            rearrangeColumns(table, resizableColumns, expansionRatio);
+        } else {
+            // case I3
+            Map<TableColumn<?, ?>, Double> shrinkageRatio = determineShrinkageRatio(resizableColumns);
+            rearrangeColumns(table, resizableColumns, shrinkageRatio);
+        }
     }
 
     private Boolean doFullTableRendering(TableView.ResizeFeatures prop) {
@@ -199,9 +221,6 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
             LOGGER.debug("Table width is 0. Returning false");
             return false;
         }
-        resizableColumns = table.getVisibleLeafColumns().stream()
-                                .filter(TableColumn::isResizable)
-                                .collect(Collectors.toList());
         if (contentFitsIntoTable(table)) {
             LOGGER.debug("Content fits into table initially");
             LOGGER.debug("Rearranging columns");
@@ -221,35 +240,46 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
     }
 
     /**
-     * Determines the share of the total width each column has.
      * This way, the proportions of the columns are kept during resize of the window
      */
-    private void determineExpansionShare() {
-        determineExpansionShare(resizableColumns);
+    private Map<TableColumn<?, ?>, Double> determineExpansionRatioWithoutColumn(TableColumn excludedVisibleColumn) {
+        List<? extends TableColumn<?, ?>> columns = resizableColumns.stream().filter(column -> !column.equals(excludedVisibleColumn)).collect(Collectors.toList());
+        return determineExpansionRatio(columns);
     }
 
     /**
-     * This way, the proportions of the columns are kept during resize of the window
+     * Determines the share of the given columns
+     * Invariant: sum(shares) = 100%
      */
-    private void determineExpansionShareWithoutColumn(TableColumn excludedVisibleColumn) {
-        List<? extends TableColumn<?, ?>> columns = resizableColumns.stream().filter(column -> !column.equals(excludedVisibleColumn)).collect(Collectors.toList());
-        determineExpansionShare(columns);
-    }
+    private Map<TableColumn<?, ?>, Double> determineExpansionRatio(List<? extends TableColumn<?, ?>> columns) {
+        Map<TableColumn<?, ?>, Double> expansionRatio = new HashMap<>();
 
-    private void determineExpansionShare(List<? extends TableColumn<?, ?>> columns) {
-        expansionShare.clear();
         // We need to store the initial preferred width, because "setWidth()" does not exist
         // There is only "setMinWidth", "setMaxWidth", and "setPrefWidth
-        Double allColumnsWidth = columns.stream().mapToDouble(TableColumn::getPrefWidth).sum();
+        Double allColumnsWidth = columns.stream().mapToDouble(TableColumn::getWidth).sum();
         LOGGER.debug("allColumnsWidth: {}", allColumnsWidth);
         for (TableColumn column : columns) {
-            double share = column.getPrefWidth() / allColumnsWidth;
+            double share = column.getWidth() / allColumnsWidth;
             LOGGER.debug("share of {}: {}", column.getText(), share);
-            expansionShare.put(column, share);
+            expansionRatio.put(column, share);
         }
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("Sum of shares: {}", expansionShare.values().stream().mapToDouble(Double::doubleValue).sum());
+            LOGGER.trace("Sum of shares: {}", expansionRatio.values().stream().mapToDouble(Double::doubleValue).sum());
         }
+        return expansionRatio;
+    }
+
+    /**
+     * Determines the shrinkage ratio. It is a uniform distribution.
+     */
+    private Map<TableColumn<?,?>, Double> determineShrinkageRatio(List<? extends TableColumn<?,?>> resizableColumns) {
+        Map<TableColumn<?, ?>, Double> shrinkageRatio = new HashMap<>();
+        Double share = 1.0 / resizableColumns.size();
+        resizableColumns.forEach(tableColumn -> shrinkageRatio.put(tableColumn, share));
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Sum of shares: {}", shrinkageRatio.values().stream().mapToDouble(Double::doubleValue).sum());
+        }
+        return shrinkageRatio;
     }
 
     /**
@@ -271,8 +301,8 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
         double oldWidth = column.getWidth();
         double newWidth;
         if (delta < 0) {
-            double minWidth = column.getMinWidth();
-            LOGGER.trace("MinWidth {}", minWidth);
+            double minWidth = getMinWidthThreshold(column);
+            LOGGER.trace("getMinWidthThreshold {}", minWidth);
             newWidth = Math.max(minWidth, oldWidth + delta);
         } else {
             double maxWidth = column.getMaxWidth();
@@ -315,7 +345,7 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
             if (!column.equals(lastModifiedColumn)) {
                 LOGGER.debug("Column changed");
                 lastModifiedColumn = column;
-                determineExpansionShareWithoutColumn(column);
+                determineExpansionRatioWithoutColumn(column);
             }
 
             // Content does already fit
@@ -344,7 +374,7 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
      * Rearranges the widths of all columns according to their shares (proportional to their preferred widths)
      */
     private Boolean rearrangeColumns(TableView<?> table) {
-        determineExpansionShare();
+        determineExpansionRatio();
 
         Double initialContentWidth = getContentWidth(table);
         LOGGER.debug("initialContentWidth {}", initialContentWidth);
@@ -366,13 +396,24 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
         return (initialContentWidth - getContentWidth(table)) != 0d;
     }
 
-    private void rearrangeColumns(TableView<?> table, List<? extends TableColumn<?, ?>> columnsToResize) {
+    /**
+     * Completely rearranges the given columnsToResize so that the complete table content fits into the table space (in case threshold of columns is not hit)
+     *
+     * Handles cases I2 and I3
+     *
+     * @param table The table to handle
+     * @param columnsToResize The columns allowed to change the widths
+     * @param ratio The expansion/shrinkage ratio of the columns
+     */
+    private void rearrangeColumns(TableView<?> table, List<? extends TableColumn<?, ?>> columnsToResize, Map<TableColumn<?, ?>, Double> ratio) {
         Double tableWidth = table.getWidth();
         Double newContentWidth;
 
+        int iterations = 0;
+
         double remainingPixels;
-        do
-        {
+        do {
+            iterations++;
             // in case the userChosenColumnToResize got bigger, the remaining available width will get below 0 --> other columns need to be shrunk
             LOGGER.debug("tableWidth {}", tableWidth);
             Double contentWidth = getContentWidth(table);
@@ -382,7 +423,7 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
             LOGGER.debug("Distributing remainingAvailableWidth {}", remainingAvailableWidth);
             for (TableColumn column : columnsToResize) {
                 LOGGER.debug("Column {}", column.getText());
-                double share = expansionShare.get(column);
+                double share = ratio.get(column);
                 // Precondition in our case: column has to have minimum width
                 double delta = share * remainingAvailableWidth;
                 LOGGER.debug("share {} * remainingAvailableWidth {} = delta {}", share, remainingAvailableWidth, delta);
@@ -393,9 +434,14 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
             }
             newContentWidth = getContentWidth(table);
             LOGGER.debug("newContentWidth {}", newContentWidth);
-            remainingPixels = tableWidth - newContentWidth;
-            LOGGER.debug("tableWidth - newContentWidth = {}", remainingPixels);
-        } while (remainingPixels > 20d);
+            remainingPixels = Math.abs(tableWidth - newContentWidth);
+            LOGGER.debug("|tableWidth - newContentWidth| = {}", remainingPixels);
+        } while (remainingPixels > 20d && iterations <= 2);
+
+        /*
+
+        Quick hack - has to be moved elsewhere
+
         // in case the table has less than 7 pixels, a scroll bar is there
         // quickfix by removing pixels
         double amountOfRemainingPixelsRequiredForNoScrollBar = 7.0;
@@ -414,6 +460,8 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
                 }
             }
         }
+
+         */
     }
 
     /**
