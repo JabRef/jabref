@@ -1,6 +1,8 @@
 package org.jabref.gui.search.rules.describer;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -10,6 +12,10 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.search.rules.SentenceAnalyzer;
 
 public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber {
+
+    // (?s) tells Java that "." also matches the newline character
+    // (?<...>...) are named groups in Java regular expressions: https://stackoverflow.com/a/415635/873282
+    private static final Pattern TT_TEXT = Pattern.compile("(?s)(?<beforett>.*)<tt>(?<intt>.*)</tt>");
 
     private final boolean regExp;
     private final boolean caseSensitive;
@@ -40,8 +46,28 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
         }
 
         textList.add(getCaseSensitiveDescription());
-        textList.add(TooltipTextUtil.createText("\n\n" +
-                        Localization.lang("Hint: To search specific fields only, enter for example:\n<tt>author=smith and title=electrical</tt>")));
+
+        // text should be separated by two empty lines
+        String separator = "\n\n";
+        String hint = Localization.lang("Hint: To search specific fields only, enter for example:\n<tt>author=smith and title=electrical</tt>");
+        Matcher matcher = TT_TEXT.matcher(hint);
+        int lastMatchPos = 0;
+        while (matcher.find()) {
+            lastMatchPos = matcher.end();
+            String beforeTT = matcher.group("beforett");
+            assert !beforeTT.equals(""); // Property of Java
+            if (!beforeTT.isBlank()) {
+                textList.add(TooltipTextUtil.createText(separator + beforeTT));
+                separator = "";
+            }
+            String inTT = matcher.group("intt");
+            textList.add(TooltipTextUtil.createText(separator + inTT, TooltipTextUtil.TextType.MONOSPACED));
+            separator = "";
+        }
+        if (lastMatchPos < hint.length()) {
+            String remaining = hint.substring(lastMatchPos);
+            textList.add(TooltipTextUtil.createText(separator + remaining));
+        }
 
         TextFlow searchDescription = new TextFlow();
         searchDescription.getChildren().setAll(textList);
