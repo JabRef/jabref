@@ -31,14 +31,6 @@ class AutomaticPersonsGroupTest {
     }
 
     @Test
-    void createSubgroupsContainingCommaSeparatedLastNames() {
-        BibEntry bibEntry = new BibEntry().withField(StandardField.AUTHOR, "Turing, Alan and Hopper, Grace");
-        var subgroups = new AutomaticPersonsGroup("", GroupHierarchyType.INDEPENDENT, StandardField.AUTHOR).createSubgroups(bibEntry);
-        var expectedSubgroups = createPersonSubGroupFrom("Turing", "Hopper");
-        assertThat(subgroups, containsInAnyOrder(expectedSubgroups));
-    }
-
-    @Test
     void createSubgroupsContainingSpaceSeparatedNames() {
         BibEntry bibEntry = new BibEntry().withField(StandardField.AUTHOR, "Alan Turing and Grace Hopper");
         var subgroups = new AutomaticPersonsGroup("", GroupHierarchyType.INDEPENDENT, StandardField.AUTHOR).createSubgroups(bibEntry);
