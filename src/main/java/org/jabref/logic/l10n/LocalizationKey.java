@@ -53,6 +53,11 @@ public class LocalizationKey {
         return this.escapedPropertyKey;
     }
 
+    public String getValueForEnglishPropertiesFile() {
+        // Newline needs to be escaped
+        return this.key.replace("\n", "\\n");
+    }
+
     public String getKey() {
         return this.key;
     }

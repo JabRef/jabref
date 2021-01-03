@@ -128,7 +128,7 @@ class LocalizationConsistencyTest {
                            .map(key -> LocalizationKey.fromKey(key.getKey()))
                            .map(key -> String.format("%s=%s",
                                    key.getEscapedPropertiesKey(),
-                                   key.getKey()))
+                                   key.getValueForEnglishPropertiesFile()))
                            .collect(Collectors.joining("\n",
                                    "DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE\n" +
                                            "PASTE THESE INTO THE ENGLISH LANGUAGE FILE\n\n",
