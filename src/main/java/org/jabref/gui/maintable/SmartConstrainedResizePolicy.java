@@ -63,38 +63,38 @@ import org.slf4j.LoggerFactory;
  *   <li>Desired width is set to a reasonable value. The desired width is a "globally" preferred width.</li>
  * </ul>
  *
- * <h2>Resizing of column</h2>
+ * <h2>RC0 - Resizing of column</h2>
  *
  * <ul>
- *   <li>If enlarged
+ *   <li>RCE0 - If enlarged
  *     <ul>
- *         <li>Content has fit into table. Then, content does not fit into table (because of delta). Column gets enlarged by the delta. Other columns should not below a certain "reasonable" size ("threshold"). All columns are shrunk (all equally) until all columns hit the threshold. In case no column can shrink any more (they are smaller or equal the threshold), they are not shrunk. Thus, the table gets wider than the table space. This leads to a scrollbar.</li>
- *         <li>Content has not fit into table. Then, content still does not fit into table (because of delta). Column gets enlarged by the delta. Other columns are not changed. Scrollbar gets wider.</li>
+ *         <li>RCE1 - Content has fit into table. Then, content does not fit into table (because of delta). Column gets enlarged by the delta. Other columns should not below a certain "reasonable" size ("threshold"). All columns are shrunk (all equally) until all columns hit the threshold. In case no column can shrink any more (they are smaller or equal the threshold), they are not shrunk. Thus, the table gets wider than the table space. This leads to a scrollbar.</li>
+ *         <li>RCE2 - Content has not fit into table. Then, content still does not fit into table (because of delta). Column gets enlarged by the delta. Other columns are not changed. Scrollbar gets wider.</li>
  *     </ul>
  *   </li>
- *   <li>If shrunk
+ *   <li>RCS0 - If shrunk
  *     <ul>
- *       <li>Content has fit into table. Then, content still fits into table (because of delta). Column must not shrink below minimum width. If minimum is reached, nothing happens. Remaining delta is distributed among other columns. No scrollbar present.</li>
- *       <li>Content has not fit into table. If the delta is applied, the content fits into the table. Delta is applied to the column. Remaining delta splits up of delta-in-bounds and delta-out-of-bounds. Delta-in-bounds is distributed among other columns. Scrollbar disappears.</li>
- *       <li>Content has not fit into table. If the delta is applied, the content still does not fit into table. Column is shrunk respecting the delta. Other columns are resized. Scrollbar shrinks.</li>
+ *       <li>RCS1 - Content has fit into table. Then, content still fits into table (because of delta). Column must not shrink below minimum width. If minimum is reached, nothing happens. Remaining delta is distributed among other columns. No scrollbar present.</li>
+ *       <li>RCS2 - Content has not fit into table. If the delta is applied, the content fits into the table. Delta is applied to the column. Remaining delta splits up of delta-in-bounds and delta-out-of-bounds. Delta-in-bounds is distributed among other columns. Scrollbar disappears.</li>
+ *       <li>RCS3 - Content has not fit into table. If the delta is applied, the content still does not fit into table. Column is shrunk respecting the delta. Other columns are resized. Scrollbar shrinks.</li>
  *     </ul>
  *   </li>
  * </ul>
  *
- * <h2>Resizing of window</h2>
+ * <h2>RW0 - Resizing of window</h2>
  *
  * <ul>
- *   <li>If enlarged
+ *   <li>RWE0 - If enlarged
  *     <ul>
- *       <li>Content has fit into table. Then, content still has to fit into table. Thus, enlarge all columns respecting the ratio (the content is enlarged proportional to actual width). Scrollbar not present.</li>
- *       <li>Content has not fit into table. Case: Content still not fits into table. No resize action. Scrollbar shrinks.</li>
- *       <li>Content has not fit into table. Case: Content fits into table. Calculate the delta and distribute across all resizable columns using the ratio. Scrollbar not present any more.</li>
+ *       <li>RWE1 - Content has fit into table. Then, content still has to fit into table. Thus, enlarge all columns respecting the ratio (the content is enlarged proportional to actual width). Scrollbar not present.</li>
+ *       <li>RWE2 - Content has not fit into table. Case: Content still not fits into table. No resize action. Scrollbar shrinks.</li>
+ *       <li>RWE3 - Content has not fit into table. Case: Content fits into table. Calculate the delta and distribute across all resizable columns using the ratio. Scrollbar not present any more.</li>
  *     </ul>
  *   </li>
- *   <li>If shrunk
+ *   <li>RWS0 - If shrunk
  *     <ul>
- *       <li>Content has fit into table. Content does not fit into table anymore (because of shrinkage). Delta is absorbed by columns until threshold is reached. If not complete delta can be absorbed, scrollbar appears.</li>
- *       <li>Content has not fit into table. Content still does not fit into table (because of shrinkage). Scrollbar enlarges. </li>
+ *       <li>RWS1 - Content has fit into table. Content does not fit into table anymore (because of shrinkage). Delta is absorbed by columns until threshold is reached. If not complete delta can be absorbed, scrollbar appears.</li>
+ *       <li>RWS2 - Content has not fit into table. Content still does not fit into table (because of shrinkage). Scrollbar enlarges. </li>
  *     </ul>
  *   </li>
  * </ul>
