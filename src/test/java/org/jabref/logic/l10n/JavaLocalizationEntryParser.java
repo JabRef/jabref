@@ -26,7 +26,8 @@ class JavaLocalizationEntryParser {
             String languageKey = getContentWithinQuotes(param);
             if (languageKey.contains("\\\n") || languageKey.contains("\\\\n")) {
                 // see also https://stackoverflow.com/a/10285687/873282
-                throw new RuntimeException("\"" + languageKey + "\" contains an escaped new line character. The newline character has to be written with a single backslash, not with a double one.");
+                // '\n' (newline character) in the language key is stored as text "\n" in the .properties file. This is OK.
+                throw new RuntimeException("\"" + languageKey + "\" contains an escaped new line character. The newline character has to be written with a single backslash, not with a double one: \\n is correct, \\\\n is wrong.");
             }
 
             // Java escape chars which are not used in property file keys
@@ -36,10 +37,6 @@ class JavaLocalizationEntryParser {
             if (languagePropertyKey.endsWith(" ")) {
                 throw new RuntimeException("\"" + languageKey + "\" ends with a space. As this is a localization key, this is illegal!");
             }
-
-            // '\n' (newline character) in the language key is stored as text "\n" in the .properties file
-            // This needs to be undone
-            //languagePropertyKey = languagePropertyKey.replace("\\n", "\n");
 
             if (!languagePropertyKey.trim().isEmpty()) {
                 result.add(languagePropertyKey);
