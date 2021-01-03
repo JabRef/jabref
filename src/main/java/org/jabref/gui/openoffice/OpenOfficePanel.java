@@ -89,13 +89,13 @@ public class OpenOfficePanel {
     private final Button help;
     private final VBox vbox = new VBox();
 
-    private OOBibBase ooBase;
     private final JabRefFrame frame;
-    private OOBibStyle style;
     private final PreferencesService preferencesService;
     private final TaskExecutor taskExecutor;
     private final StyleLoader loader;
     private OpenOfficePreferences ooPrefs;
+    private OOBibBase ooBase;
+    private OOBibStyle style;
 
     public OpenOfficePanel(JabRefFrame frame, PreferencesService preferencesService, OpenOfficePreferences ooPrefs, KeyBindingRepository keyBindingRepository) {
         ActionFactory factory = new ActionFactory(keyBindingRepository);
@@ -161,8 +161,7 @@ public class OpenOfficePanel {
         setStyleFile.setMaxWidth(Double.MAX_VALUE);
         setStyleFile.setOnAction(event -> {
 
-            StyleSelectDialogView styleDialog = new StyleSelectDialogView(loader);
-            styleDialog.showAndWait().ifPresent(selectedStyle -> {
+            dialogService.showCustomDialogAndWait(new StyleSelectDialogView(loader)).ifPresent(selectedStyle -> {
                 style = selectedStyle;
                 try {
                     style.ensureUpToDate();
@@ -246,8 +245,7 @@ public class OpenOfficePanel {
         settingsB.setOnAction(e -> settingsMenu.show(settingsB, Side.BOTTOM, 0, 0));
         manageCitations.setMaxWidth(Double.MAX_VALUE);
         manageCitations.setOnAction(e -> {
-            ManageCitationsDialogView dlg = new ManageCitationsDialogView(ooBase);
-            dlg.showAndWait();
+           dialogService.showCustomDialogAndWait(new ManageCitationsDialogView(ooBase));
         });
 
         exportCitations.setMaxWidth(Double.MAX_VALUE);
@@ -369,7 +367,7 @@ public class OpenOfficePanel {
         if (selectedPath.isPresent()) {
 
             BackgroundTask.wrap(() -> {
-              return officeInstallation.setOpenOfficePreferences(selectedPath.get());
+                return officeInstallation.setOpenOfficePreferences(selectedPath.get());
 
             }).withInitialMessage("Searching for executable")
                           .onFailure(ex -> {
@@ -467,9 +465,7 @@ public class OpenOfficePanel {
         String pageInfo = null;
         if (addPageInfo) {
 
-            AdvancedCiteDialogView citeDialog = new AdvancedCiteDialogView();
-            Optional<AdvancedCiteDialogViewModel> citeDialogViewModel = citeDialog.showAndWait();
-
+            Optional<AdvancedCiteDialogViewModel> citeDialogViewModel = dialogService.showCustomDialogAndWait(new AdvancedCiteDialogView());
             if (citeDialogViewModel.isPresent()) {
 
                 AdvancedCiteDialogViewModel model = citeDialogViewModel.get();
