@@ -57,7 +57,6 @@ public class EditorMenus {
         return () -> {
             ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
             MenuItem copyDoiUrlMenuItem = factory.createMenuItem(StandardActions.COPY_DOI, new CopyDoiUrlAction(textArea));
-
             List<MenuItem> menuItems = new ArrayList<>();
             menuItems.add(copyDoiUrlMenuItem);
             menuItems.add(new SeparatorMenuItem());
@@ -77,7 +76,6 @@ public class EditorMenus {
             CustomMenuItem cleanupURL = new CustomMenuItem(new Label(Localization.lang("Cleanup URL link")));
             cleanupURL.setDisable(textArea.textProperty().isEmpty().get());
             cleanupURL.setOnAction(event -> textArea.setText(new CleanupUrlFormatter().format(textArea.getText())));
-
             List<MenuItem> menuItems = new ArrayList<>();
             menuItems.add(cleanupURL);
             return menuItems;

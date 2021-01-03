@@ -41,7 +41,6 @@ public class DefaultMenu implements Supplier<List<MenuItem>> {
 
     private static Menu getCaseChangeMenu(TextInputControl textInputControl) {
         Objects.requireNonNull(textInputControl.textProperty());
-
         Menu submenu = new Menu(Localization.lang("Change case"));
 
         for (final Formatter caseChanger : Formatters.getCaseChangers()) {

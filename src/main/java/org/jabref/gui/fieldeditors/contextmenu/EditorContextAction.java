@@ -37,27 +37,21 @@ public class EditorContextAction extends SimpleCommand {
         BooleanBinding allSelectedBinding = Bindings.createBooleanBinding(() -> textInputControl.getSelection().getLength() == textInputControl.getLength());
         BooleanBinding maskTextBinding = (BooleanBinding) BindingsHelper.constantOf(textInputControl instanceof PasswordField); // (maskText("A") != "A");
 
-        if (SHOW_HANDLES) {
-            this.executable.bind(
-                    switch (command) {
-                        case COPY -> editableBinding.and(maskTextBinding.not()).and(hasSelectionBinding);
-                        case CUT -> maskTextBinding.not().and(hasSelectionBinding);
-                        case PASTE -> editableBinding.and(hasStringInClipboardBinding);
-                        case DELETE -> editableBinding.and(hasSelectionBinding);
-                        case SELECT_ALL -> hasTextBinding.and(allSelectedBinding.not());
-                        default -> BindingsHelper.constantOf(true);
-                    });
-        } else {
-            this.executable.bind(
-                    switch (command) {
-                        case COPY -> editableBinding.and(maskTextBinding.not()).and(hasSelectionBinding);
-                        case CUT -> maskTextBinding.not().and(hasSelectionBinding);
-                        case PASTE -> editableBinding.and(hasStringInClipboardBinding);
-                        case DELETE -> editableBinding.and(hasSelectionBinding);
-                        case SELECT_ALL -> hasTextBinding.and(allSelectedBinding.not()); // why was this disabled before?
-                        default -> BindingsHelper.constantOf(true);
-                    });
-        }
+        this.executable.bind(
+                switch (command) {
+                    case COPY -> editableBinding.and(maskTextBinding.not()).and(hasSelectionBinding);
+                    case CUT -> maskTextBinding.not().and(hasSelectionBinding);
+                    case PASTE -> editableBinding.and(hasStringInClipboardBinding);
+                    case DELETE -> editableBinding.and(hasSelectionBinding);
+                    case SELECT_ALL -> {
+                        if (SHOW_HANDLES) {
+                            yield hasTextBinding.and(allSelectedBinding.not());
+                        } else {
+                            yield BindingsHelper.constantOf(true);
+                        }
+                    }
+                    default -> BindingsHelper.constantOf(true);
+                });
     }
 
     @Override
@@ -82,7 +76,7 @@ public class EditorContextAction extends SimpleCommand {
         MenuItem selectAllMenuItem = factory.createMenuItem(StandardActions.SELECT_ALL,
                 new EditorContextAction(StandardActions.SELECT_ALL, textInputControl));
         if (SHOW_HANDLES) {
-            selectAllMenuItem.getProperties().put("refreshMenu", Boolean.TRUE); // what does that mean?
+            selectAllMenuItem.getProperties().put("refreshMenu", Boolean.TRUE);
         }
 
         return List.of(
