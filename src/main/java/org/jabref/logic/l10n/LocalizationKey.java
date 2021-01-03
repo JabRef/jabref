@@ -7,44 +7,53 @@ import java.util.Objects;
  */
 public class LocalizationKey {
 
-    private final String javaCodeKey;
-    private final String propertyKey;
+    private final String key;
+    private final String escapedPropertyKey;
 
-    private LocalizationKey(String javaCodeKey, String propertyKey) {
-        this.javaCodeKey = javaCodeKey;
-        this.propertyKey = propertyKey;
-    }
-
-    public static LocalizationKey fromJavaKey(String key) {
-        String javaCodeKey = Objects.requireNonNull(key);
-        // space, #, !, = and : are not allowed in properties file keys (# and ! only at the beginning of the key but easier to escape every instance
-        // Newline ('\n') is already escaped in Java source. Thus, there is no need to escape it a second time.
-        String propertyKey = key
-                // escape the remaining characters
+    /**
+     * @param key plain key - no escaping. E.g., "Copy \cite{key}" or "Newline follows\nsecond line" are valid parameters.
+     */
+    private LocalizationKey(String key) {
+        this.key = key;
+        // space, #, !, = and : are not allowed in properties file keys
+        // # and ! are only disallowed at the beginning of the key but easier to escape every instance
+        this.escapedPropertyKey = key
+                .replace("\n", "\\n")
                 .replace(" ", "\\ ")
                 .replace("#", "\\#")
                 .replace("!", "\\!")
                 .replace("=", "\\=")
                 .replace(":", "\\:");
-        return new LocalizationKey(javaCodeKey, propertyKey);
     }
 
+    /**
+     * @param key plain key - no escaping. E.g., "Copy \cite{key}" or "Newline follows\nsecond line" are valid parameters.
+     */
+    public static LocalizationKey fromKey(String key) {
+        return new LocalizationKey(Objects.requireNonNull(key));
+    }
+
+    public static LocalizationKey fromEscapedJavaString(String key) {
+        key = Objects.requireNonNull(key)
+                     // "\n" in the string needs to be replaced by a real newline
+                     // "\\" in the string can stay --> needs to be kept
+                     .replace("\\n", "\n");
+        return new LocalizationKey(key);
+    }
+
+    /*
     public static LocalizationKey fromPropertyKey(String key) {
         String propertyKey = key;
         // we ne need to unescape the escaped characters (see org.jabref.logic.l10n.LocalizationKey.LocalizationKey)
         String javaCodeKey = key.replaceAll("\\\\([ #!=:])", "$1");
         return new LocalizationKey(javaCodeKey, propertyKey);
     }
-
-    public String getJavaCodeKey() {
-        return this.javaCodeKey;
+    */
+    public String getEscapedPropertiesKey() {
+        return this.escapedPropertyKey;
     }
 
-    public String getPropertiesKey() {
-        return this.propertyKey;
-    }
-
-    public String getTranslationValue() {
-        return this.javaCodeKey;
+    public String getKey() {
+        return this.key;
     }
 }

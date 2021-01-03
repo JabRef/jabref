@@ -206,7 +206,7 @@ public class LocalizationParser {
         }
 
         return result.stream()
-                     .map(key -> new LocalizationEntry(path, LocalizationKey.fromPropertyKey(key).getJavaCodeKey(), type))
+                     .map(key -> new LocalizationEntry(path, key, type))
                      .collect(Collectors.toList());
     }
 

@@ -125,10 +125,10 @@ class LocalizationConsistencyTest {
                                                                 .collect(Collectors.toList());
         assertEquals(Collections.emptyList(), missingKeys,
                 missingKeys.stream()
-                           .map(key -> LocalizationKey.fromPropertyKey(key.getKey()))
+                           .map(key -> LocalizationKey.fromKey(key.getKey()))
                            .map(key -> String.format("%s=%s",
-                                   key.getPropertiesKey(),
-                                   key.getJavaCodeKey()))
+                                   key.getEscapedPropertiesKey(),
+                                   key.getKey()))
                            .collect(Collectors.joining("\n",
                                    "DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE\n" +
                                            "PASTE THESE INTO THE ENGLISH LANGUAGE FILE\n\n",

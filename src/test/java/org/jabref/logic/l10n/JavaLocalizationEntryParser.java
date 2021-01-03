@@ -31,7 +31,7 @@ class JavaLocalizationEntryParser {
 
             // Java escape chars which are not used in property file keys
             // The call to `getPropertiesKey` escapes them
-            String languagePropertyKey = LocalizationKey.fromPropertyKey(languageKey).getJavaCodeKey();
+            String languagePropertyKey = LocalizationKey.fromEscapedJavaString(languageKey).getKey();
 
             if (languagePropertyKey.endsWith(" ")) {
                 throw new RuntimeException("\"" + languageKey + "\" ends with a space. As this is a localization key, this is illegal!");
