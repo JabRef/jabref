@@ -110,7 +110,7 @@ public class WebSearchPaneViewModel {
 
         ImportEntriesDialog dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task);
         dialog.setTitle(activeFetcher.getName());
-        dialog.showAndWait();
+        dialogService.showCustomDialogAndWait(dialog);
     }
 
     public void validateQueryStringAndGiveColorFeedback(TextField querySource, String queryString) {
