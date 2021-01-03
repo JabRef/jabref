@@ -1,8 +1,11 @@
 package org.jabref.gui.metadata;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.model.database.BibDatabaseContext;
+
+import com.airhacks.afterburner.injection.Injector;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
@@ -18,7 +21,8 @@ public class BibtexStringEditorAction extends SimpleCommand {
 
     @Override
     public void execute() {
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
-        new BibtexStringEditorDialogView(database.getDatabase()).showAndWait();
+        dialogService.showCustomDialogAndWait(new BibtexStringEditorDialogView(database.getDatabase()));
     }
 }

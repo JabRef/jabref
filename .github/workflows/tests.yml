@@ -261,6 +261,6 @@ jobs:
           echo
           echo "In case you want to use a different one, please comment here and adjust your name in your git configuration for future commits"
           echo
-          echo "Just adding yourself into the AUHTORS file does not help as it is overwritten by our script ./scripts/generate-authors."
+          echo "Just adding yourself into the AUTHORS file does not help as it is overwritten by our script ./scripts/generate-authors."
           echo "Read more on the AUTHORS file at found at https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md#author-credits"
           exit 1

@@ -97,7 +97,7 @@ public class ImportAction {
 
             ImportEntriesDialog dialog = new ImportEntriesDialog(libraryTab.getBibDatabaseContext(), task);
             dialog.setTitle(Localization.lang("Import"));
-            dialog.showAndWait();
+            dialogService.showCustomDialogAndWait(dialog);
         }
     }
 
