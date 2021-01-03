@@ -9,6 +9,7 @@ import javax.swing.undo.UndoManager;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -51,6 +52,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     @FXML private ButtonType importButton;
     @FXML private Button buttonExport;
     @FXML private Label progressText;
+    @FXML private Accordion accordion;
     @FXML private ProgressIndicator progressDisplay;
     @FXML private VBox progressPane;
 
@@ -131,6 +133,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
        progressPane.managedProperty().bind(viewModel.searchProgressVisible());
        progressPane.visibleProperty().bind(viewModel.searchProgressVisible());
+       accordion.disableProperty().bind(viewModel.searchProgressVisible());
 
        viewModel.filePaneExpanded().bindBidirectional(filePane.expandedProperty());
        viewModel.resultPaneExpanded().bindBidirectional(resultPane.expandedProperty());

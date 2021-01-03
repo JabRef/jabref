@@ -75,7 +75,7 @@ public class ImportHandler {
         return new BackgroundTask<>() {
 
             @Override
-            protected List<ImportFilesResultItemViewModel> call() throws Exception {
+            protected List<ImportFilesResultItemViewModel> call() {
                 results = new ArrayList<>();
                 counter = 1;
                 CompoundEdit ce = new CompoundEdit();
@@ -111,21 +111,14 @@ public class ImportHandler {
 
                             // First try xmp import, if empty try pdf import, otherwise create empty entry
                             if (!xmpEntriesInFile.isEmpty()) {
-                                if (!pdfEntriesInFile.isEmpty()) {
-                                    // FIXME: Show merge dialog?
-                                    entriesToAdd = xmpEntriesInFile;
-                                } else {
-                                    entriesToAdd = xmpEntriesInFile;
-                                }
+                                entriesToAdd = xmpEntriesInFile;
                                 addResultToList(file, true, Localization.lang("Importing using XMP data..."));
-                            } else {
-                                if (!pdfEntriesInFile.isEmpty()) {
+                            } else if (!pdfEntriesInFile.isEmpty()) {
                                     entriesToAdd = pdfEntriesInFile;
                                     addResultToList(file, true, Localization.lang("Importing using extracted PDF data"));
-                                } else {
-                                    addResultToList(file, false, Localization.lang("No metadata found. Creating empty entry with file link"));
+                            } else {
                                     entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
-                                }
+                                    addResultToList(file, false, Localization.lang("No metadata found. Creating empty entry with file link"));
                             }
                         } else if (FileUtil.isBibFile(file)) {
                             var bibtexParserResult = contentImporter.importFromBibFile(file, fileUpdateMonitor);
@@ -133,12 +126,11 @@ public class ImportHandler {
                                 addResultToList(file, false, bibtexParserResult.getErrorMessage());
                             }
 
-                            addResultToList(file, false, Localization.lang("Importing bib entry"));
                             entriesToAdd = bibtexParserResult.getDatabaseContext().getEntries();
-
+                            addResultToList(file, false, Localization.lang("Importing bib entry"));
                         } else {
-                            addResultToList(file, false, Localization.lang("No bibtex data found. Creating empty entry with file link"));
                             entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
+                            addResultToList(file, false, Localization.lang("No bibtex data found. Creating empty entry with file link"));
                         }
 
                     } catch (IOException ex) {
@@ -185,8 +177,8 @@ public class ImportHandler {
 
         // Set owner/timestamp
         UpdateField.setAutomaticFields(entries,
-                                       preferencesService.getOwnerPreferences(),
-                                       preferencesService.getTimestampPreferences());
+                preferencesService.getOwnerPreferences(),
+                preferencesService.getTimestampPreferences());
 
         // Generate citation keys
         generateKeys(entries);
@@ -216,9 +208,9 @@ public class ImportHandler {
      */
     private void generateKeys(List<BibEntry> entries) {
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
-                                                                     bibdatabasecontext.getMetaData().getCiteKeyPattern(Globals.prefs.getCitationKeyPatternPreferences().getKeyPattern()),
-                                                                     bibdatabasecontext.getDatabase(),
-                                                                     Globals.prefs.getCitationKeyPatternPreferences());
+                bibdatabasecontext.getMetaData().getCiteKeyPattern(Globals.prefs.getCitationKeyPatternPreferences().getKeyPattern()),
+                bibdatabasecontext.getDatabase(),
+                Globals.prefs.getCitationKeyPatternPreferences());
 
         for (BibEntry entry : entries) {
             keyGenerator.generateAndSetKey(entry);
