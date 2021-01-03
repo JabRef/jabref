@@ -130,9 +130,9 @@ class LocalizationConsistencyTest {
                                    key.getEscapedPropertiesKey(),
                                    key.getValueForEnglishPropertiesFile()))
                            .collect(Collectors.joining("\n",
-                                   "DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE\n" +
+                                   "\n\nDETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE\n" +
                                            "PASTE THESE INTO THE ENGLISH LANGUAGE FILE\n\n",
-                                   "\n")));
+                                   "\n\n")));
     }
 
     @Test
