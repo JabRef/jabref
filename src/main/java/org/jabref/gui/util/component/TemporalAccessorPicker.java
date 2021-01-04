@@ -92,7 +92,7 @@ public class TemporalAccessorPicker extends DatePicker {
         return converter;
     }
 
-    public final StringConverter<? extends TemporalAccessor> getStringConverter() {
+    public final StringConverter<TemporalAccessor> getStringConverter() {
         StringConverter<TemporalAccessor> newConverter = new StringConverter<>() {
             @Override
             public String toString(TemporalAccessor value) {
