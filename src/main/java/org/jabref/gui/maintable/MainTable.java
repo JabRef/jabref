@@ -354,7 +354,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             // Center -> link files to entry
             // Depending on the pressed modifier, move/copy/link files to drop target
             switch (ControlHelper.getDroppingMouseLocation(row, event)) {
-                case TOP, BOTTOM -> importHandler.importAsNewEntries(files);
+                case TOP, BOTTOM -> {
+                    importHandler.importFilesInBackground(files).executeWith(Globals.TASK_EXECUTOR);
+                }
                 case CENTER -> {
                     BibEntry entry = target.getEntry();
                     switch (event.getTransferMode()) {

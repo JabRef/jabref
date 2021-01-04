@@ -89,7 +89,7 @@ public class ImportHandler {
                         updateProgress(counter, files.size() - 1);
                     });
 
-                    var file = files.get(0);
+                    var file = files.get(i);
                     entriesToAdd = Collections.emptyList();
 
                     try {
@@ -157,10 +157,6 @@ public class ImportHandler {
     private void addResultToList(Path newFile, boolean success, String logMessage) {
         var result = new ImportFilesResultItemViewModel(newFile, success, logMessage);
         results.add(result);
-    }
-
-    public void importAsNewEntries(List<Path> files) {
-        // Will be replaced
     }
 
     private BibEntry createEmptyEntryWithLink(Path file) {
