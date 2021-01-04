@@ -7,7 +7,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Base64;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import javafx.scene.Scene;
 
@@ -36,8 +38,13 @@ public class Theme {
     private static final Logger LOGGER = LoggerFactory.getLogger(Theme.class);
 
     private final Type type;
+
+    // String and URL formats of the path to the css.
+    // in general, call method additionalCssToLoad(), to ensure file existence checks are performed
     private final Path pathToCss;
-    private final Optional<URL> additionalCssToLoad;
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private final Optional<URL> cssUrl;
+
     private final PreferencesService preferencesService;
 
     public Theme(String path, PreferencesService preferencesService) {
@@ -47,31 +54,31 @@ public class Theme {
         if (StringUtil.isBlank(path) || BASE_CSS.equalsIgnoreCase(path)) {
             // Light theme
             this.type = Type.LIGHT;
-            this.additionalCssToLoad = Optional.empty();
+            this.cssUrl = Optional.empty();
         } else {
-            Optional<URL> cssResource = Optional.ofNullable(JabRefFrame.class.getResource(path));
-            if (cssResource.isPresent()) {
+            URL url = JabRefFrame.class.getResource(path);
+            if (url != null) {
                 // Embedded dark theme
                 this.type = Type.DARK;
             } else {
                 // Custom theme
                 this.type = Type.CUSTOM;
-                if (Files.exists(pathToCss)) {
-                    try {
-                        cssResource = Optional.of(pathToCss.toUri().toURL());
-                    } catch (MalformedURLException e) {
-                        cssResource = Optional.empty();
-                    }
+                try {
+                    url = pathToCss.toUri().toURL();
+                } catch (MalformedURLException e) {
+                    url = null;
                 }
             }
 
-            if (cssResource.isPresent()) {
-                additionalCssToLoad = cssResource;
-                LOGGER.debug("Using css {}", path);
-            } else {
-                additionalCssToLoad = Optional.empty();
-                LOGGER.warn("Cannot load css {}", path);
-            }
+            this.cssUrl = Optional.ofNullable(url);
+        }
+    }
+
+    private Optional<URL> additionalCssToLoad() {
+        if (type == Type.CUSTOM && !Files.exists(pathToCss)) {
+            return Optional.empty();
+        } else {
+            return cssUrl;
         }
     }
 
@@ -83,7 +90,7 @@ public class Theme {
         AppearancePreferences appearancePreferences = preferencesService.getAppearancePreferences();
 
         addAndWatchForChanges(scene, JabRefFrame.class.getResource(BASE_CSS), fileUpdateMonitor, 0);
-        additionalCssToLoad.ifPresent(file -> addAndWatchForChanges(scene, file, fileUpdateMonitor, 1));
+        additionalCssToLoad().ifPresent(file -> addAndWatchForChanges(scene, file, fileUpdateMonitor, 1));
 
         if (appearancePreferences.shouldOverrideDefaultFontSize()) {
             scene.getRoot().setStyle("-fx-font-size: " + appearancePreferences.getMainFontSize() + "pt;");
@@ -133,5 +140,30 @@ public class Theme {
 
     public Path getPath() {
         return pathToCss;
+    }
+
+    /**
+     * This method allows callers to consume the theme's additional stylesheet. The consumer is only called if there is
+     * a stylesheet that is additional to the base stylesheet, and either embedded in the application or present on
+     * the file system.
+     *
+     * @param consumer called with the stylesheet location if there is an additional stylesheet present. The location
+     *                 is local URL (e.g. {@code 'data:'} or {@code 'file:'})
+     */
+    public void ifAdditionalStylesheetPresent(Consumer<String> consumer) {
+
+        final Optional<String> location;
+        if (type == Theme.Type.DARK) {
+            // We need to load the css file manually, due to a bug in the jdk
+            // https://bugs.openjdk.java.net/browse/JDK-8240969
+            // TODO: Remove this workaround, and update javadoc to include jrt: URL prefix, as soon as openjfx 16 is released
+            URL url = JabRefFrame.class.getResource(pathToCss.getFileName().toString());
+            location = Optional.of("data:text/css;charset=utf-8;base64," +
+                    Base64.getEncoder().encodeToString(StringUtil.getResourceFileAsString(url).getBytes()));
+        } else {
+            location = additionalCssToLoad().map(URL::toExternalForm);
+        }
+
+        location.ifPresent(consumer);
     }
 }
