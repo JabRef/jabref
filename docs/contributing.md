@@ -29,7 +29,7 @@ The main goal of the formal requirements is to provide credit to you and to be a
 
 #### Add your change to `CHANGELOG.md`
 
-You should edit the [CHANGELOG.md](CHANGELOG.md) located in the root directory of the JabRef source.
+You should edit the [`CHANGELOG.md`](https://github.com/JabRef/jabref/blob/master/CHANGELOG.md#changelog) file located in the root directory of the JabRef source.
 Add a line with your changes in the appropriate section.
 
 If you did internal refactorings or improvements not visible to the user (e.g., UI, .bib file), then you don't need to put an entry there.
@@ -47,8 +47,8 @@ In case you add keys to the changelog, please follow these rules:
 
 #### Author credits
 
-You will be given credit in the [`AUTHORS`](AUTHORS) file in the root of the repository and the 'About' pages inside the main application.
-We will periodically update the contributors list inside [`AUTHORS`](AUTHORS).
+You will be given credit in the [`AUTHORS`](https://github.com/JabRef/jabref/blob/master/AUTHORS) file in the root of the repository and the 'About' pages inside the main application.
+We will periodically update the contributors list inside `AUTHORS`.
 This is done by an automatic shell script `scripts/generate-authors.sh`.
 
 If you want to add yourself directly with your pull request please run this script.
@@ -91,7 +91,7 @@ Actual   :[Opens\ JabRef's\ Twitter\ page (src\main\java\org\jabref\gui\JabRefFr
 ```
 
 Add the above snippet to the English translation file located at `src/main/resources/l10n/JabRef_en.properties`.
-[Crowdin](http://translate.jabref.org/) will automatically pick up the new string and add it to the other translations.
+[Crowdin](https://crowdin.com/project/jabref) will automatically pick up the new string and add it to the other translations.
 
 You can also directly run the specific test in your IDE.
 The test "LocalizationConsistencyTest" is placed under `src/test/java/net.sf.jabref.logic.l10n/LocalizationConsistencyTest.java`
@@ -100,7 +100,7 @@ Find more information in the [JabRef developer docs](https://devdocs.jabref.org/
 #### When adding a library
 
 Please try to use a version available at JCenter and add it to `build.gradle`.
-In any case, describe the library at [external-libraries.md](external-libraries.md).
+In any case, describe the library at [`external-libraries.md`](https://github.com/JabRef/jabref/blob/master/external-libraries.md#external-libraries).
 We need that information for our package maintainers (e.g., those of the [debian package](https://tracker.debian.org/pkg/jabref)).
 Also add a txt file stating the license in `libraries/`.
 It is used at `gradlew processResources` to generate the About.html files.
