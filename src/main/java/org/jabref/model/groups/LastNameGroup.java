@@ -44,8 +44,8 @@ public class LastNameGroup extends KeywordGroup {
     public boolean equals(Object other) {
         if (super.equals(other)) {
             LastNameGroup otherGroup = (LastNameGroup) other;
-            return (getSearchField().equals(otherGroup.getSearchField()) &&
-                    getSearchExpression().equals(otherGroup.getSearchExpression()));
+            return (Objects.equals(getSearchField(), otherGroup.getSearchField()) &&
+                    Objects.equals(getSearchExpression(), otherGroup.getSearchExpression()));
         }
         return false;
     }
