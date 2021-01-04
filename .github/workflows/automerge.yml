@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: 'Wait for status checks'
         id: waitforstatuschecks
-        uses: "WyriHaximus/github-action-wait-for-status@v1.2"
+        uses: "WyriHaximus/github-action-wait-for-status@v1.3"
         with:
           ignoreActions: Automerge Dependabot
           checkInterval: 13

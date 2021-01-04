@@ -1,5 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
+import java.util.Collections;
+
 import javax.swing.undo.UndoManager;
 
 import javafx.fxml.FXML;
@@ -49,6 +51,8 @@ public class CitationKeyEditor extends HBox implements FieldEditorFX {
                   .load();
 
         textField.textProperty().bindBidirectional(viewModel.textProperty());
+
+        textField.initContextMenu(Collections::emptyList);
 
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }

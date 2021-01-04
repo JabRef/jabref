@@ -267,15 +267,15 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
             this.executable.bind(
                     switch (command) {
-                        case RENAME_FILE_TO_PATTERN -> Bindings.createBooleanBinding(
+                        case RENAME_FILE_TO_PATTERN, MOVE_FILE_TO_FOLDER_AND_RENAME -> Bindings.createBooleanBinding(
                                 () -> !linkedFile.getFile().isOnlineLink()
                                         && linkedFile.getFile().findIn(databaseContext, preferencesService.getFilePreferences()).isPresent()
                                         && !linkedFile.isGeneratedNameSameAsOriginal(),
                                 linkedFile.getFile().linkProperty());
-                        case MOVE_FILE_TO_FOLDER_AND_RENAME, MOVE_FILE_TO_FOLDER -> Bindings.createBooleanBinding(
+                        case MOVE_FILE_TO_FOLDER -> Bindings.createBooleanBinding(
                                 () -> !linkedFile.getFile().isOnlineLink()
                                         && linkedFile.getFile().findIn(databaseContext, preferencesService.getFilePreferences()).isPresent()
-                                        && linkedFile.isGeneratedPathSameAsOriginal(),
+                                        && !linkedFile.isGeneratedPathSameAsOriginal(),
                                 linkedFile.getFile().linkProperty());
                         case DOWNLOAD_FILE -> Bindings.createBooleanBinding(
                                 () -> linkedFile.getFile().isOnlineLink(),

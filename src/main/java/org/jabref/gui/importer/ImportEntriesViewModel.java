@@ -207,7 +207,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             DuplicateResolverDialog dialog = new DuplicateResolverDialog(other.get(),
                     entry, DuplicateResolverDialog.DuplicateResolverType.INSPECTION, databaseContext, stateManager);
 
-            DuplicateResolverDialog.DuplicateResolverResult result = dialog.showAndWait().orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK);
+            DuplicateResolverDialog.DuplicateResolverResult result = dialogService.showCustomDialogAndWait(dialog)
+                                                                                  .orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK);
 
             if (result == DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT) {
                 // TODO: Remove old entry. Or... add it to a list of entries
@@ -237,7 +238,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             DuplicateResolverDialog diag = new DuplicateResolverDialog(entry,
                     other.get(), DuplicateResolverDialog.DuplicateResolverType.DUPLICATE_SEARCH, databaseContext, stateManager);
 
-            DuplicateResolverDialog.DuplicateResolverResult answer = diag.showAndWait().orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK);
+            DuplicateResolverDialog.DuplicateResolverResult answer = dialogService.showCustomDialogAndWait(diag)
+                                                                                  .orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK);
             if (answer == DuplicateResolverDialog.DuplicateResolverResult.KEEP_LEFT) {
                 // Remove other entry
                 entries.remove(other.get());
