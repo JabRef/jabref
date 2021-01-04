@@ -93,7 +93,7 @@ public class TemporalAccessorPicker extends DatePicker {
     }
 
     public final StringConverter<TemporalAccessor> getStringConverter() {
-        return Objects.requireNonNullElseGet(stringConverterProperty().get(), () -> new StringConverter<>() {
+        StringConverter<TemporalAccessor> newConverter = new StringConverter<>() {
             @Override
             public String toString(TemporalAccessor value) {
                 return defaultFormatter.format(value);
@@ -103,7 +103,8 @@ public class TemporalAccessorPicker extends DatePicker {
             public TemporalAccessor fromString(String value) {
                 return LocalDateTime.parse(value, defaultFormatter);
             }
-        });
+        };
+        return Objects.requireNonNullElseGet(stringConverterProperty().get(), () -> newConverter);
     }
 
     public final void setStringConverter(StringConverter<TemporalAccessor> value) {
@@ -123,13 +124,15 @@ public class TemporalAccessorPicker extends DatePicker {
     }
 
     private class InternalConverter extends StringConverter<LocalDate> {
+        @Override
         public String toString(LocalDate object) {
             TemporalAccessor value = getTemporalAccessorValue();
             return (value != null) ? getStringConverter().toString(value) : "";
         }
 
+        @Override
         public LocalDate fromString(String value) {
-            if (value == null || value.isEmpty()) {
+            if ((value == null) || value.isEmpty()) {
                 temporalAccessorValue.set(null);
                 return null;
             }
