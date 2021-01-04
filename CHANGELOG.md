@@ -16,15 +16,15 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Changed
 
-- We improved the "Find unlinked files" dialog to show import results for each file [#7209](https://github.com/JabRef/jabref/pull/7209)
+- We improved the "Find unlinked files" dialog to show import results for each file. [#7209](https://github.com/JabRef/jabref/pull/7209)
 
 ### Fixed
 
 - We fixed an issue with the style of highlighted check boxes while searching in preferences. [#7226](https://github.com/JabRef/jabref/issues/7226)
 - We fixed an issue where the option "Move file to file directory" was disabled in the entry editor for all files [#7194](https://github.com/JabRef/jabref/issues/7194)
 - We fixed an issue where application dialogs were opening in the wrong display when using multiple screens [#7273](https://github.com/JabRef/jabref/pull/7273)
-- We fixed an issue where the "Find unlinked files" dialog would freeze JabRef on importing [#7205](https://github.com/JabRef/jabref/issues/7205)
-- We fixed an issue where the "Find unlinked files" would stop importing when importing a single file failed [#7206](https://github.com/JabRef/jabref/issues/7206)
+- We fixed an issue where the "Find unlinked files" dialog would freeze JabRef on importing. [#7205](https://github.com/JabRef/jabref/issues/7205)
+- We fixed an issue where the "Find unlinked files" would stop importing when importing a single file failed. [#7206](https://github.com/JabRef/jabref/issues/7206)
 
 ### Removed
 
