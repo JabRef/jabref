@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -48,9 +49,14 @@ class ZbMATHTest {
     }
 
     @Test
-    @DisabledOnCIServer("CI server has no subscription to zbMath and thus gets 401 response")
     void searchByQueryFindsEntry() throws Exception {
         List<BibEntry> fetchedEntries = fetcher.performSearch("an:0507.57010");
         assertEquals(Collections.singletonList(donaldsonEntry), fetchedEntries);
+    }
+
+    @Test
+    void searchByIdFindsEntry() throws Exception {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0507.57010");
+        assertEquals(Optional.of(donaldsonEntry), fetchedEntry);
     }
 }
