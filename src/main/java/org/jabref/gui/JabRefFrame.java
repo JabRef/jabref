@@ -1089,7 +1089,7 @@ public class JabRefFrame extends BorderPane {
         cleanup.doPostCleanup(parserResult.getDatabase().getEntries());
         ImportEntriesDialog dialog = new ImportEntriesDialog(panel.getBibDatabaseContext(), task);
         dialog.setTitle(Localization.lang("Import"));
-        dialog.showAndWait();
+        dialogService.showCustomDialogAndWait(dialog);
     }
 
     public FileHistoryMenu getFileHistory() {

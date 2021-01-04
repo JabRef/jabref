@@ -30,6 +30,7 @@ Principles:
                Localization.lang("Something went wrong...", ioe);
        }
     ```
+
 * Never, ever throw and catch `Exception` or `Throwable`
 * Errors should only be logged when they are finally caught \(i.e., logged only once\). See **Logging** for details.
 * If the Exception message is intended to be shown to the User in the UI \(see below\) provide also a localizedMessage \(see `JabRefException`\).
@@ -57,7 +58,7 @@ Many times there is a need to provide an object on many locations simultaneously
 
 ### Main principle
 
-`EventBus` represents a communication line between multiple components. Objects can be passed through the bus and reach the listening method of another object which is registered on that `EventBus` instance. Hence the passed object is available as a parameter in the listening method.
+`EventBus` represents a communication line between multiple components. Objects can be passed through the bus and reach the listening method of another object which is registered on that `EventBus` instance. Hence, the passed object is available as a parameter in the listening method.
 
 ### Register to the `EventBus`
 
@@ -398,3 +399,20 @@ All radio buttons that should be grouped together need to have a ToggleGroup def
 </VBox>
 ```
 
+### JavaFX Dialogs
+
+All dialogs should be displayed to the user via `DialogService` interface methods.
+`DialogService` provides methods to display various dialogs (including custom ones) to the user.
+It also ensures the displayed dialog opens on the correct window via `initOwner()` (for cases where the user has multiple screens).
+The following code snippet demonstrates how a custom dialog is displayed to the user:
+
+```java
+dialogService.showCustomDialog(new DocumentViewerView());
+```
+
+If an instance of `DialogService` is unavailable within current class/scope in which the dialog needs to be displayed,
+`DialogService` can be instantiated via the code snippet shown as follows:
+
+```java
+DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+```

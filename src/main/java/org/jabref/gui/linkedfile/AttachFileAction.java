@@ -68,7 +68,7 @@ public class AttachFileAction extends SimpleCommand {
 
             LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(linkedFile);
 
-            dialog.showAndWait()
+            dialogService.showCustomDialogAndWait(dialog)
                   .ifPresent(editedLinkedFile -> {
                       Optional<FieldChange> fieldChange = entry.addFile(editedLinkedFile);
                       fieldChange.ifPresent(change -> {
