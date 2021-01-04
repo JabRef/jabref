@@ -10,7 +10,7 @@ import com.google.common.collect.HashBiMap;
 
 public class GenderEditorViewModel extends MapBasedEditorViewModel<String> {
 
-    private BiMap<String, String> itemMap = HashBiMap.create(7);
+    private final BiMap<String, String> itemMap = HashBiMap.create(7);
 
     public GenderEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
         super(field, suggestionProvider, fieldCheckers);

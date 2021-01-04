@@ -5,6 +5,7 @@ import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -28,6 +29,8 @@ public class OwnerEditor extends HBox implements FieldEditorFX {
                   .load();
 
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
+
+        textArea.initContextMenu(EditorMenus.getNameMenu(textArea));
 
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
     }
