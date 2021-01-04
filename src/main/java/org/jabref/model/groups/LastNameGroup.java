@@ -39,19 +39,4 @@ public class LastNameGroup extends KeywordGroup {
     public AbstractGroup deepCopy() {
         return new LastNameGroup(getName(), getHierarchicalContext(), getSearchField(), getSearchExpression());
     }
-
-    @Override
-    public boolean equals(Object other) {
-        if (super.equals(other)) {
-            LastNameGroup otherGroup = (LastNameGroup) other;
-            return (Objects.equals(getSearchField(), otherGroup.getSearchField()) &&
-                    Objects.equals(getSearchExpression(), otherGroup.getSearchExpression()));
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), getSearchField(), getSearchExpression());
-    }
 }
