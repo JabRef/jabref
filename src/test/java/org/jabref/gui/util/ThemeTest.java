@@ -28,9 +28,14 @@ public class ThemeTest {
     @Test
     public void lightTheme() {
         // Light theme is detected from a blank path:
-        Theme theme = new Theme("", preferencesMock);
-        assertEquals(Theme.Type.LIGHT, theme.getType());
-        theme.ifAdditionalStylesheetPresent(location -> fail(
+        Theme blankTheme = new Theme("", preferencesMock);
+        assertEquals(Theme.Type.LIGHT, blankTheme.getType());
+        blankTheme.ifAdditionalStylesheetPresent(location -> fail(
+                "didn't expect consumer to be called; was called with CSS location " + location));
+        // Light theme is detected from Base.css:
+        Theme baseTheme = new Theme("Base.css", preferencesMock);
+        assertEquals(Theme.Type.LIGHT, baseTheme.getType());
+        baseTheme.ifAdditionalStylesheetPresent(location -> fail(
                 "didn't expect consumer to be called; was called with CSS location " + location));
     }
 
