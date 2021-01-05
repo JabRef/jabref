@@ -66,16 +66,19 @@ public class Theme {
                 try {
                     url = pathToCss.toUri().toURL();
                 } catch (MalformedURLException e) {
+                    LOGGER.warn("Cannot load additional css url {} because it is a malformed url", path, e);
                     url = null;
                 }
             }
 
+            LOGGER.debug("Theme is {}, additional css url is {}", this.type, url);
             this.cssUrl = Optional.ofNullable(url);
         }
     }
 
     private Optional<URL> additionalCssToLoad() {
         if (type == Type.CUSTOM && !Files.exists(pathToCss)) {
+            LOGGER.warn("Not loading additional css file {} because it could not be found", pathToCss);
             return Optional.empty();
         } else {
             return cssUrl;
@@ -120,7 +123,7 @@ public class Theme {
                 LOGGER.debug("CSS URI {}", cssUri);
 
                 Path cssPath = Path.of(cssUri).toAbsolutePath();
-                LOGGER.info("Enabling live reloading of {}", cssPath);
+                LOGGER.info("Enabling live reloading of css file {}", cssPath);
                 fileUpdateMonitor.addListenerForFile(cssPath, () -> {
                     LOGGER.info("Reload css file {}", cssFile);
                     DefaultTaskExecutor.runInJavaFXThread(() -> {
