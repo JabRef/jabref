@@ -51,8 +51,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty addCreationDateProperty = new SimpleBooleanProperty();
     private final BooleanProperty addModificiationDateProperty = new SimpleBooleanProperty();
 
-    private Validator markTimeStampFormatValidator;
-
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
     private final GeneralPreferences initialGeneralPreferences;
@@ -70,25 +68,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.initialTelemetryPreferences = preferencesService.getTelemetryPreferences();
         this.initialOwnerPreferences = preferencesService.getOwnerPreferences();
         this.initialTimestampPreferences = preferencesService.getTimestampPreferences();
-
-        markTimeStampFormatValidator = new FunctionBasedValidator<>(
-                markTimeStampFormatProperty,
-                input -> {
-                    try {
-                        DateTimeFormatter.ofPattern(markTimeStampFormatProperty.getValue());
-                    } catch (IllegalArgumentException exception) {
-                        return false;
-                    }
-                    return true;
-                },
-                ValidationMessage.error(String.format("%s > %s > %s %n %n %s",
-                        Localization.lang("General"),
-                        Localization.lang("Time stamp"),
-                        Localization.lang("Date format"),
-                        Localization.lang("Invalid date format")
-                        )
-                )
-        );
     }
 
     public void setValues() {
@@ -152,17 +131,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                 addModificiationDateProperty.getValue()));
     }
 
-    public ValidationStatus markTimeStampFormatValidationStatus() {
-        return markTimeStampFormatValidator.getValidationStatus();
-    }
-
     public boolean validateSettings() {
-        ValidationStatus validationStatus = markTimeStampFormatValidationStatus();
-        if (!validationStatus.isValid()) {
-            validationStatus.getHighestMessage().ifPresent(message ->
-                    dialogService.showErrorDialogAndWait(message.getMessage()));
-            return false;
-        }
         return true;
     }
 
