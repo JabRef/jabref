@@ -40,14 +40,8 @@ public class GeneralTabView extends AbstractPreferenceTabView<GeneralTabViewMode
     @FXML private TextField markOwnerName;
     @FXML private CheckBox markOwnerOverwrite;
     @FXML private Button markOwnerHelp;
-    @FXML private CheckBox markTimestamp;
-    @FXML private TextField markTimeStampFormat;
-    @FXML private Label markTimeStampFormatLabel;
-    @FXML private CheckBox markTimeStampOverwrite;
-    @FXML private TextField markTimeStampFieldName;
-    @FXML private Label markTimeStampFieldNameLabel;
-    @FXML private Button markTimeStampHelp;
-    @FXML private CheckBox updateTimeStamp;
+    @FXML private CheckBox addTimestamp;
+    @FXML private CheckBox modifyTimeStamp;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
