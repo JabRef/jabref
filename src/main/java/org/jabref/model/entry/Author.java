@@ -3,6 +3,7 @@ package org.jabref.model.entry;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jabref.model.strings.StringUtil;
 
 /**
@@ -18,6 +19,7 @@ public class Author {
     private final String vonPart;
     private final String lastPart;
     private final String jrPart;
+    private Author latexFree;
 
     /**
      * Creates the Author object. If any part of the name is absent, <CODE>null</CODE> must be passed; otherwise other methods may return erroneous results.
@@ -357,5 +359,17 @@ public class Author {
             res.deleteCharAt(0);
         }
         return res.toString();
+    }
+
+    public Author latexFree() {
+        if (latexFree == null) {
+            String first = getFirst().map(LatexToUnicodeAdapter::format).orElse(null);
+            String firstabbr = getFirstAbbr().map(LatexToUnicodeAdapter::format).orElse(null);
+            String von = getVon().map(LatexToUnicodeAdapter::format).orElse(null);
+            String last = getLast().map(LatexToUnicodeAdapter::format).orElse(null);
+            String jr = getJr().map(LatexToUnicodeAdapter::format).orElse(null);
+            latexFree = new Author(first, firstabbr, von, last, jr);
+        }
+        return latexFree;
     }
 }
