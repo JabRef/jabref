@@ -144,12 +144,16 @@ public class AuthorList {
         this.authors = Objects.requireNonNull(authors);
     }
 
-    public AuthorList(Author author) {
-        this(Collections.singletonList(author));
+    public static AuthorList of(List<Author> authors) {
+        return new AuthorList(List.copyOf(authors));
     }
 
-    public AuthorList() {
-        this(new ArrayList<>());
+    public static AuthorList of(Author... authors) {
+        return new AuthorList(List.of(authors));
+    }
+
+    public static Collector<Author, ?, AuthorList> collect() {
+        return Collectors.collectingAndThen(Collectors.toUnmodifiableList(), AuthorList::new);
     }
 
     /**
