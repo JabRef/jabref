@@ -2,8 +2,7 @@ package org.jabref.gui.openoffice;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -129,7 +128,7 @@ class OOBibBase {
 
     private final DialogService dialogService;
 
-    public OOBibBase(List<URL> jarUrls, boolean atEnd, DialogService dialogService) throws IllegalAccessException, InvocationTargetException, BootstrapException, CreationException, IOException, ClassNotFoundException {
+    public OOBibBase(Path loPath, boolean atEnd, DialogService dialogService) throws IllegalAccessException, InvocationTargetException, BootstrapException, CreationException, IOException, ClassNotFoundException {
 
         this.dialogService = dialogService;
 
@@ -146,7 +145,7 @@ class OOBibBase {
 
         this.atEnd = atEnd;
 
-        xDesktop = simpleBootstrap(jarUrls);
+        xDesktop = simpleBootstrap(loPath);
     }
 
     public boolean isConnectedToDocument() {
@@ -232,14 +231,11 @@ class OOBibBase {
         return result;
     }
 
-    private XDesktop simpleBootstrap(List<URL> jarUrls)
+    private XDesktop simpleBootstrap(Path loPath)
             throws CreationException, BootstrapException {
 
-        URL[] urls = jarUrls.toArray(new URL[1]);
-        URLClassLoader loader = new URLClassLoader(urls, null);
-
         // Get the office component context:
-        XComponentContext xContext = org.jabref.gui.openoffice.Bootstrap.bootstrap(loader);
+        XComponentContext xContext = org.jabref.gui.openoffice.Bootstrap.bootstrap(loPath);
         // Get the office service manager:
         XMultiComponentFactory xServiceManager = xContext.getServiceManager();
         // Create the desktop, which is the root frame of the

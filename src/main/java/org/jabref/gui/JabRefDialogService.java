@@ -274,7 +274,9 @@ public class JabRefDialogService implements DialogService {
 
     @Override
     public <R> Optional<R> showCustomDialogAndWait(javafx.scene.control.Dialog<R> dialog) {
-        dialog.initOwner(mainWindow);
+        if (dialog.getOwner() == null) {
+            dialog.initOwner(mainWindow);
+        }
         return dialog.showAndWait();
     }
 
@@ -398,7 +400,9 @@ public class JabRefDialogService implements DialogService {
 
     @Override
     public void showCustomDialog(BaseDialog<?> aboutDialogView) {
-        aboutDialogView.initOwner(mainWindow);
+        if (aboutDialogView.getOwner() == null) {
+            aboutDialogView.initOwner(mainWindow);
+        }
         aboutDialogView.show();
     }
 }

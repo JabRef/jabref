@@ -21,13 +21,12 @@
 package org.jabref.gui.openoffice;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -254,10 +253,9 @@ public class Bootstrap {
      * @throws BootstrapException if things go awry.
      * @since UDK 3.1.0
      */
-    public static final XComponentContext bootstrap(URLClassLoader loader) throws BootstrapException {
-
+    public static final XComponentContext bootstrap(Path ooPath) throws BootstrapException {
         String[] defaultArgArray = getDefaultOptions();
-        return bootstrap(defaultArgArray, loader);
+        return bootstrap(defaultArgArray, ooPath);
     }
 
     /**
@@ -269,7 +267,7 @@ public class Bootstrap {
      * @see #getDefaultOptions()
      * @since LibreOffice 5.1
      */
-    public static final XComponentContext bootstrap(String[] argArray, URLClassLoader loader) throws BootstrapException {
+    public static final XComponentContext bootstrap(String[] argArray, Path path) throws BootstrapException {
 
         XComponentContext xContext = null;
 
@@ -280,18 +278,10 @@ public class Bootstrap {
                 throw new BootstrapException("no local component context!");
             }
 
-            // find office executable relative to this class's class loader
-            String sOffice = System.getProperty("os.name").startsWith("Windows") ? "soffice.exe" : "soffice";
-
-            File fOffice = NativeLibraryLoader.getResource(loader, sOffice);
-            if (fOffice == null) {
-                throw new BootstrapException("no office executable found!");
-            }
-
             // create call with arguments
             // We need a socket, pipe does not work. https://api.libreoffice.org/examples/examples.html
             String[] cmdArray = new String[argArray.length + 2];
-            cmdArray[0] = fOffice.getPath();
+            cmdArray[0] = path.toAbsolutePath().toString();
             cmdArray[1] = ("--accept=socket,host=localhost,port=2083" + ";urp;");
 
             System.arraycopy(argArray, 0, cmdArray, 2, argArray.length);
