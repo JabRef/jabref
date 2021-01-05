@@ -11,7 +11,7 @@ public class TimestampPreferences {
         this.addCreationDate = addCreationDate;
         this.addModificationDate = modifyTimestamp;
     }
-1
+
     public String now() {
         return DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(LocalDateTime.now());
     }

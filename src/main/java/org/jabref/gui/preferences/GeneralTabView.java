@@ -2,12 +2,10 @@ package org.jabref.gui.preferences;
 
 import java.nio.charset.Charset;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.Globals;
@@ -40,8 +38,8 @@ public class GeneralTabView extends AbstractPreferenceTabView<GeneralTabViewMode
     @FXML private TextField markOwnerName;
     @FXML private CheckBox markOwnerOverwrite;
     @FXML private Button markOwnerHelp;
-    @FXML private CheckBox addTimestamp;
-    @FXML private CheckBox modifyTimeStamp;
+    @FXML private CheckBox addCreationDate;
+    @FXML private CheckBox addModificationDate;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -92,8 +90,8 @@ public class GeneralTabView extends AbstractPreferenceTabView<GeneralTabViewMode
         markOwnerOverwrite.selectedProperty().bindBidirectional(viewModel.markOwnerOverwriteProperty());
         markOwnerOverwrite.disableProperty().bind(markOwner.selectedProperty().not());
 
-        addTimestamp.selectedProperty().bindBidirectional(viewModel.addTimestampPropertyProperty());
-        modifyTimeStamp.selectedProperty().bindBidirectional(viewModel.modifyTimestampPropertyProperty());
+        addCreationDate.selectedProperty().bindBidirectional(viewModel.addCreationDatePropertyProperty());
+        addModificationDate.selectedProperty().bindBidirectional(viewModel.addModificiationDatePropertyProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER), markOwnerHelp);
