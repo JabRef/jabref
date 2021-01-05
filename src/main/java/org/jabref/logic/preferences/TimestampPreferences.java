@@ -7,9 +7,15 @@ public class TimestampPreferences {
     private final boolean addCreationDate;
     private final boolean addModificationDate;
 
-    public TimestampPreferences(boolean addCreationDate, boolean modifyTimestamp) {
+    // Old settings used for migration
+    private final boolean useTimestamps;
+    private final boolean updateTimestamp;
+
+    public TimestampPreferences(boolean addCreationDate, boolean modifyTimestamp, boolean useTimestamps, boolean updateTimestamp) {
         this.addCreationDate = addCreationDate;
         this.addModificationDate = modifyTimestamp;
+        this.useTimestamps = useTimestamps;
+        this.updateTimestamp = updateTimestamp;
     }
 
     public String now() {
@@ -22,5 +28,13 @@ public class TimestampPreferences {
 
     public boolean isAddModificationDate() {
         return addModificationDate;
+    }
+
+    public boolean isUpdateTimestamp() {
+        return updateTimestamp;
+    }
+
+    public boolean isUseTimestamps() {
+        return useTimestamps;
     }
 }

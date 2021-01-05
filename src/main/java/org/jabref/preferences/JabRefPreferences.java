@@ -207,9 +207,6 @@ public class JabRefPreferences implements PreferencesService {
 
     public static final String USE_TIME_STAMP = "useTimeStamp";
     public static final String UPDATE_TIMESTAMP = "updateTimestamp";
-    public static final String TIME_STAMP_FIELD = "timeStampField";
-    public static final String TIME_STAMP_FORMAT = "timeStampFormat";
-    public static final String OVERWRITE_TIME_STAMP = "overwriteTimeStamp";
     public static final String ADD_CREATION_DATE = "addCreationDate";
     public static final String ADD_MODIFICATION_DATE = "addModificationDate";
 
@@ -589,14 +586,9 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn");
         defaults.put(WARN_ABOUT_DUPLICATES_IN_INSPECTION, Boolean.TRUE);
         defaults.put(USE_TIME_STAMP, Boolean.FALSE);
-        defaults.put(OVERWRITE_TIME_STAMP, Boolean.FALSE);
         defaults.put(ADD_CREATION_DATE, Boolean.FALSE);
         defaults.put(ADD_MODIFICATION_DATE, Boolean.FALSE);
 
-        // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
-        defaults.put(TIME_STAMP_FORMAT, "yyyy-MM-dd");
-
-        defaults.put(TIME_STAMP_FIELD, StandardField.TIMESTAMP.getName());
         defaults.put(UPDATE_TIMESTAMP, Boolean.FALSE);
 
         defaults.put(GENERATE_KEYS_BEFORE_SAVING, Boolean.FALSE);
@@ -1383,7 +1375,9 @@ public class JabRefPreferences implements PreferencesService {
     public TimestampPreferences getTimestampPreferences() {
         return new TimestampPreferences(
                 getBoolean(ADD_CREATION_DATE),
-                getBoolean(ADD_MODIFICATION_DATE));
+                getBoolean(ADD_MODIFICATION_DATE),
+                getBoolean(USE_TIME_STAMP),
+                getBoolean(UPDATE_TIMESTAMP));
     }
 
     @Override
