@@ -49,11 +49,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty markOwnerProperty = new SimpleBooleanProperty();
     private final StringProperty markOwnerNameProperty = new SimpleStringProperty("");
     private final BooleanProperty markOwnerOverwriteProperty = new SimpleBooleanProperty();
-    private final BooleanProperty markTimestampProperty = new SimpleBooleanProperty();
-    private final StringProperty markTimeStampFormatProperty = new SimpleStringProperty("");
-    private final BooleanProperty markTimeStampOverwriteProperty = new SimpleBooleanProperty();
-    private final StringProperty markTimeStampFieldNameProperty = new SimpleStringProperty("");
-    private final BooleanProperty updateTimeStampProperty = new SimpleBooleanProperty();
+    private final BooleanProperty addTimestampProperty = new SimpleBooleanProperty();
+    private final BooleanProperty modifyTimestampProperty = new SimpleBooleanProperty();
 
     private Validator markTimeStampFormatValidator;
 
@@ -154,6 +151,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                 markOwnerNameProperty.getValue().trim(),
                 markOwnerOverwriteProperty.getValue()));
 
+        // TODO: Get this running, without deleting old preferences that are necessary for migration
         preferencesService.storeTimestampPreferences(new TimestampPreferences(
                 markTimestampProperty.getValue(),
                 updateTimeStampProperty.getValue(),
@@ -247,23 +245,11 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     // Time stamp
 
-    public BooleanProperty markTimestampProperty() {
-        return this.markTimestampProperty;
+    public BooleanProperty addTimestampPropertyProperty() {
+        return addTimestampProperty;
     }
 
-    public StringProperty markTimeStampFormatProperty() {
-        return this.markTimeStampFormatProperty;
-    }
-
-    public BooleanProperty markTimeStampOverwriteProperty() {
-        return this.markTimeStampOverwriteProperty;
-    }
-
-    public StringProperty markTimeStampFieldNameProperty() {
-        return this.markTimeStampFieldNameProperty;
-    }
-
-    public BooleanProperty updateTimeStampProperty() {
-        return this.updateTimeStampProperty;
+    public BooleanProperty modifyTimestampPropertyProperty() {
+        return modifyTimestampProperty;
     }
 }

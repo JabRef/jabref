@@ -92,22 +92,12 @@ public class GeneralTabView extends AbstractPreferenceTabView<GeneralTabViewMode
         markOwnerOverwrite.selectedProperty().bindBidirectional(viewModel.markOwnerOverwriteProperty());
         markOwnerOverwrite.disableProperty().bind(markOwner.selectedProperty().not());
 
-        markTimestamp.selectedProperty().bindBidirectional(viewModel.markTimestampProperty());
-        markTimeStampFormatLabel.disableProperty().bind(markTimestamp.selectedProperty().not());
-        markTimeStampFormat.textProperty().bindBidirectional(viewModel.markTimeStampFormatProperty());
-        markTimeStampFormat.disableProperty().bind(markTimestamp.selectedProperty().not());
-        markTimeStampOverwrite.selectedProperty().bindBidirectional(viewModel.markTimeStampOverwriteProperty());
-        markTimeStampOverwrite.disableProperty().bind(markTimestamp.selectedProperty().not());
-        markTimeStampFieldNameLabel.disableProperty().bind(markTimestamp.selectedProperty().not());
-        markTimeStampFieldName.textProperty().bindBidirectional(viewModel.markTimeStampFieldNameProperty());
-        markTimeStampFieldName.disableProperty().bind(markTimestamp.selectedProperty().not());
-        updateTimeStamp.selectedProperty().bindBidirectional(viewModel.updateTimeStampProperty());
+        addTimestamp.selectedProperty().bindBidirectional(viewModel.addTimestampPropertyProperty());
+        modifyTimeStamp.selectedProperty().bindBidirectional(viewModel.modifyTimestampPropertyProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER), markOwnerHelp);
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.TIMESTAMP), markTimeStampHelp);
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
-        Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.markTimeStampFormatValidationStatus(), markTimeStampFormat));
     }
 }
