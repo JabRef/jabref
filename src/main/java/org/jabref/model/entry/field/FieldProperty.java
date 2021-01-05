@@ -3,7 +3,6 @@ package org.jabref.model.entry.field;
 public enum FieldProperty {
     BOOK_NAME,
     DATE,
-    DATE_TIME,
     DOI,
     EDITOR_TYPE,
     EPRINT,

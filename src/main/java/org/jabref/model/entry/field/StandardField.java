@@ -142,8 +142,8 @@ public enum StandardField implements Field {
     GROUPS("groups"),
     OWNER("owner"),
     TIMESTAMP("timestamp", FieldProperty.DATE),
-    CREATIONDATE("creationdate", FieldProperty.DATE_TIME),
-    MODIFICATIONDATE("modificationdate", FieldProperty.DATE_TIME);
+    CREATIONDATE("creationdate", FieldProperty.DATE),
+    MODIFICATIONDATE("modificationdate", FieldProperty.DATE);
 
 
     private final String name;
