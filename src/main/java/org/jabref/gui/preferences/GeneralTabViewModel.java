@@ -151,7 +151,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                 markOwnerNameProperty.getValue().trim(),
                 markOwnerOverwriteProperty.getValue()));
 
-        // TODO: Get this running, without deleting old preferences that are necessary for migration
         preferencesService.storeTimestampPreferences(new TimestampPreferences(
                 markTimestampProperty.getValue(),
                 updateTimeStampProperty.getValue(),

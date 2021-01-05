@@ -210,6 +210,9 @@ public class JabRefPreferences implements PreferencesService {
     public static final String TIME_STAMP_FIELD = "timeStampField";
     public static final String TIME_STAMP_FORMAT = "timeStampFormat";
     public static final String OVERWRITE_TIME_STAMP = "overwriteTimeStamp";
+    public static final String ADD_CREATION_DATE = "addCreationDate";
+    public static final String ADD_MODIFICATION_DATE = "addModificationDate";
+
 
     public static final String WARN_ABOUT_DUPLICATES_IN_INSPECTION = "warnAboutDuplicatesInInspection";
     public static final String NON_WRAPPABLE_FIELDS = "nonWrappableFields";
@@ -587,6 +590,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(WARN_ABOUT_DUPLICATES_IN_INSPECTION, Boolean.TRUE);
         defaults.put(USE_TIME_STAMP, Boolean.FALSE);
         defaults.put(OVERWRITE_TIME_STAMP, Boolean.FALSE);
+        defaults.put(ADD_CREATION_DATE, Boolean.FALSE);
+        defaults.put(ADD_MODIFICATION_DATE, Boolean.FALSE);
 
         // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
         defaults.put(TIME_STAMP_FORMAT, "yyyy-MM-dd");
@@ -1377,20 +1382,14 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public TimestampPreferences getTimestampPreferences() {
         return new TimestampPreferences(
-                getBoolean(USE_TIME_STAMP),
-                getBoolean(UPDATE_TIMESTAMP),
-                FieldFactory.parseField(get(TIME_STAMP_FIELD)),
-                get(TIME_STAMP_FORMAT),
-                getBoolean(OVERWRITE_TIME_STAMP));
+                getBoolean(ADD_CREATION_DATE),
+                getBoolean(ADD_MODIFICATION_DATE));
     }
 
     @Override
     public void storeTimestampPreferences(TimestampPreferences preferences) {
-        putBoolean(USE_TIME_STAMP, preferences.shouldUseTimestamps());
-        putBoolean(UPDATE_TIMESTAMP, preferences.shouldUpdateTimestamp());
-        put(TIME_STAMP_FIELD, preferences.getTimestampField().getName());
-        put(TIME_STAMP_FORMAT, preferences.getTimestampFormat());
-        putBoolean(OVERWRITE_TIME_STAMP, preferences.shouldOverwriteTimestamp());
+        putBoolean(ADD_CREATION_DATE, preferences.isAddCreationDate());
+        putBoolean(ADD_MODIFICATION_DATE, preferences.isAddModificationDate());
     }
 
     //*************************************************************************************************************

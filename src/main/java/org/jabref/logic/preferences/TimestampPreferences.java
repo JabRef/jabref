@@ -3,26 +3,24 @@ package org.jabref.logic.preferences;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import org.jabref.model.entry.field.Field;
-
 public class TimestampPreferences {
-    private final boolean addTimestamp;
-    private final boolean modifyTimestamp;
+    private final boolean addCreationDate;
+    private final boolean addModificationDate;
 
-    public TimestampPreferences(boolean addTimestamp, boolean modifyTimestamp) {
-        this.addTimestamp = addTimestamp;
-        this.modifyTimestamp = modifyTimestamp;
+    public TimestampPreferences(boolean addCreationDate, boolean modifyTimestamp) {
+        this.addCreationDate = addCreationDate;
+        this.addModificationDate = modifyTimestamp;
     }
 1
     public String now() {
         return DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(LocalDateTime.now());
     }
 
-    public boolean isAddTimestamp() {
-        return addTimestamp;
+    public boolean isAddCreationDate() {
+        return addCreationDate;
     }
 
-    public boolean isModifyTimestamp() {
-        return modifyTimestamp;
+    public boolean isAddModificationDate() {
+        return addModificationDate;
     }
 }
