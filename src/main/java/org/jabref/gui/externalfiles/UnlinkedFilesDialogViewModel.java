@@ -27,6 +27,7 @@ import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TreeItem;
 import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -57,7 +58,7 @@ public class UnlinkedFilesDialogViewModel {
     private final BooleanProperty applyButtonDisabled = new SimpleBooleanProperty();
     private final BooleanProperty scanButtonDisabled = new SimpleBooleanProperty(true);
     private final BooleanProperty exportButtonDisabled = new SimpleBooleanProperty();
-    private final ObjectProperty<TreeItem<FileNodeWrapper>> treeRoot = new SimpleObjectProperty<>();
+    private final ObjectProperty<TreeItem<FileNodeViewModel>> treeRoot = new SimpleObjectProperty<>();
     private final BooleanProperty scanButtonDefaultButton = new SimpleBooleanProperty();
     private final DoubleProperty progress = new SimpleDoubleProperty(0);
     private final StringProperty progressText = new SimpleStringProperty();
@@ -65,17 +66,16 @@ public class UnlinkedFilesDialogViewModel {
     private final BooleanProperty resultPaneExpanded = new SimpleBooleanProperty();
 
     private final ObservableList<ImportFilesResultItemViewModel> resultList = FXCollections.observableArrayList();
-
-    private final List<FileChooser.ExtensionFilter> fileFilterList = List.of(
+    private final ObservableList<ExtensionFilter> fileFilterList = FXCollections.observableArrayList(
                                                                              FileFilterConverter.ANY_FILE,
                                                                              FileFilterConverter.toExtensionFilter(StandardFileType.PDF),
                                                                              FileFilterConverter.toExtensionFilter(StandardFileType.BIBTEX_DB));
     private final DialogService dialogService;
     private final PreferencesService preferences;
-    private BackgroundTask<CheckBoxTreeItem<FileNodeWrapper>> findUnlinkedFilesTask;
+    private BackgroundTask<CheckBoxTreeItem<FileNodeViewModel>> findUnlinkedFilesTask;
     private BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesBackgroundTask;
 
-    private final BibDatabaseContext bibDatabasecontext;
+    private final BibDatabaseContext bibDatabase;
     private final TaskExecutor taskExecutor;
 
     public UnlinkedFilesDialogViewModel(DialogService dialogService, ExternalFileTypes externalFileTypes, UndoManager undoManager,
@@ -83,10 +83,10 @@ public class UnlinkedFilesDialogViewModel {
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
-        this.bibDatabasecontext = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
+        this.bibDatabase = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
         importHandler = new ImportHandler(
                                           dialogService,
-                                          bibDatabasecontext,
+                                          bibDatabase,
                                           externalFileTypes,
                                           preferences,
                                           fileUpdateMonitor,
@@ -95,8 +95,7 @@ public class UnlinkedFilesDialogViewModel {
     }
 
     public void startImport() {
-
-        CheckBoxTreeItem<FileNodeWrapper> root = (CheckBoxTreeItem<FileNodeWrapper>) treeRoot.getValue();
+        CheckBoxTreeItem<FileNodeViewModel> root = (CheckBoxTreeItem<FileNodeViewModel>) treeRoot.getValue();
         final List<Path> fileList = getFileListFromNode(root);
 
         resultList.clear();
@@ -119,7 +118,6 @@ public class UnlinkedFilesDialogViewModel {
             progressText.unbind();
             searchProgressVisible.setValue(false);
             scanButtonDisabled.setValue(false);
-
         })
         .onSuccess(results -> {
            applyButtonDisabled.setValue(false);
@@ -133,17 +131,15 @@ public class UnlinkedFilesDialogViewModel {
            filePaneExpanded.setValue(false);
            resultPaneExpanded.setValue(true);
            resultList.addAll(results);
-
         });
         importFilesBackgroundTask.executeWith(taskExecutor);
-
     }
 
     /**
      * This starts the export of all files of all selected nodes in the file tree view.
      */
     public void startExport() {
-        CheckBoxTreeItem<FileNodeWrapper> root = (CheckBoxTreeItem<FileNodeWrapper>) treeRoot.getValue();
+        CheckBoxTreeItem<FileNodeViewModel> root = (CheckBoxTreeItem<FileNodeViewModel>) treeRoot.getValue();
 
         final List<Path> fileList = getFileListFromNode(root);
         if (fileList.isEmpty()) {
@@ -178,7 +174,6 @@ public class UnlinkedFilesDialogViewModel {
     }
 
     public void startSearch() {
-
         Path directory = this.getSearchDirectory();
         FileFilter selectedFileFilter = FileFilterConverter.toFileFilter(selectedExtension.getValue());
 
@@ -188,45 +183,45 @@ public class UnlinkedFilesDialogViewModel {
         progress.unbind();
         progressText.unbind();
 
-        findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, bibDatabasecontext, preferences.getFilePreferences())
-                .onRunning(() -> {
+        findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, bibDatabase, preferences.getFilePreferences())
+        .onRunning(() -> {
 
-                    progress.set(ProgressIndicator.INDETERMINATE_PROGRESS);
-                    progressText.setValue(Localization.lang("Searching file system..."));
-                    progressText.bind(findUnlinkedFilesTask.messageProperty());
+            progress.set(ProgressIndicator.INDETERMINATE_PROGRESS);
+            progressText.setValue(Localization.lang("Searching file system..."));
+            progressText.bind(findUnlinkedFilesTask.messageProperty());
 
-                    searchProgressVisible.setValue(true);
-                    scanButtonDisabled.setValue(true);
-                    applyButtonDisabled.set(true);
-                    treeRoot.setValue(null);
-                })
-                .onFinished(() -> {
-                    scanButtonDisabled.setValue(false);
-                    applyButtonDisabled.setValue(false);
-                    searchProgressVisible.set(false);
-                    progress.set(0);
-                    searchProgressVisible.set(false);
+            searchProgressVisible.setValue(true);
+            scanButtonDisabled.setValue(true);
+            applyButtonDisabled.set(true);
+            treeRoot.setValue(null);
+        })
+        .onFinished(() -> {
+            scanButtonDisabled.setValue(false);
+            applyButtonDisabled.setValue(false);
+            searchProgressVisible.set(false);
+            progress.set(0);
+            searchProgressVisible.set(false);
 
-                })
-                .onSuccess(root -> {
-                    treeRoot.setValue(root);
-                    root.setSelected(true);
-                    root.setExpanded(true);
-                    progress.set(0);
+        })
+        .onSuccess(root -> {
+            treeRoot.setValue(root);
+            root.setSelected(true);
+            root.setExpanded(true);
+            progress.set(0);
 
-                    applyButtonDisabled.setValue(false);
-                    exportButtonDisabled.setValue(false);
-                    scanButtonDefaultButton.setValue(false);
-                    searchProgressVisible.set(false);
-                });
-        findUnlinkedFilesTask.executeWith(taskExecutor);
+            applyButtonDisabled.setValue(false);
+            exportButtonDisabled.setValue(false);
+            scanButtonDefaultButton.setValue(false);
+            searchProgressVisible.set(false);
+        });
+       findUnlinkedFilesTask.executeWith(taskExecutor);
     }
 
     public StringProperty directoryPath() {
         return this.directoryPath;
     }
 
-    public List<FileChooser.ExtensionFilter> getFileFilters() {
+    public ObservableList<ExtensionFilter> getFileFilters() {
         return this.fileFilterList;
     }
 
@@ -262,7 +257,7 @@ public class UnlinkedFilesDialogViewModel {
                  });
     }
 
-    public ObjectProperty<TreeItem<FileNodeWrapper>> treeRoot() {
+    public ObjectProperty<TreeItem<FileNodeViewModel>> treeRoot() {
         return this.treeRoot;
     }
 
@@ -300,10 +295,10 @@ public class UnlinkedFilesDialogViewModel {
         return directory;
     }
 
-    private List<Path> getFileListFromNode(CheckBoxTreeItem<FileNodeWrapper> node) {
+    private List<Path> getFileListFromNode(CheckBoxTreeItem<FileNodeViewModel> node) {
         List<Path> filesList = new ArrayList<>();
-        for (TreeItem<FileNodeWrapper> childNode : node.getChildren()) {
-            CheckBoxTreeItem<FileNodeWrapper> child = (CheckBoxTreeItem<FileNodeWrapper>) childNode;
+        for (TreeItem<FileNodeViewModel> childNode : node.getChildren()) {
+            CheckBoxTreeItem<FileNodeViewModel> child = (CheckBoxTreeItem<FileNodeViewModel>) childNode;
             if (child.isLeaf()) {
                 if (child.isSelected()) {
                     Path nodeFile = child.getValue().path;
@@ -319,7 +314,7 @@ public class UnlinkedFilesDialogViewModel {
     }
 
     public void selectAll() {
-        CheckBoxTreeItem<FileNodeWrapper> root = (CheckBoxTreeItem<FileNodeWrapper>) treeRoot.getValue();
+        CheckBoxTreeItem<FileNodeViewModel> root = (CheckBoxTreeItem<FileNodeViewModel>) treeRoot.getValue();
         // Need to toggle a twice to make sure everything is selected
         root.setSelected(true);
         root.setSelected(false);
@@ -327,7 +322,7 @@ public class UnlinkedFilesDialogViewModel {
     }
 
     public void unselectAll() {
-        CheckBoxTreeItem<FileNodeWrapper> root = (CheckBoxTreeItem<FileNodeWrapper>) treeRoot.getValue();
+        CheckBoxTreeItem<FileNodeViewModel> root = (CheckBoxTreeItem<FileNodeViewModel>) treeRoot.getValue();
         // Need to toggle a twice to make sure nothing is selected
         root.setSelected(false);
         root.setSelected(true);

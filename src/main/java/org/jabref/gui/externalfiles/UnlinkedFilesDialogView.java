@@ -6,9 +6,9 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.swing.undo.UndoManager;
 
-import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -48,7 +48,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
     @FXML private TextField directoryPathField;
     @FXML private ComboBox<FileChooser.ExtensionFilter> fileTypeSelection;
-    @FXML private TreeView<FileNodeWrapper> tree;
+    @FXML private TreeView<FileNodeViewModel> tree;
     @FXML private Button buttonScan;
     @FXML private ButtonType importButton;
     @FXML private Button buttonExport;
@@ -96,29 +96,18 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-
         viewModel = new UnlinkedFilesDialogViewModel(dialogService, ExternalFileTypes.getInstance(), undoManager, fileUpdateMonitor, preferencesService, stateManager, taskExecutor);
         viewModel.directoryPath().bindBidirectional(directoryPathField.textProperty());
 
-        fileTypeSelection.setItems(FXCollections.observableArrayList(viewModel.getFileFilters()));
+        fileTypeSelection.setItems(viewModel.getFileFilters());
         new ViewModelListCellFactory<FileChooser.ExtensionFilter>()
-        .withText(fileFilter -> fileFilter.getDescription() + fileFilter.getExtensions().stream().collect(Collectors.joining(", ", " (", ")")))
-        .withIcon(fileFilter -> ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileFilter.getExtensions().get(0))
-                                                 .map(ExternalFileType::getIcon)
-                                                 .orElse(null))
-        .install(fileTypeSelection);
+             .withText(fileFilter -> fileFilter.getDescription() + fileFilter.getExtensions().stream().collect(Collectors.joining(", ", " (", ")")))
+             .withIcon(this::getFileFilterIcon)
+             .install(fileTypeSelection);
 
-        new ViewModelTreeCellFactory<FileNodeWrapper>()
-                .withText(node -> {
-                    if (Files.isRegularFile(node.path)) {
-                        // File
-                        return node.path.getFileName().toString();
-                    } else {
-                        // Directory
-                        return node.path.getFileName() + " (" + node.fileCount + " file" + (node.fileCount > 1 ? "s" : "") + ")";
-                    }
-                })
-                .install(tree);
+        new ViewModelTreeCellFactory<FileNodeViewModel>()
+             .withText(this::getDisplayText)
+             .install(tree);
 
        tree.setPrefWidth(Double.POSITIVE_INFINITY);
        viewModel.treeRoot().bindBidirectional(tree.rootProperty());
@@ -149,29 +138,18 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     }
 
     private void setupResultTable() {
-
         colFile.setCellValueFactory(cellData -> cellData.getValue().file());
         new ValueTableCellFactory<ImportFilesResultItemViewModel, String>()
-        .withText(item -> item).withTooltip(item -> item)
-        .install(colFile);
+          .withText(item -> item).withTooltip(item -> item)
+          .install(colFile);
 
         colMessage.setCellValueFactory(cellData -> cellData.getValue().message());
         new ValueTableCellFactory<ImportFilesResultItemViewModel, String>()
-        .withText(item->item).withTooltip(item->item)
-        .install(colMessage);
+          .withText(item -> item).withTooltip(item -> item)
+          .install(colMessage);
 
         colStatus.setCellValueFactory(cellData -> cellData.getValue().getIcon());
-
-        colStatus.setCellFactory(new ValueTableCellFactory<ImportFilesResultItemViewModel, JabRefIcon>().withGraphic(item -> {
-            if (item == IconTheme.JabRefIcons.CHECK) {
-                item = item.withColor(Color.GREEN);
-            }
-            if (item == IconTheme.JabRefIcons.WARNING) {
-                item = item.withColor(Color.RED);
-            }
-            return item.getGraphicNode();
-        }));
-
+        colStatus.setCellFactory(new ValueTableCellFactory<ImportFilesResultItemViewModel, JabRefIcon>().withGraphic(this::getIcon));
         tvResult.setColumnResizePolicy((param) -> true);
     }
 
@@ -210,4 +188,33 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
        viewModel.startExport();
     }
 
+    private JabRefIcon getFileFilterIcon(FileChooser.ExtensionFilter fileFilter) {
+        return ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileFilter.getExtensions().get(0))
+                 .map(ExternalFileType::getIcon)
+                 .orElse(null);
+    }
+
+    private Node getIcon(JabRefIcon icon) {
+        if (icon == IconTheme.JabRefIcons.CHECK) {
+            icon = icon.withColor(Color.GREEN);
+        }
+        if (icon == IconTheme.JabRefIcons.WARNING) {
+            icon = icon.withColor(Color.RED);
+        }
+        return icon.getGraphicNode();
+    }
+
+    private String getDisplayText(FileNodeViewModel node) {
+        if (Files.isRegularFile(node.path)) {
+            // File
+            return node.path.getFileName().toString();
+        } else {
+            // Directory
+            if (node.fileCount > 1) {
+                return Localization.lang("%0 (%1) files", node.path.getFileName(), node.fileCount);
+            } else {
+                return Localization.lang("%0 (%1) file", node.path.getFileName(), node.fileCount);
+            }
+        }
+    }
 }

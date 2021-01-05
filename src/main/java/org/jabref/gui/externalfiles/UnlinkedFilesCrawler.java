@@ -19,7 +19,7 @@ import org.jabref.preferences.FilePreferences;
 /**
  * Util class for searching files on the file system which are not linked to a provided {@link BibDatabase}.
  */
-public class UnlinkedFilesCrawler extends BackgroundTask<CheckBoxTreeItem<FileNodeWrapper>> {
+public class UnlinkedFilesCrawler extends BackgroundTask<CheckBoxTreeItem<FileNodeViewModel>> {
 
     private final Path directory;
     private final FileFilter fileFilter;
@@ -35,7 +35,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<CheckBoxTreeItem<FileNo
     }
 
     @Override
-    protected CheckBoxTreeItem<FileNodeWrapper> call() {
+    protected CheckBoxTreeItem<FileNodeViewModel> call() {
         UnlinkedPDFFileFilter unlinkedPDFFileFilter = new UnlinkedPDFFileFilter(fileFilter, databaseContext, filePreferences);
         return searchDirectory(directory.toFile(), unlinkedPDFFileFilter);
     }
@@ -49,14 +49,14 @@ public class UnlinkedFilesCrawler extends BackgroundTask<CheckBoxTreeItem<FileNo
      * {@link CheckBoxTreeItem}. <br>
      * <br>
      * The user objects that are attached to the nodes is the
-     * {@link FileNodeWrapper}, which wraps the {@link File}-Object. <br>
+     * {@link FileNodeViewModel}, which wraps the {@link File}-Object. <br>
      * <br>
      * For ensuring the capability to cancel the work of this recursive method,
      * the first position in the integer array 'state' must be set to 1, to keep
      * the recursion running. When the states value changes, the method will
      * resolve its recursion and return what it has saved so far.
      */
-    private CheckBoxTreeItem<FileNodeWrapper> searchDirectory(File directory, UnlinkedPDFFileFilter ff) {
+    private CheckBoxTreeItem<FileNodeViewModel> searchDirectory(File directory, UnlinkedPDFFileFilter ff) {
         // Return null if the directory is not valid.
         if ((directory == null) || !directory.exists() || !directory.isDirectory()) {
             return null;
@@ -69,7 +69,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<CheckBoxTreeItem<FileNo
         } else {
             files = Arrays.asList(filesArray);
         }
-        CheckBoxTreeItem<FileNodeWrapper> root = new CheckBoxTreeItem<>(new FileNodeWrapper(directory.toPath(), 0));
+        CheckBoxTreeItem<FileNodeViewModel> root = new CheckBoxTreeItem<>(new FileNodeViewModel(directory.toPath(), 0));
 
         int filesCount = 0;
 
@@ -85,17 +85,17 @@ public class UnlinkedFilesCrawler extends BackgroundTask<CheckBoxTreeItem<FileNo
                 return root;
             }
 
-            CheckBoxTreeItem<FileNodeWrapper> subRoot = searchDirectory(subDirectory, ff);
+            CheckBoxTreeItem<FileNodeViewModel> subRoot = searchDirectory(subDirectory, ff);
             if ((subRoot != null) && (!subRoot.getChildren().isEmpty())) {
                 filesCount += subRoot.getValue().fileCount;
                 root.getChildren().add(subRoot);
             }
         }
 
-        root.setValue(new FileNodeWrapper(directory.toPath(), files.size() + filesCount));
+        root.setValue(new FileNodeViewModel(directory.toPath(), files.size() + filesCount));
 
         for (File file : files) {
-            root.getChildren().add(new CheckBoxTreeItem<>(new FileNodeWrapper(file.toPath())));
+            root.getChildren().add(new CheckBoxTreeItem<>(new FileNodeViewModel(file.toPath())));
 
             counter++;
             DefaultTaskExecutor.runInJavaFXThread(() -> {

@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 public class ImportHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportHandler.class);
-    private final BibDatabaseContext bibdatabasecontext;
+    private final BibDatabaseContext bibdatabase;
     private final PreferencesService preferencesService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final ExternalFilesEntryLinker linker;
@@ -57,7 +57,7 @@ public class ImportHandler {
                          UndoManager undoManager,
                          StateManager stateManager) {
 
-        this.bibdatabasecontext = database;
+        this.bibdatabase = database;
         this.preferencesService = preferencesService;
         this.fileUpdateMonitor = fileupdateMonitor;
         this.stateManager = stateManager;
@@ -81,6 +81,9 @@ public class ImportHandler {
                 CompoundEdit ce = new CompoundEdit();
                 for (int i = 0; i < files.size(); i++) {
 
+                    var file = files.get(i);
+                    entriesToAdd = Collections.emptyList();
+
                     if (isCanceled()) {
                         break;
                     }
@@ -89,18 +92,8 @@ public class ImportHandler {
                         updateProgress(counter, files.size() - 1);
                     });
 
-                    var file = files.get(i);
-                    entriesToAdd = Collections.emptyList();
-
                     try {
                         if (FileUtil.getFileExtension(file).filter("pdf"::equals).isPresent()) {
-
-                            var pdfImporterResult = contentImporter.importPDFContent(file);
-                            List<BibEntry> pdfEntriesInFile = pdfImporterResult.getDatabase().getEntries();
-
-                            if (pdfImporterResult.hasWarnings()) {
-                                addResultToList(file, false, Localization.lang("Error reading PDF content: %0", pdfImporterResult.getErrorMessage()));
-                            }
 
                             var xmpParserResult = contentImporter.importXMPContent(file);
                             List<BibEntry> xmpEntriesInFile = xmpParserResult.getDatabase().getEntries();
@@ -113,13 +106,23 @@ public class ImportHandler {
                             if (!xmpEntriesInFile.isEmpty()) {
                                 entriesToAdd = xmpEntriesInFile;
                                 addResultToList(file, true, Localization.lang("Importing using XMP data..."));
-                            } else if (!pdfEntriesInFile.isEmpty()) {
+                            } else {
+                                var pdfImporterResult = contentImporter.importPDFContent(file);
+                                List<BibEntry> pdfEntriesInFile = pdfImporterResult.getDatabase().getEntries();
+
+                                if (pdfImporterResult.hasWarnings()) {
+                                    addResultToList(file, false, Localization.lang("Error reading PDF content: %0", pdfImporterResult.getErrorMessage()));
+                                }
+
+                                if (!pdfEntriesInFile.isEmpty()) {
                                     entriesToAdd = pdfEntriesInFile;
                                     addResultToList(file, true, Localization.lang("Importing using extracted PDF data"));
-                            } else {
+                                } else {
                                     entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
                                     addResultToList(file, false, Localization.lang("No metadata found. Creating empty entry with file link"));
+                                }
                             }
+
                         } else if (FileUtil.isBibFile(file)) {
                             var bibtexParserResult = contentImporter.importFromBibFile(file, fileUpdateMonitor);
                             if (bibtexParserResult.hasWarnings()) {
@@ -143,7 +146,7 @@ public class ImportHandler {
                     // We need to run the actual import on the FX Thread, otherwise we will get some deadlocks with the UIThreadList
                     DefaultTaskExecutor.runInJavaFXThread(() -> importEntries(entriesToAdd));
 
-                    ce.addEdit(new UndoableInsertEntries(bibdatabasecontext.getDatabase(), entriesToAdd));
+                    ce.addEdit(new UndoableInsertEntries(bibdatabase.getDatabase(), entriesToAdd));
                     ce.end();
                     undoManager.addEdit(ce);
 
@@ -167,9 +170,9 @@ public class ImportHandler {
     }
 
     public void importEntries(List<BibEntry> entries) {
-        ImportCleanup cleanup = new ImportCleanup(bibdatabasecontext.getMode());
+        ImportCleanup cleanup = new ImportCleanup(bibdatabase.getMode());
         cleanup.doPostCleanup(entries);
-        bibdatabasecontext.getDatabase().insertEntries(entries);
+        bibdatabase.getDatabase().insertEntries(entries);
 
         // Set owner/timestamp
         UpdateField.setAutomaticFields(entries,
@@ -180,7 +183,7 @@ public class ImportHandler {
         generateKeys(entries);
 
         // Add to group
-        addToGroups(entries, stateManager.getSelectedGroup(bibdatabasecontext));
+        addToGroups(entries, stateManager.getSelectedGroup(bibdatabase));
     }
 
     private void addToGroups(List<BibEntry> entries, Collection<GroupTreeNode> groups) {
@@ -204,8 +207,8 @@ public class ImportHandler {
      */
     private void generateKeys(List<BibEntry> entries) {
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
-                bibdatabasecontext.getMetaData().getCiteKeyPattern(Globals.prefs.getCitationKeyPatternPreferences().getKeyPattern()),
-                bibdatabasecontext.getDatabase(),
+                bibdatabase.getMetaData().getCiteKeyPattern(Globals.prefs.getCitationKeyPatternPreferences().getKeyPattern()),
+                bibdatabase.getDatabase(),
                 Globals.prefs.getCitationKeyPatternPreferences());
 
         for (BibEntry entry : entries) {
