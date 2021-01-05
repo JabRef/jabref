@@ -12,16 +12,11 @@ import org.jabref.logic.importer.AuthorListParser;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 /**
- * This is an immutable class representing information of either <CODE>author</CODE>
- * or <CODE>editor</CODE> field in bibtex record.
+ * This is an immutable class representing information of either <CODE>author</CODE> or <CODE>editor</CODE> field in bibtex record.
  * <p>
- * Constructor performs parsing of raw field text and stores preformatted data.
- * Various accessor methods return author/editor field in different formats.
+ * Constructor performs parsing of raw field text and stores preformatted data. Various accessor methods return author/editor field in different formats.
  * <p>
- * Parsing algorithm is designed to satisfy two requirements: (a) when author's
- * name is typed correctly, the result should coincide with the one of BiBTeX;
- * (b) for erroneous names, output should be reasonable (but may differ from
- * BiBTeX output). The following rules are used:
+ * Parsing algorithm is designed to satisfy two requirements: (a) when author's name is typed correctly, the result should coincide with the one of BiBTeX; (b) for erroneous names, output should be reasonable (but may differ from BiBTeX output). The following rules are used:
  * <ol>
  * <li> 'author field' is a sequence of tokens;
  * <ul>
@@ -328,10 +323,7 @@ public class AuthorList {
     }
 
     /**
-     * Returns the list of authors separated by commas with last name only; If
-     * the list consists of two or more authors, "and" is inserted before the
-     * last author's name.
-     * <p>
+     * Returns the list of authors separated by commas with last name only; If the list consists of two or more authors, "and" is inserted before the last author's name.
      * <p>
      * <ul>
      * <li> "John Smith" ==> "Smith"</li>
@@ -386,11 +378,7 @@ public class AuthorList {
     }
 
     /**
-     * Returns the list of authors separated by commas with first names after
-     * last name; first names are abbreviated or not depending on parameter. If
-     * the list consists of three or more authors, "and" is inserted before the
-     * last author's name.
-     * <p>
+     * Returns the list of authors separated by commas with first names after last name; first names are abbreviated or not depending on parameter. If the list consists of three or more authors, "and" is inserted before the last author's name.
      * <p>
      * <ul>
      * <li> "John Smith" ==> "Smith, John" or "Smith, J."</li>
@@ -456,8 +444,7 @@ public class AuthorList {
     }
 
     /**
-     * Returns the list of authors separated by "and"s with first names after
-     * last name; first names are not abbreviated.
+     * Returns the list of authors separated by "and"s with first names after last name; first names are not abbreviated.
      * <p>
      * <ul>
      * <li>"John Smith" ==> "Smith, John"</li>
@@ -502,10 +489,7 @@ public class AuthorList {
     }
 
     /**
-     * Returns the list of authors separated by commas with first names before
-     * last name; first names are abbreviated or not depending on parameter. If
-     * the list consists of three or more authors, "and" is inserted before the
-     * last author's name.
+     * Returns the list of authors separated by commas with first names before last name; first names are abbreviated or not depending on parameter. If the list consists of three or more authors, "and" is inserted before the last author's name.
      * <p>
      * <ul>
      * <li>"John Smith" ==> "John Smith" or "J. Smith"</li>
@@ -516,7 +500,7 @@ public class AuthorList {
      * Smith and P. Black Brown" </li>
      * </ul>
      *
-     * @param abbreviate        whether to abbreivate first names.
+     * @param abbreviate  whether to abbreivate first names.
      * @param oxfordComma Whether to put a comma before the and at the end.
      * @return formatted list of authors.
      * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the
@@ -568,9 +552,8 @@ public class AuthorList {
 
     /**
      * Compare this object with the given one.
-     * <p>
-     * @return `true` iff the other object is an AuthorList, all contained authors are in the same order (and these
-     * authors' fields are `Objects.equals`)
+     *
+     * @return `true` iff the other object is an AuthorList, all contained authors are in the same order (and these authors' fields are `Objects.equals`)
      */
     @Override
     public boolean equals(Object o) {
@@ -591,8 +574,7 @@ public class AuthorList {
     }
 
     /**
-     * Returns the list of authors separated by "and"s with first names before
-     * last name; first names are not abbreviated.
+     * Returns the list of authors separated by "and"s with first names before last name; first names are not abbreviated.
      * <p>
      * <ul>
      * <li>"John Smith" ==> "John Smith"</li>
@@ -616,11 +598,7 @@ public class AuthorList {
     }
 
     /**
-     * Returns the list of authors in a form suitable for alphabetization. This
-     * means that last names come first, never preceded by "von" particles, and
-     * that any braces are removed. First names are abbreviated so the same name
-     * is treated similarly if abbreviated in one case and not in another. This
-     * form is not intended to be suitable for presentation, only for sorting.
+     * Returns the list of authors in a form suitable for alphabetization. This means that last names come first, never preceded by "von" particles, and that any braces are removed. First names are abbreviated so the same name is treated similarly if abbreviated in one case and not in another. This form is not intended to be suitable for presentation, only for sorting.
      * <p>
      * <ul>
      * <li>"John Smith" ==> "Smith, J.";</li>
