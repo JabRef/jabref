@@ -1,16 +1,19 @@
 package org.jabref.gui.util;
 
-import org.jabref.preferences.PreferencesService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.jabref.preferences.PreferencesService;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 
 public class ThemeTest {
@@ -88,7 +91,5 @@ public class ThemeTest {
         themeCreatedWhenAlreadyMissing.ifAdditionalStylesheetPresent(location -> consumerCalled3.set(true));
         assertTrue(consumerCalled3.get(),
                 "expected custom theme location to be offered to our test consumer");
-
-        fail("all good actually");
     }
 }
