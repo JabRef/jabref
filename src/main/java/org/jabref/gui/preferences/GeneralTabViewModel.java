@@ -128,7 +128,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         preferencesService.storeTimestampPreferences(new TimestampPreferences(
                 addCreationDateProperty.getValue(),
-                addModificiationDateProperty.getValue()));
+                addModificiationDateProperty.getValue(),
+                initialTimestampPreferences.isUpdateTimestamp()));
     }
 
     public boolean validateSettings() {

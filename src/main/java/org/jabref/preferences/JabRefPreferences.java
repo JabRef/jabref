@@ -205,7 +205,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String DEFAULT_OWNER = "defaultOwner";
     public static final String OVERWRITE_OWNER = "overwriteOwner";
 
-    public static final String USE_TIME_STAMP = "useTimeStamp";
     public static final String UPDATE_TIMESTAMP = "updateTimestamp";
     public static final String ADD_CREATION_DATE = "addCreationDate";
     public static final String ADD_MODIFICATION_DATE = "addModificationDate";
@@ -585,7 +584,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(RESOLVE_STRINGS_ALL_FIELDS, Boolean.FALSE);
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn");
         defaults.put(WARN_ABOUT_DUPLICATES_IN_INSPECTION, Boolean.TRUE);
-        defaults.put(USE_TIME_STAMP, Boolean.FALSE);
         defaults.put(ADD_CREATION_DATE, Boolean.FALSE);
         defaults.put(ADD_MODIFICATION_DATE, Boolean.FALSE);
 
@@ -1376,7 +1374,6 @@ public class JabRefPreferences implements PreferencesService {
         return new TimestampPreferences(
                 getBoolean(ADD_CREATION_DATE),
                 getBoolean(ADD_MODIFICATION_DATE),
-                getBoolean(USE_TIME_STAMP),
                 getBoolean(UPDATE_TIMESTAMP));
     }
 

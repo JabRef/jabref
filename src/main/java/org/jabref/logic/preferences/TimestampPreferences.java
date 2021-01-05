@@ -8,13 +8,11 @@ public class TimestampPreferences {
     private final boolean addModificationDate;
 
     // Old settings used for migration
-    private final boolean useTimestamps;
     private final boolean updateTimestamp;
 
-    public TimestampPreferences(boolean addCreationDate, boolean modifyTimestamp, boolean useTimestamps, boolean updateTimestamp) {
+    public TimestampPreferences(boolean addCreationDate, boolean modifyTimestamp, boolean updateTimestamp) {
         this.addCreationDate = addCreationDate;
         this.addModificationDate = modifyTimestamp;
-        this.useTimestamps = useTimestamps;
         this.updateTimestamp = updateTimestamp;
     }
 
@@ -32,9 +30,5 @@ public class TimestampPreferences {
 
     public boolean isUpdateTimestamp() {
         return updateTimestamp;
-    }
-
-    public boolean isUseTimestamps() {
-        return useTimestamps;
     }
 }
