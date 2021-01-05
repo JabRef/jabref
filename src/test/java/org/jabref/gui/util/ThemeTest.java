@@ -18,21 +18,26 @@ import static org.mockito.Mockito.mock;
 
 public class ThemeTest {
 
+    private Path tempFolder;
+
     private PreferencesService preferencesMock;
 
     @BeforeEach
-    void setUp() {
-        preferencesMock = mock(PreferencesService.class);
+    void setUp(@TempDir Path tempFolder) {
+        this.tempFolder = tempFolder;
+        this.preferencesMock = mock(PreferencesService.class);
     }
 
     @Test
-    public void lightTheme() {
-        // Light theme is detected from a blank path:
+    public void lightThemeUsedWhenPathIsBlank() {
         Theme blankTheme = new Theme("", preferencesMock);
         assertEquals(Theme.Type.LIGHT, blankTheme.getType());
         blankTheme.ifAdditionalStylesheetPresent(location -> fail(
                 "didn't expect consumer to be called; was called with CSS location " + location));
-        // Light theme is detected from Base.css:
+    }
+
+    @Test
+    public void lightThemeUsedWhenPathIsBaseCss() {
         Theme baseTheme = new Theme("Base.css", preferencesMock);
         assertEquals(Theme.Type.LIGHT, baseTheme.getType());
         baseTheme.ifAdditionalStylesheetPresent(location -> fail(
@@ -40,7 +45,7 @@ public class ThemeTest {
     }
 
     @Test
-    public void darkTheme() {
+    public void darkThemeUsedWhenPathIsDarkCss() {
         // Dark theme is detected by name:
         Theme theme = new Theme("Dark.css", preferencesMock);
         assertEquals(Theme.Type.DARK, theme.getType());
@@ -51,7 +56,23 @@ public class ThemeTest {
     }
 
     @Test
-    public void customTheme(@TempDir Path tempFolder) throws IOException {
+    public void customThemeIgnoredIfDirectory() {
+        Theme baseTheme = new Theme(tempFolder.toString(), preferencesMock);
+        assertEquals(Theme.Type.CUSTOM, baseTheme.getType());
+        baseTheme.ifAdditionalStylesheetPresent(location -> fail(
+                "didn't expect consumer to be called when CSS location is a directory; was called with CSS location " + location));
+    }
+
+    @Test
+    public void customThemeIgnoredIfInvalidPath() {
+        Theme baseTheme = new Theme("\0\0\0", preferencesMock);
+        assertEquals(Theme.Type.CUSTOM, baseTheme.getType());
+        baseTheme.ifAdditionalStylesheetPresent(location -> fail(
+                "didn't expect consumer to be called when CSS location is just some null terminators!"));
+    }
+
+    @Test
+    public void customTheme() throws IOException {
 
         // Create a temporary custom theme. It can be empty as Theme does not inspect the contents.
         Path testCss = tempFolder.resolve("test.css");
@@ -60,7 +81,7 @@ public class ThemeTest {
         // This is detected as a custom theme:
         Theme theme = new Theme(testCss.toString(), preferencesMock);
         assertEquals(Theme.Type.CUSTOM, theme.getType());
-        assertEquals(testCss, theme.getPath());
+        assertEquals(testCss.toString(), theme.getCssPathString());
 
         // Consumer passed to ifAdditionalStylesheetPresent() should be called if theme is present:
 
@@ -79,7 +100,7 @@ public class ThemeTest {
 
         Theme themeCreatedWhenAlreadyMissing = new Theme(testCss.toString(), preferencesMock);
         assertEquals(Theme.Type.CUSTOM, theme.getType());
-        assertEquals(testCss, theme.getPath());
+        assertEquals(testCss.toString(), theme.getCssPathString());
         theme.ifAdditionalStylesheetPresent(location -> fail(
                 "didn't expect consumer to be called; was called with CSS location " + location));
 

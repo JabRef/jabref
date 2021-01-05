@@ -1995,7 +1995,7 @@ public class JabRefPreferences implements PreferencesService {
     public void storeAppearancePreference(AppearancePreferences preferences) {
         putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, preferences.shouldOverrideDefaultFontSize());
         putInt(MAIN_FONT_SIZE, preferences.getMainFontSize());
-        put(FX_THEME, preferences.getTheme().getPath().toString());
+        put(FX_THEME, preferences.getTheme().getCssPathString());
     }
 
     //*************************************************************************************************************

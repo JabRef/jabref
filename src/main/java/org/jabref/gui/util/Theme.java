@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Base64;
 import java.util.Optional;
@@ -39,50 +40,103 @@ public class Theme {
 
     private final Type type;
 
-    // String and URL formats of the path to the css.
-    // in general, call method additionalCssToLoad(), to ensure file existence checks are performed
-    private final Path pathToCss;
+    /* String, Path, and URL formats of the path to the css. These are determined at construction.
+     Path and URL are only set if they are relevant and valid (i.e. no illegal characters).
+     In general, use additionalCssToLoad(), to also ensure file existence checks are performed
+     */
+    private final String cssPathString;
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private final Optional<Path> cssPath;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private final Optional<URL> cssUrl;
 
     private final PreferencesService preferencesService;
 
     public Theme(String path, PreferencesService preferencesService) {
-        this.pathToCss = Path.of(path);
+        this.cssPathString = path;
         this.preferencesService = preferencesService;
 
         if (StringUtil.isBlank(path) || BASE_CSS.equalsIgnoreCase(path)) {
             // Light theme
             this.type = Type.LIGHT;
             this.cssUrl = Optional.empty();
+            this.cssPath = Optional.empty();
         } else {
             URL url = JabRefFrame.class.getResource(path);
             if (url != null) {
                 // Embedded dark theme
                 this.type = Type.DARK;
+                this.cssPath = Optional.empty();
+                this.cssUrl = Optional.of(url);
             } else {
                 // Custom theme
                 this.type = Type.CUSTOM;
-                try {
-                    url = pathToCss.toUri().toURL();
-                } catch (MalformedURLException e) {
-                    LOGGER.warn("Cannot load additional css url {} because it is a malformed url", path, e);
-                    url = null;
-                }
+                this.cssPath = cssStringToPath(path);
+                // note that for an invalid path, the url will also be empty here:
+                this.cssUrl = cssPath.map(Theme::cssPathToUrl);
             }
 
-            LOGGER.debug("Theme is {}, additional css url is {}", this.type, url);
-            this.cssUrl = Optional.ofNullable(url);
+            LOGGER.debug("Theme is {}, additional css path is {}, url is {}",
+                    this.type, cssPath.orElse(null), cssUrl.orElse(null));
         }
     }
 
-    private Optional<URL> additionalCssToLoad() {
-        if (type == Type.CUSTOM && !Files.exists(pathToCss)) {
-            LOGGER.warn("Not loading additional css file {} because it could not be found", pathToCss);
+    /**
+     * Creates a Path from a path String
+     *
+     * @param pathString the path string
+     * @return the path on the default file system, or empty if not valid for that file system (e.g. bad characters)
+     */
+    private static Optional<Path> cssStringToPath(String pathString) {
+        try {
+            return Optional.of(Path.of(pathString));
+        } catch (InvalidPathException e) {
+            LOGGER.warn("Cannot load additional css {} because it is an invalid path: {}", pathString, e.getLocalizedMessage());
             return Optional.empty();
-        } else {
-            return cssUrl;
         }
+    }
+
+    /**
+     * Creates a URL from a file system path. The scheme of the URL depends on the file system provider, but it will
+     * generally be
+     *
+     * @param path the file system path
+     * @return the URL for that file system path
+     */
+    private static URL cssPathToUrl(Path path) {
+        try {
+            return path.toUri().toURL();
+        } catch (MalformedURLException e) {
+            LOGGER.warn("Cannot load additional css url {} because it is a malformed url: {}", path, e.getLocalizedMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Returns the additional CSS file or resource, after checking that it is accessible.
+     *
+     * Note that the file checks are immediately out of date, i.e. the CSS file could become unavailable between
+     * the check and attempts to use that file. The checks are just on a best-effort basis.
+     *
+     * @return an optional providing the URL of the CSS file/resource, or empty
+     */
+    private Optional<URL> additionalCssToLoad() {
+        // When we have a valid file system path, check that the CSS file is readable
+        if (cssPath.isPresent()) {
+            Path path = cssPath.get();
+
+            if (!Files.exists(path)) {
+                LOGGER.warn("Not loading additional css file {} because it could not be found", cssPath.get());
+                return Optional.empty();
+            }
+
+            if (Files.isDirectory(path)) {
+                LOGGER.warn("Not loading additional css file {} because it is a directory", cssPath.get());
+                return Optional.empty();
+            }
+        }
+
+        return cssUrl;
     }
 
     /**
@@ -141,8 +195,8 @@ public class Theme {
         return type;
     }
 
-    public Path getPath() {
-        return pathToCss;
+    public String getCssPathString() {
+        return cssPathString;
     }
 
     /**
@@ -160,7 +214,7 @@ public class Theme {
             // We need to load the css file manually, due to a bug in the jdk
             // https://bugs.openjdk.java.net/browse/JDK-8240969
             // TODO: Remove this workaround, and update javadoc to include jrt: URL prefix, as soon as openjfx 16 is released
-            URL url = JabRefFrame.class.getResource(pathToCss.getFileName().toString());
+            URL url = JabRefFrame.class.getResource(cssPathString);
             location = Optional.of("data:text/css;charset=utf-8;base64," +
                     Base64.getEncoder().encodeToString(StringUtil.getResourceFileAsString(url).getBytes()));
         } else {
