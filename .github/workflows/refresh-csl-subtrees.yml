@@ -25,11 +25,17 @@ jobs:
       - name: Add csl-styles remote
         run: git remote add -f csl-styles https://github.com/citation-style-language/styles.git
       - name: Update csl-styles
-        run: git subtree pull --prefix buildres/csl/csl-styles csl-styles master --squash
+        run: |
+          git subtree pull --prefix buildres/csl/csl-styles csl-styles master --squash
+          cp buildres/csl/csl-styles/ieee.csl src/main/resources/csl-styles/
+          cp buildres/csl/csl-styles/turabian-author-date.csl src/main/resources/csl-styles/
       - name: Add csl-locales remote
         run: git remote add -f csl-locales https://github.com/citation-style-language/locales.git
       - name: Update csl-locales
-        run: git subtree pull --prefix buildres/csl/csl-locales csl-locales master --squash
+        run: |
+          git subtree pull --prefix buildres/csl/csl-locales csl-locales master --squash
+          cp buildres/csl/csl-locales/locales.json src/main/resources/csl-locales/
+          cp buildres/csl/csl-locales/locales-en-US src/main/resources/csl-locales/
       - uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
