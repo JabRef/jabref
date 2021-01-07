@@ -120,6 +120,7 @@ public class WebFetchers {
         set.add(new MedlineFetcher());
         set.add(new TitleFetcher(importFormatPreferences));
         set.add(new MathSciNet(importFormatPreferences));
+        set.add(new ZbMATH(importFormatPreferences));
         set.add(new CrossRef());
         set.add(new LibraryOfCongress(importFormatPreferences));
         set.add(new IacrEprintFetcher(importFormatPreferences));
