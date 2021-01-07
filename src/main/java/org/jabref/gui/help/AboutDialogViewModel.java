@@ -58,8 +58,8 @@ public class AboutDialogViewModel extends AbstractViewModel {
         authors.set(buildInfo.authors);
         license.set(Localization.lang("License") + ":");
         changelogUrl = buildInfo.version.getChangelogUrl();
-        versionInfo = String.format("JabRef %s%n%s %s %s %nJava %s", buildInfo.version, BuildInfo.OS,
-                BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION);
+        versionInfo = String.format("JabRef %s%n%s %s %s %nJava %s %nJavaFX %s", buildInfo.version, BuildInfo.OS,
+                BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION, BuildInfo.JAVAFX_VERSION);
     }
 
     public String getDevelopmentVersion() {
