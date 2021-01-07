@@ -62,11 +62,14 @@ public class FileFilterConverter {
     }
 
     public static FileFilter toFileFilter(FileChooser.ExtensionFilter extensionFilter) {
-        List<String> extensionsCleaned = extensionFilter.getExtensions()
-                                                        .stream()
-                                                        .map(extension -> extension.replace(".", "").replace("*", ""))
-                                                        .filter(StringUtil::isNotBlank)
-                                                        .collect(Collectors.toList());
+        return toFileFilter(extensionFilter.getExtensions());
+    }
+
+    public static FileFilter toFileFilter(List<String> extensions) {
+        List<String> extensionsCleaned = extensions.stream()
+                                                   .map(extension -> extension.replace(".", "").replace("*", ""))
+                                                   .filter(StringUtil::isNotBlank)
+                                                   .collect(Collectors.toList());
         if (extensionsCleaned.isEmpty()) {
             // Except every file
             return pathname -> true;

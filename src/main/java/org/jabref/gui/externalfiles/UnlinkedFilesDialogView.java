@@ -47,7 +47,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
     @FXML private TextField directoryPathField;
-    @FXML private ComboBox<FileChooser.ExtensionFilter> fileTypeSelection;
+    @FXML private ComboBox<FileExtensionViewModel> fileTypeSelection;
     @FXML private TreeView<FileNodeViewModel> tree;
     @FXML private Button buttonScan;
     @FXML private ButtonType importButton;
@@ -100,9 +100,9 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         viewModel.directoryPath().bindBidirectional(directoryPathField.textProperty());
 
         fileTypeSelection.setItems(viewModel.getFileFilters());
-        new ViewModelListCellFactory<FileChooser.ExtensionFilter>()
-             .withText(fileFilter -> fileFilter.getDescription() + fileFilter.getExtensions().stream().collect(Collectors.joining(", ", " (", ")")))
-             .withIcon(this::getFileFilterIcon)
+        new ViewModelListCellFactory<FileExtensionViewModel>()
+             .withText(fileFilter -> fileFilter.getDescription())
+             .withIcon(fileFilter -> fileFilter.getIcon())
              .install(fileTypeSelection);
 
         new ViewModelTreeCellFactory<FileNodeViewModel>()
@@ -186,12 +186,6 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     @FXML
     void exportSelected(ActionEvent event) {
        viewModel.startExport();
-    }
-
-    private JabRefIcon getFileFilterIcon(FileChooser.ExtensionFilter fileFilter) {
-        return ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileFilter.getExtensions().get(0))
-                 .map(ExternalFileType::getIcon)
-                 .orElse(null);
     }
 
     private Node getIcon(JabRefIcon icon) {

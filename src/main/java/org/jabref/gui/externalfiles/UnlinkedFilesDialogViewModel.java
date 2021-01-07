@@ -26,16 +26,12 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TreeItem;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
@@ -52,7 +48,7 @@ public class UnlinkedFilesDialogViewModel {
 
     private final ImportHandler importHandler;
     private final StringProperty directoryPath = new SimpleStringProperty("");
-    private final ObjectProperty<FileChooser.ExtensionFilter> selectedExtension = new SimpleObjectProperty<>();
+    private final ObjectProperty<FileExtensionViewModel> selectedExtension = new SimpleObjectProperty<>();
 
     private final BooleanProperty searchProgressVisible = new SimpleBooleanProperty(false);
     private final BooleanProperty applyButtonDisabled = new SimpleBooleanProperty();
@@ -66,10 +62,7 @@ public class UnlinkedFilesDialogViewModel {
     private final BooleanProperty resultPaneExpanded = new SimpleBooleanProperty();
 
     private final ObservableList<ImportFilesResultItemViewModel> resultList = FXCollections.observableArrayList();
-    private final ObservableList<ExtensionFilter> fileFilterList = FXCollections.observableArrayList(
-                                                                             FileFilterConverter.ANY_FILE,
-                                                                             FileFilterConverter.toExtensionFilter(StandardFileType.PDF),
-                                                                             FileFilterConverter.toExtensionFilter(StandardFileType.BIBTEX_DB));
+    private final ObservableList<FileExtensionViewModel> fileFilterList;
     private final DialogService dialogService;
     private final PreferencesService preferences;
     private BackgroundTask<CheckBoxTreeItem<FileNodeViewModel>> findUnlinkedFilesTask;
@@ -92,6 +85,12 @@ public class UnlinkedFilesDialogViewModel {
                                           fileUpdateMonitor,
                                           undoManager,
                                           stateManager);
+
+
+       this.fileFilterList = FXCollections.observableArrayList(
+                                            new FileExtensionViewModel(StandardFileType.ANY_FILE,externalFileTypes),
+                                            new FileExtensionViewModel(StandardFileType.BIBTEX_DB, externalFileTypes),
+                                            new FileExtensionViewModel(StandardFileType.PDF, externalFileTypes));
     }
 
     public void startImport() {
@@ -175,7 +174,7 @@ public class UnlinkedFilesDialogViewModel {
 
     public void startSearch() {
         Path directory = this.getSearchDirectory();
-        FileFilter selectedFileFilter = FileFilterConverter.toFileFilter(selectedExtension.getValue());
+        FileFilter selectedFileFilter = selectedExtension.getValue().toFileFilter();
 
         filePaneExpanded.setValue(true);
         resultPaneExpanded.setValue(false);
@@ -221,11 +220,11 @@ public class UnlinkedFilesDialogViewModel {
         return this.directoryPath;
     }
 
-    public ObservableList<ExtensionFilter> getFileFilters() {
+    public ObservableList<FileExtensionViewModel> getFileFilters() {
         return this.fileFilterList;
     }
 
-    public ObjectProperty<FileChooser.ExtensionFilter> selectedExtension() {
+    public ObjectProperty<FileExtensionViewModel> selectedExtension() {
         return this.selectedExtension;
     }
 
