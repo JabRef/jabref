@@ -1,38 +1,41 @@
 package org.jabref.gui.util;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
-import java.util.Base64;
-import java.util.Optional;
-import java.util.function.Consumer;
-
 import javafx.scene.Scene;
-
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.AppearancePreferences;
 import org.jabref.preferences.PreferencesService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.*;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.util.Base64;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Installs the style file and provides live reloading.
  * JabRef provides two inbuilt themes and a user customizable one: Light, Dark and Custom. The Light theme is basically
  * the base.css theme. Every other theme is loaded as an addition to base.css.
+ *
+ * For type Custom, Theme will protect against removal of the CSS file, degrading as gracefully as possible. If the file
+ * becomes unavailable while the application is running, some Scenes that have not yet had the CSS installed may not be
+ * themed. The PreviewViewer, which uses WebEngine, supports data URLs and so generally are not affected by removal
+ * of the file; however Theme will not attempt to URL-encode large style sheets (greater than 48k).
  */
 public class Theme {
     public enum Type {
         LIGHT, DARK, CUSTOM
     }
+
+    private static final int MAX_IN_MEMORY_CSS_LENGTH = 48000; // 48 kilobytes. Base theme is 33k, Dark adds < 4k.
 
     public static final String BASE_CSS = "Base.css";
 
@@ -49,6 +52,8 @@ public class Theme {
     private final Optional<Path> cssPath;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private final Optional<URL> cssUrl;
+
+    private final AtomicReference<Optional<String>> cssDataUrlString = new AtomicReference<>(Optional.empty());
 
     private final PreferencesService preferencesService;
 
@@ -79,6 +84,8 @@ public class Theme {
             LOGGER.debug("Theme is {}, additional css path is {}, url is {}",
                     this.type, cssPath.orElse(null), cssUrl.orElse(null));
         }
+
+        additionalCssToLoad().ifPresent(this::loadCssToMemory);
     }
 
     /**
@@ -140,6 +147,30 @@ public class Theme {
     }
 
     /**
+     * Creates a data-embedded URL from a file or resource URL
+     * @param url the URL of the resource to convert into a data: url
+     */
+    private void loadCssToMemory(URL url) {
+        try {
+            URLConnection conn = url.openConnection();
+            conn.connect();
+
+            try (InputStream inputStream = conn.getInputStream()) {
+                byte[] data = inputStream.readNBytes(MAX_IN_MEMORY_CSS_LENGTH);
+                if (data.length < MAX_IN_MEMORY_CSS_LENGTH) {
+                    cssDataUrlString.set(Optional.of("data:text/css;charset=utf-8;base64," +
+                            Base64.getEncoder().encodeToString(data)));
+                } else {
+                    LOGGER.debug("Not loading CSS into memory as the length is >= {}", MAX_IN_MEMORY_CSS_LENGTH);
+                    cssDataUrlString.set(Optional.empty());
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.warn("Could not load css url {} into memory", url, e);
+        }
+    }
+
+    /**
      * Installs the base css file as a stylesheet in the given scene. Changes in the css file lead to a redraw of the
      * scene using the new css file.
      */
@@ -184,6 +215,7 @@ public class Theme {
                         scene.getStylesheets().remove(cssFile.toExternalForm());
                         scene.getStylesheets().add(index, cssFile.toExternalForm());
                     });
+                    additionalCssToLoad().ifPresent(this::loadCssToMemory);
                 });
             }
         } catch (IOException | URISyntaxException | UnsupportedOperationException e) {
@@ -200,27 +232,16 @@ public class Theme {
     }
 
     /**
-     * This method allows callers to consume the theme's additional stylesheet. The consumer is only called if there is
-     * a stylesheet that is additional to the base stylesheet, and either embedded in the application or present on
-     * the file system.
+     * This method allows callers to obtain the theme's additional stylesheet.
      *
-     * @param consumer called with the stylesheet location if there is an additional stylesheet present. The location
-     *                 is local URL (e.g. {@code 'data:'} or {@code 'file:'})
+     * @return called with the stylesheet location if there is an additional stylesheet present and available. The
+     * location will be a local URL. Typically it will be a {@code 'data:'} URL where the CSS is embedded. However for
+     * large themes it can be {@code 'file:'}.
      */
-    public void ifAdditionalStylesheetPresent(Consumer<String> consumer) {
-
-        final Optional<String> location;
-        if (type == Theme.Type.DARK) {
-            // We need to load the css file manually, due to a bug in the jdk
-            // https://bugs.openjdk.java.net/browse/JDK-8240969
-            // TODO: Remove this workaround, and update javadoc to include jrt: URL prefix, as soon as openjfx 16 is released
-            URL url = JabRefFrame.class.getResource(cssPathString);
-            location = Optional.of("data:text/css;charset=utf-8;base64," +
-                    Base64.getEncoder().encodeToString(StringUtil.getResourceFileAsString(url).getBytes()));
-        } else {
-            location = additionalCssToLoad().map(URL::toExternalForm);
+    public Optional<String> additionalStylesheet() {
+        if (cssDataUrlString.get().isEmpty()) {
+            additionalCssToLoad().ifPresent(this::loadCssToMemory);
         }
-
-        location.ifPresent(consumer);
+        return cssDataUrlString.get().or(() -> additionalCssToLoad().map(URL::toExternalForm));
     }
 }

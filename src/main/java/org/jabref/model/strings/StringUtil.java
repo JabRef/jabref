@@ -743,19 +743,4 @@ public class StringUtil {
     public static String substringBetween(String str, String open, String close) {
         return StringUtils.substringBetween(str, open, close);
     }
-
-    public static String getResourceFileAsString(URL resource) {
-        try {
-            URLConnection conn = resource.openConnection();
-            conn.connect();
-
-            try (InputStream inputStream = new BufferedInputStream(conn.getInputStream());
-                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                 BufferedReader reader = new BufferedReader(inputStreamReader)) {
-                return reader.lines().collect(Collectors.joining(System.lineSeparator()));
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }
