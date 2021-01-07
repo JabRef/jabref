@@ -1,7 +1,6 @@
 package org.jabref.gui.preferences;
 
 import java.nio.charset.Charset;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,11 +25,6 @@ import org.jabref.preferences.GeneralPreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.TelemetryPreferences;
 
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.Validator;
-
 public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<Language> languagesListProperty = new SimpleListProperty<>();
     private final ObjectProperty<Language> selectedLanguageProperty = new SimpleObjectProperty<>();
@@ -49,7 +43,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final StringProperty markOwnerNameProperty = new SimpleStringProperty("");
     private final BooleanProperty markOwnerOverwriteProperty = new SimpleBooleanProperty();
     private final BooleanProperty addCreationDateProperty = new SimpleBooleanProperty();
-    private final BooleanProperty addModificiationDateProperty = new SimpleBooleanProperty();
+    private final BooleanProperty addModificationDateProperty = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
@@ -92,7 +86,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         markOwnerOverwriteProperty.setValue(initialOwnerPreferences.isOverwriteOwner());
 
         addCreationDateProperty.setValue(initialTimestampPreferences.isAddCreationDate());
-        addModificiationDateProperty.setValue(initialTimestampPreferences.isAddModificationDate());
+        addModificationDateProperty.setValue(initialTimestampPreferences.isAddModificationDate());
     }
 
     public void storeSettings() {
@@ -128,8 +122,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         preferencesService.storeTimestampPreferences(new TimestampPreferences(
                 addCreationDateProperty.getValue(),
-                addModificiationDateProperty.getValue(),
-                initialTimestampPreferences.isUpdateTimestamp()));
+                addModificationDateProperty.getValue(),
+                initialTimestampPreferences.isUpdateTimestamp(),
+                initialTimestampPreferences.getTimestampField(),
+                initialTimestampPreferences.getTimestampFormat()));
     }
 
     public boolean validateSettings() {
@@ -211,7 +207,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return addCreationDateProperty;
     }
 
-    public BooleanProperty addModificiationDatePropertyProperty() {
-        return addModificiationDateProperty;
+    public BooleanProperty addModificationDatePropertyProperty() {
+        return addModificationDateProperty;
     }
 }

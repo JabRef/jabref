@@ -91,7 +91,7 @@ public class GeneralTabView extends AbstractPreferenceTabView<GeneralTabViewMode
         markOwnerOverwrite.disableProperty().bind(markOwner.selectedProperty().not());
 
         addCreationDate.selectedProperty().bindBidirectional(viewModel.addCreationDatePropertyProperty());
-        addModificationDate.selectedProperty().bindBidirectional(viewModel.addModificiationDatePropertyProperty());
+        addModificationDate.selectedProperty().bindBidirectional(viewModel.addModificationDatePropertyProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER), markOwnerHelp);

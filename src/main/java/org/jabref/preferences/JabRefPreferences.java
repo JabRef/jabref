@@ -206,6 +206,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String OVERWRITE_OWNER = "overwriteOwner";
 
     public static final String UPDATE_TIMESTAMP = "updateTimestamp";
+    public static final String TIME_STAMP_FIELD = "timeStampField";
+    public static final String TIME_STAMP_FORMAT = "timeStampFormat";
     public static final String ADD_CREATION_DATE = "addCreationDate";
     public static final String ADD_MODIFICATION_DATE = "addModificationDate";
 
@@ -588,6 +590,10 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(ADD_MODIFICATION_DATE, Boolean.FALSE);
 
         defaults.put(UPDATE_TIMESTAMP, Boolean.FALSE);
+        defaults.put(TIME_STAMP_FIELD, StandardField.TIMESTAMP.getName());
+        // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
+        defaults.put(TIME_STAMP_FORMAT, "yyyy-MM-dd");
+
 
         defaults.put(GENERATE_KEYS_BEFORE_SAVING, Boolean.FALSE);
 
@@ -1374,7 +1380,9 @@ public class JabRefPreferences implements PreferencesService {
         return new TimestampPreferences(
                 getBoolean(ADD_CREATION_DATE),
                 getBoolean(ADD_MODIFICATION_DATE),
-                getBoolean(UPDATE_TIMESTAMP));
+                getBoolean(UPDATE_TIMESTAMP),
+                FieldFactory.parseField(get(TIME_STAMP_FIELD)),
+                get(TIME_STAMP_FORMAT));
     }
 
     @Override
