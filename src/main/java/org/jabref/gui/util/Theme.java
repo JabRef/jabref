@@ -1,24 +1,30 @@
 package org.jabref.gui.util;
 
-import javafx.scene.Scene;
-import org.jabref.gui.Globals;
-import org.jabref.gui.JabRefFrame;
-import org.jabref.model.strings.StringUtil;
-import org.jabref.model.util.FileUpdateMonitor;
-import org.jabref.preferences.AppearancePreferences;
-import org.jabref.preferences.PreferencesService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+
+import javafx.scene.Scene;
+
+import org.jabref.gui.Globals;
+import org.jabref.gui.JabRefFrame;
+import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.AppearancePreferences;
+import org.jabref.preferences.PreferencesService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Installs the style file and provides live reloading.
@@ -35,9 +41,9 @@ public class Theme {
         LIGHT, DARK, CUSTOM
     }
 
-    private static final int MAX_IN_MEMORY_CSS_LENGTH = 48000; // 48 kilobytes. Base theme is 33k, Dark adds < 4k.
-
     public static final String BASE_CSS = "Base.css";
+
+    private static final int MAX_IN_MEMORY_CSS_LENGTH = 48000; // 48 kilobytes. Base theme is 33k, Dark adds < 4k.
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Theme.class);
 

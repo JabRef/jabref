@@ -1,12 +1,5 @@
 package org.jabref.model.strings;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +10,6 @@ import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.jabref.architecture.ApacheCommonsLang3Allowed;
 
