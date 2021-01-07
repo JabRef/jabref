@@ -309,7 +309,8 @@ public class IconTheme {
         REMOTE_DATABASE(MaterialDesignIcon.DATABASE),
         HOME(MaterialDesignIcon.HOME),
         LINK(MaterialDesignIcon.LINK),
-        LINK_VARIANT(MaterialDesignIcon.LINK_VARIANT);
+        LINK_VARIANT(MaterialDesignIcon.LINK_VARIANT),
+        PROTECT_STRING(MaterialDesignIcon.CODE_BRACES);
 
         private final JabRefIcon icon;
 
