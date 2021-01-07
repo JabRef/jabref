@@ -118,7 +118,7 @@ public abstract class AbstractQueryTransformator {
      * If it is not supported return an empty optional.
      */
     protected Optional<String> handleOtherField(String fieldAsString, String term){
-        return Optional.of(fieldAsString + ": \"" + term + "\"");
+        return Optional.of(String.format("%s:\"%s\"", fieldAsString, term));
     }
 
     private Optional<String> transform(QueryNode query) {
@@ -145,9 +145,22 @@ public abstract class AbstractQueryTransformator {
         StandardSyntaxParser parser = new StandardSyntaxParser();
         try {
             QueryNode luceneQuery = parser.parse(query, NO_EXPLICIT_FIELD);
-            return transform(luceneQuery);
+            System.out.println(luceneQuery);
+            Optional<String> transformedQuery = transform(luceneQuery);
+            transformedQuery = transformedQuery.map(this::removeOuterBraces);
+            return transformedQuery;
         } catch (QueryNodeParseException e) {
             throw new JabRefException("Error parsing query", e);
         }
+    }
+
+    /**
+     * Removes the outer braces as they are unnecessary
+     */
+    private String removeOuterBraces(String query) {
+        if (query.startsWith("(") && query.endsWith(")")) {
+            return query.substring(1, query.length() - 1);
+        }
+        return query;
     }
 }

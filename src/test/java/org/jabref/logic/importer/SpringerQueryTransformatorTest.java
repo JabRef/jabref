@@ -37,7 +37,7 @@ public class SpringerQueryTransformatorTest {
     @Test
     public void convertAlphabeticallyFirstJournalField() throws Exception {
         String searchQuery = parser.parseQueryStringIntoComplexQuery("journal:Nature journal:\"Complex Networks\"").get();
-        assertEquals("(journal:\"Nature\" AND journal:\"Complex Networks\")", searchQuery);
+        assertEquals("journal:\"Nature\" AND journal:\"Complex Networks\"", searchQuery);
     }
 
     @Test
@@ -49,24 +49,24 @@ public class SpringerQueryTransformatorTest {
     @Test
     public void convertNumericallyFirstYearField() throws Exception {
         String searchQuery = parser.parseQueryStringIntoComplexQuery("year:2015 year:2014").get();
-        assertEquals("(date:2015* AND date:2014*)", searchQuery);
+        assertEquals("date:2015* AND date:2014*", searchQuery);
     }
 
     @Test
     public void convertYearRangeField() throws Exception {
         String searchQuery = parser.parseQueryStringIntoComplexQuery("year-range:2012-2015").get();
-        assertEquals("(date:2012* OR date:2013* OR date:2014* OR date:2015*)", searchQuery);
+        assertEquals("date:2012* OR date:2013* OR date:2014* OR date:2015*", searchQuery);
     }
 
     @Test
     public void convertMultipleValuesWithTheSameField() throws Exception {
         String searchQuery = parser.parseQueryStringIntoComplexQuery("author:\"Igor Steinmacher\" author:\"Christoph Treude\"").get();
-        assertEquals("(name:\"Igor Steinmacher\" AND name:\"Christoph Treude\")", searchQuery);
+        assertEquals("name:\"Igor Steinmacher\" AND name:\"Christoph Treude\"", searchQuery);
     }
 
     @Test
     public void groupedOperations() throws Exception {
-        String searchQuery = parser.parseQueryStringIntoComplexQuery("(author:\"Igor Steinmacher\" OR author:\"Christoph Treude\" AND name:\"Christoph Freunde\") AND year:2015").get();
+        String searchQuery = parser.parseQueryStringIntoComplexQuery("(author:\"Igor Steinmacher\" OR author:\"Christoph Treude\" AND author:\"Christoph Freunde\") AND year:2015").get();
         assertEquals("(name:\"Igor Steinmacher\" OR (name:\"Christoph Treude\" AND name:\"Christoph Freunde\")) AND date:2015*", searchQuery);
     }
 }
