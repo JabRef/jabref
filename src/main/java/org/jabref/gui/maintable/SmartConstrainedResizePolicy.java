@@ -62,22 +62,14 @@ import org.slf4j.LoggerFactory;
  *   <li>Desired width is set to a reasonable value. The desired width is a "globally" preferred width.</li>
  * </ul>
  *
- * <h2>RC0 - Resizing of column</h2>
+ * <h2>I0 - Initial table rendering</h2>
+ * <p>
+ * Decision to take: a) Use last setting or b) rerender with desired widths. We opt for b), because we assume that user-configuration of desired widths is easy. This leads to I3 being inconsistent to RWS2 (there is no previous width in I3)
  *
  * <ul>
- *   <li>RCE0 - If enlarged
- *     <ul>
- *         <li>RCE1 - Content has fit into table. Then, content does not fit into table (because of delta). Column gets enlarged by the delta. Other columns should not below a certain "reasonable" size ("threshold"). All columns are shrunk (all equally) until all columns hit the threshold. In case no column can shrink any more (they are smaller or equal the threshold), they are not shrunk. Thus, the table gets wider than the table space. This leads to a scrollbar.</li>
- *         <li>RCE2 - Content has not fit into table. Then, content still does not fit into table (because of delta). Column gets enlarged by the delta. Other columns are not changed (consistency to RCS3). Scrollbar gets wider.</li>
- *     </ul>
- *   </li>
- *   <li>RCS0 - If shrunk
- *     <ul>
- *       <li>RCS1 - Content has fit into table. Then, content still fits into table (because of delta). Column must not shrink below minimum width. If minimum is reached, nothing happens. Remaining delta is distributed among other columns. No scrollbar present.</li>
- *       <li>RCS2 - Content has not fit into table. If the delta is applied, the content fits into the table. Delta is applied to the column. Remaining delta splits up of delta-in-bounds and delta-out-of-bounds. Delta-in-bounds is distributed among other columns. Scrollbar disappears.</li>
- *       <li>RCS3 - Content has not fit into table. If the delta is applied, the content still does not fit into table. Column is shrunk respecting the delta. Other columns are not changed (consistency to RCE2). Scrollbar shrinks.</li>
- *     </ul>
- *   </li>
+ *   <li>I1 - Initially, all columns takes the desired width.</li>
+ *   <li>I2 - If content fits into table, distribute remaining delta to table space according to the shares. No scrollbar.</li>
+ *   <li>I3 - If content does not fit into table, all columns are shrunk (all equally) until all columns hit the threshold. In case no column can shrink any more (they are smaller or equal the threshold), they are not shrunk. Thus, the table gets wider than the table space. This leads to a scrollbar.</li>
  * </ul>
  *
  * <h2>RW0 - Resizing of window</h2>
@@ -98,14 +90,22 @@ import org.slf4j.LoggerFactory;
  *   </li>
  * </ul>
  *
- * <h2>I0 - Initial table rendering</h2>
- * <p>
- * Decision to take: a) Use last setting or b) rerender with desired widths. We opt for b), because we assume that user-configuration of desired widths is easy.
+ * <h2>RC0 - Resizing of column</h2>
  *
  * <ul>
- *   <li>I1 - Initially, all columns takes the desired width.</li>
- *   <li>I2 - If content fits into table, distribute remaining delta to table space according to the shares. No scrollbar.</li>
- *   <li>I3 - If content does not fit into table, all columns are shrunk (all equally) until all columns hit the threshold. In case no column can shrink any more (they are smaller or equal the threshold), they are not shrunk. Thus, the table gets wider than the table space. This leads to a scrollbar.</li>
+ *   <li>RCE0 - If enlarged
+ *     <ul>
+ *         <li>RCE1 - Content has fit into table. Then, content does not fit into table (because of delta). Column gets enlarged by the delta. Other columns should not below a certain "reasonable" size ("threshold"). All columns are shrunk (all equally) until all columns hit the threshold. In case no column can shrink any more (they are smaller or equal the threshold), they are not shrunk. Thus, the table gets wider than the table space. This leads to a scrollbar.</li>
+ *         <li>RCE2 - Content has not fit into table. Then, content still does not fit into table (because of delta). Column gets enlarged by the delta. Other columns are not changed (consistency to RCS3). Scrollbar gets wider.</li>
+ *     </ul>
+ *   </li>
+ *   <li>RCS0 - If shrunk
+ *     <ul>
+ *       <li>RCS1 - Content has fit into table. Then, content still fits into table (because of delta). Column must not shrink below minimum width. If minimum is reached, nothing happens. Remaining delta is distributed among other columns. No scrollbar present.</li>
+ *       <li>RCS2 - Content has not fit into table. If the delta is applied, the content fits into the table. Delta is applied to the column. Remaining delta splits up of delta-in-bounds and delta-out-of-bounds. Delta-in-bounds is distributed among other columns. Scrollbar disappears.</li>
+ *       <li>RCS3 - Content has not fit into table. If the delta is applied, the content still does not fit into table. Column is shrunk respecting the delta. Other columns are not changed (consistency to RCE2). Scrollbar shrinks.</li>
+ *     </ul>
+ *   </li>
  * </ul>
  *
  * <h2>Notes</h2>
@@ -133,6 +133,10 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
 
     private Map<TableColumn, Double> desiredColumnWidths;
     private Double thresholdPercent;
+
+    // Required for RW0
+    private Double previousTableWidth;
+
     private boolean firstTimeRun = true;
 
     public SmartConstrainedResizePolicy() {
@@ -173,11 +177,12 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
 
             firstTimeGlobalVariablesInitializations(prop.getTable());
 
-            // case I0
-            LOGGER.debug("Table is rendered the first time");
+            LOGGER.debug("I0");
             doInitialTableRendering(prop.getTable());
             firstTimeRun = false;
             LOGGER.debug("First time rendering completed.");
+            previousTableWidth = prop.getTable().getWidth();
+            LOGGER.debug("Storing current table width {} as \"previous table width\"", previousTableWidth);
             return true;
         }
 
@@ -194,6 +199,8 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
             result = doColumnChange(prop.getTable(), prop.getColumn(), prop.getDelta());
         }
         LOGGER.debug("Result: {}", result);
+        previousTableWidth = prop.getTable().getWidth();
+        LOGGER.debug("Storing current table width {} as \"previous table width\"", previousTableWidth);
         return result;
     }
 
@@ -207,15 +214,26 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
      * Case I0
      */
     private void doInitialTableRendering(TableView table) {
+        if (table.getWidth() == 0.0d) {
+            LOGGER.error("Table width is 0. Returning false");
+        }
+
         LOGGER.debug("I1");
         resizableColumns.forEach(column -> column.setPrefWidth(getDesiredColumnWidth(column)));
 
-        LOGGER.debug("I2, I3");
-        doFullTableRendering(table);
+        if (contentFitsIntoTable(table)) {
+            LOGGER.debug("I2");
+            Map<TableColumn<?, ?>, Double> expansionRatio = determineExpansionRatio(resizableColumns);
+            rearrangeColumns(table, resizableColumns, expansionRatio);
+        } else {
+            LOGGER.debug("I3");
+            Map<TableColumn<?, ?>, Double> shrinkageRatio = determineShrinkageRatio(resizableColumns);
+            rearrangeColumns(table, resizableColumns, shrinkageRatio);
+        }
     }
 
     /**
-     * Cases I0 and RW0
+     * Case RW0
      */
     private Boolean doFullTableRendering(TableView table) {
         if (table.getWidth() == 0.0d) {
@@ -223,12 +241,16 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
             return false;
         }
         if (contentFitsIntoTable(table)) {
-            LOGGER.debug("I2, RWE1");
+            LOGGER.debug("RWE1");
             Map<TableColumn<?, ?>, Double> expansionRatio = determineExpansionRatio(resizableColumns);
             return rearrangeColumns(table, resizableColumns, expansionRatio);
         } else {
-            // TODO: Think about RWE2
-            LOGGER.debug("I3, RWE2, RWE3, RWS1, RWS2");
+            LOGGER.debug("RWE2, RWE3, RWS1, RWS2");
+            boolean contentHasFitIntoTable = getContentWidth(table) <= previousTableWidth;
+            if (!contentHasFitIntoTable) {
+                LOGGER.debug("RWS2");
+                return false;
+            }
             Map<TableColumn<?, ?>, Double> shrinkageRatio = determineShrinkageRatio(resizableColumns);
             return rearrangeColumns(table, resizableColumns, shrinkageRatio);
         }
