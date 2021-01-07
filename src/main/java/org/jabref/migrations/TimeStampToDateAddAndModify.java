@@ -12,6 +12,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
 import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.preferences.PreferencesService;
 
 /**
@@ -20,9 +21,11 @@ import org.jabref.preferences.PreferencesService;
 public class TimeStampToDateAddAndModify implements PostOpenMigration {
 
     private final boolean interpretTimeStampAsModificationDate;
+    private final String fieldName;
 
     public TimeStampToDateAddAndModify(TimestampPreferences timestampPreferences) {
         interpretTimeStampAsModificationDate = timestampPreferences.isUpdateTimestamp();
+        fieldName = timestampPreferences.getTimestampField().getName();
     }
 
     /**
@@ -38,7 +41,8 @@ public class TimeStampToDateAddAndModify implements PostOpenMigration {
     }
 
     private void migrateEntry(BibEntry entry) {
-        entry.getField(StandardField.TIMESTAMP).ifPresent(timeStamp -> {
+        // Query entries for their timestamp field entries
+        entry.getField(new UnknownField(fieldName)).ifPresent(timeStamp -> {
             String formattedTimeStamp = formatTimeStamp(timeStamp);
             if (interpretTimeStampAsModificationDate) {
                 entry.setField(StandardField.MODIFICATIONDATE, formattedTimeStamp);
@@ -51,7 +55,8 @@ public class TimeStampToDateAddAndModify implements PostOpenMigration {
 
     /**
      * Formats the time stamp into the local date and time format.
-     * If
+     * If the existing timestamp could not be parsed, the current date is used.
+     * For the time portion 00:00 is used
      * @param timeStamp
      * @return
      */
