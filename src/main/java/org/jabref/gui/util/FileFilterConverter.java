@@ -1,6 +1,8 @@
 package org.jabref.gui.util;
 
 import java.io.FileFilter;
+import java.nio.file.DirectoryStream.Filter;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -65,6 +67,8 @@ public class FileFilterConverter {
         return toFileFilter(extensionFilter.getExtensions());
     }
 
+    // Implement as DirectoryStream https://docs.oracle.com/javase/9/docs/api/java/nio/file/DirectoryStream.Filter.html
+
     public static FileFilter toFileFilter(List<String> extensions) {
         List<String> extensionsCleaned = extensions.stream()
                                                    .map(extension -> extension.replace(".", "").replace("*", ""))
@@ -79,4 +83,20 @@ public class FileFilterConverter {
                                        .orElse(false);
         }
     }
+
+    public static Filter<Path> toDirFilter(List<String> extensions) {
+        List<String> extensionsCleaned = extensions.stream()
+                                                   .map(extension -> extension.replace(".", "").replace("*", ""))
+                                                   .filter(StringUtil::isNotBlank)
+                                                   .collect(Collectors.toList());
+        if (extensionsCleaned.isEmpty()) {
+            // Except every file
+            return pathname -> true;
+        } else {
+            return pathname -> FileUtil.getFileExtension(pathname)
+                                       .map(extensionsCleaned::contains)
+                                       .orElse(false);
+        }
+    }
+
 }

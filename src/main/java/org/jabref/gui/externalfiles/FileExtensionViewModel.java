@@ -1,6 +1,7 @@
 package org.jabref.gui.externalfiles;
 
-import java.io.FileFilter;
+import java.nio.file.DirectoryStream.Filter;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +34,7 @@ public class FileExtensionViewModel {
                       .orElse(null);
     }
 
-    public FileFilter toFileFilter() {
-        return FileFilterConverter.toFileFilter(extensions);
+    public Filter<Path> dirFilter() {
+        return FileFilterConverter.toDirFilter(extensions);
     }
 }

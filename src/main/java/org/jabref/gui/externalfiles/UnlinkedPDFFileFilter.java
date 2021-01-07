@@ -1,7 +1,10 @@
 package org.jabref.gui.externalfiles;
 
-import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.DirectoryStream.Filter;
+import java.nio.file.Path;
 
 import org.jabref.logic.util.io.DatabaseFileLookup;
 import org.jabref.model.database.BibDatabase;
@@ -18,18 +21,18 @@ import org.jabref.preferences.FilePreferences;
  * -implementation, which it first consults. Only if this major filefilter
  * has accepted a file, this implementation will verify on that file.
  */
-public class UnlinkedPDFFileFilter implements FileFilter {
+public class UnlinkedPDFFileFilter implements DirectoryStream.Filter<Path> {
 
     private final DatabaseFileLookup lookup;
-    private final FileFilter fileFilter;
+    private final Filter<Path> fileFilter;
 
-    public UnlinkedPDFFileFilter(FileFilter fileFilter, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+    public UnlinkedPDFFileFilter(DirectoryStream.Filter<Path> fileFilter, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         this.fileFilter = fileFilter;
         this.lookup = new DatabaseFileLookup(databaseContext, filePreferences);
     }
 
     @Override
-    public boolean accept(File pathname) {
-        return fileFilter.accept(pathname) && !lookup.lookupDatabase(pathname);
+    public boolean accept(Path pathname) throws IOException {
+        return fileFilter.accept(pathname) && !lookup.lookupDatabase(pathname.toFile());
     }
 }

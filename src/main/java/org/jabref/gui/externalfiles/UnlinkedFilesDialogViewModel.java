@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -29,6 +30,7 @@ import javafx.scene.control.TreeItem;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.texparser.FileNodeViewModel;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -54,7 +56,9 @@ public class UnlinkedFilesDialogViewModel {
     private final BooleanProperty applyButtonDisabled = new SimpleBooleanProperty();
     private final BooleanProperty scanButtonDisabled = new SimpleBooleanProperty(true);
     private final BooleanProperty exportButtonDisabled = new SimpleBooleanProperty();
-    private final ObjectProperty<TreeItem<FileNodeViewModel>> treeRoot = new SimpleObjectProperty<>();
+    private final ObjectProperty<FileNodeViewModel> treeRoot = new SimpleObjectProperty<>();
+    private final ObservableList<TreeItem<FileNodeViewModel>> checkedFileList;
+
     private final BooleanProperty scanButtonDefaultButton = new SimpleBooleanProperty();
     private final DoubleProperty progress = new SimpleDoubleProperty(0);
     private final StringProperty progressText = new SimpleStringProperty();
@@ -65,7 +69,7 @@ public class UnlinkedFilesDialogViewModel {
     private final ObservableList<FileExtensionViewModel> fileFilterList;
     private final DialogService dialogService;
     private final PreferencesService preferences;
-    private BackgroundTask<CheckBoxTreeItem<FileNodeViewModel>> findUnlinkedFilesTask;
+    private BackgroundTask<org.jabref.gui.texparser.FileNodeViewModel> findUnlinkedFilesTask;
     private BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesBackgroundTask;
 
     private final BibDatabaseContext bibDatabase;
@@ -138,7 +142,7 @@ public class UnlinkedFilesDialogViewModel {
      * This starts the export of all files of all selected nodes in the file tree view.
      */
     public void startExport() {
-        CheckBoxTreeItem<FileNodeViewModel> root = (CheckBoxTreeItem<FileNodeViewModel>) treeRoot.getValue();
+        FileNodeViewModel root = treeRoot.getValue();
 
         final List<Path> fileList = getFileListFromNode(root);
         if (fileList.isEmpty()) {
@@ -174,7 +178,7 @@ public class UnlinkedFilesDialogViewModel {
 
     public void startSearch() {
         Path directory = this.getSearchDirectory();
-        FileFilter selectedFileFilter = selectedExtension.getValue().toFileFilter();
+        Filter<Path> selectedFileFilter = selectedExtension.getValue().dirFilter();
 
         filePaneExpanded.setValue(true);
         resultPaneExpanded.setValue(false);

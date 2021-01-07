@@ -1,33 +1,40 @@
 package org.jabref.gui.externalfiles;
 
 import java.io.File;
-import java.io.FileFilter;
+import java.io.IOException;
+import java.nio.file.DirectoryStream.Filter;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import javafx.scene.control.CheckBoxTreeItem;
 
+import org.jabref.gui.texparser.FileNodeViewModel;
 import org.jabref.gui.util.BackgroundTask;
-import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.FilePreferences;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Util class for searching files on the file system which are not linked to a provided {@link BibDatabase}.
  */
-public class UnlinkedFilesCrawler extends BackgroundTask<CheckBoxTreeItem<FileNodeViewModel>> {
+public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UnlinkedFilesCrawler.class);
 
     private final Path directory;
-    private final FileFilter fileFilter;
-    private int counter;
+    private final Filter<Path> fileFilter;
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
 
-    public UnlinkedFilesCrawler(Path directory, FileFilter fileFilter, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+    public UnlinkedFilesCrawler(Path directory, Filter<Path> fileFilter, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         this.directory = directory;
         this.fileFilter = fileFilter;
         this.databaseContext = databaseContext;
@@ -35,9 +42,9 @@ public class UnlinkedFilesCrawler extends BackgroundTask<CheckBoxTreeItem<FileNo
     }
 
     @Override
-    protected CheckBoxTreeItem<FileNodeViewModel> call() {
+    protected FileNodeViewModel call() throws IOException {
         UnlinkedPDFFileFilter unlinkedPDFFileFilter = new UnlinkedPDFFileFilter(fileFilter, databaseContext, filePreferences);
-        return searchDirectory(directory.toFile(), unlinkedPDFFileFilter);
+        return searchDirectory(directory, unlinkedPDFFileFilter);
     }
 
     /**
@@ -55,59 +62,46 @@ public class UnlinkedFilesCrawler extends BackgroundTask<CheckBoxTreeItem<FileNo
      * the first position in the integer array 'state' must be set to 1, to keep
      * the recursion running. When the states value changes, the method will
      * resolve its recursion and return what it has saved so far.
+     * @throws IOException
      */
-    private CheckBoxTreeItem<FileNodeViewModel> searchDirectory(File directory, UnlinkedPDFFileFilter ff) {
+    private FileNodeViewModel searchDirectory(Path file, UnlinkedPDFFileFilter ff) throws IOException {
         // Return null if the directory is not valid.
-        if ((directory == null) || !directory.exists() || !directory.isDirectory()) {
-            return null;
+        if ((directory == null) || !directory.toFile().isDirectory()) {
+            throw new IOException(String.format("Invalid directory for searching: %s", directory));
         }
 
-        File[] filesArray = directory.listFiles(ff);
-        List<File> files;
-        if (filesArray == null) {
-            files = Collections.emptyList();
-        } else {
-            files = Arrays.asList(filesArray);
+        FileNodeViewModel parent = new FileNodeViewModel(directory);
+        Map<Boolean, List<Path>> fileListPartition;
+
+        try(Stream<Path> filesStream = StreamSupport.stream(Files.newDirectoryStream(file, ff).spliterator(), false))
+        {
+            fileListPartition = filesStream.collect(Collectors.partitioningBy(path -> path.toFile().isDirectory()));
+        } catch (IOException e) {
+            LOGGER.error(String.format("%s while searching files: %s", e.getClass().getName(), e.getMessage()));
+            return parent;
+
         }
-        CheckBoxTreeItem<FileNodeViewModel> root = new CheckBoxTreeItem<>(new FileNodeViewModel(directory.toPath(), 0));
 
-        int filesCount = 0;
 
-        filesArray = directory.listFiles(pathname -> (pathname != null) && pathname.isDirectory());
-        List<File> subDirectories;
-        if (filesArray == null) {
-            subDirectories = Collections.emptyList();
-        } else {
-            subDirectories = Arrays.asList(filesArray);
-        }
-        for (File subDirectory : subDirectories) {
-            if (isCanceled()) {
-                return root;
-            }
+        List<Path> subDirectories = fileListPartition.get(true);
+        List<Path> files = fileListPartition.get(false)
+                                            .stream()
+                                            .collect(Collectors.toList());
+        int fileCount = 0;
 
-            CheckBoxTreeItem<FileNodeViewModel> subRoot = searchDirectory(subDirectory, ff);
-            if ((subRoot != null) && (!subRoot.getChildren().isEmpty())) {
-                filesCount += subRoot.getValue().fileCount;
-                root.getChildren().add(subRoot);
+        for (Path subDirectory : subDirectories) {
+            FileNodeViewModel subRoot = searchDirectory(subDirectory, ff);
+
+            if (!subRoot.getChildren().isEmpty()) {
+                fileCount += subRoot.getFileCount();
+                parent.getChildren().add(subRoot);
             }
         }
 
-        root.setValue(new FileNodeViewModel(directory.toPath(), files.size() + filesCount));
-
-        for (File file : files) {
-            root.getChildren().add(new CheckBoxTreeItem<>(new FileNodeViewModel(file.toPath())));
-
-            counter++;
-            DefaultTaskExecutor.runInJavaFXThread(() -> {
-                if (counter == 1) {
-                    updateMessage(Localization.lang("One file found"));
-                } else {
-                    updateMessage(Localization.lang("%0 files found", Integer.toString(counter)));
-                }
-            });
-
-        }
-
-        return root;
+        parent.setFileCount(files.size() + fileCount);
+        parent.getChildren().addAll(files.stream()
+                                         .map(FileNodeViewModel::new)
+                                         .collect(Collectors.toList()));
+        return parent;
     }
 }
