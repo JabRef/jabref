@@ -257,6 +257,13 @@ clean {
 }
 
 processResources {
+    gradle.taskGraph.whenReady {
+        if (gradle.taskGraph.hasTask(":jpackage")) {
+            logger.info('Adding buildres/csl to resources')
+            from("buildres/csl")
+        }
+    }
+
     filteringCharset = 'UTF-8'
 
     filesMatching("build.properties") {
