@@ -63,4 +63,10 @@ public class SpringerQueryTransformatorTest {
         String searchQuery = parser.parseQueryStringIntoComplexQuery("author:\"Igor Steinmacher\" author:\"Christoph Treude\"").get();
         assertEquals("(name:\"Igor Steinmacher\" AND name:\"Christoph Treude\")", searchQuery);
     }
+
+    @Test
+    public void groupedOperations() throws Exception {
+        String searchQuery = parser.parseQueryStringIntoComplexQuery("(author:\"Igor Steinmacher\" OR author:\"Christoph Treude\" AND name:\"Christoph Freunde\") AND year:2015").get();
+        assertEquals("(name:\"Igor Steinmacher\" OR (name:\"Christoph Treude\" AND name:\"Christoph Freunde\")) AND date:2015*", searchQuery);
+    }
 }

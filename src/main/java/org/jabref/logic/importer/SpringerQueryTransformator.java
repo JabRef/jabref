@@ -21,95 +21,51 @@ import org.slf4j.LoggerFactory;
  *
  * For simplicity this is currently limited to fielded data and the boolean AND operator.
  */
-public class SpringerQueryTransformator {
-    public static final Logger LOGGER = LoggerFactory.getLogger(SpringerQueryTransformator.class);
+public class SpringerQueryTransformator extends AbstractQueryTransformator {
 
-    /**
-     * Transforms a and b and c to (a AND b AND c), where
-     * a, b, and c can be complex expressions
-     */
-    private Optional<String> transform(BooleanQueryNode query) {
-        String delimiter;
-        if (query instanceof OrQueryNode) {
-            delimiter = " OR ";
-        } else {
-            delimiter = " AND ";
-        }
-
-        String result = query.getChildren().stream()
-                             .map(this::transform)
-                             .filter(Optional::isPresent)
-                             .map(Optional::get)
-                             .collect(Collectors.joining(delimiter, "(", ")"));
-        if (result.equals("()")) {
-            return Optional.empty();
-        }
-        return Optional.of(result);
+    @Override
+    public String getLogicalAndOperator() {
+        return " AND ";
     }
 
-    private Optional<String> transform(FieldQueryNode query) {
-        String convertedField;
-        String convertedValue;
-        switch (query.getFieldAsString()) {
-            case "author" -> {
-                convertedField = "name";
-                convertedValue = "\"" + query.getTextAsString() + "\"";
-            }
-            case "journal", "title" -> {
-                convertedField = query.getFieldAsString();
-                convertedValue = "\"" + query.getTextAsString() + "\"";
-            }
-            case "year" -> {
-                convertedField = "date";
-                convertedValue = query.getTextAsString() + "*";
-            }
-            case "year-range" -> {
-                convertedField = "";
-                String range = query.getTextAsString();
-                String[] split = range.split("-");
-                StringJoiner resultBuilder = new StringJoiner("* OR date:", "(date:", "*)");
-                for (int i = Integer.parseInt(split[0]); i <= Integer.parseInt(split[1]); i++) {
-                    resultBuilder.add(String.valueOf(i));
-                }
-                convertedValue = resultBuilder.toString();
-            }
-            default -> {
-                convertedField = "";
-                convertedValue = "\"" + query.getTextAsString() + "\"";
-            } // Just add unkown fields as default
-        }
-        if (convertedField.isEmpty()) {
-            return Optional.of(convertedValue);
-        } else {
-            return Optional.of(convertedField + ":" + convertedValue);
-        }
+    @Override
+    public String getLogicalOrOperator() {
+        return " OR ";
     }
 
-    private Optional<String> transform(QueryNode query) {
-        if (query instanceof BooleanQueryNode) {
-            return transform((BooleanQueryNode) query);
-        } else if (query instanceof FieldQueryNode) {
-            return transform((FieldQueryNode) query);
-        } else {
-            LOGGER.error("Unsupported case when transforming the query");
-            return Optional.empty();
-        }
+    @Override
+    protected String handleAuthor(String textAsString) {
+        return String.format("name:\"%s\"", textAsString);
     }
 
-    /**
-     * Parses the given query string into a complex query using lucene.
-     * Note: For unique fields, the alphabetically and numerically first instance in the query string is used in the complex query.
-     *
-     * @param query The given query string
-     * @return A complex query containing all fields of the query string
-     */
-    public Optional<String> parseQueryStringIntoComplexQuery(String query) throws JabRefException {
-        StandardSyntaxParser parser = new StandardSyntaxParser();
-        try {
-            QueryNode luceneQuery = parser.parse(query, "default");
-            return transform(luceneQuery);
-        } catch (QueryNodeParseException e) {
-            throw new JabRefException("Error parsing query", e);
+    @Override
+    protected String handleTitle(String textAsString) {
+        return String.format("title:\"%s\"", textAsString);
+    }
+
+    @Override
+    protected String handleJournal(String textAsString) {
+        return String.format("journal:\"%s\"", textAsString);
+
+    }
+
+    @Override
+    protected String handleYear(String textAsString) {
+        return String.format("year:\"%s\"", textAsString);
+    }
+
+    @Override
+    protected String handleYearRange(String textAsString) {
+        String[] split = textAsString.split("-");
+        StringJoiner resultBuilder = new StringJoiner("* OR date:", "(date:", "*)");
+        for (int i = Integer.parseInt(split[0]); i <= Integer.parseInt(split[1]); i++) {
+            resultBuilder.add(String.valueOf(i));
         }
+        return resultBuilder.toString();
+    }
+
+    @Override
+    protected String handleUnFieldedTerm(String term) {
+        return "\"" + term + "\"";
     }
 }
