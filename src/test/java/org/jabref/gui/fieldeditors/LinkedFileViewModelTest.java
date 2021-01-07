@@ -23,7 +23,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
-import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -152,12 +151,11 @@ class LinkedFileViewModelTest {
         assertTrue(Files.exists(tempFile));
     }
 
-    @FetcherTest
     void downloadDoesNotOverwriteFileTypeExtension() throws MalformedURLException {
         linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "");
 
         databaseContext = mock(BibDatabaseContext.class);
-        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]"); // use this variant, as we cannot mock the linkedFileHandler cause it's initialized inside the viewModel
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, xmpPreferences, filePreferences, externalFileType);
 
@@ -169,5 +167,27 @@ class LinkedFileViewModelTest {
         });
         task.onFailure(Assertions::fail);
         new CurrentThreadTaskExecutor().execute(task);
+    }
+
+    @Test
+    void isNotSamePath() {
+        linkedFile = new LinkedFile("desc", tempFile, "pdf");
+        databaseContext = mock(BibDatabaseContext.class);
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
+        when(databaseContext.getFirstExistingFileDir(filePreferences)).thenReturn(Optional.of(Path.of("/home")));
+
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, xmpPreferences, filePreferences, externalFileType);
+        assertFalse(viewModel.isGeneratedPathSameAsOriginal());
+    }
+
+    @Test
+    void isSamePath() {
+        linkedFile = new LinkedFile("desc", tempFile, "pdf");
+        databaseContext = mock(BibDatabaseContext.class);
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
+        when(databaseContext.getFirstExistingFileDir(filePreferences)).thenReturn(Optional.of(tempFile.getParent()));
+
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, xmpPreferences, filePreferences, externalFileType);
+        assertTrue(viewModel.isGeneratedPathSameAsOriginal());
     }
 }
