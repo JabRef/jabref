@@ -6,44 +6,44 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SpringerQueryTransformerTest implements InfixTransformerTest {
-
-    @Override
-    public String getAuthorPrefix() {
-        return "name:";
-    }
+class ZbMathQueryTransformerTest implements InfixTransformerTest{
 
     @Override
     public AbstractQueryTransformer getTransformator() {
-        return new SpringerQueryTransformer();
+        return new ZbMathQueryTransformer();
+    }
+
+    @Override
+    public String getAuthorPrefix() {
+        return "au:";
     }
 
     @Override
     public String getUnFieldedPrefix() {
-        return "";
+        return "any:";
     }
 
     @Override
     public String getJournalPrefix() {
-        return "journal:";
+        return "so:";
     }
 
     @Override
     public String getTitlePrefix() {
-        return "title:";
+        return "ti:";
     }
 
     @Override
     public void convertYearField() throws Exception {
         Optional<String> searchQuery = getTransformator().parseQueryStringIntoComplexQuery("year:2015");
-        Optional<String> expected = Optional.of("date:2015*");
+        Optional<String> expected = Optional.of("py:2015");
         assertEquals(expected, searchQuery);
     }
 
     @Override
     public void convertYearRangeField() throws Exception {
         Optional<String> searchQuery = getTransformator().parseQueryStringIntoComplexQuery("year-range:2012-2015");
-        Optional<String> expected = Optional.of("date:2012* OR date:2013* OR date:2014* OR date:2015*");
+        Optional<String> expected = Optional.of("py:2012-2015");
         assertEquals(expected, searchQuery);
     }
 }

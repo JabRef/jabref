@@ -48,7 +48,7 @@ public class SpringerQueryTransformer extends AbstractQueryTransformer {
     @Override
     protected String handleYearRange(String yearRange) {
         String[] split = yearRange.split("-");
-        StringJoiner resultBuilder = new StringJoiner("* OR date:", "(date:", "*)");
+        StringJoiner resultBuilder = new StringJoiner("*" + getLogicalOrOperator() + "date:", "(date:", "*)");
         for (int i = Integer.parseInt(split[0]); i <= Integer.parseInt(split[1]); i++) {
             resultBuilder.add(String.valueOf(i));
         }

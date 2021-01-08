@@ -28,65 +28,62 @@ public interface InfixTransformerTest {
     String getTitlePrefix();
 
     @Test
-    public default void convertAuthorField() throws Exception {
+    default void convertAuthorField() throws Exception {
         Optional<String> searchQuery = getTransformator().parseQueryStringIntoComplexQuery("author:\"Igor Steinmacher\"");
         Optional<String> expected = Optional.of(getAuthorPrefix() + "\"Igor Steinmacher\"");
         assertEquals(expected, searchQuery);
     }
 
     @Test
-    public default void convertUnFieldedTerm() throws Exception {
+    default void convertUnFieldedTerm() throws Exception {
         Optional<String> searchQuery = getTransformator().parseQueryStringIntoComplexQuery("\"default value\"");
         Optional<String> expected = Optional.of(getUnFieldedPrefix() + "\"default value\"");
         assertEquals(expected, searchQuery);
     }
 
     @Test
-    public default void convertExplicitUnFieldedTerm() throws Exception {
+    default void convertExplicitUnFieldedTerm() throws Exception {
         Optional<String> searchQuery = getTransformator().parseQueryStringIntoComplexQuery("default:\"default value\"");
         Optional<String> expected = Optional.of(getUnFieldedPrefix() + "\"default value\"");
         assertEquals(expected, searchQuery);
     }
 
     @Test
-    public default void convertJournalField() throws Exception {
+    default void convertJournalField() throws Exception {
         Optional<String> searchQuery = getTransformator().parseQueryStringIntoComplexQuery("journal:Nature");
         Optional<String> expected = Optional.of(getJournalPrefix() + "\"Nature\"");
         assertEquals(expected, searchQuery);
     }
 
     @Test
-    public default void convertAlphabeticallyFirstJournalField() throws Exception {
+    default void convertAlphabeticallyFirstJournalField() throws Exception {
         Optional<String> searchQuery = getTransformator().parseQueryStringIntoComplexQuery("journal:Nature journal:\"Complex Networks\"");
         Optional<String> expected = Optional.of(getJournalPrefix() + "\"Nature\" " + getTransformator().getLogicalAndOperator() + getJournalPrefix() + "\"Complex Networks\"");
         assertEquals(expected, searchQuery);
     }
 
     @Test
-    public void convertYearField() throws Exception;
+    void convertYearField() throws Exception;
 
     @Test
-    public void convertNumericallyFirstYearField() throws Exception;
+    void convertYearRangeField() throws Exception;
 
     @Test
-    public void convertYearRangeField() throws Exception;
-
-    @Test
-    public default void convertMultipleValuesWithTheSameField() throws Exception {
+    default void convertMultipleValuesWithTheSameField() throws Exception {
         Optional<String> searchQuery = getTransformator().parseQueryStringIntoComplexQuery("author:\"Igor Steinmacher\" author:\"Christoph Treude\"");
         Optional<String> expected = Optional.of(getAuthorPrefix() + "\"Igor Steinmacher\"" + getTransformator().getLogicalAndOperator() + getAuthorPrefix() + "\"Christoph Treude\"");
         assertEquals(expected, searchQuery);
     }
 
     @Test
-    public default void groupedOperations() throws Exception {
+    default void groupedOperations() throws Exception {
         Optional<String> searchQuery = getTransformator().parseQueryStringIntoComplexQuery("(author:\"Igor Steinmacher\" OR author:\"Christoph Treude\" AND author:\"Christoph Freunde\") AND title:test");
         Optional<String> expected = Optional.of("(" + getAuthorPrefix() + "\"Igor Steinmacher\"" + getTransformator().getLogicalOrOperator() + "(" + getAuthorPrefix() + "\"Christoph Treude\"" + getTransformator().getLogicalAndOperator() + getAuthorPrefix() + "\"Christoph Freunde\"))" + getTransformator().getLogicalAndOperator() + getTitlePrefix() + "test");
         assertEquals(expected, searchQuery);
     }
 
     @Test
-    public default void notOperator() throws Exception {
+    default void notOperator() throws Exception {
         Optional<String> searchQuery = getTransformator().parseQueryStringIntoComplexQuery("!(author:\"Igor Steinmacher\" OR author:\"Christoph Treude\")");
         Optional<String> expected = Optional.of(getTransformator().getLogicalNotOperator() + "(" + getAuthorPrefix() + "\"Igor Steinmacher\"" + getTransformator().getLogicalOrOperator() + getAuthorPrefix() + "\"Christoph Treude\")");
         assertEquals(expected, searchQuery);

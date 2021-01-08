@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * Otherwise, a single instance QueryTransformer can be used.
  */
 public abstract class AbstractQueryTransformer {
-    public static final Logger LOGGER = LoggerFactory.getLogger(SpringerQueryTransformer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractQueryTransformer.class);
     public static final String NO_EXPLICIT_FIELD = "default";
 
     /**
