@@ -34,7 +34,10 @@ import org.slf4j.LoggerFactory;
  * For type Custom, Theme will protect against removal of the CSS file, degrading as gracefully as possible. If the file
  * becomes unavailable while the application is running, some Scenes that have not yet had the CSS installed may not be
  * themed. The PreviewViewer, which uses WebEngine, supports data URLs and so generally are not affected by removal
- * of the file; however Theme will not attempt to URL-encode large style sheets (greater than 48k).
+ * of the file; however Theme will not attempt to URL-encode large style sheets so as to protect
+ * memory usage (see {@link Theme#MAX_IN_MEMORY_CSS_LENGTH}.
+ *
+ * @see <a href="https://docs.jabref.org/advanced/custom-themes">Custom themes</a> in the Jabref documentation.
  */
 public class Theme {
     public enum Type {
@@ -43,7 +46,33 @@ public class Theme {
 
     public static final String BASE_CSS = "Base.css";
 
-    private static final int MAX_IN_MEMORY_CSS_LENGTH = 48000; // 48 kilobytes. Base theme is 33k, Dark adds < 4k.
+    /**
+     * A size limit above which Theme will not attempt to keep a data-embedded URL in memory for the CSS.
+     *
+     * It's tolerable for CSS to exceed this limit; the functional benefit of the encoded CSS is in some edge
+     * case error handling. Specifically, having a reference to a data-embedded URL means that the Preview Viewer
+     * isn't impacted if the source CSS file is removed while the application is running.
+     *
+     * If the CSS is over this limit, then the user won't see any functional impact, as long as the file exists. Only if
+     * it becomes unavailable, might there be some impact. First, the Preview Viewer when created might not be themed.
+     * Second, there is a very small chance of uncaught exceptions. Theme makes a best effort to avoid this:
+     * it checks for CSS file existence before passing it to the Preview Viewer for theming. Still, as file existence
+     * checks are immediately out of date, it can't be perfectly ruled out.
+     *
+     * At the time of writing this comment:
+     *
+     * <ul>
+     * <li>src/main/java/org/jabref/gui/Base.css is 33k</li>
+     * <li>src/main/java/org/jabref/gui/Dark.css is 4k</li>
+     * <li>The dark custom theme in the Jabref documentation is 2k, see
+     * <a href="https://docs.jabref.org/advanced/custom-themes">Custom themes</a></li>
+     * </ul>
+     *
+     * So realistic custom themes will fit comfortably within 48k, even if they are modified copies of the base theme.
+     *
+     * Note that Base-64 encoding will increase the memory footprint of the URL by a third.
+     */
+    private static final int MAX_IN_MEMORY_CSS_LENGTH = 48000;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Theme.class);
 
@@ -229,10 +258,20 @@ public class Theme {
         }
     }
 
+    /**
+     * @return the Theme type
+     */
     public Type getType() {
         return type;
     }
 
+    /**
+     * Provides the raw, configured custom CSS location. This should be a file system path, but the raw string is
+     * returned even if it is not valid in some way. For this reason, the main use case for this getter is to
+     * storing or display the user preference, rather than to read and use the CSS file.
+     *
+     * @return the raw configured CSS location
+     */
     public String getCssPathString() {
         return cssPathString;
     }
