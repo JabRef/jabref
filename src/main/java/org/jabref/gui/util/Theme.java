@@ -193,10 +193,12 @@ public class Theme {
             try (InputStream inputStream = conn.getInputStream()) {
                 byte[] data = inputStream.readNBytes(MAX_IN_MEMORY_CSS_LENGTH);
                 if (data.length < MAX_IN_MEMORY_CSS_LENGTH) {
-                    cssDataUrlString.set(Optional.of("data:text/css;charset=utf-8;base64," +
-                            Base64.getEncoder().encodeToString(data)));
+                    String embeddedDataUrl = "data:text/css;charset=utf-8;base64," +
+                            Base64.getEncoder().encodeToString(data);
+                    LOGGER.debug("Embedded css in data URL of length {}", embeddedDataUrl.length());
+                    cssDataUrlString.set(Optional.of(embeddedDataUrl));
                 } else {
-                    LOGGER.debug("Not loading CSS into memory as the length is >= {}", MAX_IN_MEMORY_CSS_LENGTH);
+                    LOGGER.debug("Not embedding css in data URL as the length is >= {}", MAX_IN_MEMORY_CSS_LENGTH);
                     cssDataUrlString.set(Optional.empty());
                 }
             }
@@ -246,11 +248,11 @@ public class Theme {
                 LOGGER.info("Enabling live reloading of css file {}", cssPath);
                 fileUpdateMonitor.addListenerForFile(cssPath, () -> {
                     LOGGER.info("Reload css file {}", cssFile);
+                    additionalCssToLoad().ifPresent(this::loadCssToMemory);
                     DefaultTaskExecutor.runInJavaFXThread(() -> {
                         scene.getStylesheets().remove(cssFile.toExternalForm());
                         scene.getStylesheets().add(index, cssFile.toExternalForm());
                     });
-                    additionalCssToLoad().ifPresent(this::loadCssToMemory);
                 });
             }
         } catch (IOException | URISyntaxException | UnsupportedOperationException e) {

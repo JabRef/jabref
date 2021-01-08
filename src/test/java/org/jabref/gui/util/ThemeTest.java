@@ -6,6 +6,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Optional;
 
+import javafx.collections.FXCollections;
+import javafx.scene.Scene;
+import org.jabref.preferences.AppearancePreferences;
 import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ThemeTest {
 
@@ -27,6 +31,9 @@ public class ThemeTest {
     void setUp(@TempDir Path tempFolder) {
         this.tempFolder = tempFolder;
         this.preferencesMock = mock(PreferencesService.class);
+        AppearancePreferences appearancePreferences = mock(AppearancePreferences.class);
+        when(this.preferencesMock.getAppearancePreferences()).thenReturn(appearancePreferences);
+        when(appearancePreferences.shouldOverrideDefaultFontSize()).thenReturn(false);
     }
 
     @Test
@@ -177,5 +184,63 @@ public class ThemeTest {
         Optional<String> testCssLocation3 = themeCreatedWhenAlreadyMissing.additionalStylesheet();
         assertTrue(testCssLocation3.isPresent(), "expected custom theme location to be available");
         assertTrue(testCssLocation3.get().startsWith("file:"), "expected large custom theme to be a file");
+    }
+
+    @Test
+    public void installLiveReloadsCssData() throws IOException, InterruptedException {
+
+        /* Create a temporary custom theme that is just a small snippet of CSS. There is no CSS
+         validation (at the moment) but by making a valid CSS block we don't preclude adding validation later */
+        Path testCss = tempFolder.resolve("reload.css");
+        Files.writeString(testCss,
+                "/* Biblatex Source Code */\n" +
+                        ".code-area .text {\n" +
+                        "    -fx-font-family: monospace;\n" +
+                        "}", StandardOpenOption.CREATE);
+
+        Theme theme = new Theme(testCss.toString(), preferencesMock);
+        assertEquals(Theme.Type.CUSTOM, theme.getType());
+        assertEquals(testCss.toString(), theme.getCssPathString());
+
+        Optional<String> testCssLocation1 = theme.additionalStylesheet();
+        assertTrue(testCssLocation1.isPresent(), "expected custom theme location to be available");
+        assertEquals(
+                "data:text/css;charset=utf-8;base64,LyogQmlibGF0ZXggU291cmNlIENvZGUgKi8KLmNvZGUtYXJlYSAudGV4dCB7CiAgICAtZngtZm9udC1mYW1pbHk6IG1vbm9zcGFjZTsKfQ==",
+                testCssLocation1.get());
+
+        DefaultFileUpdateMonitor fileUpdateMonitor = null;
+        Thread thread = null;
+        try {
+            Scene scene = mock(Scene.class);
+            when(scene.getStylesheets()).thenReturn(FXCollections.observableArrayList());
+            fileUpdateMonitor = new DefaultFileUpdateMonitor();
+            thread = new Thread(fileUpdateMonitor);
+            thread.start();
+            theme.installCss(scene, fileUpdateMonitor);
+
+            Thread.sleep(2000);
+
+            Files.writeString(testCss,
+                    "/* And now for something slightly different */\n" +
+                            ".code-area .text {\n" +
+                            "    -fx-font-family: serif;\n" +
+                            "}", StandardOpenOption.CREATE);
+
+            Thread.sleep(2000);
+        } finally {
+            if (fileUpdateMonitor != null) {
+                fileUpdateMonitor.shutdown();
+            }
+            if (thread != null) {
+                thread.join();
+            }
+        }
+
+        Optional<String> testCssLocation2 = theme.additionalStylesheet();
+        assertTrue(testCssLocation2.isPresent(), "expected custom theme location to be available");
+        assertEquals(
+                "data:text/css;charset=utf-8;base64,LyogQW5kIG5vdyBmb3Igc29tZXRoaW5nIHNsaWdodGx5IGRpZmZlcmVudCAqLwouY29kZS1hcmVhIC50ZXh0IHsKICAgIC1meC1mb250LWZhbWlseTogc2VyaWY7Cn0=",
+                testCssLocation2.get(),
+                "stylesheet embedded in data: url should have reloaded");
     }
 }
