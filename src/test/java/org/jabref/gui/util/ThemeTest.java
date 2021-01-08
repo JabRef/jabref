@@ -217,7 +217,11 @@ public class ThemeTest {
             fileUpdateMonitor = new DefaultFileUpdateMonitor();
             thread = new Thread(fileUpdateMonitor);
             thread.start();
-            theme.installCss(scene, fileUpdateMonitor);
+            try {
+                theme.installCss(scene, fileUpdateMonitor);
+            } catch (NullPointerException ex) {
+                fail("Possible mocking issue due to NPE in installCss", ex);
+            }
 
             Thread.sleep(2000);
 
