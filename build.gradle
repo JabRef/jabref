@@ -269,7 +269,7 @@ processResources {
     filesMatching("build.properties") {
         expand(version: project.findProperty('projVersionInfo') ?: '100.0.0',
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
-                "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "),
+                "maintainers": new File('MAINTAINERS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "azureInstrumentationKey": System.getenv('AzureInstrumentationKey'),
                 "springerNatureAPIKey": System.getenv('SpringerNatureAPIKey'),
                 "astrophysicsDataSystemAPIKey": System.getenv('AstrophysicsDataSystemAPIKey'),

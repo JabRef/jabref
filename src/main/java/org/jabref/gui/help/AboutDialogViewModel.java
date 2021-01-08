@@ -33,8 +33,9 @@ public class AboutDialogViewModel extends AbstractViewModel {
     private final ReadOnlyStringWrapper environmentInfo = new ReadOnlyStringWrapper();
     private final Logger logger = LoggerFactory.getLogger(AboutDialogViewModel.class);
     private final ReadOnlyStringWrapper heading = new ReadOnlyStringWrapper();
-    private final ReadOnlyStringWrapper developers = new ReadOnlyStringWrapper();
+    private final ReadOnlyStringWrapper maintainers = new ReadOnlyStringWrapper();
     private final ReadOnlyStringWrapper license = new ReadOnlyStringWrapper();
+    private final ReadOnlyStringWrapper contributors = new ReadOnlyStringWrapper();
     private final ReadOnlyBooleanWrapper isDevelopmentVersion = new ReadOnlyBooleanWrapper();
     private final DialogService dialogService;
     private final ReadOnlyStringWrapper developmentVersion = new ReadOnlyStringWrapper();
@@ -54,8 +55,9 @@ public class AboutDialogViewModel extends AbstractViewModel {
                     Collectors.joining("--"));
             developmentVersion.set(dev);
         }
-        developers.set(buildInfo.developers);
+        maintainers.set(buildInfo.maintainers);
         license.set(Localization.lang("License") + ":");
+        contributors.set(Localization.lang("JabRef would not have been possible without the help of our contributors."));
         changelogUrl = buildInfo.version.getChangelogUrl();
         versionInfo = String.format("JabRef %s%n%s %s %s %nJava %s %nJavaFX %s", buildInfo.version, BuildInfo.OS,
                 BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION, BuildInfo.JAVAFX_VERSION);
@@ -81,12 +83,12 @@ public class AboutDialogViewModel extends AbstractViewModel {
         return versionInfo;
     }
 
-    public ReadOnlyStringProperty developersProperty() {
-        return developers.getReadOnlyProperty();
+    public ReadOnlyStringProperty maintainersProperty() {
+        return maintainers.getReadOnlyProperty();
     }
 
-    public String getDevelopers() {
-        return developers.get();
+    public String getMaintainers() {
+        return maintainers.get();
     }
 
     public ReadOnlyStringProperty headingProperty() {
@@ -103,6 +105,14 @@ public class AboutDialogViewModel extends AbstractViewModel {
 
     public String getLicense() {
         return license.get();
+    }
+
+    public ReadOnlyStringProperty contributorsProperty() {
+        return contributors.getReadOnlyProperty();
+    }
+
+    public String getContributors() {
+        return contributors.get();
     }
 
     public String getEnvironmentInfo() {
