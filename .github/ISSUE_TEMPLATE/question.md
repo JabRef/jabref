@@ -1,6 +1,9 @@
 ---
 name: Question
 about: Ask a question about JabRef
+title: ''
+labels: ''
+assignees: ''
 
 ---
 
