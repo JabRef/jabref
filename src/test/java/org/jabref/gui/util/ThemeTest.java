@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import javafx.collections.FXCollections;
 import javafx.scene.Scene;
+
 import org.jabref.preferences.AppearancePreferences;
 import org.jabref.preferences.PreferencesService;
 
