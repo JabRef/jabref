@@ -20,7 +20,6 @@ public final class BuildInfo {
 
 
     public final Version version;
-    public final String authors;
     public final String developers;
     public final String year;
     public final String azureInstrumentationKey;
@@ -48,7 +47,6 @@ public final class BuildInfo {
         }
 
         version = Version.parse(properties.getProperty("version"));
-        authors = properties.getProperty("authors", "");
         year = properties.getProperty("year", "");
         developers = properties.getProperty("developers", "");
         azureInstrumentationKey = BuildInfo.getValue(properties, "azureInstrumentationKey", "");

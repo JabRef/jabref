@@ -27,12 +27,12 @@ public class AboutDialogViewModel extends AbstractViewModel {
     private static final String LIBRARIES_URL = "https://github.com/JabRef/jabref/blob/master/external-libraries.md";
     private static final String GITHUB_URL = "https://github.com/JabRef/jabref";
     private static final String LICENSE_URL = "https://github.com/JabRef/jabref/blob/master/LICENSE.md";
+    private static final String CONTRIBUTORS_URL = "https://github.com/JabRef/jabref/graphs/contributors";
     private final String changelogUrl;
     private final String versionInfo;
     private final ReadOnlyStringWrapper environmentInfo = new ReadOnlyStringWrapper();
     private final Logger logger = LoggerFactory.getLogger(AboutDialogViewModel.class);
     private final ReadOnlyStringWrapper heading = new ReadOnlyStringWrapper();
-    private final ReadOnlyStringWrapper authors = new ReadOnlyStringWrapper();
     private final ReadOnlyStringWrapper developers = new ReadOnlyStringWrapper();
     private final ReadOnlyStringWrapper license = new ReadOnlyStringWrapper();
     private final ReadOnlyBooleanWrapper isDevelopmentVersion = new ReadOnlyBooleanWrapper();
@@ -55,7 +55,6 @@ public class AboutDialogViewModel extends AbstractViewModel {
             developmentVersion.set(dev);
         }
         developers.set(buildInfo.developers);
-        authors.set(buildInfo.authors);
         license.set(Localization.lang("License") + ":");
         changelogUrl = buildInfo.version.getChangelogUrl();
         versionInfo = String.format("JabRef %s%n%s %s %s %nJava %s %nJavaFX %s", buildInfo.version, BuildInfo.OS,
@@ -76,14 +75,6 @@ public class AboutDialogViewModel extends AbstractViewModel {
 
     public ReadOnlyBooleanProperty isDevelopmentVersionProperty() {
         return isDevelopmentVersion.getReadOnlyProperty();
-    }
-
-    public ReadOnlyStringProperty authorsProperty() {
-        return authors.getReadOnlyProperty();
-    }
-
-    public String getAuthors() {
-        return authors.get();
     }
 
     public String getVersionInfo() {
@@ -141,6 +132,10 @@ public class AboutDialogViewModel extends AbstractViewModel {
 
     public void openLicense() {
         openWebsite(LICENSE_URL);
+    }
+
+    public void openContributors() {
+        openWebsite(CONTRIBUTORS_URL);
     }
 
     public void openDonation() {

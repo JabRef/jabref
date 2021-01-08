@@ -86,10 +86,10 @@
             <Label styleClass="sub-heading" text="%Developers"/>
             <Label alignment="CENTER" styleClass="info-sections" text="${controller.viewModel.developers}" textAlignment="JUSTIFY" wrapText="true"/>
             <Label styleClass="sub-heading" text="%Authors"/>
-            <HBox alignment="CENTER" VBox.vgrow="ALWAYS" prefHeight="100">
-                <ScrollPane fitToWidth="true">
-                    <Label styleClass="info-sections" text="${controller.viewModel.authors}" textAlignment="JUSTIFY" wrapText="true" BorderPane.alignment="CENTER"/>
-                </ScrollPane>
+            JabRef would not have been possible without the help of our contributors.
+            <HBox alignment="CENTER_LEFT">
+                <Label styleClass="space-after" text="${controller.viewModel.license}" wrapText="true"/>
+                <Hyperlink onAction="#openContributors" text="contributors"/>
             </HBox>
             <TextArea fx:id="textAreaVersions" editable="false" prefHeight="100.0" prefWidth="200.0" styleClass="info-sections"/>
         </VBox>

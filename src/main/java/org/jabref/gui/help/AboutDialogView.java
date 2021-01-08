@@ -78,6 +78,11 @@ public class AboutDialogView extends BaseDialog<Void> {
     }
 
     @FXML
+    public void openContributors() {
+        viewModel.openContributors();
+    }
+
+    @FXML
     public void openDonation() {
         viewModel.openDonation();
     }
