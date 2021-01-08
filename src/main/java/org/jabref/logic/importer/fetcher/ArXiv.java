@@ -262,8 +262,7 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
         complexSearchQuery.getTitlePhrases().forEach(title -> searchTerms.add("ti:" + title));
         complexSearchQuery.getAbstractPhrases().forEach(abstr -> searchTerms.add("abs:" + abstr));
         complexSearchQuery.getJournal().ifPresent(journal -> searchTerms.add("jr:" + journal));
-        // Since ArXiv API does not support year search, we ignore the year related terms
-        complexSearchQuery.getToYear().ifPresent(year -> searchTerms.add(year.toString()));
+        complexSearchQuery.getSingleYear().ifPresent(year -> searchTerms.add(year.toString()));
         searchTerms.addAll(complexSearchQuery.getDefaultFieldPhrases());
         String complexQueryString = String.join(" AND ", searchTerms);
 

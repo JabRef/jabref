@@ -1,4 +1,4 @@
-package org.jabref.logic.importer;
+package org.jabref.logic.importer.fetcher.transformators;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -9,6 +9,7 @@ import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
 import org.apache.lucene.queryparser.flexible.core.nodes.BooleanQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.GroupQueryNode;
+import org.apache.lucene.queryparser.flexible.core.nodes.ModifierQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.OrQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
@@ -16,13 +17,17 @@ import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxPars
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractQueryTransformator {
-    public static final Logger LOGGER = LoggerFactory.getLogger(SpringerQueryTransformator.class);
+/**
+ * In case the transformator contains state for a query transformation (such as the {@link IEEEQueryTransformer}), it has to be noted at the JavaDoc.
+ * Otherwise, a single instance QueryTransformer can be used.
+ */
+public abstract class AbstractQueryTransformer {
+    public static final Logger LOGGER = LoggerFactory.getLogger(SpringerQueryTransformer.class);
     public static final String NO_EXPLICIT_FIELD = "default";
 
     /**
      * Transforms a and b and c to (a AND b AND c), where
-     * a, b, and c can be complex expressions
+     * a, b, and c can be complex expressions.
      */
     private Optional<String> transform(BooleanQueryNode query) {
         String delimiter;
@@ -35,8 +40,7 @@ public abstract class AbstractQueryTransformator {
 
         String result = query.getChildren().stream()
                              .map(this::transform)
-                             .filter(Optional::isPresent)
-                             .map(Optional::get)
+                             .flatMap(Optional::stream)
                              .collect(Collectors.joining(delimiter, "(", ")"));
         if (result.equals("()")) {
             return Optional.empty();
@@ -46,15 +50,27 @@ public abstract class AbstractQueryTransformator {
 
     /**
      * Returns the logical AND operator used by the library
-     * Note: whitespaces have to be included around the operator, e.g. " AND "
+     * Note: whitespaces have to be included around the operator
+     *
+     * Example: <code>" AND "</code>
      */
-    public abstract String getLogicalAndOperator();
+    protected abstract String getLogicalAndOperator();
 
     /**
-     * Returns the logial OR operator used by the library
-     * Note: whitespaces have to be included around the operator, e.g. " OR "
+     * Returns the logical OR operator used by the library
+     * Note: whitespaces have to be included around the operator
+     *
+     * Example: <code>" OR "</code>
      */
-    public abstract String getLogicalOrOperator();
+    protected abstract String getLogicalOrOperator();
+
+    /**
+     * Returns the logical NOT operator used by the library
+     *
+     * Example: <code>"!"</code>
+     */
+    protected abstract String getLogicalNotOperator();
+
 
     private Optional<String> transform(FieldQueryNode query) {
         String term = query.getTextAsString();
@@ -69,47 +85,65 @@ public abstract class AbstractQueryTransformator {
                 return Optional.of(handleJournal(term));
             }
             case "year" -> {
-                return Optional.of(handleYear(term));
+                String s = handleYear(term);
+                return s.isEmpty() ? Optional.empty() : Optional.of(s);
             }
             case "year-range" -> {
-                return Optional.of(handleYearRange(term));
+                String s = handleYearRange(term);
+                return s.isEmpty() ? Optional.empty() : Optional.of(s);
             }
             case NO_EXPLICIT_FIELD -> {
                 return Optional.of(handleUnFieldedTerm(term));
             }
             default -> {
+                // Just add unknown fields as default
                 return handleOtherField(query.getFieldAsString(), term);
-            } // Just add unkown fields as default
+            }
         }
     }
 
     /**
-     * Return a string representation of the author fielded term
+     * Handles the not modifier, all other cases are silently ignored
      */
-    protected abstract String handleAuthor(String textAsString);
+    private Optional<String> transform(ModifierQueryNode query) {
+        ModifierQueryNode.Modifier modifier = query.getModifier();
+        if (modifier == ModifierQueryNode.Modifier.MOD_NOT) {
+            return transform(query.getChild()).map(s -> getLogicalNotOperator() + s);
+        } else {
+            return transform(query.getChild());
+        }
+    }
+
+    /**
+         * Return a string representation of the author fielded term
+         */
+    protected abstract String handleAuthor(String author);
 
     /**
      * Return a string representation of the title fielded term
      */
-    protected abstract String handleTitle(String textAsString);
+    protected abstract String handleTitle(String title);
 
     /**
      * Return a string representation of the journal fielded term
      */
-    protected abstract String handleJournal(String textAsString);
+    protected abstract String handleJournal(String journalTitle);
 
     /**
      * Return a string representation of the year fielded term
      */
-    protected abstract String handleYear(String textAsString);
+    protected abstract String handleYear(String year);
 
     /**
      * Return a string representation of the year-range fielded term
+     * Should follow the structure yyyy-yyyy
+     *
+     * Example: <code>2015-2021</code>
      */
-    protected abstract String handleYearRange(String textAsString);
+    protected abstract String handleYearRange(String yearRange);
 
     /**
-     * Return a string representation of the author fielded term
+     * Return a string representation of the un-fielded (default fielded) term
      */
     protected abstract String handleUnFieldedTerm(String term);
 
@@ -128,6 +162,8 @@ public abstract class AbstractQueryTransformator {
             return transform((FieldQueryNode) query);
         } else if (query instanceof GroupQueryNode) {
             return transform(((GroupQueryNode) query).getChild());
+        } else if (query instanceof ModifierQueryNode) {
+            return transform((ModifierQueryNode) query);
         } else {
             LOGGER.error("Unsupported case when transforming the query:\n {}", query);
             return Optional.empty();
