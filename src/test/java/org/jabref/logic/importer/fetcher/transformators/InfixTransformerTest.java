@@ -58,7 +58,7 @@ public interface InfixTransformerTest {
     @Test
     default void convertAlphabeticallyFirstJournalField() throws Exception {
         Optional<String> searchQuery = getTransformator().parseQueryStringIntoComplexQuery("journal:Nature journal:\"Complex Networks\"");
-        Optional<String> expected = Optional.of(getJournalPrefix() + "\"Nature\" " + getTransformator().getLogicalAndOperator() + getJournalPrefix() + "\"Complex Networks\"");
+        Optional<String> expected = Optional.of(getJournalPrefix() + "\"Nature\"" + getTransformator().getLogicalAndOperator() + getJournalPrefix() + "\"Complex Networks\"");
         assertEquals(expected, searchQuery);
     }
 
@@ -78,7 +78,7 @@ public interface InfixTransformerTest {
     @Test
     default void groupedOperations() throws Exception {
         Optional<String> searchQuery = getTransformator().parseQueryStringIntoComplexQuery("(author:\"Igor Steinmacher\" OR author:\"Christoph Treude\" AND author:\"Christoph Freunde\") AND title:test");
-        Optional<String> expected = Optional.of("(" + getAuthorPrefix() + "\"Igor Steinmacher\"" + getTransformator().getLogicalOrOperator() + "(" + getAuthorPrefix() + "\"Christoph Treude\"" + getTransformator().getLogicalAndOperator() + getAuthorPrefix() + "\"Christoph Freunde\"))" + getTransformator().getLogicalAndOperator() + getTitlePrefix() + "test");
+        Optional<String> expected = Optional.of("(" + getAuthorPrefix() + "\"Igor Steinmacher\"" + getTransformator().getLogicalOrOperator() + "(" + getAuthorPrefix() + "\"Christoph Treude\"" + getTransformator().getLogicalAndOperator() + getAuthorPrefix() + "\"Christoph Freunde\"))" + getTransformator().getLogicalAndOperator() + getTitlePrefix() + "\"test\"");
         assertEquals(expected, searchQuery);
     }
 

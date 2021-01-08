@@ -19,17 +19,17 @@ public class ZbMathQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleAuthor(String author) {
-        return "au:" + author;
+        return String.format("au:\"%s\"", author);
     }
 
     @Override
     protected String handleTitle(String title) {
-        return "ti:" + title;
+        return String.format("ti:\"%s\"", title);
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return "so:" + journalTitle;
+        return String.format("so:\"%s\"", journalTitle);
     }
 
     @Override
@@ -44,6 +44,6 @@ public class ZbMathQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleUnFieldedTerm(String term) {
-        return "any:" + term;
+        return String.format("any:\"%s\"", term);
     }
 }

@@ -26,18 +26,18 @@ public class GVKQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleAuthor(String author) {
-        return "per:" + author;
+        return String.format("per:\"%s\"", author);
     }
 
     @Override
     protected String handleTitle(String title) {
-        return "tit:" + title;
+        return String.format("tit:\"%s\"", title);
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
         // zti means "Zeitschrift", does not search for conferences (kon:)
-        return "zti:" + journalTitle;
+        return String.format("zti:\"%s\"", journalTitle);
     }
 
     @Override
@@ -56,6 +56,6 @@ public class GVKQueryTransformer extends AbstractQueryTransformer {
     protected String handleUnFieldedTerm(String term) {
         // all does not search in full-text
         // Other option is txt: but this does not search in meta data
-        return "all:" + term;
+        return String.format("all:\"%s\"", term);
     }
 }

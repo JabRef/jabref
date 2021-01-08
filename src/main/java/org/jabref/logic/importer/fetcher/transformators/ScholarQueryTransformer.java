@@ -22,17 +22,17 @@ public class ScholarQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleAuthor(String author) {
-        return "author:" + author;
+        return String.format("author:\"%s\"", author);
     }
 
     @Override
     protected String handleTitle(String title) {
-        return "allintitle:" + title;
+        return String.format("allintitle:\"%s\"", title);
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return "source:" + journalTitle;
+        return String.format("source:\"%s\"", journalTitle);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class ScholarQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleUnFieldedTerm(String term) {
-        return term;
+        return String.format("\"%s\"", term);
     }
 
     public int getStartYear() {

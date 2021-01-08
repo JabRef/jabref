@@ -25,17 +25,17 @@ public class IEEEQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleAuthor(String author) {
-        return "author:" + author;
+        return String.format("author:\"%s\"", author);
     }
 
     @Override
     protected String handleTitle(String title) {
-        return "article_title:" + title;
+        return String.format("article_title:\"%s\"", title);
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return "publication_title:" + journalTitle;
+        return String.format("publication_title:\"%s\"", journalTitle);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class IEEEQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleUnFieldedTerm(String term) {
-        return term;
+        return String.format("\"%s\"", term);
     }
 
     public int getStartYear() {

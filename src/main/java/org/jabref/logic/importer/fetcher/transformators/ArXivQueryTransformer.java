@@ -22,17 +22,17 @@ public class ArXivQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleAuthor(String author) {
-        return "au:" + author;
+        return String.format("au:\"%s\"", author);
     }
 
     @Override
     protected String handleTitle(String title) {
-        return "ti:" + title;
+        return String.format("ti:\"%s\"", title);
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return "jr:" + journalTitle;
+        return String.format("jr:\"%s\"", journalTitle);
     }
 
     /**
@@ -53,6 +53,6 @@ public class ArXivQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleUnFieldedTerm(String term) {
-        return "all:" + term;
+        return String.format("all:\"%s\"", term);
     }
 }

@@ -27,19 +27,19 @@ public class DBLPQueryTransformer extends AbstractQueryTransformer {
     @Override
     protected String handleAuthor(String author) {
         // DBLP does not support explicit author field search
-        return author;
+        return String.format("\"%s\"", author);
     }
 
     @Override
     protected String handleTitle(String title) {
         // DBLP does not support explicit title field search
-        return title;
+        return String.format("\"%s\"", title);
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
         // DBLP does not support explicit journal field search
-        return journalTitle;
+        return String.format("\"%s\"", journalTitle);
     }
 
     @Override
@@ -61,6 +61,6 @@ public class DBLPQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleUnFieldedTerm(String term) {
-        return term;
+        return String.format("\"%s\"",term);
     }
 }
