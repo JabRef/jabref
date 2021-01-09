@@ -8,11 +8,11 @@ import org.jabref.model.entry.field.Field;
 public class TimestampPreferences {
     private final boolean addCreationDate;
     private final boolean addModificationDate;
-    private final Field timestampField;
-    private final String timestampFormat;
 
     // Old settings used for migration
     private final boolean updateTimestamp;
+    private final Field timestampField;
+    private final String timestampFormat;
 
     public TimestampPreferences(boolean addCreationDate, boolean modifyTimestamp, boolean updateTimestamp, Field timestampField, String timestampFormat) {
         this.addCreationDate = addCreationDate;
