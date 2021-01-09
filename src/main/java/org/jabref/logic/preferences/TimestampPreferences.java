@@ -26,15 +26,15 @@ public class TimestampPreferences {
         return DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(LocalDateTime.now());
     }
 
-    public boolean isAddCreationDate() {
+    public boolean shouldAddCreationDate() {
         return addCreationDate;
     }
 
-    public boolean isAddModificationDate() {
+    public boolean shouldAddModificationDate() {
         return addModificationDate;
     }
 
-    public boolean isUpdateTimestamp() {
+    public boolean shouldUpdateTimestamp() {
         return updateTimestamp;
     }
 

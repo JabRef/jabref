@@ -2,7 +2,6 @@ package org.jabref.migrations;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
@@ -10,10 +9,8 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
-import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.preferences.PreferencesService;
 
 /**
  * This class handles the migration from timestamp field to date-added and date-modified fields
@@ -24,7 +21,7 @@ public class TimeStampToDateAddAndModify implements PostOpenMigration {
     private final String fieldName;
 
     public TimeStampToDateAddAndModify(TimestampPreferences timestampPreferences) {
-        interpretTimeStampAsModificationDate = timestampPreferences.isUpdateTimestamp();
+        interpretTimeStampAsModificationDate = timestampPreferences.shouldUpdateTimestamp();
         fieldName = timestampPreferences.getTimestampField().getName();
     }
 

@@ -1387,8 +1387,8 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public void storeTimestampPreferences(TimestampPreferences preferences) {
-        putBoolean(ADD_CREATION_DATE, preferences.isAddCreationDate());
-        putBoolean(ADD_MODIFICATION_DATE, preferences.isAddModificationDate());
+        putBoolean(ADD_CREATION_DATE, preferences.shouldAddCreationDate());
+        putBoolean(ADD_MODIFICATION_DATE, preferences.shouldAddModificationDate());
     }
 
     //*************************************************************************************************************
