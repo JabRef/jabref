@@ -14,32 +14,32 @@ Fetchers are the implementation of the [search using online services](https://do
 
 On Windows, you have to log-off and log-on to let IntelliJ know about the environment variable change. Execute the gradle task "processResources" in the group "others" within IntelliJ to ensure the values have been correctly written. Now, the fetcher tests should run without issues.
 
-## Fetcher prioritization
+## Fulltext Fetchers
 
-- all fetchers run in parallel
+- all fulltext fetchers run in parallel
 - the result with the highest priority wins
 - `InterruptedException` | `ExecutionException` | `CancellationException` are ignored
 
 ### Trust Levels
 
-- SOURCE (highest)
-- PUBLISHER
-- PREPRINT
-- META_SEARCH
-- UNKNOWN (lowest)
+- SOURCE (highest): definitive URL for a particular paper
+- PUBLISHER: any publisher library
+- PREPRINT: any preprint library that might include non final publications of a paper
+- META_SEARCH: meta search engines
+- UNKNOWN (lowest): anything else not fitting the above categories
 
 ### Current trust levels
 
 All fetchers are contained in the package `org.jabref.logic.importer.fetcher`.
 Here we list the trust levels of some of them:
 
-- DOI: SOURCE, because it is the ultimate source
+- DOI: SOURCE, as the DOI is always forwarded to the correct publisher page for the paper
 - ScienceDirect: Publisher
 - Springer: Publisher
 - ACS: Publisher
 - IEEE: Publisher
 - Google Scholar: META_SEARCH, because it is a search engine
-- Arxiv: PREPRINT, ecause preprints are published there
+- Arxiv: PREPRINT, because preprints are published there
 - OpenAccessDOI: META_SEARCH
 
 Reasoning:
