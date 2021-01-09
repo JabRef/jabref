@@ -120,7 +120,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 if (duplicateFound) {
                     boolean continueImport = dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Duplicates found"),
                             Localization.lang("There are possible duplicates that haven't been resolved. Continue?"),
-                            Localization.lang("Auto merge"),
+                            Localization.lang("Continue with import"),
                             Localization.lang("Cancel import"),
                             Localization.lang("Do not ask again"),
                             optOut -> preferences.setShouldWarnAboutDuplicatesForImport(!optOut));

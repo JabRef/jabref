@@ -56,7 +56,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                     Localization.lang("One or more keys will be overwritten. Continue?"),
                     Localization.lang("Overwrite keys"),
                     Localization.lang("Cancel"),
-                    Localization.lang("Disable this confirmation dialog"),
+                    Localization.lang("Do not ask again"),
                     optOut -> Globals.prefs.storeCitationKeyPatternPreferences(
                             Globals.prefs.getCitationKeyPatternPreferences().withWarnBeforeOverwriteCiteKey(!optOut)));
         } else {
