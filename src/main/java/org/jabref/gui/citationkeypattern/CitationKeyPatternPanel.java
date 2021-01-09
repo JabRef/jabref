@@ -10,7 +10,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -19,6 +18,7 @@ import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
@@ -31,11 +31,11 @@ public class CitationKeyPatternPanel extends Pane {
 
     // one field for each type
     private final Map<EntryType, TextField> textFields = new HashMap<>();
-    private final BasePanel panel;
+    private final BibDatabaseContext databaseContext;
     private final GridPane gridPane = new GridPane();
 
-    public CitationKeyPatternPanel(BasePanel panel) {
-        this.panel = panel;
+    public CitationKeyPatternPanel(BibDatabaseContext databaseContext) {
+        this.databaseContext = databaseContext;
         gridPane.setHgap(10);
         gridPane.setVgap(5);
         buildGUI();
@@ -50,7 +50,12 @@ public class CitationKeyPatternPanel extends Pane {
     }
 
     private void buildGUI() {
-        BibDatabaseMode mode;
+        BibDatabaseMode mode = databaseContext.getMode();
+
+        // The following got irrelevant  - global settings for CitationKeyPattern are handled by
+        // commonfxcontrols/CitationKeyPatternPanel.java
+        // ToDo: this one should be abandoned
+        /*
         // check mode of currently used DB
         if (panel != null) {
             mode = panel.getBibDatabaseContext().getMode();
@@ -58,6 +63,7 @@ public class CitationKeyPatternPanel extends Pane {
             // use preferences value if no DB is open
             mode = Globals.prefs.getDefaultBibDatabaseMode();
         }
+        */
 
         int rowIndex = 1;
         int columnIndex = 0;

@@ -71,7 +71,7 @@
                         </tooltip>
                     </RadioButton>
                     <RadioButton fx:id="keywordsRadioButton" toggleGroup="$type" wrapText="true"
-                                 text="%Searching for keywords">
+                                 text="%Searching for a keyword">
                         <tooltip>
                             <Tooltip text="%Dynamically group entries by searching a field for a keyword"/>
                         </tooltip>

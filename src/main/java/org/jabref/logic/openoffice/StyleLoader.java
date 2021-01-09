@@ -25,19 +25,19 @@ public class StyleLoader {
     private final List<String> internalStyleFiles = Arrays.asList(DEFAULT_AUTHORYEAR_STYLE_PATH,
             DEFAULT_NUMERICAL_STYLE_PATH);
 
-    private final OpenOfficePreferences preferences;
-    private final Charset encoding;
+    private final OpenOfficePreferences openOfficePreferences;
     private final LayoutFormatterPreferences layoutFormatterPreferences;
+    private final Charset encoding;
 
     // Lists of the internal
     // and external styles
     private final List<OOBibStyle> internalStyles = new ArrayList<>();
     private final List<OOBibStyle> externalStyles = new ArrayList<>();
 
-    public StyleLoader(OpenOfficePreferences preferences, LayoutFormatterPreferences jabrefPreferences,
+    public StyleLoader(OpenOfficePreferences openOfficePreferences, LayoutFormatterPreferences formatterPreferences,
                        Charset encoding) {
-        this.preferences = Objects.requireNonNull(preferences);
-        this.layoutFormatterPreferences = Objects.requireNonNull(jabrefPreferences);
+        this.openOfficePreferences = Objects.requireNonNull(openOfficePreferences);
+        this.layoutFormatterPreferences = Objects.requireNonNull(formatterPreferences);
         this.encoding = Objects.requireNonNull(encoding);
         loadInternalStyles();
         loadExternalStyles();
@@ -80,7 +80,7 @@ public class StyleLoader {
     private void loadExternalStyles() {
         externalStyles.clear();
         // Read external lists
-        List<String> lists = preferences.getExternalStyles();
+        List<String> lists = openOfficePreferences.getExternalStyles();
         for (String filename : lists) {
             try {
                 OOBibStyle style = new OOBibStyle(new File(filename), layoutFormatterPreferences, encoding);
@@ -114,7 +114,7 @@ public class StyleLoader {
         for (OOBibStyle style : externalStyles) {
             filenames.add(style.getPath());
         }
-        preferences.setExternalStyles(filenames);
+        openOfficePreferences.setExternalStyles(filenames);
     }
 
     public boolean removeStyle(OOBibStyle style) {
@@ -128,7 +128,7 @@ public class StyleLoader {
     }
 
     public OOBibStyle getUsedStyle() {
-        String filename = preferences.getCurrentStyle();
+        String filename = openOfficePreferences.getCurrentStyle();
         if (filename != null) {
             for (OOBibStyle style : getStyles()) {
                 if (filename.equals(style.getPath())) {
@@ -137,7 +137,7 @@ public class StyleLoader {
             }
         }
         // Pick the first internal
-        preferences.setCurrentStyle(internalStyles.get(0).getPath());
+        openOfficePreferences.setCurrentStyle(internalStyles.get(0).getPath());
         return internalStyles.get(0);
     }
 }

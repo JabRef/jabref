@@ -14,6 +14,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Assertions;
@@ -28,6 +29,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
+@DisabledOnCIServer("Produces to many requests on CI")
 public class CompositeSearchBasedFetcherTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeSearchBasedFetcherTest.class);
@@ -39,7 +41,7 @@ public class CompositeSearchBasedFetcherTest {
     }
 
     @Test
-    public void performSearchWithoutFetchers() {
+    public void performSearchWithoutFetchers() throws Exception {
         Set<SearchBasedFetcher> empty = new HashSet<>();
         CompositeSearchBasedFetcher fetcher = new CompositeSearchBasedFetcher(empty, Integer.MAX_VALUE);
 
@@ -50,7 +52,7 @@ public class CompositeSearchBasedFetcherTest {
 
     @ParameterizedTest(name = "Perform Search on empty query.")
     @MethodSource("performSearchParameters")
-    public void performSearchOnEmptyQuery(Set<SearchBasedFetcher> fetchers) {
+    public void performSearchOnEmptyQuery(Set<SearchBasedFetcher> fetchers) throws Exception {
         CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, Integer.MAX_VALUE);
 
         List<BibEntry> queryResult = compositeFetcher.performSearch("");
@@ -61,7 +63,7 @@ public class CompositeSearchBasedFetcherTest {
     @ParameterizedTest(name = "Perform search on query \"quantum\". Using the CompositeFetcher of the following " +
             "Fetchers: {arguments}")
     @MethodSource("performSearchParameters")
-    public void performSearchOnNonEmptyQuery(Set<SearchBasedFetcher> fetchers) {
+    public void performSearchOnNonEmptyQuery(Set<SearchBasedFetcher> fetchers) throws Exception {
         CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, Integer.MAX_VALUE);
         ImportCleanup cleanup = new ImportCleanup(BibDatabaseMode.BIBTEX);
 

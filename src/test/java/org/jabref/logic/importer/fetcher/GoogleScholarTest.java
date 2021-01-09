@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -24,7 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-class GoogleScholarTest implements SearchBasedFetcherCapabilityTest {
+class GoogleScholarTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
     private GoogleScholar finder;
     private BibEntry entry;
@@ -83,6 +84,11 @@ class GoogleScholarTest implements SearchBasedFetcherCapabilityTest {
 
     @Override
     public SearchBasedFetcher getFetcher() {
+        return finder;
+    }
+
+    @Override
+    public PagedSearchBasedFetcher getPagedFetcher() {
         return finder;
     }
 

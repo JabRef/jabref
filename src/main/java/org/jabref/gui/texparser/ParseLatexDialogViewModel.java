@@ -113,7 +113,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
 
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory -> {
             latexFileDirectory.set(selectedDirectory.toAbsolutePath().toString());
-            preferencesService.setWorkingDir(selectedDirectory.toAbsolutePath());
+            preferencesService.setWorkingDirectory(selectedDirectory.toAbsolutePath());
         });
     }
 
@@ -204,7 +204,8 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         BackgroundTask.wrap(() -> entriesResolver.resolve(new DefaultLatexParser().parse(fileList)))
                       .onRunning(() -> searchInProgress.set(true))
                       .onFinished(() -> searchInProgress.set(false))
-                      .onSuccess(result -> new ParseLatexResultView(result, databaseContext, Path.of(latexFileDirectory.get())).showAndWait())
+                      .onSuccess(result -> dialogService.showCustomDialogAndWait(
+                              new ParseLatexResultView(result, databaseContext, Path.of(latexFileDirectory.get()))))
                       .onFailure(dialogService::showErrorDialogAndWait)
                       .executeWith(taskExecutor);
     }

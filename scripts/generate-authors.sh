@@ -57,6 +57,6 @@ cd "$(dirname "$(readlink -f "$BASH_SOURCE")")/.."
     # authors %aN = author name
 
     # co-authors
-    coauthors=$(git log -i --grep=co-authored-by  | grep -i "co-authored-by" | sed "s/.*co-authored-by: \(.*\)/\1/I" | sed "s/ <.*//")
+    coauthors=$(git log -i --grep=co-authored-by  | grep -i "co-authored-by" | sed "s/.*co-authored-by: \(.*\)/\1/I" | grep -v "luis-valdez" | sed "s/ <.*//")
 	echo -e "$authors\n$(git log --format='%aN')\n$coauthors" | grep -v "\[bot\]" | grep -v "JabRef" | grep -v "Siedlerchr" | grep -v "^Christoph$" | grep -v "^Mootez$" | grep -v "oscargus" | grep -v "dependabot" | grep -v "github actions" | grep -v "igorsteinmacher" | grep -v "halirutan" | grep -v "matthiasgeiger" | grep -v "Gitter Badger" | grep -v "gdstewart" | grep -v "m-mauersberger" | grep -v "chenyuheng" | LC_ALL=C.UTF-8 sort --unique --ignore-case
 } > AUTHORS

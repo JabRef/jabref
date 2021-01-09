@@ -148,7 +148,7 @@ public class IconTheme {
         ADD_ENTRY(MaterialDesignIcon.PLAYLIST_PLUS),
         EDIT_ENTRY(MaterialDesignIcon.TOOLTIP_EDIT),
         EDIT_STRINGS(MaterialDesignIcon.TOOLTIP_TEXT),
-        FOLDER(MaterialDesignIcon.FOOD_FORK_DRINK),
+        FOLDER(MaterialDesignIcon.FOLDER_OUTLINE),
         REMOVE(MaterialDesignIcon.MINUS_BOX),
         REMOVE_NOBOX(MaterialDesignIcon.MINUS),
         FILE(MaterialDesignIcon.FILE_OUTLINE),
@@ -202,6 +202,13 @@ public class IconTheme {
         EXPORT_TO_CLIPBOARD(MaterialDesignIcon.CLIPBOARD_ARROW_LEFT),
         ATTACH_FILE(MaterialDesignIcon.PAPERCLIP),
         AUTO_FILE_LINK(MaterialDesignIcon.FILE_FIND),
+        AUTO_RENAME(MaterialDesignIcon.AUTO_FIX),
+        DOWNLOAD_FILE(MaterialDesignIcon.DOWNLOAD),
+        MOVE_TO_FOLDER(MaterialDesignIcon.FILE_SEND),
+        COPY_TO_FOLDER(MaterialDesignIcon.CONTENT_COPY),
+        RENAME(MaterialDesignIcon.RENAME_BOX),
+        DELETE_FILE(MaterialDesignIcon.DELETE_FOREVER),
+        REMOVE_LINK(MaterialDesignIcon.LINK_OFF),
         AUTO_LINKED_FILE(MaterialDesignIcon.BRIEFCASE_CHECK),
         QUALITY_ASSURED(MaterialDesignIcon.CERTIFICATE),
         QUALITY(MaterialDesignIcon.CERTIFICATE),
@@ -302,7 +309,8 @@ public class IconTheme {
         REMOTE_DATABASE(MaterialDesignIcon.DATABASE),
         HOME(MaterialDesignIcon.HOME),
         LINK(MaterialDesignIcon.LINK),
-        LINK_VARIANT(MaterialDesignIcon.LINK_VARIANT);
+        LINK_VARIANT(MaterialDesignIcon.LINK_VARIANT),
+        PROTECT_STRING(MaterialDesignIcon.CODE_BRACES);
 
         private final JabRefIcon icon;
 

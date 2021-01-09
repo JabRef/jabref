@@ -58,6 +58,13 @@ public class IsbnViaOttoBibFetcher extends AbstractIsbnFetcher {
             throw new FetcherException("Could not ", e);
         }
         Element textArea = html.select("textarea").first();
+
+        // inspect the "no results" error message (if there is one)
+        Optional<Element> potentialErrorMessageDiv = Optional.ofNullable((html.select("div#flash-notice.notice.add-bottom").first()));
+        if (potentialErrorMessageDiv.isPresent() && potentialErrorMessageDiv.get().text().contains("No Results")) {
+            LOGGER.error("ISBN {} not found at ottobib", identifier);
+        }
+
         Optional<BibEntry> entry = Optional.empty();
         try {
             entry = BibtexParser.singleFromString(textArea.text(), importFormatPreferences, new DummyFileUpdateMonitor());

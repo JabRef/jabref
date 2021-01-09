@@ -1,7 +1,7 @@
 package org.jabref.gui.dialogs;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.Globals;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.model.database.event.AutosaveEvent;
 
@@ -11,21 +11,21 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class has an abstract UI role as it listens for an {@link AutosaveEvent} and saves the bib file associated with
- * the given {@link BasePanel}.
+ * the given {@link LibraryTab}.
  */
 public class AutosaveUiManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(AutosaveUiManager.class);
 
-    private final BasePanel panel;
+    private final LibraryTab libraryTab;
 
-    public AutosaveUiManager(BasePanel panel) {
-        this.panel = panel;
+    public AutosaveUiManager(LibraryTab libraryTab) {
+        this.libraryTab = libraryTab;
     }
 
     @Subscribe
-    public void listen(@SuppressWarnings("unused") AutosaveEvent event) {
+    public void listen(AutosaveEvent event) {
         try {
-            new SaveDatabaseAction(panel, Globals.prefs, Globals.entryTypesManager).save(SaveDatabaseAction.SaveDatabaseMode.SILENT);
+            new SaveDatabaseAction(libraryTab, Globals.prefs, Globals.entryTypesManager).save(SaveDatabaseAction.SaveDatabaseMode.SILENT);
         } catch (Throwable e) {
             LOGGER.error("Problem occurred while saving.", e);
         }

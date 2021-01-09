@@ -14,7 +14,6 @@ import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
@@ -36,8 +35,7 @@ public class CopyFilesAction extends SimpleCommand {
             dialogService.showInformationDialogAndWait(Localization.lang("Copy linked files to folder..."), Localization.lang("No linked files found for export."));
             return;
         }
-        CopyFilesDialogView dialog = new CopyFilesDialogView(new CopyFilesResultListDependency(data));
-        dialog.showAndWait();
+        dialogService.showCustomDialogAndWait(new CopyFilesDialogView(new CopyFilesResultListDependency(data)));
     }
 
     @Override
@@ -46,7 +44,7 @@ public class CopyFilesAction extends SimpleCommand {
         List<BibEntry> entries = stateManager.getSelectedEntries();
 
         DirectoryDialogConfiguration dirDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(Path.of(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY)))
+                .withInitialDirectory(Globals.prefs.getImportExportPreferences().getExportWorkingDirectory())
                 .build();
         Optional<Path> exportPath = dialogService.showDirectorySelectionDialog(dirDialogConfiguration);
         exportPath.ifPresent(path -> {

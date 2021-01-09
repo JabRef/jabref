@@ -1,6 +1,5 @@
 package org.jabref.gui.externalfiles;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
@@ -17,11 +16,8 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
-import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.net.URLDownload;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -154,26 +150,7 @@ public class DownloadFullTextAction extends SimpleCommand {
                     preferences.getFilePreferences(),
                     ExternalFileTypes.getInstance());
 
-            try {
-                URLDownload urlDownload = new URLDownload(newLinkedFile.getLink());
-                BackgroundTask<Path> downloadTask = onlineFile.prepareDownloadTask(targetDirectory, urlDownload);
-                downloadTask.onSuccess(destination -> {
-                    LinkedFile downloadedFile = LinkedFilesEditorViewModel.fromFile(
-                            destination,
-                            databaseContext.getFileDirectories(preferences.getFilePreferences()),
-                            ExternalFileTypes.getInstance());
-                    entry.addFile(downloadedFile);
-                    dialogService.notify(Localization.lang("Finished downloading full text document for entry %0.",
-                            entry.getCitationKey().orElse(Localization.lang("undefined"))));
-                });
-                downloadTask.titleProperty().set(Localization.lang("Downloading"));
-                downloadTask.messageProperty().set(
-                        Localization.lang("Fulltext for") + ": " + entry.getCitationKey().orElse(Localization.lang("New entry")));
-                downloadTask.showToUser(true);
-                Globals.TASK_EXECUTOR.execute(downloadTask);
-            } catch (MalformedURLException exception) {
-                dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);
-            }
+            onlineFile.download();
         } else {
             dialogService.notify(Localization.lang("Full text document for entry %0 already linked.",
                     entry.getCitationKey().orElse(Localization.lang("undefined"))));

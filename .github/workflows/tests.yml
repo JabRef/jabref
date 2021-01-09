@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.5.0
+        uses: styfle/cancel-workflow-action@0.6.0
         with:
           access_token: ${{ github.token }}
       - name: Checkout source
@@ -41,7 +41,12 @@ jobs:
         with:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-      - name: Run checkstyle
+      - name: Run check style reporter
+        uses: nikitasavinov/checkstyle-action@master
+        with:
+          reporter: github-pr-check
+          checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
+      - name: Run checkstyle gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
       - name: Run markdown-lint
         uses: avto-dev/markdown-lint@v1
@@ -86,7 +91,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:10.8
+        image: postgres:13-alpine
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -256,5 +261,6 @@ jobs:
           echo
           echo "In case you want to use a different one, please comment here and adjust your name in your git configuration for future commits"
           echo
-          echo "Background: Information about the AUTHORS file can be found at https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md#author-credits"
+          echo "Just adding yourself into the AUTHORS file does not help as it is overwritten by our script ./scripts/generate-authors."
+          echo "Read more on the AUTHORS file at found at https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md#author-credits"
           exit 1

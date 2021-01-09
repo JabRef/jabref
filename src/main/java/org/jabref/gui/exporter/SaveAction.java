@@ -30,22 +30,14 @@ public class SaveAction extends SimpleCommand {
     @Override
     public void execute() {
         SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction(
-                frame.getCurrentBasePanel(),
+                frame.getCurrentLibraryTab(),
                 Globals.prefs,
                 Globals.entryTypesManager);
 
         switch (saveMethod) {
-            case SAVE:
-                saveDatabaseAction.save();
-                break;
-            case SAVE_AS:
-                saveDatabaseAction.saveAs();
-                break;
-            case SAVE_SELECTED:
-                saveDatabaseAction.saveSelectedAsPlain();
-                break;
-            default:
-                // Never happens
+            case SAVE -> saveDatabaseAction.save();
+            case SAVE_AS -> saveDatabaseAction.saveAs();
+            case SAVE_SELECTED -> saveDatabaseAction.saveSelectedAsPlain();
         }
     }
 }

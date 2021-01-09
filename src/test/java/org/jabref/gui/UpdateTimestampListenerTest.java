@@ -8,7 +8,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ class UpdateTimestampListenerTest {
     private BibDatabase database;
     private BibEntry bibEntry;
 
-    private JabRefPreferences preferencesMock;
+    private PreferencesService preferencesMock;
     private TimestampPreferences timestampPreferencesMock;
 
     @BeforeEach
@@ -32,7 +32,7 @@ class UpdateTimestampListenerTest {
 
         database.insertEntry(bibEntry);
 
-        preferencesMock = mock(JabRefPreferences.class);
+        preferencesMock = mock(PreferencesService.class);
         timestampPreferencesMock = mock(TimestampPreferences.class);
 
         when(preferencesMock.getTimestampPreferences()).thenReturn(timestampPreferencesMock);
@@ -48,7 +48,7 @@ class UpdateTimestampListenerTest {
 
         when(timestampPreferencesMock.getTimestampField()).thenReturn(timestampField);
         when(timestampPreferencesMock.now()).thenReturn(newDate);
-        when(timestampPreferencesMock.includeTimestamps()).thenReturn(includeTimestamp);
+        when(timestampPreferencesMock.shouldIncludeTimestamps()).thenReturn(includeTimestamp);
 
         bibEntry.setField(timestampField, baseDate);
 
@@ -71,7 +71,7 @@ class UpdateTimestampListenerTest {
 
         when(timestampPreferencesMock.getTimestampField()).thenReturn(timestampField);
         when(timestampPreferencesMock.now()).thenReturn(newDate);
-        when(timestampPreferencesMock.includeTimestamps()).thenReturn(includeTimestamp);
+        when(timestampPreferencesMock.shouldIncludeTimestamps()).thenReturn(includeTimestamp);
 
         bibEntry.setField(timestampField, baseDate);
 

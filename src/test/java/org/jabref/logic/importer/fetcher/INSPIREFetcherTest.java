@@ -41,7 +41,7 @@ class INSPIREFetcherTest {
                 .withField(StandardField.EPRINT, "1405.2249")
                 .withField(StandardField.ARCHIVEPREFIX, "arXiv")
                 .withField(StandardField.PRIMARYCLASS, "math-ph");
-        List<BibEntry> fetchedEntries = fetcher.performSearch("Fr\\'echet group actions field");
+        List<BibEntry> fetchedEntries = fetcher.performSearch("Fr\\´echet group actions field");
         assertEquals(Collections.singletonList(master), fetchedEntries);
     }
 

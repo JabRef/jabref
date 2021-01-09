@@ -278,4 +278,50 @@ class BracketedPatternTest {
                 .withField(StandardField.AUTHOR, "Patrik {\\v{S}}pan{\\v{e}}l and Kseniya Dryahina and David Smith");
         assertEquals("ŠpanělEtAl", BracketedPattern.expandBrackets("[authEtAl:latex_to_unicode]", null, bibEntry, null));
     }
+
+    @Test
+    void expandBracketsWithModifierContainingRegexCharacterCkass() {
+        BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Wickedness:Managing");
+
+        assertEquals("Wickedness.Managing", BracketedPattern.expandBrackets("[title:regex(\"[:]+\",\".\")]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsEmptyStringFromEmptyBrackets() {
+        BibEntry bibEntry = new BibEntry();
+
+        assertEquals("", BracketedPattern.expandBrackets("[]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsInstitutionAbbreviationFromProvidedAbbreviation() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.AUTHOR, "{European Union Aviation Safety Agency ({EUASABRACKET})}");
+
+        assertEquals("EUASABRACKET", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsInstitutionAbbreviationForAuthorContainingUnion() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.AUTHOR, "{European Union Aviation Safety Agency}");
+
+        assertEquals("EUASA", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsLastNameForAuthorStartingWithOnlyLastNameStartingWithLowerCase() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.AUTHOR, "{eBay}");
+
+        assertEquals("eBay", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsLastNameWithChineseCharacters() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.AUTHOR, "杨秀群");
+
+        assertEquals("杨秀群", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
+    }
 }

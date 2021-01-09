@@ -4,10 +4,12 @@ import java.util.List;
 
 import javafx.scene.Node;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.controlsfx.control.NotificationPane;
 import org.controlsfx.control.action.Action;
 
@@ -33,9 +35,8 @@ public class DatabaseChangePane extends NotificationPane {
                     this.hide();
                 }),
                 new Action(Localization.lang("Review changes"), event -> {
-                    ChangeDisplayDialog changeDialog = new ChangeDisplayDialog(database, changes);
-                    changeDialog.showAndWait();
-
+                    DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+                    dialogService.showCustomDialogAndWait(new ChangeDisplayDialog(database, changes));
                     this.hide();
                 }));
         this.show();
