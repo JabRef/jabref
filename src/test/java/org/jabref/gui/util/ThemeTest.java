@@ -43,16 +43,16 @@ public class ThemeTest {
     public void lightThemeUsedWhenPathIsBlank() {
         Theme blankTheme = new Theme("", preferencesMock);
         assertEquals(Theme.Type.LIGHT, blankTheme.getType());
-        blankTheme.additionalStylesheet().ifPresent(location -> fail(
-                "didn't expect additional stylesheet to be available; with CSS location " + location));
+        assertEquals(Optional.empty(), blankTheme.getAdditionalStylesheet(),
+                "didn't expect additional stylesheet to be available");
     }
 
     @Test
     public void lightThemeUsedWhenPathIsBaseCss() {
         Theme baseTheme = new Theme("Base.css", preferencesMock);
         assertEquals(Theme.Type.LIGHT, baseTheme.getType());
-        baseTheme.additionalStylesheet().ifPresent(location -> fail(
-                "didn't expect additional stylesheet to be available; with CSS location " + location));
+        assertEquals(Optional.empty(), baseTheme.getAdditionalStylesheet(),
+                "didn't expect additional stylesheet to be available");
     }
 
     @Test
@@ -60,7 +60,7 @@ public class ThemeTest {
         // Dark theme is detected by name:
         Theme theme = new Theme("Dark.css", preferencesMock);
         assertEquals(Theme.Type.DARK, theme.getType());
-        assertTrue(theme.additionalStylesheet().isPresent(),
+        assertTrue(theme.getAdditionalStylesheet().isPresent(),
                 "expected dark theme stylesheet to be available");
     }
 
@@ -68,16 +68,16 @@ public class ThemeTest {
     public void customThemeIgnoredIfDirectory() {
         Theme baseTheme = new Theme(tempFolder.toString(), preferencesMock);
         assertEquals(Theme.Type.CUSTOM, baseTheme.getType());
-        baseTheme.additionalStylesheet().ifPresent(location -> fail(
-                "didn't expect additional stylesheet when CSS location is a directory; was called with CSS location " + location));
+        assertEquals(Optional.empty(), baseTheme.getAdditionalStylesheet(),
+                "didn't expect additional stylesheet to be available when location is a directory");
     }
 
     @Test
     public void customThemeIgnoredIfInvalidPath() {
         Theme baseTheme = new Theme("\0\0\0", preferencesMock);
         assertEquals(Theme.Type.CUSTOM, baseTheme.getType());
-        baseTheme.additionalStylesheet().ifPresent(location -> fail(
-                "didn't expect additional stylesheet when CSS location is just some null terminators!"));
+        assertEquals(Optional.empty(), baseTheme.getAdditionalStylesheet(),
+                "didn't expect additional stylesheet when CSS location is just some null terminators!");
     }
 
     @Test
@@ -97,7 +97,7 @@ public class ThemeTest {
         assertEquals(Theme.Type.CUSTOM, theme.getType());
         assertEquals(testCss.toString(), theme.getCssPathString());
 
-        Optional<String> testCssLocation1 = theme.additionalStylesheet();
+        Optional<String> testCssLocation1 = theme.getAdditionalStylesheet();
         assertTrue(testCssLocation1.isPresent(), "expected custom theme location to be available");
         assertEquals(
                 "data:text/css;charset=utf-8;base64,LyogQmlibGF0ZXggU291cmNlIENvZGUgKi8KLmNvZGUtYXJlYSAudGV4dCB7CiAgICAtZngtZm9udC1mYW1pbHk6IG1vbm9zcGFjZTsKfQ==",
@@ -108,7 +108,7 @@ public class ThemeTest {
         // Consumer passed to additionalStylesheet() should still return the data url even though file is deleted.
         // It shouldn't matter whether the file existed at the time the Theme object was created (before or after)
 
-        Optional<String> testCssLocation2 = theme.additionalStylesheet();
+        Optional<String> testCssLocation2 = theme.getAdditionalStylesheet();
         assertTrue(testCssLocation2.isPresent(), "expected custom theme location to be available");
         assertEquals(
                 "data:text/css;charset=utf-8;base64,LyogQmlibGF0ZXggU291cmNlIENvZGUgKi8KLmNvZGUtYXJlYSAudGV4dCB7CiAgICAtZngtZm9udC1mYW1pbHk6IG1vbm9zcGFjZTsKfQ==",
@@ -117,8 +117,8 @@ public class ThemeTest {
         Theme themeCreatedWhenAlreadyMissing = new Theme(testCss.toString(), preferencesMock);
         assertEquals(Theme.Type.CUSTOM, theme.getType());
         assertEquals(testCss.toString(), theme.getCssPathString());
-        themeCreatedWhenAlreadyMissing.additionalStylesheet().ifPresent(location -> fail(
-                "didn't expect additional stylesheet to be available because it didn't exist when theme was created; with CSS location " + location));
+        assertEquals(Optional.empty(), themeCreatedWhenAlreadyMissing.getAdditionalStylesheet(),
+                "didn't expect additional stylesheet to be available because it didn't exist when theme was created");
 
         // Check that the consumer is called once more, if the file is restored
         Files.writeString(testCss,
@@ -127,13 +127,13 @@ public class ThemeTest {
                         "    -fx-font-family: monospace;\n" +
                         "}", StandardOpenOption.CREATE);
 
-        Optional<String> testCssLocation3 = theme.additionalStylesheet();
+        Optional<String> testCssLocation3 = theme.getAdditionalStylesheet();
         assertTrue(testCssLocation3.isPresent(), "expected custom theme location to be available");
         assertEquals(
                 "data:text/css;charset=utf-8;base64,LyogQmlibGF0ZXggU291cmNlIENvZGUgKi8KLmNvZGUtYXJlYSAudGV4dCB7CiAgICAtZngtZm9udC1mYW1pbHk6IG1vbm9zcGFjZTsKfQ==",
                 testCssLocation3.get());
 
-        Optional<String> testCssLocation4 = themeCreatedWhenAlreadyMissing.additionalStylesheet();
+        Optional<String> testCssLocation4 = themeCreatedWhenAlreadyMissing.getAdditionalStylesheet();
         assertTrue(testCssLocation4.isPresent(), "expected custom theme location to be available");
         assertEquals(
                 "data:text/css;charset=utf-8;base64,LyogQmlibGF0ZXggU291cmNlIENvZGUgKi8KLmNvZGUtYXJlYSAudGV4dCB7CiAgICAtZngtZm9udC1mYW1pbHk6IG1vbm9zcGFjZTsKfQ==",
@@ -159,7 +159,7 @@ public class ThemeTest {
         assertEquals(Theme.Type.CUSTOM, theme.getType());
         assertEquals(testCss.toString(), theme.getCssPathString());
 
-        Optional<String> testCssLocation1 = theme.additionalStylesheet();
+        Optional<String> testCssLocation1 = theme.getAdditionalStylesheet();
         assertTrue(testCssLocation1.isPresent(), "expected custom theme location to be available");
         assertTrue(testCssLocation1.get().startsWith("file:"), "expected large custom theme to be a file");
 
@@ -167,24 +167,24 @@ public class ThemeTest {
 
         // additionalStylesheet() will no longer offer the deleted stylesheet, because it's not been held in memory
 
-        theme.additionalStylesheet().ifPresent(location -> fail(
-                "didn't expect additional stylesheet after css was deleted; was called with CSS location " + location));
+        assertEquals(Optional.empty(), theme.getAdditionalStylesheet(),
+                "didn't expect additional stylesheet after css was deleted");
 
         Theme themeCreatedWhenAlreadyMissing = new Theme(testCss.toString(), preferencesMock);
         assertEquals(Theme.Type.CUSTOM, theme.getType());
         assertEquals(testCss.toString(), theme.getCssPathString());
-        themeCreatedWhenAlreadyMissing.additionalStylesheet().ifPresent(location -> fail(
-                "didn't expect additional stylesheet to be available; with CSS location " + location));
+        assertEquals(Optional.empty(), themeCreatedWhenAlreadyMissing.getAdditionalStylesheet(),
+                "didn't expect additional stylesheet to be available because it didn't exist when theme was created");
 
         // Check that it is available once more, if the file is restored
 
         Files.move(testCss.resolveSibling("renamed.css"), testCss);
 
-        Optional<String> testCssLocation2 = theme.additionalStylesheet();
+        Optional<String> testCssLocation2 = theme.getAdditionalStylesheet();
         assertTrue(testCssLocation2.isPresent(), "expected custom theme location to be available");
         assertTrue(testCssLocation2.get().startsWith("file:"), "expected large custom theme to be a file");
 
-        Optional<String> testCssLocation3 = themeCreatedWhenAlreadyMissing.additionalStylesheet();
+        Optional<String> testCssLocation3 = themeCreatedWhenAlreadyMissing.getAdditionalStylesheet();
         assertTrue(testCssLocation3.isPresent(), "expected custom theme location to be available");
         assertTrue(testCssLocation3.get().startsWith("file:"), "expected large custom theme to be a file");
     }
@@ -195,7 +195,7 @@ public class ThemeTest {
      */
     @Test
     @EnabledOnOs(OS.WINDOWS)
-    public void installLiveReloadsCssData() throws IOException, InterruptedException {
+    public void liveReloadCssDataUrl() throws IOException, InterruptedException {
 
         /* Create a temporary custom theme that is just a small snippet of CSS. There is no CSS
          validation (at the moment) but by making a valid CSS block we don't preclude adding validation later */
@@ -210,7 +210,7 @@ public class ThemeTest {
         assertEquals(Theme.Type.CUSTOM, theme.getType());
         assertEquals(testCss.toString(), theme.getCssPathString());
 
-        Optional<String> testCssLocation1 = theme.additionalStylesheet();
+        Optional<String> testCssLocation1 = theme.getAdditionalStylesheet();
         assertTrue(testCssLocation1.isPresent(), "expected custom theme location to be available");
         assertEquals(
                 "data:text/css;charset=utf-8;base64,LyogQmlibGF0ZXggU291cmNlIENvZGUgKi8KLmNvZGUtYXJlYSAudGV4dCB7CiAgICAtZngtZm9udC1mYW1pbHk6IG1vbm9zcGFjZTsKfQ==",
@@ -248,7 +248,7 @@ public class ThemeTest {
             }
         }
 
-        Optional<String> testCssLocation2 = theme.additionalStylesheet();
+        Optional<String> testCssLocation2 = theme.getAdditionalStylesheet();
         assertTrue(testCssLocation2.isPresent(), "expected custom theme location to be available");
         assertEquals(
                 "data:text/css;charset=utf-8;base64,LyogQW5kIG5vdyBmb3Igc29tZXRoaW5nIHNsaWdodGx5IGRpZmZlcmVudCAqLwouY29kZS1hcmVhIC50ZXh0IHsKICAgIC1meC1mb250LWZhbWlseTogc2VyaWY7Cn0=",

@@ -182,7 +182,16 @@ public class Theme {
     }
 
     /**
-     * Creates a data-embedded URL from a file or resource URL
+     * Creates a data-embedded URL from a file (or resource) URL.
+     *
+     * TODO: this is only desirable for file URLs, as protection against the file being removed (see
+     *       {@link #MAX_IN_MEMORY_CSS_LENGTH} for details). However, there is a bug in OpenJFX, in that it does not
+     *       recognise jrt URLs (modular java runtime URLs). This is detailed in
+     *       <a href="https://bugs.openjdk.java.net/browse/JDK-8240969">JDK-8240969</a>.
+     *       When we upgrade to OpenJFX 16, we should limit loadCssToMemory to only URLs where the protocol is equal
+     *       to file, using {@link URL#getProtocol()}. Also rename to loadFileCssToMemory() and reword the
+     *      javadoc, for clarity.
+     *
      * @param url the URL of the resource to convert into a data: url
      */
     private void loadCssToMemory(URL url) {
@@ -285,7 +294,7 @@ public class Theme {
      * location will be a local URL. Typically it will be a {@code 'data:'} URL where the CSS is embedded. However for
      * large themes it can be {@code 'file:'}.
      */
-    public Optional<String> additionalStylesheet() {
+    public Optional<String> getAdditionalStylesheet() {
         if (cssDataUrlString.get().isEmpty()) {
             additionalCssToLoad().ifPresent(this::loadCssToMemory);
         }
