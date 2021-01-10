@@ -24,14 +24,17 @@ class TimeStampToDateAddAndModifyTest {
         assertEquals(getBibEntriesWithSameFormatAfterMigrationToCreationDate(), entries.getDatabase().getEntries());
     }
 
+    // TODO: Mock that
     public TimestampPreferences setUpForMigrationToCreationDate() {
         return new TimestampPreferences(false, false, false, StandardField.TIMESTAMP, "yyyy-mm-dd");
     }
 
+    // TODO: Mock that
     public TimestampPreferences setUpForMigrationWithCustomName() {
         return new TimestampPreferences(false, false, false, new UnknownField("dateOfCreation"), "yyyy-mm-dd");
     }
 
+    // TODO: Mock that
     public TimestampPreferences setUpForMigrationToModificationDate() {
         return new TimestampPreferences(false, false, true, StandardField.TIMESTAMP, "yyyy-mm-dd");
     }
