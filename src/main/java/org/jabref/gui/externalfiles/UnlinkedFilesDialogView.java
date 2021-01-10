@@ -4,7 +4,6 @@ import javax.inject.Inject;
 import javax.swing.undo.UndoManager;
 
 import javafx.beans.binding.Bindings;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Accordion;
@@ -76,8 +75,8 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     @Inject private TaskExecutor taskExecutor;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
 
+    private final ControlsFxVisualizer validationVisualizer;
     private UnlinkedFilesDialogViewModel viewModel;
-    private ControlsFxVisualizer validationVisualizer;
 
     public UnlinkedFilesDialogView() {
         this.validationVisualizer = new ControlsFxVisualizer();
@@ -112,15 +111,15 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         fileTypeSelection.setItems(viewModel.getFileFilters());
 
         new ViewModelListCellFactory<FileExtensionViewModel>()
-                                                              .withText(fileFilter -> fileFilter.getDescription())
-                                                              .withIcon(fileFilter -> fileFilter.getIcon())
-                                                              .install(fileTypeSelection);
+                .withText(FileExtensionViewModel::getDescription)
+                .withIcon(FileExtensionViewModel::getIcon)
+                .install(fileTypeSelection);
 
         tree.rootProperty().bind(EasyBind.map(viewModel.treeRoot(), fileNode -> new RecursiveTreeItem<>(fileNode, FileNodeViewModel::getChildren)));
 
         new ViewModelTreeCellFactory<FileNodeViewModel>()
-                                                         .withText(FileNodeViewModel::getDisplayText)
-                                                         .install(tree);
+                .withText(FileNodeViewModel::getDisplayText)
+                .install(tree);
 
         EasyBind.subscribe(tree.rootProperty(), root -> {
             ((CheckBoxTreeItem<FileNodeViewModel>) root).setSelected(true);
@@ -134,7 +133,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         viewModel.scanButtonDisabled().bindBidirectional(buttonScan.disableProperty());
         viewModel.scanButtonDefaultButton().bindBidirectional(buttonScan.defaultButtonProperty());
         buttonExport.disableProperty().bind(viewModel.exportButtonDisabled().or(
-                                                                                Bindings.isEmpty(viewModel.getCheckedFileList())));
+                Bindings.isEmpty(viewModel.getCheckedFileList())));
         viewModel.selectedExtension().bind(fileTypeSelection.valueProperty());
 
         tvResult.setItems(viewModel.resultTableItems());
@@ -161,13 +160,13 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     private void setupResultTable() {
         colFile.setCellValueFactory(cellData -> cellData.getValue().file());
         new ValueTableCellFactory<ImportFilesResultItemViewModel, String>()
-                                                                           .withText(item -> item).withTooltip(item -> item)
-                                                                           .install(colFile);
+                .withText(item -> item).withTooltip(item -> item)
+                .install(colFile);
 
         colMessage.setCellValueFactory(cellData -> cellData.getValue().message());
         new ValueTableCellFactory<ImportFilesResultItemViewModel, String>()
-                                                                           .withText(item -> item).withTooltip(item -> item)
-                                                                           .install(colMessage);
+                .withText(item -> item).withTooltip(item -> item)
+                .install(colMessage);
 
         colStatus.setCellValueFactory(cellData -> cellData.getValue().getIcon());
         colStatus.setCellFactory(new ValueTableCellFactory<ImportFilesResultItemViewModel, JabRefIcon>().withGraphic(this::getIcon));
@@ -175,37 +174,37 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     }
 
     @FXML
-    void browseFileDirectory(ActionEvent event) {
+    void browseFileDirectory() {
         viewModel.browseFileDirectory();
     }
 
     @FXML
-    void collapseAll(ActionEvent event) {
+    void collapseAll() {
         expandTree(tree.getRoot(), false);
     }
 
     @FXML
-    void expandAll(ActionEvent event) {
+    void expandAll() {
         expandTree(tree.getRoot(), true);
     }
 
     @FXML
-    void scanFiles(ActionEvent event) {
+    void scanFiles() {
         viewModel.startSearch();
     }
 
     @FXML
-    void selectAll(ActionEvent event) {
+    void selectAll() {
         tree.getCheckModel().checkAll();
     }
 
     @FXML
-    void unselectAll(ActionEvent event) {
+    void unselectAll() {
         tree.getCheckModel().clearChecks();
     }
 
     @FXML
-    void exportSelected(ActionEvent event) {
+    void exportSelected() {
         viewModel.startExport();
     }
 
@@ -220,7 +219,6 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     }
 
     /**
-     *
      * Expands or collapses the specified tree according to the <code>expand</code>-parameter.
      */
     private void expandTree(TreeItem<?> item, boolean expand) {

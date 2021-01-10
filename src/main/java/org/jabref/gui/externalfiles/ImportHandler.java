@@ -11,7 +11,6 @@ import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.undo.UndoableInsertEntries;
@@ -122,7 +121,6 @@ public class ImportHandler {
                                     addResultToList(file, false, Localization.lang("No metadata found. Creating empty entry with file link"));
                                 }
                             }
-
                         } else if (FileUtil.isBibFile(file)) {
                             var bibtexParserResult = contentImporter.importFromBibFile(file, fileUpdateMonitor);
                             if (bibtexParserResult.hasWarnings()) {
@@ -135,7 +133,6 @@ public class ImportHandler {
                             entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
                             addResultToList(file, false, Localization.lang("No bibtex data found. Creating empty entry with file link"));
                         }
-
                     } catch (IOException ex) {
                         LOGGER.error("Error importing", ex);
                         addResultToList(file, false, Localization.lang("Error from import: %0", ex.getLocalizedMessage()));
@@ -207,9 +204,10 @@ public class ImportHandler {
      */
     private void generateKeys(List<BibEntry> entries) {
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
-                bibdatabase.getMetaData().getCiteKeyPattern(Globals.prefs.getCitationKeyPatternPreferences().getKeyPattern()),
+                bibdatabase.getMetaData().getCiteKeyPattern(preferencesService.getCitationKeyPatternPreferences()
+                                                                              .getKeyPattern()),
                 bibdatabase.getDatabase(),
-                Globals.prefs.getCitationKeyPatternPreferences());
+                preferencesService.getCitationKeyPatternPreferences());
 
         for (BibEntry entry : entries) {
             keyGenerator.generateAndSetKey(entry);

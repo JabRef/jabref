@@ -98,5 +98,4 @@ public class FileFilterConverter {
                                        .orElse(false);
         }
     }
-
 }

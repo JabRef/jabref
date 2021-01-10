@@ -13,13 +13,11 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.FilePreferences;
 
 /**
- * {@link FileFilter} implementation, that allows only files which are not
- * linked in any of the {@link BibEntry}s of the specified
- * {@link BibDatabase}. <br>
- * <br>
- * This {@link FileFilter} sits on top of another {@link FileFilter}
- * -implementation, which it first consults. Only if this major filefilter
- * has accepted a file, this implementation will verify on that file.
+ * {@link FileFilter} implementation, that allows only files which are not linked in any of the {@link BibEntry}s of the
+ * specified {@link BibDatabase}.
+ * <p>
+ * This {@link FileFilter} sits on top of another {@link FileFilter} -implementation, which it first consults. Only if
+ * this major filefilter has accepted a file, this implementation will verify on that file.
  */
 public class UnlinkedPDFFileFilter implements DirectoryStream.Filter<Path> {
 
