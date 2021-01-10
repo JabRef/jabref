@@ -31,6 +31,7 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.texparser.FileNodeViewModel;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -42,6 +43,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.CheckTreeView;
 
 public class UnlinkedFilesDialogView extends BaseDialog<Void> {
@@ -73,8 +75,11 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     @Inject private FileUpdateMonitor fileUpdateMonitor;
 
     private UnlinkedFilesDialogViewModel viewModel;
+    private ControlsFxVisualizer validationVisualizer;
 
     public UnlinkedFilesDialogView() {
+        this.validationVisualizer = new ControlsFxVisualizer();
+
         this.setTitle(Localization.lang("Search for unlinked local files"));
 
         ViewLoader.view(this)
@@ -98,6 +103,9 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     private void initialize() {
         viewModel = new UnlinkedFilesDialogViewModel(dialogService, ExternalFileTypes.getInstance(), undoManager, fileUpdateMonitor, preferencesService, stateManager, taskExecutor);
         viewModel.directoryPath().bindBidirectional(directoryPathField.textProperty());
+
+        validationVisualizer.setDecoration(new IconValidationDecorator());
+        validationVisualizer.initVisualization(viewModel.directoryPathValidator(), directoryPathField);
 
         fileTypeSelection.setItems(viewModel.getFileFilters());
 

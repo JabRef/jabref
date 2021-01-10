@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -41,6 +42,9 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,6 +79,8 @@ public class UnlinkedFilesDialogViewModel {
     private final BibDatabaseContext bibDatabase;
     private final TaskExecutor taskExecutor;
 
+    private final FunctionBasedValidator<String> scanDirectoryValidator;
+
     public UnlinkedFilesDialogViewModel(DialogService dialogService, ExternalFileTypes externalFileTypes, UndoManager undoManager,
                                         FileUpdateMonitor fileUpdateMonitor, PreferencesService preferences, StateManager stateManager, TaskExecutor taskExecutor) {
         this.preferences = preferences;
@@ -90,24 +96,27 @@ public class UnlinkedFilesDialogViewModel {
                                           undoManager,
                                           stateManager);
 
-
        this.fileFilterList = FXCollections.observableArrayList(
                                             new FileExtensionViewModel(StandardFileType.ANY_FILE,externalFileTypes),
                                             new FileExtensionViewModel(StandardFileType.BIBTEX_DB, externalFileTypes),
                                             new FileExtensionViewModel(StandardFileType.PDF, externalFileTypes));
+
+
+       Predicate<String> isDirectory = path -> Files.isDirectory(Path.of(path));
+       scanDirectoryValidator = new FunctionBasedValidator<>(directoryPath, isDirectory,
+               ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
     }
 
     public void startImport() {
         List<Path> fileList = checkedFileList.stream()
-            .map(item -> item.getValue().getPath())
-            .filter(path -> path.toFile().isFile())
-            .collect(Collectors.toList());
-    if (fileList.isEmpty()) {
-    LOGGER.warn("There are no valid files checked");
-    return;
-    }
-            resultList.clear();
-
+                                             .map(item -> item.getValue().getPath())
+                                             .filter(path -> path.toFile().isFile())
+                                             .collect(Collectors.toList());
+        if (fileList.isEmpty()) {
+            LOGGER.warn("There are no valid files checked");
+            return;
+        }
+        resultList.clear();
 
         importFilesBackgroundTask = importHandler.importFilesInBackground(fileList)
         .onRunning(() -> {
@@ -212,8 +221,6 @@ public class UnlinkedFilesDialogViewModel {
         })
         .onSuccess(root -> {
             treeRoot.setValue(root);
-         //   root.setSelected(true);
-         //   root.setExpanded(true);
             progress.set(0);
 
             applyButtonDisabled.setValue(false);
@@ -302,9 +309,7 @@ public class UnlinkedFilesDialogViewModel {
         return directory;
     }
 
-
     public void selectAll() {
-         var root =  treeRoot.getValue();
         // Need to toggle a twice to make sure everything is selected
 
     }
@@ -348,6 +353,10 @@ public class UnlinkedFilesDialogViewModel {
 
     public ObservableList<TreeItem<FileNodeViewModel>> getCheckedFileList() {
         return new ReadOnlyListWrapper<>(checkedFileList);
+    }
+
+    public ValidationStatus directoryPathValidator() {
+        return this.scanDirectoryValidator.getValidationStatus();
     }
 
 }
