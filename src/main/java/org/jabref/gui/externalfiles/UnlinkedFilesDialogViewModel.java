@@ -1,22 +1,22 @@
 package org.jabref.gui.externalfiles;
 
 import java.io.BufferedWriter;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -24,9 +24,9 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TreeItem;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -57,7 +57,7 @@ public class UnlinkedFilesDialogViewModel {
     private final BooleanProperty scanButtonDisabled = new SimpleBooleanProperty(true);
     private final BooleanProperty exportButtonDisabled = new SimpleBooleanProperty();
     private final ObjectProperty<FileNodeViewModel> treeRoot = new SimpleObjectProperty<>();
-    private final ObservableList<TreeItem<FileNodeViewModel>> checkedFileList;
+    private final ObservableList<TreeItem<FileNodeViewModel>> checkedFileList = FXCollections.observableArrayList();
 
     private final BooleanProperty scanButtonDefaultButton = new SimpleBooleanProperty();
     private final DoubleProperty progress = new SimpleDoubleProperty(0);
@@ -98,14 +98,16 @@ public class UnlinkedFilesDialogViewModel {
     }
 
     public void startImport() {
-        CheckBoxTreeItem<FileNodeViewModel> root = (CheckBoxTreeItem<FileNodeViewModel>) treeRoot.getValue();
-        final List<Path> fileList = getFileListFromNode(root);
+        List<Path> fileList = checkedFileList.stream()
+            .map(item -> item.getValue().getPath())
+            .filter(path -> path.toFile().isFile())
+            .collect(Collectors.toList());
+    if (fileList.isEmpty()) {
+    LOGGER.warn("There are no valid files checked");
+    return;
+    }
+            resultList.clear();
 
-        resultList.clear();
-
-        if (fileList.isEmpty()) {
-            return;
-        }
 
         importFilesBackgroundTask = importHandler.importFilesInBackground(fileList)
         .onRunning(() -> {
@@ -142,10 +144,12 @@ public class UnlinkedFilesDialogViewModel {
      * This starts the export of all files of all selected nodes in the file tree view.
      */
     public void startExport() {
-        FileNodeViewModel root = treeRoot.getValue();
-
-        final List<Path> fileList = getFileListFromNode(root);
+        List<Path> fileList = checkedFileList.stream()
+                                             .map(item -> item.getValue().getPath())
+                                             .filter(path -> path.toFile().isFile())
+                                             .collect(Collectors.toList());
         if (fileList.isEmpty()) {
+            LOGGER.warn("There are no valid files checked");
             return;
         }
 
@@ -208,8 +212,8 @@ public class UnlinkedFilesDialogViewModel {
         })
         .onSuccess(root -> {
             treeRoot.setValue(root);
-            root.setSelected(true);
-            root.setExpanded(true);
+         //   root.setSelected(true);
+         //   root.setExpanded(true);
             progress.set(0);
 
             applyButtonDisabled.setValue(false);
@@ -260,7 +264,7 @@ public class UnlinkedFilesDialogViewModel {
                  });
     }
 
-    public ObjectProperty<TreeItem<FileNodeViewModel>> treeRoot() {
+    public ObjectProperty<FileNodeViewModel> treeRoot() {
         return this.treeRoot;
     }
 
@@ -298,48 +302,24 @@ public class UnlinkedFilesDialogViewModel {
         return directory;
     }
 
-    private List<Path> getFileListFromNode(CheckBoxTreeItem<FileNodeViewModel> node) {
-        List<Path> filesList = new ArrayList<>();
-        for (TreeItem<FileNodeViewModel> childNode : node.getChildren()) {
-            CheckBoxTreeItem<FileNodeViewModel> child = (CheckBoxTreeItem<FileNodeViewModel>) childNode;
-            if (child.isLeaf()) {
-                if (child.isSelected()) {
-                    Path nodeFile = child.getValue().path;
-                    if ((nodeFile != null) && Files.isRegularFile(nodeFile)) {
-                        filesList.add(nodeFile);
-                    }
-                }
-            } else {
-                filesList.addAll(getFileListFromNode(child));
-            }
-        }
-        return filesList;
-    }
 
     public void selectAll() {
-        CheckBoxTreeItem<FileNodeViewModel> root = (CheckBoxTreeItem<FileNodeViewModel>) treeRoot.getValue();
+         var root =  treeRoot.getValue();
         // Need to toggle a twice to make sure everything is selected
-        root.setSelected(true);
-        root.setSelected(false);
-        root.setSelected(true);
+
     }
 
     public void unselectAll() {
-        CheckBoxTreeItem<FileNodeViewModel> root = (CheckBoxTreeItem<FileNodeViewModel>) treeRoot.getValue();
         // Need to toggle a twice to make sure nothing is selected
-        root.setSelected(false);
-        root.setSelected(true);
-        root.setSelected(false);
+
     }
 
     public void expandAll() {
-        expandTree(treeRoot.getValue(), true);
-        treeRoot.getValue().setExpanded(true);
+
     }
 
     public void collapseAll() {
-        expandTree(treeRoot.getValue(), false);
-        treeRoot.getValue().setExpanded(false);
+
     }
 
     /**
@@ -365,4 +345,9 @@ public class UnlinkedFilesDialogViewModel {
     public BooleanProperty resultPaneExpanded() {
         return this.resultPaneExpanded;
     }
+
+    public ObservableList<TreeItem<FileNodeViewModel>> getCheckedFileList() {
+        return new ReadOnlyListWrapper<>(checkedFileList);
+    }
+
 }

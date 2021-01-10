@@ -1,8 +1,5 @@
 package org.jabref.gui.externalfiles;
 
-import java.nio.file.Files;
-import java.util.stream.Collectors;
-
 import javax.inject.Inject;
 import javax.swing.undo.UndoManager;
 
@@ -12,28 +9,29 @@ import javafx.scene.Node;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBoxTreeItem;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
-import javafx.scene.control.TreeView;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.texparser.FileNodeViewModel;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -43,12 +41,14 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
+import org.controlsfx.control.CheckTreeView;
 
 public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
     @FXML private TextField directoryPathField;
     @FXML private ComboBox<FileExtensionViewModel> fileTypeSelection;
-    @FXML private TreeView<FileNodeViewModel> tree;
+    @FXML private CheckTreeView<FileNodeViewModel> tree;
     @FXML private Button buttonScan;
     @FXML private ButtonType importButton;
     @FXML private Button buttonExport;
@@ -82,7 +82,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
                   .setAsDialogPane(this);
 
         Button btnImport = (Button) this.getDialogPane().lookupButton(importButton);
-        ControlHelper.setAction(importButton, getDialogPane(), evt-> viewModel.startImport());
+        ControlHelper.setAction(importButton, getDialogPane(), evt -> viewModel.startImport());
         btnImport.disableProperty().bindBidirectional(viewModel.applyButtonDisabled());
         btnImport.setTooltip(new Tooltip(Localization.lang("Starts the import of BibTeX entries.")));
 
@@ -100,53 +100,62 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         viewModel.directoryPath().bindBidirectional(directoryPathField.textProperty());
 
         fileTypeSelection.setItems(viewModel.getFileFilters());
+
         new ViewModelListCellFactory<FileExtensionViewModel>()
-             .withText(fileFilter -> fileFilter.getDescription())
-             .withIcon(fileFilter -> fileFilter.getIcon())
-             .install(fileTypeSelection);
+              .withText(fileFilter -> fileFilter.getDescription())
+              .withIcon(fileFilter -> fileFilter.getIcon())
+              .install(fileTypeSelection);
+
+        tree.rootProperty().bind(EasyBind.map(viewModel.treeRoot(), fileNode -> new RecursiveTreeItem<>(fileNode, FileNodeViewModel::getChildren)));
 
         new ViewModelTreeCellFactory<FileNodeViewModel>()
-             .withText(this::getDisplayText)
+             .withText(FileNodeViewModel::getDisplayText)
              .install(tree);
 
-       tree.setPrefWidth(Double.POSITIVE_INFINITY);
-       viewModel.treeRoot().bindBidirectional(tree.rootProperty());
-       viewModel.scanButtonDisabled().bindBidirectional(buttonScan.disableProperty());
-       viewModel.scanButtonDefaultButton().bindBidirectional(buttonScan.defaultButtonProperty());
-       viewModel.exportButtonDisabled().bindBidirectional(buttonExport.disableProperty());
-       viewModel.selectedExtension().bind(fileTypeSelection.valueProperty());
+        EasyBind.subscribe(tree.rootProperty(), root -> {
+            ((CheckBoxTreeItem<FileNodeViewModel>) root).setSelected(true);
+            root.setExpanded(true);
+            EasyBind.bindContent(viewModel.getCheckedFileList(), tree.getCheckModel().getCheckedItems());
+        });
+        tree.setPrefWidth(Double.POSITIVE_INFINITY);
+        tree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-       tvResult.setItems(viewModel.resultTableItems());
+        viewModel.scanButtonDisabled().bindBidirectional(buttonScan.disableProperty());
+        viewModel.scanButtonDefaultButton().bindBidirectional(buttonScan.defaultButtonProperty());
+        viewModel.exportButtonDisabled().bindBidirectional(buttonExport.disableProperty());
+        viewModel.selectedExtension().bind(fileTypeSelection.valueProperty());
 
-       progressDisplay.progressProperty().bind(viewModel.progress());
-       progressText.textProperty().bind(viewModel.progressText());
+        tvResult.setItems(viewModel.resultTableItems());
 
-       progressPane.managedProperty().bind(viewModel.searchProgressVisible());
-       progressPane.visibleProperty().bind(viewModel.searchProgressVisible());
-       accordion.disableProperty().bind(viewModel.searchProgressVisible());
-       tree.maxHeightProperty().bind(((Control) filePane.contentProperty().get()).heightProperty());
+        progressDisplay.progressProperty().bind(viewModel.progress());
+        progressText.textProperty().bind(viewModel.progressText());
 
-       viewModel.filePaneExpanded().bindBidirectional(filePane.expandedProperty());
-       viewModel.resultPaneExpanded().bindBidirectional(resultPane.expandedProperty());
+        progressPane.managedProperty().bind(viewModel.searchProgressVisible());
+        progressPane.visibleProperty().bind(viewModel.searchProgressVisible());
+        accordion.disableProperty().bind(viewModel.searchProgressVisible());
+        tree.maxHeightProperty().bind(((Control) filePane.contentProperty().get()).heightProperty());
 
-       viewModel.scanButtonDefaultButton().setValue(true);
-       viewModel.scanButtonDisabled().setValue(true);
-       viewModel.applyButtonDisabled().setValue(true);
-       fileTypeSelection.getSelectionModel().selectFirst();
+        viewModel.filePaneExpanded().bindBidirectional(filePane.expandedProperty());
+        viewModel.resultPaneExpanded().bindBidirectional(resultPane.expandedProperty());
 
-       setupResultTable();
+        viewModel.scanButtonDefaultButton().setValue(true);
+        viewModel.scanButtonDisabled().setValue(true);
+        viewModel.applyButtonDisabled().setValue(true);
+        fileTypeSelection.getSelectionModel().selectFirst();
+
+        setupResultTable();
     }
 
     private void setupResultTable() {
         colFile.setCellValueFactory(cellData -> cellData.getValue().file());
         new ValueTableCellFactory<ImportFilesResultItemViewModel, String>()
-          .withText(item -> item).withTooltip(item -> item)
-          .install(colFile);
+                                                                           .withText(item -> item).withTooltip(item -> item)
+                                                                           .install(colFile);
 
         colMessage.setCellValueFactory(cellData -> cellData.getValue().message());
         new ValueTableCellFactory<ImportFilesResultItemViewModel, String>()
-          .withText(item -> item).withTooltip(item -> item)
-          .install(colMessage);
+                                                                           .withText(item -> item).withTooltip(item -> item)
+                                                                           .install(colMessage);
 
         colStatus.setCellValueFactory(cellData -> cellData.getValue().getIcon());
         colStatus.setCellFactory(new ValueTableCellFactory<ImportFilesResultItemViewModel, JabRefIcon>().withGraphic(this::getIcon));
@@ -185,7 +194,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
     @FXML
     void exportSelected(ActionEvent event) {
-       viewModel.startExport();
+        viewModel.startExport();
     }
 
     private Node getIcon(JabRefIcon icon) {
@@ -198,17 +207,4 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         return icon.getGraphicNode();
     }
 
-    private String getDisplayText(FileNodeViewModel node) {
-        if (Files.isRegularFile(node.path)) {
-            // File
-            return node.path.getFileName().toString();
-        } else {
-            // Directory
-            if (node.fileCount > 1) {
-                return Localization.lang("%0 (%1) files", node.path.getFileName(), node.fileCount);
-            } else {
-                return Localization.lang("%0 (%1) file", node.path.getFileName(), node.fileCount);
-            }
-        }
-    }
 }
