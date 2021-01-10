@@ -2,7 +2,6 @@ package org.jabref.gui.maintable;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -127,11 +126,15 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SmartConstrainedResizePolicy.class);
 
+    // The delta which is "OK" the column width being smaller than the table width without any action taken
+    public static final double EPSILON_MARGIN = 20d;
+
     private List<? extends TableColumn<?, ?>> resizableColumns;
 
     private TableColumn<?, ?> lastModifiedColumn = null;
 
     private Map<TableColumn, Double> desiredColumnWidths;
+
     private Double thresholdPercent;
 
     // Required for RW0
@@ -140,7 +143,7 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
     private boolean firstTimeRun = true;
 
     public SmartConstrainedResizePolicy() {
-        this.desiredColumnWidths = Collections.emptyMap();
+        this.desiredColumnWidths = new HashMap<>();
         // default is 80%
         this.thresholdPercent = .8;
     }
@@ -160,8 +163,14 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
         return getDesiredColumnWidth(column) * thresholdPercent;
     }
 
+    /**
+     * SIDE EFFECT: Stores computed desired width if not present in HashMap. This leads to a constant desired width.
+     */
     private Double getDesiredColumnWidth(TableColumn column) {
-        return desiredColumnWidths.getOrDefault(column, column.getPrefWidth());
+        desiredColumnWidths.putIfAbsent(column, column.getPrefWidth());
+        Double result = desiredColumnWidths.get(column);
+        LOGGER.trace("Desired column width for {}: {}", column.getText(), result);
+        return result;
     }
 
     /**
@@ -169,19 +178,20 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
      */
     @Override
     public Boolean call(TableView.ResizeFeatures prop) {
+        TableView table = prop.getTable();
         if (firstTimeRun) {
-            if (prop.getTable().getWidth() == 0.0d) {
+            if (table.getWidth() == 0.0d) {
                 LOGGER.debug("Table width is 0. Returning false");
                 return false;
             }
 
-            firstTimeGlobalVariablesInitializations(prop.getTable());
+            firstTimeGlobalVariablesInitializations(table);
 
             LOGGER.debug("I0");
-            doInitialTableRendering(prop.getTable());
+            doInitialTableRendering(table);
             firstTimeRun = false;
             LOGGER.debug("First time rendering completed.");
-            previousTableWidth = prop.getTable().getWidth();
+            previousTableWidth = table.getWidth();
             LOGGER.debug("Storing current table width {} as \"previous table width\"", previousTableWidth);
             return true;
         }
@@ -193,13 +203,17 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
         if (column == null) {
             // happens at window resize
             LOGGER.debug("RW0 - Table is fully rendered");
-            result = doFullTableRendering(prop.getTable());
+            if (previousTableWidth == table.getWidth()) {
+                LOGGER.debug("Table has same size as in last run. Nothing to do");
+                return false;
+            }
+            result = doFullTableRendering(table);
         } else {
             LOGGER.debug("RC0 - Column width changed");
-            result = doColumnChange(prop.getTable(), prop.getColumn(), prop.getDelta());
+            result = doColumnChange(table, prop.getColumn(), prop.getDelta());
         }
         LOGGER.debug("Result: {}", result);
-        previousTableWidth = prop.getTable().getWidth();
+        previousTableWidth = table.getWidth();
         LOGGER.debug("Storing current table width {} as \"previous table width\"", previousTableWidth);
         return result;
     }
@@ -260,14 +274,18 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
      * case RC0
      */
     private boolean doColumnChange(TableView table, TableColumn userChangedColumn, Double sizeChange) {
+        LOGGER.debug("Start RC0 with column {} sizeChange {}", userChangedColumn.getText(), sizeChange);
         if (table.getWidth() == 0.0d) {
             LOGGER.error("Table width is 0. Returning false");
             return false;
         }
 
         return determineNewWidth(userChangedColumn, sizeChange).map(newWidth -> {
+            LOGGER.debug("Checking if content has fit into table before");
             boolean contentHasFitIntoTableBefore = contentFitsIntoTable(table);
+            LOGGER.debug("Result: contentHasFitIntoTableBefore: {}", contentHasFitIntoTableBefore);
             userChangedColumn.setPrefWidth(newWidth);
+            LOGGER.trace("New width set");
             List<? extends TableColumn<?, ?>> otherResizableColumns = resizableColumns.stream().filter(column -> !column.equals(userChangedColumn)).collect(Collectors.toList());
             if (contentHasFitIntoTableBefore) {
                 LOGGER.debug("RCE1, RCS1");
@@ -357,6 +375,7 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
         // This is com.sun.javafx.scene.control.skin.Utils.boundedSize with more comments and Optionals
 
         LOGGER.trace("Column {}", column.getText());
+        LOGGER.trace("Requested delta {}", delta);
 
         // Calculate newWidth based on delta and constraint of the column
         double oldWidth = column.getWidth();
@@ -365,13 +384,16 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
             double minWidth = getMinWidthThreshold(column);
             LOGGER.trace("getMinWidthThreshold {}", minWidth);
             newWidth = Math.max(minWidth, oldWidth + delta);
+            LOGGER.trace("newWidth {} = Math.max(minWidth {}, oldWidth {} + delta {})", newWidth, minWidth, oldWidth, delta);
         } else {
             double maxWidth = column.getMaxWidth();
             LOGGER.trace("MaxWidth {}", maxWidth);
             newWidth = Math.min(maxWidth, oldWidth + delta);
+            LOGGER.trace("newWidth {} = Math.min(maxWidth {}, oldWidth {} + delta {})", newWidth, maxWidth, oldWidth, delta);
         }
-        newWidth = Math.floor(newWidth) - 2d;
-        LOGGER.trace("Size: {} -> {}", oldWidth, newWidth);
+        LOGGER.trace("Truncating width");
+        newWidth = Math.floor(newWidth * 1.0E10) / 1.0E10;
+        LOGGER.trace("Size proposal: {} -> {}", oldWidth, newWidth);
         if (oldWidth == newWidth) {
             return Optional.empty();
         }
@@ -392,6 +414,15 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
         Double newContentWidth;
         boolean aWidthChanged = false;
 
+        // We need a second in case the EPSILON_MARGIN condition cannot be fulfilled
+        // This is for instance the case:
+        //   - New table width: 830
+        //   - 9 Columns à 100 threshold
+        //   - old table width: 900
+        //   - --> 70 pixels should be shrunk
+        //   - Columns should be shrunk
+        //   - Columns cannot be shrunk because of threshold
+        // Therefore, we introduce an iterations counter to have a safety addition to the termination condition.
         int iterations = 0;
 
         double remainingPixels;
@@ -419,36 +450,21 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
                     column.setPrefWidth(newWidth.get());
                 }
             }
+
             newContentWidth = getContentWidth(table);
             LOGGER.debug("newContentWidth {}", newContentWidth);
+
             remainingPixels = Math.abs(tableWidth - newContentWidth);
             LOGGER.debug("|tableWidth - newContentWidth| = {}", remainingPixels);
-        } while (remainingPixels > 20d && iterations <= 2);
+        } while (remainingPixels > EPSILON_MARGIN && iterations <= 2);
 
-        /*
-
-        Quick hack - has to be moved elsewhere
-
-        // in case the table has less than 7 pixels, a scroll bar is there
-        // quickfix by removing pixels
-        double amountOfRemainingPixelsRequiredForNoScrollBar = 7.0;
-        if (remainingPixels < amountOfRemainingPixelsRequiredForNoScrollBar) {
-            double pixelsToRemove = amountOfRemainingPixelsRequiredForNoScrollBar - remainingPixels;
-            Iterator<? extends TableColumn<?, ?>> iterator = columnsToResize.iterator();
-            while (pixelsToRemove > 0) {
-                if (!iterator.hasNext()) {
-                    iterator = columnsToResize.iterator();
-                }
-                TableColumn<?, ?> column = iterator.next();
-                Optional<Double> aDouble = determineNewWidth(column, -1.0);
-                if (aDouble.isPresent()) {
-                    column.setPrefWidth(aDouble.get());
-                    pixelsToRemove--;
-                }
-            }
+        // Special case if due to rounding errors contentWidth is still larger than tableWidth
+        // E.g., contentWidth - tableWidth = 0.0000000000002
+        if (remainingPixels < 1) {
+            columnsToResize.stream().filter(column -> column.getWidth() > column.getMinWidth() + 1).findFirst();
+            TableColumn<?, ?> columnToAbsorbEpsilon = columnsToResize.get(0);
+            columnToAbsorbEpsilon.setPrefWidth(columnToAbsorbEpsilon.getWidth() - remainingPixels);
         }
-
-         */
 
         LOGGER.debug("aWidthChanged is {}", aWidthChanged);
         return aWidthChanged;

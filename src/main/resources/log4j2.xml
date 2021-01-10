@@ -2,12 +2,12 @@
 <Configuration status="INFO">
     <Appenders>
         <Console name="CONSOLE" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{15} %M:%L - %msg%n" />
         </Console>
         <GuiAppender name="GuiLogger"/>
         <OurApplicationInsightsAppender name="applicationInsightsAppender"/>
         <File name="FILE" fileName="jabref.log">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+            <PatternLayout pattern="%d{HH:mm:ss} %-5level %M:%L - %msg%n" />
         </File>
     </Appenders>
     <Loggers>
