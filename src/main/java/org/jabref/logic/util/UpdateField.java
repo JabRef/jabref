@@ -93,7 +93,7 @@ public class UpdateField {
     public static void setAutomaticFields(BibEntry entry, boolean overwriteOwner, boolean overwriteTimestamp,
                                           OwnerPreferences ownerPreferences, TimestampPreferences timestampPreferences) {
         String defaultOwner = ownerPreferences.getDefaultOwner();
-        String timestamp = DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(LocalDateTime.now());
+        String timestamp = timestampPreferences.now();
         boolean setOwner = ownerPreferences.isUseOwner() && (overwriteOwner || (!entry.hasField(StandardField.OWNER)));
         boolean setTimeStamp = timestampPreferences.shouldAddCreationDate();
 
@@ -131,7 +131,7 @@ public class UpdateField {
         }
 
         String defaultOwner = ownerPreferences.getDefaultOwner();
-        String timestamp = DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(LocalDateTime.now());
+        String timestamp = timestampPreferences.now();
 
         // Iterate through all entries
         for (BibEntry curEntry : bibs) {

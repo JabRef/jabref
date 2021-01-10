@@ -115,9 +115,6 @@ public class BibEntry implements Cloneable {
     public BibEntry(EntryType type) {
         this.id = IdGenerator.next();
         setType(type);
-        String localDateTime = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-        setField(StandardField.CREATIONDATE, localDateTime);
-        setField(StandardField.MODIFICATIONDATE, localDateTime);
         this.sharedBibEntryData = new SharedBibEntryData();
     }
 

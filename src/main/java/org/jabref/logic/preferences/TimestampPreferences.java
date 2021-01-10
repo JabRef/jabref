@@ -2,6 +2,7 @@ package org.jabref.logic.preferences;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 import org.jabref.model.entry.field.Field;
 
@@ -23,7 +24,8 @@ public class TimestampPreferences {
     }
 
     public String now() {
-        return DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(LocalDateTime.now());
+        // Milli-, Micro-, and Nanoseconds are not relevant to us, so we remove them
+        return DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
     }
 
     public boolean shouldAddCreationDate() {
