@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -9,7 +10,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -41,16 +41,21 @@ class ZbMATHTest {
         donaldsonEntry.setField(StandardField.KEYWORDS, "57N13 57R10 53C05 58J99 57R65");
         donaldsonEntry.setField(StandardField.PAGES, "279--315");
         donaldsonEntry.setField(StandardField.PUBLISHER, "International Press of Boston, Somerville, MA");
-        donaldsonEntry.setField(StandardField.TITLE, "An application of gauge theory to four dimensional topology.");
+        donaldsonEntry.setField(StandardField.TITLE, "An application of gauge theory to four dimensional topology");
         donaldsonEntry.setField(StandardField.VOLUME, "18");
         donaldsonEntry.setField(StandardField.YEAR, "1983");
         donaldsonEntry.setField(new UnknownField("zbl"), "0507.57010");
     }
 
     @Test
-    @DisabledOnCIServer("CI server has no subscription to zbMath and thus gets 401 response")
     void searchByQueryFindsEntry() throws Exception {
         List<BibEntry> fetchedEntries = fetcher.performSearch("an:0507.57010");
         assertEquals(Collections.singletonList(donaldsonEntry), fetchedEntries);
+    }
+
+    @Test
+    void searchByIdFindsEntry() throws Exception {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0507.57010");
+        assertEquals(Optional.of(donaldsonEntry), fetchedEntry);
     }
 }

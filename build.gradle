@@ -90,7 +90,7 @@ configurations {
 }
 
 javafx {
-    version = "15"
+    version = "15.0.1"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
@@ -209,7 +209,7 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.38'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.39'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.3'
 }
 
@@ -263,6 +263,13 @@ clean {
 }
 
 processResources {
+    gradle.taskGraph.whenReady {
+        if (gradle.taskGraph.hasTask(":jpackage")) {
+            logger.info('Adding buildres/csl to resources')
+            from("buildres/csl")
+        }
+    }
+
     filteringCharset = 'UTF-8'
 
     filesMatching("build.properties") {

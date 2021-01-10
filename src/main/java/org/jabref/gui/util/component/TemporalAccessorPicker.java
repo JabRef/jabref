@@ -9,12 +9,17 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalQueries;
+import java.util.Objects;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DatePicker;
 import javafx.util.StringConverter;
 
+import org.jabref.gui.Globals;
+import org.jabref.gui.fieldeditors.TextInputControlBehavior;
+import org.jabref.gui.fieldeditors.contextmenu.EditorContextAction;
 import org.jabref.gui.util.BindingsHelper;
 
 /**
@@ -34,10 +39,10 @@ import org.jabref.gui.util.BindingsHelper;
  * Inspiration taken from https://github.com/edvin/tornadofx-controls/blob/master/src/main/java/tornadofx/control/DateTimePicker.java
  */
 public class TemporalAccessorPicker extends DatePicker {
-    private ObjectProperty<TemporalAccessor> temporalAccessorValue = new SimpleObjectProperty<>(null);
+    private final ObjectProperty<TemporalAccessor> temporalAccessorValue = new SimpleObjectProperty<>(null);
 
-    private DateTimeFormatter defaultFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-    private ObjectProperty<StringConverter<TemporalAccessor>> converter = new SimpleObjectProperty<StringConverter<TemporalAccessor>>(null);
+    private final DateTimeFormatter defaultFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private final ObjectProperty<StringConverter<TemporalAccessor>> converter = new SimpleObjectProperty<>(null);
 
     public TemporalAccessorPicker() {
         setConverter(new InternalConverter());
@@ -46,6 +51,12 @@ public class TemporalAccessorPicker extends DatePicker {
         BindingsHelper.bindBidirectional(valueProperty(), temporalAccessorValue,
                 TemporalAccessorPicker::addCurrentTime,
                 TemporalAccessorPicker::getDate);
+
+        getEditor().setOnContextMenuRequested(event -> {
+            ContextMenu contextMenu = new ContextMenu();
+            contextMenu.getItems().setAll(EditorContextAction.getDefaultContextMenuItems(getEditor(), Globals.getKeyPrefs()));
+            TextInputControlBehavior.showContextMenu(getEditor(), contextMenu, event);
+        });
     }
 
     private static TemporalAccessor addCurrentTime(LocalDate date) {
@@ -82,22 +93,18 @@ public class TemporalAccessorPicker extends DatePicker {
     }
 
     public final StringConverter<TemporalAccessor> getStringConverter() {
-        StringConverter<TemporalAccessor> converter = stringConverterProperty().get();
-        if (converter != null) {
-            return converter;
-        } else {
-            return new StringConverter<TemporalAccessor>() {
-                @Override
-                public String toString(TemporalAccessor value) {
-                    return defaultFormatter.format(value);
-                }
+        StringConverter<TemporalAccessor> newConverter = new StringConverter<>() {
+            @Override
+            public String toString(TemporalAccessor value) {
+                return defaultFormatter.format(value);
+            }
 
-                @Override
-                public TemporalAccessor fromString(String value) {
-                    return LocalDateTime.parse(value, defaultFormatter);
-                }
-            };
-        }
+            @Override
+            public TemporalAccessor fromString(String value) {
+                return LocalDateTime.parse(value, defaultFormatter);
+            }
+        };
+        return Objects.requireNonNullElseGet(stringConverterProperty().get(), () -> newConverter);
     }
 
     public final void setStringConverter(StringConverter<TemporalAccessor> value) {
@@ -117,13 +124,15 @@ public class TemporalAccessorPicker extends DatePicker {
     }
 
     private class InternalConverter extends StringConverter<LocalDate> {
+        @Override
         public String toString(LocalDate object) {
             TemporalAccessor value = getTemporalAccessorValue();
             return (value != null) ? getStringConverter().toString(value) : "";
         }
 
+        @Override
         public LocalDate fromString(String value) {
-            if (value == null || value.isEmpty()) {
+            if ((value == null) || value.isEmpty()) {
                 temporalAccessorValue.set(null);
                 return null;
             }

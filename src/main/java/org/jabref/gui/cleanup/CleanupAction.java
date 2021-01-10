@@ -56,10 +56,13 @@ public class CleanupAction extends SimpleCommand {
         isCanceled = false;
         modifiedEntriesCount = 0;
 
-        Optional<CleanupPreset> chosenPreset = new CleanupDialog(
+        CleanupDialog cleanupDialog = new CleanupDialog(
                 stateManager.getActiveDatabase().get(),
                 preferences.getCleanupPreset(),
-                preferences.getFilePreferences()).showAndWait();
+                preferences.getFilePreferences()
+        );
+
+        Optional<CleanupPreset> chosenPreset = dialogService.showCustomDialogAndWait(cleanupDialog);
 
         chosenPreset.ifPresent(preset -> {
             if (preset.isRenamePDFActive() && preferences.getAutoLinkPreferences().shouldAskAutoNamingPdfs()) {

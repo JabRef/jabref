@@ -10,6 +10,7 @@ import javafx.scene.layout.HBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.integrity.FieldCheckers;
@@ -49,9 +50,9 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                 new Tooltip(Localization.lang("Look up %0", field.getDisplayName())));
 
         if (field.equals(StandardField.DOI)) {
-            textArea.addToContextMenu(EditorMenus.getDOIMenu(textArea));
+            textArea.initContextMenu(EditorMenus.getDOIMenu(textArea));
         } else {
-            textArea.addToContextMenu(EditorMenus.getDefaultMenu(textArea));
+            textArea.initContextMenu(new DefaultMenu(textArea));
         }
 
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
