@@ -3,6 +3,7 @@ package org.jabref.gui.externalfiles;
 import javax.inject.Inject;
 import javax.swing.undo.UndoManager;
 
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -20,6 +21,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.TreeItem;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
@@ -28,9 +30,9 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.texparser.FileNodeViewModel;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.TaskExecutor;
@@ -110,27 +112,29 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         fileTypeSelection.setItems(viewModel.getFileFilters());
 
         new ViewModelListCellFactory<FileExtensionViewModel>()
-              .withText(fileFilter -> fileFilter.getDescription())
-              .withIcon(fileFilter -> fileFilter.getIcon())
-              .install(fileTypeSelection);
+                                                              .withText(fileFilter -> fileFilter.getDescription())
+                                                              .withIcon(fileFilter -> fileFilter.getIcon())
+                                                              .install(fileTypeSelection);
 
         tree.rootProperty().bind(EasyBind.map(viewModel.treeRoot(), fileNode -> new RecursiveTreeItem<>(fileNode, FileNodeViewModel::getChildren)));
 
         new ViewModelTreeCellFactory<FileNodeViewModel>()
-             .withText(FileNodeViewModel::getDisplayText)
-             .install(tree);
+                                                         .withText(FileNodeViewModel::getDisplayText)
+                                                         .install(tree);
 
         EasyBind.subscribe(tree.rootProperty(), root -> {
             ((CheckBoxTreeItem<FileNodeViewModel>) root).setSelected(true);
             root.setExpanded(true);
             EasyBind.bindContent(viewModel.getCheckedFileList(), tree.getCheckModel().getCheckedItems());
         });
+
         tree.setPrefWidth(Double.POSITIVE_INFINITY);
         tree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         viewModel.scanButtonDisabled().bindBidirectional(buttonScan.disableProperty());
         viewModel.scanButtonDefaultButton().bindBidirectional(buttonScan.defaultButtonProperty());
-        viewModel.exportButtonDisabled().bindBidirectional(buttonExport.disableProperty());
+        buttonExport.disableProperty().bind(viewModel.exportButtonDisabled().or(
+                                                                                Bindings.isEmpty(viewModel.getCheckedFileList())));
         viewModel.selectedExtension().bind(fileTypeSelection.valueProperty());
 
         tvResult.setItems(viewModel.resultTableItems());
@@ -177,12 +181,12 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
     @FXML
     void collapseAll(ActionEvent event) {
-        viewModel.collapseAll();
+        expandTree(tree.getRoot(), false);
     }
 
     @FXML
     void expandAll(ActionEvent event) {
-        viewModel.expandAll();
+        expandTree(tree.getRoot(), true);
     }
 
     @FXML
@@ -192,12 +196,12 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
     @FXML
     void selectAll(ActionEvent event) {
-        viewModel.selectAll();
+        tree.getCheckModel().checkAll();
     }
 
     @FXML
     void unselectAll(ActionEvent event) {
-        viewModel.unselectAll();
+        tree.getCheckModel().clearChecks();
     }
 
     @FXML
@@ -215,4 +219,16 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         return icon.getGraphicNode();
     }
 
+    /**
+     *
+     * Expands or collapses the specified tree according to the <code>expand</code>-parameter.
+     */
+    private void expandTree(TreeItem<?> item, boolean expand) {
+        if ((item != null) && !item.isLeaf()) {
+            item.setExpanded(expand);
+            for (TreeItem<?> child : item.getChildren()) {
+                expandTree(child, expand);
+            }
+        }
+    }
 }

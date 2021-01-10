@@ -31,10 +31,10 @@ import javafx.scene.control.TreeItem;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.texparser.FileNodeViewModel;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
@@ -73,7 +73,7 @@ public class UnlinkedFilesDialogViewModel {
     private final ObservableList<FileExtensionViewModel> fileFilterList;
     private final DialogService dialogService;
     private final PreferencesService preferences;
-    private BackgroundTask<org.jabref.gui.texparser.FileNodeViewModel> findUnlinkedFilesTask;
+    private BackgroundTask<FileNodeViewModel> findUnlinkedFilesTask;
     private BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesBackgroundTask;
 
     private final BibDatabaseContext bibDatabase;
@@ -105,6 +105,8 @@ public class UnlinkedFilesDialogViewModel {
        Predicate<String> isDirectory = path -> Files.isDirectory(Path.of(path));
        scanDirectoryValidator = new FunctionBasedValidator<>(directoryPath, isDirectory,
                ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
+
+       treeRoot.setValue(null);
     }
 
     public void startImport() {
@@ -120,6 +122,7 @@ public class UnlinkedFilesDialogViewModel {
 
         importFilesBackgroundTask = importHandler.importFilesInBackground(fileList)
         .onRunning(() -> {
+
             progress.bind(importFilesBackgroundTask.workDonePercentageProperty());
             progressText.bind(importFilesBackgroundTask.messageProperty());
 
@@ -307,36 +310,6 @@ public class UnlinkedFilesDialogViewModel {
             directoryPath.setValue(directory.toAbsolutePath().toString());
         }
         return directory;
-    }
-
-    public void selectAll() {
-        // Need to toggle a twice to make sure everything is selected
-
-    }
-
-    public void unselectAll() {
-        // Need to toggle a twice to make sure nothing is selected
-
-    }
-
-    public void expandAll() {
-
-    }
-
-    public void collapseAll() {
-
-    }
-
-    /**
-     * Expands or collapses the specified tree according to the <code>expand</code>-parameter.
-     */
-    private void expandTree(TreeItem<?> item, boolean expand) {
-        if ((item != null) && !item.isLeaf()) {
-            item.setExpanded(expand);
-            for (TreeItem<?> child : item.getChildren()) {
-                expandTree(child, expand);
-            }
-        }
     }
 
     public ObservableList<ImportFilesResultItemViewModel> resultTableItems() {
