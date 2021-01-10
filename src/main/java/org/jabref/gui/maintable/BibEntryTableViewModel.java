@@ -15,6 +15,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
 
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
+import org.jabref.gui.util.uithreadaware.UiThreadBinding;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -69,14 +70,14 @@ public class BibEntryTableViewModel {
     }
 
     private static Binding<List<AbstractGroup>> createMatchedGroupsBinding(BibDatabaseContext database, BibEntry entry) {
-        return EasyBind.combine(entry.getFieldBinding(StandardField.GROUPS), database.getMetaData().groupsBinding(),
+        return new UiThreadBinding<>(EasyBind.combine(entry.getFieldBinding(StandardField.GROUPS), database.getMetaData().groupsBinding(),
                 (a, b) ->
                         database.getMetaData().getGroups().map(groupTreeNode ->
                                 groupTreeNode.getMatchingGroups(entry).stream()
                                              .map(GroupTreeNode::getGroup)
                                              .filter(Predicate.not(Predicate.isEqual(groupTreeNode.getGroup())))
                                              .collect(Collectors.toList()))
-                                .orElse(Collections.emptyList()));
+                                .orElse(Collections.emptyList())));
     }
 
     public OptionalBinding<String> getField(Field field) {

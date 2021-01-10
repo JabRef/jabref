@@ -25,6 +25,7 @@ import org.jabref.gui.icon.InternalMaterialDesignIcon;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DroppingMouseLocation;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.groups.DefaultGroupsFactory;
@@ -258,12 +259,14 @@ public class GroupNodeViewModel {
     }
 
     private void refreshGroup() {
-        updateMatchedEntries(); // Update the entries matched by the group
-        // "Re-add" to the selected groups if it were selected, this refreshes the entries the user views
-        ObservableList<GroupTreeNode> selectedGroups = this.stateManager.getSelectedGroup(this.databaseContext);
-        if (selectedGroups.remove(this.groupNode)) {
-            selectedGroups.add(this.groupNode);
-        }
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            updateMatchedEntries(); // Update the entries matched by the group
+            // "Re-add" to the selected groups if it were selected, this refreshes the entries the user views
+            ObservableList<GroupTreeNode> selectedGroups = this.stateManager.getSelectedGroup(this.databaseContext);
+            if (selectedGroups.remove(this.groupNode)) {
+                selectedGroups.add(this.groupNode);
+            }
+        });
     }
 
     private void updateMatchedEntries() {

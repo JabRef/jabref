@@ -13,7 +13,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.gui.util.uithreadaware.UiThreadOptionalBinding;
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
@@ -58,7 +57,7 @@ public class MetaData {
     private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
     private final Map<String, Path> laTexFileDirectory = new HashMap<>(); // <User, FilePath>
     private final ObjectProperty<GroupTreeNode> groupsRoot = new SimpleObjectProperty<>(null);
-    private final OptionalBinding<GroupTreeNode> groupsRootBinding = new UiThreadOptionalBinding<>(new OptionalWrapper<>(groupsRoot));
+    private final OptionalBinding<GroupTreeNode> groupsRootBinding = new OptionalWrapper<>(groupsRoot);
     private Charset encoding;
     private SaveOrderConfig saveOrderConfig;
     private String defaultCiteKeyPattern;
