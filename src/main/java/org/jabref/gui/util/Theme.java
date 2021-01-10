@@ -10,6 +10,7 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -84,8 +85,6 @@ public class Theme {
      */
     private final String cssPathString;
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private final Optional<Path> cssPath;
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private final Optional<URL> cssUrl;
 
     private final AtomicReference<Optional<String>> cssDataUrlString = new AtomicReference<>(Optional.empty());
@@ -100,58 +99,31 @@ public class Theme {
             // Light theme
             this.type = Type.LIGHT;
             this.cssUrl = Optional.empty();
-            this.cssPath = Optional.empty();
         } else {
             URL url = JabRefFrame.class.getResource(path);
             if (url != null) {
                 // Embedded dark theme
                 this.type = Type.DARK;
-                this.cssPath = Optional.empty();
-                this.cssUrl = Optional.of(url);
             } else {
                 // Custom theme
                 this.type = Type.CUSTOM;
-                this.cssPath = cssStringToPath(path);
-                // note that for an invalid path, the url will also be empty here:
-                this.cssUrl = cssPath.map(Theme::cssPathToUrl);
+
+                try {
+                    url = Path.of(path).toUri().toURL();
+                } catch (InvalidPathException e) {
+                    LOGGER.warn("Cannot load additional css {} because it is an invalid path: {}", path, e.getLocalizedMessage());
+                    url = null;
+                } catch (MalformedURLException e) {
+                    LOGGER.warn("Cannot load additional css url {} because it is a malformed url: {}", path, e.getLocalizedMessage());
+                    url = null;
+                }
             }
 
-            LOGGER.debug("Theme is {}, additional css path is {}, url is {}",
-                    this.type, cssPath.orElse(null), cssUrl.orElse(null));
+            this.cssUrl = Optional.ofNullable(url);
+            LOGGER.debug("Theme is {}, additional css url is {}", this.type, cssUrl.orElse(null));
         }
 
         additionalCssToLoad().ifPresent(this::loadCssToMemory);
-    }
-
-    /**
-     * Creates a Path from a path String
-     *
-     * @param pathString the path string
-     * @return the path on the default file system, or empty if not valid for that file system (e.g. bad characters)
-     */
-    private static Optional<Path> cssStringToPath(String pathString) {
-        try {
-            return Optional.of(Path.of(pathString));
-        } catch (InvalidPathException e) {
-            LOGGER.warn("Cannot load additional css {} because it is an invalid path: {}", pathString, e.getLocalizedMessage());
-            return Optional.empty();
-        }
-    }
-
-    /**
-     * Creates a URL from a file system path. The scheme of the URL depends on the file system provider, but it will
-     * generally be
-     *
-     * @param path the file system path
-     * @return the URL for that file system path
-     */
-    private static URL cssPathToUrl(Path path) {
-        try {
-            return path.toUri().toURL();
-        } catch (MalformedURLException e) {
-            LOGGER.warn("Cannot load additional css url {} because it is a malformed url: {}", path, e.getLocalizedMessage());
-            return null;
-        }
     }
 
     /**
@@ -163,22 +135,31 @@ public class Theme {
      * @return an optional providing the URL of the CSS file/resource, or empty
      */
     private Optional<URL> additionalCssToLoad() {
-        // When we have a valid file system path, check that the CSS file is readable
-        if (cssPath.isPresent()) {
-            Path path = cssPath.get();
+        // Check external sources of CSS to make sure they are available:
+        if (isAdditionalCssExternal()) {
+            Optional<Path> cssPath = cssUrl.map(url -> Paths.get(URI.create(url.toExternalForm())));
+            // No need to return explicitly return Optional.empty() if Path is invalid; the URL will be empty anyway
+            if (cssPath.isPresent()) {
+                // When we have a valid file system path, check that the CSS file is readable
+                Path path = cssPath.get();
 
-            if (!Files.exists(path)) {
-                LOGGER.warn("Not loading additional css file {} because it could not be found", cssPath.get());
-                return Optional.empty();
-            }
+                if (!Files.exists(path)) {
+                    LOGGER.warn("Not loading additional css file {} because it could not be found", cssPath.get());
+                    return Optional.empty();
+                }
 
-            if (Files.isDirectory(path)) {
-                LOGGER.warn("Not loading additional css file {} because it is a directory", cssPath.get());
-                return Optional.empty();
+                if (Files.isDirectory(path)) {
+                    LOGGER.warn("Not loading additional css file {} because it is a directory", cssPath.get());
+                    return Optional.empty();
+                }
             }
         }
 
         return cssUrl;
+    }
+
+    private boolean isAdditionalCssExternal() {
+        return cssUrl.isPresent() && "file".equals(cssUrl.get().getProtocol());
     }
 
     /**
@@ -188,9 +169,9 @@ public class Theme {
      *       {@link #MAX_IN_MEMORY_CSS_LENGTH} for details). However, there is a bug in OpenJFX, in that it does not
      *       recognise jrt URLs (modular java runtime URLs). This is detailed in
      *       <a href="https://bugs.openjdk.java.net/browse/JDK-8240969">JDK-8240969</a>.
-     *       When we upgrade to OpenJFX 16, we should limit loadCssToMemory to only URLs where the protocol is equal
-     *       to file, using {@link URL#getProtocol()}. Also rename to loadFileCssToMemory() and reword the
-     *      javadoc, for clarity.
+     *       When we upgrade to OpenJFX 16, we should limit loadCssToMemory to external URLs i.e. check
+     *       {@link #isAdditionalCssExternal()}. Also rename to loadExternalCssToMemory() and reword the
+     *       javadoc, for clarity.
      *
      * @param url the URL of the resource to convert into a data: url
      */
