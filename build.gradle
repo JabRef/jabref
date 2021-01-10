@@ -50,7 +50,7 @@ modularity.patchModule("test", "fastparse_2.12-1.0.0.jar")
 modularity.patchModule("test2", "fastparse-utils_2.12-1.0.0.jar")
 modularity.patchModule("test3", "sourcecode_2.12-0.1.4.jar")
 
-// Workaroud for https://github.com/openjfx/javafx-gradle-plugin/issues/89
+// Workaround for https://github.com/openjfx/javafx-gradle-plugin/issues/89
 // See also https://github.com/java9-modularity/gradle-modules-plugin/issues/165
 modularity.disableEffectiveArgumentsAdjustment()
 
