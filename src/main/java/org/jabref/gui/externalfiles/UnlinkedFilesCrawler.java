@@ -64,16 +64,16 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
      * resolve its recursion and return what it has saved so far.
      * @throws IOException
      */
-    private FileNodeViewModel searchDirectory(Path file, UnlinkedPDFFileFilter ff) throws IOException {
+    private FileNodeViewModel searchDirectory(Path directory, UnlinkedPDFFileFilter fileFilter) throws IOException {
         // Return null if the directory is not valid.
-        if ((directory == null) || !directory.toFile().isDirectory()) {
+        if ((directory == null) || ! Files.isDirectory(directory)) {
             throw new IOException(String.format("Invalid directory for searching: %s", directory));
         }
 
         FileNodeViewModel parent = new FileNodeViewModel(directory);
         Map<Boolean, List<Path>> fileListPartition;
 
-        try (Stream<Path> filesStream = StreamSupport.stream(Files.newDirectoryStream(file, ff).spliterator(), false)) {
+        try (Stream<Path> filesStream = StreamSupport.stream(Files.newDirectoryStream(directory, fileFilter).spliterator(), false)) {
             fileListPartition = filesStream.collect(Collectors.partitioningBy(path -> path.toFile().isDirectory()));
         } catch (IOException e) {
             LOGGER.error(String.format("%s while searching files: %s", e.getClass().getName(), e.getMessage()));
@@ -88,7 +88,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
         int fileCount = 0;
 
         for (Path subDirectory : subDirectories) {
-            FileNodeViewModel subRoot = searchDirectory(subDirectory, ff);
+            FileNodeViewModel subRoot = searchDirectory(subDirectory, fileFilter);
 
             if (!subRoot.getChildren().isEmpty()) {
                 fileCount += subRoot.getFileCount();

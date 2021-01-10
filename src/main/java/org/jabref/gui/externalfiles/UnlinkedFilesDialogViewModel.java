@@ -96,17 +96,16 @@ public class UnlinkedFilesDialogViewModel {
                                           undoManager,
                                           stateManager);
 
-       this.fileFilterList = FXCollections.observableArrayList(
-                                            new FileExtensionViewModel(StandardFileType.ANY_FILE,externalFileTypes),
-                                            new FileExtensionViewModel(StandardFileType.BIBTEX_DB, externalFileTypes),
-                                            new FileExtensionViewModel(StandardFileType.PDF, externalFileTypes));
+        this.fileFilterList = FXCollections.observableArrayList(
+                                                                new FileExtensionViewModel(StandardFileType.ANY_FILE, externalFileTypes),
+                                                                new FileExtensionViewModel(StandardFileType.BIBTEX_DB, externalFileTypes),
+                                                                new FileExtensionViewModel(StandardFileType.PDF, externalFileTypes));
 
+        Predicate<String> isDirectory = path -> Files.isDirectory(Path.of(path));
+        scanDirectoryValidator = new FunctionBasedValidator<>(directoryPath, isDirectory,
+                                                              ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
 
-       Predicate<String> isDirectory = path -> Files.isDirectory(Path.of(path));
-       scanDirectoryValidator = new FunctionBasedValidator<>(directoryPath, isDirectory,
-               ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
-
-       treeRoot.setValue(null);
+        treeRoot.setValue(null);
     }
 
     public void startImport() {
@@ -121,34 +120,34 @@ public class UnlinkedFilesDialogViewModel {
         resultList.clear();
 
         importFilesBackgroundTask = importHandler.importFilesInBackground(fileList)
-        .onRunning(() -> {
+                                                 .onRunning(() -> {
 
-            progress.bind(importFilesBackgroundTask.workDonePercentageProperty());
-            progressText.bind(importFilesBackgroundTask.messageProperty());
+                                                     progress.bind(importFilesBackgroundTask.workDonePercentageProperty());
+                                                     progressText.bind(importFilesBackgroundTask.messageProperty());
 
-            searchProgressVisible.setValue(true);
-            scanButtonDisabled.setValue(true);
-            applyButtonDisabled.setValue(true);
-         })
-        .onFinished(() -> {
-            progress.unbind();
-            progressText.unbind();
-            searchProgressVisible.setValue(false);
-            scanButtonDisabled.setValue(false);
-        })
-        .onSuccess(results -> {
-           applyButtonDisabled.setValue(false);
-           exportButtonDisabled.setValue(false);
-           scanButtonDefaultButton.setValue(false);
+                                                     searchProgressVisible.setValue(true);
+                                                     scanButtonDisabled.setValue(true);
+                                                     applyButtonDisabled.setValue(true);
+                                                 })
+                                                 .onFinished(() -> {
+                                                     progress.unbind();
+                                                     progressText.unbind();
+                                                     searchProgressVisible.setValue(false);
+                                                     scanButtonDisabled.setValue(false);
+                                                 })
+                                                 .onSuccess(results -> {
+                                                     applyButtonDisabled.setValue(false);
+                                                     exportButtonDisabled.setValue(false);
+                                                     scanButtonDefaultButton.setValue(false);
 
-           progress.unbind();
-           progressText.unbind();
-           searchProgressVisible.setValue(false);
+                                                     progress.unbind();
+                                                     progressText.unbind();
+                                                     searchProgressVisible.setValue(false);
 
-           filePaneExpanded.setValue(false);
-           resultPaneExpanded.setValue(true);
-           resultList.addAll(results);
-        });
+                                                     filePaneExpanded.setValue(false);
+                                                     resultPaneExpanded.setValue(true);
+                                                     resultList.addAll(results);
+                                                 });
         importFilesBackgroundTask.executeWith(taskExecutor);
     }
 
@@ -169,7 +168,7 @@ public class UnlinkedFilesDialogViewModel {
         applyButtonDisabled.setValue(true);
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .withInitialDirectory(preferences.getWorkingDir()).build();
+                                                                                               .withInitialDirectory(preferences.getWorkingDir()).build();
         Optional<Path> exportPath = dialogService.showFileSaveDialog(fileDialogConfiguration);
 
         if (exportPath.isEmpty()) {
@@ -178,9 +177,8 @@ public class UnlinkedFilesDialogViewModel {
             return;
         }
 
-        try (BufferedWriter writer =
-                     Files.newBufferedWriter(exportPath.get(), StandardCharsets.UTF_8,
-                             StandardOpenOption.CREATE)) {
+        try (BufferedWriter writer = Files.newBufferedWriter(exportPath.get(), StandardCharsets.UTF_8,
+                                                             StandardOpenOption.CREATE)) {
             for (Path file : fileList) {
                 writer.write(file.toString() + "\n");
             }
@@ -203,35 +201,35 @@ public class UnlinkedFilesDialogViewModel {
         progressText.unbind();
 
         findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, bibDatabase, preferences.getFilePreferences())
-        .onRunning(() -> {
+                                                                                                                                      .onRunning(() -> {
 
-            progress.set(ProgressIndicator.INDETERMINATE_PROGRESS);
-            progressText.setValue(Localization.lang("Searching file system..."));
-            progressText.bind(findUnlinkedFilesTask.messageProperty());
+                                                                                                                                          progress.set(ProgressIndicator.INDETERMINATE_PROGRESS);
+                                                                                                                                          progressText.setValue(Localization.lang("Searching file system..."));
+                                                                                                                                          progressText.bind(findUnlinkedFilesTask.messageProperty());
 
-            searchProgressVisible.setValue(true);
-            scanButtonDisabled.setValue(true);
-            applyButtonDisabled.set(true);
-            treeRoot.setValue(null);
-        })
-        .onFinished(() -> {
-            scanButtonDisabled.setValue(false);
-            applyButtonDisabled.setValue(false);
-            searchProgressVisible.set(false);
-            progress.set(0);
-            searchProgressVisible.set(false);
+                                                                                                                                          searchProgressVisible.setValue(true);
+                                                                                                                                          scanButtonDisabled.setValue(true);
+                                                                                                                                          applyButtonDisabled.set(true);
+                                                                                                                                          treeRoot.setValue(null);
+                                                                                                                                      })
+                                                                                                                                      .onFinished(() -> {
+                                                                                                                                          scanButtonDisabled.setValue(false);
+                                                                                                                                          applyButtonDisabled.setValue(false);
+                                                                                                                                          searchProgressVisible.set(false);
+                                                                                                                                          progress.set(0);
+                                                                                                                                          searchProgressVisible.set(false);
 
-        })
-        .onSuccess(root -> {
-            treeRoot.setValue(root);
-            progress.set(0);
+                                                                                                                                      })
+                                                                                                                                      .onSuccess(root -> {
+                                                                                                                                          treeRoot.setValue(root);
+                                                                                                                                          progress.set(0);
 
-            applyButtonDisabled.setValue(false);
-            exportButtonDisabled.setValue(false);
-            scanButtonDefaultButton.setValue(false);
-            searchProgressVisible.set(false);
-        });
-       findUnlinkedFilesTask.executeWith(taskExecutor);
+                                                                                                                                          applyButtonDisabled.setValue(false);
+                                                                                                                                          exportButtonDisabled.setValue(false);
+                                                                                                                                          scanButtonDefaultButton.setValue(false);
+                                                                                                                                          searchProgressVisible.set(false);
+                                                                                                                                      });
+        findUnlinkedFilesTask.executeWith(taskExecutor);
     }
 
     public StringProperty directoryPath() {
@@ -264,14 +262,14 @@ public class UnlinkedFilesDialogViewModel {
 
     public void browseFileDirectory() {
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-            .withInitialDirectory(preferences.getWorkingDir()).build();
+                                                                                                              .withInitialDirectory(preferences.getWorkingDir()).build();
 
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
-                 .ifPresent(selectedDirectory -> {
-                     directoryPath.setValue(selectedDirectory.toAbsolutePath().toString());
-                     preferences.setWorkingDirectory(selectedDirectory.toAbsolutePath());
-                     this.scanButtonDisabled.setValue(false);
-                 });
+                     .ifPresent(selectedDirectory -> {
+                         directoryPath.setValue(selectedDirectory.toAbsolutePath().toString());
+                         preferences.setWorkingDirectory(selectedDirectory.toAbsolutePath());
+                         this.scanButtonDisabled.setValue(false);
+                     });
     }
 
     public ObjectProperty<FileNodeViewModel> treeRoot() {
