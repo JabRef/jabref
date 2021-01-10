@@ -260,7 +260,8 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
             return rearrangeColumns(table, resizableColumns, expansionRatio);
         } else {
             LOGGER.debug("RWE2, RWE3, RWS1, RWS2");
-            boolean contentHasFitIntoTable = getContentWidth(table) <= previousTableWidth;
+            boolean contentHasFitIntoTable = getContentWidth(table) - EPSILON_MARGIN <= previousTableWidth;
+            LOGGER.debug("contentHasFitIntoTable {} = getContentWidth(table) {} <= previousTableWidth {}", contentHasFitIntoTable, getContentWidth(table), previousTableWidth);
             if (!contentHasFitIntoTable) {
                 LOGGER.debug("RWS2");
                 return false;
