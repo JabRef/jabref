@@ -10,7 +10,6 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -137,7 +136,7 @@ public class Theme {
     private Optional<URL> additionalCssToLoad() {
         // Check external sources of CSS to make sure they are available:
         if (isAdditionalCssExternal()) {
-            Optional<Path> cssPath = cssUrl.map(url -> Paths.get(URI.create(url.toExternalForm())));
+            Optional<Path> cssPath = cssUrl.map(url -> Path.of(URI.create(url.toExternalForm())));
             // No need to return explicitly return Optional.empty() if Path is invalid; the URL will be empty anyway
             if (cssPath.isPresent()) {
                 // When we have a valid file system path, check that the CSS file is readable
