@@ -35,7 +35,6 @@ public class AboutDialogViewModel extends AbstractViewModel {
     private final ReadOnlyStringWrapper heading = new ReadOnlyStringWrapper();
     private final ReadOnlyStringWrapper maintainers = new ReadOnlyStringWrapper();
     private final ReadOnlyStringWrapper license = new ReadOnlyStringWrapper();
-    private final ReadOnlyStringWrapper contributors = new ReadOnlyStringWrapper();
     private final ReadOnlyBooleanWrapper isDevelopmentVersion = new ReadOnlyBooleanWrapper();
     private final DialogService dialogService;
     private final ReadOnlyStringWrapper developmentVersion = new ReadOnlyStringWrapper();
@@ -105,14 +104,6 @@ public class AboutDialogViewModel extends AbstractViewModel {
 
     public String getLicense() {
         return license.get();
-    }
-
-    public ReadOnlyStringProperty contributorsProperty() {
-        return contributors.getReadOnlyProperty();
-    }
-
-    public String getContributors() {
-        return contributors.get();
     }
 
     public String getEnvironmentInfo() {
