@@ -57,7 +57,7 @@ Many times there is a need to provide an object on many locations simultaneously
 
 ### Main principle
 
-`EventBus` represents a communication line between multiple components. Objects can be passed through the bus and reach the listening method of another object which is registered on that `EventBus` instance. Hence the passed object is available as a parameter in the listening method.
+`EventBus` represents a communication line between multiple components. Objects can be passed through the bus and reach the listening method of another object which is registered on that `EventBus` instance. Hence, the passed object is available as a parameter in the listening method.
 
 ### Register to the `EventBus`
 
@@ -186,7 +186,7 @@ The tests check whether translation strings appear correctly in the resource bun
 2. Create an empty &lt;locale code&gt;.properties file
 3. Configure the new language in [Crowdin](https://crowdin.com/project/jabref)
 
-If the language is a variant of a language `zh_CN` or `pt_BR`  it is necessary to add a language mapping for Crowdin to the crowdin.yml file in the root. Of course the properties file also has to be named according to the language code and locale.
+If the language is a variant of a language `zh_CN` or `pt_BR` it is necessary to add a language mapping for Crowdin to the crowdin.yml file in the root. Of course the properties file also has to be named according to the language code and locale.
 
 ## Cleanup and Formatters
 
@@ -396,5 +396,19 @@ All radio buttons that should be grouped together need to have a ToggleGroup def
                 <TextField fx:id="pageInfo"/>
             </children>
 </VBox>
+```
+
+### JavaFX Dialogs
+
+All dialogs should be displayed to the user via `DialogService` interface methods. `DialogService` provides methods to display various dialogs \(including custom ones\) to the user. It also ensures the displayed dialog opens on the correct window via `initOwner()` \(for cases where the user has multiple screens\). The following code snippet demonstrates how a custom dialog is displayed to the user:
+
+```java
+dialogService.showCustomDialog(new DocumentViewerView());
+```
+
+If an instance of `DialogService` is unavailable within current class/scope in which the dialog needs to be displayed, `DialogService` can be instantiated via the code snippet shown as follows:
+
+```java
+DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
 ```
 

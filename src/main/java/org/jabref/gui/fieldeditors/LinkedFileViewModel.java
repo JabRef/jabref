@@ -381,9 +381,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public void edit() {
-        LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(this.linkedFile);
-
-        Optional<LinkedFile> editedFile = dialog.showAndWait();
+        Optional<LinkedFile> editedFile = dialogService.showCustomDialogAndWait(new LinkedFileEditDialogView(this.linkedFile));
         editedFile.ifPresent(file -> {
             this.linkedFile.setLink(file.getLink());
             this.linkedFile.setDescription(file.getDescription());

@@ -289,7 +289,6 @@ public class JabRefPreferences implements PreferencesService {
      */
     public static final String OO_EXECUTABLE_PATH = "ooExecutablePath";
     public static final String OO_PATH = "ooPath";
-    public static final String OO_JARS_PATH = "ooJarsPath";
     public static final String OO_SHOW_PANEL = "showOOPanel";
     public static final String OO_SYNC_WHEN_CITING = "syncOOWhenCiting";
     public static final String OO_USE_ALL_OPEN_BASES = "useAllOpenBases";
@@ -554,15 +553,12 @@ public class JabRefPreferences implements PreferencesService {
         if (OS.WINDOWS) {
             defaults.put(OO_PATH, OpenOfficePreferences.DEFAULT_WINDOWS_PATH);
             defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_WIN_EXEC_PATH);
-            defaults.put(OO_JARS_PATH, OpenOfficePreferences.DEFAULT_WINDOWS_PATH);
         } else if (OS.OS_X) {
             defaults.put(OO_PATH, OpenOfficePreferences.DEFAULT_OSX_PATH);
             defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_OSX_EXEC_PATH);
-            defaults.put(OO_JARS_PATH, OpenOfficePreferences.DEFAULT_OSX_PATH);
         } else { // Linux
             defaults.put(OO_PATH, OpenOfficePreferences.DEFAULT_LINUX_PATH);
             defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_LINUX_EXEC_PATH);
-            defaults.put(OO_JARS_PATH, OpenOfficePreferences.DEFAULT_LINUX_PATH);
         }
 
         defaults.put(OO_SYNC_WHEN_CITING, Boolean.TRUE);
@@ -1051,7 +1047,6 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public OpenOfficePreferences getOpenOfficePreferences() {
         return new OpenOfficePreferences(
-                get(OO_JARS_PATH),
                 get(OO_EXECUTABLE_PATH),
                 get(OO_PATH),
                 getBoolean(OO_USE_ALL_OPEN_BASES),
@@ -1063,7 +1058,6 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences) {
-        put(OO_JARS_PATH, openOfficePreferences.getJarsPath());
         put(OO_EXECUTABLE_PATH, openOfficePreferences.getExecutablePath());
         put(OO_PATH, openOfficePreferences.getInstallationPath());
         putBoolean(OO_USE_ALL_OPEN_BASES, openOfficePreferences.getUseAllDatabases());
@@ -1993,7 +1987,7 @@ public class JabRefPreferences implements PreferencesService {
     public void storeAppearancePreference(AppearancePreferences preferences) {
         putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, preferences.shouldOverrideDefaultFontSize());
         putInt(MAIN_FONT_SIZE, preferences.getMainFontSize());
-        put(FX_THEME, preferences.getTheme().getPath().toString());
+        put(FX_THEME, preferences.getTheme().getCssPathString());
     }
 
     //*************************************************************************************************************

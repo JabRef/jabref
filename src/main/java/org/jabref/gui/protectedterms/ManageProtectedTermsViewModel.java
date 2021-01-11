@@ -96,8 +96,7 @@ public class ManageProtectedTermsViewModel {
     }
 
     public void createNewFile() {
-        NewProtectedTermsFileDialog newDialog = new NewProtectedTermsFileDialog(termsLoader, dialogService);
-        newDialog.showAndWait();
+        dialogService.showCustomDialogAndWait(new NewProtectedTermsFileDialog(termsLoader, dialogService));
     }
 
     public void edit(ProtectedTermsList file) {

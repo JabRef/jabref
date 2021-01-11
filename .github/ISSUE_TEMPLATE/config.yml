@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Help
+    url: https://discourse.jabref.org/c/help/
+    about: Questions and requests for help are handled at https://discourse.jabref.org
+  - name: Feature requests
+    url: https://discourse.jabref.org/c/features/
+    about: If you are missing an important feature? Let us know!
