@@ -157,7 +157,7 @@ dependencies {
     implementation 'org.controlsfx:controlsfx:11.0.3'
 
     implementation 'org.jsoup:jsoup:1.13.1'
-    implementation 'com.konghq:unirest-java:3.11.09'
+    implementation 'com.konghq:unirest-java:3.11.10'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
