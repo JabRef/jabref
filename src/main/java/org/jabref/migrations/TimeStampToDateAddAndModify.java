@@ -3,26 +3,30 @@ package org.jabref.migrations;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.field.UnknownField;
 
 /**
- * This class handles the migration from timestamp field to date-added and date-modified fields
+ * This class handles the migration from timestamp field to date-added and date-modified fields.
  */
 public class TimeStampToDateAddAndModify implements PostOpenMigration {
 
     private final boolean interpretTimeStampAsModificationDate;
-    private final String fieldName;
+    private final Field timeStampField;
+    private final TimestampPreferences timestampPreferences;
 
     public TimeStampToDateAddAndModify(TimestampPreferences timestampPreferences) {
+        this.timestampPreferences = timestampPreferences;
         interpretTimeStampAsModificationDate = timestampPreferences.shouldUpdateTimestamp();
-        fieldName = timestampPreferences.getTimestampField().getName();
+        timeStampField = timestampPreferences.getTimestampField();
     }
 
     /**
@@ -39,47 +43,51 @@ public class TimeStampToDateAddAndModify implements PostOpenMigration {
 
     private void migrateEntry(BibEntry entry) {
         // Query entries for their timestamp field entries
-        entry.getField(new UnknownField(fieldName)).ifPresent(timeStamp -> {
+        entry.getField(timeStampField).ifPresent(timeStamp -> {
             String formattedTimeStamp = formatTimeStamp(timeStamp);
+            if (
+                    Objects.isNull(formattedTimeStamp)) {
+                System.out.println("Date format " + timeStamp + " lead to null when parsed.");
+            }
             if (interpretTimeStampAsModificationDate) {
                 entry.setField(StandardField.MODIFICATIONDATE, formattedTimeStamp);
             } else {
                 entry.setField(StandardField.CREATIONDATE, formattedTimeStamp);
             }
-            entry.clearField(StandardField.TIMESTAMP);
+            entry.clearField(timeStampField);
         });
     }
 
     /**
      * Formats the time stamp into the local date and time format.
-     * If the existing timestamp could not be parsed, the current date is used.
-     * For the time portion 00:00 is used
-     * @param timeStamp
-     * @return
+     * If the existing timestamp could not be parsed, the day/month/year "1" is used.
+     * For the time portion 00:00:00 is used.
      */
     private String formatTimeStamp(String timeStamp) {
         Optional<Date> parsedDate = Date.parse(timeStamp);
         if (parsedDate.isEmpty()) {
             // What to do if the date cannot be parsed? Do we need the custom date format possibly?
-            return LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            return timestampPreferences.now();
         } else {
             Date date = parsedDate.get();
-            int year = date.getYear().orElse(LocalDate.now().getYear());
+            int year = date.getYear().orElse(1);
             int month = getMonth(date);
-            int day = date.getDay().orElse(LocalDate.now().getDayOfMonth());
+            int day = date.getDay().orElse(1);
             LocalDateTime localDateTime = LocalDateTime.of(year, month, day, 0, 0);
+            // Remove any time unites smaller than seconds
+            localDateTime.truncatedTo(ChronoUnit.SECONDS);
             return localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         }
     }
 
     /**
      * Returns the month value of the passed date if available.
-     * Otherwise returns the current month
+     * Otherwise returns the current month.
      */
     private int getMonth(Date date) {
         if (date.getMonth().isPresent()) {
             return date.getMonth().get().getNumber();
         }
-        return LocalDate.now().getMonthValue();
+        return 1;
     }
 }
