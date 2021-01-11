@@ -143,6 +143,36 @@ public class AuthorList {
         return Collectors.collectingAndThen(Collectors.toUnmodifiableList(), AuthorList::new);
     }
 
+    public static Collector<String, ?, String> andCoordinatedConjunction(boolean test) {
+        return Collectors.collectingAndThen(Collectors.toUnmodifiableList(), list -> andCoordinatedConjunction(list, test));
+    }
+
+    public static Collector<Author, ?, String> andCoordinatedConjunction(Function<Author, String> style, boolean oxfordComma) {
+        return Collectors.collectingAndThen(Collectors.toUnmodifiableList(), list -> andCoordinatedConjunction(list, style, oxfordComma));
+    }
+
+    private static String andCoordinatedConjunction(List<Author> authors, Function<Author, String> style, boolean oxfordComma) {
+        var formattedAuthors = authors.stream().map(style).collect(Collectors.toUnmodifiableList());
+        return andCoordinatedConjunction(formattedAuthors, oxfordComma);
+    }
+
+    private static String andCoordinatedConjunction(List<String> authors, boolean oxfordComma) {
+        String lastDelimiter = oxfordComma ? ", and " : " and ";
+        return switch (authors.size()) {
+            case 0 -> "";
+            case 1 -> authors.get(0);
+            case 2 -> authors.get(0) + " and " + authors.get(1);
+            default -> authors.stream()
+                              .limit(authors.size() - 1)
+                              .collect(Collectors.joining(", ", "",
+                                      lastDelimiter + lastAuthorOf(authors)));
+        };
+    }
+
+    private static String lastAuthorOf(List<String> authors) {
+        return authors.size() == 0 ? null : authors.get(authors.size() - 1);
+    }
+
     /**
      * Retrieve an AuthorList for the given string of authors or editors.
      * <p>
@@ -327,24 +357,6 @@ public class AuthorList {
      */
     public String getAsLastNames(boolean oxfordComma) {
         return andCoordinatedConjunction(getAuthors(), Author::getLastOnly, oxfordComma);
-    }
-
-    private static String andCoordinatedConjunction(List<Author> authors, Function<Author, String> style, boolean oxfordComma) {
-        String lastDelimiter = oxfordComma ? ", and " : " and ";
-        return switch (authors.size()) {
-            case 0 -> "";
-            case 1 -> style.apply(authors.get(0));
-            case 2 -> style.apply(authors.get(0)) + " and " + style.apply(authors.get(1));
-            default -> authors.stream()
-                              .limit(authors.size() - 1)
-                              .map(style)
-                              .collect(Collectors.joining(", ", "",
-                                      lastDelimiter + style.apply(lastAuthorOf(authors))));
-        };
-    }
-
-    private static Author lastAuthorOf(List<Author> authors) {
-        return authors.size() == 0 ? null : authors.get(authors.size() - 1);
     }
 
     public String getAsLastNamesLatexFree(boolean oxfordComma) {
