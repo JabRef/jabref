@@ -47,17 +47,9 @@ In case you add keys to the changelog, please follow these rules:
 
 #### Author credits
 
-You will be given credit in the [`AUTHORS`](https://github.com/JabRef/jabref/blob/master/AUTHORS) file in the root of the repository and the 'About' pages inside the main application.
-We will periodically update the contributors list inside `AUTHORS`.
-This is done by an automatic shell script `scripts/generate-authors.sh`.
-
-If you want to add yourself directly with your pull request please run this script.
-Please make sure there are no duplicates or alternate spellings of your name listed.
-If you need to merge different Git usernames or email addresses you can do so by editing `.mailmap`.
-More information on this can be found via `man git-shortlog`.
-
 Please, **do not add yourself at JavaDoc's `@authors`**.
-The contribution information is tracked via the version control system.
+The contribution information is tracked via the version control system and shown at <https://github.com/JabRef/jabref/graphs/contributors>.
+We also link to the contributors page in our about dialog.
 
 Your contribution is considered being made under [MIT license](https://tldrlegal.com/license/mit-license).
 

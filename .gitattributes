@@ -5,9 +5,6 @@ gradlew text eol=lf
 # windows line endings at windows files
 *.bat text eol=crlf
 
-# required for proper releasing
-AUTHORS text eol=lf
-
 # ensure that line endings of *.java, and *.properties are normalized
 *.java text
 *.properties text
