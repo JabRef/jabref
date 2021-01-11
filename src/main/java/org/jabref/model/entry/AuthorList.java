@@ -158,19 +158,13 @@ public class AuthorList {
 
     private static String andCoordinatedConjunction(List<String> authors, boolean oxfordComma) {
         String lastDelimiter = oxfordComma ? ", and " : " and ";
+        int lastIndex = authors.size() - 1;
         return switch (authors.size()) {
             case 0 -> "";
             case 1 -> authors.get(0);
             case 2 -> authors.get(0) + " and " + authors.get(1);
-            default -> authors.stream()
-                              .limit(authors.size() - 1)
-                              .collect(Collectors.joining(", ", "",
-                                      lastDelimiter + lastAuthorOf(authors)));
+            default -> String.join(", ", authors.subList(0, lastIndex)) + lastDelimiter + authors.get(lastIndex);
         };
-    }
-
-    private static String lastAuthorOf(List<String> authors) {
-        return authors.size() == 0 ? null : authors.get(authors.size() - 1);
     }
 
     /**
