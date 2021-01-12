@@ -116,7 +116,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
                 (!initialAppearancePreferences.getThemePreference().getName()
                                               .equalsIgnoreCase(customPathToThemeProperty.getValue())
                         || initialAppearancePreferences.getThemePreference().getType() != Theme.Type.CUSTOM)) {
-            newTheme = new ThemePreference(customPathToThemeProperty.getValue());
+            newTheme = ThemePreference.custom(customPathToThemeProperty.getValue());
         }
 
         preferences.storeAppearancePreference(new AppearancePreferences(

@@ -32,6 +32,10 @@ public class ThemePreference {
         return new ThemePreference(EMBEDDED_DARK_THEME_CSS);
     }
 
+    public static ThemePreference custom(String name) {
+        return new ThemePreference(name);
+    }
+
     /**
      * @return the Theme type. Guaranteed to be non-null.
      */
