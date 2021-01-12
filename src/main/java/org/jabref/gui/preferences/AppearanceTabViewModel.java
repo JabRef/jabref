@@ -109,17 +109,13 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
         ThemePreference newTheme = initialAppearancePreferences.getThemePreference();
         if (themeLightProperty.getValue() && initialAppearancePreferences.getThemePreference().getType() != Theme.Type.LIGHT) {
-            restartWarnings.add(Localization.lang("Theme changed to light theme."));
             newTheme = ThemePreference.light();
         } else if (themeDarkProperty.getValue() && initialAppearancePreferences.getThemePreference().getType() != Theme.Type.DARK) {
-            restartWarnings.add(Localization.lang("Theme changed to dark theme."));
             newTheme = ThemePreference.dark();
         } else if (themeCustomProperty.getValue() &&
                 (!initialAppearancePreferences.getThemePreference().getName()
                                               .equalsIgnoreCase(customPathToThemeProperty.getValue())
                         || initialAppearancePreferences.getThemePreference().getType() != Theme.Type.CUSTOM)) {
-            restartWarnings.add(Localization.lang("Theme changed to a custom theme:") + " "
-                    + customPathToThemeProperty().getValue());
             newTheme = new ThemePreference(customPathToThemeProperty.getValue());
         }
 
