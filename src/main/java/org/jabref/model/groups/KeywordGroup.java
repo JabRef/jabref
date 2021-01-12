@@ -37,18 +37,22 @@ public abstract class KeywordGroup extends AbstractGroup {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (super.equals(other)) {
-            KeywordGroup otherGroup = (KeywordGroup) other;
-            return (Objects.equals(isCaseSensitive(), otherGroup.isCaseSensitive()) &&
-                    Objects.equals(getSearchField(), otherGroup.getSearchField()) &&
-                    Objects.equals(getSearchExpression(), otherGroup.getSearchExpression()));
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
         }
-        return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+        KeywordGroup that = (KeywordGroup) o;
+        return isCaseSensitive() == that.isCaseSensitive() && Objects.equals(getSearchField(), that.getSearchField()) && Objects.equals(getSearchExpression(), that.getSearchExpression());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), isCaseSensitive(), getSearchField(), getSearchExpression());
+        return Objects.hash(super.hashCode(), getSearchField(), getSearchExpression(), isCaseSensitive());
     }
 }
