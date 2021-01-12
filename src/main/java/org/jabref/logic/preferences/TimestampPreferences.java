@@ -3,8 +3,10 @@ package org.jabref.logic.preferences;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 public class TimestampPreferences {
     private final boolean addCreationDate;
@@ -19,7 +21,7 @@ public class TimestampPreferences {
         this.addCreationDate = addCreationDate;
         this.addModificationDate = modifyTimestamp;
         this.updateTimestamp = updateTimestamp;
-        this.timestampField = timestampField;
+        this.timestampField = Objects.isNull(timestampField) ? StandardField.TIMESTAMP : timestampField;
         this.timestampFormat = timestampFormat;
     }
 

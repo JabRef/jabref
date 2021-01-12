@@ -86,6 +86,7 @@ class StudyRepositoryTest {
         when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
         when(importFormatPreferences.isKeywordSyncEnabled()).thenReturn(false);
         when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
+        when(timestampPreferences.getTimestampField()).then(invocation -> StandardField.TIMESTAMP);
         entryTypesManager = new BibEntryTypesManager();
     }
 

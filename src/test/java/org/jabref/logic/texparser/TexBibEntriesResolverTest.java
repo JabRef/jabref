@@ -42,7 +42,8 @@ public class TexBibEntriesResolverTest {
     @BeforeEach
     private void setUp() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        timestampPreferences = mock(TimestampPreferences.class);
+        timestampPreferences = mock(TimestampPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(timestampPreferences.getTimestampField()).then(invocation -> StandardField.TIMESTAMP);
         when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
 
         database = new BibDatabase();

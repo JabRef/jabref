@@ -48,6 +48,7 @@ class OpenDatabaseTest {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         timestampPreferences = mock(TimestampPreferences.class);
         when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
+        when(timestampPreferences.getTimestampField()).then(invocation -> StandardField.TIMESTAMP);
     }
 
     @Test
