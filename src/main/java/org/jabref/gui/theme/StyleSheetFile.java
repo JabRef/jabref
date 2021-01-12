@@ -55,16 +55,17 @@ final class StyleSheetFile extends StyleSheet {
     StyleSheetFile(URL url) {
         this.url = url;
         this.path = Path.of(URI.create(url.toExternalForm()));
-        updateEmbeddedDataUrl();
-    }
-
-    private void updateEmbeddedDataUrl() {
-        embedDataUrl(url, dataUrl::set);
+        reload();
     }
 
     @Override
     Path getWatchPath() {
         return path;
+    }
+
+    @Override
+    void reload() {
+        embedDataUrl(url, dataUrl::set);
     }
 
     //    /**
@@ -94,12 +95,12 @@ final class StyleSheetFile extends StyleSheet {
 
         if (!Files.exists(path)) {
             LOGGER.warn("Not loading additional css file {} because it could not be found", path);
-            return EMPTY_CSS;
+            return EMPTY_SCENE_CSS;
         }
 
         if (Files.isDirectory(path)) {
             LOGGER.warn("Not loading additional css file {} because it is a directory", path);
-            return EMPTY_CSS;
+            return EMPTY_SCENE_CSS;
         }
 
         return url;
@@ -113,11 +114,11 @@ final class StyleSheetFile extends StyleSheet {
      * large themes it can be {@code 'file:'}.
      */
     @Override
-    public Optional<String> getWebEngineStylesheet() {
+    public String getWebEngineStylesheet() {
         if (dataUrl.get().isEmpty()) {
-            updateEmbeddedDataUrl();
+            reload();
         }
-        return dataUrl.get().or(() -> Optional.of(getSceneStylesheet().toExternalForm()));
+        return dataUrl.get().orElseGet(() -> getSceneStylesheet().toExternalForm());
     }
 
     static void embedDataUrl(URL url, Consumer<Optional<String>> embedded) {
@@ -128,8 +129,7 @@ final class StyleSheetFile extends StyleSheet {
             try (InputStream inputStream = conn.getInputStream()) {
                 byte[] data = inputStream.readNBytes(MAX_IN_MEMORY_CSS_LENGTH);
                 if (data.length < MAX_IN_MEMORY_CSS_LENGTH) {
-                    String embeddedDataUrl = "data:text/css;charset=utf-8;base64," +
-                            Base64.getEncoder().encodeToString(data);
+                    String embeddedDataUrl = DATA_URL_PREFIX + Base64.getEncoder().encodeToString(data);
                     LOGGER.debug("Embedded css in data URL of length {}", embeddedDataUrl.length());
                     embedded.accept(Optional.of(embeddedDataUrl));
                 } else {

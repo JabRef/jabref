@@ -4,7 +4,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.util.Optional;
 
 import org.jabref.gui.JabRefFrame;
 
@@ -13,17 +12,21 @@ import org.slf4j.LoggerFactory;
 
 abstract class StyleSheet {
 
-    static final URL EMPTY_CSS = JabRefFrame.class.getResource("Empty.css");
+    static final String DATA_URL_PREFIX = "data:text/css;charset=utf-8;base64,";
+    static final URL EMPTY_SCENE_CSS = JabRefFrame.class.getResource("Empty.css");
+    static final String EMPTY_WEBENGINE_CSS = DATA_URL_PREFIX;
 
     static final Logger LOGGER = LoggerFactory.getLogger(StyleSheet.class);
 
     abstract URL getSceneStylesheet();
 
-    abstract Optional<String> getWebEngineStylesheet();
+    abstract String getWebEngineStylesheet();
 
     Path getWatchPath() {
         return null;
     }
+
+    abstract void reload();
 
     static StyleSheet create(String name) {
         URL url = JabRefFrame.class.getResource(name);

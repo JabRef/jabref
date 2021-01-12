@@ -45,6 +45,7 @@ public class ThemeImpl implements Theme {
     private final AtomicReference<ThemeState> state = new AtomicReference<>();
 
     private final Set<Scene> scenes = Collections.newSetFromMap(new WeakHashMap<>());
+    private final Set<WebEngine> webEngines = Collections.newSetFromMap(new WeakHashMap<>());
 
     private static final class ThemeState {
 
@@ -151,14 +152,38 @@ public class ThemeImpl implements Theme {
         });
     }
 
+    @Override
+    public void installCss(WebEngine webEngine) {
+        updateRunner.accept(() -> {
+            if (this.webEngines.add(webEngine)) {
+                webEngine.setUserStyleSheetLocation(state.get().additionalStylesheet.getWebEngineStylesheet());
+            }
+        });
+    }
+
     private void baseCssLiveUpdate() {
+        baseStyleSheet.reload();
         LOGGER.debug("Updating base CSS for {} scenes", scenes.size());
         updateRunner.accept(() -> scenes.forEach(this::updateBaseCss));
     }
 
     private void additionalCssLiveUpdate() {
-        LOGGER.debug("Updating additional CSS for {} scenes", scenes.size());
-        updateRunner.accept(() -> scenes.forEach(this::updateAdditionalCss));
+        StyleSheet styleSheet = state.get().additionalStylesheet;
+        styleSheet.reload();
+        String newStyleSheetLocation = state.get().additionalStylesheet.getWebEngineStylesheet();
+
+        LOGGER.debug("Updating additional CSS for {} scenes and {} web engines", scenes.size(), webEngines.size());
+        updateRunner.accept(() -> {
+            scenes.forEach(this::updateAdditionalCss);
+
+            webEngines.forEach(webEngine -> {
+                // force refresh by unloading style sheet, if the location hasn't changed
+                if (newStyleSheetLocation.equals(webEngine.getUserStyleSheetLocation())) {
+                    webEngine.setUserStyleSheetLocation(null);
+                }
+                webEngine.setUserStyleSheetLocation(newStyleSheetLocation);
+            });
+        });
     }
 
     private void updateBaseCss(Scene scene) {
@@ -178,17 +203,13 @@ public class ThemeImpl implements Theme {
     }
 
     @Override
-    public void installCss(WebEngine webEngine) {
-        getAdditionalStylesheet().ifPresent(webEngine::setUserStyleSheetLocation);
-    }
-
-    @Override
     public ThemePreference getPreference() {
         return state.get().themePreference;
     }
 
     @Override
+    @Deprecated(forRemoval = true) // TODO ThemeTest needs updating, and should be based on installCss(WebEngine) instead
     public Optional<String> getAdditionalStylesheet() {
-        return state.get().additionalStylesheet.getWebEngineStylesheet();
+        return Optional.of(state.get().additionalStylesheet.getWebEngineStylesheet());
     }
 }

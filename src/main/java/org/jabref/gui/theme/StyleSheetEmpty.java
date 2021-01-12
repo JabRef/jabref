@@ -1,7 +1,6 @@
 package org.jabref.gui.theme;
 
 import java.net.URL;
-import java.util.Optional;
 
 final class StyleSheetEmpty extends StyleSheet {
 
@@ -12,11 +11,16 @@ final class StyleSheetEmpty extends StyleSheet {
 
     @Override
     URL getSceneStylesheet() {
-        return EMPTY_CSS;
+        return EMPTY_SCENE_CSS;
     }
 
     @Override
-    public Optional<String> getWebEngineStylesheet() {
-        return Optional.empty();
+    public String getWebEngineStylesheet() {
+        return EMPTY_WEBENGINE_CSS;
+    }
+
+    @Override
+    void reload() {
+        // nothing to do
     }
 }

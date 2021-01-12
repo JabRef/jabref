@@ -1,18 +1,16 @@
 package org.jabref.gui.theme;
 
 import java.net.URL;
-import java.util.Optional;
 
 final class StyleSheetDataUrl extends StyleSheet {
 
     private final URL url;
 
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private Optional<String> dataUrl;
+    private volatile String dataUrl;
 
     StyleSheetDataUrl(URL url) {
         this.url = url;
-        StyleSheetFile.embedDataUrl(url, embedded -> dataUrl = embedded);
+        reload();
     }
 
     @Override
@@ -21,7 +19,12 @@ final class StyleSheetDataUrl extends StyleSheet {
     }
 
     @Override
-    public Optional<String> getWebEngineStylesheet() {
+    public String getWebEngineStylesheet() {
         return dataUrl;
+    }
+
+    @Override
+    void reload() {
+        StyleSheetFile.embedDataUrl(url, embedded -> dataUrl = embedded.orElse(EMPTY_WEBENGINE_CSS));
     }
 }
