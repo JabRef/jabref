@@ -1,16 +1,16 @@
 package org.jabref.preferences;
 
-import org.jabref.gui.util.Theme;
+import org.jabref.gui.theme.ThemePreference;
 
 public class AppearancePreferences {
     private final boolean shouldOverrideDefaultFontSize;
     private final int mainFontSize;
-    private final Theme theme;
+    private final ThemePreference themePreference;
 
-    public AppearancePreferences(boolean shouldOverrideDefaultFontSize, int mainFontSize, Theme theme) {
+    public AppearancePreferences(boolean shouldOverrideDefaultFontSize, int mainFontSize, ThemePreference themePreference) {
         this.shouldOverrideDefaultFontSize = shouldOverrideDefaultFontSize;
         this.mainFontSize = mainFontSize;
-        this.theme = theme;
+        this.themePreference = themePreference;
     }
 
     public boolean shouldOverrideDefaultFontSize() {
@@ -21,7 +21,7 @@ public class AppearancePreferences {
         return mainFontSize;
     }
 
-    public Theme getTheme() {
-        return theme;
+    public ThemePreference getThemePreference() {
+        return themePreference;
     }
 }

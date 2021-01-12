@@ -48,6 +48,7 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.metadata.SaveOrderConfig;
+import org.jabref.model.util.FileUpdateMonitor;
 
 public interface PreferencesService {
 
@@ -122,6 +123,10 @@ public interface PreferencesService {
     CleanupPreset getCleanupPreset();
 
     void setCleanupPreset(CleanupPreset cleanupPreset);
+
+    void setFileUpdateMonitor(FileUpdateMonitor fileUpdateMonitor);
+
+    FileUpdateMonitor getFileUpdateMonitor();
 
     @Deprecated
     String getDefaultsDefaultCitationKeyPattern();

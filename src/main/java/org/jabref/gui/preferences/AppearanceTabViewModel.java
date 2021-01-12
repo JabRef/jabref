@@ -10,6 +10,7 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.theme.ThemePreference;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.Theme;
 import org.jabref.logic.l10n.Localization;
@@ -28,8 +29,6 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     public static SpinnerValueFactory<Integer> fontSizeValueFactory =
             new SpinnerValueFactory.IntegerSpinnerValueFactory(9, Integer.MAX_VALUE);
-
-    private static final String EMBEDDED_DARK_THEME_CSS = "Dark.css";
 
     private final BooleanProperty fontOverrideProperty = new SimpleBooleanProperty();
     private final StringProperty fontSizeProperty = new SimpleStringProperty();
@@ -80,7 +79,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         fontOverrideProperty.setValue(initialAppearancePreferences.shouldOverrideDefaultFontSize());
         fontSizeProperty.setValue(String.valueOf(initialAppearancePreferences.getMainFontSize()));
 
-        Theme currentTheme = initialAppearancePreferences.getTheme();
+        ThemePreference currentTheme = initialAppearancePreferences.getThemePreference();
         if (currentTheme.getType() == Theme.Type.LIGHT) {
             themeLightProperty.setValue(true);
             themeDarkProperty.setValue(false);
@@ -93,7 +92,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
             themeLightProperty.setValue(false);
             themeDarkProperty.setValue(false);
             themeCustomProperty.setValue(true);
-            customPathToThemeProperty.setValue(currentTheme.getCssPathString());
+            customPathToThemeProperty.setValue(currentTheme.getName());
         }
     }
 
@@ -108,20 +107,20 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
             restartWarnings.add(Localization.lang("Override font size"));
         }
 
-        Theme newTheme = initialAppearancePreferences.getTheme();
-        if (themeLightProperty.getValue() && initialAppearancePreferences.getTheme().getType() != Theme.Type.LIGHT) {
+        ThemePreference newTheme = initialAppearancePreferences.getThemePreference();
+        if (themeLightProperty.getValue() && initialAppearancePreferences.getThemePreference().getType() != Theme.Type.LIGHT) {
             restartWarnings.add(Localization.lang("Theme changed to light theme."));
-            newTheme = new Theme("", preferences);
-        } else if (themeDarkProperty.getValue() && initialAppearancePreferences.getTheme().getType() != Theme.Type.DARK) {
+            newTheme = ThemePreference.light();
+        } else if (themeDarkProperty.getValue() && initialAppearancePreferences.getThemePreference().getType() != Theme.Type.DARK) {
             restartWarnings.add(Localization.lang("Theme changed to dark theme."));
-            newTheme = new Theme(EMBEDDED_DARK_THEME_CSS, preferences);
+            newTheme = ThemePreference.dark();
         } else if (themeCustomProperty.getValue() &&
-                (!initialAppearancePreferences.getTheme().getCssPathString()
+                (!initialAppearancePreferences.getThemePreference().getName()
                                               .equalsIgnoreCase(customPathToThemeProperty.getValue())
-                        || initialAppearancePreferences.getTheme().getType() != Theme.Type.CUSTOM)) {
+                        || initialAppearancePreferences.getThemePreference().getType() != Theme.Type.CUSTOM)) {
             restartWarnings.add(Localization.lang("Theme changed to a custom theme:") + " "
                     + customPathToThemeProperty().getValue());
-            newTheme = new Theme(customPathToThemeProperty.getValue(), preferences);
+            newTheme = new ThemePreference(customPathToThemeProperty.getValue());
         }
 
         preferences.storeAppearancePreference(new AppearancePreferences(

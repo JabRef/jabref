@@ -139,7 +139,10 @@ public class Globals {
 
     public static void shutdownThreadPools() {
         TASK_EXECUTOR.shutdown();
-        fileUpdateMonitor.shutdown();
+        FileUpdateMonitor fileUpdateMonitor = Globals.fileUpdateMonitor;
+        if (fileUpdateMonitor != null) {
+            fileUpdateMonitor.shutdown();
+        }
         JabRefExecutorService.INSTANCE.shutdownEverything();
     }
 

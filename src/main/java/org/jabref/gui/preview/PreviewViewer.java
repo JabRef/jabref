@@ -121,7 +121,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     public void setTheme(Theme theme) {
-        theme.getAdditionalStylesheet().ifPresent(location -> previewView.getEngine().setUserStyleSheetLocation(location));
+        theme.installCss(previewView.getEngine());
     }
 
     private void highlightSearchPattern() {
