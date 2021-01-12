@@ -56,6 +56,6 @@
     </HBox>
 
     <Label styleClass="sectionHeader" text="%Time stamp"/>
-    <CheckBox fx:id="addCreationDate" text="%Add timestamp to new entries (field &quot;date-added&quot;)"/>
-    <CheckBox fx:id="addModificationDate" text="%Add timestamp to modified entries (field &quot;date-modified&quot;)"/>
+    <CheckBox fx:id="addCreationDate" text="%Add timestamp to new entries (field &quot;creationdate&quot;)"/>
+    <CheckBox fx:id="addModificationDate" text="%Add timestamp to modified entries (field &quot;modificationdate&quot;)"/>
 </fx:root>

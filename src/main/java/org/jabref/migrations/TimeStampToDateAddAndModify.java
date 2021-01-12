@@ -15,7 +15,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
 /**
- * This class handles the migration from timestamp field to date-added and date-modified fields.
+ * This class handles the migration from timestamp field to creationdate and modificationdate fields.
  */
 public class TimeStampToDateAddAndModify implements PostOpenMigration {
 
