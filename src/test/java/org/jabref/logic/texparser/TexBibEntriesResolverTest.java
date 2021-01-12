@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -33,6 +34,7 @@ public class TexBibEntriesResolverTest {
 
     private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
     private ImportFormatPreferences importFormatPreferences;
+    TimestampPreferences timestampPreferences;
     private BibDatabase database;
     private BibDatabase database2;
     private BibEntry bibEntry;
@@ -40,6 +42,7 @@ public class TexBibEntriesResolverTest {
     @BeforeEach
     private void setUp() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        timestampPreferences = mock(TimestampPreferences.class);
         when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
 
         database = new BibDatabase();
@@ -102,7 +105,7 @@ public class TexBibEntriesResolverTest {
         Path texFile = Path.of(TexBibEntriesResolverTest.class.getResource("paper.tex").toURI());
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
 
-        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(parserResult);
+        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, timestampPreferences, fileMonitor).resolve(parserResult);
         LatexBibEntriesResolverResult expectedCrossingResult = new LatexBibEntriesResolverResult(parserResult);
 
         assertEquals(expectedCrossingResult, crossingResult);
@@ -114,7 +117,7 @@ public class TexBibEntriesResolverTest {
         Path texFile2 = Path.of(TexBibEntriesResolverTest.class.getResource("paper2.tex").toURI());
         LatexParserResult parserResult = new DefaultLatexParser().parse(Arrays.asList(texFile, texFile2));
 
-        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(parserResult);
+        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, timestampPreferences, fileMonitor).resolve(parserResult);
         LatexBibEntriesResolverResult expectedCrossingResult = new LatexBibEntriesResolverResult(parserResult);
 
         assertEquals(expectedCrossingResult, crossingResult);
@@ -125,7 +128,7 @@ public class TexBibEntriesResolverTest {
         Path texFile = Path.of(TexBibEntriesResolverTest.class.getResource("paper.tex").toURI());
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
 
-        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(parserResult);
+        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, timestampPreferences, fileMonitor).resolve(parserResult);
         LatexBibEntriesResolverResult expectedCrossingResult = new LatexBibEntriesResolverResult(parserResult);
 
         assertEquals(expectedCrossingResult, crossingResult);
@@ -136,7 +139,7 @@ public class TexBibEntriesResolverTest {
         Path texFile = Path.of(TexBibEntriesResolverTest.class.getResource("unknown_key.tex").toURI());
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
 
-        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(parserResult);
+        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, timestampPreferences, fileMonitor).resolve(parserResult);
         LatexBibEntriesResolverResult expectedCrossingResult = new LatexBibEntriesResolverResult(parserResult);
 
         assertEquals(expectedCrossingResult, crossingResult);
@@ -147,7 +150,7 @@ public class TexBibEntriesResolverTest {
         Path texFile = Path.of(TexBibEntriesResolverTest.class.getResource("nested.tex").toURI());
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
 
-        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(parserResult);
+        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, timestampPreferences, fileMonitor).resolve(parserResult);
         LatexBibEntriesResolverResult expectedCrossingResult = new LatexBibEntriesResolverResult(parserResult);
 
         assertEquals(expectedCrossingResult, crossingResult);
@@ -158,7 +161,7 @@ public class TexBibEntriesResolverTest {
         Path texFile = Path.of(TexBibEntriesResolverTest.class.getResource("crossref.tex").toURI());
         LatexParserResult parserResult = new DefaultLatexParser().parse(texFile);
 
-        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, fileMonitor).resolve(parserResult);
+        LatexBibEntriesResolverResult crossingResult = new TexBibEntriesResolver(database, importFormatPreferences, timestampPreferences, fileMonitor).resolve(parserResult);
         LatexBibEntriesResolverResult expectedCrossingResult = new LatexBibEntriesResolverResult(parserResult);
 
         expectedCrossingResult.addEntry(bibEntry);

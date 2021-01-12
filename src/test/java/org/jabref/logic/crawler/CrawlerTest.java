@@ -11,6 +11,7 @@ import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.crawler.git.GitHandler;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrderConfig;
@@ -34,6 +35,7 @@ class CrawlerTest {
     Path tempRepositoryDirectory;
     ImportFormatPreferences importFormatPreferences;
     SavePreferences savePreferences;
+    TimestampPreferences timestampPreferences;
     BibEntryTypesManager entryTypesManager;
     GitHandler gitHandler = mock(GitHandler.class, Answers.RETURNS_DEFAULTS);
 
@@ -45,6 +47,7 @@ class CrawlerTest {
                 new DummyFileUpdateMonitor(),
                 importFormatPreferences,
                 savePreferences,
+                timestampPreferences,
                 entryTypesManager
         );
 
@@ -91,6 +94,7 @@ class CrawlerTest {
 
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
+        timestampPreferences = mock(TimestampPreferences.class);
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
         when(savePreferences.getEncoding()).thenReturn(null);
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);

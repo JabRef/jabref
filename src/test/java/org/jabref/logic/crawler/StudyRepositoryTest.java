@@ -20,6 +20,7 @@ import org.jabref.logic.crawler.git.GitHandler;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -52,6 +53,7 @@ class StudyRepositoryTest {
     CitationKeyPatternPreferences citationKeyPatternPreferences;
     ImportFormatPreferences importFormatPreferences;
     SavePreferences savePreferences;
+    TimestampPreferences timestampPreferences;
     BibEntryTypesManager entryTypesManager;
     @TempDir
     Path tempRepositoryDirectory;
@@ -65,6 +67,7 @@ class StudyRepositoryTest {
     public void setUpMocks() {
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        timestampPreferences = mock(TimestampPreferences.class);
         citationKeyPatternPreferences = new CitationKeyPatternPreferences(
                 false,
                 false,
@@ -90,12 +93,12 @@ class StudyRepositoryTest {
     void providePathToNonExistentRepositoryThrowsException() {
         Path nonExistingRepositoryDirectory = tempRepositoryDirectory.resolve(NON_EXISTING_DIRECTORY);
 
-        assertThrows(IOException.class, () -> new StudyRepository(nonExistingRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, entryTypesManager));
+        assertThrows(IOException.class, () -> new StudyRepository(nonExistingRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, timestampPreferences, entryTypesManager));
     }
 
     @Test
     void providePathToExistentRepositoryWithOutStudyDefinitionFileThrowsException() {
-        assertThrows(IOException.class, () -> new StudyRepository(tempRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, entryTypesManager));
+        assertThrows(IOException.class, () -> new StudyRepository(tempRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, timestampPreferences, entryTypesManager));
     }
 
     /**
@@ -107,7 +110,7 @@ class StudyRepositoryTest {
         List<String> expectedSearchterms = List.of("Quantum", "Cloud Computing", "TestSearchQuery3");
         List<String> expectedActiveFetchersByName = List.of("Springer", "ArXiv");
 
-        Study study = new StudyRepository(tempRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, entryTypesManager).getStudy();
+        Study study = new StudyRepository(tempRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, timestampPreferences, entryTypesManager).getStudy();
 
         assertEquals(expectedSearchterms, study.getSearchQueryStrings());
         assertEquals("TestStudyName", study.getStudyMetaDataField(StudyMetaDataField.STUDY_NAME).get());
@@ -201,7 +204,7 @@ class StudyRepositoryTest {
     private StudyRepository getTestStudyRepository() throws Exception {
         if (Objects.isNull(studyRepository)) {
             setUpTestStudyDefinitionFile();
-            studyRepository = new StudyRepository(tempRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, entryTypesManager);
+            studyRepository = new StudyRepository(tempRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, timestampPreferences, entryTypesManager);
         }
         return studyRepository;
     }
