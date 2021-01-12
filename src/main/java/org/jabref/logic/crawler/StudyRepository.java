@@ -122,7 +122,7 @@ class StudyRepository {
      * Returns the merged entries stored in the repository for all queries
      */
     public BibDatabaseContext getStudyResultEntries() throws IOException {
-        return OpenDatabase.loadDatabase(getPathToStudyResultFile(), importFormatPreferences, timestampPreferences,  fileUpdateMonitor).getDatabaseContext();
+        return OpenDatabase.loadDatabase(getPathToStudyResultFile(), importFormatPreferences, timestampPreferences, fileUpdateMonitor).getDatabaseContext();
     }
 
     /**

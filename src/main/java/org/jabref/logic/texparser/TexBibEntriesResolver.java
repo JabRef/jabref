@@ -21,7 +21,7 @@ public class TexBibEntriesResolver {
 
     private final BibDatabase masterDatabase;
     private final ImportFormatPreferences importFormatPreferences;
-    TimestampPreferences timestampPreferences;
+    private final TimestampPreferences timestampPreferences;
     private final FileUpdateMonitor fileMonitor;
 
     public TexBibEntriesResolver(BibDatabase masterDatabase, ImportFormatPreferences importFormatPreferences, TimestampPreferences timestampPreferences, FileUpdateMonitor fileMonitor) {
