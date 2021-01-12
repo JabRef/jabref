@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.fetcher.ComplexSearchQuery;
+import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
 import org.jabref.model.entry.BibEntry;
 
 /**
@@ -36,4 +37,6 @@ public interface SearchBasedFetcher extends WebFetcher {
         // Otherwise just use query as a default term
         return this.performSearch(generatedQuery.orElse(ComplexSearchQuery.builder().defaultFieldPhrase(complexSearchQuery).build()));
     }
+
+    AbstractQueryTransformer getQueryTransformer();
 }

@@ -35,14 +35,21 @@ class ArXivQueryTransformerTest implements InfixTransformerTest {
 
     @Override
     public void convertYearField() throws Exception {
-        Optional<String> query = getTransformator().parseQueryStringIntoComplexQuery("year:2018");
+        ArXivQueryTransformer transformer = ((ArXivQueryTransformer) getTransformator());
+        Optional<String> query = transformer.parseQueryStringIntoComplexQuery("year:2018");
         Optional<String> expected = Optional.of("2018");
         assertEquals(expected, query);
+        assertEquals(2018, transformer.getStartYear());
+        assertEquals(2018, transformer.getEndYear());
     }
 
-    @Disabled("Year-range search is not supported by the arXiv API")
     @Override
     public void convertYearRangeField() throws Exception {
+        ArXivQueryTransformer transformer = ((ArXivQueryTransformer) getTransformator());
 
+        transformer.parseQueryStringIntoComplexQuery("year-range:2018-2021");
+
+        assertEquals(2018, transformer.getStartYear());
+        assertEquals(2021, transformer.getEndYear());
     }
 }

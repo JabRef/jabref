@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.fetcher.ComplexSearchQuery;
+import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.paging.Page;
 
@@ -49,4 +50,6 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
     default List<BibEntry> performSearch(String complexSearchQuery) throws FetcherException {
         return new ArrayList<>(performSearchPaged(complexSearchQuery, 0).getContent());
     }
+
+    AbstractQueryTransformer getQueryTransformer();
 }

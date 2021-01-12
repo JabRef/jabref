@@ -41,7 +41,7 @@ public class IEEEQueryTransformer extends AbstractQueryTransformer {
     @Override
     protected String handleYear(String year) {
         startYear = Math.max(startYear, Integer.parseInt(year));
-        endYear = Math.max(endYear, Integer.parseInt(year));
+        endYear = Math.min(endYear, Integer.parseInt(year));
         return "";
     }
 
@@ -49,7 +49,7 @@ public class IEEEQueryTransformer extends AbstractQueryTransformer {
     protected String handleYearRange(String yearRange) {
         String[] split = yearRange.split("-");
         startYear = Math.max(startYear, Integer.parseInt(split[0]));
-        endYear = Math.max(endYear, Integer.parseInt(split[1]));
+        endYear = Math.min(endYear, Integer.parseInt(split[1]));
         return "";
     }
 
