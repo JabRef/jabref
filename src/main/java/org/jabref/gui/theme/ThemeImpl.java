@@ -2,13 +2,17 @@ package org.jabref.gui.theme;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import javafx.scene.Scene;
-
 import javafx.scene.web.WebEngine;
+
 import org.jabref.gui.util.Theme;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.AppearancePreferences;

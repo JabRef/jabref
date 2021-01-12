@@ -1,9 +1,9 @@
 package org.jabref.gui.theme;
 
+import java.util.Objects;
+
 import org.jabref.gui.util.Theme;
 import org.jabref.model.strings.StringUtil;
-
-import java.util.Objects;
 
 public class ThemePreference {
 
@@ -12,14 +12,6 @@ public class ThemePreference {
     private final Theme.Type type;
 
     private final String name;
-
-    public static ThemePreference light() {
-        return new ThemePreference("");
-    }
-
-    public static ThemePreference dark() {
-        return new ThemePreference(EMBEDDED_DARK_THEME_CSS);
-    }
 
     public ThemePreference(String name) {
         this.name = name != null ? name : "";
@@ -30,6 +22,14 @@ public class ThemePreference {
         } else {
             this.type = Theme.Type.CUSTOM;
         }
+    }
+
+    public static ThemePreference light() {
+        return new ThemePreference("");
+    }
+
+    public static ThemePreference dark() {
+        return new ThemePreference(EMBEDDED_DARK_THEME_CSS);
     }
 
     /**
@@ -53,8 +53,12 @@ public class ThemePreference {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ThemePreference that = (ThemePreference) o;
         return type == that.type && name.equals(that.name);
     }

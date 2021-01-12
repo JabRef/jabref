@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
+
 import org.jabref.gui.theme.ThemePreference;
 
 public interface Theme {
