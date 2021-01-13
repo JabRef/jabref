@@ -20,7 +20,6 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
 <?import org.controlsfx.control.CheckTreeView?>
-
 <DialogPane xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.jabref.gui.externalfiles.UnlinkedFilesDialogView">
     <content>
@@ -54,7 +53,7 @@
                     <panes>
                         <TitledPane fx:id="filePane" text="%Currently unlinked files">
                             <ScrollPane fitToWidth="true">
-                                <CheckTreeView fx:id="tree" />
+                                <CheckTreeView fx:id="tree"/>
                             </ScrollPane>
                         </TitledPane>
                         <TitledPane fx:id="resultPane" text="%Import result" visible="false">
