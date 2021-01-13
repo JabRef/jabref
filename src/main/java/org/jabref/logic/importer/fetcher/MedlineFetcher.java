@@ -157,33 +157,6 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
         new FieldFormatterCleanup(StandardField.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
     }
 
-    @Override
-    public List<BibEntry> performSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
-        List<BibEntry> entryList;
-        String query = complexSearchQuery.toString();
-
-        if (query.isBlank()) {
-            return Collections.emptyList();
-        } else {
-            // searching for pubmed ids matching the query
-            List<String> idList = getPubMedIdsFromQuery(query);
-
-            if (idList.isEmpty()) {
-                LOGGER.info("No results found.");
-                return Collections.emptyList();
-            }
-            if (numberOfResultsFound > NUMBER_TO_FETCH) {
-                LOGGER.info(
-                        numberOfResultsFound + " results found. Only 50 relevant results will be fetched by default.");
-            }
-
-            // pass the list of ids to fetchMedline to download them. like a id fetcher for mutliple ids
-            entryList = fetchMedline(idList);
-
-            return entryList;
-        }
-    }
-
     private URL createSearchUrl(String query) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
         uriBuilder.addParameter("db", "pubmed");
@@ -219,6 +192,32 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
         } catch (IOException e) {
             throw new FetcherException("Error while fetching from Medline",
                     Localization.lang("Error while fetching from %0", "Medline"), e);
+        }
+    }
+
+    @Override
+    public List<BibEntry> performSearchForTransformedQuery(String transformedQuery) throws FetcherException {
+        List<BibEntry> entryList;
+
+        if (transformedQuery.isBlank()) {
+            return Collections.emptyList();
+        } else {
+            // searching for pubmed ids matching the query
+            List<String> idList = getPubMedIdsFromQuery(transformedQuery);
+
+            if (idList.isEmpty()) {
+                LOGGER.info("No results found.");
+                return Collections.emptyList();
+            }
+            if (numberOfResultsFound > NUMBER_TO_FETCH) {
+                LOGGER.info(
+                        numberOfResultsFound + " results found. Only 50 relevant results will be fetched by default.");
+            }
+
+            // pass the list of ids to fetchMedline to download them. like a id fetcher for mutliple ids
+            entryList = fetchMedline(idList);
+
+            return entryList;
         }
     }
 }

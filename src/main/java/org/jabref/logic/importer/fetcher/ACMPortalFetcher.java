@@ -42,9 +42,9 @@ public class ACMPortalFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(String transformedQuery) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
-        uriBuilder.addParameter("query", createQueryString(query)); // Search all fields
+        uriBuilder.addParameter("query", createQueryString(transformedQuery)); // Search all fields
         uriBuilder.addParameter("within", "owners.owner=GUIDE"); // Search within the ACM Guide to Computing Literature (encompasses the ACM Full-Text Collection)
         uriBuilder.addParameter("expformat", "bibtex"); // BibTeX format
         return uriBuilder.build().toURL();

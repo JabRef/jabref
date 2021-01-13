@@ -188,9 +188,9 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(String transformedQuery) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
-        DOAJFetcher.addPath(uriBuilder, query);
+        DOAJFetcher.addPath(uriBuilder, transformedQuery);
         // Number of results
         uriBuilder.addParameter("pageSize", "30");
         // Page (not needed so far)

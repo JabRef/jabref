@@ -33,9 +33,9 @@ public class CollectionOfComputerScienceBibliographiesFetcher implements SearchB
     }
 
     @Override
-    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(String transformedQuery) throws URISyntaxException, MalformedURLException, FetcherException {
         return new URIBuilder(BASIC_SEARCH_URL)
-                .addParameter("query", query)
+                .addParameter("query", transformedQuery)
                 .addParameter("sort", "score")
                 .build()
                 .toURL();

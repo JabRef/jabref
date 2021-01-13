@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.database.BibDatabase;
@@ -72,7 +72,7 @@ class StudyFetcher {
                 fetchResult = fetcher.performSearch(searchQuery);
             }
             return new FetchResult(fetcher.getName(), new BibDatabase(fetchResult));
-        } catch (FetcherException e) {
+        } catch (JabRefException e) {
             LOGGER.warn(String.format("%s API request failed", fetcher.getName()), e);
             return null;
         }

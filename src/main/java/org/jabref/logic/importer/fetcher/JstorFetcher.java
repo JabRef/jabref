@@ -47,44 +47,9 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
     }
 
     @Override
-    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(String transformedQuery) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_HOST);
-        uriBuilder.addParameter("Query", query);
-        return uriBuilder.build().toURL();
-    }
-
-    @Override
-    public URL getURLForQuery(ComplexSearchQuery query) throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder(SEARCH_HOST);
-        StringBuilder stringBuilder = new StringBuilder();
-        if (!query.getDefaultFieldPhrases().isEmpty()) {
-            stringBuilder.append(query.getDefaultFieldPhrases());
-        }
-        if (!query.getAuthors().isEmpty()) {
-            for (String author : query.getAuthors()) {
-                stringBuilder.append("au:").append(author);
-            }
-        }
-        if (!query.getTitlePhrases().isEmpty()) {
-            for (String title : query.getTitlePhrases()) {
-                stringBuilder.append("ti:").append(title);
-            }
-        }
-        if (query.getJournal().isPresent()) {
-            stringBuilder.append("pt:").append(query.getJournal().get());
-        }
-        if (query.getSingleYear().isPresent()) {
-            uriBuilder.addParameter("sd", String.valueOf(query.getSingleYear().get()));
-            uriBuilder.addParameter("ed", String.valueOf(query.getSingleYear().get()));
-        }
-        if (query.getFromYear().isPresent()) {
-            uriBuilder.addParameter("sd", String.valueOf(query.getFromYear().get()));
-        }
-        if (query.getToYear().isPresent()) {
-            uriBuilder.addParameter("ed", String.valueOf(query.getToYear().get()));
-        }
-
-        uriBuilder.addParameter("Query", stringBuilder.toString());
+        uriBuilder.addParameter("Query", transformedQuery);
         return uriBuilder.build().toURL();
     }
 

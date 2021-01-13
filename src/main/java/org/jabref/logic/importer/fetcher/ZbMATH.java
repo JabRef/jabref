@@ -13,6 +13,8 @@ import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
+import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
+import org.jabref.logic.importer.fetcher.transformators.ZbMathQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
@@ -50,9 +52,9 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher {
     }
     */
     @Override
-    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(String transformedQuery) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder("https://zbmath.org/bibtexoutput/");
-        uriBuilder.addParameter("q", query); // search all fields
+        uriBuilder.addParameter("q", transformedQuery); // search all fields
         uriBuilder.addParameter("start", "0"); // start index
         uriBuilder.addParameter("count", "200"); // should return up to 200 items (instead of default 100)
 
@@ -85,5 +87,10 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher {
         new MoveFieldCleanup(new UnknownField("fjournal"), StandardField.JOURNAL).cleanup(entry);
         new FieldFormatterCleanup(StandardField.JOURNAL, new RemoveBracesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);
+    }
+
+    @Override
+    public AbstractQueryTransformer getQueryTransformer() {
+        return new ZbMathQueryTransformer();
     }
 }

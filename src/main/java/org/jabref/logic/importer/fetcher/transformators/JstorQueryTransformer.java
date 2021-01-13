@@ -1,49 +1,49 @@
 package org.jabref.logic.importer.fetcher.transformators;
 
-public class DefaultQueryTransformer extends AbstractQueryTransformer {
-
+public class JstorQueryTransformer extends AbstractQueryTransformer {
     @Override
     protected String getLogicalAndOperator() {
-        return " ";
+        return " AND ";
     }
 
     @Override
     protected String getLogicalOrOperator() {
-        return " ";
+        return " OR ";
     }
 
     @Override
     protected String getLogicalNotOperator() {
-        return "";
+        return "NOT ";
     }
 
     @Override
     protected String handleAuthor(String author) {
-        return author;
+        return String.format("au:\"%s\"", author);
     }
 
     @Override
     protected String handleTitle(String title) {
-        return title;
+        return String.format("ti:\"%s\"", title);
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return journalTitle;
+        return String.format("pt:\"%s\"", journalTitle);
     }
 
     @Override
     protected String handleYear(String year) {
-        return year;
+        return "sd:" + year + getLogicalAndOperator() + "ed: " + year;
     }
 
     @Override
     protected String handleYearRange(String yearRange) {
-        return yearRange;
+        String[] split = yearRange.split("-");
+        return "sd:" + split[0] + getLogicalAndOperator() + "ed:" + split[1];
     }
 
     @Override
     protected String handleUnFieldedTerm(String term) {
-        return term;
+        return String.format("\"%s\"", term);
     }
 }

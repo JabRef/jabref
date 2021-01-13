@@ -7,22 +7,21 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
-import org.jabref.logic.importer.fetcher.ComplexSearchQuery;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.paging.Page;
 
 public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher, PagedSearchBasedFetcher {
 
     @Override
-    default Page<BibEntry> performSearchPaged(ComplexSearchQuery complexSearchQuery, int pageNumber) throws FetcherException {
+    default Page<BibEntry> performSearchPagedForTransformedQuery(String transformedQuery, int pageNumber) throws FetcherException {
         // ADR-0014
         URL urlForQuery;
         try {
-            urlForQuery = getComplexQueryURL(complexSearchQuery, pageNumber);
+            urlForQuery = getURLForQuery(transformedQuery, pageNumber);
         } catch (URISyntaxException | MalformedURLException e) {
             throw new FetcherException("Search URI crafted from complex search query is malformed", e);
         }
-        return new Page<>(complexSearchQuery.toString(), pageNumber, getBibEntries(urlForQuery));
+        return new Page<>(transformedQuery, pageNumber, getBibEntries(urlForQuery));
     }
 
     private List<BibEntry> getBibEntries(URL urlForQuery) throws FetcherException {
@@ -40,33 +39,18 @@ public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher,
     /**
      * Constructs a URL based on the query, size and page number.
      *
-     * @param query      the search query
+     * @param transformedQuery      the search query
      * @param pageNumber the number of the page indexed from 0
      */
-    URL getURLForQuery(String query, int pageNumber) throws URISyntaxException, MalformedURLException;
+    URL getURLForQuery(String transformedQuery, int pageNumber) throws URISyntaxException, MalformedURLException;
 
-    /**
-     * Constructs a URL based on the query, size and page number.
-     *
-     * @param complexSearchQuery the search query
-     * @param pageNumber         the number of the page indexed from 0
-     */
-    default URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
-        return getURLForQuery(complexSearchQuery.toString(), pageNumber);
+    @Override
+    default URL getURLForQuery(String transformedQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+        return getURLForQuery(transformedQuery, 0);
     }
 
     @Override
-    default List<BibEntry> performSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
-        return SearchBasedParserFetcher.super.performSearch(complexSearchQuery);
-    }
-
-    @Override
-    default URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
-        return getURLForQuery(query, 0);
-    }
-
-    @Override
-    default URL getURLForQuery(ComplexSearchQuery query) throws URISyntaxException, MalformedURLException, FetcherException {
-        return getComplexQueryURL(query, 0);
+    default List<BibEntry> performSearchForTransformedQuery(String transformedQuery) throws FetcherException {
+        return SearchBasedParserFetcher.super.performSearchForTransformedQuery(transformedQuery);
     }
 }

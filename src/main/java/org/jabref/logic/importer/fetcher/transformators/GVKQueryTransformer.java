@@ -8,8 +8,7 @@ public class GVKQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String getLogicalAndOperator() {
-        // GVK defaults to AND
-        return " ";
+        return " and ";
     }
 
     @Override
@@ -26,24 +25,24 @@ public class GVKQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleAuthor(String author) {
-        return String.format("per:\"%s\"", author);
+        return String.format("pica.per=\"%s\"", author);
     }
 
     @Override
     protected String handleTitle(String title) {
-        return String.format("tit:\"%s\"", title);
+        return String.format("pica.tit=\"%s\"", title);
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
         // zti means "Zeitschrift", does not search for conferences (kon:)
-        return String.format("zti:\"%s\"", journalTitle);
+        return String.format("pica.zti=\"%s\"", journalTitle);
     }
 
     @Override
     protected String handleYear(String year) {
         // ver means Veröffentlichungsangaben
-        return "ver:" + year;
+        return "pica.ver=" + year;
     }
 
     @Override
@@ -56,6 +55,6 @@ public class GVKQueryTransformer extends AbstractQueryTransformer {
     protected String handleUnFieldedTerm(String term) {
         // all does not search in full-text
         // Other option is txt: but this does not search in meta data
-        return String.format("all:\"%s\"", term);
+        return String.format("pica.all=\"%s\"", term);
     }
 }

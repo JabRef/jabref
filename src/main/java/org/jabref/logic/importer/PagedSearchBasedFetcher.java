@@ -5,33 +5,31 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.importer.fetcher.ComplexSearchQuery;
-import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
+import org.jabref.logic.JabRefException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.paging.Page;
 
 public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
 
     /**
-     * @param complexSearchQuery the complex query defining all fielded search parameters
-     * @param pageNumber         requested site number indexed from 0
+     * @param transformedQuery the complex query defining all fielded search parameters
+     * @param pageNumber       requested site number indexed from 0
      * @return Page with search results
      */
-    Page<BibEntry> performSearchPaged(ComplexSearchQuery complexSearchQuery, int pageNumber) throws FetcherException;
+    Page<BibEntry> performSearchPagedForTransformedQuery(String transformedQuery, int pageNumber) throws FetcherException;
 
     /**
-     * @param complexSearchQuery query string that can be parsed into a complex search query
-     * @param pageNumber         requested site number indexed from 0
+     * @param searchQuery query string that can be parsed into a complex search query
+     * @param pageNumber  requested site number indexed from 0
      * @return Page with search results
      */
-    default Page<BibEntry> performSearchPaged(String complexSearchQuery, int pageNumber) throws FetcherException {
-        if (complexSearchQuery.isBlank()) {
-            return new Page<>(complexSearchQuery, pageNumber, Collections.emptyList());
+    default Page<BibEntry> performSearchPaged(String searchQuery, int pageNumber) throws JabRefException {
+        if (searchQuery.isBlank()) {
+            return new Page<>(searchQuery, pageNumber, Collections.emptyList());
         }
-        QueryParser queryParser = new QueryParser();
-        Optional<ComplexSearchQuery> generatedQuery = queryParser.parseQueryStringIntoComplexQuery(complexSearchQuery);
+        Optional<String> transformedQuery = getQueryTransformer().parseQueryStringIntoComplexQuery(searchQuery);
         // Otherwise just use query as a default term
-        return this.performSearchPaged(generatedQuery.orElse(ComplexSearchQuery.builder().defaultFieldPhrase(complexSearchQuery).build()), pageNumber);
+        return this.performSearchPagedForTransformedQuery(transformedQuery.orElse(searchQuery), pageNumber);
     }
 
     /**
@@ -42,14 +40,7 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
     }
 
     @Override
-    default List<BibEntry> performSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
-        return new ArrayList<>(performSearchPaged(complexSearchQuery, 0).getContent());
+    default List<BibEntry> performSearchForTransformedQuery(String transformedQuery) throws FetcherException {
+        return new ArrayList<>(performSearchPagedForTransformedQuery(transformedQuery, 0).getContent());
     }
-
-    @Override
-    default List<BibEntry> performSearch(String complexSearchQuery) throws FetcherException {
-        return new ArrayList<>(performSearchPaged(complexSearchQuery, 0).getContent());
-    }
-
-    AbstractQueryTransformer getQueryTransformer();
 }

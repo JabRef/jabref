@@ -19,6 +19,8 @@ import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
+import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
+import org.jabref.logic.importer.fetcher.transformators.IEEEQueryTransformer;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
@@ -222,10 +224,10 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(String query, int pageNumber) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(String transformedQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
         uriBuilder.addParameter("apikey", API_KEY);
-        uriBuilder.addParameter("querytext", query);
+        uriBuilder.addParameter("querytext", transformedQuery);
         uriBuilder.addParameter("max_records", String.valueOf(getPageSize()));
         // Starts to index at 1 for the first entry
         uriBuilder.addParameter("start_record", String.valueOf(getPageSize() * pageNumber) + 1);
@@ -236,34 +238,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
     }
 
     @Override
-    public URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
-        URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
-        uriBuilder.addParameter("apikey", API_KEY);
-        uriBuilder.addParameter("max_records", String.valueOf(getPageSize()));
-        // Starts to index at 1 for the first entry
-        uriBuilder.addParameter("start_record", String.valueOf(getPageSize() * pageNumber) + 1);
-
-        if (!complexSearchQuery.getDefaultFieldPhrases().isEmpty()) {
-            uriBuilder.addParameter("querytext", String.join(" AND ", complexSearchQuery.getDefaultFieldPhrases()));
-        }
-        if (!complexSearchQuery.getAuthors().isEmpty()) {
-            uriBuilder.addParameter("author", String.join(" AND ", complexSearchQuery.getAuthors()));
-        }
-        if (!complexSearchQuery.getAbstractPhrases().isEmpty()) {
-            uriBuilder.addParameter("abstract", String.join(" AND ", complexSearchQuery.getAbstractPhrases()));
-        }
-        if (!complexSearchQuery.getTitlePhrases().isEmpty()) {
-            uriBuilder.addParameter("article_title", String.join(" AND ", complexSearchQuery.getTitlePhrases()));
-        }
-        complexSearchQuery.getJournal().ifPresent(journalTitle -> uriBuilder.addParameter("publication_title", journalTitle));
-        complexSearchQuery.getFromYear().map(String::valueOf).ifPresent(year -> uriBuilder.addParameter("start_year", year));
-        complexSearchQuery.getToYear().map(String::valueOf).ifPresent(year -> uriBuilder.addParameter("end_year", year));
-        complexSearchQuery.getSingleYear().map(String::valueOf).ifPresent(year -> {
-            uriBuilder.addParameter("start_year", year);
-            uriBuilder.addParameter("end_year", year);
-        });
-
-        URLDownload.bypassSSLVerification();
-        return uriBuilder.build().toURL();
+    public AbstractQueryTransformer getQueryTransformer() {
+        return new IEEEQueryTransformer();
     }
 }

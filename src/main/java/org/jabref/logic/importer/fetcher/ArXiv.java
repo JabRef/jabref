@@ -23,6 +23,8 @@ import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
+import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
+import org.jabref.logic.importer.fetcher.transformators.ArXivQueryTransformer;
 import org.jabref.logic.util.io.XMLUtil;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.entry.BibEntry;
@@ -252,24 +254,15 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
     /**
      * Constructs a complex query string using the field prefixes specified at https://arxiv.org/help/api/user-manual
      *
-     * @param complexSearchQuery the search query defining all fielded search parameters
+     * @param transformedQuery the search query defining all fielded search parameters
      * @return A list of entries matching the complex query
      */
     @Override
-    public Page<BibEntry> performSearchPaged(ComplexSearchQuery complexSearchQuery, int pageNumber) throws FetcherException {
-        List<String> searchTerms = new ArrayList<>();
-        complexSearchQuery.getAuthors().forEach(author -> searchTerms.add("au:" + author));
-        complexSearchQuery.getTitlePhrases().forEach(title -> searchTerms.add("ti:" + title));
-        complexSearchQuery.getAbstractPhrases().forEach(abstr -> searchTerms.add("abs:" + abstr));
-        complexSearchQuery.getJournal().ifPresent(journal -> searchTerms.add("jr:" + journal));
-        complexSearchQuery.getSingleYear().ifPresent(year -> searchTerms.add(year.toString()));
-        searchTerms.addAll(complexSearchQuery.getDefaultFieldPhrases());
-        String complexQueryString = String.join(" AND ", searchTerms);
-
-        List<BibEntry> searchResult = searchForEntries(complexQueryString, pageNumber).stream()
+    public Page<BibEntry> performSearchPagedForTransformedQuery(String transformedQuery, int pageNumber) throws FetcherException {
+        List<BibEntry> searchResult = searchForEntries(transformedQuery, pageNumber).stream()
                                                                                       .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
                                                                                       .collect(Collectors.toList());
-        return new Page<>(complexQueryString, pageNumber, searchResult);
+        return new Page<>(transformedQuery, pageNumber, searchResult);
     }
 
     @Override
@@ -417,5 +410,10 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
             getPdfUrl().ifPresent(url -> bibEntry.setFiles(Collections.singletonList(new LinkedFile(url, "PDF"))));
             return bibEntry;
         }
+    }
+
+    @Override
+    public AbstractQueryTransformer getQueryTransformer() {
+        return new ArXivQueryTransformer();
     }
 }

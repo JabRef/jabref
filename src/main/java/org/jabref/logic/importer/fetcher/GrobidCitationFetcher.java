@@ -66,13 +66,16 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
-        List<BibEntry> bibEntries = null;
-        // This just treats the complex query like a normal string query until it it implemented correctly
-        String query = complexSearchQuery.toString();
+    public String getName() {
+        return "GROBID";
+    }
+
+    @Override
+    public List<BibEntry> performSearchForTransformedQuery(String transformedQuery) throws FetcherException {
+        List<BibEntry> bibEntries;
         try {
             bibEntries = Arrays
-                    .stream(query.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
+                    .stream(transformedQuery.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
                     .map(String::trim)
                     .filter(str -> !str.isBlank())
                     .map(this::parseUsingGrobid)
@@ -86,10 +89,4 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
         }
         return bibEntries;
     }
-
-    @Override
-    public String getName() {
-        return "GROBID";
-    }
-
 }

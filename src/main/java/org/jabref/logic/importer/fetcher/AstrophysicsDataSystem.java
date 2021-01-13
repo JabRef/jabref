@@ -79,13 +79,13 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
     }
 
     /**
-     * @param query query string, matching the apache solr format
+     * @param transformedQuery query string, matching the apache solr format
      * @return URL which points to a search request for given query
      */
     @Override
-    public URL getURLForQuery(String query, int pageNumber) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(String transformedQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder builder = new URIBuilder(API_SEARCH_URL);
-        builder.addParameter("q", query);
+        builder.addParameter("q", transformedQuery);
         builder.addParameter("fl", "bibcode");
         builder.addParameter("rows", String.valueOf(getPageSize()));
         builder.addParameter("start", String.valueOf(getPageSize() * pageNumber));
@@ -274,12 +274,12 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
     }
 
     @Override
-    public Page<BibEntry> performSearchPaged(ComplexSearchQuery complexSearchQuery, int pageNumber) throws FetcherException {
+    public Page<BibEntry> performSearchPagedForTransformedQuery(String transformedQuery, int pageNumber) throws FetcherException {
         try {
             // This is currently just interpreting the complex query as a default string query
-            List<String> bibcodes = fetchBibcodes(getComplexQueryURL(complexSearchQuery, pageNumber));
+            List<String> bibcodes = fetchBibcodes(getURLForQuery(transformedQuery, pageNumber));
             Collection<BibEntry> results = performSearchByIds(bibcodes);
-            return new Page<>(complexSearchQuery.toString(), pageNumber, results);
+            return new Page<>(transformedQuery, pageNumber, results);
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
         } catch (IOException e) {
