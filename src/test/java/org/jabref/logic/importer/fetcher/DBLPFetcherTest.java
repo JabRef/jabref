@@ -50,7 +50,7 @@ public class DBLPFetcherTest {
 
     @Test
     public void findSingleEntry() throws FetcherException {
-        String query = "Process Engine Benchmarking with Betsy in the Context of {ISO/IEC} Quality Standards";
+        String query = "Process Engine Benchmarking with Betsy in the Context of \"{ISO/IEC}\" Quality Standards";
         List<BibEntry> result = dblpFetcher.performSearch(query);
 
         assertEquals(Collections.singletonList(entry), result);

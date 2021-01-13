@@ -46,6 +46,7 @@ public class GvkFetcher implements SearchBasedParserFetcher {
         uriBuilder.addParameter("maximumRecords", "50");
         uriBuilder.addParameter("recordSchema", "picaxml");
         uriBuilder.addParameter("sortKeys", "Year,,1");
+        System.out.println(uriBuilder.build().toURL());
         return uriBuilder.build().toURL();
     }
 

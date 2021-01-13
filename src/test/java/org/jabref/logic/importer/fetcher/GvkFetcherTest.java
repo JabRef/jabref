@@ -6,7 +6,9 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
 import org.jabref.logic.importer.fetcher.transformators.GVKQueryTransformer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -65,17 +67,19 @@ public class GvkFetcherTest {
     }
 
     @Test
-    public void simpleSearchQueryURLCorrect() throws MalformedURLException, URISyntaxException, FetcherException {
+    public void simpleSearchQueryURLCorrect() throws Exception {
         String query = "java jdk";
-        URL url = fetcher.getURLForQuery(query, new GVKQueryTransformer());
-        assertEquals("http://sru.gbv.de/gvk?version=1.1&operation=searchRetrieve&query=pica.all%3Djava+jdk&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1", url.toString());
+        AbstractQueryTransformer transformer = new GVKQueryTransformer();
+        URL url = fetcher.getURLForQuery(transformer.parseQueryStringIntoComplexQuery(query).get(), transformer);
+        assertEquals("http://sru.gbv.de/gvk?version=1.1&operation=searchRetrieve&query=pica.all%3D%22java%22+and+pica.all%3D%22jdk%22&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1", url.toString());
     }
 
     @Test
-    public void complexSearchQueryURLCorrect() throws MalformedURLException, URISyntaxException, FetcherException {
-        String query = "kon java tit jdk";
-        URL url = fetcher.getURLForQuery(query, new GVKQueryTransformer());
-        assertEquals("http://sru.gbv.de/gvk?version=1.1&operation=searchRetrieve&query=pica.kon%3Djava+and+pica.tit%3Djdk&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1", url.toString());
+    public void complexSearchQueryURLCorrect() throws Exception {
+        String query = "kon:java tit:jdk";
+        AbstractQueryTransformer transformer = new GVKQueryTransformer();
+        URL url = fetcher.getURLForQuery(transformer.parseQueryStringIntoComplexQuery(query).get(), new GVKQueryTransformer());
+        assertEquals("http://sru.gbv.de/gvk?version=1.1&operation=searchRetrieve&query=pica.kon%3D%22java%22+and+pica.tit%3D%22jdk%22&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1", url.toString());
     }
 
     @Test

@@ -49,11 +49,11 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
         } catch (SocketTimeoutException e) {
             String msg = "Connection timed out.";
             LOGGER.debug(msg, e);
-            throw new RuntimeException(msg, e);
+            return Optional.empty();
         } catch (IOException e) {
             String msg = "Could not process citation. " + e.getMessage();
             LOGGER.debug(msg, e);
-            throw new RuntimeException(msg, e);
+            return Optional.empty();
         }
     }
 
@@ -73,21 +73,13 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
 
     @Override
     public List<BibEntry> performSearchForTransformedQuery(String transformedQuery, AbstractQueryTransformer transformer) throws FetcherException {
-        List<BibEntry> bibEntries;
-        try {
-            bibEntries = Arrays
-                    .stream(transformedQuery.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
-                    .map(String::trim)
-                    .filter(str -> !str.isBlank())
-                    .map(this::parseUsingGrobid)
-                    .flatMap(Optional::stream)
-                    .map(this::parseBibToBibEntry)
-                    .flatMap(Optional::stream)
-                    .collect(Collectors.toList());
-        } catch (RuntimeException e) {
-            // un-wrap the wrapped exceptions
-            throw new FetcherException(e.getMessage(), e.getCause());
-        }
-        return bibEntries;
+        return Arrays.stream(transformedQuery.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
+                     .map(String::trim)
+                     .filter(str -> !str.isBlank())
+                     .map(this::parseUsingGrobid)
+                     .flatMap(Optional::stream)
+                     .map(this::parseBibToBibEntry)
+                     .flatMap(Optional::stream)
+                     .collect(Collectors.toList());
     }
 }
