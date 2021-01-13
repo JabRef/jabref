@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -56,6 +57,16 @@ class RegExpBasedFileFinder implements FileFinder {
         matcher.appendTail(expandedStringBuffer);
 
         return expandedStringBuffer.toString();
+    }
+
+    /**
+     * Helper function for expanding the content of a bracketed expression to regexp literals.
+     *
+     * @param bibEntry the {@link BibEntry} used when expanding the expression
+     */
+    private Function<String, String> expandBracketContentToRegexpLiterals(BibEntry bibEntry) {
+        var expandBracketContent = BracketedPattern.expandBracketContent(keywordDelimiter, bibEntry, null);
+        return bracketContent -> "\\Q" + expandBracketContent.apply(bracketContent) + "\\E";
     }
 
     /**
@@ -186,7 +197,9 @@ class RegExpBasedFileFinder implements FileFinder {
 
         // Last step: check if the given file can be found in this directory
         String filePart = fileParts[fileParts.length - 1].replace("[extension]", EXT_MARKER);
-        String filenameToLookFor = expandBrackets(filePart, entry, null, keywordDelimiter).replaceAll(EXT_MARKER, extensionRegExp);
+        String expandedBracketAsRegexpLiterals = BracketedPattern.expandBrackets(filePart,
+                expandBracketContentToRegexpLiterals(entry));
+        String filenameToLookFor = expandedBracketAsRegexpLiterals.replaceAll(EXT_MARKER, extensionRegExp);
 
         try {
             final Pattern toMatch = Pattern.compile('^' + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + '$',
