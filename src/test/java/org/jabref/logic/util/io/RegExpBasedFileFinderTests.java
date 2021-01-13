@@ -86,10 +86,10 @@ class RegExpBasedFileFinderTests {
 
         var extension = Collections.singletonList("pdf");
         var directory = Collections.singletonList(Path.of(FILES_DIRECTORY));
-        RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[TITLE]\\\\.[extension]", ',');
+        RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("[TITLE]\\\\.[extension]", ',');
 
         List<Path> result = fileFinder.findAssociatedFiles(bibEntry, directory, extension);
-        assertEquals(Collections.singletonList(Path.of("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/2003_Hippel_209.pdf")),
+        assertEquals(Collections.singletonList(Path.of("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/Regexp from [A-Z].pdf")),
                 result);
     }
 
