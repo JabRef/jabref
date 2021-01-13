@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 class ImportFormatReaderIntegrationTest {
 
     private ImportFormatReader reader;
-    TimestampPreferences timestampPreferences = mock(TimestampPreferences.class);
+    private TimestampPreferences timestampPreferences = mock(TimestampPreferences.class);
 
     @BeforeEach
     void setUp() {

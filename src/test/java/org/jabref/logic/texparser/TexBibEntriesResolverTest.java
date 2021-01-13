@@ -34,7 +34,7 @@ public class TexBibEntriesResolverTest {
 
     private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
     private ImportFormatPreferences importFormatPreferences;
-    TimestampPreferences timestampPreferences;
+    private TimestampPreferences timestampPreferences;
     private BibDatabase database;
     private BibDatabase database2;
     private BibEntry bibEntry;

@@ -3,7 +3,6 @@ package org.jabref.migrations;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ParserResult;
@@ -44,10 +43,6 @@ public class TimeStampToDateAddAndModify implements PostOpenMigration {
         // Query entries for their timestamp field entries
         entry.getField(timeStampField).ifPresent(timeStamp -> {
             String formattedTimeStamp = formatTimeStamp(timeStamp);
-            if (
-                    Objects.isNull(formattedTimeStamp)) {
-                System.out.println("Date format " + timeStamp + " lead to null when parsed.");
-            }
             if (interpretTimeStampAsModificationDate) {
                 entry.setField(StandardField.MODIFICATIONDATE, formattedTimeStamp);
             } else {

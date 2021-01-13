@@ -12,7 +12,7 @@ import org.jabref.model.entry.field.UnknownField;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TimeStampToDateAddAndModifyTest {
     TimestampPreferences timestampPreferences = Mockito.mock(TimestampPreferences.class);
@@ -144,7 +144,7 @@ class TimeStampToDateAddAndModifyTest {
     }
 
     private ParserResult getEntriesWithDifferentFormatsAndStandardField() {
-        /** Test cases extracted from {@link org.jabref.model.entry.Date}:
+        /* Test cases extracted from {@link org.jabref.model.entry.Date}:
          *  - "M/y" (covers 9/15, 9/2015, and 09/2015)
          *  - "MMMM (dd), yyyy" (covers September 1, 2015 and September, 2015)
          *  - "yyyy-MM-dd" (covers 2009-1-15) (already tested)

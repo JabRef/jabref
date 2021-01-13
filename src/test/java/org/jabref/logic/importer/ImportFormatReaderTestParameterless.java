@@ -20,7 +20,7 @@ class ImportFormatReaderTestParameterless {
 
     private ImportFormatReader reader;
     private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
-    TimestampPreferences timestampPreferences = mock(TimestampPreferences.class);
+    private final TimestampPreferences timestampPreferences = mock(TimestampPreferences.class);
 
     @BeforeEach
     void setUp() {
