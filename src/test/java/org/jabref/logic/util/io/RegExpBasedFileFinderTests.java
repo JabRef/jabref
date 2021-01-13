@@ -81,6 +81,19 @@ class RegExpBasedFileFinderTests {
     }
 
     @Test
+    void findAssociatedFilesContainingRegexpFromBracketedExpression() throws Exception {
+        var bibEntry = new BibEntry().withField(StandardField.TITLE, "Regexp from [A-Z]");
+
+        var extension = Collections.singletonList("pdf");
+        var directory = Collections.singletonList(Path.of(FILES_DIRECTORY));
+        RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[TITLE]\\\\.[extension]", ',');
+
+        List<Path> result = fileFinder.findAssociatedFiles(bibEntry, directory, extension);
+        assertEquals(Collections.singletonList(Path.of("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/2003_Hippel_209.pdf")),
+                result);
+    }
+
+    @Test
     void testAuthorWithDiacritics() throws Exception {
         // given
         BibEntry localEntry = new BibEntry(StandardEntryType.Article);
