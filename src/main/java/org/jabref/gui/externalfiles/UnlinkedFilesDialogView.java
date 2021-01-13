@@ -117,7 +117,6 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
                                                               .install(fileTypeSelection);
 
         tree.rootProperty().bind(EasyBind.map(viewModel.treeRoot(), fileNode -> new RecursiveTreeItem<>(fileNode, FileNodeViewModel::getChildren)));
-
         new ViewModelTreeCellFactory<FileNodeViewModel>()
                                                          .withText(FileNodeViewModel::getDisplayText)
                                                          .install(tree);
@@ -145,6 +144,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         progressPane.managedProperty().bind(viewModel.searchProgressVisible());
         progressPane.visibleProperty().bind(viewModel.searchProgressVisible());
         accordion.disableProperty().bind(viewModel.searchProgressVisible());
+        resultPane.visibleProperty().bind(viewModel.resultPaneVisble());
         tree.maxHeightProperty().bind(((Control) filePane.contentProperty().get()).heightProperty());
 
         viewModel.filePaneExpanded().bindBidirectional(filePane.expandedProperty());

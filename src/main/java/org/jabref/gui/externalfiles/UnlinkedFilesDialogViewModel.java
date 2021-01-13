@@ -68,6 +68,7 @@ public class UnlinkedFilesDialogViewModel {
     private final StringProperty progressText = new SimpleStringProperty();
     private final BooleanProperty filePaneExpanded = new SimpleBooleanProperty();
     private final BooleanProperty resultPaneExpanded = new SimpleBooleanProperty();
+    private final BooleanProperty resultPaneVisble = new SimpleBooleanProperty();
 
     private final ObservableList<ImportFilesResultItemViewModel> resultList = FXCollections.observableArrayList();
     private final ObservableList<FileExtensionViewModel> fileFilterList;
@@ -134,6 +135,9 @@ public class UnlinkedFilesDialogViewModel {
                                                      progressText.unbind();
                                                      searchProgressVisible.setValue(false);
                                                      scanButtonDisabled.setValue(false);
+                                                     resultPaneExpanded.setValue(true);
+                                                     resultPaneVisble.setValue(true);
+
                                                  })
                                                  .onSuccess(results -> {
                                                      applyButtonDisabled.setValue(false);
@@ -146,6 +150,7 @@ public class UnlinkedFilesDialogViewModel {
 
                                                      filePaneExpanded.setValue(false);
                                                      resultPaneExpanded.setValue(true);
+                                                     resultPaneVisble.setValue(true);
                                                      resultList.addAll(results);
                                                  });
         importFilesBackgroundTask.executeWith(taskExecutor);
@@ -196,6 +201,7 @@ public class UnlinkedFilesDialogViewModel {
 
         filePaneExpanded.setValue(true);
         resultPaneExpanded.setValue(false);
+        resultPaneVisble.setValue(false);
 
         progress.unbind();
         progressText.unbind();
@@ -328,6 +334,10 @@ public class UnlinkedFilesDialogViewModel {
 
     public ValidationStatus directoryPathValidator() {
         return this.scanDirectoryValidator.getValidationStatus();
+    }
+
+    public BooleanProperty resultPaneVisble() {
+        return this.resultPaneVisble;
     }
 
 }
