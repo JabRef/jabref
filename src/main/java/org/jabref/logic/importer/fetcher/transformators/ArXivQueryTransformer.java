@@ -1,5 +1,7 @@
 package org.jabref.logic.importer.fetcher.transformators;
 
+import java.util.Optional;
+
 public class ArXivQueryTransformer extends AbstractQueryTransformer {
     // These can be used for filtering in post processing
     private int startYear = Integer.MAX_VALUE;
@@ -65,11 +67,11 @@ public class ArXivQueryTransformer extends AbstractQueryTransformer {
         return String.format("all:\"%s\"", term);
     }
 
-    public int getStartYear() {
-        return startYear == Integer.MAX_VALUE ? Integer.MIN_VALUE : startYear;
+    public Optional<Integer> getStartYear() {
+        return startYear == Integer.MAX_VALUE ? Optional.empty() : Optional.of(startYear);
     }
 
-    public int getEndYear() {
-        return endYear == Integer.MIN_VALUE ? Integer.MAX_VALUE: endYear;
+    public Optional<Integer> getEndYear() {
+        return endYear == Integer.MIN_VALUE ? Optional.empty() : Optional.of(endYear);
     }
 }
