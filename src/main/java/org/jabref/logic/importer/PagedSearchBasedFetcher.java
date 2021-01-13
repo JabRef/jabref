@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.paging.Page;
 
@@ -16,7 +17,7 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
      * @param pageNumber       requested site number indexed from 0
      * @return Page with search results
      */
-    Page<BibEntry> performSearchPagedForTransformedQuery(String transformedQuery, int pageNumber) throws FetcherException;
+    Page<BibEntry> performSearchPagedForTransformedQuery(String transformedQuery, int pageNumber, AbstractQueryTransformer transformer) throws FetcherException;
 
     /**
      * @param searchQuery query string that can be parsed into a complex search query
@@ -27,9 +28,10 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
         if (searchQuery.isBlank()) {
             return new Page<>(searchQuery, pageNumber, Collections.emptyList());
         }
-        Optional<String> transformedQuery = getQueryTransformer().parseQueryStringIntoComplexQuery(searchQuery);
+        AbstractQueryTransformer transformer = getQueryTransformer();
+        Optional<String> transformedQuery = transformer.parseQueryStringIntoComplexQuery(searchQuery);
         // Otherwise just use query as a default term
-        return this.performSearchPagedForTransformedQuery(transformedQuery.orElse(searchQuery), pageNumber);
+        return this.performSearchPagedForTransformedQuery(transformedQuery.orElse(""), pageNumber, transformer);
     }
 
     /**
@@ -40,7 +42,7 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
     }
 
     @Override
-    default List<BibEntry> performSearchForTransformedQuery(String transformedQuery) throws FetcherException {
-        return new ArrayList<>(performSearchPagedForTransformedQuery(transformedQuery, 0).getContent());
+    default List<BibEntry> performSearchForTransformedQuery(String transformedQuery, AbstractQueryTransformer transformer) throws FetcherException {
+        return new ArrayList<>(performSearchPagedForTransformedQuery(transformedQuery, 0, transformer).getContent());
     }
 }

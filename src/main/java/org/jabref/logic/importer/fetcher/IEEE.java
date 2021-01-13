@@ -224,15 +224,34 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(String transformedQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(String transformedQuery, int pageNumber, AbstractQueryTransformer transformer) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
         uriBuilder.addParameter("apikey", API_KEY);
-        uriBuilder.addParameter("querytext", transformedQuery);
+        if (!transformedQuery.isBlank()) {
+            uriBuilder.addParameter("querytext", transformedQuery);
+        }
+        System.out.println(transformedQuery);
         uriBuilder.addParameter("max_records", String.valueOf(getPageSize()));
+        IEEEQueryTransformer ieeeQueryTransformer = ((IEEEQueryTransformer) transformer);
+        // Currently not working as part of the query string
+        if ((ieeeQueryTransformer).getJournal().isPresent()) {
+            uriBuilder.addParameter("publication_title", ieeeQueryTransformer.getJournal().get());
+        }
+        if (ieeeQueryTransformer.getStartYear().isPresent()) {
+            uriBuilder.addParameter("start_year", String.valueOf(ieeeQueryTransformer.getStartYear().get()));
+        }
+        if (ieeeQueryTransformer.getEndYear().isPresent()) {
+            uriBuilder.addParameter("end_year", String.valueOf(ieeeQueryTransformer.getEndYear().get()));
+        }
+        if (ieeeQueryTransformer.getArticleNumber().isPresent()) {
+            uriBuilder.addParameter("article_number", String.valueOf(ieeeQueryTransformer.getArticleNumber().get()));
+        }
         // Starts to index at 1 for the first entry
         uriBuilder.addParameter("start_record", String.valueOf(getPageSize() * pageNumber) + 1);
 
         URLDownload.bypassSSLVerification();
+
+        System.out.println(uriBuilder.build().toURL());
 
         return uriBuilder.build().toURL();
     }

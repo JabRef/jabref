@@ -258,11 +258,20 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
      * @return A list of entries matching the complex query
      */
     @Override
-    public Page<BibEntry> performSearchPagedForTransformedQuery(String transformedQuery, int pageNumber) throws FetcherException {
+    public Page<BibEntry> performSearchPagedForTransformedQuery(String transformedQuery, int pageNumber, AbstractQueryTransformer transformer) throws FetcherException {
         List<BibEntry> searchResult = searchForEntries(transformedQuery, pageNumber).stream()
-                                                                                      .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
-                                                                                      .collect(Collectors.toList());
-        return new Page<>(transformedQuery, pageNumber, searchResult);
+                                                                                    .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
+                                                                                    .collect(Collectors.toList());
+        return new Page<>(transformedQuery, pageNumber, filterYears(searchResult, transformer));
+    }
+
+    private List<BibEntry> filterYears(List<BibEntry> searchResult, AbstractQueryTransformer transformer) {
+        ArXivQueryTransformer arXivQueryTransformer = ((ArXivQueryTransformer) transformer);
+        return searchResult.stream()
+                           .filter(entry -> entry.getField(StandardField.YEAR).isPresent())
+                           .filter(entry -> arXivQueryTransformer.getEndYear() == Integer.MAX_VALUE || Integer.parseInt(entry.getField(StandardField.YEAR).get()) <= arXivQueryTransformer.getEndYear())
+                           .filter(entry -> arXivQueryTransformer.getStartYear() == Integer.MIN_VALUE ||Integer.parseInt(entry.getField(StandardField.YEAR).get()) >= arXivQueryTransformer.getStartYear())
+                           .collect(Collectors.toList());
     }
 
     @Override

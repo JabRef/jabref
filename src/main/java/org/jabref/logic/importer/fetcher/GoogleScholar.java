@@ -177,7 +177,7 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
     }
 
     @Override
-    public Page<BibEntry> performSearchPagedForTransformedQuery(String transformedQuery, int pageNumber) throws FetcherException {
+    public Page<BibEntry> performSearchPagedForTransformedQuery(String transformedQuery, int pageNumber, AbstractQueryTransformer transformer) throws FetcherException {
         try {
             obtainAndModifyCookie();
             List<BibEntry> foundEntries = new ArrayList<>(10);
@@ -188,9 +188,9 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
             uriBuilder.addParameter("q", transformedQuery);
             uriBuilder.addParameter("start", String.valueOf(pageNumber * getPageSize()));
             uriBuilder.addParameter("num", String.valueOf(getPageSize()));
-            ScholarQueryTransformer transformer = ((ScholarQueryTransformer) getQueryTransformer());
-            uriBuilder.addParameter("as_ylo", String.valueOf(transformer.getStartYear()));
-            uriBuilder.addParameter("as_yhi", String.valueOf(transformer.getEndYear()));
+            ScholarQueryTransformer scholarQueryTransformer = ((ScholarQueryTransformer) transformer);
+            uriBuilder.addParameter("as_ylo", String.valueOf(scholarQueryTransformer.getStartYear()));
+            uriBuilder.addParameter("as_yhi", String.valueOf(scholarQueryTransformer.getEndYear()));
 
             try {
                 addHitsFromQuery(foundEntries, uriBuilder.toString());

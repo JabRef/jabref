@@ -19,6 +19,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
+import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
@@ -47,7 +48,7 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
     }
 
     @Override
-    public URL getURLForQuery(String transformedQuery) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(String transformedQuery, AbstractQueryTransformer transformer) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_HOST);
         uriBuilder.addParameter("Query", transformedQuery);
         return uriBuilder.build().toURL();

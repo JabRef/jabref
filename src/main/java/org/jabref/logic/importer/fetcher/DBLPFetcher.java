@@ -44,7 +44,7 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(String transformedQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(String transformedQuery, AbstractQueryTransformer transformer) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(BASIC_SEARCH_URL);
         uriBuilder.addParameter("q", transformedQuery);
         uriBuilder.addParameter("h", String.valueOf(100)); // number of hits

@@ -44,8 +44,8 @@ public class ArXivQueryTransformer extends AbstractQueryTransformer {
      */
     @Override
     protected String handleYear(String year) {
-        startYear = Math.max(startYear, Integer.parseInt(year));
-        endYear = Math.min(endYear, Integer.parseInt(year));
+        startYear = Math.min(startYear, Integer.parseInt(year));
+        endYear = Math.max(endYear, Integer.parseInt(year));
         return year;
     }
 
@@ -55,8 +55,8 @@ public class ArXivQueryTransformer extends AbstractQueryTransformer {
     @Override
     protected String handleYearRange(String yearRange) {
         String[] split = yearRange.split("-");
-        startYear = Math.max(startYear, Integer.parseInt(split[0]));
-        endYear = Math.min(endYear, Integer.parseInt(split[1]));
+        startYear = Math.min(startYear, Integer.parseInt(split[0]));
+        endYear = Math.max(endYear, Integer.parseInt(split[1]));
         return "";
     }
 
@@ -66,10 +66,10 @@ public class ArXivQueryTransformer extends AbstractQueryTransformer {
     }
 
     public int getStartYear() {
-        return startYear;
+        return startYear == Integer.MAX_VALUE ? Integer.MIN_VALUE : startYear;
     }
 
     public int getEndYear() {
-        return endYear;
+        return endYear == Integer.MIN_VALUE ? Integer.MAX_VALUE: endYear;
     }
 }

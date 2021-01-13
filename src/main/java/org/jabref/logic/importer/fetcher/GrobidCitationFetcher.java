@@ -11,6 +11,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.model.entry.BibEntry;
@@ -71,7 +72,7 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearchForTransformedQuery(String transformedQuery) throws FetcherException {
+    public List<BibEntry> performSearchForTransformedQuery(String transformedQuery, AbstractQueryTransformer transformer) throws FetcherException {
         List<BibEntry> bibEntries;
         try {
             bibEntries = Arrays

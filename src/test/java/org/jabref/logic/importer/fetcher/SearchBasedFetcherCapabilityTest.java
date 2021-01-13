@@ -32,7 +32,7 @@ interface SearchBasedFetcherCapabilityTest {
      */
     @Test
     default void supportsAuthorSearch() throws Exception {
-        StringJoiner queryBuilder = new StringJoiner(" AND author:", "author:", "");
+        StringJoiner queryBuilder = new StringJoiner("\" AND author:\"", "author:\"", "\"");
         getTestAuthors().forEach(queryBuilder::add);
 
 
@@ -89,7 +89,7 @@ interface SearchBasedFetcherCapabilityTest {
      */
     @Test
     default void supportsJournalSearch() throws Exception {
-        List<BibEntry> result = getFetcher().performSearch("journal:" + getTestJournal());
+        List<BibEntry> result = getFetcher().performSearch("journal:\"" + getTestJournal() + "\"");
         new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
 
         assertFalse(result.isEmpty());

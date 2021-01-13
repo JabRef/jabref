@@ -23,6 +23,7 @@ import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
+import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
@@ -72,7 +73,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
     }
 
     @Override
-    public URL getURLForQuery(String transformedQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(String transformedQuery, AbstractQueryTransformer transformer) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder("https://mathscinet.ams.org/mathscinet/search/publications.html");
         uriBuilder.addParameter("pg7", "ALLF"); // search all fields
         uriBuilder.addParameter("s7", transformedQuery); // query

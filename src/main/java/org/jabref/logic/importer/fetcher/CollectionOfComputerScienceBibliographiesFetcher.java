@@ -14,6 +14,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
+import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -33,7 +34,7 @@ public class CollectionOfComputerScienceBibliographiesFetcher implements SearchB
     }
 
     @Override
-    public URL getURLForQuery(String transformedQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(String transformedQuery, AbstractQueryTransformer transformer) throws URISyntaxException, MalformedURLException, FetcherException {
         return new URIBuilder(BASIC_SEARCH_URL)
                 .addParameter("query", transformedQuery)
                 .addParameter("sort", "score")

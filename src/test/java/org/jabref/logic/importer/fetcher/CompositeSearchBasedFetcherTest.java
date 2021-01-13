@@ -18,6 +18,7 @@ import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -30,6 +31,7 @@ import static org.mockito.Mockito.when;
 
 @FetcherTest
 @DisabledOnCIServer("Produces to many requests on CI")
+@Disabled
 public class CompositeSearchBasedFetcherTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeSearchBasedFetcherTest.class);

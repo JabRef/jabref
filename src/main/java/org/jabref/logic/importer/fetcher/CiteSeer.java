@@ -20,6 +20,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
+import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
 import org.jabref.logic.importer.fileformat.CoinsParser;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
@@ -44,7 +45,7 @@ public class CiteSeer implements SearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(String transformedQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(String transformedQuery, AbstractQueryTransformer transformer) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder("https://citeseer.ist.psu.edu/search");
         uriBuilder.addParameter("sort", "rlv"); // Sort by relevance
         uriBuilder.addParameter("q", transformedQuery); // Query

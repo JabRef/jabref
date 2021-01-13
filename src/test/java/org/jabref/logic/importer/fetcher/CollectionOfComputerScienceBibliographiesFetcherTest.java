@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.fetcher.transformators.DefaultQueryTransformer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -43,7 +44,7 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
     @Test
     public void getUrlForQueryReturnsCorrectUrl() throws MalformedURLException, URISyntaxException, FetcherException {
         String query = "java jdk";
-        URL url = fetcher.getURLForQuery(query);
+        URL url = fetcher.getURLForQuery(query, new DefaultQueryTransformer());
         assertEquals("http://liinwww.ira.uka.de/bibliography/rss?query=java+jdk&sort=score", url.toString());
     }
 

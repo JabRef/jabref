@@ -10,6 +10,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 
@@ -46,13 +47,13 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearchForTransformedQuery(String transformedQuery) throws FetcherException {
+    public List<BibEntry> performSearchForTransformedQuery(String transformedQuery, AbstractQueryTransformer transformer) throws FetcherException {
         ImportCleanup cleanup = new ImportCleanup(BibDatabaseMode.BIBTEX);
         // All entries have to be converted into one format, this is necessary for the format conversion
         return fetchers.parallelStream()
                        .flatMap(searchBasedFetcher -> {
                            try {
-                               return searchBasedFetcher.performSearchForTransformedQuery(transformedQuery).stream();
+                               return searchBasedFetcher.performSearch(transformedQuery).stream();
                            } catch (FetcherException e) {
                                LOGGER.warn(String.format("%s API request failed", searchBasedFetcher.getName()), e);
                                return Stream.empty();

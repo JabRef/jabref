@@ -7,17 +7,18 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
+import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.paging.Page;
 
 public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher, PagedSearchBasedFetcher {
 
     @Override
-    default Page<BibEntry> performSearchPagedForTransformedQuery(String transformedQuery, int pageNumber) throws FetcherException {
+    default Page<BibEntry> performSearchPagedForTransformedQuery(String transformedQuery, int pageNumber, AbstractQueryTransformer transformer) throws FetcherException {
         // ADR-0014
         URL urlForQuery;
         try {
-            urlForQuery = getURLForQuery(transformedQuery, pageNumber);
+            urlForQuery = getURLForQuery(transformedQuery, pageNumber, transformer);
         } catch (URISyntaxException | MalformedURLException e) {
             throw new FetcherException("Search URI crafted from complex search query is malformed", e);
         }
@@ -42,15 +43,15 @@ public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher,
      * @param transformedQuery      the search query
      * @param pageNumber the number of the page indexed from 0
      */
-    URL getURLForQuery(String transformedQuery, int pageNumber) throws URISyntaxException, MalformedURLException;
+    URL getURLForQuery(String transformedQuery, int pageNumber, AbstractQueryTransformer transformer) throws URISyntaxException, MalformedURLException;
 
     @Override
-    default URL getURLForQuery(String transformedQuery) throws URISyntaxException, MalformedURLException, FetcherException {
-        return getURLForQuery(transformedQuery, 0);
+    default URL getURLForQuery(String transformedQuery, AbstractQueryTransformer transformer) throws URISyntaxException, MalformedURLException, FetcherException {
+        return getURLForQuery(transformedQuery, 0, transformer);
     }
 
     @Override
-    default List<BibEntry> performSearchForTransformedQuery(String transformedQuery) throws FetcherException {
-        return SearchBasedParserFetcher.super.performSearchForTransformedQuery(transformedQuery);
+    default List<BibEntry> performSearchForTransformedQuery(String transformedQuery, AbstractQueryTransformer transformer) throws FetcherException {
+        return SearchBasedParserFetcher.super.performSearchForTransformedQuery(transformedQuery, transformer);
     }
 }

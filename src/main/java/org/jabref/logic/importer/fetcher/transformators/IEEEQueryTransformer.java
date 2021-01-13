@@ -1,10 +1,15 @@
 package org.jabref.logic.importer.fetcher.transformators;
 
+import java.util.Objects;
+import java.util.Optional;
+
 /**
  * Needs to be instantiated for each new query
  */
 public class IEEEQueryTransformer extends AbstractQueryTransformer {
     // These have to be integrated into the IEEE query URL as these are just supported as query parameters
+    private String journal;
+    private String articleNumber;
     private int startYear = Integer.MAX_VALUE;
     private int endYear = Integer.MIN_VALUE;
 
@@ -35,21 +40,22 @@ public class IEEEQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return String.format("publication_title:\"%s\"", journalTitle);
+        journal = String.format("\"%s\"", journalTitle);
+        return "";
     }
 
     @Override
     protected String handleYear(String year) {
-        startYear = Math.max(startYear, Integer.parseInt(year));
-        endYear = Math.min(endYear, Integer.parseInt(year));
+        startYear = Math.min(startYear, Integer.parseInt(year));
+        endYear = Math.max(endYear, Integer.parseInt(year));
         return "";
     }
 
     @Override
     protected String handleYearRange(String yearRange) {
         String[] split = yearRange.split("-");
-        startYear = Math.max(startYear, Integer.parseInt(split[0]));
-        endYear = Math.min(endYear, Integer.parseInt(split[1]));
+        startYear = Math.min(startYear, Integer.parseInt(split[0]));
+        endYear = Math.max(endYear, Integer.parseInt(split[1]));
         return "";
     }
 
@@ -58,11 +64,32 @@ public class IEEEQueryTransformer extends AbstractQueryTransformer {
         return String.format("\"%s\"", term);
     }
 
-    public int getStartYear() {
-        return startYear;
+    @Override
+    protected Optional<String> handleOtherField(String fieldAsString, String term) {
+        return switch (fieldAsString) {
+            case "article_number" -> handleArticleNumber(term);
+            default -> super.handleOtherField(fieldAsString, term);
+        };
     }
 
-    public int getEndYear() {
-        return endYear;
+    private Optional<String> handleArticleNumber(String term) {
+        articleNumber = term;
+        return Optional.empty();
+    }
+
+    public Optional<Integer> getStartYear() {
+        return startYear == Integer.MAX_VALUE ? Optional.empty() : Optional.of(startYear);
+    }
+
+    public Optional<Integer> getEndYear() {
+        return endYear == Integer.MIN_VALUE ? Optional.empty() : Optional.of(endYear);
+    }
+
+    public Optional<String> getJournal() {
+        return Objects.isNull(journal) ? Optional.empty() : Optional.of(journal);
+    }
+
+    public Optional<String> getArticleNumber() {
+        return Objects.isNull(articleNumber) ? Optional.empty() : Optional.of(articleNumber);
     }
 }

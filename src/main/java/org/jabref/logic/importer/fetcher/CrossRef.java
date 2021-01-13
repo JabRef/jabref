@@ -18,6 +18,7 @@ import org.jabref.logic.importer.IdParserFetcher;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
+import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
 import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.entry.AuthorList;
@@ -63,7 +64,7 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
     }
 
     @Override
-    public URL getURLForQuery(String transformedQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(String transformedQuery, AbstractQueryTransformer transformer) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
         uriBuilder.addParameter("query", transformedQuery);
         return uriBuilder.build().toURL();

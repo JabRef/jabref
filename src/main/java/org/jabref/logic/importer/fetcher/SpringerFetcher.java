@@ -160,7 +160,7 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(String transformedQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(String transformedQuery, int pageNumber, AbstractQueryTransformer transformer) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
         uriBuilder.addParameter("q", transformedQuery); // Search query
         uriBuilder.addParameter("api_key", API_KEY); // API key
