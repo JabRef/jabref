@@ -57,6 +57,7 @@ open module org.jabref {
     requires reactfx;
     requires commons.cli;
     requires com.github.tomtung.latex2unicode;
+    requires fastparse;
     requires jbibtex;
     requires citeproc.java;
     requires antlr.runtime;

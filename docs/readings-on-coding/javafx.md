@@ -150,7 +150,7 @@ The view consists a FXML file `MyDialog.fxml` which defines the structure and th
 * [CSS Reference](http://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html)
 * [JFoenix](https://github.com/jfoenixadmin/JFoenix) Material Designs look & feel
 * [FontAwesomeFX](https://bitbucket.org/Jerady/fontawesomefx/overview): supports different icon fonts
-* [JavaFX Documentation project](https://fxdocs.github.io/docs/index.html): Collected information on javafx in a central place
+* [JavaFX Documentation project](https://fxdocs.github.io/docs/html5/index.html): Collected information on JavaFX in a central place
 * [FXExperience](http://fxexperience.com/) JavaFX Links of the week
 
 ## Features missing in JavaFX

@@ -74,7 +74,8 @@ public class Globals {
     public static ExporterFactory exportFactory;
     public static CountingUndoManager undoManager = new CountingUndoManager();
     public static BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
-    public static ClipBoardManager clipboardManager = new ClipBoardManager(prefs);
+
+    private static ClipBoardManager clipBoardManager = null;
 
     // Key binding preferences
     private static KeyBindingRepository keyBindingRepository;
@@ -91,6 +92,13 @@ public class Globals {
             keyBindingRepository = prefs.getKeyBindingRepository();
         }
         return keyBindingRepository;
+    }
+
+    public static synchronized ClipBoardManager getClipboardManager() {
+        if (clipBoardManager == null) {
+            clipBoardManager = new ClipBoardManager(prefs);
+        }
+        return clipBoardManager;
     }
 
     // Background tasks

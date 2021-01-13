@@ -27,7 +27,7 @@ The package `org.jabref.cli` is responsible for handling the command line option
 
 During development, one can configure IntelliJ to pass command line parameters:
 
-![IntelliJ-run-configuration](.gitbook/assets/intellij-run-configuration-command-line%20%282%29.png)
+![IntelliJ-run-configuration](.gitbook/assets/intellij-run-configuration-command-line%20%282%29%20%282%29%20%281%29.png)
 
 Passing command line arguments using gradle is currently not possible as all arguments \(such as `-Dfile.encoding=windows-1252`\) are passed to the application.
 
@@ -45,9 +45,9 @@ For new ADRs, please use [template.md](https://github.com/JabRef/jabref/tree/3b3
 
 ## FAQ
 
-* Q: I get `java: package org.jabref.logic.journals does not exist`.  
+* Q: I get `java: package org.jabref.logic.journals does not exist`.
 
-  A: You have to ignore `buildSrc/src/main`  as source directory in IntelliJ as indicated in our [setup guide](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
+  A: You have to ignore `buildSrc/src/main` as source directory in IntelliJ as indicated in our [setup guide](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
 
-     Also filed as IntelliJ issue [IDEA-240250](https://youtrack.jetbrains.com/issue/IDEA-240250).
+  Also filed as IntelliJ issue [IDEA-240250](https://youtrack.jetbrains.com/issue/IDEA-240250).
 
