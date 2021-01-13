@@ -4,6 +4,8 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -64,7 +66,7 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
                 .withField(StandardField.YEAR, "2017")
                 .withField(StandardField.BOOKTITLE, "11th European Conference on Software Architecture, ECSA 2017, Companion Proceedings, Canterbury, United Kingdom, September 11-15, 2017")
                 .withField(new UnknownField("bibsource"), "DBLP, http://dblp.uni-trier.de/https://doi.org/10.1145/3129790.3129810; DBLP, http://dblp.uni-trier.de/db/conf/ecsa/ecsa2017c.html#OlssonEW17")
-                .withField(new UnknownField("bibdate"), "2018-11-06");
+                .withField(new UnknownField("bibdate"), "2020-10-25");
 
         BibEntry secondBibEntry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("oai:DiVA.org:lnu-68408")

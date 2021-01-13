@@ -92,6 +92,10 @@ public abstract class AbstractQueryTransformer {
                 String s = handleYearRange(term);
                 return s.isEmpty() ? Optional.empty() : Optional.of(s);
             }
+            case "doi" -> {
+                String s = handleDoi(term);
+                return s.isEmpty() ? Optional.empty() : Optional.of(s);
+            }
             case NO_EXPLICIT_FIELD -> {
                 return Optional.of(handleUnFieldedTerm(term));
             }
@@ -100,6 +104,10 @@ public abstract class AbstractQueryTransformer {
                 return handleOtherField(query.getFieldAsString(), term);
             }
         }
+    }
+
+    protected String handleDoi(String term) {
+        return "doi:" + term;
     }
 
     /**

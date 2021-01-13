@@ -31,7 +31,6 @@ import static org.mockito.Mockito.when;
 
 @FetcherTest
 @DisabledOnCIServer("Produces to many requests on CI")
-@Disabled
 public class CompositeSearchBasedFetcherTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeSearchBasedFetcherTest.class);
