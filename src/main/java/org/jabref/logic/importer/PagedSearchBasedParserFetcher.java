@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
@@ -52,6 +53,6 @@ public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher,
 
     @Override
     default List<BibEntry> performSearchForTransformedQuery(String transformedQuery, AbstractQueryTransformer transformer) throws FetcherException {
-        return SearchBasedParserFetcher.super.performSearchForTransformedQuery(transformedQuery, transformer);
+        return new ArrayList<>(performSearchPagedForTransformedQuery(transformedQuery, 0, transformer).getContent());
     }
 }

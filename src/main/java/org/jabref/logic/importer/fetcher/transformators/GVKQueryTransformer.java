@@ -1,5 +1,7 @@
 package org.jabref.logic.importer.fetcher.transformators;
 
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,5 +58,10 @@ public class GVKQueryTransformer extends AbstractQueryTransformer {
         // all does not search in full-text
         // Other option is txt: but this does not search in meta data
         return String.format("pica.all=\"%s\"", term);
+    }
+
+    @Override
+    protected Optional<String> handleOtherField(String fieldAsString, String term) {
+        return Optional.of("pica." + fieldAsString + "=\"" + term + "\"");
     }
 }

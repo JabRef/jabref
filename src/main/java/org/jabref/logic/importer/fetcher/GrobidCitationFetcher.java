@@ -3,8 +3,10 @@ package org.jabref.logic.importer.fetcher;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FetcherException;
@@ -43,13 +45,13 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
      *
      * @return A BibTeX string if extraction is successful
      */
-    private Optional<String> parseUsingGrobid(String plainText) {
+    private Optional<String> parseUsingGrobid(String plainText) throws RuntimeException {
         try {
             return Optional.of(grobidService.processCitation(plainText, GrobidService.ConsolidateCitations.WITH_METADATA));
         } catch (SocketTimeoutException e) {
             String msg = "Connection timed out.";
             LOGGER.debug(msg, e);
-            return Optional.empty();
+            throw new RuntimeException(msg, e);
         } catch (IOException e) {
             String msg = "Could not process citation. " + e.getMessage();
             LOGGER.debug(msg, e);
@@ -72,14 +74,28 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     }
 
     @Override
+    public List<BibEntry> performSearch(String searchQuery) throws FetcherException {
+        List<BibEntry> collect;
+        try {
+            collect = Arrays.stream(searchQuery.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
+                                           .map(String::trim)
+                                           .filter(str -> !str.isBlank())
+                                           .map(this::parseUsingGrobid)
+                                           .flatMap(Optional::stream)
+                                           .map(this::parseBibToBibEntry)
+                                           .flatMap(Optional::stream)
+                                           .collect(Collectors.toList());
+        } catch (RuntimeException e) {
+            throw new FetcherException(e.getMessage(), e.getCause());
+        }
+        return collect;
+    }
+
+    /**
+     * Not used
+     */
+    @Override
     public List<BibEntry> performSearchForTransformedQuery(String transformedQuery, AbstractQueryTransformer transformer) throws FetcherException {
-        return Arrays.stream(transformedQuery.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
-                     .map(String::trim)
-                     .filter(str -> !str.isBlank())
-                     .map(this::parseUsingGrobid)
-                     .flatMap(Optional::stream)
-                     .map(this::parseBibToBibEntry)
-                     .flatMap(Optional::stream)
-                     .collect(Collectors.toList());
+        return Collections.emptyList();
     }
 }
