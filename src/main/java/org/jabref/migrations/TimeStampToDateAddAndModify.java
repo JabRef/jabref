@@ -14,6 +14,9 @@ import org.jabref.model.entry.field.StandardField;
 
 /**
  * This class handles the migration from timestamp field to creationdate and modificationdate fields.
+ * <p>
+ * If the old updateTimestamp setting is enabled, the timestamp field for each entry are migrated to the date-modified field.
+ * Otherwise it is migrated to the date-added field.
  */
 public class TimeStampToDateAddAndModify implements PostOpenMigration {
 
@@ -27,13 +30,6 @@ public class TimeStampToDateAddAndModify implements PostOpenMigration {
         timeStampField = timestampPreferences.getTimestampField();
     }
 
-    /**
-     * Handles the migration for opened databases.
-     * If the old updateTimestamp setting is enabled, the timestamp field for each entry are migrated to the date-modified field.
-     * Otherwise it is migrated to the date-added field.
-     *
-     * @param parserResult entries to be migrated
-     */
     @Override
     public void performMigration(ParserResult parserResult) {
         parserResult.getDatabase().getEntries().forEach(this::migrateEntry);

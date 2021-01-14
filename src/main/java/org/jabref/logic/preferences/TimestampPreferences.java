@@ -10,7 +10,7 @@ public class TimestampPreferences {
     private final boolean addCreationDate;
     private final boolean addModificationDate;
 
-    // Old settings used for migration
+    // These are old preferences. They are used for migration only.
     private final boolean updateTimestamp;
     private final Field timestampField;
     private final String timestampFormat;
@@ -36,14 +36,23 @@ public class TimestampPreferences {
         return addModificationDate;
     }
 
+    /**
+     * Required for migration only.
+     */
     public boolean shouldUpdateTimestamp() {
         return updateTimestamp;
     }
 
+    /**
+     * Required for migration only.
+     */
     public Field getTimestampField() {
         return timestampField;
     }
 
+    /**
+     * Required for migration only.
+     */
     public String getTimestampFormat() {
         return timestampFormat;
     }
