@@ -55,7 +55,7 @@ public class FileFieldWriterTest {
             // on Windows, a ":" in a path cannot be used
             // java.nio.file.InvalidPathException: Illegal char <:> at index 3: htt://arxiv.org/pdf/2010.08497v1
             // Thus, we assert that statement and return
-            assertThrows(InvalidPathException.class, () -> Path.of(inputURL));
+            assertThrows(InvalidPathException.class, () -> FileFieldParser.parse(input));
             return;
         }
 
