@@ -6,4 +6,5 @@
 
 <suppressions>
     <suppress checks="[a-zA-Z0-9]*" files="[\\/]generated[\\/]" />
+    <suppress files="CustomTitledPaneSkin.java" />
 </suppressions>
