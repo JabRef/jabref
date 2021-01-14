@@ -1,11 +1,10 @@
 package org.jabref.gui.util;
 
-import static javafx.css.StyleConverter.getEnumConverter;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.ObjectProperty;
@@ -20,6 +19,8 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.control.skin.TitledPaneSkin;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
+
+import static javafx.css.StyleConverter.getEnumConverter;
 
 /**
  *
