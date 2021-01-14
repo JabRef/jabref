@@ -22,12 +22,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 class RegExpBasedFileFinder implements FileFinder {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(RegExpBasedFileFinder.class);
 
     private static final String EXT_MARKER = "__EXTENSION__";
 
@@ -81,8 +76,7 @@ class RegExpBasedFileFinder implements FileFinder {
         try {
             return Pattern.compile('^' + fileNamePattern + '$', Pattern.CASE_INSENSITIVE);
         } catch (PatternSyntaxException e) {
-            LOGGER.warn("There is a syntax error in the regular expression \"{}\" used to search for a file", fileNamePattern, e);
-            throw new IOException("There is a syntax error in the regular expression used to search for files", e);
+            throw new IOException(String.format("There is a syntax error in the regular expression %s used to search for files", fileNamePattern), e);
         }
     }
 
