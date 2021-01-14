@@ -690,7 +690,7 @@
     -fx-padding: 0;
 }
 
-.titled-pane  {
+.accordion .titled-pane  {
    -fx-skin: "org.jabref.gui.util.CustomTitledPaneSkin";
    -fx-arrow-side: right;
 }
