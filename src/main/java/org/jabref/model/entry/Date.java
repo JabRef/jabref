@@ -62,7 +62,7 @@ public class Date {
         for (String formatString : formatStrings) {
             try {
                 // Locale is required for parsing month names correctly. Currently this expects the month names to be in english
-                TemporalAccessor parsedDate = DateTimeFormatter.ofPattern(formatString).withLocale(Locale.UK).parse(dateString);
+                TemporalAccessor parsedDate = DateTimeFormatter.ofPattern(formatString).withLocale(Locale.US).parse(dateString);
                 return Optional.of(new Date(parsedDate));
             } catch (DateTimeParseException ignored) {
                 // Ignored

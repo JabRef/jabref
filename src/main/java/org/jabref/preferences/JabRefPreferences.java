@@ -211,7 +211,6 @@ public class JabRefPreferences implements PreferencesService {
     public static final String ADD_CREATION_DATE = "addCreationDate";
     public static final String ADD_MODIFICATION_DATE = "addModificationDate";
 
-
     public static final String WARN_ABOUT_DUPLICATES_IN_INSPECTION = "warnAboutDuplicatesInInspection";
     public static final String NON_WRAPPABLE_FIELDS = "nonWrappableFields";
     public static final String RESOLVE_STRINGS_ALL_FIELDS = "resolveStringsAllFields";

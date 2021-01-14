@@ -203,11 +203,11 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     // Time stamp
 
-    public BooleanProperty addCreationDatePropertyProperty() {
+    public BooleanProperty addCreationDateProperty() {
         return addCreationDateProperty;
     }
 
-    public BooleanProperty addModificationDatePropertyProperty() {
+    public BooleanProperty addModificationDateProperty() {
         return addModificationDateProperty;
     }
 }
