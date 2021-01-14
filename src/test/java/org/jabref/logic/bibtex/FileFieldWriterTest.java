@@ -2,18 +2,21 @@ package org.jabref.logic.bibtex;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.importer.util.FileFieldParser;
+import org.jabref.logic.util.OS;
 import org.jabref.model.entry.LinkedFile;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class FileFieldWriterTest {
 
@@ -47,8 +50,16 @@ public class FileFieldWriterTest {
     public void parseFaultyOnlineInput() {
         String input = ":htt\\://arxiv.org/pdf/2010.08497v1:PDF";
         String inputURL = "htt://arxiv.org/pdf/2010.08497v1";
-        List<LinkedFile> expected = Collections.singletonList(new LinkedFile("", Path.of(inputURL), "PDF"));
 
+        if (OS.WINDOWS) {
+            // on Windows, a ":" in a path cannot be used
+            // java.nio.file.InvalidPathException: Illegal char <:> at index 3: htt://arxiv.org/pdf/2010.08497v1
+            // Thus, we assert that statement and return
+            assertThrows(InvalidPathException.class, () -> Path.of(inputURL));
+            return;
+        }
+
+        List<LinkedFile> expected = Collections.singletonList(new LinkedFile("", Path.of(inputURL), "PDF"));
         assertEquals(expected, FileFieldParser.parse(input));
     }
 
