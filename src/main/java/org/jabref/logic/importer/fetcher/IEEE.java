@@ -230,7 +230,6 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
         if (!transformedQuery.isBlank()) {
             uriBuilder.addParameter("querytext", transformedQuery);
         }
-        System.out.println(transformedQuery);
         uriBuilder.addParameter("max_records", String.valueOf(getPageSize()));
         IEEEQueryTransformer ieeeQueryTransformer = ((IEEEQueryTransformer) transformer);
         // Currently not working as part of the query string
@@ -250,8 +249,6 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
         uriBuilder.addParameter("start_record", String.valueOf(getPageSize() * pageNumber) + 1);
 
         URLDownload.bypassSSLVerification();
-
-        System.out.println(uriBuilder.build().toURL());
 
         return uriBuilder.build().toURL();
     }

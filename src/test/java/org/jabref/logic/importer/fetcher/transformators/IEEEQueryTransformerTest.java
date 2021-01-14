@@ -30,6 +30,15 @@ class IEEEQueryTransformerTest implements InfixTransformerTest{
     }
 
     @Override
+    public void convertJournalField() throws Exception {
+        IEEEQueryTransformer transformer = ((IEEEQueryTransformer) getTransformator());
+
+        transformer.parseQueryStringIntoComplexQuery("journal:Nature");
+
+        assertEquals("\"Nautre\"", transformer.getJournal().get());
+    }
+
+    @Override
     public void convertYearField() throws Exception {
         IEEEQueryTransformer transformer = ((IEEEQueryTransformer) getTransformator());
 

@@ -56,13 +56,6 @@ public interface InfixTransformerTest {
     }
 
     @Test
-    default void convertAlphabeticallyFirstJournalField() throws Exception {
-        Optional<String> searchQuery = getTransformator().parseQueryStringIntoComplexQuery("journal:Nature journal:\"Complex Networks\"");
-        Optional<String> expected = Optional.of(getJournalPrefix() + "\"Nature\"" + getTransformator().getLogicalAndOperator() + getJournalPrefix() + "\"Complex Networks\"");
-        assertEquals(expected, searchQuery);
-    }
-
-    @Test
     void convertYearField() throws Exception;
 
     @Test

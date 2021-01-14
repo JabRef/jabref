@@ -259,18 +259,14 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
      */
     @Override
     public Page<BibEntry> performSearchPagedForTransformedQuery(String transformedQuery, int pageNumber, AbstractQueryTransformer transformer) throws FetcherException {
-        System.out.println(transformedQuery);
-        System.out.println(((ArXivQueryTransformer) transformer).getStartYear() + " " + ((ArXivQueryTransformer) transformer).getEndYear());
         List<BibEntry> searchResult = searchForEntries(transformedQuery, pageNumber).stream()
                                                                                     .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
                                                                                     .collect(Collectors.toList());
-        System.out.println(searchResult);
         return new Page<>(transformedQuery, pageNumber, filterYears(searchResult, transformer));
     }
 
     private List<BibEntry> filterYears(List<BibEntry> searchResult, AbstractQueryTransformer transformer) {
         ArXivQueryTransformer arXivQueryTransformer = ((ArXivQueryTransformer) transformer);
-        System.out.println(Integer.parseInt(searchResult.get(0).getField(StandardField.DATE).get().substring(0, 4)));
         return searchResult.stream()
                            .filter(entry -> entry.getField(StandardField.DATE).isPresent())
                            // Filter the date field for year only

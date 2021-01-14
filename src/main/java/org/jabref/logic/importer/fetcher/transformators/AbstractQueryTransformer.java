@@ -71,7 +71,6 @@ public abstract class AbstractQueryTransformer {
      */
     protected abstract String getLogicalNotOperator();
 
-
     private Optional<String> transform(FieldQueryNode query) {
         String term = query.getTextAsString();
         switch (query.getFieldAsString()) {
@@ -123,8 +122,8 @@ public abstract class AbstractQueryTransformer {
     }
 
     /**
-         * Return a string representation of the author fielded term
-         */
+     * Return a string representation of the author fielded term
+     */
     protected abstract String handleAuthor(String author);
 
     /**
@@ -159,7 +158,7 @@ public abstract class AbstractQueryTransformer {
      * Return a string representation of the provided field
      * If it is not supported return an empty optional.
      */
-    protected Optional<String> handleOtherField(String fieldAsString, String term){
+    protected Optional<String> handleOtherField(String fieldAsString, String term) {
         return Optional.of(String.format("%s:\"%s\"", fieldAsString, term));
     }
 
@@ -189,7 +188,6 @@ public abstract class AbstractQueryTransformer {
         StandardSyntaxParser parser = new StandardSyntaxParser();
         try {
             QueryNode luceneQuery = parser.parse(query, NO_EXPLICIT_FIELD);
-            System.out.println(luceneQuery);
             Optional<String> transformedQuery = transform(luceneQuery);
             transformedQuery = transformedQuery.map(this::removeOuterBraces);
             return transformedQuery;

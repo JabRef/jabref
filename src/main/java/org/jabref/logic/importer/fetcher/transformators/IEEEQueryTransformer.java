@@ -8,6 +8,7 @@ import java.util.Optional;
  */
 public class IEEEQueryTransformer extends AbstractQueryTransformer {
     // These have to be integrated into the IEEE query URL as these are just supported as query parameters
+    // Journal is wrapped in quotes by the transformer
     private String journal;
     private String articleNumber;
     private int startYear = Integer.MAX_VALUE;
