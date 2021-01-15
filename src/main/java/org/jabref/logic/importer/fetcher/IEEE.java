@@ -56,6 +56,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
     private static final String API_KEY = new BuildInfo().ieeeAPIKey;
 
     private final ImportFormatPreferences preferences;
+    private IEEEQueryTransformer transformer;
 
     public IEEE(ImportFormatPreferences preferences) {
         this.preferences = Objects.requireNonNull(preferences);
@@ -224,14 +225,14 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(String transformedQuery, int pageNumber, AbstractQueryTransformer transformer) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(String transformedQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
         uriBuilder.addParameter("apikey", API_KEY);
         if (!transformedQuery.isBlank()) {
             uriBuilder.addParameter("querytext", transformedQuery);
         }
         uriBuilder.addParameter("max_records", String.valueOf(getPageSize()));
-        IEEEQueryTransformer ieeeQueryTransformer = ((IEEEQueryTransformer) transformer);
+        IEEEQueryTransformer ieeeQueryTransformer = transformer;
         // Currently not working as part of the query string
         if ((ieeeQueryTransformer).getJournal().isPresent()) {
             uriBuilder.addParameter("publication_title", ieeeQueryTransformer.getJournal().get());
@@ -255,6 +256,14 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
 
     @Override
     public AbstractQueryTransformer getQueryTransformer() {
-        return new IEEEQueryTransformer();
+        if (Objects.isNull(transformer)) {
+            transformer = new IEEEQueryTransformer();
+        }
+        return transformer;
+    }
+
+    @Override
+    public void resetTransformer() {
+        transformer = null;
     }
 }

@@ -6,14 +6,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.SearchBasedFetcher;
-import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.model.entry.BibEntry;
@@ -78,13 +76,13 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
         List<BibEntry> collect;
         try {
             collect = Arrays.stream(searchQuery.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
-                                           .map(String::trim)
-                                           .filter(str -> !str.isBlank())
-                                           .map(this::parseUsingGrobid)
-                                           .flatMap(Optional::stream)
-                                           .map(this::parseBibToBibEntry)
-                                           .flatMap(Optional::stream)
-                                           .collect(Collectors.toList());
+                            .map(String::trim)
+                            .filter(str -> !str.isBlank())
+                            .map(this::parseUsingGrobid)
+                            .flatMap(Optional::stream)
+                            .map(this::parseBibToBibEntry)
+                            .flatMap(Optional::stream)
+                            .collect(Collectors.toList());
         } catch (RuntimeException e) {
             throw new FetcherException(e.getMessage(), e.getCause());
         }
@@ -95,7 +93,7 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
      * Not used
      */
     @Override
-    public List<BibEntry> performSearchForTransformedQuery(String transformedQuery, AbstractQueryTransformer transformer) throws FetcherException {
+    public List<BibEntry> performSearchForTransformedQuery(String transformedQuery) throws FetcherException {
         return Collections.emptyList();
     }
 }

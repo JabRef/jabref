@@ -51,6 +51,7 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
     private static final int NUM_RESULTS = 10;
 
     private final ImportFormatPreferences importFormatPreferences;
+    private ScholarQueryTransformer transformer;
 
     public GoogleScholar(ImportFormatPreferences importFormatPreferences) {
         Objects.requireNonNull(importFormatPreferences);
@@ -177,7 +178,7 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
     }
 
     @Override
-    public Page<BibEntry> performSearchPagedForTransformedQuery(String transformedQuery, int pageNumber, AbstractQueryTransformer transformer) throws FetcherException {
+    public Page<BibEntry> performSearchPagedForTransformedQuery(String transformedQuery, int pageNumber) throws FetcherException {
         try {
             obtainAndModifyCookie();
             List<BibEntry> foundEntries = new ArrayList<>(10);
@@ -188,7 +189,7 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
             uriBuilder.addParameter("q", transformedQuery);
             uriBuilder.addParameter("start", String.valueOf(pageNumber * getPageSize()));
             uriBuilder.addParameter("num", String.valueOf(getPageSize()));
-            ScholarQueryTransformer scholarQueryTransformer = ((ScholarQueryTransformer) transformer);
+            ScholarQueryTransformer scholarQueryTransformer = transformer;
             uriBuilder.addParameter("as_ylo", String.valueOf(scholarQueryTransformer.getStartYear()));
             uriBuilder.addParameter("as_yhi", String.valueOf(scholarQueryTransformer.getEndYear()));
 
@@ -219,6 +220,14 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
 
     @Override
     public AbstractQueryTransformer getQueryTransformer() {
-        return new ScholarQueryTransformer();
+        if (Objects.isNull(transformer)) {
+            transformer = new ScholarQueryTransformer();
+        }
+        return transformer;
+    }
+
+    @Override
+    public void resetTransformer() {
+        transformer = null;
     }
 }

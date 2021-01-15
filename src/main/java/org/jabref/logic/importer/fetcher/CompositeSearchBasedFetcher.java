@@ -6,11 +6,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.SearchBasedFetcher;
-import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 
@@ -47,14 +47,14 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearchForTransformedQuery(String transformedQuery, AbstractQueryTransformer transformer) throws FetcherException {
+    public List<BibEntry> performSearchForTransformedQuery(String transformedQuery) throws FetcherException {
         ImportCleanup cleanup = new ImportCleanup(BibDatabaseMode.BIBTEX);
         // All entries have to be converted into one format, this is necessary for the format conversion
         return fetchers.parallelStream()
                        .flatMap(searchBasedFetcher -> {
                            try {
                                return searchBasedFetcher.performSearch(transformedQuery).stream();
-                           } catch (FetcherException e) {
+                           } catch (JabRefException e) {
                                LOGGER.warn(String.format("%s API request failed", searchBasedFetcher.getName()), e);
                                return Stream.empty();
                            }
@@ -62,5 +62,10 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
                        .limit(maximumNumberOfReturnedResults)
                        .map(cleanup::doPostCleanup)
                        .collect(Collectors.toList());
+    }
+
+    @Override
+    public void resetTransformer() {
+        fetchers.forEach(SearchBasedFetcher::resetTransformer);
     }
 }

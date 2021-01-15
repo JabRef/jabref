@@ -27,7 +27,6 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
-import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.BuildInfo;
@@ -84,7 +83,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
      * @return URL which points to a search request for given query
      */
     @Override
-    public URL getURLForQuery(String transformedQuery, int pageNumber, AbstractQueryTransformer transformer) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(String transformedQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
         URIBuilder builder = new URIBuilder(API_SEARCH_URL);
         builder.addParameter("q", transformedQuery);
         builder.addParameter("fl", "bibcode");
@@ -275,10 +274,10 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
     }
 
     @Override
-    public Page<BibEntry> performSearchPagedForTransformedQuery(String transformedQuery, int pageNumber, AbstractQueryTransformer transformer) throws FetcherException {
+    public Page<BibEntry> performSearchPagedForTransformedQuery(String transformedQuery, int pageNumber) throws FetcherException {
         try {
             // This is currently just interpreting the complex query as a default string query
-            List<String> bibcodes = fetchBibcodes(getURLForQuery(transformedQuery, pageNumber, transformer));
+            List<String> bibcodes = fetchBibcodes(getURLForQuery(transformedQuery, pageNumber));
             Collection<BibEntry> results = performSearchByIds(bibcodes);
             return new Page<>(transformedQuery, pageNumber, results);
         } catch (URISyntaxException e) {

@@ -13,7 +13,6 @@ import org.apache.lucene.queryparser.flexible.core.nodes.ModifierQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.OrQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +22,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractQueryTransformer {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractQueryTransformer.class);
-    public static final String NO_EXPLICIT_FIELD = "default";
+    private static final String NO_EXPLICIT_FIELD = "default";
 
     /**
      * Transforms a and b and c to (a AND b AND c), where

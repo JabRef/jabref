@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.cleanup.Formatter;
-import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
 import org.jabref.model.entry.BibEntry;
 
 /**
@@ -28,14 +27,13 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
      * fielded search, such as a title, author, or year parameter.
      *
      * @param transformedQuery the search query defining all fielded search parameters
-     * @param transformer
      */
     @Override
-    default List<BibEntry> performSearchForTransformedQuery(String transformedQuery, AbstractQueryTransformer transformer) throws FetcherException {
+    default List<BibEntry> performSearchForTransformedQuery(String transformedQuery) throws FetcherException {
         // ADR-0014
         URL urlForQuery;
         try {
-            urlForQuery = getURLForQuery(transformedQuery, transformer);
+            urlForQuery = getURLForQuery(transformedQuery);
         } catch (URISyntaxException | MalformedURLException | JabRefException e) {
             throw new FetcherException("Search URI crafted from complex search query is malformed", e);
         }
@@ -64,7 +62,7 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
      *
      * @param transformedQuery the search query
      */
-    URL getURLForQuery(String transformedQuery, AbstractQueryTransformer transformer) throws URISyntaxException, MalformedURLException, FetcherException;
+    URL getURLForQuery(String transformedQuery) throws URISyntaxException, MalformedURLException, FetcherException;
 
     /**
      * Performs a cleanup of the fetched entry.

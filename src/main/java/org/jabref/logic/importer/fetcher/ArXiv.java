@@ -62,6 +62,7 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
     private static final String API_URL = "https://export.arxiv.org/api/query";
 
     private final ImportFormatPreferences importFormatPreferences;
+    private ArXivQueryTransformer transformer;
 
     public ArXiv(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
@@ -258,15 +259,15 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
      * @return A list of entries matching the complex query
      */
     @Override
-    public Page<BibEntry> performSearchPagedForTransformedQuery(String transformedQuery, int pageNumber, AbstractQueryTransformer transformer) throws FetcherException {
+    public Page<BibEntry> performSearchPagedForTransformedQuery(String transformedQuery, int pageNumber) throws FetcherException {
         List<BibEntry> searchResult = searchForEntries(transformedQuery, pageNumber).stream()
                                                                                     .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
                                                                                     .collect(Collectors.toList());
-        return new Page<>(transformedQuery, pageNumber, filterYears(searchResult, transformer));
+        return new Page<>(transformedQuery, pageNumber, filterYears(searchResult));
     }
 
-    private List<BibEntry> filterYears(List<BibEntry> searchResult, AbstractQueryTransformer transformer) {
-        ArXivQueryTransformer arXivQueryTransformer = ((ArXivQueryTransformer) transformer);
+    private List<BibEntry> filterYears(List<BibEntry> searchResult) {
+        ArXivQueryTransformer arXivQueryTransformer = transformer;
         return searchResult.stream()
                            .filter(entry -> entry.getField(StandardField.DATE).isPresent())
                            // Filter the date field for year only
@@ -425,5 +426,10 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
     @Override
     public AbstractQueryTransformer getQueryTransformer() {
         return new ArXivQueryTransformer();
+    }
+
+    @Override
+    public void resetTransformer() {
+        transformer = null;
     }
 }
