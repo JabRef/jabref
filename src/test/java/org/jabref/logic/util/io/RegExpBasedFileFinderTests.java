@@ -156,34 +156,4 @@ class RegExpBasedFileFinderTests {
         // then
         assertTrue(result.isEmpty());
     }
-
-    @Test
-    void testExpandBrackets() {
-
-        assertEquals("", RegExpBasedFileFinder.expandBrackets("", entry, database, ','));
-
-        assertEquals("dropped", RegExpBasedFileFinder.expandBrackets("drop[unknownkey]ped", entry, database,
-                ','));
-
-        assertEquals("Eric von Hippel and Georg von Krogh",
-                RegExpBasedFileFinder.expandBrackets("[author]", entry, database, ','));
-
-        assertEquals("Eric von Hippel and Georg von Krogh are two famous authors.",
-                RegExpBasedFileFinder.expandBrackets("[author] are two famous authors.", entry, database,
-                        ','));
-
-        assertEquals("Eric von Hippel and Georg von Krogh are two famous authors.",
-                RegExpBasedFileFinder.expandBrackets("[author] are two famous authors.", entry, database,
-                        ','));
-
-        assertEquals(
-                "Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
-                RegExpBasedFileFinder.expandBrackets("[author] have published [fulltitle] in [journal].", entry, database,
-                        ','));
-
-        assertEquals(
-                "Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
-                RegExpBasedFileFinder.expandBrackets("[author] have published [title] in [journal].", entry, database,
-                        ','));
-    }
 }

@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.citationkeypattern.BracketedPattern;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
@@ -28,7 +27,6 @@ class RegExpBasedFileFinder implements FileFinder {
 
     private static final Pattern ESCAPE_PATTERN = Pattern.compile("([^\\\\])\\\\([^\\\\])");
 
-    private static final Pattern SQUARE_BRACKETS_PATTERN = Pattern.compile("\\[.*?\\]");
     private final String regExp;
     private final Character keywordDelimiter;
 
@@ -38,24 +36,6 @@ class RegExpBasedFileFinder implements FileFinder {
     RegExpBasedFileFinder(String regExp, Character keywordDelimiter) {
         this.regExp = regExp;
         this.keywordDelimiter = keywordDelimiter;
-    }
-
-    /**
-     * Takes a string that contains bracketed expression and expands each of these using getFieldAndFormat.
-     * <p>
-     * Unknown Bracket expressions are silently dropped.
-     */
-    public static String expandBrackets(String bracketString, BibEntry entry, BibDatabase database,
-                                        Character keywordDelimiter) {
-        Matcher matcher = SQUARE_BRACKETS_PATTERN.matcher(bracketString);
-        StringBuilder expandedStringBuffer = new StringBuilder();
-        while (matcher.find()) {
-            String replacement = BracketedPattern.expandBrackets(matcher.group(), keywordDelimiter, entry, database);
-            matcher.appendReplacement(expandedStringBuffer, replacement);
-        }
-        matcher.appendTail(expandedStringBuffer);
-
-        return expandedStringBuffer.toString();
     }
 
     private Pattern createFileNamePattern(String[] fileParts, String extensionRegExp, BibEntry entry) throws IOException {
@@ -170,9 +150,7 @@ class RegExpBasedFileFinder implements FileFinder {
         }
 
         for (int index = 0; index < (fileParts.length - 1); index++) {
-
             String dirToProcess = fileParts[index];
-            dirToProcess = expandBrackets(dirToProcess, entry, null, keywordDelimiter);
 
             if (dirToProcess.matches("^.:$")) { // Windows Drive Letter
                 actualDirectory = Path.of(dirToProcess + '/');
