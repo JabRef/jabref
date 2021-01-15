@@ -1,7 +1,6 @@
 package org.jabref.gui.preferences;
 
 import java.nio.charset.Charset;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,15 +21,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.GeneralPreferences;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.TelemetryPreferences;
-
-import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
-import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
-import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<Language> languagesListProperty = new SimpleListProperty<>();
@@ -49,13 +42,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty markOwnerProperty = new SimpleBooleanProperty();
     private final StringProperty markOwnerNameProperty = new SimpleStringProperty("");
     private final BooleanProperty markOwnerOverwriteProperty = new SimpleBooleanProperty();
-    private final BooleanProperty markTimestampProperty = new SimpleBooleanProperty();
-    private final StringProperty markTimeStampFormatProperty = new SimpleStringProperty("");
-    private final BooleanProperty markTimeStampOverwriteProperty = new SimpleBooleanProperty();
-    private final StringProperty markTimeStampFieldNameProperty = new SimpleStringProperty("");
-    private final BooleanProperty updateTimeStampProperty = new SimpleBooleanProperty();
-
-    private Validator markTimeStampFormatValidator;
+    private final BooleanProperty addCreationDateProperty = new SimpleBooleanProperty();
+    private final BooleanProperty addModificationDateProperty = new SimpleBooleanProperty();
 
     private final DialogService dialogService;
     private final PreferencesService preferencesService;
@@ -74,25 +62,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.initialTelemetryPreferences = preferencesService.getTelemetryPreferences();
         this.initialOwnerPreferences = preferencesService.getOwnerPreferences();
         this.initialTimestampPreferences = preferencesService.getTimestampPreferences();
-
-        markTimeStampFormatValidator = new FunctionBasedValidator<>(
-                markTimeStampFormatProperty,
-                input -> {
-                    try {
-                        DateTimeFormatter.ofPattern(markTimeStampFormatProperty.getValue());
-                    } catch (IllegalArgumentException exception) {
-                        return false;
-                    }
-                    return true;
-                },
-                ValidationMessage.error(String.format("%s > %s > %s %n %n %s",
-                        Localization.lang("General"),
-                        Localization.lang("Time stamp"),
-                        Localization.lang("Date format"),
-                        Localization.lang("Invalid date format")
-                        )
-                )
-        );
     }
 
     public void setValues() {
@@ -116,11 +85,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         markOwnerNameProperty.setValue(initialOwnerPreferences.getDefaultOwner());
         markOwnerOverwriteProperty.setValue(initialOwnerPreferences.isOverwriteOwner());
 
-        markTimestampProperty.setValue(initialTimestampPreferences.shouldUseTimestamps());
-        markTimeStampFormatProperty.setValue(initialTimestampPreferences.getTimestampFormat());
-        markTimeStampOverwriteProperty.setValue(initialTimestampPreferences.shouldOverwriteTimestamp());
-        markTimeStampFieldNameProperty.setValue(initialTimestampPreferences.getTimestampField().getName());
-        updateTimeStampProperty.setValue(initialTimestampPreferences.shouldUpdateTimestamp());
+        addCreationDateProperty.setValue(initialTimestampPreferences.shouldAddCreationDate());
+        addModificationDateProperty.setValue(initialTimestampPreferences.shouldAddModificationDate());
     }
 
     public void storeSettings() {
@@ -155,24 +121,14 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                 markOwnerOverwriteProperty.getValue()));
 
         preferencesService.storeTimestampPreferences(new TimestampPreferences(
-                markTimestampProperty.getValue(),
-                updateTimeStampProperty.getValue(),
-                FieldFactory.parseField(markTimeStampFieldNameProperty.getValue().trim()),
-                markTimeStampFormatProperty.getValue().trim(),
-                markTimeStampOverwriteProperty.getValue()));
-    }
-
-    public ValidationStatus markTimeStampFormatValidationStatus() {
-        return markTimeStampFormatValidator.getValidationStatus();
+                addCreationDateProperty.getValue(),
+                addModificationDateProperty.getValue(),
+                initialTimestampPreferences.shouldUpdateTimestamp(),
+                initialTimestampPreferences.getTimestampField(),
+                initialTimestampPreferences.getTimestampFormat()));
     }
 
     public boolean validateSettings() {
-        ValidationStatus validationStatus = markTimeStampFormatValidationStatus();
-        if (!validationStatus.isValid()) {
-            validationStatus.getHighestMessage().ifPresent(message ->
-                    dialogService.showErrorDialogAndWait(message.getMessage()));
-            return false;
-        }
         return true;
     }
 
@@ -247,23 +203,11 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     // Time stamp
 
-    public BooleanProperty markTimestampProperty() {
-        return this.markTimestampProperty;
+    public BooleanProperty addCreationDateProperty() {
+        return addCreationDateProperty;
     }
 
-    public StringProperty markTimeStampFormatProperty() {
-        return this.markTimeStampFormatProperty;
-    }
-
-    public BooleanProperty markTimeStampOverwriteProperty() {
-        return this.markTimeStampOverwriteProperty;
-    }
-
-    public StringProperty markTimeStampFieldNameProperty() {
-        return this.markTimeStampFieldNameProperty;
-    }
-
-    public BooleanProperty updateTimeStampProperty() {
-        return this.updateTimeStampProperty;
+    public BooleanProperty addModificationDateProperty() {
+        return addModificationDateProperty;
     }
 }

@@ -8,6 +8,7 @@ import org.jabref.logic.crawler.git.GitHandler;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.study.Study;
@@ -32,9 +33,9 @@ public class Crawler {
      * @param studyDefinitionFile The path to the study definition file that contains the list of targeted E-Libraries
      *                            and used cross-library queries
      */
-    public Crawler(Path studyDefinitionFile, GitHandler gitHandler, FileUpdateMonitor fileUpdateMonitor, ImportFormatPreferences importFormatPreferences, SavePreferences savePreferences, BibEntryTypesManager bibEntryTypesManager) throws IllegalArgumentException, IOException, ParseException, GitAPIException {
+    public Crawler(Path studyDefinitionFile, GitHandler gitHandler, FileUpdateMonitor fileUpdateMonitor, ImportFormatPreferences importFormatPreferences, SavePreferences savePreferences, TimestampPreferences timestampPreferences, BibEntryTypesManager bibEntryTypesManager) throws IllegalArgumentException, IOException, ParseException, GitAPIException {
         Path studyRepositoryRoot = studyDefinitionFile.getParent();
-        studyRepository = new StudyRepository(studyRepositoryRoot, gitHandler, importFormatPreferences, fileUpdateMonitor, savePreferences, bibEntryTypesManager);
+        studyRepository = new StudyRepository(studyRepositoryRoot, gitHandler, importFormatPreferences, fileUpdateMonitor, savePreferences, timestampPreferences, bibEntryTypesManager);
         Study study = studyRepository.getStudy();
         LibraryEntryToFetcherConverter libraryEntryToFetcherConverter = new LibraryEntryToFetcherConverter(study.getActiveLibraryEntries(), importFormatPreferences);
         this.studyFetcher = new StudyFetcher(libraryEntryToFetcherConverter.getActiveFetchers(), study.getSearchQueryStrings());
