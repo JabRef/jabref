@@ -323,7 +323,7 @@ public abstract class BibDatabaseWriter {
         CitationKeyGenerator keyGenerator = new CitationKeyGenerator(databaseContext, preferences.getCitationKeyPatternPreferences());
         for (BibEntry bes : entries) {
             Optional<String> oldKey = bes.getCitationKey();
-            if (StringUtil.isBlank(oldKey)) {
+            if (oldKey.isEmpty() || StringUtil.isBlank(oldKey.get())) {
                 Optional<FieldChange> change = keyGenerator.generateAndSetKey(bes);
                 change.ifPresent(changes::add);
             }

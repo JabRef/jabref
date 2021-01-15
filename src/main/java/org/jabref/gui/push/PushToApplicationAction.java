@@ -90,10 +90,11 @@ public class PushToApplicationAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        // If required, check that all entries have citation keys defined:
+        // If required, check that all entries have citation keys defined
         if (application.requiresCitationKeys()) {
             for (BibEntry entry : stateManager.getSelectedEntries()) {
-                if (StringUtil.isBlank(entry.getCitationKey())) {
+                Optional<String> citationKey = entry.getCitationKey();
+                if (!citationKey.isPresent() || StringUtil.isBlank(citationKey.get())) {
                     dialogService.showErrorDialogAndWait(
                             application.getDisplayName(),
                             Localization.lang("This operation requires all selected entries to have citation keys defined."));

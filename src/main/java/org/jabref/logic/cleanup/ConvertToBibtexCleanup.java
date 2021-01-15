@@ -3,6 +3,7 @@ package org.jabref.logic.cleanup;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
@@ -23,11 +24,13 @@ public class ConvertToBibtexCleanup implements CleanupJob {
         // Dates: get date and fill year and month
         // If there already exists a non blank/empty value for the field, then it is not overwritten
         entry.getPublicationDate().ifPresent(date -> {
-            if (StringUtil.isBlank(entry.getField(StandardField.YEAR))) {
+            Optional<String> yearField = entry.getField(StandardField.YEAR);
+            if (!yearField.isPresent() || StringUtil.isBlank(yearField.get())) {
                 date.getYear().flatMap(year -> entry.setField(StandardField.YEAR, year.toString())).ifPresent(changes::add);
             }
 
-            if (StringUtil.isBlank(entry.getField(StandardField.MONTH))) {
+            Optional<String> monthField = entry.getField(StandardField.MONTH);
+            if (!monthField.isPresent() || StringUtil.isBlank(monthField.get())) {
                 date.getMonth().flatMap(month -> entry.setField(StandardField.MONTH, month.getJabRefFormat())).ifPresent(changes::add);
             }
 

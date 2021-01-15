@@ -36,7 +36,7 @@ class CitationKeyBasedFileFinder implements FileFinder {
         Objects.requireNonNull(entry);
 
         Optional<String> citeKeyOptional = entry.getCitationKey();
-        if (StringUtil.isBlank(citeKeyOptional)) {
+        if (citeKeyOptional.isEmpty() || StringUtil.isBlank(citeKeyOptional.get())) {
             return Collections.emptyList();
         }
         String citeKey = citeKeyOptional.get();

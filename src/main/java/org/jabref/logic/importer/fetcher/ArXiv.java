@@ -116,7 +116,7 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
     private List<ArXivEntry> searchForEntries(BibEntry entry) throws FetcherException {
         // 1. Eprint
         Optional<String> identifier = entry.getField(StandardField.EPRINT);
-        if (StringUtil.isNotBlank(identifier)) {
+        if (identifier.isPresent() && StringUtil.isNotBlank(identifier.get())) {
             try {
                 // Get pdf of entry with the specified id
                 return OptionalUtil.toList(searchForEntryById(identifier.get()));

@@ -34,7 +34,8 @@ public class ConvertToBiblatexCleanup implements CleanupJob {
         }
         // Dates: create date out of year and month, save it and delete old fields
         // If there already exists a non blank/empty value for the field date, it is not overwritten
-        if (StringUtil.isBlank(entry.getField(StandardField.DATE))) {
+        Optional<String> dateField = entry.getField(StandardField.DATE);
+        if (dateField.isEmpty() || StringUtil.isBlank(dateField.get())) {
             entry.getFieldOrAlias(StandardField.DATE).ifPresent(newDate -> {
                 entry.setField(StandardField.DATE, newDate).ifPresent(changes::add);
                 entry.clearField(StandardField.YEAR).ifPresent(changes::add);
