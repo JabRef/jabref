@@ -10,6 +10,7 @@ import org.jabref.logic.crawler.git.GitHandler;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrderConfig;
@@ -28,6 +29,7 @@ import static org.mockito.Mockito.when;
 class LibraryEntryToFetcherConverterTest {
     ImportFormatPreferences importFormatPreferences;
     SavePreferences savePreferences;
+    TimestampPreferences timestampPreferences;
     BibEntryTypesManager entryTypesManager;
     GitHandler gitHandler;
     @TempDir
@@ -37,6 +39,7 @@ class LibraryEntryToFetcherConverterTest {
     void setUpMocks() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
+        timestampPreferences = mock(TimestampPreferences.class);
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
         when(savePreferences.getEncoding()).thenReturn(null);
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
@@ -53,7 +56,7 @@ class LibraryEntryToFetcherConverterTest {
         Path studyDefinition = tempRepositoryDirectory.resolve("study.bib");
         copyTestStudyDefinitionFileIntoDirectory(studyDefinition);
 
-        Study study = new StudyRepository(tempRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, entryTypesManager).getStudy();
+        Study study = new StudyRepository(tempRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, timestampPreferences, entryTypesManager).getStudy();
         LibraryEntryToFetcherConverter converter = new LibraryEntryToFetcherConverter(study.getActiveLibraryEntries(), importFormatPreferences);
         List<SearchBasedFetcher> result = converter.getActiveFetchers();
 
