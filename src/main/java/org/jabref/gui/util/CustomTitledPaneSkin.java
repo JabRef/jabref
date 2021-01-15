@@ -19,6 +19,7 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.control.skin.TitledPaneSkin;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
+import javafx.scene.transform.Rotate;
 
 import static javafx.css.StyleConverter.getEnumConverter;
 
@@ -84,6 +85,17 @@ public class CustomTitledPaneSkin extends TitledPaneSkin {
         title = (Region) Objects.requireNonNull(control.lookup(".title"));
         arrow = (Region) Objects.requireNonNull(title.lookup(".arrow-button"));
         text = (Text) Objects.requireNonNull(title.lookup(".text"));
+
+        // based on https://stackoverflow.com/a/55156460/3450689
+        Rotate rotate = new Rotate();
+        rotate.pivotXProperty().bind(arrow.widthProperty().divide(2.0));
+        rotate.pivotYProperty().bind(arrow.heightProperty().divide(2.0));
+        rotate.angleProperty().bind(
+                Bindings.when(control.expandedProperty())
+                        .then(-180.0)
+                        .otherwise(90.0));
+
+        arrow.getTransforms().add(rotate);
 
         registerChangeListener(control.graphicProperty(), ov -> adjustTitleLayout());
     }
