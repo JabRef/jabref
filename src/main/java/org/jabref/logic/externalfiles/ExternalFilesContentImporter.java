@@ -31,6 +31,6 @@ public class ExternalFilesContentImporter {
     }
 
     public ParserResult importFromBibFile(Path bibFile, FileUpdateMonitor fileUpdateMonitor) throws IOException {
-        return OpenDatabase.loadDatabase(bibFile, importFormatPreferences, fileUpdateMonitor);
+        return OpenDatabase.loadDatabase(bibFile, importFormatPreferences, timestampPreferences, fileUpdateMonitor);
     }
 }
