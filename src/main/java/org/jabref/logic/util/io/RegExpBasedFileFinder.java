@@ -38,19 +38,23 @@ class RegExpBasedFileFinder implements FileFinder {
         this.keywordDelimiter = keywordDelimiter;
     }
 
+    /**
+     * Creates a Pattern that matches the file name corresponding to the last element of {@code fileParts} with any bracketed patterns expanded.
+     *
+     * @throws IOException throws an IOException if a PatternSyntaxException occurs
+     */
     private Pattern createFileNamePattern(String[] fileParts, String extensionRegExp, BibEntry entry) throws IOException {
-        // Last step: check if the given file can be found in this directory
         // Protect the extension marker so that it isn't treated as a bracketed pattern
         String filePart = fileParts[fileParts.length - 1].replace("[extension]", EXT_MARKER);
 
-        // expandBracketContent is the default function for expanding the content of a bracketed expression [field:modifier]
+        // We need to supply a custom function to deal with the content of a bracketed expression and expandBracketContent is the default function
         Function<String, String> expandBracket = BracketedPattern.expandBracketContent(keywordDelimiter, entry, null);
-        // we want to post-process the content so that it can be used as a regex for finding a file name
+        // but, we want to post-process the expanded content so that it can be used as a regex for finding a file name
         Function<String, String> bracketToFileNameRegex = expandBracket.andThen(RegExpBasedFileFinder::toFileNameRegex);
 
-        String expandedBracketAsRegexpLiterals = BracketedPattern.expandBrackets(filePart, bracketToFileNameRegex);
+        String expandedBracketAsFileNameRegex = BracketedPattern.expandBrackets(filePart, bracketToFileNameRegex);
 
-        String fileNamePattern = expandedBracketAsRegexpLiterals
+        String fileNamePattern = expandedBracketAsFileNameRegex
                 .replaceAll(EXT_MARKER, extensionRegExp) // Replace the extension marker
                 .replaceAll("\\\\\\\\", "\\\\");
         try {
@@ -60,10 +64,16 @@ class RegExpBasedFileFinder implements FileFinder {
         }
     }
 
-    private static String toFileNameRegex(String content) {
-        var cleanedContent = FileNameCleaner.cleanFileName(content);
-        return content.equals(cleanedContent) ? Pattern.quote(content) :
-                "(" + Pattern.quote(content) + ")|(" + Pattern.quote(cleanedContent) + ")";
+    /**
+     * Helper method for both exact matching (if the file name were not created by JabRef) and cleaned file name matching.
+     *
+     * @param expandedContent the expanded content of a bracketed expression
+     * @return a String representation of a regex matching the expanded content and the expanded content cleaned for file name use
+     */
+    private static String toFileNameRegex(String expandedContent) {
+        var cleanedContent = FileNameCleaner.cleanFileName(expandedContent);
+        return expandedContent.equals(cleanedContent) ? Pattern.quote(expandedContent) :
+                "(" + Pattern.quote(expandedContent) + ")|(" + Pattern.quote(cleanedContent) + ")";
     }
 
     /**
@@ -190,6 +200,7 @@ class RegExpBasedFileFinder implements FileFinder {
             } // End process directory information
         }
 
+        // Last step: check if the given file can be found in this directory
         Pattern toMatch = createFileNamePattern(fileParts, extensionRegExp, entry);
         BiPredicate<Path, BasicFileAttributes> matcher = (path, attributes) -> toMatch.matcher(path.getFileName().toString()).matches();
         try (Stream<Path> pathStream = Files.find(actualDirectory, 1, matcher, FileVisitOption.FOLLOW_LINKS)) {
