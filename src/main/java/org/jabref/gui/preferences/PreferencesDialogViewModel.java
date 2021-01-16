@@ -107,7 +107,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     }
 
     public void showPreferences() {
-        new PreferencesFilterDialog(new PreferencesFilter(preferences)).showAndWait();
+        dialogService.showCustomDialogAndWait(new PreferencesFilterDialog(new PreferencesFilter(preferences)));
     }
 
     public void resetPreferences() {

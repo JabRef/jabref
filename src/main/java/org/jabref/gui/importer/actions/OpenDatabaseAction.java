@@ -184,7 +184,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         }
 
         ParserResult result = OpenDatabase.loadDatabase(fileToLoad.toString(),
-                Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+                Globals.prefs.getImportFormatPreferences(), Globals.prefs.getTimestampPreferences(), Globals.getFileUpdateMonitor());
 
         if (result.getDatabase().isShared()) {
             try {

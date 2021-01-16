@@ -199,12 +199,13 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         }
 
         TexBibEntriesResolver entriesResolver = new TexBibEntriesResolver(databaseContext.getDatabase(),
-                preferencesService.getImportFormatPreferences(), fileMonitor);
+                preferencesService.getImportFormatPreferences(), preferencesService.getTimestampPreferences(), fileMonitor);
 
         BackgroundTask.wrap(() -> entriesResolver.resolve(new DefaultLatexParser().parse(fileList)))
                       .onRunning(() -> searchInProgress.set(true))
                       .onFinished(() -> searchInProgress.set(false))
-                      .onSuccess(result -> new ParseLatexResultView(result, databaseContext, Path.of(latexFileDirectory.get())).showAndWait())
+                      .onSuccess(result -> dialogService.showCustomDialogAndWait(
+                              new ParseLatexResultView(result, databaseContext, Path.of(latexFileDirectory.get()))))
                       .onFailure(dialogService::showErrorDialogAndWait)
                       .executeWith(taskExecutor);
     }

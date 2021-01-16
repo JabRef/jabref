@@ -9,6 +9,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
@@ -23,6 +26,8 @@ import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
 
 import com.google.common.eventbus.EventBus;
+import com.tobiasdiez.easybind.optional.OptionalBinding;
+import com.tobiasdiez.easybind.optional.OptionalWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +56,8 @@ public class MetaData {
     private final Map<EntryType, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
     private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
     private final Map<String, Path> laTexFileDirectory = new HashMap<>(); // <User, FilePath>
-    private GroupTreeNode groupsRoot;
+    private final ObjectProperty<GroupTreeNode> groupsRoot = new SimpleObjectProperty<>(null);
+    private final OptionalBinding<GroupTreeNode> groupsRootBinding = new OptionalWrapper<>(groupsRoot);
     private Charset encoding;
     private SaveOrderConfig saveOrderConfig;
     private String defaultCiteKeyPattern;
@@ -60,7 +66,7 @@ public class MetaData {
     private boolean isProtected;
     private String defaultFileDirectory;
     private final ContentSelectors contentSelectors = new ContentSelectors();
-    private final Map<String, List<String>> unkownMetaData = new HashMap<>();
+    private final Map<String, List<String>> unknownMetaData = new HashMap<>();
     private boolean isEventPropagationEnabled = true;
 
     /**
@@ -80,16 +86,21 @@ public class MetaData {
     }
 
     public Optional<GroupTreeNode> getGroups() {
-        return Optional.ofNullable(groupsRoot);
+        return groupsRootBinding.getValue();
+    }
+
+    public OptionalBinding<GroupTreeNode> groupsBinding() {
+        return groupsRootBinding;
     }
 
     /**
-     * Sets a new group root node. <b>WARNING </b>: This invalidates everything
-     * returned by getGroups() so far!!!
+     * Sets a new group root node. <b>WARNING </b>: This invalidates everything returned by getGroups() so far!!!
      */
     public void setGroups(GroupTreeNode root) {
-        groupsRoot = Objects.requireNonNull(root);
-        groupsRoot.subscribeToDescendantChanged(groupTreeNode -> eventBus.post(new GroupUpdatedEvent(this)));
+        Objects.requireNonNull(root);
+        groupsRoot.setValue(root);
+        root.subscribeToDescendantChanged(groupTreeNode -> groupsRootBinding.invalidate());
+        root.subscribeToDescendantChanged(groupTreeNode -> eventBus.post(new GroupUpdatedEvent(this)));
         eventBus.post(new GroupUpdatedEvent(this));
         postChange();
     }
@@ -111,8 +122,7 @@ public class MetaData {
     /**
      * Updates the stored key patterns to the given key patterns.
      *
-     * @param bibtexKeyPattern the key patterns to update to. <br /> A reference to this object is stored internally and
-     *                         is returned at getCiteKeyPattern();
+     * @param bibtexKeyPattern the key patterns to update to. <br /> A reference to this object is stored internally and is returned at getCiteKeyPattern();
      */
     public void setCiteKeyPattern(AbstractCitationKeyPattern bibtexKeyPattern) {
         Objects.requireNonNull(bibtexKeyPattern);
@@ -317,14 +327,14 @@ public class MetaData {
     }
 
     public Map<String, List<String>> getUnknownMetaData() {
-        return Collections.unmodifiableMap(unkownMetaData);
+        return Collections.unmodifiableMap(unknownMetaData);
     }
 
     public void putUnknownMetaDataItem(String key, List<String> value) {
         Objects.requireNonNull(key);
         Objects.requireNonNull(value);
 
-        unkownMetaData.put(key, value);
+        unknownMetaData.put(key, value);
     }
 
     @Override
@@ -337,7 +347,7 @@ public class MetaData {
         }
         MetaData metaData = (MetaData) o;
         return (isProtected == metaData.isProtected)
-                && Objects.equals(groupsRoot, metaData.groupsRoot)
+                && Objects.equals(groupsRoot.getValue(), metaData.groupsRoot.getValue())
                 && Objects.equals(encoding, metaData.encoding)
                 && Objects.equals(saveOrderConfig, metaData.saveOrderConfig)
                 && Objects.equals(citeKeyPatterns, metaData.citeKeyPatterns)
@@ -352,7 +362,7 @@ public class MetaData {
 
     @Override
     public int hashCode() {
-        return Objects.hash(groupsRoot, encoding, saveOrderConfig, citeKeyPatterns, userFileDirectory,
+        return Objects.hash(groupsRoot.getValue(), encoding, saveOrderConfig, citeKeyPatterns, userFileDirectory,
                 defaultCiteKeyPattern, saveActions, mode, isProtected, defaultFileDirectory);
     }
 }

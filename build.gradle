@@ -50,6 +50,10 @@ modularity.patchModule("test", "fastparse_2.12-1.0.0.jar")
 modularity.patchModule("test2", "fastparse-utils_2.12-1.0.0.jar")
 modularity.patchModule("test3", "sourcecode_2.12-0.1.4.jar")
 
+// Workaround for https://github.com/openjfx/javafx-gradle-plugin/issues/89
+// See also https://github.com/java9-modularity/gradle-modules-plugin/issues/165
+modularity.disableEffectiveArgumentsAdjustment()
+
 sourceSets {
     main {
         java {
@@ -88,7 +92,7 @@ configurations {
 }
 
 javafx {
-    version = "15"
+    version = "15.0.1"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
@@ -119,8 +123,8 @@ dependencies {
     antlr3 'org.antlr:antlr:3.5.2'
     implementation 'org.antlr:antlr-runtime:3.5.2'
 
-    antlr4 'org.antlr:antlr4:4.9'
-    implementation 'org.antlr:antlr4-runtime:4.9'
+    antlr4 'org.antlr:antlr4:4.9.1'
+    implementation 'org.antlr:antlr4-runtime:4.9.1'
 
     implementation (group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.7.0') {
         exclude group: 'org.apache.lucene', module: 'lucene-sandbox'
@@ -157,7 +161,7 @@ dependencies {
     implementation 'org.controlsfx:controlsfx:11.0.3'
 
     implementation 'org.jsoup:jsoup:1.13.1'
-    implementation 'com.konghq:unirest-java:3.11.09'
+    implementation 'com.konghq:unirest-java:3.11.10'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
@@ -194,7 +198,7 @@ dependencies {
     testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.19'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:3.6.28'
+    testImplementation 'org.mockito:mockito-core:3.7.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.8.2'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.8.2'
     testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.15.0'
@@ -203,7 +207,7 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.38'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.39'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.3'
 }
 
@@ -257,17 +261,23 @@ clean {
 }
 
 processResources {
+    gradle.taskGraph.whenReady {
+        if (gradle.taskGraph.hasTask(":jpackage")) {
+            logger.info('Adding buildres/csl to resources')
+            from("buildres/csl")
+        }
+    }
+
     filteringCharset = 'UTF-8'
 
     filesMatching("build.properties") {
         expand(version: project.findProperty('projVersionInfo') ?: '100.0.0',
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
-                "authors": new File('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
-                "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "),
-                "azureInstrumentationKey": System.getenv('AzureInstrumentationKey'),
-                "springerNatureAPIKey": System.getenv('SpringerNatureAPIKey'),
-                "astrophysicsDataSystemAPIKey": System.getenv('AstrophysicsDataSystemAPIKey'),
-                "ieeeAPIKey": System.getenv('IEEEAPIKey')
+                "maintainers": new File('MAINTAINERS').readLines().findAll { !it.startsWith("#") }.join(", "),
+                "azureInstrumentationKey": System.getenv('AzureInstrumentationKey') ? System.getenv('AzureInstrumentationKey') : '',
+                "springerNatureAPIKey": System.getenv('SpringerNatureAPIKey') ? System.getenv('SpringerNatureAPIKey') : '',
+                "astrophysicsDataSystemAPIKey": System.getenv('AstrophysicsDataSystemAPIKey') ? System.getenv('AstrophysicsDataSystemAPIKey') : '',
+                "ieeeAPIKey": System.getenv('IEEEAPIKey') ? System.getenv('IEEEAPIKey') : ''
         )
         filteringCharset = 'UTF-8'
     }

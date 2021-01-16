@@ -97,7 +97,7 @@ public class ImportAction {
 
             ImportEntriesDialog dialog = new ImportEntriesDialog(libraryTab.getBibDatabaseContext(), task);
             dialog.setTitle(Localization.lang("Import"));
-            dialog.showAndWait();
+            dialogService.showCustomDialogAndWait(dialog);
         }
     }
 
@@ -110,7 +110,7 @@ public class ImportAction {
                     // Unknown format:
                     DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().notify(Localization.lang("Importing in unknown format") + "..."));
                     // This import method never throws an IOException:
-                    imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename, Globals.getFileUpdateMonitor()));
+                    imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename, prefs.getTimestampPreferences(), Globals.getFileUpdateMonitor()));
                 } else {
                     DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().notify(Localization.lang("Importing in %0 format", importer.get().getName()) + "..."));
                     // Specific importer:

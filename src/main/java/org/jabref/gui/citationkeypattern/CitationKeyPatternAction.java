@@ -1,8 +1,11 @@
 package org.jabref.gui.citationkeypattern;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
+
+import com.airhacks.afterburner.injection.Injector;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
@@ -18,6 +21,7 @@ public class CitationKeyPatternAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        new CitationKeyPatternDialog(frame.getCurrentLibraryTab()).showAndWait();
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+        dialogService.showCustomDialogAndWait(new CitationKeyPatternDialog(frame.getCurrentLibraryTab()));
     }
 }
