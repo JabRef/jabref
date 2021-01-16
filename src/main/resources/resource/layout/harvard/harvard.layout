@@ -7,7 +7,7 @@
 (\number)
 \end{number}
 \begin{editor}
-, }{\\i in }{\format[Authors(FirstFirst,FullName,NoPunc,And),RTFChars)]{\editor}, ed., \end{editor}
+, }{\\i in }{\format[Authors(FirstFirst,FullName,NoPunc,And),RTFChars]{\editor}, ed., \end{editor}
 \begin{booktitle}
 '\format[RTFChars]{\booktitle}'
 \end{booktitle}
