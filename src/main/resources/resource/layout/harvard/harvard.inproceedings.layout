@@ -1,4 +1,4 @@
-\format[Authors(LastFirst,Initials,FullPunc,Comma,And,inf),RTFChars]{\author} {\year}
+\format[Authors(LastFirst,Initials,FullPunc,Comma,And,inf),RTFChars]{\author} (\year)
 \format[RTFChars]{\title}
 , }{\\i in }{
 \begin{editor}
