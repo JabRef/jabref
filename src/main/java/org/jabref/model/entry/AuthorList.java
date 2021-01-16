@@ -301,6 +301,7 @@ public class AuthorList {
             latexFreeAuthors = new AuthorList(authors.stream()
                                                      .map(Author::latexFree)
                                                      .collect(Collectors.toUnmodifiableList()));
+            latexFreeAuthors.latexFreeAuthors = latexFreeAuthors;
         }
         return latexFreeAuthors;
     }
