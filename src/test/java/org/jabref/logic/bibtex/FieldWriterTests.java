@@ -22,7 +22,29 @@ class FieldWriterTests {
     void setUp() {
         this.writer = new FieldWriter(mock(FieldWriterPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
+    
+    
+    @Test
+    void includePreserveNewlineInAbstractField() throws Exception {
+        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum";
 
+        String result = writer.write(StandardField.ABSTRACT, text);
+        String expected = "{" + text + "}";
+
+        assertEquals(expected, result);
+    }
+    
+    @Test
+    void newlineInAbstractField() throws Exception {
+        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum";
+
+        String result = writer.write(StandardField.ABSTRACT, text);
+        String expected = "{" + text + "}";
+
+        assertEquals(expected, result);
+    }
+
+    
     @Test
     void normalizeNewlineInAbstractField() throws Exception {
         String text = "lorem" + OS.NEWLINE + " ipsum lorem ipsum\nlorem ipsum \rlorem ipsum\r\ntest";
@@ -33,16 +55,6 @@ class FieldWriterTests {
                 + OS.NEWLINE + "test" + "}";
 
         String result = writer.write(StandardField.ABSTRACT, text);
-
-        assertEquals(expected, result);
-    }
-
-    @Test
-    void preserveNewlineInAbstractField() throws Exception {
-        String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum";
-
-        String result = writer.write(StandardField.ABSTRACT, text);
-        String expected = "{" + text + "}";
 
         assertEquals(expected, result);
     }
