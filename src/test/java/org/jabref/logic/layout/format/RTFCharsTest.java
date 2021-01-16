@@ -185,9 +185,4 @@ class RTFCharsTest {
         assertEquals("\\'d6", formatter.format("\\\"O"));
         assertEquals("\\'dc", formatter.format("\\\"U"));
     }
-
-    @Test
-    void keepBraces() {
-        assertEquals("{Organization and JabRef}", formatter.format("{Organization and Jabef}"));
-    }
 }
