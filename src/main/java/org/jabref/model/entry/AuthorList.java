@@ -117,7 +117,7 @@ public class AuthorList {
 
     private static final WeakHashMap<String, AuthorList> AUTHOR_CACHE = new WeakHashMap<>();
     private final List<Author> authors;
-    private List<Author> latexFreeAuthors;
+    private AuthorList latexFreeAuthors;
 
     /**
      * Creates a new list of authors.
@@ -296,11 +296,11 @@ public class AuthorList {
         return authors;
     }
 
-    public List<Author> getLatexFreeAuthors() {
+    public AuthorList latexFree() {
         if (latexFreeAuthors == null) {
-            latexFreeAuthors = authors.stream()
-                                      .map(Author::latexFree)
-                                      .collect(Collectors.toUnmodifiableList());
+            latexFreeAuthors = new AuthorList(authors.stream()
+                                                     .map(Author::latexFree)
+                                                     .collect(Collectors.toUnmodifiableList()));
         }
         return latexFreeAuthors;
     }
@@ -319,10 +319,6 @@ public class AuthorList {
      */
     public String getAsNatbib() {
         return getAsNatbib(getAuthors());
-    }
-
-    public String getAsNatbibLatexFree() {
-        return getAsNatbib(getLatexFreeAuthors());
     }
 
     private static String getAsNatbib(List<Author> authors) {
@@ -353,10 +349,6 @@ public class AuthorList {
         return andCoordinatedConjunction(getAuthors(), Author::getLastOnly, oxfordComma);
     }
 
-    public String getAsLastNamesLatexFree(boolean oxfordComma) {
-        return andCoordinatedConjunction(getLatexFreeAuthors(), Author::getLastOnly, oxfordComma);
-    }
-
     /**
      * Returns the list of authors separated by commas with first names after last name; first names are abbreviated or not depending on parameter. If the list consists of three or more authors, "and" is inserted before the last author's name.
      * <p>
@@ -377,10 +369,6 @@ public class AuthorList {
      */
     public String getAsLastFirstNames(boolean abbreviate, boolean oxfordComma) {
         return andCoordinatedConjunction(getAuthors(), (auth) -> auth.getLastFirst(abbreviate), oxfordComma);
-    }
-
-    public String getAsLastFirstNamesLatexFree(boolean abbreviate, boolean oxfordComma) {
-        return andCoordinatedConjunction(getLatexFreeAuthors(), (auth) -> auth.getLastFirst(abbreviate), oxfordComma);
     }
 
     @Override
@@ -441,10 +429,6 @@ public class AuthorList {
      */
     public String getAsFirstLastNames(boolean abbreviate, boolean oxfordComma) {
         return andCoordinatedConjunction(getAuthors(), author -> author.getFirstLast(abbreviate), oxfordComma);
-    }
-
-    public String getAsFirstLastNamesLatexFree(boolean abbreviate, boolean oxfordComma) {
-        return andCoordinatedConjunction(getLatexFreeAuthors(), author -> author.getFirstLast(abbreviate), oxfordComma);
     }
 
     /**
