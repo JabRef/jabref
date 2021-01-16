@@ -5,24 +5,25 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.paging.Page;
 
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+
 public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher, PagedSearchBasedFetcher {
 
     @Override
-    default Page<BibEntry> performSearchPagedForTransformedQuery(String transformedQuery, int pageNumber) throws FetcherException {
+    default Page<BibEntry> performSearchPaged(QueryNode luceneQuery, int pageNumber) throws FetcherException {
         // ADR-0014
         URL urlForQuery;
         try {
-            urlForQuery = getURLForQuery(transformedQuery, pageNumber);
+            urlForQuery = getURLForQuery(luceneQuery, pageNumber);
         } catch (URISyntaxException | MalformedURLException e) {
             throw new FetcherException("Search URI crafted from complex search query is malformed", e);
         }
-        return new Page<>(transformedQuery, pageNumber, getBibEntries(urlForQuery));
+        return new Page<>(luceneQuery.toString(), pageNumber, getBibEntries(urlForQuery));
     }
 
     private List<BibEntry> getBibEntries(URL urlForQuery) throws FetcherException {
@@ -39,19 +40,18 @@ public interface PagedSearchBasedParserFetcher extends SearchBasedParserFetcher,
 
     /**
      * Constructs a URL based on the query, size and page number.
-     *
-     * @param transformedQuery      the search query
+     *  @param luceneQuery      the search query
      * @param pageNumber the number of the page indexed from 0
      */
-    URL getURLForQuery(String transformedQuery, int pageNumber) throws URISyntaxException, MalformedURLException;
+    URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException;
 
     @Override
-    default URL getURLForQuery(String transformedQuery) throws URISyntaxException, MalformedURLException, FetcherException {
-        return getURLForQuery(transformedQuery, 0);
+    default URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
+        return getURLForQuery(luceneQuery, 0);
     }
 
     @Override
-    default List<BibEntry> performSearchForTransformedQuery(String transformedQuery) throws FetcherException {
-        return new ArrayList<>(performSearchPagedForTransformedQuery(transformedQuery, 0).getContent());
+    default List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
+        return SearchBasedParserFetcher.super.performSearch(luceneQuery);
     }
 }

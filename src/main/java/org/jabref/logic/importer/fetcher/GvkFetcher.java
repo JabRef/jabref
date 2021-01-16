@@ -11,11 +11,11 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
-import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
 import org.jabref.logic.importer.fetcher.transformators.GVKQueryTransformer;
 import org.jabref.logic.importer.fileformat.GvkParser;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 public class GvkFetcher implements SearchBasedParserFetcher {
 
@@ -38,11 +38,11 @@ public class GvkFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(String transformedQuery, AbstractQueryTransformer transformer) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(URL_PATTERN);
         uriBuilder.addParameter("version", "1.1");
         uriBuilder.addParameter("operation", "searchRetrieve");
-        uriBuilder.addParameter("query", transformedQuery);
+        uriBuilder.addParameter("query", new GVKQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
         uriBuilder.addParameter("maximumRecords", "50");
         uriBuilder.addParameter("recordSchema", "picaxml");
         uriBuilder.addParameter("sortKeys", "Year,,1");
@@ -52,10 +52,5 @@ public class GvkFetcher implements SearchBasedParserFetcher {
     @Override
     public Parser getParser() {
         return new GvkParser();
-    }
-
-    @Override
-    public AbstractQueryTransformer getQueryTransformer() {
-        return new GVKQueryTransformer();
     }
 }

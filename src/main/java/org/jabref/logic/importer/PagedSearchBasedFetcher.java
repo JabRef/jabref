@@ -3,24 +3,27 @@ package org.jabref.logic.importer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.paging.Page;
+
+import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+import org.apache.lucene.queryparser.flexible.core.parser.SyntaxParser;
+import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 
 public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
 
     /**
-     * @param transformedQuery the complex query defining all fielded search parameters
+     * @param luceneQuery the root node of the lucene query
      * @param pageNumber       requested site number indexed from 0
      * @return Page with search results
      */
-    Page<BibEntry> performSearchPagedForTransformedQuery(String transformedQuery, int pageNumber) throws FetcherException;
+    Page<BibEntry> performSearchPaged(QueryNode luceneQuery, int pageNumber) throws FetcherException;
 
     /**
-     * @param searchQuery query string that can be parsed into a complex search query
+     * @param searchQuery query string that can be parsed into a lucene query
      * @param pageNumber  requested site number indexed from 0
      * @return Page with search results
      */
@@ -28,11 +31,13 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
         if (searchQuery.isBlank()) {
             return new Page<>(searchQuery, pageNumber, Collections.emptyList());
         }
-        resetTransformer();
-        AbstractQueryTransformer transformer = getQueryTransformer();
-        Optional<String> transformedQuery = transformer.parseQueryStringIntoComplexQuery(searchQuery);
-        // Otherwise just use query as a default term
-        return this.performSearchPagedForTransformedQuery(transformedQuery.orElse(""), pageNumber);
+        SyntaxParser parser = new StandardSyntaxParser();
+        final String NO_EXPLICIT_FIELD = "default";
+        try {
+            return this.performSearchPaged(parser.parse(searchQuery, NO_EXPLICIT_FIELD), pageNumber);
+        } catch (QueryNodeParseException e) {
+            throw new FetcherException("An error occurred during parsing of the query.");
+        }
     }
 
     /**
@@ -42,8 +47,14 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
         return 20;
     }
 
-    @Override
-    default List<BibEntry> performSearchForTransformedQuery(String transformedQuery) throws FetcherException {
-        return new ArrayList<>(performSearchPagedForTransformedQuery(transformedQuery, 0).getContent());
+    /**
+     * This method is used to send complex queries using fielded search.
+     *
+     * @param luceneQuery the root node of the lucene query
+     * @return a list of {@link BibEntry}, which are matched by the query (may be empty)
+     */
+    default List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
+        return new ArrayList<>(performSearchPaged(luceneQuery, 0).getContent());
     }
+
 }

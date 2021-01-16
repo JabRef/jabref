@@ -3,16 +3,12 @@ package org.jabref.logic.importer.fetcher.transformators;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.JabRefException;
-
-import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
 import org.apache.lucene.queryparser.flexible.core.nodes.BooleanQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.GroupQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.ModifierQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.OrQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
-import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,8 +17,8 @@ import org.slf4j.LoggerFactory;
  * Otherwise, a single instance QueryTransformer can be used.
  */
 public abstract class AbstractQueryTransformer {
+    public static final String NO_EXPLICIT_FIELD = "default";
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractQueryTransformer.class);
-    private static final String NO_EXPLICIT_FIELD = "default";
 
     /**
      * Transforms a and b and c to (a AND b AND c), where
@@ -180,19 +176,15 @@ public abstract class AbstractQueryTransformer {
      * Parses the given query string into a complex query using lucene.
      * Note: For unique fields, the alphabetically and numerically first instance in the query string is used in the complex query.
      *
-     * @param query The given query string
-     * @return A complex query containing all fields of the query string
+     * @param luceneQuery The lucene query tp transform
+     * @return A query string containing all fields that are contained in the original lucene query and
+     * that are expressible in the library specific query language, other information either is discarded or
+     * stored as part of the state of the transformer if it can be used e.g. as a URL parameter for the query.
      */
-    public Optional<String> parseQueryStringIntoComplexQuery(String query) throws JabRefException {
-        StandardSyntaxParser parser = new StandardSyntaxParser();
-        try {
-            QueryNode luceneQuery = parser.parse(query, NO_EXPLICIT_FIELD);
-            Optional<String> transformedQuery = transform(luceneQuery);
-            transformedQuery = transformedQuery.map(this::removeOuterBraces);
-            return transformedQuery;
-        } catch (QueryNodeParseException e) {
-            throw new JabRefException("Error parsing query", e);
-        }
+    public Optional<String> transformLuceneQuery(QueryNode luceneQuery) {
+        Optional<String> transformedQuery = transform(luceneQuery);
+        transformedQuery = transformedQuery.map(this::removeOuterBraces);
+        return transformedQuery;
     }
 
     /**

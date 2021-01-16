@@ -14,7 +14,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
-import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
+import org.jabref.logic.importer.fetcher.transformators.DefaultQueryTransformer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -22,6 +22,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 public class CollectionOfComputerScienceBibliographiesFetcher implements SearchBasedParserFetcher {
 
@@ -34,9 +35,9 @@ public class CollectionOfComputerScienceBibliographiesFetcher implements SearchB
     }
 
     @Override
-    public URL getURLForQuery(String transformedQuery, AbstractQueryTransformer transformer) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
         return new URIBuilder(BASIC_SEARCH_URL)
-                .addParameter("query", transformedQuery)
+                .addParameter("query", new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""))
                 .addParameter("sort", "score")
                 .build()
                 .toURL();

@@ -1,12 +1,9 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.logic.JabRefException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
 import org.jabref.logic.importer.fetcher.transformators.GVKQueryTransformer;
@@ -16,6 +13,9 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
+import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -69,16 +69,16 @@ public class GvkFetcherTest {
     @Test
     public void simpleSearchQueryURLCorrect() throws Exception {
         String query = "java jdk";
-        AbstractQueryTransformer transformer = new GVKQueryTransformer();
-        URL url = fetcher.getURLForQuery(transformer.parseQueryStringIntoComplexQuery(query).get(), transformer);
+        QueryNode luceneQuery = new StandardSyntaxParser().parse(query, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
+        URL url = fetcher.getURLForQuery(luceneQuery);
         assertEquals("http://sru.gbv.de/gvk?version=1.1&operation=searchRetrieve&query=pica.all%3D%22java%22+and+pica.all%3D%22jdk%22&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1", url.toString());
     }
 
     @Test
     public void complexSearchQueryURLCorrect() throws Exception {
         String query = "kon:java tit:jdk";
-        AbstractQueryTransformer transformer = new GVKQueryTransformer();
-        URL url = fetcher.getURLForQuery(transformer.parseQueryStringIntoComplexQuery(query).get(), new GVKQueryTransformer());
+        QueryNode luceneQuery = new StandardSyntaxParser().parse(query, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
+        URL url = fetcher.getURLForQuery(luceneQuery);
         assertEquals("http://sru.gbv.de/gvk?version=1.1&operation=searchRetrieve&query=pica.kon%3D%22java%22+and+pica.tit%3D%22jdk%22&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1", url.toString());
     }
 

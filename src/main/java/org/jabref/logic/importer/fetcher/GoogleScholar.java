@@ -19,7 +19,6 @@ import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
 import org.jabref.logic.importer.fetcher.transformators.ScholarQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
@@ -30,6 +29,7 @@ import org.jabref.model.paging.Page;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -51,7 +51,6 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
     private static final int NUM_RESULTS = 10;
 
     private final ImportFormatPreferences importFormatPreferences;
-    private ScholarQueryTransformer transformer;
 
     public GoogleScholar(ImportFormatPreferences importFormatPreferences) {
         Objects.requireNonNull(importFormatPreferences);
@@ -178,20 +177,20 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
     }
 
     @Override
-    public Page<BibEntry> performSearchPagedForTransformedQuery(String transformedQuery, int pageNumber) throws FetcherException {
+    public Page<BibEntry> performSearchPaged(QueryNode luceneQuery, int pageNumber) throws FetcherException {
+        ScholarQueryTransformer queryTransformer = new ScholarQueryTransformer();
+        String transformedQuery = queryTransformer.transformLuceneQuery(luceneQuery).orElse("");
         try {
             obtainAndModifyCookie();
             List<BibEntry> foundEntries = new ArrayList<>(10);
-
             URIBuilder uriBuilder = new URIBuilder(BASIC_SEARCH_URL);
             uriBuilder.addParameter("hl", "en");
             uriBuilder.addParameter("btnG", "Search");
             uriBuilder.addParameter("q", transformedQuery);
             uriBuilder.addParameter("start", String.valueOf(pageNumber * getPageSize()));
             uriBuilder.addParameter("num", String.valueOf(getPageSize()));
-            ScholarQueryTransformer scholarQueryTransformer = transformer;
-            uriBuilder.addParameter("as_ylo", String.valueOf(scholarQueryTransformer.getStartYear()));
-            uriBuilder.addParameter("as_yhi", String.valueOf(scholarQueryTransformer.getEndYear()));
+            uriBuilder.addParameter("as_ylo", String.valueOf(queryTransformer.getStartYear()));
+            uriBuilder.addParameter("as_yhi", String.valueOf(queryTransformer.getEndYear()));
 
             try {
                 addHitsFromQuery(foundEntries, uriBuilder.toString());
@@ -216,18 +215,5 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
         } catch (URISyntaxException e) {
             throw new FetcherException("Error while fetching from " + getName(), e);
         }
-    }
-
-    @Override
-    public AbstractQueryTransformer getQueryTransformer() {
-        if (Objects.isNull(transformer)) {
-            transformer = new ScholarQueryTransformer();
-        }
-        return transformer;
-    }
-
-    @Override
-    public void resetTransformer() {
-        transformer = null;
     }
 }

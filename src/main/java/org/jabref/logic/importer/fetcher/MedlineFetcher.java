@@ -28,6 +28,7 @@ import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.importer.fetcher.transformators.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.MedlineImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -35,6 +36,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -196,14 +198,16 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
     }
 
     @Override
-    public List<BibEntry> performSearchForTransformedQuery(String transformedQuery) throws FetcherException {
+    public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
         List<BibEntry> entryList;
+        DefaultQueryTransformer transformer = new DefaultQueryTransformer();
+        Optional<String> transformedQuery = transformer.transformLuceneQuery(luceneQuery);
 
-        if (transformedQuery.isBlank()) {
+        if (transformedQuery.isEmpty() || transformedQuery.get().isBlank()) {
             return Collections.emptyList();
         } else {
             // searching for pubmed ids matching the query
-            List<String> idList = getPubMedIdsFromQuery(transformedQuery);
+            List<String> idList = getPubMedIdsFromQuery(transformedQuery.get());
 
             if (idList.isEmpty()) {
                 LOGGER.info("No results found.");

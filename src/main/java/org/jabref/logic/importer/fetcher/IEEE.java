@@ -15,11 +15,11 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
-import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
 import org.jabref.logic.importer.fetcher.transformators.IEEEQueryTransformer;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.BuildInfo;
@@ -33,6 +33,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +57,6 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
     private static final String API_KEY = new BuildInfo().ieeeAPIKey;
 
     private final ImportFormatPreferences preferences;
-    private IEEEQueryTransformer transformer;
 
     public IEEE(ImportFormatPreferences preferences) {
         this.preferences = Objects.requireNonNull(preferences);
@@ -225,26 +225,27 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(String transformedQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
+        IEEEQueryTransformer transformer = new IEEEQueryTransformer();
+        String transformedQuery = transformer.transformLuceneQuery(luceneQuery).orElse("");
         URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
         uriBuilder.addParameter("apikey", API_KEY);
         if (!transformedQuery.isBlank()) {
             uriBuilder.addParameter("querytext", transformedQuery);
         }
         uriBuilder.addParameter("max_records", String.valueOf(getPageSize()));
-        IEEEQueryTransformer ieeeQueryTransformer = transformer;
         // Currently not working as part of the query string
-        if ((ieeeQueryTransformer).getJournal().isPresent()) {
-            uriBuilder.addParameter("publication_title", ieeeQueryTransformer.getJournal().get());
+        if (transformer.getJournal().isPresent()) {
+            uriBuilder.addParameter("publication_title", transformer.getJournal().get());
         }
-        if (ieeeQueryTransformer.getStartYear().isPresent()) {
-            uriBuilder.addParameter("start_year", String.valueOf(ieeeQueryTransformer.getStartYear().get()));
+        if (transformer.getStartYear().isPresent()) {
+            uriBuilder.addParameter("start_year", String.valueOf(transformer.getStartYear().get()));
         }
-        if (ieeeQueryTransformer.getEndYear().isPresent()) {
-            uriBuilder.addParameter("end_year", String.valueOf(ieeeQueryTransformer.getEndYear().get()));
+        if (transformer.getEndYear().isPresent()) {
+            uriBuilder.addParameter("end_year", String.valueOf(transformer.getEndYear().get()));
         }
-        if (ieeeQueryTransformer.getArticleNumber().isPresent()) {
-            uriBuilder.addParameter("article_number", String.valueOf(ieeeQueryTransformer.getArticleNumber().get()));
+        if (transformer.getArticleNumber().isPresent()) {
+            uriBuilder.addParameter("article_number", transformer.getArticleNumber().get());
         }
         // Starts to index at 1 for the first entry
         uriBuilder.addParameter("start_record", String.valueOf(getPageSize() * pageNumber) + 1);
@@ -252,18 +253,5 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
         URLDownload.bypassSSLVerification();
 
         return uriBuilder.build().toURL();
-    }
-
-    @Override
-    public AbstractQueryTransformer getQueryTransformer() {
-        if (Objects.isNull(transformer)) {
-            transformer = new IEEEQueryTransformer();
-        }
-        return transformer;
-    }
-
-    @Override
-    public void resetTransformer() {
-        transformer = null;
     }
 }

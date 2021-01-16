@@ -26,6 +26,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 /**
  * Fetches BibTeX data from DBLP (dblp.org)
@@ -44,9 +45,9 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(String transformedQuery, AbstractQueryTransformer transformer) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(BASIC_SEARCH_URL);
-        uriBuilder.addParameter("q", transformedQuery);
+        uriBuilder.addParameter("q", new DBLPQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
         uriBuilder.addParameter("h", String.valueOf(100)); // number of hits
         uriBuilder.addParameter("c", String.valueOf(0)); // no need for auto-completion
         uriBuilder.addParameter("f", String.valueOf(0)); // "from", index of first hit to download
@@ -82,10 +83,5 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
     @Override
     public Optional<HelpFile> getHelpPage() {
         return Optional.of(HelpFile.FETCHER_DBLP);
-    }
-
-    @Override
-    public AbstractQueryTransformer getQueryTransformer() {
-        return new DBLPQueryTransformer();
     }
 }

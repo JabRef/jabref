@@ -1,5 +1,8 @@
 package org.jabref.logic.importer.fetcher.transformators;
 
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class ScholarQueryTransformerTest implements InfixTransformerTest {
@@ -33,7 +36,10 @@ class ScholarQueryTransformerTest implements InfixTransformerTest {
     public void convertYearField() throws Exception {
         ScholarQueryTransformer transformer = ((ScholarQueryTransformer) getTransformator());
 
-        transformer.parseQueryStringIntoComplexQuery("year:2021");
+        String queryString = "year:2021";
+        QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
+        transformer.transformLuceneQuery(luceneQuery);
+
 
         assertEquals(2021, transformer.getStartYear());
         assertEquals(2021, transformer.getEndYear());
@@ -44,7 +50,9 @@ class ScholarQueryTransformerTest implements InfixTransformerTest {
 
         ScholarQueryTransformer transformer = ((ScholarQueryTransformer) getTransformator());
 
-        transformer.parseQueryStringIntoComplexQuery("year-range:2018-2021");
+        String queryString = "year-range:2018-2021";
+        QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
+        transformer.transformLuceneQuery(luceneQuery);
 
         assertEquals(2018, transformer.getStartYear());
         assertEquals(2021, transformer.getEndYear());

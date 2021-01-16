@@ -17,6 +17,7 @@ import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,7 +94,7 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
      * Not used
      */
     @Override
-    public List<BibEntry> performSearchForTransformedQuery(String transformedQuery) throws FetcherException {
+    public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
         return Collections.emptyList();
     }
 }

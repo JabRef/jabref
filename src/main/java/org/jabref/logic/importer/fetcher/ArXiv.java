@@ -23,7 +23,6 @@ import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
-import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
 import org.jabref.logic.importer.fetcher.transformators.ArXivQueryTransformer;
 import org.jabref.logic.util.io.XMLUtil;
 import org.jabref.logic.util.strings.StringSimilarity;
@@ -38,6 +37,7 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -62,7 +62,6 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
     private static final String API_URL = "https://export.arxiv.org/api/query";
 
     private final ImportFormatPreferences importFormatPreferences;
-    private ArXivQueryTransformer transformer;
 
     public ArXiv(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
@@ -255,24 +254,25 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
     /**
      * Constructs a complex query string using the field prefixes specified at https://arxiv.org/help/api/user-manual
      *
-     * @param transformedQuery the search query defining all fielded search parameters
+     * @param luceneQuery the root node of the lucene query
      * @return A list of entries matching the complex query
      */
     @Override
-    public Page<BibEntry> performSearchPagedForTransformedQuery(String transformedQuery, int pageNumber) throws FetcherException {
+    public Page<BibEntry> performSearchPaged(QueryNode luceneQuery, int pageNumber) throws FetcherException {
+        ArXivQueryTransformer transformer = new ArXivQueryTransformer();
+        String transformedQuery = transformer.transformLuceneQuery(luceneQuery).orElse("");
         List<BibEntry> searchResult = searchForEntries(transformedQuery, pageNumber).stream()
                                                                                     .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
                                                                                     .collect(Collectors.toList());
-        return new Page<>(transformedQuery, pageNumber, filterYears(searchResult));
+        return new Page<>(transformedQuery, pageNumber, filterYears(searchResult, transformer));
     }
 
-    private List<BibEntry> filterYears(List<BibEntry> searchResult) {
-        ArXivQueryTransformer arXivQueryTransformer = transformer;
+    private List<BibEntry> filterYears(List<BibEntry> searchResult, ArXivQueryTransformer transformer) {
         return searchResult.stream()
                            .filter(entry -> entry.getField(StandardField.DATE).isPresent())
                            // Filter the date field for year only
-                           .filter(entry -> !arXivQueryTransformer.getEndYear().isPresent() || Integer.parseInt(entry.getField(StandardField.DATE).get().substring(0, 4)) <= arXivQueryTransformer.getEndYear().get())
-                           .filter(entry -> !arXivQueryTransformer.getStartYear().isPresent() || Integer.parseInt(entry.getField(StandardField.DATE).get().substring(0, 4)) >= arXivQueryTransformer.getStartYear().get())
+                           .filter(entry -> transformer.getEndYear().isEmpty() || Integer.parseInt(entry.getField(StandardField.DATE).get().substring(0, 4)) <= transformer.getEndYear().get())
+                           .filter(entry -> transformer.getStartYear().isEmpty() || Integer.parseInt(entry.getField(StandardField.DATE).get().substring(0, 4)) >= transformer.getStartYear().get())
                            .collect(Collectors.toList());
     }
 
@@ -421,15 +421,5 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
             getPdfUrl().ifPresent(url -> bibEntry.setFiles(Collections.singletonList(new LinkedFile(url, "PDF"))));
             return bibEntry;
         }
-    }
-
-    @Override
-    public AbstractQueryTransformer getQueryTransformer() {
-        return new ArXivQueryTransformer();
-    }
-
-    @Override
-    public void resetTransformer() {
-        transformer = null;
     }
 }

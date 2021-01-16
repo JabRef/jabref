@@ -2,12 +2,16 @@ package org.jabref.logic.importer;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
-import org.jabref.logic.importer.fetcher.transformators.DefaultQueryTransformer;
 import org.jabref.model.entry.BibEntry;
+
+import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+import org.apache.lucene.queryparser.flexible.core.parser.SyntaxParser;
+import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
+
+import static org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer.NO_EXPLICIT_FIELD;
 
 /**
  * Searches web resources for bibliographic information based on a free-text query.
@@ -18,38 +22,27 @@ public interface SearchBasedFetcher extends WebFetcher {
     /**
      * This method is used to send complex queries using fielded search.
      *
-     * @param transformedQuery the search query defining all fielded search parameters
+     * @param luceneQuery the root node of the lucene query
      * @return a list of {@link BibEntry}, which are matched by the query (may be empty)
      */
-    List<BibEntry> performSearchForTransformedQuery(String transformedQuery) throws FetcherException;
+    List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException;
 
     /**
      * Looks for hits which are matched by the given free-text query.
      *
-     * @param searchQuery query string that can be parsed into a complex search query
+     * @param searchQuery query string that can be parsed into a lucene query
      * @return a list of {@link BibEntry}, which are matched by the query (may be empty)
      */
-    default List<BibEntry> performSearch(String searchQuery) throws JabRefException {
-        resetTransformer();
-        AbstractQueryTransformer transformer = getQueryTransformer();
+    default List<BibEntry> performSearch(String searchQuery) throws FetcherException {
         if (searchQuery.isBlank()) {
             return Collections.emptyList();
         }
-        Optional<String> transformedQuery;
+        SyntaxParser parser = new StandardSyntaxParser();
+
         try {
-            transformedQuery = transformer.parseQueryStringIntoComplexQuery(searchQuery);
-        } catch (JabRefException e) {
-            throw new FetcherException("Error occured during query transformation", e);
+            return this.performSearch(parser.parse(searchQuery, NO_EXPLICIT_FIELD));
+        } catch (QueryNodeParseException e) {
+            throw new FetcherException("An error occured when parsing the query");
         }
-        // Otherwise just use query as a default term
-        return this.performSearchForTransformedQuery(transformedQuery.orElse(""));
-    }
-
-    default AbstractQueryTransformer getQueryTransformer() {
-        return new DefaultQueryTransformer();
-    }
-
-    default void resetTransformer() {
-
     }
 }
