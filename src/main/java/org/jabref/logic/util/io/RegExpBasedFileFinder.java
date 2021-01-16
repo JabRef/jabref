@@ -195,7 +195,7 @@ class RegExpBasedFileFinder implements FileFinder {
                         resultFiles.addAll(findFile(entry, path, restOfFileString, extensionRegExp));
                     }
                 } catch (UncheckedIOException ioe) {
-                    throw new IOException(ioe);
+                    throw ioe.getCause();
                 }
             } // End process directory information
         }
@@ -206,7 +206,7 @@ class RegExpBasedFileFinder implements FileFinder {
         try (Stream<Path> pathStream = Files.find(actualDirectory, 1, matcher, FileVisitOption.FOLLOW_LINKS)) {
             resultFiles.addAll(pathStream.collect(Collectors.toList()));
         } catch (UncheckedIOException uncheckedIOException) {
-            throw new IOException(uncheckedIOException);
+            throw uncheckedIOException.getCause();
         }
         return resultFiles;
     }
