@@ -3,7 +3,6 @@ package org.jabref.logic.importer;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.logic.JabRefException;
 import org.jabref.model.entry.BibEntry;
 
 import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;

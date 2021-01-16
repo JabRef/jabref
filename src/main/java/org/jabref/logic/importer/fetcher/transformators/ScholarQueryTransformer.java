@@ -60,6 +60,6 @@ public class ScholarQueryTransformer extends AbstractQueryTransformer {
     }
 
     public int getEndYear() {
-        return endYear == Integer.MIN_VALUE ? Integer.MAX_VALUE: endYear;
+        return endYear == Integer.MIN_VALUE ? Integer.MAX_VALUE : endYear;
     }
 }

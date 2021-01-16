@@ -61,6 +61,6 @@ public class DBLPQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleUnFieldedTerm(String term) {
-        return String.format("\"%s\"",term);
+        return String.format("\"%s\"", term);
     }
 }
