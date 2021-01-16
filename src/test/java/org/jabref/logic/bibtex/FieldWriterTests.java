@@ -23,8 +23,9 @@ class FieldWriterTests {
         this.writer = new FieldWriter(mock(FieldWriterPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
     
+    
     @Test
-    void preserveNewlineInAbstractField() throws Exception {
+    void includePreserveNewlineInAbstractField() throws Exception {
         String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum";
 
         String result = writer.write(StandardField.ABSTRACT, text);
