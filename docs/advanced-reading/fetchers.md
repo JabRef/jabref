@@ -1,4 +1,4 @@
-# Working on fetchers
+# Information about Fetchers
 
 Fetchers are the implementation of the [search using online services](https://docs.jabref.org/collect/import-using-online-bibliographic-database). Some fetchers require API keys to get them working. To get the fetchers running in a JabRef development setup, the keys need to be placed in the respective environment variable. The following table lists the respective fetchers, where to get the key from and the environment variable where the key has to be placed.
 
@@ -13,6 +13,42 @@ Fetchers are the implementation of the [search using online services](https://do
 "Depending on the current network" means that it depends whether your request is routed through a network having paid access. For instance, some universities have subscriptions to MathSciNet.
 
 On Windows, you have to log-off and log-on to let IntelliJ know about the environment variable change. Execute the gradle task "processResources" in the group "others" within IntelliJ to ensure the values have been correctly written. Now, the fetcher tests should run without issues.
+
+## Fulltext Fetchers
+
+- all fulltext fetchers run in parallel
+- the result with the highest priority wins
+- `InterruptedException` | `ExecutionException` | `CancellationException` are ignored
+
+### Trust Levels
+
+- SOURCE (highest): definitive URL for a particular paper
+- PUBLISHER: any publisher library
+- PREPRINT: any preprint library that might include non final publications of a paper
+- META_SEARCH: meta search engines
+- UNKNOWN (lowest): anything else not fitting the above categories
+
+### Current trust levels
+
+All fetchers are contained in the package `org.jabref.logic.importer.fetcher`.
+Here we list the trust levels of some of them:
+
+- DOI: SOURCE, as the DOI is always forwarded to the correct publisher page for the paper
+- ScienceDirect: Publisher
+- Springer: Publisher
+- ACS: Publisher
+- IEEE: Publisher
+- Google Scholar: META_SEARCH, because it is a search engine
+- Arxiv: PREPRINT, because preprints are published there
+- OpenAccessDOI: META_SEARCH
+
+Reasoning:
+
+- A DOI uniquely identifies a paper. Per definition, a DOI leads to the right paper. Everything else is good guessing.
+- We assume the DOI resolution surely points to the correct paper and that publisher fetches may have errors: For instance, a title of a paper may lead to different publications of it. One the conference version, the other the journal version. --> the PDF could be chosen randomly
+
+
+Code was first introduced at [PR#3882](https://github.com/JabRef/jabref/pull/3882).
 
 ## Background on embedding the keys in JabRef
 
