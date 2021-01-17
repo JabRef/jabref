@@ -56,7 +56,7 @@
                                 <CheckTreeView fx:id="tree"/>
                             </ScrollPane>
                         </TitledPane>
-                        <TitledPane fx:id="resultPane" text="%Import result" visible="false">
+                        <TitledPane fx:id="resultPane" text="%Import result" disable="true">
                             <TableView fx:id="tvResult" editable="true" visible="false">
                                 <columns>
                                     <TableColumn fx:id="colStatus" prefWidth="100.0" text="%Status"/>

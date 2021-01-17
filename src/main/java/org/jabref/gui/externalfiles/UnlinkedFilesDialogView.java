@@ -143,7 +143,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         progressPane.managedProperty().bind(viewModel.searchProgressVisible());
         progressPane.visibleProperty().bind(viewModel.searchProgressVisible());
         accordion.disableProperty().bind(viewModel.searchProgressVisible());
-        resultPane.visibleProperty().bind(viewModel.resultPaneVisble());
+        resultPane.disableProperty().bind(viewModel.resultPaneVisble().not());
         tree.maxHeightProperty().bind(((Control) filePane.contentProperty().get()).heightProperty());
 
         viewModel.filePaneExpanded().bindBidirectional(filePane.expandedProperty());
