@@ -9,13 +9,11 @@ import java.util.Optional;
 import javafx.collections.FXCollections;
 import javafx.scene.Scene;
 
-import org.jabref.gui.theme.ThemeManagerImpl;
-import org.jabref.gui.theme.ThemePreference;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.ThemeManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-
 import org.jabref.preferences.AppearancePreferences;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;

@@ -29,7 +29,7 @@ public class ThemePreference {
             this.type = Type.CUSTOM;
         }
         this.additionalStylesheet = switch (type) {
-            case LIGHT -> StyleSheetEmpty.EMPTY;
+            case LIGHT -> StyleSheet.create("Light.css");
             case DARK -> StyleSheet.create("Dark.css");
             case CUSTOM -> StyleSheet.create(name);
         };

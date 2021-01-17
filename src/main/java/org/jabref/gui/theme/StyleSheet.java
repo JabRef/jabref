@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 abstract class StyleSheet {
 
     static final String DATA_URL_PREFIX = "data:text/css;charset=utf-8;base64,";
-    static final URL EMPTY_SCENE_CSS = JabRefFrame.class.getResource("Empty.css");
+    static final URL LIGHT_SCENE_ADDITIONAL_CSS = JabRefFrame.class.getResource("Light.css");
     static final String EMPTY_WEBENGINE_CSS = DATA_URL_PREFIX;
 
     static final Logger LOGGER = LoggerFactory.getLogger(StyleSheet.class);
@@ -41,20 +41,23 @@ abstract class StyleSheet {
                 url = null;
             }
         }
-        if (url == null) {
-            return StyleSheetEmpty.EMPTY;
-        } else if ("file".equals(url.getProtocol())) {
-            return new StyleSheetFile(url);
-        } else {
-            /*
+
+        /*
             TODO: embedding CSS in a data URL is only desirable in file URLs, as protection against the file being
              removed. This is built into StyleSheetFile (see StyleSheetFile.MAX_IN_MEMORY_CSS_LENGTH for details on
              caching). However, there is a bug in OpenJFX, in that WebEngine does not recognise jrt URLs (modular java
              runtime URLs). This is detailed in https://bugs.openjdk.java.net/browse/JDK-8240969.
              When we upgrade to OpenJFX 16, we no longer need to wrap built in themes as data URLs. Note that we
              already do not wrap the base stylesheet, because it is not used to style the WebEngine. WebEngine is
-             used for the Preview Viewer and this does not use the base CSS.
-             */
+             used for the Preview Viewer and this does not use the base CSS. This is why we already use StyleSheetResource
+             for Base.css.
+        */
+
+        if (url == null) {
+            return new StyleSheetDataUrl(LIGHT_SCENE_ADDITIONAL_CSS);
+        } else if ("file".equals(url.getProtocol())) {
+            return new StyleSheetFile(url);
+        } else {
             if ("Base.css".equals(name)) {
                 return new StyleSheetResource(url);
             } else {

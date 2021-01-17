@@ -95,12 +95,12 @@ final class StyleSheetFile extends StyleSheet {
 
         if (!Files.exists(path)) {
             LOGGER.warn("Not loading additional css file {} because it could not be found", path);
-            return EMPTY_SCENE_CSS;
+            return LIGHT_SCENE_ADDITIONAL_CSS;
         }
 
         if (Files.isDirectory(path)) {
             LOGGER.warn("Not loading additional css file {} because it is a directory", path);
-            return EMPTY_SCENE_CSS;
+            return LIGHT_SCENE_ADDITIONAL_CSS;
         }
 
         return url;
