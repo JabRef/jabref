@@ -344,7 +344,7 @@ class MSBibEntry {
         });
 
         parsedDateAcesseField.flatMap(Date::getMonth)
-                             .map(Month::getTwoDigitNumber).ifPresent(monthAcessed -> {
+                             .map(Month::getFullName).ifPresent(monthAcessed -> {
             addField(document, rootNode, "Month" + "Accessed", monthAcessed);
         });
         parsedDateAcesseField.flatMap(Date::getDay).map(Object::toString).ifPresent(dayAccessed -> {
