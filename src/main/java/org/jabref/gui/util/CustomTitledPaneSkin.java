@@ -67,6 +67,7 @@ public class CustomTitledPaneSkin extends TitledPaneSkin {
      **********************************************************/
 
     private final Region title;
+    private final Region arrowButton;
     private final Region arrow;
     private final Text text;
 
@@ -83,7 +84,8 @@ public class CustomTitledPaneSkin extends TitledPaneSkin {
     public CustomTitledPaneSkin(TitledPane control) {
         super(control);
         title = (Region) Objects.requireNonNull(control.lookup(".title"));
-        arrow = (Region) Objects.requireNonNull(title.lookup(".arrow-button"));
+        arrowButton = (Region) Objects.requireNonNull(title.lookup(".arrow-button"));
+        arrow = (Region) Objects.requireNonNull(arrowButton.lookup(".arrow"));
         text = (Text) Objects.requireNonNull(title.lookup(".text"));
 
         // based on https://stackoverflow.com/a/55156460/3450689
@@ -115,21 +117,15 @@ public class CustomTitledPaneSkin extends TitledPaneSkin {
 
         arrowTranslateBinding = Bindings.createDoubleBinding(() -> {
             double rightInset = title.getPadding().getRight();
-            return title.getWidth() - arrow.getLayoutX() - arrow.getWidth() - rightInset;
-        }, title.paddingProperty(), title.widthProperty(), arrow.widthProperty(), arrow.layoutXProperty());
-        arrow.translateXProperty().bind(arrowTranslateBinding);
+            return title.getWidth() - arrowButton.getLayoutX() - arrowButton.getWidth() - rightInset;
+        }, title.paddingProperty(), title.widthProperty(), arrowButton.widthProperty(), arrowButton.layoutXProperty());
+        arrowButton.translateXProperty().bind(arrowTranslateBinding);
 
-        textGraphicTranslateBinding = Bindings.createDoubleBinding(() -> {
-            switch (getSkinnable().getAlignment()) {
-                case TOP_CENTER:
-                case CENTER:
-                case BOTTOM_CENTER:
-                case BASELINE_CENTER:
-                    return 0.0;
-                default:
-                    return -(arrow.getWidth());
-            }
-        }, getSkinnable().alignmentProperty(), arrow.widthProperty());
+        textGraphicTranslateBinding = Bindings.createDoubleBinding(
+                () -> switch (getSkinnable().getAlignment()) {
+                    case TOP_CENTER, CENTER, BOTTOM_CENTER, BASELINE_CENTER -> 0.0;
+                    default -> -(arrowButton.getWidth());
+                }, getSkinnable().alignmentProperty(), arrowButton.widthProperty());
         text.translateXProperty().bind(textGraphicTranslateBinding);
 
         graphic = getSkinnable().getGraphic();
@@ -140,8 +136,8 @@ public class CustomTitledPaneSkin extends TitledPaneSkin {
 
     private void clearBindings() {
         if (arrowTranslateBinding != null) {
-            arrow.translateXProperty().unbind();
-            arrow.setTranslateX(0);
+            arrowButton.translateXProperty().unbind();
+            arrowButton.setTranslateX(0);
             arrowTranslateBinding.dispose();
             arrowTranslateBinding = null;
         }
