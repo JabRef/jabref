@@ -59,10 +59,10 @@ import org.jabref.gui.push.PushToVim;
 import org.jabref.gui.push.PushToWinEdt;
 import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
-import org.jabref.gui.theme.ThemeImpl;
+import org.jabref.gui.theme.ThemeManagerImpl;
 import org.jabref.gui.theme.ThemePreference;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.util.Theme;
+import org.jabref.gui.util.ThemeManager;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
@@ -410,7 +410,7 @@ public class JabRefPreferences implements PreferencesService {
 
     private Set<CustomImporter> customImporters;
 
-    private Theme globalTheme;
+    private ThemeManager themeManager;
     private FileUpdateMonitor fileUpdateMonitor;
 
     // The constructor is made private to enforce this as a singleton class:
@@ -682,7 +682,7 @@ public class JabRefPreferences implements PreferencesService {
                         "</font>__NEWLINE__");
 
         // set default theme
-        defaults.put(FX_THEME, Theme.BASE_CSS);
+        defaults.put(FX_THEME, ThemePreference.BASE_CSS);
 
         setLanguageDependentDefaultValues();
     }
@@ -1993,21 +1993,21 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public Theme getTheme() {
-        if (globalTheme == null) {
-            globalTheme = new ThemeImpl(createAppearancePreferences(), getFileUpdateMonitor(), DefaultTaskExecutor::runInJavaFXThread);
+    public ThemeManager getThemeManager() {
+        if (themeManager == null) {
+            themeManager = new ThemeManagerImpl(createAppearancePreferences(), getFileUpdateMonitor(), DefaultTaskExecutor::runInJavaFXThread);
         }
-        return globalTheme;
+        return themeManager;
     }
 
     @Override
     public void updateTheme() {
-        getTheme().updateAppearancePreferences(createAppearancePreferences());
+        getThemeManager().updateAppearancePreferences(createAppearancePreferences());
     }
 
     @Override
     public AppearancePreferences getAppearancePreferences() {
-        return getTheme().getCurrentAppearancePreferences();
+        return getThemeManager().getCurrentAppearancePreferences();
     }
 
     @Override

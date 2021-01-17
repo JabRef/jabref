@@ -2,14 +2,18 @@ package org.jabref.gui.theme;
 
 import java.util.Objects;
 
-import org.jabref.gui.util.Theme;
 import org.jabref.model.strings.StringUtil;
 
 public class ThemePreference {
 
+    public enum Type {
+        LIGHT, DARK, CUSTOM
+    }
+
+    public static final String BASE_CSS = "Base.css";
     static final String EMBEDDED_DARK_THEME_CSS = "Dark.css";
 
-    private final Theme.Type type;
+    private final Type type;
 
     private final String name;
 
@@ -17,12 +21,12 @@ public class ThemePreference {
 
     public ThemePreference(String name) {
         this.name = name != null ? name : "";
-        if (StringUtil.isBlank(this.name) || Theme.BASE_CSS.equalsIgnoreCase(this.name)) {
-            this.type = Theme.Type.LIGHT;
+        if (StringUtil.isBlank(this.name) || BASE_CSS.equalsIgnoreCase(this.name)) {
+            this.type = Type.LIGHT;
         } else if (EMBEDDED_DARK_THEME_CSS.equalsIgnoreCase(this.name)) {
-            this.type = Theme.Type.DARK;
+            this.type = Type.DARK;
         } else {
-            this.type = Theme.Type.CUSTOM;
+            this.type = Type.CUSTOM;
         }
         this.additionalStylesheet = switch (type) {
             case LIGHT -> StyleSheetEmpty.EMPTY;
@@ -46,7 +50,7 @@ public class ThemePreference {
     /**
      * @return the Theme type. Guaranteed to be non-null.
      */
-    public Theme.Type getType() {
+    public Type getType() {
         return type;
     }
 

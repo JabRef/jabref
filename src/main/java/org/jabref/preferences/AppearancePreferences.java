@@ -38,7 +38,7 @@ public class AppearancePreferences {
         AppearancePreferences that = (AppearancePreferences) o;
         return shouldOverrideDefaultFontSize == that.shouldOverrideDefaultFontSize &&
                 mainFontSize == that.mainFontSize &&
-                themePreference.equals(that.themePreference);
+                Objects.equals(themePreference, that.themePreference);
     }
 
     @Override

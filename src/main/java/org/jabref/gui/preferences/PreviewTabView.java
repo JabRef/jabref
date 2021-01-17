@@ -149,7 +149,7 @@ public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewMode
         ((PreviewViewer) previewTab.getContent()).setEntry(TestEntry.getTestEntry());
         EasyBind.subscribe(viewModel.layoutProperty(), value -> ((PreviewViewer) previewTab.getContent()).setLayout(value));
         previewTab.getContent().visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull());
-        ((PreviewViewer) previewTab.getContent()).setTheme(preferences.getTheme());
+        ((PreviewViewer) previewTab.getContent()).setThemeManager(preferences.getThemeManager());
 
         editArea.clear();
         editArea.setParagraphGraphicFactory(LineNumberFactory.get(editArea));

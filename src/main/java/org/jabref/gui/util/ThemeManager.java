@@ -7,13 +7,7 @@ import javafx.scene.web.WebEngine;
 
 import org.jabref.preferences.AppearancePreferences;
 
-public interface Theme {
-
-    enum Type {
-        LIGHT, DARK, CUSTOM
-    }
-
-    String BASE_CSS = "Base.css";
+public interface ThemeManager {
 
     /**
      * Installs the base css file as a stylesheet in the given scene. Changes in the css file lead to a redraw of the

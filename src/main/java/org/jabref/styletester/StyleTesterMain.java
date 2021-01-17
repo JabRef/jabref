@@ -31,7 +31,7 @@ public class StyleTesterMain extends Application {
         preferences.setFileUpdateMonitor(fileUpdateMonitor);
 
         Scene scene = new Scene(view.getContent());
-        preferences.getTheme().installCss(scene);
+        preferences.getThemeManager().installCss(scene);
         stage.setScene(scene);
         stage.show();
     }

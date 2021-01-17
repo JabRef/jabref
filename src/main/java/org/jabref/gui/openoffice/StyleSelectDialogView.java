@@ -78,8 +78,8 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
         previewBook.setEntry(TestEntry.getTestEntryBook());
         vbox.getChildren().add(previewBook);
 
-        previewArticle.setTheme(preferencesService.getTheme());
-        previewBook.setTheme(preferencesService.getTheme());
+        previewArticle.setThemeManager(preferencesService.getThemeManager());
+        previewBook.setThemeManager(preferencesService.getThemeManager());
 
         colName.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         colJournals.setCellValueFactory(cellData -> cellData.getValue().journalsProperty());

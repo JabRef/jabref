@@ -61,7 +61,7 @@ public class PreviewPanel extends VBox {
         previewView = new PreviewViewer(database, dialogService, stateManager);
         previewView.setLayout(previewPreferences.getCurrentPreviewStyle());
         previewView.setContextMenu(createPopupMenu());
-        previewView.setTheme(this.preferences.getTheme());
+        previewView.setThemeManager(this.preferences.getThemeManager());
         previewView.setOnDragDetected(event -> {
             previewView.startFullDrag();
 

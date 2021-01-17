@@ -19,7 +19,7 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.gui.util.Theme;
+import org.jabref.gui.util.ThemeManager;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
@@ -120,8 +120,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         });
     }
 
-    public void setTheme(Theme theme) {
-        theme.installCss(previewView.getEngine());
+    public void setThemeManager(ThemeManager themeManager) {
+        themeManager.installCss(previewView.getEngine());
     }
 
     private void highlightSearchPattern() {

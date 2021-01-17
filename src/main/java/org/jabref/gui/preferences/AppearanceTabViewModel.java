@@ -12,7 +12,6 @@ import javafx.scene.control.SpinnerValueFactory;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.theme.ThemePreference;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.util.Theme;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.strings.StringUtil;
@@ -79,11 +78,11 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         fontSizeProperty.setValue(String.valueOf(appearancePreferences.getMainFontSize()));
 
         ThemePreference currentTheme = appearancePreferences.getThemePreference();
-        if (currentTheme.getType() == Theme.Type.LIGHT) {
+        if (currentTheme.getType() == ThemePreference.Type.LIGHT) {
             themeLightProperty.setValue(true);
             themeDarkProperty.setValue(false);
             themeCustomProperty.setValue(false);
-        } else if (currentTheme.getType() == Theme.Type.DARK) {
+        } else if (currentTheme.getType() == ThemePreference.Type.DARK) {
             themeLightProperty.setValue(false);
             themeDarkProperty.setValue(true);
             themeCustomProperty.setValue(false);

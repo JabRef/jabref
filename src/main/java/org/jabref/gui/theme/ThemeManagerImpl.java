@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 
-import org.jabref.gui.util.Theme;
+import org.jabref.gui.util.ThemeManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.AppearancePreferences;
 
@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Installs the style file and provides live reloading.
+ * Installs and manages style files and provides live reloading.
  * JabRef provides two inbuilt themes and a user customizable one: Light, Dark and Custom. The Light theme is basically
  * the base.css theme. Every other theme is loaded as an addition to base.css.
  *
@@ -34,9 +34,9 @@ import org.slf4j.LoggerFactory;
  *
  * @see <a href="https://docs.jabref.org/advanced/custom-themes">Custom themes</a> in the Jabref documentation.
  */
-public class ThemeImpl implements Theme {
+public class ThemeManagerImpl implements ThemeManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ThemeImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThemeManagerImpl.class);
 
     private final FileUpdateMonitor fileUpdateMonitor;
 
@@ -49,11 +49,11 @@ public class ThemeImpl implements Theme {
     private final Set<Scene> scenes = Collections.newSetFromMap(new WeakHashMap<>());
     private final Set<WebEngine> webEngines = Collections.newSetFromMap(new WeakHashMap<>());
 
-    public ThemeImpl(AppearancePreferences initialAppearance, FileUpdateMonitor fileUpdateMonitor, Consumer<Runnable> updateRunner) {
+    public ThemeManagerImpl(AppearancePreferences initialAppearance, FileUpdateMonitor fileUpdateMonitor, Consumer<Runnable> updateRunner) {
         this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
         this.updateRunner = Objects.requireNonNull(updateRunner);
 
-        this.baseStyleSheet = StyleSheet.create(BASE_CSS);
+        this.baseStyleSheet = StyleSheet.create(ThemePreference.BASE_CSS);
 
         /* Watching base CSS only works in development and test scenarios, where the build system exposes the CSS as a
         file (e.g. for Gradle run task it will be in build/resources/main/org/jabref/gui/Base.css) */
