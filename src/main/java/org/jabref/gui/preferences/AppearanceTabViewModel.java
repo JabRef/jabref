@@ -39,7 +39,6 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
-    private final AppearancePreferences initialAppearancePreferences;
 
     private final Validator fontSizeValidator;
     private final Validator customPathToThemeValidator;
@@ -49,7 +48,6 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     public AppearanceTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.initialAppearancePreferences = preferences.getAppearancePreferences();
 
         fontSizeValidator = new FunctionBasedValidator<>(
                 fontSizeProperty,
@@ -76,10 +74,11 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        fontOverrideProperty.setValue(initialAppearancePreferences.shouldOverrideDefaultFontSize());
-        fontSizeProperty.setValue(String.valueOf(initialAppearancePreferences.getMainFontSize()));
+        AppearancePreferences appearancePreferences = preferences.getAppearancePreferences();
+        fontOverrideProperty.setValue(appearancePreferences.shouldOverrideDefaultFontSize());
+        fontSizeProperty.setValue(String.valueOf(appearancePreferences.getMainFontSize()));
 
-        ThemePreference currentTheme = initialAppearancePreferences.getThemePreference();
+        ThemePreference currentTheme = appearancePreferences.getThemePreference();
         if (currentTheme.getType() == Theme.Type.LIGHT) {
             themeLightProperty.setValue(true);
             themeDarkProperty.setValue(false);
@@ -98,24 +97,20 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        if (initialAppearancePreferences.shouldOverrideDefaultFontSize() != fontOverrideProperty.getValue()) {
+
+        AppearancePreferences currentPreferences = preferences.getAppearancePreferences();
+        if (currentPreferences.shouldOverrideDefaultFontSize() != fontOverrideProperty.getValue()) {
             restartWarnings.add(Localization.lang("Override font settings"));
         }
 
         int newFontSize = Integer.parseInt(fontSizeProperty.getValue());
-        if (initialAppearancePreferences.getMainFontSize() != newFontSize) {
-            restartWarnings.add(Localization.lang("Override font size"));
-        }
 
-        ThemePreference newTheme = initialAppearancePreferences.getThemePreference();
-        if (themeLightProperty.getValue() && initialAppearancePreferences.getThemePreference().getType() != Theme.Type.LIGHT) {
+        ThemePreference newTheme = currentPreferences.getThemePreference();
+        if (themeLightProperty.getValue()) {
             newTheme = ThemePreference.light();
-        } else if (themeDarkProperty.getValue() && initialAppearancePreferences.getThemePreference().getType() != Theme.Type.DARK) {
+        } else if (themeDarkProperty.getValue()) {
             newTheme = ThemePreference.dark();
-        } else if (themeCustomProperty.getValue() &&
-                (!initialAppearancePreferences.getThemePreference().getName()
-                                              .equalsIgnoreCase(customPathToThemeProperty.getValue())
-                        || initialAppearancePreferences.getThemePreference().getType() != Theme.Type.CUSTOM)) {
+        } else if (themeCustomProperty.getValue()) {
             newTheme = ThemePreference.custom(customPathToThemeProperty.getValue());
         }
 

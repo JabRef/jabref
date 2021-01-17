@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -16,7 +17,6 @@ import javafx.scene.web.WebEngine;
 import org.jabref.gui.util.Theme;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.AppearancePreferences;
-import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,51 +38,20 @@ public class ThemeImpl implements Theme {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeImpl.class);
 
-    private final PreferencesService preferencesService;
-
     private final FileUpdateMonitor fileUpdateMonitor;
 
     private final Consumer<Runnable> updateRunner;
 
     private final StyleSheet baseStyleSheet;
 
-    private final AtomicReference<ThemeState> state = new AtomicReference<>();
+    private final AtomicReference<AppearancePreferences> appearancePreferences = new AtomicReference<>();
 
     private final Set<Scene> scenes = Collections.newSetFromMap(new WeakHashMap<>());
     private final Set<WebEngine> webEngines = Collections.newSetFromMap(new WeakHashMap<>());
 
-    private static final class ThemeState {
-
-        private final ThemePreference themePreference;
-
-        private final StyleSheet additionalStylesheet;
-
-        public ThemeState(ThemePreference themePreference) {
-            this.themePreference = themePreference;
-            this.additionalStylesheet = switch (themePreference.getType()) {
-                case LIGHT -> StyleSheetEmpty.EMPTY;
-                case DARK -> StyleSheet.create("Dark.css");
-                case CUSTOM -> StyleSheet.create(themePreference.getName());
-            };
-        }
-    }
-
-    public ThemeImpl(ThemePreference themePreference, PreferencesService preferencesService, FileUpdateMonitor fileUpdateMonitor, Consumer<Runnable> updateRunner) {
-        if (themePreference == null) {
-            throw new IllegalArgumentException("Theme preference required");
-        }
-        if (preferencesService == null) {
-            throw new IllegalArgumentException("Preference service required");
-        }
-        if (fileUpdateMonitor == null) {
-            throw new IllegalArgumentException("File update monitor required");
-        }
-        if (updateRunner == null) {
-            throw new IllegalArgumentException("Update runner required");
-        }
-        this.preferencesService = preferencesService;
-        this.fileUpdateMonitor = fileUpdateMonitor;
-        this.updateRunner = updateRunner;
+    public ThemeImpl(AppearancePreferences initialAppearance, FileUpdateMonitor fileUpdateMonitor, Consumer<Runnable> updateRunner) {
+        this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
+        this.updateRunner = Objects.requireNonNull(updateRunner);
 
         this.baseStyleSheet = StyleSheet.create(BASE_CSS);
 
@@ -98,34 +67,34 @@ public class ThemeImpl implements Theme {
             }
         }
 
-        baseCssLiveUpdate();
-        updateThemePreference(themePreference);
+        updateAppearancePreferences(Objects.requireNonNull(initialAppearance));
+    }
+
+    private StyleSheet additionalStylesheet() {
+        return appearancePreferences.get().getThemePreference().getAdditionalStylesheet();
     }
 
     @Override
-    public void updateThemePreference(ThemePreference themePreference) {
+    public void updateAppearancePreferences(AppearancePreferences newPreferences) {
 
-        if (themePreference == null) {
+        if (newPreferences == null) {
             throw new IllegalArgumentException("Theme preference required");
         }
 
-        ThemeState oldState = this.state.get();
-        if (oldState != null) {
+        AppearancePreferences oldPreferences = this.appearancePreferences.get();
+        if (oldPreferences != null) {
+            if (!newPreferences.equals(oldPreferences)) {
+                LOGGER.info("Not updating appearance preferences because it hasn't changed");
 
-            if (oldState.themePreference.equals(themePreference)) {
-                LOGGER.info("Not updating theme preference because it hasn't changed");
-                return;
-            }
-
-            Path oldPath = oldState.additionalStylesheet.getWatchPath();
-            if (oldPath != null) {
-                fileUpdateMonitor.removeListener(oldPath, this::additionalCssLiveUpdate);
-                LOGGER.info("No longer watch css {} for live updates", oldPath);
+                Path oldPath = oldPreferences.getThemePreference().getAdditionalStylesheet().getWatchPath();
+                if (oldPath != null) {
+                    fileUpdateMonitor.removeListener(oldPath, this::additionalCssLiveUpdate);
+                    LOGGER.info("No longer watch css {} for live updates", oldPath);
+                }
             }
         }
-        ThemeState newState = new ThemeState(themePreference);
-        Path newPath = newState.additionalStylesheet.getWatchPath();
-        this.state.set(newState);
+        Path newPath = newPreferences.getThemePreference().getAdditionalStylesheet().getWatchPath();
+        this.appearancePreferences.set(newPreferences);
 
         if (newPath != null) {
             try {
@@ -139,19 +108,15 @@ public class ThemeImpl implements Theme {
         additionalCssLiveUpdate();
 
         LOGGER.info("Theme set to {} with base css {} and additional css {}",
-                themePreference, baseStyleSheet, state.get().additionalStylesheet);
+                newPreferences.getThemePreference(), baseStyleSheet, additionalStylesheet());
     }
 
     @Override
     public void installCss(Scene scene) {
-        AppearancePreferences appearancePreferences = preferencesService.getAppearancePreferences();
         updateRunner.accept(() -> {
             if (this.scenes.add(scene)) {
                 updateBaseCss(scene);
                 updateAdditionalCss(scene);
-            }
-            if (appearancePreferences.shouldOverrideDefaultFontSize()) {
-                scene.getRoot().setStyle("-fx-font-size: " + appearancePreferences.getMainFontSize() + "pt;");
             }
         });
     }
@@ -160,7 +125,7 @@ public class ThemeImpl implements Theme {
     public void installCss(WebEngine webEngine) {
         updateRunner.accept(() -> {
             if (this.webEngines.add(webEngine)) {
-                webEngine.setUserStyleSheetLocation(state.get().additionalStylesheet.getWebEngineStylesheet());
+                webEngine.setUserStyleSheetLocation(additionalStylesheet().getWebEngineStylesheet());
             }
         });
     }
@@ -172,9 +137,9 @@ public class ThemeImpl implements Theme {
     }
 
     private void additionalCssLiveUpdate() {
-        StyleSheet styleSheet = state.get().additionalStylesheet;
+        StyleSheet styleSheet = additionalStylesheet();
         styleSheet.reload();
-        String newStyleSheetLocation = state.get().additionalStylesheet.getWebEngineStylesheet();
+        String newStyleSheetLocation = styleSheet.getWebEngineStylesheet();
 
         LOGGER.debug("Updating additional CSS for {} scenes and {} web engines", scenes.size(), webEngines.size());
         updateRunner.accept(() -> {
@@ -199,21 +164,29 @@ public class ThemeImpl implements Theme {
     }
 
     private void updateAdditionalCss(Scene scene) {
+        AppearancePreferences appearance = this.appearancePreferences.get();
         List<String> stylesheets = scene.getStylesheets();
         if (stylesheets.size() == 2) {
             stylesheets.remove(1);
         }
-        stylesheets.add(1, state.get().additionalStylesheet.getSceneStylesheet().toExternalForm());
+        stylesheets.add(1,
+                appearance.getThemePreference().getAdditionalStylesheet().getSceneStylesheet().toExternalForm());
+
+        if (appearance.shouldOverrideDefaultFontSize()) {
+            scene.getRoot().setStyle("-fx-font-size: " + appearance.getMainFontSize() + "pt;");
+        } else {
+            scene.getRoot().setStyle("");
+        }
     }
 
     @Override
-    public ThemePreference getPreference() {
-        return state.get().themePreference;
+    public AppearancePreferences getCurrentAppearancePreferences() {
+        return appearancePreferences.get();
     }
 
     @Override
     @Deprecated(forRemoval = true) // TODO ThemeTest needs updating, and should be based on installCss(WebEngine) instead
     public Optional<String> getAdditionalStylesheet() {
-        return Optional.of(state.get().additionalStylesheet.getWebEngineStylesheet());
+        return Optional.of(additionalStylesheet().getWebEngineStylesheet());
     }
 }

@@ -1,5 +1,7 @@
 package org.jabref.preferences;
 
+import java.util.Objects;
+
 import org.jabref.gui.theme.ThemePreference;
 
 public class AppearancePreferences {
@@ -23,5 +25,24 @@ public class AppearancePreferences {
 
     public ThemePreference getThemePreference() {
         return themePreference;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        AppearancePreferences that = (AppearancePreferences) o;
+        return shouldOverrideDefaultFontSize == that.shouldOverrideDefaultFontSize &&
+                mainFontSize == that.mainFontSize &&
+                themePreference.equals(that.themePreference);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(shouldOverrideDefaultFontSize, mainFontSize, themePreference);
     }
 }

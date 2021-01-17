@@ -13,6 +13,8 @@ public class ThemePreference {
 
     private final String name;
 
+    private final StyleSheet additionalStylesheet;
+
     public ThemePreference(String name) {
         this.name = name != null ? name : "";
         if (StringUtil.isBlank(this.name) || Theme.BASE_CSS.equalsIgnoreCase(this.name)) {
@@ -22,6 +24,11 @@ public class ThemePreference {
         } else {
             this.type = Theme.Type.CUSTOM;
         }
+        this.additionalStylesheet = switch (type) {
+            case LIGHT -> StyleSheetEmpty.EMPTY;
+            case DARK -> StyleSheet.create("Dark.css");
+            case CUSTOM -> StyleSheet.create(name);
+        };
     }
 
     public static ThemePreference light() {
@@ -70,6 +77,10 @@ public class ThemePreference {
     @Override
     public int hashCode() {
         return Objects.hash(type, name);
+    }
+
+    public StyleSheet getAdditionalStylesheet() {
+        return additionalStylesheet;
     }
 
     @Override

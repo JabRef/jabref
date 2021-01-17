@@ -1985,25 +1985,29 @@ public class JabRefPreferences implements PreferencesService {
     // AppearancePreferences
     //*************************************************************************************************************
 
+    private AppearancePreferences createAppearancePreferences() {
+        return new AppearancePreferences(
+                getBoolean(OVERRIDE_DEFAULT_FONT_SIZE),
+                getInt(MAIN_FONT_SIZE),
+                new ThemePreference(get(FX_THEME)));
+    }
+
     @Override
     public Theme getTheme() {
         if (globalTheme == null) {
-            globalTheme = new ThemeImpl(new ThemePreference(get(FX_THEME)), this, getFileUpdateMonitor(), DefaultTaskExecutor::runInJavaFXThread);
+            globalTheme = new ThemeImpl(createAppearancePreferences(), getFileUpdateMonitor(), DefaultTaskExecutor::runInJavaFXThread);
         }
         return globalTheme;
     }
 
     @Override
     public void updateTheme() {
-        getTheme().updateThemePreference(new ThemePreference(get(FX_THEME)));
+        getTheme().updateAppearancePreferences(createAppearancePreferences());
     }
 
     @Override
     public AppearancePreferences getAppearancePreferences() {
-        return new AppearancePreferences(
-                getBoolean(OVERRIDE_DEFAULT_FONT_SIZE),
-                getInt(MAIN_FONT_SIZE),
-                globalTheme.getPreference());
+        return getTheme().getCurrentAppearancePreferences();
     }
 
     @Override

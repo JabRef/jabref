@@ -5,7 +5,7 @@ import java.util.Optional;
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 
-import org.jabref.gui.theme.ThemePreference;
+import org.jabref.preferences.AppearancePreferences;
 
 public interface Theme {
 
@@ -31,9 +31,9 @@ public interface Theme {
      */
     void installCss(WebEngine webEngine);
 
-    void updateThemePreference(ThemePreference themePreference);
+    void updateAppearancePreferences(AppearancePreferences appearancePreferences);
 
-    ThemePreference getPreference();
+    AppearancePreferences getCurrentAppearancePreferences();
 
     /**
      * This method allows callers to obtain the theme's additional stylesheet.
