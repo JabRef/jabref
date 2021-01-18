@@ -1,7 +1,7 @@
-\format[RTFChars,AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author} (\year), 
+\format[Authors(LastFirst,Initials,FullPunc,Comma,And,inf),RTFChars]{\author} (\year), 
 }{\format[RTFChars]{\title}}{
 \begin{editor}
-, }{\\i in }{\format[RTFChars,AuthorFirstFirst,AuthorAndsReplacer]{\editor}, ed., \end{editor}
+, }{\\i in }{\format[Authors(FirstFirst,FullName,NoPunc,And),RTFChars]{\editor}, ed., \end{editor}
 \begin{booktitle}
 '\format[RTFChars]{\booktitle}'
 \end{booktitle}
