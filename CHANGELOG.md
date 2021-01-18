@@ -20,6 +20,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Changed
 
 - The content of the field `timestamp` is migrated to `creationdate`. In case one configured "udpate timestampe", it is migrated to `modificationdate`. [koppor#130](https://github.com/koppor/jabref/issues/130)
+- We fixed an issue where groups generated from authors' last names did not include all entries of the authors' [#5833](https://github.com/JabRef/jabref/issues/5833)
 - The export to MS Office XML now uses the month name for the field `MonthAcessed` instead of the two digit number [#7354](https://github.com/JabRef/jabref/issues/7354)
 
 ### Fixed
@@ -107,7 +108,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the password for a shared SQL database was not remembered [#6869](https://github.com/JabRef/jabref/issues/6869)
 - We fixed an issue where newly added entires were not synced to a shared SQL database [#7176](https://github.com/JabRef/jabref/issues/7176)
 - We fixed an issue where the PDF-Content importer threw an exception when no DOI number is present at the first page of the PDF document [#7203](https://github.com/JabRef/jabref/issues/7203)
-- We fixed an issue where groups generated from authors' last names did not include all entries of the authors' [#5833](https://github.com/JabRef/jabref/issues/5833)
 - We fixed an issue where groups created from aux files did not update on file changes [#6394](https://github.com/JabRef/jabref/issues/6394)
 - We fixed an issue where authors that only have last names were incorrectly identified as institutes when generating citation keys [#7199](https://github.com/JabRef/jabref/issues/7199)
 - We fixed an issue where institutes were incorrectly identified as universities when generating citation keys [#6942](https://github.com/JabRef/jabref/issues/6942)
