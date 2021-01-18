@@ -6,6 +6,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.IntegerBinding;
@@ -23,6 +25,7 @@ import org.jabref.gui.icon.InternalMaterialDesignIcon;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.DroppingMouseLocation;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.groups.DefaultGroupsFactory;
@@ -34,6 +37,7 @@ import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticGroup;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.TexGroup;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 
@@ -59,6 +63,7 @@ public class GroupNodeViewModel {
     private final CustomLocalDragboard localDragBoard;
     private final ObservableList<BibEntry> entriesList;
     private final PreferencesService preferencesService;
+    private final InvalidationListener onInvalidatedGroup = (listener) -> refreshGroup();
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard, PreferencesService preferencesService) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
@@ -80,6 +85,9 @@ public class GroupNodeViewModel {
                                      .collect(Collectors.toCollection(FXCollections::observableArrayList));
         } else {
             children = EasyBind.mapBacked(groupNode.getChildren(), this::toViewModel);
+        }
+        if (groupNode.getGroup() instanceof TexGroup) {
+            databaseContext.getMetaData().groupsBinding().addListener(new WeakInvalidationListener(onInvalidatedGroup));
         }
         hasChildren = new SimpleBooleanProperty();
         hasChildren.bind(Bindings.isNotEmpty(children));
@@ -250,6 +258,17 @@ public class GroupNodeViewModel {
         }
     }
 
+    private void refreshGroup() {
+        DefaultTaskExecutor.runInJavaFXThread(() -> {
+            updateMatchedEntries(); // Update the entries matched by the group
+            // "Re-add" to the selected groups if it were selected, this refreshes the entries the user views
+            ObservableList<GroupTreeNode> selectedGroups = this.stateManager.getSelectedGroup(this.databaseContext);
+            if (selectedGroups.remove(this.groupNode)) {
+                selectedGroups.add(this.groupNode);
+            }
+        });
+    }
+
     private void updateMatchedEntries() {
         // We calculate the new hit value
         // We could be more intelligent and try to figure out the new number of hits based on the entry change
@@ -290,10 +309,11 @@ public class GroupNodeViewModel {
     }
 
     /**
-     * Decides if the content stored in the given {@link Dragboard} can be droped on the given target row.
-     * Currently, the following sources are allowed:
-     *  - another group (will be added as subgroup on drop)
-     *  - entries if the group implements {@link GroupEntryChanger} (will be assigned to group on drop)
+     * Decides if the content stored in the given {@link Dragboard} can be dropped on the given target row. Currently, the following sources are allowed:
+     * <ul>
+     *     <li>another group (will be added as subgroup on drop)</li>
+     *     <li>entries if the group implements {@link GroupEntryChanger} (will be assigned to group on drop)</li>
+     * </ul>
      */
     public boolean acceptableDrop(Dragboard dragboard) {
         // TODO: we should also check isNodeDescendant
@@ -343,15 +363,9 @@ public class GroupNodeViewModel {
             // Bottom + top -> insert source row before / after this row
             // Center -> add as child
             switch (mouseLocation) {
-                case BOTTOM:
-                    this.moveTo(targetParent.get(), targetIndex + 1);
-                    break;
-                case CENTER:
-                    this.moveTo(target);
-                    break;
-                case TOP:
-                    this.moveTo(targetParent.get(), targetIndex);
-                    break;
+                case BOTTOM -> this.moveTo(targetParent.get(), targetIndex + 1);
+                case CENTER -> this.moveTo(target);
+                case TOP -> this.moveTo(targetParent.get(), targetIndex);
             }
         } else {
             // No parent = root -> just add

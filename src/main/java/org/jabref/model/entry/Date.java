@@ -9,6 +9,7 @@ import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -60,7 +61,8 @@ public class Date {
 
         for (String formatString : formatStrings) {
             try {
-                TemporalAccessor parsedDate = DateTimeFormatter.ofPattern(formatString).parse(dateString);
+                // Locale is required for parsing month names correctly. Currently this expects the month names to be in English
+                TemporalAccessor parsedDate = DateTimeFormatter.ofPattern(formatString).withLocale(Locale.US).parse(dateString);
                 return Optional.of(new Date(parsedDate));
             } catch (DateTimeParseException ignored) {
                 // Ignored
