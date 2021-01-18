@@ -60,7 +60,7 @@ We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/?from=jabref). For adv
 
 We recommend to install IntelliJ IDEA using [JetBrains Toolbox App](https://www.jetbrains.com/toolbox-app/), because IDE updates are automatically installed.
 
-#### Ecipse
+#### Eclipse
 
 On Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download_Eclipse) or the [step-by-step guideline from Krizna](https://www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/) to install Eclipse. On Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
 

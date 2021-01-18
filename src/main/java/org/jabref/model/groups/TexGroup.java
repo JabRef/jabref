@@ -3,7 +3,7 @@ package org.jabref.model.groups;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -26,7 +26,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(TexGroup.class);
 
     private final Path filePath;
-    private Set<String> keysUsedInAux = null;
+    private Set<String> keysUsedInAux;
     private final FileUpdateMonitor fileMonitor;
     private final AuxParser auxParser;
     private final MetaData metaData;
@@ -119,6 +119,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     public void fileUpdated() {
         // Reset previous parse result
         keysUsedInAux = null;
+        metaData.groupsBinding().invalidate();
     }
 
     private Path relativize(Path path) {
@@ -132,11 +133,8 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     }
 
     private List<Path> getFileDirectoriesAsPaths() {
-        List<Path> fileDirs = new ArrayList<>();
-
-        metaData.getLatexFileDirectory(user)
-                .ifPresent(fileDirs::add);
-
-        return fileDirs;
+        return metaData.getLatexFileDirectory(user)
+                       .map(List::of)
+                       .orElse(Collections.emptyList());
     }
 }
