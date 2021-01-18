@@ -114,7 +114,7 @@ dependencies {
 
     implementation 'commons-cli:commons-cli:1.4'
 
-    implementation 'org.libreoffice:libreoffice:7.0.3'
+    implementation 'org.libreoffice:libreoffice:7.0.4'
     implementation 'org.libreoffice:unoloader:7.0.4'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.9'
