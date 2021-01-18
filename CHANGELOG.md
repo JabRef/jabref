@@ -20,6 +20,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 ### Changed
 
 - The content of the field `timestamp` is migrated to `creationdate`. In case one configured "udpate timestampe", it is migrated to `modificationdate`. [koppor#130](https://github.com/koppor/jabref/issues/130)
+- We fixed an issue where groups generated from authors' last names did not include all entries of the authors' [#5833](https://github.com/JabRef/jabref/issues/5833)
 - The export to MS Office XML now uses the month name for the field `MonthAcessed` instead of the two digit number [#7354](https://github.com/JabRef/jabref/issues/7354)
 
 ### Fixed
