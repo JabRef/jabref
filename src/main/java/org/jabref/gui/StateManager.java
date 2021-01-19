@@ -17,6 +17,7 @@ import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 import javafx.scene.Node;
 
+import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.util.OptionalObjectProperty;
@@ -56,6 +57,7 @@ public class StateManager {
     private final EasyBinding<Boolean> anyTaskRunning = EasyBind.reduce(backgroundTasks, tasks -> tasks.anyMatch(Task::isRunning));
     private final EasyBinding<Double> tasksProgress = EasyBind.reduce(backgroundTasks, tasks -> tasks.filter(Task::isRunning).mapToDouble(Task::getProgress).average().orElse(1));
     private final ObservableMap<String, DialogWindowState> dialogWindowStates = FXCollections.observableHashMap();
+    private GroupViewMode selectedGroupMode = GroupViewMode.INTERSECTION;
 
     public StateManager() {
         activeGroups.bind(Bindings.valueAt(selectedGroups, activeDatabase.orElse(null)));
@@ -158,5 +160,13 @@ public class StateManager {
 
     public void setDialogWindowState(String className, DialogWindowState state) {
         dialogWindowStates.put(className, state);
+    }
+
+    public GroupViewMode getGroupViewMode() {
+        return this.selectedGroupMode;
+    }
+    public void setGroupNodeViewModel(GroupViewMode viewModel)
+    {
+        this.selectedGroupMode = viewModel;
     }
 }

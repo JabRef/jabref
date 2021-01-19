@@ -11,6 +11,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.SidePaneComponent;
 import org.jabref.gui.SidePaneManager;
 import org.jabref.gui.SidePaneType;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
@@ -27,11 +28,13 @@ public class GroupSidePane extends SidePaneComponent {
     private final PreferencesService preferences;
     private final DialogService dialogService;
     private final Button intersectionUnionToggle = IconTheme.JabRefIcons.GROUP_INTERSECTION.asButton();
+    private final StateManager stateManager;
 
-    public GroupSidePane(SidePaneManager manager, PreferencesService preferences, DialogService dialogService) {
+    public GroupSidePane(SidePaneManager manager, PreferencesService preferences, DialogService dialogService, StateManager stateManager) {
         super(manager, IconTheme.JabRefIcons.TOGGLE_GROUPS, Localization.lang("Groups"));
         this.preferences = preferences;
         this.dialogService = dialogService;
+        this.stateManager = stateManager;
     }
 
     @Override
@@ -66,9 +69,11 @@ public class GroupSidePane extends SidePaneComponent {
 
         if (mode == GroupViewMode.UNION) {
             preferences.setGroupViewMode(GroupViewMode.INTERSECTION);
+            stateManager.setGroupNodeViewModel(GroupViewMode.INTERSECTION);
             dialogService.notify(Localization.lang("Group view mode set to intersection"));
         } else if (mode == GroupViewMode.INTERSECTION) {
             preferences.setGroupViewMode(GroupViewMode.UNION);
+            stateManager.setGroupNodeViewModel(GroupViewMode.UNION);
             dialogService.notify(Localization.lang("Group view mode set to union"));
         }
 
