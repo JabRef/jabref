@@ -13,7 +13,6 @@ import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.SpecialFieldValue;
-import org.jabref.preferences.PreferencesService;
 
 public class SpecialFieldsToSeparateFields implements PostOpenMigration {
     private final KeywordList possibleKeywordsToMigrate;
