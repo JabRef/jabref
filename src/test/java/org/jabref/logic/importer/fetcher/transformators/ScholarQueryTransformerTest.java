@@ -40,7 +40,6 @@ class ScholarQueryTransformerTest implements InfixTransformerTest {
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         transformer.transformLuceneQuery(luceneQuery);
 
-
         assertEquals(2021, transformer.getStartYear());
         assertEquals(2021, transformer.getEndYear());
     }

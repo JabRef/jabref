@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Disabled;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class GVKQueryTransformerTest implements InfixTransformerTest{
+class GVKQueryTransformerTest implements InfixTransformerTest {
 
     @Override
     public AbstractQueryTransformer getTransformator() {

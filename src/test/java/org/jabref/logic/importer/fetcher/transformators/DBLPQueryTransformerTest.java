@@ -21,7 +21,8 @@ class DBLPQueryTransformerTest implements InfixTransformerTest {
 
     @Override
     public String getUnFieldedPrefix() {
-        return "";    }
+        return "";
+    }
 
     @Override
     public String getJournalPrefix() {

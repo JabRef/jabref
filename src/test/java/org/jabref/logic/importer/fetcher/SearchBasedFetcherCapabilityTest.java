@@ -35,7 +35,6 @@ interface SearchBasedFetcherCapabilityTest {
         StringJoiner queryBuilder = new StringJoiner("\" AND author:\"", "author:\"", "\"");
         getTestAuthors().forEach(queryBuilder::add);
 
-
         List<BibEntry> result = getFetcher().performSearch(queryBuilder.toString());
         new ImportCleanup(BibDatabaseMode.BIBTEX).doPostCleanup(result);
 
