@@ -81,7 +81,7 @@ class RegExpBasedFileFinderTests {
     }
 
     @Test
-    void findAssociatedFilesContainingRegexpFromBracketedExpression() throws Exception {
+    void findAssociatedFilesContainingBracketsFromBracketedExpression() throws Exception {
         var bibEntry = new BibEntry().withField(StandardField.TITLE, "Regexp from [A-Z]");
 
         var extension = Collections.singletonList("pdf");
