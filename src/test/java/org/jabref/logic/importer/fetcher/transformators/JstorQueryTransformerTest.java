@@ -1,7 +1,5 @@
 package org.jabref.logic.importer.fetcher.transformators;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class JstorQueryTransformerTest implements InfixTransformerTest {
 
     @Override

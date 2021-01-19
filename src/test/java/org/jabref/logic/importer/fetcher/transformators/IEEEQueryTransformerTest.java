@@ -3,7 +3,7 @@ package org.jabref.logic.importer.fetcher.transformators;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class IEEEQueryTransformerTest implements InfixTransformerTest{
 
