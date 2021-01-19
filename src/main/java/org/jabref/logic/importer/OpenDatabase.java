@@ -9,12 +9,10 @@ import java.util.List;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.TimestampPreferences;
-import org.jabref.logic.specialfields.SpecialFieldsUtils;
 import org.jabref.migrations.ConvertLegacyExplicitGroups;
 import org.jabref.migrations.ConvertMarkingToGroups;
 import org.jabref.migrations.PostOpenMigration;
 import org.jabref.migrations.TimeStampToDateAddAndModify;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
@@ -64,13 +62,6 @@ public class OpenDatabase {
             throws IOException {
         ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(fileToOpen,
                 importFormatPreferences.getEncoding());
-
-        if (importFormatPreferences.isKeywordSyncEnabled()) {
-            for (BibEntry entry : result.getDatabase().getEntries()) {
-                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, importFormatPreferences.getKeywordSeparator());
-            }
-            LOGGER.debug("Synchronized special fields based on keywords");
-        }
 
         performLoadDatabaseMigrations(result, timestampPreferences);
 
