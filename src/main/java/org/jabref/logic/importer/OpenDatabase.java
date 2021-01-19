@@ -9,12 +9,11 @@ import java.util.List;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.TimestampPreferences;
-import org.jabref.logic.specialfields.SpecialFieldsUtils;
 import org.jabref.migrations.ConvertLegacyExplicitGroups;
 import org.jabref.migrations.ConvertMarkingToGroups;
 import org.jabref.migrations.PostOpenMigration;
+import org.jabref.migrations.SpecialFieldsToSeparateFields;
 import org.jabref.migrations.TimeStampToDateAddAndModify;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
@@ -65,23 +64,17 @@ public class OpenDatabase {
         ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(fileToOpen,
                 importFormatPreferences.getEncoding());
 
-        if (importFormatPreferences.isKeywordSyncEnabled()) {
-            for (BibEntry entry : result.getDatabase().getEntries()) {
-                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, importFormatPreferences.getKeywordSeparator());
-            }
-            LOGGER.debug("Synchronized special fields based on keywords");
-        }
-
-        performLoadDatabaseMigrations(result, timestampPreferences);
+        performLoadDatabaseMigrations(result, timestampPreferences, importFormatPreferences.getKeywordSeparator());
 
         return result;
     }
 
-    private static void performLoadDatabaseMigrations(ParserResult parserResult, TimestampPreferences timestampPreferences) {
+    private static void performLoadDatabaseMigrations(ParserResult parserResult, TimestampPreferences timestampPreferences, Character keywordDelimited) {
         List<PostOpenMigration> postOpenMigrations = Arrays.asList(
                 new ConvertLegacyExplicitGroups(),
                 new ConvertMarkingToGroups(),
-                new TimeStampToDateAddAndModify(timestampPreferences)
+                new TimeStampToDateAddAndModify(timestampPreferences),
+                new SpecialFieldsToSeparateFields(keywordDelimited)
         );
 
         for (PostOpenMigration migration : postOpenMigrations) {
