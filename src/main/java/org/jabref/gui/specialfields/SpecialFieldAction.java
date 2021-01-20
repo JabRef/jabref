@@ -2,6 +2,7 @@ package org.jabref.gui.specialfields;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
@@ -13,7 +14,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.specialfields.SpecialFieldsUtils;
+import org.jabref.logic.util.UpdateField;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
@@ -70,17 +71,9 @@ public class SpecialFieldAction extends SimpleCommand {
             NamedCompound ce = new NamedCompound(undoText);
             for (BibEntry bibEntry : bes) {
                 // if (value==null) and then call nullField has been omitted as updatefield also handles value==null
-                List<FieldChange> changes = SpecialFieldsUtils.updateField(
-                        specialField,
-                        value,
-                        bibEntry,
-                        nullFieldIfValueIsTheSame,
-                        preferencesService.getSpecialFieldsPreferences().isKeywordSyncEnabled(),
-                        preferencesService.getKeywordDelimiter());
+                Optional<FieldChange> change = UpdateField.updateField(bibEntry, specialField, value, nullFieldIfValueIsTheSame);
 
-                for (FieldChange change : changes) {
-                    ce.addEdit(new UndoableFieldChange(change));
-                }
+                change.ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
             }
             ce.end();
             if (ce.hasEdits()) {

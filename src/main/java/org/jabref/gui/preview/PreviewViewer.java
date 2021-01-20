@@ -70,7 +70,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private static final String JS_UNMARK_WITH_CALLBACK = "" +
             "var markInstance = new Mark(document.getElementById(\"content\"));" +
             "markInstance.unmark(%s);";
-    private static final Pattern UNESCAPED_FORWARD_SLASH = Pattern.compile("\"(?<!\\\\\\\\)/\"");
+    private static final Pattern UNESCAPED_FORWARD_SLASH = Pattern.compile("(?<!\\\\)/");
 
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
