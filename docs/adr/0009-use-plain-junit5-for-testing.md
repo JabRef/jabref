@@ -49,7 +49,7 @@ assertFalse(actual.contains("\n"));
 
 ### Hamcrest
 
-Homepage: <http://hamcrest.org/JavaHamcrest/>
+Homepage: <https://github.com/hamcrest/JavaHamcrest>
 
 * Good, because offers advanced matchers (such as `contains`)
 * Bad, because not full fluent API

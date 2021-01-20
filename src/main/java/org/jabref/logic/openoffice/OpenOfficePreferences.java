@@ -1,7 +1,6 @@
 package org.jabref.logic.openoffice;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class OpenOfficePreferences {
@@ -16,9 +15,8 @@ public class OpenOfficePreferences {
 
     public static final String DEFAULT_LINUX_PATH = "/usr/lib/libreoffice";
     public static final String DEFAULT_LINUX_EXEC_PATH = "/usr/lib/libreoffice/program/soffice";
+    public static final String DEFAULT_LINUX_FLATPAK_EXEC_PATH = "/app/bin/soffice";
     public static final String LINUX_EXECUTABLE = "soffice";
-
-    public static final List<String> OO_JARS = Arrays.asList("unoil.jar", "jurt.jar", "juh.jar", "ridl.jar");
 
     private String executablePath = "";
     private String installationPath = "";
@@ -27,10 +25,8 @@ public class OpenOfficePreferences {
     private boolean showPanel;
     private List<String> externalStyles = new ArrayList<>();
     private String currentStyle = "";
-    private String jarsPath = "";
 
     public OpenOfficePreferences(
-            String jarsPath,
             String executablePath,
             String installationPath,
             boolean useAllDatabases,
@@ -39,7 +35,6 @@ public class OpenOfficePreferences {
             List<String> externalStyles,
             String currentStyle
     ) {
-        this.jarsPath = jarsPath;
         this.executablePath = executablePath;
         this.installationPath = installationPath;
         this.useAllDatabases = useAllDatabases;
@@ -51,7 +46,6 @@ public class OpenOfficePreferences {
 
     public void clearCurrentStyle() {
         this.currentStyle = null;
-        // TODO: sync to prefs
     }
 
     /**
@@ -131,26 +125,13 @@ public class OpenOfficePreferences {
         this.currentStyle = currentStyle;
     }
 
-    /**
-     * directory that contains juh.jar, jurt.jar, ridl.jar, unoil.jar
-     */
-    public String getJarsPath() {
-        return jarsPath;
-    }
-
-    public void setJarsPath(String jarsPath) {
-        this.jarsPath = jarsPath;
-    }
-
     public void updateConnectionParams(String ooPath, String execPath, String jarsPath) {
         setInstallationPath(ooPath);
         setExecutablePath(execPath);
-        setJarsPath(jarsPath);
     }
 
     public void clearConnectionSettings() {
         this.installationPath = "";
         this.executablePath = "";
-        this.jarsPath = "";
     }
 }

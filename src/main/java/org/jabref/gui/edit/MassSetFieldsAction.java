@@ -37,7 +37,6 @@ public class MassSetFieldsAction extends SimpleCommand {
     @Override
     public void execute() {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
-        MassSetFieldsDialog dialog = new MassSetFieldsDialog(stateManager.getSelectedEntries(), database, dialogService, undoManager);
-        dialog.showAndWait();
+        dialogService.showCustomDialogAndWait(new MassSetFieldsDialog(stateManager.getSelectedEntries(), database, dialogService, undoManager));
     }
 }

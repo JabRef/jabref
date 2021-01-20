@@ -1,6 +1,9 @@
 package org.jabref.gui.importer;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
+
+import com.airhacks.afterburner.injection.Injector;
 
 public class ManageCustomImportsAction extends SimpleCommand {
 
@@ -9,6 +12,7 @@ public class ManageCustomImportsAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        new ImportCustomizationDialog().showAndWait();
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+        dialogService.showCustomDialog(new ImportCustomizationDialog());
     }
 }
