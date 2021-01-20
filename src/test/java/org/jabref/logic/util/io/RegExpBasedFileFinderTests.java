@@ -94,6 +94,23 @@ class RegExpBasedFileFinderTests {
     }
 
     @Test
+    void findAssociatedFilesFindFileContainingParenthesizesFromBracketedExpression() throws Exception {
+        var bibEntry = new BibEntry().withCitationKey("Guo_ICC_2010")
+                                     .withField(StandardField.TITLE, "Ferroelectric Metal Organic Framework (MOF)")
+                                     .withField(StandardField.AUTHOR, "Guo, M. and Cai, H.-L. and Xiong, R.-G.")
+                                     .withField(StandardField.JOURNAL, "Inorganic Chemistry Communications")
+                                     .withField(StandardField.YEAR, "2010");
+
+        var extension = Collections.singletonList("pdf");
+        var directory = Collections.singletonList(Path.of(FILES_DIRECTORY));
+        RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/.*[TITLE].*\\\\.[extension]", ',');
+
+        List<Path> result = fileFinder.findAssociatedFiles(bibEntry, directory, extension);
+        assertEquals(Collections.singletonList(Path.of("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/directory/subdirectory/GUO ea - INORG CHEM COMMUN 2010 - Ferroelectric Metal Organic Framework (MOF).pdf")),
+                result);
+    }
+
+    @Test
     void testAuthorWithDiacritics() throws Exception {
         // given
         BibEntry localEntry = new BibEntry(StandardEntryType.Article);
