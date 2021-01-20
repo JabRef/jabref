@@ -4,7 +4,7 @@ After reading through this guide, check out some good first issues to contribute
 
 In case you are aiming to contribute other improvements, please head over to our general [JabRef contribution page](https://docs.jabref.org/faqcontributing).
 
-In case you are an instructor and want to use **JabRef as software engineering example**, please head to [https://devdocs.jabref.org/teaching](https://devdocs.jabref.org/teaching).
+In case you are an instructor and want to use **JabRef as a software engineering example**, please head to [https://devdocs.jabref.org/teaching](https://devdocs.jabref.org/teaching).
 
 ## Contribute code
 
@@ -16,7 +16,7 @@ We welcome contributions to JabRef and encourage you to follow the GitHub workfl
    1. Fork the JabRef into your GitHub account.
    2. Clone your forked repository on your local machine.
 2. **Create a new branch** \(such as `fix-for-issue-121`\). Be sure to create a **separate branch** for each improvement you implement.
-3. Do your work on the **new branch - not the master branch.** Refer to our [code howtos](https://devdocs.jabref.org/getting-into-the-code/code-howtos) if you have questions about your implementation.
+3. Do your work on the **new branch — not the master branch.** Refer to our [code how-tos](https://devdocs.jabref.org/getting-into-the-code/code-howtos) if you have questions about your implementation.
 4. Create a pull request. For an overview of pull requests, take a look at GitHub's [pull request help documentation](https://help.github.com/articles/about-pull-requests/).
 5. In case your pull request is not yet complete or not yet ready for review, consider creating a [draft pull request](https://github.blog/2019-02-14-introducing-draft-pull-requests/) instead.
 
@@ -32,7 +32,7 @@ You should edit the [`CHANGELOG.md`](https://github.com/JabRef/jabref/blob/maste
 
 If you did internal refactorings or improvements not visible to the user \(e.g., UI, .bib file\), then you don't need to put an entry there.
 
-**Format of keyboard shortcuts**
+#### **Format of keyboard shortcuts**
 
 Example: `<kbd>Ctrl</kbd> + <kbd>Enter</kbd>`
 
@@ -75,7 +75,7 @@ Actual   :[Opens\ JabRef's\ Twitter\ page (src\main\java\org\jabref\gui\JabRefFr
 
 Add the above snippet to the English translation file located at `src/main/resources/l10n/JabRef_en.properties`. [Crowdin](https://crowdin.com/project/jabref) will automatically pick up the new string and add it to the other translations.
 
-You can also directly run the specific test in your IDE. The test "LocalizationConsistencyTest" is placed under `src/test/java/net.sf.jabref.logic.l10n/LocalizationConsistencyTest.java` Find more information in the [JabRef developer docs](https://devdocs.jabref.org/getting-into-the-code/code-howtos#using-localization-correctly).
+You can also directly run the specific test in your IDE. The test "LocalizationConsistencyTest" is placed under `src/test/java/net.sf.jabref.logic.l10n/LocalizationConsistencyTest.java`. Find more information in the [JabRef developer docs](https://devdocs.jabref.org/getting-into-the-code/code-howtos#using-localization-correctly).
 
 #### When adding a library
 
@@ -87,7 +87,7 @@ In case you add a library or do major code rewrites, we ask you to document your
 
 We simply ask to create a new markdown file in `docs/adr` following the template presented at [https://adr.github.io/madr/](https://adr.github.io/madr/).
 
-In case you want to directly add a comment to a class, simply use following template \(based on [sustainable architectural decisions](https://www.infoq.com/articles/sustainable-architectural-design-decisions)\):
+In case you want to directly add a comment to a class, simply use the following template \(based on [sustainable architectural decisions](https://www.infoq.com/articles/sustainable-architectural-design-decisions)\):
 
 ```text
 In the context of <use case/user story u>,
@@ -109,7 +109,7 @@ If you want to indicate that a pull request is not yet complete **before** creat
 
 For improving developer's documentation, go on at the [docs/ subdirectory of JabRef's code](https://github.com/JabRef/jabref/tree/master/docs) and edit the file. GitHub offers a good guide at [Editing files in another user's repository](https://help.github.com/en/github/managing-files-in-a-repository/editing-files-in-another-users-repository).
 
-In case you use some gitbook special features and you want to test them, checkout JabRef's code locally, and execute following steps:
+In case you use some gitbook special features, and you want to test them, checkout JabRef's code locally, and execute following steps:
 
 1. `npm install -g gitbook`
 2. `cd docs`
