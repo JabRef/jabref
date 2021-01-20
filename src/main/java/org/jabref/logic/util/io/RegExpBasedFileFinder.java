@@ -206,6 +206,7 @@ class RegExpBasedFileFinder implements FileFinder {
         try (Stream<Path> pathStream = Files.find(actualDirectory, 1, matcher, FileVisitOption.FOLLOW_LINKS)) {
             resultFiles.addAll(pathStream.collect(Collectors.toList()));
         } catch (UncheckedIOException uncheckedIOException) {
+            // Previously, an empty list were returned here on both IOException and UncheckedIOException
             throw uncheckedIOException.getCause();
         }
         return resultFiles;
