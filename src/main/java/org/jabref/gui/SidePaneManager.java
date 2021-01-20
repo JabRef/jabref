@@ -29,7 +29,7 @@ public class SidePaneManager {
 
         OpenOfficePreferences openOfficePreferences = preferencesService.getOpenOfficePreferences();
         Stream.of(
-                new GroupSidePane(this, preferencesService, dialogService, stateManager),
+                new GroupSidePane(this, preferencesService, dialogService),
                 new WebSearchPane(this, preferencesService, dialogService, stateManager),
                 new OpenOfficeSidePanel(this, preferencesService, frame))
               .forEach(pane -> components.put(pane.getType(), pane));
