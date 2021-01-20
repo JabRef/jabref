@@ -94,6 +94,19 @@ class RegExpBasedFileFinderTests {
     }
 
     @Test
+    void findAssociatedFilesFindCleamedFileFromBracketedExpression() throws Exception {
+        var bibEntry = new BibEntry().withField(StandardField.JOURNAL, "ACM/IEEE-CS");
+
+        var extension = Collections.singletonList("pdf");
+        var directory = Collections.singletonList(Path.of(FILES_DIRECTORY));
+        RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("[JOURNAL]\\\\.[extension]", ',');
+
+        List<Path> result = fileFinder.findAssociatedFiles(bibEntry, directory, extension);
+        assertEquals(Collections.singletonList(Path.of("src/test/resources/org/jabref/logic/importer/unlinkedFilesTestFolder/ACM_IEEE-CS.pdf")),
+                result);
+    }
+
+    @Test
     void findAssociatedFilesFindFileContainingParenthesizesFromBracketedExpression() throws Exception {
         var bibEntry = new BibEntry().withCitationKey("Guo_ICC_2010")
                                      .withField(StandardField.TITLE, "Ferroelectric Metal Organic Framework (MOF)")
