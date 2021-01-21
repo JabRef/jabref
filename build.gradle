@@ -568,7 +568,7 @@ jlink {
     mergedModule {
         requires 'java.compiler';
         requires 'java.datatransfer';
-        requires 'java.desktop':
+        requires 'java.desktop';
         requires 'java.logging';
         requires 'java.management';
         requires 'java.naming';
