@@ -28,7 +28,7 @@ import com.tobiasdiez.easybind.EasyBind;
 public class MainTableDataModel {
     private final FilteredList<BibEntryTableViewModel> entriesFiltered;
     private final SortedList<BibEntryTableViewModel> entriesSorted;
-    private GroupViewMode groupViewMode;
+    private final GroupViewMode groupViewMode;
     private final ObjectProperty<MainTableFieldValueFormatter> fieldValueFormatter;
     private final PreferencesService preferencesService;
     private final BibDatabaseContext bibDatabaseContext;
@@ -53,6 +53,8 @@ public class MainTableDataModel {
         stateManager.setActiveSearchResultSize(context, resultSize);
         // We need to wrap the list since otherwise sorting in the table does not work
         entriesSorted = new SortedList<>(entriesFiltered);
+        groupViewMode = preferencesService.getGroupViewMode();
+
     }
 
     private boolean isMatched(ObservableList<GroupTreeNode> groups, Optional<SearchQuery> query, BibEntryTableViewModel entry) {
@@ -75,8 +77,6 @@ public class MainTableDataModel {
             // No selected group, show all entries
             return Optional.empty();
         }
-
-        groupViewMode = preferencesService.getGroupViewMode();
 
         final MatcherSet searchRules = MatcherSets.build(groupViewMode == GroupViewMode.INTERSECTION ? MatcherSets.MatcherType.AND : MatcherSets.MatcherType.OR);
 
