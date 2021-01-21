@@ -1,5 +1,7 @@
 package org.jabref.model.groups;
 
+import java.util.Objects;
+
 import org.jabref.model.entry.field.Field;
 
 /**
@@ -32,5 +34,25 @@ public abstract class KeywordGroup extends AbstractGroup {
     @Override
     public boolean isDynamic() {
         return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+        KeywordGroup that = (KeywordGroup) o;
+        return isCaseSensitive() == that.isCaseSensitive() && Objects.equals(getSearchField(), that.getSearchField()) && Objects.equals(getSearchExpression(), that.getSearchExpression());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), getSearchField(), getSearchExpression(), isCaseSensitive());
     }
 }

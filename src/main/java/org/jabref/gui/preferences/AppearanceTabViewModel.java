@@ -93,7 +93,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
             themeLightProperty.setValue(false);
             themeDarkProperty.setValue(false);
             themeCustomProperty.setValue(true);
-            customPathToThemeProperty.setValue(currentTheme.getPath().toString());
+            customPathToThemeProperty.setValue(currentTheme.getCssPathString());
         }
     }
 
@@ -116,7 +116,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
             restartWarnings.add(Localization.lang("Theme changed to dark theme."));
             newTheme = new Theme(EMBEDDED_DARK_THEME_CSS, preferences);
         } else if (themeCustomProperty.getValue() &&
-                (!initialAppearancePreferences.getTheme().getPath().toString()
+                (!initialAppearancePreferences.getTheme().getCssPathString()
                                               .equalsIgnoreCase(customPathToThemeProperty.getValue())
                         || initialAppearancePreferences.getTheme().getType() != Theme.Type.CUSTOM)) {
             restartWarnings.add(Localization.lang("Theme changed to a custom theme:") + " "

@@ -119,8 +119,7 @@ public class BibtexParser implements Parser {
     }
 
     /**
-     * Will parse the BibTex-Data found when reading from reader. Ignores any encoding supplied in the file by
-     * "Encoding: myEncoding".
+     * Will parse the BibTex-Data found when reading from reader. Ignores any encoding supplied in the file by "Encoding: myEncoding".
      * <p>
      * The reader will be consumed.
      * <p>
@@ -311,8 +310,7 @@ public class BibtexParser implements Parser {
     }
 
     /**
-     * Puts all text that has been read from the reader, including newlines, etc., since the last call of this method into a string.
-     * Removes the JabRef file header, if it is found
+     * Puts all text that has been read from the reader, including newlines, etc., since the last call of this method into a string. Removes the JabRef file header, if it is found
      *
      * @return the text read so far
      */
@@ -611,8 +609,7 @@ public class BibtexParser implements Parser {
     }
 
     /**
-     * This method is used to parse string labels, field names, entry type and
-     * numbers outside brackets.
+     * This method is used to parse string labels, field names, entry type and numbers outside brackets.
      */
     private String parseTextToken() throws IOException {
         StringBuilder token = new StringBuilder(20);
