@@ -2,12 +2,10 @@ package org.jabref.gui.preferences;
 
 import java.nio.charset.Charset;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.Globals;
@@ -40,14 +38,8 @@ public class GeneralTabView extends AbstractPreferenceTabView<GeneralTabViewMode
     @FXML private TextField markOwnerName;
     @FXML private CheckBox markOwnerOverwrite;
     @FXML private Button markOwnerHelp;
-    @FXML private CheckBox markTimestamp;
-    @FXML private TextField markTimeStampFormat;
-    @FXML private Label markTimeStampFormatLabel;
-    @FXML private CheckBox markTimeStampOverwrite;
-    @FXML private TextField markTimeStampFieldName;
-    @FXML private Label markTimeStampFieldNameLabel;
-    @FXML private Button markTimeStampHelp;
-    @FXML private CheckBox updateTimeStamp;
+    @FXML private CheckBox addCreationDate;
+    @FXML private CheckBox addModificationDate;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -98,22 +90,12 @@ public class GeneralTabView extends AbstractPreferenceTabView<GeneralTabViewMode
         markOwnerOverwrite.selectedProperty().bindBidirectional(viewModel.markOwnerOverwriteProperty());
         markOwnerOverwrite.disableProperty().bind(markOwner.selectedProperty().not());
 
-        markTimestamp.selectedProperty().bindBidirectional(viewModel.markTimestampProperty());
-        markTimeStampFormatLabel.disableProperty().bind(markTimestamp.selectedProperty().not());
-        markTimeStampFormat.textProperty().bindBidirectional(viewModel.markTimeStampFormatProperty());
-        markTimeStampFormat.disableProperty().bind(markTimestamp.selectedProperty().not());
-        markTimeStampOverwrite.selectedProperty().bindBidirectional(viewModel.markTimeStampOverwriteProperty());
-        markTimeStampOverwrite.disableProperty().bind(markTimestamp.selectedProperty().not());
-        markTimeStampFieldNameLabel.disableProperty().bind(markTimestamp.selectedProperty().not());
-        markTimeStampFieldName.textProperty().bindBidirectional(viewModel.markTimeStampFieldNameProperty());
-        markTimeStampFieldName.disableProperty().bind(markTimestamp.selectedProperty().not());
-        updateTimeStamp.selectedProperty().bindBidirectional(viewModel.updateTimeStampProperty());
+        addCreationDate.selectedProperty().bindBidirectional(viewModel.addCreationDateProperty());
+        addModificationDate.selectedProperty().bindBidirectional(viewModel.addModificationDateProperty());
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER), markOwnerHelp);
-        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.TIMESTAMP), markTimeStampHelp);
 
         validationVisualizer.setDecoration(new IconValidationDecorator());
-        Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.markTimeStampFormatValidationStatus(), markTimeStampFormat));
     }
 }

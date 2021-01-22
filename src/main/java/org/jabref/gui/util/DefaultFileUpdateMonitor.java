@@ -32,7 +32,7 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFileUpdateMonitor.class);
 
     private final Multimap<Path, FileUpdateListener> listeners = ArrayListMultimap.create(20, 4);
-    private WatchService watcher;
+    private volatile WatchService watcher;
     private final AtomicBoolean notShutdown = new AtomicBoolean(true);
     private Optional<JabRefException> filesystemMonitorFailure;
 
@@ -102,7 +102,10 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
     public void shutdown() {
         try {
             notShutdown.set(false);
-            watcher.close();
+            WatchService watcher = this.watcher;
+            if (watcher != null) {
+                watcher.close();
+            }
         } catch (IOException e) {
             LOGGER.error("error closing watcher", e);
         }

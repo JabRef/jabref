@@ -10,6 +10,7 @@ import org.jabref.logic.crawler.git.GitHandler;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrderConfig;
@@ -27,6 +28,7 @@ import static org.mockito.Mockito.when;
 class StudyDatabaseToFetcherConverterTest {
     ImportFormatPreferences importFormatPreferences;
     SavePreferences savePreferences;
+    TimestampPreferences timestampPreferences;
     BibEntryTypesManager entryTypesManager;
     GitHandler gitHandler;
     @TempDir
@@ -36,6 +38,7 @@ class StudyDatabaseToFetcherConverterTest {
     void setUpMocks() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
+        timestampPreferences = mock(TimestampPreferences.class);
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
         when(savePreferences.getEncoding()).thenReturn(null);
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
@@ -52,7 +55,7 @@ class StudyDatabaseToFetcherConverterTest {
         Path studyDefinition = tempRepositoryDirectory.resolve("study.yml");
         copyTestStudyDefinitionFileIntoDirectory(studyDefinition);
 
-        StudyRepository studyRepository = new StudyRepository(tempRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, entryTypesManager);
+        StudyRepository studyRepository = new StudyRepository(tempRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, timestampPreferences, entryTypesManager);
         StudyDatabaseToFetcherConverter converter = new StudyDatabaseToFetcherConverter(studyRepository.getActiveLibraryEntries(), importFormatPreferences);
         List<SearchBasedFetcher> result = converter.getActiveFetchers();
 

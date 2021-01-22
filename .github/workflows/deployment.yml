@@ -1,6 +1,7 @@
 name: Deployment
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
@@ -41,7 +42,7 @@ jobs:
     name: Create installer and portable version for ${{ matrix.displayName }}
     steps:
       - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.6.0
+        uses: styfle/cancel-workflow-action@0.7.0
         with:
           access_token: ${{ github.token }}
       - name: Fetch all history for all tags and branches
@@ -49,12 +50,12 @@ jobs:
         with:
           fetch-depth: 0
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.7
+        uses: gittools/actions/gitversion/setup@v0.9.8
         with:
           versionSpec: "5.x"
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v0.9.7
+        uses: gittools/actions/gitversion/execute@v0.9.8
       - name: Set up JDK 15 for linux and mac
         uses: actions/setup-java@v1
         with:
@@ -96,11 +97,11 @@ jobs:
         if: matrix.os == 'macos-latest'
         shell: bash
         run: |
-          codesign --entitlements buildres/mac/myapp.entitlements --options runtime -vvv -f --sign "Developer ID Application: Tobias Diez (W2PU6LW5U5)" build/distribution/JabRef.app/Contents/runtime/Contents/MacOS/libjli.dylib
-          codesign --entitlements buildres/mac/myapp.entitlements --options runtime -vvv -f --sign "Developer ID Application: Tobias Diez (W2PU6LW5U5)" build/distribution/JabRef.app/Contents/MacOS/JabRef
-          codesign --entitlements buildres/mac/myapp.entitlements --options runtime -vvv -f --sign "Developer ID Application: Tobias Diez (W2PU6LW5U5)" build/distribution/JabRef.app
+          codesign --entitlements buildres/mac/jabref.entitlements --options runtime -vvv -f --sign "Developer ID Application: Tobias Diez (W2PU6LW5U5)" build/distribution/JabRef.app/Contents/runtime/Contents/MacOS/libjli.dylib
+          codesign --entitlements buildres/mac/jabref.entitlements --options runtime -vvv -f --sign "Developer ID Application: Tobias Diez (W2PU6LW5U5)" build/distribution/JabRef.app/Contents/MacOS/JabRef
+          codesign --entitlements buildres/mac/jabref.entitlements --options runtime -vvv -f --sign "Developer ID Application: Tobias Diez (W2PU6LW5U5)" build/distribution/JabRef.app
           jpackage --type pkg --dest build/distribution --name JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --app-image build/distribution/JabRef.app --verbose --type dmg --vendor JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --file-associations buildres/mac/bibtexAssociations.properties --resource-dir buildres/mac
-          codesign -s "Developer ID Application: Tobias Diez (W2PU6LW5U5)" --options runtime --entitlements buildres/mac/myapp.entitlements -vvvv --deep "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg"
+          codesign -s "Developer ID Application: Tobias Diez (W2PU6LW5U5)" --options runtime --entitlements buildres/mac/jabref.entitlements -vvvv --deep "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg"
           jpackage --type pkg --dest build/distribution --name JabRef --mac-package-identifier JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --app-image build/distribution/JabRef.app --verbose --type pkg --vendor JabRef --app-version "${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" --file-associations buildres/mac/bibtexAssociations.properties --resource-dir buildres/mac
           productsign --sign "Developer ID Installer: Tobias Diez (W2PU6LW5U5)" "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg" "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg"
       - name: Notarize dmg and pkg installer
@@ -161,12 +162,12 @@ jobs:
       - name: Fetch all history for all tags and branches
         run: git fetch --prune --unshallow
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.7
+        uses: gittools/actions/gitversion/setup@v0.9.8
         with:
           versionSpec: '5.x'
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v0.9.7
+        uses: gittools/actions/gitversion/execute@v0.9.8
       - name: Get linux binaries
         uses: actions/download-artifact@master
         with:

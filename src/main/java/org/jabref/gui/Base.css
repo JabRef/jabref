@@ -427,8 +427,11 @@
 }
 
 .check-box > .box > .mark {
-    -fx-background-color: -fx-control-inner-background;
     -fx-padding: 0.2em 0.2em 0.2em 0.2em;
+}
+
+.check-box:selected > .box > .mark {
+    -fx-background-color: -fx-control-inner-background;
     -fx-shape: "M6.61 11.89L3.5 8.78 2.44 9.84 6.61 14l8.95-8.95L14.5 4z";
     -fx-stroke-width: 5;
 }

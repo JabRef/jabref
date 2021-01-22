@@ -280,7 +280,7 @@ class BracketedPatternTest {
     }
 
     @Test
-    void expandBracketsWithModifierContainingRegexCharacterCkass() {
+    void expandBracketsWithModifierContainingRegexCharacterClass() {
         BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Wickedness:Managing");
 
         assertEquals("Wickedness.Managing", BracketedPattern.expandBrackets("[title:regex(\"[:]+\",\".\")]", null, bibEntry, null));
@@ -291,5 +291,37 @@ class BracketedPatternTest {
         BibEntry bibEntry = new BibEntry();
 
         assertEquals("", BracketedPattern.expandBrackets("[]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsInstitutionAbbreviationFromProvidedAbbreviation() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.AUTHOR, "{European Union Aviation Safety Agency ({EUASABRACKET})}");
+
+        assertEquals("EUASABRACKET", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsInstitutionAbbreviationForAuthorContainingUnion() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.AUTHOR, "{European Union Aviation Safety Agency}");
+
+        assertEquals("EUASA", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsLastNameForAuthorStartingWithOnlyLastNameStartingWithLowerCase() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.AUTHOR, "{eBay}");
+
+        assertEquals("eBay", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsLastNameWithChineseCharacters() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.AUTHOR, "杨秀群");
+
+        assertEquals("杨秀群", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
     }
 }
