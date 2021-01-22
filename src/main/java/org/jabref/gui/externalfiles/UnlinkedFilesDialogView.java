@@ -236,6 +236,7 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     void exportSelected() {
         viewModel.startExport();
     }
+
     /**
      * Expands or collapses the specified tree according to the <code>expand</code>-parameter.
      */

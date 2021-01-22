@@ -346,7 +346,6 @@ public class FileUtil {
         return getFileExtension(file).filter(type -> "bib".equals(type)).isPresent();
     }
 
-
     /**
      * Test if the file is a bib file by simply checking the extension to be ".bib"
      *
