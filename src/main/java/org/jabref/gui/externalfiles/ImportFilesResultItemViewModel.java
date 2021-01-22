@@ -22,8 +22,7 @@ public class ImportFilesResultItemViewModel {
         this.message.setValue(message);
         if (success) {
             this.icon.setValue(IconTheme.JabRefIcons.CHECK.withColor(Color.GREEN));
-        }
-        else {
+        } else {
             this.icon.setValue(IconTheme.JabRefIcons.WARNING.withColor(Color.RED));
         }
     }

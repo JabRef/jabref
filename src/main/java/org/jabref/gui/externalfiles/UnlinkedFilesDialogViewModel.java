@@ -120,11 +120,8 @@ public class UnlinkedFilesDialogViewModel {
                     progressValueProperty.set(0);
                     taskActiveProperty.setValue(false);
                 })
-                .onSuccess(root -> {
-                    progressValueProperty.set(0);
-                    taskActiveProperty.setValue(false);
-                    treeRootProperty.setValue(root);
-                });
+                .onSuccess(treeRootProperty::setValue);
+
         findUnlinkedFilesTask.executeWith(taskExecutor);
     }
 

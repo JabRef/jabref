@@ -26,6 +26,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.TreeItem;
 import javafx.scene.layout.VBox;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -179,8 +180,8 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
                 .withText(item -> item).withTooltip(item -> item)
                 .install(colMessage);
 
-        colStatus.setCellValueFactory(cellData -> cellData.getValue().getIcon());
-        colStatus.setCellFactory(new ValueTableCellFactory<ImportFilesResultItemViewModel, JabRefIcon>().withGraphic(this::getIcon));
+        colStatus.setCellValueFactory(cellData -> cellData.getValue().icon());
+        colStatus.setCellFactory(new ValueTableCellFactory<ImportFilesResultItemViewModel, JabRefIcon>().withGraphic(JabRefIcon::getGraphicNode));
         importResultTable.setColumnResizePolicy((param) -> true);
 
         importResultTable.setItems(viewModel.resultTableItems());

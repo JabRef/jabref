@@ -100,7 +100,7 @@
                     </Button>
                     <Button onAction="#startImport" text="%Import" fx:id="importButton" ButtonBar.buttonData="APPLY">
                         <tooltip>
-                            <Tooltip text="Starts the import of BibTeX entries."/>
+                            <Tooltip text="%Starts the import of BibTeX entries."/>
                         </tooltip>
                     </Button>
                 </buttons>
