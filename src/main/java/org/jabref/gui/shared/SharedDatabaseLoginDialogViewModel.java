@@ -203,7 +203,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
         if (rememberPassword.get()) {
             try {
-                prefs.setPassword(new Password(password.getValue(), password.getValue()).encrypt());
+                prefs.setPassword(new Password(password.getValue(), user.getValue()).encrypt());
             } catch (GeneralSecurityException | UnsupportedEncodingException e) {
                 LOGGER.error("Could not store the password due to encryption problems.", e);
             }
