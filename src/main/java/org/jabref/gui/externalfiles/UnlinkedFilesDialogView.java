@@ -5,7 +5,6 @@ import javax.swing.undo.UndoManager;
 
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Accordion;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -22,12 +21,9 @@ import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
@@ -168,8 +164,8 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
                 .withText(item -> item).withTooltip(item -> item)
                 .install(colMessage);
 
-        colStatus.setCellValueFactory(cellData -> cellData.getValue().getIcon());
-        colStatus.setCellFactory(new ValueTableCellFactory<ImportFilesResultItemViewModel, JabRefIcon>().withGraphic(this::getIcon));
+        colStatus.setCellValueFactory(cellData -> cellData.getValue().icon());
+        colStatus.setCellFactory(new ValueTableCellFactory<ImportFilesResultItemViewModel, JabRefIcon>().withGraphic(JabRefIcon::getGraphicNode));
         tvResult.setColumnResizePolicy((param) -> true);
     }
 
@@ -207,17 +203,6 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
     void exportSelected() {
         viewModel.startExport();
     }
-
-    private Node getIcon(JabRefIcon icon) {
-        if (icon == IconTheme.JabRefIcons.CHECK) {
-            icon = icon.withColor(Color.GREEN);
-        }
-        if (icon == IconTheme.JabRefIcons.WARNING) {
-            icon = icon.withColor(Color.RED);
-        }
-        return icon.getGraphicNode();
-    }
-
     /**
      * Expands or collapses the specified tree according to the <code>expand</code>-parameter.
      */

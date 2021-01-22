@@ -49,13 +49,13 @@ public class Localization {
      * @param params Replacement strings for parameters %0, %1, etc.
      * @return The message with replaced parameters
      */
-    public static <T> String lang(String key, T... params) {
+    public static String lang(String key, Object... params) {
         if (localizedMessages == null) {
             // I'm logging this because it should never happen
             LOGGER.error("Messages are not initialized before accessing key: {}", key);
             setLanguage(Language.ENGLISH);
         }
-        var stringParams = Arrays.stream(params).map(T::toString).toArray(String[]::new);
+        var stringParams = Arrays.stream(params).map(Object::toString).toArray(String[]::new);
 
         return lookup(localizedMessages, key, stringParams);
     }

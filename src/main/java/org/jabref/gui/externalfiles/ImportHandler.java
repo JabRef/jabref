@@ -10,7 +10,6 @@ import java.util.List;
 import javax.swing.undo.CompoundEdit;
 import javax.swing.undo.UndoManager;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.undo.UndoableInsertEntries;
@@ -48,8 +47,7 @@ public class ImportHandler {
     private int counter;
     private List<BibEntry> entriesToAdd;
 
-    public ImportHandler(DialogService dialogService,
-                         BibDatabaseContext database,
+    public ImportHandler(BibDatabaseContext database,
                          ExternalFileTypes externalFileTypes,
                          PreferencesService preferencesService,
                          FileUpdateMonitor fileupdateMonitor,
@@ -78,21 +76,20 @@ public class ImportHandler {
                 results = new ArrayList<>();
                 counter = 1;
                 CompoundEdit ce = new CompoundEdit();
-                for (int i = 0; i < files.size(); i++) {
-
-                    var file = files.get(i);
+                for (Path file: files) {
                     entriesToAdd = Collections.emptyList();
 
                     if (isCanceled()) {
                         break;
                     }
+
                     DefaultTaskExecutor.runInJavaFXThread(() -> {
-                        updateMessage(Localization.lang("Processing file %0 of %1", counter, files.size()));
+                        updateMessage(Localization.lang("Processing file %0", file.getFileName()));
                         updateProgress(counter, files.size() - 1);
                     });
 
                     try {
-                        if (FileUtil.getFileExtension(file).filter("pdf"::equals).isPresent()) {
+                        if (FileUtil.isPDFFile(file)) {
 
                             var xmpParserResult = contentImporter.importXMPContent(file);
                             List<BibEntry> xmpEntriesInFile = xmpParserResult.getDatabase().getEntries();
@@ -131,7 +128,7 @@ public class ImportHandler {
                             addResultToList(file, false, Localization.lang("Importing bib entry"));
                         } else {
                             entriesToAdd = Collections.singletonList(createEmptyEntryWithLink(file));
-                            addResultToList(file, false, Localization.lang("No bibtex data found. Creating empty entry with file link"));
+                            addResultToList(file, false, Localization.lang("No BibTeX data found. Creating empty entry with file link"));
                         }
                     } catch (IOException ex) {
                         LOGGER.error("Error importing", ex);

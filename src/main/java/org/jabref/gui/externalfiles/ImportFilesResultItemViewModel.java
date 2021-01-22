@@ -6,6 +6,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.paint.Color;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
@@ -20,12 +21,15 @@ public class ImportFilesResultItemViewModel {
         this.file.setValue(file.toString());
         this.message.setValue(message);
         if (success) {
-            this.icon.setValue(IconTheme.JabRefIcons.CHECK);
+            this.icon.setValue(IconTheme.JabRefIcons.CHECK.withColor(Color.GREEN));
+        }
+        else {
+            this.icon.setValue(IconTheme.JabRefIcons.WARNING.withColor(Color.RED));
         }
     }
 
-    public ObjectProperty<JabRefIcon> getIcon() {
-        return icon;
+    public ObjectProperty<JabRefIcon> icon() {
+        return this.icon;
     }
 
     public StringProperty file() {

@@ -89,7 +89,6 @@ public class UnlinkedFilesDialogViewModel {
         this.taskExecutor = taskExecutor;
         this.bibDatabase = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
         importHandler = new ImportHandler(
-                dialogService,
                 bibDatabase,
                 externalFileTypes,
                 preferences,
@@ -122,7 +121,6 @@ public class UnlinkedFilesDialogViewModel {
 
         importFilesBackgroundTask = importHandler.importFilesInBackground(fileList)
                                                  .onRunning(() -> {
-
                                                      progress.bind(importFilesBackgroundTask.workDonePercentageProperty());
                                                      progressText.bind(importFilesBackgroundTask.messageProperty());
 
@@ -131,15 +129,6 @@ public class UnlinkedFilesDialogViewModel {
                                                      applyButtonDisabled.setValue(true);
                                                  })
                                                  .onFinished(() -> {
-                                                     progress.unbind();
-                                                     progressText.unbind();
-                                                     searchProgressVisible.setValue(false);
-                                                     scanButtonDisabled.setValue(false);
-                                                     resultPaneExpanded.setValue(true);
-                                                     resultPaneVisble.setValue(true);
-
-                                                 })
-                                                 .onSuccess(results -> {
                                                      applyButtonDisabled.setValue(false);
                                                      exportButtonDisabled.setValue(false);
                                                      scanButtonDefaultButton.setValue(false);
@@ -151,8 +140,8 @@ public class UnlinkedFilesDialogViewModel {
                                                      filePaneExpanded.setValue(false);
                                                      resultPaneExpanded.setValue(true);
                                                      resultPaneVisble.setValue(true);
-                                                     resultList.addAll(results);
-                                                 });
+                                                 })
+                                                 .onSuccess(resultList::addAll);
         importFilesBackgroundTask.executeWith(taskExecutor);
     }
 
@@ -218,21 +207,15 @@ public class UnlinkedFilesDialogViewModel {
                     treeRoot.setValue(null);
                 })
                 .onFinished(() -> {
-                    scanButtonDisabled.setValue(false);
-                    applyButtonDisabled.setValue(false);
-                    searchProgressVisible.set(false);
                     progress.set(0);
-                    searchProgressVisible.set(false);
-                })
-                .onSuccess(root -> {
-                    treeRoot.setValue(root);
-                    progress.set(0);
-
                     applyButtonDisabled.setValue(false);
                     exportButtonDisabled.setValue(false);
                     scanButtonDefaultButton.setValue(false);
                     searchProgressVisible.set(false);
-                });
+                })
+                .onSuccess(treeRoot::setValue);
+
+
         findUnlinkedFilesTask.executeWith(taskExecutor);
     }
 
