@@ -17,9 +17,9 @@ import javax.swing.undo.UndoManager;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -56,19 +56,12 @@ public class UnlinkedFilesDialogViewModel {
     private final StringProperty directoryPath = new SimpleStringProperty("");
     private final ObjectProperty<FileExtensionViewModel> selectedExtension = new SimpleObjectProperty<>();
 
-    private final BooleanProperty searchProgressVisible = new SimpleBooleanProperty(false);
-    private final BooleanProperty applyButtonDisabled = new SimpleBooleanProperty();
-    private final BooleanProperty scanButtonDisabled = new SimpleBooleanProperty(true);
-    private final BooleanProperty exportButtonDisabled = new SimpleBooleanProperty();
-    private final ObjectProperty<FileNodeViewModel> treeRoot = new SimpleObjectProperty<>();
-    private final ObservableList<TreeItem<FileNodeViewModel>> checkedFileList = FXCollections.observableArrayList();
+    private final ObjectProperty<FileNodeViewModel> treeRootProperty = new SimpleObjectProperty<>();
+    private final SimpleListProperty<TreeItem<FileNodeViewModel>> checkedFileListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
 
-    private final BooleanProperty scanButtonDefaultButton = new SimpleBooleanProperty();
-    private final DoubleProperty progress = new SimpleDoubleProperty(0);
-    private final StringProperty progressText = new SimpleStringProperty();
-    private final BooleanProperty filePaneExpanded = new SimpleBooleanProperty();
-    private final BooleanProperty resultPaneExpanded = new SimpleBooleanProperty();
-    private final BooleanProperty resultPaneVisble = new SimpleBooleanProperty();
+    private final BooleanProperty taskActiveProperty = new SimpleBooleanProperty(false);
+    private final DoubleProperty progressValueProperty = new SimpleDoubleProperty(0);
+    private final StringProperty progressTextProperty = new SimpleStringProperty();
 
     private final ObservableList<ImportFilesResultItemViewModel> resultList = FXCollections.observableArrayList();
     private final ObservableList<FileExtensionViewModel> fileFilterList;
@@ -105,14 +98,41 @@ public class UnlinkedFilesDialogViewModel {
         scanDirectoryValidator = new FunctionBasedValidator<>(directoryPath, isDirectory,
                 ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
 
-        treeRoot.setValue(null);
+        treeRootProperty.setValue(null);
+    }
+
+    public void startSearch() {
+        Path directory = this.getSearchDirectory();
+        Filter<Path> selectedFileFilter = selectedExtension.getValue().dirFilter();
+
+        progressValueProperty.unbind();
+        progressTextProperty.unbind();
+
+        findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, bibDatabase, preferences.getFilePreferences())
+                .onRunning(() -> {
+                    progressValueProperty.set(ProgressIndicator.INDETERMINATE_PROGRESS);
+                    progressTextProperty.setValue(Localization.lang("Searching file system..."));
+                    progressTextProperty.bind(findUnlinkedFilesTask.messageProperty());
+                    taskActiveProperty.setValue(true);
+                    treeRootProperty.setValue(null);
+                })
+                .onFinished(() -> {
+                    progressValueProperty.set(0);
+                    taskActiveProperty.setValue(false);
+                })
+                .onSuccess(root -> {
+                    progressValueProperty.set(0);
+                    taskActiveProperty.setValue(false);
+                    treeRootProperty.setValue(root);
+                });
+        findUnlinkedFilesTask.executeWith(taskExecutor);
     }
 
     public void startImport() {
-        List<Path> fileList = checkedFileList.stream()
-                                             .map(item -> item.getValue().getPath())
-                                             .filter(path -> path.toFile().isFile())
-                                             .collect(Collectors.toList());
+        List<Path> fileList = checkedFileListProperty.stream()
+                                                     .map(item -> item.getValue().getPath())
+                                                     .filter(path -> path.toFile().isFile())
+                                                     .collect(Collectors.toList());
         if (fileList.isEmpty()) {
             LOGGER.warn("There are no valid files checked");
             return;
@@ -121,25 +141,14 @@ public class UnlinkedFilesDialogViewModel {
 
         importFilesBackgroundTask = importHandler.importFilesInBackground(fileList)
                                                  .onRunning(() -> {
-                                                     progress.bind(importFilesBackgroundTask.workDonePercentageProperty());
-                                                     progressText.bind(importFilesBackgroundTask.messageProperty());
-
-                                                     searchProgressVisible.setValue(true);
-                                                     scanButtonDisabled.setValue(true);
-                                                     applyButtonDisabled.setValue(true);
+                                                     progressValueProperty.bind(importFilesBackgroundTask.workDonePercentageProperty());
+                                                     progressTextProperty.bind(importFilesBackgroundTask.messageProperty());
+                                                     taskActiveProperty.setValue(true);
                                                  })
                                                  .onFinished(() -> {
-                                                     applyButtonDisabled.setValue(false);
-                                                     exportButtonDisabled.setValue(false);
-                                                     scanButtonDefaultButton.setValue(false);
-
-                                                     progress.unbind();
-                                                     progressText.unbind();
-                                                     searchProgressVisible.setValue(false);
-
-                                                     filePaneExpanded.setValue(false);
-                                                     resultPaneExpanded.setValue(true);
-                                                     resultPaneVisble.setValue(true);
+                                                     progressValueProperty.unbind();
+                                                     progressTextProperty.unbind();
+                                                     taskActiveProperty.setValue(false);
                                                  })
                                                  .onSuccess(resultList::addAll);
         importFilesBackgroundTask.executeWith(taskExecutor);
@@ -149,25 +158,23 @@ public class UnlinkedFilesDialogViewModel {
      * This starts the export of all files of all selected nodes in the file tree view.
      */
     public void startExport() {
-        List<Path> fileList = checkedFileList.stream()
-                                             .map(item -> item.getValue().getPath())
-                                             .filter(path -> path.toFile().isFile())
-                                             .collect(Collectors.toList());
+        List<Path> fileList = checkedFileListProperty.stream()
+                                                     .map(item -> item.getValue().getPath())
+                                                     .filter(path -> path.toFile().isFile())
+                                                     .collect(Collectors.toList());
         if (fileList.isEmpty()) {
             LOGGER.warn("There are no valid files checked");
             return;
         }
 
-        exportButtonDisabled.setValue(true);
-        applyButtonDisabled.setValue(true);
-
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .withInitialDirectory(preferences.getWorkingDir()).build();
+                .withInitialDirectory(preferences.getWorkingDir())
+                .addExtensionFilter(StandardFileType.TXT)
+                .withDefaultExtension(StandardFileType.TXT)
+                .build();
         Optional<Path> exportPath = dialogService.showFileSaveDialog(fileDialogConfiguration);
 
         if (exportPath.isEmpty()) {
-            exportButtonDisabled.setValue(false);
-            applyButtonDisabled.setValue(false);
             return;
         }
 
@@ -179,88 +186,15 @@ public class UnlinkedFilesDialogViewModel {
         } catch (IOException e) {
             LOGGER.error("Error exporting", e);
         }
-
-        exportButtonDisabled.setValue(false);
-        applyButtonDisabled.setValue(false);
-    }
-
-    public void startSearch() {
-        Path directory = this.getSearchDirectory();
-        Filter<Path> selectedFileFilter = selectedExtension.getValue().dirFilter();
-
-        filePaneExpanded.setValue(true);
-        resultPaneExpanded.setValue(false);
-        resultPaneVisble.setValue(false);
-
-        progress.unbind();
-        progressText.unbind();
-
-        findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, bibDatabase, preferences.getFilePreferences())
-                .onRunning(() -> {
-                    progress.set(ProgressIndicator.INDETERMINATE_PROGRESS);
-                    progressText.setValue(Localization.lang("Searching file system..."));
-                    progressText.bind(findUnlinkedFilesTask.messageProperty());
-
-                    searchProgressVisible.setValue(true);
-                    scanButtonDisabled.setValue(true);
-                    applyButtonDisabled.set(true);
-                    treeRoot.setValue(null);
-                })
-                .onFinished(() -> {
-                    progress.set(0);
-                    applyButtonDisabled.setValue(false);
-                    exportButtonDisabled.setValue(false);
-                    scanButtonDefaultButton.setValue(false);
-                    searchProgressVisible.set(false);
-                })
-                .onSuccess(treeRoot::setValue);
-
-
-        findUnlinkedFilesTask.executeWith(taskExecutor);
-    }
+     }
 
     public StringProperty directoryPath() {
         return this.directoryPath;
+
     }
 
     public ObservableList<FileExtensionViewModel> getFileFilters() {
         return this.fileFilterList;
-    }
-
-    public ObjectProperty<FileExtensionViewModel> selectedExtension() {
-        return this.selectedExtension;
-    }
-
-    public BooleanProperty searchProgressVisible() {
-        return this.searchProgressVisible;
-    }
-
-    public BooleanProperty applyButtonDisabled() {
-        return this.applyButtonDisabled;
-    }
-
-    public BooleanProperty scanButtonDisabled() {
-        return this.scanButtonDisabled;
-    }
-
-    public BooleanProperty exportButtonDisabled() {
-        return this.exportButtonDisabled;
-    }
-
-    public void browseFileDirectory() {
-        DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(preferences.getWorkingDir()).build();
-
-        dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
-                     .ifPresent(selectedDirectory -> {
-                         directoryPath.setValue(selectedDirectory.toAbsolutePath().toString());
-                         preferences.setWorkingDirectory(selectedDirectory.toAbsolutePath());
-                         this.scanButtonDisabled.setValue(false);
-                     });
-    }
-
-    public ObjectProperty<FileNodeViewModel> treeRoot() {
-        return this.treeRoot;
     }
 
     public void cancelTasks() {
@@ -272,16 +206,15 @@ public class UnlinkedFilesDialogViewModel {
         }
     }
 
-    public BooleanProperty scanButtonDefaultButton() {
-        return this.scanButtonDefaultButton;
-    }
+    public void browseFileDirectory() {
+        DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
+                .withInitialDirectory(preferences.getWorkingDir()).build();
 
-    public DoubleProperty progress() {
-        return this.progress;
-    }
-
-    public StringProperty progressText() {
-        return this.progressText;
+        dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
+                     .ifPresent(selectedDirectory -> {
+                         directoryPath.setValue(selectedDirectory.toAbsolutePath().toString());
+                         preferences.setWorkingDirectory(selectedDirectory.toAbsolutePath());
+                     });
     }
 
     private Path getSearchDirectory() {
@@ -301,23 +234,35 @@ public class UnlinkedFilesDialogViewModel {
         return this.resultList;
     }
 
-    public BooleanProperty filePaneExpanded() {
-        return this.filePaneExpanded;
+    public ObjectProperty<FileNodeViewModel> treeRootProperty() {
+        return this.treeRootProperty;
     }
 
-    public BooleanProperty resultPaneExpanded() {
-        return this.resultPaneExpanded;
+    public ObjectProperty<FileExtensionViewModel> selectedExtensionProperty() {
+        return this.selectedExtension;
     }
 
-    public ObservableList<TreeItem<FileNodeViewModel>> getCheckedFileList() {
-        return new ReadOnlyListWrapper<>(checkedFileList);
+    public StringProperty directoryPathProperty() {
+        return this.directoryPath;
     }
 
-    public ValidationStatus directoryPathValidator() {
+    public ValidationStatus directoryPathValidationStatus() {
         return this.scanDirectoryValidator.getValidationStatus();
     }
 
-    public BooleanProperty resultPaneVisble() {
-        return this.resultPaneVisble;
+    public DoubleProperty progressValueProperty() {
+        return this.progressValueProperty;
+    }
+
+    public StringProperty progressTextProperty() {
+        return this.progressTextProperty;
+    }
+
+    public BooleanProperty taskActiveProperty() {
+        return this.taskActiveProperty;
+    }
+
+    public SimpleListProperty<TreeItem<FileNodeViewModel>> checkedFileListProperty() {
+        return checkedFileListProperty;
     }
 }
