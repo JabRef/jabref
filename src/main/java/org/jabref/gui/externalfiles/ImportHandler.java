@@ -43,9 +43,6 @@ public class ImportHandler {
     private final ExternalFilesContentImporter contentImporter;
     private final UndoManager undoManager;
     private final StateManager stateManager;
-    private List<ImportFilesResultItemViewModel> results;
-    private int counter;
-    private List<BibEntry> entriesToAdd;
 
     public ImportHandler(BibDatabaseContext database,
                          ExternalFileTypes externalFileTypes,
@@ -70,10 +67,12 @@ public class ImportHandler {
 
     public BackgroundTask<List<ImportFilesResultItemViewModel>> importFilesInBackground(List<Path> files) {
         return new BackgroundTask<>() {
+            private int counter;
+            private List<BibEntry> entriesToAdd;
+            private final List<ImportFilesResultItemViewModel> results = new ArrayList<>();
 
             @Override
             protected List<ImportFilesResultItemViewModel> call() {
-                results = new ArrayList<>();
                 counter = 1;
                 CompoundEdit ce = new CompoundEdit();
                 for (Path file: files) {
@@ -148,12 +147,12 @@ public class ImportHandler {
                 }
                 return results;
             }
-        };
-    }
 
-    private void addResultToList(Path newFile, boolean success, String logMessage) {
-        var result = new ImportFilesResultItemViewModel(newFile, success, logMessage);
-        results.add(result);
+            private void addResultToList(Path newFile, boolean success, String logMessage) {
+                var result = new ImportFilesResultItemViewModel(newFile, success, logMessage);
+                results.add(result);
+            }
+        };
     }
 
     private BibEntry createEmptyEntryWithLink(Path file) {
