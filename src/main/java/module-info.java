@@ -61,11 +61,6 @@ open module org.jabref {
     requires jbibtex;
     requires citeproc.java;
     requires antlr.runtime;
-    requires org.graalvm.truffle;
-    requires org.graalvm.sdk;
-    requires transitive org.graalvm.js;
-    requires java.scripting;
-    requires jdk.internal.vm.compiler;
     requires org.apache.xmpbox;
     requires de.saxsys.mvvmfx.validation;
     requires com.google.gson;

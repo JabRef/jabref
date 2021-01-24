@@ -1,6 +1,7 @@
 package org.jabref.logic.l10n;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -48,13 +49,15 @@ public class Localization {
      * @param params Replacement strings for parameters %0, %1, etc.
      * @return The message with replaced parameters
      */
-    public static String lang(String key, String... params) {
+    public static String lang(String key, Object... params) {
         if (localizedMessages == null) {
             // I'm logging this because it should never happen
             LOGGER.error("Messages are not initialized before accessing key: {}", key);
             setLanguage(Language.ENGLISH);
         }
-        return lookup(localizedMessages, key, params);
+        var stringParams = Arrays.stream(params).map(Object::toString).toArray(String[]::new);
+
+        return lookup(localizedMessages, key, stringParams);
     }
 
     /**

@@ -8,9 +8,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.citationkeypattern.BracketedPattern;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
@@ -28,7 +27,6 @@ class RegExpBasedFileFinder implements FileFinder {
 
     private static final Pattern ESCAPE_PATTERN = Pattern.compile("([^\\\\])\\\\([^\\\\])");
 
-    private static final Pattern SQUARE_BRACKETS_PATTERN = Pattern.compile("\\[.*?\\]");
     private final String regExp;
     private final Character keywordDelimiter;
 
@@ -41,21 +39,41 @@ class RegExpBasedFileFinder implements FileFinder {
     }
 
     /**
-     * Takes a string that contains bracketed expression and expands each of these using getFieldAndFormat.
-     * <p>
-     * Unknown Bracket expressions are silently dropped.
+     * Creates a Pattern that matches the file name corresponding to the last element of {@code fileParts} with any bracketed patterns expanded.
+     *
+     * @throws IOException throws an IOException if a PatternSyntaxException occurs
      */
-    public static String expandBrackets(String bracketString, BibEntry entry, BibDatabase database,
-                                        Character keywordDelimiter) {
-        Matcher matcher = SQUARE_BRACKETS_PATTERN.matcher(bracketString);
-        StringBuilder expandedStringBuffer = new StringBuilder();
-        while (matcher.find()) {
-            String replacement = BracketedPattern.expandBrackets(matcher.group(), keywordDelimiter, entry, database);
-            matcher.appendReplacement(expandedStringBuffer, replacement);
-        }
-        matcher.appendTail(expandedStringBuffer);
+    private Pattern createFileNamePattern(String[] fileParts, String extensionRegExp, BibEntry entry) throws IOException {
+        // Protect the extension marker so that it isn't treated as a bracketed pattern
+        String filePart = fileParts[fileParts.length - 1].replace("[extension]", EXT_MARKER);
 
-        return expandedStringBuffer.toString();
+        // We need to supply a custom function to deal with the content of a bracketed expression and expandBracketContent is the default function
+        Function<String, String> expandBracket = BracketedPattern.expandBracketContent(keywordDelimiter, entry, null);
+        // but, we want to post-process the expanded content so that it can be used as a regex for finding a file name
+        Function<String, String> bracketToFileNameRegex = expandBracket.andThen(RegExpBasedFileFinder::toFileNameRegex);
+
+        String expandedBracketAsFileNameRegex = BracketedPattern.expandBrackets(filePart, bracketToFileNameRegex);
+
+        String fileNamePattern = expandedBracketAsFileNameRegex
+                .replaceAll(EXT_MARKER, extensionRegExp) // Replace the extension marker
+                .replaceAll("\\\\\\\\", "\\\\");
+        try {
+            return Pattern.compile('^' + fileNamePattern + '$', Pattern.CASE_INSENSITIVE);
+        } catch (PatternSyntaxException e) {
+            throw new IOException(String.format("There is a syntax error in the regular expression %s used to search for files", fileNamePattern), e);
+        }
+    }
+
+    /**
+     * Helper method for both exact matching (if the file name were not created by JabRef) and cleaned file name matching.
+     *
+     * @param expandedContent the expanded content of a bracketed expression
+     * @return a String representation of a regex matching the expanded content and the expanded content cleaned for file name use
+     */
+    private static String toFileNameRegex(String expandedContent) {
+        var cleanedContent = FileNameCleaner.cleanFileName(expandedContent);
+        return expandedContent.equals(cleanedContent) ? Pattern.quote(expandedContent) :
+                "(" + Pattern.quote(expandedContent) + ")|(" + Pattern.quote(cleanedContent) + ")";
     }
 
     /**
@@ -142,9 +160,7 @@ class RegExpBasedFileFinder implements FileFinder {
         }
 
         for (int index = 0; index < (fileParts.length - 1); index++) {
-
             String dirToProcess = fileParts[index];
-            dirToProcess = expandBrackets(dirToProcess, entry, null, keywordDelimiter);
 
             if (dirToProcess.matches("^.:$")) { // Windows Drive Letter
                 actualDirectory = Path.of(dirToProcess + '/');
@@ -179,33 +195,21 @@ class RegExpBasedFileFinder implements FileFinder {
                         resultFiles.addAll(findFile(entry, path, restOfFileString, extensionRegExp));
                     }
                 } catch (UncheckedIOException ioe) {
-                    throw new IOException(ioe);
+                    throw ioe.getCause();
                 }
             } // End process directory information
         }
 
         // Last step: check if the given file can be found in this directory
-        String filePart = fileParts[fileParts.length - 1].replace("[extension]", EXT_MARKER);
-        String filenameToLookFor = expandBrackets(filePart, entry, null, keywordDelimiter).replaceAll(EXT_MARKER, extensionRegExp);
-
-        try {
-            final Pattern toMatch = Pattern.compile('^' + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + '$',
-                    Pattern.CASE_INSENSITIVE);
-            BiPredicate<Path, BasicFileAttributes> matcher = (path, attributes) -> toMatch.matcher(path.getFileName().toString()).matches();
-            resultFiles.addAll(collectFilesWithMatcher(actualDirectory, matcher));
-        } catch (UncheckedIOException | PatternSyntaxException e) {
-            throw new IOException("Could not look for " + filenameToLookFor, e);
-        }
-
-        return resultFiles;
-    }
-
-    private List<Path> collectFilesWithMatcher(Path actualDirectory, BiPredicate<Path, BasicFileAttributes> matcher) {
+        Pattern toMatch = createFileNamePattern(fileParts, extensionRegExp, entry);
+        BiPredicate<Path, BasicFileAttributes> matcher = (path, attributes) -> toMatch.matcher(path.getFileName().toString()).matches();
         try (Stream<Path> pathStream = Files.find(actualDirectory, 1, matcher, FileVisitOption.FOLLOW_LINKS)) {
-            return pathStream.collect(Collectors.toList());
-        } catch (UncheckedIOException | IOException ioe) {
-            return Collections.emptyList();
+            resultFiles.addAll(pathStream.collect(Collectors.toList()));
+        } catch (UncheckedIOException uncheckedIOException) {
+            // Previously, an empty list were returned here on both IOException and UncheckedIOException
+            throw uncheckedIOException.getCause();
         }
+        return resultFiles;
     }
 
     private boolean isSubDirectory(Path rootDirectory, Path path) {
