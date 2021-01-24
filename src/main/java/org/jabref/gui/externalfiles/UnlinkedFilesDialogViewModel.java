@@ -56,7 +56,7 @@ public class UnlinkedFilesDialogViewModel {
     private final StringProperty directoryPath = new SimpleStringProperty("");
     private final ObjectProperty<FileExtensionViewModel> selectedExtension = new SimpleObjectProperty<>();
 
-    private final ObjectProperty<FileNodeViewModel> treeRootProperty = new SimpleObjectProperty<>();
+    private final ObjectProperty<Optional<FileNodeViewModel>> treeRootProperty = new SimpleObjectProperty<>();
     private final SimpleListProperty<TreeItem<FileNodeViewModel>> checkedFileListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final BooleanProperty taskActiveProperty = new SimpleBooleanProperty(false);
@@ -98,7 +98,7 @@ public class UnlinkedFilesDialogViewModel {
         scanDirectoryValidator = new FunctionBasedValidator<>(directoryPath, isDirectory,
                 ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
 
-        treeRootProperty.setValue(null);
+        treeRootProperty.setValue(Optional.empty());
     }
 
     public void startSearch() {
@@ -114,13 +114,13 @@ public class UnlinkedFilesDialogViewModel {
                     progressTextProperty.setValue(Localization.lang("Searching file system..."));
                     progressTextProperty.bind(findUnlinkedFilesTask.messageProperty());
                     taskActiveProperty.setValue(true);
-                    treeRootProperty.setValue(null);
+                    treeRootProperty.setValue(Optional.empty());
                 })
                 .onFinished(() -> {
                     progressValueProperty.set(0);
                     taskActiveProperty.setValue(false);
                 })
-                .onSuccess(treeRootProperty::setValue);
+                .onSuccess(treeRoot -> treeRootProperty.setValue(Optional.of(treeRoot)));
 
         findUnlinkedFilesTask.executeWith(taskExecutor);
     }
@@ -185,11 +185,6 @@ public class UnlinkedFilesDialogViewModel {
         }
      }
 
-    public StringProperty directoryPath() {
-        return this.directoryPath;
-
-    }
-
     public ObservableList<FileExtensionViewModel> getFileFilters() {
         return this.fileFilterList;
     }
@@ -231,7 +226,7 @@ public class UnlinkedFilesDialogViewModel {
         return this.resultList;
     }
 
-    public ObjectProperty<FileNodeViewModel> treeRootProperty() {
+    public ObjectProperty<Optional<FileNodeViewModel>> treeRootProperty() {
         return this.treeRootProperty;
     }
 

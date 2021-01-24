@@ -1,7 +1,5 @@
 package org.jabref.gui.externalfiles;
 
-import java.util.Objects;
-
 import javax.inject.Inject;
 import javax.swing.undo.UndoManager;
 
@@ -148,15 +146,9 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
         unlinkedFilesList.maxHeightProperty().bind(((Control) filePane.contentProperty().get()).heightProperty());
         unlinkedFilesList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
         unlinkedFilesList.rootProperty().bind(EasyBind.map(viewModel.treeRootProperty(),
-                fileNode -> {
-                    if (!Objects.isNull(fileNode)) {
-                        return new RecursiveTreeItem<>(fileNode, FileNodeViewModel::getChildren);
-                    } else {
-                        return null;
-                    }
-                }));
+                fileNode -> fileNode.map(fileNodeViewModel -> new RecursiveTreeItem<>(fileNodeViewModel, FileNodeViewModel::getChildren))
+                                    .orElse(null)));
 
         EasyBind.subscribe(unlinkedFilesList.rootProperty(), root -> {
             if (root != null) {
