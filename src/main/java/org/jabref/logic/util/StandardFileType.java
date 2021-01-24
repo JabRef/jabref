@@ -42,7 +42,8 @@ public enum StandardFileType implements FileType {
     XMP("xmp"),
     ZIP("zip"),
     CSS("css"),
-    YAML("yaml");
+    YAML("yaml"),
+    ANY_FILE("*");
 
     private final List<String> extensions;
 

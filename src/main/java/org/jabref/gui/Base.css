@@ -690,6 +690,31 @@
     -fx-padding: 0;
 }
 
+.accordion .titled-pane  {
+   -fx-skin: "org.jabref.gui.util.CustomTitledPaneSkin";
+   -fx-arrow-side: right;
+}
+
+.accordion .titled-pane .title {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-insets: 5 5 5 5;
+}
+
+.accordion .titled-pane > *.content {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+/*
+ * The arrow button has some right padding that's added
+ * by "modena.css". This simply puts the padding on the
+ * left since the arrow is positioned on the right.
+ */
+.titled-pane > .title > .arrow-button {
+    -fx-padding: 0.0em 0.0em 0.0em 0.583em;
+}
+
 .text-input {
     -fx-background-color: -fx-outer-border, -fx-control-inner-background;
     -fx-background-insets: 0, 1;
