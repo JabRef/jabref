@@ -89,13 +89,18 @@ public class FileFieldParser {
 
         if (field == null) {
             String pathStr = entry.get(1);
-            Path path;
-            try {
-                // there is no Path.isValidPath(String) method
-                path = Path.of(pathStr);
-                field = new LinkedFile(entry.get(0), path, entry.get(2));
-            } catch (InvalidPathException e) {
+            if (pathStr.contains("//")) {
+                // In case the path contains //, we assume it is a malformed URL, not a malformed path.
+                // On linux, the double slash would be converted to a single slash.
                 field = new LinkedFile(entry.get(0), pathStr, entry.get(2));
+            } else {
+                try {
+                    // there is no Path.isValidPath(String) method
+                    Path path = Path.of(pathStr);
+                    field = new LinkedFile(entry.get(0), path, entry.get(2));
+                } catch (InvalidPathException e) {
+                    field = new LinkedFile(entry.get(0), pathStr, entry.get(2));
+                }
             }
         }
 
