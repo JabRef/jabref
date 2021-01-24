@@ -10,4 +10,4 @@
 *******                                       ******** 
 ******************************************************
 
-Written by Matthias Stürmer - mstuermer[at]ethz.ch
+Written by Matthias StÃ¼rmer - mstuermer[at]ethz.ch
