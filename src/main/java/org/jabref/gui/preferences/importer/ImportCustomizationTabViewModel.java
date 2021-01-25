@@ -1,4 +1,4 @@
-package org.jabref.gui.importer;
+package org.jabref.gui.preferences.importer;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -14,6 +14,8 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
+import org.jabref.gui.importer.ImporterViewModel;
+import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.l10n.Localization;
@@ -24,9 +26,9 @@ import org.jabref.preferences.PreferencesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ImportCustomizationDialogViewModel extends AbstractViewModel {
+public class ImportCustomizationTabViewModel extends AbstractViewModel implements PreferenceTabViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ImportCustomizationDialogViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImportCustomizationTabViewModel.class);
 
     private final ListProperty<ImporterViewModel> importers = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<ImporterViewModel> selectedImporters = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -34,17 +36,28 @@ public class ImportCustomizationDialogViewModel extends AbstractViewModel {
     private final PreferencesService preferences;
     private final DialogService dialogService;
 
-    public ImportCustomizationDialogViewModel(PreferencesService preferences, DialogService dialogService) {
+    public ImportCustomizationTabViewModel(PreferencesService preferences, DialogService dialogService) {
         this.preferences = preferences;
         this.dialogService = dialogService;
-        loadImporters();
     }
 
-    private void loadImporters() {
+    @Override
+    public void setValues() {
         Set<CustomImporter> importersLogic = preferences.getCustomImportFormats();
         for (CustomImporter importer : importersLogic) {
             importers.add(new ImporterViewModel(importer));
         }
+    }
+
+    @Override
+    public void storeSettings() {
+        preferences.storeCustomImportFormats(importers.stream()
+                                                      .map(ImporterViewModel::getLogic)
+                                                      .collect(Collectors.toSet()));
+        Globals.IMPORT_FORMAT_READER.resetImportFormats(
+                preferences.getImportFormatPreferences(),
+                preferences.getXmpPreferences(),
+                Globals.getFileUpdateMonitor());
     }
 
     /**
@@ -123,16 +136,6 @@ public class ImportCustomizationDialogViewModel extends AbstractViewModel {
 
     public void removeSelectedImporter() {
         importers.removeAll(selectedImporters);
-    }
-
-    public void saveToPrefs() {
-        preferences.storeCustomImportFormats(importers.stream()
-                                                        .map(ImporterViewModel::getLogic)
-                                                        .collect(Collectors.toSet()));
-        Globals.IMPORT_FORMAT_READER.resetImportFormats(
-                preferences.getImportFormatPreferences(),
-                preferences.getXmpPreferences(),
-                Globals.getFileUpdateMonitor());
     }
 
     public ListProperty<ImporterViewModel> selectedImportersProperty() {
