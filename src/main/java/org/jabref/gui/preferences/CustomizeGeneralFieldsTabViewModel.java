@@ -1,6 +1,8 @@
-package org.jabref.gui.customizefields;
+package org.jabref.gui.preferences;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -14,21 +16,28 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.PreferencesService;
 
-public class CustomizeGeneralFieldsDialogViewModel {
+public class CustomizeGeneralFieldsTabViewModel implements PreferenceTabViewModel {
+
+    private final StringProperty fieldsProperty = new SimpleStringProperty();
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
-    private final StringProperty fieldsText = new SimpleStringProperty("");
 
-    public CustomizeGeneralFieldsDialogViewModel(DialogService dialogService, PreferencesService preferences) {
+    public CustomizeGeneralFieldsTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-
-        // Using stored custom values or, if they do not exist, default values
-        setFieldsText(preferences.getEntryEditorTabList());
     }
 
-    private void setFieldsText(Map<String, Set<Field>> tabNamesAndFields) {
+    @Override
+    public void setValues() {
+        setFieldsProperty(preferences.getEntryEditorTabList());
+    }
+
+    public void resetToDefaults() {
+        setFieldsProperty(preferences.getDefaultTabNamesAndFields());
+    }
+
+    private void setFieldsProperty(Map<String, Set<Field>> tabNamesAndFields) {
         StringBuilder sb = new StringBuilder();
 
         // Fill with customized vars
@@ -38,16 +47,13 @@ public class CustomizeGeneralFieldsDialogViewModel {
             sb.append(FieldFactory.serializeFieldsList(tab.getValue()));
             sb.append('\n');
         }
-        fieldsText.set(sb.toString());
+        fieldsProperty.set(sb.toString());
     }
 
-    public StringProperty fieldsTextProperty() {
-        return fieldsText;
-    }
-
-    public void saveFields() {
+    @Override
+    public void storeSettings() {
         Map<String, Set<Field>> customTabsMap = new LinkedHashMap<>();
-        String[] lines = fieldsText.get().split("\n");
+        String[] lines = fieldsProperty.get().split("\n");
 
         for (String line : lines) {
             String[] parts = line.split(":");
@@ -77,8 +83,17 @@ public class CustomizeGeneralFieldsDialogViewModel {
         preferences.storeEntryEditorTabList(customTabsMap);
     }
 
-    public void resetFields() {
-        // Using default values
-        setFieldsText(preferences.getDefaultTabNamesAndFields());
+    @Override
+    public boolean validateSettings() {
+        return true;
+    }
+
+    @Override
+    public List<String> getRestartWarnings() {
+        return new ArrayList<>();
+    }
+
+    public StringProperty fieldsProperty() {
+        return fieldsProperty;
     }
 }

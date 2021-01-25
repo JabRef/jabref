@@ -60,7 +60,6 @@ import org.jabref.gui.cleanup.CleanupAction;
 import org.jabref.gui.contentselector.ManageContentSelectorAction;
 import org.jabref.gui.copyfiles.CopyFilesAction;
 import org.jabref.gui.customentrytypes.CustomizeEntryAction;
-import org.jabref.gui.customizefields.SetupGeneralFieldsAction;
 import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.documentviewer.ShowDocumentViewerAction;

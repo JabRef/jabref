@@ -1,7 +1,8 @@
-package org.jabref.gui.customizefields;
+package org.jabref.gui;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.preferences.CustomizeGeneralFieldsTabView;
+import org.jabref.gui.preferences.SimplePreferencesDialog;
 
 import com.airhacks.afterburner.injection.Injector;
 
@@ -10,6 +11,6 @@ public class SetupGeneralFieldsAction extends SimpleCommand {
     @Override
     public void execute() {
         DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-        dialogService.showCustomDialogAndWait(new CustomizeGeneralFieldsDialogView());
+        dialogService.showCustomDialogAndWait(new SimplePreferencesDialog(new CustomizeGeneralFieldsTabView()));
     }
 }
