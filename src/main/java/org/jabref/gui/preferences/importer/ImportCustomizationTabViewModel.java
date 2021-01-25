@@ -11,7 +11,6 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.importer.ImporterViewModel;
@@ -26,7 +25,7 @@ import org.jabref.preferences.PreferencesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ImportCustomizationTabViewModel extends AbstractViewModel implements PreferenceTabViewModel {
+public class ImportCustomizationTabViewModel implements PreferenceTabViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportCustomizationTabViewModel.class);
 
