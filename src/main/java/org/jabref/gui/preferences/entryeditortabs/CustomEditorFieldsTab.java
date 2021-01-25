@@ -19,7 +19,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class CustomizeGeneralFieldsTabView extends AbstractPreferenceTabView<CustomizeGeneralFieldsTabViewModel> implements PreferencesTab {
+public class CustomEditorFieldsTab extends AbstractPreferenceTabView<CustomEditorFieldsTabViewModel> implements PreferencesTab {
 
     @FXML private Button generalFieldsHelp;
     @FXML private TextArea fieldsTextArea;
@@ -27,15 +27,19 @@ public class CustomizeGeneralFieldsTabView extends AbstractPreferenceTabView<Cus
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferences;
 
-    public CustomizeGeneralFieldsTabView() {
-
+    public CustomEditorFieldsTab() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
     }
 
+    @Override
+    public String getTabName() {
+        return Localization.lang("Custom editor tabs");
+    }
+
     public void initialize() {
-        viewModel = new CustomizeGeneralFieldsTabViewModel(dialogService, preferences);
+        viewModel = new CustomEditorFieldsTabViewModel(dialogService, preferences);
 
         fieldsTextArea.textProperty().bindBidirectional(viewModel.fieldsProperty());
 
@@ -43,23 +47,8 @@ public class CustomizeGeneralFieldsTabView extends AbstractPreferenceTabView<Cus
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.GENERAL_FIELDS), generalFieldsHelp);
     }
 
-    @Override
-    public String getTabName() {
-        return Localization.lang("Set General Fields");
-    }
-
-    @Override
-    public void setValues() {
-        viewModel.setValues();
-    }
-
     @FXML
     void resetToDefaults() {
         viewModel.resetToDefaults();
-    }
-
-    @Override
-    public void storeSettings() {
-        viewModel.storeSettings();
     }
 }

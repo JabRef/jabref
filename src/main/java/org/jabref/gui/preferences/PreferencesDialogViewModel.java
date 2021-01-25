@@ -15,7 +15,7 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.preferences.appearance.AppearanceTabView;
 import org.jabref.gui.preferences.citationkeypattern.CitationKeyPatternTabView;
 import org.jabref.gui.preferences.entryeditor.EntryEditorTabView;
-import org.jabref.gui.preferences.entryeditortabs.CustomizeGeneralFieldsTabView;
+import org.jabref.gui.preferences.entryeditortabs.CustomEditorFieldsTab;
 import org.jabref.gui.preferences.exporter.ExportCustomizationTab;
 import org.jabref.gui.preferences.external.ExternalTabView;
 import org.jabref.gui.preferences.file.FileTabView;
@@ -68,7 +68,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new ExternalTabView(preferences, frame.getPushToApplicationsManager()),
                 new GroupsTabView(preferences),
                 new EntryEditorTabView(preferences),
-                new CustomizeGeneralFieldsTabView(),
+                new CustomEditorFieldsTab(),
                 new CitationKeyPatternTabView(preferences),
                 new LinkedFilesTabView(preferences),
                 new NameFormatterTabView(preferences),

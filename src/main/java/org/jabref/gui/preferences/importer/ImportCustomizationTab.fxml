@@ -10,7 +10,7 @@
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.preferences.importer.ImportCustomizationTab">
 
-    <Label styleClass="titleHeader" text="%Manage custom imports"/>
+    <Label styleClass="titleHeader" text="%Custom import formats"/>
 
     <TableView fx:id="importerTable">
         <columns>
@@ -22,6 +22,7 @@
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
         </columnResizePolicy>
     </TableView>
+
     <HBox alignment="BASELINE_RIGHT" spacing="10.0">
         <Button fx:id="addButton" onAction="#add" text="%Add" prefWidth="80.0"/>
         <Button onAction="#remove" text="%Remove" prefWidth="80.0"/>

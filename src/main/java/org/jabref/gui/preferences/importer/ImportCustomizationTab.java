@@ -22,12 +22,11 @@ import com.tobiasdiez.easybind.EasyBind;
 
 public class ImportCustomizationTab extends AbstractPreferenceTabView<ImportCustomizationTabViewModel> implements PreferencesTab {
 
-    @FXML private Button addButton;
-
     @FXML private TableView<ImporterViewModel> importerTable;
     @FXML private TableColumn<ImporterViewModel, String> nameColumn;
     @FXML private TableColumn<ImporterViewModel, String> classColumn;
     @FXML private TableColumn<ImporterViewModel, String> basePathColumn;
+    @FXML private Button addButton;
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferences;
@@ -36,6 +35,11 @@ public class ImportCustomizationTab extends AbstractPreferenceTabView<ImportCust
         ViewLoader.view(this)
                   .root(this)
                   .load();
+    }
+
+    @Override
+    public String getTabName() {
+        return Localization.lang("Custom import formats");
     }
 
     @FXML
@@ -55,11 +59,6 @@ public class ImportCustomizationTab extends AbstractPreferenceTabView<ImportCust
         addButton.setTooltip(new Tooltip(
                 Localization.lang("Add a (compiled) custom Importer class from a class path.")
                         + "\n" + Localization.lang("The path need not be on the classpath of JabRef.")));
-    }
-
-    @Override
-    public String getTabName() {
-        return Localization.lang("Manage custom imports");
     }
 
     @FXML

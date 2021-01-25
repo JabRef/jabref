@@ -1,8 +1,6 @@
 package org.jabref.gui.preferences.entryeditortabs;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,14 +15,14 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.PreferencesService;
 
-public class CustomizeGeneralFieldsTabViewModel implements PreferenceTabViewModel {
+public class CustomEditorFieldsTabViewModel implements PreferenceTabViewModel {
 
     private final StringProperty fieldsProperty = new SimpleStringProperty();
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
 
-    public CustomizeGeneralFieldsTabViewModel(DialogService dialogService, PreferencesService preferences) {
+    public CustomEditorFieldsTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
     }
@@ -82,16 +80,6 @@ public class CustomizeGeneralFieldsTabViewModel implements PreferenceTabViewMode
         }
 
         preferences.storeEntryEditorTabList(customTabsMap);
-    }
-
-    @Override
-    public boolean validateSettings() {
-        return true;
-    }
-
-    @Override
-    public List<String> getRestartWarnings() {
-        return new ArrayList<>();
     }
 
     public StringProperty fieldsProperty() {

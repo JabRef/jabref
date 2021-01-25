@@ -35,6 +35,11 @@ public class ExportCustomizationTab extends AbstractPreferenceTabView<ExportCust
                   .load();
     }
 
+    @Override
+    public String getTabName() {
+        return Localization.lang("Custom export formats");
+    }
+
     @FXML
     private void initialize() {
         viewModel = new ExportCustomizationTabViewModel(preferences, dialogService, repository);
@@ -60,10 +65,5 @@ public class ExportCustomizationTab extends AbstractPreferenceTabView<ExportCust
     @FXML
     private void remove() {
         viewModel.removeExporters();
-    }
-
-    @Override
-    public String getTabName() {
-        return Localization.lang("Customize Export Formats");
     }
 }
