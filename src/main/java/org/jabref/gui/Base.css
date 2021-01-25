@@ -1217,6 +1217,6 @@ TextFlow * {
 
 }
 
-.mainTable-header{
+.mainTable-header {
     -fx-fill: -fx-mid-text-color;
 }

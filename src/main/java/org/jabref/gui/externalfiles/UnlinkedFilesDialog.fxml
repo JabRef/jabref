@@ -34,14 +34,14 @@
                 <ColumnConstraints hgrow="SOMETIMES"/>
             </columnConstraints>
             <rowConstraints>
-                <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
-                <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="20.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="20.0" vgrow="SOMETIMES"/>
             </rowConstraints>
                 <Label text="%Start directory:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
                 <TextField fx:id="directoryPathField" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
                 <Button onAction="#browseFileDirectory" styleClass="icon-button,narrow"
                         GridPane.columnIndex="2" GridPane.rowIndex="0"
-                        prefHeight="20.0" prefWidth="20.0">
+                        minWidth="20.0" minHeight="20.0" prefHeight="20.0" prefWidth="20.0">
                     <graphic>
                         <JabRefIconView glyph="OPEN"/>
                     </graphic>
