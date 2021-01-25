@@ -50,9 +50,9 @@
                     </tooltip>
                 </Button>
 
-                <Label text="%File extension:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <Label text="%File type:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
                 <ComboBox fx:id="fileTypeCombo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                <Button fx:id="scanButton" onAction="#scanFiles" text="%Scan directory"
+                <Button fx:id="scanButton" onAction="#scanFiles" text="%Search"
                         GridPane.columnIndex="2" GridPane.rowIndex="1">
                     <tooltip>
                         <Tooltip text="%Searches the selected directory for unlinked files."/>
@@ -68,14 +68,14 @@
                             </ScrollPane>
                         </TitledPane>
                         <TitledPane fx:id="resultPane" text="%Import result" disable="true">
-                            <TableView fx:id="importResultTable">
+                            <TableView fx:id="importResultTable" styleClass="unlinkedFilesResultTable">
                                 <columns>
                                     <TableColumn fx:id="colStatus" prefWidth="100.0" text="%Status"/>
-                                    <TableColumn fx:id="colMessage" prefWidth="300.0" text="%Message"/>
                                     <TableColumn fx:id="colFile" prefWidth="500.0" text="%File"/>
+                                    <TableColumn fx:id="colMessage" prefWidth="300.0" text="%Message"/>
                                 </columns>
                                 <columnResizePolicy>
-                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                    <TableView fx:constant="UNCONSTRAINED_RESIZE_POLICY"/>
                                 </columnResizePolicy>
                             </TableView>
                         </TitledPane>
