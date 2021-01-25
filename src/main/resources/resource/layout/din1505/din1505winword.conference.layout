@@ -1,9 +1,9 @@
-{[\Bibtexkey]:}	
-{\\scaps \format[Authors(LastFirst,Initials,FullPunc,Semicolon,Comma,inf),RTFChars]{\author}}
+{[\Bibtexkey]:}
+{\\scaps \format[Authors(LastFirst,Semicolon,Amp),RTFChars]{\author}}
 : \format[RTFChars]{\title}}
 . In:
 \begin{editor}
- {\\scaps \format[Authors(LastFirst,Initials,FullPunc,Semicolon,Comma,inf),RTFChars]{\editor}} (Hrsg.)
+ {\\scaps \format[Authors(LastFirst,Semicolon,Amp),RTFChars]{\editor}} (Hrsg.)
 \end{editor}
 : {\\i \format[RTFChars]{\publisher}}.
 \begin{volume}
