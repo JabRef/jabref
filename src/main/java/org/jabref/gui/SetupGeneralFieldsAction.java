@@ -1,8 +1,8 @@
 package org.jabref.gui;
 
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.preferences.CustomizeGeneralFieldsTabView;
 import org.jabref.gui.preferences.SimplePreferencesDialog;
+import org.jabref.gui.preferences.entryeditortabs.CustomizeGeneralFieldsTabView;
 
 import com.airhacks.afterburner.injection.Injector;
 
