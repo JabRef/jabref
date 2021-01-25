@@ -129,10 +129,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                 initialTimestampPreferences.getTimestampFormat()));
     }
 
-    public boolean validateSettings() {
-        return true;
-    }
-
     @Override
     public List<String> getRestartWarnings() {
         return restartWarning;

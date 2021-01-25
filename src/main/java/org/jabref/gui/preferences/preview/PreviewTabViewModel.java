@@ -244,11 +244,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         return true;
     }
 
-    @Override
-    public List<String> getRestartWarnings() {
-        return new ArrayList<>();
-    }
-
     public void addToChosen() {
         List<PreviewLayout> selected = new ArrayList<>(availableSelectionModelProperty.getValue().getSelectedItems());
         availableSelectionModelProperty.getValue().clearSelection();

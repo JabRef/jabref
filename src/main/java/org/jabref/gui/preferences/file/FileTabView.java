@@ -1,8 +1,5 @@
 package org.jabref.gui.preferences.file;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -86,15 +83,5 @@ public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> imp
     @Override
     public String getTabName() {
         return Localization.lang("File");
-    }
-
-    @Override
-    public boolean validateSettings() {
-        return true;
-    }
-
-    @Override
-    public List<String> getRestartWarnings() {
-        return new ArrayList<>();
     }
 }

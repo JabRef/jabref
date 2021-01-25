@@ -123,11 +123,6 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     }
 
     @Override
-    public boolean validateSettings() {
-        return true;
-    }
-
-    @Override
     public List<String> getRestartWarnings() {
         return restartWarnings;
     }

@@ -299,11 +299,6 @@ public class TableTabViewModel implements PreferenceTabViewModel {
         return true;
     }
 
-    @Override
-    public List<String> getRestartWarnings() {
-        return restartWarnings;
-    }
-
     public ListProperty<MainTableColumnModel> columnsListProperty() {
         return this.columnsListProperty;
     }

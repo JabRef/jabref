@@ -2,8 +2,6 @@ package org.jabref.gui.preferences.linkedfiles;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -131,11 +129,6 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
             return false;
         }
         return true;
-    }
-
-    @Override
-    public List<String> getRestartWarnings() {
-        return new ArrayList<>();
     }
 
     public void mainFileDirBrowse() {

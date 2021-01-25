@@ -1,6 +1,5 @@
 package org.jabref.gui.preferences.file;
 
-import java.util.List;
 import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
@@ -127,16 +126,6 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         preferences.storeExportSaveOrder(newSaveOrderConfig);
 
         preferences.storeShouldAutosave(autosaveLocalLibraries.getValue());
-    }
-
-    @Override
-    public boolean validateSettings() {
-        return false;
-    }
-
-    @Override
-    public List<String> getRestartWarnings() {
-        return null;
     }
 
     // General

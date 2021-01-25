@@ -79,16 +79,6 @@ public class NameFormatterTabViewModel implements PreferenceTabViewModel {
         formatterListProperty.remove(formatter);
     }
 
-    @Override
-    public boolean validateSettings() {
-        return true;
-    }
-
-    @Override
-    public List<String> getRestartWarnings() {
-        return new ArrayList<>();
-    }
-
     public ListProperty<NameFormatterItemModel> formatterListProperty() {
         return formatterListProperty;
     }

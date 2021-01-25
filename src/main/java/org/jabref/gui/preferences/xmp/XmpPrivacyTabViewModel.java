@@ -1,8 +1,6 @@
 package org.jabref.gui.preferences.xmp;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -100,11 +98,6 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
             return false;
         }
         return true;
-    }
-
-    @Override
-    public List<String> getRestartWarnings() {
-        return new ArrayList<>();
     }
 
     public BooleanProperty xmpFilterEnabledProperty() {

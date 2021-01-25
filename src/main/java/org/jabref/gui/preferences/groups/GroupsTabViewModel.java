@@ -1,8 +1,5 @@
 package org.jabref.gui.preferences.groups;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -62,16 +59,6 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
                 displayGroupCountProperty.getValue(),
                 keywordSeparatorProperty.getValue().charAt(0));
         preferences.storeGroupsPreferences(newGroupsPreferences);
-    }
-
-    @Override
-    public boolean validateSettings() {
-        return true;
-    }
-
-    @Override
-    public List<String> getRestartWarnings() {
-        return new ArrayList<>();
     }
 
     public BooleanProperty groupViewModeIntersectionProperty() {

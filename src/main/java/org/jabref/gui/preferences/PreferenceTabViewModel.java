@@ -1,6 +1,6 @@
 package org.jabref.gui.preferences;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public interface PreferenceTabViewModel {
@@ -40,6 +40,6 @@ public interface PreferenceTabViewModel {
      * @return The messages for the changed properties (e. g. "Changed language: English")
      */
     default List<String> getRestartWarnings() {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 }
