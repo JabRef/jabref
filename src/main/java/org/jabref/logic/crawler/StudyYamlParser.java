@@ -13,15 +13,15 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-public class StudyYAMLParser {
+public class StudyYamlParser {
 
     /**
      * Parses the given yaml study definition file into a study instance
      */
-    public Study parseStudyYAMLFile(Path studyYAMLFile) throws IOException {
+    public Study parseStudyYamlFile(Path studyYamlFile) throws IOException {
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
         yamlMapper.registerModule(new JavaTimeModule());
-        try (InputStream fileInputStream = new FileInputStream(studyYAMLFile.toFile())) {
+        try (InputStream fileInputStream = new FileInputStream(studyYamlFile.toFile())) {
             return yamlMapper.readValue(fileInputStream, Study.class);
         }
     }
@@ -29,11 +29,11 @@ public class StudyYAMLParser {
     /**
      * Writes the given study instance into a yaml file to the given path
      */
-    public void writeStudyYAMLFile(Study study, Path studyYAMLFile) throws IOException {
+    public void writeStudyYamlFile(Study study, Path studyYamlFile) throws IOException {
         ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory().disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
                                                                     .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES));
         yamlMapper.registerModule(new JavaTimeModule());
         yamlMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        yamlMapper.writeValue(studyYAMLFile.toFile(), study);
+        yamlMapper.writeValue(studyYamlFile.toFile(), study);
     }
 }

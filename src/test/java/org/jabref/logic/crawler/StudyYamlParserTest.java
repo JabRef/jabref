@@ -16,7 +16,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class StudyYAMLParserTest {
+class StudyYamlParserTest {
     @TempDir
     static Path testDirectory;
     Study expectedStudy;
@@ -24,7 +24,7 @@ class StudyYAMLParserTest {
     @BeforeEach
     void setupStudy() throws Exception {
         Path destination = testDirectory.resolve("study.yml");
-        URL studyDefinition = StudyYAMLParser.class.getResource("study.yml");
+        URL studyDefinition = StudyYamlParser.class.getResource("study.yml");
         FileUtil.copyFile(Path.of(studyDefinition.toURI()), destination, true);
 
         List<String> authors = List.of("Jab Ref");
@@ -39,16 +39,16 @@ class StudyYAMLParserTest {
 
     @Test
     public void parseStudyFileSuccessfully() throws Exception {
-        Study study = new StudyYAMLParser().parseStudyYAMLFile(testDirectory.resolve("study.yml"));
+        Study study = new StudyYamlParser().parseStudyYamlFile(testDirectory.resolve("study.yml"));
 
         assertEquals(expectedStudy, study);
     }
 
     @Test
     public void writeStudyFileSuccessfully() throws Exception {
-        new StudyYAMLParser().writeStudyYAMLFile(expectedStudy, testDirectory.resolve("study.yml"));
+        new StudyYamlParser().writeStudyYamlFile(expectedStudy, testDirectory.resolve("study.yml"));
 
-        Study study = new StudyYAMLParser().parseStudyYAMLFile(testDirectory.resolve("study.yml"));
+        Study study = new StudyYamlParser().parseStudyYamlFile(testDirectory.resolve("study.yml"));
 
         assertEquals(expectedStudy, study);
     }

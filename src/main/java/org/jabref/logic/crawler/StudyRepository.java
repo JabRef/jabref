@@ -128,7 +128,7 @@ class StudyRepository {
      * @throws ParseException Problem parsing the study definition file.
      */
     private Study parseStudyFile() throws IOException {
-        return new StudyYAMLParser().parseStudyYAMLFile(studyDefinitionFile);
+        return new StudyYamlParser().parseStudyYamlFile(studyDefinitionFile);
     }
 
     /**
@@ -177,7 +177,7 @@ class StudyRepository {
     }
 
     private void persistStudy() throws IOException {
-        new StudyYAMLParser().writeStudyYAMLFile(study, studyDefinitionFile);
+        new StudyYamlParser().writeStudyYamlFile(study, studyDefinitionFile);
     }
 
     /**
