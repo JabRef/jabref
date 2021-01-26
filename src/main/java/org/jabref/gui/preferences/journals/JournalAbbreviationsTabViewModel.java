@@ -143,7 +143,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                     List<AbbreviationViewModel> builtInViewModels = result.stream()
                                                                           .map(AbbreviationViewModel::new)
                                                                           .collect(Collectors.toList());
-                    journalFiles.add(new AbbreviationsFileViewModel(builtInViewModels, "JabRef built in list"));
+                    journalFiles.add(new AbbreviationsFileViewModel(builtInViewModels, Localization.lang("JabRef built in list")));
                     selectLastJournalFile();
                 })
                 .onFailure(dialogService::showErrorDialogAndWait)
