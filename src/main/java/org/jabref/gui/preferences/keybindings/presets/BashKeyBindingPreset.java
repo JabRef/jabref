@@ -1,4 +1,4 @@
-package org.jabref.gui.keyboard.presets;
+package org.jabref.gui.preferences.keybindings.presets;
 
 import java.util.HashMap;
 import java.util.Map;

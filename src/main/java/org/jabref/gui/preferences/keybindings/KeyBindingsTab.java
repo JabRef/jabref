@@ -1,9 +1,8 @@
-package org.jabref.gui.keyboard;
+package org.jabref.gui.preferences.keybindings;
 
 import javax.inject.Inject;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
@@ -14,9 +13,10 @@ import javafx.scene.control.TreeTableView;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.keyboard.presets.KeyBindingPreset;
-import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
+import org.jabref.gui.preferences.PreferencesTab;
+import org.jabref.gui.preferences.keybindings.presets.KeyBindingPreset;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -25,10 +25,8 @@ import org.jabref.preferences.PreferencesService;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 
-public class KeyBindingsDialogView extends BaseDialog<Void> {
+public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabViewModel> implements PreferencesTab {
 
-    @FXML private ButtonType resetButton;
-    @FXML private ButtonType saveButton;
     @FXML private TreeTableView<KeyBindingViewModel> keyBindingsTable;
     @FXML private TreeTableColumn<KeyBindingViewModel, String> actionColumn;
     @FXML private TreeTableColumn<KeyBindingViewModel, String> shortcutColumn;
@@ -39,23 +37,21 @@ public class KeyBindingsDialogView extends BaseDialog<Void> {
     @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferences;
-    private KeyBindingsDialogViewModel viewModel;
 
-    public KeyBindingsDialogView() {
-        this.setTitle(Localization.lang("Key bindings"));
-        this.getDialogPane().setPrefSize(375, 475);
-
+    public KeyBindingsTab() {
         ViewLoader.view(this)
-                  .load()
-                  .setAsDialogPane(this);
+                  .root(this)
+                  .load();
+    }
 
-        ControlHelper.setAction(resetButton, getDialogPane(), event -> setDefaultBindings());
-        ControlHelper.setAction(saveButton, getDialogPane(), event -> saveKeyBindingsAndCloseDialog());
+    @Override
+    public String getTabName() {
+        return Localization.lang("Key bindings");
     }
 
     @FXML
     private void initialize() {
-        viewModel = new KeyBindingsDialogViewModel(keyBindingRepository, dialogService, preferences);
+        viewModel = new KeyBindingsTabViewModel(keyBindingRepository, dialogService, preferences);
 
         keyBindingsTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         viewModel.selectedKeyBindingProperty().bind(
@@ -89,18 +85,7 @@ public class KeyBindingsDialogView extends BaseDialog<Void> {
     }
 
     @FXML
-    private void closeDialog() {
-        close();
-    }
-
-    @FXML
-    private void saveKeyBindingsAndCloseDialog() {
-        viewModel.saveKeyBindings();
-        closeDialog();
-    }
-
-    @FXML
-    private void setDefaultBindings() {
+    private void resetBindings() {
         viewModel.resetToDefault();
     }
 }

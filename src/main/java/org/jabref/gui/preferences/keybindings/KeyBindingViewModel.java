@@ -1,4 +1,4 @@
-package org.jabref.gui.keyboard;
+package org.jabref.gui.preferences.keybindings;
 
 import java.util.Optional;
 
@@ -11,6 +11,9 @@ import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.gui.keyboard.KeyBindingCategory;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 
 import com.google.common.base.CaseFormat;
 

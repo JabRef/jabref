@@ -1,5 +1,7 @@
-package org.jabref.gui.keyboard;
+package org.jabref.gui.preferences.keybindings;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -13,17 +15,20 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyEvent;
 
-import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.keyboard.presets.BashKeyBindingPreset;
-import org.jabref.gui.keyboard.presets.KeyBindingPreset;
+import org.jabref.gui.keyboard.KeyBindingCategory;
+import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.preferences.PreferenceTabViewModel;
+import org.jabref.gui.preferences.keybindings.presets.BashKeyBindingPreset;
+import org.jabref.gui.preferences.keybindings.presets.KeyBindingPreset;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
-public class KeyBindingsDialogViewModel extends AbstractViewModel {
+public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
 
     private final KeyBindingRepository keyBindingRepository;
+    private final KeyBindingRepository initialKeyBindingRepository;
     private final PreferencesService preferences;
     private final OptionalObjectProperty<KeyBindingViewModel> selectedKeyBinding = OptionalObjectProperty.empty();
     private final ObjectProperty<KeyBindingViewModel> rootKeyBinding = new SimpleObjectProperty<>();
@@ -31,26 +36,22 @@ public class KeyBindingsDialogViewModel extends AbstractViewModel {
 
     private final DialogService dialogService;
 
-    public KeyBindingsDialogViewModel(KeyBindingRepository keyBindingRepository, DialogService dialogService, PreferencesService preferences) {
+    private final List<String> restartWarning = new ArrayList<>();
+
+    public KeyBindingsTabViewModel(KeyBindingRepository keyBindingRepository, DialogService dialogService, PreferencesService preferences) {
         this.keyBindingRepository = Objects.requireNonNull(keyBindingRepository);
+        this.initialKeyBindingRepository = new KeyBindingRepository(keyBindingRepository.getKeyBindings());
         this.dialogService = Objects.requireNonNull(dialogService);
         this.preferences = Objects.requireNonNull(preferences);
-        populateTable();
+
         keyBindingPresets.add(new BashKeyBindingPreset());
-    }
-
-    public OptionalObjectProperty<KeyBindingViewModel> selectedKeyBindingProperty() {
-        return selectedKeyBinding;
-    }
-
-    public ObjectProperty<KeyBindingViewModel> rootKeyBindingProperty() {
-        return rootKeyBinding;
     }
 
     /**
      * Read all keybindings from the keybinding repository and create table keybinding models for them
      */
-    private void populateTable() {
+    @Override
+    public void setValues() {
         KeyBindingViewModel root = new KeyBindingViewModel(keyBindingRepository, KeyBindingCategory.FILE);
         for (KeyBindingCategory category : KeyBindingCategory.values()) {
             KeyBindingViewModel categoryItem = new KeyBindingViewModel(keyBindingRepository, category);
@@ -81,13 +82,12 @@ public class KeyBindingsDialogViewModel extends AbstractViewModel {
         }
     }
 
-    public void saveKeyBindings() {
+    public void storeSettings() {
         preferences.storeKeyBindingRepository(keyBindingRepository);
 
-        String title = Localization.lang("Key bindings changed");
-        String content = Localization.lang("Your new key bindings have been stored.") + '\n'
-                + Localization.lang("You must restart JabRef for the new key bindings to work properly.");
-        dialogService.showInformationDialogAndWait(title, content);
+        if (!keyBindingRepository.equals(initialKeyBindingRepository)) {
+            restartWarning.add(Localization.lang("Key bindings changed"));
+        }
     }
 
     public void resetToDefault() {
@@ -98,7 +98,7 @@ public class KeyBindingsDialogViewModel extends AbstractViewModel {
                 ButtonType.CANCEL).ifPresent(response -> {
             if (response == resetButtonType) {
                 keyBindingRepository.resetToDefault();
-                populateTable();
+                setValues();
             }
         });
     }
@@ -109,10 +109,23 @@ public class KeyBindingsDialogViewModel extends AbstractViewModel {
         }
 
         preset.getKeyBindings().forEach(keyBindingRepository::put);
-        populateTable();
+        setValues();
     }
 
     public ListProperty<KeyBindingPreset> keyBindingPresets() {
         return keyBindingPresets;
+    }
+
+    @Override
+    public List<String> getRestartWarnings() {
+        return restartWarning;
+    }
+
+    public OptionalObjectProperty<KeyBindingViewModel> selectedKeyBindingProperty() {
+        return selectedKeyBinding;
+    }
+
+    public ObjectProperty<KeyBindingViewModel> rootKeyBindingProperty() {
+        return rootKeyBinding;
     }
 }

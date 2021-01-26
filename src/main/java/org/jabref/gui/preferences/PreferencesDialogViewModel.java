@@ -23,6 +23,7 @@ import org.jabref.gui.preferences.general.GeneralTabView;
 import org.jabref.gui.preferences.groups.GroupsTabView;
 import org.jabref.gui.preferences.importer.ImportCustomizationTab;
 import org.jabref.gui.preferences.journals.JournalAbbreviationsTab;
+import org.jabref.gui.preferences.keybindings.KeyBindingsTab;
 import org.jabref.gui.preferences.linkedfiles.LinkedFilesTabView;
 import org.jabref.gui.preferences.nameformatter.NameFormatterTabView;
 import org.jabref.gui.preferences.network.NetworkTabView;
@@ -63,6 +64,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
         preferenceTabs = FXCollections.observableArrayList(
                 new GeneralTabView(preferences),
+                new KeyBindingsTab(),
                 new FileTabView(preferences),
                 new TableTabView(preferences),
                 new PreviewTabView(preferences),

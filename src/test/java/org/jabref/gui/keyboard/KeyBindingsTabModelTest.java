@@ -7,6 +7,8 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.preferences.keybindings.KeyBindingViewModel;
+import org.jabref.gui.preferences.keybindings.KeyBindingsTabViewModel;
 import org.jabref.logic.util.OS;
 import org.jabref.preferences.PreferencesService;
 
@@ -23,15 +25,15 @@ import static org.mockito.Mockito.mock;
 /**
  * Test class for the keybindings dialog view model
  */
-class KeyBindingsDialogViewModelTest {
+class KeyBindingsTabModelTest {
 
-    private KeyBindingsDialogViewModel model;
+    private KeyBindingsTabViewModel model;
     private KeyBindingRepository keyBindingRepository;
 
     @BeforeEach
     void setUp() {
         keyBindingRepository = new KeyBindingRepository();
-        model = new KeyBindingsDialogViewModel(keyBindingRepository, mock(DialogService.class), mock(PreferencesService.class));
+        model = new KeyBindingsTabViewModel(keyBindingRepository, mock(DialogService.class), mock(PreferencesService.class));
     }
 
     @Test
@@ -43,7 +45,7 @@ class KeyBindingsDialogViewModelTest {
         model.setNewBindingForCurrent(shortcutKeyEvent);
         KeyCombination combination = KeyCombination.keyCombination(keyBindingRepository.get(KeyBinding.COPY).get());
         assertFalse(KeyBindingRepository.checkKeyCombinationEquality(combination, shortcutKeyEvent));
-        model.saveKeyBindings();
+        model.storeSettings();
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.COPY, shortcutKeyEvent));
     }
 
@@ -61,7 +63,7 @@ class KeyBindingsDialogViewModelTest {
 
         assertTrue(KeyBindingRepository.checkKeyCombinationEquality(combination, shortcutKeyEvent));
 
-        model.saveKeyBindings();
+        model.storeSettings();
 
         assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.IMPORT_INTO_NEW_DATABASE,
                                                                     shortcutKeyEvent));
@@ -100,7 +102,7 @@ class KeyBindingsDialogViewModelTest {
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
         model.setNewBindingForCurrent(shortcutKeyEvent);
 
-        model.saveKeyBindings();
+        model.storeSettings();
 
         assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
     }
@@ -114,7 +116,7 @@ class KeyBindingsDialogViewModelTest {
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
         model.setNewBindingForCurrent(shortcutKeyEvent);
 
-        model.saveKeyBindings();
+        model.storeSettings();
 
         assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
     }
@@ -129,12 +131,12 @@ class KeyBindingsDialogViewModelTest {
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
 
         model.setNewBindingForCurrent(shortcutKeyEvent);
-        model.saveKeyBindings();
+        model.storeSettings();
 
         assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
 
         keyBindingRepository.resetToDefault();
-        model.saveKeyBindings();
+        model.storeSettings();
 
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
     }
@@ -164,12 +166,12 @@ class KeyBindingsDialogViewModelTest {
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
 
         model.setNewBindingForCurrent(shortcutKeyEvent);
-        model.saveKeyBindings();
+        model.storeSettings();
 
         assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
 
         viewModel.resetToDefault();
-        model.saveKeyBindings();
+        model.storeSettings();
 
         assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
     }
