@@ -7,7 +7,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
-import org.jabref.logic.JabRefException;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
 
@@ -36,7 +35,7 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
         URL urlForQuery;
         try {
             urlForQuery = getURLForQuery(luceneQuery);
-        } catch (URISyntaxException | MalformedURLException | JabRefException e) {
+        } catch (URISyntaxException | MalformedURLException | FetcherException e) {
             throw new FetcherException("Search URI crafted from complex search query is malformed", e);
         }
         return getBibEntries(urlForQuery);

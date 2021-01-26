@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jabref.logic.JabRefException;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
@@ -55,7 +54,7 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
                        .flatMap(searchBasedFetcher -> {
                            try {
                                return searchBasedFetcher.performSearch(luceneQuery).stream();
-                           } catch (JabRefException e) {
+                           } catch (FetcherException e) {
                                LOGGER.warn(String.format("%s API request failed", searchBasedFetcher.getName()), e);
                                return Stream.empty();
                            }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.logic.JabRefException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.paging.Page;
 
@@ -27,7 +26,7 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
      * @param pageNumber  requested site number indexed from 0
      * @return Page with search results
      */
-    default Page<BibEntry> performSearchPaged(String searchQuery, int pageNumber) throws JabRefException {
+    default Page<BibEntry> performSearchPaged(String searchQuery, int pageNumber) throws FetcherException {
         if (searchQuery.isBlank()) {
             return new Page<>(searchQuery, pageNumber, Collections.emptyList());
         }
