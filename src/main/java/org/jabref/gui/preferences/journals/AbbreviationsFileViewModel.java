@@ -35,6 +35,7 @@ public class AbbreviationsFileViewModel {
         this.path = Optional.ofNullable(filePath);
         this.name = path.get().toAbsolutePath().toString();
         this.isBuiltInList = new SimpleBooleanProperty(false);
+        this.abbreviations.add(new AbbreviationViewModel(null));
     }
 
     /**
