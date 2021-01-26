@@ -2,10 +2,13 @@ package org.jabref.logic.importer.util;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jabref.gui.JabRefGUI;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.model.entry.LinkedFile;
 
 public class FileFieldParser {
@@ -56,7 +59,9 @@ public class FileFieldParser {
         }
 
         if (!entry.isEmpty()) {
-            files.add(convert(entry));
+            if(convert(entry)!=null){
+                files.add(convert(entry));
+            }
         }
 
         return files;
@@ -77,17 +82,25 @@ public class FileFieldParser {
             }
         }
 
-        if (field == null) {
-            field = new LinkedFile(entry.get(0), Path.of(entry.get(1)), entry.get(2));
-        }
+        try {
+            if (field == null) {
+                field = new LinkedFile(entry.get(0), Path.of(entry.get(1)), entry.get(2));
+            }
 
-        // link is only mandatory field
-        if (field.getDescription().isEmpty() && field.getLink().isEmpty() && !field.getFileType().isEmpty()) {
-            field = new LinkedFile("", Path.of(field.getFileType()), "");
-        } else if (!field.getDescription().isEmpty() && field.getLink().isEmpty() && field.getFileType().isEmpty()) {
-            field = new LinkedFile("", Path.of(field.getDescription()), "");
+            // link is only mandatory field
+            if (field.getDescription().isEmpty() && field.getLink().isEmpty() && !field.getFileType().isEmpty()) {
+                field = new LinkedFile("", Path.of(field.getFileType()), "");
+            } else if (!field.getDescription().isEmpty() && field.getLink().isEmpty() && field.getFileType().isEmpty()) {
+                field = new LinkedFile("", Path.of(field.getDescription()), "");
+            }
+            entry.clear();
+        }catch (InvalidPathException exception){
+            DefaultTaskExecutor.runInJavaFXThread(() ->
+                    JabRefGUI.getMainFrame()
+                            .getDialogService()
+                            .showErrorDialogAndWait("Invalid File Path", entry.get(1)+" is not a valid file path")
+            );
         }
-        entry.clear();
         return field;
     }
 }
