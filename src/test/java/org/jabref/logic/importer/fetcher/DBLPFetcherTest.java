@@ -50,6 +50,7 @@ public class DBLPFetcherTest {
 
     @Test
     public void findSingleEntry() throws FetcherException {
+        // In Lucene curly brackets are used for range queries, therefore they have to be escaped using "". See https://lucene.apache.org/core/5_4_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html
         String query = "Process Engine Benchmarking with Betsy in the Context of \"{ISO/IEC}\" Quality Standards";
         List<BibEntry> result = dblpFetcher.performSearch(query);
 
