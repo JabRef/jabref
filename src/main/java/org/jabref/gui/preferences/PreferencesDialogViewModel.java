@@ -22,6 +22,7 @@ import org.jabref.gui.preferences.file.FileTabView;
 import org.jabref.gui.preferences.general.GeneralTabView;
 import org.jabref.gui.preferences.groups.GroupsTabView;
 import org.jabref.gui.preferences.importer.ImportCustomizationTab;
+import org.jabref.gui.preferences.journals.JournalAbbreviationsTab;
 import org.jabref.gui.preferences.linkedfiles.LinkedFilesTabView;
 import org.jabref.gui.preferences.nameformatter.NameFormatterTabView;
 import org.jabref.gui.preferences.network.NetworkTabView;
@@ -66,6 +67,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new TableTabView(preferences),
                 new PreviewTabView(preferences),
                 new ExternalTabView(preferences, frame.getPushToApplicationsManager()),
+                new JournalAbbreviationsTab(),
                 new GroupsTabView(preferences),
                 new EntryEditorTabView(preferences),
                 new CustomEditorFieldsTab(),

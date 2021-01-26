@@ -1,4 +1,4 @@
-package org.jabref.gui.journals;
+package org.jabref.gui.preferences.journals;
 
 import java.util.Objects;
 

@@ -1,4 +1,4 @@
-package org.jabref.gui.journals;
+package org.jabref.gui.preferences.journals;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -35,7 +35,6 @@ public class AbbreviationsFileViewModel {
         this.path = Optional.ofNullable(filePath);
         this.name = path.get().toAbsolutePath().toString();
         this.isBuiltInList = new SimpleBooleanProperty(false);
-        this.abbreviations.add(new AbbreviationViewModel(null));
     }
 
     /**

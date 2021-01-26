@@ -1,4 +1,4 @@
-package org.jabref.gui.journals;
+package org.jabref.gui.preferences.journals;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -14,12 +14,14 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 
-import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
+import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.Abbreviation;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -33,9 +35,9 @@ import org.slf4j.LoggerFactory;
  * This class provides a model for managing journal abbreviation lists. It provides all necessary methods to create,
  * modify or delete journal abbreviations and files. To visualize the model one can bind the properties to UI elements.
  */
-public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
+public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel {
 
-    private final Logger logger = LoggerFactory.getLogger(ManageJournalAbbreviationsViewModel.class);
+    private final Logger logger = LoggerFactory.getLogger(JournalAbbreviationsTabViewModel.class);
     private final SimpleListProperty<AbbreviationsFileViewModel> journalFiles = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final SimpleListProperty<AbbreviationViewModel> abbreviations = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final SimpleIntegerProperty abbreviationsCount = new SimpleIntegerProperty();
@@ -52,8 +54,10 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private boolean shouldWriteLists;
 
-    public ManageJournalAbbreviationsViewModel(PreferencesService preferences, DialogService dialogService,
-                                               TaskExecutor taskExecutor, JournalAbbreviationRepository journalAbbreviationRepository) {
+    public JournalAbbreviationsTabViewModel(PreferencesService preferences,
+                                            DialogService dialogService,
+                                            TaskExecutor taskExecutor,
+                                            JournalAbbreviationRepository journalAbbreviationRepository) {
         this.preferences = Objects.requireNonNull(preferences);
         this.dialogService = Objects.requireNonNull(dialogService);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
@@ -99,32 +103,13 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
         });
     }
 
-    public SimpleBooleanProperty isLoadingProperty() {
-        return isLoading;
-    }
+    @Override
+    public void setValues() {
+        journalFiles.clear();
 
-    /**
-     * This will load the built in abbreviation files and add it to the list of journal abbreviation files.
-     */
-    void addBuiltInList() {
-        BackgroundTask
-                .wrap(journalAbbreviationRepository::getAllLoaded)
-                .onRunning(() -> isLoading.setValue(true))
-                .onSuccess(result -> {
-                    isLoading.setValue(false);
-                    addList(Localization.lang("JabRef built in list"), result);
-                    selectLastJournalFile();
-                })
-                .onFailure(dialogService::showErrorDialogAndWait)
-                .executeWith(taskExecutor);
-    }
-
-    private void addList(String name, List<Abbreviation> abbreviations) {
-        List<AbbreviationViewModel> builtInListViewModel = abbreviations.stream()
-                                                                        .map(AbbreviationViewModel::new)
-                                                                        .collect(Collectors.toList());
-        AbbreviationsFileViewModel fileViewModel = new AbbreviationsFileViewModel(builtInListViewModel, name);
-        journalFiles.add(fileViewModel);
+        createFileObjects();
+        selectLastJournalFile();
+        addBuiltInList();
     }
 
     /**
@@ -133,6 +118,36 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     public void createFileObjects() {
         List<String> externalFiles = abbreviationsPreferences.getExternalJournalLists();
         externalFiles.forEach(name -> openFile(Path.of(name)));
+    }
+
+    /**
+     * This will set the {@code currentFile} property to the {@link AbbreviationsFileViewModel} object that was added to
+     * the {@code journalFiles} list property lastly. If there are no files in the list property this method will do
+     * nothing as the {@code currentFile} property is already {@code null}.
+     */
+    public void selectLastJournalFile() {
+        if (!journalFiles.isEmpty()) {
+            currentFile.set(journalFilesProperty().get(journalFilesProperty().size() - 1));
+        }
+    }
+
+    /**
+     * This will load the built in abbreviation files and add it to the list of journal abbreviation files.
+     */
+    public void addBuiltInList() {
+        BackgroundTask
+                .wrap(journalAbbreviationRepository::getAllLoaded)
+                .onRunning(() -> isLoading.setValue(true))
+                .onSuccess(result -> {
+                    isLoading.setValue(false);
+                    List<AbbreviationViewModel> builtInViewModels = result.stream()
+                                                                          .map(AbbreviationViewModel::new)
+                                                                          .collect(Collectors.toList());
+                    journalFiles.add(new AbbreviationsFileViewModel(builtInViewModels, "JabRef built in list"));
+                    selectLastJournalFile();
+                })
+                .onFailure(dialogService::showErrorDialogAndWait)
+                .executeWith(taskExecutor);
     }
 
     /**
@@ -217,6 +232,13 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
 
     public void addAbbreviation(String name, String abbreviation) {
         addAbbreviation(name, abbreviation, "");
+    }
+
+    public void addAbbreviation() {
+        addAbbreviation(
+                Localization.lang("Name"),
+                Localization.lang("Abbreviation"),
+                Localization.lang("Shortest unique abbreviation"));
     }
 
     /**
@@ -318,22 +340,12 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
     }
 
     /**
-     * This will set the {@code currentFile} property to the {@link AbbreviationsFileViewModel} object that was added to
-     * the {@code journalFiles} list property lastly. If there are no files in the list property this method will do
-     * nothing as the {@code currentFile} property is already {@code null}.
-     */
-    public void selectLastJournalFile() {
-        if (!journalFiles.isEmpty()) {
-            currentFile.set(journalFilesProperty().get(journalFilesProperty().size() - 1));
-        }
-    }
-
-    /**
      * This method first saves all external files to its internal list, then writes all abbreviations to their files and
      * finally updates the abbreviations auto complete. It basically calls {@link #saveExternalFilesList()}, {@link
      * #saveJournalAbbreviationFiles() }}.
      */
-    public void save() {
+    @Override
+    public void storeSettings() {
         BackgroundTask.wrap(() -> {
             saveExternalFilesList();
 
@@ -344,6 +356,13 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
 
             preferences.storeJournalAbbreviationPreferences(abbreviationsPreferences);
         }).executeWith(taskExecutor);
+
+        // Update journal abbreviation repository
+        Globals.journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
+    }
+
+    public SimpleBooleanProperty isLoadingProperty() {
+        return isLoading;
     }
 
     public SimpleListProperty<AbbreviationsFileViewModel> journalFilesProperty() {
@@ -376,16 +395,5 @@ public class ManageJournalAbbreviationsViewModel extends AbstractViewModel {
 
     public SimpleBooleanProperty isFileRemovableProperty() {
         return isFileRemovable;
-    }
-
-    public void addAbbreviation() {
-        addAbbreviation(Localization.lang("Name"), Localization.lang("Abbreviation"),
-                Localization.lang("Shortest unique abbreviation"));
-    }
-
-    public void init() {
-        createFileObjects();
-        selectLastJournalFile();
-        addBuiltInList();
     }
 }

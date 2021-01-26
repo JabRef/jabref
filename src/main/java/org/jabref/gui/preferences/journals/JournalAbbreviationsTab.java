@@ -1,10 +1,9 @@
-package org.jabref.gui.journals;
+package org.jabref.gui.preferences.journals;
 
 import javax.inject.Inject;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
@@ -13,12 +12,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.TextFieldTableCell;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
+import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
@@ -30,11 +27,10 @@ import com.tobiasdiez.easybind.EasyBind;
  * This class controls the user interface of the journal abbreviations dialog. The UI elements and their layout are
  * defined in the FXML file.
  */
-public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
+public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAbbreviationsTabViewModel> implements PreferencesTab {
 
-    @FXML public Label loadingLabel;
-    @FXML public ProgressIndicator progressIndicator;
-    @FXML private ButtonType saveButton;
+    @FXML private Label loadingLabel;
+    @FXML private ProgressIndicator progressIndicator;
     @FXML private TableView<AbbreviationViewModel> journalAbbreviationsTable;
     @FXML private TableColumn<AbbreviationViewModel, String> journalTableNameColumn;
     @FXML private TableColumn<AbbreviationViewModel, String> journalTableAbbreviationColumn;
@@ -45,29 +41,25 @@ public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
     @FXML private Button openAbbreviationListButton;
     @FXML private Button addAbbreviationListButton;
     @FXML private Button removeAbbreviationListButton;
+
     @Inject private PreferencesService preferences;
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
     @Inject private JournalAbbreviationRepository abbreviationRepository;
-    private ManageJournalAbbreviationsViewModel viewModel;
 
-    public ManageJournalAbbreviationsView() {
-        this.setTitle(Localization.lang("Journal abbreviations"));
-
-        ViewLoader.view(this).load().setAsDialogPane(this);
-
-        ControlHelper.setAction(saveButton, getDialogPane(), event -> saveAbbreviationsAndCloseDialog());
+    public JournalAbbreviationsTab() {
+        ViewLoader.view(this)
+                  .root(this)
+                  .load();
     }
 
     @FXML
     private void initialize() {
-        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor, abbreviationRepository);
+        viewModel = new JournalAbbreviationsTabViewModel(preferences, dialogService, taskExecutor, abbreviationRepository);
 
         setButtonStyles();
         setUpTable();
         setBindings();
-
-        viewModel.init();
     }
 
     private void setButtonStyles() {
@@ -136,7 +128,8 @@ public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
 
     @FXML
     private void editAbbreviation() {
-        journalAbbreviationsTable.edit(journalAbbreviationsTable.getSelectionModel().getSelectedIndex(),
+        journalAbbreviationsTable.edit(
+                journalAbbreviationsTable.getSelectionModel().getSelectedIndex(),
                 journalTableNameColumn);
     }
 
@@ -145,20 +138,15 @@ public class ManageJournalAbbreviationsView extends BaseDialog<Void> {
         viewModel.deleteAbbreviation();
     }
 
-    @FXML
-    private void saveAbbreviationsAndCloseDialog() {
-        viewModel.save();
-
-        // Update journal abbreviation repository
-        Globals.journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
-
-        close();
-    }
-
     private void selectNewAbbreviation() {
         int lastRow = viewModel.abbreviationsCountProperty().get() - 1;
         journalAbbreviationsTable.scrollTo(lastRow);
         journalAbbreviationsTable.getSelectionModel().select(lastRow);
         journalAbbreviationsTable.getFocusModel().focus(lastRow);
+    }
+
+    @Override
+    public String getTabName() {
+        return Localization.lang("Journal abbreviations");
     }
 }

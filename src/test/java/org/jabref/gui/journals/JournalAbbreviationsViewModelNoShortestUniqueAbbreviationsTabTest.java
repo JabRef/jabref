@@ -13,6 +13,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.preferences.journals.AbbreviationViewModel;
+import org.jabref.gui.preferences.journals.AbbreviationsFileViewModel;
+import org.jabref.gui.preferences.journals.JournalAbbreviationsTabViewModel;
 import org.jabref.gui.util.CurrentThreadTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.JabRefException;
@@ -37,9 +40,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class ManageJournalAbbreviationsViewModelNoShortestUniqueAbbreviationsTest {
+class JournalAbbreviationsViewModelNoShortestUniqueAbbreviationsTabTest {
 
-    private ManageJournalAbbreviationsViewModel viewModel;
+    private JournalAbbreviationsTabViewModel viewModel;
     private Path emptyTestFile;
     private Path testFile1Entries;
     private Path testFile3Entries;
@@ -57,7 +60,7 @@ class ManageJournalAbbreviationsViewModelNoShortestUniqueAbbreviationsTest {
 
         dialogService = mock(DialogService.class);
         TaskExecutor taskExecutor = new CurrentThreadTaskExecutor();
-        viewModel = new ManageJournalAbbreviationsViewModel(preferences, dialogService, taskExecutor, repository);
+        viewModel = new JournalAbbreviationsTabViewModel(preferences, dialogService, taskExecutor, repository);
         emptyTestFile = createTestFile(tempFolder, "emptyTestFile.csv", "");
         testFile1Entries = createTestFile(tempFolder, "testFile1Entries.csv", "Test Entry;TE" + NEWLINE + "");
         testFile3Entries = createTestFile(tempFolder, "testFile3Entries.csv", "Abbreviations;Abb" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME" + NEWLINE + "");
@@ -449,7 +452,7 @@ class ManageJournalAbbreviationsViewModelNoShortestUniqueAbbreviationsTest {
         viewModel.addNewFile();
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile5EntriesWithDuplicate));
         viewModel.addNewFile();
-        viewModel.save();
+        viewModel.storeSettings();
     }
 
     /**
