@@ -1,18 +1,19 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -64,31 +65,19 @@ public class GvkFetcherTest {
     }
 
     @Test
-    public void simpleSearchQueryStringCorrect() {
+    public void simpleSearchQueryURLCorrect() throws Exception {
         String query = "java jdk";
-        String result = fetcher.getSearchQueryString(query);
-        assertEquals("pica.all=java jdk", result);
+        QueryNode luceneQuery = new StandardSyntaxParser().parse(query, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
+        URL url = fetcher.getURLForQuery(luceneQuery);
+        assertEquals("http://sru.gbv.de/gvk?version=1.1&operation=searchRetrieve&query=pica.all%3D%22java%22+and+pica.all%3D%22jdk%22&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1", url.toString());
     }
 
     @Test
-    public void simpleSearchQueryURLCorrect() throws MalformedURLException, URISyntaxException, FetcherException {
-        String query = "java jdk";
-        URL url = fetcher.getURLForQuery(query);
-        assertEquals("http://sru.gbv.de/gvk?version=1.1&operation=searchRetrieve&query=pica.all%3Djava+jdk&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1", url.toString());
-    }
-
-    @Test
-    public void complexSearchQueryStringCorrect() {
-        String query = "kon java tit jdk";
-        String result = fetcher.getSearchQueryString(query);
-        assertEquals("pica.kon=java and pica.tit=jdk", result);
-    }
-
-    @Test
-    public void complexSearchQueryURLCorrect() throws MalformedURLException, URISyntaxException, FetcherException {
-        String query = "kon java tit jdk";
-        URL url = fetcher.getURLForQuery(query);
-        assertEquals("http://sru.gbv.de/gvk?version=1.1&operation=searchRetrieve&query=pica.kon%3Djava+and+pica.tit%3Djdk&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1", url.toString());
+    public void complexSearchQueryURLCorrect() throws Exception {
+        String query = "kon:java tit:jdk";
+        QueryNode luceneQuery = new StandardSyntaxParser().parse(query, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
+        URL url = fetcher.getURLForQuery(luceneQuery);
+        assertEquals("http://sru.gbv.de/gvk?version=1.1&operation=searchRetrieve&query=pica.kon%3D%22java%22+and+pica.tit%3D%22jdk%22&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1", url.toString());
     }
 
     @Test
