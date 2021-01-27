@@ -59,8 +59,9 @@ public class FileFieldParser {
         }
 
         if (!entry.isEmpty()) {
-            if(convert(entry)!=null){
-                files.add(convert(entry));
+            LinkedFile linkedFile = convert(entry);
+            if (linkedFile != null) {
+                files.add(linkedFile);
             }
         }
 
@@ -94,12 +95,8 @@ public class FileFieldParser {
                 field = new LinkedFile("", Path.of(field.getDescription()), "");
             }
             entry.clear();
-        }catch (InvalidPathException exception){
-            DefaultTaskExecutor.runInJavaFXThread(() ->
-                    JabRefGUI.getMainFrame()
-                            .getDialogService()
-                            .showErrorDialogAndWait("Invalid File Path", entry.get(1)+" is not a valid file path")
-            );
+        } catch (InvalidPathException ignored) {
+            // ignored
         }
         return field;
     }
