@@ -28,6 +28,7 @@ import org.jabref.gui.preferences.linkedfiles.LinkedFilesTabView;
 import org.jabref.gui.preferences.nameformatter.NameFormatterTabView;
 import org.jabref.gui.preferences.network.NetworkTabView;
 import org.jabref.gui.preferences.preview.PreviewTabView;
+import org.jabref.gui.preferences.protectedterms.ProtectedTermsTab;
 import org.jabref.gui.preferences.table.TableTabView;
 import org.jabref.gui.preferences.xmp.XmpPrivacyTabView;
 import org.jabref.gui.push.PushToApplicationsManager;
@@ -68,6 +69,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new FileTabView(preferences),
                 new TableTabView(preferences),
                 new PreviewTabView(preferences),
+                new ProtectedTermsTab(),
                 new ExternalTabView(preferences, frame.getPushToApplicationsManager()),
                 new JournalAbbreviationsTab(),
                 new GroupsTabView(preferences),

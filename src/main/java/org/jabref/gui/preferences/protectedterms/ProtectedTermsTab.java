@@ -1,9 +1,8 @@
-package org.jabref.gui.protectedterms;
+package org.jabref.gui.preferences.protectedterms;
 
 import javax.inject.Inject;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
@@ -12,7 +11,8 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
+import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
@@ -26,8 +26,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 /**
  * Dialog for managing term list files.
  */
-public class ManageProtectedTermsDialog extends BaseDialog<Void> {
-
+public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsTabViewModel> implements PreferencesTab {
     @FXML private TableView<ProtectedTermsList> filesTable;
     @FXML private TableColumn<ProtectedTermsList, Boolean> filesTableEnabledColumn;
     @FXML private TableColumn<ProtectedTermsList, String> filesTableDescriptionColumn;
@@ -38,28 +37,23 @@ public class ManageProtectedTermsDialog extends BaseDialog<Void> {
     @Inject private ProtectedTermsLoader termsLoader;
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferences;
-    private ManageProtectedTermsViewModel viewModel;
 
-    public ManageProtectedTermsDialog() {
-        this.setTitle(Localization.lang("Manage protected terms files"));
-
+    public ProtectedTermsTab() {
         ViewLoader.view(this)
-                  .load()
-                  .setAsDialogPane(this);
+                  .root(this)
+                  .load();
+    }
 
-        setResultConverter(button -> {
-            if (button.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
-                viewModel.save();
-            }
-            return null;
-        });
+    @Override
+    public String getTabName() {
+        return Localization.lang("Protected terms files");
     }
 
     @FXML
     public void initialize() {
-        viewModel = new ManageProtectedTermsViewModel(termsLoader, dialogService, preferences);
+        viewModel = new ProtectedTermsTabViewModel(termsLoader, dialogService, preferences);
 
-        filesTable.setItems(viewModel.getTermsFiles());
+        filesTable.itemsProperty().bind(viewModel.termsFilesProperty());
         new ViewModelTableRowFactory<ProtectedTermsList>()
                 .withContextMenu(this::createContextMenu)
                 .install(filesTable);

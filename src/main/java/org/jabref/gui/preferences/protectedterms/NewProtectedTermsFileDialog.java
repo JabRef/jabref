@@ -1,4 +1,7 @@
-package org.jabref.gui.protectedterms;
+package org.jabref.gui.preferences.protectedterms;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -12,7 +15,7 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.util.StandardFileType;
 
 public class NewProtectedTermsFileDialog extends BaseDialog<Void> {
@@ -20,7 +23,7 @@ public class NewProtectedTermsFileDialog extends BaseDialog<Void> {
     private final TextField newFile = new TextField();
     private final DialogService dialogService;
 
-    public NewProtectedTermsFileDialog(ProtectedTermsLoader termsLoader, DialogService dialogService) {
+    public NewProtectedTermsFileDialog(List<ProtectedTermsList> termsLists, DialogService dialogService) {
         this.dialogService = dialogService;
 
         this.setTitle(Localization.lang("New protected terms file"));
@@ -32,10 +35,8 @@ public class NewProtectedTermsFileDialog extends BaseDialog<Void> {
                 .build();
 
         Button browse = new Button(Localization.lang("Browse"));
-        browse.setOnAction(event -> {
-            this.dialogService.showFileSaveDialog(fileDialogConfiguration)
-                              .ifPresent(file -> newFile.setText(file.toAbsolutePath().toString()));
-        });
+        browse.setOnAction(event -> this.dialogService.showFileSaveDialog(fileDialogConfiguration)
+                                                      .ifPresent(file -> newFile.setText(file.toAbsolutePath().toString())));
 
         TextField newDescription = new TextField();
         VBox container = new VBox(10,
@@ -51,7 +52,10 @@ public class NewProtectedTermsFileDialog extends BaseDialog<Void> {
 
         setResultConverter(button -> {
             if (button == ButtonType.OK) {
-                termsLoader.addNewProtectedTermsList(newDescription.getText(), newFile.getText(), true);
+                ProtectedTermsList newList = new ProtectedTermsList(newDescription.getText(), new ArrayList<>(), newFile.getText(), false);
+                newList.setEnabled(true);
+                newList.createAndWriteHeading(newDescription.getText());
+                termsLists.add(newList);
             }
             return null;
         });
