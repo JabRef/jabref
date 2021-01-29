@@ -19,12 +19,12 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class AppearanceTabView extends AbstractPreferenceTabView<AppearanceTabViewModel> implements PreferencesTab {
 
-    @FXML public CheckBox fontOverride;
-    @FXML public Spinner<Integer> fontSize;
-    @FXML public RadioButton themeLight;
-    @FXML public RadioButton themeDark;
-    @FXML public RadioButton customTheme;
-    @FXML public TextField customThemePath;
+    @FXML private CheckBox fontOverride;
+    @FXML private Spinner<Integer> fontSize;
+    @FXML private RadioButton themeLight;
+    @FXML private RadioButton themeDark;
+    @FXML private RadioButton customTheme;
+    @FXML private TextField customThemePath;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 

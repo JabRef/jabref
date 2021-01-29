@@ -13,8 +13,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-<fx:root prefWidth="650.0" spacing="10.0" type="VBox" xmlns="http://javafx.com/javafx/11.0.1"
-         xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.preferences.table.TableTabView">
+<fx:root spacing="10.0" type="VBox"
+         xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+         fx:controller="org.jabref.gui.preferences.table.TableTabView">
     <fx:define>
         <ToggleGroup fx:id="specialFieldsStoreMode"/>
         <ToggleGroup fx:id="urlDoiShownFirst"/>
@@ -24,8 +25,8 @@
     <Label styleClass="titleHeader" text="%Entry table"/>
     <Label styleClass="sectionHeader" text="%Columns"/>
     <HBox spacing="4.0">
-        <VBox spacing="4.0" HBox.hgrow="SOMETIMES">
-            <TableView fx:id="columnsList" editable="true" prefHeight="300.0" prefWidth="220.0">
+        <VBox spacing="4.0" HBox.hgrow="SOMETIMES" prefWidth="220.0">
+            <TableView fx:id="columnsList" prefHeight="300.0">
                 <columns>
                     <TableColumn fx:id="nameColumn" prefWidth="160.0" text="%Name"/>
                     <TableColumn fx:id="actionsColumn" maxWidth="40.0" minWidth="40.0" resizable="false"/>
@@ -36,7 +37,7 @@
             </TableView>
             <ComboBox fx:id="addColumnName" editable="true" maxWidth="Infinity"/>
         </VBox>
-        <VBox alignment="CENTER">
+        <VBox alignment="CENTER" HBox.hgrow="NEVER">
             <Button prefHeight="20.0" prefWidth="20.0"
                     styleClass="icon-button,narrow" onAction="#updateToCurrentColumnOrder">
                 <graphic>
@@ -76,7 +77,7 @@
                 </tooltip>
             </Button>
         </VBox>
-        <VBox spacing="10.0">
+        <VBox spacing="10.0" HBox.hgrow="SOMETIMES">
             <padding>
                 <Insets left="20.0"/>
             </padding>

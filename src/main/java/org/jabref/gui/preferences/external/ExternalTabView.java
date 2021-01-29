@@ -23,14 +23,11 @@ public class ExternalTabView extends AbstractPreferenceTabView<ExternalTabViewMo
 
     @FXML private TextField eMailReferenceSubject;
     @FXML private CheckBox autoOpenAttachedFolders;
-
     @FXML private ComboBox<PushToApplication> pushToApplicationCombo;
     @FXML private TextField citeCommand;
-
     @FXML private CheckBox useCustomTerminal;
     @FXML private TextField customTerminalCommand;
     @FXML private Button customTerminalBrowse;
-
     @FXML private CheckBox useCustomFileBrowser;
     @FXML private TextField customFileBrowserCommand;
     @FXML private Button customFileBrowserBrowse;

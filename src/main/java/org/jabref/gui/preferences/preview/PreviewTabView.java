@@ -56,6 +56,7 @@ public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewMode
     @FXML private Button resetDefaultButton;
     @FXML private Tab previewTab;
     @FXML private CodeArea editArea;
+
     @Inject private StateManager stateManager;
 
     private final ContextMenu contextMenu = new ContextMenu();

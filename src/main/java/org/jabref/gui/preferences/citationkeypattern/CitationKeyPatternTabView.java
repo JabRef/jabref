@@ -21,17 +21,17 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class CitationKeyPatternTabView extends AbstractPreferenceTabView<CitationKeyPatternTabViewModel> implements PreferencesTab {
 
-    @FXML public CheckBox overwriteAllow;
-    @FXML public CheckBox overwriteWarning;
-    @FXML public CheckBox generateOnSave;
-    @FXML public RadioButton letterStartA;
-    @FXML public RadioButton letterStartB;
-    @FXML public RadioButton letterAlwaysAdd;
-    @FXML public TextField keyPatternRegex;
-    @FXML public TextField keyPatternReplacement;
-    @FXML public TextField unwantedCharacters;
-    @FXML public Button keyPatternHelp;
-    @FXML public CitationKeyPatternPanel bibtexKeyPatternTable;
+    @FXML private CheckBox overwriteAllow;
+    @FXML private CheckBox overwriteWarning;
+    @FXML private CheckBox generateOnSave;
+    @FXML private RadioButton letterStartA;
+    @FXML private RadioButton letterStartB;
+    @FXML private RadioButton letterAlwaysAdd;
+    @FXML private TextField keyPatternRegex;
+    @FXML private TextField keyPatternReplacement;
+    @FXML private TextField unwantedCharacters;
+    @FXML private Button keyPatternHelp;
+    @FXML private CitationKeyPatternPanel bibtexKeyPatternTable;
 
     public CitationKeyPatternTabView(PreferencesService preferences) {
         this.preferences = preferences;
