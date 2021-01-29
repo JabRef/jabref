@@ -8,19 +8,16 @@ import java.util.stream.Collectors;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.UnknownField;
-
-import static org.jabref.model.entry.types.SystematicLiteratureReviewStudyEntryType.LIBRARY_ENTRY;
+import org.jabref.model.study.StudyDatabase;
 
 /**
  * Converts library entries from the given study into their corresponding fetchers.
  */
-class LibraryEntryToFetcherConverter {
-    private final List<BibEntry> libraryEntries;
+class StudyDatabaseToFetcherConverter {
+    private final List<StudyDatabase> libraryEntries;
     private final ImportFormatPreferences importFormatPreferences;
 
-    public LibraryEntryToFetcherConverter(List<BibEntry> libraryEntries, ImportFormatPreferences importFormatPreferences) {
+    public StudyDatabaseToFetcherConverter(List<StudyDatabase> libraryEntries, ImportFormatPreferences importFormatPreferences) {
         this.libraryEntries = libraryEntries;
         this.importFormatPreferences = importFormatPreferences;
     }
@@ -42,9 +39,8 @@ class LibraryEntryToFetcherConverter {
      * @param libraryEntries List of entries
      * @return List of fetcher instances
      */
-    private List<SearchBasedFetcher> getFetchersFromLibraryEntries(List<BibEntry> libraryEntries) {
+    private List<SearchBasedFetcher> getFetchersFromLibraryEntries(List<StudyDatabase> libraryEntries) {
         return libraryEntries.parallelStream()
-                             .filter(bibEntry -> bibEntry.getType().getName().equals(LIBRARY_ENTRY.getName()))
                              .map(this::createFetcherFromLibraryEntry)
                              .filter(Objects::nonNull)
                              .collect(Collectors.toList());
@@ -53,12 +49,12 @@ class LibraryEntryToFetcherConverter {
     /**
      * Transforms a library entry into a SearchBasedFetcher instance. This only works if the library entry specifies a supported fetcher.
      *
-     * @param libraryEntry the entry that will be converted
+     * @param studyDatabase the entry that will be converted
      * @return An instance of the fetcher defined by the library entry.
      */
-    private SearchBasedFetcher createFetcherFromLibraryEntry(BibEntry libraryEntry) {
+    private SearchBasedFetcher createFetcherFromLibraryEntry(StudyDatabase studyDatabase) {
         Set<SearchBasedFetcher> searchBasedFetchers = WebFetchers.getSearchBasedFetchers(importFormatPreferences);
-        String libraryNameFromFetcher = libraryEntry.getField(new UnknownField("name")).orElse("");
+        String libraryNameFromFetcher = studyDatabase.getName();
         return searchBasedFetchers.stream()
                                   .filter(searchBasedFetcher -> searchBasedFetcher.getName().toLowerCase().equals(libraryNameFromFetcher.toLowerCase()))
                                   .findAny()
