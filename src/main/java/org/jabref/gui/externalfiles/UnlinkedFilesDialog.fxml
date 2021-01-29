@@ -68,7 +68,7 @@
                             </ScrollPane>
                         </TitledPane>
                         <TitledPane fx:id="resultPane" text="%Import result" disable="true">
-                            <TableView fx:id="importResultTable" styleClass="unlinkedFilesResultTable">
+                            <TableView fx:id="importResultTable">
                                 <columns>
                                     <TableColumn fx:id="colStatus" prefWidth="100.0" text="%Status"/>
                                     <TableColumn fx:id="colFile" prefWidth="500.0" text="%File"/>
