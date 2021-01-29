@@ -17,7 +17,6 @@ import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
@@ -39,9 +38,7 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public LinkedFilesTab(PreferencesService preferences) {
-        this.preferences = preferences;
-
+    public LinkedFilesTab() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -53,7 +50,7 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
     }
 
     public void initialize() {
-        this.viewModel = new LinkedFilesTabViewModel(dialogService, preferences);
+        this.viewModel = new LinkedFilesTabViewModel(dialogService, preferencesService);
 
         mainFileDirectory.textProperty().bindBidirectional(viewModel.mainFileDirectoryProperty());
         useBibLocationAsPrimary.selectedProperty().bindBidirectional(viewModel.useBibLocationAsPrimaryProperty());

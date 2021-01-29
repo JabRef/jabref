@@ -20,7 +20,6 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
@@ -36,9 +35,7 @@ public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewMo
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public XmpPrivacyTab(PreferencesService preferences) {
-        this.preferences = preferences;
-
+    public XmpPrivacyTab() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -50,7 +47,7 @@ public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewMo
     }
 
     public void initialize() {
-        this.viewModel = new XmpPrivacyTabViewModel(dialogService, preferences);
+        this.viewModel = new XmpPrivacyTabViewModel(dialogService, preferencesService);
 
         enableXmpFilter.selectedProperty().bindBidirectional(viewModel.xmpFilterEnabledProperty());
         filterList.disableProperty().bind(viewModel.xmpFilterEnabledProperty().not());

@@ -8,7 +8,6 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -20,9 +19,7 @@ public class GroupsTab extends AbstractPreferenceTabView<GroupsTabViewModel> imp
     @FXML private CheckBox displayGroupCount;
     @FXML private TextField keywordSeparator;
 
-    public GroupsTab(PreferencesService preferences) {
-        this.preferences = preferences;
-
+    public GroupsTab() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -34,7 +31,7 @@ public class GroupsTab extends AbstractPreferenceTabView<GroupsTabViewModel> imp
     }
 
     public void initialize() {
-        this.viewModel = new GroupsTabViewModel(dialogService, preferences);
+        this.viewModel = new GroupsTabViewModel(dialogService, preferencesService);
 
         groupViewModeIntersection.selectedProperty().bindBidirectional(viewModel.groupViewModeIntersectionProperty());
         groupViewModeUnion.selectedProperty().bindBidirectional(viewModel.groupViewModeUnionProperty());

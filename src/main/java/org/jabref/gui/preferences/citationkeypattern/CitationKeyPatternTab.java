@@ -15,7 +15,6 @@ import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -33,9 +32,7 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
     @FXML private Button keyPatternHelp;
     @FXML private CitationKeyPatternPanel bibtexKeyPatternTable;
 
-    public CitationKeyPatternTab(PreferencesService preferences) {
-        this.preferences = preferences;
-
+    public CitationKeyPatternTab() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -47,7 +44,7 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
     }
 
     public void initialize() {
-        this.viewModel = new CitationKeyPatternTabViewModel(dialogService, preferences);
+        this.viewModel = new CitationKeyPatternTabViewModel(dialogService, preferencesService);
 
         overwriteAllow.selectedProperty().bindBidirectional(viewModel.overwriteAllowProperty());
         overwriteWarning.selectedProperty().bindBidirectional(viewModel.overwriteWarningProperty());
@@ -70,8 +67,8 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
     public void setValues() {
         viewModel.setValues();
         bibtexKeyPatternTable.setValues(
-                Globals.entryTypesManager.getAllTypes(preferences.getGeneralPreferences().getDefaultBibDatabaseMode()),
-                preferences.getGlobalCitationKeyPattern());
+                Globals.entryTypesManager.getAllTypes(preferencesService.getGeneralPreferences().getDefaultBibDatabaseMode()),
+                preferencesService.getGlobalCitationKeyPattern());
     }
 
     @Override

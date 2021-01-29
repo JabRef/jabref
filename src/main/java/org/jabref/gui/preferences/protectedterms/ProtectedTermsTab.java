@@ -9,7 +9,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.CheckBoxTableCell;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
@@ -19,7 +18,6 @@ import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -35,8 +33,6 @@ public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsT
     @FXML private TableColumn<ProtectedTermsList, Boolean> filesTableDeleteColumn;
 
     @Inject private ProtectedTermsLoader termsLoader;
-    @Inject private DialogService dialogService;
-    @Inject private PreferencesService preferences;
 
     public ProtectedTermsTab() {
         ViewLoader.view(this)
@@ -51,7 +47,7 @@ public class ProtectedTermsTab extends AbstractPreferenceTabView<ProtectedTermsT
 
     @FXML
     public void initialize() {
-        viewModel = new ProtectedTermsTabViewModel(termsLoader, dialogService, preferences);
+        viewModel = new ProtectedTermsTabViewModel(termsLoader, dialogService, preferencesService);
 
         filesTable.itemsProperty().bind(viewModel.termsFilesProperty());
         new ViewModelTableRowFactory<ProtectedTermsList>()

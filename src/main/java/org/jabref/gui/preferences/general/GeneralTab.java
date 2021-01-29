@@ -20,7 +20,6 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
@@ -45,9 +44,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public GeneralTab(PreferencesService preferences) {
-        this.preferences = preferences;
-
+    public GeneralTab() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -59,7 +56,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     }
 
     public void initialize() {
-        this.viewModel = new GeneralTabViewModel(dialogService, preferences);
+        this.viewModel = new GeneralTabViewModel(dialogService, preferencesService);
 
         new ViewModelListCellFactory<Language>()
                 .withText(Language::getDisplayName)

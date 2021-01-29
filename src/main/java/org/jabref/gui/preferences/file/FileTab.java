@@ -18,7 +18,6 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.NewLineSeparator;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -37,17 +36,14 @@ public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> impleme
     @FXML private CheckBox autosaveLocalLibraries;
     @FXML private Button autosaveLocalLibrariesHelp;
 
-    public FileTab(PreferencesService preferences) {
-        this.preferences = preferences;
-
+    public FileTab() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
     }
 
     public void initialize() {
-        this.viewModel = new FileTabViewModel(preferences);
-
+        this.viewModel = new FileTabViewModel(preferencesService);
         openLastStartup.selectedProperty().bindBidirectional(viewModel.openLastStartupProperty());
         noWrapFiles.textProperty().bindBidirectional(viewModel.noWrapFilesProperty());
         resolveStringsBibTex.selectedProperty().bindBidirectional(viewModel.resolveStringsBibTexProperty());

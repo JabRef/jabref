@@ -7,13 +7,11 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.exporter.ExporterViewModel;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -25,8 +23,6 @@ public class ExportCustomizationTab extends AbstractPreferenceTabView<ExportCust
     @FXML private TableColumn<ExporterViewModel, String> layoutColumn;
     @FXML private TableColumn<ExporterViewModel, String> extensionColumn;
 
-    @Inject private DialogService dialogService;
-    @Inject private PreferencesService preferences;
     @Inject private JournalAbbreviationRepository repository;
 
     public ExportCustomizationTab() {
@@ -42,7 +38,7 @@ public class ExportCustomizationTab extends AbstractPreferenceTabView<ExportCust
 
     @FXML
     private void initialize() {
-        viewModel = new ExportCustomizationTabViewModel(preferences, dialogService, repository);
+        viewModel = new ExportCustomizationTabViewModel(preferencesService, dialogService, repository);
 
         exporterTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         exporterTable.itemsProperty().bind(viewModel.exportersProperty());

@@ -64,25 +64,25 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         this.frame = frame;
 
         preferenceTabs = FXCollections.observableArrayList(
-                new GeneralTab(preferences),
+                new GeneralTab(),
                 new KeyBindingsTab(),
-                new FileTab(preferences),
-                new TableTab(preferences),
-                new PreviewTab(preferences),
+                new FileTab(),
+                new TableTab(),
+                new PreviewTab(),
                 new ProtectedTermsTab(),
-                new ExternalTab(preferences, frame.getPushToApplicationsManager()),
+                new ExternalTab(frame.getPushToApplicationsManager()),
                 new JournalAbbreviationsTab(),
-                new GroupsTab(preferences),
-                new EntryEditorTab(preferences),
+                new GroupsTab(),
+                new EntryEditorTab(),
                 new CustomEditorFieldsTab(),
-                new CitationKeyPatternTab(preferences),
-                new LinkedFilesTab(preferences),
-                new NameFormatterTab(preferences),
+                new CitationKeyPatternTab(),
+                new LinkedFilesTab(),
+                new NameFormatterTab(),
                 new ImportCustomizationTab(),
                 new ExportCustomizationTab(),
-                new XmpPrivacyTab(preferences),
-                new NetworkTab(preferences),
-                new AppearanceTab(preferences)
+                new XmpPrivacyTab(),
+                new NetworkTab(),
+                new AppearanceTab()
         );
     }
 

@@ -1,7 +1,5 @@
 package org.jabref.gui.preferences.importer;
 
-import javax.inject.Inject;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
@@ -9,13 +7,11 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.importer.ImporterViewModel;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -27,9 +23,6 @@ public class ImportCustomizationTab extends AbstractPreferenceTabView<ImportCust
     @FXML private TableColumn<ImporterViewModel, String> classColumn;
     @FXML private TableColumn<ImporterViewModel, String> basePathColumn;
     @FXML private Button addButton;
-
-    @Inject private DialogService dialogService;
-    @Inject private PreferencesService preferences;
 
     public ImportCustomizationTab() {
         ViewLoader.view(this)
@@ -44,7 +37,7 @@ public class ImportCustomizationTab extends AbstractPreferenceTabView<ImportCust
 
     @FXML
     private void initialize() {
-        viewModel = new ImportCustomizationTabViewModel(preferences, dialogService);
+        viewModel = new ImportCustomizationTabViewModel(preferencesService, dialogService);
 
         importerTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         importerTable.itemsProperty().bind(viewModel.importersProperty());

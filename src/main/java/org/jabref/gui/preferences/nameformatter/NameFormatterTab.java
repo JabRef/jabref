@@ -19,7 +19,6 @@ import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -33,9 +32,7 @@ public class NameFormatterTab extends AbstractPreferenceTabView<NameFormatterTab
     @FXML private TextField addFormatterString;
     @FXML private Button formatterHelp;
 
-    public NameFormatterTab(PreferencesService preferences) {
-        this.preferences = preferences;
-
+    public NameFormatterTab() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -47,7 +44,7 @@ public class NameFormatterTab extends AbstractPreferenceTabView<NameFormatterTab
     }
 
     public void initialize() {
-        this.viewModel = new NameFormatterTabViewModel(dialogService, preferences);
+        this.viewModel = new NameFormatterTabViewModel(dialogService, preferencesService);
 
         formatterNameColumn.setSortable(true);
         formatterNameColumn.setReorderable(false);

@@ -12,7 +12,6 @@ import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
@@ -28,9 +27,7 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public AppearanceTab(PreferencesService preferences) {
-        this.preferences = preferences;
-
+    public AppearanceTab() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -42,7 +39,7 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
     }
 
     public void initialize() {
-        this.viewModel = new AppearanceTabViewModel(dialogService, preferences);
+        this.viewModel = new AppearanceTabViewModel(dialogService, preferencesService);
 
         fontOverride.selectedProperty().bindBidirectional(viewModel.fontOverrideProperty());
 

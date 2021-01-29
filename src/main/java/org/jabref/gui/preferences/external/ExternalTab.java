@@ -14,7 +14,6 @@ import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
@@ -36,8 +35,7 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public ExternalTab(PreferencesService preferences, PushToApplicationsManager pushToApplicationsManager) {
-        this.preferences = preferences;
+    public ExternalTab(PushToApplicationsManager pushToApplicationsManager) {
         this.pushToApplicationsManager = pushToApplicationsManager;
 
         ViewLoader.view(this)
@@ -51,7 +49,7 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
     }
 
     public void initialize() {
-        this.viewModel = new ExternalTabViewModel(dialogService, preferences, pushToApplicationsManager);
+        this.viewModel = new ExternalTabViewModel(dialogService, preferencesService, pushToApplicationsManager);
 
         new ViewModelListCellFactory<PushToApplication>()
                 .withText(PushToApplication::getDisplayName)

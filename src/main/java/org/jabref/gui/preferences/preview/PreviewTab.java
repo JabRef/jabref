@@ -35,7 +35,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -66,9 +65,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public PreviewTab(PreferencesService preferences) {
-        this.preferences = preferences;
-
+    public PreviewTab() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -102,7 +99,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
     }
 
     public void initialize() {
-        this.viewModel = new PreviewTabViewModel(dialogService, preferences, taskExecutor, stateManager);
+        this.viewModel = new PreviewTabViewModel(dialogService, preferencesService, taskExecutor, stateManager);
 
         lastKeyPressTime = System.currentTimeMillis();
 
@@ -148,11 +145,11 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         sortUpButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
         sortDownButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
 
-        previewTab.setContent(new PreviewViewer(new BibDatabaseContext(), dialogService, Globals.stateManager));
+        previewTab.setContent(new PreviewViewer(new BibDatabaseContext(), dialogService, stateManager));
         ((PreviewViewer) previewTab.getContent()).setEntry(TestEntry.getTestEntry());
         EasyBind.subscribe(viewModel.layoutProperty(), value -> ((PreviewViewer) previewTab.getContent()).setLayout(value));
         previewTab.getContent().visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull());
-        ((PreviewViewer) previewTab.getContent()).setTheme(preferences.getTheme());
+        ((PreviewViewer) previewTab.getContent()).setTheme(preferencesService.getTheme());
 
         editArea.clear();
         editArea.setParagraphGraphicFactory(LineNumberFactory.get(editArea));

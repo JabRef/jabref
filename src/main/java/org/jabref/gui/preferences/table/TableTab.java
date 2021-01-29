@@ -23,7 +23,6 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
@@ -51,9 +50,7 @@ public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> imple
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public TableTab(PreferencesService preferences) {
-        this.preferences = preferences;
-
+    public TableTab() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -65,12 +62,12 @@ public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> imple
     }
 
     public void initialize() {
-        this.viewModel = new TableTabViewModel(dialogService, preferences);
+        this.viewModel = new TableTabViewModel(dialogService, preferencesService);
 
         setupTable();
         setupBindings();
 
-        ActionFactory actionFactory = new ActionFactory(preferences.getKeyBindingRepository());
+        ActionFactory actionFactory = new ActionFactory(preferencesService.getKeyBindingRepository());
         actionFactory.configureIconButton(StandardActions.HELP_SPECIAL_FIELDS, new HelpAction(HelpFile.SPECIAL_FIELDS), specialFieldsHelp);
     }
 

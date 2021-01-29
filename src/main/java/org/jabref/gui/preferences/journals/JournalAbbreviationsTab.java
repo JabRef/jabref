@@ -11,14 +11,12 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.TextFieldTableCell;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -42,8 +40,6 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     @FXML private Button addAbbreviationListButton;
     @FXML private Button removeAbbreviationListButton;
 
-    @Inject private PreferencesService preferences;
-    @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
     @Inject private JournalAbbreviationRepository abbreviationRepository;
 
@@ -55,7 +51,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
     @FXML
     private void initialize() {
-        viewModel = new JournalAbbreviationsTabViewModel(preferences, dialogService, taskExecutor, abbreviationRepository);
+        viewModel = new JournalAbbreviationsTabViewModel(preferencesService, dialogService, taskExecutor, abbreviationRepository);
 
         setButtonStyles();
         setUpTable();

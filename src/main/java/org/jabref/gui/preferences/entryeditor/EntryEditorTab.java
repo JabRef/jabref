@@ -8,7 +8,6 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -29,8 +28,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
     @FXML private RadioButton firstNameModeFull;
     @FXML private RadioButton firstNameModeBoth;
 
-    public EntryEditorTab(PreferencesService preferences) {
-        this.preferences = preferences;
+    public EntryEditorTab() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -42,7 +40,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
     }
 
     public void initialize() {
-        this.viewModel = new EntryEditorTabViewModel(dialogService, preferences);
+        this.viewModel = new EntryEditorTabViewModel(dialogService, preferencesService);
 
         openOnNewEntry.selectedProperty().bindBidirectional(viewModel.openOnNewEntryProperty());
         defaultSource.selectedProperty().bindBidirectional(viewModel.defaultSourceProperty());

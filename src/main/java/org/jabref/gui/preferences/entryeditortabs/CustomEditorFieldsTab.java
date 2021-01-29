@@ -1,12 +1,9 @@
 package org.jabref.gui.preferences.entryeditortabs;
 
-import javax.inject.Inject;
-
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -15,7 +12,6 @@ import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -23,9 +19,6 @@ public class CustomEditorFieldsTab extends AbstractPreferenceTabView<CustomEdito
 
     @FXML private Button generalFieldsHelp;
     @FXML private TextArea fieldsTextArea;
-
-    @Inject private DialogService dialogService;
-    @Inject private PreferencesService preferences;
 
     public CustomEditorFieldsTab() {
         ViewLoader.view(this)
@@ -39,7 +32,7 @@ public class CustomEditorFieldsTab extends AbstractPreferenceTabView<CustomEdito
     }
 
     public void initialize() {
-        viewModel = new CustomEditorFieldsTabViewModel(dialogService, preferences);
+        viewModel = new CustomEditorFieldsTabViewModel(dialogService, preferencesService);
 
         fieldsTextArea.textProperty().bindBidirectional(viewModel.fieldsProperty());
 

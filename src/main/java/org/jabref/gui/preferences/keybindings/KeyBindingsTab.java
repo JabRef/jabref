@@ -11,7 +11,6 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 
-import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
@@ -20,7 +19,6 @@ import org.jabref.gui.preferences.keybindings.presets.KeyBindingPreset;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -35,8 +33,6 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
     @FXML private MenuButton presetsButton;
 
     @Inject private KeyBindingRepository keyBindingRepository;
-    @Inject private DialogService dialogService;
-    @Inject private PreferencesService preferences;
 
     public KeyBindingsTab() {
         ViewLoader.view(this)
@@ -51,7 +47,7 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
 
     @FXML
     private void initialize() {
-        viewModel = new KeyBindingsTabViewModel(keyBindingRepository, dialogService, preferences);
+        viewModel = new KeyBindingsTabViewModel(keyBindingRepository, dialogService, preferencesService);
 
         keyBindingsTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         viewModel.selectedKeyBindingProperty().bind(
