@@ -5,7 +5,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
 
 import org.jabref.gui.Globals;
 import org.jabref.gui.actions.ActionFactory;
@@ -31,17 +30,11 @@ public class CitationKeyPatternTabView extends AbstractPreferenceTabView<Citatio
     @FXML public TextField keyPatternRegex;
     @FXML public TextField keyPatternReplacement;
     @FXML public TextField unwantedCharacters;
-    @FXML public HBox keyPatternContainer;
     @FXML public Button keyPatternHelp;
-
-    private final CitationKeyPatternPanel bibtexKeyPatternTable;
+    @FXML public CitationKeyPatternPanel bibtexKeyPatternTable;
 
     public CitationKeyPatternTabView(PreferencesService preferences) {
         this.preferences = preferences;
-
-        bibtexKeyPatternTable = new CitationKeyPatternPanel(preferences,
-                Globals.entryTypesManager.getAllTypes(preferences.getGeneralPreferences().getDefaultBibDatabaseMode()),
-                preferences.getGlobalCitationKeyPattern());
 
         ViewLoader.view(this)
                   .root(this)
@@ -66,10 +59,8 @@ public class CitationKeyPatternTabView extends AbstractPreferenceTabView<Citatio
         keyPatternReplacement.textProperty().bindBidirectional(viewModel.keyPatternReplacementProperty());
         unwantedCharacters.textProperty().bindBidirectional(viewModel.unwantedCharactersProperty());
 
-        bibtexKeyPatternTable.setPrefWidth(650.0);
         bibtexKeyPatternTable.patternListProperty().bindBidirectional(viewModel.patternListProperty());
         bibtexKeyPatternTable.defaultKeyPatternProperty().bindBidirectional(viewModel.defaultKeyPatternProperty());
-        keyPatternContainer.getChildren().add(bibtexKeyPatternTable);
 
         ActionFactory actionFactory = new ActionFactory(Globals.getKeyPrefs());
         actionFactory.configureIconButton(StandardActions.HELP_KEY_PATTERNS, new HelpAction(HelpFile.CITATION_KEY_PATTERN), keyPatternHelp);
@@ -78,7 +69,9 @@ public class CitationKeyPatternTabView extends AbstractPreferenceTabView<Citatio
     @Override
     public void setValues() {
         viewModel.setValues();
-        bibtexKeyPatternTable.setValues();
+        bibtexKeyPatternTable.setValues(
+                Globals.entryTypesManager.getAllTypes(preferences.getGeneralPreferences().getDefaultBibDatabaseMode()),
+                preferences.getGlobalCitationKeyPattern());
     }
 
     @Override
