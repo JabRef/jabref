@@ -19,7 +19,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class CitationKeyPatternTabView extends AbstractPreferenceTabView<CitationKeyPatternTabViewModel> implements PreferencesTab {
+public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKeyPatternTabViewModel> implements PreferencesTab {
 
     @FXML private CheckBox overwriteAllow;
     @FXML private CheckBox overwriteWarning;
@@ -33,7 +33,7 @@ public class CitationKeyPatternTabView extends AbstractPreferenceTabView<Citatio
     @FXML private Button keyPatternHelp;
     @FXML private CitationKeyPatternPanel bibtexKeyPatternTable;
 
-    public CitationKeyPatternTabView(PreferencesService preferences) {
+    public CitationKeyPatternTab(PreferencesService preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)

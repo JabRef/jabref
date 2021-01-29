@@ -25,7 +25,7 @@ import org.jabref.preferences.PreferencesService;
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
-public class XmpPrivacyTabView extends AbstractPreferenceTabView<XmpPrivacyTabViewModel> implements PreferencesTab {
+public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewModel> implements PreferencesTab {
 
     @FXML private CheckBox enableXmpFilter;
     @FXML private TableView<Field> filterList;
@@ -36,7 +36,7 @@ public class XmpPrivacyTabView extends AbstractPreferenceTabView<XmpPrivacyTabVi
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public XmpPrivacyTabView(PreferencesService preferences) {
+    public XmpPrivacyTab(PreferencesService preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)

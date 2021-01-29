@@ -19,7 +19,7 @@ import org.jabref.preferences.PreferencesService;
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
-public class ExternalTabView extends AbstractPreferenceTabView<ExternalTabViewModel> implements PreferencesTab {
+public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel> implements PreferencesTab {
 
     @FXML private TextField eMailReferenceSubject;
     @FXML private CheckBox autoOpenAttachedFolders;
@@ -36,7 +36,7 @@ public class ExternalTabView extends AbstractPreferenceTabView<ExternalTabViewMo
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public ExternalTabView(PreferencesService preferences, PushToApplicationsManager pushToApplicationsManager) {
+    public ExternalTab(PreferencesService preferences, PushToApplicationsManager pushToApplicationsManager) {
         this.preferences = preferences;
         this.pushToApplicationsManager = pushToApplicationsManager;
 

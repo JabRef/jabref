@@ -12,7 +12,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class EntryEditorTabView extends AbstractPreferenceTabView<EntryEditorTabViewModel> implements PreferencesTab {
+public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabViewModel> implements PreferencesTab {
 
     @FXML private CheckBox openOnNewEntry;
     @FXML private CheckBox defaultSource;
@@ -29,7 +29,7 @@ public class EntryEditorTabView extends AbstractPreferenceTabView<EntryEditorTab
     @FXML private RadioButton firstNameModeFull;
     @FXML private RadioButton firstNameModeBoth;
 
-    public EntryEditorTabView(PreferencesService preferences) {
+    public EntryEditorTab(PreferencesService preferences) {
         this.preferences = preferences;
         ViewLoader.view(this)
                   .root(this)

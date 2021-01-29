@@ -22,7 +22,7 @@ import org.jabref.preferences.PreferencesService;
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
-public class LinkedFilesTabView extends AbstractPreferenceTabView<LinkedFilesTabViewModel> implements PreferencesTab {
+public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabViewModel> implements PreferencesTab {
 
     @FXML private TextField mainFileDirectory;
     @FXML private CheckBox useBibLocationAsPrimary;
@@ -39,7 +39,7 @@ public class LinkedFilesTabView extends AbstractPreferenceTabView<LinkedFilesTab
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public LinkedFilesTabView(PreferencesService preferences) {
+    public LinkedFilesTab(PreferencesService preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)

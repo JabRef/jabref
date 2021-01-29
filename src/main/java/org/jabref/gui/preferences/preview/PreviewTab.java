@@ -43,7 +43,7 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 
-public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewModel> implements PreferencesTab {
+public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> implements PreferencesTab {
 
     @FXML private CheckBox showAsTabCheckBox;
     @FXML private ListView<PreviewLayout> availableListView;
@@ -66,7 +66,7 @@ public class PreviewTabView extends AbstractPreferenceTabView<PreviewTabViewMode
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public PreviewTabView(PreferencesService preferences) {
+    public PreviewTab(PreferencesService preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)

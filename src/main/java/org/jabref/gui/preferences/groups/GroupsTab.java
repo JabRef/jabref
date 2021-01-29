@@ -12,7 +12,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class GroupsTabView extends AbstractPreferenceTabView<GroupsTabViewModel> implements PreferencesTab {
+public class GroupsTab extends AbstractPreferenceTabView<GroupsTabViewModel> implements PreferencesTab {
 
     @FXML private RadioButton groupViewModeIntersection;
     @FXML private RadioButton groupViewModeUnion;
@@ -20,7 +20,7 @@ public class GroupsTabView extends AbstractPreferenceTabView<GroupsTabViewModel>
     @FXML private CheckBox displayGroupCount;
     @FXML private TextField keywordSeparator;
 
-    public GroupsTabView(PreferencesService preferences) {
+    public GroupsTab(PreferencesService preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)

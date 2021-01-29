@@ -25,7 +25,7 @@ import org.jabref.preferences.PreferencesService;
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
-public class GeneralTabView extends AbstractPreferenceTabView<GeneralTabViewModel> implements PreferencesTab {
+public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> implements PreferencesTab {
 
     @FXML private ComboBox<Language> language;
     @FXML private ComboBox<Charset> defaultEncoding;
@@ -45,7 +45,7 @@ public class GeneralTabView extends AbstractPreferenceTabView<GeneralTabViewMode
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public GeneralTabView(PreferencesService preferences) {
+    public GeneralTab(PreferencesService preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)

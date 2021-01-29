@@ -25,7 +25,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.textfield.CustomPasswordField;
 
-public class NetworkTabView extends AbstractPreferenceTabView<NetworkTabViewModel> implements PreferencesTab {
+public class NetworkTab extends AbstractPreferenceTabView<NetworkTabViewModel> implements PreferencesTab {
     @FXML private Label remoteLabel;
     @FXML private CheckBox remoteServer;
     @FXML private TextField remotePort;
@@ -49,7 +49,7 @@ public class NetworkTabView extends AbstractPreferenceTabView<NetworkTabViewMode
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public NetworkTabView(PreferencesService preferences) {
+    public NetworkTab(PreferencesService preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)

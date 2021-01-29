@@ -22,7 +22,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> implements PreferencesTab {
+public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> implements PreferencesTab {
 
     @FXML private CheckBox openLastStartup;
     @FXML private TextField noWrapFiles;
@@ -37,7 +37,7 @@ public class FileTabView extends AbstractPreferenceTabView<FileTabViewModel> imp
     @FXML private CheckBox autosaveLocalLibraries;
     @FXML private Button autosaveLocalLibrariesHelp;
 
-    public FileTabView(PreferencesService preferences) {
+    public FileTab(PreferencesService preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)

@@ -12,25 +12,25 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.preferences.appearance.AppearanceTabView;
-import org.jabref.gui.preferences.citationkeypattern.CitationKeyPatternTabView;
-import org.jabref.gui.preferences.entryeditor.EntryEditorTabView;
+import org.jabref.gui.preferences.appearance.AppearanceTab;
+import org.jabref.gui.preferences.citationkeypattern.CitationKeyPatternTab;
+import org.jabref.gui.preferences.entryeditor.EntryEditorTab;
 import org.jabref.gui.preferences.entryeditortabs.CustomEditorFieldsTab;
 import org.jabref.gui.preferences.exporter.ExportCustomizationTab;
-import org.jabref.gui.preferences.external.ExternalTabView;
-import org.jabref.gui.preferences.file.FileTabView;
-import org.jabref.gui.preferences.general.GeneralTabView;
-import org.jabref.gui.preferences.groups.GroupsTabView;
+import org.jabref.gui.preferences.external.ExternalTab;
+import org.jabref.gui.preferences.file.FileTab;
+import org.jabref.gui.preferences.general.GeneralTab;
+import org.jabref.gui.preferences.groups.GroupsTab;
 import org.jabref.gui.preferences.importer.ImportCustomizationTab;
 import org.jabref.gui.preferences.journals.JournalAbbreviationsTab;
 import org.jabref.gui.preferences.keybindings.KeyBindingsTab;
-import org.jabref.gui.preferences.linkedfiles.LinkedFilesTabView;
-import org.jabref.gui.preferences.nameformatter.NameFormatterTabView;
-import org.jabref.gui.preferences.network.NetworkTabView;
-import org.jabref.gui.preferences.preview.PreviewTabView;
+import org.jabref.gui.preferences.linkedfiles.LinkedFilesTab;
+import org.jabref.gui.preferences.nameformatter.NameFormatterTab;
+import org.jabref.gui.preferences.network.NetworkTab;
+import org.jabref.gui.preferences.preview.PreviewTab;
 import org.jabref.gui.preferences.protectedterms.ProtectedTermsTab;
-import org.jabref.gui.preferences.table.TableTabView;
-import org.jabref.gui.preferences.xmp.XmpPrivacyTabView;
+import org.jabref.gui.preferences.table.TableTab;
+import org.jabref.gui.preferences.xmp.XmpPrivacyTab;
 import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.push.PushToEmacs;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -64,25 +64,25 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         this.frame = frame;
 
         preferenceTabs = FXCollections.observableArrayList(
-                new GeneralTabView(preferences),
+                new GeneralTab(preferences),
                 new KeyBindingsTab(),
-                new FileTabView(preferences),
-                new TableTabView(preferences),
-                new PreviewTabView(preferences),
+                new FileTab(preferences),
+                new TableTab(preferences),
+                new PreviewTab(preferences),
                 new ProtectedTermsTab(),
-                new ExternalTabView(preferences, frame.getPushToApplicationsManager()),
+                new ExternalTab(preferences, frame.getPushToApplicationsManager()),
                 new JournalAbbreviationsTab(),
-                new GroupsTabView(preferences),
-                new EntryEditorTabView(preferences),
+                new GroupsTab(preferences),
+                new EntryEditorTab(preferences),
                 new CustomEditorFieldsTab(),
-                new CitationKeyPatternTabView(preferences),
-                new LinkedFilesTabView(preferences),
-                new NameFormatterTabView(preferences),
+                new CitationKeyPatternTab(preferences),
+                new LinkedFilesTab(preferences),
+                new NameFormatterTab(preferences),
                 new ImportCustomizationTab(),
                 new ExportCustomizationTab(),
-                new XmpPrivacyTabView(preferences),
-                new NetworkTabView(preferences),
-                new AppearanceTabView(preferences)
+                new XmpPrivacyTab(preferences),
+                new NetworkTab(preferences),
+                new AppearanceTab(preferences)
         );
     }
 

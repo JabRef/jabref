@@ -28,7 +28,7 @@ import org.jabref.preferences.PreferencesService;
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
-public class TableTabView extends AbstractPreferenceTabView<TableTabViewModel> implements PreferencesTab {
+public class TableTab extends AbstractPreferenceTabView<TableTabViewModel> implements PreferencesTab {
 
     @FXML private TableView<MainTableColumnModel> columnsList;
     @FXML private TableColumn<MainTableColumnModel, String> nameColumn;
@@ -51,7 +51,7 @@ public class TableTabView extends AbstractPreferenceTabView<TableTabViewModel> i
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public TableTabView(PreferencesService preferences) {
+    public TableTab(PreferencesService preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)

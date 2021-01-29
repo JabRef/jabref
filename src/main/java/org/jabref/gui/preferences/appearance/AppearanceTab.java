@@ -17,7 +17,7 @@ import org.jabref.preferences.PreferencesService;
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
-public class AppearanceTabView extends AbstractPreferenceTabView<AppearanceTabViewModel> implements PreferencesTab {
+public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewModel> implements PreferencesTab {
 
     @FXML private CheckBox fontOverride;
     @FXML private Spinner<Integer> fontSize;
@@ -28,7 +28,7 @@ public class AppearanceTabView extends AbstractPreferenceTabView<AppearanceTabVi
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public AppearanceTabView(PreferencesService preferences) {
+    public AppearanceTab(PreferencesService preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)

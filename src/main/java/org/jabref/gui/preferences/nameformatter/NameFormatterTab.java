@@ -23,7 +23,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class NameFormatterTabView extends AbstractPreferenceTabView<NameFormatterTabViewModel> implements PreferencesTab {
+public class NameFormatterTab extends AbstractPreferenceTabView<NameFormatterTabViewModel> implements PreferencesTab {
 
     @FXML private TableView<NameFormatterItemModel> formatterList;
     @FXML private TableColumn<NameFormatterItemModel, String> formatterNameColumn;
@@ -33,7 +33,7 @@ public class NameFormatterTabView extends AbstractPreferenceTabView<NameFormatte
     @FXML private TextField addFormatterString;
     @FXML private Button formatterHelp;
 
-    public NameFormatterTabView(PreferencesService preferences) {
+    public NameFormatterTab(PreferencesService preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)
