@@ -74,7 +74,7 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
         Map<Boolean, List<Path>> fileListPartition;
 
         try (Stream<Path> filesStream = StreamSupport.stream(Files.newDirectoryStream(directory, fileFilter).spliterator(), false)) {
-            fileListPartition = filesStream.collect(Collectors.partitioningBy(path -> path.toFile().isDirectory()));
+            fileListPartition = filesStream.collect(Collectors.partitioningBy(Files::isDirectory));
         } catch (IOException e) {
             LOGGER.error(String.format("%s while searching files: %s", e.getClass().getName(), e.getMessage()));
             return parent;
