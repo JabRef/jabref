@@ -7,8 +7,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jabref.gui.JabRefGUI;
-import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.model.entry.LinkedFile;
 
 public class FileFieldParser {
