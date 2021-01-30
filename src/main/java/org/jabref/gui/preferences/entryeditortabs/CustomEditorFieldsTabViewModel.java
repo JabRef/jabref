@@ -29,14 +29,14 @@ public class CustomEditorFieldsTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        setFieldsProperty(preferences.getEntryEditorTabList());
+        setFields(preferences.getEntryEditorTabList());
     }
 
     public void resetToDefaults() {
-        setFieldsProperty(preferences.getDefaultTabNamesAndFields());
+        setFields(preferences.getDefaultTabNamesAndFields());
     }
 
-    private void setFieldsProperty(Map<String, Set<Field>> tabNamesAndFields) {
+    private void setFields(Map<String, Set<Field>> tabNamesAndFields) {
         StringBuilder sb = new StringBuilder();
 
         // Fill with customized vars

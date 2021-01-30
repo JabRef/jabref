@@ -56,16 +56,16 @@ public class CitationKeyPatternPanelViewModel {
         patternListProperty.add(defaultItemProperty.getValue());
 
         entryTypeList.stream()
-                        .map(BibEntryType::getType)
-                        .forEach(entryType -> {
-                            String pattern;
-                            if (initialKeyPattern.isDefaultValue(entryType)) {
-                                pattern = "";
-                            } else {
-                                pattern = initialKeyPattern.getPatterns().get(entryType).get(0);
-                            }
-                            patternListProperty.add(new CitationKeyPatternPanelItemModel(entryType, pattern));
-                        });
+                     .map(BibEntryType::getType)
+                     .forEach(entryType -> {
+                         String pattern;
+                         if (initialKeyPattern.isDefaultValue(entryType)) {
+                             pattern = "";
+                         } else {
+                             pattern = initialKeyPattern.getPatterns().get(entryType).get(0);
+                         }
+                         patternListProperty.add(new CitationKeyPatternPanelItemModel(entryType, pattern));
+                     });
     }
 
     public void setItemToDefaultPattern(CitationKeyPatternPanelItemModel item) {
