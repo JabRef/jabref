@@ -229,7 +229,7 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherT
 
     @Override
     public List<String> getTestAuthors() {
-        return List.of("\"Tobias Diez\"");
+        return List.of("Tobias Diez");
     }
 
     @Disabled("Is not supported by the current API")
@@ -247,7 +247,7 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherT
 
     @Override
     public String getTestJournal() {
-        return "\"Journal of Geometry and Physics (2013)\"";
+        return "Journal of Geometry and Physics (2013)";
     }
 
     /**

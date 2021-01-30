@@ -220,10 +220,8 @@ public class PdfContentImporter extends Importer {
             entry.ifPresent(result::add);
         } catch (EncryptedPdfsNotSupportedException e) {
             return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
-        } catch (IOException exception) {
+        } catch (IOException | FetcherException exception) {
             return ParserResult.fromError(exception);
-        } catch (FetcherException e) {
-            return ParserResult.fromErrorMessage(e.getMessage());
         }
 
         result.forEach(entry -> entry.addFile(new LinkedFile("", filePath.toAbsolutePath(), "PDF")));

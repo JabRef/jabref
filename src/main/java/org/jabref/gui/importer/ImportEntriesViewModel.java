@@ -171,7 +171,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
 
     private void buildImportHandlerThenImportEntries(List<BibEntry> entriesToImport) {
         ImportHandler importHandler = new ImportHandler(
-                dialogService,
                 databaseContext,
                 ExternalFileTypes.getInstance(),
                 preferences,

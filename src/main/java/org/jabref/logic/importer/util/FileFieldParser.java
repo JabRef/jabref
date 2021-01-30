@@ -18,7 +18,7 @@ public class FileFieldParser {
             return files;
         }
 
-        List<String> entry = new ArrayList<>();
+        List<String> linkedFileData = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         boolean inXmlChar = false;
         boolean escaped = false;
@@ -40,33 +40,41 @@ public class FileFieldParser {
                 sb.append(c);
                 inXmlChar = false;
             } else if (!escaped && (c == ':')) {
-                entry.add(sb.toString());
+                // We are in the next LinkedFile data element
+                linkedFileData.add(sb.toString());
                 sb = new StringBuilder();
             } else if (!escaped && (c == ';') && !inXmlChar) {
-                entry.add(sb.toString());
-                sb = new StringBuilder();
+                linkedFileData.add(sb.toString());
+                files.add(convert(linkedFileData));
 
-                files.add(convert(entry));
+                // next iteration
+                sb = new StringBuilder();
             } else {
                 sb.append(c);
             }
             escaped = false;
         }
         if (sb.length() > 0) {
-            entry.add(sb.toString());
+            linkedFileData.add(sb.toString());
         }
-
         if (!entry.isEmpty()) {
             LinkedFile linkedFile = convert(entry);
             if (linkedFile != null) {
                 files.add(linkedFile);
             }
         }
-
         return files;
     }
 
-    private static LinkedFile convert(List<String> entry) {
+    /**
+     * Converts the given textual representation of a LinkedFile object
+     *
+     * SIDE EFFECT: The given entry list is cleared upon completion
+     *
+     * @param entry the list of elements in the linked file textual representation
+     * @return a LinkedFile object
+     */
+    static LinkedFile convert(List<String> entry) {
         // ensure list has at least 3 fields
         while (entry.size() < 3) {
             entry.add("");
@@ -75,9 +83,10 @@ public class FileFieldParser {
         LinkedFile field = null;
         if (LinkedFile.isOnlineLink(entry.get(1))) {
             try {
-                field = new LinkedFile(new URL(entry.get(1)), entry.get(2));
+                field = new LinkedFile(entry.get(0), new URL(entry.get(1)), entry.get(2));
             } catch (MalformedURLException ignored) {
-                // ignored
+                // in case the URL is malformed, store it nevertheless
+                field = new LinkedFile(entry.get(0), entry.get(1), entry.get(2));
             }
         }
 
