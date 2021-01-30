@@ -57,8 +57,8 @@ public class FileFieldParser {
         if (sb.length() > 0) {
             linkedFileData.add(sb.toString());
         }
-        if (!entry.isEmpty()) {
-            LinkedFile linkedFile = convert(entry);
+        if (!linkedFileData.isEmpty()) {
+            LinkedFile linkedFile = convert(linkedFileData);
             if (linkedFile != null) {
                 files.add(linkedFile);
             }
