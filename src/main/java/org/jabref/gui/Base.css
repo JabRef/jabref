@@ -1224,3 +1224,7 @@ TextFlow * {
 .mainTable-header {
     -fx-fill: -fx-mid-text-color;
 }
+
+.prefSpinner{
+    -fx-pref-width: 5em;
+}
