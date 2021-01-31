@@ -164,7 +164,8 @@ public class JabRefFrame extends BorderPane {
 
     private final FileHistoryMenu fileHistory;
 
-    @SuppressWarnings({"FieldCanBeLocal"}) private EasyObservableList<BibDatabaseContext> openDatabaseList;
+    @SuppressWarnings({"FieldCanBeLocal"})
+    private EasyObservableList<BibDatabaseContext> openDatabaseList;
 
     private final Stage mainStage;
     private final StateManager stateManager;
@@ -315,7 +316,7 @@ public class JabRefFrame extends BorderPane {
         }
 
         Globals.prefs.storeTelemetryPreferences(telemetryPreferences.withCollectTelemetry(shouldCollect)
-                                                                    .withAskToCollectTelemetry(false));
+                .withAskToCollectTelemetry(false));
     }
 
     /**
@@ -350,11 +351,11 @@ public class JabRefFrame extends BorderPane {
                 prefs.clearEditedFiles();
             } else {
                 Path focusedDatabase = getCurrentLibraryTab().getBibDatabaseContext()
-                                                             .getDatabasePath()
-                                                             .orElse(null);
+                        .getDatabasePath()
+                        .orElse(null);
                 prefs.storeGuiPreferences(prefs.getGuiPreferences()
-                                               .withLastFilesOpened(filenames)
-                                               .withLastFocusedFile(focusedDatabase));
+                        .withLastFilesOpened(filenames)
+                        .withLastFocusedFile(focusedDatabase));
             }
         }
 
@@ -463,7 +464,7 @@ public class JabRefFrame extends BorderPane {
         if (!splitPane.getDividers().isEmpty()) {
             EasyBind.subscribe(splitPane.getDividers().get(0).positionProperty(),
                     position -> prefs.storeGuiPreferences(prefs.getGuiPreferences()
-                                                               .withSidePaneWidth(position.doubleValue())));
+                            .withSidePaneWidth(position.doubleValue())));
         }
     }
 
@@ -555,8 +556,8 @@ public class JabRefFrame extends BorderPane {
      */
     public List<LibraryTab> getLibraryTabs() {
         return tabbedPane.getTabs().stream()
-                         .map(tab -> (LibraryTab) tab)
-                         .collect(Collectors.toList());
+                .map(tab -> (LibraryTab) tab)
+                .collect(Collectors.toList());
     }
 
     public void showLibraryTabAt(int i) {
@@ -587,8 +588,8 @@ public class JabRefFrame extends BorderPane {
         stateManager.activeDatabaseProperty().bind(
                 EasyBind.map(tabbedPane.getSelectionModel().selectedItemProperty(),
                         selectedTab -> Optional.ofNullable(selectedTab)
-                                               .map(tab -> (LibraryTab) tab)
-                                               .map(LibraryTab::getBibDatabaseContext)));
+                                .map(tab -> (LibraryTab) tab)
+                                .map(LibraryTab::getBibDatabaseContext)));
 
         // Subscribe to the search
         EasyBind.subscribe(stateManager.activeSearchQueryProperty(),
@@ -829,8 +830,6 @@ public class JabRefFrame extends BorderPane {
         SidePaneComponent groups = sidePaneManager.getComponent(SidePaneType.GROUPS);
         SidePaneComponent openOffice = sidePaneManager.getComponent(SidePaneType.OPEN_OFFICE);
 
-        view.getItems().add(new SeparatorMenuItem());
-        view.getItems().clear();
         view.getItems().addAll(
                 factory.createCheckMenuItem(webSearch.getToggleAction(), webSearch.getToggleCommand(), sidePaneManager.isComponentVisible(SidePaneType.WEB_SEARCH)),
                 factory.createCheckMenuItem(groups.getToggleAction(), groups.getToggleCommand(), sidePaneManager.isComponentVisible(SidePaneType.GROUPS)),
@@ -980,10 +979,10 @@ public class JabRefFrame extends BorderPane {
         } else {
             // only add tab if DB is not already open
             Optional<LibraryTab> libraryTab = getLibraryTabs().stream()
-                                                              .filter(p -> p.getBibDatabaseContext()
-                                                                            .getDatabasePath()
-                                                                            .equals(parserResult.getPath()))
-                                                              .findFirst();
+                    .filter(p -> p.getBibDatabaseContext()
+                            .getDatabasePath()
+                            .equals(parserResult.getPath()))
+                    .findFirst();
 
             if (libraryTab.isPresent()) {
                 tabbedPane.getSelectionModel().select(libraryTab.get());
@@ -1101,10 +1100,10 @@ public class JabRefFrame extends BorderPane {
      */
     private boolean confirmClose(LibraryTab libraryTab) {
         String filename = libraryTab.getBibDatabaseContext()
-                                    .getDatabasePath()
-                                    .map(Path::toAbsolutePath)
-                                    .map(Path::toString)
-                                    .orElse(Localization.lang("untitled"));
+                .getDatabasePath()
+                .map(Path::toAbsolutePath)
+                .map(Path::toString)
+                .orElse(Localization.lang("untitled"));
 
         ButtonType saveChanges = new ButtonType(Localization.lang("Save changes"), ButtonBar.ButtonData.YES);
         ButtonType discardChanges = new ButtonType(Localization.lang("Discard changes"), ButtonBar.ButtonData.NO);
