@@ -140,12 +140,12 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
 
     @Override
     public List<String> getTestAuthors() {
-        return List.of("\"Steinmacher, Igor\"", "\"Gerosa, Marco\"", "\"Conte, Tayana U.\"");
+        return List.of("Steinmacher, Igor", "Gerosa, Marco", "Conte, Tayana U.");
     }
 
     @Override
     public String getTestJournal() {
-        return "\"Clinical Research in Cardiology\"";
+        return "Clinical Research in Cardiology";
     }
 
     @Override

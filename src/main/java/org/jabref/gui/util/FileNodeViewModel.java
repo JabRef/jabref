@@ -1,4 +1,4 @@
-package org.jabref.gui.texparser;
+package org.jabref.gui.util;
 
 import java.nio.file.Path;
 
