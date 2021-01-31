@@ -1225,6 +1225,6 @@ TextFlow * {
     -fx-fill: -fx-mid-text-color;
 }
 
-.prefSpinner{
+.fontsizeSpinner{
     -fx-pref-width: 5em;
 }
