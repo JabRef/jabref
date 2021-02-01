@@ -134,14 +134,14 @@ public class WebFetchers {
     /**
      * @return sorted set containing entry based fetchers
      */
-    public static SortedSet<EntryBasedFetcher> getEntryBasedFetchers(ImportFormatPreferences importFormatPreferences, APIKeyPreferences apiKeyPreferences) {
+    public static SortedSet<EntryBasedFetcher> getEntryBasedFetchers(ImportFormatPreferences importFormatPreferences, FetcherApiPreferences fetcherApiPreferences) {
         SortedSet<EntryBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
         set.add(new AstrophysicsDataSystem(importFormatPreferences));
         set.add(new DoiFetcher(importFormatPreferences));
         set.add(new IsbnFetcher(importFormatPreferences));
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new CrossRef());
-        set.add(new WorldcatFetcher(apiKeyPreferences.getWorldcatKey()));
+        set.add(new WorldcatFetcher(fetcherApiPreferences.getWorldcatKey()));
         return set;
     }
 

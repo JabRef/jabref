@@ -52,6 +52,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new ExternalTabView(preferences, frame.getPushToApplicationsManager()),
                 new GroupsTabView(preferences),
                 new EntryEditorTabView(preferences),
+                new FetcherTab(preferences),
                 new CitationKeyPatternTabView(preferences),
                 new LinkedFilesTabView(preferences),
                 new NameFormatterTabView(preferences),

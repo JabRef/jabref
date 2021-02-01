@@ -73,7 +73,7 @@ import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
-import org.jabref.logic.importer.APIKeyPreferences;
+import org.jabref.logic.importer.FetcherApiPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fileformat.CustomImporter;
@@ -2302,6 +2302,16 @@ public class JabRefPreferences implements PreferencesService {
             remove(CUSTOM_EXPORT_FORMAT + i);
             i++;
         }
+    }
+
+    @Override
+    public FetcherApiPreferences getApiKeyPreferences() {
+        return new FetcherApiPreferences(get(IMPORT_API_WORLDCAT));
+    }
+
+    @Override
+    public void storeApiKeyPreferences(FetcherApiPreferences preferences) {
+        put(IMPORT_API_WORLDCAT, preferences.getWorldcatKey());
     }
 
     //*************************************************************************************************************

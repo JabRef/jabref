@@ -27,6 +27,7 @@ import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
+import org.jabref.logic.importer.FetcherApiPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
@@ -287,6 +288,10 @@ public interface PreferencesService {
     Set<CustomImporter> getCustomImportFormats();
 
     void storeCustomImportFormats(Set<CustomImporter> customImporters);
+
+    FetcherApiPreferences getApiKeyPreferences();
+
+    void storeApiKeyPreferences(FetcherApiPreferences preferences);
 
     //*************************************************************************************************************
     // Preview preferences
