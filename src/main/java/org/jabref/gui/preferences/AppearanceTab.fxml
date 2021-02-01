@@ -25,7 +25,7 @@
     <CheckBox fx:id="fontOverride" text="%Override default font settings"/>
     <HBox alignment="CENTER_LEFT" spacing="4.0">
         <Label text="%Size" disable="${!fontOverride.selected}"/>
-        <Spinner fx:id="fontSize" prefWidth="60.0" editable="true"/>
+        <Spinner fx:id="fontSize" styleClass="fontsizeSpinner" editable="true"/>
         <padding>
             <Insets left="20.0"/>
         </padding>
