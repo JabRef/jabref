@@ -19,7 +19,7 @@ public class FileExtensionViewModel {
     private final ExternalFileTypes externalFileTypes;
 
     FileExtensionViewModel(FileType fileType, ExternalFileTypes externalFileTypes) {
-        this.description = Localization.lang("%0 file", fileType.toString());
+        this.description = Localization.lang("%0 file", fileType.getName());
         this.extensions = fileType.getExtensionsWithDot();
         this.externalFileTypes = externalFileTypes;
     }

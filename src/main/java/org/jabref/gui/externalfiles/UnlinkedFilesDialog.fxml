@@ -34,14 +34,14 @@
                 <ColumnConstraints hgrow="SOMETIMES"/>
             </columnConstraints>
             <rowConstraints>
-                <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
-                <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="20.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="20.0" vgrow="SOMETIMES"/>
             </rowConstraints>
                 <Label text="%Start directory:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
                 <TextField fx:id="directoryPathField" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
                 <Button onAction="#browseFileDirectory" styleClass="icon-button,narrow"
                         GridPane.columnIndex="2" GridPane.rowIndex="0"
-                        prefHeight="20.0" prefWidth="20.0">
+                        minWidth="20.0" minHeight="20.0" prefHeight="20.0" prefWidth="20.0">
                     <graphic>
                         <JabRefIconView glyph="OPEN"/>
                     </graphic>
@@ -50,9 +50,9 @@
                     </tooltip>
                 </Button>
 
-                <Label text="%File extension:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <Label text="%File type:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
                 <ComboBox fx:id="fileTypeCombo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                <Button fx:id="scanButton" onAction="#scanFiles" text="%Scan directory"
+                <Button fx:id="scanButton" onAction="#scanFiles" text="%Search"
                         GridPane.columnIndex="2" GridPane.rowIndex="1">
                     <tooltip>
                         <Tooltip text="%Searches the selected directory for unlinked files."/>
@@ -71,11 +71,11 @@
                             <TableView fx:id="importResultTable">
                                 <columns>
                                     <TableColumn fx:id="colStatus" prefWidth="100.0" text="%Status"/>
-                                    <TableColumn fx:id="colMessage" prefWidth="300.0" text="%Message"/>
                                     <TableColumn fx:id="colFile" prefWidth="500.0" text="%File"/>
+                                    <TableColumn fx:id="colMessage" prefWidth="300.0" text="%Message"/>
                                 </columns>
                                 <columnResizePolicy>
-                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                    <TableView fx:constant="UNCONSTRAINED_RESIZE_POLICY"/>
                                 </columnResizePolicy>
                             </TableView>
                         </TitledPane>
