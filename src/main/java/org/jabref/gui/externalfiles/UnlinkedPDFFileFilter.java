@@ -4,6 +4,7 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.DirectoryStream.Filter;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.jabref.logic.util.io.DatabaseFileLookup;
@@ -31,6 +32,11 @@ public class UnlinkedPDFFileFilter implements DirectoryStream.Filter<Path> {
 
     @Override
     public boolean accept(Path pathname) throws IOException {
-        return fileFilter.accept(pathname) && !lookup.lookupDatabase(pathname.toFile());
+
+        if (Files.isDirectory(pathname)) {
+            return true;
+        } else {
+            return fileFilter.accept(pathname) && !lookup.lookupDatabase(pathname);
+        }
     }
 }

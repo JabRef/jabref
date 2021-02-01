@@ -642,6 +642,10 @@
     -fx-background-color: -jr-warn;
 }
 
+.file-row-text{
+    -fx-fill: -jr-search-text;
+}
+
 .combo-box-base {
     -fx-background-color: -fx-outer-border, -fx-control-inner-background;
     -fx-background-insets: 0, 1;
@@ -1217,6 +1221,10 @@ TextFlow * {
 
 }
 
-.mainTable-header{
+.mainTable-header {
     -fx-fill: -fx-mid-text-color;
+}
+
+.fontsizeSpinner{
+    -fx-pref-width: 5em;
 }
