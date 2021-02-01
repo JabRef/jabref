@@ -16,7 +16,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added some symbols and keybindings to the context menu in the entry editor. [#7268](https://github.com/JabRef/jabref/pull/7268)
 - We added keybindings for setting and clearing the read status. [#7264](https://github.com/JabRef/jabref/issues/7264)
 - We added two new fields to track the creation and most recent modification date and time for each entry. [koppor#130](https://github.com/koppor/jabref/issues/130)
-- We added a WorldCcat fetcher. [#1065](https://github.com/JabRef/jabref/issues/1065) [#2581](https://github.com/JabRef/jabref/issues/2581)
+- We added a fetcher for [WorldCat](https://www.worldcat.org/). [#1065](https://github.com/JabRef/jabref/issues/1065) [#2581](https://github.com/JabRef/jabref/issues/2581)
 
 ### Changed
 
@@ -252,7 +252,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We reintroduced the index column. [#5844](https://github.com/JabRef/jabref/pull/5844)
 - Filenames of external files can no longer contain curly braces. [#5926](https://github.com/JabRef/jabref/pull/5926)
 - We made the filters more easily accessible in the integrity check dialog. [#5955](https://github.com/JabRef/jabref/pull/5955)
-- We added a WorldCcat fetcher. [#1065](https://github.com/JabRef/jabref/issues/1065) [#2581](https://github.com/JabRef/jabref/issues/2581). [WorldCat](http://www.worldcat.org/webservices/catalog/)
 - We reimplemented and improved the dialog "Customize entry types". [#4719](https://github.com/JabRef/jabref/issues/4719)
 - We added an [American Physical Society](https://journals.aps.org/) fetcher. [#818](https://github.com/JabRef/jabref/issues/818)
 - We added possibility to enable/disable items quantity in groups. [#6042](https://github.com/JabRef/jabref/issues/6042)
