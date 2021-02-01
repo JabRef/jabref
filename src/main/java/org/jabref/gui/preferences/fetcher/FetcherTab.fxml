@@ -12,7 +12,7 @@
 <?import org.jabref.gui.icon.JabRefIconView?>
 <fx:root spacing="10.0" type="VBox" prefWidth="650.0"
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-         fx:controller="org.jabref.gui.preferences.FetcherTab">
+         fx:controller="org.jabref.gui.preferences.fetcher.FetcherTab">
 
     <Label styleClass="titleHeader" text="%Fetcher API keys"/>
 

@@ -1,4 +1,4 @@
-package org.jabref.gui.preferences;
+package org.jabref.gui.preferences.fetcher;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,6 +11,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.desktop.JabRefDesktop;
+import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.importer.FetcherApiPreferences;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;

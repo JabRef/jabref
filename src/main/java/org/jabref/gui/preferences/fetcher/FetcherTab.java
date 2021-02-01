@@ -1,11 +1,12 @@
-package org.jabref.gui.preferences;
+package org.jabref.gui.preferences.fetcher;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 
+import org.jabref.gui.preferences.AbstractPreferenceTabView;
+import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -14,9 +15,7 @@ public class FetcherTab extends AbstractPreferenceTabView<FetcherTabViewModel> i
     @FXML private CheckBox useWorldcatKey;
     @FXML private TextField worldcatKey;
 
-    public FetcherTab(PreferencesService preferences) {
-        this.preferences = preferences;
-
+    public FetcherTab() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -24,7 +23,7 @@ public class FetcherTab extends AbstractPreferenceTabView<FetcherTabViewModel> i
 
     @FXML
     private void initialize() {
-        viewModel = new FetcherTabViewModel(preferences);
+        viewModel = new FetcherTabViewModel(preferencesService);
 
         useWorldcatKey.selectedProperty().bindBidirectional(viewModel.getUseWorldcatKeyProperty());
         worldcatKey.textProperty().bindBidirectional(viewModel.getWorldcatKeyProperty());
