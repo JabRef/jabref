@@ -23,21 +23,14 @@ public class Ordinal implements LayoutFormatter {
         while (m.find()) {
             String result = m.group(1);
             int value = Integer.parseInt(result);
-            String ordinalString;
-            switch (value) {
-            case 1:
-                ordinalString = "st";
-                break;
-            case 2:
-                ordinalString = "nd";
-                break;
-            case 3:
-                ordinalString = "rd";
-                break;
-            default:
-                ordinalString = "th";
-                break;
-            }
+            // CHECKSTYLE:OFF
+            String ordinalString = switch (value) {
+                case 1 -> "st";
+                case 2 -> "nd";
+                case 3 -> "rd";
+                default -> "th";
+            };
+            // CHECKSTYLE:ON
             m.appendReplacement(sb, result + ordinalString);
         }
         m.appendTail(sb);

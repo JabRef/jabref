@@ -11,11 +11,12 @@ import java.util.Objects;
 /**
  * Helper class to get a Layout object.
  *
+ * <pre>
  * <code>
  * LayoutHelper helper = new LayoutHelper(...a reader...);
  * Layout layout = helper.getLayoutFromText();
  * </code>
- *
+ * </pre>
  */
 public class LayoutHelper {
 
@@ -36,7 +37,6 @@ public class LayoutHelper {
     private final List<StringInt> parsedEntries = new ArrayList<>();
     private final LayoutFormatterPreferences prefs;
     private boolean endOfFile;
-
 
     public LayoutHelper(Reader in, LayoutFormatterPreferences prefs) {
         this.in = new PushbackReader(Objects.requireNonNull(in));
@@ -178,10 +178,9 @@ public class LayoutHelper {
 
                     // changed section begin - arudert
                     // keep the backslash so we know wether this is a fieldname or an ordinary parameter
-                    //if (c != '\\')
-                    //{
+                    // if (c != '\\') {
                     buffer.append((char) c);
-                    //}
+                    // }
                     // changed section end - arudert
 
                 }
@@ -228,8 +227,7 @@ public class LayoutHelper {
                     buffer = new StringBuilder(100);
                 }
 
-                if ((c != '\\') || escaped)// (previous == '\\')))
-                {
+                if ((c != '\\') || escaped) /* (previous == '\\'))) */ {
                     buffer.append((char) c);
                 }
 

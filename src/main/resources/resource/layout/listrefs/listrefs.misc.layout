@@ -1,18 +1,18 @@
-<tr id="\format{\bibtexkey}" class="entry">
+<tr id="\format{\citationkey}" class="entry">
 	<td>\begin{author}\format[Authors(LastFirst,InitialsNoSpace,NoPunc),HTMLChars]{\author}\end{author} (\year), <i>"\format[HTMLChars]{\title}"</i>\begin{howpublished}, \howpublished\end{howpublished}. \begin{month}\format[HTMLChars]{\month}, \year.\end{month}
-	<p class="infolinks">\begin{abstract}[<a href="javascript:toggleInfo('\format{\bibtexkey}','abstract')">Abstract</a>]\end{abstract}\begin{comment} [<a href="javascript:toggleInfo('\format{\bibtexkey}','comment')">Comment</a>] \end{comment} [<a href="javascript:toggleInfo('\format{\bibtexkey}','bibtex')">BibTeX</a>]\begin{doi} [<a href="\format[DOICheck]{\doi}" target="_blank">DOI</a>]\end{doi}\begin{url} [<a href="\format{\url}" target="_blank">URL</a>]\end{url}</p>
+	<p class="infolinks">\begin{abstract}[<a href="javascript:toggleInfo('\format{\citationkey}','abstract')">Abstract</a>]\end{abstract}\begin{comment} [<a href="javascript:toggleInfo('\format{\citationkey}','comment')">Comment</a>] \end{comment} [<a href="javascript:toggleInfo('\format{\citationkey}','bibtex')">BibTeX</a>]\begin{doi} [<a href="\format[DOICheck]{\doi}" target="_blank">DOI</a>]\end{doi}\begin{url} [<a href="\format{\url}" target="_blank">URL</a>]\end{url}</p>
 	</td>
 </tr>\begin{abstract}
-<tr id="abs_\format{\bibtexkey}" class="abstract noshow">
+<tr id="abs_\format{\citationkey}" class="abstract noshow">
 	<td><b>Abstract</b>: \format[HTMLChars]{\abstract}</td>
 </tr>\end{abstract}\begin{comment}
-<tr id="rev_\format{\bibtexkey}" class="comment noshow">
+<tr id="rev_\format{\citationkey}" class="comment noshow">
 	<td><b>Comment</b>: \format[HTMLChars]{\comment}</td>
 </tr>\end{comment}
-<tr id="bib_\format{\bibtexkey}" class="bibtex noshow">
+<tr id="bib_\format{\citationkey}" class="bibtex noshow">
 <td><b>BibTeX</b>:
 <pre>
-@\format[ToLowerCase]{\entrytype}{\bibtexkey,\begin{author}
+@\format[ToLowerCase]{\entrytype}{\citationkey,\begin{author}
   author = {\format[HTMLChars]{\author}}\end{author}\begin{editor},
   editor = {\format[HTMLChars]{\editor}}\end{editor}\begin{title},
   title = {\format[HTMLChars]{\title}}\end{title}\begin{booktitle},

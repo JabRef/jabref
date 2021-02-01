@@ -12,8 +12,9 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
-import org.jabref.logic.importer.SearchBasedParserFetcher;
+import org.jabref.logic.importer.fetcher.transformators.SpringerQueryTransformer;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
@@ -26,6 +27,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +36,7 @@ import org.slf4j.LoggerFactory;
  *
  * @implNote see <a href="https://dev.springernature.com/">API documentation</a> for more details
  */
-public class SpringerFetcher implements SearchBasedParserFetcher {
+public class SpringerFetcher implements PagedSearchBasedParserFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringerFetcher.class);
 
@@ -118,7 +120,11 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
                 urls.forEach(data -> {
                     JSONObject url = (JSONObject) data;
                     if (url.optString("format").equalsIgnoreCase("pdf")) {
-                        entry.addFile(new LinkedFile("online", url.optString("value"), "PDF"));
+                        try {
+                            entry.addFile(new LinkedFile(new URL(url.optString("value")), "PDF"));
+                        } catch (MalformedURLException e) {
+                            LOGGER.info("Malformed URL: {}", url.optString("value"));
+                        }
                     }
                 });
             }
@@ -155,13 +161,24 @@ public class SpringerFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
-        uriBuilder.addParameter("q", query); // Search query
+        uriBuilder.addParameter("q", new SpringerQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // Search query
         uriBuilder.addParameter("api_key", API_KEY); // API key
-        uriBuilder.addParameter("p", "20"); // Number of results to return
-        //uriBuilder.addParameter("s", "1"); // Start item (not needed at the moment)
+        uriBuilder.addParameter("s", String.valueOf(getPageSize() * pageNumber + 1)); // Start entry, starts indexing at 1
+        uriBuilder.addParameter("p", String.valueOf(getPageSize())); // Page size
         return uriBuilder.build().toURL();
+    }
+
+    private String constructComplexQueryString(ComplexSearchQuery complexSearchQuery) {
+        List<String> searchTerms = new ArrayList<>();
+        complexSearchQuery.getAuthors().forEach(author -> searchTerms.add("name:" + author));
+        complexSearchQuery.getTitlePhrases().forEach(title -> searchTerms.add("title:" + title));
+        complexSearchQuery.getJournal().ifPresent(journal -> searchTerms.add("journal:" + journal));
+        // Since Springer API does not support year range search, we ignore formYear and toYear and use "singleYear" only
+        complexSearchQuery.getSingleYear().ifPresent(year -> searchTerms.add("date:" + year.toString() + "*"));
+        searchTerms.addAll(complexSearchQuery.getDefaultFieldPhrases());
+        return String.join(" AND ", searchTerms);
     }
 
     @Override

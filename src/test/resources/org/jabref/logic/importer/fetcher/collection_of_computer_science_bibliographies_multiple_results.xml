@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml-stylesheet title="XSL_formatting" type="text/xsl" href="http://liinwww.ira.uka.de/bibliography/rss.xsl"?><rss version="2.0">
+
+    <channel xmlns:dc="http://purl.org/dc/elements/1.1/">
+
+        <title>CCSB: +"effective java" +"joshua bloch" +"java series"</title>
+        <link>http://liinwww.ira.uka.de/bibliography/#search</link>
+        <description>Search results in The Collection of Computer Science Bibliographies for query: +"effective java" +"joshua bloch" +"java series"</description>
+        <language>en</language>
+        <copyright>The data is available for noncommercial or private use only, harvesting is prohibited (the data may be obtained using other means and not this RSS feed).</copyright>
+        <webMaster>liinwwwa@ira.uka.de</webMaster>
+        <lastBuildDate>Mon,  09  Mar 2020 03:14:28 +0100</lastBuildDate>
+        <ttl>5760</ttl>
+
+        <item>
+            <description>
+                <p>
+                    Author: Joshua Bloch;
+                    <br/>
+                    Title: Effective Java: Programming Language Guide;
+                    <br/>
+                    Year: 2001;
+                    <br/>
+                    Abstract available;
+                    <br/>
+                    4 records for this title/author combination available.
+                </p>
+            </description>
+
+            <dc:title>Effective Java: Programming Language Guide</dc:title>
+
+            <dc:date>2001</dc:date>
+
+            <dc:creator>Joshua Bloch</dc:creator>
+
+            <title>[2001] Effective Java: Programming Language Guide (by: Joshua Bloch)</title>
+
+        </item>
+
+        <item>
+            <link>http://liinwww.ira.uka.de/searchbib/index?query=hpdtjrpbcpgllljdctmdkfnhqdcnrkkc&amp;results=bibtex&amp;mode=dup&amp;rss=1</link>
+
+            <dc:creator>Joshua Bloch</dc:creator>
+
+            <dc:title>Effective Java</dc:title>
+
+            <description>
+                <p>
+                    Author: Joshua Bloch;
+                    <br/>
+                    Title: Effective Java;
+                    <br/>
+                    Year: 2001;
+                    <br/>
+                    URLs available (possible fulltext access);
+                    <br/>
+                    2 records for this title/author combination available.
+                </p>
+            </description>
+
+            <title>[2001] Effective Java (by: Joshua Bloch)</title>
+
+        </item>
+
+    </channel>
+</rss>

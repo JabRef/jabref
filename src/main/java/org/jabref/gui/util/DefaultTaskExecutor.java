@@ -16,6 +16,7 @@ import java.util.function.Consumer;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 
+import org.jabref.gui.StateManager;
 import org.jabref.logic.util.DelayTaskThrottler;
 
 import org.slf4j.Logger;
@@ -32,6 +33,13 @@ public class DefaultTaskExecutor implements TaskExecutor {
     private final ExecutorService executor = Executors.newFixedThreadPool(5);
     private final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
     private final WeakHashMap<DelayTaskThrottler, Void> throttlers = new WeakHashMap<>();
+
+    private final StateManager stateManager;
+
+    public DefaultTaskExecutor(StateManager stateManager) {
+        super();
+        this.stateManager = stateManager;
+    }
 
     /**
      *
@@ -96,7 +104,11 @@ public class DefaultTaskExecutor implements TaskExecutor {
 
     @Override
     public <V> Future<V> execute(BackgroundTask<V> task) {
-        return execute(getJavaFXTask(task));
+        Task<V> javafxTask = getJavaFXTask(task);
+        if (task.showToUser()) {
+            stateManager.addBackgroundTask(javafxTask);
+        }
+        return execute(javafxTask);
     }
 
     @Override
@@ -110,6 +122,9 @@ public class DefaultTaskExecutor implements TaskExecutor {
         return scheduledExecutor.schedule(getJavaFXTask(task), delay, unit);
     }
 
+    /**
+     * Shuts everything down. After termination, this method returns.
+     */
     @Override
     public void shutdown() {
         executor.shutdownNow();
@@ -128,8 +143,11 @@ public class DefaultTaskExecutor implements TaskExecutor {
         Task<V> javaTask = new Task<V>() {
 
             {
+                this.updateMessage(task.messageProperty().get());
+                this.updateTitle(task.titleProperty().get());
                 BindingsHelper.subscribeFuture(task.progressProperty(), progress -> updateProgress(progress.getWorkDone(), progress.getMax()));
                 BindingsHelper.subscribeFuture(task.messageProperty(), this::updateMessage);
+                BindingsHelper.subscribeFuture(task.titleProperty(), this::updateTitle);
                 BindingsHelper.subscribeFuture(task.isCanceledProperty(), cancelled -> {
                     if (cancelled) {
                         cancel();

@@ -9,11 +9,11 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.scene.control.SelectionModel;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.logic.cleanup.Cleanups;
-import org.jabref.model.cleanup.FieldFormatterCleanup;
-import org.jabref.model.cleanup.Formatter;
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
@@ -62,17 +62,31 @@ public class FieldFormatterCleanupsPanelViewModel {
         cleanupsListProperty.remove(cleanup);
     }
 
-    public BooleanProperty cleanupsDisableProperty() { return cleanupsDisableProperty; }
+    public BooleanProperty cleanupsDisableProperty() {
+        return cleanupsDisableProperty;
+    }
 
-    public ListProperty<FieldFormatterCleanup> cleanupsListProperty() { return cleanupsListProperty; }
+    public ListProperty<FieldFormatterCleanup> cleanupsListProperty() {
+        return cleanupsListProperty;
+    }
 
-    public ObjectProperty<SelectionModel<FieldFormatterCleanup>> selectedCleanupProperty() { return selectedCleanupProperty; }
+    public ObjectProperty<SelectionModel<FieldFormatterCleanup>> selectedCleanupProperty() {
+        return selectedCleanupProperty;
+    }
 
-    public ListProperty<Field> availableFieldsProperty() { return availableFieldsProperty; }
+    public ListProperty<Field> availableFieldsProperty() {
+        return availableFieldsProperty;
+    }
 
-    public ObjectProperty<Field> selectedFieldProperty() { return selectedFieldProperty; }
+    public ObjectProperty<Field> selectedFieldProperty() {
+        return selectedFieldProperty;
+    }
 
-    public ListProperty<Formatter> availableFormattersProperty() { return availableFormattersProperty; }
+    public ListProperty<Formatter> availableFormattersProperty() {
+        return availableFormattersProperty;
+    }
 
-    public ObjectProperty<Formatter> selectedFormatterProperty() { return selectedFormatterProperty; }
+    public ObjectProperty<Formatter> selectedFormatterProperty() {
+        return selectedFormatterProperty;
+    }
 }

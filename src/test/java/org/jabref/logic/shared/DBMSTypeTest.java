@@ -2,7 +2,6 @@ package org.jabref.logic.shared;
 
 import java.util.Optional;
 
-import org.jabref.model.database.shared.DBMSType;
 import org.jabref.testutils.category.DatabaseTest;
 
 import org.junit.jupiter.api.Test;

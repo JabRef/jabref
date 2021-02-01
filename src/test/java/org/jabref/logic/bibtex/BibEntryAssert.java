@@ -8,7 +8,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
@@ -125,7 +124,7 @@ public class BibEntryAssert {
 
     public static void assertEquals(InputStream expectedIs, URL fileToImport, Importer importer)
             throws URISyntaxException, IOException {
-        assertEquals(expectedIs, Paths.get(fileToImport.toURI()), importer);
+        assertEquals(expectedIs, Path.of(fileToImport.toURI()), importer);
     }
 
     /**
@@ -147,6 +146,6 @@ public class BibEntryAssert {
 
     public static void assertEquals(List<BibEntry> expected, URL fileToImport, Importer importer)
             throws URISyntaxException, IOException {
-        assertEquals(expected, Paths.get(fileToImport.toURI()), importer);
+        assertEquals(expected, Path.of(fileToImport.toURI()), importer);
     }
 }

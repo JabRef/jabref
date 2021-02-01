@@ -9,7 +9,6 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
 
     private final boolean considerRefs;
 
-
     /**
      * @param considerRefs Indicates whether the strings should be
      *                     sorted according to internal references in addition to
@@ -58,10 +57,8 @@ public class BibtexStringComparator implements Comparator<BibtexString> {
             if (textPre.contains("#" + namePost + "#")) {
                 res = -res;
             }
-
         }
 
         return res;
     }
-
 }

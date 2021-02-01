@@ -6,8 +6,12 @@ import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 
+import org.jabref.gui.fieldeditors.FieldNameLabel;
+
 /**
- * Standard BibTeX and BibLaTeX fields
+ * Standard BibTeX and BibLaTeX fields, as well as "normal" JabRef specific fields.
+ *
+ * See {@link FieldNameLabel#getDescription(org.jabref.model.entry.field.Field)} for a description of each field.
  */
 public enum StandardField implements Field {
 
@@ -55,11 +59,14 @@ public enum StandardField implements Field {
     FOREWORD("foreword", FieldProperty.PERSON_NAMES),
     FOLDER("folder"),
     GENDER("gender", FieldProperty.GENDER),
+    HALID("hal_id"),
+    HALVERSION("hal_version"),
     HOLDER("holder", FieldProperty.PERSON_NAMES),
     HOWPUBLISHED("howpublished"),
     IDS("ids", FieldProperty.MULTIPLE_ENTRY_LINK),
     INSTITUTION("institution"),
     INTRODUCTION("introduction", FieldProperty.PERSON_NAMES),
+    INTRODUCEDIN("introducedin"),
     ISBN("isbn", "ISBN", FieldProperty.ISBN),
     ISRN("isrn", "ISRN"),
     ISSN("issn", "ISSN"),
@@ -74,6 +81,7 @@ public enum StandardField implements Field {
     LANGUAGE("language", FieldProperty.LANGUAGE),
     LABEL("label"),
     LIBRARY("library"),
+    LICENSE("license"),
     LOCATION("location"),
     MAINSUBTITLE("mainsubtitle", FieldProperty.BOOK_NAME),
     MAINTITLE("maintitle", FieldProperty.BOOK_NAME),
@@ -98,7 +106,10 @@ public enum StandardField implements Field {
     PUBSTATE("pubstate", FieldProperty.PUBLICATION_STATE),
     PRIMARYCLASS("primaryclass"),
     RELATED("related", FieldProperty.MULTIPLE_ENTRY_LINK),
+    RELATEDTYPE("relatedtype"),
+    RELATEDSTRING("relatedstring"),
     REPORTNO("reportno"),
+    REPOSITORY("repository"),
     REVIEW("review"),
     REVISION("revision"),
     SCHOOL("school"),
@@ -109,6 +120,7 @@ public enum StandardField implements Field {
     SORTKEY("sortkey"),
     SORTNAME("sortname", FieldProperty.PERSON_NAMES),
     SUBTITLE("subtitle"),
+    SWHID("swhid"),
     TITLE("title"),
     TITLEADDON("titleaddon"),
     TRANSLATOR("translator", FieldProperty.PERSON_NAMES),
@@ -124,7 +136,15 @@ public enum StandardField implements Field {
     YEARFILED("yearfiled"),
     MR_NUMBER("mrnumber"),
     XDATA("xdata", FieldProperty.MULTIPLE_ENTRY_LINK),
-    XREF("xref", FieldProperty.SINGLE_ENTRY_LINK);
+    XREF("xref", FieldProperty.SINGLE_ENTRY_LINK),
+
+    // JabRef-specific fields
+    GROUPS("groups"),
+    OWNER("owner"),
+    TIMESTAMP("timestamp", FieldProperty.DATE),
+    CREATIONDATE("creationdate", FieldProperty.DATE),
+    MODIFICATIONDATE("modificationdate", FieldProperty.DATE);
+
 
     private final String name;
     private final String displayName;

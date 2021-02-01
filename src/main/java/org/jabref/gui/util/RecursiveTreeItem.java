@@ -7,12 +7,13 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBoxTreeItem;
 import javafx.util.Callback;
+
+import com.tobiasdiez.easybind.EasyBind;
 
 /**
  * @implNote Taken from https://gist.github.com/lestard/011e9ed4433f9eb791a8
@@ -21,8 +22,8 @@ import javafx.util.Callback;
 public class RecursiveTreeItem<T> extends CheckBoxTreeItem<T> {
 
     private final Callback<T, BooleanProperty> expandedProperty;
-    private Callback<T, ObservableList<T>> childrenFactory;
-    private ObjectProperty<Predicate<T>> filter = new SimpleObjectProperty<>();
+    private final Callback<T, ObservableList<T>> childrenFactory;
+    private final ObjectProperty<Predicate<T>> filter = new SimpleObjectProperty<>();
     private FilteredList<RecursiveTreeItem<T>> children;
 
     public RecursiveTreeItem(final T value, Callback<T, ObservableList<T>> func) {
@@ -66,25 +67,10 @@ public class RecursiveTreeItem<T> extends CheckBoxTreeItem<T> {
     }
 
     private void addChildrenListener(T value) {
-        children = new FilteredList<>(
-                BindingsHelper.mapBacked(childrenFactory.call(value),
-                        child -> new RecursiveTreeItem<>(child, getGraphic(), childrenFactory, expandedProperty, filter)));
-        children.predicateProperty().bind(Bindings.createObjectBinding(() -> this::showNode, filter));
+        children = EasyBind.mapBacked(childrenFactory.call(value), child -> new RecursiveTreeItem<>(child, getGraphic(), childrenFactory, expandedProperty, filter))
+                           .filtered(Bindings.createObjectBinding(() -> this::showNode, filter));
 
-        getChildren().addAll(0, children);
-
-        children.addListener((ListChangeListener<RecursiveTreeItem<T>>) change -> {
-            while (change.next()) {
-
-                if (change.wasRemoved()) {
-                    getChildren().removeAll(change.getRemoved());
-                }
-
-                if (change.wasAdded()) {
-                    getChildren().addAll(change.getFrom(), change.getAddedSubList());
-                }
-            }
-        });
+        Bindings.bindContent(getChildren(), children);
     }
 
     private boolean showNode(RecursiveTreeItem<T> node) {

@@ -21,18 +21,18 @@ import javafx.util.Duration;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 import org.fxmisc.flowless.Cell;
 import org.fxmisc.flowless.VirtualFlow;
 import org.fxmisc.flowless.VirtualFlowHit;
 
 public class DocumentViewerControl extends StackPane {
 
-    private TaskExecutor taskExecutor;
+    private final TaskExecutor taskExecutor;
 
-    private ObjectProperty<Integer> currentPage = new SimpleObjectProperty<>(1);
-    private DoubleProperty scrollY = new SimpleDoubleProperty();
-    private DoubleProperty scrollYMax = new SimpleDoubleProperty();
+    private final ObjectProperty<Integer> currentPage = new SimpleObjectProperty<>(1);
+    private final DoubleProperty scrollY = new SimpleDoubleProperty();
+    private final DoubleProperty scrollYMax = new SimpleDoubleProperty();
     private VirtualFlow<DocumentPageViewModel, DocumentViewerPage> flow;
     private PageDimension desiredPageDimension = PageDimension.ofFixedWidth(600);
 
@@ -155,7 +155,7 @@ public class DocumentViewerControl extends StackPane {
             // Set empty background and create proper rendering in background (for smoother loading)
             background = new Rectangle(getDesiredWidth(), getDesiredHeight());
             background.setStyle("-fx-fill: WHITE");
-            //imageView.setImage(new WritableImage(getDesiredWidth(), getDesiredHeight()));
+            // imageView.setImage(new WritableImage(getDesiredWidth(), getDesiredHeight()));
             BackgroundTask<Image> generateImage = BackgroundTask
                     .wrap(() -> renderPage(initialPage))
                     .onSuccess(image -> {

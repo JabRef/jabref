@@ -35,7 +35,6 @@ public class ChangeCaseFunction implements BstFunction {
 
     private final VM vm;
 
-
     public ChangeCaseFunction(VM vm) {
         this.vm = vm;
     }
@@ -63,5 +62,4 @@ public class ChangeCaseFunction implements BstFunction {
 
         stack.push(BibtexCaseChanger.changeCase(s, FORMAT_MODE.getFormatModeForBSTFormat(format)));
     }
-
 }

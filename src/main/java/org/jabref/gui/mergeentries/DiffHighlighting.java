@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import javafx.scene.text.Text;
 
 import com.github.difflib.DiffUtils;
-import com.github.difflib.algorithm.DiffException;
 import com.github.difflib.patch.AbstractDelta;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,13 +22,7 @@ public class DiffHighlighting {
     public static List<Text> generateDiffHighlighting(String baseString, String modifiedString, String separator) {
         List<String> stringList = Arrays.asList(baseString.split(separator));
         List<Text> result = stringList.stream().map(text -> forUnchanged(text + separator)).collect(Collectors.toList());
-        List<AbstractDelta<String>> deltaList;
-        try {
-            deltaList = DiffUtils.diff(stringList, Arrays.asList(modifiedString.split(separator))).getDeltas();
-        } catch (DiffException e) {
-            LOGGER.error("Error while generating diff of " + baseString + " and " + modifiedString);
-            return Collections.emptyList();
-        }
+        List<AbstractDelta<String>> deltaList = DiffUtils.diff(stringList, Arrays.asList(modifiedString.split(separator))).getDeltas();
         Collections.reverse(deltaList);
         for (AbstractDelta<String> delta : deltaList) {
             int startPos = delta.getSource().getPosition();
@@ -87,13 +80,7 @@ public class DiffHighlighting {
     public static List<Text> generateSymmetricHighlighting(String baseString, String modifiedString, String separator) {
         List<String> stringList = Arrays.asList(baseString.split(separator));
         List<Text> result = stringList.stream().map(text -> DiffHighlighting.forUnchanged(text + separator)).collect(Collectors.toList());
-        List<AbstractDelta<String>> deltaList;
-        try {
-            deltaList = DiffUtils.diff(stringList, Arrays.asList(modifiedString.split(separator))).getDeltas();
-        } catch (DiffException e) {
-            LOGGER.error("Error while generating diff of " + baseString + " and " + modifiedString);
-            return Collections.emptyList();
-        }
+        List<AbstractDelta<String>> deltaList = DiffUtils.diff(stringList, Arrays.asList(modifiedString.split(separator))).getDeltas();
         Collections.reverse(deltaList);
         for (AbstractDelta<String> delta : deltaList) {
             int startPos = delta.getSource().getPosition();

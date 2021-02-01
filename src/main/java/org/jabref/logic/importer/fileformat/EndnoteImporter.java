@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -197,9 +197,8 @@ public class EndnoteImporter extends Importer {
                     } else {
                         hm.put(StandardField.PUBLISHER, val);
                     }
-                }
-                // replace single dash page ranges (23-45) with double dashes (23--45):
-                else if ("P".equals(prefix)) {
+                } else if ("P".equals(prefix)) {
+                    // replace single dash page ranges (23-45) with double dashes (23--45):
                     hm.put(StandardField.PAGES, val.replaceAll("([0-9]) *- *([0-9])", "$1--$2"));
                 } else if ("V".equals(prefix)) {
                     hm.put(StandardField.VOLUME, val);
@@ -233,8 +232,7 @@ public class EndnoteImporter extends Importer {
                         type = StandardEntryType.MastersThesis;
                     }
                 } else if ("F".equals(prefix)) {
-                    hm.put(InternalField.KEY_FIELD, BibtexKeyGenerator.cleanKey(val,
-                            preferences.getBibtexKeyPatternPreferences().isEnforceLegalKey()));
+                    hm.put(InternalField.KEY_FIELD, CitationKeyGenerator.cleanKey(val, ""));
                 }
             }
 
@@ -245,14 +243,14 @@ public class EndnoteImporter extends Importer {
                 author = "";
             }
 
-            //fixauthorscomma
+            // fixauthorscomma
             if (!"".equals(author)) {
                 hm.put(StandardField.AUTHOR, fixAuthor(author));
             }
             if (!"".equals(editor)) {
                 hm.put(StandardField.EDITOR, fixAuthor(editor));
             }
-            //if pages missing and article number given, use the article number
+            // if pages missing and article number given, use the article number
             if (((hm.get(StandardField.PAGES) == null) || "-".equals(hm.get(StandardField.PAGES))) && !"".equals(artnum)) {
                 hm.put(StandardField.PAGES, artnum);
             }
@@ -262,11 +260,9 @@ public class EndnoteImporter extends Importer {
             if (!b.getFields().isEmpty()) {
                 bibitems.add(b);
             }
-
         }
 
         return new ParserResult(bibitems);
-
     }
 
     /**
@@ -292,5 +288,4 @@ public class EndnoteImporter extends Importer {
             return AuthorList.fixAuthorLastNameFirst(s);
         }
     }
-
 }

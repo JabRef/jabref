@@ -3,13 +3,14 @@ package org.jabref.model.groups;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import org.jabref.model.auxparser.AuxParser;
-import org.jabref.model.auxparser.AuxParserResult;
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.auxparser.AuxParser;
+import org.jabref.logic.auxparser.AuxParserResult;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.FileHelper;
@@ -19,16 +20,17 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@AllowedToUseLogic("because it needs access to aux parser")
 public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TexGroup.class);
 
-    private Path filePath;
-    private Set<String> keysUsedInAux = null;
+    private final Path filePath;
+    private Set<String> keysUsedInAux;
     private final FileUpdateMonitor fileMonitor;
-    private AuxParser auxParser;
+    private final AuxParser auxParser;
     private final MetaData metaData;
-    private String user;
+    private final String user;
 
     TexGroup(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData, String user) {
         super(name, context);
@@ -60,7 +62,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
             keysUsedInAux = auxResult.getUniqueKeys();
         }
 
-        return entry.getCiteKeyOptional().map(keysUsedInAux::contains).orElse(false);
+        return entry.getCitationKey().map(keysUsedInAux::contains).orElse(false);
     }
 
     @Override
@@ -97,7 +99,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     @Override
     public String toString() {
         return "TexGroup{" +
-               "filePath=" + filePath +
+                "filePath=" + filePath +
                 ", keysUsedInAux=" + keysUsedInAux +
                 ", auxParser=" + auxParser +
                 ", fileMonitor=" + fileMonitor +
@@ -117,6 +119,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     public void fileUpdated() {
         // Reset previous parse result
         keysUsedInAux = null;
+        metaData.groupsBinding().invalidate();
     }
 
     private Path relativize(Path path) {
@@ -126,15 +129,12 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
     private Path expandPath(Path path) {
         List<Path> fileDirectories = getFileDirectoriesAsPaths();
-        return FileHelper.expandFilenameAsPath(path.toString(), fileDirectories).orElse(path);
+        return FileHelper.find(path.toString(), fileDirectories).orElse(path);
     }
 
     private List<Path> getFileDirectoriesAsPaths() {
-        List<Path> fileDirs = new ArrayList<>();
-
-        metaData.getLatexFileDirectory(user)
-                .ifPresent(fileDirs::add);
-
-        return fileDirs;
+        return metaData.getLatexFileDirectory(user)
+                       .map(List::of)
+                       .orElse(Collections.emptyList());
     }
 }

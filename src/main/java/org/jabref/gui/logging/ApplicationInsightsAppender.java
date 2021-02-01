@@ -1,6 +1,6 @@
 package org.jabref.gui.logging;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.logic.logging.LogMessages;
 
 import com.microsoft.applicationinsights.telemetry.ExceptionTelemetry;
@@ -57,5 +57,4 @@ public class ApplicationInsightsAppender extends AbstractAppender {
             return new ApplicationInsightsAppender(this.getName(), this.getFilter(), this.isIgnoreExceptions(), this.getPropertyArray());
         }
     }
-
 }

@@ -1,11 +1,16 @@
 package org.jabref.model.util;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class MultiKeyMap<K1, K2, V> {
-    private final Map<K1, Map<K2, V>> map = new HashMap<>();
+public class MultiKeyMap<K1 extends Enum<K1>, K2, V> {
+    private final EnumMap<K1, Map<K2, V>> map;
+
+    public MultiKeyMap(Class<K1> keyType) {
+        map = new EnumMap<>(keyType);
+    }
 
     public Optional<V> get(K1 key1, K2 key2) {
         Map<K2, V> metaValue = map.get(key1);

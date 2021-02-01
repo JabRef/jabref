@@ -30,7 +30,6 @@ public abstract class SidePaneComponent {
         this.icon = icon;
         this.title = title;
         this.toggleCommand = new ToggleCommand(this);
-
     }
 
     protected void hide() {

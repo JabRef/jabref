@@ -12,6 +12,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
@@ -20,8 +21,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
@@ -34,6 +35,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -41,13 +43,16 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.CheckListView;
-import org.fxmisc.easybind.EasyBind;
 
-public class ImportEntriesDialog extends BaseDialog<Void> {
+public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
     public CheckListView<BibEntry> entriesListView;
     public ButtonType importButton;
+    public Label totalItems;
+    public Label selectedItems;
+    public CheckBox downloadLinkedOnlineFiles;
     private final BackgroundTask<ParserResult> task;
     private ImportEntriesViewModel viewModel;
     @Inject private TaskExecutor taskExecutor;
@@ -55,8 +60,9 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
     @Inject private UndoManager undoManager;
     @Inject private PreferencesService preferences;
     @Inject private StateManager stateManager;
+    @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
-    private BibDatabaseContext database;
+    private final BibDatabaseContext database;
 
     /**
      * Imports the given entries into the given database. The entries are provided using the BackgroundTask
@@ -67,7 +73,6 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
     public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task) {
         this.database = database;
         this.task = task;
-
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
@@ -76,21 +81,22 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
         Button btn = (Button) this.getDialogPane().lookupButton(importButton);
         btn.disableProperty().bind(booleanBind);
 
+        downloadLinkedOnlineFiles.setSelected(preferences.getFilePreferences().shouldDownloadLinkedFiles());
+
         setResultConverter(button -> {
             if (button == importButton) {
-                viewModel.importEntries(entriesListView.getCheckModel().getCheckedItems());
+                viewModel.importEntries(entriesListView.getCheckModel().getCheckedItems(), downloadLinkedOnlineFiles.isSelected());
             } else {
                 dialogService.notify(Localization.lang("Import canceled"));
             }
 
-            return null;
+            return false;
         });
     }
 
     @FXML
     private void initialize() {
-        viewModel = new ImportEntriesViewModel(task, taskExecutor, database, dialogService, undoManager, preferences, stateManager, fileUpdateMonitor);
-
+        viewModel = new ImportEntriesViewModel(task, taskExecutor, database, dialogService, undoManager, preferences, stateManager, entryTypesManager, fileUpdateMonitor);
         Label placeholder = new Label();
         placeholder.textProperty().bind(viewModel.messageProperty());
         entriesListView.setPlaceholder(placeholder);
@@ -126,18 +132,21 @@ public class ImportEntriesDialog extends BaseDialog<Void> {
                     }).executeWith(Globals.TASK_EXECUTOR);
 
                     /*
-                    inserted the if-statement here, since a Platforn.runLater() call did not work.
+                    inserted the if-statement here, since a Platform.runLater() call did not work.
                     also tried to move it to the end of the initialize method, but it did not select the entry.
                     */
                     if (entriesListView.getItems().size() == 1) {
                         selectAllNewEntries();
-                      }
+                    }
 
                     return container;
                 })
                 .withOnMouseClickedEvent((entry, event) -> entriesListView.getCheckModel().toggleCheckState(entry))
                 .withPseudoClass(entrySelected, entriesListView::getItemBooleanProperty)
                 .install(entriesListView);
+
+        selectedItems.textProperty().bind(Bindings.size(entriesListView.getCheckModel().getCheckedItems()).asString());
+        totalItems.textProperty().bind(Bindings.size(entriesListView.getItems()).asString());
         entriesListView.setSelectionModel(new NoSelectionModel<>());
     }
 

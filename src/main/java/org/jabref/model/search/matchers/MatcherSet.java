@@ -22,7 +22,6 @@ public abstract class MatcherSet implements SearchMatcher {
         MatcherSet that = (MatcherSet) o;
 
         return Objects.equals(matchers, that.matchers);
-
     }
 
     @Override
@@ -41,5 +40,4 @@ public abstract class MatcherSet implements SearchMatcher {
         sb.append('}');
         return sb.toString();
     }
-
 }

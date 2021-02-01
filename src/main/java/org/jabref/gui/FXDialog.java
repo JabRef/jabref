@@ -8,18 +8,17 @@ import javafx.scene.image.Image;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import org.jabref.Globals;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 
 /**
  * This class provides a super class for all dialogs implemented in JavaFX.
- *
+ * <p>
  * To create a custom JavaFX dialog one should create an instance of this class and set a dialog
  * pane through the inherited {@link Dialog#setDialogPane(DialogPane)} method.
  * The dialog can be shown via {@link Dialog#show()} or {@link Dialog#showAndWait()}.
- *
+ * <p>
  * The layout of the pane should be defined in an external fxml file and loaded it via the
  * {@link FXMLLoader}.
  */
@@ -78,5 +77,4 @@ public class FXDialog extends Alert {
     private Stage getDialogWindow() {
         return (Stage) getDialogPane().getScene().getWindow();
     }
-
 }

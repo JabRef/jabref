@@ -9,7 +9,9 @@ public class NameFormatterItemModel {
     private final StringProperty name = new SimpleStringProperty("");
     private final StringProperty format = new SimpleStringProperty("");
 
-    NameFormatterItemModel() { this(""); }
+    NameFormatterItemModel() {
+        this("");
+    }
 
     NameFormatterItemModel(String name) {
         this(name, NameFormatter.DEFAULT_FORMAT);
@@ -28,7 +30,9 @@ public class NameFormatterItemModel {
         return name.getValue();
     }
 
-    public StringProperty nameProperty() { return name; }
+    public StringProperty nameProperty() {
+        return name;
+    }
 
     public void setFormat(String format) {
         this.format.setValue(format);
@@ -38,8 +42,12 @@ public class NameFormatterItemModel {
         return format.getValue();
     }
 
-    public StringProperty formatProperty() { return format; }
+    public StringProperty formatProperty() {
+        return format;
+    }
 
     @Override
-    public String toString() { return "[" + name.getValue() + "," + format.getValue() + "]"; }
+    public String toString() {
+        return "[" + name.getValue() + "," + format.getValue() + "]";
+    }
 }

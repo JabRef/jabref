@@ -16,7 +16,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.texparser.LatexBibEntriesResolverResult;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class ParseLatexResultView extends BaseDialog<Void> {
 

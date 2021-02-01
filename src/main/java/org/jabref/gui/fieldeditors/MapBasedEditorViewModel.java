@@ -5,7 +5,7 @@ import java.util.List;
 
 import javafx.util.StringConverter;
 
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.field.Field;
 
@@ -20,7 +20,7 @@ public abstract class MapBasedEditorViewModel<T> extends OptionEditorViewModel<T
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MapBasedEditorViewModel.class);
 
-    public MapBasedEditorViewModel(Field field, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
+    public MapBasedEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
         super(field, suggestionProvider, fieldCheckers);
     }
 
@@ -35,7 +35,7 @@ public abstract class MapBasedEditorViewModel<T> extends OptionEditorViewModel<T
                 if (object == null) {
                     return null;
                 } else {
-                    return getItemMap().inverse().getOrDefault(object, object.toString()); //if the object is not found we simply return itself as string
+                    return getItemMap().inverse().getOrDefault(object, object.toString()); // if the object is not found we simply return itself as string
                 }
             }
 
@@ -52,6 +52,7 @@ public abstract class MapBasedEditorViewModel<T> extends OptionEditorViewModel<T
 
     /**
      * Converts a String value to the Type T. If the type cannot be directly casted to T, this method must be overriden in a subclass
+     *
      * @param string The input value to convert
      * @return The value or null if the value could not be casted
      */
@@ -63,7 +64,6 @@ public abstract class MapBasedEditorViewModel<T> extends OptionEditorViewModel<T
             LOGGER.error(String.format("Could not cast string to type %1$s. Try overriding the method in a subclass and provide a conversion from string to the concrete type %1$s", string.getClass()), ex);
         }
         return null;
-
     }
 
     @Override

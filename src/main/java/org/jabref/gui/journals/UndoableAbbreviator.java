@@ -43,7 +43,7 @@ public class UndoableAbbreviator {
             return false; // Unknown, cannot abbreviate anything.
         }
 
-        String newText = getAbbreviatedName(journalAbbreviationRepository.getAbbreviation(text).get());
+        String newText = getAbbreviatedName(journalAbbreviationRepository.get(text).get());
 
         if (newText.equals(origText)) {
             return false;

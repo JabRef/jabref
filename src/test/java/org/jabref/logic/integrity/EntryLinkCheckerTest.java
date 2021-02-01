@@ -57,7 +57,7 @@ class EntryLinkCheckerTest {
         entry.setField(StandardField.CROSSREF, "banana");
 
         BibEntry entry2 = new BibEntry();
-        entry2.setCiteKey("banana");
+        entry2.setCitationKey("banana");
         database.insertEntry(entry2);
 
         List<IntegrityMessage> message = checker.check(entry);
@@ -69,11 +69,11 @@ class EntryLinkCheckerTest {
         entry.setField(StandardField.RELATED, "banana,pineapple");
 
         BibEntry entry2 = new BibEntry();
-        entry2.setCiteKey("banana");
+        entry2.setCitationKey("banana");
         database.insertEntry(entry2);
 
         BibEntry entry3 = new BibEntry();
-        entry3.setCiteKey("pineapple");
+        entry3.setCitationKey("pineapple");
         database.insertEntry(entry3);
 
         List<IntegrityMessage> message = checker.check(entry);
@@ -87,11 +87,11 @@ class EntryLinkCheckerTest {
         database.insertEntry(entry1);
 
         BibEntry entry2 = new BibEntry();
-        entry2.setCiteKey("banana");
+        entry2.setCitationKey("banana");
         database.insertEntry(entry2);
 
         BibEntry entry3 = new BibEntry();
-        entry3.setCiteKey("pineapple");
+        entry3.setCitationKey("pineapple");
         database.insertEntry(entry3);
 
         List<IntegrityMessage> message = checker.check(entry1);

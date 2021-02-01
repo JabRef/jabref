@@ -16,8 +16,8 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.Globals;
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.Globals;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
@@ -80,7 +80,8 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
 
         Comparator<FileAnnotation> byPage = Comparator.comparingInt(FileAnnotation::getPage);
 
-        List<FileAnnotationViewModel> newAnnotations = fileAnnotations.getOrDefault(currentFile, new ArrayList<>())
+        List<FileAnnotationViewModel> newAnnotations = fileAnnotations
+                .getOrDefault(currentFile, new ArrayList<>())
                 .stream()
                 .filter(annotation -> (null != annotation.getContent()))
                 .sorted(byPage)
@@ -122,7 +123,7 @@ public class FileAnnotationTabViewModel extends AbstractViewModel {
         sj.add(Localization.lang("Content") + ": " + getCurrentAnnotation().getContent());
         sj.add(Localization.lang("Marking") + ": " + getCurrentAnnotation().markingProperty().get());
 
-        Globals.clipboardManager.setContent(sj.toString());
+        Globals.getClipboardManager().setContent(sj.toString());
     }
 
     private FileAnnotationViewModel getCurrentAnnotation() {

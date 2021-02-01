@@ -11,7 +11,6 @@ public abstract class AbstractParamLayoutFormatter implements ParamLayoutFormatt
 
     private static final char SEPARATOR = ',';
 
-
     protected AbstractParamLayoutFormatter() {
     }
 

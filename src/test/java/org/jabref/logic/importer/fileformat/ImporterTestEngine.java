@@ -5,7 +5,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -33,7 +32,7 @@ public class ImporterTestEngine {
      * @throws IOException if there is a problem when trying to read the files in the file system
      */
     public static Collection<String> getTestFiles(Predicate<String> fileNamePredicate) throws IOException {
-        try (Stream<Path> stream = Files.list(Paths.get(TEST_RESOURCES))) {
+        try (Stream<Path> stream = Files.list(Path.of(TEST_RESOURCES))) {
             return stream
                     .map(path -> path.getFileName().toString())
                     .filter(fileNamePredicate)
@@ -61,7 +60,7 @@ public class ImporterTestEngine {
 
     private static Path getPath(String fileName) throws IOException {
         try {
-            return Paths.get(ImporterTestEngine.class.getResource(fileName).toURI());
+            return Path.of(ImporterTestEngine.class.getResource(fileName).toURI());
         } catch (URISyntaxException e) {
             throw new IOException(e);
         }

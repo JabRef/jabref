@@ -1,6 +1,5 @@
 package org.jabref.gui.externalfiles;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
@@ -10,18 +9,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javafx.concurrent.Task;
 
-import org.jabref.Globals;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
-import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
-import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.importer.FulltextFetchers;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.net.URLDownload;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -100,7 +96,7 @@ public class DownloadFullTextAction extends SimpleCommand {
         findFullTextsTask.setOnSucceeded(value ->
                 downloadFullTexts(findFullTextsTask.getValue(), stateManager.getActiveDatabase().get()));
 
-        dialogService.showProgressDialogAndWait(
+        dialogService.showProgressDialog(
                 Localization.lang("Download full text documents"),
                 Localization.lang("Looking for full text document..."),
                 findFullTextsTask);
@@ -116,9 +112,7 @@ public class DownloadFullTextAction extends SimpleCommand {
                 Optional<Path> dir = databaseContext.getFirstExistingFileDir(Globals.prefs.getFilePreferences());
                 if (dir.isEmpty()) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Directory not found"),
-                            Localization.lang("Main file directory not set!") + " "
-                                    + Localization.lang("Preferences")
-                                    + " -> " + Localization.lang("File"));
+                            Localization.lang("Main file directory not set. Check the preferences (linked files) or the library properties."));
                     return;
                 }
 
@@ -126,7 +120,7 @@ public class DownloadFullTextAction extends SimpleCommand {
                 addLinkedFileFromURL(databaseContext, result.get(), entry, dir.get());
             } else {
                 dialogService.notify(Localization.lang("No full text document found for entry %0.",
-                        entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+                        entry.getCitationKey().orElse(Localization.lang("undefined"))));
             }
         }
     }
@@ -150,29 +144,14 @@ public class DownloadFullTextAction extends SimpleCommand {
                     databaseContext,
                     Globals.TASK_EXECUTOR,
                     dialogService,
-                    preferences.getXMPPreferences(),
+                    preferences.getXmpPreferences(),
                     preferences.getFilePreferences(),
                     ExternalFileTypes.getInstance());
 
-            try {
-                URLDownload urlDownload = new URLDownload(newLinkedFile.getLink());
-                BackgroundTask<Path> downloadTask = onlineFile.prepareDownloadTask(targetDirectory, urlDownload);
-                downloadTask.onSuccess(destination -> {
-                    LinkedFile downloadedFile = LinkedFilesEditorViewModel.fromFile(
-                            destination,
-                            databaseContext.getFileDirectoriesAsPaths(preferences.getFilePreferences()),
-                            ExternalFileTypes.getInstance());
-                    entry.addFile(downloadedFile);
-                    dialogService.notify(Localization.lang("Finished downloading full text document for entry %0.",
-                            entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
-                });
-                Globals.TASK_EXECUTOR.execute(downloadTask);
-            } catch (MalformedURLException exception) {
-                dialogService.showErrorDialogAndWait(Localization.lang("Invalid URL"), exception);
-            }
+            onlineFile.download();
         } else {
             dialogService.notify(Localization.lang("Full text document for entry %0 already linked.",
-                    entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+                    entry.getCitationKey().orElse(Localization.lang("undefined"))));
         }
     }
 }

@@ -7,7 +7,8 @@ import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
 
-/** * A parser converts an {@link InputStream} into a list of {@link BibEntry}.
+/**
+ * A parser converts an {@link InputStream} into a list of {@link BibEntry}.
  */
 public interface Parser {
 

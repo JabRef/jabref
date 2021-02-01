@@ -11,7 +11,6 @@ public class RemotePreferences {
     private int port;
     private boolean useRemoteServer;
 
-
     public RemotePreferences(int port, boolean useRemoteServer) {
         this.port = port;
         this.useRemoteServer = useRemoteServer;
@@ -43,5 +42,4 @@ public class RemotePreferences {
     public static InetAddress getIpAddress() throws UnknownHostException {
         return InetAddress.getByName("localhost");
     }
-
 }

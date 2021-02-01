@@ -63,5 +63,4 @@ public class ImportCustomEntryTypesDialog extends BaseDialog<Void> {
         });
         differentCustomizationCheckList.setItems(viewModel.differentCustomizations());
     }
-
 }

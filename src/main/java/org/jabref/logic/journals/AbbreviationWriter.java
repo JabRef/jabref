@@ -28,7 +28,7 @@ public final class AbbreviationWriter {
         try (OutputStreamWriter writer = new OutputStreamWriter(Files.newOutputStream(path), encoding);
              CSVPrinter csvPrinter = new CSVPrinter(writer, AbbreviationFormat.getCSVFormat())) {
             for (Abbreviation entry : abbreviations) {
-                if (entry.shortestUniqueAbbreviationProperty().get().isEmpty()) {
+                if (entry.getShortestUniqueAbbreviation().isEmpty()) {
                     csvPrinter.printRecord(entry.getName(), entry.getAbbreviation());
                 } else {
                     csvPrinter.printRecord(entry.getName(), entry.getAbbreviation(), entry.getShortestUniqueAbbreviation());

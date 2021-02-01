@@ -6,7 +6,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 
-import org.jabref.gui.BasePanel;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -15,8 +15,7 @@ import org.jabref.logic.l10n.Localization;
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
-public class ReplaceStringView extends BaseDialog<Void>
-{
+public class ReplaceStringView extends BaseDialog<Void> {
 
     @FXML private RadioButton allReplace;
     @FXML private CheckBox selectFieldOnly;
@@ -29,10 +28,10 @@ public class ReplaceStringView extends BaseDialog<Void>
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
-    public ReplaceStringView(BasePanel basePanel)  {
+    public ReplaceStringView(LibraryTab libraryTab) {
         this.setTitle(Localization.lang("Replace String"));
 
-        viewModel = new ReplaceStringViewModel(basePanel);
+        viewModel = new ReplaceStringViewModel(libraryTab);
 
         ViewLoader.view(this)
                   .load()
@@ -55,8 +54,7 @@ public class ReplaceStringView extends BaseDialog<Void>
     @FXML
     private void buttonReplace() {
         String findString = findField.getText();
-        if ("".equals(findString))
-        {
+        if ("".equals(findString)) {
             this.close();
             return;
         }

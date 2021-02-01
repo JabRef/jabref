@@ -60,7 +60,6 @@ public class BibtexTextPrefix {
             } else {
                 numOfChars--;
             }
-
         }
         sb.append(toPrefix.substring(0, i));
         while (braceLevel > 0) {

@@ -11,7 +11,7 @@ import org.jabref.model.entry.field.FieldFactory;
 /**
  * Stores the save order config from MetaData
  * <p>
- * Format: <choice>, pair of field + ascending (boolean)
+ * Format: &lt;choice>, pair of field + ascending (boolean)
  */
 public class SaveOrderConfig {
 
@@ -81,7 +81,9 @@ public class SaveOrderConfig {
         }
         if (o instanceof SaveOrderConfig) {
             SaveOrderConfig that = (SaveOrderConfig) o;
-            return Objects.equals(sortCriteria, that.sortCriteria) && Objects.equals(saveInOriginalOrder, that.saveInOriginalOrder);
+            return Objects.equals(sortCriteria, that.sortCriteria) &&
+                    Objects.equals(saveInOriginalOrder, that.saveInOriginalOrder) &&
+                    Objects.equals(saveInSpecifiedOrder, that.saveInSpecifiedOrder);
         }
         return false;
     }
@@ -94,9 +96,9 @@ public class SaveOrderConfig {
     @Override
     public String toString() {
         return "SaveOrderConfig{" + "saveInOriginalOrder=" + saveInOriginalOrder
-               + "saveInSpecifiedOrder =" + saveInSpecifiedOrder
-               + ", sortCriteria=" + sortCriteria +
-               '}';
+                + "saveInSpecifiedOrder =" + saveInSpecifiedOrder
+                + ", sortCriteria=" + sortCriteria +
+                '}';
     }
 
     public void setSaveInOriginalOrder() {
@@ -150,8 +152,8 @@ public class SaveOrderConfig {
         @Override
         public String toString() {
             return "SortCriterion{" + "field='" + field + '\'' +
-                   ", descending=" + descending +
-                   '}';
+                    ", descending=" + descending +
+                    '}';
         }
 
         @Override
@@ -164,14 +166,12 @@ public class SaveOrderConfig {
             }
             SortCriterion that = (SortCriterion) o;
             return Objects.equals(descending, that.descending) &&
-                   Objects.equals(field, that.field);
+                    Objects.equals(field, that.field);
         }
 
         @Override
         public int hashCode() {
             return Objects.hash(field, descending);
         }
-
     }
-
 }

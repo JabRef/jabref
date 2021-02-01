@@ -3,14 +3,13 @@ package org.jabref.gui.desktop.os;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 
 public class Windows implements NativeDesktop {
-    private static String DEFAULT_EXECUTABLE_EXTENSION = ".exe";
+    private static final String DEFAULT_EXECUTABLE_EXTENSION = ".exe";
 
     @Override
     public void openFile(String filePath, String fileType) throws IOException {
@@ -32,9 +31,9 @@ public class Windows implements NativeDesktop {
             progFiles = System.getenv("ProgramFiles");
         }
         if ((directoryName != null) && !directoryName.isEmpty()) {
-            return Paths.get(progFiles, directoryName, programName + DEFAULT_EXECUTABLE_EXTENSION).toString();
+            return Path.of(progFiles, directoryName, programName + DEFAULT_EXECUTABLE_EXTENSION).toString();
         }
-        return Paths.get(progFiles, programName + DEFAULT_EXECUTABLE_EXTENSION).toString();
+        return Path.of(progFiles, programName + DEFAULT_EXECUTABLE_EXTENSION).toString();
     }
 
     @Override
@@ -42,14 +41,14 @@ public class Windows implements NativeDesktop {
         String programDir = System.getenv("ProgramFiles");
 
         if (programDir != null) {
-            return Paths.get(programDir);
+            return Path.of(programDir);
         }
         return getUserDirectory();
     }
 
     @Override
     public void openFileWithApplication(String filePath, String application) throws IOException {
-        new ProcessBuilder(Paths.get(application).toString(), Paths.get(filePath).toString()).start();
+        new ProcessBuilder(Path.of(application).toString(), Path.of(filePath).toString()).start();
     }
 
     @Override

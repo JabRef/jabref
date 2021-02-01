@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IsbnFetcher.class);
+    private static final Pattern NEWLINE_SPACE_PATTERN = Pattern.compile("\\n|\\r\\n|\\s");
     protected final ImportFormatPreferences importFormatPreferences;
 
     public IsbnFetcher(ImportFormatPreferences importFormatPreferences) {
@@ -44,6 +46,8 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
         if (StringUtil.isBlank(identifier)) {
             return Optional.empty();
         }
+        // remove any newlines and spaces.
+        identifier = NEWLINE_SPACE_PATTERN.matcher(identifier).replaceAll("");
 
         IsbnViaEbookDeFetcher isbnViaEbookDeFetcher = new IsbnViaEbookDeFetcher(importFormatPreferences);
         Optional<BibEntry> bibEntry = isbnViaEbookDeFetcher.performSearchById(identifier);

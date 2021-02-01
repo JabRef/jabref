@@ -2,7 +2,6 @@ package org.jabref.gui.importer;
 
 import javax.inject.Inject;
 
-import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -15,27 +14,24 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.ViewModelTableRowFactory;
-import org.jabref.logic.importer.fileformat.CustomImporter;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class ImportCustomizationDialog extends BaseDialog<Void> {
 
     @FXML private ButtonType addButton;
     @FXML private ButtonType removeButton;
     @FXML private ButtonType closeButton;
-    @FXML private TableView<CustomImporter> importerTable;
-    @FXML private TableColumn<CustomImporter, String> nameColumn;
-    @FXML private TableColumn<CustomImporter, String> classColumn;
-    @FXML private TableColumn<CustomImporter, String> basePathColumn;
+    @FXML private TableView<ImporterViewModel> importerTable;
+    @FXML private TableColumn<ImporterViewModel, String> nameColumn;
+    @FXML private TableColumn<ImporterViewModel, String> classColumn;
+    @FXML private TableColumn<ImporterViewModel, String> basePathColumn;
 
     @Inject private DialogService dialogService;
     @Inject private PreferencesService preferences;
-    @Inject private JournalAbbreviationLoader loader;
     private ImportCustomizationDialogViewModel viewModel;
 
     public ImportCustomizationDialog() {
@@ -61,12 +57,12 @@ public class ImportCustomizationDialog extends BaseDialog<Void> {
         viewModel = new ImportCustomizationDialogViewModel(preferences, dialogService);
         importerTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         importerTable.itemsProperty().bind(viewModel.importersProperty());
-        EasyBind.listBind(viewModel.selectedImportersProperty(), importerTable.getSelectionModel().getSelectedItems());
-        nameColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getName()));
-        classColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getClassName()));
-        basePathColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getBasePath().toString()));
-        new ViewModelTableRowFactory<CustomImporter>()
-                .withTooltip(CustomImporter::getDescription)
+        EasyBind.bindContent(viewModel.selectedImportersProperty(), importerTable.getSelectionModel().getSelectedItems());
+        nameColumn.setCellValueFactory(cellData -> cellData.getValue().name());
+        classColumn.setCellValueFactory(cellData -> cellData.getValue().className());
+        basePathColumn.setCellValueFactory(cellData -> cellData.getValue().basePath());
+        new ViewModelTableRowFactory<ImporterViewModel>()
+                .withTooltip(importer -> importer.getLogic().getDescription())
                 .install(importerTable);
     }
 }

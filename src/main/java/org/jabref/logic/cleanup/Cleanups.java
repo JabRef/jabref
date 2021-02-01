@@ -14,9 +14,6 @@ import org.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
-import org.jabref.model.cleanup.FieldFormatterCleanup;
-import org.jabref.model.cleanup.FieldFormatterCleanups;
-import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
@@ -67,7 +64,7 @@ public class Cleanups {
 
         List<FieldFormatterCleanup> actions = new ArrayList<>();
 
-        //read concrete actions
+        // read concrete actions
         int startIndex = 0;
 
         // first remove all newlines for easier parsing
@@ -82,7 +79,7 @@ public class Cleanups {
                 int endIndex = remainingString.indexOf(']');
                 startIndex += endIndex + 1;
 
-                //read each formatter
+                // read each formatter
                 int tokenIndex = remainingString.indexOf(',');
                 do {
                     boolean doBreak = false;

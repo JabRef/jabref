@@ -68,7 +68,7 @@ public class CSLAdapter {
         if ((cslInstance == null) || !Objects.equals(newStyle, style)) {
             // lang and forceLang are set to the default values of other CSL constructors
             cslInstance = new CSL(dataProvider, new JabRefLocaleProvider(),
-                  new DefaultAbbreviationProvider(), null, newStyle, "en-US", false, true);
+                    new DefaultAbbreviationProvider(), null, newStyle, "en-US");
             style = newStyle;
         }
 
@@ -90,7 +90,7 @@ public class CSLAdapter {
          * Converts the {@link BibEntry} into {@link CSLItemData}.
          */
         private static CSLItemData bibEntryToCSLItemData(BibEntry bibEntry) {
-            String citeKey = bibEntry.getCiteKeyOptional().orElse("");
+            String citeKey = bibEntry.getCitationKey().orElse("");
             BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(bibEntry.getType().getName()), new Key(citeKey));
 
             // Not every field is already generated into latex free fields
@@ -118,16 +118,16 @@ public class CSLAdapter {
         @Override
         public CSLItemData retrieveItem(String id) {
             return data.stream()
-                    .filter(entry -> entry.getCiteKeyOptional().orElse("").equals(id))
-                    .map(JabRefItemDataProvider::bibEntryToCSLItemData)
-                    .findFirst().orElse(null);
+                       .filter(entry -> entry.getCitationKey().orElse("").equals(id))
+                       .map(JabRefItemDataProvider::bibEntryToCSLItemData)
+                       .findFirst().orElse(null);
         }
 
         @Override
         public String[] getIds() {
             return data.stream()
-                    .map(entry -> entry.getCiteKeyOptional().orElse(""))
-                    .toArray(String[]::new);
+                       .map(entry -> entry.getCitationKey().orElse(""))
+                       .toArray(String[]::new);
         }
     }
 }

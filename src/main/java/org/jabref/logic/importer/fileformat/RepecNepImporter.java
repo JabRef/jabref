@@ -149,7 +149,6 @@ public class RepecNepImporter extends Importer {
     private String preLine = "";
     private boolean inOverviewSection;
 
-
     public RepecNepImporter(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
     }
@@ -264,7 +263,7 @@ public class RepecNepImporter extends Importer {
                                 institutionDone && (this.lastLine
                                         .indexOf(')') > (this.lastLine.indexOf('(') + 1)) ? this.lastLine
                                         .indexOf(')') : this.lastLine.length())
-                                .trim());
+                                             .trim());
             } else {
                 author = this.lastLine.trim();
                 institutionDone = true;
@@ -339,7 +338,6 @@ public class RepecNepImporter extends Importer {
             } else if ("JEL".equals(keyword)) {
                 // parse JEL field
                 be.setField(new UnknownField("jel"), readMultipleLines(in));
-
             } else if (keyword.startsWith("Date")) {
                 // parse date field
                 String content = readMultipleLines(in);
@@ -403,13 +401,11 @@ public class RepecNepImporter extends Importer {
 
                     bibitems.add(be);
                     paperNoStr = null;
-
                 } else {
                     this.preLine = this.lastLine;
                     readLine(reader);
                 }
             }
-
         } catch (Exception e) {
             String message = "Error in REPEC-NEP import on line " + this.line;
             if (paperNoStr != null) {

@@ -58,9 +58,7 @@ public class RegexBasedSearchRule implements SearchRule {
                     return true;
                 }
             }
-
         }
         return false;
     }
-
 }

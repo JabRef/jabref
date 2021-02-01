@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.FileFieldParser;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.preferences.FilePreferences;
 
 public class FileChecker implements ValueChecker {
 
@@ -29,7 +29,8 @@ public class FileChecker implements ValueChecker {
             return Optional.empty();
         }
 
-        List<LinkedFile> linkedFiles = FileFieldParser.parse(value).stream()
+        List<LinkedFile> linkedFiles = FileFieldParser
+                .parse(value).stream()
                 .filter(file -> !file.isOnlineLink())
                 .collect(Collectors.toList());
 

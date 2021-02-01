@@ -18,9 +18,11 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
-import org.jabref.logic.importer.SearchBasedParserFetcher;
+import org.jabref.logic.importer.fetcher.transformators.IEEEQueryTransformer;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -31,6 +33,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +44,7 @@ import org.slf4j.LoggerFactory;
  *
  * @implNote <a href="https://developer.ieee.org/docs">API documentation</a>
  */
-public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
+public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IEEE.class);
     private static final String STAMP_BASE_STRING_DOCUMENT = "/stamp/stamp.jsp?tp=&arnumber=";
@@ -51,6 +54,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
     private static final Pattern PDF_PATTERN = Pattern.compile("\"(https://ieeexplore.ieee.org/ielx[0-9/]+\\.pdf[^\"]+)\"");
     private static final String IEEE_DOI = "10.1109";
     private static final String BASE_URL = "https://ieeexplore.ieee.org";
+    private static final String API_KEY = new BuildInfo().ieeeAPIKey;
 
     private final ImportFormatPreferences preferences;
 
@@ -65,22 +69,14 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
         BibEntry entry = new BibEntry();
 
         switch (jsonEntry.optString("content_type")) {
-            case "Books":
-                entry.setType(StandardEntryType.Book);
-                break;
-            case "Conferences":
-                entry.setType(StandardEntryType.InProceedings);
-                break;
-            case "Courses":
-                entry.setType(StandardEntryType.Misc);
-                break;
-            default:
-                entry.setType(StandardEntryType.Article);
-                break;
+            case "Books" -> entry.setType(StandardEntryType.Book);
+            case "Conferences" -> entry.setType(StandardEntryType.InProceedings);
+            case "Courses" -> entry.setType(StandardEntryType.Misc);
+            default -> entry.setType(StandardEntryType.Article);
         }
 
         entry.setField(StandardField.ABSTRACT, jsonEntry.optString("abstract"));
-        //entry.setField(StandardField.IEEE_ID, jsonEntry.optString("article_number"));
+        // entry.setField(StandardField.IEEE_ID, jsonEntry.optString("article_number"));
 
         final List<String> authors = new ArrayList<>();
         JSONObject authorsContainer = jsonEntry.optJSONObject("authors");
@@ -88,10 +84,10 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
             JSONObject author = (JSONObject) authorPure;
             authors.add(author.optString("full_name"));
         });
-        entry.setField(StandardField.AUTHOR, authors.stream().collect(Collectors.joining(" and ")));
+        entry.setField(StandardField.AUTHOR, String.join(" and ", authors));
         entry.setField(StandardField.LOCATION, jsonEntry.optString("conference_location"));
         entry.setField(StandardField.DOI, jsonEntry.optString("doi"));
-        entry.setField(StandardField.YEAR,jsonEntry.optString("publication_year"));
+        entry.setField(StandardField.YEAR, jsonEntry.optString("publication_year"));
         entry.setField(StandardField.PAGES, jsonEntry.optString("start_page") + "--" + jsonEntry.optString("end_page"));
 
         JSONObject keywordsContainer = jsonEntry.optJSONObject("index_terms");
@@ -113,7 +109,11 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
         entry.setField(StandardField.ISBN, jsonEntry.optString("isbn"));
         entry.setField(StandardField.ISSN, jsonEntry.optString("issn"));
         entry.setField(StandardField.ISSUE, jsonEntry.optString("issue"));
-        entry.addFile(new LinkedFile("", jsonEntry.optString("pdf_url"), "PDF"));
+        try {
+            entry.addFile(new LinkedFile(new URL(jsonEntry.optString("pdf_url")), "PDF"));
+        } catch (MalformedURLException e) {
+            LOGGER.error("Fetched PDF URL String is malformed.");
+        }
         entry.setField(StandardField.JOURNALTITLE, jsonEntry.optString("publication_title"));
         entry.setField(StandardField.DATE, jsonEntry.optString("publication_date"));
         entry.setField(StandardField.EVENTTITLEADDON, jsonEntry.optString("conference_location"));
@@ -141,13 +141,12 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
                 stampString = STAMP_BASE_STRING_DOCUMENT + docId;
             }
 
-            //You get this url if you export bibtex from IEEE
+            // You get this url if you export bibtex from IEEE
             Matcher stampMatcher = STAMP_PATTERN.matcher(urlString.get());
             if (stampMatcher.find()) {
                 // Found it
                 stampString = stampMatcher.group(1);
             }
-
         }
 
         // If not, try DOI
@@ -156,7 +155,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
             if (doi.isPresent() && doi.get().getDOI().startsWith(IEEE_DOI) && doi.get().getExternalURI().isPresent()) {
                 // Download the HTML page from IEEE
                 URLDownload urlDownload = new URLDownload(doi.get().getExternalURI().get().toURL());
-                //We don't need to modify the cookies, but we need support for them
+                // We don't need to modify the cookies, but we need support for them
                 urlDownload.getCookieFromUrl();
 
                 String resolvedDOIPage = urlDownload.asString();
@@ -176,7 +175,7 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
 
         // Download the HTML page containing a frame with the PDF
         URLDownload urlDownload = new URLDownload(BASE_URL + stampString);
-        //We don't need to modify the cookies, but we need support for them
+        // We don't need to modify the cookies, but we need support for them
         urlDownload.getCookieFromUrl();
 
         String framePage = urlDownload.asString();
@@ -193,17 +192,6 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
     @Override
     public TrustLevel getTrustLevel() {
         return TrustLevel.PUBLISHER;
-    }
-
-    @Override
-    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
-        uriBuilder.addParameter("apikey", "86wnawtvtc986d3wtnqynm8c");
-        uriBuilder.addParameter("querytext", query);
-
-        URLDownload.bypassSSLVerification();
-
-        return uriBuilder.build().toURL();
     }
 
     @Override
@@ -234,5 +222,36 @@ public class IEEE implements FulltextFetcher, SearchBasedParserFetcher {
     @Override
     public Optional<HelpFile> getHelpPage() {
         return Optional.of(HelpFile.FETCHER_IEEEXPLORE);
+    }
+
+    @Override
+    public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
+        IEEEQueryTransformer transformer = new IEEEQueryTransformer();
+        String transformedQuery = transformer.transformLuceneQuery(luceneQuery).orElse("");
+        URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
+        uriBuilder.addParameter("apikey", API_KEY);
+        if (!transformedQuery.isBlank()) {
+            uriBuilder.addParameter("querytext", transformedQuery);
+        }
+        uriBuilder.addParameter("max_records", String.valueOf(getPageSize()));
+        // Currently not working as part of the query string
+        if (transformer.getJournal().isPresent()) {
+            uriBuilder.addParameter("publication_title", transformer.getJournal().get());
+        }
+        if (transformer.getStartYear().isPresent()) {
+            uriBuilder.addParameter("start_year", String.valueOf(transformer.getStartYear().get()));
+        }
+        if (transformer.getEndYear().isPresent()) {
+            uriBuilder.addParameter("end_year", String.valueOf(transformer.getEndYear().get()));
+        }
+        if (transformer.getArticleNumber().isPresent()) {
+            uriBuilder.addParameter("article_number", transformer.getArticleNumber().get());
+        }
+        // Starts to index at 1 for the first entry
+        uriBuilder.addParameter("start_record", String.valueOf(getPageSize() * pageNumber) + 1);
+
+        URLDownload.bypassSSLVerification();
+
+        return uriBuilder.build().toURL();
     }
 }

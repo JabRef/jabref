@@ -9,7 +9,7 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.net.ProgressInputStream;
 import org.jabref.logic.net.URLDownload;
 
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class FileDownloadTask extends BackgroundTask<Path> {
 

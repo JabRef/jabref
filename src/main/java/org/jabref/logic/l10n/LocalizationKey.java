@@ -18,7 +18,7 @@ public class LocalizationKey {
     public String getPropertiesKey() {
         // space, #, !, = and : are not allowed in properties file keys (# and ! only at the beginning of the key but easier to escape every instance
         return this.key.replace(" ", "\\ ").replace("#", "\\#").replace("!", "\\!").replace("=", "\\=")
-                .replace(":", "\\:").replace("\\\\", "\\");
+                       .replace(":", "\\:").replace("\\\\", "\\");
     }
 
     public String getTranslationValue() {

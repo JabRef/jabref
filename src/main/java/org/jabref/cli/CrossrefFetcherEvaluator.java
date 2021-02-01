@@ -9,7 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.CrossRef;
@@ -71,7 +71,6 @@ public class CrossrefFetcherEvaluator {
                             } catch (FetcherException e) {
                                 e.printStackTrace();
                             }
-
                         } else {
                             try {
                                 Optional<DOI> crossrefDOI = new CrossRef().findIdentifier(entry);
@@ -86,7 +85,6 @@ public class CrossrefFetcherEvaluator {
                         countDownLatch.countDown();
                     }
                 });
-
             }
             countDownLatch.await();
 

@@ -4,6 +4,7 @@
   "path": "JabRefHost.bat",
   "type": "stdio",
   "allowed_origins": [
-    "chrome-extension://bifehkofibaamoeaopjglfkddgkijdlh/"
+    "chrome-extension://bifehkofibaamoeaopjglfkddgkijdlh/",
+    "chrome-extension://pgkajmkfgbehiomipedjhoddkejohfna/"
   ]
 }

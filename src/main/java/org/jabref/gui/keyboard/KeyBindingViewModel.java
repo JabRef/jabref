@@ -64,11 +64,11 @@ public class KeyBindingViewModel {
     private void setBinding(String bind) {
         this.realBinding = bind;
         String[] parts = bind.split(" ");
-        String displayBind = "";
+        StringBuilder displayBind = new StringBuilder();
         for (String part : parts) {
-            displayBind += CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, part) + " ";
+            displayBind.append(CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, part)).append(" ");
         }
-        this.shownBinding.set(displayBind.trim().replace(" ", " + "));
+        this.shownBinding.set(displayBind.toString().trim().replace(" ", " + "));
     }
 
     private void setDisplayName() {
@@ -135,7 +135,19 @@ public class KeyBindingViewModel {
         }
     }
 
-    public Optional<JabRefIcon> getIcon() {
+    public void clear() {
+        if (!isCategory()) {
+            String key = getKeyBinding().getConstant();
+            keyBindingRepository.put(key, "");
+            setBinding(keyBindingRepository.get(key));
+        }
+    }
+
+    public Optional<JabRefIcon> getResetIcon() {
+        return isCategory() ? Optional.empty() : Optional.of(IconTheme.JabRefIcons.REFRESH);
+    }
+
+    public Optional<JabRefIcon> getClearIcon() {
         return isCategory() ? Optional.empty() : Optional.of(IconTheme.JabRefIcons.CLEANUP_ENTRIES);
     }
 }

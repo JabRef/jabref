@@ -12,7 +12,6 @@ public class OracleNotificationListener implements DatabaseChangeListener {
 
     private final DBMSSynchronizer dbmsSynchronizer;
 
-
     public OracleNotificationListener(DBMSSynchronizer dbmsSynchronizer) {
         this.dbmsSynchronizer = dbmsSynchronizer;
     }

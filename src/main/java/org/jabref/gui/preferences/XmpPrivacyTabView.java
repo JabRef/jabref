@@ -18,7 +18,7 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
@@ -32,20 +32,22 @@ public class XmpPrivacyTabView extends AbstractPreferenceTabView<XmpPrivacyTabVi
     @FXML private ComboBox<Field> addFieldName;
     @FXML private Button addField;
 
-    private ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
+    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    public XmpPrivacyTabView(JabRefPreferences preferences) {
+    public XmpPrivacyTabView(PreferencesService preferences) {
         this.preferences = preferences;
 
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
     }
 
     @Override
-    public String getTabName() { return Localization.lang("XMP metadata"); }
+    public String getTabName() {
+        return Localization.lang("XMP metadata");
+    }
 
-    public void initialize () {
+    public void initialize() {
         this.viewModel = new XmpPrivacyTabViewModel(dialogService, preferences);
 
         enableXmpFilter.selectedProperty().bindBidirectional(viewModel.xmpFilterEnabledProperty());
@@ -97,5 +99,7 @@ public class XmpPrivacyTabView extends AbstractPreferenceTabView<XmpPrivacyTabVi
         Platform.runLater(() -> validationVisualizer.initVisualization(viewModel.xmpFilterListValidationStatus(), filterList));
     }
 
-    public void addField() { viewModel.addField(); }
+    public void addField() {
+        viewModel.addField();
+    }
 }

@@ -2,15 +2,15 @@ package org.jabref.gui.openoffice;
 
 class BibEntryNotFoundException extends Exception {
 
-    private final String bibtexKey;
+    private final String citationKey;
 
-    public BibEntryNotFoundException(String bibtexKey, String message) {
+    public BibEntryNotFoundException(String citationKey, String message) {
         super(message);
 
-        this.bibtexKey = bibtexKey;
+        this.citationKey = citationKey;
     }
 
-    public String getBibtexKey() {
-        return bibtexKey;
+    public String getCitationKey() {
+        return citationKey;
     }
 }

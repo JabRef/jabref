@@ -4,12 +4,13 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 
+import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 
+@AllowedToUseAwt("Requires AWT to open a file")
 public class OSX implements NativeDesktop {
 
     @Override
@@ -48,6 +49,6 @@ public class OSX implements NativeDesktop {
 
     @Override
     public Path getApplicationDirectory() {
-        return Paths.get("/Applications");
+        return Path.of("/Applications");
     }
 }

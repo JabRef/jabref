@@ -44,7 +44,7 @@ public class HtmlExportFormatTest {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "my paper title");
         entry.setField(StandardField.AUTHOR, "Stefan Kolb");
-        entry.setCiteKey("mykey");
+        entry.setCitationKey("mykey");
         entries = Arrays.asList(entry);
     }
 

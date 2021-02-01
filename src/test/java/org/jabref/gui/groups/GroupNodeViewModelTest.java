@@ -12,7 +12,6 @@ import org.jabref.gui.util.DroppingMouseLocation;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
@@ -20,6 +19,7 @@ import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.WordKeywordGroup;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class GroupNodeViewModelTest {
+class GroupNodeViewModelTest {
 
     private StateManager stateManager;
     private BibDatabaseContext databaseContext;
@@ -37,7 +37,7 @@ public class GroupNodeViewModelTest {
     private TaskExecutor taskExecutor;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         stateManager = mock(StateManager.class);
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.emptyObservableList());
         databaseContext = new BibDatabaseContext();
@@ -48,24 +48,24 @@ public class GroupNodeViewModelTest {
     }
 
     @Test
-    public void getDisplayNameConvertsLatexToUnicode() throws Exception {
+    void getDisplayNameConvertsLatexToUnicode() throws Exception {
         GroupNodeViewModel viewModel = getViewModelForGroup(
                 new WordKeywordGroup("\\beta", GroupHierarchyType.INDEPENDENT, StandardField.TITLE, "search", true, ',', false));
         assertEquals("β", viewModel.getDisplayName());
     }
 
     @Test
-    public void alwaysMatchedByEmptySearchString() throws Exception {
+    void alwaysMatchedByEmptySearchString() throws Exception {
         assertTrue(viewModel.isMatchedBy(""));
     }
 
     @Test
-    public void isMatchedIfContainsPartOfSearchString() throws Exception {
+    void isMatchedIfContainsPartOfSearchString() throws Exception {
         assertTrue(viewModel.isMatchedBy("est"));
     }
 
     @Test
-    public void treeOfAutomaticKeywordGroupIsCombined() throws Exception {
+    void treeOfAutomaticKeywordGroupIsCombined() throws Exception {
         BibEntry entryOne = new BibEntry().withField(StandardField.KEYWORDS, "A > B > B1, A > C");
         BibEntry entryTwo = new BibEntry().withField(StandardField.KEYWORDS, "A > D, E");
         BibEntry entryThree = new BibEntry().withField(StandardField.KEYWORDS, "A > B > B2");
@@ -94,7 +94,7 @@ public class GroupNodeViewModelTest {
     }
 
     @Test
-    public void draggedOnTopOfGroupAddsBeforeIt() throws Exception {
+    void draggedOnTopOfGroupAddsBeforeIt() throws Exception {
         GroupNodeViewModel rootViewModel = getViewModelForGroup(new WordKeywordGroup("root", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "A", true, ',', true));
         WordKeywordGroup groupA = new WordKeywordGroup("A", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "A", true, ',', true);
         WordKeywordGroup groupB = new WordKeywordGroup("B", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "A > B", true, ',', true);
@@ -109,7 +109,7 @@ public class GroupNodeViewModelTest {
     }
 
     @Test
-    public void draggedOnBottomOfGroupAddsAfterIt() throws Exception {
+    void draggedOnBottomOfGroupAddsAfterIt() throws Exception {
         GroupNodeViewModel rootViewModel = getViewModelForGroup(new WordKeywordGroup("root", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "A", true, ',', true));
         WordKeywordGroup groupA = new WordKeywordGroup("A", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "A", true, ',', true);
         WordKeywordGroup groupB = new WordKeywordGroup("B", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "A > B", true, ',', true);
@@ -124,7 +124,7 @@ public class GroupNodeViewModelTest {
     }
 
     @Test
-    public void draggedOnBottomOfGroupAddsAfterItWhenSourceGroupWasBefore() throws Exception {
+    void draggedOnBottomOfGroupAddsAfterItWhenSourceGroupWasBefore() throws Exception {
         GroupNodeViewModel rootViewModel = getViewModelForGroup(new WordKeywordGroup("root", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "A", true, ',', true));
         WordKeywordGroup groupA = new WordKeywordGroup("A", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "A", true, ',', true);
         WordKeywordGroup groupB = new WordKeywordGroup("B", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "A > B", true, ',', true);
@@ -139,7 +139,7 @@ public class GroupNodeViewModelTest {
     }
 
     @Test
-    public void draggedOnTopOfGroupAddsBeforeItWhenSourceGroupWasBefore() throws Exception {
+    void draggedOnTopOfGroupAddsBeforeItWhenSourceGroupWasBefore() throws Exception {
         GroupNodeViewModel rootViewModel = getViewModelForGroup(new WordKeywordGroup("root", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "A", true, ',', true));
         WordKeywordGroup groupA = new WordKeywordGroup("A", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "A", true, ',', true);
         WordKeywordGroup groupB = new WordKeywordGroup("B", GroupHierarchyType.INCLUDING, StandardField.KEYWORDS, "A > B", true, ',', true);
@@ -154,24 +154,24 @@ public class GroupNodeViewModelTest {
     }
 
     @Test
-    public void entriesAreAddedCorrectly() {
+    void entriesAreAddedCorrectly() {
         String groupName = "group";
         ExplicitGroup group = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT, ',');
         BibEntry entry = new BibEntry();
         databaseContext.getDatabase().insertEntry(entry);
 
-        GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard());
+        GroupNodeViewModel model = new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), mock(PreferencesService.class));
         model.addEntriesToGroup(databaseContext.getEntries());
 
         assertEquals(databaseContext.getEntries(), model.getGroupNode().getEntriesInGroup(databaseContext.getEntries()));
-        assertEquals(groupName, entry.getField(InternalField.GROUPS).get());
+        assertEquals(groupName, entry.getField(StandardField.GROUPS).get());
     }
 
     private GroupNodeViewModel getViewModelForGroup(AbstractGroup group) {
-        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard());
+        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), mock(PreferencesService.class));
     }
 
     private GroupNodeViewModel getViewModelForGroup(GroupTreeNode group) {
-        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard());
+        return new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, group, new CustomLocalDragboard(), mock(PreferencesService.class));
     }
 }

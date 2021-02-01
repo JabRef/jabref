@@ -4,7 +4,6 @@ import java.util.regex.Pattern;
 
 public class SearchRules {
 
-
     private static final Pattern SIMPLE_EXPRESSION = Pattern.compile("[^\\p{Punct}]*");
 
     private SearchRules() {
@@ -32,12 +31,11 @@ public class SearchRules {
         return SIMPLE_EXPRESSION.matcher(query).matches();
     }
 
-    private static SearchRule getSearchRule(boolean caseSensitive, boolean regex) {
+    static SearchRule getSearchRule(boolean caseSensitive, boolean regex) {
         if (regex) {
             return new RegexBasedSearchRule(caseSensitive);
         } else {
             return new ContainBasedSearchRule(caseSensitive);
         }
     }
-
 }

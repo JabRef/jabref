@@ -8,8 +8,9 @@ import org.jabref.model.entry.AuthorList;
  * <li>Names are given in order: von last, jr, first.</li>
  * <li>First names will NOT be abbreviated.</li>
  * <li>Individual authors are separated by commas.</li>
- * <li>The 'and' of a list of three or more authors is preceeded by a comma
- * (Oxford comma)</li>
+ * <li>The 'and' of a list of three or more authors is preceded by a comma
+ * (Oxford comma)
+ * </ul>
  */
 public class AuthorLastFirstOxfordCommas implements LayoutFormatter {
 

@@ -10,8 +10,8 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import org.jabref.Globals;
-import org.jabref.JabRefGUI;
+import org.jabref.gui.Globals;
+import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.desktop.os.DefaultDesktop;
 import org.jabref.gui.desktop.os.Linux;
 import org.jabref.gui.desktop.os.NativeDesktop;
@@ -27,7 +27,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Eprint;
 import org.jabref.model.util.FileHelper;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,17 +49,17 @@ public class JabRefDesktop {
      * Open a http/pdf/ps viewer for the given link string.
      */
     public static void openExternalViewer(BibDatabaseContext databaseContext, String initialLink, Field initialField)
-        throws IOException {
+            throws IOException {
         String link = initialLink;
         Field field = initialField;
         if (StandardField.PS.equals(field) || StandardField.PDF.equals(field)) {
             // Find the default directory for this field type:
-            List<String> dir = databaseContext.getFileDirectories(field, Globals.prefs.getFilePreferences());
+            List<Path> directories = databaseContext.getFileDirectories(Globals.prefs.getFilePreferences());
 
-            Optional<Path> file = FileHelper.expandFilename(link, dir);
+            Optional<Path> file = FileHelper.find(link, directories);
 
             // Check that the file exists:
-            if (!file.isPresent() || !Files.exists(file.get())) {
+            if (file.isEmpty() || !Files.exists(file.get())) {
                 throw new IOException("File not found (" + field + "): '" + link + "'.");
             }
             link = file.get().toAbsolutePath().toString();
@@ -71,7 +70,7 @@ public class JabRefDesktop {
                 if ("pdf".equalsIgnoreCase(split[split.length - 1])) {
                     field = StandardField.PDF;
                 } else if ("ps".equalsIgnoreCase(split[split.length - 1])
-                           || ((split.length >= 3) && "ps".equalsIgnoreCase(split[split.length - 2]))) {
+                        || ((split.length >= 3) && "ps".equalsIgnoreCase(split[split.length - 2]))) {
                     field = StandardField.PS;
                 }
             }
@@ -111,40 +110,33 @@ public class JabRefDesktop {
     /**
      * Open an external file, attempting to use the correct viewer for it.
      *
-     * @param databaseContext
-     *            The database this file belongs to.
-     * @param link
-     *            The filename.
+     * @param databaseContext The database this file belongs to.
+     * @param link            The filename.
      * @return false if the link couldn't be resolved, true otherwise.
      */
     public static boolean openExternalFileAnyFormat(final BibDatabaseContext databaseContext, String link,
                                                     final Optional<ExternalFileType> type)
-        throws IOException {
+            throws IOException {
 
         if (REMOTE_LINK_PATTERN.matcher(link.toLowerCase(Locale.ROOT)).matches()) {
             openExternalFilePlatformIndependent(type, link);
             return true;
         }
 
-        Optional<Path> file = FileHelper.expandFilename(databaseContext, link, Globals.prefs.getFilePreferences());
+        Optional<Path> file = FileHelper.find(databaseContext, link, Globals.prefs.getFilePreferences());
         if (file.isPresent() && Files.exists(file.get())) {
             // Open the file:
             String filePath = file.get().toString();
             openExternalFilePlatformIndependent(type, filePath);
-            return true;
         } else {
             // No file matched the name, try to open it directly using the given app
             openExternalFilePlatformIndependent(type, link);
-            return true;
         }
-    }
-
-    public static boolean openExternalFileAnyFormat(Path file, final BibDatabaseContext databaseContext, final Optional<ExternalFileType> type) throws IOException {
-        return openExternalFileAnyFormat(databaseContext, file.toString(), type);
+        return true;
     }
 
     private static void openExternalFilePlatformIndependent(Optional<ExternalFileType> fileType, String filePath)
-        throws IOException {
+            throws IOException {
         if (fileType.isPresent()) {
             String application = fileType.get().getOpenWithApplication();
 
@@ -154,28 +146,29 @@ public class JabRefDesktop {
                 NATIVE_DESKTOP.openFileWithApplication(filePath, application);
             }
         } else {
-            //File type is not given and therefore no application specified
-            //Let the OS handle the opening of the file
+            // File type is not given and therefore no application specified
+            // Let the OS handle the opening of the file
             NATIVE_DESKTOP.openFile(filePath, "");
         }
     }
 
     /**
      * Opens a file browser of the folder of the given file. If possible, the file is selected
+     *
      * @param fileLink the location of the file
-     * @throws IOException
+     * @throws IOException if the default file browser cannot be opened
      */
     public static void openFolderAndSelectFile(Path fileLink) throws IOException {
         if (fileLink == null) {
             return;
         }
-        boolean usingDefault = Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_FILE_BROWSER_APPLICATION);
 
-        if (usingDefault) {
+        boolean useCustomFileBrowser = Globals.prefs.getExternalApplicationsPreferences().useCustomFileBrowser();
+        if (!useCustomFileBrowser) {
             NATIVE_DESKTOP.openFolderAndSelectFile(fileLink);
         } else {
             String absolutePath = fileLink.toAbsolutePath().getParent().toString();
-            String command = Globals.prefs.get(JabRefPreferences.FILE_BROWSER_COMMAND);
+            String command = Globals.prefs.getExternalApplicationsPreferences().getCustomFileBrowserCommand();
             if (!command.isEmpty()) {
                 command = command.replaceAll("\\s+", " "); // normalize white spaces
 
@@ -199,7 +192,6 @@ public class JabRefDesktop {
      * Opens the given URL using the system browser
      *
      * @param url the URL to open
-     * @throws IOException
      */
     public static void openBrowser(String url) throws IOException {
         Optional<ExternalFileType> fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("html");
@@ -214,13 +206,13 @@ public class JabRefDesktop {
      * Opens the url with the users standard Browser.
      * If that fails a popup will be shown to instruct the user to open the link manually
      * and the link gets copied to the clipboard
-     * @param url
+     * @param url the URL to open
      */
     public static void openBrowserShowPopup(String url) {
         try {
             openBrowser(url);
         } catch (IOException exception) {
-            Globals.clipboardManager.setContent(url);
+            Globals.getClipboardManager().setContent(url);
             LOGGER.error("Could not open browser", exception);
             String couldNotOpenBrowser = Localization.lang("Could not open browser.");
             String openManually = Localization.lang("Please open %0 manually.", url);
@@ -232,9 +224,8 @@ public class JabRefDesktop {
 
     /**
      * Opens a new console starting on the given file location
-     *
-     * If no command is specified in {@link Globals},
-     * the default system console will be executed.
+     * <p>
+     * If no command is specified in {@link Globals}, the default system console will be executed.
      *
      * @param file Location the console should be opened at.
      */
@@ -244,12 +235,12 @@ public class JabRefDesktop {
         }
 
         String absolutePath = file.toPath().toAbsolutePath().getParent().toString();
-        boolean usingDefault = Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION);
 
-        if (usingDefault) {
+        boolean useCustomTerminal = Globals.prefs.getExternalApplicationsPreferences().useCustomTerminal();
+        if (!useCustomTerminal) {
             NATIVE_DESKTOP.openConsole(absolutePath);
         } else {
-            String command = Globals.prefs.get(JabRefPreferences.CONSOLE_COMMAND);
+            String command = Globals.prefs.getExternalApplicationsPreferences().getCustomTerminalCommand();
             command = command.trim();
 
             if (!command.isEmpty()) {

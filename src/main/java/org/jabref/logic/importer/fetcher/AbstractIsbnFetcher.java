@@ -36,5 +36,4 @@ public abstract class AbstractIsbnFetcher implements IdBasedParserFetcher {
     public Parser getParser() {
         return new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
     }
-
 }

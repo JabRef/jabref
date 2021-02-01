@@ -23,8 +23,6 @@ import org.xml.sax.SAXParseException;
 
 /**
  * Importer for the MS Office 2007 XML bibliography format
- *
- * ...
  */
 public class MsBibImporter extends Importer {
 
@@ -110,7 +108,6 @@ public class MsBibImporter extends Importer {
 
             dBuild.setXIncludeAware(false);
             dBuild.setExpandEntityReferences(false);
-
         } catch (ParserConfigurationException e) {
             LOGGER.warn("Builder not fully configured. Feature:'{}' is probably not supported by current XML processor. {}", feature, e);
         }

@@ -17,7 +17,7 @@ class LanguageTest {
 
     @Test
     void convertKnownLanguageAndCountryCorrect() {
-        //Language and country code have to be separated see: https://stackoverflow.com/a/3318598
+        // Language and country code have to be separated see: https://stackoverflow.com/a/3318598
         assertEquals(Optional.of(new Locale("pt", "BR")), Language.convertToSupportedLocale(Language.BRAZILIAN_PORTUGUESE));
     }
 

@@ -14,7 +14,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.metadata.FilePreferences;
+import org.jabref.preferences.FilePreferences;
 
 public class ExternalFilesEntryLinker {
 
@@ -56,8 +56,8 @@ public class ExternalFilesEntryLinker {
             FileUtil.getFileExtension(file).ifPresent(ext -> {
                 ExternalFileType type = externalFileTypes.getExternalFileTypeByExt(ext)
                                                          .orElse(new UnknownExternalFileType(ext));
-                Path relativePath = FileUtil.relativize(file, bibDatabaseContext.getFileDirectoriesAsPaths(filePreferences));
-                LinkedFile linkedfile = new LinkedFile("", relativePath.toString(), type.getName());
+                Path relativePath = FileUtil.relativize(file, bibDatabaseContext.getFileDirectories(filePreferences));
+                LinkedFile linkedfile = new LinkedFile("", relativePath, type.getName());
                 entry.addFile(linkedfile);
             });
         }

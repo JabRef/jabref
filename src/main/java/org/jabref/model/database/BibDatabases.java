@@ -1,34 +1,14 @@
 package org.jabref.model.database;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.IdGenerator;
 
 public class BibDatabases {
 
     private BibDatabases() {
-    }
-
-    /**
-     * Gets a collection of entries and sets an ID for every entry. After that
-     * all entries are inserted into a new BibDatabase.
-     *
-     * @param entries a collection that contains {@link BibEntry}
-     * @return BibDatabase that contains the entries
-     */
-    public static BibDatabase createDatabase(Collection<BibEntry> entries) {
-        BibDatabase database = new BibDatabase();
-
-        for (BibEntry entry : entries) {
-            entry.setId(IdGenerator.next());
-        }
-        database.insertEntries(new ArrayList<>(entries));
-
-        return database;
     }
 
     /**

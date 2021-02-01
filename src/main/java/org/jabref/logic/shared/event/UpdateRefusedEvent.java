@@ -4,8 +4,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 /**
- * A new {@link UpdateRefusedEvent} is fired, when the user tries to push changes of an obsolete
- * {@link BibEntry} to the server.
+ * A new {@link UpdateRefusedEvent} is fired, when the user tries to push changes of an obsolete {@link BibEntry} to the server.
  */
 public class UpdateRefusedEvent {
 
@@ -15,7 +14,7 @@ public class UpdateRefusedEvent {
 
     /**
      * @param bibDatabaseContext Affected {@link BibDatabaseContext}
-     * @param localBibEntry Affected {@link BibEntry}
+     * @param localBibEntry      Affected {@link BibEntry}
      */
     public UpdateRefusedEvent(BibDatabaseContext bibDatabaseContext, BibEntry localBibEntry, BibEntry sharedBibEntry) {
         this.bibDatabaseContext = bibDatabaseContext;

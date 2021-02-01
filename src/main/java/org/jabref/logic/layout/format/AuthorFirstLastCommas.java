@@ -17,5 +17,4 @@ public class AuthorFirstLastCommas implements LayoutFormatter {
     public String format(String fieldText) {
         return AuthorList.fixAuthorFirstNameFirstCommas(fieldText, false, false);
     }
-
 }

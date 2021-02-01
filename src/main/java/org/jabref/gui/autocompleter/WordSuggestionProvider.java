@@ -1,35 +1,28 @@
 package org.jabref.gui.autocompleter;
 
 import java.util.Objects;
-import java.util.StringTokenizer;
+import java.util.stream.Stream;
 
-import org.jabref.model.entry.BibEntry;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.field.Field;
 
 /**
- * Stores all words in the given field which are separated by SEPARATING_CHARS.
+ * Stores all words in the given field.
  */
-public class WordSuggestionProvider extends StringSuggestionProvider implements AutoCompleteSuggestionProvider<String> {
-
-    private static final String SEPARATING_CHARS = ";,\n ";
+public class WordSuggestionProvider extends StringSuggestionProvider {
 
     private final Field field;
+    private final BibDatabase database;
 
-    public WordSuggestionProvider(Field field) {
+    public WordSuggestionProvider(Field field, BibDatabase database) {
         this.field = Objects.requireNonNull(field);
+        this.database = database;
     }
 
     @Override
-    public void indexEntry(BibEntry entry) {
-        if (entry == null) {
-            return;
-        }
-
-        entry.getField(field).ifPresent(fieldValue -> {
-            StringTokenizer tok = new StringTokenizer(fieldValue, SEPARATING_CHARS);
-            while (tok.hasMoreTokens()) {
-                addPossibleSuggestions(tok.nextToken());
-            }
-        });
+    public Stream<String> getSource() {
+        return database.getEntries()
+                       .parallelStream()
+                       .flatMap(entry -> entry.getFieldAsWords(field).stream());
     }
 }

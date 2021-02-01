@@ -1,4 +1,4 @@
-<dt>\format[ToLowerCase]{\entrytype} \begin{bibtexkey}<a name="\bibtexkey">(\bibtexkey)</a>\end{bibtexkey}</dt>
+<dt>\format[ToLowerCase]{\entrytype} \begin{citationkey}<a name="\citationkey">(\citationkey)</a>\end{citationkey}</dt>
 \begin{author}<dd>\format[Authors(LastFirst,InititialsNoSpace),HTMLChars]{\author}</dd>\end{author}\begin{title}
 <dd><i>\format[HTMLChars]{\title}</i></dd>\end{title}\begin{editor}
 <dd>\format[AuthorLastFirst,AuthorLastFirstAbbreviator,AuthorAndsCommaReplacer,HTMLChars]{\editor} <i>(ed.)</i></dd>\end{editor}\begin{booktitle}

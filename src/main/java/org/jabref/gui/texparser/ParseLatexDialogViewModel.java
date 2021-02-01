@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -26,6 +25,7 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
+import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.texparser.DefaultLatexParser;
@@ -75,7 +75,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         this.searchInProgress = new SimpleBooleanProperty(false);
         this.successfulSearch = new SimpleBooleanProperty(false);
 
-        Predicate<String> isDirectory = path -> Paths.get(path).toFile().isDirectory();
+        Predicate<String> isDirectory = path -> Path.of(path).toFile().isDirectory();
         latexDirectoryValidator = new FunctionBasedValidator<>(latexFileDirectory, isDirectory,
                 ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
     }
@@ -110,11 +110,11 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
 
     public void browseButtonClicked() {
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
-                .withInitialDirectory(Paths.get(latexFileDirectory.get())).build();
+                .withInitialDirectory(Path.of(latexFileDirectory.get())).build();
 
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory -> {
             latexFileDirectory.set(selectedDirectory.toAbsolutePath().toString());
-            preferencesService.setWorkingDir(selectedDirectory.toAbsolutePath());
+            preferencesService.setWorkingDirectory(selectedDirectory.toAbsolutePath());
         });
     }
 
@@ -122,7 +122,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
      * Run a recursive search in a background task.
      */
     public void searchButtonClicked() {
-        BackgroundTask.wrap(() -> searchDirectory(Paths.get(latexFileDirectory.get())))
+        BackgroundTask.wrap(() -> searchDirectory(Path.of(latexFileDirectory.get())))
                       .onRunning(() -> {
                           root.set(null);
                           noFilesFound.set(true);
@@ -140,7 +140,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
     }
 
     private void handleFailure(Exception exception) {
-        final boolean permissionProblem = exception instanceof IOException && exception.getCause() instanceof FileSystemException && exception.getCause().getMessage().endsWith("Operation not permitted");
+        final boolean permissionProblem = (exception instanceof IOException) && (exception.getCause() instanceof FileSystemException) && exception.getCause().getMessage().endsWith("Operation not permitted");
         if (permissionProblem) {
             dialogService.showErrorDialogAndWait(String.format(Localization.lang("JabRef does not have permission to access %s"), exception.getCause().getMessage()));
         } else {
@@ -149,7 +149,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
     }
 
     private FileNodeViewModel searchDirectory(Path directory) throws IOException {
-        if (directory == null || !directory.toFile().isDirectory()) {
+        if ((directory == null) || !directory.toFile().isDirectory()) {
             throw new IOException(String.format("Invalid directory for searching: %s", directory));
         }
 
@@ -200,12 +200,13 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         }
 
         TexBibEntriesResolver entriesResolver = new TexBibEntriesResolver(databaseContext.getDatabase(),
-                preferencesService.getImportFormatPreferences(), fileMonitor);
+                preferencesService.getImportFormatPreferences(), preferencesService.getTimestampPreferences(), fileMonitor);
 
         BackgroundTask.wrap(() -> entriesResolver.resolve(new DefaultLatexParser().parse(fileList)))
                       .onRunning(() -> searchInProgress.set(true))
                       .onFinished(() -> searchInProgress.set(false))
-                      .onSuccess(result -> new ParseLatexResultView(result, databaseContext, Paths.get(latexFileDirectory.get())).showAndWait())
+                      .onSuccess(result -> dialogService.showCustomDialogAndWait(
+                              new ParseLatexResultView(result, databaseContext, Path.of(latexFileDirectory.get()))))
                       .onFailure(dialogService::showErrorDialogAndWait)
                       .executeWith(taskExecutor);
     }

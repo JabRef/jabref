@@ -9,7 +9,7 @@
             <keywords>java</keywords>
             <year>2016</year>
             <author>Max Mustermann</author>
-            <bibtexkey>Mustermann2016</bibtexkey>
+            <citationkey>Mustermann2016</citationkey>
             <publisher>Java Book Publisher</publisher>
             <title>Java 8 Lambdas</title>
         </inbook>

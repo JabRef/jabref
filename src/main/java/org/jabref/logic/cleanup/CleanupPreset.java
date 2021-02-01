@@ -6,8 +6,6 @@ import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
 
-import org.jabref.model.cleanup.FieldFormatterCleanups;
-
 public class CleanupPreset {
 
     private final Set<CleanupStep> activeJobs;

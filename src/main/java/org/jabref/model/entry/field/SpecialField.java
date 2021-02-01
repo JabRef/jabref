@@ -13,43 +13,43 @@ import org.jabref.model.entry.KeywordList;
 public enum SpecialField implements Field {
 
     PRINTED("printed",
-        SpecialFieldValue.PRINTED
+            SpecialFieldValue.PRINTED
     ),
 
     PRIORITY("priority",
-        SpecialFieldValue.CLEAR_PRIORITY,
-        SpecialFieldValue.PRIORITY_HIGH,
-        SpecialFieldValue.PRIORITY_MEDIUM,
-        SpecialFieldValue.PRIORITY_LOW
+            SpecialFieldValue.CLEAR_PRIORITY,
+            SpecialFieldValue.PRIORITY_HIGH,
+            SpecialFieldValue.PRIORITY_MEDIUM,
+            SpecialFieldValue.PRIORITY_LOW
     ),
 
     QUALITY("qualityassured",
-        SpecialFieldValue.QUALITY_ASSURED
+            SpecialFieldValue.QUALITY_ASSURED
     ),
 
     RANKING("ranking",
-        SpecialFieldValue.CLEAR_RANK,
-        SpecialFieldValue.RANK_1,
-        SpecialFieldValue.RANK_2,
-        SpecialFieldValue.RANK_3,
-        SpecialFieldValue.RANK_4,
-        SpecialFieldValue.RANK_5
+            SpecialFieldValue.CLEAR_RANK,
+            SpecialFieldValue.RANK_1,
+            SpecialFieldValue.RANK_2,
+            SpecialFieldValue.RANK_3,
+            SpecialFieldValue.RANK_4,
+            SpecialFieldValue.RANK_5
     ),
 
     READ_STATUS("readstatus",
-        SpecialFieldValue.CLEAR_READ_STATUS,
-        SpecialFieldValue.READ,
-        SpecialFieldValue.SKIMMED
+            SpecialFieldValue.CLEAR_READ_STATUS,
+            SpecialFieldValue.READ,
+            SpecialFieldValue.SKIMMED
     ),
 
     RELEVANCE("relevance",
-        SpecialFieldValue.RELEVANT
+            SpecialFieldValue.RELEVANT
     );
 
-    private List<SpecialFieldValue> values;
-    private KeywordList keywords;
-    private HashMap<String, SpecialFieldValue> map;
-    private String fieldName;
+    private final List<SpecialFieldValue> values;
+    private final KeywordList keywords;
+    private final HashMap<String, SpecialFieldValue> map;
+    private final String fieldName;
 
     SpecialField(String fieldName, SpecialFieldValue... values) {
         this.fieldName = fieldName;
@@ -99,5 +99,4 @@ public enum SpecialField implements Field {
     public boolean isStandardField() {
         return false;
     }
-
 }

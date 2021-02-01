@@ -9,7 +9,6 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -81,7 +80,7 @@ public class LocalizationParser {
 
     public static Set<LocalizationEntry> findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest type)
             throws IOException {
-        try (Stream<Path> pathStream = Files.walk(Paths.get("src/main"))) {
+        try (Stream<Path> pathStream = Files.walk(Path.of("src/main"))) {
             return pathStream
                     .filter(LocalizationParser::isJavaFile)
                     .flatMap(path -> getLocalizationParametersInJavaFile(path, type).stream())
@@ -93,7 +92,7 @@ public class LocalizationParser {
 
     private static Set<LocalizationEntry> findLocalizationEntriesInJavaFiles(LocalizationBundleForTest type)
             throws IOException {
-        try (Stream<Path> pathStream = Files.walk(Paths.get("src/main"))) {
+        try (Stream<Path> pathStream = Files.walk(Path.of("src/main"))) {
             return pathStream
                     .filter(LocalizationParser::isJavaFile)
                     .flatMap(path -> getLanguageKeysInJavaFile(path, type).stream())
@@ -105,7 +104,7 @@ public class LocalizationParser {
 
     private static Set<LocalizationEntry> findLocalizationEntriesInFxmlFiles(LocalizationBundleForTest type)
             throws IOException {
-        try (Stream<Path> pathStream = Files.walk(Paths.get("src/main"))) {
+        try (Stream<Path> pathStream = Files.walk(Path.of("src/main"))) {
             return pathStream
                     .filter(LocalizationParser::isFxmlFile)
                     .flatMap(path -> getLanguageKeysInFxmlFile(path, type).stream())

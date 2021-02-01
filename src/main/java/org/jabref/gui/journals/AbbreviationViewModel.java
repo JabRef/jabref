@@ -15,24 +15,22 @@ import org.jabref.logic.journals.Abbreviation;
  */
 public class AbbreviationViewModel {
 
-    private final Abbreviation abbreviationObject;
     private final StringProperty name = new SimpleStringProperty("");
     private final StringProperty abbreviation = new SimpleStringProperty("");
     private final StringProperty shortestUniqueAbbreviation = new SimpleStringProperty("");
     private final BooleanProperty pseudoAbbreviation = new SimpleBooleanProperty();
 
-    public AbbreviationViewModel(Abbreviation abbreviation) {
-        this.abbreviationObject = abbreviation;
-        this.pseudoAbbreviation.set(this.abbreviationObject == null);
-        if (this.abbreviationObject != null) {
-            this.name.bindBidirectional(this.abbreviationObject.nameProperty());
-            this.abbreviation.bindBidirectional(this.abbreviationObject.abbreviationProperty());
-            this.shortestUniqueAbbreviation.bindBidirectional(this.abbreviationObject.shortestUniqueAbbreviationProperty());
+    public AbbreviationViewModel(Abbreviation abbreviationObject) {
+        this.pseudoAbbreviation.set(abbreviationObject == null);
+        if (abbreviationObject != null) {
+            this.name.setValue(abbreviationObject.getName());
+            this.abbreviation.setValue(abbreviationObject.getAbbreviation());
+            this.shortestUniqueAbbreviation.setValue(abbreviationObject.getShortestUniqueAbbreviation());
         }
     }
 
     public Abbreviation getAbbreviationObject() {
-        return abbreviationObject;
+        return new Abbreviation(getName(), getAbbreviation(), getShortestUniqueAbbreviation());
     }
 
     public String getName() {
@@ -80,16 +78,20 @@ public class AbbreviationViewModel {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(abbreviationObject);
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        AbbreviationViewModel that = (AbbreviationViewModel) o;
+        return Objects.equals(getName(), that.getName()) &&
+                isPseudoAbbreviation() == that.isPseudoAbbreviation();
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof AbbreviationViewModel) {
-            return Objects.equals(this.abbreviationObject, ((AbbreviationViewModel) obj).abbreviationObject);
-        } else {
-            return false;
-        }
+    public int hashCode() {
+        return Objects.hash(getName(), isPseudoAbbreviation());
     }
 }

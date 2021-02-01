@@ -11,14 +11,13 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.specialfields.SpecialFieldsUtils;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.preferences.PreferencesService;
 
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 public class ManageKeywordsViewModel {
 
@@ -105,12 +104,8 @@ public class ManageKeywordsViewModel {
             return;
         }
 
-        if (preferences.isKeywordSyncEnabled() && !keywordsToAdd.isEmpty()) {
-            SpecialFieldsUtils.synchronizeSpecialFields(keywordsToAdd, keywordsToRemove);
-        }
-
         NamedCompound ce = updateKeywords(entries, keywordsToAdd, keywordsToRemove);
-        //TODO: bp.getUndoManager().addEdit(ce);
+        // TODO: bp.getUndoManager().addEdit(ce);
     }
 
     private NamedCompound updateKeywords(List<BibEntry> entries, KeywordList keywordsToAdd,
@@ -125,13 +120,7 @@ public class ManageKeywordsViewModel {
 
             // put keywords back
             Optional<FieldChange> change = entry.putKeywords(keywords, preferences.getKeywordDelimiter());
-            if (change.isPresent()) {
-                ce.addEdit(new UndoableFieldChange(change.get()));
-            }
-
-            if (preferences.isKeywordSyncEnabled()) {
-                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, preferences.getKeywordDelimiter());
-            }
+            change.ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
         }
         ce.end();
         return ce;

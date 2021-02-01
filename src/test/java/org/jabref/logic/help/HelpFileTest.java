@@ -11,20 +11,19 @@ import org.jabref.logic.net.URLDownload;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.jabref.logic.help.HelpFile.values;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class HelpFileTest {
+class HelpFileTest {
 
     private final String jabrefHelp = "https://docs.jabref.org/";
 
     static Stream<HelpFile> getAllHelpFiles() {
-        return Arrays.stream(values());
+        return Arrays.stream(HelpFile.values());
     }
 
     @ParameterizedTest
     @MethodSource("getAllHelpFiles")
-    public void referToValidPage(HelpFile help) throws IOException {
+    void referToValidPage(HelpFile help) throws IOException {
         URL url = new URL(jabrefHelp + help.getPageName());
         HttpURLConnection http = (HttpURLConnection) url.openConnection();
         http.setRequestProperty("User-Agent", URLDownload.USER_AGENT);

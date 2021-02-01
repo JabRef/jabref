@@ -1,6 +1,6 @@
 package org.jabref.logic.exporter;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -117,7 +117,7 @@ class GroupSerializerTest {
 
     @Test
     void serializeSingleTexGroup() throws Exception {
-        TexGroup group = TexGroup.createWithoutFileMonitoring("myTexGroup", GroupHierarchyType.INDEPENDENT, Paths.get("path", "To", "File"), new DefaultAuxParser(new BibDatabase()), new DummyFileUpdateMonitor(), new MetaData());
+        TexGroup group = TexGroup.createWithoutFileMonitoring("myTexGroup", GroupHierarchyType.INDEPENDENT, Path.of("path", "To", "File"), new DefaultAuxParser(new BibDatabase()), new DummyFileUpdateMonitor(), new MetaData());
         List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(Collections.singletonList("0 TexGroup:myTexGroup;0;path/To/File;1;;;;"), serialization);
     }

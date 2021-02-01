@@ -98,6 +98,7 @@ public class BibtexString implements Cloneable {
 
     /**
      * Returns the name/label of the string
+     *
      * @return
      */
     public String getName() {
@@ -185,10 +186,10 @@ public class BibtexString implements Cloneable {
             return false;
         }
         BibtexString that = (BibtexString) o;
-        return (Objects.equals(hasChanged,that.hasChanged) &&
+        return (Objects.equals(hasChanged, that.hasChanged) &&
                 Objects.equals(name, that.name) &&
                 Objects.equals(content, that.content) &&
-                Objects.equals(id, that.id)  &&
+                Objects.equals(id, that.id) &&
                 Objects.equals(type, that.type) &&
                 Objects.equals(parsedSerialization, that.parsedSerialization));
     }

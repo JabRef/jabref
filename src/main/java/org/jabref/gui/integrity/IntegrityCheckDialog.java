@@ -12,7 +12,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.MouseButton;
 import javafx.stage.Modality;
 
-import org.jabref.gui.BasePanel;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.l10n.Localization;
@@ -23,7 +23,7 @@ import org.controlsfx.control.table.TableFilter;
 public class IntegrityCheckDialog extends BaseDialog<Void> {
 
     private final List<IntegrityMessage> messages;
-    private final BasePanel basePanel;
+    private final LibraryTab libraryTab;
     @FXML private TableView<IntegrityMessage> messagesTable;
     @FXML private TableColumn<IntegrityMessage, String> keyColumn;
     @FXML private TableColumn<IntegrityMessage, String> fieldColumn;
@@ -34,9 +34,9 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     private IntegrityCheckDialogViewModel viewModel;
     private TableFilter<IntegrityMessage> tableFilter;
 
-    public IntegrityCheckDialog(List<IntegrityMessage> messages, BasePanel basePanel) {
+    public IntegrityCheckDialog(List<IntegrityMessage> messages, LibraryTab libraryTab) {
         this.messages = messages;
-        this.basePanel = basePanel;
+        this.libraryTab = libraryTab;
         this.setTitle(Localization.lang("Check integrity"));
         this.initModality(Modality.NONE);
 
@@ -48,7 +48,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     private void onSelectionChanged(ListChangeListener.Change<? extends IntegrityMessage> change) {
         if (change.next()) {
             change.getAddedSubList().stream().findFirst().ifPresent(message ->
-                    basePanel.editEntryAndFocusField(message.getEntry(), message.getField()));
+                    libraryTab.editEntryAndFocusField(message.getEntry(), message.getField()));
         }
     }
 
@@ -62,7 +62,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
 
         messagesTable.getSelectionModel().getSelectedItems().addListener(this::onSelectionChanged);
         messagesTable.setItems(viewModel.getMessages());
-        keyColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().getEntry().getCiteKeyOptional().orElse("")));
+        keyColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().getEntry().getCitationKey().orElse("")));
         fieldColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().getField().getDisplayName()));
         messageColumn.setCellValueFactory(row -> new ReadOnlyStringWrapper(row.getValue().getMessage()));
 

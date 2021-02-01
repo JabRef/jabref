@@ -19,7 +19,6 @@ import org.jabref.model.entry.AuthorList;
  * <p>
  * Idea from: http://stuermer.ch/blog/bibliography-reference-management-with-jabref.html
  * </p>
- *
  */
 public class AuthorOrgSci implements LayoutFormatter {
 

@@ -2,6 +2,7 @@ package org.jabref.logic.layout.format;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collections;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -10,94 +11,94 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class WrapFileLinksTest {
+class WrapFileLinksTest {
 
     private WrapFileLinks formatter;
 
     @BeforeEach
-    public void setUp() {
-        FileLinkPreferences preferences = new FileLinkPreferences(Collections.emptyList(), Collections.emptyList());
+    void setUp() {
+        FileLinkPreferences preferences = new FileLinkPreferences("", Collections.emptyList());
         formatter = new WrapFileLinks(preferences);
     }
 
     @Test
-    public void testEmpty() {
+    void testEmpty() {
         assertEquals("", formatter.format(""));
     }
 
     @Test
-    public void testNull() {
+    void testNull() {
         assertEquals("", formatter.format(null));
     }
 
-    public void testNoFormatSetNonEmptyString() {
+    void testNoFormatSetNonEmptyString() {
         assertThrows(NullPointerException.class, () -> formatter.format("test.pdf"));
     }
 
     @Test
-    public void testFileExtension() {
+    void testFileExtension() {
         formatter.setArgument("\\x");
         assertEquals("pdf", formatter.format("test.pdf"));
     }
 
     @Test
-    public void testFileExtensionNoExtension() {
+    void testFileExtensionNoExtension() {
         formatter.setArgument("\\x");
         assertEquals("", formatter.format("test"));
     }
 
     @Test
-    public void testPlainTextString() {
+    void testPlainTextString() {
         formatter.setArgument("x");
         assertEquals("x", formatter.format("test.pdf"));
     }
 
     @Test
-    public void testDescription() {
+    void testDescription() {
         formatter.setArgument("\\d");
         assertEquals("Test file", formatter.format("Test file:test.pdf:PDF"));
     }
 
     @Test
-    public void testDescriptionNoDescription() {
+    void testDescriptionNoDescription() {
         formatter.setArgument("\\d");
         assertEquals("", formatter.format("test.pdf"));
     }
 
     @Test
-    public void testType() {
+    void testType() {
         formatter.setArgument("\\f");
         assertEquals("PDF", formatter.format("Test file:test.pdf:PDF"));
     }
 
     @Test
-    public void testTypeNoType() {
+    void testTypeNoType() {
         formatter.setArgument("\\f");
         assertEquals("", formatter.format("test.pdf"));
     }
 
     @Test
-    public void testIterator() {
+    void testIterator() {
         formatter.setArgument("\\i");
         assertEquals("1", formatter.format("Test file:test.pdf:PDF"));
     }
 
     @Test
-    public void testIteratorTwoItems() {
+    void testIteratorTwoItems() {
         formatter.setArgument("\\i\n");
         assertEquals("1\n2\n", formatter.format("Test file:test.pdf:PDF;test2.pdf"));
     }
 
     @Test
-    public void testEndingBracket() {
+    void testEndingBracket() {
         formatter.setArgument("(\\d)");
         assertEquals("(Test file)", formatter.format("Test file:test.pdf:PDF"));
     }
 
     @Test
-    public void testPath() throws IOException {
-        FileLinkPreferences preferences = new FileLinkPreferences(Collections.emptyList(),
-                Collections.singletonList("src/test/resources/pdfs/"));
+    void testPath() throws IOException {
+        FileLinkPreferences preferences = new FileLinkPreferences("",
+                Collections.singletonList(Path.of("src/test/resources/pdfs/")));
         formatter = new WrapFileLinks(preferences);
         formatter.setArgument("\\p");
         assertEquals(new File("src/test/resources/pdfs/encrypted.pdf").getCanonicalPath(),
@@ -105,8 +106,8 @@ public class WrapFileLinksTest {
     }
 
     @Test
-    public void testPathFallBackToGeneratedDir() throws IOException {
-        FileLinkPreferences preferences = new FileLinkPreferences(Collections.singletonList("src/test/resources/pdfs/"),
+    void testPathFallBackToGeneratedDir() throws IOException {
+        FileLinkPreferences preferences = new FileLinkPreferences("src/test/resources/pdfs/",
                 Collections.emptyList());
         formatter = new WrapFileLinks(preferences);
         formatter.setArgument("\\p");
@@ -115,16 +116,16 @@ public class WrapFileLinksTest {
     }
 
     @Test
-    public void testPathReturnsRelativePathIfNotFound() {
-        FileLinkPreferences preferences = new FileLinkPreferences(Collections.emptyList(),
-                Collections.singletonList("src/test/resources/pdfs/"));
+    void testPathReturnsRelativePathIfNotFound() {
+        FileLinkPreferences preferences = new FileLinkPreferences("",
+                Collections.singletonList(Path.of("src/test/resources/pdfs/")));
         formatter = new WrapFileLinks(preferences);
         formatter.setArgument("\\p");
         assertEquals("test.pdf", formatter.format("Preferences:test.pdf:PDF"));
     }
 
     @Test
-    public void testRelativePath() {
+    void testRelativePath() {
         formatter.setArgument("\\r");
         assertEquals("test.pdf", formatter.format("Test file:test.pdf:PDF"));
     }

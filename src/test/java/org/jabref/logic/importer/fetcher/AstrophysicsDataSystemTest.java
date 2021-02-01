@@ -5,9 +5,11 @@ import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.paging.Page;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -20,10 +22,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-public class AstrophysicsDataSystemTest {
+public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
 
     private AstrophysicsDataSystem fetcher;
-    private BibEntry diezSliceTheoremEntry, famaeyMcGaughEntry, sunWelchEntry, xiongSunEntry, ingersollPollardEntry, luceyPaulEntry;
+    private BibEntry diezSliceTheoremEntry;
+    private BibEntry famaeyMcGaughEntry;
+    private BibEntry sunWelchEntry;
+    private BibEntry xiongSunEntry;
+    private BibEntry ingersollPollardEntry;
+    private BibEntry luceyPaulEntry;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -34,7 +41,7 @@ public class AstrophysicsDataSystemTest {
 
         diezSliceTheoremEntry = new BibEntry();
         diezSliceTheoremEntry.setType(StandardEntryType.Article);
-        diezSliceTheoremEntry.setCiteKey("2018arXiv181204698D");
+        diezSliceTheoremEntry.setCitationKey("2018arXiv181204698D");
         diezSliceTheoremEntry.setField(StandardField.AUTHOR, "Diez, Tobias and Rudolph, Gerd");
         diezSliceTheoremEntry.setField(StandardField.TITLE, "Slice theorem and orbit type stratification in infinite dimensions");
         diezSliceTheoremEntry.setField(StandardField.YEAR, "2018");
@@ -52,7 +59,7 @@ public class AstrophysicsDataSystemTest {
 
         famaeyMcGaughEntry = new BibEntry();
         famaeyMcGaughEntry.setType(StandardEntryType.Article);
-        famaeyMcGaughEntry.setCiteKey("2012LRR....15...10F");
+        famaeyMcGaughEntry.setCitationKey("2012LRR....15...10F");
         famaeyMcGaughEntry.setField(StandardField.AUTHOR, "Famaey, Beno{\\^\\i}t and McGaugh, Stacy S.");
         famaeyMcGaughEntry.setField(StandardField.TITLE, "Modified Newtonian Dynamics (MOND): Observational Phenomenology and Relativistic Extensions");
         famaeyMcGaughEntry.setField(StandardField.JOURNAL, "Living Reviews in Relativity");
@@ -71,7 +78,7 @@ public class AstrophysicsDataSystemTest {
 
         sunWelchEntry = new BibEntry();
         sunWelchEntry.setType(StandardEntryType.Article);
-        sunWelchEntry.setCiteKey("2012NatMa..11...44S");
+        sunWelchEntry.setCitationKey("2012NatMa..11...44S");
         sunWelchEntry.setField(StandardField.AUTHOR, "Sun, Yanming and Welch, Gregory C. and Leong, Wei Lin and Takacs, Christopher J. and Bazan, Guillermo C. and Heeger, Alan J.");
         sunWelchEntry.setField(StandardField.DOI, "10.1038/nmat3160");
         sunWelchEntry.setField(StandardField.JOURNAL, "Nature Materials");
@@ -85,7 +92,7 @@ public class AstrophysicsDataSystemTest {
 
         xiongSunEntry = new BibEntry();
         xiongSunEntry.setType(StandardEntryType.Article);
-        xiongSunEntry.setCiteKey("2007ITGRS..45..879X");
+        xiongSunEntry.setCitationKey("2007ITGRS..45..879X");
         xiongSunEntry.setField(StandardField.AUTHOR, "Xiong, Xiaoxiong and Sun, Junqiang and Barnes, William and Salomonson, Vincent and Esposito, Joseph and Erives, Hector and Guenther, Bruce");
         xiongSunEntry.setField(StandardField.DOI, "10.1109/TGRS.2006.890567");
         xiongSunEntry.setField(StandardField.JOURNAL, "IEEE Transactions on Geoscience and Remote Sensing");
@@ -99,7 +106,7 @@ public class AstrophysicsDataSystemTest {
 
         ingersollPollardEntry = new BibEntry();
         ingersollPollardEntry.setType(StandardEntryType.Article);
-        ingersollPollardEntry.setCiteKey("1982Icar...52...62I");
+        ingersollPollardEntry.setCitationKey("1982Icar...52...62I");
         ingersollPollardEntry.setField(StandardField.ABSTRACT, "If Jupiter's and Saturn's fluid interiors were inviscid and adiabatic,         any steady zonal motion would take the form of differentially         rotating cylinders concentric about the planetary axis of         rotation. B. A. Smith et al. [ Science215, 504-537 (1982)]         showed that Saturn's observed zonal wind profile extends a         significant distance below cloud base. Further extension into         the interior occurs if the values of the eddy viscosity and         superadiabaticity are small. We estimate these values using a         scaling analysis of deep convection in the presence of         differential rotation. The differential rotation inhibits the         convection and reduces the effective eddy viscosity. Viscous         dissipation of zonal mean kinetic energy is then within the         bounds set by the internal heat source. The differential         rotation increases the superadiabaticity, but not so much as to         eliminate the cylindrical structure of the flow. Very large         departures from adiabaticity, necessary for decoupling the         atmosphere and interior, do not occur. Using our scaling         analysis we develop the anelastic equations that describe         motions in Jupiter's and Saturn's interiors. A simple problem is         solved, that of an adiabatic fluid with a steady zonal wind         varying as a function of cylindrical radius. Low zonal         wavenumber perturbations are two dimensional (independent of the         axial coordinate) and obey a modified barotropic stability         equation. The parameter analogous to {\\ensuremath{\\beta}} is         negative and is three to four times larger than the         {\\ensuremath{\\beta}} for thin atmospheres. Jupiter's and         Saturn's observed zonal wind profiles are close to marginal         stability according to this deep sphere criterion, but are         several times supercritical according to the thin atmosphere         criterion.");
         ingersollPollardEntry.setField(StandardField.AUTHOR, "Ingersoll, A. P. and Pollard, D.");
         ingersollPollardEntry.setField(StandardField.DOI, "10.1016/0019-1035(82)90169-5");
@@ -115,7 +122,7 @@ public class AstrophysicsDataSystemTest {
 
         luceyPaulEntry = new BibEntry();
         luceyPaulEntry.setType(StandardEntryType.Article);
-        luceyPaulEntry.setCiteKey("2000JGR...10520297L");
+        luceyPaulEntry.setCitationKey("2000JGR...10520297L");
         luceyPaulEntry.setField(StandardField.AUTHOR, "Lucey, Paul G. and Blewett, David T. and Jolliff, Bradley L.");
         luceyPaulEntry.setField(StandardField.DOI, "10.1029/1999JE001117");
         luceyPaulEntry.setField(StandardField.JOURNAL, "\\jgr");
@@ -130,13 +137,8 @@ public class AstrophysicsDataSystemTest {
     }
 
     @Test
-    public void testHelpPage() {
-        assertEquals("import-using-online-bibliographic-database/ads", fetcher.getHelpPage().get().getPageName());
-    }
-
-    @Test
     public void testGetName() {
-        assertEquals("SAO/NASA Astrophysics Data System", fetcher.getName());
+        assertEquals("SAO/NASA ADS", fetcher.getName());
     }
 
     @Test
@@ -159,7 +161,7 @@ public class AstrophysicsDataSystemTest {
     @Test
     public void testPerformSearchByFamaeyMcGaughEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.12942/lrr-2012-10");
-        fetchedEntry.ifPresent(entry -> entry.clearField(StandardField.ABSTRACT));//Remove abstract due to copyright
+        fetchedEntry.ifPresent(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright
         assertEquals(Optional.of(famaeyMcGaughEntry), fetchedEntry);
     }
 
@@ -177,7 +179,7 @@ public class AstrophysicsDataSystemTest {
     @Test
     public void testPerformSearchBySunWelchEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1038/nmat3160");
-        fetchedEntry.ifPresent(entry -> entry.clearField(StandardField.ABSTRACT)); //Remove abstract due to copyright
+        fetchedEntry.ifPresent(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright
         assertEquals(Optional.of(sunWelchEntry), fetchedEntry);
     }
 
@@ -197,5 +199,24 @@ public class AstrophysicsDataSystemTest {
     public void testPerformSearchByLuceyPaulEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("2000JGR...10520297L");
         assertEquals(Optional.of(luceyPaulEntry), fetchedEntry);
+    }
+
+    @Test
+    public void performSearchByQueryPaged_searchLimitsSize() throws Exception {
+        Page<BibEntry> page = fetcher.performSearchPaged("author:\"A\"", 0);
+        assertEquals(fetcher.getPageSize(), page.getSize(), "fetcher return wrong page size");
+    }
+
+    @Test
+    public void performSearchByQueryPaged_invalidAuthorsReturnEmptyPages() throws Exception {
+        Page<BibEntry> page = fetcher.performSearchPaged("author:\"ThisAuthorWillNotBeFound\"", 0);
+        Page<BibEntry> page5 = fetcher.performSearchPaged("author:\"ThisAuthorWillNotBeFound\"", 5);
+        assertEquals(0, page.getSize(), "fetcher doesnt return empty pages for invalid author");
+        assertEquals(0, page5.getSize(), "fetcher doesnt return empty pages for invalid author");
+    }
+
+    @Override
+    public PagedSearchBasedFetcher getPagedFetcher() {
+        return fetcher;
     }
 }

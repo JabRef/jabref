@@ -28,7 +28,7 @@ public class UndoableChangeType extends AbstractUndoableJabRefEdit {
     @Override
     public String getPresentationName() {
         return Localization.lang("change type of entry %0 from %1 to %2",
-                StringUtil.boldHTML(entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))),
+                StringUtil.boldHTML(entry.getCitationKey().orElse(Localization.lang("undefined"))),
                 StringUtil.boldHTML(oldType.getDisplayName(), Localization.lang("undefined")),
                 StringUtil.boldHTML(newType.getDisplayName()));
     }

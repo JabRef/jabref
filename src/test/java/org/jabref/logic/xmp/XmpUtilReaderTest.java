@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -42,7 +41,7 @@ class XmpUtilReaderTest {
         when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
         xmpPreferences = mock(XmpPreferences.class);
         // The code assumes privacy filters to be off
-        when(xmpPreferences.isUseXMPPrivacyFilter()).thenReturn(false);
+        when(xmpPreferences.shouldUseXmpPrivacyFilter()).thenReturn(false);
 
         when(xmpPreferences.getKeywordSeparator()).thenReturn(',');
 
@@ -54,7 +53,7 @@ class XmpUtilReaderTest {
      */
     @Test
     void testReadArticleDublinCoreReadRawXmp() throws IOException, URISyntaxException, ParseException {
-        Path path = Paths.get(XmpUtilShared.class.getResource("article_dublinCore.pdf").toURI());
+        Path path = Path.of(XmpUtilShared.class.getResource("article_dublinCore.pdf").toURI());
         List<XMPMetadata> meta = XmpUtilReader.readRawXmp(path);
 
         DublinCoreSchema dcSchema = meta.get(0).getDublinCoreSchema();
@@ -71,15 +70,15 @@ class XmpUtilReaderTest {
      */
     @Test
     void testReadArticleDublinCoreReadXmp() throws IOException, URISyntaxException, ParseException {
-        Path pathPdf = Paths.get(XmpUtilShared.class.getResource("article_dublinCore.pdf").toURI());
+        Path pathPdf = Path.of(XmpUtilShared.class.getResource("article_dublinCore.pdf").toURI());
         List<BibEntry> entries = XmpUtilReader.readXmp(pathPdf, xmpPreferences);
         BibEntry entry = entries.get(0);
 
         String bibString = Resources.toString(XmpUtilShared.class.getResource("article_dublinCore.bib"), StandardCharsets.UTF_8);
         Optional<BibEntry> entryFromBibFile = parser.parseSingleEntry(bibString);
         entryFromBibFile.get().setFiles(Arrays.asList(
-                new LinkedFile("", "paper.pdf", "PDF"),
-                new LinkedFile("", pathPdf.toAbsolutePath().toString(), "PDF"))
+                new LinkedFile("", Path.of("paper.pdf"), "PDF"),
+                new LinkedFile("", pathPdf.toAbsolutePath(), "PDF"))
         );
 
         assertEquals(entryFromBibFile.get(), entry);
@@ -90,7 +89,7 @@ class XmpUtilReaderTest {
      */
     @Test
     void testReadEmtpyMetadata() throws IOException, URISyntaxException {
-        List<BibEntry> entries = XmpUtilReader.readXmp(Paths.get(XmpUtilShared.class.getResource("empty_metadata.pdf").toURI()), xmpPreferences);
+        List<BibEntry> entries = XmpUtilReader.readXmp(Path.of(XmpUtilShared.class.getResource("empty_metadata.pdf").toURI()), xmpPreferences);
         assertEquals(Collections.emptyList(), entries);
     }
 
@@ -99,15 +98,24 @@ class XmpUtilReaderTest {
      */
     @Test
     void testReadPDMetadata() throws IOException, URISyntaxException, ParseException {
-        Path pathPdf = Paths.get(XmpUtilShared.class.getResource("PD_metadata.pdf").toURI());
+        Path pathPdf = Path.of(XmpUtilShared.class.getResource("PD_metadata.pdf").toURI());
         List<BibEntry> entries = XmpUtilReader.readXmp(pathPdf, xmpPreferences);
 
         String bibString = Resources.toString(XmpUtilShared.class.getResource("PD_metadata.bib"), StandardCharsets.UTF_8);
         Optional<BibEntry> entryFromBibFile = parser.parseSingleEntry(bibString);
         entryFromBibFile.get().setFiles(Collections.singletonList(
-                new LinkedFile("", pathPdf.toAbsolutePath().toString(), "PDF"))
+                new LinkedFile("", pathPdf.toAbsolutePath(), "PDF"))
         );
 
         assertEquals(entryFromBibFile.get(), entries.get(0));
+    }
+
+    /**
+     * Tests an pdf file with metadata which has no description section.
+     */
+    @Test
+    void testReadNoDescriptionMetadata() throws IOException, URISyntaxException {
+        List<BibEntry> entries = XmpUtilReader.readXmp(Path.of(XmpUtilShared.class.getResource("no_description_metadata.pdf").toURI()), xmpPreferences);
+        assertEquals(Collections.emptyList(), entries);
     }
 }

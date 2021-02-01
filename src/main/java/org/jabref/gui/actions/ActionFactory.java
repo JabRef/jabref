@@ -1,5 +1,6 @@
 package org.jabref.gui.actions;
 
+import java.lang.reflect.InaccessibleObjectException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
@@ -16,9 +17,9 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.model.strings.StringUtil;
 
 import com.sun.javafx.scene.control.ContextMenuContent;
+import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.commands.Command;
 import org.controlsfx.control.action.ActionUtils;
-import org.fxmisc.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +67,7 @@ public class ActionFactory {
                 Method getLabel = ContextMenuContent.MenuItemContainer.class.getDeclaredMethod("getLabel");
                 getLabel.setAccessible(true);
                 return (Label) getLabel.invoke(container);
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            } catch (InaccessibleObjectException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                 LOGGER.warn("Could not get label of menu item", e);
             }
         }
@@ -135,12 +136,14 @@ public class ActionFactory {
         button.graphicProperty().unbind();
         action.getIcon().ifPresent(icon -> button.setGraphic(icon.getGraphicNode()));
 
+        button.setFocusTraversable(false); // Prevent the buttons from stealing the focus
         return button;
     }
 
     public ButtonBase configureIconButton(Action action, Command command, ButtonBase button) {
+        ActionUtils.unconfigureButton(button);
         ActionUtils.configureButton(
-                                    new JabRefAction(action, command, keyBindingRepository, Sources.FromButton),
+                new JabRefAction(action, command, keyBindingRepository, Sources.FromButton),
                 button,
                 ActionUtils.ActionTextBehavior.HIDE);
 

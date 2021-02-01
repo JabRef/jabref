@@ -44,5 +44,4 @@ class StringRemoveChangeViewModel extends DatabaseChangeViewModel {
         );
         return container;
     }
-
 }

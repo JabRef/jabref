@@ -28,23 +28,19 @@ public class TitleFetcherTest {
 
         bibEntryBischof2009 = new BibEntry();
         bibEntryBischof2009.setType(StandardEntryType.InProceedings);
-        bibEntryBischof2009.setCiteKey("Bischof_2009");
+        bibEntryBischof2009.setCitationKey("Bischof_2009");
         bibEntryBischof2009.setField(StandardField.AUTHOR, "Marc Bischof and Oliver Kopp and Tammo van Lessen and Frank Leymann");
         bibEntryBischof2009.setField(StandardField.BOOKTITLE, "2009 35th Euromicro Conference on Software Engineering and Advanced Applications");
         bibEntryBischof2009.setField(StandardField.PUBLISHER, "{IEEE}");
         bibEntryBischof2009.setField(StandardField.TITLE, "{BPELscript}: A Simplified Script Syntax for {WS}-{BPEL} 2.0");
         bibEntryBischof2009.setField(StandardField.YEAR, "2009");
+        bibEntryBischof2009.setField(StandardField.MONTH, "aug");
         bibEntryBischof2009.setField(StandardField.DOI, "10.1109/seaa.2009.21");
     }
 
     @Test
     public void testGetName() {
         assertEquals("Title", fetcher.getName());
-    }
-
-    @Test
-    public void testGetHelpPage() {
-        assertEquals("import-using-publication-identifiers/titletobibtex", fetcher.getHelpPage().get().getPageName());
     }
 
     @Test

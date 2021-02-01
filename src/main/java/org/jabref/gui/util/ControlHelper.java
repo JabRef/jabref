@@ -21,6 +21,8 @@ public class ControlHelper {
     private static PseudoClass dragOverCenter = PseudoClass.getPseudoClass("dragOver-center");
     private static PseudoClass dragOverTop = PseudoClass.getPseudoClass("dragOver-top");
 
+    public enum EllipsisPosition { BEGINNING, CENTER, ENDING }
+
     public static void setAction(ButtonType buttonType, DialogPane dialogPane, Consumer<Event> consumer) {
         Button button = (Button) dialogPane.lookupButton(buttonType);
         button.addEventFilter(ActionEvent.ACTION, (event -> {
@@ -96,5 +98,47 @@ public class ControlHelper {
 
     public static void removeDroppingPseudoClasses(Cell<?> cell) {
         removePseudoClasses(cell, dragOverBottom, dragOverCenter, dragOverTop);
+    }
+
+    /**
+     * If needed, truncates a given string to <code>maxCharacters</code>, adding <code>ellipsisString</code> instead.
+     *
+     * @param text text which should be truncated, if needed
+     * @param maxCharacters maximum amount of characters which the resulting text should have, including the
+     *                      <code>ellipsisString</code>; if set to -1, then the default length of 75 characters will be
+     *                      used
+     * @param ellipsisString string which should be used for indicating the truncation
+     * @param ellipsisPosition location in the given text where the truncation should be performed
+     * @return the new, truncated string
+     */
+    public static String truncateString(String text, int maxCharacters, String ellipsisString, EllipsisPosition ellipsisPosition) {
+        if (text == null || "".equals(text)) {
+            return text; // return original
+        }
+
+        if (ellipsisString == null) {
+            ellipsisString = "";
+        }
+
+        if (maxCharacters == -1) {
+            maxCharacters = 75; // default
+        }
+
+        maxCharacters = Math.max(ellipsisString.length(), maxCharacters);
+
+        if (text.length() > maxCharacters) {
+            // truncation necessary
+            switch (ellipsisPosition) {
+                case BEGINNING:
+                    return ellipsisString + text.substring(text.length() - (maxCharacters - ellipsisString.length()));
+                case CENTER:
+                    int partialLength = (int) Math.floor((maxCharacters - ellipsisString.length()) / 2f);
+                    return text.substring(0, partialLength) + ellipsisString + text.substring(text.length() - partialLength);
+                case ENDING:
+                    return text.substring(0, maxCharacters - ellipsisString.length()) + ellipsisString;
+            }
+        }
+
+        return text;
     }
 }

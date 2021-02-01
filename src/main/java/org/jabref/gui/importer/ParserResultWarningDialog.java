@@ -9,7 +9,6 @@ import org.jabref.logic.l10n.Localization;
 
 /**
  * Class for generating a dialog showing warnings from ParserResult
- *
  */
 public class ParserResultWarningDialog {
 
@@ -20,7 +19,7 @@ public class ParserResultWarningDialog {
      * Shows a dialog with the warnings from an import or open of a file
      *
      * @param parserResult - ParserResult for the current import/open
-     * @param jabRefFrame - the JabRefFrame
+     * @param jabRefFrame  - the JabRefFrame
      */
     public static void showParserResultWarningDialog(final ParserResult parserResult, final JabRefFrame jabRefFrame) {
         Objects.requireNonNull(parserResult);
@@ -31,12 +30,12 @@ public class ParserResultWarningDialog {
     /**
      * Shows a dialog with the warnings from an import or open of a file
      *
-     * @param parserResult - ParserResult for the current import/open
-     * @param jabRefFrame - the JabRefFrame
+     * @param parserResult   - ParserResult for the current import/open
+     * @param jabRefFrame    - the JabRefFrame
      * @param dataBaseNumber - Database tab number to activate when showing the warning dialog
      */
     public static void showParserResultWarningDialog(final ParserResult parserResult, final JabRefFrame jabRefFrame,
-            final int dataBaseNumber) {
+                                                     final int dataBaseNumber) {
         Objects.requireNonNull(parserResult);
         Objects.requireNonNull(jabRefFrame);
         // Return if no warnings
@@ -46,7 +45,7 @@ public class ParserResultWarningDialog {
 
         // Switch tab if asked to do so
         if (dataBaseNumber >= 0) {
-            jabRefFrame.showBasePanelAt(dataBaseNumber);
+            jabRefFrame.showLibraryTabAt(dataBaseNumber);
         }
 
         // Generate string with warning texts
@@ -60,10 +59,10 @@ public class ParserResultWarningDialog {
 
         // Generate dialog title
         String dialogTitle;
-        if (dataBaseNumber < 0) {
+        if (dataBaseNumber < 0 || parserResult.getPath().isEmpty()) {
             dialogTitle = Localization.lang("Warnings");
         } else {
-            dialogTitle = Localization.lang("Warnings") + " (" + parserResult.getFile().get().getName() + ")";
+            dialogTitle = Localization.lang("Warnings") + " (" + parserResult.getPath().get().getFileName() + ")";
         }
 
         // Show dialog

@@ -1,11 +1,14 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -14,19 +17,25 @@ import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GrobidCitationFetcher implements SearchBasedFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GrobidCitationFetcher.class);
+
     private static final String GROBID_URL = "http://grobid.jabref.org:8070";
     private ImportFormatPreferences importFormatPreferences;
     private GrobidService grobidService;
 
     public GrobidCitationFetcher(ImportFormatPreferences importFormatPreferences) {
+        this(importFormatPreferences, new GrobidService(GROBID_URL));
+    }
+
+    GrobidCitationFetcher(ImportFormatPreferences importFormatPreferences, GrobidService grobidService) {
         this.importFormatPreferences = importFormatPreferences;
-        this.grobidService = new GrobidService(GROBID_URL);
+        this.grobidService = grobidService;
     }
 
     /**
@@ -35,11 +44,16 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
      *
      * @return A BibTeX string if extraction is successful
      */
-    private Optional<String> parseUsingGrobid(String plainText) {
+    private Optional<String> parseUsingGrobid(String plainText) throws RuntimeException {
         try {
             return Optional.of(grobidService.processCitation(plainText, GrobidService.ConsolidateCitations.WITH_METADATA));
+        } catch (SocketTimeoutException e) {
+            String msg = "Connection timed out.";
+            LOGGER.debug(msg, e);
+            throw new RuntimeException(msg, e);
         } catch (IOException e) {
-            LOGGER.debug("Could not process citation", e);
+            String msg = "Could not process citation. " + e.getMessage();
+            LOGGER.debug(msg, e);
             return Optional.empty();
         }
     }
@@ -54,20 +68,33 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(String query) {
-        return Arrays
-                .stream(query.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
-                .map(String::trim)
-                .filter(str -> !str.isBlank())
-                .map(reference -> parseUsingGrobid(reference))
-                .flatMap(Optional::stream)
-                .map(reference -> parseBibToBibEntry(reference))
-                .flatMap(Optional::stream)
-                .collect(Collectors.toList());
+    public String getName() {
+        return "GROBID";
     }
 
     @Override
-    public String getName() {
-        return "GROBID";
+    public List<BibEntry> performSearch(String searchQuery) throws FetcherException {
+        List<BibEntry> collect;
+        try {
+            collect = Arrays.stream(searchQuery.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
+                            .map(String::trim)
+                            .filter(str -> !str.isBlank())
+                            .map(this::parseUsingGrobid)
+                            .flatMap(Optional::stream)
+                            .map(this::parseBibToBibEntry)
+                            .flatMap(Optional::stream)
+                            .collect(Collectors.toList());
+        } catch (RuntimeException e) {
+            throw new FetcherException(e.getMessage(), e.getCause());
+        }
+        return collect;
+    }
+
+    /**
+     * Not used
+     */
+    @Override
+    public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
+        return Collections.emptyList();
     }
 }

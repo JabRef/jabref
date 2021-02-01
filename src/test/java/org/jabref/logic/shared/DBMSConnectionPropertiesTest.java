@@ -1,7 +1,5 @@
 package org.jabref.logic.shared;
 
-import org.jabref.model.database.shared.DBMSType;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

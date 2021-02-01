@@ -10,14 +10,12 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.model.texparser.LatexParser;
 import org.jabref.model.texparser.LatexParserResult;
 
 import org.slf4j.Logger;
@@ -35,7 +33,7 @@ public class DefaultLatexParser implements LatexParser {
      */
     private static final String[] CITE_COMMANDS = {
             "[cC]ite(alt|alp|author|authorfull|date|num|p|t|text|title|url|year|yearpar)?",
-            "([aA]|[aA]uto|fnote|foot|footfull|full|no|[nN]ote|[pP]aren|[pP]note|[tT]ext|[sS]mart|super)cite",
+            "([aA]|[aA]uto|fnote|foot|footfull|full|no|[nN]ote|[pP]aren|[pP]note|[tT]ext|[sS]mart|super)cite([s*]?)",
             "footcitetext", "(block|text)cquote"
     };
     private static final String CITE_GROUP = "key";
@@ -63,7 +61,7 @@ public class DefaultLatexParser implements LatexParser {
 
     @Override
     public LatexParserResult parse(String citeString) {
-        matchCitation(Paths.get(""), 1, citeString);
+        matchCitation(Path.of(""), 1, citeString);
         return latexParserResult;
     }
 

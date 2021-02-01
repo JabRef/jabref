@@ -9,7 +9,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,7 +21,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.jabref.JabRefMain;
 import org.jabref.logic.util.StandardFileType;
 
 import de.undercouch.citeproc.helper.CSLUtils;
@@ -106,7 +104,7 @@ public class CitationStyle {
                 text = CSLUtils.readURLToString(url, StandardCharsets.UTF_8.toString());
             } else {
                 // if the url is null then the style is located outside the classpath
-                text = new String(Files.readAllBytes(Paths.get(styleFile)), StandardCharsets.UTF_8);
+                text = new String(Files.readAllBytes(Path.of(styleFile)), StandardCharsets.UTF_8);
             }
             return createCitationStyleFromSource(text, styleFile);
         } catch (NoSuchFileException e) {
@@ -136,7 +134,7 @@ public class CitationStyle {
             return STYLES;
         }
 
-        URL url = JabRefMain.class.getResource(STYLES_ROOT + "/acm-siggraph.csl");
+        URL url = CitationStyle.class.getResource(STYLES_ROOT + "/acm-siggraph.csl");
         Objects.requireNonNull(url);
 
         try {

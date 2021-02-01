@@ -27,5 +27,4 @@ public class LocalizationKeyParams {
 
         return translation;
     }
-
 }

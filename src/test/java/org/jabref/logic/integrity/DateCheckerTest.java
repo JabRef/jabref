@@ -2,19 +2,13 @@ package org.jabref.logic.integrity;
 
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DateCheckerTest {
 
-    private DateChecker checker;
-
-    @BeforeEach
-    void setUp() {
-        checker = new DateChecker();
-    }
+    private final DateChecker checker = new DateChecker();
 
     @Test
     void complainsAboutInvalidIsoLikeDate() {

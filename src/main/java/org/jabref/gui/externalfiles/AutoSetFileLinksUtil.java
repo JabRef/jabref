@@ -14,30 +14,51 @@ import org.jabref.gui.externalfiletype.UnknownExternalFileType;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileFinder;
 import org.jabref.logic.util.io.FileFinders;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.metadata.FilePreferences;
 import org.jabref.model.util.FileHelper;
+import org.jabref.preferences.FilePreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AutoSetFileLinksUtil {
 
+    public static class LinkFilesResult {
+        private final List<BibEntry> changedEntries = new ArrayList<>();
+        private final List<IOException> fileExceptions = new ArrayList<>();
+
+        protected void addBibEntry(BibEntry bibEntry) {
+            changedEntries.add(bibEntry);
+        }
+
+        protected void addFileException(IOException exception) {
+            fileExceptions.add(exception);
+        }
+
+        public List<BibEntry> getChangedEntries() {
+            return changedEntries;
+        }
+
+        public List<IOException> getFileExceptions() {
+            return fileExceptions;
+        }
+    }
+
     private static final Logger LOGGER = LoggerFactory.getLogger(AutoSetFileLinksUtil.class);
-    private List<Path> directories;
-    private AutoLinkPreferences autoLinkPreferences;
-    private ExternalFileTypes externalFileTypes;
+    private final List<Path> directories;
+    private final AutoLinkPreferences autoLinkPreferences;
+    private final ExternalFileTypes externalFileTypes;
 
     public AutoSetFileLinksUtil(BibDatabaseContext databaseContext, FilePreferences filePreferences, AutoLinkPreferences autoLinkPreferences, ExternalFileTypes externalFileTypes) {
-        this(databaseContext.getFileDirectoriesAsPaths(filePreferences), autoLinkPreferences, externalFileTypes);
+        this(databaseContext.getFileDirectories(filePreferences), autoLinkPreferences, externalFileTypes);
     }
 
     private AutoSetFileLinksUtil(List<Path> directories, AutoLinkPreferences autoLinkPreferences, ExternalFileTypes externalFileTypes) {
@@ -46,36 +67,41 @@ public class AutoSetFileLinksUtil {
         this.externalFileTypes = externalFileTypes;
     }
 
-    public List<BibEntry> linkAssociatedFiles(List<BibEntry> entries, NamedCompound ce) {
-        List<BibEntry> changedEntries = new ArrayList<>();
-        for (BibEntry entry : entries) {
+    public LinkFilesResult linkAssociatedFiles(List<BibEntry> entries, NamedCompound ce) {
+        LinkFilesResult result = new LinkFilesResult();
 
+        for (BibEntry entry : entries) {
             List<LinkedFile> linkedFiles = new ArrayList<>();
+
             try {
                 linkedFiles = findAssociatedNotLinkedFiles(entry);
             } catch (IOException e) {
+                result.addFileException(e);
                 LOGGER.error("Problem finding files", e);
             }
 
             if (ce != null) {
+                boolean changed = false;
+
                 for (LinkedFile linkedFile : linkedFiles) {
                     // store undo information
                     String newVal = FileFieldWriter.getStringRepresentation(linkedFile);
-
                     String oldVal = entry.getField(StandardField.FILE).orElse(null);
-
                     UndoableFieldChange fieldChange = new UndoableFieldChange(entry, StandardField.FILE, oldVal, newVal);
                     ce.addEdit(fieldChange);
+                    changed = true;
 
                     DefaultTaskExecutor.runInJavaFXThread(() -> {
                         entry.addFile(linkedFile);
                     });
                 }
 
-                changedEntries.add(entry);
+                if (changed) {
+                    result.addBibEntry(entry);
+                }
             }
         }
-        return changedEntries;
+        return result;
     }
 
     public List<LinkedFile> findAssociatedNotLinkedFiles(BibEntry entry) throws IOException {

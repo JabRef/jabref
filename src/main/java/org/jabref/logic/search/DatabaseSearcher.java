@@ -35,5 +35,4 @@ public class DatabaseSearcher {
         List<BibEntry> matchEntries = database.getEntries().stream().filter(query::isMatch).collect(Collectors.toList());
         return BibDatabases.purgeEmptyEntries(matchEntries);
     }
-
 }

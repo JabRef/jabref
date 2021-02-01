@@ -11,7 +11,7 @@ public class CreateDocBook5Editors implements LayoutFormatter {
 
     @Override
     public String format(String fieldText) {
-        //		<editor><personname><firstname>L.</firstname><surname>Xue</surname></personname></editor>
+        // <editor><personname><firstname>L.</firstname><surname>Xue</surname></personname></editor>
         StringBuilder sb = new StringBuilder(100);
         AuthorList al = AuthorList.parse(fieldText);
         DocBookAuthorFormatter formatter = new DocBookAuthorFormatter();

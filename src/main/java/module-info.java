@@ -19,6 +19,7 @@ open module org.jabref {
     requires de.jensd.fx.fontawesomefx.materialdesignicons;
     requires org.controlsfx.controls;
     requires org.fxmisc.richtext;
+    requires com.tobiasdiez.easybind;
 
     provides com.airhacks.afterburner.views.ResourceLocator
             with org.jabref.gui.util.JabRefResourceLocator;
@@ -46,25 +47,20 @@ open module org.jabref {
     requires applicationinsights.core;
 
     // Libre Office
-    requires org.jabref.thirdparty.libreoffice;
+    requires org.libreoffice.uno;
 
     // Other modules
     requires commons.logging;
     requires com.google.common;
-    requires easybind;
     requires jakarta.inject;
     requires org.apache.pdfbox;
     requires reactfx;
     requires commons.cli;
     requires com.github.tomtung.latex2unicode;
+    requires fastparse;
     requires jbibtex;
     requires citeproc.java;
     requires antlr.runtime;
-    requires org.graalvm.truffle;
-    requires org.graalvm.sdk;
-    requires transitive org.graalvm.js;
-    requires java.scripting;
-    requires jdk.internal.vm.compiler;
     requires org.apache.xmpbox;
     requires de.saxsys.mvvmfx.validation;
     requires com.google.gson;
@@ -81,11 +77,18 @@ open module org.jabref {
     requires org.apache.commons.lang3;
     requires org.antlr.antlr4.runtime;
     requires flowless;
-    requires org.apache.tika.core;
+    requires tika.core;
 
     requires flexmark;
     requires flexmark.ext.gfm.strikethrough;
     requires flexmark.ext.gfm.tasklist;
     requires flexmark.util.ast;
     requires flexmark.util.data;
+    requires com.h2database.mvstore;
+    requires lucene.queryparser;
+    requires lucene.core;
+    requires org.eclipse.jgit;
+    requires com.fasterxml.jackson.databind;
+    requires com.fasterxml.jackson.dataformat.yaml;
+    requires com.fasterxml.jackson.datatype.jsr310;
 }

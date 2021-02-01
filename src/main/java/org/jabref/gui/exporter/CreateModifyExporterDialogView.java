@@ -4,13 +4,12 @@ import javax.inject.Inject;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.preferences.PreferencesService;
 
@@ -18,9 +17,8 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class CreateModifyExporterDialogView extends BaseDialog<ExporterViewModel> {
 
-    @Inject private final JournalAbbreviationLoader loader;
+    @Inject private JournalAbbreviationRepository repository;
     private final ExporterViewModel exporter;
-    @FXML private Button browseButton;
     @FXML private TextField name;
     @FXML private TextField fileName;
     @FXML private TextField extension;
@@ -29,13 +27,9 @@ public class CreateModifyExporterDialogView extends BaseDialog<ExporterViewModel
     @Inject private PreferencesService preferences;
     private CreateModifyExporterDialogViewModel viewModel;
 
-    public CreateModifyExporterDialogView(ExporterViewModel exporter, DialogService dialogService,
-                                          PreferencesService preferences, JournalAbbreviationLoader loader) {
+    public CreateModifyExporterDialogView(ExporterViewModel exporter) {
         this.setTitle(Localization.lang("Customize Export Formats"));
         this.exporter = exporter;
-        this.loader = loader;
-        this.dialogService = dialogService;
-        this.preferences = preferences;
 
         ViewLoader.view(this)
                   .load()
@@ -52,7 +46,7 @@ public class CreateModifyExporterDialogView extends BaseDialog<ExporterViewModel
 
     @FXML
     private void initialize() {
-        viewModel = new CreateModifyExporterDialogViewModel(exporter, dialogService, preferences, loader);
+        viewModel = new CreateModifyExporterDialogViewModel(exporter, dialogService, preferences, repository);
         name.textProperty().bindBidirectional(viewModel.getName());
         fileName.textProperty().bindBidirectional(viewModel.getLayoutFileName());
         extension.textProperty().bindBidirectional(viewModel.getExtension());

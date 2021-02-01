@@ -21,7 +21,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
 
 class ChangeDisplayDialog extends BaseDialog<Boolean> {
 
@@ -55,15 +55,15 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
         });
 
         VBox leftContent = new VBox(changesList,
-                                    selectAllChangesFromDisk,
-                                    unselectAllAcceptChanges);
+                selectAllChangesFromDisk,
+                unselectAllAcceptChanges);
 
         ScrollPane leftScroll = new ScrollPane(leftContent);
         leftScroll.setFitToHeight(true);
         leftScroll.setFitToWidth(true);
 
         pane.getItems().addAll(leftScroll, infoPanel);
-        pane.setResizableWithParent(leftScroll, false);
+        SplitPane.setResizableWithParent(leftScroll, false);
 
         getDialogPane().setContent(pane);
 
@@ -74,29 +74,28 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
         ButtonType dismissChanges = new ButtonType(Localization.lang("Dismiss"), ButtonData.CANCEL_CLOSE);
 
         getDialogPane().getButtonTypes().setAll(new ButtonType(Localization.lang("Accept changes"), ButtonBar.ButtonData.APPLY),
-                                                dismissChanges);
+                dismissChanges);
 
         setResultConverter(button -> {
             if (button == dismissChanges) {
                 return false;
-
             } else {
                 // Perform all accepted changes
                 NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
                 for (DatabaseChangeViewModel change : changes) {
                     if (change instanceof EntryChangeViewModel) {
-                        change.makeChange(database, ce); //We don't have a checkbox for accept and always get the correct merged entry, the accept property in this special case only controls the radio buttons selection
+                        // We don't have a checkbox for accept and always get the correct merged entry, the accept property in this special case only controls the radio buttons selection
+                        change.makeChange(database, ce);
                     } else if (change.isAccepted()) {
                         change.makeChange(database, ce);
                     }
                 }
                 ce.end();
-                //TODO: panel.getUndoManager().addEdit(ce);
+                // TODO: panel.getUndoManager().addEdit(ce);
 
                 return true;
             }
         });
-
     }
 
     private void selectedChangeChanged(DatabaseChangeViewModel currentChange) {
@@ -107,11 +106,9 @@ class ChangeDisplayDialog extends BaseDialog<Boolean> {
                 cb.setManaged(true);
                 infoPanel.setBottom(cb);
                 cb.selectedProperty().bindBidirectional(currentChange.acceptedProperty());
-
             } else {
                 cb.setManaged(false);
             }
-
         }
     }
 }

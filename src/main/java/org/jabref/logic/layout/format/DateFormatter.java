@@ -20,5 +20,4 @@ public class DateFormatter implements ParamLayoutFormatter {
     public void setArgument(String arg) {
         formatString = arg;
     }
-
 }

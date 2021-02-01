@@ -47,7 +47,7 @@ public class URLUtil {
             // extract url parameter
             String[] pairs = query.split("&");
 
-            for (String pair: pairs) {
+            for (String pair : pairs) {
                 // "clean" url is decoded value of "url" parameter
                 if (pair.startsWith("url=")) {
                     String value = pair.substring(pair.indexOf('=') + 1);
@@ -67,6 +67,7 @@ public class URLUtil {
 
     /**
      * Checks whether the given String is a URL.
+     * <p>
      * Currently only checks for a protocol String.
      *
      * @param url the String to check for a URL
@@ -78,6 +79,7 @@ public class URLUtil {
 
     /**
      * Look for the last '.' in the link, and return the following characters.
+     * <p>
      * This gives the extension for most reasonably named links.
      *
      * @param link The link

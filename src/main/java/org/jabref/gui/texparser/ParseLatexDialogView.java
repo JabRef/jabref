@@ -14,6 +14,7 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.TaskExecutor;
@@ -24,9 +25,9 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import org.controlsfx.control.CheckTreeView;
-import org.fxmisc.easybind.EasyBind;
 
 public class ParseLatexDialogView extends BaseDialog<Void> {
 
@@ -76,7 +77,7 @@ public class ParseLatexDialogView extends BaseDialog<Void> {
         EasyBind.subscribe(fileTreeView.rootProperty(), root -> {
             ((CheckBoxTreeItem<FileNodeViewModel>) root).setSelected(true);
             root.setExpanded(true);
-            EasyBind.listBind(viewModel.getCheckedFileList(), fileTreeView.getCheckModel().getCheckedItems());
+            EasyBind.bindContent(viewModel.getCheckedFileList(), fileTreeView.getCheckModel().getCheckedItems());
         });
 
         latexDirectoryField.textProperty().bindBidirectional(viewModel.latexFileDirectoryProperty());

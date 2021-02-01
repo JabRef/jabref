@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -22,7 +21,6 @@ import org.jabref.model.metadata.MetaData;
 public class ParserResult {
     private final Set<BibEntryType> entryTypes;
     private final List<String> warnings = new ArrayList<>();
-    private final List<String> duplicateKeys = new ArrayList<>();
     private BibDatabase database;
     private MetaData metaData;
     private Path file;
@@ -35,7 +33,7 @@ public class ParserResult {
     }
 
     public ParserResult(Collection<BibEntry> entries) {
-        this(BibDatabases.createDatabase(BibDatabases.purgeEmptyEntries(entries)));
+        this(new BibDatabase(BibDatabases.purgeEmptyEntries(entries)));
     }
 
     public ParserResult(BibDatabase database) {
@@ -94,6 +92,15 @@ public class ParserResult {
         return entryTypes;
     }
 
+    public Optional<Path> getPath() {
+        return Optional.ofNullable(file);
+    }
+
+    /**
+     * @return the file object of the database file
+     * @deprecated use {@link #getPath()}} instead
+     */
+    @Deprecated
     public Optional<File> getFile() {
         return Optional.ofNullable(file).map(Path::toFile);
     }
@@ -126,35 +133,6 @@ public class ParserResult {
         return new ArrayList<>(warnings);
     }
 
-    /**
-     * Add a key to the list of duplicated BibTeX keys found in the database.
-     *
-     * @param key The duplicated key
-     */
-    public void addDuplicateKey(String key) {
-        if (!duplicateKeys.contains(key)) {
-            duplicateKeys.add(key);
-        }
-    }
-
-    /**
-     * Query whether any duplicated BibTeX keys have been found in the database.
-     *
-     * @return true if there is at least one duplicate key.
-     */
-    public boolean hasDuplicateKeys() {
-        return !duplicateKeys.isEmpty();
-    }
-
-    /**
-     * Get all duplicated keys found in the database.
-     *
-     * @return A list containing the duplicated keys.
-     */
-    public List<String> getDuplicateKeys() {
-        return duplicateKeys;
-    }
-
     public boolean isInvalid() {
         return invalid;
     }
@@ -164,7 +142,7 @@ public class ParserResult {
     }
 
     public String getErrorMessage() {
-        return warnings().stream().collect(Collectors.joining(" "));
+        return String.join(" ", warnings());
     }
 
     public BibDatabaseContext getDatabaseContext() {

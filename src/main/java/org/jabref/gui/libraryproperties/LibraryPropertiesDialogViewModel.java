@@ -2,7 +2,6 @@ package org.jabref.gui.libraryproperties;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Set;
 
@@ -19,14 +18,15 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.cleanup.Cleanups;
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
+import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.l10n.Encodings;
-import org.jabref.model.cleanup.FieldFormatterCleanup;
-import org.jabref.model.cleanup.FieldFormatterCleanups;
+import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.database.shared.DatabaseLocation;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.preferences.PreferencesService;
@@ -107,6 +107,8 @@ public class LibraryPropertiesDialogViewModel {
         }
 
         Set<Field> fieldNames = FieldFactory.getCommonFields();
+        // allow entrytype field as sort criterion
+        fieldNames.add(InternalField.TYPE_HEADER);
         primarySortFieldsProperty.addAll(fieldNames);
         secondarySortFieldsProperty.addAll(fieldNames);
         tertiarySortFieldsProperty.addAll(fieldNames);
@@ -126,9 +128,8 @@ public class LibraryPropertiesDialogViewModel {
             cleanupsDisableProperty().setValue(!value.isEnabled());
             cleanupsProperty().setValue(FXCollections.observableArrayList(value.getConfiguredActions()));
         }, () -> {
-            initialMetaData.setSaveActions(Cleanups.DEFAULT_SAVE_ACTIONS);
-           cleanupsDisableProperty().setValue(!Cleanups.DEFAULT_SAVE_ACTIONS.isEnabled());
-           cleanupsProperty().setValue(FXCollections.observableArrayList(Cleanups.DEFAULT_SAVE_ACTIONS.getConfiguredActions()));
+            cleanupsDisableProperty().setValue(!Cleanups.DEFAULT_SAVE_ACTIONS.isEnabled());
+            cleanupsProperty().setValue(FXCollections.observableArrayList(Cleanups.DEFAULT_SAVE_ACTIONS.getConfiguredActions()));
         });
     }
 
@@ -155,7 +156,7 @@ public class LibraryPropertiesDialogViewModel {
         if (latexFileDirectory.isEmpty()) {
             newMetaData.clearLatexFileDirectory(preferences.getUser());
         } else {
-            newMetaData.setLatexFileDirectory(preferences.getUser(), Paths.get(latexFileDirectory));
+            newMetaData.setLatexFileDirectory(preferences.getUser(), Path.of(latexFileDirectory));
         }
 
         if (libraryProtectedProperty.getValue()) {
@@ -315,7 +316,11 @@ public class LibraryPropertiesDialogViewModel {
 
     // FieldFormatterCleanupsPanel
 
-    public BooleanProperty cleanupsDisableProperty() { return cleanupsDisableProperty; }
+    public BooleanProperty cleanupsDisableProperty() {
+        return cleanupsDisableProperty;
+    }
 
-    public ListProperty<FieldFormatterCleanup> cleanupsProperty() { return cleanupsProperty; }
+    public ListProperty<FieldFormatterCleanup> cleanupsProperty() {
+        return cleanupsProperty;
+    }
 }

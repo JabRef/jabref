@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.texparser.Citation;
@@ -20,11 +21,13 @@ public class TexBibEntriesResolver {
 
     private final BibDatabase masterDatabase;
     private final ImportFormatPreferences importFormatPreferences;
+    private final TimestampPreferences timestampPreferences;
     private final FileUpdateMonitor fileMonitor;
 
-    public TexBibEntriesResolver(BibDatabase masterDatabase, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
+    public TexBibEntriesResolver(BibDatabase masterDatabase, ImportFormatPreferences importFormatPreferences, TimestampPreferences timestampPreferences, FileUpdateMonitor fileMonitor) {
         this.masterDatabase = masterDatabase;
         this.importFormatPreferences = importFormatPreferences;
+        this.timestampPreferences = timestampPreferences;
         this.fileMonitor = fileMonitor;
     }
 
@@ -36,7 +39,7 @@ public class TexBibEntriesResolver {
 
         // Preload databases from BIB files.
         Map<Path, BibDatabase> bibDatabases = resolverResult.getBibFiles().values().stream().distinct().collect(Collectors.toMap(
-                Function.identity(), path -> OpenDatabase.loadDatabase(path.toString(), importFormatPreferences, fileMonitor).getDatabase()));
+                Function.identity(), path -> OpenDatabase.loadDatabase(path.toString(), importFormatPreferences, timestampPreferences, fileMonitor).getDatabase()));
 
         // Get all pairs Entry<String entryKey, Citation>.
         Stream<Map.Entry<String, Citation>> citationsStream = latexParserResult.getCitations().entries().stream().distinct();
@@ -52,9 +55,9 @@ public class TexBibEntriesResolver {
     private Stream<? extends BibEntry> apply(Map.Entry<String, Citation> mapEntry, LatexParserResult latexParserResult, Map<Path, BibDatabase> bibDatabases) {
         return latexParserResult.getBibFiles().get(mapEntry.getValue().getPath()).stream().distinct().flatMap(bibFile ->
                 // Get a specific entry from an entryKey and a BIB file.
-                bibDatabases.get(bibFile).getEntriesByKey(mapEntry.getKey()).stream().distinct()
+                bibDatabases.get(bibFile).getEntriesByCitationKey(mapEntry.getKey()).stream().distinct()
                             // Check if there is already an entry with the same key in the given database.
-                            .filter(entry -> !entry.equals(masterDatabase.getEntryByKey(entry.getCiteKeyOptional().orElse("")).orElse(new BibEntry())))
+                            .filter(entry -> !entry.equals(masterDatabase.getEntryByCitationKey(entry.getCitationKey().orElse("")).orElse(new BibEntry())))
                             // Add cross-referencing data to the entry (fill empty fields).
                             .map(entry -> addCrossReferencingData(entry, bibFile, bibDatabases)));
     }

@@ -1,7 +1,7 @@
 package org.jabref.model.entry;
 
 /**
- *  Stores all information needed to manage entries on a shared (SQL) database.
+ * Stores all information needed to manage entries on a shared (SQL) database.
  */
 public class SharedBibEntryData {
 
@@ -33,5 +33,4 @@ public class SharedBibEntryData {
     public void setVersion(int version) {
         this.version = version;
     }
-
 }

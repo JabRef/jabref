@@ -6,9 +6,8 @@ import java.util.List;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 
-import org.jabref.Globals;
-import org.jabref.gui.Dialog;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
@@ -18,7 +17,6 @@ import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
@@ -43,10 +41,9 @@ public class IntegrityCheckAction extends SimpleCommand {
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
         IntegrityCheck check = new IntegrityCheck(database,
                 Globals.prefs.getFilePreferences(),
-                Globals.prefs.getBibtexKeyPatternPreferences(),
-                Globals.journalAbbreviationLoader.getRepository(Globals.prefs.getJournalAbbreviationPreferences()),
-                Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY),
-                Globals.prefs.getBoolean(JabRefPreferences.ALLOW_INTEGER_EDITION_BIBTEX));
+                Globals.prefs.getCitationKeyPatternPreferences(),
+                Globals.journalAbbreviationRepository,
+                Globals.prefs.getGeneralPreferences().shouldAllowIntegerEditionBibtex());
 
         Task<List<IntegrityMessage>> task = new Task<>() {
             @Override
@@ -54,6 +51,7 @@ public class IntegrityCheckAction extends SimpleCommand {
                 List<IntegrityMessage> result = new ArrayList<>();
 
                 ObservableList<BibEntry> entries = database.getDatabase().getEntries();
+                result.addAll(check.checkDatabase(database.getDatabase()));
                 for (int i = 0; i < entries.size(); i++) {
                     if (isCancelled()) {
                         break;
@@ -72,13 +70,12 @@ public class IntegrityCheckAction extends SimpleCommand {
             if (messages.isEmpty()) {
                 dialogService.notify(Localization.lang("No problems found."));
             } else {
-                Dialog<Void> dialog = new IntegrityCheckDialog(messages, frame.getCurrentBasePanel());
-                dialog.showAndWait();
+                dialogService.showCustomDialogAndWait(new IntegrityCheckDialog(messages, frame.getCurrentLibraryTab()));
             }
         });
-        task.setOnFailed(event -> dialogService.showErrorDialogAndWait("Integrity check failed."));
+        task.setOnFailed(event -> dialogService.showErrorDialogAndWait("Integrity check failed.", task.getException()));
 
-        dialogService.showProgressDialogAndWait(
+        dialogService.showProgressDialog(
                 Localization.lang("Checking integrity..."),
                 Localization.lang("Checking integrity..."),
                 task);

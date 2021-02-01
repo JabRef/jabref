@@ -19,9 +19,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.shared.exception.OfflineLockException;
-import org.jabref.model.database.shared.DBMSType;
-import org.jabref.model.database.shared.DatabaseConnection;
-import org.jabref.model.database.shared.DatabaseConnectionProperties;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.SharedBibEntryData;
 import org.jabref.model.entry.event.EntriesEventSource;
@@ -136,10 +133,10 @@ public abstract class DBMSProcessor {
      * For use in test only. Inserts the BibEntry into the shared database.
      *
      * @param bibEntry {@link BibEntry} to be inserted.
-     * */
-     public void insertEntry(BibEntry bibEntry) {
-         insertEntries(Collections.singletonList(bibEntry));
-     }
+     */
+    public void insertEntry(BibEntry bibEntry) {
+        insertEntries(Collections.singletonList(bibEntry));
+    }
 
     /**
      * Inserts the List of BibEntry into the shared database.
@@ -168,12 +165,12 @@ public abstract class DBMSProcessor {
                 .append(escape("TYPE"))
                 .append(") VALUES(?)");
         // Number of commas is bibEntries.size() - 1
-        for (int i = 0; i < bibEntries.size() - 1; i++) {
+        for (int i = 0; i < (bibEntries.size() - 1); i++) {
             insertIntoEntryQuery.append(", (?)");
         }
 
         try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery.toString(),
-                new String[]{"SHARED_ID"})) {
+                new String[] {"SHARED_ID"})) {
             for (int i = 0; i < bibEntries.size(); i++) {
                 preparedEntryStatement.setString(i + 1, bibEntries.get(i).getType().getName());
             }
@@ -228,8 +225,8 @@ public abstract class DBMSProcessor {
         }
         return bibEntries.stream().filter((entry) ->
                 !remoteIds.contains(entry.getSharedBibEntryData().getSharedID()))
-                .collect(Collectors.toList());
-        }
+                         .collect(Collectors.toList());
+    }
 
     /**
      * Inserts the given list of BibEntry into FIELD table.
@@ -242,6 +239,7 @@ public abstract class DBMSProcessor {
             // Coerce to ArrayList in order to use List.get()
             List<List<Field>> fields = bibEntries.stream().map(bibEntry -> new ArrayList<>(bibEntry.getFields()))
                                                  .collect(Collectors.toList());
+
             StringBuilder insertFieldQuery = new StringBuilder()
                     .append("INSERT INTO ")
                     .append(escape("FIELD"))
@@ -256,8 +254,13 @@ public abstract class DBMSProcessor {
             for (List<Field> entryFields : fields) {
                 numFields += entryFields.size();
             }
+
+            if (numFields == 0) {
+                return; // Prevent SQL Exception
+            }
+
             // Number of commas is fields.size() - 1
-            for (int i = 0; i < numFields - 1; i++) {
+            for (int i = 0; i < (numFields - 1); i++) {
                 insertFieldQuery.append(", (?, ?, ?)");
             }
             try (PreparedStatement preparedFieldStatement = connection.prepareStatement(insertFieldQuery.toString())) {
@@ -496,7 +499,8 @@ public abstract class DBMSProcessor {
              .append("F.").append(escape("VALUE"))
              .append(" FROM ")
              .append(escape("ENTRY"))
-             .append(" inner join ")
+             // Handle special case if entry does not have any fields (yet)
+             .append(" left outer join ")
              .append(escape("FIELD"))
              .append(" F on ")
              .append(escape("ENTRY")).append(".").append(escape("SHARED_ID"))
@@ -511,41 +515,37 @@ public abstract class DBMSProcessor {
         query.append(" order by ")
              .append(escape("SHARED_ID"));
 
-        PreparedStatement preparedStatement;
-        try {
-            preparedStatement = connection.prepareStatement(query.toString());
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query.toString())) {
             for (int i = 0; i < sharedIDs.size(); i++) {
                 preparedStatement.setInt(i + 1, sharedIDs.get(i));
             }
-        } catch (SQLException e) {
-            LOGGER.debug("Executed >{}<", query.toString());
-            LOGGER.error("SQL Error", e);
-            return Collections.emptyList();
-        }
-        try (ResultSet selectEntryResultSet = preparedStatement.executeQuery()) {
-            BibEntry bibEntry = null;
-            int lastId = -1;
-            while (selectEntryResultSet.next()) {
-                // We get a list of field values of bib entries "grouped" by bib entries
-                // Thus, the first change in the shared id leads to a new BibEntry
-                if (selectEntryResultSet.getInt("SHARED_ID") > lastId) {
-                    bibEntry = new BibEntry();
-                    bibEntry.getSharedBibEntryData().setSharedID(selectEntryResultSet.getInt("SHARED_ID"));
-                    bibEntry.setType(EntryTypeFactory.parse(selectEntryResultSet.getString("TYPE")));
-                    bibEntry.getSharedBibEntryData().setVersion(selectEntryResultSet.getInt("VERSION"));
-                    sharedEntries.add(bibEntry);
-                    lastId = selectEntryResultSet.getInt("SHARED_ID");
-                }
 
-                // In all cases, we set the field value of the newly created BibEntry object
-                String value = selectEntryResultSet.getString("VALUE");
-                if (value != null) {
-                    bibEntry.setField(FieldFactory.parseField(selectEntryResultSet.getString("NAME")), value, EntriesEventSource.SHARED);
+            try (ResultSet selectEntryResultSet = preparedStatement.executeQuery()) {
+                BibEntry bibEntry = null;
+                int lastId = -1;
+                while (selectEntryResultSet.next()) {
+                    // We get a list of field values of bib entries "grouped" by bib entries
+                    // Thus, the first change in the shared id leads to a new BibEntry
+                    if (selectEntryResultSet.getInt("SHARED_ID") > lastId) {
+                        bibEntry = new BibEntry();
+                        bibEntry.getSharedBibEntryData().setSharedID(selectEntryResultSet.getInt("SHARED_ID"));
+                        bibEntry.setType(EntryTypeFactory.parse(selectEntryResultSet.getString("TYPE")));
+                        bibEntry.getSharedBibEntryData().setVersion(selectEntryResultSet.getInt("VERSION"));
+                        sharedEntries.add(bibEntry);
+                        lastId = selectEntryResultSet.getInt("SHARED_ID");
+                    }
+
+                    // In all cases, we set the field value of the newly created BibEntry object
+                    String value = selectEntryResultSet.getString("VALUE");
+                    if (value != null) {
+                        bibEntry.setField(FieldFactory.parseField(selectEntryResultSet.getString("NAME")), value, EntriesEventSource.SHARED);
+                    }
                 }
             }
         } catch (SQLException e) {
             LOGGER.error("Executed >{}<", query.toString());
             LOGGER.error("SQL Error", e);
+            return Collections.emptyList();
         }
 
         return sharedEntries;

@@ -6,18 +6,18 @@ import org.jabref.model.entry.field.Field;
 
 public class XmpPreferences {
 
-    private final boolean useXMPPrivacyFilter;
+    private final boolean useXmpPrivacyFilter;
     private final Set<Field> xmpPrivacyFilter;
     private final Character keywordSeparator;
 
-    public XmpPreferences(boolean useXMPPrivacyFilter, Set<Field> xmpPrivacyFilter, Character keywordSeparator) {
-        this.useXMPPrivacyFilter = useXMPPrivacyFilter;
+    public XmpPreferences(boolean useXmpPrivacyFilter, Set<Field> xmpPrivacyFilter, Character keywordSeparator) {
+        this.useXmpPrivacyFilter = useXmpPrivacyFilter;
         this.xmpPrivacyFilter = xmpPrivacyFilter;
         this.keywordSeparator = keywordSeparator;
     }
 
-    public boolean isUseXMPPrivacyFilter() {
-        return useXMPPrivacyFilter;
+    public boolean shouldUseXmpPrivacyFilter() {
+        return useXmpPrivacyFilter;
     }
 
     public Set<Field> getXmpPrivacyFilter() {

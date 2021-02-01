@@ -5,7 +5,6 @@ import org.jabref.model.entry.AuthorList;
 
 /**
  * Author First First prints ....
- *
  */
 public class AuthorFirstFirst implements LayoutFormatter {
 

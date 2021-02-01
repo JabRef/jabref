@@ -25,13 +25,13 @@ class EntryChangeViewModel extends DatabaseChangeViewModel {
         this.oldEntry = entry;
         this.newEntry = newEntry;
 
-        name = entry.getCiteKeyOptional()
+        name = entry.getCitationKey()
                     .map(key -> Localization.lang("Modified entry") + ": '" + key + '\'')
                     .orElse(Localization.lang("Modified entry"));
     }
 
     /**
-     *   We override this here to select the radio buttons accordingly
+     * We override this here to select the radio buttons accordingly
      */
     @Override
     public void setAccepted(boolean accepted) {

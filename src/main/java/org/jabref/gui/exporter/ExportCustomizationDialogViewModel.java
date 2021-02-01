@@ -11,7 +11,7 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.exporter.TemplateExporter;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.preferences.PreferencesService;
 
 public class ExportCustomizationDialogViewModel extends AbstractViewModel {
@@ -21,25 +21,24 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
 
     private final PreferencesService preferences;
     private final DialogService dialogService;
-    private final JournalAbbreviationLoader loader;
+    private final JournalAbbreviationRepository repository;
 
-    public ExportCustomizationDialogViewModel(PreferencesService preferences, DialogService dialogService, JournalAbbreviationLoader loader) {
+    public ExportCustomizationDialogViewModel(PreferencesService preferences, DialogService dialogService, JournalAbbreviationRepository repository) {
         this.preferences = preferences;
         this.dialogService = dialogService;
-        this.loader = loader;
+        this.repository = repository;
         loadExporters();
     }
 
     private void loadExporters() {
-        List<TemplateExporter> exportersLogic = preferences.getCustomExportFormats(loader);
+        List<TemplateExporter> exportersLogic = preferences.getCustomExportFormats(repository);
         for (TemplateExporter exporter : exportersLogic) {
             exporters.add(new ExporterViewModel(exporter));
         }
     }
 
     public void addExporter() {
-        CreateModifyExporterDialogView dialog = new CreateModifyExporterDialogView(null, dialogService, preferences,
-                loader);
+        CreateModifyExporterDialogView dialog = new CreateModifyExporterDialogView(null);
         Optional<ExporterViewModel> exporter = dialogService.showCustomDialogAndWait(dialog);
         if ((exporter != null) && exporter.isPresent()) {
             exporters.add(exporter.get());
@@ -53,7 +52,7 @@ public class ExportCustomizationDialogViewModel extends AbstractViewModel {
             return;
         }
         exporterToModify = selectedExporters.get(0);
-        dialog = new CreateModifyExporterDialogView(exporterToModify, dialogService, preferences, loader);
+        dialog = new CreateModifyExporterDialogView(exporterToModify);
         Optional<ExporterViewModel> exporter = dialogService.showCustomDialogAndWait(dialog);
         if ((exporter != null) && exporter.isPresent()) {
             exporters.remove(exporterToModify);

@@ -53,7 +53,6 @@ public class PdfContentImporter extends Importer {
 
     public PdfContentImporter(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
-
     }
 
     /**
@@ -164,7 +163,7 @@ public class PdfContentImporter extends Importer {
                             res = res.concat(" and ");
                         }
                         if ("et".equalsIgnoreCase(splitNames[i]) && (splitNames.length > (i + 1))
-                            && "al.".equalsIgnoreCase(splitNames[i + 1])) {
+                                && "al.".equalsIgnoreCase(splitNames[i + 1])) {
                             res = res.concat("others");
                             break;
                         } else {
@@ -192,14 +191,14 @@ public class PdfContentImporter extends Importer {
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
         throw new UnsupportedOperationException("PdfContentImporter does not support importDatabase(BufferedReader reader)."
-                                                + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
+                + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
     }
 
     @Override
     public ParserResult importDatabase(String data) throws IOException {
         Objects.requireNonNull(data);
         throw new UnsupportedOperationException("PdfContentImporter does not support importDatabase(String data)."
-                                                + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
+                + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
     }
 
     @Override
@@ -213,26 +212,23 @@ public class PdfContentImporter extends Importer {
                 ParserResult parserResult = new ParserResult(result);
                 Optional<BibEntry> entry = new DoiFetcher(importFormatPreferences).performSearchById(doi.get().getDOI());
                 entry.ifPresent(parserResult.getDatabase()::insertEntry);
-                entry.ifPresent(bibEntry -> bibEntry.addFile(new LinkedFile("", filePath.toAbsolutePath().toString(), "PDF")));
+                entry.ifPresent(bibEntry -> bibEntry.addFile(new LinkedFile("", filePath.toAbsolutePath(), "PDF")));
                 return parserResult;
             }
 
             Optional<BibEntry> entry = getEntryFromPDFContent(firstPageContents, OS.NEWLINE);
             entry.ifPresent(result::add);
-
         } catch (EncryptedPdfsNotSupportedException e) {
             return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
-        } catch (IOException exception) {
+        } catch (IOException | FetcherException exception) {
             return ParserResult.fromError(exception);
-        } catch (FetcherException e) {
-            return ParserResult.fromErrorMessage(e.getMessage());
         }
 
-        result.forEach(entry -> entry.addFile(new LinkedFile("", filePath.toAbsolutePath().toString(), "PDF")));
+        result.forEach(entry -> entry.addFile(new LinkedFile("", filePath.toAbsolutePath(), "PDF")));
         return new ParserResult(result);
     }
 
-    //make this method package visible so we can test it
+    // make this method package visible so we can test it
     Optional<BibEntry> getEntryFromPDFContent(String firstpageContents, String lineSeparator) {
 
         // idea: split[] contains the different lines
@@ -248,7 +244,7 @@ public class PdfContentImporter extends Importer {
 
         lines = firstpageContentsUnifiedLineBreaks.split(lineSeparator);
 
-        lineIndex = 0; //to prevent array index out of bounds exception on second run we need to reset i to zero
+        lineIndex = 0; // to prevent array index out of bounds exception on second run we need to reset i to zero
 
         proceedToNextNonEmptyLine();
         if (lineIndex >= lines.length) {
@@ -300,7 +296,7 @@ public class PdfContentImporter extends Importer {
         fillCurStringWithNonEmptyLines();
         title = streamlineTitle(curString);
         curString = "";
-        //i points to the next non-empty line
+        // i points to the next non-empty line
 
         // after title: authors
         author = null;
@@ -391,9 +387,9 @@ public class PdfContentImporter extends Importer {
                 editor = streamlineNames(curString.substring(0, pos - 1));
 
                 int edslength = "(Eds.)".length();
-                int posWithEditor = pos + edslength + 2;//+2 because of ":" after (Eds.) and the subsequent space
+                int posWithEditor = pos + edslength + 2; // +2 because of ":" after (Eds.) and the subsequent space
                 if (posWithEditor > curString.length()) {
-                    curString = curString.substring(posWithEditor - 2); //we don't have any spaces after Eds so we substract the 2
+                    curString = curString.substring(posWithEditor - 2); // we don't have any spaces after Eds so we substract the 2
                 } else {
                     curString = curString.substring(posWithEditor);
                 }
@@ -420,15 +416,17 @@ public class PdfContentImporter extends Importer {
                     }
                     if (pos >= 0) {
                         pos += 3;
-                        char delimiter = curString.charAt(pos);
-                        if ((delimiter == ':') || (delimiter == ' ')) {
-                            pos++;
-                        }
-                        int nextSpace = curString.indexOf(' ', pos);
-                        if (nextSpace > 0) {
-                            DOI = curString.substring(pos, nextSpace);
-                        } else {
-                            DOI = curString.substring(pos);
+                        if (curString.length() > pos) {
+                            char delimiter = curString.charAt(pos);
+                            if ((delimiter == ':') || (delimiter == ' ')) {
+                                pos++;
+                            }
+                            int nextSpace = curString.indexOf(' ', pos);
+                            if (nextSpace > 0) {
+                                DOI = curString.substring(pos, nextSpace);
+                            } else {
+                                DOI = curString.substring(pos);
+                            }
                         }
                     }
                 }
@@ -535,7 +533,6 @@ public class PdfContentImporter extends Importer {
         if (m.find()) {
             year = curString.substring(m.start(), m.end());
         }
-
     }
 
     /**

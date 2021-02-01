@@ -1,21 +1,21 @@
 package org.jabref.logic.net;
 
 /*
-import com.github.tomakehurst.wiremock.WireMockServer;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+ import com.github.tomakehurst.wiremock.WireMockServer;
+ import org.junit.jupiter.api.AfterEach;
+ import org.junit.jupiter.api.BeforeEach;
+ import org.junit.jupiter.api.Test;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.any;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.head;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+ import static com.github.tomakehurst.wiremock.client.WireMock.any;
+ import static com.github.tomakehurst.wiremock.client.WireMock.get;
+ import static com.github.tomakehurst.wiremock.client.WireMock.head;
+ import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+ import static org.junit.jupiter.api.Assertions.assertFalse;
+ import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class MimeTypeDetectorTest {
+ class MimeTypeDetectorTest {
 
     private WireMockServer wireMockServer = new WireMockServer();
 
@@ -105,5 +105,5 @@ class MimeTypeDetectorTest {
 
         assertTrue(new URLDownload(mimeTypeVariation).isMimeType("application/pdf"));
     }
-}
+ }
 */

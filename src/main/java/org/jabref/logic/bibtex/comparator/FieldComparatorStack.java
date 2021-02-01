@@ -12,7 +12,6 @@ public class FieldComparatorStack<T> implements Comparator<T> {
 
     private final List<? extends Comparator<? super T>> comparators;
 
-
     public FieldComparatorStack(List<? extends Comparator<? super T>> comparators) {
         this.comparators = comparators;
     }

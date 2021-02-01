@@ -9,6 +9,7 @@ import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -40,6 +41,7 @@ public class Date {
      *  - "dd-MM-yyyy" (covers 15-1-2009)
      *  - "d.M.uuuu" (covers 15.1.2015)
      *  - "uuuu.M.d" (covers 2015.1.15)
+     *  - "MMM, uuuu" (covers Jan, 2020)
      * The code is essentially taken from http://stackoverflow.com/questions/4024544/how-to-parse-dates-in-multiple-formats-using-simpledateformat.
      */
     public static Optional<Date> parse(String dateString) {
@@ -54,22 +56,24 @@ public class Date {
                 "MMMM d, uuuu",
                 "MMMM, uuuu",
                 "d.M.uuuu",
-                "uuuu.M.d", "uuuu");
+                "uuuu.M.d", "uuuu",
+                "MMM, uuuu");
 
-            for (String formatString : formatStrings) {
-                try {
-                    TemporalAccessor parsedDate = DateTimeFormatter.ofPattern(formatString).parse(dateString);
-                    return Optional.of(new Date(parsedDate));
-                } catch (DateTimeParseException ignored) {
-                    // Ignored
-                }
+        for (String formatString : formatStrings) {
+            try {
+                // Locale is required for parsing month names correctly. Currently this expects the month names to be in English
+                TemporalAccessor parsedDate = DateTimeFormatter.ofPattern(formatString).withLocale(Locale.US).parse(dateString);
+                return Optional.of(new Date(parsedDate));
+            } catch (DateTimeParseException ignored) {
+                // Ignored
             }
+        }
 
         return Optional.empty();
     }
 
     public static Optional<Date> parse(Optional<String> yearValue, Optional<String> monthValue,
-            Optional<String> dayValue) {
+                                       Optional<String> dayValue) {
         Optional<Year> year = yearValue.flatMap(Date::convertToInt).map(Year::of);
         Optional<Month> month = monthValue.flatMap(Month::parse);
         Optional<Integer> day = dayValue.flatMap(Date::convertToInt);

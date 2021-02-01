@@ -31,8 +31,8 @@ class DatabaseFileLookupTest {
         database = result.getDatabase();
         entries = database.getEntries();
 
-        entry1 = database.getEntryByKey("entry1").get();
-        entry2 = database.getEntryByKey("entry2").get();
+        entry1 = database.getEntryByCitationKey("entry1").get();
+        entry2 = database.getEntryByCitationKey("entry2").get();
     }
 
     /**

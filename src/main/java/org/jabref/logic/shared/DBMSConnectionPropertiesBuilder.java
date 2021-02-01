@@ -1,7 +1,5 @@
 package org.jabref.logic.shared;
 
-import org.jabref.model.database.shared.DBMSType;
-
 public class DBMSConnectionPropertiesBuilder {
     private DBMSType type;
     private String host;

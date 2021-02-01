@@ -21,7 +21,6 @@ public class PdfXmpImporter extends Importer {
 
     private final XmpPreferences xmpPreferences;
 
-
     public PdfXmpImporter(XmpPreferences xmpPreferences) {
         this.xmpPreferences = xmpPreferences;
     }
@@ -87,5 +86,4 @@ public class PdfXmpImporter extends Importer {
     public String getDescription() {
         return "Wraps the XMPUtility function to be used as an Importer.";
     }
-
 }

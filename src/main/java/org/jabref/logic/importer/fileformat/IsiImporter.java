@@ -314,7 +314,6 @@ public class IsiImporter extends Importer {
             }
             for (Object aToRemove : toRemove) {
                 hm.remove(aToRemove);
-
             }
 
             // Polish entries
@@ -348,7 +347,7 @@ public class IsiImporter extends Importer {
         for (String part : parts) {
             try {
                 int number = Integer.parseInt(part);
-                Optional<Month>  month = Month.getMonthByNumber(number);
+                Optional<Month> month = Month.getMonthByNumber(number);
                 if (month.isPresent()) {
                     return month.get().getJabRefFormat();
                 }
@@ -362,8 +361,7 @@ public class IsiImporter extends Importer {
     /**
      * Will expand ISI first names.
      * <p>
-     * Fixed bug from:
-     * http://sourceforge.net/tracker/index.php?func=detail&aid=1542552&group_id=92314&atid=600306
+     * Fixed bug from: http://sourceforge.net/tracker/index.php?func=detail&aid=1542552&group_id=92314&atid=600306
      */
     public static String isiAuthorConvert(String author) {
 
@@ -403,7 +401,6 @@ public class IsiImporter extends Importer {
             }
         }
         return sb.toString();
-
     }
 
     private static String[] isiAuthorsConvert(String[] authors) {
@@ -419,5 +416,4 @@ public class IsiImporter extends Importer {
         String[] s = IsiImporter.isiAuthorsConvert(authors.split(" and |;"));
         return String.join(" and ", s);
     }
-
 }

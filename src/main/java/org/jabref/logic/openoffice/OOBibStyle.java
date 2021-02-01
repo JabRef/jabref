@@ -76,7 +76,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private static final String BRACKET_AFTER_IN_LIST = "BracketAfterInList";
     private static final String BRACKET_BEFORE_IN_LIST = "BracketBeforeInList";
     private static final String UNIQUEFIER_SEPARATOR = "UniquefierSeparator";
-    private static final String BIBTEX_KEY_CITATIONS = "BibTeXKeyCitations";
+    private static final String CITATION_KEY_CITATIONS = "BibTeXKeyCitations";
     private static final String SUBSCRIPT_CITATIONS = "SubscriptCitations";
     private static final String SUPERSCRIPT_CITATIONS = "SuperscriptCitations";
     private static final String BOLD_CITATIONS = "BoldCitations";
@@ -125,7 +125,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private boolean isDefaultLayoutPresent;
 
     public OOBibStyle(File styleFile, LayoutFormatterPreferences prefs,
-            Charset encoding) throws IOException {
+                      Charset encoding) throws IOException {
         this.prefs = Objects.requireNonNull(prefs);
         this.styleFile = Objects.requireNonNull(styleFile);
         this.encoding = Objects.requireNonNull(encoding);
@@ -134,6 +134,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         fromResource = false;
         path = styleFile.getPath();
     }
+
     public OOBibStyle(String resourcePath, LayoutFormatterPreferences prefs) throws IOException {
         this.prefs = Objects.requireNonNull(prefs);
         Objects.requireNonNull(resourcePath);
@@ -183,7 +184,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         citProperties.put(SUPERSCRIPT_CITATIONS, Boolean.FALSE);
         citProperties.put(SUBSCRIPT_CITATIONS, Boolean.FALSE);
         citProperties.put(MULTI_CITE_CHRONOLOGICAL, Boolean.TRUE);
-        citProperties.put(BIBTEX_KEY_CITATIONS, Boolean.FALSE);
+        citProperties.put(CITATION_KEY_CITATIONS, Boolean.FALSE);
         citProperties.put(ITALIC_ET_AL, Boolean.FALSE);
         citProperties.put(OXFORD_COMMA, "");
     }
@@ -280,48 +281,46 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
             }
             // Check if we should change mode:
             switch (line) {
-            case NAME_MARK:
-                mode = BibStyleMode.NAME;
-                continue;
-            case LAYOUT_MRK:
-                mode = BibStyleMode.LAYOUT;
-                continue;
-            case PROPERTIES_MARK:
-                mode = BibStyleMode.PROPERTIES;
-                continue;
-            case CITATION_MARK:
-                mode = BibStyleMode.CITATION;
-                continue;
-            case JOURNALS_MARK:
-                mode = BibStyleMode.JOURNALS;
-                continue;
-            default:
-                break;
-
+                case NAME_MARK:
+                    mode = BibStyleMode.NAME;
+                    continue;
+                case LAYOUT_MRK:
+                    mode = BibStyleMode.LAYOUT;
+                    continue;
+                case PROPERTIES_MARK:
+                    mode = BibStyleMode.PROPERTIES;
+                    continue;
+                case CITATION_MARK:
+                    mode = BibStyleMode.CITATION;
+                    continue;
+                case JOURNALS_MARK:
+                    mode = BibStyleMode.JOURNALS;
+                    continue;
+                default:
+                    break;
             }
 
             switch (mode) {
-            case NAME:
-                if (!line.trim().isEmpty()) {
-                    name = line.trim();
-                }
-                break;
-            case LAYOUT:
-                handleStructureLine(line);
-                break;
-            case PROPERTIES:
-                handlePropertiesLine(line, properties);
-                break;
-            case CITATION:
-                handlePropertiesLine(line, citProperties);
-                break;
-            case JOURNALS:
-                handleJournalsLine(line);
-                break;
-            default:
-                break;
+                case NAME:
+                    if (!line.trim().isEmpty()) {
+                        name = line.trim();
+                    }
+                    break;
+                case LAYOUT:
+                    handleStructureLine(line);
+                    break;
+                case PROPERTIES:
+                    handlePropertiesLine(line, properties);
+                    break;
+                case CITATION:
+                    handlePropertiesLine(line, citProperties);
+                    break;
+                case JOURNALS:
+                    handleJournalsLine(line);
+                    break;
+                default:
+                    break;
             }
-
         }
         // Set validity boolean based on whether we found anything interesting
         // in the file:
@@ -348,17 +347,18 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private void handleStructureLine(String line) {
         int index = line.indexOf('=');
         if ((index > 0) && (index < (line.length() - 1))) {
-            String formatString = line.substring(index + 1);
-            isDefaultLayoutPresent = line.substring(0, index).equals(OOBibStyle.DEFAULT_MARK);
-            EntryType type = EntryTypeFactory.parse(line.substring(0, index));
+
             try {
+                String formatString = line.substring(index + 1);
                 Layout layout = new LayoutHelper(new StringReader(formatString), this.prefs).getLayoutFromText();
-                if (isDefaultLayoutPresent) {
+                EntryType type = EntryTypeFactory.parse(line.substring(0, index));
+
+                if (!isDefaultLayoutPresent && line.substring(0, index).equals(OOBibStyle.DEFAULT_MARK)) {
+                    isDefaultLayoutPresent = true;
                     defaultBibLayout = layout;
                 } else {
                     bibLayout.put(type, layout);
                 }
-
             } catch (IOException ex) {
                 LOGGER.warn("Cannot parse bibliography structure", ex);
             }
@@ -467,11 +467,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
                         }
                     }
                     combineFrom = -1;
-
                 }
                 // If it doesn't end here, just keep iterating.
             }
-
         }
         sb.append(bracketAfter);
         return sb.toString();
@@ -492,7 +490,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * @return The formatted citation.
      */
     public String getCitationMarker(List<BibEntry> entries, Map<BibEntry, BibDatabase> database, boolean inParenthesis,
-            String[] uniquefiers, int[] unlimAuthors) {
+                                    String[] uniquefiers, int[] unlimAuthors) {
         // Look for groups of uniquefied entries that should be combined in the output.
         // E.g. (Olsen, 2005a, b) should be output instead of (Olsen, 2005a; Olsen, 2005b).
         int piv = -1;
@@ -583,11 +581,11 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * @return The formatted citation.
      */
     private String getAuthorYearParenthesisMarker(List<BibEntry> entries, Map<BibEntry, BibDatabase> database,
-            String[] uniquifiers, int[] unlimAuthors) {
+                                                  String[] uniquifiers, int[] unlimAuthors) {
 
         String authorField = getStringCitProperty(AUTHOR_FIELD); // The bibtex field providing author names, e.g. "author" or "editor".
         int maxA = getIntCitProperty(MAX_AUTHORS); // The maximum number of authors to write out in full without using etal. Set to
-                                                             // -1 to always write out all authors.
+                                                   // -1 to always write out all authors.
         String yearSep = getStringCitProperty(YEAR_SEPARATOR); // The String to separate authors from year, e.g. "; ".
         String startBrace = getStringCitProperty(BRACKET_BEFORE); // The opening parenthesis.
         String endBrace = getStringCitProperty(BRACKET_AFTER); // The closing parenthesis.
@@ -624,7 +622,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         }
         sb.append(endBrace);
         return sb.toString();
-
     }
 
     /**
@@ -636,11 +633,11 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * @return The formatted citation.
      */
     private String getAuthorYearInTextMarker(List<BibEntry> entries, Map<BibEntry, BibDatabase> database,
-            String[] uniquefiers,
-            int[] unlimAuthors) {
+                                             String[] uniquefiers,
+                                             int[] unlimAuthors) {
         String authorField = getStringCitProperty(AUTHOR_FIELD); // The bibtex field providing author names, e.g. "author" or "editor".
         int maxA = getIntCitProperty(MAX_AUTHORS); // The maximum number of authors to write out in full without using etal. Set to
-                                                             // -1 to always write out all authors.
+                                                   // -1 to always write out all authors.
         String yearSep = getStringCitProperty(IN_TEXT_YEAR_SEPARATOR); // The String to separate authors from year, e.g. "; ".
         String startBrace = getStringCitProperty(BRACKET_BEFORE); // The opening parenthesis.
         String endBrace = getStringCitProperty(BRACKET_AFTER); // The closing parenthesis.
@@ -802,8 +799,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return (Boolean) citProperties.get(FORMAT_CITATIONS);
     }
 
-    public boolean isBibtexKeyCiteMarkers() {
-        return (Boolean) citProperties.get(BIBTEX_KEY_CITATIONS);
+    public boolean isCitationKeyCiteMarkers() {
+        return (Boolean) citProperties.get(CITATION_KEY_CITATIONS);
     }
 
     /**
@@ -877,7 +874,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     private String createAuthorList(String author, int maxAuthors, String andString,
-            String yearSep) {
+                                    String yearSep) {
         Objects.requireNonNull(author);
         String etAlString = getStringCitProperty(ET_AL_STRING); //  The String to represent authors that are not mentioned, e.g. " et al."
         String authorSep = getStringCitProperty(AUTHOR_SEPARATOR); // The String to add between author names except the last two, e.g. ", ".

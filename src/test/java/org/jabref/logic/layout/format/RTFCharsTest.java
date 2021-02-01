@@ -87,8 +87,8 @@ class RTFCharsTest {
 
     @Test
     void testComplicated6() {
-        assertEquals("Pchn\\u261a\\u263c w t\\u281e \\u322l\\u243od\\u378z je\\u380za lub o\\u347sm skrzy\\u324n fig"
-                , formatter.format("Pchnąć w tę łódź jeża lub ośm skrzyń fig"));
+        assertEquals("Pchn\\u261a\\u263c w t\\u281e \\u322l\\u243od\\u378z je\\u380za lub o\\u347sm skrzy\\u324n fig",
+                formatter.format("Pchnąć w tę łódź jeża lub ośm skrzyń fig"));
     }
 
     @Test

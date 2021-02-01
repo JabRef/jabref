@@ -44,5 +44,4 @@ class StringNameChangeViewModel extends DatabaseChangeViewModel {
     public Node description() {
         return new Label(newString.getName() + " : " + string.getContent());
     }
-
 }

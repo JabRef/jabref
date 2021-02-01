@@ -1,21 +1,21 @@
-<tr id="\format{\bibtexkey}" class="entry">
+<tr id="\format{\citationkey}" class="entry">
 	<td>\format[Authors(LastFirst,InitialsNoSpace),HTMLChars]{\author}</td>
-	<td>\format[HTMLChars]{\title} <p class="infolinks">\begin{abstract}[<a href="javascript:toggleInfo('\format{\bibtexkey}','abstract')">Abstract</a>] \end{abstract}\begin{comment}[<a href="javascript:toggleInfo('\format{\bibtexkey}','comment')">Comment</a>] \end{comment}[<a href="javascript:toggleInfo('\format{\bibtexkey}','bibtex')">BibTeX</a>]</p></td>
+	<td>\format[HTMLChars]{\title} <p class="infolinks">\begin{abstract}[<a href="javascript:toggleInfo('\format{\citationkey}','abstract')">Abstract</a>] \end{abstract}\begin{comment}[<a href="javascript:toggleInfo('\format{\citationkey}','comment')">Comment</a>] \end{comment}[<a href="javascript:toggleInfo('\format{\citationkey}','bibtex')">BibTeX</a>]</p></td>
 	<td>\year</td>
 	<td>\format[HTMLChars]{\journal}\begin{volume}<br/>Vol. \volume\end{volume}\begin{number}(\format[FormatPagesForHTML]{\number})\end{number}\format[HTMLChars]{\booktitle}\begin{pages}, pp. \format[FormatPagesForHTML]{\pages}\end{pages}\begin{school}<i>School</i>: \format[HTMLChars]{\school}\end{school}\begin{howpublished}\format[HTMLChars]{\howpublished}\end{howpublished}&nbsp;</td>
 	<td>\format[ToLowerCase]{\entrytype}</td>
 	<td>\begin{doi}<a href="\format[DOICheck]{\doi}">DOI</a> \end{doi}\begin{url}<a href="\format{\url}">URL</a>\end{url}&nbsp;</td>
 </tr>\begin{abstract}
-<tr id="abs_\format{\bibtexkey}" class="abstract noshow">
+<tr id="abs_\format{\citationkey}" class="abstract noshow">
 	<td colspan="6"><b>Abstract</b>: \format[HTMLChars]{\abstract}</td>
 </tr>\end{abstract}\begin{comment}
-<tr id="rev_\format{\bibtexkey}" class="comment noshow">
+<tr id="rev_\format{\citationkey}" class="comment noshow">
 	<td colspan="6"><b>Comment</b>: \format[HTMLChars]{\comment}</td>
 </tr>\end{comment}
-<tr id="bib_\format{\bibtexkey}" class="bibtex noshow">
+<tr id="bib_\format{\citationkey}" class="bibtex noshow">
 <td colspan="6"><b>BibTeX</b>:
 <pre>
-@\format[ToLowerCase]{\entrytype}{\bibtexkey,\begin{author}
+@\format[ToLowerCase]{\entrytype}{\citationkey,\begin{author}
   author = {\format[HTMLChars]{\author}}\end{author}\begin{title},
   title = {\format[HTMLChars]{\title}}\end{title}\begin{booktitle},
   booktitle = {\format[HTMLChars]{\booktitle}}\end{booktitle}\begin{journal},

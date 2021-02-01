@@ -10,78 +10,86 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.groups.GroupViewMode;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.gui.groups.GroupsPreferences;
+import org.jabref.preferences.PreferencesService;
 
 public class GroupsTabViewModel implements PreferenceTabViewModel {
 
-    private final BooleanProperty grayNonHitsProperty = new SimpleBooleanProperty();
     private final BooleanProperty groupViewModeIntersectionProperty = new SimpleBooleanProperty();
     private final BooleanProperty groupViewModeUnionProperty = new SimpleBooleanProperty();
     private final BooleanProperty autoAssignGroupProperty = new SimpleBooleanProperty();
     private final BooleanProperty displayGroupCountProperty = new SimpleBooleanProperty();
-    private final StringProperty defaultGroupingFieldProperty = new SimpleStringProperty("");
     private final StringProperty keywordSeparatorProperty = new SimpleStringProperty("");
 
     private final DialogService dialogService;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
+    private final GroupsPreferences initialGroupsPreferences;
 
-    public GroupsTabViewModel(DialogService dialogService, JabRefPreferences preferences) {
+    public GroupsTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.initialGroupsPreferences = preferences.getGroupsPreferences();
     }
 
     @Override
     public void setValues() {
-        grayNonHitsProperty.setValue(preferences.getBoolean(JabRefPreferences.GRAY_OUT_NON_HITS));
-        switch (preferences.getGroupViewMode()) {
-            case INTERSECTION:
+        switch (initialGroupsPreferences.getGroupViewMode()) {
+            case INTERSECTION -> {
                 groupViewModeIntersectionProperty.setValue(true);
                 groupViewModeUnionProperty.setValue(false);
-                break;
-            case UNION:
+            }
+            case UNION -> {
                 groupViewModeIntersectionProperty.setValue(false);
                 groupViewModeUnionProperty.setValue(true);
-                break;
+            }
         }
-        autoAssignGroupProperty.setValue(preferences.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP));
-        displayGroupCountProperty.setValue(preferences.getBoolean(JabRefPreferences.DISPLAY_GROUP_COUNT));
-
-        defaultGroupingFieldProperty.setValue(preferences.get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
-        keywordSeparatorProperty.setValue(preferences.get(JabRefPreferences.KEYWORD_SEPARATOR));
+        autoAssignGroupProperty.setValue(initialGroupsPreferences.shouldAutoAssignGroup());
+        displayGroupCountProperty.setValue(initialGroupsPreferences.shouldDisplayGroupCount());
+        keywordSeparatorProperty.setValue(initialGroupsPreferences.getKeywordDelimiter().toString());
     }
 
     @Override
     public void storeSettings() {
-        preferences.putBoolean(JabRefPreferences.GRAY_OUT_NON_HITS, grayNonHitsProperty.getValue());
+        GroupViewMode groupViewMode = GroupViewMode.UNION;
         if (groupViewModeIntersectionProperty.getValue()) {
-            preferences.setGroupViewMode(GroupViewMode.INTERSECTION);
-        } else if (groupViewModeUnionProperty.getValue()) {
-            preferences.setGroupViewMode(GroupViewMode.UNION);
+            groupViewMode = GroupViewMode.INTERSECTION;
         }
-        preferences.putBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP, autoAssignGroupProperty.getValue());
-        preferences.putBoolean(JabRefPreferences.DISPLAY_GROUP_COUNT, displayGroupCountProperty.getValue());
 
-        preferences.put(JabRefPreferences.GROUPS_DEFAULT_FIELD, defaultGroupingFieldProperty.getValue().trim());
-        preferences.put(JabRefPreferences.KEYWORD_SEPARATOR, keywordSeparatorProperty.getValue());
+        GroupsPreferences newGroupsPreferences = new GroupsPreferences(
+                groupViewMode,
+                autoAssignGroupProperty.getValue(),
+                displayGroupCountProperty.getValue(),
+                keywordSeparatorProperty.getValue().charAt(0));
+        preferences.storeGroupsPreferences(newGroupsPreferences);
     }
 
     @Override
-    public boolean validateSettings() { return true; }
+    public boolean validateSettings() {
+        return true;
+    }
 
     @Override
-    public List<String> getRestartWarnings() { return new ArrayList<>(); }
+    public List<String> getRestartWarnings() {
+        return new ArrayList<>();
+    }
 
-    public BooleanProperty grayNonHitsProperty() { return grayNonHitsProperty; }
+    public BooleanProperty groupViewModeIntersectionProperty() {
+        return groupViewModeIntersectionProperty;
+    }
 
-    public BooleanProperty groupViewModeIntersectionProperty() { return groupViewModeIntersectionProperty; }
+    public BooleanProperty groupViewModeUnionProperty() {
+        return groupViewModeUnionProperty;
+    }
 
-    public BooleanProperty groupViewModeUnionProperty() { return groupViewModeUnionProperty; }
+    public BooleanProperty autoAssignGroupProperty() {
+        return autoAssignGroupProperty;
+    }
 
-    public BooleanProperty autoAssignGroupProperty() { return autoAssignGroupProperty; }
+    public BooleanProperty displayGroupCount() {
+        return displayGroupCountProperty;
+    }
 
-    public BooleanProperty displayGroupCount() { return displayGroupCountProperty;}
-
-    public StringProperty defaultGroupingFieldProperty() { return defaultGroupingFieldProperty; }
-
-    public StringProperty keywordSeparatorProperty() { return keywordSeparatorProperty; }
+    public StringProperty keywordSeparatorProperty() {
+        return keywordSeparatorProperty;
+    }
 }

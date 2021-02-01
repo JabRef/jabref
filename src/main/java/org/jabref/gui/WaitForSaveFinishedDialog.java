@@ -17,12 +17,12 @@ public class WaitForSaveFinishedDialog {
         this.dialogService = dialogService;
     }
 
-    public void showAndWait(List<BasePanel> basePanels) {
-        if (basePanels.stream().anyMatch(BasePanel::isSaving)) {
-            Task<Void> waitForSaveFinished = new Task<Void>() {
+    public void showAndWait(List<LibraryTab> LibraryTabs) {
+        if (LibraryTabs.stream().anyMatch(LibraryTab::isSaving)) {
+            Task<Void> waitForSaveFinished = new Task<>() {
                 @Override
                 protected Void call() throws Exception {
-                    while (basePanels.stream().anyMatch(BasePanel::isSaving)) {
+                    while (LibraryTabs.stream().anyMatch(LibraryTab::isSaving)) {
                         if (isCancelled()) {
                             return null;
                         } else {
@@ -33,7 +33,7 @@ public class WaitForSaveFinishedDialog {
                 }
             };
 
-            dialogService.showProgressDialogAndWait(
+            dialogService.showProgressDialog(
                     Localization.lang("Please wait..."),
                     Localization.lang("Waiting for save operation to finish") + "...",
                     waitForSaveFinished

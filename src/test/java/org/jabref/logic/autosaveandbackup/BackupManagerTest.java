@@ -1,7 +1,6 @@
 package org.jabref.logic.autosaveandbackup;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Test;
 
@@ -13,9 +12,9 @@ public class BackupManagerTest {
 
     @Test
     public void autosaveFileNameIsCorrectlyGeneratedWithinTmpDirectory() {
-        Path bibPath = Paths.get("tmp", "test.bib");
+        Path bibPath = Path.of("tmp", "test.bib");
         Path savPath = BackupManager.getBackupPath(bibPath);
-        assertEquals(Paths.get("tmp", "test.bib.sav"), savPath);
+        assertEquals(Path.of("tmp", "test.bib.sav"), savPath);
     }
 
     @Test

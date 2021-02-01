@@ -19,8 +19,6 @@ public abstract class AbstractIsbnFetcherTest {
 
     public abstract void testName();
 
-    public abstract void testHelpPage();
-
     public abstract void authorsAreCorrectlyFormatted() throws Exception;
 
     public abstract void searchByIdSuccessfulWithShortISBN() throws FetcherException;

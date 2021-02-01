@@ -24,7 +24,6 @@ public class Protocol implements AutoCloseable {
     private final ObjectOutputStream out;
     private final ObjectInputStream in;
 
-
     public Protocol(Socket socket) throws IOException {
         this.socket = socket;
         this.out = new ObjectOutputStream(socket.getOutputStream());

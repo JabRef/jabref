@@ -4,8 +4,8 @@ import java.util.List;
 
 import javafx.application.Platform;
 
-import org.jabref.JabRefGUI;
 import org.jabref.cli.ArgumentProcessor;
+import org.jabref.gui.JabRefGUI;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.remote.server.MessageHandler;
 

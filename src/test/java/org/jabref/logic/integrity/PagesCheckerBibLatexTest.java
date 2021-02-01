@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class PagesCheckerBibLatexTest {
 
@@ -70,4 +71,45 @@ class PagesCheckerBibLatexTest {
     void complainsAboutPPPrefix() {
         assertEquals(Optional.of("should contain a valid page number range"), checker.checkValue("pp. 12-15"));
     }
+
+    @Test
+    void bibLaTexAcceptsRangeOfNumbersWithDoubleDash() {
+        assertEquals(Optional.empty(), checker.checkValue("1--2"));
+    }
+
+    @Test
+    void bibLaTexAcceptsOnePageNumber() {
+        assertEquals(Optional.empty(), checker.checkValue("12"));
+    }
+
+    @Test
+    void bibLaTexAcceptsRangeOfNumbersWithSingleDash() {
+        assertEquals(Optional.empty(), checker.checkValue("1-2"));
+    }
+
+    @Test
+    void bibLaTexAcceptsMorePageNumbers() {
+        assertEquals(Optional.empty(), checker.checkValue("1,2,3"));
+    }
+
+    @Test
+    void bibLaTexAcceptsNoSimpleRangeOfNumbers() {
+        assertEquals(Optional.empty(), checker.checkValue("43+"));
+    }
+
+    @Test
+    void bibLaTexDoesNotAcceptMorePageNumbersWithoutComma() {
+        assertNotEquals(Optional.empty(), checker.checkValue("1 2"));
+    }
+
+    @Test
+    void bibLaTexDoesNotAcceptBrackets() {
+        assertNotEquals(Optional.empty(), checker.checkValue("{1}-{2}"));
+    }
+
+    @Test
+    void bibLaTexAcceptsMorePageNumbersWithRangeOfNumbers() {
+        assertEquals(Optional.empty(), checker.checkValue("7+,41--43,73"));
+    }
+
 }

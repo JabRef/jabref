@@ -28,7 +28,7 @@ class MergeReviewIntoCommentActionMigrationTest {
 
         action.performMigration(actualParserResult);
 
-        assertEquals(entry, actualParserResult.getDatabase().getEntryByKey("Entry1").get());
+        assertEquals(entry, actualParserResult.getDatabase().getEntryByCitationKey("Entry1").get());
     }
 
     @Test
@@ -42,7 +42,7 @@ class MergeReviewIntoCommentActionMigrationTest {
 
         action.performMigration(actualParserResult);
 
-        assertEquals(expectedEntry, actualParserResult.getDatabase().getEntryByKey("Entry1").get());
+        assertEquals(expectedEntry, actualParserResult.getDatabase().getEntryByCitationKey("Entry1").get());
     }
 
     @Test
@@ -53,7 +53,7 @@ class MergeReviewIntoCommentActionMigrationTest {
 
         action.performMigration(actualParserResult);
 
-        assertEquals(entry, actualParserResult.getDatabase().getEntryByKey("Entry1").get());
+        assertEquals(entry, actualParserResult.getDatabase().getEntryByCitationKey("Entry1").get());
     }
 
     @Test
@@ -69,7 +69,7 @@ class MergeReviewIntoCommentActionMigrationTest {
 
         action.performMigration(actualParserResult);
 
-        assertEquals(expectedEntry, actualParserResult.getDatabase().getEntryByKey("Entry1").get());
+        assertEquals(expectedEntry, actualParserResult.getDatabase().getEntryByCitationKey("Entry1").get());
     }
 
     @Test
@@ -86,12 +86,12 @@ class MergeReviewIntoCommentActionMigrationTest {
 
         action.performMigration(actualParserResult);
 
-        assertEquals(expectedEntry, actualParserResult.getDatabase().getEntryByKey("Entry1").get());
+        assertEquals(expectedEntry, actualParserResult.getDatabase().getEntryByCitationKey("Entry1").get());
     }
 
     private BibEntry createMinimalBibEntry() {
         BibEntry entry = new BibEntry();
-        entry.setCiteKey("Entry1");
+        entry.setCitationKey("Entry1");
         entry.setField(StandardField.TITLE, "A random entry!");
         entry.setField(StandardField.AUTHOR, "JabRef DEVELOPERS");
         return entry;

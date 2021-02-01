@@ -2,8 +2,8 @@ package org.jabref.gui.collab;
 
 import javafx.scene.Node;
 
-import org.jabref.Globals;
-import org.jabref.JabRefGUI;
+import org.jabref.gui.Globals;
+import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntries;
@@ -17,7 +17,7 @@ class EntryAddChangeViewModel extends DatabaseChangeViewModel {
 
     public EntryAddChangeViewModel(BibEntry entry) {
         super();
-        this.name = entry.getCiteKeyOptional()
+        this.name = entry.getCitationKey()
                          .map(key -> Localization.lang("Added entry") + ": '" + key + '\'')
                          .orElse(Localization.lang("Added entry"));
         this.entry = entry;

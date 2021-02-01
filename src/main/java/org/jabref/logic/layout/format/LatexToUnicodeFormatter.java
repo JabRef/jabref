@@ -1,8 +1,8 @@
 package org.jabref.logic.layout.format;
 
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
-import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 /**
@@ -35,5 +35,4 @@ public class LatexToUnicodeFormatter extends Formatter implements LayoutFormatte
     public String getExampleInput() {
         return "M{\\\"{o}}nch";
     }
-
 }

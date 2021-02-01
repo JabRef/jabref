@@ -2,23 +2,23 @@ package org.jabref.gui.push;
 
 import java.util.List;
 
+import javafx.beans.property.ObjectProperty;
+
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.PushToApplicationPreferences;
 
 /**
  * Class that defines interaction with an external application in the form of "pushing" selected entries to it.
  */
 public interface PushToApplication {
 
-    String getName();
-
-    String getApplicationName();
+    String getDisplayName();
 
     String getTooltip();
 
     JabRefIcon getIcon();
-
 
     /**
      * The actual operation. This method will not be called on the event dispatch thread, so it should not do GUI
@@ -32,11 +32,12 @@ public interface PushToApplication {
     void operationCompleted();
 
     /**
-     * Check whether this operation requires BibTeX keys to be set for the entries. If true is returned an error message
+     * Check whether this operation requires citation keys to be set for the entries. If true is returned an error message
      * will be displayed if keys are missing.
      *
-     * @return true if BibTeX keys are required for this operation.
+     * @return true if citation keys are required for this operation.
      */
-    boolean requiresBibtexKeys();
+    boolean requiresCitationKeys();
 
+    PushToApplicationSettings getSettings(PushToApplication application, ObjectProperty<PushToApplicationPreferences> preferences);
 }

@@ -84,7 +84,6 @@ public class ApsFetcher implements FulltextFetcher {
             if (urlParts.length == 2) {
                 return Optional.of(urlParts[1]);
             }
-
         } catch (IOException e) {
             LOGGER.warn("Error connecting to APS", e);
         }

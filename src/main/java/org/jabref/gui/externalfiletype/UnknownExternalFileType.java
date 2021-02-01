@@ -5,7 +5,7 @@ import org.jabref.gui.icon.JabRefIcon;
 
 /**
  * Unknown external file type.
- *
+ * <p>
  * This instance represents a file type unknown to JabRef.
  * This can happen, for example, when a database is loaded which contains links to files of a type that has not been defined on this JabRef instance.
  */

@@ -7,11 +7,15 @@ import javax.swing.undo.UndoManager;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.CustomMenuItem;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.Tooltip;
 
-import org.jabref.Globals;
+import org.jabref.gui.EntryTypeView;
+import org.jabref.gui.Globals;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
@@ -23,6 +27,7 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryTypeDefinitions;
+import org.jabref.model.strings.StringUtil;
 
 public class ChangeEntryTypeMenu {
 
@@ -31,13 +36,18 @@ public class ChangeEntryTypeMenu {
     }
 
     public static MenuItem createMenuItem(EntryType type, BibEntry entry, UndoManager undoManager) {
-        MenuItem menuItem = new MenuItem(type.getDisplayName());
+        CustomMenuItem menuItem = new CustomMenuItem(new Label(type.getDisplayName()));
         menuItem.setOnAction(event -> {
             NamedCompound compound = new NamedCompound(Localization.lang("Change entry type"));
             entry.setType(type)
                  .ifPresent(change -> compound.addEdit(new UndoableChangeType(change)));
             undoManager.addEdit(compound);
         });
+        String description = EntryTypeView.getDescription(type);
+        if (StringUtil.isNotBlank(description)) {
+            Tooltip tooltip = new Tooltip(description);
+            Tooltip.install(menuItem.getContent(), tooltip);
+        }
         return menuItem;
     }
 

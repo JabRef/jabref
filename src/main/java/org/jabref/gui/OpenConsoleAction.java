@@ -24,11 +24,11 @@ public class OpenConsoleAction extends SimpleCommand {
     @Override
     public void execute() {
         stateManager.getActiveDatabase().flatMap(BibDatabaseContext::getDatabasePath).ifPresent(path -> {
-                try {
-                    JabRefDesktop.openConsole(path.toFile());
-                } catch (IOException e) {
-                    LOGGER.info("Could not open console", e);
-                }
+            try {
+                JabRefDesktop.openConsole(path.toFile());
+            } catch (IOException e) {
+                LOGGER.info("Could not open console", e);
+            }
         });
     }
 }

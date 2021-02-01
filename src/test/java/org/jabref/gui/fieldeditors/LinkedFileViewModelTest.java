@@ -22,8 +22,7 @@ import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.metadata.FilePreferences;
-import org.jabref.testutils.category.FetcherTest;
+import org.jabref.preferences.FilePreferences;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +37,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 class LinkedFileViewModelTest {
@@ -49,14 +48,14 @@ class LinkedFileViewModelTest {
     private BibDatabaseContext databaseContext;
     private TaskExecutor taskExecutor;
     private DialogService dialogService;
-    private ExternalFileTypes externalFileType = mock(ExternalFileTypes.class);
-    private FilePreferences filePreferences = mock(FilePreferences.class);
-    private XmpPreferences xmpPreferences = mock(XmpPreferences.class);
+    private final ExternalFileTypes externalFileType = mock(ExternalFileTypes.class);
+    private final FilePreferences filePreferences = mock(FilePreferences.class);
+    private final XmpPreferences xmpPreferences = mock(XmpPreferences.class);
 
     @BeforeEach
     void setUp(@TempDir Path tempFolder) throws Exception {
         entry = new BibEntry();
-        entry.setCiteKey("asdf");
+        entry.setCitationKey("asdf");
         databaseContext = new BibDatabaseContext();
         taskExecutor = mock(TaskExecutor.class);
         dialogService = mock(DialogService.class);
@@ -71,26 +70,26 @@ class LinkedFileViewModelTest {
     @Test
     void deleteWhenFilePathNotPresentReturnsTrue() {
         // Making this a spy, so we can inject an empty optional without digging into the implementation
-        linkedFile = spy(new LinkedFile("", "nonexistent file", ""));
+        linkedFile = spy(new LinkedFile("", Path.of("nonexistent file"), ""));
         doReturn(Optional.empty()).when(linkedFile).findIn(any(BibDatabaseContext.class), any(FilePreferences.class));
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, xmpPreferences, filePreferences, externalFileType);
         boolean removed = viewModel.delete();
 
         assertTrue(removed);
-        verifyZeroInteractions(dialogService); // dialog was never shown
+        verifyNoInteractions(dialogService); // dialog was never shown
     }
 
     @Test
     void deleteWhenRemoveChosenReturnsTrueButDoesNotDeletesFile() {
-        linkedFile = new LinkedFile("", tempFile.toString(), "");
+        linkedFile = new LinkedFile("", tempFile, "");
         when(dialogService.showCustomButtonDialogAndWait(
-                                                         any(AlertType.class),
-                                                         anyString(),
-                                                         anyString(),
-                                                         any(ButtonType.class),
-                                                         any(ButtonType.class),
-                                                         any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(3))); // first vararg - remove button
+                any(AlertType.class),
+                anyString(),
+                anyString(),
+                any(ButtonType.class),
+                any(ButtonType.class),
+                any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(3))); // first vararg - remove button
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, xmpPreferences, filePreferences, externalFileType);
         boolean removed = viewModel.delete();
@@ -101,14 +100,14 @@ class LinkedFileViewModelTest {
 
     @Test
     void deleteWhenDeleteChosenReturnsTrueAndDeletesFile() {
-        linkedFile = new LinkedFile("", tempFile.toString(), "");
+        linkedFile = new LinkedFile("", tempFile, "");
         when(dialogService.showCustomButtonDialogAndWait(
-                                                         any(AlertType.class),
-                                                         anyString(),
-                                                         anyString(),
-                                                         any(ButtonType.class),
-                                                         any(ButtonType.class),
-                                                         any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(4))); // second vararg - delete button
+                any(AlertType.class),
+                anyString(),
+                anyString(),
+                any(ButtonType.class),
+                any(ButtonType.class),
+                any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(4))); // second vararg - delete button
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, xmpPreferences, filePreferences, externalFileType);
         boolean removed = viewModel.delete();
@@ -119,14 +118,14 @@ class LinkedFileViewModelTest {
 
     @Test
     void deleteMissingFileReturnsTrue() {
-        linkedFile = new LinkedFile("", "!!nonexistent file!!", "");
+        linkedFile = new LinkedFile("", Path.of("!!nonexistent file!!"), "");
         when(dialogService.showCustomButtonDialogAndWait(
-                                                         any(AlertType.class),
-                                                         anyString(),
-                                                         anyString(),
-                                                         any(ButtonType.class),
-                                                         any(ButtonType.class),
-                                                         any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(4))); // second vararg - delete button
+                any(AlertType.class),
+                anyString(),
+                anyString(),
+                any(ButtonType.class),
+                any(ButtonType.class),
+                any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(4))); // second vararg - delete button
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, xmpPreferences, filePreferences, externalFileType);
         boolean removed = viewModel.delete();
@@ -136,14 +135,14 @@ class LinkedFileViewModelTest {
 
     @Test
     void deleteWhenDialogCancelledReturnsFalseAndDoesNotRemoveFile() {
-        linkedFile = new LinkedFile("desc", tempFile.toString(), "pdf");
+        linkedFile = new LinkedFile("desc", tempFile, "pdf");
         when(dialogService.showCustomButtonDialogAndWait(
-                                                         any(AlertType.class),
-                                                         anyString(),
-                                                         anyString(),
-                                                         any(ButtonType.class),
-                                                         any(ButtonType.class),
-                                                         any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(5))); // third vararg - cancel button
+                any(AlertType.class),
+                anyString(),
+                anyString(),
+                any(ButtonType.class),
+                any(ButtonType.class),
+                any(ButtonType.class))).thenAnswer(invocation -> Optional.of(invocation.getArgument(5))); // third vararg - cancel button
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, xmpPreferences, filePreferences, externalFileType);
         boolean removed = viewModel.delete();
@@ -152,12 +151,11 @@ class LinkedFileViewModelTest {
         assertTrue(Files.exists(tempFile));
     }
 
-    @FetcherTest
     void downloadDoesNotOverwriteFileTypeExtension() throws MalformedURLException {
         linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "");
 
         databaseContext = mock(BibDatabaseContext.class);
-        when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]"); //use this variant, as we cannot mock the linkedFileHandler cause it's initialized inside the viewModel
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, xmpPreferences, filePreferences, externalFileType);
 
@@ -169,5 +167,27 @@ class LinkedFileViewModelTest {
         });
         task.onFailure(Assertions::fail);
         new CurrentThreadTaskExecutor().execute(task);
+    }
+
+    @Test
+    void isNotSamePath() {
+        linkedFile = new LinkedFile("desc", tempFile, "pdf");
+        databaseContext = mock(BibDatabaseContext.class);
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
+        when(databaseContext.getFirstExistingFileDir(filePreferences)).thenReturn(Optional.of(Path.of("/home")));
+
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, xmpPreferences, filePreferences, externalFileType);
+        assertFalse(viewModel.isGeneratedPathSameAsOriginal());
+    }
+
+    @Test
+    void isSamePath() {
+        linkedFile = new LinkedFile("desc", tempFile, "pdf");
+        databaseContext = mock(BibDatabaseContext.class);
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
+        when(databaseContext.getFirstExistingFileDir(filePreferences)).thenReturn(Optional.of(tempFile.getParent()));
+
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, xmpPreferences, filePreferences, externalFileType);
+        assertTrue(viewModel.isGeneratedPathSameAsOriginal());
     }
 }

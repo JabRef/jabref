@@ -1,7 +1,7 @@
 package org.jabref.gui.auximport;
 
+import org.jabref.logic.auxparser.AuxParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.auxparser.AuxParserResult;
 
 public class AuxParserResultViewModel {
 

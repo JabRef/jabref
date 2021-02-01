@@ -126,5 +126,4 @@ public class EntryComparator implements Comparator<BibEntry> {
     private static int idCompare(BibEntry b1, BibEntry b2) {
         return b1.getId().compareTo(b2.getId());
     }
-
 }

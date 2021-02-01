@@ -9,12 +9,18 @@ on:
 
 env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
+  AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
+  IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
 
 jobs:
   checkstyle:
     name: Checkstyle
     runs-on: ubuntu-latest
     steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.7.0
+        with:
+          access_token: ${{ github.token }}
       - name: Checkout source
         uses: actions/checkout@v2
       - name: Set up JDK
@@ -35,8 +41,18 @@ jobs:
         with:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-      - name: Run checkstyle
+      - name: Run check style reporter
+        uses: nikitasavinov/checkstyle-action@master
+        with:
+          reporter: github-pr-check
+          checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
+      - name: Run checkstyle gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
+      - name: Run markdown-lint
+        uses: avto-dev/markdown-lint@v1
+        with:
+          args: CHANGELOG.md CONTRIBUTING.md README.md docs/
+          config: '.markdownlint.yml'
   tests:
     name: Unit tests
     runs-on: ubuntu-latest
@@ -48,7 +64,7 @@ jobs:
         with:
           java-version: 14
       - uses: actions/cache@v1
-        name: Restore gradle chache
+        name: Restore gradle cache
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
@@ -75,7 +91,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:10.8
+        image: postgres:13-alpine
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -92,7 +108,7 @@ jobs:
         with:
           java-version: 14
       - uses: actions/cache@v1
-        name: Restore gradle chache
+        name: Restore gradle cache
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
@@ -138,7 +154,7 @@ jobs:
         with:
           java-version: 14
       - uses: actions/cache@v1
-        name: Restore gradle chache
+        name: Restore gradle cache
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
@@ -188,7 +204,7 @@ jobs:
         with:
           java-version: 14
       - uses: actions/cache@v1
-        name: Restore gradle chache
+        name: Restore gradle cache
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
@@ -205,7 +221,7 @@ jobs:
         if: ${{ steps.checksecrets.outputs.secretspresent }}
         run: xvfb-run --auto-servernum ./gradlew jacocoTestReport && bash <(curl -s https://codecov.io/bash);
         env:
-          CI: "false" # we pretend to run locally - even if tests fail on the CI, they count towards test coverage
+          CI: "true"
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           DBMS: "postgresql"
   # This is https://github.com/marketplace/actions/gradle-wrapper-validation

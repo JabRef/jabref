@@ -2,64 +2,36 @@ package org.jabref.logic.journals;
 
 import java.util.Objects;
 
-import javafx.beans.property.SimpleStringProperty;
-
-import org.jabref.model.strings.StringUtil;
-
 public class Abbreviation implements Comparable<Abbreviation> {
 
-    private final SimpleStringProperty name = new SimpleStringProperty("");
-    private final SimpleStringProperty abbreviation = new SimpleStringProperty("");
-    private final SimpleStringProperty shortestUniqueAbbreviation = new SimpleStringProperty("");
+    private final String name;
+    private final String abbreviation;
+    private final String shortestUniqueAbbreviation;
 
     public Abbreviation(String name, String abbreviation) {
-        this(name, abbreviation, StringUtil.EMPTY);
+        this(name, abbreviation, "");
     }
 
     public Abbreviation(String name, String abbreviation, String shortestUniqueAbbreviation) {
-        this.name.set(Objects.requireNonNull(name).trim());
-        this.abbreviation.set(Objects.requireNonNull(abbreviation).trim());
-        this.shortestUniqueAbbreviation.set(shortestUniqueAbbreviation.trim());
+        this.name = name;
+        this.abbreviation = abbreviation;
+        this.shortestUniqueAbbreviation = shortestUniqueAbbreviation.trim();
     }
 
     public String getName() {
-        return name.get();
-    }
-
-    public void setName(String name) {
-        this.name.set(name);
-    }
-
-    public SimpleStringProperty nameProperty() {
         return name;
     }
 
     public String getAbbreviation() {
-        return abbreviation.get();
-    }
-
-    public void setAbbreviation(String abbreviation) {
-        this.abbreviation.set(abbreviation);
-    }
-
-    public SimpleStringProperty abbreviationProperty() {
         return abbreviation;
     }
 
     public String getShortestUniqueAbbreviation() {
-        String result = shortestUniqueAbbreviation.get();
+        String result = shortestUniqueAbbreviation;
         if (result.isEmpty()) {
             return getAbbreviation();
         }
         return result;
-    }
-
-    public void setShortestUniqueAbbreviation(String shortestUniqueAbbreviation) {
-        this.shortestUniqueAbbreviation.set(shortestUniqueAbbreviation);
-    }
-
-    public SimpleStringProperty shortestUniqueAbbreviationProperty() {
-        return shortestUniqueAbbreviation;
     }
 
     public String getMedlineAbbreviation() {

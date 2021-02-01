@@ -21,7 +21,7 @@ Chosen option: "Use MariaDB Connector", because comes out best \(see below\).
 
 The [MariaDB Connector](https://mariadb.com/kb/en/library/about-mariadb-connector-j/) is a LGPL-licensed JDBC driver to connect to MySQL and MariaDB.
 
-* Good, because can be used as drop-in replacement for MySQL connectopr
+* Good, because can be used as drop-in replacement for MySQL connector
 
 ### Use MySQL Connector
 
@@ -30,3 +30,4 @@ The [MySQL Connector](https://www.mysql.com/de/products/connector/) is distribut
 * Good, because it stems from the same development team than MySQL
 * Bad, because the "Universal FOSS Exception" makes licensing more complicated.
 
+<!-- markdownlint-disable-file MD024 -->

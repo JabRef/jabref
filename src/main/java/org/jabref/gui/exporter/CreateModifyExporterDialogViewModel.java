@@ -1,7 +1,6 @@
 package org.jabref.gui.exporter;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -11,7 +10,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.StandardFileType;
@@ -38,15 +37,15 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
     private final StringProperty layoutFile = new SimpleStringProperty("");
     private final StringProperty extension = new SimpleStringProperty("");
 
-    private final JournalAbbreviationLoader loader;
+    private final JournalAbbreviationRepository repository;
 
     public CreateModifyExporterDialogViewModel(ExporterViewModel exporter, DialogService dialogService, PreferencesService preferences,
-                                               JournalAbbreviationLoader loader) {
+                                               JournalAbbreviationRepository repository) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.loader = loader;
+        this.repository = repository;
 
-        //Set text of each of the boxes
+        // Set text of each of the boxes
         if (exporter != null) {
             name.setValue(exporter.name().get());
             layoutFile.setValue(exporter.layoutFileName().get());
@@ -55,10 +54,11 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
     }
 
     public ExporterViewModel saveExporter() {
-        Path layoutFileDir = Paths.get(layoutFile.get()).getParent();
+        Path layoutFileDir = Path.of(layoutFile.get()).getParent();
         if (layoutFileDir != null) {
             String layoutFileDirString = layoutFileDir.toString();
-            preferences.setExportWorkingDirectory(layoutFileDirString);
+            preferences.storeImportExportPreferences(
+                    preferences.getImportExportPreferences().withExportWorkingDirectory(Path.of(layoutFileDirString)));
         }
 
         // Check that there are no empty strings.
@@ -70,23 +70,19 @@ public class CreateModifyExporterDialogViewModel extends AbstractViewModel {
         }
 
         // Create a new exporter to be returned to ExportCustomizationDialogViewModel, which requested it
-        LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(loader);
-        SavePreferences savePreferences = preferences.loadForExportFromPreferences();
+        LayoutFormatterPreferences layoutPreferences = preferences.getLayoutFormatterPreferences(repository);
+        SavePreferences savePreferences = preferences.getSavePreferencesForExport();
         TemplateExporter format = new TemplateExporter(name.get(), layoutFile.get(), extension.get(),
                 layoutPreferences, savePreferences);
         format.setCustomExport(true);
         return new ExporterViewModel(format);
     }
 
-    public String getExportWorkingDirectory() {
-        return preferences.getExportWorkingDirectory();
-    }
-
     public void browse() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(Localization.lang("Custom layout file"), StandardFileType.LAYOUT)
                 .withDefaultExtension(Localization.lang("Custom layout file"), StandardFileType.LAYOUT)
-                .withInitialDirectory(getExportWorkingDirectory()).build();
+                .withInitialDirectory(preferences.getImportExportPreferences().getExportWorkingDirectory()).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(f -> layoutFile.set(f.toAbsolutePath().toString()));
     }
 

@@ -47,7 +47,6 @@ public class Replace extends AbstractParamLayoutFormatter {
         }
         regex = parts.get(0);
         replaceWith = parts.get(1);
-
     }
 
     @Override

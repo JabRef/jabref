@@ -38,13 +38,13 @@ class DoiResolutionTest {
     @Test
     void linkWithPdfStringLeadsToFulltext() throws IOException {
         entry.setField(StandardField.DOI, "10.1002/acr2.11101");
-        assertEquals(Optional.of(new URL("https://onlinelibrary.wiley.com/doi/epdf/10.1002/acr2.11101")), finder.findFullText(entry));
+        assertEquals(Optional.of(new URL("https://onlinelibrary.wiley.com/doi/pdf/10.1002/acr2.11101")), finder.findFullText(entry));
     }
 
     @Test
-    void multipleLinksWithSmallEditDistanceLeadToFulltext() throws IOException {
-        entry.setField(StandardField.DOI, "10.1002/acr2.11101");
-        assertEquals(Optional.of(new URL("https://onlinelibrary.wiley.com/doi/epdf/10.1002/acr2.11101")), finder.findFullText(entry));
+    void citationMetaTagLeadsToFulltext() throws IOException {
+        entry.setField(StandardField.DOI, "10.1007/978-3-319-89963-3_28");
+        assertEquals(Optional.of(new URL("https://link.springer.com/content/pdf/10.1007%2F978-3-319-89963-3_28.pdf")), finder.findFullText(entry));
     }
 
     @Test

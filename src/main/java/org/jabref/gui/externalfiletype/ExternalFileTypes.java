@@ -10,14 +10,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.jabref.Globals;
-import org.jabref.model.entry.FileFieldWriter;
+import org.jabref.gui.Globals;
+import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileHelper;
-import org.jabref.preferences.JabRefPreferences;
 
-//Do not make this class final, as it otherwise can't be mocked for tests
+// Do not make this class final, as it otherwise can't be mocked for tests
 public class ExternalFileTypes {
 
     // This String is used in the encoded list in prefs of external file type
@@ -56,7 +55,7 @@ public class ExternalFileTypes {
      * @return The ExternalFileType registered, or null if none.
      */
     public Optional<ExternalFileType> getExternalFileTypeByName(String name) {
-        Optional<ExternalFileType> externalFileType = externalFileTypes.stream().filter(type -> type.getExtension().equals(name)).findFirst();
+        Optional<ExternalFileType> externalFileType = externalFileTypes.stream().filter(type -> type.getName().equals(name)).findFirst();
         if (externalFileType.isPresent()) {
             return externalFileType;
         }
@@ -179,7 +178,7 @@ public class ExternalFileTypes {
             array[i] = new String[] {type.getName(), FILE_TYPE_REMOVED_FLAG};
             i++;
         }
-        Globals.prefs.put(JabRefPreferences.EXTERNAL_FILE_TYPES, FileFieldWriter.encodeStringArray(array));
+        Globals.prefs.storeExternalFileTypes(FileFieldWriter.encodeStringArray(array));
     }
 
     /**
@@ -190,7 +189,7 @@ public class ExternalFileTypes {
      * @return A String[] containing all information about this file type.
      */
     private String[] getStringArrayRepresentation(ExternalFileType type) {
-        return new String[]{type.getName(), type.getExtension(), type.getMimeType(), type.getOpenWithApplication(), type.getIcon().name()};
+        return new String[] {type.getName(), type.getExtension(), type.getMimeType(), type.getOpenWithApplication(), type.getIcon().name()};
     }
 
     /**
@@ -200,14 +199,16 @@ public class ExternalFileTypes {
         // First get a list of the default file types as a starting point:
         List<ExternalFileType> types = new ArrayList<>(getDefaultExternalFileTypes());
         // If no changes have been stored, simply use the defaults:
-        if (Globals.prefs.get(JabRefPreferences.EXTERNAL_FILE_TYPES, null) == null) {
+        Optional<String> storedFileTypes = Globals.prefs.getExternalFileTypes();
+        if (storedFileTypes.isEmpty()) {
             externalFileTypes.clear();
             externalFileTypes.addAll(types);
             return;
         }
+
         // Read the prefs information for file types:
         String[][] vals = StringUtil
-                .decodeStringDoubleArray(Globals.prefs.get(JabRefPreferences.EXTERNAL_FILE_TYPES, ""));
+                .decodeStringDoubleArray(storedFileTypes.orElse(""));
         for (String[] val : vals) {
             if ((val.length == 2) && val[1].equals(FILE_TYPE_REMOVED_FLAG)) {
                 // This entry indicates that a default entry type should be removed:
@@ -256,7 +257,7 @@ public class ExternalFileTypes {
 
     public Optional<ExternalFileType> fromLinkedFile(LinkedFile linkedFile, boolean deduceUnknownType) {
         Optional<ExternalFileType> type = getExternalFileTypeByName(linkedFile.getFileType());
-        boolean isUnknownType = !type.isPresent() || (type.get() instanceof UnknownExternalFileType);
+        boolean isUnknownType = type.isEmpty() || (type.get() instanceof UnknownExternalFileType);
 
         if (isUnknownType && deduceUnknownType) {
             // No file type was recognized. Try to find a usable file type based on mime type:
@@ -267,7 +268,7 @@ public class ExternalFileTypes {
 
             // No type could be found from mime type. Try based on the extension:
             return FileHelper.getFileExtension(linkedFile.getLink())
-                    .flatMap(this::getExternalFileTypeByExt);
+                             .flatMap(this::getExternalFileTypeByExt);
         } else {
             return type;
         }

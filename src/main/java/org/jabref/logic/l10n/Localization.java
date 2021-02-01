@@ -1,6 +1,7 @@
 package org.jabref.logic.l10n;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -48,13 +49,15 @@ public class Localization {
      * @param params Replacement strings for parameters %0, %1, etc.
      * @return The message with replaced parameters
      */
-    public static String lang(String key, String... params) {
+    public static String lang(String key, Object... params) {
         if (localizedMessages == null) {
             // I'm logging this because it should never happen
-            LOGGER.error("Messages are not initialized before accessing key: " + key);
+            LOGGER.error("Messages are not initialized before accessing key: {}", key);
             setLanguage(Language.ENGLISH);
         }
-        return lookup(localizedMessages, key, params);
+        var stringParams = Arrays.stream(params).map(Object::toString).toArray(String[]::new);
+
+        return lookup(localizedMessages, key, stringParams);
     }
 
     /**
@@ -67,7 +70,7 @@ public class Localization {
         Optional<Locale> knownLanguage = Language.convertToSupportedLocale(language);
         final Locale defaultLocale = Locale.getDefault();
         if (knownLanguage.isEmpty()) {
-            LOGGER.warn("Language " + language + " is not supported by JabRef (Default:" + defaultLocale + ")");
+            LOGGER.warn("Language {} is not supported by JabRef (Default: {})", language, defaultLocale);
             setLanguage(Language.ENGLISH);
             return;
         }
@@ -133,9 +136,9 @@ public class Localization {
      * This looks up a key in the bundle and replaces parameters %0, ..., %9 with the respective params given. Note that
      * the keys are the "unescaped" strings from the bundle property files.
      *
-     * @param bundle            The {@link LocalizationBundle} which is usually {@link Localization#localizedMessages}.
-     * @param key               The lookup key.
-     * @param params            The parameters that should be inserted into the message
+     * @param bundle The {@link LocalizationBundle} which is usually {@link Localization#localizedMessages}.
+     * @param key    The lookup key.
+     * @param params The parameters that should be inserted into the message
      * @return The final message with replaced parameters.
      */
     private static String lookup(LocalizationBundle bundle, String key, String... params) {
@@ -143,7 +146,7 @@ public class Localization {
 
         String translation = bundle.containsKey(key) ? bundle.getString(key) : "";
         if (translation.isEmpty()) {
-            LOGGER.warn("Warning: could not get translation for \"" + key + "\" for locale " + Locale.getDefault());
+            LOGGER.warn("Warning: could not get translation for \"{}\" for locale {}", key, Locale.getDefault());
             translation = key;
         }
         return new LocalizationKeyParams(translation, params).replacePlaceholders();

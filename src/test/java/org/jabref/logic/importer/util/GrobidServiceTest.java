@@ -19,7 +19,7 @@ public class GrobidServiceTest {
 
     @BeforeAll
     public static void setup() {
-        grobidService = new GrobidService("http://grobid.cm.in.tum.de:8070");
+        grobidService = new GrobidService("http://grobid.jabref.org:8070");
     }
 
     @Test
@@ -30,7 +30,7 @@ public class GrobidServiceTest {
         String[] responseRows = response.split("\n");
         assertNotNull(response);
         assertEquals('@', response.charAt(0));
-        assertTrue(responseRows[1].contains("author") && responseRows[1].contains("Derwing and M Rossiter"));
+        assertTrue(responseRows[1].contains("author") && responseRows[1].contains("Derwing, T and Rossiter, M"));
         assertTrue(responseRows[2].contains("title") && responseRows[2].contains("Teaching native speakers"));
         assertTrue(responseRows[3].contains("journal") && responseRows[3].contains("Journal of Multilingual and Multicultural"));
         assertTrue(responseRows[4].contains("year") && responseRows[4].contains("2002"));

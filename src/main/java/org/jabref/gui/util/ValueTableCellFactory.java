@@ -8,10 +8,10 @@ import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Screen;
 import javafx.util.Callback;
 
 import org.jabref.model.strings.StringUtil;
@@ -78,8 +78,7 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
 
     @Override
     public TableCell<S, T> call(TableColumn<S, T> param) {
-
-        return new TableCell<S, T>() {
+        return new TableCell<>() {
 
             @Override
             protected void updateItem(T item, boolean empty) {
@@ -91,7 +90,7 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                     setOnMouseClicked(null);
                     setTooltip(null);
                 } else {
-                    S rowItem = ((TableRow<S>) getTableRow()).getItem();
+                    S rowItem = getTableRow().getItem();
 
                     if (toText != null) {
                         setText(toText.apply(item));
@@ -102,7 +101,12 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                     if (toTooltip != null) {
                         String tooltipText = toTooltip.apply(rowItem, item);
                         if (StringUtil.isNotBlank(tooltipText)) {
-                            setTooltip(new Tooltip(tooltipText));
+                            Screen currentScreen = Screen.getPrimary();
+                            double maxWidth = currentScreen.getBounds().getWidth();
+                            Tooltip tooltip = new Tooltip(tooltipText);
+                            tooltip.setMaxWidth(maxWidth * 2 / 3);
+                            tooltip.setWrapText(true);
+                            setTooltip(tooltip);
                         }
                     }
 

@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -83,14 +82,14 @@ public class OvidImporterTest {
 
     @Test
     public void testImportEmpty() throws IOException, URISyntaxException {
-        Path file = Paths.get(OvidImporter.class.getResource("Empty.txt").toURI());
+        Path file = Path.of(OvidImporter.class.getResource("Empty.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), entries);
     }
 
     @Test
     public void testImportEntries1() throws IOException, URISyntaxException {
-        Path file = Paths.get(OvidImporter.class.getResource("OvidImporterTest1.txt").toURI());
+        Path file = Path.of(OvidImporter.class.getResource("OvidImporterTest1.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         assertEquals(5, entries.size());
 
@@ -143,7 +142,7 @@ public class OvidImporterTest {
 
     @Test
     public void testImportEntries2() throws IOException, URISyntaxException {
-        Path file = Paths.get(OvidImporter.class.getResource("OvidImporterTest2Invalid.txt").toURI());
+        Path file = Path.of(OvidImporter.class.getResource("OvidImporterTest2Invalid.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), entries);
     }
@@ -152,7 +151,7 @@ public class OvidImporterTest {
     public void testImportSingleEntries() throws IOException, URISyntaxException {
 
         for (int n = 3; n <= 7; n++) {
-            Path file = Paths.get(OvidImporter.class.getResource("OvidImporterTest" + n + ".txt").toURI());
+            Path file = Path.of(OvidImporter.class.getResource("OvidImporterTest" + n + ".txt").toURI());
             try (InputStream nis = OvidImporter.class.getResourceAsStream("OvidImporterTestBib" + n + ".bib")) {
                 List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase()
                                                  .getEntries();

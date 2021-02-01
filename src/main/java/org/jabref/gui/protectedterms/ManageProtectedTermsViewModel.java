@@ -1,6 +1,8 @@
 package org.jabref.gui.protectedterms;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javafx.collections.FXCollections;
@@ -14,6 +16,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsList;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.OptionalUtil;
@@ -42,7 +45,32 @@ public class ManageProtectedTermsViewModel {
     }
 
     public void save() {
-        preferences.setProtectedTermsPreferences(termsLoader);
+        List<String> enabledExternalList = new ArrayList<>();
+        List<String> disabledExternalList = new ArrayList<>();
+        List<String> enabledInternalList = new ArrayList<>();
+        List<String> disabledInternalList = new ArrayList<>();
+
+        for (ProtectedTermsList list : termsLoader.getProtectedTermsLists()) {
+            if (list.isInternalList()) {
+                if (list.isEnabled()) {
+                    enabledInternalList.add(list.getLocation());
+                } else {
+                    disabledInternalList.add(list.getLocation());
+                }
+            } else {
+                if (list.isEnabled()) {
+                    enabledExternalList.add(list.getLocation());
+                } else {
+                    disabledExternalList.add(list.getLocation());
+                }
+            }
+        }
+
+        preferences.storeProtectedTermsPreferences(new ProtectedTermsPreferences(
+                enabledInternalList,
+                enabledExternalList,
+                disabledInternalList,
+                disabledExternalList));
     }
 
     public void addFile() {
@@ -68,8 +96,7 @@ public class ManageProtectedTermsViewModel {
     }
 
     public void createNewFile() {
-        NewProtectedTermsFileDialog newDialog = new NewProtectedTermsFileDialog(termsLoader, dialogService);
-        newDialog.showAndWait();
+        dialogService.showCustomDialogAndWait(new NewProtectedTermsFileDialog(termsLoader, dialogService));
     }
 
     public void edit(ProtectedTermsList file) {

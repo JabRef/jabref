@@ -31,6 +31,6 @@
             </HBox>
         </VBox>
     </content>
+    <ButtonType buttonData="OK_DONE" text="%Save"/>
     <ButtonType fx:constant="CANCEL"/>
-    <ButtonType fx:constant="APPLY"/>
 </DialogPane>

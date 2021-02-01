@@ -1,6 +1,6 @@
 package org.jabref.gui.exporter;
 
-import org.jabref.Globals;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
@@ -30,22 +30,14 @@ public class SaveAction extends SimpleCommand {
     @Override
     public void execute() {
         SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction(
-                frame.getCurrentBasePanel(),
+                frame.getCurrentLibraryTab(),
                 Globals.prefs,
                 Globals.entryTypesManager);
 
         switch (saveMethod) {
-            case SAVE:
-                saveDatabaseAction.save();
-                break;
-            case SAVE_AS:
-                saveDatabaseAction.saveAs();
-                break;
-            case SAVE_SELECTED:
-                saveDatabaseAction.saveSelectedAsPlain();
-                break;
-            default:
-                // Never happens
+            case SAVE -> saveDatabaseAction.save();
+            case SAVE_AS -> saveDatabaseAction.saveAs();
+            case SAVE_SELECTED -> saveDatabaseAction.saveSelectedAsPlain();
         }
     }
 }

@@ -2,7 +2,7 @@
 
 	<div class="bibtex_header">
 		<div class="bibtex_key">
-			<a name="\bibtexkey">\bibtexkey</a>
+			<a name="\citationkey">\citationkey</a>
 		</div>
 
 		\begin{file}

@@ -8,9 +8,7 @@
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-
 <?import org.jabref.gui.icon.JabRefIconView?>
-
 <fx:root prefWidth="650.0" spacing="10.0" type="VBox" xmlns="http://javafx.com/javafx/11.0.1"
          xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.preferences.NameFormatterTabView">
     <Label styleClass="titleHeader" text="%Special name formatters"/>
@@ -36,7 +34,7 @@
         </VBox>
         <VBox>
             <Button fx:id="formatterHelp" prefHeight="25.0" prefWidth="25.0"/>
-            <VBox VBox.vgrow="ALWAYS" />
+            <VBox VBox.vgrow="ALWAYS"/>
             <Button styleClass="icon-button,narrow" onAction="#addFormatter"
                     prefHeight="25.0" prefWidth="25.0">
                 <graphic>

@@ -19,8 +19,8 @@ public interface FulltextFetcher {
      * @param entry The Bibtex entry
      * @return The fulltext PDF URL Optional, if found, or an empty Optional if not found.
      * @throws NullPointerException if no BibTex entry is given
-     * @throws java.io.IOException if an IO operation has failed
-     * @throws FetcherException if a fetcher specific error occurred
+     * @throws java.io.IOException  if an IO operation has failed
+     * @throws FetcherException     if a fetcher specific error occurred
      */
     Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException;
 

@@ -5,13 +5,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 
 /**
  * This group contains entries, which were manually assigned to it.
- * Assignments are stored in the {@link InternalField#GROUPS} field.
+ * Assignments are stored in the {@link StandardField#GROUPS} field.
  * Thus, internally, we represent {@link ExplicitGroup} as a special {@link WordKeywordGroup} operating on
- * {@link InternalField#GROUPS}.
+ * {@link StandardField#GROUPS}.
  */
 public class ExplicitGroup extends WordKeywordGroup {
 
@@ -22,7 +22,7 @@ public class ExplicitGroup extends WordKeywordGroup {
     private final List<String> legacyEntryKeys = new ArrayList<>();
 
     public ExplicitGroup(String name, GroupHierarchyType context, Character keywordSeparator) {
-        super(name, context, InternalField.GROUPS, name, true, keywordSeparator, true);
+        super(name, context, StandardField.GROUPS, name, true, keywordSeparator, true);
     }
 
     public void addLegacyEntryKey(String key) {

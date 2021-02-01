@@ -9,7 +9,6 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-
 <fx:root prefWidth="650.0" spacing="10.0" type="VBox"
          xmlns="http://javafx.com/javafx/8.0.212" xmlns:fx="http://javafx.com/fxml/1"
          fx:controller="org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel">
@@ -27,14 +26,14 @@
     <GridPane hgap="10.0" vgap="4.0">
         <columnConstraints>
             <ColumnConstraints hgrow="NEVER" minWidth="25.0" maxWidth="25.0"/>
-            <ColumnConstraints hgrow="SOMETIMES" percentWidth="30.0" />
-            <ColumnConstraints hgrow="SOMETIMES" />
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="30.0"/>
+            <ColumnConstraints hgrow="SOMETIMES"/>
             <ColumnConstraints hgrow="SOMETIMES" halignment="LEFT"/>
         </columnConstraints>
         <rowConstraints>
-            <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints minHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints minHeight="30.0" vgrow="SOMETIMES"/>
         </rowConstraints>
 
         <Label text="%Primary sort criterion" GridPane.columnIndex="1" GridPane.rowIndex="0"

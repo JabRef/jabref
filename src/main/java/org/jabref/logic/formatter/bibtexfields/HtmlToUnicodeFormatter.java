@@ -1,9 +1,9 @@
 package org.jabref.logic.formatter.bibtexfields;
 
 import org.jabref.architecture.ApacheCommonsLang3Allowed;
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
-import org.jabref.model.cleanup.Formatter;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -33,6 +33,6 @@ public class HtmlToUnicodeFormatter extends Formatter implements LayoutFormatter
     @Override
     public String format(String fieldText) {
         // StringEscapeUtils converts characters and regex kills tags
-        return StringEscapeUtils.unescapeHtml4(fieldText).replaceAll("<[^>]*>","");
+        return StringEscapeUtils.unescapeHtml4(fieldText).replaceAll("<[^>]*>", "");
     }
 }

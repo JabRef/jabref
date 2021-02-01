@@ -57,5 +57,4 @@ public abstract class EntryEditorTab extends Tab {
     protected void previousPreviewStyle() {
         // do nothing by default
     }
-
 }

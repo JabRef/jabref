@@ -15,6 +15,7 @@ import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.TextInputDialog;
 
+import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
@@ -30,7 +31,7 @@ public interface DialogService {
      * This will create and display new {@link ChoiceDialog} of type T with a default choice and a collection of possible choices
      *
      * @implNote The implementation should accept {@code null} for {@code defaultChoice}, but callers should use {@link #showChoiceDialogAndWait(String, String, String, Collection)}.
-    */
+     */
     <T> Optional<T> showChoiceDialogAndWait(String title, String content, String okButtonLabel, T defaultChoice, Collection<T> choices);
 
     /**
@@ -161,6 +162,13 @@ public interface DialogService {
                                                     String optOutMessage, Consumer<Boolean> optOutAction);
 
     /**
+     * Shows a custom dialog without returning any results.
+     *
+     * @param dialog dialog to show
+     */
+    void showCustomDialog(BaseDialog<?> dialog);
+
+    /**
      * This will create and display a new dialog of the specified
      * {@link Alert.AlertType} but with user defined buttons as optional
      * {@link ButtonType}s.
@@ -184,16 +192,27 @@ public interface DialogService {
      * @param dialog dialog to show
      * @param <R>    type of result
      */
-    <R> Optional<R> showCustomDialogAndWait(Dialog<R> dialog);
+    <R> Optional<R> showCustomDialogAndWait(javafx.scene.control.Dialog<R> dialog);
 
     /**
      * Constructs and shows a canceable {@link ProgressDialog}. Clicking cancel will cancel the underlying service and close the dialog
      *
-     * @param title title of the dialog
+     * @param title   title of the dialog
      * @param content message to show above the progress bar
-     * @param task The {@link Task} which executes the work and for which to show the dialog
+     * @param task    The {@link Task} which executes the work and for which to show the dialog
      */
-    <V> void showProgressDialogAndWait(String title, String content, Task<V> task);
+    <V> void showProgressDialog(String title, String content, Task<V> task);
+
+    /**
+     * Constructs and shows a dialog showing the progress of running background tasks.
+     * Clicking cancel will cancel the underlying service and close the dialog.
+     * The dialog will exit as soon as none of the background tasks are running
+     *
+     * @param title        title of the dialog
+     * @param content      message to show below the list of background tasks
+     * @param stateManager The {@link StateManager} which contains the background tasks
+     */
+    <V> Optional<ButtonType> showBackgroundProgressDialogAndWait(String title, String content, StateManager stateManager);
 
     /**
      * Notify the user in an non-blocking way (i.e., in form of toast in a snackbar).

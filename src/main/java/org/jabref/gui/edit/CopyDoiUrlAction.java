@@ -4,8 +4,8 @@ import java.util.Optional;
 
 import javafx.scene.control.TextArea;
 
-import org.jabref.Globals;
-import org.jabref.JabRefGUI;
+import org.jabref.gui.Globals;
+import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.identifier.DOI;
@@ -27,7 +27,7 @@ public class CopyDoiUrlAction extends SimpleCommand {
 
         Optional<String> urlOptional = DOI.parse(identifier).map(DOI::getURIAsASCIIString);
         if (urlOptional.isPresent()) {
-            Globals.clipboardManager.setContent(urlOptional.get());
+            Globals.getClipboardManager().setContent(urlOptional.get());
             JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("The link has been copied to the clipboard."));
         } else {
             JabRefGUI.getMainFrame().getDialogService().notify(Localization.lang("Invalid DOI: '%0'.", identifier));

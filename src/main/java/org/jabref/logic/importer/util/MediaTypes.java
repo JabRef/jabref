@@ -5,4 +5,5 @@ package org.jabref.logic.importer.util;
  */
 public class MediaTypes {
     public static final String APPLICATION_BIBTEX = "application/x-bibtex";
+    public static final String CITATIONSTYLES_JSON = "application/vnd.citationstyles.csl+json";
 }

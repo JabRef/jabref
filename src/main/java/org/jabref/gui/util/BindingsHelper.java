@@ -4,9 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.binding.StringBinding;
@@ -22,26 +20,16 @@ import javafx.collections.ObservableMap;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
 
-import org.fxmisc.easybind.EasyBind;
-import org.fxmisc.easybind.PreboundBinding;
-import org.fxmisc.easybind.Subscription;
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.PreboundBinding;
+import com.tobiasdiez.easybind.Subscription;
 
 /**
- * Helper methods for javafx binding.
- * Some methods are taken from https://bugs.openjdk.java.net/browse/JDK-8134679
+ * Helper methods for javafx binding. Some methods are taken from https://bugs.openjdk.java.net/browse/JDK-8134679
  */
 public class BindingsHelper {
 
     private BindingsHelper() {
-    }
-
-    public static <T> BooleanBinding any(ObservableList<T> source, Predicate<T> predicate) {
-        return Bindings.createBooleanBinding(() -> source.stream().anyMatch(predicate), source);
-    }
-
-    public static <T> BooleanBinding all(ObservableList<T> source, Predicate<T> predicate) {
-        // Stream.allMatch() (in contrast to Stream.anyMatch() returns 'true' for empty streams, so this has to be checked explicitly.
-        return Bindings.createBooleanBinding(() -> !source.isEmpty() && source.stream().allMatch(predicate), source);
     }
 
     public static Subscription includePseudoClassWhen(Node node, PseudoClass pseudoClass, ObservableValue<? extends Boolean> condition) {
@@ -53,20 +41,8 @@ public class BindingsHelper {
         return subscription;
     }
 
-    /**
-     * Creates a new list in which each element is converted using the provided mapping.
-     * All changes to the underlying list are propagated to the converted list.
-     *
-     * In contrast to {@link org.fxmisc.easybind.EasyBind#map(ObservableList, Function)},
-     * the items are converted when the are inserted (and at the initialization) instead of when they are accessed.
-     * Thus the initial CPU overhead and memory consumption is higher but the access to list items is quicker.
-     */
-    public static <A, B> MappedList<B, A> mapBacked(ObservableList<A> source, Function<A, B> mapper) {
-        return new MappedList<>(source, mapper);
-    }
-
     public static <T, U> ObservableList<U> map(ObservableValue<T> source, Function<T, List<U>> mapper) {
-        PreboundBinding<List<U>> binding = new PreboundBinding<List<U>>(source) {
+        PreboundBinding<List<U>> binding = new PreboundBinding<>(source) {
 
             @Override
             protected List<U> computeValue() {
@@ -80,7 +56,7 @@ public class BindingsHelper {
     }
 
     /**
-     * Binds propertA bidirectional to propertyB using the provided map functions to convert between them.
+     * Binds propertyA bidirectional to propertyB using the provided map functions to convert between them.
      */
     public static <A, B> void bindBidirectional(Property<A> propertyA, Property<B> propertyB, Function<A, B> mapAtoB, Function<B, A> mapBtoA) {
         Consumer<B> updateA = newValueB -> propertyA.setValue(mapBtoA.apply(newValueB));
@@ -89,15 +65,14 @@ public class BindingsHelper {
     }
 
     /**
-     * Binds propertA bidirectional to propertyB while using updateB to update propertyB when propertyA changed.
+     * Binds propertyA bidirectional to propertyB while using updateB to update propertyB when propertyA changed.
      */
     public static <A> void bindBidirectional(Property<A> propertyA, ObservableValue<A> propertyB, Consumer<A> updateB) {
         bindBidirectional(propertyA, propertyB, propertyA::setValue, updateB);
     }
 
     /**
-     * Binds propertA bidirectional to propertyB using updateB to update propertyB when propertyA changed and similar
-     * for updateA.
+     * Binds propertyA bidirectional to propertyB using updateB to update propertyB when propertyA changed and similar for updateA.
      */
     public static <A, B> void bindBidirectional(ObservableValue<A> propertyA, ObservableValue<B> propertyB, Consumer<B> updateA, Consumer<A> updateB) {
         final BidirectionalBinding<A, B> binding = new BidirectionalBinding<>(propertyA, propertyB, updateA, updateB);
@@ -111,10 +86,10 @@ public class BindingsHelper {
 
     public static <A, B> void bindContentBidirectional(ObservableList<A> propertyA, ListProperty<B> propertyB, Consumer<ObservableList<B>> updateA, Consumer<List<A>> updateB) {
         bindContentBidirectional(
-                                 propertyA,
-                                 (ObservableValue<ObservableList<B>>) propertyB,
-                                 updateA,
-                                 updateB);
+                propertyA,
+                (ObservableValue<ObservableList<B>>) propertyB,
+                updateA,
+                updateB);
     }
 
     public static <A, B> void bindContentBidirectional(ObservableList<A> propertyA, ObservableValue<B> propertyB, Consumer<B> updateA, Consumer<List<A>> updateB) {
@@ -132,10 +107,10 @@ public class BindingsHelper {
         Consumer<List<A>> updateB = newValueList -> property.setValue(mapToB.apply(newValueList));
 
         bindContentBidirectional(
-                                 listProperty,
-                                 property,
-                                 updateList,
-                                 updateB);
+                listProperty,
+                property,
+                updateList,
+                updateB);
     }
 
     public static <A, V, B> void bindContentBidirectional(ObservableMap<A, V> propertyA, ObservableValue<B> propertyB, Consumer<B> updateA, Consumer<Map<A, V>> updateB) {
@@ -151,14 +126,14 @@ public class BindingsHelper {
     public static <A, V, B> void bindContentBidirectional(ObservableMap<A, V> propertyA, Property<B> propertyB, Consumer<B> updateA, Function<Map<A, V>, B> mapToB) {
         Consumer<Map<A, V>> updateB = newValueList -> propertyB.setValue(mapToB.apply(newValueList));
         bindContentBidirectional(
-                                 propertyA,
-                                 propertyB,
-                                 updateA,
-                                 updateB);
+                propertyA,
+                propertyB,
+                updateA,
+                updateB);
     }
 
     public static <T> ObservableValue<T> constantOf(T value) {
-        return new ObjectBinding<T>() {
+        return new ObjectBinding<>() {
 
             @Override
             protected T computeValue() {

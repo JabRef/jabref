@@ -33,5 +33,4 @@ public class LogMessages {
     public void clear() {
         messages.clear();
     }
-
 }

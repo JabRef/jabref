@@ -11,7 +11,7 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 /**
- * Wrapper around a {@link BibEntry} offering methods for {@link BibDatabaseMode} dependend results
+ * Wrapper around a {@link BibEntry} offering methods for {@link BibDatabaseMode}-dependent results
  */
 public class TypedBibEntry {
 
@@ -20,23 +20,23 @@ public class TypedBibEntry {
     private final BibDatabaseMode mode;
 
     public TypedBibEntry(BibEntry entry, BibDatabaseMode mode) {
-        this(entry, Optional.empty(), mode);
-    }
-
-    private TypedBibEntry(BibEntry entry, Optional<BibDatabase> database, BibDatabaseMode mode) {
         this.entry = Objects.requireNonNull(entry);
-        this.database = Objects.requireNonNull(database);
+        this.database = Optional.empty();
+        // mode may be null
         this.mode = mode;
     }
 
     public TypedBibEntry(BibEntry entry, BibDatabaseContext databaseContext) {
-        this(entry, Optional.of(databaseContext.getDatabase()), databaseContext.getMode());
+        this.entry = Objects.requireNonNull(entry);
+        this.database = Optional.of(databaseContext.getDatabase());
+        this.mode = Objects.requireNonNull(databaseContext).getMode();
     }
 
     /**
-     * Returns true if this entry contains the fields it needs to be
-     * complete.
-     * @param entryTypesManager
+     * Checks the fields of the entry whether all required fields are set.
+     * In other words: It is checked whether this entry contains all fields it needs to be complete.
+     *
+     * @return true if all required fields are set, false otherwise
      */
     public boolean hasAllRequiredFields(BibEntryTypesManager entryTypesManager) {
         Optional<BibEntryType> type = entryTypesManager.enrich(entry.getType(), this.mode);

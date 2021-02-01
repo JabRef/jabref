@@ -352,7 +352,7 @@ public class BiblatexEntryTypeDefinitions {
             .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.DATE)
             .withDetailFields(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.LANGUAGE, StandardField.HOWPUBLISHED,
                     StandardField.NOTE, StandardField.LOCATION, StandardField.ADDENDUM, StandardField.PUBSTATE, StandardField.EVENTTITLE,
-                    StandardField.EVENTDATE,StandardField.VENUE, StandardField.URL, StandardField.URLDATE)
+                    StandardField.EVENTDATE, StandardField.VENUE, StandardField.URL, StandardField.URLDATE)
             .build();
 
     private static final BibEntryType CONFERENCE = new BibEntryTypeBuilder()
@@ -427,7 +427,7 @@ public class BiblatexEntryTypeDefinitions {
             .build();
 
     private static final BibEntryType DATASET = new BibEntryTypeBuilder()
-            .withType(StandardEntryType.DATESET)
+            .withType(StandardEntryType.Dataset)
             .withImportantFields(
                     StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.HOWPUBLISHED, StandardField.LOCATION, StandardField.DOI,
                     StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
@@ -437,8 +437,6 @@ public class BiblatexEntryTypeDefinitions {
                     StandardField.ADDENDUM, StandardField.PUBSTATE, StandardField.DOI, StandardField.EPRINT,
                     StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
             .build();
-
-
 
     public static final List<BibEntryType> ALL = Arrays.asList(ARTICLE, BOOK, MVBOOK, INBOOK, BOOKINBOOK, SUPPBOOK,
             BOOKLET, COLLECTION, MVCOLLECTION, INCOLLECTION, SUPPCOLLECTION, MANUAL, MISC, ONLINE, PATENT, PERIODICAL,

@@ -1,7 +1,6 @@
 package org.jabref.model.groups;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -10,13 +9,12 @@ import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.model.util.OptionalUtil;
 
 public class AutomaticKeywordGroup extends AutomaticGroup {
 
-    private Character keywordDelimiter;
-    private Character keywordHierarchicalDelimiter;
-    private Field field;
+    private final Character keywordDelimiter;
+    private final Character keywordHierarchicalDelimiter;
+    private final Field field;
 
     public AutomaticKeywordGroup(String name, GroupHierarchyType context, Field field, Character keywordDelimiter, Character keywordHierarchicalDelimiter) {
         super(name, context);
@@ -62,13 +60,11 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
 
     @Override
     public Set<GroupTreeNode> createSubgroups(BibEntry entry) {
-        Optional<KeywordList> keywordList = entry.getLatexFreeField(field)
-                                                 .map(fieldValue -> KeywordList.parse(fieldValue, keywordDelimiter));
-        return OptionalUtil.toStream(keywordList)
-                           .flatMap(KeywordList::stream)
-                           .filter(keyword -> StringUtil.isNotBlank(keyword.get()))
-                           .map(this::createGroup)
-                           .collect(Collectors.toSet());
+        KeywordList keywordList = entry.getFieldAsKeywords(field, keywordDelimiter);
+        return keywordList.stream()
+                          .filter(keyword -> StringUtil.isNotBlank(keyword.get()))
+                          .map(this::createGroup)
+                          .collect(Collectors.toSet());
     }
 
     private GroupTreeNode createGroup(Keyword keywordChain) {

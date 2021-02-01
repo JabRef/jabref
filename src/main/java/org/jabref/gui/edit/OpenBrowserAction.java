@@ -15,5 +15,4 @@ public class OpenBrowserAction extends SimpleCommand {
     public void execute() {
         JabRefDesktop.openBrowserShowPopup(urlToOpen);
     }
-
 }

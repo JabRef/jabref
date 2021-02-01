@@ -1,6 +1,6 @@
 coverage:
   ignore:
-  - src/gen/.*
+  - src/generated/.*
   status:
     patch: false
     project:

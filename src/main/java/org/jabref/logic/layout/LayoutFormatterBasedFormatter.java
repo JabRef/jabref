@@ -1,9 +1,9 @@
 package org.jabref.logic.layout;
 
-import org.jabref.model.cleanup.Formatter;
+import org.jabref.logic.cleanup.Formatter;
 
 /**
- * When having to use a LayoutFormatter as Formatter, this class is helpful. One usecase is {@link org.jabref.model.cleanup.FieldFormatterCleanup}
+ * When having to use a LayoutFormatter as Formatter, this class is helpful. One usecase is {@link org.jabref.logic.cleanup.FieldFormatterCleanup}
  */
 public class LayoutFormatterBasedFormatter extends Formatter {
 

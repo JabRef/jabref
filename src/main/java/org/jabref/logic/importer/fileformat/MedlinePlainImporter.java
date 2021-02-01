@@ -16,7 +16,6 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
@@ -24,9 +23,8 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 /**
  * Importer for the MEDLINE Plain format.
- *
- * check here for details on the format
- * http://www.nlm.nih.gov/bsd/mms/medlineelements.html
+ * <p>
+ * check here for details on the format http://www.nlm.nih.gov/bsd/mms/medlineelements.html
  */
 public class MedlinePlainImporter extends Importer {
 
@@ -75,11 +73,11 @@ public class MedlinePlainImporter extends Importer {
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
 
-        //use optional here, so that no exception will be thrown if the file is empty
+        // use optional here, so that no exception will be thrown if the file is empty
         String linesAsString = reader.lines().reduce((line, nextline) -> line + "\n" + nextline).orElse("");
 
         String[] entries = linesAsString.replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
-                .split("\\n\\n");
+                                        .split("\\n\\n");
 
         for (String entry1 : entries) {
 
@@ -146,7 +144,7 @@ public class MedlinePlainImporter extends Importer {
                     }
                 }
 
-                //store the fields in a map
+                // store the fields in a map
                 Map<String, Field> hashMap = new HashMap<>();
                 hashMap.put("PG", StandardField.PAGES);
                 hashMap.put("PL", StandardField.ADDRESS);
@@ -170,9 +168,9 @@ public class MedlinePlainImporter extends Importer {
                 hashMap.put("STAT", new UnknownField("status"));
                 hashMap.put("SB", new UnknownField("subset"));
                 hashMap.put("OTO", new UnknownField("termowner"));
-                hashMap.put("OWN", InternalField.OWNER);
+                hashMap.put("OWN", StandardField.OWNER);
 
-                //add the fields to hm
+                // add the fields to hm
                 for (Map.Entry<String, Field> mapEntry : hashMap.entrySet()) {
                     String medlineKey = mapEntry.getKey();
                     Field bibtexKey = mapEntry.getValue();
@@ -219,7 +217,6 @@ public class MedlinePlainImporter extends Importer {
         }
 
         return new ParserResult(bibitems);
-
     }
 
     private boolean checkLineValidity(String line) {
@@ -256,9 +253,9 @@ public class MedlinePlainImporter extends Importer {
     private void addStandardNumber(Map<Field, String> hm, String lab, String value) {
         if ("IS".equals(lab)) {
             Field key = StandardField.ISSN;
-            //it is possible to have two issn, one for electronic and for print
-            //if there are two then it comes at the end in brackets (electronic) or (print)
-            //so search for the brackets
+            // it is possible to have two issn, one for electronic and for print
+            // if there are two then it comes at the end in brackets (electronic) or (print)
+            // so search for the brackets
             if (value.indexOf('(') > 0) {
                 int keyStart = value.indexOf('(');
                 int keyEnd = value.indexOf(')');
@@ -294,7 +291,6 @@ public class MedlinePlainImporter extends Importer {
                 idValue = value.substring(0, startOfIdentifier - 1);
             }
             hm.put(key, idValue);
-
         } else if ("LID".equals(lab)) {
             hm.put(new UnknownField("location-id"), value);
         } else if ("MID".equals(lab)) {
@@ -342,10 +338,10 @@ public class MedlinePlainImporter extends Importer {
     private void addAbstract(Map<Field, String> hm, String lab, String value) {
         String abstractValue = "";
         if ("AB".equals(lab)) {
-            //adds copyright information that comes at the end of an abstract
+            // adds copyright information that comes at the end of an abstract
             if (value.contains("Copyright")) {
                 int copyrightIndex = value.lastIndexOf("Copyright");
-                //remove the copyright from the field since the name of the field is copyright
+                // remove the copyright from the field since the name of the field is copyright
                 String copyrightInfo = value.substring(copyrightIndex).replaceAll("Copyright ", "");
                 hm.put(new UnknownField("copyright"), copyrightInfo);
                 abstractValue = value.substring(0, copyrightIndex);

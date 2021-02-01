@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
  * A file output stream that is similar to the standard {@link FileOutputStream}, except that all writes are first
  * redirected to a temporary file. When the stream is closed, the temporary file (atomically) replaces the target file.
  *
+ * <p>
  * In detail, the strategy is to:
  * <ol>
  * <li>Write to a temporary file (with .tmp suffix) in the same directory as the destination file.</li>
@@ -29,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * <li>Delete the backup file (if configured to do so).</li>
  * </ol>
  * If all goes well, no temporary or backup files will remain on disk after closing the stream.
- *
+ * <p>
  * Errors are handled as follows:
  * <ol>
  * <li>If anything goes wrong while writing to the temporary file, the temporary file will be deleted (leaving the
@@ -37,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * <li>If anything goes wrong while copying the temporary file to the target file, the backup of the original file is
  * kept.</li>
  * </ol>
- *
+ * <p>
  * Implementation inspired by code from <a href="https://github.com/martylamb/atomicfileoutputstream/blob/master/src/main/java/com/martiansoftware/io/AtomicFileOutputStream.java">Marty
  * Lamb</a> and <a href="https://github.com/apache/zookeeper/blob/master/src/java/main/org/apache/zookeeper/common/AtomicFileOutputStream.java">Apache</a>.
  */
@@ -67,7 +68,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     /**
      * Creates a new output stream to write to or replace the file at the specified path.
      *
-     * @param path the path of the file to write to or replace
+     * @param path       the path of the file to write to or replace
      * @param keepBackup whether to keep the backup file after a successful write process
      */
     public AtomicFileOutputStream(Path path, boolean keepBackup) throws IOException {
@@ -91,8 +92,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
     }
 
     /**
-     * Creates a new output stream to write to or replace the file at the specified path. The backup file is deleted
-     * when the write was successful.
+     * Creates a new output stream to write to or replace the file at the specified path. The backup file is deleted when the write was successful.
      *
      * @param path the path of the file to write to or replace
      */

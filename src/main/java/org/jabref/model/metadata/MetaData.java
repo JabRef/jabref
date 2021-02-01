@@ -9,10 +9,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
-import org.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
-import org.jabref.model.cleanup.FieldFormatterCleanups;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.citationkeypattern.AbstractCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPattern;
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.field.Field;
@@ -22,7 +26,12 @@ import org.jabref.model.groups.event.GroupUpdatedEvent;
 import org.jabref.model.metadata.event.MetaDataChangedEvent;
 
 import com.google.common.eventbus.EventBus;
+import com.tobiasdiez.easybind.optional.OptionalBinding;
+import com.tobiasdiez.easybind.optional.OptionalWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+@AllowedToUseLogic("because it needs access to citation pattern and cleanups")
 public class MetaData {
 
     public static final String META_FLAG = "jabref-meta: ";
@@ -33,7 +42,7 @@ public class MetaData {
     public static final String DATABASE_TYPE = "databaseType";
     public static final String GROUPSTREE = "grouping";
     public static final String GROUPSTREE_LEGACY = "groupstree";
-    public static final String FILE_DIRECTORY = "file" + FilePreferences.DIR_SUFFIX;
+    public static final String FILE_DIRECTORY = "fileDirectory";
     public static final String PROTECTED_FLAG_META = "protectedFlag";
     public static final String SELECTOR_META_PREFIX = "selector_";
 
@@ -41,11 +50,14 @@ public class MetaData {
     public static final char SEPARATOR_CHARACTER = ';';
     public static final String SEPARATOR_STRING = String.valueOf(SEPARATOR_CHARACTER);
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MetaData.class);
+
     private final EventBus eventBus = new EventBus();
     private final Map<EntryType, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
     private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
     private final Map<String, Path> laTexFileDirectory = new HashMap<>(); // <User, FilePath>
-    private GroupTreeNode groupsRoot;
+    private final ObjectProperty<GroupTreeNode> groupsRoot = new SimpleObjectProperty<>(null);
+    private final OptionalBinding<GroupTreeNode> groupsRootBinding = new OptionalWrapper<>(groupsRoot);
     private Charset encoding;
     private SaveOrderConfig saveOrderConfig;
     private String defaultCiteKeyPattern;
@@ -54,7 +66,7 @@ public class MetaData {
     private boolean isProtected;
     private String defaultFileDirectory;
     private final ContentSelectors contentSelectors = new ContentSelectors();
-    private final Map<String, List<String>> unkownMetaData = new HashMap<>();
+    private final Map<String, List<String>> unknownMetaData = new HashMap<>();
     private boolean isEventPropagationEnabled = true;
 
     /**
@@ -74,16 +86,21 @@ public class MetaData {
     }
 
     public Optional<GroupTreeNode> getGroups() {
-        return Optional.ofNullable(groupsRoot);
+        return groupsRootBinding.getValue();
+    }
+
+    public OptionalBinding<GroupTreeNode> groupsBinding() {
+        return groupsRootBinding;
     }
 
     /**
-     * Sets a new group root node. <b>WARNING </b>: This invalidates everything
-     * returned by getGroups() so far!!!
+     * Sets a new group root node. <b>WARNING </b>: This invalidates everything returned by getGroups() so far!!!
      */
     public void setGroups(GroupTreeNode root) {
-        groupsRoot = Objects.requireNonNull(root);
-        groupsRoot.subscribeToDescendantChanged(groupTreeNode -> eventBus.post(new GroupUpdatedEvent(this)));
+        Objects.requireNonNull(root);
+        groupsRoot.setValue(root);
+        root.subscribeToDescendantChanged(groupTreeNode -> groupsRootBinding.invalidate());
+        root.subscribeToDescendantChanged(groupTreeNode -> eventBus.post(new GroupUpdatedEvent(this)));
         eventBus.post(new GroupUpdatedEvent(this));
         postChange();
     }
@@ -91,12 +108,12 @@ public class MetaData {
     /**
      * @return the stored label patterns
      */
-    public AbstractBibtexKeyPattern getCiteKeyPattern(GlobalBibtexKeyPattern globalPattern) {
+    public AbstractCitationKeyPattern getCiteKeyPattern(GlobalCitationKeyPattern globalPattern) {
         Objects.requireNonNull(globalPattern);
-        AbstractBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(globalPattern);
+        AbstractCitationKeyPattern bibtexKeyPattern = new DatabaseCitationKeyPattern(globalPattern);
 
         // Add stored key patterns
-        citeKeyPatterns.forEach(bibtexKeyPattern::addBibtexKeyPattern);
+        citeKeyPatterns.forEach(bibtexKeyPattern::addCitationKeyPattern);
         getDefaultCiteKeyPattern().ifPresent(bibtexKeyPattern::setDefaultValue);
 
         return bibtexKeyPattern;
@@ -105,10 +122,9 @@ public class MetaData {
     /**
      * Updates the stored key patterns to the given key patterns.
      *
-     * @param bibtexKeyPattern the key patterns to update to. <br /> A reference to this object is stored internally and
-     *                         is returned at getCiteKeyPattern();
+     * @param bibtexKeyPattern the key patterns to update to. <br /> A reference to this object is stored internally and is returned at getCiteKeyPattern();
      */
-    public void setCiteKeyPattern(AbstractBibtexKeyPattern bibtexKeyPattern) {
+    public void setCiteKeyPattern(AbstractCitationKeyPattern bibtexKeyPattern) {
         Objects.requireNonNull(bibtexKeyPattern);
 
         List<String> defaultValue = bibtexKeyPattern.getDefaultValue();
@@ -266,7 +282,7 @@ public class MetaData {
     }
 
     /**
-     * This Method (with additional parameter) has been introduced to avoid event loops while saving a database.
+     * This method (with additional parameter) has been introduced to avoid event loops while saving a database.
      */
     public void setEncoding(Charset encoding, ChangePropagation postChanges) {
         this.encoding = Objects.requireNonNull(encoding);
@@ -311,14 +327,14 @@ public class MetaData {
     }
 
     public Map<String, List<String>> getUnknownMetaData() {
-        return Collections.unmodifiableMap(unkownMetaData);
+        return Collections.unmodifiableMap(unknownMetaData);
     }
 
     public void putUnknownMetaDataItem(String key, List<String> value) {
         Objects.requireNonNull(key);
         Objects.requireNonNull(value);
 
-        unkownMetaData.put(key, value);
+        unknownMetaData.put(key, value);
     }
 
     @Override
@@ -331,7 +347,7 @@ public class MetaData {
         }
         MetaData metaData = (MetaData) o;
         return (isProtected == metaData.isProtected)
-                && Objects.equals(groupsRoot, metaData.groupsRoot)
+                && Objects.equals(groupsRoot.getValue(), metaData.groupsRoot.getValue())
                 && Objects.equals(encoding, metaData.encoding)
                 && Objects.equals(saveOrderConfig, metaData.saveOrderConfig)
                 && Objects.equals(citeKeyPatterns, metaData.citeKeyPatterns)
@@ -346,7 +362,7 @@ public class MetaData {
 
     @Override
     public int hashCode() {
-        return Objects.hash(groupsRoot, encoding, saveOrderConfig, citeKeyPatterns, userFileDirectory,
+        return Objects.hash(groupsRoot.getValue(), encoding, saveOrderConfig, citeKeyPatterns, userFileDirectory,
                 defaultCiteKeyPattern, saveActions, mode, isProtected, defaultFileDirectory);
     }
 }

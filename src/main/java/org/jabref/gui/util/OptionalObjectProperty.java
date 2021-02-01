@@ -6,10 +6,10 @@ import javafx.beans.binding.BooleanExpression;
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.SimpleObjectProperty;
 
-import org.fxmisc.easybind.PreboundBinding;
+import com.tobiasdiez.easybind.PreboundBinding;
 
 /**
- * Similar to {@link org.fxmisc.easybind.monadic.MonadicObservableValue}
+ * Similar to {@link com.tobiasdiez.easybind.monadic.MonadicObservableValue}
  */
 public class OptionalObjectProperty<T> extends SimpleObjectProperty<Optional<T>> {
 

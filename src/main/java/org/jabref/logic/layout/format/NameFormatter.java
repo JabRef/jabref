@@ -14,9 +14,9 @@ import org.jabref.model.entry.AuthorList;
  *
  * The formatter needs a parameter to be passed in that follows the following format:
  *
- * <case1>@<range11>@"<format>"@<range12>@"<format>"@<range13>...@@
+ * <code>&lt;case1>@&lt;range11>@"&lt;format>"@&lt;range12>@"&lt;format>"@&lt;range13>...@@
  *
- * <case2>@<range21>@... and so on.
+ * &lt;case2>@&lt;range21>@...</code> and so on.
  *
  * Individual cases are separated by @@ and items in a case by @.
  *
@@ -29,7 +29,7 @@ import org.jabref.model.entry.AuthorList;
  * case2 = 3
  * case3 = *
  *
- * Ranges are either <integer>..<integer>, <integer> or the character * using a 1 based index for indexing
+ * Ranges are either &lt;integer>..&lt;integer>, &lt;integer> or the character * using a 1 based index for indexing
  * authors from the given authorlist. Integer indexes can be negative to denote them to start from
  * the end of the list where -1 is the last author.
  *
@@ -43,7 +43,7 @@ import org.jabref.model.entry.AuthorList;
  *
  * 2..-1 will affect Mary, Bruce and Arthur
  *
- * The <format> uses the Bibtex formatter format:
+ * The &lt;format> uses the Bibtex formatter format:
  *
  * The four letter v, f, l, j indicate the name parts von, first, last, jr which
  * are used within curly braces. A single letter v, f, l, j indicates that the name should be abbreviated.
@@ -120,7 +120,6 @@ public class NameFormatter implements LayoutFormatter {
             }
         }
         return sb.toString();
-
     }
 
     public String format(String toFormat, String inParameters) {

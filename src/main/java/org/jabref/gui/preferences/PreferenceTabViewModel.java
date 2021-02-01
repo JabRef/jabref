@@ -17,7 +17,7 @@ public interface PreferenceTabViewModel {
     /**
      * This method is called when the user presses OK in the
      * Preferences dialog. Implementing classes must make sure all
-     * settings presented get stored in JabRefPreferences.
+     * settings presented get stored in PreferencesService.
      */
     void storeSettings();
 

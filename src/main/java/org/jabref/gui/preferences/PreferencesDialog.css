@@ -31,7 +31,7 @@
 }
 
 *:search-highlight {
-	-fx-background-color: -jr-light-red;
+    -fx-background-color: -jr-light-red;
 }
 
 .code-area {
