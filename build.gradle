@@ -205,7 +205,7 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:3.7.7'
     testImplementation 'org.xmlunit:xmlunit-core:2.8.2'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.8.2'
-    testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.15.0'
+    testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.16.0'
     testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.15.0'
     testImplementation "org.testfx:testfx-core:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
