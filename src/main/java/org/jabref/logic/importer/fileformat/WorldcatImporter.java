@@ -34,7 +34,7 @@ public class WorldcatImporter extends Importer {
      * @throws IllegalArgumentException if s is badly formated or other exception occurs during parsing
      */
     private Document parse(BufferedReader s) {
-        try { 
+        try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
 
@@ -66,7 +66,7 @@ public class WorldcatImporter extends Importer {
      * @return the tag element
      * @throws NullPointerException if there is no element by this tag
      */
-    private Element getElementByTag(Element xml, String tag) throws NullPointerException { 
+    private Element getElementByTag(Element xml, String tag) throws NullPointerException {
         NodeList nl = xml.getElementsByTagName(tag);
         return (Element) nl.item(0);
     }
@@ -75,19 +75,18 @@ public class WorldcatImporter extends Importer {
      * Parse the xml entry to a bib entry
      * @param xmlEntry the XML element from open search
      * @return the correspoinding bibentry
-     * @throws IOException if we cannot search Worldcat with the OCLC of the entry
      */
-    private BibEntry xmlEntryToBibEntry(Element xmlEntry) throws IOException { 
+    private BibEntry xmlEntryToBibEntry(Element xmlEntry) {
         String authors = getElementByTag(xmlEntry, "dc:creator").getTextContent();
 
         String title = getElementByTag(xmlEntry, "dc:title").getTextContent();
 
         String oclcNr = getElementByTag(xmlEntry, "oclcterms:recordIdentifie").getTextContent();
         String url = "http://worldcat.org/oclc/" + oclcNr;
-        
+
         String date = getElementByTag(xmlEntry, "dc:date").getTextContent();
 
-        String publisher =  getElementByTag(xmlEntry, "dc:publisher").getTextContent();
+        String publisher = getElementByTag(xmlEntry, "dc:publisher").getTextContent();
 
         BibEntry entry = new BibEntry();
 
@@ -101,13 +100,12 @@ public class WorldcatImporter extends Importer {
     }
 
     /**
-     * Parse an XML documents with open search entries to a parserResult of 
+     * Parse an XML documents with open search entries to a parserResult of
      * the bibentries
      * @param doc the main XML document from open search
      * @return the ParserResult containing the BibEntries collection
-     * @throws IOException if {@link xmlEntryToBibEntry} throws 
      */
-    private ParserResult docToParserRes(Document doc) throws IOException { 
+    private ParserResult docToParserRes(Document doc) {
         Element feed = (Element) doc.getElementsByTagName("entries").item(0);
         NodeList entryXMLList = feed.getElementsByTagName("entry");
 
@@ -115,7 +113,7 @@ public class WorldcatImporter extends Importer {
         for (int i = 0; i < entryXMLList.getLength(); i++) {
             Element xmlEntry = (Element) entryXMLList.item(i);
             BibEntry bibEntry = xmlEntryToBibEntry(xmlEntry);
-            bibList.add(bibEntry);		
+            bibList.add(bibEntry);
         }
 
         return new ParserResult(bibList);

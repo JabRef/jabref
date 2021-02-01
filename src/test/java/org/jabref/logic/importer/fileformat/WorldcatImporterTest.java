@@ -19,15 +19,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class WorldcatImporterTest {
-    
+
     WorldcatImporter importer;
 
     private String getFilePath(String filename) throws IOException {
-        Predicate<String> filePredicate = name -> {
-            return name.startsWith(filename) && name.endsWith(".xml");
-        };
+        Predicate<String> filePredicate = name -> name.startsWith(filename) && name.endsWith(".xml");
         Collection<String> paths = ImporterTestEngine.getTestFiles(filePredicate);
-        if (paths.size() > 1 || paths.size() == 0) {
+        if (paths.size() != 1) {
             throw new IllegalArgumentException("Filename returned 0 or more than 1 result: " + filename);
         }
         return paths.iterator().next();
@@ -35,8 +33,7 @@ public class WorldcatImporterTest {
 
     private String getFileContent(String filename) throws IOException {
         String path = getFilePath(filename);
-        String content = Files.readString(getPath(path));
-        return content;
+        return Files.readString(getPath(path));
     }
 
     private static Path getPath(String fileName) throws IOException {
@@ -50,9 +47,9 @@ public class WorldcatImporterTest {
     @BeforeEach
     public void setUp() {
         importer = new WorldcatImporter();
-        
+
     }
-    
+
     @Test
     public void withResultIsRecognizedFormat() throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(importer, getFilePath("WorldcatImporterTestWithResult"));

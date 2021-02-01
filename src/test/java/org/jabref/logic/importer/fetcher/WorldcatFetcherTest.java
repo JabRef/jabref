@@ -26,7 +26,7 @@ public class WorldcatFetcherTest {
     @Test
     public void testPerformSearchForBadTitle() throws FetcherException {
         BibEntry entry = new BibEntry();
-        //Mashing keyboard. Verified on https://platform.worldcat.org/api-explorer/apis/wcapi/Bib/OpenSearch
+        // Mashing keyboard. Verified on https://platform.worldcat.org/api-explorer/apis/wcapi/Bib/OpenSearch
         entry.setField(StandardField.TITLE, "ASDhbsdfnm");
         List<BibEntry> list = fetcher.performSearch(entry);
         assertTrue(list.isEmpty());
@@ -35,7 +35,7 @@ public class WorldcatFetcherTest {
     @Test
     public void testPerformSearchForExistingTitle() throws FetcherException {
         BibEntry entry = new BibEntry();
-        //Example "The very best of Glenn Miller". Verified on same link as above
+        // Example "The very best of Glenn Miller". Verified on same link as above
         entry.setField(StandardField.TITLE, "The very best of Glenn");
         List<BibEntry> list = fetcher.performSearch(entry);
         assertFalse(list.isEmpty());

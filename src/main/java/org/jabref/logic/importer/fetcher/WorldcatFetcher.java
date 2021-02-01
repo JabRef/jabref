@@ -176,7 +176,7 @@ public class WorldcatFetcher implements EntryBasedFetcher {
             Document detailedXML = parseOpenSearchXML(openSearchDocument);
             String detailedXMLString;
             try (StringWriter sw = new StringWriter()) {
-                //Transform XML to String
+                // Transform XML to String
                 TransformerFactory tf = TransformerFactory.newInstance();
                 Transformer t = tf.newTransformer();
                 t.transform(new DOMSource(detailedXML), new StreamResult(sw));
@@ -198,8 +198,7 @@ public class WorldcatFetcher implements EntryBasedFetcher {
                     parserResult = new ParserResult(errorBibDataBase);
                 }
                 return parserResult.getDatabase().getEntries();
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 throw new FetcherException("Could not perform search (Worldcat) ", e);
             }
         } else {

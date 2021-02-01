@@ -7,5 +7,7 @@ public class FetcherApiPreferences {
         this.worldcatKey = worldcatKey;
     }
 
-    public String getWorldcatKey() { return worldcatKey; }
+    public String getWorldcatKey() {
+        return worldcatKey;
+    }
 }
