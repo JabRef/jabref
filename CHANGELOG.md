@@ -42,6 +42,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the password for a shared SQL database was only remembered if it was the same as the username [#6869](https://github.com/JabRef/jabref/issues/6869)
 - We fixed an issue where alt+keyboard shortcuts do not work [#6994](https://github.com/JabRef/jabref/issues/6994)
 - We fixed an issue where the file path is invisible in dark theme. [#7382](https://github.com/JabRef/jabref/issues/7382)
+- We fixed an issue where the secondary sorting is not working for some special fields. [#7015](https://github.com/JabRef/jabref/issues/7015)
 - We fixed an issue where changing the font size makes the font size field too small. [#7085](https://github.com/JabRef/jabref/issues/7085)
 
 ### Removed
