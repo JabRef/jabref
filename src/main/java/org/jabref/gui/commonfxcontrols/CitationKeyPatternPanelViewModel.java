@@ -36,17 +36,14 @@ public class CitationKeyPatternPanelViewModel {
 
     private final ListProperty<CitationKeyPatternPanelItemModel> patternListProperty = new SimpleListProperty<>();
     private final ObjectProperty<CitationKeyPatternPanelItemModel> defaultItemProperty = new SimpleObjectProperty<>();
-    private final AbstractCitationKeyPattern initialKeyPattern;
-    private final Collection<BibEntryType> bibEntryTypeList;
+
     private final PreferencesService preferences;
 
-    public CitationKeyPatternPanelViewModel(PreferencesService preferences, Collection<BibEntryType> entryTypeList, AbstractCitationKeyPattern initialKeyPattern) {
+    public CitationKeyPatternPanelViewModel(PreferencesService preferences) {
         this.preferences = preferences;
-        this.bibEntryTypeList = entryTypeList;
-        this.initialKeyPattern = initialKeyPattern;
     }
 
-    public void setValues() {
+    public void setValues(Collection<BibEntryType> entryTypeList, AbstractCitationKeyPattern initialKeyPattern) {
         String defaultPattern;
         if ((initialKeyPattern.getDefaultValue() == null) || initialKeyPattern.getDefaultValue().isEmpty()) {
             defaultPattern = "";
@@ -58,17 +55,17 @@ public class CitationKeyPatternPanelViewModel {
         patternListProperty.setValue(FXCollections.observableArrayList());
         patternListProperty.add(defaultItemProperty.getValue());
 
-        bibEntryTypeList.stream()
-                        .map(BibEntryType::getType)
-                        .forEach(entryType -> {
-                            String pattern;
-                            if (initialKeyPattern.isDefaultValue(entryType)) {
-                                pattern = "";
-                            } else {
-                                pattern = initialKeyPattern.getPatterns().get(entryType).get(0);
-                            }
-                            patternListProperty.add(new CitationKeyPatternPanelItemModel(entryType, pattern));
-                        });
+        entryTypeList.stream()
+                     .map(BibEntryType::getType)
+                     .forEach(entryType -> {
+                         String pattern;
+                         if (initialKeyPattern.isDefaultValue(entryType)) {
+                             pattern = "";
+                         } else {
+                             pattern = initialKeyPattern.getPatterns().get(entryType).get(0);
+                         }
+                         patternListProperty.add(new CitationKeyPatternPanelItemModel(entryType, pattern));
+                     });
     }
 
     public void setItemToDefaultPattern(CitationKeyPatternPanelItemModel item) {
