@@ -47,7 +47,14 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
     public static TexGroup create(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData) throws IOException {
         TexGroup group = new TexGroup(name, context, filePath, auxParser, fileMonitor, metaData);
-        fileMonitor.addListenerForFile(filePath, group);
+
+        String user = System.getProperty("user.name") + '-' + InetAddress.getLocalHost().getHostName();
+        List<Path> fileDirectoriesAsPaths = metaData.getLatexFileDirectory(user)
+                .map(List::of)
+                .orElse(Collections.emptyList());
+        Path expandedFilePath = FileHelper.find(filePath.toString(), fileDirectoriesAsPaths).orElse(filePath);
+
+        fileMonitor.addListenerForFile(expandedFilePath, group);
         return group;
     }
 
