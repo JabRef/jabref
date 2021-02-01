@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.function.Predicate;
 
@@ -38,7 +37,7 @@ public class WorldcatImporterTest {
 
     private static Path getPath(String fileName) throws IOException {
         try {
-            return Paths.get(ImporterTestEngine.class.getResource(fileName).toURI());
+            return Path.of(ImporterTestEngine.class.getResource(fileName).toURI());
         } catch (URISyntaxException e) {
             throw new IOException(e);
         }
