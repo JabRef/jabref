@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 
-public class ReadStatusFieldComparator implements Comparator<Optional<SpecialFieldValueViewModel>> {
+public class SpecialFieldComparator implements Comparator<Optional<SpecialFieldValueViewModel>> {
 
     @Override
     public int compare(Optional<SpecialFieldValueViewModel> val1, Optional<SpecialFieldValueViewModel> val2) {

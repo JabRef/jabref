@@ -19,10 +19,8 @@ import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.OptionalValueTableCellFactory;
-import org.jabref.gui.util.comparator.PriorityFieldComparator;
 import org.jabref.gui.util.comparator.RankingFieldComparator;
-import org.jabref.gui.util.comparator.ReadStatusFieldComparator;
-import org.jabref.gui.util.comparator.ToggleFieldComparator;
+import org.jabref.gui.util.comparator.SpecialFieldComparator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
@@ -84,19 +82,8 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
 
         if (specialField == SpecialField.RANKING) {
             this.setComparator(new RankingFieldComparator());
-        }
-
-        // Added comparator for Read Status
-        if (specialField == SpecialField.READ_STATUS) {
-            this.setComparator(new ReadStatusFieldComparator());
-        }
-
-        if (specialField == SpecialField.PRIORITY) {
-            this.setComparator(new PriorityFieldComparator());
-        }
-
-        if (specialField == SpecialField.RELEVANCE || specialField == SpecialField.QUALITY || specialField == SpecialField.PRINTED) {
-            this.setComparator(new ToggleFieldComparator());
+        } else {
+            this.setComparator(new SpecialFieldComparator());
         }
 
         this.setSortable(true);
