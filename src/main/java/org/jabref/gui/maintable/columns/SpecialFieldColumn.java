@@ -22,6 +22,7 @@ import org.jabref.gui.util.OptionalValueTableCellFactory;
 import org.jabref.gui.util.comparator.PriorityFieldComparator;
 import org.jabref.gui.util.comparator.RankingFieldComparator;
 import org.jabref.gui.util.comparator.ReadStatusFieldComparator;
+import org.jabref.gui.util.comparator.ToggleFieldComparator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
@@ -92,6 +93,10 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
 
         if (specialField == SpecialField.PRIORITY) {
             this.setComparator(new PriorityFieldComparator());
+        }
+
+        if (specialField == SpecialField.RELEVANCE || specialField == SpecialField.QUALITY || specialField == SpecialField.PRINTED) {
+            this.setComparator(new ToggleFieldComparator());
         }
 
         this.setSortable(true);
