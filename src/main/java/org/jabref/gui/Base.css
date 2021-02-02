@@ -600,6 +600,15 @@
     -fx-stroke: -jr-gray-2;
 }
 
+.list-view {
+    -fx-border-color: -fx-outer-border;
+}
+
+.list-view:hover {
+    -fx-border-color: -jr-selected;
+    -fx-border-width: 2;
+}
+
 .scroll-pane:focused,
 .split-pane:focused,
 .list-view:focused,
