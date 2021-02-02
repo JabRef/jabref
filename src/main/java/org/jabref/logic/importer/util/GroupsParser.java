@@ -1,10 +1,8 @@
 package org.jabref.logic.importer.util;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.auxparser.DefaultAuxParser;
@@ -29,7 +27,6 @@ import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.model.util.FileHelper;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.LoggerFactory;
@@ -129,13 +126,6 @@ public class GroupsParser {
         GroupHierarchyType context = GroupHierarchyType.getByNumberOrDefault(Integer.parseInt(tok.nextToken()));
         try {
             Path path = Path.of(tok.nextToken());
-
-            String user = System.getProperty("user.name") + '-' + InetAddress.getLocalHost().getHostName();
-            List<Path> fileDirectoriesAsPaths = metaData.getLatexFileDirectory(user)
-                    .map(List::of)
-                    .orElse(Collections.emptyList());
-            path = FileHelper.find(path.toString(), fileDirectoriesAsPaths).orElse(path);
-
             try {
                 TexGroup newGroup = TexGroup.create(name, context, path, new DefaultAuxParser(new BibDatabase()), fileMonitor, metaData);
                 addGroupDetails(tok, newGroup);
