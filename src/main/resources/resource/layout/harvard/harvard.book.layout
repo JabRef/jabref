@@ -2,7 +2,7 @@
 \format[Authors(LastFirst,Initials,FullPunc,Comma,And,inf),RTFChars]{\author}
 \end{author}
 \begin{editor}
-\format[FirstFirst,FullName,NoPunc,And,RTFChars]{\editor}, ed., \end{editor}
+\format[Authors(FirstFirst,FullName,NoPunc,And),RTFChars]{\editor}, ed., \end{editor}
  (\year), 
 }{\\i \format[RTFChars]{\title}}{
 \begin{volume}
