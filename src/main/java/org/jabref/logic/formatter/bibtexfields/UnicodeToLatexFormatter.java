@@ -7,6 +7,7 @@ import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
