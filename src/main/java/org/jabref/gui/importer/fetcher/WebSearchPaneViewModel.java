@@ -1,6 +1,7 @@
 package org.jabref.gui.importer.fetcher;
 
 import java.util.SortedSet;
+import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,6 +35,7 @@ public class WebSearchPaneViewModel {
     private final ObjectProperty<SearchBasedFetcher> selectedFetcher = new SimpleObjectProperty<>();
     private final ListProperty<SearchBasedFetcher> fetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final StringProperty query = new SimpleStringProperty();
+    private final ExecutorService executor = Executors.newFixedThreadPool(1);
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final Pattern queryPattern;
@@ -105,7 +107,7 @@ public class WebSearchPaneViewModel {
 
         BackgroundTask<ParserResult> task;
         task = BackgroundTask.wrap(() -> new ParserResult(activeFetcher.performSearch(getQuery().trim())))
-                             .withInitialMessage(Localization.lang("Processing %0", getQuery().trim()));
+                .withInitialMessage(Localization.lang("Processing %0", getQuery().trim()));
         task.onFailure(dialogService::showErrorDialogAndWait);
 
         ImportEntriesDialog dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task);
@@ -113,11 +115,10 @@ public class WebSearchPaneViewModel {
         dialogService.showCustomDialogAndWait(dialog);
     }
 
+
     public void validateQueryStringAndGiveColorFeedback(TextField querySource, String queryString) {
-        Matcher queryValidation = queryPattern.matcher(queryString.strip());
-        if (!queryString.strip().isBlank() && !queryValidation.matches()) {
-            Matcher laxQueryValidation = laxQueryPattern.matcher(queryString.strip());
-            if (laxQueryValidation.matches()) {
+        if (!queryString.strip().isBlank() && !isPatternMatched(queryPattern, queryString)) {
+            if (isPatternMatched(laxQueryPattern, queryString)) {
                 setPseudoClassToUnsupported(querySource);
                 querySource.setTooltip(new Tooltip(Localization.lang("This query uses unsupported fields.")));
             } else {
@@ -148,5 +149,26 @@ public class WebSearchPaneViewModel {
 
     private boolean containsYearAndYearRange(String queryString) {
         return queryString.toLowerCase().contains("year:") && queryString.toLowerCase().contains("year-range:");
+    }
+
+    // Use Thread Pool to control the match time
+    private boolean isPatternMatched(Pattern pattern, String queryString) {
+        boolean isMatched;
+        Callable<Boolean> call = () -> {
+            Matcher queryValidation = pattern.matcher(queryString.strip());
+            queryValidation.matches();
+            return true;
+        };
+
+        try {
+            Future<Boolean> future = executor.submit(call);
+            isMatched = future.get(1000 * 10, TimeUnit.MILLISECONDS);
+        } catch (Exception e) {
+            isMatched = false;
+        }
+
+        executor.shutdown();
+
+        return isMatched;
     }
 }
