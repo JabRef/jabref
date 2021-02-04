@@ -1,12 +1,9 @@
 package org.jabref.gui.importer.fetcher;
 
 import java.util.SortedSet;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javafx.beans.property.ListProperty;
@@ -25,6 +22,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
@@ -156,22 +154,17 @@ public class WebSearchPaneViewModel {
 
     // Use Thread Pool to control the match time
     private boolean isPatternMatched(Pattern pattern, String queryString) {
-        boolean isMatched;
-        Callable<Boolean> call = () -> {
-            Matcher queryValidation = pattern.matcher(queryString.strip());
-            queryValidation.matches();
-            return true;
-        };
+        boolean isMatched = true;
 
         try {
-            Future<Boolean> future = executor.submit(call);
-            isMatched = future.get(1000 * 10, TimeUnit.MILLISECONDS);
+            BackgroundTask.wrap(() -> pattern.matcher(queryString.strip()).matches())
+                    .executeWith((TaskExecutor) executor)
+                    .get(1000 * 10, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             isMatched = false;
         }
 
         executor.shutdown();
-
         return isMatched;
     }
 }
