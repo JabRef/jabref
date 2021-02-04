@@ -1,7 +1,11 @@
 package org.jabref.gui.importer.fetcher;
 
 import java.util.SortedSet;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -114,7 +118,6 @@ public class WebSearchPaneViewModel {
         dialog.setTitle(activeFetcher.getName());
         dialogService.showCustomDialogAndWait(dialog);
     }
-
 
     public void validateQueryStringAndGiveColorFeedback(TextField querySource, String queryString) {
         if (!queryString.strip().isBlank() && !isPatternMatched(queryPattern, queryString)) {
