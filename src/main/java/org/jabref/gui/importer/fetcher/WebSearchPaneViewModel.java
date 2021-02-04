@@ -158,8 +158,8 @@ public class WebSearchPaneViewModel {
 
         try {
             BackgroundTask.wrap(() -> pattern.matcher(queryString.strip()).matches())
-                    .executeWith((TaskExecutor) executor)
-                    .get(1000 * 10, TimeUnit.MILLISECONDS);
+                          .executeWith((TaskExecutor) executor)
+                          .get(1000 * 10, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             isMatched = false;
         }
