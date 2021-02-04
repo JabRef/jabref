@@ -224,6 +224,13 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         clipBoardManager.setContent(content);
     }
 
+    public void copySelectionToClipBoard() {
+        ClipboardContent content = new ClipboardContent();
+        content.putString(getSelectionHtmlContent());
+
+        clipBoardManager.setContent(content);
+    }
+
     @Override
     public void invalidated(Observable observable) {
         update();
