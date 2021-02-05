@@ -47,6 +47,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the secondary sorting is not working for some special fields. [#7015](https://github.com/JabRef/jabref/issues/7015)
 - We fixed an issue where changing the font size makes the font size field too small. [#7085](https://github.com/JabRef/jabref/issues/7085)
 - We fixed an issue where the buttons are invisible for file field. [#6859](https://github.com/JabRef/jabref/issues/6859)
+- We fixed an issue where the Unicode to Latex formatter produced wrong results for characters with a codepoint higher than Character.MAX_VALUE. [#7387](https://github.com/JabRef/jabref/issues/7387)
 
 ### Removed
 
