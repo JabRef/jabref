@@ -68,14 +68,13 @@ public class InternalMaterialDesignIcon implements JabRefIcon {
         return unicode;
     }
 
-
     public String getCode() {
         return this.unicode;
     }
 
     @Override
     public String fontFamily() {
-        return "";
+        return FontIcon.of(getIkon()).getFont().getFamily();
     }
 
     @Override
