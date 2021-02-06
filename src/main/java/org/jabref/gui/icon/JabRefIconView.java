@@ -3,10 +3,7 @@ package org.jabref.gui.icon;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
-import com.tobiasdiez.easybind.EasyBind;
-import de.jensd.fx.glyphs.GlyphIcon;
-
-public class JabRefIconView extends GlyphIcon<IconTheme.JabRefIcons> {
+public class JabRefIconView  {
 
     /**
      * This property is only needed to get proper IDE support in FXML files
@@ -15,11 +12,7 @@ public class JabRefIconView extends GlyphIcon<IconTheme.JabRefIcons> {
     private final ObjectProperty<IconTheme.JabRefIcons> glyph;
 
     public JabRefIconView(IconTheme.JabRefIcons icon, String iconSize) {
-        super(IconTheme.JabRefIcons.class);
         this.glyph = new SimpleObjectProperty<>(icon);
-        EasyBind.subscribe(glyph, this::setIcon);
-        setIcon(icon);
-        setStyle(String.format("-fx-font-family: %s; -fx-font-size: %s;", icon.fontFamily(), iconSize));
     }
 
     public JabRefIconView(IconTheme.JabRefIcons icon) {
@@ -30,7 +23,6 @@ public class JabRefIconView extends GlyphIcon<IconTheme.JabRefIcons> {
         this(IconTheme.JabRefIcons.ERROR, "1em");
     }
 
-    @Override
     public IconTheme.JabRefIcons getDefaultGlyph() {
         return IconTheme.JabRefIcons.ERROR;
     }

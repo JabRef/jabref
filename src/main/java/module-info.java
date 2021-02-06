@@ -15,8 +15,11 @@ open module org.jabref {
     requires afterburner.fx;
     requires com.jfoenix;
     requires de.saxsys.mvvmfx;
-    requires de.jensd.fx.fontawesomefx.commons;
-    requires de.jensd.fx.fontawesomefx.materialdesignicons;
+
+    requires org.kordamp.ikonli.core;
+    requires org.kordamp.ikonli.javafx;
+    requires org.kordamp.ikonli.materialdesign2;
+
     requires org.controlsfx.controls;
     requires org.fxmisc.richtext;
     requires com.tobiasdiez.easybind;

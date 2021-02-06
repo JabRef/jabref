@@ -44,7 +44,7 @@ import org.jabref.preferences.PreferencesService;
 import com.google.common.base.Enums;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableList;
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
 
 public class GroupNodeViewModel {
 
@@ -213,7 +213,9 @@ public class GroupNodeViewModel {
     }
 
     private Optional<JabRefIcon> parseIcon(String iconCode) {
-        return Enums.getIfPresent(MaterialDesignIcon.class, iconCode.toUpperCase(Locale.ENGLISH))
+
+        // TOOD:
+        return Enums.getIfPresent(MaterialDesignA.class, iconCode.toUpperCase(Locale.ENGLISH))
                     .toJavaUtil()
                     .map(icon -> new InternalMaterialDesignIcon(getColor(), icon));
     }
