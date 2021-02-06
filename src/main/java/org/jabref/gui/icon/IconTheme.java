@@ -35,11 +35,6 @@ public class IconTheme {
     private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
 
     public static void loadFonts() {
-        try (InputStream stream = getMaterialDesignIconsStream()) {
-            Font.loadFont(stream, 7);
-        } catch (IOException e) {
-            LOGGER.error("Error loading Material Design Icons TTF font", e);
-        }
 
         try (InputStream stream = getJabRefMaterialDesignIconsStream()) {
             Font.loadFont(stream, 7);
@@ -48,9 +43,6 @@ public class IconTheme {
         }
     }
 
-    private static InputStream getMaterialDesignIconsStream() {
-        return IconTheme.class.getResourceAsStream("/fonts/materialdesignicons-webfont.ttf");
-    }
 
     private static InputStream getJabRefMaterialDesignIconsStream() throws IOException {
         return IconTheme.class.getResource("/fonts/JabRefMaterialDesign.ttf").openStream();

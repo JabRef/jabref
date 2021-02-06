@@ -14,21 +14,21 @@ import org.kordamp.ikonli.Ikon;
  */
 public enum JabRefMaterialDesignIcon implements Ikon{
 
-    TEX_STUDIO("jab-texstudio","\ue900"),
-    TEX_MAKER("jab-textmaker","\ue901"),
-    EMACS("jab-emacs","\ue902"),
-    OPEN_OFFICE("jab-oo", "\ue903"),
-    VIM("jab-vim","\ue904"),
-    VIM2("jab-vim2","\ue905"),
-    LYX("jab-lyx","\ue906"),
-    WINEDT("jab-winedt","\ue907"),
-    ARXIV("jab-arxiv", "\ue908"),
-    COPY("jab-copy","\ue909"),
-    PASTE("jab-paste", "\ue90a"),
-    SET_CENTER("jab-setcenter","\ue90b"),
-    SET_ALL("jab-setall","\ue90c"),
-    VSCODE("jab-vsvode","\ue90d"),
-    CANCEL("jab-cancel", "\ue90e");
+    TEX_STUDIO("jab-texstudio",'\ue900'),
+    TEX_MAKER("jab-textmaker",'\ue901'),
+    EMACS("jab-emacs",'\ue902'),
+    OPEN_OFFICE("jab-oo", '\ue903'),
+    VIM("jab-vim", '\ue904'),
+    VIM2("jab-vim2",'\ue905'),
+    LYX("jab-lyx",'\ue906'),
+    WINEDT("jab-winedt",'\ue907'),
+    ARXIV("jab-arxiv", '\ue908'),
+    COPY("jab-copy",'\ue909'),
+    PASTE("jab-paste", '\ue90a'),
+    SET_CENTER("jab-setcenter",'\ue90b'),
+    SET_ALL("jab-setall",'\ue90c'),
+    VSCODE("jab-vsvode",'\ue90d'),
+    CANCEL("jab-cancel", '\ue90e');
 
 
     public static JabRefMaterialDesignIcon findByDescription(String description) {
@@ -43,9 +43,9 @@ public enum JabRefMaterialDesignIcon implements Ikon{
     private String description;
     private int code;
 
-    JabRefMaterialDesignIcon(String description, String code) {
+    JabRefMaterialDesignIcon(String description, int code) {
         this.description = description;
-        this.code = Integer.parseInt(code, 16);
+        this.code = code;
     }
 
     @Override

@@ -20,6 +20,11 @@ open module org.jabref {
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.materialdesign2;
 
+    provides org.kordamp.ikonli.IkonHandler
+            with org.jabref.gui.icon.JabRefIkonHandler;
+    provides org.kordamp.ikonli.IkonProvider
+            with org.jabref.gui.icon.JabrefIconProvider;
+
     requires org.controlsfx.controls;
     requires org.fxmisc.richtext;
     requires com.tobiasdiez.easybind;
