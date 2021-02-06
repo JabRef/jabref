@@ -336,6 +336,11 @@ public class IconTheme {
         }
 
         @Override
+        public Ikon getIkon() {
+            return icon.getIkon();
+        }
+
+        @Override
         public Node getGraphicNode() {
             return icon.getGraphicNode();
         }

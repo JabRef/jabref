@@ -75,14 +75,17 @@ public class InternalMaterialDesignIcon implements JabRefIcon {
 
     @Override
     public String fontFamily() {
-        // TODO Auto-generated method stub
-        return null;
+        return "";
     }
 
     @Override
     public String unicode() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.unicode;
+    }
+
+    @Override
+    public Ikon getIkon() {
+       return icons.get(0);
     }
 
 

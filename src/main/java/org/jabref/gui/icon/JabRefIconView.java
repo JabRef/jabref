@@ -16,10 +16,10 @@ public class JabRefIconView extends FontIcon {
 
     public JabRefIconView(IconTheme.JabRefIcons icon, String iconSize) {
 
-        super(icon.unicode());
+        super(icon.getIkon());
         this.glyph = new SimpleObjectProperty<>(icon);
 
-        EasyBind.subscribe(glyph, x->setIconLiteral(x.unicode()));
+        EasyBind.subscribe(glyph, x->setIconCode(x.getIkon()));
 
     }
 
