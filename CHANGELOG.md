@@ -25,7 +25,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where groups generated from authors' last names did not include all entries of the authors' [#5833](https://github.com/JabRef/jabref/issues/5833)
 - The export to MS Office XML now uses the month name for the field `MonthAcessed` instead of the two digit number [#7354](https://github.com/JabRef/jabref/issues/7354)
 - We included some standalone dialogs from the options menu in the main preference dialog and fixed some visual issues in the preferences dialog. [#7384](https://github.com/JabRef/jabref/pull/7384)
-- Readd query syntax validation. [#7411](https://github.com/JabRef/jabref/pull/7411)
 
 ### Fixed
 
@@ -47,6 +46,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the file path is invisible in dark theme. [#7382](https://github.com/JabRef/jabref/issues/7382)
 - We fixed an issue where the secondary sorting is not working for some special fields. [#7015](https://github.com/JabRef/jabref/issues/7015)
 - We fixed an issue where changing the font size makes the font size field too small. [#7085](https://github.com/JabRef/jabref/issues/7085)
+- We fixed an issue where GUI freezes when searching long titles with some characters. [#7411](https://github.com/JabRef/jabref/issues/7411)
 
 ### Removed
 
