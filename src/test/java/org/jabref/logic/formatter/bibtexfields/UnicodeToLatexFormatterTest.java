@@ -25,6 +25,11 @@ class UnicodeToLatexFormatterTest {
     }
 
     @Test
+    void formatHighCodepointUnicodeCharacter() {
+        assertEquals("$\\epsilon$", formatter.format("\uD835\uDF16"));
+    }
+
+    @Test
     void formatExample() {
         assertEquals("M{\\\"{o}}nch", formatter.format(formatter.getExampleInput()));
     }

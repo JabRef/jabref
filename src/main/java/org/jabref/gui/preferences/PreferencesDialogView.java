@@ -82,6 +82,8 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
                 preferencesContainer.setContent(null);
             } else {
                 preferencesContainer.setContent(tab.getBuilder());
+                ((AbstractPreferenceTabView<?>) tab).prefWidthProperty().bind(preferencesContainer.widthProperty());
+                ((AbstractPreferenceTabView<?>) tab).getStyleClass().add("preferencesTab");
             }
         });
 

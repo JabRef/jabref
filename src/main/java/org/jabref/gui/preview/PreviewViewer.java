@@ -38,6 +38,26 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewViewer.class);
 
+    // https://stackoverflow.com/questions/5669448/get-selected-texts-html-in-div/5670825#5670825
+    private static final String JS_GET_SELECTION_HTML_SCRIPT = "function getSelectionHtml() {" +
+                                                               "    var html = \"\";" +
+                                                               "    if (typeof window.getSelection != \"undefined\") {" +
+                                                               "        var sel = window.getSelection();" +
+                                                               "        if (sel.rangeCount) {" +
+                                                               "            var container = document.createElement(\"div\");" +
+                                                               "            for (var i = 0, len = sel.rangeCount; i < len; ++i) {" +
+                                                               "                container.appendChild(sel.getRangeAt(i).cloneContents());" +
+                                                               "            }" +
+                                                               "            html = container.innerHTML;" +
+                                                               "        }" +
+                                                               "    } else if (typeof document.selection != \"undefined\") {" +
+                                                               "        if (document.selection.type == \"Text\") {" +
+                                                               "            html = document.selection.createRange().htmlText;" +
+                                                               "        }" +
+                                                               "    }" +
+                                                               "    return html;" +
+                                                               "};" +
+                                                               "getSelectionHtml();";
     private static final String JS_HIGHLIGHT_FUNCTION =
             "<head>" +
                     "   <meta charset=\"UTF-8\">" +
@@ -224,12 +244,24 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         clipBoardManager.setContent(content);
     }
 
+    public void copySelectionToClipBoard() {
+        ClipboardContent content = new ClipboardContent();
+        content.putString(getSelectionTextContent());
+        content.putHtml(getSelectionHtmlContent());
+
+        clipBoardManager.setContent(content);
+    }
+
     @Override
     public void invalidated(Observable observable) {
         update();
     }
 
-    public String getSelectionHtmlContent() {
+    public String getSelectionTextContent() {
         return (String) previewView.getEngine().executeScript("window.getSelection().toString()");
+    }
+
+    public String getSelectionHtmlContent() {
+        return (String) previewView.getEngine().executeScript(JS_GET_SELECTION_HTML_SCRIPT);
     }
 }
