@@ -86,7 +86,7 @@ public class WebSearchPane extends SidePaneComponent {
 
         // Allows to trigger search on pressing enter
         query.setOnKeyPressed(event -> {
-            if(event.getCode() == KeyCode.ENTER) {
+            if (event.getCode() == KeyCode.ENTER) {
                 viewModel.search();
             }
         });
