@@ -91,7 +91,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We changed connect timeouts for server requests to 30 seconds in general and 5 seconds for GROBID server (special) and improved user notifications on connection issues. [7026](https://github.com/JabRef/jabref/pull/7026)
 - We changed the order of the library tab context menu items. [#7171](https://github.com/JabRef/jabref/issues/7171)
 - We changed the way linked files are opened on Linux to use the native openFile method, compatible with confined  packages. [7037](https://github.com/JabRef/jabref/pull/7037)
-- We refined the entry preview to show the full names of authors and editors, to list the editor only if no author is present, have the year ealier. [#7083](https://github.com/JabRef/jabref/issues/7083)
+- We refined the entry preview to show the full names of authors and editors, to list the editor only if no author is present, have the year earlier. [#7083](https://github.com/JabRef/jabref/issues/7083)
 
 ### Fixed
 
