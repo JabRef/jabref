@@ -49,6 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.util.EnumSet.allOf;
+
 public class IconTheme {
 
     public static final Color DEFAULT_DISABLED_COLOR = Color.web("#c8c8c8");
@@ -63,18 +64,18 @@ public class IconTheme {
     }
 
     public static Optional<JabRefIcon> findIcon(String code, Color color) {
-      return ICON_NAMES.stream().filter(icon->icon.toString().equals(code.toUpperCase(Locale.ENGLISH)))
-                                          .map(internalMat -> new InternalMaterialDesignIcon(internalMat).withColor(color)).findFirst();
+        return ICON_NAMES.stream().filter(icon -> icon.toString().equals(code.toUpperCase(Locale.ENGLISH)))
+                         .map(internalMat -> new InternalMaterialDesignIcon(internalMat).withColor(color)).findFirst();
     }
 
     public static Image getJabRefImageFX() {
         return getImageFX("jabrefIcon48");
     }
 
-    public static void loadAllIkons(){
+    public static void loadAllIkons() {
         ServiceLoader<IkonProvider> providers = ServiceLoader.load(IkonProvider.class);
 
-        for(IkonProvider provider: providers) {
+        for (IkonProvider provider : providers) {
             ICON_NAMES.addAll(allOf(provider.getIkon()));
         }
     }
@@ -101,7 +102,7 @@ public class IconTheme {
         String key = Objects.requireNonNull(name, "icon name");
         if (!KEY_TO_ICON.containsKey(key)) {
             LOGGER.warn("Could not find icon url by name " + name + ", so falling back on default icon "
-                    + DEFAULT_ICON_PATH);
+                        + DEFAULT_ICON_PATH);
         }
         String path = KEY_TO_ICON.getOrDefault(key, DEFAULT_ICON_PATH);
         return Objects.requireNonNull(IconTheme.class.getResource(path), "Path must not be null for key " + key);
