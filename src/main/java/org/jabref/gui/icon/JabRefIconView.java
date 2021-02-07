@@ -72,5 +72,4 @@ public class JabRefIconView extends FontIcon {
     public Number getGlyphSize() {
         return glyphSize.getValue();
     }
-
 }

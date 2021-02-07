@@ -30,6 +30,14 @@ public enum JabRefMaterialDesignIcon implements Ikon {
     VSCODE("jab-vsvode", '\ue90d'),
     CANCEL("jab-cancel", '\ue90e');
 
+    private String description;
+    private int code;
+
+    JabRefMaterialDesignIcon(String description, int code) {
+        this.description = description;
+        this.code = code;
+    }
+
     public static JabRefMaterialDesignIcon findByDescription(String description) {
         for (JabRefMaterialDesignIcon font : values()) {
             if (font.getDescription().equals(description)) {
@@ -37,14 +45,6 @@ public enum JabRefMaterialDesignIcon implements Ikon {
             }
         }
         throw new IllegalArgumentException("Icon description '" + description + "' is invalid!");
-    }
-
-    private String description;
-    private int code;
-
-    JabRefMaterialDesignIcon(String description, int code) {
-        this.description = description;
-        this.code = code;
     }
 
     @Override

@@ -230,11 +230,6 @@ dependencyUpdates.resolutionStrategy = {
                 selection.reject('Release candidate')
             }
         }
-        rules.withModule("de.jensd:fontawesomefx-materialdesignfont") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /2.0.26.*/) {
-                selection.reject('1.7.22-11 is actually newer (strange version system)')
-            }
-        }
         rules.withModule("org.javamodularity.moduleplugin:org.javamodularity.moduleplugin.gradle.plugin") { ComponentSelection selection ->
             if (selection.candidate.version ==~ /1.6.0/) {
                 selection.reject("Does not work due to bug, see https://github.com/JabRef/jabref/pull/5270")
