@@ -2,7 +2,6 @@ package org.jabref.gui.icon;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -17,8 +16,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignB;
@@ -52,20 +49,6 @@ public class IconTheme {
     private static final String DEFAULT_ICON_PATH = "/images/external/red.png";
     private static final Logger LOGGER = LoggerFactory.getLogger(IconTheme.class);
     private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
-
-    public static void loadFonts() {
-
-        try (InputStream stream = getJabRefMaterialDesignIconsStream()) {
-            Font.loadFont(stream, 7);
-        } catch (IOException e) {
-            LOGGER.error("Error loading custom font for custom JabRef icons", e);
-        }
-    }
-
-
-    private static InputStream getJabRefMaterialDesignIconsStream() throws IOException {
-        return IconTheme.class.getResource("/fonts/JabRefMaterialDesign.ttf").openStream();
-    }
 
     public static Color getDefaultGroupColor() {
         return Color.web("#8a8a8a");

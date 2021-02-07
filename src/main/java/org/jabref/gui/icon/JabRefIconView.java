@@ -2,7 +2,6 @@ package org.jabref.gui.icon;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-
 import com.tobiasdiez.easybind.EasyBind;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -18,9 +17,7 @@ public class JabRefIconView extends FontIcon {
 
         super(icon.getIkon());
         this.glyph = new SimpleObjectProperty<>(icon);
-
         EasyBind.subscribe(glyph, x->setIconCode(x.getIkon()));
-
     }
 
     public JabRefIconView(IconTheme.JabRefIcons icon) {

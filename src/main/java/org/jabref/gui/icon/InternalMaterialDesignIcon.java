@@ -7,9 +7,6 @@ import java.util.stream.Collectors;
 
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
-
-import org.jabref.gui.util.ColorUtil;
 
 import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -41,16 +38,11 @@ public class InternalMaterialDesignIcon implements JabRefIcon {
 
     @Override
     public Node getGraphicNode() {
-
         Ikon icon = icons.get(0);
         FontIcon fontIcon = FontIcon.of(icon);
-
-        Text text = new Text(unicode);
-        text.getStyleClass().add("glyph-icon");
-        text.setStyle(String.format("-fx-font-family: %s;", fontIcon.getFont().getFamily()));
-
-        color.ifPresent(color -> text.setStyle(text.getStyle() + String.format("-fx-fill: %s;", ColorUtil.toRGBCode(color))));
-        return text;
+        fontIcon.getStyleClass().add("glyph-icon");
+        color.ifPresent(fontIcon::setIconColor);
+        return fontIcon;
     }
 
     @Override
