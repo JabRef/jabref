@@ -57,7 +57,7 @@ public class InternalMaterialDesignIcon implements JabRefIcon {
 
     @Override
     public String name() {
-        return unicode;
+        return icons.get(0).toString();
     }
 
     public String getCode() {

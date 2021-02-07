@@ -17,7 +17,7 @@
             <Button fx:id="newGroupButton" onAction="#addNewGroup" styleClass="icon-button"
                     ButtonBar.buttonData="RIGHT">
                 <graphic>
-                    <JabRefIconView glyph="NEW_GROUP" glyphSize="18"/>
+                    <JabRefIconView glyph="NEW_GROUP"/>
                 </graphic>
                 <tooltip>
                     <Tooltip text="%New group"/>

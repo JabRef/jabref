@@ -7,16 +7,23 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.ServiceLoader;
+import java.util.Set;
 
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+
 import org.kordamp.ikonli.Ikon;
+import org.kordamp.ikonli.IkonProvider;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignA;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignB;
 import org.kordamp.ikonli.materialdesign2.MaterialDesignC;
@@ -41,7 +48,7 @@ import org.kordamp.ikonli.materialdesign2.MaterialDesignW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+import static java.util.EnumSet.allOf;
 public class IconTheme {
 
     public static final Color DEFAULT_DISABLED_COLOR = Color.web("#c8c8c8");
@@ -49,13 +56,27 @@ public class IconTheme {
     private static final String DEFAULT_ICON_PATH = "/images/external/red.png";
     private static final Logger LOGGER = LoggerFactory.getLogger(IconTheme.class);
     private static final Map<String, String> KEY_TO_ICON = readIconThemeFile(IconTheme.class.getResource("/images/Icons.properties"), "/images/external/");
+    private static final Set<Ikon> ICON_NAMES = new HashSet<>();
 
     public static Color getDefaultGroupColor() {
         return Color.web("#8a8a8a");
     }
 
+    public static Optional<JabRefIcon> findIcon(String code, Color color) {
+      return ICON_NAMES.stream().filter(icon->icon.toString().equals(code.toUpperCase(Locale.ENGLISH)))
+                                          .map(internalMat -> new InternalMaterialDesignIcon(internalMat).withColor(color)).findFirst();
+    }
+
     public static Image getJabRefImageFX() {
         return getImageFX("jabrefIcon48");
+    }
+
+    public static void loadAllIkons(){
+        ServiceLoader<IkonProvider> providers = ServiceLoader.load(IkonProvider.class);
+
+        for(IkonProvider provider: providers) {
+            ICON_NAMES.addAll(allOf(provider.getIkon()));
+        }
     }
 
     /*
