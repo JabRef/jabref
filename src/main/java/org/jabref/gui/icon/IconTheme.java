@@ -302,8 +302,8 @@ public class IconTheme {
         ENTRY_TYPE(MaterialDesignP.PENCIL),
         NEW_GROUP(MaterialDesignP.PLUS),
         OPEN_LINK(MaterialDesignO.OPEN_IN_NEW),
-        LOOKUP_IDENTIFIER(MaterialDesignW.WEB), // TODO: use WEB_SEARCH instead as soon as it is available
-        FETCH_FULLTEXT(MaterialDesignW.WEB), // TODO: use WEB_SEARCH instead as soon as it is available
+        LOOKUP_IDENTIFIER(MaterialDesignS.SEARCH_WEB),
+        FETCH_FULLTEXT(MaterialDesignS.SEARCH_WEB),
         FETCH_BY_IDENTIFIER(MaterialDesignC.CLIPBOARD_ARROW_DOWN),
         TOGGLE_ABBREVIATION(MaterialDesignF.FORMAT_ALIGN_CENTER),
         NEW_FILE(MaterialDesignP.PLUS),
