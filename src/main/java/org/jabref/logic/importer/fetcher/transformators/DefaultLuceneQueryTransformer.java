@@ -1,19 +1,17 @@
 package org.jabref.logic.importer.fetcher.transformators;
 
 /**
- * This class converts a query string written in lucene syntax into a complex  query.
- *
- * For simplicity this is currently limited to fielded data and the boolean AND operator.
+ * Transforms the query to a lucene query string
  */
-public class SpringerQueryTransformer extends AbstractQueryTransformer {
+public class DefaultLuceneQueryTransformer extends AbstractQueryTransformer {
 
     @Override
-    public String getLogicalAndOperator() {
+    protected String getLogicalAndOperator() {
         return " AND ";
     }
 
     @Override
-    public String getLogicalOrOperator() {
+    protected String getLogicalOrOperator() {
         return " OR ";
     }
 
@@ -24,27 +22,26 @@ public class SpringerQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleAuthor(String author) {
-        return String.format("name:\"%s\"", author);
+        return handleOtherField("author", author).get();
     }
 
     @Override
     protected String handleTitle(String title) {
-        return String.format("title:\"%s\"", title);
+        return handleOtherField("title", title).get();
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return String.format("journal:\"%s\"", journalTitle);
-
+        return handleOtherField("journal", journalTitle).get();
     }
 
     @Override
     protected String handleYear(String year) {
-        return String.format("date:%s*", year);
+        return handleOtherField("year", year).get();
     }
 
     @Override
     protected String handleUnFieldedTerm(String term) {
-        return "\"" + term + "\"";
+        return term;
     }
 }

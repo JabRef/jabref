@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.fetcher.transformators;
 
 import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.BooleanQueryNode;
@@ -13,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * In case the transformator contains state for a query transformation (such as the {@link IEEEQueryTransformer}), it has to be noted at the JavaDoc.
+ * In case the transformer contains state for a query transformation (such as the {@link IEEEQueryTransformer}), it has to be noted at the JavaDoc.
  * Otherwise, a single instance QueryTransformer can be used.
  */
 public abstract class AbstractQueryTransformer {
@@ -142,7 +143,17 @@ public abstract class AbstractQueryTransformer {
      *
      * Example: <code>2015-2021</code>
      */
-    protected abstract String handleYearRange(String yearRange);
+    protected String handleYearRange(String yearRange) {
+        String[] split = yearRange.split("-");
+        if (split.length != 2) {
+            return yearRange;
+        }
+        StringJoiner resultBuilder = new StringJoiner(getLogicalOrOperator());
+        for (int i = Integer.parseInt(split[0]); i <= Integer.parseInt(split[1]); i++) {
+            resultBuilder.add(handleYear(String.valueOf(i)));
+        }
+        return resultBuilder.toString();
+    }
 
     /**
      * Return a string representation of the un-fielded (default fielded) term

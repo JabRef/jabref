@@ -1,30 +1,30 @@
 package org.jabref.logic.importer.fetcher.transformators;
 
-public class DefaultQueryTransformer extends AbstractQueryTransformer {
+public class CollectionOfComputerScienceBibliographiesQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String getLogicalAndOperator() {
-        return " ";
+        return " AND ";
     }
 
     @Override
     protected String getLogicalOrOperator() {
-        return " ";
+        return " OR ";
     }
 
     @Override
     protected String getLogicalNotOperator() {
-        return "";
+        return "-";
     }
 
     @Override
     protected String handleAuthor(String author) {
-        return author;
+        return String.format("au:\"%s\"", author);
     }
 
     @Override
     protected String handleTitle(String title) {
-        return title;
+        return String.format("ti:\"%s\"", title);
     }
 
     @Override
@@ -34,7 +34,7 @@ public class DefaultQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleYear(String year) {
-        return year;
+        return String.format("year:\"%s\"", year);
     }
 
     @Override
