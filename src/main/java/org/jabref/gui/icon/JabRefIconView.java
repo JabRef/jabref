@@ -2,6 +2,11 @@ package org.jabref.gui.icon;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.css.Size;
+import javafx.css.SizeUnits;
+
+import org.jabref.gui.icon.IconTheme.JabRefIcons;
+
 import com.tobiasdiez.easybind.EasyBind;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -12,20 +17,33 @@ public class JabRefIconView extends FontIcon {
      * (e.g. validation that parameter passed to "icon" is indeed of type {@link IconTheme.JabRefIcons}).
      */
     private final ObjectProperty<IconTheme.JabRefIcons> glyph;
+    private final ObjectProperty<Number> glyphSize;
 
-    public JabRefIconView(IconTheme.JabRefIcons icon, String iconSize) {
-
+    public JabRefIconView(JabRefIcons icon, int size) {
         super(icon.getIkon());
         this.glyph = new SimpleObjectProperty<>(icon);
-        EasyBind.subscribe(glyph, x->setIconCode(x.getIkon()));
+        this.glyphSize = new SimpleObjectProperty<>(size);
+
+        EasyBind.subscribe(glyph, glyph -> setIconCode(glyph.getIkon()));
+        EasyBind.subscribe(glyphSize, glyphsize -> setIconSize(glyphsize.intValue()));
     }
 
     public JabRefIconView(IconTheme.JabRefIcons icon) {
-        this(icon, "1em");
+
+        super(icon.getIkon());
+        Size size = new Size(1.0, SizeUnits.EM);
+        this.glyph = new SimpleObjectProperty<>(icon);
+        this.glyphSize = new SimpleObjectProperty<>(9);
+
+        int px = (int) size.pixels(getFont());
+        glyphSize.set(px);
+        EasyBind.subscribe(glyph, glyph -> setIconCode(glyph.getIkon()));
+        EasyBind.subscribe(glyphSize, glyphsize -> setIconSize(glyphsize.intValue()));
+
     }
 
     public JabRefIconView() {
-        this(IconTheme.JabRefIcons.ERROR, "1em");
+        this(IconTheme.JabRefIcons.ERROR);
     }
 
     public IconTheme.JabRefIcons getDefaultGlyph() {
@@ -44,5 +62,12 @@ public class JabRefIconView extends FontIcon {
         return glyph;
     }
 
+    public void setGlyphSize(Number value) {
+        this.glyphSize.set(value);
+    }
+
+    public ObjectProperty<Number> glyphSizeProperty() {
+        return glyphSize;
+    }
 
 }
