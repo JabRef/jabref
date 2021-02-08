@@ -1,4 +1,4 @@
-# MADR Templae
+# MADR Template
 
 The template of [MADR](https://adr.github.io/madr/) is available at <https://github.com/adr/madr#the-template>.
 You can omit the `<-- optional -->` parts, which lead to a very minimal ADR:

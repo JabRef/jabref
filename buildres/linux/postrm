@@ -22,7 +22,8 @@ case "$1" in
         # Remove the native-messaging hosts script only if relative to the deb package
         for NATIVE_MESSAGING_JSON in "/usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json"\
                                      "/etc/chromium/native-messaging-hosts/org.jabref.jabref.json"\
-                                     "/etc/opt/chrome/native-messaging-hosts/org.jabref.jabref.json"; do
+                                     "/etc/opt/chrome/native-messaging-hosts/org.jabref.jabref.json"\
+                                     "/etc/opt/edge/native-messaging-hosts/org.jabref.jabref.json"; do
             if [ -e $NATIVE_MESSAGING_JSON ] && grep --quiet '"path": "/opt' $NATIVE_MESSAGING_JSON; then
                 rm $NATIVE_MESSAGING_JSON
             fi

@@ -1,8 +1,8 @@
 package org.jabref.gui.mergeentries;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -13,12 +13,12 @@ import org.jabref.model.entry.field.StandardField;
 
 public class MergeWithFetchedEntryAction extends SimpleCommand {
 
-    private final BasePanel basePanel;
+    private final LibraryTab libraryTab;
     private final DialogService dialogService;
     private final StateManager stateManager;
 
-    public MergeWithFetchedEntryAction(BasePanel basePanel, DialogService dialogService, StateManager stateManager) {
-        this.basePanel = basePanel;
+    public MergeWithFetchedEntryAction(LibraryTab libraryTab, DialogService dialogService, StateManager stateManager) {
+        this.libraryTab = libraryTab;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
 
@@ -35,6 +35,6 @@ public class MergeWithFetchedEntryAction extends SimpleCommand {
         }
 
         BibEntry originalEntry = stateManager.getSelectedEntries().get(0);
-        new FetchAndMergeEntry(basePanel, Globals.TASK_EXECUTOR).fetchAndMerge(originalEntry);
+        new FetchAndMergeEntry(libraryTab, Globals.TASK_EXECUTOR).fetchAndMerge(originalEntry);
     }
 }

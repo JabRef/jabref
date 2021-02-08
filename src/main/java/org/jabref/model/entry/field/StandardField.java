@@ -6,8 +6,12 @@ import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 
+import org.jabref.gui.fieldeditors.FieldNameLabel;
+
 /**
  * Standard BibTeX and BibLaTeX fields, as well as "normal" JabRef specific fields.
+ *
+ * See {@link FieldNameLabel#getDescription(org.jabref.model.entry.field.Field)} for a description of each field.
  */
 public enum StandardField implements Field {
 
@@ -137,7 +141,10 @@ public enum StandardField implements Field {
     // JabRef-specific fields
     GROUPS("groups"),
     OWNER("owner"),
-    TIMESTAMP("timestamp", FieldProperty.DATE);
+    TIMESTAMP("timestamp", FieldProperty.DATE),
+    CREATIONDATE("creationdate", FieldProperty.DATE),
+    MODIFICATIONDATE("modificationdate", FieldProperty.DATE);
+
 
     private final String name;
     private final String displayName;

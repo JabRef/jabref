@@ -230,7 +230,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
     public void askForNameAndRename() {
         String oldFile = this.linkedFile.getLink();
         Path oldFilePath = Path.of(oldFile);
-        Optional<String> askedFileName = dialogService.showInputDialogWithDefaultAndWait(Localization.lang("Rename file"), Localization.lang("New Filename"), oldFilePath.getFileName().toString());
+        Optional<String> askedFileName = dialogService.showInputDialogWithDefaultAndWait(
+                Localization.lang("Rename file"),
+                Localization.lang("New Filename"),
+                oldFilePath.getFileName().toString());
         askedFileName.ifPresent(this::renameFileToName);
     }
 
@@ -314,14 +317,14 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     /**
-     * Compares suggested filepath of current linkedFile with existing filepath.
+     * Compares suggested directory of current linkedFile with existing filepath directory.
      *
      * @return true if suggested filepath is same as existing filepath.
      */
     public boolean isGeneratedPathSameAsOriginal() {
         Optional<Path> newDir = databaseContext.getFirstExistingFileDir(filePreferences);
 
-        Optional<Path> currentDir = linkedFile.findIn(databaseContext, filePreferences);
+        Optional<Path> currentDir = linkedFile.findIn(databaseContext, filePreferences).map(Path::getParent);
 
         BiPredicate<Path, Path> equality = (fileA, fileB) -> {
             try {
@@ -378,9 +381,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public void edit() {
-        LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(this.linkedFile);
-
-        Optional<LinkedFile> editedFile = dialog.showAndWait();
+        Optional<LinkedFile> editedFile = dialogService.showCustomDialogAndWait(new LinkedFileEditDialogView(this.linkedFile));
         editedFile.ifPresent(file -> {
             this.linkedFile.setLink(file.getLink());
             this.linkedFile.setDescription(file.getDescription());
@@ -431,7 +432,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                 List<LinkedFile> linkedFiles = entry.getFiles();
                 int oldFileIndex = -1;
                 int i = 0;
-                while (i < linkedFiles.size() && oldFileIndex == -1) {
+                while ((i < linkedFiles.size()) && (oldFileIndex == -1)) {
                     LinkedFile file = linkedFiles.get(i);
                     // The file type changes as part of download process (see prepareDownloadTask), thus we only compare by link
                     if (file.getLink().equalsIgnoreCase(linkedFile.getLink())) {

@@ -2,9 +2,11 @@ package org.jabref.gui.specialfields;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+
+import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
@@ -12,10 +14,11 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.specialfields.SpecialFieldsUtils;
+import org.jabref.logic.util.UpdateField;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +32,8 @@ public class SpecialFieldAction extends SimpleCommand {
     private final boolean nullFieldIfValueIsTheSame;
     private final String undoText;
     private final DialogService dialogService;
+    private final PreferencesService preferencesService;
+    private final UndoManager undoManager;
     private final StateManager stateManager;
 
     /**
@@ -40,6 +45,8 @@ public class SpecialFieldAction extends SimpleCommand {
                               boolean nullFieldIfValueIsTheSame,
                               String undoText,
                               DialogService dialogService,
+                              PreferencesService preferencesService,
+                              UndoManager undoManager,
                               StateManager stateManager) {
         this.frame = frame;
         this.specialField = specialField;
@@ -47,6 +54,8 @@ public class SpecialFieldAction extends SimpleCommand {
         this.nullFieldIfValueIsTheSame = nullFieldIfValueIsTheSame;
         this.undoText = undoText;
         this.dialogService = dialogService;
+        this.preferencesService = preferencesService;
+        this.undoManager = undoManager;
         this.stateManager = stateManager;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
@@ -62,23 +71,15 @@ public class SpecialFieldAction extends SimpleCommand {
             NamedCompound ce = new NamedCompound(undoText);
             for (BibEntry bibEntry : bes) {
                 // if (value==null) and then call nullField has been omitted as updatefield also handles value==null
-                List<FieldChange> changes = SpecialFieldsUtils.updateField(
-                        specialField,
-                        value,
-                        bibEntry,
-                        nullFieldIfValueIsTheSame,
-                        Globals.prefs.getSpecialFieldsPreferences().isKeywordSyncEnabled(),
-                        Globals.prefs.getKeywordDelimiter());
+                Optional<FieldChange> change = UpdateField.updateField(bibEntry, specialField, value, nullFieldIfValueIsTheSame);
 
-                for (FieldChange change : changes) {
-                    ce.addEdit(new UndoableFieldChange(change));
-                }
+                change.ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
             }
             ce.end();
             if (ce.hasEdits()) {
-                frame.getCurrentBasePanel().getUndoManager().addEdit(ce);
-                frame.getCurrentBasePanel().markBaseChanged();
-                frame.getCurrentBasePanel().updateEntryEditorIfShowing();
+                frame.getCurrentLibraryTab().getUndoManager().addEdit(ce);
+                frame.getCurrentLibraryTab().markBaseChanged();
+                frame.getCurrentLibraryTab().updateEntryEditorIfShowing();
                 String outText;
                 if (nullFieldIfValueIsTheSame || value == null) {
                     outText = getTextDone(specialField, Integer.toString(bes.size()));
@@ -97,7 +98,7 @@ public class SpecialFieldAction extends SimpleCommand {
     private String getTextDone(SpecialField field, String... params) {
         Objects.requireNonNull(params);
 
-        SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field, frame.getUndoManager());
+        SpecialFieldViewModel viewModel = new SpecialFieldViewModel(field, preferencesService, undoManager);
 
         if (field.isSingleValueField() && (params.length == 1) && (params[0] != null)) {
             // Single value fields can be toggled only

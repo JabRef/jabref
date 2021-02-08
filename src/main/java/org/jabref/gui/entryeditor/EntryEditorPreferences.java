@@ -14,6 +14,7 @@ public class EntryEditorPreferences {
     private final boolean shouldShowLatexCitationsTab;
     private boolean showSourceTabByDefault;
     private boolean enableValidation;
+    private double dividerPosition;
 
     public EntryEditorPreferences(Map<String, Set<Field>> entryEditorTabList,
                                   boolean shouldOpenOnNewEntry,
@@ -21,7 +22,8 @@ public class EntryEditorPreferences {
                                   boolean isMrdlibAccepted,
                                   boolean shouldShowLatexCitationsTab,
                                   boolean showSourceTabByDefault,
-                                  boolean enableValidation) {
+                                  boolean enableValidation,
+                                  double dividerPosition) {
 
         this.entryEditorTabList = entryEditorTabList;
         this.shouldOpenOnNewEntry = shouldOpenOnNewEntry;
@@ -30,6 +32,7 @@ public class EntryEditorPreferences {
         this.shouldShowLatexCitationsTab = shouldShowLatexCitationsTab;
         this.showSourceTabByDefault = showSourceTabByDefault;
         this.enableValidation = enableValidation;
+        this.dividerPosition = dividerPosition;
     }
 
     public Map<String, Set<Field>> getEntryEditorTabList() {
@@ -56,7 +59,16 @@ public class EntryEditorPreferences {
         return shouldShowLatexCitationsTab;
     }
 
-    public boolean isEnableValidation() {
+    public boolean shouldEnableValidation() {
         return enableValidation;
+    }
+
+    public double getDividerPosition() {
+        return dividerPosition;
+    }
+
+    public EntryEditorPreferences withDividerPosition(double dividerPosition) {
+        this.dividerPosition = dividerPosition;
+        return this;
     }
 }

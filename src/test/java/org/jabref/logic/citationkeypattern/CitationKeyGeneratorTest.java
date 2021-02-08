@@ -1,6 +1,5 @@
 package org.jabref.logic.citationkeypattern;
 
-import java.util.Collections;
 import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -80,8 +79,7 @@ class CitationKeyGeneratorTest {
     }
 
     static String generateKey(BibEntry entry, String pattern, BibDatabase database) {
-        GlobalCitationKeyPattern keyPattern = new GlobalCitationKeyPattern(Collections.emptyList());
-        keyPattern.setDefaultValue(pattern);
+        GlobalCitationKeyPattern keyPattern = GlobalCitationKeyPattern.fromPattern(pattern);
         CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(
                 false,
                 false,
@@ -379,7 +377,7 @@ class CitationKeyGeneratorTest {
                 .withField(StandardField.CROSSREF, "entry2");
         BibEntry entry2 = new BibEntry()
                 .withCitationKey("entry2")
-                .withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University}}");
+                .withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
@@ -405,7 +403,7 @@ class CitationKeyGeneratorTest {
                 .withField(StandardField.CROSSREF, "entry2");
         BibEntry entry2 = new BibEntry()
                 .withCitationKey("entry2")
-                .withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University, Department of Electrical Engineering}}");
+                .withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University, Department of Electrical Engineering}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
@@ -451,7 +449,7 @@ class CitationKeyGeneratorTest {
                 .withField(StandardField.CROSSREF, "entry2");
         BibEntry entry2 = new BibEntry()
                 .withCitationKey("entry2")
-                .withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University, School of Computer Engineering}}");
+                .withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University, School of Computer Engineering}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
@@ -1070,7 +1068,7 @@ class CitationKeyGeneratorTest {
                 .withField(StandardField.AUTHOR, AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1)
                 .withField(StandardField.YEAR, "2019");
 
-        assertEquals("Newton-2019", generateKey(entry, "[auth]-[year]"));
+        assertEquals("Newton2019", generateKey(entry, "[auth]-[year]"));
     }
 
     @Test
@@ -1078,7 +1076,7 @@ class CitationKeyGeneratorTest {
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Newton, Isaac")
                                        .withField(StandardField.YEAR, "2019");
 
-        assertEquals("newt-2019", generateKey(entry, "[auth4:lower]-[year]"));
+        assertEquals("newt2019", generateKey(entry, "[auth4:lower]-[year]"));
     }
 
     @Test
@@ -1093,5 +1091,39 @@ class CitationKeyGeneratorTest {
         BibEntry bibEntry = new BibEntry().withField(StandardField.AUTHOR, "Gödel, Kurt");
 
         assertEquals(4, generateKey(bibEntry, "[auth4_1]").length());
+    }
+
+    @Test
+    void generateKeyWithNonNormalizedUnicode() {
+        BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Modèle et outil pour soutenir la scénarisation pédagogique de MOOC connectivistes");
+
+        assertEquals("Modele", generateKey(bibEntry, "[veryshorttitle]"));
+    }
+
+    @Test
+    void generateKeyWithModifierContainingRegexCharacterClass() {
+        BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Wickedness Managing");
+
+        assertEquals("WM", generateKey(bibEntry, "[title:regex(\"[a-z]+\",\"\")]"));
+    }
+
+    @Test
+    void generateKeyDoesNotModifyTheKeyWithIncorrectRegexReplacement() {
+        String pattern = "[title]";
+        GlobalCitationKeyPattern keyPattern = GlobalCitationKeyPattern.fromPattern(pattern);
+        CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(
+                false,
+                false,
+                false,
+                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+                "[", // Invalid regexp
+                "",
+                DEFAULT_UNWANTED_CHARACTERS,
+                keyPattern,
+                ',');
+
+        BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Wickedness Managing");
+        assertEquals("WickednessManaging",
+                new CitationKeyGenerator(keyPattern, new BibDatabase(), patternPreferences).generateKey(bibEntry));
     }
 }

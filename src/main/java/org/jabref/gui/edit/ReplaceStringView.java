@@ -6,7 +6,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 
-import org.jabref.gui.BasePanel;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -28,10 +28,10 @@ public class ReplaceStringView extends BaseDialog<Void> {
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
-    public ReplaceStringView(BasePanel basePanel) {
+    public ReplaceStringView(LibraryTab libraryTab) {
         this.setTitle(Localization.lang("Replace String"));
 
-        viewModel = new ReplaceStringViewModel(basePanel);
+        viewModel = new ReplaceStringViewModel(libraryTab);
 
         ViewLoader.view(this)
                   .load()

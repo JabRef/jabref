@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -24,7 +25,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-class GoogleScholarTest implements SearchBasedFetcherCapabilityTest {
+@DisabledOnCIServer("CI server is blocked by Google")
+class GoogleScholarTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
     private GoogleScholar finder;
     private BibEntry entry;
@@ -39,7 +41,6 @@ class GoogleScholarTest implements SearchBasedFetcherCapabilityTest {
     }
 
     @Test
-    @DisabledOnCIServer("CI server is blocked by Google")
     void linkFound() throws IOException, FetcherException {
         entry.setField(StandardField.TITLE, "Towards Application Portability in Platform as a Service");
 
@@ -50,7 +51,6 @@ class GoogleScholarTest implements SearchBasedFetcherCapabilityTest {
     }
 
     @Test
-    @DisabledOnCIServer("CI server is blocked by Google")
     void noLinkFound() throws IOException, FetcherException {
         entry.setField(StandardField.TITLE, "Curriculum programme of career-oriented java specialty guided by principles of software engineering");
 
@@ -58,7 +58,6 @@ class GoogleScholarTest implements SearchBasedFetcherCapabilityTest {
     }
 
     @Test
-    @DisabledOnCIServer("CI server is blocked by Google")
     void findSingleEntry() throws FetcherException {
         entry.setType(StandardEntryType.InProceedings);
         entry.setCitationKey("geiger2013detecting");
@@ -74,7 +73,6 @@ class GoogleScholarTest implements SearchBasedFetcherCapabilityTest {
     }
 
     @Test
-    @DisabledOnCIServer("CI server is blocked by Google")
     void findManyEntries() throws FetcherException {
         List<BibEntry> foundEntries = finder.performSearch("random test string");
 
@@ -83,6 +81,11 @@ class GoogleScholarTest implements SearchBasedFetcherCapabilityTest {
 
     @Override
     public SearchBasedFetcher getFetcher() {
+        return finder;
+    }
+
+    @Override
+    public PagedSearchBasedFetcher getPagedFetcher() {
         return finder;
     }
 

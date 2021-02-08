@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -26,7 +27,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-class ArXivTest implements SearchBasedFetcherCapabilityTest {
+class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
     private ArXiv fetcher;
     private BibEntry entry;
     private BibEntry sliceTheoremPaper;
@@ -135,13 +136,13 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest {
     @Test
     void searchEntryByPartOfTitle() throws Exception {
         assertEquals(Collections.singletonList(sliceTheoremPaper),
-                fetcher.performSearch("ti:\"slice theorem for Frechet\""));
+                fetcher.performSearch("title:\"slice theorem for Frechet\""));
     }
 
     @Test
     void searchEntryByPartOfTitleWithAcuteAccent() throws Exception {
         assertEquals(Collections.singletonList(sliceTheoremPaper),
-                fetcher.performSearch("ti:\"slice theorem for Fréchet\""));
+                fetcher.performSearch("title:\"slice theorem for Fréchet\""));
     }
 
     @Test
@@ -228,7 +229,7 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest {
 
     @Override
     public List<String> getTestAuthors() {
-        return List.of("\"Tobias Diez\"");
+        return List.of("Tobias Diez");
     }
 
     @Disabled("Is not supported by the current API")
@@ -246,32 +247,47 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest {
 
     @Override
     public String getTestJournal() {
-        return "\"Journal of Geometry and Physics (2013)\"";
+        return "Journal of Geometry and Physics (2013)";
     }
 
+    /**
+     * A phrase is a sequence of terms wrapped in quotes.
+     * Only documents that contain exactly this sequence are returned.
+     */
     @Test
     public void supportsPhraseSearch() throws Exception {
-        BibEntry expected = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.AUTHOR, "Tobias Büscher and Angel L. Diez and Gerhard Gompper and Jens Elgeti")
-                .withField(StandardField.TITLE, "Instability and fingering of interfaces in growing tissue")
-                .withField(StandardField.DATE, "2020-03-10")
-                .withField(StandardField.ABSTRACT, "Interfaces in tissues are ubiquitous, both between tissue and environment as well as between populations of different cell types. The propagation of an interface can be driven mechanically. % e.g. by a difference in the respective homeostatic stress of the different cell types. Computer simulations of growing tissues are employed to study the stability of the interface between two tissues on a substrate. From a mechanical perspective, the dynamics and stability of this system is controlled mainly by four parameters of the respective tissues: (i) the homeostatic stress (ii) cell motility (iii) tissue viscosity and (iv) substrate friction. For propagation driven by a difference in homeostatic stress, the interface is stable for tissue-specific substrate friction even for very large differences of homeostatic stress; however, it becomes unstable above a critical stress difference when the tissue with the larger homeostatic stress has a higher viscosity. A small difference in directed bulk motility between the two tissues suffices to result in propagation with a stable interface, even for otherwise identical tissues. Larger differences in motility force, however, result in a finite-wavelength instability of the interface. Interestingly, the instability is apparently bound by nonlinear effects and the amplitude of the interface undulations only grows to a finite value in time.")
-                .withField(StandardField.DOI, "10.1088/1367-2630/ab9e88")
-                .withField(StandardField.EPRINT, "2003.04601")
-                .withField(StandardField.DOI, "10.1088/1367-2630/ab9e88")
-                .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/2003.04601v1:PDF")
-                .withField(StandardField.EPRINTTYPE, "arXiv")
-                .withField(StandardField.EPRINTCLASS, "q-bio.TO")
-                .withField(StandardField.KEYWORDS, "q-bio.TO");
-
-        List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("au:\"Tobias Diez\"");
-        List<BibEntry> resultWithOutPhraseSearch = fetcher.performSearch("au:Tobias Diez");
-        // Ensure that phrase search result is just a subset of the default search result
+        List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("title:\"Taxonomy of Distributed\"");
+        List<BibEntry> resultWithOutPhraseSearch = fetcher.performSearch("title:Taxonomy AND title:of AND title:Distributed");
+        // Phrase search result has to be subset of the default search result
         assertTrue(resultWithOutPhraseSearch.containsAll(resultWithPhraseSearch));
-        resultWithOutPhraseSearch.removeAll(resultWithPhraseSearch);
+    }
 
-        // There is only a single paper found by searching for Tobias Diez as author that is not authored by "Tobias Diez".
-        assertEquals(Collections.singletonList(expected), resultWithOutPhraseSearch);
+    /**
+     * A phrase is a sequence of terms wrapped in quotes.
+     * Only documents that contain exactly this sequence are returned.
+     */
+    @Test
+    public void supportsPhraseSearchAndMatchesExact() throws Exception {
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Fauzi Adi Rafrastara and Qi Deyu")
+                .withField(StandardField.TITLE, "A Survey and Taxonomy of Distributed Data Mining Research Studies: A Systematic Literature Review")
+                .withField(StandardField.DATE, "2020-09-14")
+                .withField(StandardField.ABSTRACT, "Context: Data Mining (DM) method has been evolving year by year and as of today there is also the enhancement of DM technique that can be run several times faster than the traditional one, called Distributed Data Mining (DDM). It is not a new field in data processing actually, but in the recent years many researchers have been paying more attention on this area. Problems: The number of publication regarding DDM in high reputation journals and conferences has increased significantly. It makes difficult for researchers to gain a comprehensive view of DDM that require further research. Solution: We conducted a systematic literature review to map the previous research in DDM field. Our objective is to provide the motivation for new research by identifying the gap in DDM field as well as the hot area itself. Result: Our analysis came up with some conclusions by answering 7 research questions proposed in this literature review. In addition, the taxonomy of DDM research area is presented in this paper. Finally, this systematic literature review provides the statistic of development of DDM since 2000 to 2015, in which this will help the future researchers to have a comprehensive overview of current situation of DDM.")
+                .withField(StandardField.EPRINT, "2009.10618")
+                .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/2009.10618v1:PDF")
+                .withField(StandardField.EPRINTTYPE, "arXiv")
+                .withField(StandardField.EPRINTCLASS, "cs.DC")
+                .withField(StandardField.KEYWORDS, "cs.DC, cs.LG");
+
+        List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("title:\"Taxonomy of Distributed\"");
+
+        // There is only a single paper found by searching that contains the exact sequence "Taxonomy of Distributed" in the title.
+        assertEquals(Collections.singletonList(expected), resultWithPhraseSearch);
+    }
+
+    @Override
+    public PagedSearchBasedFetcher getPagedFetcher() {
+        return fetcher;
     }
 
     @Test
@@ -289,7 +305,7 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest {
                 .withField(StandardField.EPRINTCLASS, "q-bio.TO")
                 .withField(StandardField.KEYWORDS, "q-bio.TO");
 
-        List<BibEntry> result = fetcher.performSearch("au:\"Tobias Büscher\" AND ti:\"Instability and fingering of interfaces\"");
+        List<BibEntry> result = fetcher.performSearch("author:\"Tobias Büscher\" AND title:\"Instability and fingering of interfaces\"");
 
         // There is only one paper authored by Tobias Büscher with that phrase in the title
         assertEquals(Collections.singletonList(expected), result);

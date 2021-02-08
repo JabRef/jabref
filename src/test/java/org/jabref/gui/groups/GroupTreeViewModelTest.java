@@ -44,6 +44,11 @@ class GroupTreeViewModelTest {
     }
 
     @Test
+    void rootGroupIsSelectedByDefault() {
+        assertEquals(groupTree.rootGroupProperty().get().getGroupNode(), stateManager.getSelectedGroup(databaseContext).get(0));
+    }
+
+    @Test
     void explicitGroupsAreRemovedFromEntriesOnDelete() {
         ExplicitGroup group = new ExplicitGroup("group", GroupHierarchyType.INDEPENDENT, ',');
         BibEntry entry = new BibEntry();

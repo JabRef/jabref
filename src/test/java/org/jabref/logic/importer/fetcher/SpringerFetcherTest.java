@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -21,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @FetcherTest
-class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest {
+class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
     SpringerFetcher fetcher;
 
@@ -45,7 +46,7 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest {
                 .withField(StandardField.PUBLISHER, "Springer")
                 .withField(StandardField.TITLE, "Overcoming Social Barriers When Contributing to Open Source Software Projects")
                 .withField(StandardField.YEAR, "2019")
-                .withField(StandardField.FILE, "online:http\\://link.springer.com/openurl/pdf?id=doi\\:10.1007/s10606-018-9335-z:PDF")
+                .withField(StandardField.FILE, ":http\\://link.springer.com/openurl/pdf?id=doi\\:10.1007/s10606-018-9335-z:PDF")
                 .withField(StandardField.ABSTRACT, "An influx of newcomers is critical to the survival, long-term success, and continuity of many Open Source Software (OSS) community-based projects. However, newcomers face many barriers when making their first contribution, leading in many cases to dropouts. Due to the collaborative nature of community-based OSS projects, newcomers may be susceptible to social barriers, such as communication breakdowns and reception issues. In this article, we report a two-phase study aimed at better understanding social barriers faced by newcomers. In the first phase, we qualitatively analyzed the literature and data collected from practitioners to identify barriers that hinder newcomers’ first contribution. We designed a model composed of 58 barriers, including 13 social barriers. In the second phase, based on the barriers model, we developed FLOSScoach, a portal to support newcomers making their first contribution. We evaluated the portal in a diary-based study and found that the portal guided the newcomers and reduced the need for communication. Our results provide insights for communities that want to support newcomers and lay a foundation for building better onboarding tools. The contributions of this paper include identifying and gathering empirical evidence of social barriers faced by newcomers; understanding how social barriers can be reduced or avoided by using a portal that organizes proper information for newcomers (FLOSScoach); presenting guidelines for communities and newcomers on how to reduce or avoid social barriers; and identifying new streams of research.");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("JabRef Social Barriers Steinmacher");
@@ -105,11 +106,11 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest {
                 .withField(StandardField.BOOKTITLE, "Transforming Digital Worlds")
                 .withField(StandardField.TITLE, "Diversifying the Next Generation of Information Scientists: Six Years of Implementation and Outcomes for a Year-Long REU Program")
                 .withField(StandardField.YEAR, "2018")
-                .withField(StandardField.FILE, "online:http\\://link.springer.com/openurl/pdf?id=doi\\:10.1007/978-3-319-78105-1_75:PDF")
+                .withField(StandardField.FILE, ":http\\://link.springer.com/openurl/pdf?id=doi\\:10.1007/978-3-319-78105-1_75:PDF")
                 .withField(StandardField.ABSTRACT, "The iSchool Inclusion Institute (i3) is a Research Experience for Undergraduates (REU) program in the US designed to address underrepresentation in the information sciences. i3 is a year-long, cohort-based program that prepares undergraduate students for graduate school in information science and is rooted in a research and leadership development curriculum. Using data from six years of i3 cohorts, we present in this paper a qualitative and quantitative evaluation of the program in terms of student learning, research production, and graduate school enrollment. We find that students who participate in i3 report significant learning gains in information-science- and graduate-school-related areas and that 52% of i3 participants enroll in graduate school, over 2 $$\\times $$ × the national average. Based on these and additional results, we distill recommendations for future implementations of similar programs to address underrepresentation in information science.");
 
-        List<BibEntry> resultPhrase = fetcher.performSearch("name:\"Redmiles David\"");
-        List<BibEntry> result = fetcher.performSearch("name:Redmiles David");
+        List<BibEntry> resultPhrase = fetcher.performSearch("author:\"Redmiles David\"");
+        List<BibEntry> result = fetcher.performSearch("author:Redmiles David");
 
         // Phrase search should be a subset of the normal search result.
         Assertions.assertTrue(result.containsAll(resultPhrase));
@@ -119,8 +120,8 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest {
 
     @Test
     public void supportsBooleanANDSearch() throws Exception {
-        List<BibEntry> resultJustByAuthor = fetcher.performSearch("name:\"Redmiles, David\"");
-        List<BibEntry> result = fetcher.performSearch("name:\"Redmiles, David\" AND journal:Computer Supported Cooperative Work");
+        List<BibEntry> resultJustByAuthor = fetcher.performSearch("author:\"Redmiles, David\"");
+        List<BibEntry> result = fetcher.performSearch("author:\"Redmiles, David\" AND journal:\"Computer Supported Cooperative Work\"");
 
         Assertions.assertTrue(resultJustByAuthor.containsAll(result));
         List<BibEntry> allEntriesFromCSCW = result.stream()
@@ -139,11 +140,16 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest {
 
     @Override
     public List<String> getTestAuthors() {
-        return List.of("\"Steinmacher, Igor\"", "\"Gerosa, Marco\"", "\"Conte, Tayana U.\"");
+        return List.of("Steinmacher, Igor", "Gerosa, Marco", "Conte, Tayana U.");
     }
 
     @Override
     public String getTestJournal() {
-        return "\"Clinical Research in Cardiology\"";
+        return "Clinical Research in Cardiology";
+    }
+
+    @Override
+    public PagedSearchBasedFetcher getPagedFetcher() {
+        return fetcher;
     }
 }

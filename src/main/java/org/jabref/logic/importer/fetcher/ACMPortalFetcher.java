@@ -11,10 +11,12 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
+import org.jabref.logic.importer.fetcher.transformators.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 public class ACMPortalFetcher implements SearchBasedParserFetcher {
 
@@ -36,15 +38,16 @@ public class ACMPortalFetcher implements SearchBasedParserFetcher {
         return Optional.of(HelpFile.FETCHER_ACM);
     }
 
-    private static String createQueryString(String query) {
+    private static String createQueryString(QueryNode query) throws FetcherException {
+        String queryString = new DefaultQueryTransformer().transformLuceneQuery(query).orElse("");
         // Query syntax to search for an entry that matches "one" and "two" in any field is: (+one +two)
-        return "(%252B" + query.trim().replaceAll("\\s+", "%20%252B") + ")";
+        return "(%252B" + queryString.trim().replaceAll("\\s+", "%20%252B") + ")";
     }
 
     @Override
-    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
-        uriBuilder.addParameter("query", createQueryString(query)); // Search all fields
+        uriBuilder.addParameter("query", createQueryString(luceneQuery)); // Search all fields
         uriBuilder.addParameter("within", "owners.owner=GUIDE"); // Search within the ACM Guide to Computing Literature (encompasses the ACM Full-Text Collection)
         uriBuilder.addParameter("expformat", "bibtex"); // BibTeX format
         return uriBuilder.build().toURL();

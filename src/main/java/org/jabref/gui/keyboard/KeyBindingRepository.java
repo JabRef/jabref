@@ -16,20 +16,19 @@ import javafx.scene.input.KeyEvent;
 
 import org.jabref.logic.util.OS;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class KeyBindingRepository {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(KeyBindingRepository.class);
     /**
      * sorted by localization
      */
     private final SortedMap<KeyBinding, String> bindings;
-    private final int shortcutMask = -1;
 
     public KeyBindingRepository() {
         this(Collections.emptyList(), Collections.emptyList());
+    }
+
+    public KeyBindingRepository(SortedMap<KeyBinding, String> bindings) {
+        this.bindings = bindings;
     }
 
     public KeyBindingRepository(List<String> bindNames, List<String> bindings) {
@@ -120,13 +119,15 @@ public class KeyBindingRepository {
         return Optional.empty();
     }
 
-    public KeyCombination getKeyCombination(KeyBinding bindName) {
+    public Optional<KeyCombination> getKeyCombination(KeyBinding bindName) {
         String binding = get(bindName.getConstant());
+        if (binding.isEmpty()) {
+            return Optional.empty();
+        }
         if (OS.OS_X) {
             binding = binding.replace("ctrl", "meta");
         }
-
-        return KeyCombination.valueOf(binding);
+        return Optional.of(KeyCombination.valueOf(binding));
     }
 
     /**
@@ -137,8 +138,8 @@ public class KeyBindingRepository {
      * @return true if matching, else false
      */
     public boolean checkKeyCombinationEquality(KeyBinding binding, KeyEvent keyEvent) {
-        KeyCombination keyCombination = getKeyCombination(binding);
-        return checkKeyCombinationEquality(keyCombination, keyEvent);
+        return getKeyCombination(binding).filter(combination -> checkKeyCombinationEquality(combination, keyEvent))
+                                         .isPresent();
     }
 
     public List<String> getBindNames() {
@@ -147,5 +148,24 @@ public class KeyBindingRepository {
 
     public List<String> getBindings() {
         return new ArrayList<>(bindings.values());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        KeyBindingRepository that = (KeyBindingRepository) o;
+
+        return bindings.equals(that.bindings);
+    }
+
+    @Override
+    public int hashCode() {
+        return bindings.hashCode();
     }
 }

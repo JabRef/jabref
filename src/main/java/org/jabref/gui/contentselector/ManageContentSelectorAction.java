@@ -1,9 +1,12 @@
 package org.jabref.gui.contentselector;
 
-import org.jabref.gui.BasePanel;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
+
+import com.airhacks.afterburner.injection.Injector;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
@@ -19,7 +22,8 @@ public class ManageContentSelectorAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        BasePanel basePanel = jabRefFrame.getCurrentBasePanel();
-        new ContentSelectorDialogView(basePanel).showAndWait();
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+        LibraryTab libraryTab = jabRefFrame.getCurrentLibraryTab();
+        dialogService.showCustomDialogAndWait(new ContentSelectorDialogView(libraryTab));
     }
 }

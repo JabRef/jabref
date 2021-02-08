@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.5.0
+        uses: styfle/cancel-workflow-action@0.7.0
         with:
           access_token: ${{ github.token }}
       - name: Checkout source
@@ -41,7 +41,12 @@ jobs:
         with:
           path: ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-      - name: Run checkstyle
+      - name: Run check style reporter
+        uses: nikitasavinov/checkstyle-action@master
+        with:
+          reporter: github-pr-check
+          checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
+      - name: Run checkstyle gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
       - name: Run markdown-lint
         uses: avto-dev/markdown-lint@v1
@@ -59,7 +64,7 @@ jobs:
         with:
           java-version: 14
       - uses: actions/cache@v1
-        name: Restore gradle chache
+        name: Restore gradle cache
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
@@ -86,7 +91,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:10.8
+        image: postgres:13-alpine
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -103,7 +108,7 @@ jobs:
         with:
           java-version: 14
       - uses: actions/cache@v1
-        name: Restore gradle chache
+        name: Restore gradle cache
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
@@ -149,7 +154,7 @@ jobs:
         with:
           java-version: 14
       - uses: actions/cache@v1
-        name: Restore gradle chache
+        name: Restore gradle cache
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
@@ -199,7 +204,7 @@ jobs:
         with:
           java-version: 14
       - uses: actions/cache@v1
-        name: Restore gradle chache
+        name: Restore gradle cache
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
@@ -227,34 +232,3 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: gradle/wrapper-validation-action@v1
-  checkauthors:
-    name: "Validate AUTHORS"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          # full checkout needed for authors generation
-          fetch-depth: 0
-      - name: "All authors of this PR listed in AUTHORS"
-        id: authors_check
-        shell: bash
-        run: |
-          git config user.name "JabRef Author Checker [bot]"
-          git config user.email "noreply@jabref.org"
-          ./scripts/generate-authors.sh
-          set +o pipefail
-          added=$(git diff HEAD --no-ext-diff --unified=0 -a --no-prefix | egrep "^\+[^+]" | sed "s/^\+//")
-          if [ -z "$added" ]; then
-            echo "No authors added"
-            exit 0
-          fi
-          echo "Authors found in this PR not listed in the AUTHORS file."
-          echo
-          echo "The JabRef maintainers will add the following name to the AUTHORS file"
-          echo
-          echo -e "$added"
-          echo
-          echo "In case you want to use a different one, please comment here and adjust your name in your git configuration for future commits"
-          echo
-          echo "Background: Information about the AUTHORS file can be found at https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md#author-credits"
-          exit 1

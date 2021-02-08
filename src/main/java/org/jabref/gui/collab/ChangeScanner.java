@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.gui.Globals;
 import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
 import org.jabref.logic.bibtex.comparator.BibEntryDiff;
 import org.jabref.logic.bibtex.comparator.BibStringDiff;
@@ -14,6 +13,7 @@ import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +22,11 @@ public class ChangeScanner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ChangeScanner.class);
     private final BibDatabaseContext database;
+    private final PreferencesService preferencesService;
 
-    public ChangeScanner(BibDatabaseContext database) {
+    public ChangeScanner(BibDatabaseContext database, PreferencesService preferencesService) {
         this.database = database;
+        this.preferencesService = preferencesService;
     }
 
     public List<DatabaseChangeViewModel> scanForChanges() {
@@ -37,14 +39,14 @@ public class ChangeScanner {
 
             // Parse the modified file
             // Important: apply all post-load actions
-            ImportFormatPreferences importFormatPreferences = Globals.prefs.getImportFormatPreferences();
-            ParserResult result = OpenDatabase.loadDatabase(database.getDatabasePath().get(), importFormatPreferences, new DummyFileUpdateMonitor());
+            ImportFormatPreferences importFormatPreferences = preferencesService.getImportFormatPreferences();
+            ParserResult result = OpenDatabase.loadDatabase(database.getDatabasePath().get(), importFormatPreferences, preferencesService.getTimestampPreferences(), new DummyFileUpdateMonitor());
             BibDatabaseContext databaseOnDisk = result.getDatabaseContext();
 
             // Start looking at changes.
             BibDatabaseDiff differences = BibDatabaseDiff.compare(database, databaseOnDisk);
             differences.getMetaDataDifferences().ifPresent(diff -> {
-                changes.add(new MetaDataChangeViewModel(diff, Globals.prefs));
+                changes.add(new MetaDataChangeViewModel(diff, preferencesService));
                 diff.getGroupDifferences().ifPresent(groupDiff -> changes.add(new GroupChangeViewModel(groupDiff)));
             });
             differences.getPreambleDifferences().ifPresent(diff -> changes.add(new PreambleChangeViewModel(diff)));

@@ -19,13 +19,13 @@ import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.specialfields.SpecialFieldViewModel;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.OptionalValueTableCellFactory;
-import org.jabref.gui.util.comparator.PriorityFieldComparator;
 import org.jabref.gui.util.comparator.RankingFieldComparator;
-import org.jabref.gui.util.comparator.ReadStatusFieldComparator;
+import org.jabref.gui.util.comparator.SpecialFieldComparator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.SpecialFieldValue;
+import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.Rating;
@@ -35,14 +35,16 @@ import org.controlsfx.control.Rating;
  */
 public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldValueViewModel>> {
 
+    private final PreferencesService preferencesService;
     private final UndoManager undoManager;
 
-    public SpecialFieldColumn(MainTableColumnModel model, UndoManager undoManager) {
+    public SpecialFieldColumn(MainTableColumnModel model, PreferencesService preferencesService, UndoManager undoManager) {
         super(model);
+        this.preferencesService = preferencesService;
         this.undoManager = undoManager;
 
         SpecialField specialField = (SpecialField) FieldFactory.parseField(model.getQualifier());
-        SpecialFieldViewModel specialFieldViewModel = new SpecialFieldViewModel(specialField, undoManager);
+        SpecialFieldViewModel specialFieldViewModel = new SpecialFieldViewModel(specialField, preferencesService, undoManager);
 
         Node headerGraphic = specialFieldViewModel.getIcon().getGraphicNode();
         Tooltip.install(headerGraphic, new Tooltip(specialFieldViewModel.getLocalization()));
@@ -80,15 +82,8 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
 
         if (specialField == SpecialField.RANKING) {
             this.setComparator(new RankingFieldComparator());
-        }
-
-        // Added comparator for Read Status
-        if (specialField == SpecialField.READ_STATUS) {
-            this.setComparator(new ReadStatusFieldComparator());
-        }
-
-        if (specialField == SpecialField.PRIORITY) {
-            this.setComparator(new PriorityFieldComparator());
+        } else {
+            this.setComparator(new SpecialFieldComparator());
         }
 
         this.setSortable(true);
@@ -98,7 +93,7 @@ public class SpecialFieldColumn extends MainTableColumn<Optional<SpecialFieldVal
         Rating ranking = new Rating();
         ranking.setRating(value.getValue().toRating());
         EasyBind.subscribe(ranking.ratingProperty(), rating ->
-                new SpecialFieldViewModel(SpecialField.RANKING, undoManager)
+                new SpecialFieldViewModel(SpecialField.RANKING, preferencesService, undoManager)
                         .setSpecialFieldValue(entry.getEntry(), SpecialFieldValue.getRating(rating.intValue())));
 
         return ranking;

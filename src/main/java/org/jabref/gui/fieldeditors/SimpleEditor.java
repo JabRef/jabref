@@ -8,11 +8,11 @@ import javafx.scene.layout.Priority;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.ContentSelectorSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProvider;
-import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
+import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 public class SimpleEditor extends HBox implements FieldEditorFX {
 
@@ -22,7 +22,7 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
     public SimpleEditor(final Field field,
                         final SuggestionProvider<?> suggestionProvider,
                         final FieldCheckers fieldCheckers,
-                        final JabRefPreferences preferences,
+                        final PreferencesService preferences,
                         final boolean isMultiLine) {
         this.viewModel = new SimpleEditorViewModel(field, suggestionProvider, fieldCheckers);
 
@@ -30,7 +30,7 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
         HBox.setHgrow(textInput, Priority.ALWAYS);
 
         textInput.textProperty().bindBidirectional(viewModel.textProperty());
-        ((ContextMenuAddable) textInput).addToContextMenu(EditorMenus.getDefaultMenu(textInput));
+        ((ContextMenuAddable) textInput).initContextMenu(new DefaultMenu(textInput));
         this.getChildren().add(textInput);
 
         if (!isMultiLine) {
@@ -47,7 +47,7 @@ public class SimpleEditor extends HBox implements FieldEditorFX {
     public SimpleEditor(final Field field,
                         final SuggestionProvider<?> suggestionProvider,
                         final FieldCheckers fieldCheckers,
-                        final JabRefPreferences preferences) {
+                        final PreferencesService preferences) {
         this(field, suggestionProvider, fieldCheckers, preferences, false);
     }
 

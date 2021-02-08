@@ -8,6 +8,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
 
@@ -43,9 +44,11 @@ public class DefaultInjector implements PresenterFactory {
         } else if (clazz == ProtectedTermsLoader.class) {
             return Globals.protectedTermsLoader;
         } else if (clazz == ClipBoardManager.class) {
-            return Globals.clipboardManager;
+            return Globals.getClipboardManager();
         } else if (clazz == UndoManager.class) {
             return Globals.undoManager;
+        } else if (clazz == BibEntryTypesManager.class) {
+            return Globals.entryTypesManager;
         } else {
             try {
                 return clazz.newInstance();

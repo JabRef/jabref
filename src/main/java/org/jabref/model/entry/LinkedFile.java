@@ -33,15 +33,24 @@ public class LinkedFile implements Serializable {
     private transient StringProperty fileType = new SimpleStringProperty();
 
     public LinkedFile(String description, Path link, String fileType) {
+        this(Objects.requireNonNull(description), Objects.requireNonNull(link).toString(), Objects.requireNonNull(fileType));
+    }
+
+    /**
+     * Constructor for non-valid paths. We need to parse them, because the GUI needs to render it.
+     */
+    public LinkedFile(String description, String link, String fileType) {
         this.description.setValue(Objects.requireNonNull(description));
-        setLink(Objects.requireNonNull(link).toString());
+        setLink(link);
         this.fileType.setValue(Objects.requireNonNull(fileType));
     }
 
     public LinkedFile(URL link, String fileType) {
-        this.description.setValue("");
-        setLink(Objects.requireNonNull(link).toString());
-        this.fileType.setValue(Objects.requireNonNull(fileType));
+        this("", Objects.requireNonNull(link).toString(), Objects.requireNonNull(fileType));
+    }
+
+    public LinkedFile(String description, URL link, String fileType) {
+        this(description, Objects.requireNonNull(link).toString(), Objects.requireNonNull(fileType));
     }
 
     public StringProperty descriptionProperty() {
@@ -133,7 +142,7 @@ public class LinkedFile implements Serializable {
      * @param toCheck The String to check
      * @return <code>true</code>, if it starts with "http://", "https://" or contains "www."; <code>false</code> otherwise
      */
-    private boolean isOnlineLink(String toCheck) {
+    public static boolean isOnlineLink(String toCheck) {
         String normalizedFilePath = toCheck.trim().toLowerCase();
         return normalizedFilePath.startsWith("http://") || normalizedFilePath.startsWith("https://") || normalizedFilePath.contains("www.");
     }

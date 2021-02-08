@@ -24,10 +24,10 @@ import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 
-import org.jabref.gui.BasePanel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.Globals;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.edit.EditAction;
@@ -57,7 +57,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTable.class);
 
-    private final BasePanel panel;
+    private final LibraryTab libraryTab;
+    private final DialogService dialogService;
     private final BibDatabaseContext database;
     private final MainTableDataModel model;
 
@@ -68,7 +69,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private String columnSearchTerm;
 
     public MainTable(MainTableDataModel model,
-                     BasePanel panel,
+                     LibraryTab libraryTab,
                      BibDatabaseContext database,
                      PreferencesService preferencesService,
                      DialogService dialogService,
@@ -77,14 +78,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                      KeyBindingRepository keyBindingRepository) {
         super();
 
-        this.panel = panel;
+        this.libraryTab = libraryTab;
+        this.dialogService = dialogService;
         this.database = Objects.requireNonNull(database);
         this.model = model;
-        UndoManager undoManager = panel.getUndoManager();
+        UndoManager undoManager = libraryTab.getUndoManager();
         MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
 
         importHandler = new ImportHandler(
-                dialogService, database, externalFileTypes,
+                database, externalFileTypes,
                 preferencesService,
                 Globals.getFileUpdateMonitor(),
                 undoManager,
@@ -93,22 +95,27 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         localDragboard = stateManager.getLocalDragboard();
 
         this.getColumns().addAll(
-                new MainTableColumnFactory(database, preferencesService, externalFileTypes, panel.getUndoManager(), dialogService)
-                        .createColumns());
+                new MainTableColumnFactory(
+                        database,
+                        preferencesService,
+                        externalFileTypes,
+                        libraryTab.getUndoManager(),
+                        dialogService).createColumns());
 
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
                 .withOnMouseClickedEvent((entry, event) -> {
                     if (event.getClickCount() == 2) {
-                        panel.showAndEdit(entry.getEntry());
+                        libraryTab.showAndEdit(entry.getEntry());
                     }
                 })
                 .withContextMenu(entry -> RightClickMenu.create(entry,
                         keyBindingRepository,
-                        panel,
+                        libraryTab,
                         dialogService,
                         stateManager,
                         preferencesService,
-                        Globals.clipboardManager))
+                        undoManager,
+                        Globals.getClipboardManager()))
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
                 .setOnDragOver(this::handleOnDragOver)
@@ -130,7 +137,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             }
         }
         */
-       mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
+
+        mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
                     .map(column -> (MainTableColumn<?>) column)
                     .filter(column -> column.getModel().equals(columnModel))
@@ -153,9 +161,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         // Store visual state
         new PersistenceVisualStateTable(this, preferencesService);
 
-        // TODO: Float marked entries
-        // model.updateMarkingState(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
-
         setupKeyBindings(keyBindingRepository);
 
         this.setOnKeyTyped(key -> {
@@ -169,8 +174,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     /**
-     * This is called, if a user starts typing some characters into the keyboard with focus on main table.
-     * The {@link MainTable} will scroll to the cell with the same starting column value and typed string
+     * This is called, if a user starts typing some characters into the keyboard with focus on main table. The {@link
+     * MainTable} will scroll to the cell with the same starting column value and typed string
      *
      * @param sortedColumn The sorted column in {@link MainTable}
      * @param keyEvent     The pressed character
@@ -220,8 +225,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         if (!selectedEntries.isEmpty()) {
             try {
-                Globals.clipboardManager.setContent(selectedEntries);
-                panel.output(panel.formatOutputMessage(Localization.lang("Copied"), selectedEntries.size()));
+                Globals.getClipboardManager().setContent(selectedEntries);
+                dialogService.notify(libraryTab.formatOutputMessage(Localization.lang("Copied"), selectedEntries.size()));
             } catch (IOException e) {
                 LOGGER.error("Error while copying selected entries to clipboard", e);
             }
@@ -230,7 +235,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     public void cut() {
         copy();
-        panel.delete(true);
+        libraryTab.delete(true);
     }
 
     private void setupKeyBindings(KeyBindingRepository keyBindings) {
@@ -238,7 +243,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             if (event.getCode() == KeyCode.ENTER) {
                 getSelectedEntries().stream()
                                     .findFirst()
-                                    .ifPresent(panel::showAndEdit);
+                                    .ifPresent(libraryTab::showAndEdit);
                 event.consume();
                 return;
             }
@@ -256,16 +261,16 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         break;
                     case PASTE:
                         if (!OS.OS_X) {
-                            new EditAction(StandardActions.PASTE, panel.frame(), Globals.stateManager).execute();
+                            new EditAction(StandardActions.PASTE, libraryTab.frame(), Globals.stateManager).execute();
                         }
                         event.consume();
                         break;
                     case COPY:
-                        new EditAction(StandardActions.COPY, panel.frame(), Globals.stateManager).execute();
+                        new EditAction(StandardActions.COPY, libraryTab.frame(), Globals.stateManager).execute();
                         event.consume();
                         break;
                     case CUT:
-                        new EditAction(StandardActions.CUT, panel.frame(), Globals.stateManager).execute();
+                        new EditAction(StandardActions.CUT, libraryTab.frame(), Globals.stateManager).execute();
                         event.consume();
                         break;
                     default:
@@ -289,10 +294,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     public void paste(BibDatabaseMode bibDatabaseMode) {
         // Find entries in clipboard
-        List<BibEntry> entriesToAdd = Globals.clipboardManager.extractData();
+        List<BibEntry> entriesToAdd = Globals.getClipboardManager().extractData();
         ImportCleanup cleanup = new ImportCleanup(bibDatabaseMode);
         cleanup.doPostCleanup(entriesToAdd);
-        panel.insertEntries(entriesToAdd);
+        libraryTab.insertEntries(entriesToAdd);
         if (!entriesToAdd.isEmpty()) {
             this.requestFocus();
         }
@@ -348,29 +353,26 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             // Different actions depending on where the user releases the drop in the target row
             // Bottom + top -> import entries
             // Center -> link files to entry
+            // Depending on the pressed modifier, move/copy/link files to drop target
             switch (ControlHelper.getDroppingMouseLocation(row, event)) {
-                case TOP:
-                case BOTTOM:
-                    importHandler.importAsNewEntries(files);
-                    break;
-                case CENTER:
-                    // Depending on the pressed modifier, move/copy/link files to drop target
+                case TOP, BOTTOM -> importHandler.importFilesInBackground(files).executeWith(Globals.TASK_EXECUTOR);
+                case CENTER -> {
                     BibEntry entry = target.getEntry();
                     switch (event.getTransferMode()) {
-                        case LINK:
+                        case LINK -> {
                             LOGGER.debug("Mode LINK"); // shift on win or no modifier
                             importHandler.getLinker().addFilesToEntry(entry, files);
-                            break;
-                        case MOVE:
+                        }
+                        case MOVE -> {
                             LOGGER.debug("Mode MOVE"); // alt on win
                             importHandler.getLinker().moveFilesToFileDirAndAddToEntry(entry, files);
-                            break;
-                        case COPY:
+                        }
+                        case COPY -> {
                             LOGGER.debug("Mode Copy"); // ctrl on win
                             importHandler.getLinker().copyFilesToFileDirAndAddToEntry(entry, files);
-                            break;
+                        }
                     }
-                    break;
+                }
             }
 
             success = true;
