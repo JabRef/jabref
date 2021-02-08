@@ -17,7 +17,7 @@ public class DefaultLuceneQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String getLogicalNotOperator() {
-        return "-";
+        return "NOT ";
     }
 
     @Override

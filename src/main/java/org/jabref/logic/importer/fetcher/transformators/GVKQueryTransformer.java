@@ -16,13 +16,13 @@ public class GVKQueryTransformer extends AbstractQueryTransformer {
     @Override
     protected String getLogicalOrOperator() {
         LOGGER.warn("GVK does not support Boolean OR operator");
-        return "";
+        return " ";
     }
 
     @Override
     protected String getLogicalNotOperator() {
         LOGGER.warn("GVK does not support Boolean NOT operator");
-        return "";
+        return " ";
     }
 
     @Override
@@ -43,8 +43,8 @@ public class GVKQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleYear(String year) {
-        // ver means Veröffentlichungsangaben
-        return "pica.ver=" + year;
+        // "erj" means "Erscheinungsjahr"
+        return "pica.erj=" + year;
     }
 
     @Override
