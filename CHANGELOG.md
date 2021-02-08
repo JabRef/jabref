@@ -49,6 +49,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where changing the font size makes the font size field too small. [#7085](https://github.com/JabRef/jabref/issues/7085)
 - We fixed an issue with TexGroups on Linux systems, where the modification of an aux-file did not trigger an auto-update for TexGroups. Furthermore, the detection of file modifications is now more reliable. [#7412](https://github.com/JabRef/jabref/pull/7412)
 - We fixed an issue where the Unicode to Latex formatter produced wrong results for characters with a codepoint higher than Character.MAX_VALUE. [#7387](https://github.com/JabRef/jabref/issues/7387)
+- We fixed an issue where a non valid value as font size results in an uncaught exception. [#7415](https://github.com/JabRef/jabref/issues/7415)
 
 ### Removed
 
