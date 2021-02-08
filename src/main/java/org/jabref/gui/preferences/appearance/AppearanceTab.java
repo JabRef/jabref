@@ -3,11 +3,9 @@ package org.jabref.gui.preferences.appearance;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
+import javafx.util.converter.IntegerStringConverter;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -15,6 +13,8 @@ import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+
+import java.util.regex.Pattern;
 
 public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewModel> implements PreferencesTab {
 
@@ -26,6 +26,15 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
     @FXML private TextField customThemePath;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
+
+    private TextFormatter<Integer> fontSizeFormatter = new TextFormatter<Integer>(new IntegerStringConverter(), 9,
+            c -> {
+                if (Pattern.matches("\\d*", c.getText())){
+                    return c;
+                }
+                c.setText("0");
+                return c;
+            });
 
     public AppearanceTab() {
         ViewLoader.view(this)
@@ -48,6 +57,7 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
         fontSize.getEditor().setAlignment(Pos.CENTER_RIGHT);
         fontSize.setValueFactory(AppearanceTabViewModel.fontSizeValueFactory);
         fontSize.getEditor().textProperty().bindBidirectional(viewModel.fontSizeProperty());
+        fontSize.getEditor().setTextFormatter(fontSizeFormatter);
 
         themeLight.selectedProperty().bindBidirectional(viewModel.themeLightProperty());
         themeDark.selectedProperty().bindBidirectional(viewModel.themeDarkProperty());
