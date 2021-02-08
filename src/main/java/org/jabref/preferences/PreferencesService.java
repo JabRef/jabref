@@ -15,7 +15,6 @@ import org.jabref.gui.groups.GroupsPreferences;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences;
-import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.util.Theme;
 import org.jabref.logic.JabRefException;
@@ -231,10 +230,6 @@ public interface PreferencesService {
     ColumnPreferences getColumnPreferences();
 
     void storeColumnPreferences(ColumnPreferences columnPreferences);
-
-    MainTablePreferences getMainTablePreferences();
-
-    void storeMainTablePreferences(MainTablePreferences mainTablePreferences);
 
     MainTableNameFormatPreferences getMainTableNameFormatPreferences();
 

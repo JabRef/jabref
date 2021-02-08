@@ -83,7 +83,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.database = Objects.requireNonNull(database);
         this.model = model;
         UndoManager undoManager = libraryTab.getUndoManager();
-        MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
+        ColumnPreferences columnPreferences = preferencesService.getColumnPreferences();
 
         importHandler = new ImportHandler(
                 database, externalFileTypes,
@@ -137,17 +137,14 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             }
         }
         */
-
-        mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
+        columnPreferences.getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
                     .map(column -> (MainTableColumn<?>) column)
                     .filter(column -> column.getModel().equals(columnModel))
                     .findFirst()
                     .ifPresent(column -> this.getSortOrder().add(column)));
 
-        if (mainTablePreferences.getResizeColumnsToFit()) {
-            this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
-        }
+        this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
 
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
@@ -330,7 +327,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         List<BibEntry> entries = getSelectionModel().getSelectedItems().stream().map(BibEntryTableViewModel::getEntry).collect(Collectors.toList());
 
-        // The following is necesary to initiate the drag and drop in javafx, although we don't need the contents
+        // The following is necessary to initiate the drag and drop in javafx, although we don't need the contents
         // It doesn't work without
         ClipboardContent content = new ClipboardContent();
         Dragboard dragboard = startDragAndDrop(TransferMode.MOVE);

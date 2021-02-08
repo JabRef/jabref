@@ -36,7 +36,9 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.PreferencesService;
@@ -76,7 +78,6 @@ public class MainTableColumnFactory {
         List<TableColumn<BibEntryTableViewModel, ?>> columns = new ArrayList<>();
 
         columnPreferences.getColumns().forEach(column -> {
-
             switch (column.getType()) {
                 case INDEX:
                     columns.add(createIndexColumn(column));
@@ -109,7 +110,19 @@ public class MainTableColumnFactory {
                 default:
                 case NORMALFIELD:
                     if (!column.getQualifier().isBlank()) {
-                        columns.add(createFieldColumn(column));
+                        TableColumn<BibEntryTableViewModel, ?> fieldColumn = createFieldColumn(column);
+                        columns.add(fieldColumn);
+                        fieldColumn.setPrefWidth(ColumnPreferences.DEFAULT_COLUMN_WIDTH);
+                        if (column.getQualifier().equalsIgnoreCase(StandardField.YEAR.getName())) {
+                            // 60 is chosen, because of the optimal width of a four digit number
+                            fieldColumn.setPrefWidth(60);
+                        } else if (column.getQualifier().equalsIgnoreCase(InternalField.TYPE_HEADER.getName())) {
+                            // 90 is chosen, because of the optimal width of the entry type
+                            fieldColumn.setPrefWidth(90);
+                        } else {
+                            fieldColumn.setMinWidth(ColumnPreferences.DEFAULT_COLUMN_MIN_WIDTH);
+                            fieldColumn.setPrefWidth(ColumnPreferences.DEFAULT_COLUMN_WIDTH);
+                        }
                     }
                     break;
             }
@@ -125,7 +138,7 @@ public class MainTableColumnFactory {
     }
 
     /**
-     * Creates a column with a continous number
+     * Creates a column with a continuous number
      */
     private TableColumn<BibEntryTableViewModel, String> createIndexColumn(MainTableColumnModel columnModel) {
         TableColumn<BibEntryTableViewModel, String> column = new MainTableColumn<>(columnModel);

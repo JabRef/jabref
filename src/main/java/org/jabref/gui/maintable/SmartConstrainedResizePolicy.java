@@ -1,12 +1,13 @@
 package org.jabref.gui.maintable;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-import javafx.scene.control.ResizeFeaturesBase;
-import javafx.scene.control.TableColumnBase;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 
@@ -14,91 +15,467 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This resize policy is almost the same as {@link TableView#CONSTRAINED_RESIZE_POLICY}
- * We make sure that the width of all columns sums up to the total width of the table.
- * However, in contrast to {@link TableView#CONSTRAINED_RESIZE_POLICY} we size the columns initially by their preferred width.
+ * This resize policy supports following properties &ndash; preferably user-configurable:
+ *
+ * <ul>
+ *  <li>Honoring the minimal and maximal width for each column</li>
+ *  <li>Honoring a <emph>desired width</emph> of each column (if available). It is used at initial table rendering (e.g., program startup) and for the threshold (see below). It is not used in other cases.</li>
+ *  <li>Honoring non-resizable columns (i.e., that a column should not be scaled)</li>
+ *  <li>Desired width derivation (e.g., <code>80%</code> of the desired width) is a point from which on the column should not be shrunk any more. This is called the <emph>threshold</emph>.</li>
+ * </ul>
+ * <p>
+ * This resize policy supports following properties (non user-configurable):
+ *
+ * <ul>
+ *  <li>Between each resizing, the properties of each column (minimal width, resizable, ...) can change.</li>
+ *  <li>Automatic sizing of the columns:
+ *    <ul>
+ *      <li>Each column should have at least its minimal size.</li>
+ *      <li>If the space honoring the minimal width is not sufficient, a horizontal scrollbar should be used.</li>
+ *      <li>Columns with fixed size should use those fixed sizes</li>
+ *      <li>If there is additional space left the remaining columns should be broadened to use this space</li>
+ *    </ul>
+ *  </li>
+ *  <li>We balance between a complete fit into the table space and the desired width. A "huge" derivation from the desired width is not accepted.</li>
+ *  <li>Ideally, the columns should have the desired width</li>
+ *  <li>If a user changes the size of a column, the new size of that column should be set.</li>
+ *  <li>No behavior toggle buttons by the user --&gt; this policy is a smart one</li>
+ *  <li>We distinguish between a column being resized by the user and a column automatically resized.</li>
+ *  <li>In case a user changes a column manually:
+ *    <ul>
+ *      <li>The column shrinks/enlarges by the requested delta.</li>
+ *      <li>The column must not shrink below the minimum width / enlarge above the maximum width.</li>
+ *      <li>Thereby, the desired width is <emph>not</emph> changed.</li>
+ *      <li>The other columns adapt "smartly": The other columns according to their current ratio. This way, the column proportions are respected.</li>
+ *    </ul>
+ *  </li>
+ *  <li>The ratio used for enlargement of columns respects the current column width. The ratio for shrinkage is constant for all columns.</li>
+ * </ul>
+ * <p>
+ * The implementation is driven by following factors:
+ *
+ * <ul>
+ *   <li>Minimal width is an "absolute" minimal making the content nearly barely visible</li>
+ *   <li>Maximal width is an "absolute" maximal width making the content too much visible</li>
+ *   <li>The preferred width holds the current active width of a column (due to JavaFX design decisions).</li>
+ *   <li>Desired width is set to a reasonable value. The desired width is a "globally" preferred width.</li>
+ * </ul>
+ *
+ * <h2>I0 - Initial table rendering</h2>
+ * <p>
+ * Decision to take: a) Use last setting or b) rerender with desired widths. We opt for b), because we assume that user-configuration of desired widths is easy. This leads to I3 being inconsistent to RWS2 (there is no previous width in I3)
+ *
+ * <ul>
+ *   <li>I1 - Initially, all columns takes the desired width.</li>
+ *   <li>I2 - If content fits into table, distribute remaining delta to table space according to the shares. No scrollbar.</li>
+ *   <li>I3 - If content does not fit into table, all columns are shrunk (all equally) until all columns hit the threshold. In case no column can shrink any more (they are smaller or equal the threshold), they are not shrunk. Thus, the table gets wider than the table space. This leads to a scrollbar.</li>
+ * </ul>
+ *
+ * <h2>RW0 - Resizing of window</h2>
+ *
+ * <ul>
+ *   <li>RWE0 - If enlarged
+ *     <ul>
+ *       <li>RWE1 - Content has fit into table. Then, content still has to fit into table. Thus, enlarge all columns respecting the ratio (the content is enlarged proportional to actual width). Scrollbar not present.</li>
+ *       <li>RWE2 - Content has not fit into table. Case: Content still not fits into table. No resize action. Scrollbar shrinks.</li>
+ *       <li>RWE3 - Content has not fit into table. Case: Content fits into table. Calculate the delta and distribute across all resizable columns using the ratio. Scrollbar not present any more.</li>
+ *     </ul>
+ *   </li>
+ *   <li>RWS0 - If shrunk
+ *     <ul>
+ *       <li>RWS1 - Content has fit into table. Content does not fit into table anymore (because of shrinkage). Delta is absorbed by columns until threshold is reached. If not complete delta can be absorbed, scrollbar appears.</li>
+ *       <li>RWS2 - Content has not fit into table. Content still does not fit into table (because of shrinkage). Scrollbar enlarges. </li>
+ *     </ul>
+ *   </li>
+ * </ul>
+ *
+ * <h2>RC0 - Resizing of column</h2>
+ *
+ * <ul>
+ *   <li>RCE0 - If enlarged
+ *     <ul>
+ *         <li>RCE1 - Content has fit into table. Then, content does not fit into table (because of delta). Column gets enlarged by the delta. Other columns should not below a certain "reasonable" size ("threshold"). All columns are shrunk (all equally) until all columns hit the threshold. In case no column can shrink any more (they are smaller or equal the threshold), they are not shrunk. Thus, the table gets wider than the table space. This leads to a scrollbar.</li>
+ *         <li>RCE2 - Content has not fit into table. Then, content still does not fit into table (because of delta). Column gets enlarged by the delta. Other columns are not changed (consistency to RCS3). Scrollbar gets wider.</li>
+ *     </ul>
+ *   </li>
+ *   <li>RCS0 - If shrunk
+ *     <ul>
+ *       <li>RCS1 - Content has fit into table. Then, content still fits into table (because of delta). Column must not shrink below minimum width. If minimum is reached, nothing happens. Remaining delta is distributed among other columns. No scrollbar present.</li>
+ *       <li>RCS2 - Content has not fit into table. If the delta is applied, the content fits into the table. Delta is applied to the column. Remaining delta splits up of delta-in-bounds and delta-out-of-bounds. Delta-in-bounds is distributed among other columns. Scrollbar disappears.</li>
+ *       <li>RCS3 - Content has not fit into table. If the delta is applied, the content still does not fit into table. Column is shrunk respecting the delta. Other columns are not changed (consistency to RCE2). Scrollbar shrinks.</li>
+ *     </ul>
+ *   </li>
+ * </ul>
+ *
+ * <h2>Notes</h2>
+ *
+ * <ul>
+ *   <li>Design goal of this class is to be self-contained and not dependent on other non-JavaFX classes.</li>
+ *   <li>TODO: In case the desired column width is updated, the SmartConstrainedResizePolicy needs to be reinstantiated. A more advanced code would use JavaFX Properties for that.</li>
+ * </ul>
+ *
+ * <p>Related Work</p>
+ * <ul>
+ *   <li><a href="https://github.com/edvin/tornadofx/wiki/TableView-SmartResize">TableView SmartResize Policy</a></li>
+ *   <li><a href="https://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/TableView.html#CONSTRAINED_RESIZE_POLICY">CONSTRAINED_RESIZE_POLICY</a>: This policy a) initially adjust the column widths of all columns in a way that the table fits the whole table space, b) adjusts the width of the columns right to the current column to have the whole table fit into the table space. The policy starts with the minimum width, not with the preferred width. The policy does not support the case if the content does not fit into the table space.</li>
+ *   <li><a href="https://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/TableView.html#UNCONSTRAINED_RESIZE_POLICY">UNCONSTRAINED_RESIZE_POLICY</a>: This policy just resizes the specified column by the provided delta and shifts all other columns (to the right of the given column) further to the right (when the delta is positive) or to the left (when the delta is negative).</li>
+ *   <li><a href="https://github.com/JoshuaD84/HypnosMusicPlayer/blob/06ce94cd69382f13901f0b73491bb93afd4b84ee/src/net/joshuad/hypnos/fxui/HypnosResizePolicy.java">HypnosResizePolicy</a>: Similar to CONSTRAINED_RESIZE_POLICY. However, at resize extra space is given to columns that aren't at their pref width and need that type of space (negative or positive) on a proportional basis first.</li>
+ * </ul>
  */
 public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFeatures, Boolean> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SmartConstrainedResizePolicy.class);
 
+    // The delta which is "OK" the column width being smaller than the table width without any action taken
+    public static final double EPSILON_MARGIN = 20d;
+
+    private List<? extends TableColumn<?, ?>> resizableColumns;
+
+    private TableColumn<?, ?> lastModifiedColumn = null;
+
+    private Map<TableColumn, Double> desiredColumnWidths;
+
+    private Double thresholdPercent;
+
+    // Required for RW0
+    private Double previousTableWidth;
+
+    private boolean firstTimeRun = true;
+
+    public SmartConstrainedResizePolicy() {
+        this.desiredColumnWidths = new HashMap<>();
+        // default is 80%
+        this.thresholdPercent = .8;
+    }
+
+    /**
+     * Sets an desired column width for a set of columns. A "desired" width is a width which is wished by the user
+     *
+     * @param desiredColumnWidths
+     * @param thresholdPercent    Value between 0 and 1 (normal percentage calculation: 1 is 100%, .8 is 80%, ...)
+     */
+    public SmartConstrainedResizePolicy(Map<TableColumn, Double> desiredColumnWidths, Double thresholdPercent) {
+        this.desiredColumnWidths = desiredColumnWidths;
+        this.thresholdPercent = thresholdPercent;
+    }
+
+    public Double getMinWidthThreshold(TableColumn column) {
+        return getDesiredColumnWidth(column) * thresholdPercent;
+    }
+
+    /**
+     * SIDE EFFECT: Stores computed desired width if not present in HashMap. This leads to a constant desired width.
+     */
+    private Double getDesiredColumnWidth(TableColumn column) {
+        desiredColumnWidths.putIfAbsent(column, column.getPrefWidth());
+        Double result = desiredColumnWidths.get(column);
+        LOGGER.trace("Desired column width for {}: {}", column.getText(), result);
+        return result;
+    }
+
+    /**
+     * @return <code>false</code> if surely no changes happened, <code>true</code> if some change happened
+     */
     @Override
     public Boolean call(TableView.ResizeFeatures prop) {
-        if (prop.getColumn() == null) {
-            return initColumnSize(prop.getTable());
-        } else {
-            return constrainedResize(prop);
-        }
-    }
-
-    private Boolean initColumnSize(TableView<?> table) {
-        double tableWidth = getContentWidth(table);
-        List<? extends TableColumnBase<?, ?>> visibleLeafColumns = table.getVisibleLeafColumns();
-        double totalWidth = visibleLeafColumns.stream().mapToDouble(TableColumnBase::getWidth).sum();
-
-        if (Math.abs(totalWidth - tableWidth) > 1) {
-            double totalPrefWidth = visibleLeafColumns.stream().mapToDouble(TableColumnBase::getPrefWidth).sum();
-            if (totalPrefWidth > 0) {
-                for (TableColumnBase col : visibleLeafColumns) {
-                    double share = col.getPrefWidth() / totalPrefWidth;
-                    double newSize = tableWidth * share;
-
-                    // Just to make sure that we are staying under the total table width (due to rounding errors)
-                    newSize -= 2;
-
-                    resize(col, newSize - col.getWidth());
-                }
+        TableView table = prop.getTable();
+        if (firstTimeRun) {
+            if (table.getWidth() == 0.0d) {
+                LOGGER.debug("Table width is 0. Returning false");
+                return false;
             }
+
+            firstTimeGlobalVariablesInitializations(table);
+
+            LOGGER.debug("I0");
+            doInitialTableRendering(table);
+            firstTimeRun = false;
+            LOGGER.debug("First time rendering completed.");
+            previousTableWidth = table.getWidth();
+            LOGGER.debug("Storing current table width {} as \"previous table width\"", previousTableWidth);
+            return true;
         }
 
-        return false;
+        LOGGER.debug("RC0, RW0");
+
+        TableColumn<?, ?> column = prop.getColumn();
+        Boolean result;
+        if (column == null) {
+            // happens at window resize
+            LOGGER.debug("RW0 - Table is fully rendered");
+            if (previousTableWidth == table.getWidth()) {
+                LOGGER.debug("Table has same size as in last run. Nothing to do");
+                return false;
+            }
+            result = doFullTableRendering(table);
+        } else {
+            LOGGER.debug("RC0 - Column width changed");
+            result = doColumnChange(table, prop.getColumn(), prop.getDelta());
+        }
+        LOGGER.debug("Result: {}", result);
+        previousTableWidth = table.getWidth();
+        LOGGER.debug("Storing current table width {} as \"previous table width\"", previousTableWidth);
+        return result;
     }
 
-    private void resize(TableColumnBase column, double delta) {
-        // We have to use reflection since TableUtil is not visible to us
-        try {
-            // TODO: reflective access, should be removed
-            Class<?> clazz = Class.forName("javafx.scene.control.TableUtil");
-            Method constrainedResize = clazz.getDeclaredMethod("resize", TableColumnBase.class, double.class);
-            constrainedResize.setAccessible(true);
-            constrainedResize.invoke(null, column, delta);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException e) {
-            LOGGER.error("Could not invoke resize in TableUtil", e);
+    private void firstTimeGlobalVariablesInitializations(TableView<?> table) {
+        resizableColumns = table.getVisibleLeafColumns().stream()
+                                .filter(TableColumn::isResizable)
+                                .collect(Collectors.toList());
+    }
+
+    /**
+     * Case I0
+     */
+    private void doInitialTableRendering(TableView table) {
+        if (table.getWidth() == 0.0d) {
+            LOGGER.error("Table width is 0. Returning false");
+        }
+
+        LOGGER.debug("I1");
+        resizableColumns.forEach(column -> column.setPrefWidth(getDesiredColumnWidth(column)));
+
+        if (contentFitsIntoTable(table)) {
+            LOGGER.debug("I2");
+            Map<TableColumn<?, ?>, Double> expansionRatio = determineExpansionRatio(resizableColumns);
+            rearrangeColumns(table, resizableColumns, expansionRatio);
+        } else {
+            LOGGER.debug("I3");
+            Map<TableColumn<?, ?>, Double> shrinkageRatio = determineShrinkageRatio(resizableColumns);
+            rearrangeColumns(table, resizableColumns, shrinkageRatio);
         }
     }
 
-    private Boolean constrainedResize(TableView.ResizeFeatures<?> prop) {
-        TableView<?> table = prop.getTable();
-        List<? extends TableColumnBase<?, ?>> visibleLeafColumns = table.getVisibleLeafColumns();
-        return constrainedResize(prop,
-                false,
-                getContentWidth(table) - 2,
-                visibleLeafColumns);
-    }
-
-    private Boolean constrainedResize(TableView.ResizeFeatures prop, Boolean isFirstRun, Double contentWidth, List<? extends TableColumnBase<?, ?>> visibleLeafColumns) {
-        // We have to use reflection since TableUtil is not visible to us
-        try {
-            // TODO: reflective access, should be removed
-            Class<?> clazz = Class.forName("javafx.scene.control.TableUtil");
-            Method constrainedResize = clazz.getDeclaredMethod("constrainedResize", ResizeFeaturesBase.class, Boolean.TYPE, Double.TYPE, List.class);
-            constrainedResize.setAccessible(true);
-            Object returnValue = constrainedResize.invoke(null, prop, isFirstRun, contentWidth, visibleLeafColumns);
-            return (Boolean) returnValue;
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | ClassNotFoundException e) {
-            LOGGER.error("Could not invoke constrainedResize in TableUtil", e);
+    /**
+     * Case RW0
+     */
+    private Boolean doFullTableRendering(TableView table) {
+        if (table.getWidth() == 0.0d) {
+            LOGGER.error("Table width is 0. Returning false");
             return false;
         }
+        if (contentFitsIntoTable(table)) {
+            LOGGER.debug("RWE1");
+            Map<TableColumn<?, ?>, Double> expansionRatio = determineExpansionRatio(resizableColumns);
+            return rearrangeColumns(table, resizableColumns, expansionRatio);
+        } else {
+            LOGGER.debug("RWE2, RWE3, RWS1, RWS2");
+            boolean contentHasFitIntoTable = getContentWidth(table) - EPSILON_MARGIN <= previousTableWidth;
+            LOGGER.debug("contentHasFitIntoTable {} = getContentWidth(table) {} <= previousTableWidth {}", contentHasFitIntoTable, getContentWidth(table), previousTableWidth);
+            if (!contentHasFitIntoTable) {
+                LOGGER.debug("RWS2");
+                return false;
+            }
+            Map<TableColumn<?, ?>, Double> shrinkageRatio = determineShrinkageRatio(resizableColumns);
+            return rearrangeColumns(table, resizableColumns, shrinkageRatio);
+        }
     }
 
-    private Double getContentWidth(TableView<?> table) {
-        try {
-            // TODO: reflective access, should be removed
-            Field privateStringField = TableView.class.getDeclaredField("contentWidth");
-            privateStringField.setAccessible(true);
-            return (Double) privateStringField.get(table);
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            return 0d;
+    /**
+     * case RC0
+     */
+    private boolean doColumnChange(TableView table, TableColumn userChangedColumn, Double sizeChange) {
+        LOGGER.debug("Start RC0 with column {} sizeChange {}", userChangedColumn.getText(), sizeChange);
+        if (table.getWidth() == 0.0d) {
+            LOGGER.error("Table width is 0. Returning false");
+            return false;
         }
+
+        return determineNewWidth(userChangedColumn, sizeChange).map(newWidth -> {
+            LOGGER.debug("Checking if content has fit into table before");
+            boolean contentHasFitIntoTableBefore = contentFitsIntoTable(table);
+            LOGGER.debug("Result: contentHasFitIntoTableBefore: {}", contentHasFitIntoTableBefore);
+            userChangedColumn.setPrefWidth(newWidth);
+            LOGGER.trace("New width set");
+            List<? extends TableColumn<?, ?>> otherResizableColumns = resizableColumns.stream().filter(column -> !column.equals(userChangedColumn)).collect(Collectors.toList());
+            if (contentHasFitIntoTableBefore) {
+                LOGGER.debug("RCE1, RCS1");
+                Map<TableColumn<?, ?>, Double> shrinkageRatio = determineShrinkageRatio(otherResizableColumns);
+                rearrangeColumns(table, otherResizableColumns, shrinkageRatio);
+            } else {
+                if (sizeChange >= 0) {
+                    LOGGER.debug("RCE2");
+                    // no more action, because other columns are not changed.
+                } else {
+                    if (contentFitsIntoTable(table)) {
+                        LOGGER.debug("RCS2");
+                        Map<TableColumn<?, ?>, Double> expansionRatio = determineExpansionRatio(otherResizableColumns);
+                        rearrangeColumns(table, otherResizableColumns, expansionRatio);
+                    } else {
+                        LOGGER.debug("RCS3");
+                        // no more action, because other columns are not changed.
+                    }
+                }
+            }
+            return true;
+        }).orElse(false);
+    }
+
+    private boolean contentFitsIntoTable(TableView<?> table) {
+        double tableWidth = table.getWidth();
+        Double contentWidth = getContentWidth(table);
+        boolean comparisonResult = tableWidth >= contentWidth;
+        LOGGER.debug("tableWidth {} >= contentWidth {}: {}", tableWidth, contentWidth, comparisonResult);
+        return comparisonResult;
+    }
+
+    /**
+     * This way, the proportions of the columns are kept during resize of the window
+     */
+    private Map<TableColumn<?, ?>, Double> determineExpansionRatioWithoutColumn(TableColumn excludedVisibleColumn) {
+        List<? extends TableColumn<?, ?>> columns = resizableColumns.stream().filter(column -> !column.equals(excludedVisibleColumn)).collect(Collectors.toList());
+        return determineExpansionRatio(columns);
+    }
+
+    /**
+     * Determines the share of the given columns
+     * Invariant: sum(shares) = 100%
+     */
+    private Map<TableColumn<?, ?>, Double> determineExpansionRatio(List<? extends TableColumn<?, ?>> columns) {
+        Map<TableColumn<?, ?>, Double> expansionRatio = new HashMap<>();
+
+        // We need to store the initial preferred width, because "setWidth()" does not exist
+        // There is only "setMinWidth", "setMaxWidth", and "setPrefWidth
+        Double allColumnsWidth = columns.stream().mapToDouble(TableColumn::getWidth).sum();
+        LOGGER.debug("allColumnsWidth: {}", allColumnsWidth);
+        for (TableColumn column : columns) {
+            double share = column.getWidth() / allColumnsWidth;
+            LOGGER.debug("share of {}: {}", column.getText(), share);
+            expansionRatio.put(column, share);
+        }
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Sum of shares: {}", expansionRatio.values().stream().mapToDouble(Double::doubleValue).sum());
+        }
+        return expansionRatio;
+    }
+
+    /**
+     * Determines the shrinkage ratio. It is a uniform distribution.
+     */
+    private Map<TableColumn<?, ?>, Double> determineShrinkageRatio(List<? extends TableColumn<?, ?>> resizableColumns) {
+        Map<TableColumn<?, ?>, Double> shrinkageRatio = new HashMap<>();
+        Double share = 1.0 / resizableColumns.size();
+        resizableColumns.forEach(tableColumn -> shrinkageRatio.put(tableColumn, share));
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace("Sum of shares: {}", shrinkageRatio.values().stream().mapToDouble(Double::doubleValue).sum());
+        }
+        return shrinkageRatio;
+    }
+
+    /**
+     * Determines the new width of the column based on the requested delta. It respects the min and max width of the column.
+     * <br>
+     * This method is also called if the table content is wider than the window. Thus, it does not respect the overall table width;
+     * "just" the width constraints of the given column
+     *
+     * @param column The column the resize is requested
+     * @param delta  The delta requested
+     * @return the new size, Optional.empty() if no resize is possible
+     */
+    private Optional<Double> determineNewWidth(TableColumn column, Double delta) {
+        // This is com.sun.javafx.scene.control.skin.Utils.boundedSize with more comments and Optionals
+
+        LOGGER.trace("Column {}", column.getText());
+        LOGGER.trace("Requested delta {}", delta);
+
+        // Calculate newWidth based on delta and constraint of the column
+        double oldWidth = column.getWidth();
+        double newWidth;
+        if (delta < 0) {
+            double minWidth = getMinWidthThreshold(column);
+            LOGGER.trace("getMinWidthThreshold {}", minWidth);
+            newWidth = Math.max(minWidth, oldWidth + delta);
+            LOGGER.trace("newWidth {} = Math.max(minWidth {}, oldWidth {} + delta {})", newWidth, minWidth, oldWidth, delta);
+        } else {
+            double maxWidth = column.getMaxWidth();
+            LOGGER.trace("MaxWidth {}", maxWidth);
+            newWidth = Math.min(maxWidth, oldWidth + delta);
+            LOGGER.trace("newWidth {} = Math.min(maxWidth {}, oldWidth {} + delta {})", newWidth, maxWidth, oldWidth, delta);
+        }
+        LOGGER.trace("Truncating width");
+        newWidth = Math.floor(newWidth * 1.0E10) / 1.0E10;
+        LOGGER.trace("Size proposal: {} -> {}", oldWidth, newWidth);
+        if (oldWidth == newWidth) {
+            return Optional.empty();
+        }
+        return Optional.of(newWidth);
+    }
+
+    /**
+     * Completely rearranges the given columnsToResize so that the complete table content fits into the table space (in case threshold of columns is not hit)
+     * <p>
+     * Handles cases I2, I3, RWE1 to RWE3, and RWS1 and RWS2
+     *
+     * @param table           The table to handle
+     * @param columnsToResize The columns allowed to change the widths
+     * @param ratio           The expansion/shrinkage ratio of the columns
+     */
+    private boolean rearrangeColumns(TableView<?> table, List<? extends TableColumn<?, ?>> columnsToResize, Map<TableColumn<?, ?>, Double> ratio) {
+        Double tableWidth = table.getWidth();
+        Double newContentWidth;
+        boolean aWidthChanged = false;
+
+        // We need a second in case the EPSILON_MARGIN condition cannot be fulfilled
+        // This is for instance the case:
+        //   - New table width: 830
+        //   - 9 Columns à 100 threshold
+        //   - old table width: 900
+        //   - --> 70 pixels should be shrunk
+        //   - Columns should be shrunk
+        //   - Columns cannot be shrunk because of threshold
+        // Therefore, we introduce an iterations counter to have a safety addition to the termination condition.
+        int iterations = 0;
+
+        double remainingPixels;
+        do
+        {
+            iterations++;
+            // in case the userChosenColumnToResize got bigger, the remaining available width will get below 0 --> other columns need to be shrunk
+            LOGGER.debug("tableWidth {}", tableWidth);
+            Double contentWidth = getContentWidth(table);
+            LOGGER.debug("contentWidth {}", contentWidth);
+            Double remainingAvailableWidth = tableWidth - contentWidth;
+            // Double remainingAvailableWidth = Math.max(0, tableWidth - contentWidth);
+            LOGGER.debug("Distributing remainingAvailableWidth {}", remainingAvailableWidth);
+            for (TableColumn column : columnsToResize) {
+                LOGGER.debug("Column {}", column.getText());
+                double share = ratio.get(column);
+                // Precondition in our case: column has to have minimum width
+                double delta = share * remainingAvailableWidth;
+                LOGGER.debug("share {} * remainingAvailableWidth {} = delta {}", share, remainingAvailableWidth, delta);
+                Optional<Double> newWidth = determineNewWidth(column, delta);
+                if (newWidth.isPresent()) {
+                    // in case we can do something, do it
+                    // otherwise, the next loop iteration will distribute it
+                    aWidthChanged = true;
+                    column.setPrefWidth(newWidth.get());
+                }
+            }
+
+            newContentWidth = getContentWidth(table);
+            LOGGER.debug("newContentWidth {}", newContentWidth);
+
+            remainingPixels = Math.abs(tableWidth - newContentWidth);
+            LOGGER.debug("|tableWidth - newContentWidth| = {}", remainingPixels);
+        } while (remainingPixels > EPSILON_MARGIN && iterations <= 2);
+
+        // Special case if due to rounding errors contentWidth is still larger than tableWidth
+        // E.g., contentWidth - tableWidth = 0.0000000000002
+        if (remainingPixels < 1) {
+            columnsToResize.stream().filter(column -> column.getWidth() > column.getMinWidth() + 1).findFirst();
+            TableColumn<?, ?> columnToAbsorbEpsilon = columnsToResize.get(0);
+            columnToAbsorbEpsilon.setPrefWidth(columnToAbsorbEpsilon.getWidth() - remainingPixels);
+        }
+
+        LOGGER.debug("aWidthChanged is {}", aWidthChanged);
+        return aWidthChanged;
+    }
+
+    /**
+     * Computes and returns the width required by the content of the table
+     */
+    private Double getContentWidth(TableView<?> table) {
+        // The current table content width contains all visible columns: the resizable ones and the non-resizable ones
+        return table.getVisibleLeafColumns().stream().mapToDouble(TableColumn::getWidth).sum();
     }
 }

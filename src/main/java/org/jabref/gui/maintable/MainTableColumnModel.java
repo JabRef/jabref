@@ -124,6 +124,9 @@ public class MainTableColumnModel {
         return typeProperty.getValue();
     }
 
+    /**
+     * Returns the field name of the column (e.g., year)
+     */
     public String getQualifier() {
         return qualifierProperty.getValue();
     }

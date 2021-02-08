@@ -40,7 +40,8 @@ public class PersistenceVisualStateTable {
                          .collect(Collectors.toList()),
                 mainTable.getSortOrder().stream()
                          .map(column -> ((MainTableColumn<?>) column).getModel())
-                         .collect(Collectors.toList())
+                         .collect(Collectors.toList()),
+                preferences.getColumnPreferences().isDedicatedFileColumnsEnabled()
         ));
     }
 }
