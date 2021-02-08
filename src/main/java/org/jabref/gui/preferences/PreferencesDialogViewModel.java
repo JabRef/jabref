@@ -12,6 +12,25 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.preferences.appearance.AppearanceTab;
+import org.jabref.gui.preferences.citationkeypattern.CitationKeyPatternTab;
+import org.jabref.gui.preferences.entryeditor.EntryEditorTab;
+import org.jabref.gui.preferences.entryeditortabs.CustomEditorFieldsTab;
+import org.jabref.gui.preferences.exporter.ExportCustomizationTab;
+import org.jabref.gui.preferences.external.ExternalTab;
+import org.jabref.gui.preferences.file.FileTab;
+import org.jabref.gui.preferences.general.GeneralTab;
+import org.jabref.gui.preferences.groups.GroupsTab;
+import org.jabref.gui.preferences.importer.ImportCustomizationTab;
+import org.jabref.gui.preferences.journals.JournalAbbreviationsTab;
+import org.jabref.gui.preferences.keybindings.KeyBindingsTab;
+import org.jabref.gui.preferences.linkedfiles.LinkedFilesTab;
+import org.jabref.gui.preferences.nameformatter.NameFormatterTab;
+import org.jabref.gui.preferences.network.NetworkTab;
+import org.jabref.gui.preferences.preview.PreviewTab;
+import org.jabref.gui.preferences.protectedterms.ProtectedTermsTab;
+import org.jabref.gui.preferences.table.TableTab;
+import org.jabref.gui.preferences.xmp.XmpPrivacyTab;
 import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.push.PushToEmacs;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -45,19 +64,25 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
         this.frame = frame;
 
         preferenceTabs = FXCollections.observableArrayList(
-                new GeneralTabView(preferences),
-                new FileTabView(preferences),
-                new TableTabView(preferences),
-                new PreviewTabView(preferences),
-                new ExternalTabView(preferences, frame.getPushToApplicationsManager()),
-                new GroupsTabView(preferences),
-                new EntryEditorTabView(preferences),
-                new CitationKeyPatternTabView(preferences),
-                new LinkedFilesTabView(preferences),
-                new NameFormatterTabView(preferences),
-                new XmpPrivacyTabView(preferences),
-                new NetworkTabView(preferences),
-                new AppearanceTabView(preferences)
+                new GeneralTab(),
+                new KeyBindingsTab(),
+                new FileTab(),
+                new TableTab(),
+                new PreviewTab(),
+                new ProtectedTermsTab(),
+                new ExternalTab(frame.getPushToApplicationsManager()),
+                new JournalAbbreviationsTab(),
+                new GroupsTab(),
+                new EntryEditorTab(),
+                new CustomEditorFieldsTab(),
+                new CitationKeyPatternTab(),
+                new LinkedFilesTab(),
+                new NameFormatterTab(),
+                new ImportCustomizationTab(),
+                new ExportCustomizationTab(),
+                new XmpPrivacyTab(),
+                new NetworkTab(),
+                new AppearanceTab()
         );
     }
 

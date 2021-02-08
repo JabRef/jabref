@@ -32,7 +32,7 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFileUpdateMonitor.class);
 
     private final Multimap<Path, FileUpdateListener> listeners = ArrayListMultimap.create(20, 4);
-    private WatchService watcher;
+    private volatile WatchService watcher;
     private final AtomicBoolean notShutdown = new AtomicBoolean(true);
     private Optional<JabRefException> filesystemMonitorFailure;
 
@@ -56,8 +56,8 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
                     if (kind == StandardWatchEventKinds.OVERFLOW) {
                         Thread.yield();
                         continue;
-                    } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-                        // We only handle "ENTRY_MODIFY" here, so the context is always a Path
+                    } else if (kind == StandardWatchEventKinds.ENTRY_CREATE || kind == StandardWatchEventKinds.ENTRY_MODIFY) {
+                        // We only handle "ENTRY_CREATE" and "ENTRY_MODIFY" here, so the context is always a Path
                         @SuppressWarnings("unchecked")
                         WatchEvent<Path> ev = (WatchEvent<Path>) event;
                         Path path = ((Path) key.watchable()).resolve(ev.context());
@@ -88,7 +88,7 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
         if (isActive()) {
             // We can't watch files directly, so monitor their parent directory for updates
             Path directory = file.toAbsolutePath().getParent();
-            directory.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
+            directory.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY);
             listeners.put(file, listener);
         }
     }
@@ -102,7 +102,10 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
     public void shutdown() {
         try {
             notShutdown.set(false);
-            watcher.close();
+            WatchService watcher = this.watcher;
+            if (watcher != null) {
+                watcher.close();
+            }
         } catch (IOException e) {
             LOGGER.error("error closing watcher", e);
         }

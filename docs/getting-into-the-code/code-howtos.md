@@ -30,7 +30,6 @@ Principles:
                Localization.lang("Something went wrong...", ioe);
        }
     ```
-
 * Never, ever throw and catch `Exception` or `Throwable`
 * Errors should only be logged when they are finally caught \(i.e., logged only once\). See **Logging** for details.
 * If the Exception message is intended to be shown to the User in the UI \(see below\) provide also a localizedMessage \(see `JabRefException`\).
@@ -62,7 +61,7 @@ Many times there is a need to provide an object on many locations simultaneously
 
 ### Register to the `EventBus`
 
-Any listening method has to be annotated with `@Subscribe` keyword and must have only one accepting parameter. Furthermore the object which contains such listening method\(s\) has to be registered using the `register(Object)` method provided by `EventBus`. The listening methods can be overloaded by using different parameter types.
+Any listening method has to be annotated with `@Subscribe` keyword and must have only one accepting parameter. Furthermore, the object which contains such listening method\(s\) has to be registered using the `register(Object)` method provided by `EventBus`. The listening methods can be overloaded by using different parameter types.
 
 ### Posting an object
 
@@ -187,11 +186,11 @@ The tests check whether translation strings appear correctly in the resource bun
 2. Create an empty &lt;locale code&gt;.properties file
 3. Configure the new language in [Crowdin](https://crowdin.com/project/jabref)
 
-If the language is a variant of a language `zh_CN` or `pt_BR`  it is necessary to add a language mapping for Crowdin to the crowdin.yml file in the root. Of course the properties file also has to be named according to the language code and locale.
+If the language is a variant of a language `zh_CN` or `pt_BR` it is necessary to add a language mapping for Crowdin to the crowdin.yml file in the root. Of course the properties file also has to be named according to the language code and locale.
 
 ## Cleanup and Formatters
 
-We try to build a cleanup mechanism based on formatters. The idea is that we can register these actions in arbitrary places, e.g., onSave, onImport, onExport, cleanup, etc. and apply them to different fields. The formatters themself are independent of any logic and therefore easy to test.
+We try to build a cleanup mechanism based on formatters. The idea is that we can register these actions in arbitrary places, e.g., onSave, onImport, onExport, cleanup, etc. and apply them to different fields. The formatters themselves are independent of any logic and therefore easy to test.
 
 Example: [NormalizePagesFormatter](https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/formatter/bibtexfields/NormalizePagesFormatter.java)
 
@@ -401,18 +400,15 @@ All radio buttons that should be grouped together need to have a ToggleGroup def
 
 ### JavaFX Dialogs
 
-All dialogs should be displayed to the user via `DialogService` interface methods.
-`DialogService` provides methods to display various dialogs (including custom ones) to the user.
-It also ensures the displayed dialog opens on the correct window via `initOwner()` (for cases where the user has multiple screens).
-The following code snippet demonstrates how a custom dialog is displayed to the user:
+All dialogs should be displayed to the user via `DialogService` interface methods. `DialogService` provides methods to display various dialogs \(including custom ones\) to the user. It also ensures the displayed dialog opens on the correct window via `initOwner()` \(for cases where the user has multiple screens\). The following code snippet demonstrates how a custom dialog is displayed to the user:
 
 ```java
 dialogService.showCustomDialog(new DocumentViewerView());
 ```
 
-If an instance of `DialogService` is unavailable within current class/scope in which the dialog needs to be displayed,
-`DialogService` can be instantiated via the code snippet shown as follows:
+If an instance of `DialogService` is unavailable within current class/scope in which the dialog needs to be displayed, `DialogService` can be instantiated via the code snippet shown as follows:
 
 ```java
 DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
 ```
+

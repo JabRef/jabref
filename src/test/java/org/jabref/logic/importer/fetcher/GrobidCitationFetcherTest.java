@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -110,7 +111,7 @@ public class GrobidCitationFetcherTest {
     @Test
     public void performSearchThrowsExceptionInCaseOfConnectionIssues() throws IOException {
         GrobidService grobidServiceMock = mock(GrobidService.class);
-        when(grobidServiceMock.processCitation(anyString(), any())).thenThrow(new IOException("Any IO Exception"));
+        when(grobidServiceMock.processCitation(anyString(), any())).thenThrow(new SocketTimeoutException("Timeout"));
         grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences, grobidServiceMock);
 
         assertThrows(FetcherException.class, () -> {
