@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -32,8 +34,9 @@ import org.xml.sax.SAXException;
 
 /**
  * A parser for the bavarian flavor (Bibliotheksverbund Bayern) of the marc xml standard
- *
- * See <a href="https://www.dnb.de/DE/Professionell/Metadatendienste/Exportformate/MARC21/marc21_node.html">Feldbeschreibung der Titeldaten bei der Deutschen Nationalbibliothek</a>
+ * <p>
+ * See <a href="https://www.dnb.de/DE/Professionell/Metadatendienste/Exportformate/MARC21/marc21_node.html">Feldbeschreibung
+ * der Titeldaten bei der Deutschen Nationalbibliothek</a>
  */
 public class MarcXmlParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(MarcXmlParser.class);
@@ -293,6 +296,40 @@ public class MarcXmlParser implements Parser {
                         }
                     }
                 }
+                default -> {
+                    int tagNumber = Integer.parseInt(tag);
+
+                    if (tagNumber >= 546 && tagNumber <= 599) { // notes
+                        // FixMe: Some notes seem to have tags lower than 546
+
+                        String[] notes = new String[]{
+                                getSubfield("a", datafield),
+                                getSubfield("0", datafield),
+                                getSubfield("h", datafield),
+                                getSubfield("S", datafield),
+                                getSubfield("c", datafield),
+                                getSubfield("f", datafield),
+                                getSubfield("i", datafield),
+                                getSubfield("k", datafield),
+                                getSubfield("l", datafield),
+                                getSubfield("z", datafield),
+                                getSubfield("3", datafield),
+                                getSubfield("5", datafield)
+                        };
+
+                        String notesJoined = Arrays.stream(notes)
+                                                   .filter(StringUtil::isNotBlank)
+                                                   .collect(Collectors.joining("\n\n"));
+
+                        if (bibEntry.getField(StandardField.NOTE).isPresent()) {
+                            bibEntry.setField(StandardField.NOTE, bibEntry.getField(StandardField.NOTE).get().concat(notesJoined));
+                        } else {
+                            bibEntry.setField(StandardField.NOTE, notesJoined);
+                        }
+                    } else {
+                        LOGGER.debug("Unparsed tag: {}", tag);
+                    }
+                }
             }
         }
 
@@ -301,7 +338,6 @@ public class MarcXmlParser implements Parser {
          *  pages
          *  volume and number correct
          *  series and journals stored in different tags
-         *  notes: 546-599
          *  thesis
          *  proceedings
          */
@@ -310,9 +346,9 @@ public class MarcXmlParser implements Parser {
     }
 
     private String getSubfield(String a, Element datafield) {
-        List<Element> liste = getChildren("subfield", datafield);
+        List<Element> subfields = getChildren("subfield", datafield);
 
-        for (Element subfield : liste) {
+        for (Element subfield : subfields) {
             if (subfield.getAttribute("code").equals(a)) {
                 return (subfield.getTextContent());
             }
