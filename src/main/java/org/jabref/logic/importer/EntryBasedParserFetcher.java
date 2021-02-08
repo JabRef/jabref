@@ -56,7 +56,7 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher {
         Objects.requireNonNull(entry);
 
         try {
-            if (getURLForEntry(entry) == null){
+            if (getURLForEntry(entry) == null) {
                 return Collections.emptyList();
             }
         } catch (MalformedURLException e) {

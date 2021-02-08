@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -50,13 +51,13 @@ class ZbMATHTest {
     @Test
     void searchByQueryFindsEntry() throws Exception {
         List<BibEntry> fetchedEntries = fetcher.performSearch("an:0507.57010");
-        assertEquals(Collections.singletonList(donaldsonEntry), fetchedEntries);
+        assertEquals(donaldsonEntry, fetchedEntries.get(0));
     }
 
     @Test
     void searchByIdFindsEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0507.57010");
-        assertEquals(Optional.of(donaldsonEntry), fetchedEntry);
+        assertTrue(fetchedEntry.equals(donaldsonEntry));
     }
 
     @Test
@@ -66,7 +67,7 @@ class ZbMATHTest {
         searchEntry.setField(StandardField.AUTHOR, "S. K. {Donaldson}");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
-        assertEquals(Collections.singletonList(donaldsonEntry), fetchedEntries);
+        assertEquals(donaldsonEntry, fetchedEntries.get(0));
 
         searchEntry.setField(StandardField.TITLE, "t");
         searchEntry.setField(StandardField.AUTHOR, "a");
@@ -80,6 +81,6 @@ class ZbMATHTest {
         searchEntry.setField(StandardField.ZBL_NUMBER, "0507.57010");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
-        assertEquals(Collections.singletonList(donaldsonEntry), fetchedEntries);
+        assertEquals(donaldsonEntry, fetchedEntries.get(0));
     }
 }
