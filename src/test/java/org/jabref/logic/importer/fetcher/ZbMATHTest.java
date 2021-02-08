@@ -58,4 +58,28 @@ class ZbMATHTest {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0507.57010");
         assertEquals(Optional.of(donaldsonEntry), fetchedEntry);
     }
+
+    @Test
+    void searchByEntryFindsEntry() throws Exception {
+        BibEntry searchEntry = new BibEntry();
+        searchEntry.setField(StandardField.TITLE, "An application of gauge theory to four dimensional topology");
+        searchEntry.setField(StandardField.AUTHOR, "S. K. {Donaldson}");
+
+        List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
+        assertEquals(Collections.singletonList(donaldsonEntry), fetchedEntries);
+
+        searchEntry.setField(StandardField.TITLE, "t");
+        searchEntry.setField(StandardField.AUTHOR, "a");
+        fetchedEntries = fetcher.performSearch(searchEntry);
+        assertEquals(Collections.emptyList(), fetchedEntries);
+    }
+
+    @Test
+    void searchByIdInEntryFindsEntry() throws Exception {
+        BibEntry searchEntry = new BibEntry();
+        searchEntry.setField(StandardField.ZBL_NUMBER, "0507.57010");
+
+        List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
+        assertEquals(Collections.singletonList(donaldsonEntry), fetchedEntries);
+    }
 }

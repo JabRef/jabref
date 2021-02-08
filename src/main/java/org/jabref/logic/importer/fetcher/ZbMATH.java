@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -51,7 +52,6 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
         Optional<String> zblidInEntry = entry.getField(StandardField.ZBL_NUMBER);
         if (zblidInEntry.isPresent()) {
             // zbmath id is already present
-            System.out.println("Zbl number is present.");
             return getUrlForIdentifier(zblidInEntry.get());
         }
 
@@ -72,11 +72,9 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
             String author = entry.getFieldOrAlias(StandardField.AUTHOR).get();
             author = author.replace(" and ", ";");
             uriBuilder.addParameter("a", author);
-            System.out.println("Author = "+author);
         }
 
         String urlString = uriBuilder.build().toString();
-        System.out.println(urlString);
         HttpResponse<JsonNode> response = Unirest.get(urlString)
                                                  .asJson();
         String zblid = null;
@@ -84,21 +82,14 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
             JSONArray result = response.getBody()
                                        .getObject()
                                        .getJSONArray("results");
-            System.out.println(result.toString());
             if (result.length() > 0) {
                 zblid = result.getJSONObject(0)
                               .get("zbl_id")
                               .toString();
             }
-            if (zblid != null) {
-                System.out.println("zbl_id = " + zblid);
-            } else {
-                System.out.println("No zbl_id found.");
-            }
         }
         if (zblid == null) {
-            // citation matching API found no entry
-            // what should happen in this case?
+            // citation matching API found no matching entry
             return null;
         } else {
             return getUrlForIdentifier(zblid);

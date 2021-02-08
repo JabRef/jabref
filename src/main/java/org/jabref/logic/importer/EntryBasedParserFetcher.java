@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -53,6 +54,17 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher {
     @Override
     default List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         Objects.requireNonNull(entry);
+
+        try {
+            if (getURLForEntry(entry) == null){
+                System.out.println("I am here! Return empty List!");
+                return Collections.emptyList();
+            }
+        } catch (MalformedURLException e) {
+            throw new FetcherException("Search URI is malformed", e);
+        } catch (URISyntaxException e) {
+            throw new FetcherException("Search URI is malformed", e);
+        }
 
         try (InputStream stream = new BufferedInputStream(getURLForEntry(entry).openStream())) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
