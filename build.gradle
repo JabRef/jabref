@@ -115,8 +115,8 @@ dependencies {
 
     implementation 'commons-cli:commons-cli:1.4'
 
-    implementation 'org.libreoffice:libreoffice:7.0.4'
-    implementation 'org.libreoffice:unoloader:7.0.4'
+    implementation 'org.libreoffice:libreoffice:7.1.0'
+    implementation 'org.libreoffice:unoloader:7.1.0'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.9'
     implementation 'info.debatty:java-string-similarity:2.0.0'
@@ -127,7 +127,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.9.1'
     implementation 'org.antlr:antlr4-runtime:4.9.1'
 
-    implementation (group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.7.0') {
+    implementation (group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.8.0') {
         exclude group: 'org.apache.lucene', module: 'lucene-sandbox'
     }
 
@@ -165,7 +165,7 @@ dependencies {
     implementation 'org.controlsfx:controlsfx:11.0.3'
 
     implementation 'org.jsoup:jsoup:1.13.1'
-    implementation 'com.konghq:unirest-java:3.11.10'
+    implementation 'com.konghq:unirest-java:3.11.11'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
@@ -195,11 +195,11 @@ dependencies {
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.62.2'
 
     testImplementation 'io.github.classgraph:classgraph:4.8.102'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.0'
-    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.7.0'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.7.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.7.1'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.7.1'
 
-    testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.19'
+    testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.20'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
     testImplementation 'org.mockito:mockito-core:3.7.7'
