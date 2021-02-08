@@ -32,6 +32,8 @@ import org.xml.sax.SAXException;
 
 /**
  * A parser for the bavarian flavor (Bibliotheksverbund Bayern) of the marc xml standard
+ *
+ * See <a href="https://www.dnb.de/DE/Professionell/Metadatendienste/Exportformate/MARC21/marc21_node.html">Feldbeschreibung der Titeldaten bei der Deutschen Nationalbibliothek</a>
  */
 public class MarcXmlParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(MarcXmlParser.class);
