@@ -24,6 +24,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,11 +41,14 @@ public class ImportAction {
     private Exception importError;
     private final TaskExecutor taskExecutor = Globals.TASK_EXECUTOR;
 
-    public ImportAction(JabRefFrame frame, boolean openInNew, Importer importer) {
+    private final PreferencesService prefs;
+
+    public ImportAction(JabRefFrame frame, boolean openInNew, Importer importer, PreferencesService prefs) {
         this.importer = Optional.ofNullable(importer);
         this.frame = frame;
         this.dialogService = frame.getDialogService();
         this.openInNew = openInNew;
+        this.prefs = prefs;
     }
 
     /**
@@ -83,13 +87,17 @@ public class ImportAction {
                 frame.addTab(parserResult.getDatabaseContext(), true);
                 dialogService.notify(Localization.lang("Imported entries") + ": " + parserResult.getDatabase().getEntries().size());
             })
-                .executeWith(taskExecutor);
+           .onFailure(ex-> {
+               LOGGER.error("Error importing", ex);
+               dialogService.notify(Localization.lang("Error importing. See the error log for details."));
+           })
+           .executeWith(taskExecutor);
         } else {
             final LibraryTab libraryTab = frame.getCurrentLibraryTab();
 
             ImportEntriesDialog dialog = new ImportEntriesDialog(libraryTab.getBibDatabaseContext(), task);
             dialog.setTitle(Localization.lang("Import"));
-            dialog.showAndWait();
+            dialogService.showCustomDialogAndWait(dialog);
         }
     }
 
@@ -102,7 +110,7 @@ public class ImportAction {
                     // Unknown format:
                     DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().notify(Localization.lang("Importing in unknown format") + "..."));
                     // This import method never throws an IOException:
-                    imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename, Globals.getFileUpdateMonitor()));
+                    imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename, prefs.getTimestampPreferences(), Globals.getFileUpdateMonitor()));
                 } else {
                     DefaultTaskExecutor.runInJavaFXThread(() -> frame.getDialogService().notify(Localization.lang("Importing in %0 format", importer.get().getName()) + "..."));
                     // Specific importer:
@@ -135,7 +143,7 @@ public class ImportAction {
 
             if (ImportFormatReader.BIBTEX_FORMAT.equals(importResult.format)) {
                 // additional treatment of BibTeX
-                new DatabaseMerger().mergeMetaData(
+                new DatabaseMerger(prefs.getKeywordDelimiter()).mergeMetaData(
                         result.getMetaData(),
                         parserResult.getMetaData(),
                         importResult.parserResult.getFile().map(File::getName).orElse("unknown"),
@@ -145,7 +153,7 @@ public class ImportAction {
         }
 
         // set timestamp and owner
-        UpdateField.setAutomaticFields(resultDatabase.getEntries(), Globals.prefs.getOwnerPreferences(), Globals.prefs.getTimestampPreferences()); // set timestamp and owner
+        UpdateField.setAutomaticFields(resultDatabase.getEntries(), prefs.getOwnerPreferences(), prefs.getTimestampPreferences()); // set timestamp and owner
 
         return result;
     }

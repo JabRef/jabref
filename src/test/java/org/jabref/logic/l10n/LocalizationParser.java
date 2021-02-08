@@ -25,6 +25,9 @@ import java.util.stream.Stream;
 
 import javafx.fxml.FXMLLoader;
 
+import com.airhacks.afterburner.views.ViewLoader;
+import org.mockito.Answers;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 public class LocalizationParser {
@@ -188,6 +191,9 @@ public class LocalizationParser {
     private static List<LocalizationEntry> getLanguageKeysInFxmlFile(Path path, LocalizationBundleForTest type) {
         List<String> result = new ArrayList<>();
 
+        // Afterburner ViewLoader forces a controller factory, but we do not need any controller
+        MockedStatic<ViewLoader> viewLoader = Mockito.mockStatic(ViewLoader.class, Answers.RETURNS_DEEP_STUBS);
+
         // Record which keys are requested; we pretend that we have all keys
         ResourceBundle registerUsageResourceBundle = new ResourceBundle() {
 
@@ -212,11 +218,14 @@ public class LocalizationParser {
             FXMLLoader loader = new FXMLLoader(path.toUri().toURL(), registerUsageResourceBundle);
             // We don't want to initialize controller
             loader.setControllerFactory(Mockito::mock);
+
             // We need to load in "static mode" because otherwise fxml files with fx:root doesn't work
             setStaticLoad(loader);
             loader.load();
         } catch (IOException exception) {
             throw new RuntimeException(exception);
+        } finally {
+            viewLoader.close();
         }
 
         return result.stream()

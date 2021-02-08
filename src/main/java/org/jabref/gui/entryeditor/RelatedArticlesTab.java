@@ -29,7 +29,8 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseModeDetection;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.MrDlibPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,15 +42,15 @@ public class RelatedArticlesTab extends EntryEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RelatedArticlesTab.class);
     private final EntryEditorPreferences preferences;
-    private final EntryEditor entryEditor;
     private final DialogService dialogService;
+    private final PreferencesService preferencesService;
 
-    public RelatedArticlesTab(EntryEditor entryEditor, EntryEditorPreferences preferences, DialogService dialogService) {
+    public RelatedArticlesTab(EntryEditor entryEditor, EntryEditorPreferences preferences, PreferencesService preferencesService, DialogService dialogService) {
         setText(Localization.lang("Related articles"));
         setTooltip(new Tooltip(Localization.lang("Related articles")));
-        this.entryEditor = entryEditor;
         this.preferences = preferences;
         this.dialogService = dialogService;
+        this.preferencesService = preferencesService;
     }
 
     /**
@@ -64,8 +65,8 @@ public class RelatedArticlesTab extends EntryEditorTab {
         ProgressIndicator progress = new ProgressIndicator();
         progress.setMaxSize(100, 100);
 
-        MrDLibFetcher fetcher = new MrDLibFetcher(Globals.prefs.get(JabRefPreferences.LANGUAGE),
-                Globals.BUILD_INFO.version);
+        MrDLibFetcher fetcher = new MrDLibFetcher(preferencesService.getLanguage().name(),
+                Globals.BUILD_INFO.version, preferencesService);
         BackgroundTask
                 .wrap(() -> fetcher.performSearch(entry))
                 .onRunning(() -> progress.setVisible(true))
@@ -210,11 +211,12 @@ public class RelatedArticlesTab extends EntryEditorTab {
         vb.setSpacing(10);
 
         button.setOnAction(event -> {
-            JabRefPreferences prefs = JabRefPreferences.getInstance();
-            prefs.putBoolean(JabRefPreferences.ACCEPT_RECOMMENDATIONS, true);
-            prefs.putBoolean(JabRefPreferences.SEND_LANGUAGE_DATA, cbLanguage.isSelected());
-            prefs.putBoolean(JabRefPreferences.SEND_OS_DATA, cbOS.isSelected());
-            prefs.putBoolean(JabRefPreferences.SEND_TIMEZONE_DATA, cbTimezone.isSelected());
+            preferencesService.storeMrDlibPreferences(new MrDlibPreferences(
+                    true,
+                    cbLanguage.isSelected(),
+                    cbOS.isSelected(),
+                    cbTimezone.isSelected()));
+
             dialogService.showWarningDialogAndWait(Localization.lang("Restart"), Localization.lang("Please restart JabRef for preferences to take effect."));
             setContent(getRelatedArticlesPane(entry));
         });

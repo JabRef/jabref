@@ -18,7 +18,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class CleanupAction extends SimpleCommand {
@@ -31,7 +30,7 @@ public class CleanupAction extends SimpleCommand {
     private boolean isCanceled;
     private int modifiedEntriesCount;
 
-    public CleanupAction(JabRefFrame frame, JabRefPreferences preferences, DialogService dialogService, StateManager stateManager) {
+    public CleanupAction(JabRefFrame frame, PreferencesService preferences, DialogService dialogService, StateManager stateManager) {
         this.frame = frame;
         this.preferences = preferences;
         this.dialogService = dialogService;
@@ -57,20 +56,23 @@ public class CleanupAction extends SimpleCommand {
         isCanceled = false;
         modifiedEntriesCount = 0;
 
-        Optional<CleanupPreset> chosenPreset = new CleanupDialog(
+        CleanupDialog cleanupDialog = new CleanupDialog(
                 stateManager.getActiveDatabase().get(),
                 preferences.getCleanupPreset(),
-                preferences.getFilePreferences()).showAndWait();
+                preferences.getFilePreferences()
+        );
+
+        Optional<CleanupPreset> chosenPreset = dialogService.showCustomDialogAndWait(cleanupDialog);
 
         chosenPreset.ifPresent(preset -> {
-            if (preset.isRenamePDFActive() && Globals.prefs.getBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN)) {
+            if (preset.isRenamePDFActive() && preferences.getAutoLinkPreferences().shouldAskAutoNamingPdfs()) {
                 boolean confirmed = dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Autogenerate PDF Names"),
                         Localization.lang("Auto-generating PDF-Names does not support undo. Continue?"),
                         Localization.lang("Autogenerate PDF Names"),
                         Localization.lang("Cancel"),
-                        Localization.lang("Disable this confirmation dialog"),
-                        optOut -> Globals.prefs.putBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN, !optOut));
-
+                        Localization.lang("Do not ask again"),
+                        optOut -> preferences.storeAutoLinkPreferences(preferences.getAutoLinkPreferences()
+                                                                                  .withAskAutoNamingPdfs(!optOut)));
                 if (!confirmed) {
                     isCanceled = true;
                     return;

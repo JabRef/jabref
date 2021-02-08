@@ -280,7 +280,7 @@ class BracketedPatternTest {
     }
 
     @Test
-    void expandBracketsWithModifierContainingRegexCharacterCkass() {
+    void expandBracketsWithModifierContainingRegexCharacterClass() {
         BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Wickedness:Managing");
 
         assertEquals("Wickedness.Managing", BracketedPattern.expandBrackets("[title:regex(\"[:]+\",\".\")]", null, bibEntry, null));
@@ -291,5 +291,77 @@ class BracketedPatternTest {
         BibEntry bibEntry = new BibEntry();
 
         assertEquals("", BracketedPattern.expandBrackets("[]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsInstitutionAbbreviationFromProvidedAbbreviation() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.AUTHOR, "{European Union Aviation Safety Agency ({EUASABRACKET})}");
+
+        assertEquals("EUASABRACKET", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsInstitutionAbbreviationForAuthorContainingUnion() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.AUTHOR, "{European Union Aviation Safety Agency}");
+
+        assertEquals("EUASA", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsLastNameForAuthorStartingWithOnlyLastNameStartingWithLowerCase() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.AUTHOR, "{eBay}");
+
+        assertEquals("eBay", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsLastNameWithChineseCharacters() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.AUTHOR, "杨秀群");
+
+        assertEquals("杨秀群", BracketedPattern.expandBrackets("[auth]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsWithTestCasesFromRegExpBasedFileFinder() {
+        BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("HipKro03");
+        entry.setField(StandardField.AUTHOR, "Eric von Hippel and Georg von Krogh");
+        entry.setField(StandardField.TITLE, "Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science");
+        entry.setField(StandardField.JOURNAL, "Organization Science");
+        entry.setField(StandardField.YEAR, "2003");
+        entry.setField(StandardField.VOLUME, "14");
+        entry.setField(StandardField.PAGES, "209--223");
+        entry.setField(StandardField.NUMBER, "2");
+        entry.setField(StandardField.ADDRESS, "Institute for Operations Research and the Management Sciences (INFORMS), Linthicum, Maryland, USA");
+        entry.setField(StandardField.DOI, "http://dx.doi.org/10.1287/orsc.14.2.209.14992");
+        entry.setField(StandardField.ISSN, "1526-5455");
+        entry.setField(StandardField.PUBLISHER, "INFORMS");
+
+        BibDatabase database = new BibDatabase();
+        database.insertEntry(entry);
+
+        assertEquals("", BracketedPattern.expandBrackets("", ',', entry, database));
+
+        assertEquals("dropped", BracketedPattern.expandBrackets("drop[unknownkey]ped", ',', entry, database));
+
+        assertEquals("Eric von Hippel and Georg von Krogh",
+                BracketedPattern.expandBrackets("[author]", ',', entry, database));
+
+        assertEquals("Eric von Hippel and Georg von Krogh are two famous authors.",
+                BracketedPattern.expandBrackets("[author] are two famous authors.", ',', entry, database));
+
+        assertEquals("Eric von Hippel and Georg von Krogh are two famous authors.",
+                BracketedPattern.expandBrackets("[author] are two famous authors.", ',', entry, database));
+
+        assertEquals(
+                "Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
+                BracketedPattern.expandBrackets("[author] have published [fulltitle] in [journal].", ',', entry, database));
+
+        assertEquals(
+                "Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
+                BracketedPattern.expandBrackets("[author] have published [title] in [journal].", ',', entry, database));
     }
 }

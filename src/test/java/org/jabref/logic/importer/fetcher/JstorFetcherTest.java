@@ -12,6 +12,7 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Disabled;
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 @FetcherTest
+@DisabledOnCIServer("CI server is blocked by JSTOR")
 public class JstorFetcherTest implements SearchBasedFetcherCapabilityTest {
 
     private final JstorFetcher fetcher = new JstorFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
@@ -40,10 +42,30 @@ public class JstorFetcherTest implements SearchBasedFetcherCapabilityTest {
             .withField(StandardField.URL, "http://www.jstor.org/stable/90002164")
             .withField(StandardField.YEAR, "2017");
 
+    private final BibEntry doiEntry = new BibEntry(StandardEntryType.Article)
+            .withCitationKey("10.1086/501484")
+            .withField(StandardField.AUTHOR, "Johnmarshall Reeve")
+            .withField(StandardField.TITLE, "Teachers as Facilitators: What Autonomy‐Supportive Teachers Do and Why Their Students Benefit")
+            .withField(StandardField.ISSN, "00135984, 15548279")
+            .withField(StandardField.JOURNAL, "The Elementary School Journal")
+            .withField(StandardField.ABSTRACT, "Abstract Students are sometimes proactive and engaged in classroom learning activities, but they are also sometimes only reactive and passive. Recognizing this, in this article I argue that students’ classroom engagement depends, in part, on the supportive quality of the classroom climate in which they learn. According to the dialectical framework within self‐determination theory, students possess inner motivational resources that classroom conditions can support or frustrate. When teachers find ways to nurture these inner resources, they adopt an autonomy‐supportive motivating style. After articulating what autonomy‐supportive teachers say and do during instruction, I discuss 3 points: teachers can learn how to be more autonomy supportive toward students; teachers most engage students when they offer high levels of both autonomy support and structure; and an autonomy‐supportive motivating style is an important element to a high‐quality teacher‐student relationship.")
+            .withField(StandardField.PUBLISHER, "The University of Chicago Press")
+            .withField(StandardField.NUMBER, "3")
+            .withField(StandardField.PAGES, "225--236")
+            .withField(StandardField.VOLUME, "106")
+            .withField(StandardField.URL, "http://www.jstor.org/stable/10.1086/501484")
+            .withField(StandardField.YEAR, "2006");
+
     @Test
     void searchByTitle() throws Exception {
-        List<BibEntry> entries = fetcher.performSearch("ti: \"Test Anxiety Analysis of Chinese College Students in Computer-based Spoken English Test\"");
+        List<BibEntry> entries = fetcher.performSearch("title: \"Test Anxiety Analysis of Chinese College Students in Computer-based Spoken English Test\"");
         assertEquals(Collections.singletonList(bibEntry), entries);
+    }
+
+    @Test
+    void searchById() throws FetcherException {
+        assertEquals(Optional.of(bibEntry), fetcher.performSearchById("90002164"));
+        assertEquals(Optional.of(doiEntry), fetcher.performSearchById("https://www.jstor.org/stable/10.1086/501484?seq=1"));
     }
 
     @Test
@@ -64,12 +86,19 @@ public class JstorFetcherTest implements SearchBasedFetcherCapabilityTest {
 
     @Override
     public String getTestJournal() {
+        // Does not provide articles and journals
         return "Test";
     }
 
     @Disabled("jstor does not support search only based on year")
     @Override
     public void supportsYearRangeSearch() throws Exception {
+
+    }
+
+    @Disabled("jstor does not provide articles with journals")
+    @Override
+    public void supportsJournalSearch() throws Exception {
 
     }
 

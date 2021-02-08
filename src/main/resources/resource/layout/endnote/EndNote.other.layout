@@ -1,6 +1,6 @@
 %0 \endnotereftype
 %0 Generic
-%A \format[AuthorLastFirst,RemoveBracketsAddComma,AuthorAndsReplacer]{\author}
+%A \format[AAuthors(LastFirst,FullName,Semicolon,Amp)]{\author}
 %D \year
 %T \format[RemoveLatexCommands]{\title}
 %E

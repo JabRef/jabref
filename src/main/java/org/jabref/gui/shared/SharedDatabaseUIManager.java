@@ -63,10 +63,10 @@ public class SharedDatabaseUIManager {
         if (answer.isPresent()) {
             if (answer.get().equals(reconnect)) {
                 jabRefFrame.closeCurrentTab();
-                new SharedDatabaseLoginDialogView(jabRefFrame).showAndWait();
+                dialogService.showCustomDialogAndWait(new SharedDatabaseLoginDialogView(jabRefFrame));
             } else if (answer.get().equals(workOffline)) {
                 connectionLostEvent.getBibDatabaseContext().convertToLocalDatabase();
-                // jabRefFrame.refreshWindowAndTabTitles();
+                jabRefFrame.getLibraryTabs().forEach(tab -> tab.updateTabTitle(tab.isModified()));
                 jabRefFrame.getDialogService().notify(Localization.lang("Working offline."));
             }
         } else {
@@ -101,7 +101,7 @@ public class SharedDatabaseUIManager {
 
         if (response.isPresent() && response.get().equals(merge)) {
             MergeEntriesDialog dialog = new MergeEntriesDialog(localBibEntry, sharedBibEntry);
-            Optional<BibEntry> mergedEntry = dialog.showAndWait();
+            Optional<BibEntry> mergedEntry = dialogService.showCustomDialogAndWait(dialog);
 
             mergedEntry.ifPresent(mergedBibEntry -> {
                 mergedBibEntry.getSharedBibEntryData().setSharedID(sharedBibEntry.getSharedBibEntryData().getSharedID());

@@ -25,6 +25,7 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
+import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.texparser.DefaultLatexParser;
@@ -113,7 +114,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
 
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory -> {
             latexFileDirectory.set(selectedDirectory.toAbsolutePath().toString());
-            preferencesService.setWorkingDir(selectedDirectory.toAbsolutePath());
+            preferencesService.setWorkingDirectory(selectedDirectory.toAbsolutePath());
         });
     }
 
@@ -139,7 +140,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
     }
 
     private void handleFailure(Exception exception) {
-        final boolean permissionProblem = exception instanceof IOException && exception.getCause() instanceof FileSystemException && exception.getCause().getMessage().endsWith("Operation not permitted");
+        final boolean permissionProblem = (exception instanceof IOException) && (exception.getCause() instanceof FileSystemException) && exception.getCause().getMessage().endsWith("Operation not permitted");
         if (permissionProblem) {
             dialogService.showErrorDialogAndWait(String.format(Localization.lang("JabRef does not have permission to access %s"), exception.getCause().getMessage()));
         } else {
@@ -148,7 +149,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
     }
 
     private FileNodeViewModel searchDirectory(Path directory) throws IOException {
-        if (directory == null || !directory.toFile().isDirectory()) {
+        if ((directory == null) || !directory.toFile().isDirectory()) {
             throw new IOException(String.format("Invalid directory for searching: %s", directory));
         }
 
@@ -199,12 +200,13 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         }
 
         TexBibEntriesResolver entriesResolver = new TexBibEntriesResolver(databaseContext.getDatabase(),
-                preferencesService.getImportFormatPreferences(), fileMonitor);
+                preferencesService.getImportFormatPreferences(), preferencesService.getTimestampPreferences(), fileMonitor);
 
         BackgroundTask.wrap(() -> entriesResolver.resolve(new DefaultLatexParser().parse(fileList)))
                       .onRunning(() -> searchInProgress.set(true))
                       .onFinished(() -> searchInProgress.set(false))
-                      .onSuccess(result -> new ParseLatexResultView(result, databaseContext, Path.of(latexFileDirectory.get())).showAndWait())
+                      .onSuccess(result -> dialogService.showCustomDialogAndWait(
+                              new ParseLatexResultView(result, databaseContext, Path.of(latexFileDirectory.get()))))
                       .onFailure(dialogService::showErrorDialogAndWait)
                       .executeWith(taskExecutor);
     }

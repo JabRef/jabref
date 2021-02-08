@@ -14,6 +14,7 @@ import javafx.scene.control.TextField;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.util.FileNodeViewModel;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.RecursiveTreeItem;
 import org.jabref.gui.util.TaskExecutor;

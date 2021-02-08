@@ -18,27 +18,27 @@ import javafx.scene.control.TextField;
 
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.JabRefPreferencesFilter;
+import org.jabref.preferences.PreferencesFilter;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 
 public class PreferencesFilterDialog extends BaseDialog<Void> {
 
-    private final JabRefPreferencesFilter preferencesFilter;
-    private final ObservableList<JabRefPreferencesFilter.PreferenceOption> preferenceOptions;
-    private final FilteredList<JabRefPreferencesFilter.PreferenceOption> filteredOptions;
+    private final PreferencesFilter preferencesFilter;
+    private final ObservableList<PreferencesFilter.PreferenceOption> preferenceOptions;
+    private final FilteredList<PreferencesFilter.PreferenceOption> filteredOptions;
 
-    @FXML private TableView<JabRefPreferencesFilter.PreferenceOption> table;
-    @FXML private TableColumn<JabRefPreferencesFilter.PreferenceOption, JabRefPreferencesFilter.PreferenceType> columnType;
-    @FXML private TableColumn<JabRefPreferencesFilter.PreferenceOption, String> columnKey;
-    @FXML private TableColumn<JabRefPreferencesFilter.PreferenceOption, Object> columnValue;
-    @FXML private TableColumn<JabRefPreferencesFilter.PreferenceOption, Object> columnDefaultValue;
+    @FXML private TableView<PreferencesFilter.PreferenceOption> table;
+    @FXML private TableColumn<PreferencesFilter.PreferenceOption, PreferencesFilter.PreferenceType> columnType;
+    @FXML private TableColumn<PreferencesFilter.PreferenceOption, String> columnKey;
+    @FXML private TableColumn<PreferencesFilter.PreferenceOption, Object> columnValue;
+    @FXML private TableColumn<PreferencesFilter.PreferenceOption, Object> columnDefaultValue;
     @FXML private CheckBox showOnlyDeviatingPreferenceOptions;
     @FXML private Label count;
     @FXML private TextField searchField;
 
-    public PreferencesFilterDialog(JabRefPreferencesFilter preferencesFilter) {
+    public PreferencesFilterDialog(PreferencesFilter preferencesFilter) {
         this.preferencesFilter = Objects.requireNonNull(preferencesFilter);
         this.preferenceOptions = FXCollections.observableArrayList();
         this.filteredOptions = new FilteredList<>(this.preferenceOptions);

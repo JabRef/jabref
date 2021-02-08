@@ -8,14 +8,14 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.bibtex.comparator.MetaDataDiff;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 class MetaDataChangeViewModel extends DatabaseChangeViewModel {
 
     private final MetaDataDiff metaDataDiff;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
 
-    public MetaDataChangeViewModel(MetaDataDiff metaDataDiff, JabRefPreferences preferences) {
+    public MetaDataChangeViewModel(MetaDataDiff metaDataDiff, PreferencesService preferences) {
         super(Localization.lang("Metadata change"));
         this.metaDataDiff = metaDataDiff;
         this.preferences = preferences;

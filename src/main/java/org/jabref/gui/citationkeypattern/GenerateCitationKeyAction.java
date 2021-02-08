@@ -14,7 +14,6 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
 
 public class GenerateCitationKeyAction extends SimpleCommand {
 
@@ -51,14 +50,15 @@ public class GenerateCitationKeyAction extends SimpleCommand {
     }
 
     public static boolean confirmOverwriteKeys(DialogService dialogService) {
-        if (Globals.prefs.getBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY)) {
+        if (Globals.prefs.getCitationKeyPatternPreferences().shouldWarnBeforeOverwriteCiteKey()) {
             return dialogService.showConfirmationDialogWithOptOutAndWait(
                     Localization.lang("Overwrite keys"),
                     Localization.lang("One or more keys will be overwritten. Continue?"),
                     Localization.lang("Overwrite keys"),
                     Localization.lang("Cancel"),
-                    Localization.lang("Disable this confirmation dialog"),
-                    optOut -> Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, !optOut));
+                    Localization.lang("Do not ask again"),
+                    optOut -> Globals.prefs.storeCitationKeyPatternPreferences(
+                            Globals.prefs.getCitationKeyPatternPreferences().withWarnBeforeOverwriteCiteKey(!optOut)));
         } else {
             // Always overwrite keys by default
             return true;
@@ -67,7 +67,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
 
     private void checkOverwriteKeysChosen() {
         // We don't want to generate keys for entries which already have one thus remove the entries
-        if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
+        if (Globals.prefs.getCitationKeyPatternPreferences().shouldAvoidOverwriteCiteKey()) {
             entries.removeIf(BibEntry::hasCitationKey);
             // if we're going to override some citation keys warn the user about it
         } else if (entries.parallelStream().anyMatch(BibEntry::hasCitationKey)) {

@@ -26,7 +26,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.GuiPreferences;
 
 import impl.org.controlsfx.skin.DecorationPane;
 import org.slf4j.Logger;
@@ -62,10 +62,11 @@ public class JabRefGUI {
         LOGGER.debug("Initializing frame");
         mainFrame.init();
 
+        GuiPreferences guiPreferences = Globals.prefs.getGuiPreferences();
         // Restore window location and/or maximised state
-        if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
+        if (guiPreferences.isWindowMaximised()) {
             mainStage.setMaximized(true);
-        } else if (Screen.getScreens().size() == 1 && isWindowPositionOutOfBounds()) {
+        } else if ((Screen.getScreens().size() == 1) && isWindowPositionOutOfBounds()) {
             // corrects the Window, if its outside of the mainscreen
             LOGGER.debug("The Jabref Window is outside the Main Monitor\n");
             mainStage.setX(0);
@@ -74,10 +75,10 @@ public class JabRefGUI {
             mainStage.setHeight(768);
             correctedWindowPos = true;
         } else {
-            mainStage.setX(Globals.prefs.getDouble(JabRefPreferences.POS_X));
-            mainStage.setY(Globals.prefs.getDouble(JabRefPreferences.POS_Y));
-            mainStage.setWidth(Globals.prefs.getDouble(JabRefPreferences.SIZE_X));
-            mainStage.setHeight(Globals.prefs.getDouble(JabRefPreferences.SIZE_Y));
+            mainStage.setX(guiPreferences.getPositionX());
+            mainStage.setY(guiPreferences.getPositionY());
+            mainStage.setWidth(guiPreferences.getSizeX());
+            mainStage.setHeight(guiPreferences.getSizeY());
         }
         debugLogWindowState(mainStage);
 
@@ -120,7 +121,7 @@ public class JabRefGUI {
 
     private void openDatabases() {
         // If the option is enabled, open the last edited libraries, if any.
-        if (!isBlank && Globals.prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)) {
+        if (!isBlank && Globals.prefs.getGuiPreferences().shouldOpenLastEdited()) {
             openLastEditedDatabases();
         }
 
@@ -136,7 +137,10 @@ public class JabRefGUI {
                                          .findFirst()
                                          .flatMap(ParserResult::getFile)
                                          .map(File::getAbsolutePath)
-                                         .orElse(Globals.prefs.get(JabRefPreferences.LAST_FOCUSED));
+                                         .orElse(Globals.prefs.getGuiPreferences()
+                                                              .getLastFocusedFile()
+                                                              .toAbsolutePath()
+                                                              .toString());
 
         // Add all bibDatabases databases to the frame:
         boolean first = false;
@@ -210,11 +214,17 @@ public class JabRefGUI {
     }
 
     private void saveWindowState(Stage mainStage) {
-        Globals.prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, mainStage.isMaximized());
-        Globals.prefs.putDouble(JabRefPreferences.POS_X, mainStage.getX());
-        Globals.prefs.putDouble(JabRefPreferences.POS_Y, mainStage.getY());
-        Globals.prefs.putDouble(JabRefPreferences.SIZE_X, mainStage.getWidth());
-        Globals.prefs.putDouble(JabRefPreferences.SIZE_Y, mainStage.getHeight());
+        GuiPreferences preferences = Globals.prefs.getGuiPreferences();
+        Globals.prefs.storeGuiPreferences(new GuiPreferences(
+                mainStage.getX(),
+                mainStage.getY(),
+                mainStage.getWidth(),
+                mainStage.getHeight(),
+                mainStage.isMaximized(),
+                preferences.shouldOpenLastEdited(),
+                preferences.getLastFilesOpened(),
+                preferences.getLastFocusedFile(),
+                preferences.getSidePaneWidth()));
         debugLogWindowState(mainStage);
     }
 
@@ -241,14 +251,16 @@ public class JabRefGUI {
      * @return outbounds
      */
     private boolean isWindowPositionOutOfBounds() {
-        return !Screen.getPrimary().getBounds().contains(Globals.prefs.getDouble(JabRefPreferences.POS_X), Globals.prefs.getDouble(JabRefPreferences.POS_Y));
+        return !Screen.getPrimary().getBounds().contains(
+                Globals.prefs.getGuiPreferences().getPositionX(),
+                Globals.prefs.getGuiPreferences().getPositionY());
     }
 
     private void openLastEditedDatabases() {
-        if (Globals.prefs.get(JabRefPreferences.LAST_EDITED) == null) {
+        List<String> lastFiles = Globals.prefs.getGuiPreferences().getLastFilesOpened();
+        if (lastFiles.isEmpty()) {
             return;
         }
-        List<String> lastFiles = Globals.prefs.getStringList(JabRefPreferences.LAST_EDITED);
 
         for (String fileName : lastFiles) {
             File dbFile = new File(fileName);
@@ -263,7 +275,7 @@ public class JabRefGUI {
             }
 
             ParserResult parsedDatabase = OpenDatabase.loadDatabase(fileName,
-                    Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+                    Globals.prefs.getImportFormatPreferences(), Globals.prefs.getTimestampPreferences(), Globals.getFileUpdateMonitor());
 
             if (parsedDatabase.isEmpty()) {
                 LOGGER.error(Localization.lang("Error opening file") + " '" + dbFile.getPath() + "'");

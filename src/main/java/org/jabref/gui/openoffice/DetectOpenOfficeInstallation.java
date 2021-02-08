@@ -10,12 +10,11 @@ import org.jabref.gui.desktop.JabRefDesktop;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.util.OS;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 /**
  * Tools for automatically detecting OpenOffice or LibreOffice installations.
@@ -24,23 +23,19 @@ public class DetectOpenOfficeInstallation {
 
     private final OpenOfficePreferences ooPrefs;
     private final DialogService dialogService;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferencesService;
 
-    public DetectOpenOfficeInstallation(JabRefPreferences preferences, DialogService dialogService) {
-        this.preferences = preferences;
+    public DetectOpenOfficeInstallation(PreferencesService preferencesService, DialogService dialogService) {
+        this.preferencesService = preferencesService;
         this.dialogService = dialogService;
-        this.ooPrefs = preferences.getOpenOfficePreferences();
-    }
-
-    public boolean isInstalled() {
-        return autoDetectPaths();
+        this.ooPrefs = preferencesService.getOpenOfficePreferences();
     }
 
     public boolean isExecutablePathDefined() {
         return checkAutoDetectedPaths(ooPrefs);
     }
 
-    private Optional<Path> selectInstallationPath() {
+    public Optional<Path> selectInstallationPath() {
 
         final NativeDesktop nativeDesktop = JabRefDesktop.getNativeDesktop();
 
@@ -52,32 +47,19 @@ public class DetectOpenOfficeInstallation {
         return dialogService.showDirectorySelectionDialog(dirDialogConfiguration);
     }
 
-    private boolean autoDetectPaths() {
-        List<Path> installations = OpenOfficeFileSearch.detectInstallations();
-
-        // manually add installation path
-        if (installations.isEmpty()) {
-            selectInstallationPath().ifPresent(installations::add);
-        }
-
-        // select among multiple installations
-        Optional<Path> actualFile = chooseAmongInstallations(installations);
-        if (actualFile.isPresent()) {
-            return setOpenOfficePreferences(actualFile.get());
-        }
-
-        return false;
-    }
-
     /**
      * Checks whether the executablePath exists
      */
     private boolean checkAutoDetectedPaths(OpenOfficePreferences openOfficePreferences) {
         String executablePath = openOfficePreferences.getExecutablePath();
+
+        if (OS.LINUX && (System.getenv("FLATPAK_SANDBOX_DIR") != null)) {
+            executablePath = OpenOfficePreferences.DEFAULT_LINUX_FLATPAK_EXEC_PATH;
+        }
         return !StringUtil.isNullOrEmpty(executablePath) && Files.exists(Path.of(executablePath));
     }
 
-    private boolean setOpenOfficePreferences(Path installDir) {
+    public boolean setOpenOfficePreferences(Path installDir) {
         Optional<Path> execPath = Optional.empty();
 
         if (OS.WINDOWS) {
@@ -88,20 +70,16 @@ public class DetectOpenOfficeInstallation {
             execPath = FileUtil.find(OpenOfficePreferences.LINUX_EXECUTABLE, installDir);
         }
 
-        Optional<Path> jarFilePath = FileUtil.find(OpenOfficePreferences.OO_JARS.get(0), installDir);
-
-        if (execPath.isPresent() && jarFilePath.isPresent()) {
-            ooPrefs.setInstallationPath(installDir.toString());
+        if (execPath.isPresent()) {
             ooPrefs.setExecutablePath(execPath.get().toString());
-            ooPrefs.setJarsPath(jarFilePath.get().getParent().toString());
-            preferences.setOpenOfficePreferences(ooPrefs);
+            preferencesService.setOpenOfficePreferences(ooPrefs);
             return true;
         }
 
         return false;
     }
 
-    private Optional<Path> chooseAmongInstallations(List<Path> installDirs) {
+    public Optional<Path> chooseAmongInstallations(List<Path> installDirs) {
         if (installDirs.isEmpty()) {
             return Optional.empty();
         }

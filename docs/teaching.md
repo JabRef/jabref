@@ -1,17 +1,19 @@
-# JabRef and Software Engineering
+# JabRef and Software Engineering Training
 
-With JabRef students can level-up their coding and GitHub skills. When taking part in JabRef development, one will learn modern Java coding practices, how code reviews work and how to properly address reviewing feedback.
+By using JabRef as training object in exercises and labs, students can level-up their coding and project management skills. When taking part in JabRef development, one will learn modern Java coding practices, how code reviews work and how to properly address reviewing feedback.
 
-JabRef tries to achieve high code quality. This ultimately leads to improved software engineering knowledge of contributors. After contributing for JabRef, both coding and general software engineering skills will have increased. Our [development strategy](getting-into-the-code/development-strategy.md) provides more details.
+## Why university instructors should cooperate with us?
 
-We recommend to start early and constantly, since students working earlier and more often produce projects that are more correct and completed earlier at the same overall invested time [1](teaching.md#Ayaankazerouni).
+* No need to think about software engineering excersies any more: JabRef has them.
+* No need to provision infra structure
+* High-quality student educuation due to real-world tooling and real-world code base
+* Sustainability of student works: No more thrown-away solved excercises: They now are incorparted in a real-world product
+* Visibility of your research groups
 
-## Notes for instructors
+## How to integrate JabRef in your class
 
-1. Be aware that JabRef is run by volunteers. This implies that the development team cannot ensure to provide feedback on code within hours.
-2. Be aware that from the first pull request to the final acceptance the typical time needed is two weeks.
-3. Be aware that JabRef tries to achieve high code quality. This leads to code reviews requiring actions from the contributors. This also applies for code of students. Read on at our [Development Strategy](getting-into-the-code/development-strategy.md) for more details.
-4. Choose tasks from one of the following boards. Write a comment on each issue so that it can be reserved for your course.
+1. Get in touch with the JabRef team to discuss details. We offer email, skype, [gitter.im](https://gitter.im/JabRef/jabref), discord. Get in touch with [@koppor](https://github.com/koppor/) to find the right channel and to start forming the success of your course.
+2. Choose tasks from one of the following boards. Write a comment on each issue so that it can be reserved for your course.
    * Candidates for university projects: [https://github.com/JabRef/jabref/projects/9](https://github.com/JabRef/jabref/projects/9)
      * This board categorizes in small, medium, and large features
    * Feature Board: [https://github.com/JabRef/jabref/projects/7](https://github.com/JabRef/jabref/projects/7)
@@ -19,8 +21,12 @@ We recommend to start early and constantly, since students working earlier and m
    * Bug Board: [https://github.com/JabRef/jabref/projects/5](https://github.com/JabRef/jabref/projects/5)
      * This is an excellent board to find issues training the maintenance knowledge which is essential for industry work
    * General "good first issues". The JabRef team tags issues as [good first issues](https://github.com/jabref/jabref/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to indicate open tasks offering a good start into the JabRef code. These issues are more a list of random bugs and features. For a more structured comparison of the opened tasks, we recommend the project boards listed above.
-5. Be aware that the difficulty of bugs and feature vary. A task should be chosen with care. The JabRef team can help here: The majority of the team has experiences in teaching
-6. Get in touch with the JabRef team to discuss details. We offer email, skype, [gitter.im](https://gitter.im/JabRef/jabref), discord. Get in touch with [@koppor](https://github.com/koppor/) to find the right channel and to start forming the success of your course.
+   * Be aware that the difficulty of bugs and feature vary. A task should be chosen with care. The JabRef team can help here: The majority of the team has experiences in teaching
+3. Schedule tasks with students
+4. Code reviews by JabRef maintainers
+5. Students address feedback and learn more about good coding practices by incoporating feedback
+6. Students update their pull request
+7. Pull request is merged
 
 For a near-to-perfect preparation and effect of the course, we ask you to get in touch with us **four weeks** in advance. Then, the JabRef team can a\) learn about the starting skill level of the students, b\) the aimed skill level at the end of the course, c\) the amount of time the students are given to learn about and contribute to JabRef, d\) check the [feature board](https://github.com/JabRef/jabref/projects/7) for appropriate tasks \(and fill it as needed\), e\) recommend appropriate features.
 
@@ -34,7 +40,7 @@ There is no special process for student contributions. We want to discuss it nev
 
 The process for accepting contributions is as below. The syntax is [BPMN](https://en.wikipedia.org/wiki/Business_Process_Model_and_Notation) modeled using [bpmn.io](https://bpmn.io/).
 
-[![process](.gitbook/assets/contribution-process-reviews%20%281%29.svg)](https://github.com/JabRef/jabref/tree/ed275b62fe7dac57a086e43802e36deb93c63e31/docs/images/contribution-process-reviews.svg)
+[![process](.gitbook/assets/contribution-process-reviews%20%282%29%20%282%29%20%282%29%20%281%29.svg)](https://github.com/JabRef/jabref/tree/ed275b62fe7dac57a086e43802e36deb93c63e31/docs/images/contribution-process-reviews.svg)
 
 In short, the contribution is **reviewed by two JabRef developers**. Typically, they have constructive feedback on their contribution. This means, that the contributors get comments on their contribution enabling them to level-up their coding skill. Incorporating improvements takes time, too. The benefit is two-fold: a\) contributors improve their coding skills and b\) JabRef's code quality improves. All in all, we ask to respect the aims of the JabRef team and to reserve time to incorporate the reviewer's comments.
 
@@ -46,7 +52,7 @@ GitHub describes that in their page [Understanding the GitHub flow](https://guid
 
 Newcomers contributing in the context of a university teaching experience are invited to follow the process described above. In case the capacity of the instructing university allows, we propose a three-step approach. First, the contributors prepare their contribution as usual. Then, they submit the pull request _to a separate repository_. There, the instructor reviews the pull request and provides feedback. This happens in a loop until the instructor shows the green light. Then, the pull request can be submitted to the main JabRef repository. This will help to reduce the load on the JabRef team and improve the quality of the initial pull request.
 
-[![process with instructor](.gitbook/assets/contribution-process-reviews-with-instructor%20%281%29.svg)](https://github.com/JabRef/jabref/tree/ed275b62fe7dac57a086e43802e36deb93c63e31/docs/images/contribution-process-reviews-with-instructor.svg)
+[![process with instructor](.gitbook/assets/contribution-process-reviews-with-instructor%20%281%29%20%282%29%20%282%29%20%282%29.svg)](https://github.com/JabRef/jabref/tree/ed275b62fe7dac57a086e43802e36deb93c63e31/docs/images/contribution-process-reviews-with-instructor.svg)
 
 ## Past courses
 
@@ -115,6 +121,14 @@ Course [Open Source Software](https://github.com/igorsteinmacher/DSL-UTFPR)
 
 * Summary: Students are requested to contribute to an Open Source project to learn about the maintenance and evolution of software projects. This project is the predecessor of NAU's CS499.
 * Course offered from 2013 to 2016 with different names
+
+## Notes
+
+1. JabRef tries to achieve high code quality. This ultimately leads to improved software engineering knowledge of contributors. After contributing for JabRef, both coding and general software engineering skills will have increased. Our [development strategy](getting-into-the-code/development-strategy.md) provides more details.
+2. We recommend to start early and constantly, since students working earlier and more often produce projects that are more correct and completed earlier at the same overall invested time [1](teaching.md#Ayaankazerouni).
+3. Be aware that JabRef is run by volunteers. This implies that the development team cannot ensure to provide feedback on code within hours.
+4. Be aware that from the first pull request to the final acceptance the typical time needed is two weeks.
+5. Be aware that JabRef tries to achieve high code quality. This leads to code reviews requiring actions from the contributors. This also applies for code of students. Read on at our [Development Strategy](getting-into-the-code/development-strategy.md) for more details.
 
 ## References
 

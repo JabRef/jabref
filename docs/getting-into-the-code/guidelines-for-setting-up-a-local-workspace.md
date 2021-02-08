@@ -20,10 +20,9 @@ This section list the prerequisites you need to get started to develop JabRef. A
 
 A working Java \(Develoment Kit\) 15 installation with Java FX support is required. In the command line \(terminal in Linux, cmd in Windows\) run `javac -version` and make sure that the reported version is Java 15 \(e.g `javac 15`\). If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
 
-[JavaFX is not part of the default JDK any more](https://www.reddit.com/r/java/comments/82qm9x/javafx_will_be_removed_from_the_java_jdk_in_jdk_11/), it needs to be installed separately if not using a special JDK. ~~We recommend to setup the full Liberica JDK including JavaFX. You can get it from [https://bell-sw.com/pages/downloads/?version=java-15&package=jdk-full](https://bell-sw.com/pages/downloads/?version=java-15&package=jdk-full). On Windows, you can execute `choco install libericajdkfull` \(requires [installation of chocolatey - a package manager for Windows](https://chocolatey.org/install)\).~~ (Liberica JDK 15 does not include the Java compiler properly any more)
+[JavaFX is not part of the default JDK any more](https://www.reddit.com/r/java/comments/82qm9x/javafx_will_be_removed_from_the_java_jdk_in_jdk_11/), it needs to be installed separately if not using a special JDK. ~~We recommend to setup the full Liberica JDK including JavaFX. You can get it from~~ [~~https://bell-sw.com/pages/downloads/?version=java-15&package=jdk-full~~](https://bell-sw.com/pages/downloads/?version=java-15&package=jdk-full)~~. On Windows, you can execute `choco install libericajdkfull` \(requires~~ [~~installation of chocolatey - a package manager for Windows~~](https://chocolatey.org/install)~~\).~~ \(Liberica JDK 15 does not include the Java compiler properly any more\)
 
-Download and install the JDK from [https://jdk.java.net/](https://jdk.java.net/).
-Afterwards, download the "jmods" JavaFX 15 zip archive from [https://gluonhq.com/products/javafx/](https://gluonhq.com/products/javafx/) and put the `.jmod` files into `C:\Program Files\OpenJDK\jdk-15\jmods`.
+Download and install the JDK from [https://jdk.java.net/](https://jdk.java.net/). Afterwards, download the "jmods" JavaFX 15 zip archive from [https://gluonhq.com/products/javafx/](https://gluonhq.com/products/javafx/) and put the `.jmod` files into `C:\Program Files\OpenJDK\jdk-15\jmods`.
 
 ### GitHub Account
 
@@ -55,14 +54,13 @@ It is strongly recommend that you have git installed.
 
 ### IDE
 
-We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/).
-For advanced users, [Eclipse](https://eclipse.org/) \(`2020-09` or newer\) is also possible.
+We suggest [IntelliJ IDEA](https://www.jetbrains.com/idea/?from=jabref). For advanced users, [Eclipse](https://eclipse.org/) \(`2020-09` or newer\) is also possible.
 
 #### IntelliJ
 
 We recommend to install IntelliJ IDEA using [JetBrains Toolbox App](https://www.jetbrains.com/toolbox-app/), because IDE updates are automatically installed.
 
-#### Ecipse
+#### Eclipse
 
 On Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download_Eclipse) or the [step-by-step guideline from Krizna](https://www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/) to install Eclipse. On Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
 
@@ -129,7 +127,7 @@ To prepare IntelliJ's build system two additional steps are required:
 
 To have autoformat working properly in the context of line wrapping, "Wrap at right margin" has to be disabled as shown below. Details are found in [IntelliJ issue 240517](https://youtrack.jetbrains.com/issue/IDEA-240517).
 
-![Disable wrapping at right margin to prevent JavaDoc to be wrapped](../.gitbook/assets/intellij-wrap-at-right-margin.png)
+![Disable wrapping at right margin to prevent JavaDoc to be wrapped](../.gitbook/assets/intellij-wrap-at-right-margin%20%284%29%20%284%29%20%284%29.png)
 
 #### Using Gradle from within IntelliJ IDEA
 
@@ -157,7 +155,7 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 * In **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** the setting "Build and run using" and "Test using" is set to "IntelliJ IDEA".
 * Ignore the Gradle project "buildSrc" by clicking the button **Select Project Data To Import** in the Gradle Tool Window and unchecking the folder "buildSrc".
 
-    ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc%20%282%29.png)
+  ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc%20%282%29%20%282%29%20%282%29%20%283%29.png)
 
 * Delete `org.jabref.gui.logging.plugins.Log4jPlugins` \(location: `generated\org\jabref\gui\logging\plugins\Log4jPlugins.java`\). Otherwise, you will see following error:
 
@@ -197,8 +195,9 @@ Finally, ensure that the checkstyle configuration file is in place:
 7. Ensure that the [latest CheckStyle version](https://checkstyle.org/releasenotes.html) is selected \(8.36 or higher\). 8.36 is required for Java 15.
 8. Set the "Scan Scope" to "Only Java sources \(including tests\)
 9. Save settings by clicking "OK"
-10. Your configuration should now look like this:  
-  ![checkstyle settings](../.gitbook/assets/intellij-checkstyle-settings.png)
+10. Your configuration should now look like this:
+
+    ![checkstyle settings](../.gitbook/assets/intellij-checkstyle-settings.png)
 
 ### Setup for Eclipse
 
@@ -215,7 +214,7 @@ Make sure your Eclipse installation us up to date.
 4. Create a run/debug configuration for the main class `org.jabref.gui.JabRefLauncher` and/or for `org.jabref.gui.JabRefMain` \(both can be used equivalently\)
    * Remark: The run/debug configuration needs to be added by right clicking the class \(e.g. JabRefLauncher or JabRefMain\) otherwise it will not work.
 
-     ![Creating the run/debug configuration by right clicking on the class](../.gitbook/assets/eclipse-create-run-config%20%281%29%20%281%29.png)
+     ![Creating the run/debug configuration by right clicking on the class](../.gitbook/assets/eclipse-create-run-config%20%281%29%20%283%29%20%283%29%20%284%29%20%284%29.png)
 
    * In the tab "Arguments" of the run/debug configuration, enter the following runtime VM arguments:
 
@@ -287,3 +286,4 @@ There might be problems with building if you have openjfx libraries in local mav
 ```
 
 As a workaround, you can remove all local openjfx artifacts by deleting the whole openjfx folder from specified location.
+

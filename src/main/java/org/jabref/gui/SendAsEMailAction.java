@@ -19,7 +19,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,11 +38,13 @@ import org.slf4j.LoggerFactory;
 public class SendAsEMailAction extends SimpleCommand {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SendAsEMailAction.class);
-    private DialogService dialogService;
-    private StateManager stateManager;
+    private final DialogService dialogService;
+    private final PreferencesService preferencesService;
+    private final StateManager stateManager;
 
-    public SendAsEMailAction(DialogService dialogService, StateManager stateManager) {
+    public SendAsEMailAction(DialogService dialogService, PreferencesService preferencesService, StateManager stateManager) {
         this.dialogService = dialogService;
+        this.preferencesService = preferencesService;
         this.stateManager = stateManager;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
@@ -74,7 +76,7 @@ public class SendAsEMailAction extends SimpleCommand {
         List<BibEntry> entries = stateManager.getSelectedEntries();
 
         // write the entries using sw, which is used later to form the email content
-        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(Globals.prefs.getFieldWriterPreferences()), Globals.entryTypesManager);
+        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new FieldWriter(preferencesService.getFieldWriterPreferences()), Globals.entryTypesManager);
 
         for (BibEntry entry : entries) {
             try {
@@ -88,9 +90,9 @@ public class SendAsEMailAction extends SimpleCommand {
 
         // open folders is needed to indirectly support email programs, which cannot handle
         //   the unofficial "mailto:attachment" property
-        boolean openFolders = JabRefPreferences.getInstance().getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES);
+        boolean openFolders = preferencesService.getExternalApplicationsPreferences().shouldAutoOpenEmailAttachmentsFolder();
 
-        List<Path> fileList = FileUtil.getListOfLinkedFiles(entries, databaseContext.getFileDirectories(Globals.prefs.getFilePreferences()));
+        List<Path> fileList = FileUtil.getListOfLinkedFiles(entries, databaseContext.getFileDirectories(preferencesService.getFilePreferences()));
         for (Path path : fileList) {
             attachments.add(path.toAbsolutePath().toString());
             if (openFolders) {
@@ -104,7 +106,7 @@ public class SendAsEMailAction extends SimpleCommand {
 
         String mailTo = "?Body=".concat(rawEntries.getBuffer().toString());
         mailTo = mailTo.concat("&Subject=");
-        mailTo = mailTo.concat(JabRefPreferences.getInstance().get(JabRefPreferences.EMAIL_SUBJECT));
+        mailTo = mailTo.concat(preferencesService.getExternalApplicationsPreferences().getEmailSubject());
         for (String path : attachments) {
             mailTo = mailTo.concat("&Attachment=\"").concat(path);
             mailTo = mailTo.concat("\"");

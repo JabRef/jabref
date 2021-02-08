@@ -16,12 +16,13 @@ Architectural decisions for JabRef:
 * [ADR-0011](https://github.com/JabRef/jabref/tree/master/docs/adr/0011-test-external-links-in-documentation.md) - Test external links in documentation
 * [ADR-0012](https://github.com/JabRef/jabref/tree/master/docs/adr/0012-handle-different-bibEntry-formats-of-fetchers.md) - Handle different bibentry formats of fetchers by adding a layer
 * [ADR-0013](https://github.com/JabRef/jabref/tree/master/docs/adr/0013-add-native-support-biblatex-software.md) - Add Native Support for BibLatex-Software
-fix checkstyle in adr
+
+  fix checkstyle in adr
+
 * [ADR-0014](https://github.com/JabRef/jabref/tree/master/docs/adr/0014-separate-URL-creation-to-enable-proper-logging.md) - Separate URL creation to enable proper logging
 * [ADR-0015](https://github.com/JabRef/jabref/tree/master/docs/adr/0015-support-an-abstract-query-syntax-for-query-conversion.md) - Query syntax design
 * [ADR-0016](https://github.com/JabRef/jabref/tree/master/docs/adr/0016-mutable-preferences-objects.md) - Mutable preferences objects
 * [ADR-0017](https://github.com/JabRef/jabref/tree/master/docs/adr/0017-allow-model-access-logic.md) - Allow org.jabref.model to access org.jabref.logic
-
 
 For new ADRs, please use [template.md](https://github.com/JabRef/jabref/tree/master/docs/adr/template.md) as basis. More information on the used format is available at [https://adr.github.io/madr/](https://adr.github.io/madr/). General information about architectural decision records is available at [https://adr.github.io/](https://adr.github.io/). Then add them to the above list.
 

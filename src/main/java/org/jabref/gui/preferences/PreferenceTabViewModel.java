@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences;
 
+import java.util.Collections;
 import java.util.List;
 
 public interface PreferenceTabViewModel {
@@ -17,7 +18,7 @@ public interface PreferenceTabViewModel {
     /**
      * This method is called when the user presses OK in the
      * Preferences dialog. Implementing classes must make sure all
-     * settings presented get stored in JabRefPreferences.
+     * settings presented get stored in PreferencesService.
      */
     void storeSettings();
 
@@ -28,7 +29,9 @@ public interface PreferenceTabViewModel {
      * If the tab is *not* ready, it should display a message to the user
      * informing about the illegal setting.
      */
-    boolean validateSettings();
+    default boolean validateSettings() {
+        return true;
+    }
 
     /**
      * This method should be called after storing the preferences, to
@@ -36,5 +39,7 @@ public interface PreferenceTabViewModel {
      *
      * @return The messages for the changed properties (e. g. "Changed language: English")
      */
-    List<String> getRestartWarnings();
+    default List<String> getRestartWarnings() {
+        return Collections.emptyList();
+    }
 }

@@ -144,7 +144,7 @@ public class ArgumentProcessor {
                 // * means "guess the format":
                 System.out.println(Localization.lang("Importing in unknown format") + ": " + file);
 
-                ImportFormatReader.UnknownFormatImport importResult = Globals.IMPORT_FORMAT_READER.importUnknownFormat(file, new DummyFileUpdateMonitor());
+                ImportFormatReader.UnknownFormatImport importResult = Globals.IMPORT_FORMAT_READER.importUnknownFormat(file, Globals.prefs.getTimestampPreferences(), new DummyFileUpdateMonitor());
 
                 System.out.println(Localization.lang("Format used") + ": " + importResult.format);
                 return Optional.of(importResult.parserResult);
@@ -321,7 +321,7 @@ public class ArgumentProcessor {
                 boolean bibExtension = aLeftOver.toLowerCase(Locale.ENGLISH).endsWith("bib");
                 ParserResult pr = new ParserResult();
                 if (bibExtension) {
-                    pr = OpenDatabase.loadDatabase(aLeftOver, Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+                    pr = OpenDatabase.loadDatabase(aLeftOver, Globals.prefs.getImportFormatPreferences(), Globals.prefs.getTimestampPreferences(), Globals.getFileUpdateMonitor());
                 }
 
                 if (!bibExtension || (pr.isEmpty())) {
@@ -456,8 +456,8 @@ public class ArgumentProcessor {
     private void importPreferences() {
         try {
             Globals.prefs.importPreferences(cli.getPreferencesImport());
-            Globals.entryTypesManager.addCustomOrModifiedTypes(Globals.prefs.loadBibEntryTypes(BibDatabaseMode.BIBTEX),
-                    Globals.prefs.loadBibEntryTypes(BibDatabaseMode.BIBLATEX));
+            Globals.entryTypesManager.addCustomOrModifiedTypes(Globals.prefs.getBibEntryTypes(BibDatabaseMode.BIBTEX),
+                    Globals.prefs.getBibEntryTypes(BibDatabaseMode.BIBLATEX));
             List<TemplateExporter> customExporters = Globals.prefs.getCustomExportFormats(Globals.journalAbbreviationRepository);
             LayoutFormatterPreferences layoutPreferences =
                     Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository);

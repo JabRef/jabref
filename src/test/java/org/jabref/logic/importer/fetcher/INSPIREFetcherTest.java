@@ -41,7 +41,7 @@ class INSPIREFetcherTest {
                 .withField(StandardField.EPRINT, "1405.2249")
                 .withField(StandardField.ARCHIVEPREFIX, "arXiv")
                 .withField(StandardField.PRIMARYCLASS, "math-ph");
-        List<BibEntry> fetchedEntries = fetcher.performSearch("Fr\\'echet group actions field");
+        List<BibEntry> fetchedEntries = fetcher.performSearch("Fr\\´echet group actions field");
         assertEquals(Collections.singletonList(master), fetchedEntries);
     }
 
@@ -59,7 +59,7 @@ class INSPIREFetcherTest {
                 .withField(StandardField.EPRINT, "hep-ph/9802379")
                 .withField(StandardField.ARCHIVEPREFIX, "arXiv")
                 .withField(new UnknownField("reportnumber"), "BUDKER-INP-1998-7, TTP-98-10");
-        List<BibEntry> fetchedEntries = fetcher.performSearch("hep-ph/9802379");
+        List<BibEntry> fetchedEntries = fetcher.performSearch("\"hep-ph/9802379\"");
         assertEquals(Collections.singletonList(article), fetchedEntries);
     }
 }

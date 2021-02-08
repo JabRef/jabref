@@ -1,6 +1,7 @@
 package org.jabref.gui;
 
 import org.jabref.model.entry.event.EntryChangedEvent;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
@@ -17,8 +18,8 @@ class UpdateTimestampListener {
 
     @Subscribe
     public void listen(EntryChangedEvent event) {
-        if (preferencesService.getTimestampPreferences().includeTimestamps()) {
-            event.getBibEntry().setField(preferencesService.getTimestampPreferences().getTimestampField(),
+        if (preferencesService.getTimestampPreferences().shouldAddModificationDate()) {
+            event.getBibEntry().setField(StandardField.MODIFICATIONDATE,
                     preferencesService.getTimestampPreferences().now());
         }
     }

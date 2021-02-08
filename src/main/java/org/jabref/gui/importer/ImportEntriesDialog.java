@@ -35,6 +35,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -59,6 +60,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     @Inject private UndoManager undoManager;
     @Inject private PreferencesService preferences;
     @Inject private StateManager stateManager;
+    @Inject private BibEntryTypesManager entryTypesManager;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
     private final BibDatabaseContext database;
 
@@ -94,7 +96,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
     @FXML
     private void initialize() {
-        viewModel = new ImportEntriesViewModel(task, taskExecutor, database, dialogService, undoManager, preferences, stateManager, fileUpdateMonitor);
+        viewModel = new ImportEntriesViewModel(task, taskExecutor, database, dialogService, undoManager, preferences, stateManager, entryTypesManager, fileUpdateMonitor);
         Label placeholder = new Label();
         placeholder.textProperty().bind(viewModel.messageProperty());
         entriesListView.setPlaceholder(placeholder);

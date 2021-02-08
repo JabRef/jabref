@@ -17,7 +17,7 @@ import org.jabref.logic.formatter.bibtexfields.TrimWhitespaceFormatter;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -26,7 +26,11 @@ public class UrlEditor extends HBox implements FieldEditorFX {
     @FXML private final UrlEditorViewModel viewModel;
     @FXML private EditorTextArea textArea;
 
-    public UrlEditor(Field field, DialogService dialogService, SuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers, JabRefPreferences preferences) {
+    public UrlEditor(Field field,
+                     DialogService dialogService,
+                     SuggestionProvider<?> suggestionProvider,
+                     FieldCheckers fieldCheckers,
+                     PreferencesService preferences) {
         this.viewModel = new UrlEditorViewModel(field, suggestionProvider, dialogService, fieldCheckers);
 
         ViewLoader.view(this)
@@ -35,7 +39,7 @@ public class UrlEditor extends HBox implements FieldEditorFX {
 
         textArea.textProperty().bindBidirectional(viewModel.textProperty());
         Supplier<List<MenuItem>> contextMenuSupplier = EditorMenus.getCleanupUrlMenu(textArea);
-        textArea.addToContextMenu(contextMenuSupplier);
+        textArea.initContextMenu(contextMenuSupplier);
 
         // init paste handler for UrlEditor to format pasted url link in textArea
         textArea.setPasteActionHandler(() -> textArea.setText(new CleanupUrlFormatter().format(new TrimWhitespaceFormatter().format(textArea.getText()))));

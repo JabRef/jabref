@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -16,13 +17,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
-public class AstrophysicsDataSystemTest {
+public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
 
     private AstrophysicsDataSystem fetcher;
     private BibEntry diezSliceTheoremEntry;
@@ -215,11 +215,8 @@ public class AstrophysicsDataSystemTest {
         assertEquals(0, page5.getSize(), "fetcher doesnt return empty pages for invalid author");
     }
 
-    @Test
-    public void performSearchByQueryPaged_twoPagesNotEqual() throws Exception {
-        Page<BibEntry> page = fetcher.performSearchPaged("author:\"A\"", 0);
-        Page<BibEntry> page2 = fetcher.performSearchPaged("author:\"A\"", 1);
-        // This tests if the fetcher actually performs paging
-        assertNotEquals(page.getContent(), page2.getContent(), "Two consecutive pages shouldn't be equal");
+    @Override
+    public PagedSearchBasedFetcher getPagedFetcher() {
+        return fetcher;
     }
 }

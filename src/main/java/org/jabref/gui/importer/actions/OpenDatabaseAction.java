@@ -6,8 +6,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -17,8 +19,6 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.dialogs.BackupUIManager;
-import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
@@ -30,7 +30,7 @@ import org.jabref.logic.shared.DatabaseNotSupportedException;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,18 +49,20 @@ public class OpenDatabaseAction extends SimpleCommand {
             new CheckForNewEntryTypesAction());
 
     private final JabRefFrame frame;
+    private final PreferencesService preferencesService;
     private final DialogService dialogService;
 
-    public OpenDatabaseAction(JabRefFrame frame) {
+    public OpenDatabaseAction(JabRefFrame frame, PreferencesService preferencesService, DialogService dialogService) {
         this.frame = frame;
-        this.dialogService = frame.getDialogService();
+        this.preferencesService = preferencesService;
+        this.dialogService = dialogService;
     }
 
     /**
      * Go through the list of post open actions, and perform those that need to be performed.
      *
-     * @param libraryTab  The BasePanel where the database is shown.
-     * @param result The result of the BIB file parse operation.
+     * @param libraryTab The BasePanel where the database is shown.
+     * @param result     The result of the BIB file parse operation.
      */
     public static void performPostOpenActions(LibraryTab libraryTab, ParserResult result) {
         for (GUIPostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
@@ -159,17 +161,15 @@ public class OpenDatabaseAction extends SimpleCommand {
      */
     private void openTheFile(Path file, boolean raisePanel) {
         Objects.requireNonNull(file);
-        if (Files.exists(file)) {
-
-            BackgroundTask.wrap(() -> loadDatabase(file))
-                          .onSuccess(result -> {
-                              LibraryTab libraryTab = addNewDatabase(result, file, raisePanel);
-                              OpenDatabaseAction.performPostOpenActions(libraryTab, result);
-                          })
-                          .onFailure(ex -> dialogService.showErrorDialogAndWait(Localization.lang("Connection error"),
-                                  ex.getMessage() + "\n\n" + Localization.lang("A local copy will be opened.")))
-                          .executeWith(Globals.TASK_EXECUTOR);
+        if (!Files.exists(file)) {
+            return;
         }
+
+        BackgroundTask<ParserResult> backgroundTask = BackgroundTask.wrap(() -> loadDatabase(file));
+        LibraryTab.Factory libraryTabFactory = new LibraryTab.Factory();
+        LibraryTab newTab = libraryTabFactory.createLibraryTab(frame, preferencesService, file, backgroundTask);
+
+        backgroundTask.onFinished(() -> trackOpenNewDatabase(newTab));
     }
 
     private ParserResult loadDatabase(Path file) throws Exception {
@@ -177,14 +177,14 @@ public class OpenDatabaseAction extends SimpleCommand {
 
         dialogService.notify(Localization.lang("Opening") + ": '" + file + "'");
 
-        Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, fileToLoad.getParent().toString());
+        Globals.prefs.setWorkingDirectory(fileToLoad.getParent());
 
         if (BackupManager.backupFileDiffers(fileToLoad)) {
             BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad);
         }
 
         ParserResult result = OpenDatabase.loadDatabase(fileToLoad.toString(),
-                Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+                Globals.prefs.getImportFormatPreferences(), Globals.prefs.getTimestampPreferences(), Globals.getFileUpdateMonitor());
 
         if (result.getDatabase().isShared()) {
             try {
@@ -201,13 +201,11 @@ public class OpenDatabaseAction extends SimpleCommand {
         return result;
     }
 
-    private LibraryTab addNewDatabase(ParserResult result, final Path file, boolean raisePanel) {
-        if (result.hasWarnings()) {
-            ParserResultWarningDialog.showParserResultWarningDialog(result, frame);
-        }
+    private void trackOpenNewDatabase(LibraryTab libraryTab) {
+        Map<String, String> properties = new HashMap<>();
+        Map<String, Double> measurements = new HashMap<>();
+        measurements.put("NumberOfEntries", (double) libraryTab.getBibDatabaseContext().getDatabase().getEntryCount());
 
-        LibraryTab libraryTab = new LibraryTab(frame, Globals.prefs, result.getDatabaseContext(), ExternalFileTypes.getInstance());
-        frame.addTab(libraryTab, raisePanel);
-        return libraryTab;
+        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("OpenNewDatabase", properties, measurements));
     }
 }

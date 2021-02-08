@@ -16,10 +16,11 @@ public final class BuildInfo {
     public static final String OS_VERSION = System.getProperty("os.version", UNKNOWN_VERSION).toLowerCase(Locale.ROOT);
     public static final String OS_ARCH = System.getProperty("os.arch", UNKNOWN_VERSION).toLowerCase(Locale.ROOT);
     public static final String JAVA_VERSION = System.getProperty("java.version", UNKNOWN_VERSION).toLowerCase(Locale.ROOT);
+    public static final String JAVAFX_VERSION = System.getProperty("javafx.runtime.version", UNKNOWN_VERSION).toLowerCase(Locale.ROOT);
+
 
     public final Version version;
-    public final String authors;
-    public final String developers;
+    public final String maintainers;
     public final String year;
     public final String azureInstrumentationKey;
     public final String springerNatureAPIKey;
@@ -46,9 +47,8 @@ public final class BuildInfo {
         }
 
         version = Version.parse(properties.getProperty("version"));
-        authors = properties.getProperty("authors", "");
         year = properties.getProperty("year", "");
-        developers = properties.getProperty("developers", "");
+        maintainers = properties.getProperty("maintainers", "");
         azureInstrumentationKey = BuildInfo.getValue(properties, "azureInstrumentationKey", "");
         springerNatureAPIKey = BuildInfo.getValue(properties, "springerNatureAPIKey", "118d90a519d0fc2a01ee9715400054d4");
         astrophysicsDataSystemAPIKey = BuildInfo.getValue(properties, "astrophysicsDataSystemAPIKey", "tAhPRKADc6cC26mZUnAoBt3MAjCvKbuCZsB4lI3c");
