@@ -65,16 +65,6 @@ public class InternalMaterialDesignIcon implements JabRefIcon {
     }
 
     @Override
-    public String fontFamily() {
-        return FontIcon.of(getIkon()).getFont().getFamily();
-    }
-
-    @Override
-    public String unicode() {
-        return this.unicode;
-    }
-
-    @Override
     public Ikon getIkon() {
         return icons.get(0);
     }

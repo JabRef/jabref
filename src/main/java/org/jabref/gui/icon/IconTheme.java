@@ -68,7 +68,7 @@ public class IconTheme {
                          .map(internalMat -> new InternalMaterialDesignIcon(internalMat).withColor(color)).findFirst();
     }
 
-    public static Image getJabRefImageFX() {
+    public static Image getJabRefImage() {
         return getImageFX("jabrefIcon48");
     }
 
@@ -348,16 +348,6 @@ public class IconTheme {
         @Override
         public Node getGraphicNode() {
             return icon.getGraphicNode();
-        }
-
-        @Override
-        public String unicode() {
-            return icon.unicode();
-        }
-
-        @Override
-        public String fontFamily() {
-            return icon.fontFamily();
         }
 
         public Button asButton() {

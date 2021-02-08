@@ -15,9 +15,5 @@ public interface JabRefIcon {
 
     JabRefIcon disabled();
 
-    String fontFamily();
-
-    String unicode();
-
     Ikon getIkon();
 }

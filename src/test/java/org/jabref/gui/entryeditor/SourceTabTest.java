@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.OptionalObjectProperty;
@@ -44,6 +45,7 @@ class SourceTabTest {
 
     @Start
     public void onStart(Stage stage) {
+        IconTheme.loadAllIkons();
         area = new CodeArea();
         area.appendText("some example\n text to go here\n across a couple of \n lines....");
         StateManager stateManager = mock(StateManager.class);
