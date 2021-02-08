@@ -30,7 +30,6 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
     // The fontSizeFormatter formats the input given to the fontSize spinner so that Non valid values cannot be entered.
     private TextFormatter<Integer> fontSizeFormatter = new TextFormatter<Integer>(new IntegerStringConverter(), 9,
             c -> {
-
                 if (Pattern.matches("\\d*", c.getText())) {
                     return c;
                 }
