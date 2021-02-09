@@ -41,7 +41,7 @@ public interface SearchBasedFetcher extends WebFetcher {
         try {
             return this.performSearch(parser.parse(searchQuery, NO_EXPLICIT_FIELD));
         } catch (QueryNodeParseException e) {
-            throw new FetcherException("An error occured when parsing the query");
+            throw new FetcherException("An error occurred when parsing the query");
         }
     }
 }
