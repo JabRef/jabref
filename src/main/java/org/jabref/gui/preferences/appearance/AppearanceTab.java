@@ -20,8 +20,6 @@ import org.jabref.logic.l10n.Localization;
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
-
-
 public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewModel> implements PreferencesTab {
 
     @FXML private CheckBox fontOverride;
