@@ -1,10 +1,14 @@
 package org.jabref.gui.preferences.appearance;
 
+import java.util.regex.Pattern;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
-
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.util.converter.IntegerStringConverter;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
@@ -14,7 +18,7 @@ import org.jabref.logic.l10n.Localization;
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
-import java.util.regex.Pattern;
+
 
 public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewModel> implements PreferencesTab {
 
@@ -27,7 +31,7 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
-    // The fontSizeFormatter formats the input given to the fontSize spinner so that Non valid values cannot be entered.
+    // The fontSizeFormatter formats the input given to the fontSize spinner so that non valid values cannot be entered.
     private TextFormatter<Integer> fontSizeFormatter = new TextFormatter<Integer>(new IntegerStringConverter(), 9,
             c -> {
                 if (Pattern.matches("\\d*", c.getText())) {
