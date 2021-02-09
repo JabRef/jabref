@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences.appearance;
 
 import java.util.regex.Pattern;
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -10,6 +11,7 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.util.converter.IntegerStringConverter;
+
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.IconValidationDecorator;
