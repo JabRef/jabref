@@ -64,6 +64,9 @@ public class IconTheme {
     }
 
     public static Optional<JabRefIcon> findIcon(String code, Color color) {
+        if (ICON_NAMES.isEmpty()) {
+            loadAllIkons();
+        }
         return ICON_NAMES.stream().filter(icon -> icon.toString().equals(code.toUpperCase(Locale.ENGLISH)))
                          .map(internalMat -> new InternalMaterialDesignIcon(internalMat).withColor(color)).findFirst();
     }
@@ -72,7 +75,7 @@ public class IconTheme {
         return getImageFX("jabrefIcon48");
     }
 
-    public static void loadAllIkons() {
+    private static void loadAllIkons() {
         ServiceLoader<IkonProvider> providers = ServiceLoader.load(IkonProvider.class);
 
         for (IkonProvider provider : providers) {
