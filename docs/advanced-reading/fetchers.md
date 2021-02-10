@@ -9,6 +9,7 @@ Fetchers are the implementation of the [search using online services](https://do
 | [SAO/NASA Astrophysics Data System](https://docs.jabref.org/collect/import-using-online-bibliographic-database/ads) | [ADS UI](https://ui.adsabs.harvard.edu/user/settings/token) | `AstrophysicsDataSystemAPIKey` | 5000 calls/day |
 | [Springer Nature](https://docs.jabref.org/collect/import-using-online-bibliographic-database/springer) | [Springer Nature API Portal](https://dev.springernature.com/) | `SpringerNatureAPIKey` | 5000 calls/day |
 | [Zentralblatt Math](https://www.zbmath.org/) | \(none\) | \(none\) | Depending on the current network |
+| [WorldCat](https://www.worldcat.org/) | [OCLC Developer Network](https://authn.sd00.worldcat.org/wayf/metaauth-ui/cmnd/protocol/samlpost) | `worldCatAPIKey` | \(none\) | 
 
 "Depending on the current network" means that it depends whether your request is routed through a network having paid access. For instance, some universities have subscriptions to MathSciNet.
 
