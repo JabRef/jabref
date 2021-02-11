@@ -6,6 +6,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -60,7 +62,7 @@ public class WorldcatFetcher implements EntryBasedFetcher {
      * @return the earch query for the api
      */
     private String getOpenSearchURL(String title) throws MalformedURLException {
-        String query = "&q=srw.ti+all+\"" + title + "\"";
+        String query = "&q=srw.ti+all+" + URLEncoder.encode("\"" + title + "\"", StandardCharsets.UTF_8);
         URL url = new URL(WORLDCAT_OPEN_SEARCH_URL + query);
         return url.toString();
     }
