@@ -32,6 +32,7 @@ import org.jabref.model.entry.field.StandardField;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -88,17 +89,16 @@ public class WorldcatFetcher implements EntryBasedFetcher {
      * Get more information about a article through its OCLC id. Picks the first
      * element with this tag
      * @param id the oclc id
-     * @return the XML element that contains all tags
+     * @return the Node of the XML element that contains all tags
      */
-    private Element getSpecificInfoOnOCLC(String id) throws IOException {
+    private Node getSpecificInfoOnOCLC(String id) throws IOException {
         URLDownload urlDownload = new URLDownload(WORLDCAT_READ_URL.replace("{OCLC-NUMBER}", id));
         URLDownload.bypassSSLVerification();
         String resp = urlDownload.asString();
 
         Document mainDoc = parse(resp);
-        NodeList parentElemOfTags = mainDoc.getElementsByTagName("oclcdcs");
 
-        return (Element) parentElemOfTags.item(0);
+        return mainDoc.getElementsByTagName("oclcdcs").item(0);
     }
 
      /**
@@ -153,7 +153,7 @@ public class WorldcatFetcher implements EntryBasedFetcher {
                 Element xmlEntry = (Element) entryXMLList.item(i);
 
                 String oclc = xmlEntry.getElementsByTagName("oclcterms:recordIdentifier").item(0).getTextContent();
-                Element detailedInfo = getSpecificInfoOnOCLC(oclc);
+                Element detailedInfo = (Element) newDoc.importNode(getSpecificInfoOnOCLC(oclc), true);
 
                 Element newEntry = newDoc.createElement("entry");
                 newEntry.appendChild(detailedInfo);
