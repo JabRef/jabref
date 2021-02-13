@@ -7,6 +7,7 @@ import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -1125,5 +1126,45 @@ class CitationKeyGeneratorTest {
         BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Wickedness Managing");
         assertEquals("WickednessManaging",
                 new CitationKeyGenerator(keyPattern, new BibDatabase(), patternPreferences).generateKey(bibEntry));
+    }
+
+    @Test
+    void doesNotOverwriteKeyIfShouldAvoidOverwriteIsTrue() {
+        String pattern = "ChosenKeyPattern";
+        GlobalCitationKeyPattern keyPattern = GlobalCitationKeyPattern.fromPattern(pattern);
+        CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(
+                true,
+                false,
+                false,
+                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+                "",
+                "",
+                DEFAULT_UNWANTED_CHARACTERS,
+                keyPattern,
+                ',');
+
+        BibEntry entry = new BibEntry().withField(InternalField.KEY_FIELD, "DefaultKey");
+        assertEquals("DefaultKey",
+                new CitationKeyGenerator(keyPattern, new BibDatabase(), patternPreferences).generateKey(entry));
+    }
+
+    @Test
+    void generatesKeyIfShouldAvoidOverwriteIsTrueButKeyFieldIsBlank() throws ParseException {
+        String pattern = "ChosenKeyPattern";
+        GlobalCitationKeyPattern keyPattern = GlobalCitationKeyPattern.fromPattern(pattern);
+        CitationKeyPatternPreferences patternPreferences = new CitationKeyPatternPreferences(
+                true,
+                false,
+                false,
+                CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A,
+                "",
+                "",
+                DEFAULT_UNWANTED_CHARACTERS,
+                keyPattern,
+                ',');
+
+        BibEntry entry = new BibEntry().withField(InternalField.KEY_FIELD, "");
+        assertEquals("ChosenKeyPattern",
+                new CitationKeyGenerator(keyPattern, new BibDatabase(), patternPreferences).generateKey(entry));
     }
 }
