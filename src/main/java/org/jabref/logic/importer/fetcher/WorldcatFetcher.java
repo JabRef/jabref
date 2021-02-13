@@ -26,9 +26,11 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.WorldcatImporter;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.strings.StringUtil;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -48,6 +50,10 @@ public class WorldcatFetcher implements EntryBasedFetcher {
     private String WORLDCAT_READ_URL = "https://www.worldcat.org/webservices/catalog/content/{OCLC-NUMBER}?recordSchema=info%3Asrw%2Fschema%2F1%2Fdc&wskey=";
 
     public WorldcatFetcher(String worldcatKey) {
+        if (StringUtil.isBlank(worldcatKey)) {
+            worldcatKey = new BuildInfo().worldCatAPIKey;
+        }
+
         WORLDCAT_OPEN_SEARCH_URL += worldcatKey;
         WORLDCAT_READ_URL += worldcatKey;
     }
