@@ -49,7 +49,7 @@ class ZbMATHTest {
     @Test
     void searchByQueryFindsEntry() throws Exception {
         List<BibEntry> fetchedEntries = fetcher.performSearch("an:0507.57010");
-        assertEquals(donaldsonEntry, fetchedEntries.get(0));
+        assertEquals(Collections.singletonList(donaldsonEntry), fetchedEntries);
     }
 
     @Test
@@ -65,11 +65,16 @@ class ZbMATHTest {
         searchEntry.setField(StandardField.AUTHOR, "S. K. {Donaldson}");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
-        assertEquals(donaldsonEntry, fetchedEntries.get(0));
+        assertEquals(Collections.singletonList(donaldsonEntry), fetchedEntries);
+    }
 
+    @Test
+    void searchByNoneEntryFindsNothing() throws Exception {
+        BibEntry searchEntry = new BibEntry();
         searchEntry.setField(StandardField.TITLE, "t");
         searchEntry.setField(StandardField.AUTHOR, "a");
-        fetchedEntries = fetcher.performSearch(searchEntry);
+
+        List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
         assertEquals(Collections.emptyList(), fetchedEntries);
     }
 
@@ -79,6 +84,6 @@ class ZbMATHTest {
         searchEntry.setField(StandardField.ZBL_NUMBER, "0507.57010");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
-        assertEquals(donaldsonEntry, fetchedEntries.get(0));
+        assertEquals(Collections.singletonList(donaldsonEntry), fetchedEntries);
     }
 }

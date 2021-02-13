@@ -55,25 +55,22 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher {
     default List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         Objects.requireNonNull(entry);
 
+        URL UrlForEntry;
         try {
-            if (getURLForEntry(entry) == null) {
+            if ((UrlForEntry = getURLForEntry(entry)) == null) {
                 return Collections.emptyList();
             }
-        } catch (MalformedURLException e) {
-            throw new FetcherException("Search URI is malformed", e);
-        } catch (URISyntaxException e) {
+        } catch (MalformedURLException | URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
         }
 
-        try (InputStream stream = new BufferedInputStream(getURLForEntry(entry).openStream())) {
+        try (InputStream stream = new BufferedInputStream(UrlForEntry.openStream())) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
             // Post-cleanup
             fetchedEntries.forEach(this::doPostCleanup);
 
             return fetchedEntries;
-        } catch (URISyntaxException e) {
-            throw new FetcherException("Search URI is malformed", e);
         } catch (IOException e) {
             // TODO: Catch HTTP Response 401 errors and report that user has no rights to access resource
             throw new FetcherException("A network error occurred", e);

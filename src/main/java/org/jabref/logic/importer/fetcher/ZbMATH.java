@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.MoveFieldCleanup;
@@ -18,6 +19,7 @@ import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformators.ZbMathQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -68,11 +70,18 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
 
         if (entry.getFieldOrAlias(StandardField.AUTHOR).isPresent()) {
             // replace "and" by ";" as citation matching API uses ";" for separation
-            String author = entry.getFieldOrAlias(StandardField.AUTHOR).get();
-            author = author.replace(" and ", ";");
-            uriBuilder.addParameter("a", author);
+            AuthorList authors =AuthorList.parse(entry.getFieldOrAlias(StandardField.AUTHOR).get());
+            String authorsWithSemicolon = authors.getAuthors().stream()
+                                                 .map(author -> author.getLastFirst(false))
+                                                 .collect(Collectors.joining(";"));
+            uriBuilder.addParameter("a", authorsWithSemicolon);
         }
 
+        /*
+        zbmath citation matching API does only return json, thus we use the
+        citation matching API to extract the zbl_id and then use getUrlForIdentifier
+        to get the bibtex data.
+         */
         String urlString = uriBuilder.build().toString();
         HttpResponse<JsonNode> response = Unirest.get(urlString)
                                                  .asJson();
