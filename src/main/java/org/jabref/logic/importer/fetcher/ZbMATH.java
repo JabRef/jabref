@@ -70,7 +70,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
 
         if (entry.getFieldOrAlias(StandardField.AUTHOR).isPresent()) {
             // replace "and" by ";" as citation matching API uses ";" for separation
-            AuthorList authors =AuthorList.parse(entry.getFieldOrAlias(StandardField.AUTHOR).get());
+            AuthorList authors = AuthorList.parse(entry.getFieldOrAlias(StandardField.AUTHOR).get());
             String authorsWithSemicolon = authors.getAuthors().stream()
                                                  .map(author -> author.getLastFirst(false))
                                                  .collect(Collectors.joining(";"));
