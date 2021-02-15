@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Added
 
+- We added zbmath to the public databases from which the bibliographic information of an existing entry can be updated. [#7437](https://github.com/JabRef/jabref/issues/7437)
 - We added the possibility to add a new entry via its zbMath ID (zbMATH can be chosen as ID type in the "Select entry type" window). [#7202](https://github.com/JabRef/jabref/issues/7202)
 - We added the extension support and the external application support (For Texshow, Texmaker and LyX) to the flatpak [#7248](https://github.com/JabRef/jabref/pull/7248)
 - We added some symbols and keybindings to the context menu in the entry editor. [#7268](https://github.com/JabRef/jabref/pull/7268)
