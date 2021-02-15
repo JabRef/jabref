@@ -1,5 +1,7 @@
 package org.jabref.gui.preferences.appearance;
 
+import java.util.regex.Pattern;
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -7,6 +9,8 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
+import javafx.util.converter.IntegerStringConverter;
 
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
@@ -26,6 +30,16 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
     @FXML private TextField customThemePath;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
+
+    // The fontSizeFormatter formats the input given to the fontSize spinner so that non valid values cannot be entered.
+    private TextFormatter<Integer> fontSizeFormatter = new TextFormatter<Integer>(new IntegerStringConverter(), 9,
+            c -> {
+                if (Pattern.matches("\\d*", c.getText())) {
+                    return c;
+                }
+                c.setText("0");
+                return c;
+            });
 
     public AppearanceTab() {
         ViewLoader.view(this)
@@ -48,6 +62,7 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
         fontSize.getEditor().setAlignment(Pos.CENTER_RIGHT);
         fontSize.setValueFactory(AppearanceTabViewModel.fontSizeValueFactory);
         fontSize.getEditor().textProperty().bindBidirectional(viewModel.fontSizeProperty());
+        fontSize.getEditor().setTextFormatter(fontSizeFormatter);
 
         themeLight.selectedProperty().bindBidirectional(viewModel.themeLightProperty());
         themeDark.selectedProperty().bindBidirectional(viewModel.themeDarkProperty());
