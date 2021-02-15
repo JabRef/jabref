@@ -5,7 +5,7 @@ jobs:
   automerge:
     name: Automerge Dependabot
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]'
+    if: github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]'
     steps:
       - name: 'Wait for status checks'
         id: waitforstatuschecks
@@ -17,7 +17,7 @@ jobs:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       - name: Auto approve
         uses: hmarr/auto-approve-action@v2.0.0
-        if: github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]' &&  steps.waitforstatuschecks.outputs.status == 'success'
+        if: steps.waitforstatuschecks.outputs.status == 'success'
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
       - name: Merge pull requests
