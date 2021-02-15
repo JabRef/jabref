@@ -27,6 +27,7 @@ import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
 import org.jabref.logic.importer.fileformat.SilverPlatterImporter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
@@ -162,12 +163,12 @@ public class ImportFormatReader {
      *
      * @throws ImportException if the import fails (for example, if no suitable importer is found)
      */
-    public UnknownFormatImport importUnknownFormat(Path filePath, FileUpdateMonitor fileMonitor) throws ImportException {
+    public UnknownFormatImport importUnknownFormat(Path filePath, TimestampPreferences timestampPreferences, FileUpdateMonitor fileMonitor) throws ImportException {
         Objects.requireNonNull(filePath);
 
         // First, see if it is a BibTeX file:
         try {
-            ParserResult parserResult = OpenDatabase.loadDatabase(filePath, importFormatPreferences, fileMonitor);
+            ParserResult parserResult = OpenDatabase.loadDatabase(filePath, importFormatPreferences, timestampPreferences, fileMonitor);
             if (parserResult.getDatabase().hasEntries() || !parserResult.getDatabase().hasNoStrings()) {
                 parserResult.setFile(filePath.toFile());
                 return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, parserResult);
@@ -185,7 +186,7 @@ public class ImportFormatReader {
      * Tries to import entries by iterating through the available import filters,
      * and keeping the import that seems the most promising
      *
-     * @param importDatabase the function to import the entries with a formatter
+     * @param importDatabase     the function to import the entries with a formatter
      * @param isRecognizedFormat the function to check whether the source is in the correct format for an importer
      * @return an UnknownFormatImport with the imported entries and metadata
      * @throws ImportException if the import fails (for example, if no suitable importer is found)
@@ -247,5 +248,4 @@ public class ImportFormatReader {
 
         return importUnknownFormat(importer -> importer.importDatabase(data), importer -> importer.isRecognizedFormat(data));
     }
-
 }

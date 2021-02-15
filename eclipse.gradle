@@ -34,9 +34,6 @@ eclipse {
                 def javafxfxml = entries.find { isJavafxFXML(it) };
                 javafxfxml.entryAttributes['add-opens'] = 'javafx.fxml/javafx.fxml=org.jabref';
 
-                def graaltruffle = entries.find{ isTruffleGraal(it) } ;
-                graaltruffle.entryAttributes['add-exports'] = 'com.oracle.truffle.regex/com.oracle.truffle.regex=org.graalvm.truffle';
-
                 entries.findAll { isLibrary(it) && isTestScope(it) }.each { //mark test source files
                     it.entryAttributes['test'] = 'true'
                 }
@@ -65,8 +62,6 @@ boolean isJavafxControls(entry) { return entry.properties.path.contains('javafx-
 boolean isJavafxGraphics(entry) { return entry.properties.path.contains('javafx-graphics'); }
 
 boolean isJavafxFXML(entry) { return entry.properties.path.contains('javafx-fxml'); }
-
-boolean isTruffleGraal(entry)  {return entry.properties.path.contains('org.graalvm.regex'); }
 
 // add formatter and cleanup settings to Eclipse settings
 // see http://stackoverflow.com/a/27461890/873282

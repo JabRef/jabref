@@ -5,7 +5,7 @@
 \begin{edition}\format[RTFChars]{\edition} ed. \end{edition}
 \begin{year}\format[RTFChars]{\year}, \end{year}
 \begin{volume}vol \format[RTFChars]{\volume}, \end{volume}
-\begin{number}núm. \format[RTFChars]{\number}, \end{number}
+\begin{number}num. \format[RTFChars]{\number}, \end{number}
 \begin{pages}p. \format[RTFChars]{\pages}.\end{pages}
 \\par
 \\par

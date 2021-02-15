@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.OpenDatabase;
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.texparser.Citation;
@@ -20,11 +21,13 @@ public class TexBibEntriesResolver {
 
     private final BibDatabase masterDatabase;
     private final ImportFormatPreferences importFormatPreferences;
+    private final TimestampPreferences timestampPreferences;
     private final FileUpdateMonitor fileMonitor;
 
-    public TexBibEntriesResolver(BibDatabase masterDatabase, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
+    public TexBibEntriesResolver(BibDatabase masterDatabase, ImportFormatPreferences importFormatPreferences, TimestampPreferences timestampPreferences, FileUpdateMonitor fileMonitor) {
         this.masterDatabase = masterDatabase;
         this.importFormatPreferences = importFormatPreferences;
+        this.timestampPreferences = timestampPreferences;
         this.fileMonitor = fileMonitor;
     }
 
@@ -36,7 +39,7 @@ public class TexBibEntriesResolver {
 
         // Preload databases from BIB files.
         Map<Path, BibDatabase> bibDatabases = resolverResult.getBibFiles().values().stream().distinct().collect(Collectors.toMap(
-                Function.identity(), path -> OpenDatabase.loadDatabase(path.toString(), importFormatPreferences, fileMonitor).getDatabase()));
+                Function.identity(), path -> OpenDatabase.loadDatabase(path.toString(), importFormatPreferences, timestampPreferences, fileMonitor).getDatabase()));
 
         // Get all pairs Entry<String entryKey, Citation>.
         Stream<Map.Entry<String, Citation>> citationsStream = latexParserResult.getCitations().entries().stream().distinct();

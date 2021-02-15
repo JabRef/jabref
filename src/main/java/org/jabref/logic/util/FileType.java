@@ -15,4 +15,6 @@ public interface FileType {
     }
 
     List<String> getExtensions();
+
+    String getName();
 }

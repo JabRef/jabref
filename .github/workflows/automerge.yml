@@ -11,7 +11,7 @@ jobs:
         id: waitforstatuschecks
         uses: "WyriHaximus/github-action-wait-for-status@v1.3"
         with:
-          ignoreActions: Automerge Dependabot
+          ignoreActions: Automerge Dependabot,codecov/project
           checkInterval: 13
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"

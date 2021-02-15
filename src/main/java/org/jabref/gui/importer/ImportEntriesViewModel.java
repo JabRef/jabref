@@ -119,10 +119,10 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                                                      .anyMatch(this::hasDuplicate)).onSuccess(duplicateFound -> {
                 if (duplicateFound) {
                     boolean continueImport = dialogService.showConfirmationDialogWithOptOutAndWait(Localization.lang("Duplicates found"),
-                            Localization.lang("There are possible duplicates (marked with an icon) that haven't been resolved. Continue?"),
+                            Localization.lang("There are possible duplicates that haven't been resolved. Continue?"),
                             Localization.lang("Continue with import"),
                             Localization.lang("Cancel import"),
-                            Localization.lang("Disable this confirmation dialog"),
+                            Localization.lang("Do not ask again"),
                             optOut -> preferences.setShouldWarnAboutDuplicatesForImport(!optOut));
 
                     if (!continueImport) {
@@ -171,7 +171,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
 
     private void buildImportHandlerThenImportEntries(List<BibEntry> entriesToImport) {
         ImportHandler importHandler = new ImportHandler(
-                dialogService,
                 databaseContext,
                 ExternalFileTypes.getInstance(),
                 preferences,

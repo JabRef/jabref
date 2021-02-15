@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.6.0
+        uses: styfle/cancel-workflow-action@0.8.0
         with:
           access_token: ${{ github.token }}
       - name: Checkout source
@@ -64,7 +64,7 @@ jobs:
         with:
           java-version: 14
       - uses: actions/cache@v1
-        name: Restore gradle chache
+        name: Restore gradle cache
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
@@ -108,7 +108,7 @@ jobs:
         with:
           java-version: 14
       - uses: actions/cache@v1
-        name: Restore gradle chache
+        name: Restore gradle cache
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
@@ -154,7 +154,7 @@ jobs:
         with:
           java-version: 14
       - uses: actions/cache@v1
-        name: Restore gradle chache
+        name: Restore gradle cache
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
@@ -204,7 +204,7 @@ jobs:
         with:
           java-version: 14
       - uses: actions/cache@v1
-        name: Restore gradle chache
+        name: Restore gradle cache
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
