@@ -20,13 +20,11 @@ import org.jabref.logic.importer.fetcher.DOAJFetcher;
 import org.jabref.logic.importer.fetcher.DiVA;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.DoiResolution;
-import org.jabref.logic.importer.fetcher.GoogleScholar;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.INSPIREFetcher;
 import org.jabref.logic.importer.fetcher.IacrEprintFetcher;
 import org.jabref.logic.importer.fetcher.IsbnFetcher;
-import org.jabref.logic.importer.fetcher.JstorFetcher;
 import org.jabref.logic.importer.fetcher.LibraryOfCongress;
 import org.jabref.logic.importer.fetcher.MathSciNet;
 import org.jabref.logic.importer.fetcher.MedlineFetcher;
@@ -96,7 +94,7 @@ public class WebFetchers {
         set.add(new ZbMATH(importFormatPreferences));
         // see https://github.com/JabRef/jabref/issues/5804
         // set.add(new ACMPortalFetcher(importFormatPreferences));
-        set.add(new GoogleScholar(importFormatPreferences));
+        // set.add(new GoogleScholar(importFormatPreferences));
         set.add(new DBLPFetcher(importFormatPreferences));
         set.add(new SpringerFetcher());
         set.add(new CrossRef());
@@ -105,7 +103,7 @@ public class WebFetchers {
         set.add(new IEEE(importFormatPreferences));
         set.add(new CompositeSearchBasedFetcher(set, 30));
         set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences));
-        set.add(new JstorFetcher(importFormatPreferences));
+        // set.add(new JstorFetcher(importFormatPreferences));
         return set;
     }
 
@@ -122,12 +120,13 @@ public class WebFetchers {
         set.add(new MedlineFetcher());
         set.add(new TitleFetcher(importFormatPreferences));
         set.add(new MathSciNet(importFormatPreferences));
+        set.add(new ZbMATH(importFormatPreferences));
         set.add(new CrossRef());
         set.add(new LibraryOfCongress(importFormatPreferences));
         set.add(new IacrEprintFetcher(importFormatPreferences));
         set.add(new RfcFetcher(importFormatPreferences));
         set.add(new Medra());
-        set.add(new JstorFetcher(importFormatPreferences));
+        // set.add(new JstorFetcher(importFormatPreferences));
         return set;
     }
 
@@ -141,6 +140,7 @@ public class WebFetchers {
         set.add(new IsbnFetcher(importFormatPreferences));
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new CrossRef());
+        set.add(new ZbMATH(importFormatPreferences));
         return set;
     }
 
@@ -169,8 +169,8 @@ public class WebFetchers {
         fetchers.add(new IEEE(importFormatPreferences));
         fetchers.add(new ApsFetcher());
         // Meta search
-        fetchers.add(new JstorFetcher(importFormatPreferences));
-        fetchers.add(new GoogleScholar(importFormatPreferences));
+        // fetchers.add(new JstorFetcher(importFormatPreferences));
+        // fetchers.add(new GoogleScholar(importFormatPreferences));
         fetchers.add(new OpenAccessDoi());
 
         return fetchers;

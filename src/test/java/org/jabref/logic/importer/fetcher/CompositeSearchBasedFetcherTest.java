@@ -14,6 +14,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Assertions;
@@ -28,6 +29,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
+@DisabledOnCIServer("Produces to many requests on CI")
 public class CompositeSearchBasedFetcherTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeSearchBasedFetcherTest.class);
@@ -112,8 +114,8 @@ public class CompositeSearchBasedFetcherTest {
         // list.add(new MedlineFetcher());
 
         // Create different sized sets of fetchers to use in the composite fetcher.
-        // Selected 273 to have differencing sets
-        for (int i = 1; i < Math.pow(2, list.size()); i += 273) {
+        // Selected 1173 to have differencing sets
+        for (int i = 1; i < Math.pow(2, list.size()); i += 1173) {
             Set<SearchBasedFetcher> fetchers = new HashSet<>();
             // Only shift i at maximum to its MSB to the right
             for (int j = 0; Math.pow(2, j) <= i; j++) {

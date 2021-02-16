@@ -60,6 +60,7 @@ public enum KeyBinding {
     HELP("Help", Localization.lang("Help"), "F1", KeyBindingCategory.FILE),
     IMPORT_INTO_CURRENT_DATABASE("Import into current library", Localization.lang("Import into current library"), "ctrl+I", KeyBindingCategory.FILE),
     IMPORT_INTO_NEW_DATABASE("Import into new library", Localization.lang("Import into new library"), "ctrl+alt+I", KeyBindingCategory.FILE),
+    MERGE_ENTRIES("Merge entries", Localization.lang("Merge entries"), "ctrl+M", KeyBindingCategory.TOOLS),
     NEW_ARTICLE("New article", Localization.lang("New article"), "ctrl+shift+A", KeyBindingCategory.BIBTEX),
     NEW_BOOK("New book", Localization.lang("New book"), "ctrl+shift+B", KeyBindingCategory.BIBTEX),
     NEW_ENTRY("New entry", Localization.lang("New entry"), "ctrl+N", KeyBindingCategory.BIBTEX),
@@ -105,7 +106,10 @@ public enum KeyBinding {
     UNDO("Undo", Localization.lang("Undo"), "ctrl+Z", KeyBindingCategory.EDIT),
     WEB_SEARCH("Web search", Localization.lang("Web search"), "alt+4", KeyBindingCategory.SEARCH),
     WRITE_XMP("Write XMP", Localization.lang("Write XMP"), "F6", KeyBindingCategory.TOOLS),
-    CLEAR_SEARCH("Clear search", Localization.lang("Clear search"), "ESCAPE", KeyBindingCategory.SEARCH);
+    CLEAR_SEARCH("Clear search", Localization.lang("Clear search"), "ESCAPE", KeyBindingCategory.SEARCH),
+    CLEAR_READ_STATUS("Clear read status", Localization.lang("Clear read status"), "", KeyBindingCategory.EDIT),
+    READ("Set read status to read", Localization.lang("Set read status to read"), "", KeyBindingCategory.EDIT),
+    SKIMMED("Set read status to skimmed", Localization.lang("Set read status to skimmed"), "", KeyBindingCategory.EDIT);
 
     private final String constant;
     private final String localization;

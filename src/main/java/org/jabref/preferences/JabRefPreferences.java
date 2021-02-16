@@ -205,11 +205,13 @@ public class JabRefPreferences implements PreferencesService {
     public static final String DEFAULT_OWNER = "defaultOwner";
     public static final String OVERWRITE_OWNER = "overwriteOwner";
 
-    public static final String USE_TIME_STAMP = "useTimeStamp";
+    // Required for migration from pre-v5.3 only
     public static final String UPDATE_TIMESTAMP = "updateTimestamp";
     public static final String TIME_STAMP_FIELD = "timeStampField";
     public static final String TIME_STAMP_FORMAT = "timeStampFormat";
-    public static final String OVERWRITE_TIME_STAMP = "overwriteTimeStamp";
+
+    public static final String ADD_CREATION_DATE = "addCreationDate";
+    public static final String ADD_MODIFICATION_DATE = "addModificationDate";
 
     public static final String WARN_ABOUT_DUPLICATES_IN_INSPECTION = "warnAboutDuplicatesInInspection";
     public static final String NON_WRAPPABLE_FIELDS = "nonWrappableFields";
@@ -288,7 +290,6 @@ public class JabRefPreferences implements PreferencesService {
      */
     public static final String OO_EXECUTABLE_PATH = "ooExecutablePath";
     public static final String OO_PATH = "ooPath";
-    public static final String OO_JARS_PATH = "ooJarsPath";
     public static final String OO_SHOW_PANEL = "showOOPanel";
     public static final String OO_SYNC_WHEN_CITING = "syncOOWhenCiting";
     public static final String OO_USE_ALL_OPEN_BASES = "useAllOpenBases";
@@ -503,8 +504,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SIDE_PANE_COMPONENT_NAMES, "");
         defaults.put(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, "");
 
-        defaults.put(COLUMN_NAMES, "groups;files;linked_id;field:entrytype;field:author/editor;field:title;field:year;field:journal/booktitle;field:citationkey");
-        defaults.put(COLUMN_WIDTHS, "28;28;28;75;300;470;60;130;100");
+        defaults.put(COLUMN_NAMES, "groups;files;linked_id;field:entrytype;field:author/editor;field:title;field:year;field:journal/booktitle;special:ranking;special:readstatus;special:priority");
+        defaults.put(COLUMN_WIDTHS, "28;28;28;75;300;470;60;130;50;50;50");
 
         defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
         defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
@@ -553,15 +554,12 @@ public class JabRefPreferences implements PreferencesService {
         if (OS.WINDOWS) {
             defaults.put(OO_PATH, OpenOfficePreferences.DEFAULT_WINDOWS_PATH);
             defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_WIN_EXEC_PATH);
-            defaults.put(OO_JARS_PATH, OpenOfficePreferences.DEFAULT_WINDOWS_PATH);
         } else if (OS.OS_X) {
             defaults.put(OO_PATH, OpenOfficePreferences.DEFAULT_OSX_PATH);
             defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_OSX_EXEC_PATH);
-            defaults.put(OO_JARS_PATH, OpenOfficePreferences.DEFAULT_OSX_PATH);
         } else { // Linux
             defaults.put(OO_PATH, OpenOfficePreferences.DEFAULT_LINUX_PATH);
             defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_LINUX_EXEC_PATH);
-            defaults.put(OO_JARS_PATH, OpenOfficePreferences.DEFAULT_LINUX_PATH);
         }
 
         defaults.put(OO_SYNC_WHEN_CITING, Boolean.TRUE);
@@ -585,14 +583,13 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(RESOLVE_STRINGS_ALL_FIELDS, Boolean.FALSE);
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn");
         defaults.put(WARN_ABOUT_DUPLICATES_IN_INSPECTION, Boolean.TRUE);
-        defaults.put(USE_TIME_STAMP, Boolean.FALSE);
-        defaults.put(OVERWRITE_TIME_STAMP, Boolean.FALSE);
+        defaults.put(ADD_CREATION_DATE, Boolean.FALSE);
+        defaults.put(ADD_MODIFICATION_DATE, Boolean.FALSE);
 
+        defaults.put(UPDATE_TIMESTAMP, Boolean.FALSE);
+        defaults.put(TIME_STAMP_FIELD, StandardField.TIMESTAMP.getName());
         // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
         defaults.put(TIME_STAMP_FORMAT, "yyyy-MM-dd");
-
-        defaults.put(TIME_STAMP_FIELD, StandardField.TIMESTAMP.getName());
-        defaults.put(UPDATE_TIMESTAMP, Boolean.FALSE);
 
         defaults.put(GENERATE_KEYS_BEFORE_SAVING, Boolean.FALSE);
 
@@ -661,16 +658,17 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(PREVIEW_STYLE,
                 "<font face=\"sans-serif\">" +
                         "<b>\\bibtextype</b><a name=\"\\citationkey\">\\begin{citationkey} (\\citationkey)</a>\\end{citationkey}__NEWLINE__" +
-                        "\\begin{author}<BR><BR>\\format[Authors(LastFirst, FullName,Sep= / ,Sep= / ),HTMLChars]{\\author}\\end{author}__NEWLINE__" +
-                        "\\begin{editor & !author}<BR><BR>\\format[Authors(LastFirst,FullName,Sep= / ,Sep= / ),HTMLChars]{\\editor} (\\format[IfPlural(Eds.,Ed.)]{\\editor})\\end{editor & !author}__NEWLINE__" +
+                        "\\begin{author}<BR><BR>\\format[Authors(LastFirst, FullName,Sep= / ,LastSep= / ),HTMLChars]{\\author}\\end{author}__NEWLINE__" +
+                        "\\begin{editor & !author}<BR><BR>\\format[Authors(LastFirst,FullName,Sep= / ,LastSep= / ),HTMLChars]{\\editor} (\\format[IfPlural(Eds.,Ed.)]{\\editor})\\end{editor & !author}__NEWLINE__" +
                         "\\begin{title}<BR><b>\\format[HTMLChars]{\\title}</b> \\end{title}__NEWLINE__" +
-                        "\\begin{year}<BR>\\year\\end{year}__NEWLINE__" +
-                        "\\begin{booktitle}<BR><i>\\format[HTMLChars]{\\booktitle}</i>, \\end{booktitle}__NEWLINE__" +
+                        "<BR>\\begin{date}\\date\\end{date}\\begin{edition}, \\edition. edition\\end{edition}__NEWLINE__" +
+                        "\\begin{editor & author}<BR><BR>\\format[Authors(LastFirst,FullName,Sep= / ,LastSep= / ),HTMLChars]{\\editor} (\\format[IfPlural(Eds.,Ed.)]{\\editor})\\end{editor & author}__NEWLINE__" +
+                        "\\begin{booktitle}<BR><i>\\format[HTMLChars]{\\booktitle}</i>\\end{booktitle}__NEWLINE__" +
                         "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}" +
-                        "\\begin{journal}<BR><BR><i>\\format[HTMLChars]{\\journal}</i> \\end{journal} \\begin{volume}, Vol. \\volume\\end{volume}\\begin{series}<BR> \\format[HTMLChars]{\\series}\\end{series}\\begin{number}, No. \\format[HTMLChars]{\\number}\\end{number}__NEWLINE__" +
+                        "\\begin{editor & !author}<BR>\\end{editor & !author}\\begin{!editor}<BR>\\end{!editor}\\begin{journal}<BR><i>\\format[HTMLChars]{\\journal}</i> \\end{journal} \\begin{volume}, Vol. \\volume\\end{volume}\\begin{series}<BR>\\format[HTMLChars]{\\series}\\end{series}\\begin{number}, No. \\format[HTMLChars]{\\number}\\end{number}__NEWLINE__" +
                         "\\begin{school} \\format[HTMLChars]{\\school}, \\end{school}__NEWLINE__" +
                         "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__" +
-                        "\\begin{publisher}<BR><BR>\\format[HTMLChars]{\\publisher}\\end{publisher}\\begin{location}: \\format[HTMLChars]{\\location} \\end{location}__NEWLINE__" +
+                        "\\begin{publisher}<BR>\\format[HTMLChars]{\\publisher}\\end{publisher}\\begin{location}: \\format[HTMLChars]{\\location} \\end{location}__NEWLINE__" +
                         "\\begin{pages}<BR> p. \\format[FormatPagesForHTML]{\\pages}\\end{pages}__NEWLINE__" +
                         "\\begin{abstract}<BR><BR><b>Abstract: </b>\\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__" +
                         "\\begin{owncitation}<BR><BR><b>Own citation: </b>\\format[HTMLChars]{\\owncitation} \\end{owncitation}__NEWLINE__" +
@@ -1049,7 +1047,6 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public OpenOfficePreferences getOpenOfficePreferences() {
         return new OpenOfficePreferences(
-                get(OO_JARS_PATH),
                 get(OO_EXECUTABLE_PATH),
                 get(OO_PATH),
                 getBoolean(OO_USE_ALL_OPEN_BASES),
@@ -1061,7 +1058,6 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences) {
-        put(OO_JARS_PATH, openOfficePreferences.getJarsPath());
         put(OO_EXECUTABLE_PATH, openOfficePreferences.getExecutablePath());
         put(OO_PATH, openOfficePreferences.getInstallationPath());
         putBoolean(OO_USE_ALL_OPEN_BASES, openOfficePreferences.getUseAllDatabases());
@@ -1376,20 +1372,17 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public TimestampPreferences getTimestampPreferences() {
         return new TimestampPreferences(
-                getBoolean(USE_TIME_STAMP),
+                getBoolean(ADD_CREATION_DATE),
+                getBoolean(ADD_MODIFICATION_DATE),
                 getBoolean(UPDATE_TIMESTAMP),
                 FieldFactory.parseField(get(TIME_STAMP_FIELD)),
-                get(TIME_STAMP_FORMAT),
-                getBoolean(OVERWRITE_TIME_STAMP));
+                get(TIME_STAMP_FORMAT));
     }
 
     @Override
     public void storeTimestampPreferences(TimestampPreferences preferences) {
-        putBoolean(USE_TIME_STAMP, preferences.shouldUseTimestamps());
-        putBoolean(UPDATE_TIMESTAMP, preferences.shouldUpdateTimestamp());
-        put(TIME_STAMP_FIELD, preferences.getTimestampField().getName());
-        put(TIME_STAMP_FORMAT, preferences.getTimestampFormat());
-        putBoolean(OVERWRITE_TIME_STAMP, preferences.shouldOverwriteTimestamp());
+        putBoolean(ADD_CREATION_DATE, preferences.shouldAddCreationDate());
+        putBoolean(ADD_MODIFICATION_DATE, preferences.shouldAddModificationDate());
     }
 
     //*************************************************************************************************************
@@ -1994,7 +1987,7 @@ public class JabRefPreferences implements PreferencesService {
     public void storeAppearancePreference(AppearancePreferences preferences) {
         putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, preferences.shouldOverrideDefaultFontSize());
         putInt(MAIN_FONT_SIZE, preferences.getMainFontSize());
-        put(FX_THEME, preferences.getTheme().getPath().toString());
+        put(FX_THEME, preferences.getTheme().getCssPathString());
     }
 
     //*************************************************************************************************************

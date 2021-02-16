@@ -141,8 +141,10 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         icon.setOnMouseClicked(event -> linkedFile.open());
         Text link = new Text();
         link.textProperty().bind(linkedFile.linkProperty());
+        link.getStyleClass().setAll("file-row-text");
         Text desc = new Text();
         desc.textProperty().bind(linkedFile.descriptionProperty());
+        desc.getStyleClass().setAll("file-row-text");
 
         ProgressBar progressIndicator = new ProgressBar();
         progressIndicator.progressProperty().bind(linkedFile.downloadProgressProperty());
@@ -267,15 +269,15 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
             this.executable.bind(
                     switch (command) {
-                        case RENAME_FILE_TO_PATTERN -> Bindings.createBooleanBinding(
+                        case RENAME_FILE_TO_PATTERN, MOVE_FILE_TO_FOLDER_AND_RENAME -> Bindings.createBooleanBinding(
                                 () -> !linkedFile.getFile().isOnlineLink()
                                         && linkedFile.getFile().findIn(databaseContext, preferencesService.getFilePreferences()).isPresent()
                                         && !linkedFile.isGeneratedNameSameAsOriginal(),
                                 linkedFile.getFile().linkProperty());
-                        case MOVE_FILE_TO_FOLDER_AND_RENAME, MOVE_FILE_TO_FOLDER -> Bindings.createBooleanBinding(
+                        case MOVE_FILE_TO_FOLDER -> Bindings.createBooleanBinding(
                                 () -> !linkedFile.getFile().isOnlineLink()
                                         && linkedFile.getFile().findIn(databaseContext, preferencesService.getFilePreferences()).isPresent()
-                                        && linkedFile.isGeneratedPathSameAsOriginal(),
+                                        && !linkedFile.isGeneratedPathSameAsOriginal(),
                                 linkedFile.getFile().linkProperty());
                         case DOWNLOAD_FILE -> Bindings.createBooleanBinding(
                                 () -> linkedFile.getFile().isOnlineLink(),

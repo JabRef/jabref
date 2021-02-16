@@ -19,6 +19,7 @@ import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.JabRefPreferences;
 
@@ -73,7 +74,8 @@ public class Globals {
     public static ExporterFactory exportFactory;
     public static CountingUndoManager undoManager = new CountingUndoManager();
     public static BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
-    public static ClipBoardManager clipboardManager = new ClipBoardManager(prefs);
+
+    private static ClipBoardManager clipBoardManager = null;
 
     // Key binding preferences
     private static KeyBindingRepository keyBindingRepository;
@@ -90,6 +92,13 @@ public class Globals {
             keyBindingRepository = prefs.getKeyBindingRepository();
         }
         return keyBindingRepository;
+    }
+
+    public static synchronized ClipBoardManager getClipboardManager() {
+        if (clipBoardManager == null) {
+            clipBoardManager = new ClipBoardManager(prefs);
+        }
+        return clipBoardManager;
     }
 
     // Background tasks
@@ -111,7 +120,9 @@ public class Globals {
 
     private static void startTelemetryClient() {
         TelemetryConfiguration telemetryConfiguration = TelemetryConfiguration.getActive();
-        telemetryConfiguration.setInstrumentationKey(Globals.BUILD_INFO.azureInstrumentationKey);
+        if (!StringUtil.isNullOrEmpty(Globals.BUILD_INFO.azureInstrumentationKey)) {
+            telemetryConfiguration.setInstrumentationKey(Globals.BUILD_INFO.azureInstrumentationKey);
+        }
         telemetryConfiguration.setTrackingIsDisabled(!Globals.prefs.getTelemetryPreferences().shouldCollectTelemetry());
         telemetryClient = new TelemetryClient(telemetryConfiguration);
         telemetryClient.getContext().getProperties().put("JabRef version", Globals.BUILD_INFO.version.toString());

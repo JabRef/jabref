@@ -1,5 +1,6 @@
 package org.jabref.logic.citationkeypattern;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,6 +32,7 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
+import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,13 +61,14 @@ public class BracketedPattern {
      */
     private static final Pattern NOT_CAPITAL_CHARACTER = Pattern.compile("[^A-Z]");
     /**
-     * Matches with "({[A-Z]}+)", which should be used to abbreviate the name of an institution
+     * Matches uppercase english letters between "({" and "})", which should be used to abbreviate the name of an institution
      */
-    private static final Pattern ABBREVIATIONS = Pattern.compile(".*\\(\\{[A-Z]+}\\).*");
+    private static final Pattern INLINE_ABBREVIATION = Pattern.compile("(?<=\\(\\{)[A-Z]+(?=}\\))");
     /**
      * Matches with "dep"/"dip", case insensitive
      */
     private static final Pattern DEPARTMENTS = Pattern.compile("^d[ei]p.*", Pattern.CASE_INSENSITIVE);
+    private static final Pattern WHITESPACE = Pattern.compile("\\p{javaWhitespace}");
 
     private enum Institution {
         SCHOOL,
@@ -74,9 +77,9 @@ public class BracketedPattern {
         TECHNOLOGY;
 
         /**
-         * Matches "uni" at the start of a string or after a space, case insensitive
+         * Matches "uni" followed by "v" or "b", at the start of a string or after a space, case insensitive
          */
-        private static final Pattern UNIVERSITIES = Pattern.compile("^uni.*", Pattern.CASE_INSENSITIVE);
+        private static final Pattern UNIVERSITIES = Pattern.compile("^uni(v|b|$).*", Pattern.CASE_INSENSITIVE);
         /**
          * Matches with "tech", case insensitive
          */
@@ -184,7 +187,7 @@ public class BracketedPattern {
      * @param database         The {@link BibDatabase} for field resolving. May be null.
      * @return a function accepting a bracketed expression and returning the result of expanding it
      */
-    private static Function<String, String> expandBracketContent(Character keywordDelimiter, BibEntry entry, BibDatabase database) {
+    public static Function<String, String> expandBracketContent(Character keywordDelimiter, BibEntry entry, BibDatabase database) {
         return (String bracket) -> {
             String expandedPattern;
             List<String> fieldParts = parseFieldAndModifiers(bracket);
@@ -492,9 +495,9 @@ public class BracketedPattern {
         for (Author author : AuthorList.parse(unparsedAuthors).getAuthors()) {
             // If the author is an institution, use an institution key instead of the full name
             String lastName = author.getLast()
-                                    .map(LatexToUnicodeAdapter::format)
-                                    .map(isInstitution(author) ?
-                                            BracketedPattern::generateInstitutionKey : Function.identity())
+                                    .map(lastPart -> isInstitution(author) ?
+                                            generateInstitutionKey(lastPart) :
+                                            LatexToUnicodeAdapter.format(lastPart))
                                     .orElse(null);
             authorList.addAuthor(
                     author.getFirst().map(LatexToUnicodeAdapter::format).orElse(null),
@@ -508,14 +511,15 @@ public class BracketedPattern {
     }
 
     /**
-     * Checks if an author is an institution by verifying that only the last name is present.
+     * Checks if an author is an institution which can get a citation key from {@link #generateInstitutionKey(String)}.
      *
      * @param author the checked author
-     * @return true if only the last name is present
+     * @return true if only the last name is present and it contains at least one whitespace character.
      */
     private static boolean isInstitution(Author author) {
         return author.getFirst().isEmpty() && author.getFirstAbbr().isEmpty() && author.getJr().isEmpty()
-                && author.getVon().isEmpty() && author.getLast().isPresent();
+                && author.getVon().isEmpty() && author.getLast().isPresent()
+                && WHITESPACE.matcher(author.getLast().get()).find();
     }
 
     /**
@@ -658,52 +662,31 @@ public class BracketedPattern {
     }
 
     public static String removeSmallWords(String title) {
-        StringJoiner stringJoiner = new StringJoiner(" ");
         String formattedTitle = formatTitle(title);
 
         try (Scanner titleScanner = new Scanner(formattedTitle)) {
-            mainl:
-            while (titleScanner.hasNext()) {
-                String word = titleScanner.next();
-
-                for (String smallWord : Word.SMALLER_WORDS) {
-                    if (word.equalsIgnoreCase(smallWord)) {
-                        continue mainl;
-                    }
-                }
-
-                stringJoiner.add(word);
-            }
+            return titleScanner.tokens()
+                               .filter(Predicate.not(
+                                       Word::isSmallerWord))
+                               .collect(Collectors.joining(" "));
         }
-
-        return stringJoiner.toString();
     }
 
     private static String getTitleWordsWithSpaces(int number, String title) {
-        StringJoiner stringJoiner = new StringJoiner(" ");
         String formattedTitle = formatTitle(title);
-        int words = 0;
 
         try (Scanner titleScanner = new Scanner(formattedTitle)) {
-            while (titleScanner.hasNext() && (words < number)) {
-                String word = titleScanner.next();
-
-                stringJoiner.add(word);
-                words++;
-            }
+            return titleScanner.tokens()
+                               .limit(number)
+                               .collect(Collectors.joining(" "));
         }
-
-        return stringJoiner.toString();
     }
 
     private static String keepLettersAndDigitsOnly(String in) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < in.length(); i++) {
-            if (Character.isLetterOrDigit(in.charAt(i))) {
-                stringBuilder.append(in.charAt(i));
-            }
-        }
-        return stringBuilder.toString();
+        return in.codePoints()
+                 .filter(Character::isLetterOrDigit)
+                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                 .toString();
     }
 
     /**
@@ -1132,51 +1115,6 @@ public class BracketedPattern {
     }
 
     /**
-     * Will remove diacritics from the content.
-     * <ul>
-     * <li>Replaces umlaut: \"x with xe, e.g. \"o -> oe, \"u -> ue, etc.</li>
-     * <li>Removes all other diacritics: \?x -> x, e.g. \'a -> a, etc.</li>
-     * </ul>
-     *
-     * @param content The content.
-     * @return The content without diacritics.
-     */
-    private static String removeDiacritics(String content) {
-        if (content.isEmpty()) {
-            return content;
-        }
-
-        String result = content;
-        // Replace umlaut with '?e'
-        result = result.replaceAll("\\{\\\\\"([a-zA-Z])\\}", "$1e");
-        result = result.replaceAll("\\\\\"\\{([a-zA-Z])\\}", "$1e");
-        result = result.replaceAll("\\\\\"([a-zA-Z])", "$1e");
-        // Remove diacritics
-        result = result.replaceAll("\\{\\\\.([a-zA-Z])\\}", "$1");
-        result = result.replaceAll("\\\\.\\{([a-zA-Z])\\}", "$1");
-        result = result.replaceAll("\\\\.([a-zA-Z])", "$1");
-        return result;
-    }
-
-    /**
-     * Unifies umlauts.
-     * <ul>
-     * <li>Replaces: $\ddot{\mathrm{X}}$ (an alternative umlaut) with: {\"X}</li>
-     * <li>Replaces: \?{X} and \?X with {\?X}, where ? is a diacritic symbol</li>
-     * </ul>
-     *
-     * @param content The content.
-     * @return The content with unified diacritics.
-     */
-    private static String unifyDiacritics(String content) {
-        return content.replaceAll(
-                "\\$\\\\ddot\\{\\\\mathrm\\{([^\\}])\\}\\}\\$",
-                "{\\\"$1}").replaceAll(
-                "(\\\\[^\\-a-zA-Z])\\{?([a-zA-Z])\\}?",
-                "{$1$2}");
-    }
-
-    /**
      * <p>
      * An author or editor may be and institution not a person. In that case the key generator builds very long keys,
      * e.g.: for &ldquo;The Attributed Graph Grammar System (AGG)&rdquo; -> &ldquo;TheAttributedGraphGrammarSystemAGG&rdquo;.
@@ -1248,15 +1186,20 @@ public class BracketedPattern {
             return "";
         }
 
-        String result = content;
-        result = unifyDiacritics(result);
-        result = result.replaceAll("^\\{", "").replaceAll("}$", "");
-        Matcher matcher = ABBREVIATIONS.matcher(result);
-        if (matcher.matches()) {
-            return matcher.group(1);
+        Matcher matcher = INLINE_ABBREVIATION.matcher(content);
+        if (matcher.find()) {
+            return LatexToUnicodeAdapter.format(matcher.group());
         }
 
-        result = removeDiacritics(result);
+        Optional<String> unicodeFormattedName = LatexToUnicodeAdapter.parse(content);
+        if (unicodeFormattedName.isEmpty()) {
+            LOGGER.warn("{} could not be converted to unicode. This can result in an incorrect or missing institute citation key", content);
+        }
+        String result = unicodeFormattedName.orElse(Normalizer.normalize(content, Normalizer.Form.NFC));
+
+        // Special characters can't be allowed past this point because the citation key generator might replace them with multiple mixed-case characters
+        result = StringUtil.replaceSpecialCharacters(result);
+
         String[] institutionNameTokens = result.split(",");
 
         // Key parts
@@ -1335,7 +1278,6 @@ public class BracketedPattern {
      * institution keyword and has an uppercase first letter, except univ/tech key word.
      *
      * @param word to check
-     * @return
      */
     private static boolean noOtherInstitutionKeyWord(String word) {
         return !DEPARTMENTS.matcher(word).matches()

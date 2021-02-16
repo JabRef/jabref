@@ -7,8 +7,11 @@ import java.util.Set;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.l10n.Localization;
+
+import com.airhacks.afterburner.injection.Injector;
 
 public class CustomizeExternalFileTypesViewModel {
 
@@ -52,9 +55,8 @@ public class CustomizeExternalFileTypesViewModel {
             fileTypes.add(fileTypes.indexOf(type), typeForEdit);
             fileTypes.remove(type);
         }
-
-        EditExternalFileTypeEntryDialog dlg = new EditExternalFileTypeEntryDialog(typeForEdit, dialogTitle);
-        dlg.showAndWait();
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+        dialogService.showCustomDialogAndWait(new EditExternalFileTypeEntryDialog(typeForEdit, dialogTitle));
     }
 
     public void edit(ExternalFileType type) {

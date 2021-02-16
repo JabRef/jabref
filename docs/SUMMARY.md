@@ -15,7 +15,7 @@
   * [Custom SVG icons](advanced-reading/custom-svg-icons.md)
   * [Working on fetchers](advanced-reading/fetchers.md)
   * [Creating a binary and debug it](advanced-reading/jpackage.md)
-* [JabRef and Software Engineering](teaching.md)
+* [JabRef and Software Engineering Training](teaching.md)
 * [Readings on Coding](readings-on-coding/README.md)
   * [Readings on JavaFX](readings-on-coding/javafx.md)
   * [Useful development tooling](readings-on-coding/tools.md)

@@ -664,7 +664,7 @@ public class LibraryTab extends Tab {
                     message,
                     okButton,
                     cancelButton,
-                    Localization.lang("Disable this confirmation dialog"),
+                    Localization.lang("Do not ask again"),
                     optOut -> preferencesService.storeGeneralPreferences(
                             preferencesService.getGeneralPreferences().withConfirmDelete(!optOut)));
         } else {
