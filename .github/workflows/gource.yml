@@ -52,3 +52,4 @@ jobs:
         with:
           name: Gource
           path: ./gource-videos/
+          retention-days: 100
