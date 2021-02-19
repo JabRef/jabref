@@ -56,6 +56,7 @@ import com.sun.star.frame.XComponentLoader;
 import com.sun.star.frame.XController;
 import com.sun.star.frame.XDesktop;
 import com.sun.star.frame.XModel;
+import com.sun.star.frame.XFrame;
 import com.sun.star.lang.DisposedException;
 import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.Locale;
@@ -85,67 +86,90 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class for manipulating the Bibliography of the currently start document in OpenOffice.
+ * Class for manipulating the Bibliography of the currently started
+ * document in OpenOffice.
  */
 @AllowedToUseAwt("Requires AWT for italics and bold")
 class OOBibBase {
 
     private static final OOPreFormatter POSTFORMATTER = new OOPreFormatter();
 
-    private static final String BIB_SECTION_NAME = "JR_bib";
+    private static final String BIB_SECTION_NAME     = "JR_bib";
     private static final String BIB_SECTION_END_NAME = "JR_bib_end";
+
     private static final String BIB_CITATION = "JR_cite";
-    private static final Pattern CITE_PATTERN = Pattern.compile(OOBibBase.BIB_CITATION + "\\d*_(\\d*)_(.*)");
+    private static final Pattern CITE_PATTERN =
+	Pattern.compile(BIB_CITATION + "\\d*_(\\d*)_(.*)");
 
     private static final String CHAR_STYLE_NAME = "CharStyleName";
 
-    private static final int AUTHORYEAR_PAR = 1;
+    private static final int AUTHORYEAR_PAR    = 1;
     private static final int AUTHORYEAR_INTEXT = 2;
-    private static final int INVISIBLE_CIT = 3;
+    private static final int INVISIBLE_CIT     = 3;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OOBibBase.class);
-    private XMultiServiceFactory mxDocFactory;
-    private XTextDocument mxDoc;
-    private XText text;
-    private final XDesktop xDesktop;
+    private static final Logger LOGGER =
+	LoggerFactory.getLogger(OOBibBase.class);
+
+    private XMultiServiceFactory    mxDocFactory;
+    private XTextDocument           mxDoc;
+    private XText                   text;
+    private final XDesktop          xDesktop;
     private XTextViewCursorSupplier xViewCursorSupplier;
-    private XComponent xCurrentComponent;
-    private XPropertySet propertySet;
+    private XComponent              xCurrentComponent;
+    private XPropertySet            propertySet;
+    private XPropertyContainer      userProperties;
 
-    private XPropertyContainer userProperties;
     private final boolean atEnd;
+
     private final Comparator<BibEntry> entryComparator;
     private final Comparator<BibEntry> yearAuthorTitleComparator;
-    private final FieldComparator authComp = new FieldComparator(StandardField.AUTHOR);
-    private final FieldComparator yearComp = new FieldComparator(StandardField.YEAR);
 
-    private final FieldComparator titleComp = new FieldComparator(StandardField.TITLE);
-    private final List<Comparator<BibEntry>> authorYearTitleList = new ArrayList<>(3);
+    // private final FieldComparator authComp  = new FieldComparator(StandardField.AUTHOR);
+    // private final FieldComparator yearComp  = new FieldComparator(StandardField.YEAR);
+    // private final FieldComparator titleComp = new FieldComparator(StandardField.TITLE);
 
-    private final List<Comparator<BibEntry>> yearAuthorTitleList = new ArrayList<>(3);
+    // private final List<Comparator<BibEntry>> authorYearTitleList = new ArrayList<>(3);
+    // private final List<Comparator<BibEntry>> yearAuthorTitleList = new ArrayList<>(3);
+
     private final Map<String, String> uniquefiers = new HashMap<>();
+
     private List<String> sortedReferenceMarks;
 
     private final DialogService dialogService;
 
-    public OOBibBase(Path loPath, boolean atEnd, DialogService dialogService) throws IllegalAccessException, InvocationTargetException, BootstrapException, CreationException, IOException, ClassNotFoundException {
-
+    public OOBibBase(Path loPath,
+		     boolean atEnd,
+		     DialogService dialogService
+		     ) throws IllegalAccessException,
+			      InvocationTargetException,
+			      BootstrapException,
+			      CreationException,
+			      IOException,
+			      ClassNotFoundException
+    {
         this.dialogService = dialogService;
+	{
+	    FieldComparator a = new FieldComparator(StandardField.AUTHOR);
+	    FieldComparator y = new FieldComparator(StandardField.YEAR);
+	    FieldComparator t = new FieldComparator(StandardField.TITLE);
 
-        authorYearTitleList.add(authComp);
-        authorYearTitleList.add(yearComp);
-        authorYearTitleList.add(titleComp);
-
-        yearAuthorTitleList.add(yearComp);
-        yearAuthorTitleList.add(authComp);
-        yearAuthorTitleList.add(titleComp);
-
-        entryComparator = new FieldComparatorStack<>(authorYearTitleList);
-        yearAuthorTitleComparator = new FieldComparatorStack<>(yearAuthorTitleList);
-
-        this.atEnd = atEnd;
-
-        xDesktop = simpleBootstrap(loPath);
+	    {
+		List<Comparator<BibEntry>> ayt = new ArrayList<>(3);
+		ayt.add(a);
+		ayt.add(y);
+		ayt.add(t);
+		this.entryComparator= new FieldComparatorStack<>(ayt);
+	    }
+	    {
+		List<Comparator<BibEntry>> yat = new ArrayList<>(3);
+		yat.add(y);
+		yat.add(a);
+		yat.add(t);
+		this.yearAuthorTitleComparator = new FieldComparatorStack<>(yat);
+	    }
+	}
+        this.atEnd    = atEnd;
+        this.xDesktop = simpleBootstrap(loPath);
     }
 
     public boolean isConnectedToDocument() {
@@ -153,10 +177,27 @@ class OOBibBase {
     }
 
     public XTextDocument selectComponent(List<XTextDocument> list) {
-        List<DocumentTitleViewModel> viewModel = list.stream().map(DocumentTitleViewModel::new).collect(Collectors.toList());
-        // this whole method is part of a background task when auto-detecting instances, so we need to show dialog in FX thread
-        Optional<DocumentTitleViewModel> selectedDocument = dialogService.showChoiceDialogAndWait(Localization.lang("Select document"), Localization.lang("Found documents:"), Localization.lang("Use selected document"), viewModel);
-        return selectedDocument.map(DocumentTitleViewModel::getXtextDocument).orElse(null);
+        List<DocumentTitleViewModel> viewModel =
+	    list
+	    .stream()
+	    .map(DocumentTitleViewModel::new)
+	    .collect(Collectors.toList());
+
+        // This whole method is part of a background task when
+        // auto-detecting instances, so we need to show dialog in FX
+        // thread
+        Optional<DocumentTitleViewModel> selectedDocument =
+	    dialogService
+	    .showChoiceDialogAndWait(
+				     Localization.lang("Select document"),
+				     Localization.lang("Found documents:"),
+				     Localization.lang("Use selected document"),
+				     viewModel
+				     );
+        return
+	    selectedDocument
+	    .map(DocumentTitleViewModel::getXtextDocument)
+	    .orElse(null);
     }
 
     public Optional<String> getCurrentDocumentTitle() {
@@ -166,41 +207,55 @@ class OOBibBase {
     private Optional<String> getDocumentTitle(XTextDocument doc) {
         if (doc == null) {
             return Optional.empty();
-        } else {
-            try {
-                return Optional.of(String.valueOf(OOUtil.getProperty(doc.getCurrentController().getFrame(), "Title")));
-            } catch (UnknownPropertyException | WrappedTargetException e) {
-                LOGGER.warn("Could not get document title", e);
-                return Optional.empty();
-            }
         }
+
+	try {
+	    XFrame frame = doc.getCurrentController().getFrame();
+	    Object frame_title_obj = OOUtil.getProperty( frame , "Title");
+	    String frame_title_str = String.valueOf(frame_title_obj);
+	    return  Optional.of(frame_title_str);
+	} catch (UnknownPropertyException | WrappedTargetException e) {
+	    LOGGER.warn("Could not get document title", e);
+	    return Optional.empty();
+	}
     }
 
-    public void selectDocument() throws NoDocumentException, NoSuchElementException, WrappedTargetException {
-        List<XTextDocument> textDocumentList = getTextDocuments();
-        XTextDocument selected;
-        if (textDocumentList.isEmpty()) {
-            // No text documents found.
-            throw new NoDocumentException("No Writer documents found");
-        } else if (textDocumentList.size() == 1) {
-            // Get the only one
-            selected = textDocumentList.get(0);
-        } else {
-            // Bring up a dialog
-            selected = selectComponent(textDocumentList);
-        }
+    public void selectDocument()
+	throws NoDocumentException,
+	       NoSuchElementException,
+	       WrappedTargetException
+    {
+	{
+	    XTextDocument selected;
+	    List<XTextDocument> textDocumentList = getTextDocuments();
+	    if (textDocumentList.isEmpty()) {
+		// No text documents found.
+		throw new NoDocumentException("No Writer documents found");
+	    } else if (textDocumentList.size() == 1) {
+		// Get the only one
+		selected = textDocumentList.get(0);
+	    } else {
+		// Bring up a dialog
+		selected = selectComponent(textDocumentList);
+	    }
 
-        if (selected == null) {
-            return;
-        }
-        xCurrentComponent = UnoRuntime.queryInterface(XComponent.class, selected);
-        mxDoc = selected;
+	    if (selected == null) {
+		return;
+	    }
+	    xCurrentComponent = UnoRuntime.queryInterface(XComponent.class, selected);
+	    mxDoc = selected;
+	}
 
-        UnoRuntime.queryInterface(XDocumentIndexesSupplier.class, xCurrentComponent);
 
-        XModel xModel = UnoRuntime.queryInterface(XModel.class, xCurrentComponent);
-        XController xController = xModel.getCurrentController();
-        xViewCursorSupplier = UnoRuntime.queryInterface(XTextViewCursorSupplier.class, xController);
+	// TODO: what is the point of the next line? Does it have a side effect?
+	//
+        // UnoRuntime.queryInterface(XDocumentIndexesSupplier.class, xCurrentComponent);
+
+	{
+	    XModel xModel = UnoRuntime.queryInterface(XModel.class, xCurrentComponent);
+	    XController xController = xModel.getCurrentController();
+	    xViewCursorSupplier = UnoRuntime.queryInterface(XTextViewCursorSupplier.class, xController);
+	}
 
         // get a reference to the body text of the document
         text = mxDoc.getText();
@@ -208,8 +263,11 @@ class OOBibBase {
         // Access the text document's multi service factory:
         mxDocFactory = UnoRuntime.queryInterface(XMultiServiceFactory.class, mxDoc);
 
-        XDocumentPropertiesSupplier supp = UnoRuntime.queryInterface(XDocumentPropertiesSupplier.class, mxDoc);
-        userProperties = supp.getDocumentProperties().getUserDefinedProperties();
+	{
+	    XDocumentPropertiesSupplier supp =
+		UnoRuntime.queryInterface(XDocumentPropertiesSupplier.class, mxDoc);
+	    userProperties = supp.getDocumentProperties().getUserDefinedProperties();
+	}
         propertySet = UnoRuntime.queryInterface(XPropertySet.class, userProperties);
     }
 
@@ -232,8 +290,9 @@ class OOBibBase {
     }
 
     private XDesktop simpleBootstrap(Path loPath)
-            throws CreationException, BootstrapException {
-
+            throws CreationException,
+		   BootstrapException
+    {
         // Get the office component context:
         XComponentContext xContext = org.jabref.gui.openoffice.Bootstrap.bootstrap(loPath);
         // Get the office service manager:
@@ -248,7 +307,8 @@ class OOBibBase {
         }
         XDesktop resultDesktop = UnoRuntime.queryInterface(XDesktop.class, desktop);
 
-        UnoRuntime.queryInterface(XComponentLoader.class, desktop);
+	// TODO: useless call?
+        // UnoRuntime.queryInterface(XComponentLoader.class, desktop);
 
         return resultDesktop;
     }
@@ -769,9 +829,9 @@ class OOBibBase {
     private String getUniqueReferenceMarkName(String bibtexKey, int type) {
         XNameAccess xNamedRefMarks = getReferenceMarks();
         int i = 0;
-        String name = OOBibBase.BIB_CITATION + '_' + type + '_' + bibtexKey;
+        String name = BIB_CITATION + '_' + type + '_' + bibtexKey;
         while (xNamedRefMarks.hasByName(name)) {
-            name = OOBibBase.BIB_CITATION + i + '_' + type + '_' + bibtexKey;
+            name = BIB_CITATION + i + '_' + type + '_' + bibtexKey;
             i++;
         }
         return name;
