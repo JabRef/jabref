@@ -1258,6 +1258,7 @@ class OOBibBase {
             refreshCiteMarkers(databases, style);
         }
     }
+
     /**
      * Do the opposite of combineCiteMarkers.
      * Combined markers are split, with a space inserted between.
@@ -1274,47 +1275,47 @@ class OOBibBase {
 
         int piv = 0;
         boolean madeModifications = false;
-        while (piv < (names.size() )) {
+        while (piv < (names.size())) {
             XTextRange range1 = UnoRuntime.queryInterface(XTextContent.class, nameAccess.getByName(names.get(piv)))
-		.getAnchor();
+                .getAnchor();
 
             XTextCursor mxDocCursor = range1.getText().createTextCursorByRange(range1);
-	    //
-	    // If we are supposed to set character format for citations, test this before
-	    // making any changes. This way we can throw an exception before any reference
-	    // marks are removed, preventing damage to the user's document:
-	    if (style.isFormatCitations()) {
-		XPropertySet xCursorProps = UnoRuntime.queryInterface(XPropertySet.class, mxDocCursor);
-		String charStyle = style.getCitationCharacterFormat();
-		try {
-		    xCursorProps.setPropertyValue(CHAR_STYLE_NAME, charStyle);
-		} catch (UnknownPropertyException | PropertyVetoException | IllegalArgumentException |
-			 WrappedTargetException ex) {
-		    // Setting the character format failed, so we throw an exception that
-		    // will result in an error message for the user:
+            //
+            // If we are supposed to set character format for citations, test this before
+            // making any changes. This way we can throw an exception before any reference
+            // marks are removed, preventing damage to the user's document:
+            if (style.isFormatCitations()) {
+                XPropertySet xCursorProps = UnoRuntime.queryInterface(XPropertySet.class, mxDocCursor);
+                String charStyle = style.getCitationCharacterFormat();
+                try {
+                    xCursorProps.setPropertyValue(CHAR_STYLE_NAME, charStyle);
+                } catch (UnknownPropertyException | PropertyVetoException | IllegalArgumentException |
+                         WrappedTargetException ex) {
+                    // Setting the character format failed, so we throw an exception that
+                    // will result in an error message for the user:
                         throw new UndefinedCharacterFormatException(charStyle);
-		}
-	    }
+                }
+            }
 
-	    List<String> keys = parseRefMarkName(names.get(piv));
-	    if ( keys.size() > 1 ){
-		removeReferenceMark(names.get(piv));
-		//
-		// Insert bookmark for each key
-		int last = keys.size()-1;
-		int i = 0;
-		for (String key : keys) {
-		    String bName = getUniqueReferenceMarkName(key, OOBibBase.AUTHORYEAR_PAR);
-		    insertReferenceMark(bName, "tmp", mxDocCursor, true, style);
-		    mxDocCursor.collapseToEnd();
-		    if ( i != last ){
-			mxDocCursor.setString(" ");
-			mxDocCursor.collapseToEnd();
-		    }
-		    i++;
-		}
-		madeModifications = true;
-	    }
+            List<String> keys = parseRefMarkName(names.get(piv));
+            if (keys.size() > 1) {
+                removeReferenceMark(names.get(piv));
+                //
+                // Insert bookmark for each key
+                int last = keys.size() - 1;
+                int i = 0;
+                for (String key : keys) {
+                    String bName = getUniqueReferenceMarkName(key, OOBibBase.AUTHORYEAR_PAR);
+                    insertReferenceMark(bName, "tmp", mxDocCursor, true, style);
+                    mxDocCursor.collapseToEnd();
+                    if (i != last){
+                        mxDocCursor.setString(" ");
+                        mxDocCursor.collapseToEnd();
+                    }
+                    i++;
+                }
+                madeModifications = true;
+            }
             piv++;
         }
         if (madeModifications) {
