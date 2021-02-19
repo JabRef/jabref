@@ -1308,7 +1308,7 @@ class OOBibBase {
                     String bName = getUniqueReferenceMarkName(key, OOBibBase.AUTHORYEAR_PAR);
                     insertReferenceMark(bName, "tmp", mxDocCursor, true, style);
                     mxDocCursor.collapseToEnd();
-                    if (i != last){
+                    if (i != last) {
                         mxDocCursor.setString(" ");
                         mxDocCursor.collapseToEnd();
                     }
