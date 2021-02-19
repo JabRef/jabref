@@ -112,7 +112,7 @@ class OOBibBase {
 
     private XMultiServiceFactory    mxDocFactory;
     private XTextDocument           mxDoc;
-    private XText                   text;
+    private XText                   xtext;
     private final XDesktop          xDesktop;
     private XTextViewCursorSupplier xViewCursorSupplier;
     private XComponent              xCurrentComponent;
@@ -136,6 +136,12 @@ class OOBibBase {
     private List<String> sortedReferenceMarks;
 
     private final DialogService dialogService;
+
+    private static <T> T unoQI(Class<T> zInterface,
+			       Object object)
+    {
+	return UnoRuntime.queryInterface( zInterface, object );
+    }
 
     public OOBibBase(Path loPath,
 		     boolean atEnd,
@@ -187,7 +193,7 @@ class OOBibBase {
         // auto-detecting instances, so we need to show dialog in FX
         // thread
         Optional<DocumentTitleViewModel> selectedDocument =
-	    dialogService
+	    this.dialogService
 	    .showChoiceDialogAndWait(
 				     Localization.lang("Select document"),
 				     Localization.lang("Found documents:"),
@@ -201,7 +207,7 @@ class OOBibBase {
     }
 
     public Optional<String> getCurrentDocumentTitle() {
-        return getDocumentTitle(mxDoc);
+        return getDocumentTitle( this.mxDoc );
     }
 
     private Optional<String> getDocumentTitle(XTextDocument doc) {
@@ -210,7 +216,7 @@ class OOBibBase {
         }
 
 	try {
-	    XFrame frame = doc.getCurrentController().getFrame();
+	    XFrame frame           = doc.getCurrentController().getFrame();
 	    Object frame_title_obj = OOUtil.getProperty( frame , "Title");
 	    String frame_title_str = String.valueOf(frame_title_obj);
 	    return  Optional.of(frame_title_str);
@@ -242,33 +248,33 @@ class OOBibBase {
 	    if (selected == null) {
 		return;
 	    }
-	    xCurrentComponent = UnoRuntime.queryInterface(XComponent.class, selected);
-	    mxDoc = selected;
+	    this.xCurrentComponent = unoQI(XComponent.class, selected);
+	    this.mxDoc = selected;
 	}
 
 
 	// TODO: what is the point of the next line? Does it have a side effect?
 	//
-        // UnoRuntime.queryInterface(XDocumentIndexesSupplier.class, xCurrentComponent);
+        // unoQI(XDocumentIndexesSupplier.class, xCurrentComponent);
 
 	{
-	    XModel xModel = UnoRuntime.queryInterface(XModel.class, xCurrentComponent);
-	    XController xController = xModel.getCurrentController();
-	    xViewCursorSupplier = UnoRuntime.queryInterface(XTextViewCursorSupplier.class, xController);
+	    XModel      mo = unoQI(XModel.class, this.xCurrentComponent);
+	    XController co = mo.getCurrentController();
+	    xViewCursorSupplier = unoQI(XTextViewCursorSupplier.class, co);
 	}
 
         // get a reference to the body text of the document
-        text = mxDoc.getText();
+        this.xtext = this.mxDoc.getText();
 
         // Access the text document's multi service factory:
-        mxDocFactory = UnoRuntime.queryInterface(XMultiServiceFactory.class, mxDoc);
+        this.mxDocFactory = unoQI(XMultiServiceFactory.class, this.mxDoc);
 
 	{
 	    XDocumentPropertiesSupplier supp =
-		UnoRuntime.queryInterface(XDocumentPropertiesSupplier.class, mxDoc);
+		unoQI(XDocumentPropertiesSupplier.class, this.mxDoc);
 	    userProperties = supp.getDocumentProperties().getUserDefinedProperties();
 	}
-        propertySet = UnoRuntime.queryInterface(XPropertySet.class, userProperties);
+        propertySet = unoQI(XPropertySet.class, userProperties);
     }
 
     private List<XTextDocument> getTextDocuments() throws NoSuchElementException, WrappedTargetException {
@@ -280,8 +286,8 @@ class OOBibBase {
 
         while (componentEnumeration.hasMoreElements()) {
             Object nextElement = componentEnumeration.nextElement();
-            XComponent component = UnoRuntime.queryInterface(XComponent.class, nextElement);
-            XTextDocument document = UnoRuntime.queryInterface(XTextDocument.class, component);
+            XComponent component = unoQI(XComponent.class, nextElement);
+            XTextDocument document = unoQI(XTextDocument.class, component);
             if (document != null) {
                 result.add(document);
             }
@@ -305,10 +311,10 @@ class OOBibBase {
         } catch (Exception e) {
             throw new CreationException(e.getMessage());
         }
-        XDesktop resultDesktop = UnoRuntime.queryInterface(XDesktop.class, desktop);
+        XDesktop resultDesktop = unoQI(XDesktop.class, desktop);
 
 	// TODO: useless call?
-        // UnoRuntime.queryInterface(XComponentLoader.class, desktop);
+        // unoQI(XComponentLoader.class, desktop);
 
         return resultDesktop;
     }
@@ -391,7 +397,7 @@ class OOBibBase {
 
             xViewCursor.getText().insertString(xViewCursor, " ", false);
             if (style.isFormatCitations()) {
-                XPropertySet xCursorProps = UnoRuntime.queryInterface(XPropertySet.class, xViewCursor);
+                XPropertySet xCursorProps = unoQI(XPropertySet.class, xViewCursor);
                 String charStyle = style.getCitationCharacterFormat();
                 try {
                     xCursorProps.setPropertyValue(CHAR_STYLE_NAME, charStyle);
@@ -741,7 +747,7 @@ class OOBibBase {
         boolean mustTestCharFormat = style.isFormatCitations();
         for (int i = 0; i < names.size(); i++) {
             Object referenceMark = xReferenceMarks.getByName(names.get(i));
-            XTextContent bookmark = UnoRuntime.queryInterface(XTextContent.class, referenceMark);
+            XTextContent bookmark = unoQI(XTextContent.class, referenceMark);
 
             XTextCursor cursor = bookmark.getAnchor().getText().createTextCursorByRange(bookmark.getAnchor());
 
@@ -751,7 +757,7 @@ class OOBibBase {
                 // exist, we end up deleting the markers before the process crashes due to a the missing
                 // format, with catastrophic consequences for the user.
                 mustTestCharFormat = false; // need to do this only once
-                XPropertySet xCursorProps = UnoRuntime.queryInterface(XPropertySet.class, cursor);
+                XPropertySet xCursorProps = unoQI(XPropertySet.class, cursor);
                 String charStyle = style.getCitationCharacterFormat();
                 try {
                     xCursorProps.setPropertyValue(CHAR_STYLE_NAME, charStyle);
@@ -761,14 +767,14 @@ class OOBibBase {
                 }
             }
 
-            text.removeTextContent(bookmark);
+            this.xtext.removeTextContent(bookmark);
 
             insertReferenceMark(names.get(i), citMarkers[i], cursor, types[i] != OOBibBase.INVISIBLE_CIT, style);
             if (hadBibSection && (getBookmarkRange(OOBibBase.BIB_SECTION_NAME) == null)) {
                 // We have overwritten the marker for the start of the reference list.
                 // We need to add it again.
                 cursor.collapseToEnd();
-                OOUtil.insertParagraphBreak(text, cursor);
+                OOUtil.insertParagraphBreak(this.xtext, cursor);
                 insertBookMark(OOBibBase.BIB_SECTION_NAME, cursor);
             }
         }
@@ -787,20 +793,20 @@ class OOBibBase {
 
     private List<String> getSortedReferenceMarks(final XNameAccess nameAccess)
             throws WrappedTargetException, NoSuchElementException {
-        XTextViewCursorSupplier cursorSupplier = UnoRuntime.queryInterface(XTextViewCursorSupplier.class,
-                mxDoc.getCurrentController());
+        XTextViewCursorSupplier cursorSupplier = unoQI(XTextViewCursorSupplier.class,
+                this.mxDoc.getCurrentController());
 
         XTextViewCursor viewCursor = cursorSupplier.getViewCursor();
         XTextRange initialPos = viewCursor.getStart();
         List<String> names = Arrays.asList(nameAccess.getElementNames());
         List<Point> positions = new ArrayList<>(names.size());
         for (String name : names) {
-            XTextContent textContent = UnoRuntime.queryInterface(XTextContent.class, nameAccess.getByName(name));
+            XTextContent textContent = unoQI(XTextContent.class, nameAccess.getByName(name));
             XTextRange range = textContent.getAnchor();
             // Check if we are inside a footnote:
-            if (UnoRuntime.queryInterface(XFootnote.class, range.getText()) != null) {
+            if (unoQI(XFootnote.class, range.getText()) != null) {
                 // Find the linking footnote marker:
-                XFootnote footer = UnoRuntime.queryInterface(XFootnote.class, range.getText());
+                XFootnote footer = unoQI(XFootnote.class, range.getText());
                 // The footnote's anchor gives the correct position in the text:
                 range = footer.getAnchor();
             }
@@ -822,7 +828,7 @@ class OOBibBase {
     }
 
     public XNameAccess getReferenceMarks() {
-        XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, xCurrentComponent);
+        XReferenceMarksSupplier supplier = unoQI(XReferenceMarksSupplier.class, xCurrentComponent);
         return supplier.getReferenceMarks();
     }
 
@@ -867,7 +873,7 @@ class OOBibBase {
         List<String> keys = new ArrayList<>();
         for (String name1 : names) {
             Object bookmark = xNamedMarks.getByName(name1);
-            UnoRuntime.queryInterface(XTextContent.class, bookmark);
+            unoQI(XTextContent.class, bookmark);
 
             List<String> newKeys = parseRefMarkName(name1);
             for (String key : newKeys) {
@@ -983,7 +989,7 @@ class OOBibBase {
                                      boolean htmlMarkup)
             throws NoSuchElementException, WrappedTargetException {
         Object referenceMark = nameAccess.getByName(refMarkName);
-        XTextContent bookmark = UnoRuntime.queryInterface(XTextContent.class, referenceMark);
+        XTextContent bookmark = unoQI(XTextContent.class, referenceMark);
 
         XTextCursor cursor = bookmark.getAnchor().getText().createTextCursorByRange(bookmark.getAnchor());
         String citPart = cursor.getString();
@@ -1042,15 +1048,15 @@ class OOBibBase {
             if (entry.getKey() instanceof UndefinedBibtexEntry) {
                 continue;
             }
-            OOUtil.insertParagraphBreak(text, cursor);
+            OOUtil.insertParagraphBreak(this.xtext, cursor);
             if (style.isNumberEntries()) {
                 int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
-                OOUtil.insertTextAtCurrentLocation(text, cursor,
+                OOUtil.insertTextAtCurrentLocation(this.xtext, cursor,
                         style.getNumCitationMarker(Collections.singletonList(number++), minGroupingCount, true), Collections.emptyList());
             }
             Layout layout = style.getReferenceFormat(entry.getKey().getType());
             layout.setPostFormatter(POSTFORMATTER);
-            OOUtil.insertFullReferenceAtCurrentLocation(text, cursor, layout, parFormat, entry.getKey(),
+            OOUtil.insertFullReferenceAtCurrentLocation(this.xtext, cursor, layout, parFormat, entry.getKey(),
                     entry.getValue(), uniquefiers.get(entry.getKey().getCitationKey().orElse(null)));
         }
     }
@@ -1058,36 +1064,36 @@ class OOBibBase {
     private void createBibTextSection2(boolean end)
             throws IllegalArgumentException, CreationException {
 
-        XTextCursor mxDocCursor = text.createTextCursor();
+        XTextCursor mxDocCursor = this.xtext.createTextCursor();
         if (end) {
             mxDocCursor.gotoEnd(false);
         }
-        OOUtil.insertParagraphBreak(text, mxDocCursor);
+        OOUtil.insertParagraphBreak(this.xtext, mxDocCursor);
         // Create a new TextSection from the document factory and access it's XNamed interface
         XNamed xChildNamed;
         try {
-            xChildNamed = UnoRuntime.queryInterface(XNamed.class,
-                    mxDocFactory.createInstance("com.sun.star.text.TextSection"));
+            xChildNamed = unoQI(XNamed.class,
+                    this.mxDocFactory.createInstance("com.sun.star.text.TextSection"));
         } catch (Exception e) {
             throw new CreationException(e.getMessage());
         }
         // Set the new sections name to 'Child_Section'
         xChildNamed.setName(OOBibBase.BIB_SECTION_NAME);
         // Access the Child_Section's XTextContent interface and insert it into the document
-        XTextContent xChildSection = UnoRuntime.queryInterface(XTextContent.class, xChildNamed);
-        text.insertTextContent(mxDocCursor, xChildSection, false);
+        XTextContent xChildSection = unoQI(XTextContent.class, xChildNamed);
+        this.xtext.insertTextContent(mxDocCursor, xChildSection, false);
     }
 
     private void clearBibTextSectionContent2()
             throws NoSuchElementException, WrappedTargetException, IllegalArgumentException, CreationException {
 
         // Check if the section exists:
-        XTextSectionsSupplier supplier = UnoRuntime.queryInterface(XTextSectionsSupplier.class, mxDoc);
+        XTextSectionsSupplier supplier = unoQI(XTextSectionsSupplier.class, this.mxDoc);
         if (supplier.getTextSections().hasByName(OOBibBase.BIB_SECTION_NAME)) {
             XTextSection section = (XTextSection) ((Any) supplier.getTextSections().getByName(OOBibBase.BIB_SECTION_NAME))
                     .getObject();
             // Clear it:
-            XTextCursor cursor = text.createTextCursorByRange(section.getAnchor());
+            XTextCursor cursor = this.xtext.createTextCursorByRange(section.getAnchor());
             cursor.gotoRange(section.getAnchor(), false);
             cursor.setString("");
         } else {
@@ -1098,11 +1104,11 @@ class OOBibBase {
     private void populateBibTextSection(Map<BibEntry, BibDatabase> entries, OOBibStyle style)
             throws NoSuchElementException, WrappedTargetException, PropertyVetoException,
             UnknownPropertyException, UndefinedParagraphFormatException, IllegalArgumentException, CreationException {
-        XTextSectionsSupplier supplier = UnoRuntime.queryInterface(XTextSectionsSupplier.class, mxDoc);
+        XTextSectionsSupplier supplier = unoQI(XTextSectionsSupplier.class, this.mxDoc);
         XTextSection section = (XTextSection) ((Any) supplier.getTextSections().getByName(OOBibBase.BIB_SECTION_NAME))
                 .getObject();
-        XTextCursor cursor = text.createTextCursorByRange(section.getAnchor());
-        OOUtil.insertTextAtCurrentLocation(text, cursor, (String) style.getProperty(OOBibStyle.TITLE),
+        XTextCursor cursor = this.xtext.createTextCursorByRange(section.getAnchor());
+        OOUtil.insertTextAtCurrentLocation(this.xtext, cursor, (String) style.getProperty(OOBibStyle.TITLE),
                 (String) style.getProperty(OOBibStyle.REFERENCE_HEADER_PARAGRAPH_FORMAT));
         insertFullReferenceAtCursor(cursor, entries, style,
                 (String) style.getProperty(OOBibStyle.REFERENCE_PARAGRAPH_FORMAT));
@@ -1113,18 +1119,18 @@ class OOBibBase {
             throws IllegalArgumentException, CreationException {
         Object bookmark;
         try {
-            bookmark = mxDocFactory.createInstance("com.sun.star.text.Bookmark");
+            bookmark = this.mxDocFactory.createInstance("com.sun.star.text.Bookmark");
         } catch (Exception e) {
             throw new CreationException(e.getMessage());
         }
         // name the bookmark
-        XNamed xNamed = UnoRuntime.queryInterface(XNamed.class, bookmark);
+        XNamed xNamed = unoQI(XNamed.class, bookmark);
         xNamed.setName(name);
         // get XTextContent interface
-        XTextContent xTextContent = UnoRuntime.queryInterface(XTextContent.class, bookmark);
+        XTextContent xTextContent = unoQI(XTextContent.class, bookmark);
         // insert bookmark at the end of the document
         // instead of mxDocText.getEnd you could use a text cursor's XTextRange interface or any XTextRange
-        text.insertTextContent(position, xTextContent, true);
+        this.xtext.insertTextContent(position, xTextContent, true);
         position.collapseToEnd();
         return xTextContent;
     }
@@ -1146,17 +1152,17 @@ class OOBibBase {
 
         Object bookmark;
         try {
-            bookmark = mxDocFactory.createInstance("com.sun.star.text.ReferenceMark");
+            bookmark = this.mxDocFactory.createInstance("com.sun.star.text.ReferenceMark");
         } catch (Exception e) {
             throw new CreationException(e.getMessage());
         }
         // Name the reference
-        XNamed xNamed = UnoRuntime.queryInterface(XNamed.class, bookmark);
+        XNamed xNamed = unoQI(XNamed.class, bookmark);
         xNamed.setName(name);
 
         if (withText) {
             position.setString(citText);
-            XPropertySet xCursorProps = UnoRuntime.queryInterface(XPropertySet.class, position);
+            XPropertySet xCursorProps = unoQI(XPropertySet.class, position);
 
             // Set language to [None]:
             xCursorProps.setPropertyValue("CharLocale", new Locale("zxx", "", ""));
@@ -1174,7 +1180,7 @@ class OOBibBase {
         }
 
         // get XTextContent interface
-        XTextContent xTextContent = UnoRuntime.queryInterface(XTextContent.class, bookmark);
+        XTextContent xTextContent = unoQI(XTextContent.class, bookmark);
 
         position.getText().insertTextContent(position, xTextContent, true);
 
@@ -1195,8 +1201,8 @@ class OOBibBase {
         XNameAccess xReferenceMarks = getReferenceMarks();
         if (xReferenceMarks.hasByName(name)) {
             Object referenceMark = xReferenceMarks.getByName(name);
-            XTextContent bookmark = UnoRuntime.queryInterface(XTextContent.class, referenceMark);
-            text.removeTextContent(bookmark);
+            XTextContent bookmark = unoQI(XTextContent.class, referenceMark);
+            this.xtext.removeTextContent(bookmark);
         }
     }
 
@@ -1216,13 +1222,13 @@ class OOBibBase {
             return null;
         }
         Object foundBookmark = xNamedBookmarks.getByName(name);
-        XTextContent xFoundBookmark = UnoRuntime.queryInterface(XTextContent.class, foundBookmark);
+        XTextContent xFoundBookmark = unoQI(XTextContent.class, foundBookmark);
         return xFoundBookmark.getAnchor();
     }
 
     private XNameAccess getBookmarks() {
         // query XBookmarksSupplier from document model and get bookmarks collection
-        XBookmarksSupplier xBookmarksSupplier = UnoRuntime.queryInterface(XBookmarksSupplier.class, xCurrentComponent);
+        XBookmarksSupplier xBookmarksSupplier = unoQI(XBookmarksSupplier.class, xCurrentComponent);
         XNameAccess xNamedBookmarks = xBookmarksSupplier.getBookmarks();
         return xNamedBookmarks;
     }
@@ -1233,7 +1239,7 @@ class OOBibBase {
         XTextCursor cursor = position.getText().createTextCursorByRange(range);
         cursor.goRight((short) start, false);
         cursor.goRight((short) (end - start), true);
-        XPropertySet xcp = UnoRuntime.queryInterface(XPropertySet.class, cursor);
+        XPropertySet xcp = unoQI(XPropertySet.class, cursor);
         if (italicize) {
             xcp.setPropertyValue("CharPosture", com.sun.star.awt.FontSlant.ITALIC);
         } else {
@@ -1249,14 +1255,14 @@ class OOBibBase {
         // TODO: doesn't work for citations in footnotes/tables
         List<String> names = getSortedReferenceMarks(nameAccess);
 
-        final XTextRangeCompare compare = UnoRuntime.queryInterface(XTextRangeCompare.class, text);
+        final XTextRangeCompare compare = unoQI(XTextRangeCompare.class, this.xtext);
 
         int piv = 0;
         boolean madeModifications = false;
         while (piv < (names.size() - 1)) {
-            XTextRange range1 = UnoRuntime.queryInterface(XTextContent.class, nameAccess.getByName(names.get(piv)))
+            XTextRange range1 = unoQI(XTextContent.class, nameAccess.getByName(names.get(piv)))
                                           .getAnchor().getEnd();
-            XTextRange range2 = UnoRuntime.queryInterface(XTextContent.class, nameAccess.getByName(names.get(piv + 1)))
+            XTextRange range2 = unoQI(XTextContent.class, nameAccess.getByName(names.get(piv + 1)))
                                           .getAnchor().getStart();
             if (range1.getText() != range2.getText()) {
                 piv++;
@@ -1276,7 +1282,7 @@ class OOBibBase {
                 // making any changes. This way we can throw an exception before any reference
                 // marks are removed, preventing damage to the user's document:
                 if (style.isFormatCitations()) {
-                    XPropertySet xCursorProps = UnoRuntime.queryInterface(XPropertySet.class, mxDocCursor);
+                    XPropertySet xCursorProps = unoQI(XPropertySet.class, mxDocCursor);
                     String charStyle = style.getCitationCharacterFormat();
                     try {
                         xCursorProps.setPropertyValue(CHAR_STYLE_NAME, charStyle);
@@ -1331,12 +1337,12 @@ class OOBibBase {
         // TODO: doesn't work for citations in footnotes/tables
         List<String> names = getSortedReferenceMarks(nameAccess);
 
-        final XTextRangeCompare compare = UnoRuntime.queryInterface(XTextRangeCompare.class, text);
+        final XTextRangeCompare compare = unoQI(XTextRangeCompare.class, this.xtext);
 
         int piv = 0;
         boolean madeModifications = false;
         while (piv < (names.size())) {
-            XTextRange range1 = UnoRuntime.queryInterface(XTextContent.class, nameAccess.getByName(names.get(piv)))
+            XTextRange range1 = unoQI(XTextContent.class, nameAccess.getByName(names.get(piv)))
                 .getAnchor();
 
             XTextCursor mxDocCursor = range1.getText().createTextCursorByRange(range1);
@@ -1345,7 +1351,7 @@ class OOBibBase {
             // making any changes. This way we can throw an exception before any reference
             // marks are removed, preventing damage to the user's document:
             if (style.isFormatCitations()) {
-                XPropertySet xCursorProps = UnoRuntime.queryInterface(XPropertySet.class, mxDocCursor);
+                XPropertySet xCursorProps = unoQI(XPropertySet.class, mxDocCursor);
                 String charStyle = style.getCitationCharacterFormat();
                 try {
                     xCursorProps.setPropertyValue(CHAR_STYLE_NAME, charStyle);
