@@ -45,6 +45,7 @@ import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.beans.XPropertyContainer;
 import com.sun.star.beans.XPropertySet;
+import com.sun.star.beans.XPropertySetInfo;
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XEnumeration;
@@ -235,7 +236,6 @@ class OOBibBase {
 	    XTextDocument selected;
 	    List<XTextDocument> textDocumentList = getTextDocuments();
 	    if (textDocumentList.isEmpty()) {
-		// No text documents found.
 		throw new NoDocumentException("No Writer documents found");
 	    } else if (textDocumentList.size() == 1) {
 		// Get the only one
@@ -260,7 +260,7 @@ class OOBibBase {
 	{
 	    XModel      mo = unoQI(XModel.class, this.xCurrentComponent);
 	    XController co = mo.getCurrentController();
-	    xViewCursorSupplier = unoQI(XTextViewCursorSupplier.class, co);
+	    this.xViewCursorSupplier = unoQI(XTextViewCursorSupplier.class, co);
 	}
 
         // get a reference to the body text of the document
@@ -272,24 +272,28 @@ class OOBibBase {
 	{
 	    XDocumentPropertiesSupplier supp =
 		unoQI(XDocumentPropertiesSupplier.class, this.mxDoc);
-	    userProperties = supp.getDocumentProperties().getUserDefinedProperties();
+	    this.userProperties = supp.getDocumentProperties().getUserDefinedProperties();
 	}
-        propertySet = unoQI(XPropertySet.class, userProperties);
+        this.propertySet = unoQI(XPropertySet.class, this.userProperties);
     }
 
-    private List<XTextDocument> getTextDocuments() throws NoSuchElementException, WrappedTargetException {
+    private List<XTextDocument> getTextDocuments()
+	throws NoSuchElementException,
+	       WrappedTargetException
+    {
         List<XTextDocument> result = new ArrayList<>();
-        XEnumerationAccess enumAccess = xDesktop.getComponents();
-        XEnumeration componentEnumeration = enumAccess.createEnumeration();
+
+        XEnumerationAccess  enumAccess = xDesktop.getComponents();
+        XEnumeration        compEnum   = enumAccess.createEnumeration();
 
         // TODO: http://api.openoffice.org/docs/DevelopersGuide/OfficeDev/OfficeDev.xhtml#1_1_3_2_1_2_Frame_Hierarchies
 
-        while (componentEnumeration.hasMoreElements()) {
-            Object nextElement = componentEnumeration.nextElement();
-            XComponent component = unoQI(XComponent.class, nextElement);
-            XTextDocument document = unoQI(XTextDocument.class, component);
-            if (document != null) {
-                result.add(document);
+        while (compEnum.hasMoreElements()) {
+            Object       next = compEnum.nextElement();
+            XComponent   comp = unoQI(XComponent.class   , next);
+            XTextDocument doc = unoQI(XTextDocument.class, comp);
+            if (doc != null) {
+                result.add(doc);
             }
         }
         return result;
@@ -300,55 +304,75 @@ class OOBibBase {
 		   BootstrapException
     {
         // Get the office component context:
-        XComponentContext xContext = org.jabref.gui.openoffice.Bootstrap.bootstrap(loPath);
-        // Get the office service manager:
-        XMultiComponentFactory xServiceManager = xContext.getServiceManager();
+        XComponentContext      context = org.jabref.gui.openoffice.Bootstrap.bootstrap(loPath);
+        XMultiComponentFactory sem     = context.getServiceManager();
+
         // Create the desktop, which is the root frame of the
         // hierarchy of frames that contain viewable components:
         Object desktop;
         try {
-            desktop = xServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", xContext);
+            desktop = sem.createInstanceWithContext("com.sun.star.frame.Desktop", context);
         } catch (Exception e) {
             throw new CreationException(e.getMessage());
         }
-        XDesktop resultDesktop = unoQI(XDesktop.class, desktop);
+        XDesktop result = unoQI(XDesktop.class, desktop);
 
 	// TODO: useless call?
         // unoQI(XComponentLoader.class, desktop);
 
-        return resultDesktop;
+        return result;
     }
 
-    public Optional<String> getCustomProperty(String property) throws UnknownPropertyException, WrappedTargetException {
-        if (propertySet.getPropertySetInfo().hasPropertyByName(property)) {
-            return Optional.ofNullable(propertySet.getPropertyValue(property).toString());
+    public Optional<String> getCustomProperty(String property)
+	throws UnknownPropertyException,
+	       WrappedTargetException
+    {
+	XPropertySetInfo psi = this.propertySet.getPropertySetInfo();
+        if (psi.hasPropertyByName(property)) {
+	    String v = this.propertySet.getPropertyValue(property).toString();
+            return Optional.ofNullable(v);
         }
         return Optional.empty();
     }
 
-    public void updateSortedReferenceMarks() throws WrappedTargetException, NoSuchElementException {
-        sortedReferenceMarks = getSortedReferenceMarks(getReferenceMarks());
+    public void updateSortedReferenceMarks()
+	throws WrappedTargetException,
+	       NoSuchElementException
+    {
+        this.sortedReferenceMarks = getSortedReferenceMarks(getReferenceMarks());
     }
 
-    public void setCustomProperty(String property, String value) throws UnknownPropertyException,
-            NotRemoveableException, PropertyExistException, IllegalTypeException, IllegalArgumentException {
-        if (propertySet.getPropertySetInfo().hasPropertyByName(property)) {
-            userProperties.removeProperty(property);
+    public void setCustomProperty(String property, String value)
+	throws UnknownPropertyException,
+	       NotRemoveableException,
+	       PropertyExistException,
+	       IllegalTypeException,
+	       IllegalArgumentException
+    {
+	XPropertySetInfo psi = this.propertySet.getPropertySetInfo();
+        if (psi.hasPropertyByName(property)) {
+            this.userProperties.removeProperty(property);
         }
         if (value != null) {
-            userProperties.addProperty(property, com.sun.star.beans.PropertyAttribute.REMOVEABLE,
-                    new Any(Type.STRING, value));
+            this.userProperties.addProperty(property,
+					    com.sun.star.beans.PropertyAttribute.REMOVEABLE,
+					    new Any(Type.STRING, value)
+					    );
         }
     }
 
     /**
-     * This method inserts a cite marker in the text for the given BibEntry, and may refresh the bibliography.
+     * This method inserts a cite marker in the text (at the cursor) for the given
+     * BibEntry, and may refresh the bibliography.
      *
      * @param entries       The entries to cite.
      * @param database      The database the entry belongs to.
      * @param style         The bibliography style we are using.
-     * @param inParenthesis Indicates whether it is an in-text citation or a citation in parenthesis. This is not relevant if numbered citations are used.
-     * @param withText      Indicates whether this should be a normal citation (true) or an empty (invisible) citation (false).
+     * @param inParenthesis Indicates whether it is an in-text citation
+     *                      or a citation in parenthesis.
+     *                      This is not relevant if numbered citations are used.
+     * @param withText      Indicates whether this should be a normal citation (true)
+     *                      or an empty (invisible) citation (false).
      * @param sync          Indicates whether the reference list should be refreshed.
      * @throws IllegalTypeException
      * @throws PropertyExistException
@@ -363,17 +387,32 @@ class OOBibBase {
      * @throws BibEntryNotFoundException
      * @throws UndefinedParagraphFormatException
      */
-    public void insertEntry(List<BibEntry> entries, BibDatabase database,
-                            List<BibDatabase> allBases, OOBibStyle style,
-                            boolean inParenthesis, boolean withText, String pageInfo, boolean sync)
-            throws IllegalArgumentException,
-            UnknownPropertyException, NotRemoveableException, PropertyExistException, IllegalTypeException,
-            UndefinedCharacterFormatException, WrappedTargetException, NoSuchElementException, PropertyVetoException,
-            IOException, CreationException, BibEntryNotFoundException, UndefinedParagraphFormatException {
-
+    public void insertEntry(List<BibEntry>    entries,
+			    BibDatabase       database,
+                            List<BibDatabase> allBases,
+			    OOBibStyle        style,
+                            boolean           inParenthesis,
+			    boolean           withText,
+			    String            pageInfo,
+			    boolean           sync
+			    )
+	throws IllegalArgumentException,
+	       UnknownPropertyException,
+	       NotRemoveableException,
+	       PropertyExistException,
+	       IllegalTypeException,
+	       UndefinedCharacterFormatException,
+	       WrappedTargetException,
+	       NoSuchElementException,
+	       PropertyVetoException,
+	       IOException,
+	       CreationException,
+	       BibEntryNotFoundException,
+	       UndefinedParagraphFormatException
+    {
         try {
-
-            XTextViewCursor xViewCursor = xViewCursorSupplier.getViewCursor();
+	    // Get the cursor positioned by the user.
+            XTextViewCursor xViewCursor = this.xViewCursorSupplier.getViewCursor();
 
             if (entries.size() > 1) {
                 if (style.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL)) {
