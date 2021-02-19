@@ -361,6 +361,15 @@ class OOBibBase {
         }
     }
 
+    private void sortBibEntryList( List<BibEntry>    entries, OOBibStyle        style ){
+	if (entries.size() > 1) {
+	    if (style.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL)) {
+		entries.sort(this.yearAuthorTitleComparator);
+	    } else {
+		entries.sort(this.entryComparator);
+	    }
+	}
+    }
     /**
      * This method inserts a cite marker in the text (at the cursor) for the given
      * BibEntry, and may refresh the bibliography.
@@ -414,6 +423,8 @@ class OOBibBase {
 	    // Get the cursor positioned by the user.
             XTextViewCursor xViewCursor = this.xViewCursorSupplier.getViewCursor();
 
+	    sortBibEntryList( entries, style );
+	    /*
             if (entries.size() > 1) {
                 if (style.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL)) {
                     entries.sort(yearAuthorTitleComparator);
@@ -421,6 +432,7 @@ class OOBibBase {
                     entries.sort(entryComparator);
                 }
             }
+	    */
 
             String keyString = String.join(",",
                     entries.stream().map(entry -> entry.getCitationKey().orElse("")).collect(Collectors.toList()));
