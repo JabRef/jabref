@@ -111,33 +111,28 @@ class OOBibBase {
     private static final Logger LOGGER =
 	LoggerFactory.getLogger(OOBibBase.class);
 
+    /* variables  */
+    private final DialogService dialogService;
+    private final XDesktop      xDesktop;
+    private final boolean       atEnd;
+    private final Comparator<BibEntry> entryComparator;
+    private final Comparator<BibEntry> yearAuthorTitleComparator;
+
+    /* document-related */
     private XMultiServiceFactory    mxDocFactory;
     private XTextDocument           mxDoc;
     private XText                   xtext;
-    private final XDesktop          xDesktop;
     private XTextViewCursorSupplier xViewCursorSupplier;
     private XComponent              xCurrentComponent;
     private XPropertySet            propertySet;
     private XPropertyContainer      userProperties;
 
-    private final boolean atEnd;
-
-    private final Comparator<BibEntry> entryComparator;
-    private final Comparator<BibEntry> yearAuthorTitleComparator;
-
-    // private final FieldComparator authComp  = new FieldComparator(StandardField.AUTHOR);
-    // private final FieldComparator yearComp  = new FieldComparator(StandardField.YEAR);
-    // private final FieldComparator titleComp = new FieldComparator(StandardField.TITLE);
-
-    // private final List<Comparator<BibEntry>> authorYearTitleList = new ArrayList<>(3);
-    // private final List<Comparator<BibEntry>> yearAuthorTitleList = new ArrayList<>(3);
 
     private final Map<String, String> uniquefiers = new HashMap<>();
 
     private List<String> sortedReferenceMarks;
 
-    private final DialogService dialogService;
-
+    // unoQI : short for UnoRuntime.queryInterface
     private static <T> T unoQI(Class<T> zInterface,
 			       Object object)
     {
