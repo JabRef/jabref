@@ -439,7 +439,7 @@ class OOBibBase {
     /*
      *
      */
-    public XNameAccess getReferenceMarks() {
+    private XNameAccess getReferenceMarks() {
         XReferenceMarksSupplier supplier =
 	    unoQI(XReferenceMarksSupplier.class,
 		  this.xCurrentComponent);
@@ -1034,9 +1034,12 @@ class OOBibBase {
     }
 
     private List<String> getSortedReferenceMarks(final XNameAccess nameAccess)
-            throws WrappedTargetException, NoSuchElementException {
-        XTextViewCursorSupplier cursorSupplier = unoQI(XTextViewCursorSupplier.class,
-                this.mxDoc.getCurrentController());
+            throws WrappedTargetException,
+		   NoSuchElementException
+    {
+        XTextViewCursorSupplier cursorSupplier =
+	    unoQI(XTextViewCursorSupplier.class,
+		  this.mxDoc.getCurrentController());
 
         XTextViewCursor viewCursor = cursorSupplier.getViewCursor();
         XTextRange initialPos = viewCursor.getStart();
