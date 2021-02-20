@@ -868,7 +868,8 @@ class OOBibBase {
         List<String> names = Arrays.asList(nameAccess.getElementNames());
         List<Point> positions = new ArrayList<>(names.size());
         for (String name : names) {
-            XTextContent textContent = unoQI(XTextContent.class, nameAccess.getByName(name));
+            XTextContent textContent =
+		unoQI(XTextContent.class, nameAccess.getByName(name));
             XTextRange range = textContent.getAnchor();
             // Check if we are inside a footnote:
             if (unoQI(XFootnote.class, range.getText()) != null) {
