@@ -137,7 +137,11 @@ class OOBibBase {
 
     private List<String> sortedReferenceMarks;
 
-    // unoQI : short for UnoRuntime.queryInterface
+    /** unoQI : short for UnoRuntime.queryInterface
+     *
+     * Returns: a reference to the requested UNO interface type if
+     * available, otherwise null
+     */
     private static <T> T unoQI(Class<T> zInterface,
 			       Object object)
     {
@@ -755,6 +759,72 @@ class OOBibBase {
         }
     }
 
+    /**
+     * Extract the list of citation keys from a reference mark name.
+     *
+     * @param name The reference mark name.
+     * @return The list of citation keys encoded in the name.
+     *         In case of duplicated citation keys, only the first occurrence.
+     *         Otherwise their order is preserved.
+     */
+    public List<String> parseRefMarkNameToUniqueCitationKeys(String name) {
+        List<String> keys = new ArrayList<>();
+        Matcher citeMatcher = CITE_PATTERN.matcher(name);
+        if (citeMatcher.find()) {
+            String[] keystring = citeMatcher.group(2).split(",");
+            for (String aKeystring : keystring) {
+                if (!keys.contains(aKeystring)) {
+                    keys.add(aKeystring);
+                }
+            }
+        }
+        return keys;
+    }
+
+    private List<String> findCitedKeys()
+	throws NoSuchElementException,
+	       WrappedTargetException
+    {
+        XNameAccess xNamedMarks = getReferenceMarks();
+        String[] names          = xNamedMarks.getElementNames();
+
+        List<String> keys = new ArrayList<>();
+        for (String name1 : names) {
+            Object bookmark = xNamedMarks.getByName(name1);
+            assert (null != unoQI(XTextContent.class, bookmark));
+
+            List<String> newKeys = parseRefMarkNameToUniqueCitationKeys(name1);
+            for (String key : newKeys) {
+                if (!keys.contains(key)) {
+                    keys.add(key);
+                }
+            }
+        }
+
+        return keys;
+    }
+
+    private Map<BibEntry, BibDatabase> findCitedEntries(List<BibDatabase> databases, List<String> keys,
+                                                        Map<String, BibDatabase> linkSourceBase) {
+        Map<BibEntry, BibDatabase> entries = new LinkedHashMap<>();
+        for (String key : keys) {
+            boolean found = false;
+            for (BibDatabase database : databases) {
+                Optional<BibEntry> entry = database.getEntryByCitationKey(key);
+                if (entry.isPresent()) {
+                    entries.put(entry.get(), database);
+                    linkSourceBase.put(key, database);
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                entries.put(new UndefinedBibtexEntry(key), null);
+            }
+        }
+        return entries;
+    }
 
     /**
      * Refresh all cite markers in the document.
@@ -772,10 +842,18 @@ class OOBibBase {
      * @throws PropertyVetoException
      * @throws UnknownPropertyException
      */
-    public List<String> refreshCiteMarkers(List<BibDatabase> databases, OOBibStyle style)
-            throws WrappedTargetException, IllegalArgumentException, NoSuchElementException,
-            UndefinedCharacterFormatException, UnknownPropertyException, PropertyVetoException, IOException,
-            CreationException, BibEntryNotFoundException {
+    public List<String> refreshCiteMarkers(List<BibDatabase> databases,
+					   OOBibStyle style)
+	throws WrappedTargetException,
+	       IllegalArgumentException,
+	       NoSuchElementException,
+	       UndefinedCharacterFormatException,
+	       UnknownPropertyException,
+	       PropertyVetoException,
+	       IOException,
+	       CreationException,
+	       BibEntryNotFoundException
+    {
         try {
             return refreshCiteMarkersInternal(databases, style);
         } catch (DisposedException ex) {
@@ -786,11 +864,17 @@ class OOBibBase {
         }
     }
 
-    private List<String> refreshCiteMarkersInternal(List<BibDatabase> databases, OOBibStyle style)
-            throws WrappedTargetException, IllegalArgumentException, NoSuchElementException,
-            UndefinedCharacterFormatException, UnknownPropertyException, PropertyVetoException,
-            CreationException, BibEntryNotFoundException {
-
+    private List<String> refreshCiteMarkersInternal(List<BibDatabase> databases,
+						    OOBibStyle style)
+	throws WrappedTargetException,
+	       IllegalArgumentException,
+	       NoSuchElementException,
+	       UndefinedCharacterFormatException,
+	       UnknownPropertyException,
+	       PropertyVetoException,
+	       CreationException,
+	       BibEntryNotFoundException
+    {
         List<String> cited = findCitedKeys();
         Map<String, BibDatabase> linkSourceBase = new HashMap<>();
         Map<BibEntry, BibDatabase> entries = findCitedEntries(databases, cited, linkSourceBase);
@@ -1178,71 +1262,12 @@ class OOBibBase {
         populateBibTextSection(entries, style);
     }
 
-    private List<String> findCitedKeys() throws NoSuchElementException, WrappedTargetException {
-        XNameAccess xNamedMarks = getReferenceMarks();
-        String[] names = xNamedMarks.getElementNames();
-        List<String> keys = new ArrayList<>();
-        for (String name1 : names) {
-            Object bookmark = xNamedMarks.getByName(name1);
-            unoQI(XTextContent.class, bookmark);
-
-            List<String> newKeys = parseRefMarkName(name1);
-            for (String key : newKeys) {
-                if (!keys.contains(key)) {
-                    keys.add(key);
-                }
-            }
-        }
-
-        return keys;
-    }
-
-    private Map<BibEntry, BibDatabase> findCitedEntries(List<BibDatabase> databases, List<String> keys,
-                                                        Map<String, BibDatabase> linkSourceBase) {
-        Map<BibEntry, BibDatabase> entries = new LinkedHashMap<>();
-        for (String key : keys) {
-            boolean found = false;
-            for (BibDatabase database : databases) {
-                Optional<BibEntry> entry = database.getEntryByCitationKey(key);
-                if (entry.isPresent()) {
-                    entries.put(entry.get(), database);
-                    linkSourceBase.put(key, database);
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) {
-                entries.put(new UndefinedBibtexEntry(key), null);
-            }
-        }
-        return entries;
-    }
 
     private Point findPosition(XTextViewCursor cursor, XTextRange range) {
         cursor.gotoRange(range, false);
         return cursor.getPosition();
     }
 
-    /**
-     * Extract the list of citation keys from a reference mark name.
-     *
-     * @param name The reference mark name.
-     * @return The list of citation keys encoded in the name.
-     */
-    public List<String> parseRefMarkName(String name) {
-        List<String> keys = new ArrayList<>();
-        Matcher citeMatcher = CITE_PATTERN.matcher(name);
-        if (citeMatcher.find()) {
-            String[] keystring = citeMatcher.group(2).split(",");
-            for (String aKeystring : keystring) {
-                if (!keys.contains(aKeystring)) {
-                    keys.add(aKeystring);
-                }
-            }
-        }
-        return keys;
-    }
 
     /**
      * Resolve the citation key from a citation reference marker name, and look up the index of the key in a list of keys.
@@ -1619,8 +1644,8 @@ class OOBibBase {
                     }
                 }
 
-                List<String> keys = parseRefMarkName(names.get(piv));
-                keys.addAll(parseRefMarkName(names.get(piv + 1)));
+                List<String> keys = parseRefMarkNameToUniqueCitationKeys(names.get(piv));
+                keys.addAll(parseRefMarkNameToUniqueCitationKeys(names.get(piv + 1)));
                 removeReferenceMark(names.get(piv));
                 removeReferenceMark(names.get(piv + 1));
                 List<BibEntry> entries = new ArrayList<>();
@@ -1688,7 +1713,7 @@ class OOBibBase {
                 }
             }
 
-            List<String> keys = parseRefMarkName(names.get(piv));
+            List<String> keys = parseRefMarkNameToUniqueCitationKeys(names.get(piv));
             if (keys.size() > 1) {
                 removeReferenceMark(names.get(piv));
                 //
