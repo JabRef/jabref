@@ -210,7 +210,7 @@ class OOBibBase {
         return getDocumentTitle( this.mxDoc );
     }
 
-    private Optional<String> getDocumentTitle(XTextDocument doc) {
+    private static Optional<String> getDocumentTitle(XTextDocument doc) {
         if (doc == null) {
             return Optional.empty();
         }
