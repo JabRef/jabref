@@ -942,11 +942,15 @@ class OOBibBase {
             // We need to sort the entries according to their order of appearance:
             entries = getSortedEntriesFromSortedRefMarks(names, linkSourceBase);
         } else {
+	    // Find them again? Why?
+	    Map<BibEntry, BibDatabase> entries2 =
+		findCitedEntries(databases, cited, linkSourceBase);
+
             SortedMap<BibEntry, BibDatabase> newMap = new TreeMap<>(entryComparator);
-            for (Map.Entry<BibEntry, BibDatabase> bibtexEntryBibtexDatabaseEntry : findCitedEntries(databases, cited,
-                    linkSourceBase).entrySet()) {
-                newMap.put(bibtexEntryBibtexDatabaseEntry.getKey(), bibtexEntryBibtexDatabaseEntry.getValue());
-            }
+            for (Map.Entry<BibEntry, BibDatabase> kv : entries2.entrySet()) {
+		newMap.put(kv.getKey(),
+			   kv.getValue());
+	    }
             entries = newMap;
         }
         clearBibTextSectionContent2();
