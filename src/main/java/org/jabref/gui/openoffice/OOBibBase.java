@@ -801,7 +801,7 @@ class OOBibBase {
         }
     }
 
-    
+
     /**
      * Extract the list of citation keys from a reference mark name.
      *
@@ -938,16 +938,17 @@ class OOBibBase {
         }
     }
 
-    private static Optional<BibEntry> linkSourceBaseCiteKeyToBibEbtry( Map<String, BibDatabase>   linkSourceBase,
-								       String kj )
+    private static Optional<BibEntry> linkSourceBaseCiteKeyToBibEbtry( Map<String, BibDatabase> linkSourceBase,
+								       String citeKey )
     {
-	BibDatabase database = linkSourceBase.get(kj);
+	BibDatabase database = linkSourceBase.get(citeKey);
 	Optional<BibEntry> res = ( (database == null)
 				   ? Optional.empty()
-				   : database.getEntryByCitationKey(kj)
+				   : database.getEntryByCitationKey(citeKey)
 				   );
 	return res;
     }
+
     private List<String> refreshCiteMarkersInternal(List<BibDatabase> databases,
 						    OOBibStyle style)
 	throws WrappedTargetException,
@@ -1020,9 +1021,11 @@ class OOBibBase {
                 bibtexKeys[i] = keys;
 		//
                 BibEntry[] cEntries = new BibEntry[keys.length];
+		// fill cEntries
                 for (int j = 0; j < keys.length; j++) {
 		    String kj = keys[j];
-		    Optional<BibEntry> tmpEntry = linkSourceBaseCiteKeyToBibEbtry( linkSourceBase, kj );
+		    Optional<BibEntry> tmpEntry =
+			linkSourceBaseCiteKeyToBibEbtry( linkSourceBase, kj );
                     if (tmpEntry.isPresent()) {
                         cEntries[j] = tmpEntry.get();
                     } else {
