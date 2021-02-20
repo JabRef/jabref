@@ -781,6 +781,14 @@ class OOBibBase {
         return keys;
     }
 
+    /**
+     *  Extract citation keys from names of referenceMarks in the document.
+     *
+     *  Each citation key is listed only once, in the order of first appearance.
+     *
+     *   doc.referenceMarks.names.map(parse).flatten.unique
+     *
+     */
     private List<String> findCitedKeys()
 	throws NoSuchElementException,
 	       WrappedTargetException
