@@ -509,14 +509,6 @@ class OOBibBase {
 	    }
 
 	    sortBibEntryList( entries, style );
-	    //	      if (entries.size() > 1) {
-	    //                if (style.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL)) {
-	    //                    entries.sort(yearAuthorTitleComparator);
-	    //                } else {
-	    //                    entries.sort(entryComparator);
-	    //                }
-	    //            }
-
 
             String keyString =
 		String.join(",",
