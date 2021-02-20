@@ -938,6 +938,16 @@ class OOBibBase {
         }
     }
 
+    private static Optional<BibEntry> linkSourceBaseCiteKeyToBibEbtry( Map<String, BibDatabase>   linkSourceBase,
+								       String kj )
+    {
+	BibDatabase database = linkSourceBase.get(kj);
+	Optional<BibEntry> res = ( (database == null)
+				   ? Optional.empty()
+				   : database.getEntryByCitationKey(kj)
+				   );
+	return res;
+    }
     private List<String> refreshCiteMarkersInternal(List<BibDatabase> databases,
 						    OOBibStyle style)
 	throws WrappedTargetException,
@@ -1000,33 +1010,29 @@ class OOBibBase {
 
         int[] types = new int[names.size()];
         for (int i = 0; i < names.size(); i++) {
-            // Matcher citeMatcher = CITE_PATTERN.matcher(names.get(i));
-	    Optional<ParsedRefMark> op = parseRefMarkName( names.get(i) );
-            // if (citeMatcher.find()) {
+	    final String namei = names.get(i);
+	    Optional<ParsedRefMark> op = parseRefMarkName( namei );
             if ( op.isPresent() ) {
 		ParsedRefMark ov = op.get();
-                // String typeStr = citeMatcher.group(1);
-                // int type = Integer.parseInt(typeStr);
 		int type = ov.type;
                 types[i] = type; // Remember the type in case we need to uniquefy.
-                // String[] keys = citeMatcher.group(2).split(",");
                 String[] keys = ov.citedKeys.stream().toArray(String[]::new);
                 bibtexKeys[i] = keys;
 		//
                 BibEntry[] cEntries = new BibEntry[keys.length];
                 for (int j = 0; j < keys.length; j++) {
-                    BibDatabase database = linkSourceBase.get(keys[j]);
-                    Optional<BibEntry> tmpEntry = ( (database == null)
-						    ? Optional.empty()
-						    : database.getEntryByCitationKey(keys[j])
-						    );
+		    String kj = keys[j];
+		    Optional<BibEntry> tmpEntry = linkSourceBaseCiteKeyToBibEbtry( linkSourceBase, kj );
                     if (tmpEntry.isPresent()) {
                         cEntries[j] = tmpEntry.get();
                     } else {
-                        LOGGER.info("Citation key not found: '" + keys[j] + '\'');
+                        LOGGER.info("Citation key not found: '" + kj + '\'');
                         LOGGER.info("Problem with reference mark: '" + names.get(i) + '\'');
-                        throw new BibEntryNotFoundException(names.get(i), Localization
-                                .lang("Could not resolve BibTeX entry for citation marker '%0'.", names.get(i)));
+			String msg = Localization.lang("Could not resolve BibTeX entry"
+						       +" for citation marker '%0'.",
+						       names.get(i)
+						       );
+                        throw new BibEntryNotFoundException(names.get(i), msg);
                     }
                 } // for j
 
