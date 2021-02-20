@@ -796,17 +796,23 @@ class OOBibBase {
      *         If name does not match CITE_PATTERN, an empty List<String> is returned.
      */
     private List<String> parseRefMarkNameToUniqueCitationKeys(String name) {
-        List<String> keys = new ArrayList<>();
-        Matcher citeMatcher = CITE_PATTERN.matcher(name);
-        if (citeMatcher.find()) {
-            String[] keystring = citeMatcher.group(2).split(",");
-            for (String aKeystring : keystring) {
-                if (!keys.contains(aKeystring)) {
-                    keys.add(aKeystring);
-                }
-            }
-        }
-        return keys;
+	/*
+	 * List<String> keys = new ArrayList<>();
+	 * Matcher citeMatcher = CITE_PATTERN.matcher(name);
+	 * if (citeMatcher.find()) {
+         *    String[] keystring = citeMatcher.group(2).split(",");
+         *    for (String aKeystring : keystring) {
+         *        if (!keys.contains(aKeystring)) {
+         *            keys.add(aKeystring);
+         *        }
+         *    }
+	 * }
+	 */
+	Optional< ParsedRefMark > op = parseRefMarkName( name );
+	if ( op.isPresent() ){
+	    return op.get().citedKeys.stream().distinct().collect(Collectors.toList());
+	}
+        return new ArrayList<>();
     }
 
     /**
