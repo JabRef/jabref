@@ -449,7 +449,7 @@ class OOBibBase {
     /*
      * called from ManageCitationsDialogViewModel(...)
      */
-    public List<String> getJabRefReferenceMarks(XNameAccess nameAccess) {
+    private List<String> getJabRefReferenceMarkNames(XNameAccess nameAccess) {
         String[] names = nameAccess.getElementNames();
         // Remove all reference marks that don't look like JabRef citations:
         List<String> result = new ArrayList<>();
@@ -469,7 +469,7 @@ class OOBibBase {
 	       WrappedTargetException
     {
         XNameAccess nameAccess = this.getReferenceMarks();
-        List<String> names = this.getJabRefReferenceMarks(nameAccess);
+        List<String> names = this.getJabRefReferenceMarkNames(nameAccess);
 	List<CitationEntry> citations = new ArrayList(names.size());
         for (String name : names) {
             CitationEntry entry = new CitationEntry(name,
