@@ -423,21 +423,34 @@ class OOBibBase {
             XTextViewCursor xViewCursor = this.xViewCursorSupplier.getViewCursor();
 
 	    sortBibEntryList( entries, style );
-	    /*
-            if (entries.size() > 1) {
-                if (style.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL)) {
-                    entries.sort(yearAuthorTitleComparator);
-                } else {
-                    entries.sort(entryComparator);
-                }
-            }
-	    */
+	    //	      if (entries.size() > 1) {
+	    //                if (style.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL)) {
+	    //                    entries.sort(yearAuthorTitleComparator);
+	    //                } else {
+	    //                    entries.sort(entryComparator);
+	    //                }
+	    //            }
+
 
             String keyString = String.join(",",
-                    entries.stream().map(entry -> entry.getCitationKey().orElse("")).collect(Collectors.toList()));
+					   entries
+					   .stream()
+					   .map(entry ->
+						entry
+						.getCitationKey()
+						.orElse("")
+						)
+					   .collect(Collectors.toList())
+					   );
             // Insert bookmark:
-            String bName = getUniqueReferenceMarkName(keyString,
-                    withText ? inParenthesis ? OOBibBase.AUTHORYEAR_PAR : OOBibBase.AUTHORYEAR_INTEXT : OOBibBase.INVISIBLE_CIT);
+            String bName = getUniqueReferenceMarkName(
+						      keyString,
+						      withText
+						      ? ( inParenthesis
+							  ? OOBibBase.AUTHORYEAR_PAR
+							  : OOBibBase.AUTHORYEAR_INTEXT )
+						      : OOBibBase.INVISIBLE_CIT
+						      );
 
             // If we should store metadata for page info, do that now:
             if (pageInfo != null) {
