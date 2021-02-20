@@ -104,6 +104,10 @@ class OOBibBase {
     private static final Pattern CITE_PATTERN =
 	Pattern.compile(BIB_CITATION + "\\d*_(\\d*)_(.*)");
 
+    // Another pattern, to also recover the "i" part
+    private static final Pattern CITE_PATTERN2 =
+	Pattern.compile(BIB_CITATION + "(\\d*)_(\\d*)_(.*)");
+
     private static final String CHAR_STYLE_NAME = "CharStyleName";
 
     /* Types of in-text citation.
@@ -562,6 +566,27 @@ class OOBibBase {
         return name;
     }
 
+    private class ParsedRefMark {
+	public String i ; // "", "0", "1" ...
+	public int type ;
+	public List<String> citedKeys;
+	ParsedRefMark( String i, int type, List<String> citedKeys ){
+	    this.i=i;
+	    this.type = type;
+	    this.citedKeys = citedKeys;
+	}
+    }
+    private Optional<ParsedRefMark> parseRefMarkName( String name ){
+        Matcher citeMatcher = CITE_PATTERN2.matcher(name);
+        if (!citeMatcher.find()) {
+	    return Optional.empty();
+	}
+	List<String> keys = Arrays.asList( citeMatcher.group(3).split(",") );
+	String i = citeMatcher.group(1);
+	int type = Integer.parseInt( citeMatcher.group(2) );
+	return( Optional.of( new ParsedRefMark( i, type, keys ) ) );
+    }
+
     /**
      * This method inserts a cite marker in the text (at the cursor) for the given
      * BibEntry, and may refresh the bibliography.
@@ -759,6 +784,7 @@ class OOBibBase {
         }
     }
 
+    
     /**
      * Extract the list of citation keys from a reference mark name.
      *
