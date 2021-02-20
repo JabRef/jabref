@@ -104,6 +104,9 @@ class OOBibBase {
 
     private static final String CHAR_STYLE_NAME = "CharStyleName";
 
+    /* Types of in-text citation.
+     * Their numeric values are used in reference mark names.
+     */
     private static final int AUTHORYEAR_PAR    = 1;
     private static final int AUTHORYEAR_INTEXT = 2;
     private static final int INVISIBLE_CIT     = 3;
@@ -137,6 +140,34 @@ class OOBibBase {
 			       Object object)
     {
 	return UnoRuntime.queryInterface( zInterface, object );
+    }
+
+    /*
+     * Constructor
+     */
+
+    private XDesktop simpleBootstrap(Path loPath)
+	throws CreationException,
+	       BootstrapException
+    {
+        // Get the office component context:
+        XComponentContext      context = org.jabref.gui.openoffice.Bootstrap.bootstrap(loPath);
+        XMultiComponentFactory sem     = context.getServiceManager();
+
+        // Create the desktop, which is the root frame of the
+        // hierarchy of frames that contain viewable components:
+        Object desktop;
+        try {
+            desktop = sem.createInstanceWithContext("com.sun.star.frame.Desktop", context);
+        } catch (Exception e) {
+            throw new CreationException(e.getMessage());
+        }
+        XDesktop result = unoQI(XDesktop.class, desktop);
+
+	// TODO: useless call?
+        // unoQI(XComponentLoader.class, desktop);
+
+        return result;
     }
 
     public OOBibBase(Path loPath,
@@ -176,6 +207,32 @@ class OOBibBase {
 
     public boolean isConnectedToDocument() {
         return this.xCurrentComponent != null;
+    }
+
+    /*
+     *  section: selectDocument()
+     */
+
+    private static List<XTextDocument> getTextDocuments( XDesktop desktop )
+	throws NoSuchElementException,
+	       WrappedTargetException
+    {
+        List<XTextDocument> result = new ArrayList<>();
+
+        XEnumerationAccess  enumAccess = desktop.getComponents();
+        XEnumeration        compEnum   = enumAccess.createEnumeration();
+
+        // TODO: http://api.openoffice.org/docs/DevelopersGuide/OfficeDev/OfficeDev.xhtml#1_1_3_2_1_2_Frame_Hierarchies
+
+        while (compEnum.hasMoreElements()) {
+            Object       next = compEnum.nextElement();
+            XComponent   comp = unoQI(XComponent.class   , next);
+            XTextDocument doc = unoQI(XTextDocument.class, comp);
+            if (doc != null) {
+                result.add(doc);
+            }
+        }
+        return result;
     }
 
     private static Optional<String> getDocumentTitle(XTextDocument doc) {
@@ -238,27 +295,6 @@ class OOBibBase {
 	    .orElse(null);
     }
 
-    private static List<XTextDocument> getTextDocuments( XDesktop desktop )
-	throws NoSuchElementException,
-	       WrappedTargetException
-    {
-        List<XTextDocument> result = new ArrayList<>();
-
-        XEnumerationAccess  enumAccess = desktop.getComponents();
-        XEnumeration        compEnum   = enumAccess.createEnumeration();
-
-        // TODO: http://api.openoffice.org/docs/DevelopersGuide/OfficeDev/OfficeDev.xhtml#1_1_3_2_1_2_Frame_Hierarchies
-
-        while (compEnum.hasMoreElements()) {
-            Object       next = compEnum.nextElement();
-            XComponent   comp = unoQI(XComponent.class   , next);
-            XTextDocument doc = unoQI(XTextDocument.class, comp);
-            if (doc != null) {
-                result.add(doc);
-            }
-        }
-        return result;
-    }
     /** Choose a document to work with.
      *
      *  inititalized fields:
@@ -323,52 +359,38 @@ class OOBibBase {
         this.propertySet = unoQI(XPropertySet.class, this.userProperties);
     }
 
+    /*
+     *  Getters useful after selectDocument()
+     */
+
     public Optional<String> getCurrentDocumentTitle() {
         return OOBibBase.getDocumentTitle( this.mxDoc );
     }
 
 
-    private XDesktop simpleBootstrap(Path loPath)
-            throws CreationException,
-		   BootstrapException
-    {
-        // Get the office component context:
-        XComponentContext      context = org.jabref.gui.openoffice.Bootstrap.bootstrap(loPath);
-        XMultiComponentFactory sem     = context.getServiceManager();
-
-        // Create the desktop, which is the root frame of the
-        // hierarchy of frames that contain viewable components:
-        Object desktop;
-        try {
-            desktop = sem.createInstanceWithContext("com.sun.star.frame.Desktop", context);
-        } catch (Exception e) {
-            throw new CreationException(e.getMessage());
-        }
-        XDesktop result = unoQI(XDesktop.class, desktop);
-
-	// TODO: useless call?
-        // unoQI(XComponentLoader.class, desktop);
-
-        return result;
-    }
-
     public Optional<String> getCustomProperty(String property)
 	throws UnknownPropertyException,
 	       WrappedTargetException
     {
-	XPropertySetInfo psi = this.propertySet.getPropertySetInfo();
+	assert (this.propertySet != null);
+	XPropertySetInfo psi =
+	    this.propertySet
+	    .getPropertySetInfo();
         if (psi.hasPropertyByName(property)) {
-	    String v = this.propertySet.getPropertyValue(property).toString();
+	    String v =
+		this.propertySet
+		.getPropertyValue(property)
+		.toString();
             return Optional.ofNullable(v);
         }
         return Optional.empty();
     }
 
-    public void updateSortedReferenceMarks()
-	throws WrappedTargetException,
-	       NoSuchElementException
-    {
-        this.sortedReferenceMarks = getSortedReferenceMarks(getReferenceMarks());
+    public XNameAccess getReferenceMarks() {
+        XReferenceMarksSupplier supplier =
+	    unoQI(XReferenceMarksSupplier.class,
+		  this.xCurrentComponent);
+        return supplier.getReferenceMarks();
     }
 
     public void setCustomProperty(String property, String value)
@@ -378,27 +400,41 @@ class OOBibBase {
 	       IllegalTypeException,
 	       IllegalArgumentException
     {
-	XPropertySetInfo psi = this.propertySet.getPropertySetInfo();
+	XPropertySetInfo psi =
+	    this.propertySet
+	    .getPropertySetInfo();
         if (psi.hasPropertyByName(property)) {
             this.userProperties.removeProperty(property);
         }
         if (value != null) {
-            this.userProperties.addProperty(property,
-					    com.sun.star.beans.PropertyAttribute.REMOVEABLE,
-					    new Any(Type.STRING, value)
-					    );
+            this.userProperties
+		.addProperty(property,
+			     com.sun.star.beans.PropertyAttribute.REMOVEABLE,
+			     new Any(Type.STRING, value)
+			     );
         }
     }
 
-    private void sortBibEntryList( List<BibEntry>    entries, OOBibStyle        style ){
-	if (entries.size() > 1) {
-	    if (style.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL)) {
-		entries.sort(this.yearAuthorTitleComparator);
-	    } else {
-		entries.sort(this.entryComparator);
-	    }
+    private void sortBibEntryList( List<BibEntry>    entries,
+				   OOBibStyle        style )
+    {
+	if (entries.size() <= 1){
+	    return;
+	}
+	if (style.getBooleanCitProperty( OOBibStyle.MULTI_CITE_CHRONOLOGICAL )) {
+	    entries.sort(this.yearAuthorTitleComparator);
+	} else {
+	    entries.sort(this.entryComparator);
 	}
     }
+
+    private static int citationTypeFromOptions( boolean withText, boolean inParenthesis ){
+	if ( !withText ){ return OOBibBase.INVISIBLE_CIT ; }
+	return ( inParenthesis
+		 ? OOBibBase.AUTHORYEAR_PAR
+		 : OOBibBase.AUTHORYEAR_INTEXT );
+    }
+
     /**
      * This method inserts a cite marker in the text (at the cursor) for the given
      * BibEntry, and may refresh the bibliography.
@@ -412,6 +448,7 @@ class OOBibBase {
      * @param withText      Indicates whether this should be a normal citation (true)
      *                      or an empty (invisible) citation (false).
      * @param sync          Indicates whether the reference list should be refreshed.
+     *
      * @throws IllegalTypeException
      * @throws PropertyExistException
      * @throws NotRemoveableException
@@ -449,8 +486,27 @@ class OOBibBase {
 	       UndefinedParagraphFormatException
     {
         try {
-	    // Get the cursor positioned by the user.
-            XTextViewCursor xViewCursor = this.xViewCursorSupplier.getViewCursor();
+	    XTextCursor cursor;
+	    {
+		// Get the cursor positioned by the user.
+		XTextViewCursor xViewCursor =
+		    this.xViewCursorSupplier
+		    .getViewCursor();
+		//
+		// https://wiki.openoffice.org/wiki/Documentation/DevGuide/Text/Example:_Visible_Cursor_Position
+		//
+		// We create a model cursor at the current view cursor
+		// position with the following steps: we get the Text
+		// service from the TextViewCursor, the cursor is an
+		// XTextRange and has therefore a method getText()
+		//
+		XText xDocumentText = xViewCursor.getText();
+		// the text creates a model cursor from the viewcursor
+		XTextCursor xModelCursor =
+		    xDocumentText.createTextCursorByRange(xViewCursor.getStart());
+		// use the xModelCursor
+		cursor = xModelCursor;
+	    }
 
 	    sortBibEntryList( entries, style );
 	    //	      if (entries.size() > 1) {
@@ -462,25 +518,15 @@ class OOBibBase {
 	    //            }
 
 
-            String keyString = String.join(",",
-					   entries
-					   .stream()
-					   .map(entry ->
-						entry
-						.getCitationKey()
-						.orElse("")
-						)
-					   .collect(Collectors.toList())
-					   );
+            String keyString =
+		String.join(",",
+			    entries.stream()
+			    .map( entry -> entry.getCitationKey().orElse("") )
+			    .collect( Collectors.toList() )
+			    );
             // Insert bookmark:
-            String bName = getUniqueReferenceMarkName(
-						      keyString,
-						      withText
-						      ? ( inParenthesis
-							  ? OOBibBase.AUTHORYEAR_PAR
-							  : OOBibBase.AUTHORYEAR_INTEXT )
-						      : OOBibBase.INVISIBLE_CIT
-						      );
+	    int    citationType = citationTypeFromOptions( withText, inParenthesis );
+            String bName        = getUniqueReferenceMarkName( keyString, citationType );
 
             // If we should store metadata for page info, do that now:
             if (pageInfo != null) {
@@ -488,35 +534,51 @@ class OOBibBase {
                 setCustomProperty(bName, pageInfo);
             }
 
-            xViewCursor.getText().insertString(xViewCursor, " ", false);
-            if (style.isFormatCitations()) {
-                XPropertySet xCursorProps = unoQI(XPropertySet.class, xViewCursor);
-                String charStyle = style.getCitationCharacterFormat();
+	    // insert space
+            cursor
+		.getText()
+		.insertString(cursor, " ", false);
+
+            if ( style.isFormatCitations() ) {
+                XPropertySet xCursorProps = unoQI(XPropertySet.class, cursor);
+                String       charStyle    = style.getCitationCharacterFormat();
                 try {
                     xCursorProps.setPropertyValue(CHAR_STYLE_NAME, charStyle);
-                } catch (UnknownPropertyException | PropertyVetoException | IllegalArgumentException |
-                        WrappedTargetException ex) {
-                    // Setting the character format failed, so we throw an exception that
-                    // will result in an error message for the user. Before that,
-                    // delete the space we inserted:
-                    xViewCursor.goLeft((short) 1, true);
-                    xViewCursor.setString("");
-                    throw new UndefinedCharacterFormatException(charStyle);
-                }
+                } catch ( UnknownPropertyException
+			| PropertyVetoException
+			| IllegalArgumentException
+			| WrappedTargetException ex
+			)
+		    {
+			// Setting the character format failed, so we throw an exception that
+			// will result in an error message for the user. Before that,
+			// delete the space we inserted:
+			cursor.goLeft((short) 1, true);
+			cursor.setString("");
+			throw new UndefinedCharacterFormatException(charStyle);
+		    }
             }
-            xViewCursor.goLeft((short) 1, false);
+            cursor.goLeft((short) 1, false);
             Map<BibEntry, BibDatabase> databaseMap = new HashMap<>();
             for (BibEntry entry : entries) {
                 databaseMap.put(entry, database);
             }
-            String citeText = style.isNumberEntries() ? "-" : style.getCitationMarker(entries, databaseMap,
-                    inParenthesis, null, null);
-            insertReferenceMark(bName, citeText, xViewCursor, withText, style);
+            String citeText =
+		style.isNumberEntries()
+		? "-"
+		: style.getCitationMarker(entries,
+					  databaseMap,
+					  inParenthesis,
+					  null,
+					  null
+					  );
 
-            xViewCursor.collapseToEnd();
-            xViewCursor.goRight((short) 1, false);
+            insertReferenceMark(bName, citeText, cursor, withText, style);
 
-            XTextRange position = xViewCursor.getEnd();
+            cursor.collapseToEnd();
+            cursor.goRight((short) 1, false);
+
+            XTextRange position = cursor.getEnd();
 
             if (sync) {
                 // To account for numbering and for uniqiefiers, we must refresh the cite markers:
@@ -528,7 +590,7 @@ class OOBibBase {
             }
 
             // Go back to the relevant position:
-            xViewCursor.gotoRange(position, false);
+            cursor.gotoRange(position, false);
         } catch (DisposedException ex) {
             // We need to catch this one here because the OpenOfficePanel class is
             // loaded before connection, and therefore cannot directly reference
@@ -925,10 +987,11 @@ class OOBibBase {
         return result;
     }
 
-    public XNameAccess getReferenceMarks() {
-        XReferenceMarksSupplier supplier =
-	    unoQI(XReferenceMarksSupplier.class, xCurrentComponent);
-        return supplier.getReferenceMarks();
+    public void updateSortedReferenceMarks()
+	throws WrappedTargetException,
+	       NoSuchElementException
+    {
+        this.sortedReferenceMarks = getSortedReferenceMarks(getReferenceMarks());
     }
 
     /*
