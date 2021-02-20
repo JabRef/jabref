@@ -233,7 +233,7 @@ class OOBibBase {
     {
 	{
 	    XTextDocument selected;
-	    List<XTextDocument> textDocumentList = getTextDocuments();
+	    List<XTextDocument> textDocumentList = getTextDocuments(this.xDesktop);
 	    if (textDocumentList.isEmpty()) {
 		throw new NoDocumentException("No Writer documents found");
 	    } else if (textDocumentList.size() == 1) {
@@ -276,13 +276,13 @@ class OOBibBase {
         this.propertySet = unoQI(XPropertySet.class, this.userProperties);
     }
 
-    private List<XTextDocument> getTextDocuments()
+    private static List<XTextDocument> getTextDocuments( XDesktop desktop )
 	throws NoSuchElementException,
 	       WrappedTargetException
     {
         List<XTextDocument> result = new ArrayList<>();
 
-        XEnumerationAccess  enumAccess = xDesktop.getComponents();
+        XEnumerationAccess  enumAccess = desktop.getComponents();
         XEnumeration        compEnum   = enumAccess.createEnumeration();
 
         // TODO: http://api.openoffice.org/docs/DevelopersGuide/OfficeDev/OfficeDev.xhtml#1_1_3_2_1_2_Frame_Hierarchies
