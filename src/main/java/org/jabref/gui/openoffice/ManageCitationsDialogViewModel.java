@@ -35,13 +35,15 @@ public class ManageCitationsDialogViewModel {
         this.ooBase = ooBase;
         this.dialogService = dialogService;
 
-        XNameAccess nameAccess = ooBase.getReferenceMarks();
-        List<String> names = ooBase.getJabRefReferenceMarks(nameAccess);
-        for (String name : names) {
+        // XNameAccess nameAccess = ooBase.getReferenceMarks();
+        // List<String> names = ooBase.getJabRefReferenceMarks(nameAccess);
+	List<CitationEntry> cts = ooBase.getCitationEntries();
+        //for (String name : names) {
+        for ( CitationEntry entry  : cts ) {
 
-            CitationEntry entry = new CitationEntry(name,
-                    ooBase.getCitationContext(nameAccess, name, 30, 30, true),
-                    ooBase.getCustomProperty(name));
+            //CitationEntry entry = new CitationEntry(name,
+            //        ooBase.getCitationContext(nameAccess, name, 30, 30, true),
+            //        ooBase.getCustomProperty(name));
 
             CitationEntryViewModel itemViewModelEntry = new CitationEntryViewModel(entry);
             citations.add(itemViewModelEntry);

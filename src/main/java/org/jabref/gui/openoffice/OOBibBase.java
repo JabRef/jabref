@@ -33,6 +33,8 @@ import org.jabref.logic.openoffice.OOPreFormatter;
 import org.jabref.logic.openoffice.OOUtil;
 import org.jabref.logic.openoffice.UndefinedBibtexEntry;
 import org.jabref.logic.openoffice.UndefinedParagraphFormatException;
+import org.jabref.logic.openoffice.CitationEntry;
+
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -445,6 +447,40 @@ class OOBibBase {
     }
 
     /*
+     * called from ManageCitationsDialogViewModel(...)
+     */
+    public List<String> getJabRefReferenceMarks(XNameAccess nameAccess) {
+        String[] names = nameAccess.getElementNames();
+        // Remove all reference marks that don't look like JabRef citations:
+        List<String> result = new ArrayList<>();
+        if (names != null) {
+            for (String name : names) {
+                if (CITE_PATTERN.matcher(name).find()) {
+                    result.add(name);
+                }
+            }
+        }
+        return result;
+    }
+
+    public List<CitationEntry> getCitationEntries()
+	throws NoSuchElementException,
+	       UnknownPropertyException,
+	       WrappedTargetException
+    {
+        XNameAccess nameAccess = this.getReferenceMarks();
+        List<String> names = this.getJabRefReferenceMarks(nameAccess);
+	List<CitationEntry> citations = new ArrayList(names.size());
+        for (String name : names) {
+            CitationEntry entry = new CitationEntry(name,
+                    this.getCitationContext(nameAccess, name, 30, 30, true),
+                    this.getCustomProperty(name));
+            citations.add(entry);
+        }
+	return citations;
+    }
+
+    /*
      * The first occurrence of bibtexKey gets no serial number, the
      * second gets 0, the third 1 ...
      *
@@ -606,7 +642,7 @@ class OOBibBase {
 		// the text we insert?
 		String citeText =
 		    style.isNumberEntries()
-		    ? "-" // A dash only. Presumably 
+		    ? "-" // A dash only. Presumably we expect a refresh later.
 		    : style.getCitationMarker(entries,
 					      databaseMap,
 					      inParenthesis,
@@ -659,19 +695,6 @@ class OOBibBase {
         }
     }
 
-    public List<String> getJabRefReferenceMarks(XNameAccess nameAccess) {
-        String[] names = nameAccess.getElementNames();
-        // Remove all reference marks that don't look like JabRef citations:
-        List<String> result = new ArrayList<>();
-        if (names != null) {
-            for (String name : names) {
-                if (CITE_PATTERN.matcher(name).find()) {
-                    result.add(name);
-                }
-            }
-        }
-        return result;
-    }
 
     /**
      * Refresh all cite markers in the document.
