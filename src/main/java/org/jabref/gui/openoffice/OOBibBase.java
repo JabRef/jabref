@@ -178,8 +178,8 @@ class OOBibBase {
         return this.xCurrentComponent != null;
     }
 
-    private XTextDocument selectComponent(List<XTextDocument> list,
-					  DialogService dialogService)
+    private static XTextDocument selectComponent(List<XTextDocument> list,
+						 DialogService dialogService)
     {
 	class DocumentTitleViewModel {
 
