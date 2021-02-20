@@ -492,20 +492,27 @@ class OOBibBase {
 		XTextViewCursor xViewCursor =
 		    this.xViewCursorSupplier
 		    .getViewCursor();
-		//
-		// https://wiki.openoffice.org/wiki/Documentation/DevGuide/Text/Example:_Visible_Cursor_Position
-		//
-		// We create a model cursor at the current view cursor
-		// position with the following steps: we get the Text
-		// service from the TextViewCursor, the cursor is an
-		// XTextRange and has therefore a method getText()
-		//
-		XText xDocumentText = xViewCursor.getText();
-		// the text creates a model cursor from the viewcursor
-		XTextCursor xModelCursor =
-		    xDocumentText.createTextCursorByRange(xViewCursor.getStart());
-		// use the xModelCursor
-		cursor = xModelCursor;
+		if ( true ){
+		    cursor = xViewCursor;
+		} else {
+		    //
+		    // An XTextCursor is sufficient for the rest.
+		    //
+		    // https://wiki.openoffice.org/wiki/Documentation/DevGuide/Text/\
+		    //      Example:_Visible_Cursor_Position
+		    //
+		    // We create a model cursor at the current view cursor
+		    // position with the following steps: we get the Text
+		    // service from the TextViewCursor, the cursor is an
+		    // XTextRange and has therefore a method getText()
+		    //
+		    XText xDocumentText = xViewCursor.getText();
+		    // the text creates a model cursor from the viewcursor
+		    XTextCursor xModelCursor =
+			xDocumentText.createTextCursorByRange(xViewCursor.getStart());
+		    // use the xModelCursor
+		    cursor = xModelCursor;
+		}
 	    }
 
 	    sortBibEntryList( entries, style );
@@ -516,7 +523,7 @@ class OOBibBase {
 			    .map( entry -> entry.getCitationKey().orElse("") )
 			    .collect( Collectors.toList() )
 			    );
-            // Insert bookmark:
+	    // Generate unique bookmark-name
 	    int    citationType = citationTypeFromOptions( withText, inParenthesis );
             String bName        = getUniqueReferenceMarkName( keyString, citationType );
 
@@ -531,6 +538,7 @@ class OOBibBase {
 		.getText()
 		.insertString(cursor, " ", false);
 
+	    // format the space inserted
             if ( style.isFormatCitations() ) {
                 XPropertySet xCursorProps = unoQI(XPropertySet.class, cursor);
                 String       charStyle    = style.getCitationCharacterFormat();
@@ -542,47 +550,60 @@ class OOBibBase {
 			| WrappedTargetException ex
 			)
 		    {
-			// Setting the character format failed, so we throw an exception that
-			// will result in an error message for the user. Before that,
-			// delete the space we inserted:
+			// Setting the character format failed, so we
+			// throw an exception that will result in an
+			// error message for the user.
+			//
+			// Before that, delete the space we inserted:
 			cursor.goLeft((short) 1, true);
 			cursor.setString("");
 			throw new UndefinedCharacterFormatException(charStyle);
 		    }
             }
+
+	    // go back to before the space
             cursor.goLeft((short) 1, false);
-            Map<BibEntry, BibDatabase> databaseMap = new HashMap<>();
-            for (BibEntry entry : entries) {
-                databaseMap.put(entry, database);
-            }
-            String citeText =
-		style.isNumberEntries()
-		? "-"
-		: style.getCitationMarker(entries,
-					  databaseMap,
-					  inParenthesis,
-					  null,
-					  null
-					  );
 
-            insertReferenceMark(bName, citeText, cursor, withText, style);
-
+            // Insert bookmark and text
+	    {
+		// Create a BibEntry to BibDatabase map (to make
+		// style.getCitationMarker happy?)
+		Map<BibEntry, BibDatabase> databaseMap = new HashMap<>();
+		for (BibEntry entry : entries) {
+		    databaseMap.put(entry, database);
+		}
+		String citeText =
+		    style.isNumberEntries()
+		    ? "-"
+		    : style.getCitationMarker(entries,
+					      databaseMap,
+					      inParenthesis,
+					      null,
+					      null
+					      );
+		insertReferenceMark(bName, citeText, cursor, withText, style);
+	    }
+	    //
+	    // Move to the right of the space and remember this
+	    // position: we will come back here in the end.
+	    //
             cursor.collapseToEnd();
             cursor.goRight((short) 1, false);
-
             XTextRange position = cursor.getEnd();
 
             if (sync) {
-                // To account for numbering and for uniqiefiers, we must refresh the cite markers:
+                // To account for numbering and for uniqiefiers, we
+                // must refresh the cite markers:
                 updateSortedReferenceMarks();
                 refreshCiteMarkers(allBases, style);
 
                 // Insert it at the current position:
                 rebuildBibTextSection(allBases, style);
+
+		// Go back to the relevant position:
+		cursor.gotoRange(position, false);
             }
 
-            // Go back to the relevant position:
-            cursor.gotoRange(position, false);
         } catch (DisposedException ex) {
             // We need to catch this one here because the OpenOfficePanel class is
             // loaded before connection, and therefore cannot directly reference
