@@ -238,10 +238,27 @@ class OOBibBase {
 	    .orElse(null);
     }
 
-    public Optional<String> getCurrentDocumentTitle() {
-        return getDocumentTitle( this.mxDoc );
-    }
+    private static List<XTextDocument> getTextDocuments( XDesktop desktop )
+	throws NoSuchElementException,
+	       WrappedTargetException
+    {
+        List<XTextDocument> result = new ArrayList<>();
 
+        XEnumerationAccess  enumAccess = desktop.getComponents();
+        XEnumeration        compEnum   = enumAccess.createEnumeration();
+
+        // TODO: http://api.openoffice.org/docs/DevelopersGuide/OfficeDev/OfficeDev.xhtml#1_1_3_2_1_2_Frame_Hierarchies
+
+        while (compEnum.hasMoreElements()) {
+            Object       next = compEnum.nextElement();
+            XComponent   comp = unoQI(XComponent.class   , next);
+            XTextDocument doc = unoQI(XTextDocument.class, comp);
+            if (doc != null) {
+                result.add(doc);
+            }
+        }
+        return result;
+    }
     /** Choose a document to work with.
      *
      *  inititalized fields:
@@ -306,27 +323,10 @@ class OOBibBase {
         this.propertySet = unoQI(XPropertySet.class, this.userProperties);
     }
 
-    private static List<XTextDocument> getTextDocuments( XDesktop desktop )
-	throws NoSuchElementException,
-	       WrappedTargetException
-    {
-        List<XTextDocument> result = new ArrayList<>();
-
-        XEnumerationAccess  enumAccess = desktop.getComponents();
-        XEnumeration        compEnum   = enumAccess.createEnumeration();
-
-        // TODO: http://api.openoffice.org/docs/DevelopersGuide/OfficeDev/OfficeDev.xhtml#1_1_3_2_1_2_Frame_Hierarchies
-
-        while (compEnum.hasMoreElements()) {
-            Object       next = compEnum.nextElement();
-            XComponent   comp = unoQI(XComponent.class   , next);
-            XTextDocument doc = unoQI(XTextDocument.class, comp);
-            if (doc != null) {
-                result.add(doc);
-            }
-        }
-        return result;
+    public Optional<String> getCurrentDocumentTitle() {
+        return OOBibBase.getDocumentTitle( this.mxDoc );
     }
+
 
     private XDesktop simpleBootstrap(Path loPath)
             throws CreationException,
