@@ -43,8 +43,6 @@ java {
 application {
     mainClassName = "org.jabref.gui.JabRefLauncher"
     mainModule = 'org.jabref'
-     // enable assertions
-    applicationDefaultJvmArgs = ['-ea']
 }
 
 // TODO: Ugly workaround to temporarily ignore build errors to dependencies of latex2unicode
