@@ -1327,25 +1327,40 @@ class OOBibBase {
 
 
     /**
-     * Resolve the citation key from a citation reference marker name, and look up the index of the key in a list of keys.
+     * Resolve the citation key from a citation reference marker name,
+     * and look up the index of the key in a list of keys.
      *
      * @param citRefName The name of the ReferenceMark representing the citation.
      * @param keys       A List of citation keys representing the entries in the bibliography.
-     * @return the indices of the cited keys, -1 if a key is not found. Returns null if the ref name could not be resolved as a citation.
+     * @return the (1-based) indices of the cited keys, -1 if a key is not found.
+     *         Returns Collections.emptyList() if the ref name could not be resolved as a citation.
      */
     private List<Integer> findCitedEntryIndex(String citRefName, List<String> keys) {
-        Matcher citeMatcher = CITE_PATTERN.matcher(citRefName);
-        if (citeMatcher.find()) {
-            List<String> keyStrings = Arrays.asList(citeMatcher.group(2).split(","));
-            List<Integer> result = new ArrayList<>(keyStrings.size());
-            for (String key : keyStrings) {
-                int ind = keys.indexOf(key);
-                result.add(ind == -1 ? -1 : 1 + ind);
-            }
-            return result;
-        } else {
-            return Collections.emptyList();
-        }
+	/*
+	 * Matcher citeMatcher = CITE_PATTERN.matcher(citRefName);
+	 * if (citeMatcher.find()) {
+	 *     List<String> keyStrings = Arrays.asList(citeMatcher.group(2).split(","));
+	 *     List<Integer> result = new ArrayList<>(keyStrings.size());
+	 *     for (String key : keyStrings) {
+	 *         int ind = keys.indexOf(key);
+	 *         result.add(ind == -1 ? -1 : 1 + ind);
+	 *     }
+	 *     return result;
+	 * } else {
+	 *     return Collections.emptyList();
+	 * }
+	 */
+	Optional< ParsedRefMark > op = parseRefMarkName( citRefName );
+	if ( !op.isPresent() ){
+	    return Collections.emptyList();
+	}
+	List<String> keyStrings = op.get().citedKeys;
+	List<Integer> result = new ArrayList<>(keyStrings.size());
+	for (String key : keyStrings) {
+	    int ind = keys.indexOf(key);
+	    result.add(ind == -1 ? -1 : 1 + ind);
+	}
+	return result;
     }
 
     private Map<BibEntry, BibDatabase> getSortedEntriesFromSortedRefMarks(List<String> names,
