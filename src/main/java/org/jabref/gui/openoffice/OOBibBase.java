@@ -766,6 +766,8 @@ class OOBibBase {
      * @return The list of citation keys encoded in the name.
      *         In case of duplicated citation keys, only the first occurrence.
      *         Otherwise their order is preserved.
+     *
+     *         If name does not match CITE_PATTERN, an empty List<String> is returned.
      */
     private List<String> parseRefMarkNameToUniqueCitationKeys(String name) {
         List<String> keys = new ArrayList<>();
