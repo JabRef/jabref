@@ -184,11 +184,11 @@ class OOBibBase {
 	class DocumentTitleViewModel {
 
 	    private final XTextDocument xTextDocument;
-	    private final String description;
+	    private final String        description;
 
 	    public DocumentTitleViewModel(XTextDocument xTextDocument) {
 		this.xTextDocument = xTextDocument;
-		this.description = getDocumentTitle(xTextDocument).orElse("");
+		this.description   = OOBibBase.getDocumentTitle(xTextDocument).orElse("");
 	    }
 
 	    public XTextDocument getXtextDocument() {
