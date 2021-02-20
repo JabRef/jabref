@@ -32,19 +32,11 @@ public class ManageCitationsDialogViewModel {
     private final DialogService dialogService;
 
     public ManageCitationsDialogViewModel(OOBibBase ooBase, DialogService dialogService) throws NoSuchElementException, WrappedTargetException, UnknownPropertyException {
-        this.ooBase = ooBase;
+        this.ooBase        = ooBase;
         this.dialogService = dialogService;
 
-        // XNameAccess nameAccess = ooBase.getReferenceMarks();
-        // List<String> names = ooBase.getJabRefReferenceMarks(nameAccess);
 	List<CitationEntry> cts = ooBase.getCitationEntries();
-        //for (String name : names) {
         for ( CitationEntry entry  : cts ) {
-
-            //CitationEntry entry = new CitationEntry(name,
-            //        ooBase.getCitationContext(nameAccess, name, 30, 30, true),
-            //        ooBase.getCustomProperty(name));
-
             CitationEntryViewModel itemViewModelEntry = new CitationEntryViewModel(entry);
             citations.add(itemViewModelEntry);
         }
