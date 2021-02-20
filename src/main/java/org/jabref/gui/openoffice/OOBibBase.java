@@ -269,7 +269,9 @@ class OOBibBase {
 		selected = textDocumentList.get(0);
 	    } else {
 		// Bring up a dialog
-		selected = selectDocumentDialog(textDocumentList, this.dialogService);
+		selected =
+		    OOBibBase.selectDocumentDialog(textDocumentList,
+						   this.dialogService);
 	    }
 
 	    if (selected == null) {
