@@ -767,7 +767,7 @@ class OOBibBase {
      *         In case of duplicated citation keys, only the first occurrence.
      *         Otherwise their order is preserved.
      */
-    public List<String> parseRefMarkNameToUniqueCitationKeys(String name) {
+    private List<String> parseRefMarkNameToUniqueCitationKeys(String name) {
         List<String> keys = new ArrayList<>();
         Matcher citeMatcher = CITE_PATTERN.matcher(name);
         if (citeMatcher.find()) {
