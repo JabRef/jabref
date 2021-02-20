@@ -390,7 +390,7 @@ class OOBibBase {
         return Optional.empty();
     }
 
-    public void setCustomProperty(String property, String value)
+    private void setCustomProperty(String property, String value)
 	throws UnknownPropertyException,
 	       NotRemoveableException,
 	       PropertyExistException,
