@@ -812,7 +812,11 @@ class OOBibBase {
             Object referenceMark = xReferenceMarks.getByName(names.get(i));
             XTextContent bookmark = unoQI(XTextContent.class, referenceMark);
 
-            XTextCursor cursor = bookmark.getAnchor().getText().createTextCursorByRange(bookmark.getAnchor());
+            XTextCursor cursor =
+		bookmark
+		.getAnchor()
+		.getText()
+		.createTextCursorByRange(bookmark.getAnchor());
 
             if (mustTestCharFormat) {
                 // If we are supposed to set character format for citations, must run a test before we
