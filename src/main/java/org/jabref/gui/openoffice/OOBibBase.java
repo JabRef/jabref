@@ -814,8 +814,23 @@ class OOBibBase {
         return keys;
     }
 
-    private Map<BibEntry, BibDatabase> findCitedEntries(List<BibDatabase> databases, List<String> keys,
-                                                        Map<String, BibDatabase> linkSourceBase) {
+    /**
+     * @return LinkedHashMap, from BibEntry to BibDatabase
+     *
+     *  If a key is not found, BibEntry is new UndefinedBibtexEntry(key), BibDatabase is null.
+     *  If key is found, then
+     *          BibEntry is what we found, BibDatabase is the database we found it in.
+     *          linkSourceBase.put(key, database); is called.
+     *
+     *  So:
+     *  - result has an entry for each key, in the same order
+     *  - key in the entry is the same as the original key
+     *  - on return linkSourceBase has an entry for the keys we did find
+     */
+    private Map<BibEntry, BibDatabase> findCitedEntries(List<BibDatabase> databases,
+							List<String> keys,
+                                                        Map<String, BibDatabase> linkSourceBase)
+    {
         Map<BibEntry, BibDatabase> entries = new LinkedHashMap<>();
         for (String key : keys) {
             boolean found = false;
