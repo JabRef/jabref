@@ -933,7 +933,7 @@ class OOBibBase {
 	       BibEntryNotFoundException
     {
         List<String> cited = findCitedKeys();
-        Map<String, BibDatabase> linkSourceBase = new HashMap<>();
+        Map<String, BibDatabase>   linkSourceBase = new HashMap<>();
         Map<BibEntry, BibDatabase> entries = findCitedEntries(databases, cited, linkSourceBase);
 
         XNameAccess xReferenceMarks = getReferenceMarks();
