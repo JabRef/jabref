@@ -461,6 +461,10 @@ class OOBibBase {
      * @throws CreationException
      * @throws BibEntryNotFoundException
      * @throws UndefinedParagraphFormatException
+     *
+     * TODO: https://www.openoffice.org/api/docs/common/ref/com/sun/star/document/XUndoManager.html
+     * Group changes into a single Undo context.
+     *
      */
     public void insertEntry(List<BibEntry>    entries,
 			    BibDatabase       database,
@@ -572,9 +576,10 @@ class OOBibBase {
 		for (BibEntry entry : entries) {
 		    databaseMap.put(entry, database);
 		}
+		// the text we insert?
 		String citeText =
 		    style.isNumberEntries()
-		    ? "-"
+		    ? "-" // A dash only. Presumably 
 		    : style.getCitationMarker(entries,
 					      databaseMap,
 					      inParenthesis,
