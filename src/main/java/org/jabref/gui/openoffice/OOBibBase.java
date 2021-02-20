@@ -611,14 +611,16 @@ class OOBibBase {
 		 * position was deleted by rebuildBibTextSection()
 		 *
 		 * at com.sun.proxy.$Proxy44.gotoRange(Unknown Source)
-		 * at org.jabref@100.0.0/org.jabref.gui.openoffice.OOBibBase.insertEntry(OOBibBase.java:609)
+		 * at org.jabref@100.0.0/org.jabref.gui.openoffice
+		 *      .OOBibBase.insertEntry(OOBibBase.java:609)
 		 *
 		 */
 		// Go back to the relevant position:
 		try {
 		    cursor.gotoRange(position, false);
 		} catch ( com.sun.star.uno.RuntimeException ex ){
-		    LOGGER.warn("OOBibBase.insertEntry: Could not go back to end of in-text citation", ex);
+		    LOGGER.warn("OOBibBase.insertEntry:"
+				+" Could not go back to end of in-text citation", ex);
 		}
             }
 
