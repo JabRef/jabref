@@ -459,6 +459,13 @@ class OOBibBase {
     private static boolean isJabRefReferenceMarkName( String name ){
 	return (CITE_PATTERN.matcher(name).find());
     }
+    private static List<String> filterIsJabRefReferenceMarkName( List<String> names ) {
+	return ( names
+		 .stream()
+		 .filter( OOBibBase::isJabRefReferenceMarkName )
+		 .collect(Collectors.toList())
+		 );
+    }
 
     /*
      * called from getCitationEntries(...)
