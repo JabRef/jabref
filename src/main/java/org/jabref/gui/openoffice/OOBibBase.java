@@ -375,9 +375,11 @@ class OOBibBase {
 	       WrappedTargetException
     {
 	assert (this.propertySet != null);
+
 	XPropertySetInfo psi =
 	    this.propertySet
 	    .getPropertySetInfo();
+
         if (psi.hasPropertyByName(property)) {
 	    String v =
 		this.propertySet
