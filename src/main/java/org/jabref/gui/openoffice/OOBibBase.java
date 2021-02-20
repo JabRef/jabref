@@ -978,39 +978,48 @@ class OOBibBase {
         }
 
         // Remove all reference marks that don't look like JabRef citations:
-        List<String> tmp = new ArrayList<>();
-        for (String name : names) {
-            if (CITE_PATTERN.matcher(name).find()) {
-                tmp.add(name);
-            }
-        }
-        names = tmp;
+	/*
+	 * List<String> tmp = new ArrayList<>();
+	 * for (String name : names) {
+         *    if (CITE_PATTERN.matcher(name).find()) {
+         *        tmp.add(name);
+         *    }
+	 * }
+	 * names = tmp;
+	 */
+	names = filterIsJabRefReferenceMarkName( names );
 
         Map<String, Integer> numbers = new HashMap<>();
         int lastNum = 0;
         // First compute citation markers for all citations:
-        String[] citMarkers = new String[names.size()];
+        String[]   citMarkers     = new String[names.size()];
         String[][] normCitMarkers = new String[names.size()][];
-        String[][] bibtexKeys = new String[names.size()][];
+        String[][] bibtexKeys     = new String[names.size()][];
 
-        int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
+        final int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
 
         int[] types = new int[names.size()];
         for (int i = 0; i < names.size(); i++) {
-            Matcher citeMatcher = CITE_PATTERN.matcher(names.get(i));
-            if (citeMatcher.find()) {
-                String typeStr = citeMatcher.group(1);
-                int type = Integer.parseInt(typeStr);
+            // Matcher citeMatcher = CITE_PATTERN.matcher(names.get(i));
+	    Optional<ParsedRefMark> op = parseRefMarkName( names.get(i) );
+            // if (citeMatcher.find()) {
+            if ( op.isPresent() ) {
+		ParsedRefMark ov = op.get();
+                // String typeStr = citeMatcher.group(1);
+                // int type = Integer.parseInt(typeStr);
+		int type = ov.type;
                 types[i] = type; // Remember the type in case we need to uniquefy.
-                String[] keys = citeMatcher.group(2).split(",");
+                // String[] keys = citeMatcher.group(2).split(",");
+                String[] keys = ov.citedKeys.stream().toArray(String[]::new);
                 bibtexKeys[i] = keys;
+		//
                 BibEntry[] cEntries = new BibEntry[keys.length];
-                for (int j = 0; j < cEntries.length; j++) {
+                for (int j = 0; j < keys.length; j++) {
                     BibDatabase database = linkSourceBase.get(keys[j]);
-                    Optional<BibEntry> tmpEntry = Optional.empty();
-                    if (database != null) {
-                        tmpEntry = database.getEntryByCitationKey(keys[j]);
-                    }
+                    Optional<BibEntry> tmpEntry = ( (database == null)
+						    ? Optional.empty()
+						    : database.getEntryByCitationKey(keys[j])
+						    );
                     if (tmpEntry.isPresent()) {
                         cEntries[j] = tmpEntry.get();
                     } else {
@@ -1019,7 +1028,7 @@ class OOBibBase {
                         throw new BibEntryNotFoundException(names.get(i), Localization
                                 .lang("Could not resolve BibTeX entry for citation marker '%0'.", names.get(i)));
                     }
-                }
+                } // for j
 
                 String[] normCitMarker = new String[keys.length];
                 String citationMarker;
@@ -1099,8 +1108,8 @@ class OOBibBase {
                 }
                 citMarkers[i] = citationMarker;
                 normCitMarkers[i] = normCitMarker;
-            }
-        }
+            } // if (citeMatcher.find())
+        } // for i
 
         uniquefiers.clear();
         if (!style.isCitationKeyCiteMarkers() && !style.isNumberEntries()) {
