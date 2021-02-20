@@ -178,6 +178,22 @@ class OOBibBase {
         return this.xCurrentComponent != null;
     }
 
+    private static Optional<String> getDocumentTitle(XTextDocument doc) {
+        if (doc == null) {
+            return Optional.empty();
+        }
+
+	try {
+	    XFrame frame           = doc.getCurrentController().getFrame();
+	    Object frame_title_obj = OOUtil.getProperty( frame , "Title");
+	    String frame_title_str = String.valueOf(frame_title_obj);
+	    return  Optional.of(frame_title_str);
+	} catch (UnknownPropertyException | WrappedTargetException e) {
+	    LOGGER.warn("Could not get document title", e);
+	    return Optional.empty();
+	}
+    }
+
     private static XTextDocument selectDocumentDialog(List<XTextDocument> list,
 						      DialogService dialogService)
     {
@@ -226,22 +242,18 @@ class OOBibBase {
         return getDocumentTitle( this.mxDoc );
     }
 
-    private static Optional<String> getDocumentTitle(XTextDocument doc) {
-        if (doc == null) {
-            return Optional.empty();
-        }
-
-	try {
-	    XFrame frame           = doc.getCurrentController().getFrame();
-	    Object frame_title_obj = OOUtil.getProperty( frame , "Title");
-	    String frame_title_str = String.valueOf(frame_title_obj);
-	    return  Optional.of(frame_title_str);
-	} catch (UnknownPropertyException | WrappedTargetException e) {
-	    LOGGER.warn("Could not get document title", e);
-	    return Optional.empty();
-	}
-    }
-
+    /** Choose a document to work with.
+     *
+     *  inititalized fields:
+     *     - this.xCurrentComponent
+     *     - this.mxDoc
+     *     - this.xViewCursorSupplier
+     *     - this.xtext
+     *     - this.mxDocFactory
+     *     - this.userProperties
+     *     - this.propertySet
+     *
+     */
     public void selectDocument()
 	throws NoDocumentException,
 	       NoSuchElementException,
