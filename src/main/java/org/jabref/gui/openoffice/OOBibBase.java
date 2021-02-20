@@ -487,11 +487,7 @@ class OOBibBase {
 	if (names == null) {
 	    return new ArrayList<>();
 	}
-	return ( Arrays.asList( names )
-		 .stream()
-		 .filter( OOBibBase::isJabRefReferenceMarkName )
-		 .collect(Collectors.toList())
-		 );
+	return filterIsJabRefReferenceMarkName( Arrays.asList( names ) );
     }
 
     /**
