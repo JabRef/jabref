@@ -456,21 +456,35 @@ class OOBibBase {
         return supplier.getReferenceMarks();
     }
 
+    private static boolean isJabRefReferenceMarkName( String name ){
+	return (CITE_PATTERN.matcher(name).find());
+    }
+
     /*
      * called from getCitationEntries(...)
      */
     private List<String> getJabRefReferenceMarkNames(XNameAccess nameAccess) {
         String[] names = nameAccess.getElementNames();
         // Remove all reference marks that don't look like JabRef citations:
-        List<String> result = new ArrayList<>();
-        if (names != null) {
-            for (String name : names) {
-                if (CITE_PATTERN.matcher(name).find()) {
-                    result.add(name);
-                }
-            }
-        }
-        return result;
+	/*
+	 * List<String> result = new ArrayList<>();
+	 * if (names != null) {
+	 *     for (String name : names) {
+         *       if (CITE_PATTERN.matcher(name).find()) {
+         *           result.add(name);
+         *       }
+         *   }
+	 * }
+	 * return result;
+	 */
+	if (names == null) {
+	    return new ArrayList<>();
+	}
+	return ( Arrays.asList( names )
+		 .stream()
+		 .filter( OOBibBase::isJabRefReferenceMarkName )
+		 .collect(Collectors.toList())
+		 );
     }
 
     /**
