@@ -178,17 +178,38 @@ class OOBibBase {
         return this.xCurrentComponent != null;
     }
 
-    public XTextDocument selectComponent(List<XTextDocument> list) {
+    private XTextDocument selectComponent(List<XTextDocument> list,
+					  DialogService dialogService)
+    {
+	class DocumentTitleViewModel {
+
+	    private final XTextDocument xTextDocument;
+	    private final String description;
+
+	    public DocumentTitleViewModel(XTextDocument xTextDocument) {
+		this.xTextDocument = xTextDocument;
+		this.description = getDocumentTitle(xTextDocument).orElse("");
+	    }
+
+	    public XTextDocument getXtextDocument() {
+		return xTextDocument;
+	    }
+
+	    @Override
+	    public String toString() {
+		return description;
+	    }
+	}
         List<DocumentTitleViewModel> viewModel =
 	    list.stream()
-	    .map(DocumentTitleViewModel::new)
+	    .map( DocumentTitleViewModel::new )
 	    .collect(Collectors.toList());
 
         // This whole method is part of a background task when
         // auto-detecting instances, so we need to show dialog in FX
         // thread
         Optional<DocumentTitleViewModel> selectedDocument =
-	    this.dialogService
+	    dialogService
 	    .showChoiceDialogAndWait(
 				     Localization.lang("Select document"),
 				     Localization.lang("Found documents:"),
@@ -197,7 +218,7 @@ class OOBibBase {
 				     );
         return
 	    selectedDocument
-	    .map(DocumentTitleViewModel::getXtextDocument)
+	    .map( DocumentTitleViewModel::getXtextDocument )
 	    .orElse(null);
     }
 
@@ -236,7 +257,7 @@ class OOBibBase {
 		selected = textDocumentList.get(0);
 	    } else {
 		// Bring up a dialog
-		selected = selectComponent(textDocumentList);
+		selected = selectComponent(textDocumentList, this.dialogService);
 	    }
 
 	    if (selected == null) {
@@ -1551,23 +1572,4 @@ class OOBibBase {
         }
     }
 
-    private class DocumentTitleViewModel {
-
-        private final XTextDocument xTextDocument;
-        private final String description;
-
-        public DocumentTitleViewModel(XTextDocument xTextDocument) {
-            this.xTextDocument = xTextDocument;
-            this.description = getDocumentTitle(xTextDocument).orElse("");
-        }
-
-        public XTextDocument getXtextDocument() {
-            return xTextDocument;
-        }
-
-        @Override
-        public String toString() {
-            return description;
-        }
-    }
 }
