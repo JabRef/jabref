@@ -605,8 +605,21 @@ class OOBibBase {
                 // Insert it at the current position:
                 rebuildBibTextSection(allBases, style);
 
+		/*
+		 * TODO: inserting a reference in the "References" section
+		 * provokes an "Unknown Source" exception here, because
+		 * position was deleted by rebuildBibTextSection()
+		 *
+		 * at com.sun.proxy.$Proxy44.gotoRange(Unknown Source)
+		 * at org.jabref@100.0.0/org.jabref.gui.openoffice.OOBibBase.insertEntry(OOBibBase.java:609)
+		 *
+		 */
 		// Go back to the relevant position:
-		cursor.gotoRange(position, false);
+		try {
+		    cursor.gotoRange(position, false);
+		} catch ( com.sun.star.uno.RuntimeException ex ){
+		    LOGGER.warn("OOBibBase.insertEntry: Could not go back to end of in-text citation", ex);
+		}
             }
 
         } catch (DisposedException ex) {
@@ -1298,6 +1311,7 @@ class OOBibBase {
 		XTextCursor cursor = this.xtext.createTextCursorByRange(section.getAnchor());
 		cursor.gotoRange(section.getAnchor(), false);
 		cursor.setString("");
+		return;
 	    } catch ( NoSuchElementException ex ) {
 		// NoSuchElementException: is thrown by child access
 		// methods of collections, if the addressed child does
