@@ -447,7 +447,7 @@ class OOBibBase {
     }
 
     /*
-     * called from ManageCitationsDialogViewModel(...)
+     * called from getCitationEntries(...)
      */
     private List<String> getJabRefReferenceMarkNames(XNameAccess nameAccess) {
         String[] names = nameAccess.getElementNames();
