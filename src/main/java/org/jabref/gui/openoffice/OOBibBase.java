@@ -1368,28 +1368,33 @@ class OOBibBase {
 
         Map<BibEntry, BibDatabase> newList = new LinkedHashMap<>();
         for (String name : names) {
-            Matcher citeMatcher = CITE_PATTERN.matcher(name);
-            if (citeMatcher.find()) {
-                String[] keys = citeMatcher.group(2).split(",");
-                for (String key : keys) {
-                    BibDatabase database = linkSourceBase.get(key);
-                    Optional<BibEntry> origEntry = Optional.empty();
-                    if (database != null) {
-                        origEntry = database.getEntryByCitationKey(key);
-                    }
-                    if (origEntry.isPresent()) {
-                        if (!newList.containsKey(origEntry.get())) {
-                            newList.put(origEntry.get(), database);
-                        }
-                    } else {
-                        LOGGER.info("Citation key not found: '" + key + "'");
-                        LOGGER.info("Problem with reference mark: '" + name + "'");
-                        newList.put(new UndefinedBibtexEntry(key), null);
-                    }
-                }
-            }
+	    /*
+	     * Matcher citeMatcher = CITE_PATTERN.matcher(name);
+	     *  if (citeMatcher.find()) {
+             *    String[] keys = citeMatcher.group(2).split(",");
+	     */
+	    Optional<ParsedRefMark> op = parseRefMarkName( name );
+	    if ( ! op.isPresent() ){ continue; }
+	    List<String> keys = op.get().citedKeys;
+	    for (String key : keys) {
+		BibDatabase        database  = linkSourceBase.get(key);
+		Optional<BibEntry> origEntry = Optional.empty();
+		if (database != null) {
+		    origEntry = database.getEntryByCitationKey(key);
+		}
+		if (origEntry.isPresent()) {
+		    BibEntry oe = origEntry.get();
+		    if (!newList.containsKey(oe)) {
+			newList.put(oe, database);
+		    }
+		} else {
+		    LOGGER.info("Citation key not found: '" + key + "'");
+		    LOGGER.info("Problem with reference mark: '" + name + "'");
+		    newList.put(new UndefinedBibtexEntry(key), null);
+		}
+	    }
+	    /*  } */
         }
-
         return newList;
     }
 
