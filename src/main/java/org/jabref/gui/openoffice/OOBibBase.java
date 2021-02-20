@@ -896,10 +896,18 @@ class OOBibBase {
     }
 
     public XNameAccess getReferenceMarks() {
-        XReferenceMarksSupplier supplier = unoQI(XReferenceMarksSupplier.class, xCurrentComponent);
+        XReferenceMarksSupplier supplier =
+	    unoQI(XReferenceMarksSupplier.class, xCurrentComponent);
         return supplier.getReferenceMarks();
     }
 
+    /*
+     * The first occurrence of bibtexKey gets no serial number, the
+     * second gets 0, the third 1 ...
+     *
+     * Or the first unused in this series, after removals.
+     *
+     */
     private String getUniqueReferenceMarkName(String bibtexKey, int type) {
         XNameAccess xNamedRefMarks = getReferenceMarks();
         int i = 0;
