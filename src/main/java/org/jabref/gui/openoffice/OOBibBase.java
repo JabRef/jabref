@@ -370,7 +370,7 @@ class OOBibBase {
     }
 
 
-    public Optional<String> getCustomProperty(String property)
+    private Optional<String> getCustomProperty(String property)
 	throws UnknownPropertyException,
 	       WrappedTargetException
     {
