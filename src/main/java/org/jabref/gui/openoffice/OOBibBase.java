@@ -919,12 +919,22 @@ class OOBibBase {
         return name;
     }
 
-    public void rebuildBibTextSection(List<BibDatabase> databases, OOBibStyle style)
-            throws NoSuchElementException, WrappedTargetException, IllegalArgumentException,
-            CreationException, PropertyVetoException, UnknownPropertyException, UndefinedParagraphFormatException {
-        List<String> cited = findCitedKeys();
-        Map<String, BibDatabase> linkSourceBase = new HashMap<>();
-        Map<BibEntry, BibDatabase> entries = findCitedEntries(databases, cited, linkSourceBase); // Although entries are redefined without use, this also updates linkSourceBase
+    public void rebuildBibTextSection(List<BibDatabase> databases,
+				      OOBibStyle style)
+	throws NoSuchElementException,
+	       WrappedTargetException,
+	       IllegalArgumentException,
+	       CreationException,
+	       PropertyVetoException,
+	       UnknownPropertyException,
+	       UndefinedParagraphFormatException
+    {
+        List<String>               cited          = findCitedKeys();
+        Map<String, BibDatabase>   linkSourceBase = new HashMap<>();
+        Map<BibEntry, BibDatabase> entries =
+	    // Although entries are redefined without use, this also
+	    // updates linkSourceBase
+	    findCitedEntries(databases, cited, linkSourceBase);
 
         List<String> names = sortedReferenceMarks;
 
