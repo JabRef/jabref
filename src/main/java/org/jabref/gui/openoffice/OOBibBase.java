@@ -180,7 +180,7 @@ class OOBibBase {
     }
 
     public boolean isConnectedToDocument() {
-        return xCurrentComponent != null;
+        return this.xCurrentComponent != null;
     }
 
     public XTextDocument selectComponent(List<XTextDocument> list) {
