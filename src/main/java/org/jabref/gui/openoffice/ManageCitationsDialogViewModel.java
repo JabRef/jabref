@@ -43,14 +43,9 @@ public class ManageCitationsDialogViewModel {
     }
 
     public void storeSettings() {
-        List<CitationEntry> ciationEntries = citations.stream().map(CitationEntryViewModel::toCitationEntry).collect(Collectors.toList());
+        List<CitationEntry> citationEntries = citations.stream().map(CitationEntryViewModel::toCitationEntry).collect(Collectors.toList());
         try {
-            for (CitationEntry entry : ciationEntries) {
-                Optional<String> pageInfo = entry.getPageInfo();
-                if (pageInfo.isPresent()) {
-                    ooBase.setCustomProperty(entry.getRefMarkName(), pageInfo.get());
-                }
-            }
+	    ooBase.applyCitationEntries( citationEntries );
         } catch (UnknownPropertyException | NotRemoveableException | PropertyExistException | IllegalTypeException |
                 IllegalArgumentException ex) {
             LOGGER.warn("Problem modifying citation", ex);

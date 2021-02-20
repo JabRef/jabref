@@ -465,6 +465,9 @@ class OOBibBase {
         return result;
     }
 
+    /**
+     *
+     */
     public List<CitationEntry> getCitationEntries()
 	throws NoSuchElementException,
 	       UnknownPropertyException,
@@ -474,12 +477,67 @@ class OOBibBase {
         List<String> names = this.getJabRefReferenceMarkNames(nameAccess);
 	List<CitationEntry> citations = new ArrayList(names.size());
         for (String name : names) {
-            CitationEntry entry = new CitationEntry(name,
-                    this.getCitationContext(nameAccess, name, 30, 30, true),
-                    this.getCustomProperty(name));
+            CitationEntry entry =
+		new CitationEntry(name,
+				  this.getCitationContext(nameAccess, name, 30, 30, true),
+				  this.getCustomProperty(name)
+				  );
             citations.add(entry);
         }
 	return citations;
+    }
+
+    /**
+     * Apply editable parts of citationEntries to the document.
+     *
+     * - Currently the only editable part is pageInfo.
+     *
+     * Since the only call to applyCitationEntries() only changes
+     * pageInfo w.r.t those returned by getCitationEntries(), we can
+     * do with the following restrictions:
+     *
+     * - Missing pageInfo means no action.
+     *
+     * - Missing CitationEntry means no action (no attempt to
+     *   remove citation from the text).
+     *
+     * - Reference to citation not present in the text evokes
+     *   no error, and setCustomProperty() is called.
+     *
+     */
+    public void applyCitationEntries( List<CitationEntry> citationEntries )
+	throws UnknownPropertyException,
+	       NotRemoveableException,
+	       PropertyExistException,
+	       IllegalTypeException,
+	       IllegalArgumentException
+    {
+	// Leave exceptions to the caller.
+	//
+	// Note: not catching exceptions here means nothing is applied
+	//       after the first problematic entry. We might catch and
+	//       collect messages here. 
+	//
+	// try {
+	for (CitationEntry entry : citationEntries) {
+	    Optional<String> pageInfo = entry.getPageInfo();
+	    if (pageInfo.isPresent()) {
+		this.setCustomProperty( entry.getRefMarkName(), pageInfo.get() );
+	    } else {
+		// TODO: if pageInfo is not present, or is empty:
+		// maybe we should remove it from the document.
+	    }
+	}
+	// } catch (UnknownPropertyException
+	//        | NotRemoveableException
+	//        | PropertyExistException
+	//        | IllegalTypeException
+	//        | IllegalArgumentException ex)
+	// {
+	//   LOGGER.warn("Problem modifying citation", ex);
+	//   dialogService.showErrorDialogAndWait(
+	//         Localization.lang("Problem modifying citation"), ex);
+	//  }
     }
 
     /*
