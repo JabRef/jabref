@@ -19,14 +19,13 @@ import org.jabref.model.entry.field.UnknownField;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ContentSelectorViewModelTest {
+public class ContentSelectorDialogViewModelTest {
     private ContentSelectorDialogViewModel viewModel;
     private final LibraryTab libraryTab = mock(LibraryTab.class);
     private final DialogService dialogService = mock(DialogService.class);
