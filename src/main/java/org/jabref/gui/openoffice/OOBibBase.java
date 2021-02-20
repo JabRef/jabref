@@ -936,10 +936,9 @@ class OOBibBase {
 	    // updates linkSourceBase
 	    findCitedEntries(databases, cited, linkSourceBase);
 
-        List<String> names = sortedReferenceMarks;
-
         if (style.isSortByPosition()) {
             // We need to sort the entries according to their order of appearance:
+	    List<String> names = sortedReferenceMarks;
             entries = getSortedEntriesFromSortedRefMarks(names, linkSourceBase);
         } else {
 	    // Find them again? Why?
