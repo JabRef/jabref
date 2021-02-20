@@ -1289,13 +1289,26 @@ class OOBibBase {
 
         // Check if the section exists:
         XTextSectionsSupplier supplier = unoQI(XTextSectionsSupplier.class, this.mxDoc);
-        if (supplier.getTextSections().hasByName(OOBibBase.BIB_SECTION_NAME)) {
-            XTextSection section = (XTextSection) ((Any) supplier.getTextSections().getByName(OOBibBase.BIB_SECTION_NAME))
-                    .getObject();
-            // Clear it:
-            XTextCursor cursor = this.xtext.createTextCursorByRange(section.getAnchor());
-            cursor.gotoRange(section.getAnchor(), false);
-            cursor.setString("");
+	com.sun.star.container.XNameAccess ts = supplier.getTextSections();
+        if (ts.hasByName(OOBibBase.BIB_SECTION_NAME)) {
+	    try {
+		Any a = ((Any) ts.getByName(OOBibBase.BIB_SECTION_NAME));
+		XTextSection section = (XTextSection) a.getObject();
+		// Clear it:
+		XTextCursor cursor = this.xtext.createTextCursorByRange(section.getAnchor());
+		cursor.gotoRange(section.getAnchor(), false);
+		cursor.setString("");
+	    } catch ( NoSuchElementException ex ) {
+		// NoSuchElementException: is thrown by child access
+		// methods of collections, if the addressed child does
+		// not exist.
+		//
+		// We got this exception from ts.getByName() despite the ts.hasByName() check
+		// just above.
+		// Try to create.
+		LOGGER.warn( "Could not get section '"+ OOBibBase.BIB_SECTION_NAME + "'", ex );
+		createBibTextSection2(atEnd);
+	    }
         } else {
             createBibTextSection2(atEnd);
         }
