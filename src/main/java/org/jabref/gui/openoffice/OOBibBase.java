@@ -386,13 +386,6 @@ class OOBibBase {
         return Optional.empty();
     }
 
-    public XNameAccess getReferenceMarks() {
-        XReferenceMarksSupplier supplier =
-	    unoQI(XReferenceMarksSupplier.class,
-		  this.xCurrentComponent);
-        return supplier.getReferenceMarks();
-    }
-
     public void setCustomProperty(String property, String value)
 	throws UnknownPropertyException,
 	       NotRemoveableException,
@@ -415,6 +408,10 @@ class OOBibBase {
         }
     }
 
+    /*
+     * === insertEntry
+     */
+
     private void sortBibEntryList( List<BibEntry>    entries,
 				   OOBibStyle        style )
     {
@@ -429,10 +426,40 @@ class OOBibBase {
     }
 
     private static int citationTypeFromOptions( boolean withText, boolean inParenthesis ){
-	if ( !withText ){ return OOBibBase.INVISIBLE_CIT ; }
+	if ( !withText ){
+	    return OOBibBase.INVISIBLE_CIT ;
+	}
 	return ( inParenthesis
 		 ? OOBibBase.AUTHORYEAR_PAR
 		 : OOBibBase.AUTHORYEAR_INTEXT );
+    }
+
+    /*
+     *
+     */
+    public XNameAccess getReferenceMarks() {
+        XReferenceMarksSupplier supplier =
+	    unoQI(XReferenceMarksSupplier.class,
+		  this.xCurrentComponent);
+        return supplier.getReferenceMarks();
+    }
+
+    /*
+     * The first occurrence of bibtexKey gets no serial number, the
+     * second gets 0, the third 1 ...
+     *
+     * Or the first unused in this series, after removals.
+     *
+     */
+    private String getUniqueReferenceMarkName(String bibtexKey, int type) {
+        XNameAccess xNamedRefMarks = getReferenceMarks();
+        int i = 0;
+        String name = BIB_CITATION + '_' + type + '_' + bibtexKey;
+        while (xNamedRefMarks.hasByName(name)) {
+            name = BIB_CITATION + i + '_' + type + '_' + bibtexKey;
+            i++;
+        }
+        return name;
     }
 
     /**
@@ -1027,23 +1054,6 @@ class OOBibBase {
         this.sortedReferenceMarks = getSortedReferenceMarks(getReferenceMarks());
     }
 
-    /*
-     * The first occurrence of bibtexKey gets no serial number, the
-     * second gets 0, the third 1 ...
-     *
-     * Or the first unused in this series, after removals.
-     *
-     */
-    private String getUniqueReferenceMarkName(String bibtexKey, int type) {
-        XNameAccess xNamedRefMarks = getReferenceMarks();
-        int i = 0;
-        String name = BIB_CITATION + '_' + type + '_' + bibtexKey;
-        while (xNamedRefMarks.hasByName(name)) {
-            name = BIB_CITATION + i + '_' + type + '_' + bibtexKey;
-            i++;
-        }
-        return name;
-    }
 
     public void rebuildBibTextSection(List<BibDatabase> databases,
 				      OOBibStyle style)
