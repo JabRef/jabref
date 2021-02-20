@@ -185,8 +185,7 @@ class OOBibBase {
 
     public XTextDocument selectComponent(List<XTextDocument> list) {
         List<DocumentTitleViewModel> viewModel =
-	    list
-	    .stream()
+	    list.stream()
 	    .map(DocumentTitleViewModel::new)
 	    .collect(Collectors.toList());
 
