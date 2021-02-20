@@ -178,8 +178,8 @@ class OOBibBase {
         return this.xCurrentComponent != null;
     }
 
-    private static XTextDocument selectComponent(List<XTextDocument> list,
-						 DialogService dialogService)
+    private static XTextDocument selectDocumentDialog(List<XTextDocument> list,
+						      DialogService dialogService)
     {
 	class DocumentTitleViewModel {
 
@@ -257,7 +257,7 @@ class OOBibBase {
 		selected = textDocumentList.get(0);
 	    } else {
 		// Bring up a dialog
-		selected = selectComponent(textDocumentList, this.dialogService);
+		selected = selectDocumentDialog(textDocumentList, this.dialogService);
 	    }
 
 	    if (selected == null) {
