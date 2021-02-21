@@ -110,7 +110,7 @@ class OOBibBase {
 
     private static final String CHAR_STYLE_NAME = "CharStyleName";
 
-    /* Types of in-text citation.
+    /* Types of in-text citation. (itcType)
      * Their numeric values are used in reference mark names.
      */
     private static final int AUTHORYEAR_PAR    = 1;
