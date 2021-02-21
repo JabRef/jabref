@@ -1159,6 +1159,85 @@ class OOBibBase {
 	return normCitMarker;
     }
 
+    private class CitationNumberingState {
+	public Map<String, Integer> numbers;
+	public int lastNum;
+	CitationNumberingState(){
+	    // For numbered citation style. Map( citedKey, number )
+	    Map<String, Integer> numbers = new HashMap<>();
+	    int lastNum = 0;
+	}
+    }
+
+    /**
+     *  Number citations.
+     *
+     *  @param cEntries BibEntries to number. Numbering follows this order.
+     *  @param keys : assert( keys[j] == cEntries[j].getCitationKey() )
+     *  @param style
+     *  @param cns IN:keys already seen mapped to their number, and
+     *                lastNum the largest number already used. (0 for
+     *                none)
+     *
+     *             OUT: the same, updated according to the numbers
+     *                  allocated here.
+     *
+     *  @return an int for each cEntry. (-1) for UndefinedBibtexEntry
+     */
+    private static List<Integer> rcmNumForIsNumberEntriesIsSortByPosition(  BibEntry[] cEntries,
+									    String[] keys,
+									    OOBibStyle style,
+									    CitationNumberingState cns )
+    {
+	assert (style.isNumberEntries());
+	assert (style.isSortByPosition());
+	assert (cEntries.length == keys.length );
+	if ( true ){
+	    /*
+	     * If this never prints (or throws), we can drop the "keys" parameter.
+	     */
+	    for (int j = 0; j < cEntries.length; j++) {
+		BibEntry cej = cEntries[j];
+		String   kj  = keys[j];
+		if (  kj != cej.getCitationKey().get() ){
+		    System.out.println
+			( "keys != cEntries in rcmNumForIsNumberEntriesIsSortByPosition" );
+		}
+	    }
+	}
+	//
+	// We have sorted the citation markers
+	// according to their order of appearance, so
+	// we simply count up for each marker
+	// referring to a new entry:
+	//
+	// num: Numbers for namei parts. (-1) for none.
+	//      Passed to style.getNumCitationMarker()
+	List<Integer> num = new ArrayList<>(cEntries.length);
+	//
+	//
+	// fill num while adjusting lastNum and filling numbers
+	//
+	for (int j = 0; j < cEntries.length; j++) {
+	    BibEntry cej = cEntries[j];
+	    String   kj  = keys[j]; // cej.getCitationKey().get()
+	    if (cej instanceof UndefinedBibtexEntry) {
+		num.add(j, -1); // gets no cns.number
+	    } else {
+		if (cns.numbers.containsKey(kj)) {
+		    // already seen
+		    num.add(j, cns.numbers.get(kj));
+		} else {
+		    // new
+		    cns.lastNum++;  // 1-based
+		    num.add(         j, cns.lastNum);
+		    cns.numbers.put(kj, cns.lastNum);
+		}
+	    }
+	}
+	return num;
+    }
+
     private List<String> refreshCiteMarkersInternal
 	( List<BibDatabase> databases,
 	  OOBibStyle style
@@ -1183,9 +1262,8 @@ class OOBibBase {
 	List<String>               names          = sce.refMarkNames;
 	//*****
 
-	// For numbered citation style. Map( citedKey, number )
-        Map<String, Integer> numbers = new HashMap<>();
-        int lastNum = 0;
+	// // For numbered citation style. Map( citedKey, number )
+	CitationNumberingState cns = new CitationNumberingState();
 
         // First compute citation markers for all citations:
         String[]   citMarkers     = new String[names.size()];
@@ -1230,35 +1308,11 @@ class OOBibBase {
 		    //
                 } else if (style.isNumberEntries()) {
                     if (style.isSortByPosition()) {
-                        // We have sorted the citation markers
-                        // according to their order of appearance, so
-                        // we simply count up for each marker
-                        // referring to a new entry:
-			//
 			// num: Numbers for namei parts. (-1) for none.
 			//      Passed to style.getNumCitationMarker()
-                        List<Integer> num = new ArrayList<>(cEntries.length);
+                        List<Integer> num =
+			    rcmNumForIsNumberEntriesIsSortByPosition( cEntries, keys, style, cns );
 			//
-			//
-			// fill num while adjusting lastNum and filling numbers
-			//
-                        for (int j = 0; j < cEntries.length; j++) {
-			    BibEntry cej = cEntries[j];
-			    String   kj  = keys[j];
-                            if (cej instanceof UndefinedBibtexEntry) {
-                                num.add(j, -1); // gets no number
-                            } else {
-                                if (numbers.containsKey(kj)) {
-				    // already seen
-				    num.add(j, numbers.get(kj));
-                                } else {
-				    // new
-				    lastNum++;  // 1-based
-				    num.add(     j, lastNum);
-                                    numbers.put(kj, lastNum);
-                                }
-                            }
-                        }
 			// set citationMarker
                         citationMarker =
 			    style.getNumCitationMarker(num, minGroupingCount, false);
