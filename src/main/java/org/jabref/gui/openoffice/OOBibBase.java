@@ -670,8 +670,8 @@ class OOBibBase {
      * Parse a refMarkName.
      *
      */
-    private static Optional<ParsedRefMark> parseRefMarkName( String name ){
-        Matcher citeMatcher = CITE_PATTERN2.matcher(name);
+    private static Optional<ParsedRefMark> parseRefMarkName( String refMarkName ){
+        Matcher citeMatcher = CITE_PATTERN2.matcher(refMarkName);
         if (!citeMatcher.find()) {
 	    return Optional.empty();
 	}
