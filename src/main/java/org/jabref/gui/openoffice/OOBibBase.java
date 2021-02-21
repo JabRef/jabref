@@ -1134,7 +1134,9 @@ class OOBibBase {
 						);
     }
 
-    private static String rcmCitationMarkerForIsCitationKeyCiteMarkers( BibEntry[] cEntries, OOBibStyle style ){
+    private static String rcmCitationMarkerForIsCitationKeyCiteMarkers( BibEntry[] cEntries,
+									OOBibStyle style )
+    {
 
 	assert( style.isCitationKeyCiteMarkers() );
 
@@ -1148,7 +1150,9 @@ class OOBibBase {
 	return citationMarker;
     }
 
-    private static String[] rcmNormCitMarkersForIsCitationKeyCiteMarkers( BibEntry[] cEntries, OOBibStyle style ){
+    private static String[] rcmNormCitMarkersForIsCitationKeyCiteMarkers( BibEntry[] cEntries,
+									  OOBibStyle style )
+    {
 	assert( style.isCitationKeyCiteMarkers() );
 
 	String[] normCitMarker = new String[cEntries.length];
@@ -1194,6 +1198,8 @@ class OOBibBase {
 	assert (cEntries.length == keys.length );
 	if ( true ){
 	    /*
+	     * TODO: do we need a test case?
+	     *
 	     * If this never prints (or throws), we can drop the "keys" parameter.
 	     */
 	    for (int j = 0; j < cEntries.length; j++) {
@@ -1242,24 +1248,22 @@ class OOBibBase {
      * Resolve the citation key from a citation reference marker name,
      * and look up the index of the key in a list of keys.
      *
-     * @param refMarkName The name of the ReferenceMark representing the citation.
-     * @param orderedCiteKeys       A List of citation keys representing the entries in the bibliography.
+     * @param keysCitedHere    The citation keys needing indices.
+     * @param orderedCiteKeys  A List of citation keys representing the entries in the bibliography.
      * @return the (1-based) indices of the cited keys, -1 if a key is not found.
      *         Returns Collections.emptyList() if the ref name could not be resolved as a citation.
      */
-    private List<Integer> findCitedEntryIndex(String refMarkName, List<String> orderedCiteKeys) {
-	Optional< ParsedRefMark > op = parseRefMarkName( refMarkName );
-	if ( !op.isPresent() ){
-	    return Collections.emptyList();
-	}
-	List<String> keysCitedHere = op.get().citedKeys;
-	List<Integer> result = new ArrayList<>(keysCitedHere.size());
+    private List<Integer> findCitedEntryIndices( List<String>  keysCitedHere,
+						 List<String> orderedCiteKeys)
+    {
+	List<Integer> result        = new ArrayList<>(keysCitedHere.size());
 	for (String key : keysCitedHere) {
 	    int ind = orderedCiteKeys.indexOf(key);
 	    result.add(ind == -1 ? -1 : 1 + ind);
 	}
 	return result;
     }
+
 
     private List<String> refreshCiteMarkersInternal
 	( List<BibDatabase> databases,
@@ -1330,49 +1334,24 @@ class OOBibBase {
 		    normCitMarker  = rcmNormCitMarkersForIsCitationKeyCiteMarkers( cEntries, style );
 		    //
                 } else if (style.isNumberEntries()) {
+		    List<Integer> num ;
                     if (style.isSortByPosition()) {
-			// num: Numbers for namei parts. (-1) for none.
-			//      Passed to style.getNumCitationMarker()
-                        List<Integer> num =
-			    rcmNumForIsNumberEntriesIsSortByPosition( cEntries, keys, style, cns );
-			//
-			// set citationMarker
-                        citationMarker =
-			    style.getNumCitationMarker(num, minGroupingCount, false);
-			//
-			// fill normCitMarker
-                        for (int j = 0; j < cEntries.length; j++) {
-			    List<Integer> numj = Collections.singletonList(num.get(j));
-                            normCitMarker[j] =
-				style.getNumCitationMarker( numj, minGroupingCount, false );
-                        }
+                        num = rcmNumForIsNumberEntriesIsSortByPosition( cEntries, keys, style, cns );
                     } else {
-			//
-			// (numbered_citations, order_from bibliography)
-			//
-                        // We need to find the number of the cited
-                        // entry in the bibliography, and use that
-                        // number for the cite marker:
-			//
-                        List<Integer> num = findCitedEntryIndex( namei, cited );
-
-                        if (num.isEmpty()) {
-                            throw new BibEntryNotFoundException
-				( names.get(i)
-				  , Localization.lang
-				  ( "Could not resolve BibTeX entry for citation marker '%0'."
-				    , names.get(i) )
-				  );
-                        }
-			//
-			citationMarker =
-			    style.getNumCitationMarker(num, minGroupingCount, false);
-                        // normCitMarker
-                        for (int j = 0; j < keys.length; j++) {
-			    List<Integer> numj = Collections.singletonList(num.get(j));
-                            normCitMarker[j] = style.getNumCitationMarker(numj, minGroupingCount, false);
-                        }
+                        num = findCitedEntryIndices( Arrays.asList(keys) , cited );
                     }
+		    //
+		    // set citationMarker
+		    citationMarker =
+			style.getNumCitationMarker(num, minGroupingCount, false);
+		    //
+		    // fill normCitMarker
+		    for (int j = 0; j < cEntries.length; j++) {
+			List<Integer> numj = Collections.singletonList(num.get(j));
+			normCitMarker[j] =
+			    style.getNumCitationMarker( numj, minGroupingCount, false );
+		    }
+		    //
                 } else {
 		    sortBibEntryArray( cEntries, style );
 		    // Update key list to match the new sorting:
