@@ -445,7 +445,7 @@ class OOBibBase {
 	}
     }
 
-    private static int citationTypeFromOptions( boolean withText, boolean inParenthesis ){
+    private static int citationTypeFromOptions( boolean withText, boolean inParenthesis ) {
 	if ( !withText ){
 	    return OOBibBase.INVISIBLE_CIT ;
 	}
