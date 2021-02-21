@@ -1164,76 +1164,92 @@ class OOBibBase {
 	    Optional<ParsedRefMark> op = parseRefMarkName( namei );
             if ( op.isPresent() ) {
 		ParsedRefMark ov = op.get();
-		int type = ov.type;
-                types[i] = type; // Remember the type in case we need to uniquefy.
+		int type = ov.itcType;
+                types[i] = type; // Remember the itcType in case we need to uniquefy.
                 String[] keys = ov.citedKeys.stream().toArray(String[]::new);
                 bibtexKeys[i] = keys;
 		//
-		/*
-                BibEntry[] cEntries = new BibEntry[keys.length];
-		// fill cEntries
-                for (int j = 0; j < keys.length; j++) {
-		    String kj = keys[j];
-		    Optional<BibEntry> tmpEntry =
-			linkSourceBaseCiteKeyToBibEntry( linkSourceBase, kj );
-                    if (tmpEntry.isPresent()) {
-                        cEntries[j] = tmpEntry.get();
-                    } else {
-                        LOGGER.info("Citation key not found: '" + kj + '\'');
-                        LOGGER.info("Problem with reference mark: '" + namei + '\'');
-			String msg = Localization.lang("Could not resolve BibTeX entry"
-						       +" for citation marker '%0'.",
-						       namei
-						       );
-                        throw new BibEntryNotFoundException(namei, msg);
-                    }
-                } // for j
-		*/
-		BibEntry[] cEntries = linkSourceBaseGetBibEntriesOfCiteKeys( linkSourceBase, keys, namei );
-                String[] normCitMarker = new String[keys.length];
-                String citationMarker;
+		BibEntry[] cEntries =
+		    linkSourceBaseGetBibEntriesOfCiteKeys( linkSourceBase, keys, namei );
+		assert (cEntries.length == keys.length) ;
+		//
+		// normCitMarker[ cEntries.length ] null if missing
+                String[] normCitMarker = new String[cEntries.length];
+                String   citationMarker; // normCitMarker.replace( null -> "" ).join(",")
+		//
+		// fill normCitMarker, set citationMarker
                 if (style.isCitationKeyCiteMarkers()) {
+		    //
                     StringBuilder sb = new StringBuilder();
-                    normCitMarkers[i] = new String[keys.length];
-                    for (int j = 0; j < keys.length; j++) {
-                        normCitMarkers[i][j] = cEntries[j].getCitationKey().orElse(null);
-                        sb.append(cEntries[j].getCitationKey().orElse(""));
+                    normCitMarkers[i] = new String[cEntries.length];
+                    for (int j = 0; j < cEntries.length; j++) {
+			Optional<String> cejKey = cEntries[j].getCitationKey();
+                        normCitMarkers[i][j]    = cejKey.orElse(null);
+                        sb.append(cejKey.orElse(""));
                         if (j < (keys.length - 1)) {
                             sb.append(',');
                         }
                     }
                     citationMarker = sb.toString();
+		    //
                 } else if (style.isNumberEntries()) {
                     if (style.isSortByPosition()) {
-                        // We have sorted the citation markers according to their order of appearance,
-                        // so we simply count up for each marker referring to a new entry:
-                        List<Integer> num = new ArrayList<>(keys.length);
-                        for (int j = 0; j < keys.length; j++) {
-                            if (cEntries[j] instanceof UndefinedBibtexEntry) {
-                                num.add(j, -1);
+                        // We have sorted the citation markers
+                        // according to their order of appearance, so
+                        // we simply count up for each marker
+                        // referring to a new entry:
+			//
+			// num: Numbers for namei parts. (-1) for none.
+			//      Passed to style.getNumCitationMarker()
+                        List<Integer> num = new ArrayList<>(cEntries.length);
+			//
+			//
+			// fill num while adjusting lastNum and filling numbers
+			//
+                        for (int j = 0; j < cEntries.length; j++) {
+			    BibEntry cej = cEntries[j];
+			    String   kj  = keys[j];
+                            if (cej instanceof UndefinedBibtexEntry) {
+                                num.add(j, -1); // gets no number
                             } else {
-                                num.add(j, lastNum + 1);
-                                if (numbers.containsKey(keys[j])) {
-                                    num.set(j, numbers.get(keys[j]));
+                                if (numbers.containsKey(kj)) {
+				    // already seen
+				    num.add(j, numbers.get(kj));
                                 } else {
-                                    numbers.put(keys[j], num.get(j));
-                                    lastNum = num.get(j);
+				    // new
+				    lastNum++;  // 1-based
+				    num.add(     j, lastNum);
+                                    numbers.put(kj, lastNum);
                                 }
                             }
                         }
-                        citationMarker = style.getNumCitationMarker(num, minGroupingCount, false);
-                        for (int j = 0; j < keys.length; j++) {
-                            normCitMarker[j] = style.getNumCitationMarker(Collections.singletonList(num.get(j)),
-                                    minGroupingCount, false);
+			// set citationMarker
+                        citationMarker =
+			    style.getNumCitationMarker(num, minGroupingCount, false);
+			//
+			// fill normCitMarker
+                        for (int j = 0; j < cEntries.length; j++) {
+			    List<Integer> numj = Collections.singletonList(num.get(j));
+                            normCitMarker[j] =
+				style.getNumCitationMarker( numj, minGroupingCount, false );
                         }
                     } else {
-                        // We need to find the number of the cited entry in the bibliography,
-                        // and use that number for the cite marker:
-                        List<Integer> num = findCitedEntryIndex(names.get(i), cited);
+			//
+			// (numbered_citations, order_from bibliography)
+			//
+                        // We need to find the number of the cited
+                        // entry in the bibliography, and use that
+                        // number for the cite marker:
+			//
+                        List<Integer> num = findCitedEntryIndex( namei, cited );
 
                         if (num.isEmpty()) {
-                            throw new BibEntryNotFoundException(names.get(i), Localization
-                                    .lang("Could not resolve BibTeX entry for citation marker '%0'.", names.get(i)));
+                            throw new BibEntryNotFoundException
+				( names.get(i)
+				  , Localization.lang
+				  ( "Could not resolve BibTeX entry for citation marker '%0'."
+				    , names.get(i) )
+				  );
                         } else {
                             citationMarker = style.getNumCitationMarker(num, minGroupingCount, false);
                         }
