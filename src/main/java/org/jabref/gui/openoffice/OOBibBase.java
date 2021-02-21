@@ -655,13 +655,13 @@ class OOBibBase {
      *   This is what we get back from parsing a refMarkName
      *
      */
-    private class ParsedRefMark {
+    private static class ParsedRefMark {
 	public String i ; // "", "0", "1" ...
 	public int itcType ; // in-text-citation type
 	public List<String> citedKeys;
 	ParsedRefMark( String i, int itcType, List<String> citedKeys ){
-	    this.i=i;
-	    this.itcType = itcType;
+	    this.i         = i;
+	    this.itcType   = itcType;
 	    this.citedKeys = citedKeys;
 	}
     }
@@ -670,7 +670,7 @@ class OOBibBase {
      * Parse a refMarkName.
      *
      */
-    private Optional<ParsedRefMark> parseRefMarkName( String name ){
+    private static Optional<ParsedRefMark> parseRefMarkName( String name ){
         Matcher citeMatcher = CITE_PATTERN2.matcher(name);
         if (!citeMatcher.find()) {
 	    return Optional.empty();
@@ -678,7 +678,7 @@ class OOBibBase {
 	List<String> keys = Arrays.asList( citeMatcher.group(3).split(",") );
 	String i = citeMatcher.group(1);
 	int itcType = Integer.parseInt( citeMatcher.group(2) );
-	return( Optional.of( new ParsedRefMark( i, itcType, keys ) ) );
+	return( Optional.of( new OOBibBase.ParsedRefMark( i, itcType, keys ) ) );
     }
 
     /**
