@@ -35,16 +35,15 @@
     org.jabref=io.github.classgraph
 
 --add-modules
-    org.kordamp.ikonli.core,org.kordamp.ikonli.javafx
+    org.kordamp.ikonli.core,org.kordamp.ikonli.javafx,org.kordamp.ikonli.materialdesign2
+    
+--add-reads
+    org.kordamp.ikonli/org.kordamp.ikonli.IkonHandler=org.jabref.gui.icon.JabRefIkonHandler
 
 --add-reads
-    org.kordamp.ikonli.IkonHandler=org.jabref.gui.icon.JabRefIkonHandler
+    org.kordamp.ikonli/org.kordampt.ikonli.IkonProvider=org.jabref.gui.icon.JabrefIconProvider
 
 --add-reads
-    org.kordamp.ikonli.IkonProvider=org.jabref.gui.icon.JabrefIconProvider
+    org.jabref=org.kordamp.ikonli
 
---add-reads
-    org.jabref=org.kordamp.ikonli.IkonHandler
 
---add-reads
-    org.jabref=org.kordamp.ikonli.IkonProvider
