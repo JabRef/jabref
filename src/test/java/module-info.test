@@ -43,7 +43,5 @@
 --add-reads
    org.kordamp.ikonli.IkonProvider=org.jabref.gui.icon.JabrefIconProvider
 
---add-reads
-    org.jabref=org.kordamp.ikonli
 
 
