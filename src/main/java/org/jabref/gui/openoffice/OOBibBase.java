@@ -1062,6 +1062,7 @@ class OOBibBase {
      *    refMarkNames : sortedReferenceMarks,
      *                   except for style.isNumberEntries(),
      *                   where we keep the order from xReferenceMarks.getElementNames()
+     *                   In any case: we apply filterIsJabRefReferenceMarkName.
      *
      *    entries : from findCitedEntries()
      *              for style.isNumberEntries() reordered by entryComparator
