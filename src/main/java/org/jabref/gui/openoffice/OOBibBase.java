@@ -1518,34 +1518,20 @@ class OOBibBase {
      * Resolve the citation key from a citation reference marker name,
      * and look up the index of the key in a list of keys.
      *
-     * @param citRefName The name of the ReferenceMark representing the citation.
-     * @param keys       A List of citation keys representing the entries in the bibliography.
+     * @param refMarkName The name of the ReferenceMark representing the citation.
+     * @param orderedCiteKeys       A List of citation keys representing the entries in the bibliography.
      * @return the (1-based) indices of the cited keys, -1 if a key is not found.
      *         Returns Collections.emptyList() if the ref name could not be resolved as a citation.
      */
-    private List<Integer> findCitedEntryIndex(String citRefName, List<String> keys) {
-	/*
-	 * Matcher citeMatcher = CITE_PATTERN.matcher(citRefName);
-	 * if (citeMatcher.find()) {
-	 *     List<String> keyStrings = Arrays.asList(citeMatcher.group(2).split(","));
-	 *     List<Integer> result = new ArrayList<>(keyStrings.size());
-	 *     for (String key : keyStrings) {
-	 *         int ind = keys.indexOf(key);
-	 *         result.add(ind == -1 ? -1 : 1 + ind);
-	 *     }
-	 *     return result;
-	 * } else {
-	 *     return Collections.emptyList();
-	 * }
-	 */
-	Optional< ParsedRefMark > op = parseRefMarkName( citRefName );
+    private List<Integer> findCitedEntryIndex(String refMarkName, List<String> orderedCiteKeys) {
+	Optional< ParsedRefMark > op = parseRefMarkName( refMarkName );
 	if ( !op.isPresent() ){
 	    return Collections.emptyList();
 	}
-	List<String> keyStrings = op.get().citedKeys;
-	List<Integer> result = new ArrayList<>(keyStrings.size());
-	for (String key : keyStrings) {
-	    int ind = keys.indexOf(key);
+	List<String> keysCitedHere = op.get().citedKeys;
+	List<Integer> result = new ArrayList<>(keysCitedHere.size());
+	for (String key : keysCitedHere) {
+	    int ind = orderedCiteKeys.indexOf(key);
 	    result.add(ind == -1 ? -1 : 1 + ind);
 	}
 	return result;
