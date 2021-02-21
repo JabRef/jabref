@@ -222,9 +222,6 @@ class OOBibBase {
         this.xDesktop = simpleBootstrap(loPath);
     }
 
-    public boolean isConnectedToDocument() {
-        return this.xCurrentComponent != null;
-    }
 
     /*
      *  section: selectDocument()
@@ -375,6 +372,44 @@ class OOBibBase {
 	    this.userProperties = supp.getDocumentProperties().getUserDefinedProperties();
 	}
         this.propertySet = unoQI(XPropertySet.class, this.userProperties);
+
+	// TODO: maybe we should install an event handler for document
+	// close: addCloseListener
+	//
+	// https://www.openoffice.org/api/docs/common/ref/com/sun/star/util/XCloseBroadcaster.html#addCloseListener
+    }
+
+    private void forgetDocument(){
+	this.xCurrentComponent   = null ;
+	this.mxDoc               = null ;
+	this.xViewCursorSupplier = null ;
+	this.xtext               = null ;
+	this.mxDocFactory        = null ;
+	this.userProperties      = null ;
+	this.propertySet         = null ;
+    }
+    public boolean isConnectedToDocument() {
+        return this.xCurrentComponent != null;
+    }
+
+    public boolean checkDocumentConnection(){
+	boolean res = true;
+	// These are set by selectDocument:
+	if (null == this.xCurrentComponent   ){ res = false; }
+	if (null == this.mxDoc               ){ res = false; }
+	if (null == this.xViewCursorSupplier ){ res = false; }
+	if (null == this.xtext               ){ res = false; }
+	if (null == this.mxDocFactory        ){ res = false; }
+	if (null == this.userProperties      ){ res = false; }
+	if (null == this.propertySet         ){ res = false; }
+	//
+	if ( ! res ){
+	    forgetDocument();
+	    return false;
+	}
+	// Attempt to check document is really available
+	// TODO
+	return true;
     }
 
     /*
