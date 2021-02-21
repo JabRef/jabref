@@ -1146,8 +1146,10 @@ class OOBibBase {
 	List<String>               names          = sce.refMarkNames;
 	//*****
 
+	// For numbered citation style. Map( citedKey, number )
         Map<String, Integer> numbers = new HashMap<>();
         int lastNum = 0;
+
         // First compute citation markers for all citations:
         String[]   citMarkers     = new String[names.size()];
         String[][] normCitMarkers = new String[names.size()][];
