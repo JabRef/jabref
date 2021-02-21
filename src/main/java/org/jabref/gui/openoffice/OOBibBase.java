@@ -457,11 +457,19 @@ class OOBibBase {
     /*
      *
      */
-    private XNameAccess getReferenceMarks() {
+    private XNameAccess getReferenceMarks()
+	throws NoDocumentException
+    {
         XReferenceMarksSupplier supplier =
 	    unoQI(XReferenceMarksSupplier.class,
 		  this.xCurrentComponent);
-        return supplier.getReferenceMarks();
+	try {
+	    XNameAccess res = supplier.getReferenceMarks();
+	    return Optional.of(res);
+	} catch ( Exception ex ){
+	    LOGGER.warn( "getReferenceMarks caught: ", ex );
+	    throw NoDocumentException("getReferenceMarks failed");
+	}
     }
 
     private static boolean isJabRefReferenceMarkName( String name ){
