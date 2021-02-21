@@ -1201,10 +1201,9 @@ class OOBibBase {
                 if (style.isCitationKeyCiteMarkers()) {
 		    //
                     StringBuilder sb = new StringBuilder();
-                    normCitMarkers[i] = new String[cEntries.length];
                     for (int j = 0; j < cEntries.length; j++) {
 			Optional<String> cejKey = cEntries[j].getCitationKey();
-                        normCitMarkers[i][j]    = cejKey.orElse(null);
+                        normCitMarker[j]        = cejKey.orElse(null);
                         sb.append(cejKey.orElse(""));
                         if (j < (keys.length - 1)) {
                             sb.append(',');
