@@ -996,15 +996,15 @@ class OOBibBase {
 
         List<String> names;
         if (style.isSortByPosition()) {
-            // We need to sort the reference marks according to their order of appearance:
+            // We need to sort the reference marks according to their
+            // order of appearance:
             names = sortedReferenceMarks;
         } else if (style.isNumberEntries()) {
-            // We need to sort the reference marks according to the sorting of the bibliographic
-            // entries:
+            // We need to sort the reference marks according to the
+            // sorting of the bibliographic entries:
             SortedMap<BibEntry, BibDatabase> newMap = new TreeMap<>(entryComparator);
             for (Map.Entry<BibEntry, BibDatabase> ee : entries.entrySet()) {
-                newMap.put(ee.getKey(),
-			   ee.getValue());
+                newMap.put(ee.getKey(), ee.getValue());
             }
             entries = newMap;
             // Rebuild the list of cited keys according to the sort order:
