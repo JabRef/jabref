@@ -153,6 +153,11 @@ class OOBibBase {
     }
 
     /*
+     * Shall we keep calls I suspect to be useless?
+     */
+    private final boolean run_useless_parts = true;
+
+    /*
      * Constructor
      */
 
@@ -175,7 +180,9 @@ class OOBibBase {
         XDesktop result = unoQI(XDesktop.class, desktop);
 
 	// TODO: useless call?
-        // unoQI(XComponentLoader.class, desktop);
+	if ( run_useless_parts ){
+	    unoQI(XComponentLoader.class, desktop);
+	}
 
         return result;
     }
@@ -346,8 +353,9 @@ class OOBibBase {
 
 
 	// TODO: what is the point of the next line? Does it have a side effect?
-	//
-        // unoQI(XDocumentIndexesSupplier.class, xCurrentComponent);
+	if ( run_useless_parts ){
+	    unoQI(XDocumentIndexesSupplier.class, xCurrentComponent);
+	}
 
 	{
 	    XModel      mo = unoQI(XModel.class, this.xCurrentComponent);
@@ -1027,7 +1035,8 @@ class OOBibBase {
         String[][] normCitMarkers = new String[names.size()][];
         String[][] bibtexKeys     = new String[names.size()][];
 
-        final int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
+        final int minGroupingCount =
+	    style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
 
         int[] types = new int[names.size()];
         for (int i = 0; i < names.size(); i++) {
