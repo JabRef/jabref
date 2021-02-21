@@ -1134,6 +1134,31 @@ class OOBibBase {
 						);
     }
 
+    private static String rcmCitationMarkerForIsCitationKeyCiteMarkers( BibEntry[] cEntries, OOBibStyle style ){
+
+	assert( style.isCitationKeyCiteMarkers() );
+
+	StringBuilder sb = new StringBuilder();
+	for (int j = 0; j < cEntries.length; j++) {
+	    if (j > 0) { sb.append(','); }
+	    Optional<String> cejKey = cEntries[j].getCitationKey();
+	    sb.append(cejKey.orElse(""));
+	}
+	String citationMarker = sb.toString();
+	return citationMarker;
+    }
+
+    private static String[] rcmNormCitMarkersForIsCitationKeyCiteMarkers( BibEntry[] cEntries, OOBibStyle style ){
+	assert( style.isCitationKeyCiteMarkers() );
+
+	String[] normCitMarker = new String[cEntries.length];
+	for (int j = 0; j < cEntries.length; j++) {
+	    Optional<String> cejKey = cEntries[j].getCitationKey();
+	    normCitMarker[j]        = cejKey.orElse(null);
+	}
+	return normCitMarker;
+    }
+
     private List<String> refreshCiteMarkersInternal
 	( List<BibDatabase> databases,
 	  OOBibStyle style
@@ -1200,16 +1225,8 @@ class OOBibBase {
 		// fill normCitMarker, set citationMarker
                 if (style.isCitationKeyCiteMarkers()) {
 		    //
-                    StringBuilder sb = new StringBuilder();
-                    for (int j = 0; j < cEntries.length; j++) {
-			Optional<String> cejKey = cEntries[j].getCitationKey();
-                        normCitMarker[j]        = cejKey.orElse(null);
-                        sb.append(cejKey.orElse(""));
-                        if (j < (keys.length - 1)) {
-                            sb.append(',');
-                        }
-                    }
-                    citationMarker = sb.toString();
+		    citationMarker = rcmCitationMarkerForIsCitationKeyCiteMarkers( cEntries, style );
+		    normCitMarker  = rcmNormCitMarkersForIsCitationKeyCiteMarkers( cEntries, style );
 		    //
                 } else if (style.isNumberEntries()) {
                     if (style.isSortByPosition()) {
