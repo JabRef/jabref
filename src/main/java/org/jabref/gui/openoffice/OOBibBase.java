@@ -409,6 +409,12 @@ class OOBibBase {
 	}
 	// Attempt to check document is really available
 	// TODO
+	try {
+	    getReferenceMarks();
+	} catch (NoDocumentException ex ) {
+	    forgetDocument();
+	    return false;
+	}
 	return true;
     }
 
