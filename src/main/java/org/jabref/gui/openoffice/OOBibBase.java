@@ -938,7 +938,7 @@ class OOBibBase {
         }
     }
 
-    private static Optional<BibEntry> linkSourceBaseCiteKeyToBibEbtry( Map<String, BibDatabase> linkSourceBase,
+    private static Optional<BibEntry> linkSourceBaseCiteKeyToBibEntry( Map<String, BibDatabase> linkSourceBase,
 								       String citeKey )
     {
 	BibDatabase database = linkSourceBase.get(citeKey);
@@ -947,6 +947,33 @@ class OOBibBase {
 				   : database.getEntryByCitationKey(citeKey)
 				   );
 	return res;
+    }
+
+    private static BibEntry[] linkSourceBaseGetBibEntriesOfCiteKeys( Map<String, BibDatabase> linkSourceBase,
+								     String[] keys, // citeKeys
+								     String namei   // refMarkName
+								     )
+	throws BibEntryNotFoundException
+    {
+	BibEntry[] cEntries = new BibEntry[keys.length];
+	// fill cEntries
+	for (int j = 0; j < keys.length; j++) {
+	    String kj = keys[j];
+	    Optional<BibEntry> tmpEntry =
+		linkSourceBaseCiteKeyToBibEntry( linkSourceBase, kj );
+	    if (tmpEntry.isPresent()) {
+		cEntries[j] = tmpEntry.get();
+	    } else {
+		LOGGER.info("Citation key not found: '" + kj + '\'');
+		LOGGER.info("Problem with reference mark: '" + namei + '\'');
+		String msg = Localization.lang("Could not resolve BibTeX entry"
+					       +" for citation marker '%0'.",
+					       namei
+					       );
+		throw new BibEntryNotFoundException(namei, msg);
+	    }
+	} // for j
+	return cEntries;
     }
 
     private List<String> refreshCiteMarkersInternal(List<BibDatabase> databases,
@@ -962,7 +989,8 @@ class OOBibBase {
     {
         List<String> cited = findCitedKeys();
         Map<String, BibDatabase>   linkSourceBase = new HashMap<>();
-        Map<BibEntry, BibDatabase> entries = findCitedEntries(databases, cited, linkSourceBase);
+        Map<BibEntry, BibDatabase> entries =
+	    findCitedEntries(databases, cited, linkSourceBase);
 
         XNameAccess xReferenceMarks = getReferenceMarks();
 
@@ -974,8 +1002,9 @@ class OOBibBase {
             // We need to sort the reference marks according to the sorting of the bibliographic
             // entries:
             SortedMap<BibEntry, BibDatabase> newMap = new TreeMap<>(entryComparator);
-            for (Map.Entry<BibEntry, BibDatabase> bibtexEntryBibtexDatabaseEntry : entries.entrySet()) {
-                newMap.put(bibtexEntryBibtexDatabaseEntry.getKey(), bibtexEntryBibtexDatabaseEntry.getValue());
+            for (Map.Entry<BibEntry, BibDatabase> ee : entries.entrySet()) {
+                newMap.put(ee.getKey(),
+			   ee.getValue());
             }
             entries = newMap;
             // Rebuild the list of cited keys according to the sort order:
@@ -1020,25 +1049,27 @@ class OOBibBase {
                 String[] keys = ov.citedKeys.stream().toArray(String[]::new);
                 bibtexKeys[i] = keys;
 		//
+		/*
                 BibEntry[] cEntries = new BibEntry[keys.length];
 		// fill cEntries
                 for (int j = 0; j < keys.length; j++) {
 		    String kj = keys[j];
 		    Optional<BibEntry> tmpEntry =
-			linkSourceBaseCiteKeyToBibEbtry( linkSourceBase, kj );
+			linkSourceBaseCiteKeyToBibEntry( linkSourceBase, kj );
                     if (tmpEntry.isPresent()) {
                         cEntries[j] = tmpEntry.get();
                     } else {
                         LOGGER.info("Citation key not found: '" + kj + '\'');
-                        LOGGER.info("Problem with reference mark: '" + names.get(i) + '\'');
+                        LOGGER.info("Problem with reference mark: '" + namei + '\'');
 			String msg = Localization.lang("Could not resolve BibTeX entry"
 						       +" for citation marker '%0'.",
-						       names.get(i)
+						       namei
 						       );
-                        throw new BibEntryNotFoundException(names.get(i), msg);
+                        throw new BibEntryNotFoundException(namei, msg);
                     }
                 } // for j
-
+		*/
+		BibEntry[] cEntries = linkSourceBaseGetBibEntriesOfCiteKeys( linkSourceBase, keys, namei );
                 String[] normCitMarker = new String[keys.length];
                 String citationMarker;
                 if (style.isCitationKeyCiteMarkers()) {
