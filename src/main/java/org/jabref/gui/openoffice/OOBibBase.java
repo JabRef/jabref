@@ -830,8 +830,8 @@ class OOBibBase {
 		    : style.getCitationMarker(entries,
 					      databaseMap,
 					      inParenthesis,
-					      null,
-					      null
+					      null, // uniquefiers
+					      null  // unlimAuthors
 					      );
 		insertReferenceMark(bName, citeText, cursor, withText, style);
 	    }
@@ -1353,26 +1353,35 @@ class OOBibBase {
 		    }
 		    //
                 } else {
+		    assert( !style.isCitationKeyCiteMarkers() );
+		    assert( !style.isNumberEntries() );
+		    // sort itcBlock
 		    sortBibEntryArray( cEntries, style );
+		    //
 		    // Update key list to match the new sorting:
 		    for (int j = 0; j < cEntries.length; j++) {
 			bibtexKeys[i][j] = cEntries[j].getCitationKey().orElse(null);
 		    }
-
-                    citationMarker = style.getCitationMarker( Arrays.asList(cEntries),
-							      entries,
-							      type == OOBibBase.AUTHORYEAR_PAR,
-							      null,
-							      null );
-                    // We need "normalized" (in parenthesis) markers for uniqueness checking purposes:
+		    //
+                    citationMarker = style.getCitationMarker( Arrays.asList(cEntries), // entries
+							      entries, // database
+							      type == OOBibBase.AUTHORYEAR_PAR, // inParenthesis
+							      null, // uniquefiers
+							      null  // unlimAuthors
+							      );
+		    //
+                    // We need "normalized" (in parenthesis) markers
+                    // for uniqueness checking purposes:
+		    //
+		    // Fill normCitMarker
                     for (int j = 0; j < cEntries.length; j++) {
 			List<BibEntry> cej = Collections.singletonList(cEntries[j]);
                         normCitMarker[j] =
-			    style.getCitationMarker( cej,
-						     entries,
-						     true,
-						     null,
-						     new int[] {-1}
+			    style.getCitationMarker( cej,      // entries
+						     entries,  // database
+						     true,     // inParenthesis
+						     null,     // uniquefiers
+						     new int[] {-1} // unlimAuthors
 						     );
                     }
                 }
@@ -1476,8 +1485,13 @@ class OOBibBase {
                     }
                 }
                 if (needsChange) {
-                    citMarkers[j] = style.getCitationMarker(Arrays.asList(cEntries), entries,
-                            types[j] == OOBibBase.AUTHORYEAR_PAR, uniquif, firstLimAuthors);
+                    citMarkers[j] =
+			style.getCitationMarker( Arrays.asList(cEntries),
+						 entries,
+						 types[j] == OOBibBase.AUTHORYEAR_PAR,
+						 uniquif,
+						 firstLimAuthors
+						 );
                 }
             }
         }
