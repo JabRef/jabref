@@ -31,7 +31,13 @@ public class ManageCitationsDialogViewModel {
     private final OOBibBase ooBase;
     private final DialogService dialogService;
 
-    public ManageCitationsDialogViewModel(OOBibBase ooBase, DialogService dialogService) throws NoSuchElementException, WrappedTargetException, UnknownPropertyException {
+    public ManageCitationsDialogViewModel(OOBibBase ooBase,
+					  DialogService dialogService)
+	throws NoSuchElementException,
+	       WrappedTargetException,
+	       UnknownPropertyException,
+	       NoDocumentException
+    {
         this.ooBase        = ooBase;
         this.dialogService = dialogService;
 

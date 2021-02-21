@@ -196,15 +196,20 @@ public class OpenOfficePanel {
                     style.ensureUpToDate();
                 }
 
-                ooBase.updateSortedReferenceMarks();
+                ooBase.updateSortedReferenceMarks(); // NoDocumentException
 
                 List<BibDatabase> databases = getBaseList();
                 List<String> unresolvedKeys = ooBase.refreshCiteMarkers(databases, style);
                 ooBase.rebuildBibTextSection(databases, style);
                 if (!unresolvedKeys.isEmpty()) {
-                    dialogService.showErrorDialogAndWait(Localization.lang("Unable to synchronize bibliography"),
-                                                         Localization.lang("Your OpenOffice/LibreOffice document references the citation key '%0', which could not be found in your current library.",
-                                                                           unresolvedKeys.get(0)));
+                    dialogService
+			.showErrorDialogAndWait(
+			    Localization.lang
+			    ("Unable to synchronize bibliography"),
+			    Localization.lang
+			    ("Your OpenOffice/LibreOffice document references the citation key '%0', which could not be found in your current library.",
+			     unresolvedKeys.get(0) )
+						);
                 }
             } catch (UndefinedCharacterFormatException ex) {
                 reportUndefinedCharacterFormat(ex);
@@ -212,6 +217,8 @@ public class OpenOfficePanel {
                 reportUndefinedParagraphFormat(ex);
             } catch (ConnectionLostException ex) {
                 showConnectionLostErrorMessage();
+            } catch (NoDocumentException ex) {
+                showNoDocumentErrorMessage();
             } catch (IOException ex) {
                 LOGGER.warn("Problem with style file", ex);
                 dialogService.showErrorDialogAndWait(Localization.lang("No valid style file defined"),
@@ -234,6 +241,8 @@ public class OpenOfficePanel {
                 ooBase.combineCiteMarkers(getBaseList(), style);
             } catch (UndefinedCharacterFormatException ex) {
                 reportUndefinedCharacterFormat(ex);
+            } catch (NoDocumentException ex) {
+                showNoDocumentErrorMessage();
             } catch (com.sun.star.lang.IllegalArgumentException | UnknownPropertyException | PropertyVetoException |
                      CreationException | NoSuchElementException | WrappedTargetException | IOException |
                      BibEntryNotFoundException ex) {
@@ -246,6 +255,8 @@ public class OpenOfficePanel {
         unmerge.setOnAction(e -> {
             try {
                 ooBase.unCombineCiteMarkers(getBaseList(), style);
+            } catch (NoDocumentException ex) {
+		showNoDocumentErrorMessage();
             } catch (UndefinedCharacterFormatException ex) {
                 reportUndefinedCharacterFormat(ex);
             } catch (com.sun.star.lang.IllegalArgumentException | UnknownPropertyException | PropertyVetoException |
@@ -303,7 +314,7 @@ public class OpenOfficePanel {
                 style.ensureUpToDate();
             }
 
-            ooBase.updateSortedReferenceMarks();
+            ooBase.updateSortedReferenceMarks(); // NoDocumentException
 
             List<BibDatabase> databases = getBaseList();
             List<String> unresolvedKeys = ooBase.refreshCiteMarkers(databases, style);
@@ -317,6 +328,8 @@ public class OpenOfficePanel {
 
             BibDatabaseContext databaseContext = new BibDatabaseContext(newDatabase);
             this.frame.addTab(databaseContext, true);
+	} catch (NoDocumentException ex ) {
+	    showNoDocumentErrorMessage();
         } catch (BibEntryNotFoundException ex) {
             LOGGER.debug("BibEntry not found", ex);
             dialogService.showErrorDialogAndWait(Localization.lang("Unable to synchronize bibliography"),
@@ -504,8 +517,15 @@ public class OpenOfficePanel {
                     if (style == null) {
                         style = loader.getUsedStyle();
                     }
-                    ooBase.insertEntry(entries, database, getBaseList(), style, inParenthesis, withText, pageInfo,
-                                       ooPrefs.getSyncWhenCiting());
+                    ooBase.insertEntry(entries,
+				       database,
+				       getBaseList(),
+				       style,
+				       inParenthesis,
+				       withText,
+				       pageInfo,
+                                       ooPrefs.getSyncWhenCiting()
+				       );
                 } catch (FileNotFoundException ex) {
 
                     dialogService.showErrorDialogAndWait(
@@ -513,6 +533,8 @@ public class OpenOfficePanel {
                                                          Localization.lang("You must select either a valid style file, or use one of the default styles."));
 
                     LOGGER.warn("Problem with style file", ex);
+                } catch (NoDocumentException ex) {
+                    showNoDocumentErrorMessage();
                 } catch (ConnectionLostException ex) {
                     showConnectionLostErrorMessage();
                 } catch (UndefinedCharacterFormatException ex) {
@@ -582,8 +604,16 @@ public class OpenOfficePanel {
     }
 
     private void showConnectionLostErrorMessage() {
-        dialogService.showErrorDialogAndWait(Localization.lang("Connection lost"),
-                                             Localization.lang("Connection to OpenOffice/LibreOffice has been lost. " + "Please make sure OpenOffice/LibreOffice is running, and try to reconnect."));
+        dialogService.showErrorDialogAndWait
+	    (Localization.lang("Connection lost"),
+	     Localization.lang
+	     ("Connection to OpenOffice/LibreOffice has been lost. "
+	      + "Please make sure OpenOffice/LibreOffice is running, and try to reconnect."));
+    }
+
+    private void showNoDocumentErrorMessage() {
+        dialogService.showErrorDialogAndWait(Localization.lang("Connection to document lost"),
+                                             Localization.lang("Connection to OpenOffice/LibreOffice document has been lost. " + "Please make sure OpenOffice/LibreOffice is running, and try to reconnect."));
     }
 
     private void reportUndefinedParagraphFormat(UndefinedParagraphFormatException ex) {

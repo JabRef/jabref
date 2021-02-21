@@ -508,10 +508,10 @@ class OOBibBase {
 		  this.xCurrentComponent);
 	try {
 	    XNameAccess res = supplier.getReferenceMarks();
-	    return Optional.of(res);
+	    return res;
 	} catch ( Exception ex ){
 	    LOGGER.warn( "getReferenceMarks caught: ", ex );
-	    throw NoDocumentException("getReferenceMarks failed");
+	    throw new NoDocumentException("getReferenceMarks failed");
 	}
     }
 
@@ -555,7 +555,8 @@ class OOBibBase {
     public List<CitationEntry> getCitationEntries()
 	throws NoSuchElementException,
 	       UnknownPropertyException,
-	       WrappedTargetException
+	       WrappedTargetException,
+	       NoDocumentException
     {
         XNameAccess nameAccess = this.getReferenceMarks();
         List<String> names = this.getJabRefReferenceMarkNames(nameAccess);
@@ -631,7 +632,9 @@ class OOBibBase {
      * Or the first unused in this series, after removals.
      *
      */
-    private String getUniqueReferenceMarkName(String bibtexKey, int type) {
+    private String getUniqueReferenceMarkName(String bibtexKey, int type)
+	throws NoDocumentException
+    {
         XNameAccess xNamedRefMarks = getReferenceMarks();
         int i = 0;
         String name = BIB_CITATION + '_' + type + '_' + bibtexKey;
@@ -715,7 +718,8 @@ class OOBibBase {
 	       IOException,
 	       CreationException,
 	       BibEntryNotFoundException,
-	       UndefinedParagraphFormatException
+	       UndefinedParagraphFormatException,
+	       NoDocumentException
     {
         try {
 	    XTextCursor cursor;
@@ -889,7 +893,8 @@ class OOBibBase {
      */
     private List<String> findCitedKeys()
 	throws NoSuchElementException,
-	       WrappedTargetException
+	       WrappedTargetException,
+	       NoDocumentException
     {
         XNameAccess xNamedMarks = getReferenceMarks();
         String[] names          = xNamedMarks.getElementNames();
@@ -973,7 +978,8 @@ class OOBibBase {
 	       PropertyVetoException,
 	       IOException,
 	       CreationException,
-	       BibEntryNotFoundException
+	       BibEntryNotFoundException,
+	       NoDocumentException
     {
         try {
             return refreshCiteMarkersInternal(databases, style);
@@ -1032,7 +1038,8 @@ class OOBibBase {
 	       UnknownPropertyException,
 	       PropertyVetoException,
 	       CreationException,
-	       BibEntryNotFoundException
+	       BibEntryNotFoundException,
+	       NoDocumentException
     {
         List<String> cited = findCitedKeys();
         Map<String, BibDatabase>   linkSourceBase = new HashMap<>();
@@ -1381,7 +1388,8 @@ class OOBibBase {
 
     public void updateSortedReferenceMarks()
 	throws WrappedTargetException,
-	       NoSuchElementException
+	       NoSuchElementException,
+	       NoDocumentException
     {
         this.sortedReferenceMarks = getSortedReferenceMarks(getReferenceMarks());
     }
@@ -1395,7 +1403,8 @@ class OOBibBase {
 	       CreationException,
 	       PropertyVetoException,
 	       UnknownPropertyException,
-	       UndefinedParagraphFormatException
+	       UndefinedParagraphFormatException,
+	       NoDocumentException
     {
         List<String>               cited          = findCitedKeys();
         Map<String, BibDatabase>   linkSourceBase = new HashMap<>();
@@ -1729,7 +1738,11 @@ class OOBibBase {
         position.collapseToEnd();
     }
 
-    private void removeReferenceMark(String name) throws NoSuchElementException, WrappedTargetException {
+    private void removeReferenceMark(String name)
+	throws NoSuchElementException,
+	       WrappedTargetException,
+	       NoDocumentException
+    {
         XNameAccess xReferenceMarks = getReferenceMarks();
         if (xReferenceMarks.hasByName(name)) {
             Object referenceMark = xReferenceMarks.getByName(name);
@@ -1780,9 +1793,17 @@ class OOBibBase {
     }
 
     public void combineCiteMarkers(List<BibDatabase> databases, OOBibStyle style)
-            throws IOException, WrappedTargetException, NoSuchElementException, IllegalArgumentException,
-            UndefinedCharacterFormatException, UnknownPropertyException, PropertyVetoException, CreationException,
-            BibEntryNotFoundException {
+            throws IOException,
+		   WrappedTargetException,
+		   NoSuchElementException,
+		   IllegalArgumentException,
+		   UndefinedCharacterFormatException,
+		   UnknownPropertyException,
+		   PropertyVetoException,
+		   CreationException,
+		   BibEntryNotFoundException,
+		   NoDocumentException
+    {
         XNameAccess nameAccess = getReferenceMarks();
         // TODO: doesn't work for citations in footnotes/tables
         List<String> names = getSortedReferenceMarks(nameAccess);
@@ -1862,9 +1883,17 @@ class OOBibBase {
      * Combined markers are split, with a space inserted between.
      */
     public void unCombineCiteMarkers(List<BibDatabase> databases, OOBibStyle style)
-            throws IOException, WrappedTargetException, NoSuchElementException, IllegalArgumentException,
-            UndefinedCharacterFormatException, UnknownPropertyException, PropertyVetoException, CreationException,
-            BibEntryNotFoundException {
+	throws IOException,
+	       WrappedTargetException,
+	       NoSuchElementException,
+	       IllegalArgumentException,
+	       UndefinedCharacterFormatException,
+	       UnknownPropertyException,
+	       PropertyVetoException,
+	       CreationException,
+	       BibEntryNotFoundException,
+	       NoDocumentException
+    {
         XNameAccess nameAccess = getReferenceMarks();
         // TODO: doesn't work for citations in footnotes/tables
         List<String> names = getSortedReferenceMarks(nameAccess);
@@ -1923,7 +1952,10 @@ class OOBibBase {
     }
 
     public BibDatabase generateDatabase(List<BibDatabase> databases)
-            throws NoSuchElementException, WrappedTargetException {
+	throws NoSuchElementException,
+	       WrappedTargetException,
+	       NoDocumentException
+    {
         BibDatabase resultDatabase = new BibDatabase();
         List<String> cited = findCitedKeys();
         List<BibEntry> entriesToInsert = new ArrayList<>();
