@@ -379,6 +379,9 @@ class OOBibBase {
 	// https://www.openoffice.org/api/docs/common/ref/com/sun/star/util/XCloseBroadcaster.html#addCloseListener
     }
 
+    /*
+     * TODO: GUI should be notified
+     */
     private void forgetDocument(){
 	this.xCurrentComponent   = null ;
 	this.mxDoc               = null ;
@@ -388,6 +391,7 @@ class OOBibBase {
 	this.userProperties      = null ;
 	this.propertySet         = null ;
     }
+
     public boolean isConnectedToDocument() {
         return this.xCurrentComponent != null;
     }
@@ -532,17 +536,6 @@ class OOBibBase {
     private List<String> getJabRefReferenceMarkNames(XNameAccess nameAccess) {
         String[] names = nameAccess.getElementNames();
         // Remove all reference marks that don't look like JabRef citations:
-	/*
-	 * List<String> result = new ArrayList<>();
-	 * if (names != null) {
-	 *     for (String name : names) {
-         *       if (CITE_PATTERN.matcher(name).find()) {
-         *           result.add(name);
-         *       }
-         *   }
-	 * }
-	 * return result;
-	 */
 	if (names == null) {
 	    return new ArrayList<>();
 	}
@@ -625,7 +618,8 @@ class OOBibBase {
 	//  }
     }
 
-    /*
+    /**
+     *
      * The first occurrence of bibtexKey gets no serial number, the
      * second gets 0, the third 1 ...
      *
@@ -645,6 +639,10 @@ class OOBibBase {
         return name;
     }
 
+    /**
+     *   This is what we get back from parsing a refMarkName
+     *
+     */
     private class ParsedRefMark {
 	public String i ; // "", "0", "1" ...
 	public int type ;
@@ -655,6 +653,11 @@ class OOBibBase {
 	    this.citedKeys = citedKeys;
 	}
     }
+
+    /**
+     * Parse a refMarkName.
+     *
+     */
     private Optional<ParsedRefMark> parseRefMarkName( String name ){
         Matcher citeMatcher = CITE_PATTERN2.matcher(name);
         if (!citeMatcher.find()) {
@@ -918,35 +921,35 @@ class OOBibBase {
     /**
      * @return LinkedHashMap, from BibEntry to BibDatabase
      *
-     *  If a key is not found, BibEntry is new UndefinedBibtexEntry(key), BibDatabase is null.
-     *  If key is found, then
+     *  If a citedKey is not found, BibEntry is new UndefinedBibtexEntry(citedKey), BibDatabase is null.
+     *  If citedKey is found, then
      *          BibEntry is what we found, BibDatabase is the database we found it in.
-     *          linkSourceBase.put(key, database); is called.
+     *          linkSourceBase.put(citedKey, database); is called.
      *
      *  So:
-     *  - result has an entry for each key, in the same order
-     *  - key in the entry is the same as the original key
-     *  - on return linkSourceBase has an entry for the keys we did find
+     *  - result has an entry for each citedKey, in the same order
+     *  - citedKey in the entry is the same as the original citedKey
+     *  - on return linkSourceBase has an entry for the citedKey we did find
      */
     private Map<BibEntry, BibDatabase> findCitedEntries(List<BibDatabase> databases,
-							List<String> keys,
+							List<String> citedKeys,
                                                         Map<String, BibDatabase> linkSourceBase)
     {
         Map<BibEntry, BibDatabase> entries = new LinkedHashMap<>();
-        for (String key : keys) {
+        for (String citedKey : citedKeys) {
             boolean found = false;
             for (BibDatabase database : databases) {
-                Optional<BibEntry> entry = database.getEntryByCitationKey(key);
+                Optional<BibEntry> entry = database.getEntryByCitationKey(citedKey);
                 if (entry.isPresent()) {
                     entries.put(entry.get(), database);
-                    linkSourceBase.put(key, database);
+                    linkSourceBase.put(citedKey, database);
                     found = true;
                     break;
                 }
             }
 
             if (!found) {
-                entries.put(new UndefinedBibtexEntry(key), null);
+                entries.put(new UndefinedBibtexEntry(citedKey), null);
             }
         }
         return entries;
@@ -991,8 +994,9 @@ class OOBibBase {
         }
     }
 
-    private static Optional<BibEntry> linkSourceBaseCiteKeyToBibEntry( Map<String, BibDatabase> linkSourceBase,
-								       String citeKey )
+    private static Optional<BibEntry> linkSourceBaseCiteKeyToBibEntry
+	( Map<String, BibDatabase> linkSourceBase,
+	  String citeKey )
     {
 	BibDatabase database = linkSourceBase.get(citeKey);
 	Optional<BibEntry> res = ( (database == null)
@@ -1002,10 +1006,11 @@ class OOBibBase {
 	return res;
     }
 
-    private static BibEntry[] linkSourceBaseGetBibEntriesOfCiteKeys( Map<String, BibDatabase> linkSourceBase,
-								     String[] keys, // citeKeys
-								     String namei   // refMarkName
-								     )
+    private static BibEntry[] linkSourceBaseGetBibEntriesOfCiteKeys
+	( Map<String, BibDatabase> linkSourceBase,
+	  String[] keys, // citeKeys
+	  String namei   // refMarkName
+	  )
 	throws BibEntryNotFoundException
     {
 	BibEntry[] cEntries = new BibEntry[keys.length];
@@ -1029,8 +1034,97 @@ class OOBibBase {
 	return cEntries;
     }
 
-    private List<String> refreshCiteMarkersInternal(List<BibDatabase> databases,
-						    OOBibStyle style)
+    private class GetSortedCitedEntriesResult {
+	Map<String, BibDatabase>   linkSourceBase;
+	List<String>               citedKeys;
+	Map<BibEntry, BibDatabase> entries;
+	List<String>               refMarkNames;
+	public GetSortedCitedEntriesResult
+	    (
+	     Map<String, BibDatabase>   linkSourceBase,
+	     List<String>               citedKeys,
+	     Map<BibEntry, BibDatabase> entries,
+	     List<String>               refMarkNames )
+	{
+	    this.linkSourceBase = linkSourceBase;
+	    this.citedKeys      = citedKeys;
+	    this.entries        = entries;
+	    this.refMarkNames   = refMarkNames;
+	}
+    }
+
+    /**
+     *
+     * @return GetSortedCitedEntriesResult where
+     *
+     *    linkSourceBase maps the citedKeys to the database we found it in
+     *
+     *    refMarkNames : sortedReferenceMarks,
+     *                   except for style.isNumberEntries(),
+     *                   where we keep the order from xReferenceMarks.getElementNames()
+     *
+     *    entries : from findCitedEntries()
+     *              for style.isNumberEntries() reordered by entryComparator
+     *
+     *    citedKeys : citeKey for each ref we found in the document.
+     *                order: from findCitedKeys(),
+     *                except for style.isNumberEntries() where reordered as entries
+     */
+    private GetSortedCitedEntriesResult getSortedCitedEntries
+	( List<BibDatabase> databases,
+	  OOBibStyle style,
+	  XNameAccess xReferenceMarks
+	  )
+	throws NoSuchElementException,
+	       WrappedTargetException,
+	       NoDocumentException
+    {
+        Map<String, BibDatabase>   linkSourceBase = new HashMap<>();
+
+        List<String>               cited = findCitedKeys();
+        Map<BibEntry, BibDatabase> entries =
+	    findCitedEntries(databases, cited, linkSourceBase);
+
+        List<String> names;
+        if (style.isSortByPosition()) {
+            // We need to sort the reference marks according to their
+            // order of appearance:
+            names = sortedReferenceMarks;
+        } else if (style.isNumberEntries()) {
+	    //
+            // We need to sort the reference marks according to the
+            // sorting of the bibliographic entries:
+	    //
+            SortedMap<BibEntry, BibDatabase> newMap = new TreeMap<>(entryComparator);
+            for (Map.Entry<BibEntry, BibDatabase> ee : entries.entrySet()) {
+                newMap.put(ee.getKey(), ee.getValue());
+            }
+            entries = newMap;
+            // Rebuild the list of cited keys according to the sort order:
+            cited.clear();
+            for (BibEntry entry : entries.keySet()) {
+                cited.add(entry.getCitationKey().orElse(null));
+            }
+	    //
+            names = Arrays.asList(xReferenceMarks.getElementNames());
+        } else {
+            names = sortedReferenceMarks;
+        }
+
+        // Remove all reference marks that don't look like JabRef citations:
+	names = filterIsJabRefReferenceMarkName( names );
+
+	return new GetSortedCitedEntriesResult( linkSourceBase,
+						cited,
+						entries,
+						names
+						);
+    }
+
+    private List<String> refreshCiteMarkersInternal
+	( List<BibDatabase> databases,
+	  OOBibStyle style
+	  )
 	throws WrappedTargetException,
 	       IllegalArgumentException,
 	       NoSuchElementException,
@@ -1041,12 +1135,21 @@ class OOBibBase {
 	       BibEntryNotFoundException,
 	       NoDocumentException
     {
-        List<String> cited = findCitedKeys();
+        XNameAccess xReferenceMarks = getReferenceMarks();
+
+	GetSortedCitedEntriesResult sce =
+	    getSortedCitedEntries( databases, style, xReferenceMarks );
+	Map<String, BibDatabase>   linkSourceBase = sce.linkSourceBase;
+	List<String>               cited          = sce.citedKeys;
+	Map<BibEntry, BibDatabase> entries        = ece.entries;
+	List<String>               names          = sce.refMarkNames;
+	//*****
+	/*
         Map<String, BibDatabase>   linkSourceBase = new HashMap<>();
+
+        List<String> cited = findCitedKeys();
         Map<BibEntry, BibDatabase> entries =
 	    findCitedEntries(databases, cited, linkSourceBase);
-
-        XNameAccess xReferenceMarks = getReferenceMarks();
 
         List<String> names;
         if (style.isSortByPosition()) {
@@ -1073,6 +1176,8 @@ class OOBibBase {
 
         // Remove all reference marks that don't look like JabRef citations:
 	names = filterIsJabRefReferenceMarkName( names );
+	*/
+	//**********
 
         Map<String, Integer> numbers = new HashMap<>();
         int lastNum = 0;
