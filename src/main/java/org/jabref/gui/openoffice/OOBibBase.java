@@ -626,14 +626,14 @@ class OOBibBase {
      * Or the first unused in this series, after removals.
      *
      */
-    private String getUniqueReferenceMarkName(String bibtexKey, int type)
+    private String getUniqueReferenceMarkName(String bibtexKey, int itcType)
 	throws NoDocumentException
     {
         XNameAccess xNamedRefMarks = getReferenceMarks();
         int i = 0;
-        String name = BIB_CITATION + '_' + type + '_' + bibtexKey;
+        String name = BIB_CITATION + '_' + itcType + '_' + bibtexKey;
         while (xNamedRefMarks.hasByName(name)) {
-            name = BIB_CITATION + i + '_' + type + '_' + bibtexKey;
+            name = BIB_CITATION + i + '_' + itcType + '_' + bibtexKey;
             i++;
         }
         return name;
@@ -645,11 +645,11 @@ class OOBibBase {
      */
     private class ParsedRefMark {
 	public String i ; // "", "0", "1" ...
-	public int type ;
+	public int itcType ; // in-text-citation type
 	public List<String> citedKeys;
-	ParsedRefMark( String i, int type, List<String> citedKeys ){
+	ParsedRefMark( String i, int itcType, List<String> citedKeys ){
 	    this.i=i;
-	    this.type = type;
+	    this.itcType = itcType;
 	    this.citedKeys = citedKeys;
 	}
     }
@@ -665,8 +665,8 @@ class OOBibBase {
 	}
 	List<String> keys = Arrays.asList( citeMatcher.group(3).split(",") );
 	String i = citeMatcher.group(1);
-	int type = Integer.parseInt( citeMatcher.group(2) );
-	return( Optional.of( new ParsedRefMark( i, type, keys ) ) );
+	int itcType = Integer.parseInt( citeMatcher.group(2) );
+	return( Optional.of( new ParsedRefMark( i, itcType, keys ) ) );
     }
 
     /**
