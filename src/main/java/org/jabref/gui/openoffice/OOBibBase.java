@@ -1141,43 +1141,9 @@ class OOBibBase {
 	    getSortedCitedEntries( databases, style, xReferenceMarks );
 	Map<String, BibDatabase>   linkSourceBase = sce.linkSourceBase;
 	List<String>               cited          = sce.citedKeys;
-	Map<BibEntry, BibDatabase> entries        = ece.entries;
+	Map<BibEntry, BibDatabase> entries        = sce.entries;
 	List<String>               names          = sce.refMarkNames;
 	//*****
-	/*
-        Map<String, BibDatabase>   linkSourceBase = new HashMap<>();
-
-        List<String> cited = findCitedKeys();
-        Map<BibEntry, BibDatabase> entries =
-	    findCitedEntries(databases, cited, linkSourceBase);
-
-        List<String> names;
-        if (style.isSortByPosition()) {
-            // We need to sort the reference marks according to their
-            // order of appearance:
-            names = sortedReferenceMarks;
-        } else if (style.isNumberEntries()) {
-            // We need to sort the reference marks according to the
-            // sorting of the bibliographic entries:
-            SortedMap<BibEntry, BibDatabase> newMap = new TreeMap<>(entryComparator);
-            for (Map.Entry<BibEntry, BibDatabase> ee : entries.entrySet()) {
-                newMap.put(ee.getKey(), ee.getValue());
-            }
-            entries = newMap;
-            // Rebuild the list of cited keys according to the sort order:
-            cited.clear();
-            for (BibEntry entry : entries.keySet()) {
-                cited.add(entry.getCitationKey().orElse(null));
-            }
-            names = Arrays.asList(xReferenceMarks.getElementNames());
-        } else {
-            names = sortedReferenceMarks;
-        }
-
-        // Remove all reference marks that don't look like JabRef citations:
-	names = filterIsJabRefReferenceMarkName( names );
-	*/
-	//**********
 
         Map<String, Integer> numbers = new HashMap<>();
         int lastNum = 0;
