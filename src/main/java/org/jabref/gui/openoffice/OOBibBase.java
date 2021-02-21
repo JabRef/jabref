@@ -1355,6 +1355,8 @@ class OOBibBase {
                 } else {
 		    assert( !style.isCitationKeyCiteMarkers() );
 		    assert( !style.isNumberEntries() );
+		    // Citations in (Au1, Au2 2000) form
+		    //
 		    // sort itcBlock
 		    sortBibEntryArray( cEntries, style );
 		    //
@@ -1391,21 +1393,29 @@ class OOBibBase {
         } // for i
 
 	//
-	// uniqiefiers
+	// uniqiefiers  "a", "b" in (2000a, 2000b)
 	//
         uniquefiers.clear();
         if (!style.isCitationKeyCiteMarkers() && !style.isNumberEntries()) {
-	    // Numbered citations do not need uniquefiers
-	    // 
+	    // Only for normal citations. Numbered citations and
+	    // citeKeys are already unique.
+	    //
 	    //
             // See if there are duplicate citations marks referring to
             // different entries. If so, we need to use uniquefiers:
-            Map<String, List<String>> refKeys = new HashMap<>();
+	    //
+	    // refKeys: normCitMarker to bibtexkeys sharing it
+	    // refNums: normCitMarker to (indices of normCitMarkers)
+	    //
+	    // Two lists keyed to the same marker correspond, and are
+	    // ordered as in normCitMarkers[i][j]
+	    //
+            Map<String, List<String>>  refKeys = new HashMap<>();
             Map<String, List<Integer>> refNums = new HashMap<>();
             for (int i = 0; i < citMarkers.length; i++) {
                 String[] markers = normCitMarkers[i]; // compare normalized markers, since the actual markers can be different
                 for (int j = 0; j < markers.length; j++) {
-                    String marker = markers[j];
+                    String marker     = markers[j];
                     String currentKey = bibtexKeys[i][j];
                     if (refKeys.containsKey(marker)) {
                         // Ok, we have seen this exact marker before.
@@ -1415,6 +1425,7 @@ class OOBibBase {
                             refNums.get(marker).add(i);
                         }
                     } else {
+			// add as new entry
                         List<String> l = new ArrayList<>(1);
                         l.add(currentKey);
                         refKeys.put(marker, l);
