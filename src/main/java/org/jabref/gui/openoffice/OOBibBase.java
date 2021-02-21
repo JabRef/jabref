@@ -495,7 +495,9 @@ class OOBibBase {
 		 : OOBibBase.AUTHORYEAR_INTEXT );
     }
 
-    /*
+    /**
+     *
+     * @throws NoDocumentException
      *
      */
     private XNameAccess getReferenceMarks()
