@@ -1018,15 +1018,6 @@ class OOBibBase {
         }
 
         // Remove all reference marks that don't look like JabRef citations:
-	/*
-	 * List<String> tmp = new ArrayList<>();
-	 * for (String name : names) {
-         *    if (CITE_PATTERN.matcher(name).find()) {
-         *        tmp.add(name);
-         *    }
-	 * }
-	 * names = tmp;
-	 */
 	names = filterIsJabRefReferenceMarkName( names );
 
         Map<String, Integer> numbers = new HashMap<>();
