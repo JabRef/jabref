@@ -606,7 +606,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
             }
 
             BibDatabase currentDatabase = database.get(currentEntry);
-            int unlimA = unlimAuthors == null ? -1 : unlimAuthors[j];
+            int unlimA = (unlimAuthors == null) ? -1 : unlimAuthors[j];
             int maxAuthors = unlimA > 0 ? unlimA : maxA;
 
             String author = getCitationMarkerField(currentEntry, currentDatabase, authorField);
@@ -659,7 +659,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
             }
 
             BibDatabase currentDatabase = database.get(currentEntry);
-            int unlimA = unlimAuthors == null ? -1 : unlimAuthors[i];
+            int unlimA = (unlimAuthors == null) ? -1 : unlimAuthors[i];
             int maxAuthors = unlimA > 0 ? unlimA : maxA;
 
             if (i > 0) {
