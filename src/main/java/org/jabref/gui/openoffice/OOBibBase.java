@@ -1405,13 +1405,11 @@ class OOBibBase {
             // different entries. If so, we need to use uniquefiers:
 	    //
 	    // refKeys: normCitMarker to bibtexkeys sharing it
-	    // refNums: normCitMarker to (indices of normCitMarkers)
 	    //
-	    // Two lists keyed to the same marker correspond, and are
-	    // ordered as in normCitMarkers[i][j]
+	    // The entries in the lists are ordered as in
+	    // normCitMarkers[i][j]
 	    //
             Map<String, List<String>>  refKeys = new HashMap<>();
-            Map<String, List<Integer>> refNums = new HashMap<>();
             for (int i = 0; i < citMarkers.length; i++) {
                 String[] markers = normCitMarkers[i]; // compare normalized markers, since the actual markers can be different
                 for (int j = 0; j < markers.length; j++) {
@@ -1422,16 +1420,12 @@ class OOBibBase {
                         if (!refKeys.get(marker).contains(currentKey)) {
                             // ... but not for this entry.
                             refKeys.get(marker).add(currentKey);
-                            refNums.get(marker).add(i);
                         }
                     } else {
 			// add as new entry
                         List<String> l = new ArrayList<>(1);
                         l.add(currentKey);
                         refKeys.put(marker, l);
-                        List<Integer> l2 = new ArrayList<>(1);
-                        l2.add(i);
-                        refNums.put(marker, l2);
                     }
                 }
             }
