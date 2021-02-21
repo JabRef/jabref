@@ -1238,6 +1238,29 @@ class OOBibBase {
 	return num;
     }
 
+    /**
+     * Resolve the citation key from a citation reference marker name,
+     * and look up the index of the key in a list of keys.
+     *
+     * @param refMarkName The name of the ReferenceMark representing the citation.
+     * @param orderedCiteKeys       A List of citation keys representing the entries in the bibliography.
+     * @return the (1-based) indices of the cited keys, -1 if a key is not found.
+     *         Returns Collections.emptyList() if the ref name could not be resolved as a citation.
+     */
+    private List<Integer> findCitedEntryIndex(String refMarkName, List<String> orderedCiteKeys) {
+	Optional< ParsedRefMark > op = parseRefMarkName( refMarkName );
+	if ( !op.isPresent() ){
+	    return Collections.emptyList();
+	}
+	List<String> keysCitedHere = op.get().citedKeys;
+	List<Integer> result = new ArrayList<>(keysCitedHere.size());
+	for (String key : keysCitedHere) {
+	    int ind = orderedCiteKeys.indexOf(key);
+	    result.add(ind == -1 ? -1 : 1 + ind);
+	}
+	return result;
+    }
+
     private List<String> refreshCiteMarkersInternal
 	( List<BibDatabase> databases,
 	  OOBibStyle style
@@ -1631,28 +1654,6 @@ class OOBibBase {
     }
 
 
-    /**
-     * Resolve the citation key from a citation reference marker name,
-     * and look up the index of the key in a list of keys.
-     *
-     * @param refMarkName The name of the ReferenceMark representing the citation.
-     * @param orderedCiteKeys       A List of citation keys representing the entries in the bibliography.
-     * @return the (1-based) indices of the cited keys, -1 if a key is not found.
-     *         Returns Collections.emptyList() if the ref name could not be resolved as a citation.
-     */
-    private List<Integer> findCitedEntryIndex(String refMarkName, List<String> orderedCiteKeys) {
-	Optional< ParsedRefMark > op = parseRefMarkName( refMarkName );
-	if ( !op.isPresent() ){
-	    return Collections.emptyList();
-	}
-	List<String> keysCitedHere = op.get().citedKeys;
-	List<Integer> result = new ArrayList<>(keysCitedHere.size());
-	for (String key : keysCitedHere) {
-	    int ind = orderedCiteKeys.indexOf(key);
-	    result.add(ind == -1 ? -1 : 1 + ind);
-	}
-	return result;
-    }
 
     private Map<BibEntry, BibDatabase> getSortedEntriesFromSortedRefMarks(List<String> names,
                                                                           Map<String, BibDatabase> linkSourceBase) {
