@@ -489,6 +489,18 @@ class OOBibBase {
 	    entries.sort(this.entryComparator);
 	}
     }
+    private void sortBibEntryArray( BibEntry[] entries,
+				    OOBibStyle style )
+    {
+	if (entries.length >= 1) {
+	    return;
+	}
+	if (style.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL)) {
+	    Arrays.sort(entries, yearAuthorTitleComparator);
+	} else {
+	    Arrays.sort(entries, entryComparator);
+	}
+    }
 
     private static int citationTypeFromOptions( boolean withText, boolean inParenthesis ) {
 	if ( !withText ){
@@ -1159,6 +1171,14 @@ class OOBibBase {
 	    style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
 
         int[] types = new int[names.size()];
+	//
+	//
+	// fill:
+	//    types[i]      = ov.itcType
+	//    bibtexKeys[i] = ov.citedKeys.toArray()
+	//    citMarkers[i] = what goes in the text
+	//    normCitMarkers[i][j] = for unification
+	//
         for (int i = 0; i < names.size(); i++) {
 	    final String namei = names.get(i);
 	    Optional<ParsedRefMark> op = parseRefMarkName( namei );
@@ -1250,47 +1270,55 @@ class OOBibBase {
 				  ( "Could not resolve BibTeX entry for citation marker '%0'."
 				    , names.get(i) )
 				  );
-                        } else {
-                            citationMarker = style.getNumCitationMarker(num, minGroupingCount, false);
                         }
-
+			//
+			citationMarker =
+			    style.getNumCitationMarker(num, minGroupingCount, false);
+                        // normCitMarker
                         for (int j = 0; j < keys.length; j++) {
-                            List<Integer> list = new ArrayList<>(1);
-                            list.add(num.get(j));
-                            normCitMarker[j] = style.getNumCitationMarker(list, minGroupingCount, false);
+			    List<Integer> numj = Collections.singletonList(num.get(j));
+                            normCitMarker[j] = style.getNumCitationMarker(numj, minGroupingCount, false);
                         }
                     }
                 } else {
+		    sortBibEntryArray( cEntries, style );
+		    // Update key list to match the new sorting:
+		    for (int j = 0; j < cEntries.length; j++) {
+			bibtexKeys[i][j] = cEntries[j].getCitationKey().orElse(null);
+		    }
 
-                    if (cEntries.length > 1) {
-                        if (style.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL)) {
-                            Arrays.sort(cEntries, yearAuthorTitleComparator);
-                        } else {
-                            Arrays.sort(cEntries, entryComparator);
-                        }
-                        // Update key list to match the new sorting:
-                        for (int j = 0; j < cEntries.length; j++) {
-                            bibtexKeys[i][j] = cEntries[j].getCitationKey().orElse(null);
-                        }
-                    }
-
-                    citationMarker = style.getCitationMarker(Arrays.asList(cEntries), entries,
-                            type == OOBibBase.AUTHORYEAR_PAR, null, null);
+                    citationMarker = style.getCitationMarker( Arrays.asList(cEntries),
+							      entries,
+							      type == OOBibBase.AUTHORYEAR_PAR,
+							      null,
+							      null );
                     // We need "normalized" (in parenthesis) markers for uniqueness checking purposes:
                     for (int j = 0; j < cEntries.length; j++) {
-                        normCitMarker[j] = style.getCitationMarker(Collections.singletonList(cEntries[j]), entries,
-                                true, null, new int[] {-1});
+			List<BibEntry> cej = Collections.singletonList(cEntries[j]);
+                        normCitMarker[j] =
+			    style.getCitationMarker( cej,
+						     entries,
+						     true,
+						     null,
+						     new int[] {-1}
+						     );
                     }
                 }
-                citMarkers[i] = citationMarker;
+                citMarkers[i]     = citationMarker;
                 normCitMarkers[i] = normCitMarker;
             } // if (citeMatcher.find())
         } // for i
 
+	//
+	// uniqiefiers
+	//
         uniquefiers.clear();
         if (!style.isCitationKeyCiteMarkers() && !style.isNumberEntries()) {
-            // See if there are duplicate citations marks referring to different entries. If so, we need to
-            // use uniquefiers:
+	    // Numbered citations do not need uniquefiers
+	    // 
+	    //
+            // See if there are duplicate citations marks referring to
+            // different entries. If so, we need to use uniquefiers:
             Map<String, List<String>> refKeys = new HashMap<>();
             Map<String, List<Integer>> refNums = new HashMap<>();
             for (int i = 0; i < citMarkers.length; i++) {
@@ -1436,6 +1464,9 @@ class OOBibBase {
         return unresolvedKeys;
     }
 
+    /**
+     *
+     */
     private List<String> getSortedReferenceMarks(final XNameAccess nameAccess)
             throws WrappedTargetException,
 		   NoSuchElementException
