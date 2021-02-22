@@ -1398,84 +1398,85 @@ class OOBibBase {
         for (int i = 0; i < names.size(); i++) {
             final String namei = names.get(i);
             Optional<ParsedRefMark> op = parseRefMarkName( namei );
-            if ( op.isPresent() ) {
-                ParsedRefMark ov = op.get();
-                int type = ov.itcType;
-                types[i] = type; // Remember the itcType in case we need to uniquefy.
-                String[] keys = ov.citedKeys.stream().toArray(String[]::new);
-                bibtexKeys[i] = keys;
+            if ( !op.isPresent() ) {
+                continue;
+            }
+            ParsedRefMark ov = op.get();
+            int type = ov.itcType;
+            types[i] = type; // Remember the itcType in case we need to uniquefy.
+            String[] keys = ov.citedKeys.stream().toArray(String[]::new);
+            bibtexKeys[i] = keys;
+            //
+            BibEntry[] cEntries =
+                linkSourceBaseGetBibEntriesOfCiteKeys( linkSourceBase, keys, namei );
+            assert (cEntries.length == keys.length) ;
+            //
+            // normCitMarker[ cEntries.length ] null if missing
+            String[] normCitMarker = new String[cEntries.length];
+            String   citationMarker; // normCitMarker.replace( null -> "" ).join(",")
+            //
+            // fill normCitMarker, set citationMarker
+            if (style.isCitationKeyCiteMarkers()) {
                 //
-                BibEntry[] cEntries =
-                    linkSourceBaseGetBibEntriesOfCiteKeys( linkSourceBase, keys, namei );
-                assert (cEntries.length == keys.length) ;
+                citationMarker = rcmCitationMarkerForIsCitationKeyCiteMarkers( cEntries, style );
+                normCitMarker  = rcmNormCitMarkersForIsCitationKeyCiteMarkers( cEntries, style );
                 //
-                // normCitMarker[ cEntries.length ] null if missing
-                String[] normCitMarker = new String[cEntries.length];
-                String   citationMarker; // normCitMarker.replace( null -> "" ).join(",")
-                //
-                // fill normCitMarker, set citationMarker
-                if (style.isCitationKeyCiteMarkers()) {
-                    //
-                    citationMarker = rcmCitationMarkerForIsCitationKeyCiteMarkers( cEntries, style );
-                    normCitMarker  = rcmNormCitMarkersForIsCitationKeyCiteMarkers( cEntries, style );
-                    //
-                } else if (style.isNumberEntries()) {
-                    List<Integer> num ;
-                    if (style.isSortByPosition()) {
-                        num = rcmNumForIsNumberEntriesIsSortByPosition( cEntries, keys, style, cns );
-                    } else {
-                        num = findCitedEntryIndices( Arrays.asList(keys) , cited );
-                    }
-                    //
-                    // set citationMarker
-                    citationMarker =
-                        style.getNumCitationMarker(num, minGroupingCount, false);
-                    //
-                    // fill normCitMarker
-                    for (int j = 0; j < cEntries.length; j++) {
-                        List<Integer> numj = Collections.singletonList(num.get(j));
-                        normCitMarker[j] =
-                            style.getNumCitationMarker( numj, minGroupingCount, false );
-                    }
-                    //
+            } else if (style.isNumberEntries()) {
+                List<Integer> num ;
+                if (style.isSortByPosition()) {
+                    num = rcmNumForIsNumberEntriesIsSortByPosition( cEntries, keys, style, cns );
                 } else {
-                    assert( !style.isCitationKeyCiteMarkers() );
-                    assert( !style.isNumberEntries() );
-                    // Citations in (Au1, Au2 2000) form
-                    //
-                    // sort itcBlock
-                    sortBibEntryArray( cEntries, style );
-                    //
-                    // Update key list to match the new sorting:
-                    for (int j = 0; j < cEntries.length; j++) {
-                        bibtexKeys[i][j] = cEntries[j].getCitationKey().orElse(null);
-                    }
-                    //
-                    citationMarker = style.getCitationMarker( Arrays.asList(cEntries), // entries
-                                                              entries, // database
-                                                              type == OOBibBase.AUTHORYEAR_PAR, // inParenthesis
-                                                              null, // uniquefiers
-                                                              null  // unlimAuthors
-                                                              );
-                    //
-                    // We need "normalized" (in parenthesis) markers
-                    // for uniqueness checking purposes:
-                    //
-                    // Fill normCitMarker
-                    for (int j = 0; j < cEntries.length; j++) {
-                        List<BibEntry> cej = Collections.singletonList(cEntries[j]);
-                        normCitMarker[j] =
-                            style.getCitationMarker( cej,      // entries
-                                                     entries,  // database
-                                                     true,     // inParenthesis
-                                                     null,     // uniquefiers
-                                                     new int[] {-1} // unlimAuthors
-                                                     );
-                    }
+                    num = findCitedEntryIndices( Arrays.asList(keys) , cited );
                 }
-                citMarkers[i]     = citationMarker;
-                normCitMarkers[i] = normCitMarker;
-            } // if (citeMatcher.find())
+                //
+                // set citationMarker
+                citationMarker =
+                    style.getNumCitationMarker(num, minGroupingCount, false);
+                //
+                // fill normCitMarker
+                for (int j = 0; j < cEntries.length; j++) {
+                    List<Integer> numj = Collections.singletonList(num.get(j));
+                    normCitMarker[j] =
+                        style.getNumCitationMarker( numj, minGroupingCount, false );
+                }
+                //
+            } else {
+                assert( !style.isCitationKeyCiteMarkers() );
+                assert( !style.isNumberEntries() );
+                // Citations in (Au1, Au2 2000) form
+                //
+                // sort itcBlock
+                sortBibEntryArray( cEntries, style );
+                //
+                // Update key list to match the new sorting:
+                for (int j = 0; j < cEntries.length; j++) {
+                    bibtexKeys[i][j] = cEntries[j].getCitationKey().orElse(null);
+                }
+                //
+                citationMarker = style.getCitationMarker( Arrays.asList(cEntries), // entries
+                                                          entries, // database
+                                                          type == OOBibBase.AUTHORYEAR_PAR, // inParenthesis
+                                                          null, // uniquefiers
+                                                          null  // unlimAuthors
+                                                          );
+                //
+                // We need "normalized" (in parenthesis) markers
+                // for uniqueness checking purposes:
+                //
+                // Fill normCitMarker
+                for (int j = 0; j < cEntries.length; j++) {
+                    List<BibEntry> cej = Collections.singletonList(cEntries[j]);
+                    normCitMarker[j] =
+                        style.getCitationMarker( cej,      // entries
+                                                 entries,  // database
+                                                 true,     // inParenthesis
+                                                 null,     // uniquefiers
+                                                 new int[] {-1} // unlimAuthors
+                                                 );
+                }
+            }
+            citMarkers[i]     = citationMarker;
+            normCitMarkers[i] = normCitMarker;
         } // for i
 
 
@@ -1611,6 +1612,7 @@ class OOBibBase {
         // Refresh all reference marks with the citation markers we computed:
         rcmApplyNewCitationMarkers( names, citMarkers, types, style );
 
+        // Collect and return uunresolved citation keys.
         // uses: entries
         List<String> unresolvedKeys = new ArrayList<>();
         for (BibEntry entry : entries.keySet()) {
