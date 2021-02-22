@@ -1481,19 +1481,18 @@ class OOBibBase {
                     }
 
                     String uniq = uniquefiers.get(currentKey);
-                    Optional<BibEntry> tmpEntry = Optional.empty();
+                    if (uniq == null) {
+                        uniquif[j] = "";
+                    } else {
+                        uniquif[j] = uniq;
+                        needsChange = true;
+                    }
 
                     if (firstLimAuthors[j] > 0) {
                         needsChange = true;
                     }
 
-                    if (uniq == null) {
-                        uniquif[j] = "";
-                    } else {
-                        needsChange = true;
-                        uniquif[j] = uniq;
-                    }
-
+                    Optional<BibEntry> tmpEntry = Optional.empty();
                     {
                         BibDatabase database = linkSourceBase.get(currentKey);
                         if (database != null) {
