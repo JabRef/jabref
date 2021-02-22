@@ -1426,6 +1426,11 @@ class OOBibBase {
             uniquefiers.clear();
 
         } else {
+
+            assert( !style.isCitationKeyCiteMarkers() );
+            assert( !style.isNumberEntries() );
+            // Citations in (Au1, Au2 2000) form
+
             //    normCitMarkers[i][j] = for unification
             String[][] normCitMarkers = new String[nRefMarks][];
 
@@ -1436,10 +1441,6 @@ class OOBibBase {
                     linkSourceBaseGetBibEntriesOfCiteKeys( linkSourceBase, bibtexKeys[i], namei );
                 assert (cEntries.length == bibtexKeys[i].length) ;
 
-                assert( !style.isCitationKeyCiteMarkers() );
-                assert( !style.isNumberEntries() );
-                // Citations in (Au1, Au2 2000) form
-                //
                 // sort itcBlock
                 sortBibEntryArray( cEntries, style );
 
