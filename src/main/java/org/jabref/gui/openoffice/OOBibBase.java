@@ -1554,15 +1554,23 @@ class OOBibBase {
                 String charStyle = style.getCitationCharacterFormat();
                 try {
                     xCursorProps.setPropertyValue(CHAR_STYLE_NAME, charStyle);
-                } catch (UnknownPropertyException | PropertyVetoException | IllegalArgumentException |
-                        WrappedTargetException ex) {
+                } catch (UnknownPropertyException
+                         | PropertyVetoException
+                         | IllegalArgumentException
+                         | WrappedTargetException ex) {
                     throw new UndefinedCharacterFormatException(charStyle);
                 }
             }
 
             this.xtext.removeTextContent(bookmark);
 
-            insertReferenceMark(names.get(i), citMarkers[i], cursor, types[i] != OOBibBase.INVISIBLE_CIT, style);
+            insertReferenceMark(names.get(i),
+                                citMarkers[i],
+                                cursor,
+                                types[i] != OOBibBase.INVISIBLE_CIT,
+                                style
+                                );
+
             if (hadBibSection && (getBookmarkRange(OOBibBase.BIB_SECTION_NAME) == null)) {
                 // We have overwritten the marker for the start of the reference list.
                 // We need to add it again.
