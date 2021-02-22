@@ -1480,12 +1480,14 @@ class OOBibBase {
                         seenBefore.add(currentKey);
                     }
 
-                    String uniq = uniquefiers.get(currentKey);
-                    if (uniq == null) {
-                        uniquif[j] = "";
-                    } else {
-                        uniquif[j] = uniq;
-                        needsChange = true;
+                    {
+                        String uniq = uniquefiers.get(currentKey);
+                        if (uniq == null) {
+                            uniquif[j] = "";
+                        } else {
+                            uniquif[j] = uniq;
+                            needsChange = true;
+                        }
                     }
 
                     if (firstLimAuthors[j] > 0) {
