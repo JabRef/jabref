@@ -1525,131 +1525,131 @@ class OOBibBase {
             // uniquefiers:  "a", "b" in (2000a, 2000b)
             uniquefiers.clear();
 
-        // The following block
-        // changes: citMarkers[i], uniquefiers
-        // uses: nRefMarks, normCitMarkers, bibtexKeys,
-        //       style (style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST))
-        //       linkSourceBase, entries, types
-        //
-        if (!style.isCitationKeyCiteMarkers() && !style.isNumberEntries()) {
-            // Only for normal citations. Numbered citations and
-            // citeKeys are already unique.
+            // The following block
+            // changes: citMarkers[i], uniquefiers
+            // uses: nRefMarks, normCitMarkers, bibtexKeys,
+            //       style (style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST))
+            //       linkSourceBase, entries, types
+            //
+            if (!style.isCitationKeyCiteMarkers() && !style.isNumberEntries()) {
+                // Only for normal citations. Numbered citations and
+                // citeKeys are already unique.
 
-            // See if there are duplicate citations marks referring to
-            // different entries. If so, we need to use uniquefiers:
+                // See if there are duplicate citations marks referring to
+                // different entries. If so, we need to use uniquefiers:
 
-            // refKeys: normCitMarker to list of bibtexkeys sharing it.
-            //          The entries in the lists are ordered as in
-            //          normCitMarkers[i][j]
-            Map<String, List<String>>  refKeys = new HashMap<>();
+                // refKeys: normCitMarker to list of bibtexkeys sharing it.
+                //          The entries in the lists are ordered as in
+                //          normCitMarkers[i][j]
+                Map<String, List<String>>  refKeys = new HashMap<>();
 
-            for (int i = 0; i < nRefMarks; i++) {
-                // Compare normalized markers, since the actual
-                // markers can be different.
-                String[] markers = normCitMarkers[i];
-                for (int j = 0; j < markers.length; j++) {
-                    String marker     = markers[j];
-                    String currentKey = bibtexKeys[i][j];
-                    if (refKeys.containsKey(marker)) {
-                        // Ok, we have seen this exact marker before.
-                        if (!refKeys.get(marker).contains(currentKey)) {
-                            // ... but not for this entry.
-                            refKeys.get(marker).add(currentKey);
-                        }
-                    } else {
-                        // add as new entry
-                        List<String> l = new ArrayList<>(1);
-                        l.add(currentKey);
-                        refKeys.put(marker, l);
-                    }
-                }
-            }
-
-            // Go through the collected lists and see where we need to
-            // uniquefy:
-            for (Map.Entry<String, List<String>> stringListEntry : refKeys.entrySet()) {
-                List<String> clashingKeys = stringListEntry.getValue();
-                if (clashingKeys.size() > 1) {
-                    // This marker appears for more than one unique entry:
-                    int uniq = 'a';
-                    for (String key : clashingKeys) {
-                        // Update the map of uniquefiers for the
-                        // benefit of both the following generation of
-                        // new citation markers, and for the method
-                        // that builds the bibliography:
-                        uniquefiers.put(key, String.valueOf((char) uniq));
-                        uniq++;
-                    }
-                }
-            }
-
-            // Finally, go through all citation markers, and update
-            // those referring to entries in our current list:
-            final int maxAuthorsFirst = style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST);
-            Set<String> seenBefore = new HashSet<>();
-            for (int i = 0; i < nRefMarks; i++) {
-                final int  nCitedEntries = bibtexKeys[i].length;
-                boolean    needsChange     = false;
-                int[]      firstLimAuthors = new int[nCitedEntries];
-                String[]   uniquif         = new String[nCitedEntries];
-                BibEntry[] cEntries        = new BibEntry[nCitedEntries];
-
-                for (int j = 0; j < nCitedEntries; j++) {
-                    String currentKey = bibtexKeys[i][j];
-
-                    // firstLimAuthors will be (-1) except at the first
-                    // refMark it appears at, where a positive maxAuthorsFirst
-                    // may override. This is why:
-                    // https://discourse.jabref.org/t/number-of-authors-in-citations-style-libreoffice/747/3
-                    // "Some citation styles require to list the full
-                    // names of the first 4 authors for the first
-                    // time. Later it is sufficient to have only maybe
-                    // (Author A and Author B 2019 et al.)"
-                    firstLimAuthors[j] = -1;
-                    if (maxAuthorsFirst > 0) {
-                        if (!seenBefore.contains(currentKey)) {
-                            firstLimAuthors[j] = maxAuthorsFirst;
-                        }
-                        seenBefore.add(currentKey);
-                    }
-
-                    {
-                        String uniq = uniquefiers.get(currentKey);
-                        if (uniq == null) {
-                            uniquif[j] = "";
+                for (int i = 0; i < nRefMarks; i++) {
+                    // Compare normalized markers, since the actual
+                    // markers can be different.
+                    String[] markers = normCitMarkers[i];
+                    for (int j = 0; j < markers.length; j++) {
+                        String marker     = markers[j];
+                        String currentKey = bibtexKeys[i][j];
+                        if (refKeys.containsKey(marker)) {
+                            // Ok, we have seen this exact marker before.
+                            if (!refKeys.get(marker).contains(currentKey)) {
+                                // ... but not for this entry.
+                                refKeys.get(marker).add(currentKey);
+                            }
                         } else {
-                            uniquif[j] = uniq;
-                            needsChange = true;
+                            // add as new entry
+                            List<String> l = new ArrayList<>(1);
+                            l.add(currentKey);
+                            refKeys.put(marker, l);
                         }
                     }
+                }
 
-                    if (firstLimAuthors[j] > 0) {
-                        needsChange = true;
+                // Go through the collected lists and see where we need to
+                // uniquefy:
+                for (Map.Entry<String, List<String>> stringListEntry : refKeys.entrySet()) {
+                    List<String> clashingKeys = stringListEntry.getValue();
+                    if (clashingKeys.size() > 1) {
+                        // This marker appears for more than one unique entry:
+                        int uniq = 'a';
+                        for (String key : clashingKeys) {
+                            // Update the map of uniquefiers for the
+                            // benefit of both the following generation of
+                            // new citation markers, and for the method
+                            // that builds the bibliography:
+                            uniquefiers.put(key, String.valueOf((char) uniq));
+                            uniq++;
+                        }
                     }
+                }
 
-                    {
-                        BibDatabase database = linkSourceBase.get(currentKey);
-                        if (database != null) {
-                            Optional<BibEntry> tmpEntry = database.getEntryByCitationKey(currentKey);
-                            if (tmpEntry.isPresent()) {
-                                cEntries[j] = tmpEntry.get();
+                // Finally, go through all citation markers, and update
+                // those referring to entries in our current list:
+                final int maxAuthorsFirst = style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST);
+                Set<String> seenBefore = new HashSet<>();
+                for (int i = 0; i < nRefMarks; i++) {
+                    final int  nCitedEntries = bibtexKeys[i].length;
+                    boolean    needsChange     = false;
+                    int[]      firstLimAuthors = new int[nCitedEntries];
+                    String[]   uniquif         = new String[nCitedEntries];
+                    BibEntry[] cEntries        = new BibEntry[nCitedEntries];
+
+                    for (int j = 0; j < nCitedEntries; j++) {
+                        String currentKey = bibtexKeys[i][j];
+
+                        // firstLimAuthors will be (-1) except at the first
+                        // refMark it appears at, where a positive maxAuthorsFirst
+                        // may override. This is why:
+                        // https://discourse.jabref.org/t/number-of-authors-in-citations-style-libreoffice/747/3
+                        // "Some citation styles require to list the full
+                        // names of the first 4 authors for the first
+                        // time. Later it is sufficient to have only maybe
+                        // (Author A and Author B 2019 et al.)"
+                        firstLimAuthors[j] = -1;
+                        if (maxAuthorsFirst > 0) {
+                            if (!seenBefore.contains(currentKey)) {
+                                firstLimAuthors[j] = maxAuthorsFirst;
+                            }
+                            seenBefore.add(currentKey);
+                        }
+
+                        {
+                            String uniq = uniquefiers.get(currentKey);
+                            if (uniq == null) {
+                                uniquif[j] = "";
+                            } else {
+                                uniquif[j] = uniq;
+                                needsChange = true;
                             }
                         }
+
+                        if (firstLimAuthors[j] > 0) {
+                            needsChange = true;
+                        }
+
+                        {
+                            BibDatabase database = linkSourceBase.get(currentKey);
+                            if (database != null) {
+                                Optional<BibEntry> tmpEntry = database.getEntryByCitationKey(currentKey);
+                                if (tmpEntry.isPresent()) {
+                                    cEntries[j] = tmpEntry.get();
+                                }
+                            }
+                        }
+
+                    } // for j
+
+                    if (needsChange) {
+                        citMarkers[i] =
+                            style.getCitationMarker( Arrays.asList(cEntries),
+                                                     entries,
+                                                     types[i] == OOBibBase.AUTHORYEAR_PAR,
+                                                     uniquif,
+                                                     firstLimAuthors
+                                                     );
                     }
-
-                } // for j
-
-                if (needsChange) {
-                    citMarkers[i] =
-                        style.getCitationMarker( Arrays.asList(cEntries),
-                                                 entries,
-                                                 types[i] == OOBibBase.AUTHORYEAR_PAR,
-                                                 uniquif,
-                                                 firstLimAuthors
-                                                 );
-                }
-            } // for i
-        } // if normalStyle
+                } // for i
+            } // if normalStyle
         }
 
 
