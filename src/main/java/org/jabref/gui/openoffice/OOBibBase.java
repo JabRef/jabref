@@ -1407,33 +1407,29 @@ class OOBibBase {
             uniquefiers.clear();
 
         } else if (style.isNumberEntries()) {
-            // --- begin-head ---
+
             for (int i = 0; i < names.size(); i++) {
                 final String namei = names.get(i);
 
                 BibEntry[] cEntries =
                     linkSourceBaseGetBibEntriesOfCiteKeys( linkSourceBase, bibtexKeys[i], namei );
                 assert (cEntries.length == bibtexKeys[i].length) ;
-                //
+
                 String   citationMarker;
-                // --- end-head ---
+
                 List<Integer> num ;
                 if (style.isSortByPosition()) {
                     num = rcmNumForIsNumberEntriesIsSortByPosition( cEntries, bibtexKeys[i], style, cns );
                 } else {
                     num = findCitedEntryIndices( Arrays.asList(bibtexKeys[i]) , cited );
                 }
-                //
-                // set citationMarker
+
                 citationMarker =
                     style.getNumCitationMarker(num, minGroupingCount, false);
-                //
-                // --- begin-tail ---
                 citMarkers[i]     = citationMarker;
-            } // for i
-            // --- end-tail ---
-            // uniquefiers:  "a", "b" in (2000a, 2000b)
+            }
             uniquefiers.clear();
+
         } else {
             //    normCitMarkers[i][j] = for unification
             String[][] normCitMarkers = new String[nRefMarks][];
