@@ -1463,6 +1463,15 @@ class OOBibBase {
 
                 for (int j = 0; j < nCitedEntries; j++) {
                     String currentKey = bibtexKeys[i][j];
+
+                    // firstLimAuthors will be (-1) except at the first
+                    // refMark it appears at, where a positive maxAuthorsFirst
+                    // may override. This is why:
+                    // https://discourse.jabref.org/t/number-of-authors-in-citations-style-libreoffice/747/3
+                    // "Some citation styles require to list the full
+                    // names of the first 4 authors for the first
+                    // time. Later it is sufficient to have only maybe
+                    // (Author A and Author B 2019 et al.)"
                     firstLimAuthors[j] = -1;
                     if (maxAuthorsFirst > 0) {
                         if (!seenBefore.contains(currentKey)) {
@@ -1470,6 +1479,7 @@ class OOBibBase {
                         }
                         seenBefore.add(currentKey);
                     }
+
                     String uniq = uniquefiers.get(currentKey);
                     Optional<BibEntry> tmpEntry = Optional.empty();
                     if (uniq == null) {
@@ -1505,7 +1515,7 @@ class OOBibBase {
                                                  entries,
                                                  types[i] == OOBibBase.AUTHORYEAR_PAR,
                                                  uniquif,
-                                                 firstLimAuthors
+                                                 firstLimAuthors // unlimAuthors
                                                  );
                 }
             } // for i
