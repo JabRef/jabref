@@ -1415,18 +1415,13 @@ class OOBibBase {
                     linkSourceBaseGetBibEntriesOfCiteKeys( linkSourceBase, bibtexKeys[i], namei );
                 assert (cEntries.length == bibtexKeys[i].length) ;
 
-                String   citationMarker;
-
                 List<Integer> num ;
                 if (style.isSortByPosition()) {
                     num = rcmNumForIsNumberEntriesIsSortByPosition( cEntries, bibtexKeys[i], style, cns );
                 } else {
                     num = findCitedEntryIndices( Arrays.asList(bibtexKeys[i]) , cited );
                 }
-
-                citationMarker =
-                    style.getNumCitationMarker(num, minGroupingCount, false);
-                citMarkers[i]     = citationMarker;
+                citMarkers[i] = style.getNumCitationMarker(num, minGroupingCount, false);
             }
             uniquefiers.clear();
 
