@@ -1438,7 +1438,6 @@ class OOBibBase {
 
                 // normCitMarker[ cEntries.length ] null if missing
                 String[] normCitMarker = new String[cEntries.length];
-                String   citationMarker;
 
                 assert( !style.isCitationKeyCiteMarkers() );
                 assert( !style.isNumberEntries() );
@@ -1452,12 +1451,12 @@ class OOBibBase {
                     bibtexKeys[i][j] = cEntries[j].getCitationKey().orElse(null);
                 }
 
-                citationMarker = style.getCitationMarker( Arrays.asList(cEntries), // entries
-                                                          entries, // database
-                                                          types[i] == OOBibBase.AUTHORYEAR_PAR,
-                                                          null, // uniquefiers
-                                                          null  // unlimAuthors
-                                                          );
+                citMarkers[i] = style.getCitationMarker( Arrays.asList(cEntries), // entries
+                                                         entries, // database
+                                                         types[i] == OOBibBase.AUTHORYEAR_PAR,
+                                                         null, // uniquefiers
+                                                         null  // unlimAuthors
+                                                         );
 
                 // We need "normalized" (in parenthesis) markers
                 // for uniqueness checking purposes:
@@ -1474,7 +1473,6 @@ class OOBibBase {
                                                  );
                 }
 
-                citMarkers[i]     = citationMarker;
                 normCitMarkers[i] = normCitMarker;
             }
             uniquefiers.clear();
