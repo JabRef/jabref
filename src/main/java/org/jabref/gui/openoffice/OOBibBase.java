@@ -1482,6 +1482,7 @@ class OOBibBase {
 
                     String uniq = uniquefiers.get(currentKey);
                     Optional<BibEntry> tmpEntry = Optional.empty();
+
                     if (uniq == null) {
                         if (firstLimAuthors[j] > 0) {
                             needsChange = true;
@@ -1504,10 +1505,12 @@ class OOBibBase {
                         }
                         uniquif[j] = uniq;
                     }
+
                     if (tmpEntry.isPresent()) {
                         cEntries[j] = tmpEntry.get();
                     }
-                }
+
+                } // for j
 
                 if (needsChange) {
                     citMarkers[i] =
