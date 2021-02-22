@@ -1528,55 +1528,56 @@ class OOBibBase {
         // Refresh all reference marks with the citation markers we computed:
         // changes:
         // uses: style, names, xReferenceMarks, this.xtext, citMarkers, types 
+        {
+            final boolean hadBibSection = (getBookmarkRange(OOBibBase.BIB_SECTION_NAME) != null);
 
-        final boolean hadBibSection = (getBookmarkRange(OOBibBase.BIB_SECTION_NAME) != null);
+            // Check if we are supposed to set a character format for citations:
+            boolean mustTestCharFormat = style.isFormatCitations();
 
-        // Check if we are supposed to set a character format for citations:
-        boolean mustTestCharFormat = style.isFormatCitations();
+            for (int i = 0; i < nRefMarks; i++) {
+                Object referenceMark = xReferenceMarks.getByName(names.get(i));
+                XTextContent bookmark = unoQI(XTextContent.class, referenceMark);
 
-        for (int i = 0; i < nRefMarks; i++) {
-            Object referenceMark = xReferenceMarks.getByName(names.get(i));
-            XTextContent bookmark = unoQI(XTextContent.class, referenceMark);
+                XTextCursor cursor =
+                    bookmark
+                    .getAnchor()
+                    .getText()
+                    .createTextCursorByRange(bookmark.getAnchor());
 
-            XTextCursor cursor =
-                bookmark
-                .getAnchor()
-                .getText()
-                .createTextCursorByRange(bookmark.getAnchor());
-
-            if (mustTestCharFormat) {
-                // If we are supposed to set character format for citations, must run a test before we
-                // delete old citation markers. Otherwise, if the specified character format doesn't
-                // exist, we end up deleting the markers before the process crashes due to a the missing
-                // format, with catastrophic consequences for the user.
-                mustTestCharFormat = false; // need to do this only once
-                XPropertySet xCursorProps = unoQI(XPropertySet.class, cursor);
-                String charStyle = style.getCitationCharacterFormat();
-                try {
-                    xCursorProps.setPropertyValue(CHAR_STYLE_NAME, charStyle);
-                } catch (UnknownPropertyException
-                         | PropertyVetoException
-                         | IllegalArgumentException
-                         | WrappedTargetException ex) {
-                    throw new UndefinedCharacterFormatException(charStyle);
+                if (mustTestCharFormat) {
+                    // If we are supposed to set character format for citations, must run a test before we
+                    // delete old citation markers. Otherwise, if the specified character format doesn't
+                    // exist, we end up deleting the markers before the process crashes due to a the missing
+                    // format, with catastrophic consequences for the user.
+                    mustTestCharFormat = false; // need to do this only once
+                    XPropertySet xCursorProps = unoQI(XPropertySet.class, cursor);
+                    String charStyle = style.getCitationCharacterFormat();
+                    try {
+                        xCursorProps.setPropertyValue(CHAR_STYLE_NAME, charStyle);
+                    } catch (UnknownPropertyException
+                             | PropertyVetoException
+                             | IllegalArgumentException
+                             | WrappedTargetException ex) {
+                        throw new UndefinedCharacterFormatException(charStyle);
+                    }
                 }
-            }
 
-            this.xtext.removeTextContent(bookmark);
+                this.xtext.removeTextContent(bookmark);
 
-            insertReferenceMark(names.get(i),
-                                citMarkers[i],
-                                cursor,
-                                types[i] != OOBibBase.INVISIBLE_CIT,
-                                style
-                                );
+                insertReferenceMark(names.get(i),
+                                    citMarkers[i],
+                                    cursor,
+                                    types[i] != OOBibBase.INVISIBLE_CIT,
+                                    style
+                                    );
 
-            if (hadBibSection && (getBookmarkRange(OOBibBase.BIB_SECTION_NAME) == null)) {
-                // We have overwritten the marker for the start of the reference list.
-                // We need to add it again.
-                cursor.collapseToEnd();
-                OOUtil.insertParagraphBreak(this.xtext, cursor);
-                insertBookMark(OOBibBase.BIB_SECTION_NAME, cursor);
+                if (hadBibSection && (getBookmarkRange(OOBibBase.BIB_SECTION_NAME) == null)) {
+                    // We have overwritten the marker for the start of the reference list.
+                    // We need to add it again.
+                    cursor.collapseToEnd();
+                    OOUtil.insertParagraphBreak(this.xtext, cursor);
+                    insertBookMark(OOBibBase.BIB_SECTION_NAME, cursor);
+                }
             }
         }
 
