@@ -1486,24 +1486,19 @@ class OOBibBase {
                     if (uniq == null) {
                         if (firstLimAuthors[j] > 0) {
                             needsChange = true;
-                            BibDatabase database = linkSourceBase.get(currentKey);
-                            if (database != null) {
-                                tmpEntry = database.getEntryByCitationKey(currentKey);
-                            }
                         } else {
-                            BibDatabase database = linkSourceBase.get(currentKey);
-                            if (database != null) {
-                                tmpEntry = database.getEntryByCitationKey(currentKey);
-                            }
                         }
                         uniquif[j] = "";
                     } else {
                         needsChange = true;
+                        uniquif[j] = uniq;
+                    }
+
+                    {
                         BibDatabase database = linkSourceBase.get(currentKey);
                         if (database != null) {
                             tmpEntry = database.getEntryByCitationKey(currentKey);
                         }
-                        uniquif[j] = uniq;
                     }
 
                     if (tmpEntry.isPresent()) {
