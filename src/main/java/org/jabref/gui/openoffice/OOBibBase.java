@@ -1436,9 +1436,6 @@ class OOBibBase {
                     linkSourceBaseGetBibEntriesOfCiteKeys( linkSourceBase, bibtexKeys[i], namei );
                 assert (cEntries.length == bibtexKeys[i].length) ;
 
-                // normCitMarker[ cEntries.length ] null if missing
-                String[] normCitMarker = new String[cEntries.length];
-
                 assert( !style.isCitationKeyCiteMarkers() );
                 assert( !style.isNumberEntries() );
                 // Citations in (Au1, Au2 2000) form
@@ -1461,7 +1458,8 @@ class OOBibBase {
                 // We need "normalized" (in parenthesis) markers
                 // for uniqueness checking purposes:
                 //
-                // Fill normCitMarker
+                // normCitMarker[ cEntries.length ] null if missing
+                String[] normCitMarker = new String[cEntries.length];
                 for (int j = 0; j < cEntries.length; j++) {
                     List<BibEntry> cej = Collections.singletonList(cEntries[j]);
                     normCitMarker[j] =
@@ -1472,7 +1470,6 @@ class OOBibBase {
                                                  new int[] {-1} // unlimAuthors
                                                  );
                 }
-
                 normCitMarkers[i] = normCitMarker;
             }
             uniquefiers.clear();
