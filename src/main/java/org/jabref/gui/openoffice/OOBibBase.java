@@ -1453,14 +1453,14 @@ class OOBibBase {
             // those referring to entries in our current list:
             int maxAuthorsFirst = style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST);
             Set<String> seenBefore = new HashSet<>();
-            for (int j = 0; j < bibtexKeys.length; j++) {
+            for (int i = 0; i < bibtexKeys.length; i++) {
                 boolean  needsChange     = false;
-                int[]    firstLimAuthors = new int[bibtexKeys[j].length];
-                String[] uniquif         = new String[bibtexKeys[j].length];
-                BibEntry[] cEntries      = new BibEntry[bibtexKeys[j].length];
+                int[]    firstLimAuthors = new int[bibtexKeys[i].length];
+                String[] uniquif         = new String[bibtexKeys[i].length];
+                BibEntry[] cEntries      = new BibEntry[bibtexKeys[i].length];
 
-                for (int k = 0; k < bibtexKeys[j].length; k++) {
-                    String currentKey = bibtexKeys[j][k];
+                for (int k = 0; k < bibtexKeys[i].length; k++) {
+                    String currentKey = bibtexKeys[i][k];
                     firstLimAuthors[k] = -1;
                     if (maxAuthorsFirst > 0) {
                         if (!seenBefore.contains(currentKey)) {
@@ -1498,15 +1498,15 @@ class OOBibBase {
                 }
 
                 if (needsChange) {
-                    citMarkers[j] =
+                    citMarkers[i] =
                         style.getCitationMarker( Arrays.asList(cEntries),
                                                  entries,
-                                                 types[j] == OOBibBase.AUTHORYEAR_PAR,
+                                                 types[i] == OOBibBase.AUTHORYEAR_PAR,
                                                  uniquif,
                                                  firstLimAuthors
                                                  );
                 }
-            } // for j
+            } // for i
         } // if normalStyle
 
         // Refresh all reference marks with the citation markers we computed:
