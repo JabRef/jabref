@@ -1504,7 +1504,6 @@ class OOBibBase {
                         }
                     }
 
-
                 } // for j
 
                 if (needsChange) {
