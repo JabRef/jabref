@@ -1406,6 +1406,8 @@ class OOBibBase {
         // fill:
         //    citMarkers[i] = what goes in the text
         //    normCitMarkers[i][j] = for unification
+
+        // --- begin-head ---
         for (int i = 0; i < names.size(); i++) {
             final String namei = names.get(i);
 
@@ -1416,7 +1418,8 @@ class OOBibBase {
             // normCitMarker[ cEntries.length ] null if missing
             String[] normCitMarker = new String[cEntries.length];
             String   citationMarker; // normCitMarker.replace( null -> "" ).join(",")
-            //
+            // --- end-head ---
+
             // fill normCitMarker, set citationMarker
             if (style.isCitationKeyCiteMarkers()) {
                 //
@@ -1477,8 +1480,10 @@ class OOBibBase {
                                                  );
                 }
             }
+            // --- begin-tail ---
             citMarkers[i]     = citationMarker;
             normCitMarkers[i] = normCitMarker;
+            // --- end-tail ---
         } // for i
 
 
