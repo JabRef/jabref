@@ -1459,19 +1459,19 @@ class OOBibBase {
                 String[] uniquif         = new String[bibtexKeys[i].length];
                 BibEntry[] cEntries      = new BibEntry[bibtexKeys[i].length];
 
-                for (int k = 0; k < bibtexKeys[i].length; k++) {
-                    String currentKey = bibtexKeys[i][k];
-                    firstLimAuthors[k] = -1;
+                for (int j = 0; j < bibtexKeys[i].length; j++) {
+                    String currentKey = bibtexKeys[i][j];
+                    firstLimAuthors[j] = -1;
                     if (maxAuthorsFirst > 0) {
                         if (!seenBefore.contains(currentKey)) {
-                            firstLimAuthors[k] = maxAuthorsFirst;
+                            firstLimAuthors[j] = maxAuthorsFirst;
                         }
                         seenBefore.add(currentKey);
                     }
                     String uniq = uniquefiers.get(currentKey);
                     Optional<BibEntry> tmpEntry = Optional.empty();
                     if (uniq == null) {
-                        if (firstLimAuthors[k] > 0) {
+                        if (firstLimAuthors[j] > 0) {
                             needsChange = true;
                             BibDatabase database = linkSourceBase.get(currentKey);
                             if (database != null) {
@@ -1483,17 +1483,17 @@ class OOBibBase {
                                 tmpEntry = database.getEntryByCitationKey(currentKey);
                             }
                         }
-                        uniquif[k] = "";
+                        uniquif[j] = "";
                     } else {
                         needsChange = true;
                         BibDatabase database = linkSourceBase.get(currentKey);
                         if (database != null) {
                             tmpEntry = database.getEntryByCitationKey(currentKey);
                         }
-                        uniquif[k] = uniq;
+                        uniquif[j] = uniq;
                     }
                     if (tmpEntry.isPresent()) {
-                        cEntries[k] = tmpEntry.get();
+                        cEntries[j] = tmpEntry.get();
                     }
                 }
 
