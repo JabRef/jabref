@@ -1152,19 +1152,6 @@ class OOBibBase {
         return citationMarker;
     }
 
-    private static String[] rcmNormCitMarkersForIsCitationKeyCiteMarkers( BibEntry[] cEntries,
-                                                                          OOBibStyle style )
-    {
-        assert( style.isCitationKeyCiteMarkers() );
-
-        String[] normCitMarker = new String[cEntries.length];
-        for (int j = 0; j < cEntries.length; j++) {
-            Optional<String> cejKey = cEntries[j].getCitationKey();
-            normCitMarker[j]        = cejKey.orElse(null);
-        }
-        return normCitMarker;
-    }
-
     private class CitationNumberingState {
         public Map<String, Integer> numbers;
         public int lastNum;
@@ -1405,10 +1392,8 @@ class OOBibBase {
         // fill:
         //    citMarkers[i] = what goes in the text
 
-        //    normCitMarkers[i][j] = for unification
-        String[][] normCitMarkers = new String[nRefMarks][];
 
-        // fill citationMarker
+        // fill citMarkers
         if (style.isCitationKeyCiteMarkers()) {
             // --- begin-head ---
             for (int i = 0; i < names.size(); i++) {
@@ -1418,17 +1403,13 @@ class OOBibBase {
                     linkSourceBaseGetBibEntriesOfCiteKeys( linkSourceBase, bibtexKeys[i], namei );
                 assert (cEntries.length == bibtexKeys[i].length) ;
                 //
-                // normCitMarker[ cEntries.length ] null if missing
-                String[] normCitMarker = new String[cEntries.length];
-                String   citationMarker; // normCitMarker.replace( null -> "" ).join(",")
+                String   citationMarker;
                 // --- end-head ---
                 //
                 citationMarker = rcmCitationMarkerForIsCitationKeyCiteMarkers( cEntries, style );
-                normCitMarker  = rcmNormCitMarkersForIsCitationKeyCiteMarkers( cEntries, style );
                 //
                 // --- begin-tail ---
                 citMarkers[i]     = citationMarker;
-                normCitMarkers[i] = normCitMarker;
             } // for i
             // --- end-tail ---
             // uniquefiers:  "a", "b" in (2000a, 2000b)
@@ -1442,9 +1423,7 @@ class OOBibBase {
                     linkSourceBaseGetBibEntriesOfCiteKeys( linkSourceBase, bibtexKeys[i], namei );
                 assert (cEntries.length == bibtexKeys[i].length) ;
                 //
-                // normCitMarker[ cEntries.length ] null if missing
-                String[] normCitMarker = new String[cEntries.length];
-                String   citationMarker; // normCitMarker.replace( null -> "" ).join(",")
+                String   citationMarker;
                 // --- end-head ---
                 List<Integer> num ;
                 if (style.isSortByPosition()) {
@@ -1457,21 +1436,15 @@ class OOBibBase {
                 citationMarker =
                     style.getNumCitationMarker(num, minGroupingCount, false);
                 //
-                // fill normCitMarker
-                for (int j = 0; j < cEntries.length; j++) {
-                    List<Integer> numj = Collections.singletonList(num.get(j));
-                    normCitMarker[j] =
-                        style.getNumCitationMarker( numj, minGroupingCount, false );
-                }
-                //
                 // --- begin-tail ---
                 citMarkers[i]     = citationMarker;
-                normCitMarkers[i] = normCitMarker;
             } // for i
             // --- end-tail ---
             // uniquefiers:  "a", "b" in (2000a, 2000b)
             uniquefiers.clear();
         } else {
+            //    normCitMarkers[i][j] = for unification
+            String[][] normCitMarkers = new String[nRefMarks][];
             // --- begin-head ---
             for (int i = 0; i < names.size(); i++) {
                 final String namei = names.get(i);
