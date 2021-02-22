@@ -1410,8 +1410,8 @@ class OOBibBase {
             Map<String, List<String>>  refKeys = new HashMap<>();
 
             for (int i = 0; i < citMarkers.length; i++) {
-                // compare normalized markers, since the actual
-                // markers can be different
+                // Compare normalized markers, since the actual
+                // markers can be different.
                 String[] markers = normCitMarkers[i];
                 for (int j = 0; j < markers.length; j++) {
                     String marker     = markers[j];
@@ -1434,11 +1434,11 @@ class OOBibBase {
             // Go through the collected lists and see where we need to
             // uniquefy:
             for (Map.Entry<String, List<String>> stringListEntry : refKeys.entrySet()) {
-                List<String> keys = stringListEntry.getValue();
-                if (keys.size() > 1) {
+                List<String> clashingKeys = stringListEntry.getValue();
+                if (clashingKeys.size() > 1) {
                     // This marker appears for more than one unique entry:
                     int uniq = 'a';
-                    for (String key : keys) {
+                    for (String key : clashingKeys) {
                         // Update the map of uniquefiers for the
                         // benefit of both the following generation of
                         // new citation markers, and for the method
@@ -1454,10 +1454,10 @@ class OOBibBase {
             int maxAuthorsFirst = style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST);
             Set<String> seenBefore = new HashSet<>();
             for (int j = 0; j < bibtexKeys.length; j++) {
-                boolean needsChange = false;
-                int[] firstLimAuthors = new int[bibtexKeys[j].length];
-                String[] uniquif = new String[bibtexKeys[j].length];
-                BibEntry[] cEntries = new BibEntry[bibtexKeys[j].length];
+                boolean  needsChange     = false;
+                int[]    firstLimAuthors = new int[bibtexKeys[j].length];
+                String[] uniquif         = new String[bibtexKeys[j].length];
+                BibEntry[] cEntries      = new BibEntry[bibtexKeys[j].length];
                 for (int k = 0; k < bibtexKeys[j].length; k++) {
                     String currentKey = bibtexKeys[j][k];
                     firstLimAuthors[k] = -1;
@@ -1504,7 +1504,7 @@ class OOBibBase {
                                                  firstLimAuthors
                                                  );
                 }
-            }
+            } // for j
         } // if normalStyle
 
         // Refresh all reference marks with the citation markers we computed:
