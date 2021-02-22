@@ -136,7 +136,9 @@ class OOBibBase {
     private XPropertySet            propertySet;
     private XPropertyContainer      userProperties;
 
-
+    /*
+     *  uniquefiers : maps bibtexkeys to letters ("a", "b")
+     */
     private final Map<String, String> uniquefiers = new HashMap<>();
 
     private List<String> sortedReferenceMarks;
@@ -1393,7 +1395,7 @@ class OOBibBase {
         } // for i
 
 	//
-	// uniqiefiers  "a", "b" in (2000a, 2000b)
+	// uniquefiers  "a", "b" in (2000a, 2000b)
 	//
         uniquefiers.clear();
         if (!style.isCitationKeyCiteMarkers() && !style.isNumberEntries()) {
@@ -1411,7 +1413,9 @@ class OOBibBase {
 	    //
             Map<String, List<String>>  refKeys = new HashMap<>();
             for (int i = 0; i < citMarkers.length; i++) {
-                String[] markers = normCitMarkers[i]; // compare normalized markers, since the actual markers can be different
+		// compare normalized markers, since the actual
+		// markers can be different
+                String[] markers = normCitMarkers[i];
                 for (int j = 0; j < markers.length; j++) {
                     String marker     = markers[j];
                     String currentKey = bibtexKeys[i][j];
@@ -1499,7 +1503,7 @@ class OOBibBase {
 						 );
                 }
             }
-        }
+        } // if normalStyle
 
         // Refresh all reference marks with the citation markers we computed:
         boolean hadBibSection = getBookmarkRange(OOBibBase.BIB_SECTION_NAME) != null;
