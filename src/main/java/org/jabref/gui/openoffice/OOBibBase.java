@@ -1515,7 +1515,7 @@ class OOBibBase {
                                                  entries,
                                                  types[i] == OOBibBase.AUTHORYEAR_PAR,
                                                  uniquif,
-                                                 firstLimAuthors // unlimAuthors
+                                                 firstLimAuthors
                                                  );
                 }
             } // for i
