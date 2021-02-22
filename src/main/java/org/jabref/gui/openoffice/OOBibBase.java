@@ -1483,10 +1483,11 @@ class OOBibBase {
                     String uniq = uniquefiers.get(currentKey);
                     Optional<BibEntry> tmpEntry = Optional.empty();
 
+                    if (uniq == null && (firstLimAuthors[j] > 0) ) {
+                        needsChange = true;
+                    }
+
                     if (uniq == null) {
-                        if (firstLimAuthors[j] > 0) {
-                            needsChange = true;
-                        }
                         uniquif[j] = "";
                     } else {
                         needsChange = true;
