@@ -1428,37 +1428,37 @@ class OOBibBase {
         } else {
             //    normCitMarkers[i][j] = for unification
             String[][] normCitMarkers = new String[nRefMarks][];
-            // --- begin-head ---
+
             for (int i = 0; i < names.size(); i++) {
                 final String namei = names.get(i);
 
                 BibEntry[] cEntries =
                     linkSourceBaseGetBibEntriesOfCiteKeys( linkSourceBase, bibtexKeys[i], namei );
                 assert (cEntries.length == bibtexKeys[i].length) ;
-                //
+
                 // normCitMarker[ cEntries.length ] null if missing
                 String[] normCitMarker = new String[cEntries.length];
-                String   citationMarker; // normCitMarker.replace( null -> "" ).join(",")
-                // --- end-head ---
+                String   citationMarker;
+
                 assert( !style.isCitationKeyCiteMarkers() );
                 assert( !style.isNumberEntries() );
                 // Citations in (Au1, Au2 2000) form
                 //
                 // sort itcBlock
                 sortBibEntryArray( cEntries, style );
-                //
+
                 // Update key list to match the new sorting:
                 for (int j = 0; j < cEntries.length; j++) {
                     bibtexKeys[i][j] = cEntries[j].getCitationKey().orElse(null);
                 }
-                //
+
                 citationMarker = style.getCitationMarker( Arrays.asList(cEntries), // entries
                                                           entries, // database
                                                           types[i] == OOBibBase.AUTHORYEAR_PAR,
                                                           null, // uniquefiers
                                                           null  // unlimAuthors
                                                           );
-                //
+
                 // We need "normalized" (in parenthesis) markers
                 // for uniqueness checking purposes:
                 //
@@ -1473,12 +1473,10 @@ class OOBibBase {
                                                  new int[] {-1} // unlimAuthors
                                                  );
                 }
-                // --- begin-tail ---
+
                 citMarkers[i]     = citationMarker;
                 normCitMarkers[i] = normCitMarker;
-            } // for i
-            // --- end-tail ---
-            // uniquefiers:  "a", "b" in (2000a, 2000b)
+            }
             uniquefiers.clear();
 
             // The following block
