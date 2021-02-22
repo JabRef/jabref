@@ -1526,9 +1526,14 @@ class OOBibBase {
         } // if normalStyle
 
         // Refresh all reference marks with the citation markers we computed:
+        // changes:
+        // uses: style, names, xReferenceMarks, this.xtext, citMarkers, types 
+
         boolean hadBibSection = (getBookmarkRange(OOBibBase.BIB_SECTION_NAME) != null);
+
         // Check if we are supposed to set a character format for citations:
         boolean mustTestCharFormat = style.isFormatCitations();
+
         for (int i = 0; i < nRefMarks; i++) {
             Object referenceMark = xReferenceMarks.getByName(names.get(i));
             XTextContent bookmark = unoQI(XTextContent.class, referenceMark);
@@ -1567,6 +1572,7 @@ class OOBibBase {
             }
         }
 
+        // uses: entries
         List<String> unresolvedKeys = new ArrayList<>();
         for (BibEntry entry : entries.keySet()) {
             if (entry instanceof UndefinedBibtexEntry) {
