@@ -1368,25 +1368,13 @@ class OOBibBase {
 
         GetSortedCitedEntriesResult sce =
             getSortedCitedEntries( databases, style, xReferenceMarks );
-        Map<String, BibDatabase>   linkSourceBase = sce.linkSourceBase;
-        List<String>               cited          = sce.citedKeys;
-        Map<BibEntry, BibDatabase> entries        = sce.entries;
         List<String>               names          = sce.refMarkNames;
         //*****
 
-        // // For numbered citation style. Map( citedKey, number )
-        CitationNumberingState cns = new CitationNumberingState();
-
-        // First compute citation markers for all citations:
+        // Compute citation markers for all citations:
         final int nRefMarks  = names.size();
-        String[]   citMarkers     = new String[nRefMarks];
-        String[][] normCitMarkers = new String[nRefMarks][];
-        String[][] bibtexKeys     = new String[nRefMarks][];
-
-        final int minGroupingCount =
-            style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
-
-        int[] types = new int[nRefMarks];
+        int[]      types      = new int[nRefMarks];
+        String[][] bibtexKeys = new String[nRefMarks][];
 
         // fill:
         //    types[i]      = ov.itcType
@@ -1403,6 +1391,18 @@ class OOBibBase {
             //
         }
 
+        Map<BibEntry, BibDatabase> entries        = sce.entries;
+        List<String>               cited          = sce.citedKeys;
+        Map<String, BibDatabase>   linkSourceBase = sce.linkSourceBase;
+
+        // // For numbered citation style. Map( citedKey, number )
+        CitationNumberingState cns = new CitationNumberingState();
+
+        final int minGroupingCount =
+            style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
+
+        String[]   citMarkers     = new String[nRefMarks];
+        String[][] normCitMarkers = new String[nRefMarks][];
         // fill:
         //    citMarkers[i] = what goes in the text
         //    normCitMarkers[i][j] = for unification
