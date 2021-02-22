@@ -1433,22 +1433,26 @@ class OOBibBase {
                     }
                 }
             }
-            // Go through the collected lists and see where we need to uniquefy:
+            // Go through the collected lists and see where we need to
+            // uniquefy:
             for (Map.Entry<String, List<String>> stringListEntry : refKeys.entrySet()) {
                 List<String> keys = stringListEntry.getValue();
                 if (keys.size() > 1) {
                     // This marker appears for more than one unique entry:
                     int uniq = 'a';
                     for (String key : keys) {
-                        // Update the map of uniquefiers for the benefit of both the following generation of new
-                        // citation markers, and for the method that builds the bibliography:
+                        // Update the map of uniquefiers for the
+                        // benefit of both the following generation of
+                        // new citation markers, and for the method
+                        // that builds the bibliography:
                         uniquefiers.put(key, String.valueOf((char) uniq));
                         uniq++;
                     }
                 }
             }
 
-            // Finally, go through all citation markers, and update those referring to entries in our current list:
+            // Finally, go through all citation markers, and update
+            // those referring to entries in our current list:
             int maxAuthorsFirst = style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST);
             Set<String> seenBefore = new HashSet<>();
             for (int j = 0; j < bibtexKeys.length; j++) {
