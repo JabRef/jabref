@@ -1394,24 +1394,21 @@ class OOBibBase {
             } // if (citeMatcher.find())
         } // for i
 
-        //
-        // uniquefiers  "a", "b" in (2000a, 2000b)
-        //
+
+        // uniquefiers:  "a", "b" in (2000a, 2000b)
         uniquefiers.clear();
         if (!style.isCitationKeyCiteMarkers() && !style.isNumberEntries()) {
             // Only for normal citations. Numbered citations and
             // citeKeys are already unique.
-            //
-            //
+
             // See if there are duplicate citations marks referring to
             // different entries. If so, we need to use uniquefiers:
-            //
-            // refKeys: normCitMarker to bibtexkeys sharing it
-            //
-            // The entries in the lists are ordered as in
-            // normCitMarkers[i][j]
-            //
+
+            // refKeys: normCitMarker to list of bibtexkeys sharing it.
+            //          The entries in the lists are ordered as in
+            //          normCitMarkers[i][j]
             Map<String, List<String>>  refKeys = new HashMap<>();
+
             for (int i = 0; i < citMarkers.length; i++) {
                 // compare normalized markers, since the actual
                 // markers can be different
@@ -1433,6 +1430,7 @@ class OOBibBase {
                     }
                 }
             }
+
             // Go through the collected lists and see where we need to
             // uniquefy:
             for (Map.Entry<String, List<String>> stringListEntry : refKeys.entrySet()) {
