@@ -1295,14 +1295,15 @@ class OOBibBase {
         CitationNumberingState cns = new CitationNumberingState();
 
         // First compute citation markers for all citations:
-        String[]   citMarkers     = new String[names.size()];
-        String[][] normCitMarkers = new String[names.size()][];
-        String[][] bibtexKeys     = new String[names.size()][];
+        final int nRefMarks  = names.size();
+        String[]   citMarkers     = new String[nRefMarks];
+        String[][] normCitMarkers = new String[nRefMarks][];
+        String[][] bibtexKeys     = new String[nRefMarks][];
 
         final int minGroupingCount =
             style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
 
-        int[] types = new int[names.size()];
+        int[] types = new int[nRefMarks];
         //
         //
         // fill:
@@ -1409,7 +1410,7 @@ class OOBibBase {
             //          normCitMarkers[i][j]
             Map<String, List<String>>  refKeys = new HashMap<>();
 
-            for (int i = 0; i < citMarkers.length; i++) {
+            for (int i = 0; i < nRefMarks; i++) {
                 // Compare normalized markers, since the actual
                 // markers can be different.
                 String[] markers = normCitMarkers[i];
@@ -1453,7 +1454,7 @@ class OOBibBase {
             // those referring to entries in our current list:
             int maxAuthorsFirst = style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST);
             Set<String> seenBefore = new HashSet<>();
-            for (int i = 0; i < bibtexKeys.length; i++) {
+            for (int i = 0; i < nRefMarks; i++) {
                 boolean  needsChange     = false;
                 int[]    firstLimAuthors = new int[bibtexKeys[i].length];
                 String[] uniquif         = new String[bibtexKeys[i].length];
@@ -1513,7 +1514,7 @@ class OOBibBase {
         boolean hadBibSection = getBookmarkRange(OOBibBase.BIB_SECTION_NAME) != null;
         // Check if we are supposed to set a character format for citations:
         boolean mustTestCharFormat = style.isFormatCitations();
-        for (int i = 0; i < names.size(); i++) {
+        for (int i = 0; i < nRefMarks; i++) {
             Object referenceMark = xReferenceMarks.getByName(names.get(i));
             XTextContent bookmark = unoQI(XTextContent.class, referenceMark);
 
