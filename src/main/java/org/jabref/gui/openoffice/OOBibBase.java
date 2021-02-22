@@ -1391,7 +1391,7 @@ class OOBibBase {
         // fill:
         //    types[i]      = ov.itcType
         //    bibtexKeys[i] = ov.citedKeys.toArray()
-        for (int i = 0; i < names.size(); i++) {
+        for (int i = 0; i < nRefMarks; i++) {
             final String namei = names.get(i);
             Optional<ParsedRefMark> op = parseRefMarkName( namei );
             if ( !op.isPresent() ) {
