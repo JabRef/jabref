@@ -1402,13 +1402,13 @@ class OOBibBase {
             style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
 
         String[]   citMarkers     = new String[nRefMarks];
-        String[][] normCitMarkers = new String[nRefMarks][];
         // fill:
         //    citMarkers[i] = what goes in the text
+
         //    normCitMarkers[i][j] = for unification
+        String[][] normCitMarkers = new String[nRefMarks][];
 
-
-        // fill normCitMarker, set citationMarker
+        // fill citationMarker
         if (style.isCitationKeyCiteMarkers()) {
             // --- begin-head ---
             for (int i = 0; i < names.size(); i++) {
