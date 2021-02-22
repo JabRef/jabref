@@ -1431,6 +1431,8 @@ class OOBibBase {
                 normCitMarkers[i] = normCitMarker;
             } // for i
             // --- end-tail ---
+            // uniquefiers:  "a", "b" in (2000a, 2000b)
+            uniquefiers.clear();
         } else if (style.isNumberEntries()) {
             // --- begin-head ---
             for (int i = 0; i < names.size(); i++) {
@@ -1467,6 +1469,8 @@ class OOBibBase {
                 normCitMarkers[i] = normCitMarker;
             } // for i
             // --- end-tail ---
+            // uniquefiers:  "a", "b" in (2000a, 2000b)
+            uniquefiers.clear();
         } else {
             // --- begin-head ---
             for (int i = 0; i < names.size(); i++) {
@@ -1518,11 +1522,10 @@ class OOBibBase {
                 normCitMarkers[i] = normCitMarker;
             } // for i
             // --- end-tail ---
+            // uniquefiers:  "a", "b" in (2000a, 2000b)
+            uniquefiers.clear();
         }
 
-
-        // uniquefiers:  "a", "b" in (2000a, 2000b)
-        uniquefiers.clear();
 
         // The following block
         // changes: citMarkers[i], uniquefiers
