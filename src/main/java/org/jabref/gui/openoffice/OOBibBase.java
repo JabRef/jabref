@@ -1496,9 +1496,8 @@ class OOBibBase {
 
                     {
                         BibDatabase database = linkSourceBase.get(currentKey);
-                        Optional<BibEntry> tmpEntry = Optional.empty();
                         if (database != null) {
-                            tmpEntry = database.getEntryByCitationKey(currentKey);
+                            Optional<BibEntry> tmpEntry = database.getEntryByCitationKey(currentKey);
                             if (tmpEntry.isPresent()) {
                                 cEntries[j] = tmpEntry.get();
                             }
