@@ -1402,13 +1402,10 @@ class OOBibBase {
                 BibEntry[] cEntries =
                     linkSourceBaseGetBibEntriesOfCiteKeys( linkSourceBase, bibtexKeys[i], namei );
                 assert (cEntries.length == bibtexKeys[i].length) ;
-
-                String   citationMarker;
-
-                citationMarker = rcmCitationMarkerForIsCitationKeyCiteMarkers( cEntries, style );
-                citMarkers[i]     = citationMarker;
+                citMarkers[i] = rcmCitationMarkerForIsCitationKeyCiteMarkers( cEntries, style );
             }
             uniquefiers.clear();
+
         } else if (style.isNumberEntries()) {
             // --- begin-head ---
             for (int i = 0; i < names.size(); i++) {
