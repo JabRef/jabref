@@ -1398,6 +1398,13 @@ class OOBibBase {
 
         // uniquefiers:  "a", "b" in (2000a, 2000b)
         uniquefiers.clear();
+
+        // The following block
+        // changes: citMarkers[i], uniquefiers
+        // uses: nRefMarks, normCitMarkers, bibtexKeys,
+        //       style (style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST))
+        //       linkSourceBase, entries, types
+        //
         if (!style.isCitationKeyCiteMarkers() && !style.isNumberEntries()) {
             // Only for normal citations. Numbered citations and
             // citeKeys are already unique.
