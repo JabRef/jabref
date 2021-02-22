@@ -1499,9 +1499,9 @@ class OOBibBase {
                         Optional<BibEntry> tmpEntry = Optional.empty();
                         if (database != null) {
                             tmpEntry = database.getEntryByCitationKey(currentKey);
-                        }
-                        if (tmpEntry.isPresent()) {
-                            cEntries[j] = tmpEntry.get();
+                            if (tmpEntry.isPresent()) {
+                                cEntries[j] = tmpEntry.get();
+                            }
                         }
                     }
 
