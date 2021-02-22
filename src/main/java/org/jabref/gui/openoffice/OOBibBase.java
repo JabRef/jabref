@@ -1458,6 +1458,7 @@ class OOBibBase {
                 int[]    firstLimAuthors = new int[bibtexKeys[j].length];
                 String[] uniquif         = new String[bibtexKeys[j].length];
                 BibEntry[] cEntries      = new BibEntry[bibtexKeys[j].length];
+
                 for (int k = 0; k < bibtexKeys[j].length; k++) {
                     String currentKey = bibtexKeys[j][k];
                     firstLimAuthors[k] = -1;
@@ -1495,6 +1496,7 @@ class OOBibBase {
                         cEntries[k] = tmpEntry.get();
                     }
                 }
+
                 if (needsChange) {
                     citMarkers[j] =
                         style.getCitationMarker( Arrays.asList(cEntries),
