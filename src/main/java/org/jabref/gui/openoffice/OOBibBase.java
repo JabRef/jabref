@@ -1486,7 +1486,6 @@ class OOBibBase {
                     if (uniq == null) {
                         if (firstLimAuthors[j] > 0) {
                             needsChange = true;
-                        } else {
                         }
                         uniquif[j] = "";
                     } else {
