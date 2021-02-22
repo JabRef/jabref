@@ -1387,14 +1387,10 @@ class OOBibBase {
             style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
 
         int[] types = new int[nRefMarks];
-        //
-        //
+
         // fill:
         //    types[i]      = ov.itcType
         //    bibtexKeys[i] = ov.citedKeys.toArray()
-        //    citMarkers[i] = what goes in the text
-        //    normCitMarkers[i][j] = for unification
-        //
         for (int i = 0; i < names.size(); i++) {
             final String namei = names.get(i);
             Optional<ParsedRefMark> op = parseRefMarkName( namei );
@@ -1402,14 +1398,20 @@ class OOBibBase {
                 continue;
             }
             ParsedRefMark ov = op.get();
-            int type = ov.itcType;
-            types[i] = type; // Remember the itcType in case we need to uniquefy.
-            String[] keys = ov.citedKeys.stream().toArray(String[]::new);
-            bibtexKeys[i] = keys;
+            types[i]      = ov.itcType; // Remember the itcType in case we need to uniquefy.
+            bibtexKeys[i] = ov.citedKeys.stream().toArray(String[]::new);
             //
+        }
+
+        // fill:
+        //    citMarkers[i] = what goes in the text
+        //    normCitMarkers[i][j] = for unification
+        for (int i = 0; i < names.size(); i++) {
+            final String namei = names.get(i);
+
             BibEntry[] cEntries =
-                linkSourceBaseGetBibEntriesOfCiteKeys( linkSourceBase, keys, namei );
-            assert (cEntries.length == keys.length) ;
+                linkSourceBaseGetBibEntriesOfCiteKeys( linkSourceBase, bibtexKeys[i], namei );
+            assert (cEntries.length == bibtexKeys[i].length) ;
             //
             // normCitMarker[ cEntries.length ] null if missing
             String[] normCitMarker = new String[cEntries.length];
@@ -1424,9 +1426,9 @@ class OOBibBase {
             } else if (style.isNumberEntries()) {
                 List<Integer> num ;
                 if (style.isSortByPosition()) {
-                    num = rcmNumForIsNumberEntriesIsSortByPosition( cEntries, keys, style, cns );
+                    num = rcmNumForIsNumberEntriesIsSortByPosition( cEntries, bibtexKeys[i], style, cns );
                 } else {
-                    num = findCitedEntryIndices( Arrays.asList(keys) , cited );
+                    num = findCitedEntryIndices( Arrays.asList(bibtexKeys[i]) , cited );
                 }
                 //
                 // set citationMarker
@@ -1455,7 +1457,7 @@ class OOBibBase {
                 //
                 citationMarker = style.getCitationMarker( Arrays.asList(cEntries), // entries
                                                           entries, // database
-                                                          type == OOBibBase.AUTHORYEAR_PAR, // inParenthesis
+                                                          types[i] == OOBibBase.AUTHORYEAR_PAR, // inParenthesis
                                                           null, // uniquefiers
                                                           null  // unlimAuthors
                                                           );
