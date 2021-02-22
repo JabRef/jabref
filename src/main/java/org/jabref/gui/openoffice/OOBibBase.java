@@ -1524,8 +1524,6 @@ class OOBibBase {
             // --- end-tail ---
             // uniquefiers:  "a", "b" in (2000a, 2000b)
             uniquefiers.clear();
-        }
-
 
         // The following block
         // changes: citMarkers[i], uniquefiers
@@ -1652,6 +1650,8 @@ class OOBibBase {
                 }
             } // for i
         } // if normalStyle
+        }
+
 
         // Refresh all reference marks with the citation markers we computed:
         rcmApplyNewCitationMarkers( names, citMarkers, types, style );
