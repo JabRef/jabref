@@ -1407,6 +1407,9 @@ class OOBibBase {
         //    citMarkers[i] = what goes in the text
         //    normCitMarkers[i][j] = for unification
 
+
+            // fill normCitMarker, set citationMarker
+            if (style.isCitationKeyCiteMarkers()) {
         // --- begin-head ---
         for (int i = 0; i < names.size(); i++) {
             final String namei = names.get(i);
@@ -1419,14 +1422,28 @@ class OOBibBase {
             String[] normCitMarker = new String[cEntries.length];
             String   citationMarker; // normCitMarker.replace( null -> "" ).join(",")
             // --- end-head ---
-
-            // fill normCitMarker, set citationMarker
-            if (style.isCitationKeyCiteMarkers()) {
                 //
                 citationMarker = rcmCitationMarkerForIsCitationKeyCiteMarkers( cEntries, style );
                 normCitMarker  = rcmNormCitMarkersForIsCitationKeyCiteMarkers( cEntries, style );
                 //
+            // --- begin-tail ---
+            citMarkers[i]     = citationMarker;
+            normCitMarkers[i] = normCitMarker;
+        } // for i
+        // --- end-tail ---
             } else if (style.isNumberEntries()) {
+        // --- begin-head ---
+        for (int i = 0; i < names.size(); i++) {
+            final String namei = names.get(i);
+
+            BibEntry[] cEntries =
+                linkSourceBaseGetBibEntriesOfCiteKeys( linkSourceBase, bibtexKeys[i], namei );
+            assert (cEntries.length == bibtexKeys[i].length) ;
+            //
+            // normCitMarker[ cEntries.length ] null if missing
+            String[] normCitMarker = new String[cEntries.length];
+            String   citationMarker; // normCitMarker.replace( null -> "" ).join(",")
+            // --- end-head ---
                 List<Integer> num ;
                 if (style.isSortByPosition()) {
                     num = rcmNumForIsNumberEntriesIsSortByPosition( cEntries, bibtexKeys[i], style, cns );
@@ -1445,7 +1462,24 @@ class OOBibBase {
                         style.getNumCitationMarker( numj, minGroupingCount, false );
                 }
                 //
+            // --- begin-tail ---
+            citMarkers[i]     = citationMarker;
+            normCitMarkers[i] = normCitMarker;
+        } // for i
+        // --- end-tail ---
             } else {
+        // --- begin-head ---
+        for (int i = 0; i < names.size(); i++) {
+            final String namei = names.get(i);
+
+            BibEntry[] cEntries =
+                linkSourceBaseGetBibEntriesOfCiteKeys( linkSourceBase, bibtexKeys[i], namei );
+            assert (cEntries.length == bibtexKeys[i].length) ;
+            //
+            // normCitMarker[ cEntries.length ] null if missing
+            String[] normCitMarker = new String[cEntries.length];
+            String   citationMarker; // normCitMarker.replace( null -> "" ).join(",")
+            // --- end-head ---
                 assert( !style.isCitationKeyCiteMarkers() );
                 assert( !style.isNumberEntries() );
                 // Citations in (Au1, Au2 2000) form
@@ -1479,12 +1513,12 @@ class OOBibBase {
                                                  new int[] {-1} // unlimAuthors
                                                  );
                 }
-            }
             // --- begin-tail ---
             citMarkers[i]     = citationMarker;
             normCitMarkers[i] = normCitMarker;
-            // --- end-tail ---
         } // for i
+        // --- end-tail ---
+            }
 
 
         // uniquefiers:  "a", "b" in (2000a, 2000b)
