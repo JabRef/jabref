@@ -1483,7 +1483,7 @@ class OOBibBase {
                     String uniq = uniquefiers.get(currentKey);
                     Optional<BibEntry> tmpEntry = Optional.empty();
 
-                    if (uniq == null && (firstLimAuthors[j] > 0) ) {
+                    if (firstLimAuthors[j] > 0) {
                         needsChange = true;
                     }
 
