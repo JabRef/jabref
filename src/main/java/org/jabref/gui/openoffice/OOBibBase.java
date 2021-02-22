@@ -1494,17 +1494,17 @@ class OOBibBase {
                         needsChange = true;
                     }
 
-                    Optional<BibEntry> tmpEntry = Optional.empty();
                     {
                         BibDatabase database = linkSourceBase.get(currentKey);
+                        Optional<BibEntry> tmpEntry = Optional.empty();
                         if (database != null) {
                             tmpEntry = database.getEntryByCitationKey(currentKey);
                         }
+                        if (tmpEntry.isPresent()) {
+                            cEntries[j] = tmpEntry.get();
+                        }
                     }
 
-                    if (tmpEntry.isPresent()) {
-                        cEntries[j] = tmpEntry.get();
-                    }
 
                 } // for j
 
