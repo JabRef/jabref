@@ -1455,11 +1455,11 @@ class OOBibBase {
             int maxAuthorsFirst = style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST);
             Set<String> seenBefore = new HashSet<>();
             for (int i = 0; i < nRefMarks; i++) {
-                final int nCitedEntries = bibtexKeys[i].length;
-                boolean  needsChange     = false;
-                int[]    firstLimAuthors = new int[nCitedEntries];
-                String[] uniquif         = new String[nCitedEntries];
-                BibEntry[] cEntries      = new BibEntry[nCitedEntries];
+                final int  nCitedEntries = bibtexKeys[i].length;
+                boolean    needsChange     = false;
+                int[]      firstLimAuthors = new int[nCitedEntries];
+                String[]   uniquif         = new String[nCitedEntries];
+                BibEntry[] cEntries        = new BibEntry[nCitedEntries];
 
                 for (int j = 0; j < nCitedEntries; j++) {
                     String currentKey = bibtexKeys[i][j];
