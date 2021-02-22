@@ -1395,24 +1395,19 @@ class OOBibBase {
 
         // fill citMarkers
         if (style.isCitationKeyCiteMarkers()) {
-            // --- begin-head ---
+
             for (int i = 0; i < names.size(); i++) {
                 final String namei = names.get(i);
 
                 BibEntry[] cEntries =
                     linkSourceBaseGetBibEntriesOfCiteKeys( linkSourceBase, bibtexKeys[i], namei );
                 assert (cEntries.length == bibtexKeys[i].length) ;
-                //
+
                 String   citationMarker;
-                // --- end-head ---
-                //
+
                 citationMarker = rcmCitationMarkerForIsCitationKeyCiteMarkers( cEntries, style );
-                //
-                // --- begin-tail ---
                 citMarkers[i]     = citationMarker;
-            } // for i
-            // --- end-tail ---
-            // uniquefiers:  "a", "b" in (2000a, 2000b)
+            }
             uniquefiers.clear();
         } else if (style.isNumberEntries()) {
             // --- begin-head ---
