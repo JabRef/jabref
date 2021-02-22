@@ -1519,7 +1519,7 @@ class OOBibBase {
         } // if normalStyle
 
         // Refresh all reference marks with the citation markers we computed:
-        boolean hadBibSection = getBookmarkRange(OOBibBase.BIB_SECTION_NAME) != null;
+        boolean hadBibSection = (getBookmarkRange(OOBibBase.BIB_SECTION_NAME) != null);
         // Check if we are supposed to set a character format for citations:
         boolean mustTestCharFormat = style.isFormatCitations();
         for (int i = 0; i < nRefMarks; i++) {
