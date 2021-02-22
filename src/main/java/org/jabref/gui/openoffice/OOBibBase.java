@@ -1452,7 +1452,7 @@ class OOBibBase {
 
             // Finally, go through all citation markers, and update
             // those referring to entries in our current list:
-            int maxAuthorsFirst = style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST);
+            final int maxAuthorsFirst = style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST);
             Set<String> seenBefore = new HashSet<>();
             for (int i = 0; i < nRefMarks; i++) {
                 final int  nCitedEntries = bibtexKeys[i].length;
