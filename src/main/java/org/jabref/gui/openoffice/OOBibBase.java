@@ -1750,10 +1750,12 @@ class OOBibBase {
         // find coordinates
         List<Point> positions = new ArrayList<>(names.size());
         {
+            XNameAccess nameAccess = documentConnection.getReferenceMarks();
             XTextViewCursor viewCursor = documentConnection.getViewCursor();
             // initialPos: to be restored before return
             XTextRange initialPos = viewCursor.getStart();
             for (String name : names) {
+
                 XTextContent textContent =
                     unoQI(XTextContent.class, nameAccess.getByName(name));
                 XTextRange range = textContent.getAnchor();
