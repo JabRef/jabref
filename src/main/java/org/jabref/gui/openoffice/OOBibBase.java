@@ -1610,13 +1610,14 @@ class OOBibBase {
                 List<Integer> num ;
                 if (style.isSortByPosition()) {
                     num = rcmNumForIsNumberEntriesIsSortByPosition( cEntries, bibtexKeys[i], style, cns );
+                    citMarkers[i] = style.getNumCitationMarker(num, minGroupingCount, false);
                 } else {
                     // An exception: numbered entries that are NOT sorted by position
                     // exceptional_refmarkorder, entries and cited are sorted
                     num = findCitedEntryIndices( Arrays.asList(bibtexKeys[i]) , cited );
+                    citMarkers[i] = style.getNumCitationMarker(num, minGroupingCount, false);
                 }
-                citMarkers[i] = style.getNumCitationMarker(num, minGroupingCount, false);
-            }
+            } // for
             uniquefiers.clear();
 
         } else {
