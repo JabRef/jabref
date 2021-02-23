@@ -1297,7 +1297,7 @@ class OOBibBase {
         return citMarkers;
     }
 
-    private class CitationNumberingState {
+    private static class CitationNumberingState {
         public Map<String, Integer> numbers;
         public int lastNum;
         CitationNumberingState(){
@@ -1376,6 +1376,40 @@ class OOBibBase {
             }
         }
         return num;
+    }
+
+    private static String []
+        rcmCitationMarkersForIsNumberEntriesIsSortByPosition( List<String> referenceMarkNames,
+                                                              String[][] bibtexKeys,
+                                                              Map<String, BibEntry>  citeKeyToBibEntry,
+                                                              OOBibStyle style )
+        throws BibEntryNotFoundException
+    {
+        assert (style.isNumberEntries());
+        assert (style.isSortByPosition());
+
+        final int nRefMarks = referenceMarkNames.size();
+        assert( nRefMarks == bibtexKeys.length );
+        String[]   citMarkers     = new String[nRefMarks];
+
+        // // For numbered citation style. Map( citedKey, number )
+        CitationNumberingState cns = new CitationNumberingState();
+
+        final int minGroupingCount =
+            style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
+
+        for (int i = 0; i < referenceMarkNames.size(); i++) {
+            final String namei = referenceMarkNames.get(i);
+
+            BibEntry[] cEntries =
+                            mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei, false );
+            assert (cEntries.length == bibtexKeys[i].length) ;
+
+            List<Integer> num ;
+            num = rcmNumForIsNumberEntriesIsSortByPosition( cEntries, bibtexKeys[i], style, cns );
+            citMarkers[i] = style.getNumCitationMarker(num, minGroupingCount, false);
+        } // for
+        return citMarkers;
     }
 
     /**
@@ -1583,7 +1617,7 @@ class OOBibBase {
             //
         }
         //
-        String[]   citMarkers; //  = new String[nRefMarks];
+        String[]   citMarkers  = new String[nRefMarks];
         // fill:
         //    citMarkers[i] = what goes in the text
 
@@ -1594,22 +1628,8 @@ class OOBibBase {
            uniquefiers.clear();
         } else if (style.isNumberEntries()) {
 
-
             if (style.isSortByPosition()) {
-                // // For numbered citation style. Map( citedKey, number )
-                CitationNumberingState cns = new CitationNumberingState();
-                final int minGroupingCount =
-                    style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
-                for (int i = 0; i < referenceMarkNames.size(); i++) {
-                    final String namei = referenceMarkNames.get(i);
-
-                    BibEntry[] cEntries =
-                        mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei, false );
-                    assert (cEntries.length == bibtexKeys[i].length) ;
-                    List<Integer> num ;
-                    num = rcmNumForIsNumberEntriesIsSortByPosition( cEntries, bibtexKeys[i], style, cns );
-                    citMarkers[i] = style.getNumCitationMarker(num, minGroupingCount, false);
-                } // for
+                citMarkers = rcmCitationMarkersForIsNumberEntriesIsSortByPosition(referenceMarkNames, bibtexKeys, citeKeyToBibEntry, style);
             } else {
                 // An exception: numbered entries that are NOT sorted by position
                 // exceptional_refmarkorder, entries and cited are sorted
