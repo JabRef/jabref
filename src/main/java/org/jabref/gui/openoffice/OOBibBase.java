@@ -1437,7 +1437,7 @@ class OOBibBase {
                 // We have overwritten the marker for the start of the reference list.
                 // We need to add it again.
                 cursor.collapseToEnd();
-                OOUtil.insertParagraphBreak(this.xText, cursor);
+                OOUtil.insertParagraphBreak(documentConnection.xText, cursor);
                 insertBookMark(OOBibBase.BIB_SECTION_NAME, cursor);
             }
         }
