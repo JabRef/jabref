@@ -1909,26 +1909,34 @@ class OOBibBase {
 
 
     /**
-     *  @param referenceMarkNames
+     * @param referenceMarkNames
+     * @param linkSourceBase Helps to find the entries
+     *
+     * @return LinkedHashMap from BibEntry to BibDatabase with
+     * iteration order as first appearance in referenceMarkNames.
      */
     private Map<BibEntry, BibDatabase> getSortedEntriesFromSortedRefMarks(List<String> referenceMarkNames,
                                                                           Map<String, BibDatabase> linkSourceBase) {
 
+        // LinkedHashMap: iteration order is insertion-order, not
+        // affected if a key is re-inserted.
         Map<BibEntry, BibDatabase> newList = new LinkedHashMap<>();
+
         for (String name : referenceMarkNames) {
             Optional<ParsedRefMark> op = parseRefMarkName( name );
             if ( ! op.isPresent() ){ continue; }
+
             List<String> keys = op.get().citedKeys;
             for (String key : keys) {
                 BibDatabase        database  = linkSourceBase.get(key);
                 Optional<BibEntry> origEntry = Optional.empty();
                 if (database != null) {
                     origEntry = database.getEntryByCitationKey(key);
-                }
-                if (origEntry.isPresent()) {
-                    BibEntry oe = origEntry.get();
-                    if (!newList.containsKey(oe)) {
-                        newList.put(oe, database);
+                    if (origEntry.isPresent()) {
+                        BibEntry oe = origEntry.get();
+                        if (!newList.containsKey(oe)) {
+                            newList.put(oe, database);
+                        }
                     }
                 } else {
                     LOGGER.info("Citation key not found: '" + key + "'");
