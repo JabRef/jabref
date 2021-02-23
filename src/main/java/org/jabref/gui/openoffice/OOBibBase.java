@@ -2171,7 +2171,7 @@ class OOBibBase {
         if (xReferenceMarks.hasByName(name)) {
             Object referenceMark = xReferenceMarks.getByName(name);
             XTextContent bookmark = unoQI(XTextContent.class, referenceMark);
-            this.xText.removeTextContent(bookmark);
+            documentConnection.xText.removeTextContent(bookmark);
         }
     }
 
