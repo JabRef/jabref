@@ -1899,12 +1899,12 @@ class OOBibBase {
                  citeKeyToBibEntry
                  );
         } else {
-            // Find them again? Why?
-            Map<BibEntry, BibDatabase> entries2 =
-                findCitedEntries(databases, cited, linkSourceBase, citeKeyToBibEntry);
+            // // Find them again? Why?
+            // Map<BibEntry, BibDatabase> entries2 =
+            //   findCitedEntries(databases, cited, linkSourceBase, citeKeyToBibEntry);
 
             SortedMap<BibEntry, BibDatabase> newMap = new TreeMap<>(entryComparator);
-            for (Map.Entry<BibEntry, BibDatabase> kv : entries2.entrySet()) {
+            for (Map.Entry<BibEntry, BibDatabase> kv : entries.entrySet()) {
                 newMap.put(kv.getKey(),
                            kv.getValue());
             }
