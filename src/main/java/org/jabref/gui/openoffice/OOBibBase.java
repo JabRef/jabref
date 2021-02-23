@@ -1279,6 +1279,7 @@ class OOBibBase {
                                                        String[][] bibtexKeys,
                                                        Map<String, BibEntry>  citeKeyToBibEntry,
                                                        OOBibStyle style )
+        throws BibEntryNotFoundException
     {
         assert( style.isCitationKeyCiteMarkers() );
         final int nRefMarks = referenceMarkNames.size();
