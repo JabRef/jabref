@@ -1443,8 +1443,9 @@ class OOBibBase {
         }
     }
 
-    private List<String> refreshCiteMarkersInternal( List<BibDatabase> databases,
-                                                     OOBibStyle style           )
+    private List<String> refreshCiteMarkersInternal(DocumentConnection documentConnection,
+                                                    List<BibDatabase> databases,
+                                                    OOBibStyle style           )
         throws WrappedTargetException,
                IllegalArgumentException,
                NoSuchElementException,
@@ -1455,10 +1456,10 @@ class OOBibBase {
                BibEntryNotFoundException,
                NoDocumentException
     {
-        XNameAccess xReferenceMarks = getReferenceMarks();
+        XNameAccess xReferenceMarks = documentConnection.getReferenceMarks();
 
         GetSortedCitedEntriesResult sce =
-            getSortedCitedEntries( databases, style, xReferenceMarks );
+            getSortedCitedEntries(documentConnection, databases, style, xReferenceMarks );
         List<String>               names          = sce.refMarkNames;
 
         // Compute citation markers for all citations:
@@ -1707,9 +1708,9 @@ class OOBibBase {
 
 
         // Refresh all reference marks with the citation markers we computed:
-        rcmApplyNewCitationMarkers( names, citMarkers, types, style );
+        rcmApplyNewCitationMarkers(documentConnection, names, citMarkers, types, style );
 
-        // Collect and return uunresolved citation keys.
+        // Collect and return unresolved citation keys.
         // uses: entries
         List<String> unresolvedKeys = new ArrayList<>();
         for (BibEntry entry : entries.keySet()) {
