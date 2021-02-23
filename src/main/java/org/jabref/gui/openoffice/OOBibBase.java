@@ -1936,24 +1936,6 @@ class OOBibBase {
             if ( ! op.isPresent() ){ continue; }
 
             List<String> keys = op.get().citedKeys;
-            /*
-            for (String key : keys) {
-                BibDatabase        database  = linkSourceBase.get(key);
-                if (database != null) {
-                    Optional<BibEntry> origEntry = database.getEntryByCitationKey(key);
-                    if (origEntry.isPresent()) {
-                        BibEntry oe = origEntry.get();
-                        if (!newList.containsKey(oe)) {
-                            newList.put(oe, database);
-                        }
-                    }
-                } else {
-                    LOGGER.info("Citation key not found: '" + key + "'");
-                    LOGGER.info("Problem with reference mark: '" + name + "'");
-                    newList.put(new UndefinedBibtexEntry(key), null);
-                }
-            }
-            */
             // no need to look in the database again
             for (String key : keys) {
                 BibDatabase database  = linkSourceBase.get(key);
