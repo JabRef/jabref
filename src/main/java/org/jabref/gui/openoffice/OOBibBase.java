@@ -1893,7 +1893,7 @@ class OOBibBase {
 
         if (style.isSortByPosition()) {
             // We need to sort the entries according to their order of appearance:
-            entries = getSortedEntriesFromSortedRefMarks(
+            entries = sortEntriesByRefMarkNames(
                  jabRefReferenceMarkNamesSortedByPosition,
                  citeKeyToBibEntry,
                  entries
@@ -1920,10 +1920,10 @@ class OOBibBase {
      * iteration order as first appearance in referenceMarkNames.
      */
     private Map<BibEntry, BibDatabase>
-        getSortedEntriesFromSortedRefMarks(List<String> referenceMarkNames,
-                                           Map<String, BibEntry> citeKeyToBibEntry,
-                                           Map<BibEntry, BibDatabase> entries
-                                           )
+        sortEntriesByRefMarkNames(List<String> referenceMarkNames,
+                                  Map<String, BibEntry> citeKeyToBibEntry,
+                                  Map<BibEntry, BibDatabase> entries
+                                  )
     {
 
         // LinkedHashMap: iteration order is insertion-order, not
