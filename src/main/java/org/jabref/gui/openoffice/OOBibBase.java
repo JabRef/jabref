@@ -1270,7 +1270,8 @@ class OOBibBase {
         return new GetSortedCitedEntriesResult( linkSourceBase,
                                                 cited,
                                                 entries,
-                                                names
+                                                names,
+                                                citeKeyToBibEntry
                                                 );
     }
 
