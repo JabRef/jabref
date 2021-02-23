@@ -1919,10 +1919,11 @@ class OOBibBase {
      * @return LinkedHashMap from BibEntry to BibDatabase with
      * iteration order as first appearance in referenceMarkNames.
      */
-    private Map<BibEntry, BibDatabase> getSortedEntriesFromSortedRefMarks(List<String> referenceMarkNames,
-                                                                          Map<String, BibEntry> citeKeyToBibEntry,
-                                                                          Map<BibEntry, BibDatabase> entries
-                                                                          )
+    private Map<BibEntry, BibDatabase>
+        getSortedEntriesFromSortedRefMarks(List<String> referenceMarkNames,
+                                           Map<String, BibEntry> citeKeyToBibEntry,
+                                           Map<BibEntry, BibDatabase> entries
+                                           )
     {
 
         // LinkedHashMap: iteration order is insertion-order, not
