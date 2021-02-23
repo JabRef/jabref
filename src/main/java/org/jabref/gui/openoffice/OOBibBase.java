@@ -1061,8 +1061,10 @@ class OOBibBase {
         return keys;
     }
 
+
     /**
      * @return LinkedHashMap, from BibEntry to BibDatabase
+     *         Side effect: add found citedKeys to linkSourceBase
      *
      *  If a citedKey is not found, BibEntry is new UndefinedBibtexEntry(citedKey), BibDatabase is null.
      *  If citedKey is found, then
@@ -1076,7 +1078,8 @@ class OOBibBase {
      */
     private Map<BibEntry, BibDatabase> findCitedEntries(List<BibDatabase> databases,
                                                         List<String> citedKeys,
-                                                        Map<String, BibDatabase> linkSourceBase)
+                                                        Map<String, BibDatabase> linkSourceBase
+                                                        )
     {
         Map<BibEntry, BibDatabase> entries = new LinkedHashMap<>();
         for (String citedKey : citedKeys) {
@@ -1226,18 +1229,17 @@ class OOBibBase {
                WrappedTargetException,
                NoDocumentException
     {
+
+        // keys cited in the text
+        List<String>               cited = findCitedKeys( documentConnection );
+
         Map<String, BibDatabase>   linkSourceBase = new HashMap<>();
 
-        List<String>               cited = findCitedKeys( documentConnection );
-        Map<BibEntry, BibDatabase> entries =
-            findCitedEntries(databases, cited, linkSourceBase);
+        Map<BibEntry, BibDatabase> entries = findCitedEntries(databases, cited, linkSourceBase);
+
 
         List<String> names;
-        if (style.isSortByPosition()) {
-            // We need to sort the reference marks according to their
-            // order of appearance:
-            names = sortedReferenceMarks;
-        } else if (style.isNumberEntries()) {
+        if (style.isNumberEntries() && ! style.isSortByPosition()) {
             //
             // We need to sort the reference marks according to the
             // sorting of the bibliographic entries:
@@ -1255,6 +1257,8 @@ class OOBibBase {
             //
             names = Arrays.asList(xReferenceMarks.getElementNames());
         } else {
+            // We need to sort the reference marks according to their
+            // order of appearance:
             names = sortedReferenceMarks;
         }
 
@@ -1492,6 +1496,8 @@ class OOBibBase {
 
         GetSortedCitedEntriesResult sce =
             getSortedCitedEntries(documentConnection, databases, style, xReferenceMarks );
+
+
         List<String>               referenceMarkNames          = sce.refMarkNames;
 
         // Compute citation markers for all citations:
