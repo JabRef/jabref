@@ -861,35 +861,10 @@ class OOBibBase {
                UndefinedParagraphFormatException,
                NoDocumentException
     {
+
         try {
-            XTextCursor cursor;
-            {
-                // Get the cursor positioned by the user.
-                XTextViewCursor xViewCursor =
-                    this.xViewCursorSupplier
-                    .getViewCursor();
-                if ( true ){
-                    cursor = xViewCursor;
-                } else {
-                    //
-                    // An XTextCursor is sufficient for the rest.
-                    //
-                    // https://wiki.openoffice.org/wiki/Documentation/DevGuide/Text/\
-                    //      Example:_Visible_Cursor_Position
-                    //
-                    // We create a model cursor at the current view cursor
-                    // position with the following steps: we get the Text
-                    // service from the TextViewCursor, the cursor is an
-                    // XTextRange and has therefore a method getText()
-                    //
-                    XText xDocumentText = xViewCursor.getText();
-                    // the text creates a model cursor from the viewcursor
-                    XTextCursor xModelCursor =
-                        xDocumentText.createTextCursorByRange(xViewCursor.getStart());
-                    // use the xModelCursor
-                    cursor = xModelCursor;
-                }
-            }
+            // Get the cursor positioned by the user.
+            XTextCursor cursor = this.xDocumentConnection.getViewCursor();
 
             sortBibEntryList( entries, style );
 
