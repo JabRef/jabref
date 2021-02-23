@@ -1274,6 +1274,28 @@ class OOBibBase {
         return citationMarker;
     }
 
+    private static String[]
+        rcmCitationMarkersForIsCitationKeyCiteMarkers( List<String> referenceMarkNames,
+                                                       String[][] bibtexKeys,
+                                                       Map<String, BibEntry>  citeKeyToBibEntry,
+                                                       OOBibStyle style )
+    {
+        assert( style.isCitationKeyCiteMarkers() );
+        final int nRefMarks = referenceMarkNames.size();
+        assert( nRefMarks == bibtexKeys.length );
+        String[]   citMarkers     = new String[nRefMarks];
+        for (int i = 0; i < referenceMarkNames.size(); i++) {
+            final String namei = referenceMarkNames.get(i);
+
+            BibEntry[] cEntries =
+                mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei, false );
+            assert (cEntries.length == bibtexKeys[i].length) ;
+
+            citMarkers[i] = rcmCitationMarkerForIsCitationKeyCiteMarkers( cEntries, style );
+        }
+        return citMarkers;
+    }
+
     private class CitationNumberingState {
         public Map<String, Integer> numbers;
         public int lastNum;
@@ -1514,8 +1536,17 @@ class OOBibBase {
         // Normally we sort the reference marks according to their
         // order of appearance:
         List<String> referenceMarkNames = jabRefReferenceMarkNamesSortedByPosition;
-
-
+        //
+        // Compute citation markers for all citations:
+        final int nRefMarks  = referenceMarkNames.size();
+        int[]      types      = new int[nRefMarks];
+        String[][] bibtexKeys = new String[nRefMarks][];
+        //
+        // fill:
+        //    types[i]      = ov.itcType
+        //    bibtexKeys[i] = ov.citedKeys.toArray()
+        parseRefMarkNamesToArrays( referenceMarkNames, types, bibtexKeys );
+        //
         // An exception: numbered entries that are NOT sorted by position
         // I think in this case we do not care, since numbering comes from
         // order in cited
@@ -1529,21 +1560,21 @@ class OOBibBase {
         //                referenceMarkNames = filterIsJabRefReferenceMarkName( referenceMarkNames );
         //            }
         //        }
+        //
 
-        ///***********************
+
         // keys cited in the text
-
         List<String>               cited = findCitedKeys( documentConnection );
         Map<String, BibEntry>      citeKeyToBibEntry   = new HashMap<>();
         Map<BibEntry, BibDatabase> entries =
             findCitedEntries(databases, cited, citeKeyToBibEntry);
         // entries are now in same order as cited
-
+        //
         if (style.isNumberEntries() && ! style.isSortByPosition()) {
-
+            //
             // sort entries to order in bibliography
             entries = sortEntriesByComparator( entries, entryComparator );
-
+            //
             // adjust order of cited to match
             cited.clear();
             for (BibEntry entry : entries.keySet()) {
@@ -1551,22 +1582,7 @@ class OOBibBase {
             }
             //
         }
-
-
-        //**********************
-
-
-        // Compute citation markers for all citations:
-        final int nRefMarks  = referenceMarkNames.size();
-        int[]      types      = new int[nRefMarks];
-        String[][] bibtexKeys = new String[nRefMarks][];
-
-
-        // fill:
-        //    types[i]      = ov.itcType
-        //    bibtexKeys[i] = ov.citedKeys.toArray()
-        parseRefMarkNamesToArrays( referenceMarkNames, types, bibtexKeys );
-
+        //
         String[]   citMarkers     = new String[nRefMarks];
         // fill:
         //    citMarkers[i] = what goes in the text
@@ -1575,15 +1591,8 @@ class OOBibBase {
         // fill citMarkers
         if (style.isCitationKeyCiteMarkers()) {
 
-            for (int i = 0; i < referenceMarkNames.size(); i++) {
-                final String namei = referenceMarkNames.get(i);
+           citMarkers = rcmCitationMarkersForIsCitationKeyCiteMarkers( referenceMarkNames, bibtexKeys, citeKeyToBibEntry, style );
 
-                BibEntry[] cEntries =
-                    mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei, false );
-                assert (cEntries.length == bibtexKeys[i].length) ;
-
-                citMarkers[i] = rcmCitationMarkerForIsCitationKeyCiteMarkers( cEntries, style );
-            }
             uniquefiers.clear();
 
         } else if (style.isNumberEntries()) {
