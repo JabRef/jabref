@@ -1855,7 +1855,7 @@ class OOBibBase {
             }
             entries = newMap;
         }
-        clearBibTextSectionContent2();
+        clearBibTextSectionContent2(this.xDocumentConnection);
         populateBibTextSection(entries, style);
     }
 
@@ -2010,10 +2010,10 @@ class OOBibBase {
                 // just above.
                 // Try to create.
                 LOGGER.warn( "Could not get section '"+ OOBibBase.BIB_SECTION_NAME + "'", ex );
-                createBibTextSection2(atEnd);
+                createBibTextSection2(documentConnection, atEnd);
             }
         } else {
-            createBibTextSection2(atEnd);
+            createBibTextSection2(documentConnection, atEnd);
         }
     }
 
