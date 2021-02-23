@@ -1796,6 +1796,28 @@ class OOBibBase {
         this.sortedReferenceMarks = getJabRefReferenceMarkNamesSortedByPosition(this.xDocumentConnection);
     }
 
+    /**
+     * GUI action
+     *
+     * @return unresolvedKeys
+     */
+    public List<String>  updateDocument(List<BibDatabase> databases,
+                                        OOBibStyle style)
+        throws NoSuchElementException,
+               WrappedTargetException,
+               IllegalArgumentException,
+               CreationException,
+               PropertyVetoException,
+               UnknownPropertyException,
+               UndefinedParagraphFormatException,
+               NoDocumentException
+    {
+        updateSortedReferenceMarks(); // NoDocumentException
+        List<String> unresolvedKeys = refreshCiteMarkers(databases, style);
+        rebuildBibTextSection(databases, style);
+        return unresolvedKeys;
+    }
+
 
     public void rebuildBibTextSection(List<BibDatabase> databases,
                                       OOBibStyle style)
@@ -2314,6 +2336,7 @@ class OOBibBase {
         return resultDatabase;
     }
 
+    
     private static class ComparableMark implements Comparable<ComparableMark> {
 
         private final String name;

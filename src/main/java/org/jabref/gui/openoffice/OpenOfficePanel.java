@@ -196,11 +196,9 @@ public class OpenOfficePanel {
                     style.ensureUpToDate();
                 }
 
-                ooBase.updateSortedReferenceMarks(); // NoDocumentException
-
                 List<BibDatabase> databases = getBaseList();
-                List<String> unresolvedKeys = ooBase.refreshCiteMarkers(databases, style);
-                ooBase.rebuildBibTextSection(databases, style);
+                List<String> unresolvedKeys = ooBase.updateDocument(databases, style);
+
                 if (!unresolvedKeys.isEmpty()) {
                     dialogService
 			.showErrorDialogAndWait(
