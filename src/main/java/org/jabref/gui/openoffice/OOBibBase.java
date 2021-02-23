@@ -1391,7 +1391,8 @@ class OOBibBase {
         assert( types.length      == nRefMarks );
 
         XNameAccess xReferenceMarks = documentConnection.getReferenceMarks();
-        final boolean hadBibSection = (getBookmarkRange(OOBibBase.BIB_SECTION_NAME) != null);
+        final boolean hadBibSection =
+            (getBookmarkRange(documentConnection, OOBibBase.BIB_SECTION_NAME) != null);
 
         // If we are supposed to set character format for citations,
         // must run a test before we delete old citation
@@ -1435,7 +1436,8 @@ class OOBibBase {
                                 style
                                 );
 
-            if (hadBibSection && (getBookmarkRange(OOBibBase.BIB_SECTION_NAME) == null)) {
+            if (hadBibSection && (getBookmarkRange(documentConnection,
+                                                   OOBibBase.BIB_SECTION_NAME) == null)) {
                 // We have overwritten the marker for the start of the reference list.
                 // We need to add it again.
                 cursor.collapseToEnd();
