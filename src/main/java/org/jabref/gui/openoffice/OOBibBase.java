@@ -632,8 +632,8 @@ class OOBibBase {
      * === insertEntry
      */
 
-    private void sortBibEntryList( List<BibEntry>    entries,
-                                   OOBibStyle        style )
+    private void sortBibEntryListForMulticite( List<BibEntry>    entries,
+                                               OOBibStyle        style )
     {
         if (entries.size() <= 1){
             return;
@@ -644,8 +644,8 @@ class OOBibBase {
             entries.sort(this.entryComparator);
         }
     }
-    private void sortBibEntryArray( BibEntry[] entries,
-                                    OOBibStyle style )
+    private void sortBibEntryArrayForMulticite( BibEntry[] entries,
+                                                OOBibStyle style )
     {
         if (entries.length <= 1) {
             return;
@@ -888,7 +888,7 @@ class OOBibBase {
             // Get the cursor positioned by the user.
             XTextCursor cursor = documentConnection.getViewCursor();
 
-            sortBibEntryList( entries, style );
+            sortBibEntryListForMulticite( entries, style );
 
             String keyString =
                 String.join(",",
@@ -1586,7 +1586,7 @@ class OOBibBase {
                 assert (cEntries.length == bibtexKeys[i].length) ;
 
                 // sort itcBlock
-                sortBibEntryArray( cEntries, style );
+                sortBibEntryArrayForMulticite( cEntries, style );
 
                 // Update key list to match the new sorting:
                 for (int j = 0; j < cEntries.length; j++) {
