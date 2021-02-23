@@ -1974,9 +1974,10 @@ class OOBibBase {
             correctEntries = entries;
         } else {
             // Sort map
-            Map<BibEntry, BibDatabase> newMap = new TreeMap<>(entryComparator);
-            newMap.putAll(entries);
-            correctEntries = newMap;
+            //Map<BibEntry, BibDatabase> newMap = new TreeMap<>(entryComparator);
+            //newMap.putAll(entries);
+            //correctEntries = newMap;
+            correctEntries = sortEntriesByComparator( entries, entryComparator );
         }
         int number = 1;
         for (Map.Entry<BibEntry, BibDatabase> entry : correctEntries.entrySet()) {
