@@ -2054,7 +2054,8 @@ class OOBibBase {
              );
 
         insertFullReferenceAtCursor
-            (cursor,
+            (documentConnection,
+             cursor,
              entries,
              style,
              (String) style.getProperty(OOBibStyle.REFERENCE_PARAGRAPH_FORMAT)
