@@ -2198,11 +2198,13 @@ class OOBibBase {
         return xFoundBookmark.getAnchor();
     }
 
-    private XNameAccess getBookmarks() {
+    private XNameAccess getBookmarks(DocumentConnection documentConnection) {
         // query XBookmarksSupplier from document model
         // and get bookmarks collection
         XBookmarksSupplier xBookmarksSupplier =
-            unoQI(XBookmarksSupplier.class, xCurrentComponent);
+            unoQI(XBookmarksSupplier.class,
+                  documentConnection.xCurrentComponent
+                  );
         XNameAccess xNamedBookmarks =
             xBookmarksSupplier.getBookmarks();
         return xNamedBookmarks;
