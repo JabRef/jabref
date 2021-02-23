@@ -1832,7 +1832,7 @@ class OOBibBase {
                UndefinedParagraphFormatException,
                NoDocumentException
     {
-        List<String>               cited          = findCitedKeys();
+        List<String>               cited          = findCitedKeys(this.xDocumentConnection);
         Map<String, BibDatabase>   linkSourceBase = new HashMap<>();
         Map<BibEntry, BibDatabase> entries =
             // Although entries are redefined without use, this also
