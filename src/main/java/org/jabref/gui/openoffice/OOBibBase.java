@@ -1662,9 +1662,7 @@ class OOBibBase {
             if (style.isSortByPosition()) {
                 citMarkers = rcmCitationMarkersForIsNumberEntriesIsSortByPosition(referenceMarkNames, bibtexKeys, citeKeyToBibEntry, style);
             } else {
-
-                citMarkers = rcmCitationMarkersForIsNumberEntriesNotSortByPosition( referenceMarkNames, bibtexKeys, entries, style  );
-
+                citMarkers = rcmCitationMarkersForIsNumberEntriesNotSortByPosition(referenceMarkNames, bibtexKeys, entries, style  );
             }
             uniquefiers.clear();
 
