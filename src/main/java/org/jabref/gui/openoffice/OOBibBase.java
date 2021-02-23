@@ -1822,9 +1822,10 @@ class OOBibBase {
                UndefinedParagraphFormatException,
                NoDocumentException,
                UndefinedCharacterFormatException,
-               BibEntryNotFoundException
+               BibEntryNotFoundException,
+               IOException
     {
-        updateSortedReferenceMarks(); // NoDocumentException
+        updateSortedReferenceMarks();
         List<String> unresolvedKeys = refreshCiteMarkers(databases, style);
         rebuildBibTextSection(databases, style);
         return unresolvedKeys;
