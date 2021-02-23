@@ -1908,12 +1908,14 @@ class OOBibBase {
 
 
 
-
-    private Map<BibEntry, BibDatabase> getSortedEntriesFromSortedRefMarks(List<String> names,
+    /**
+     *  @param referenceMarkNames
+     */
+    private Map<BibEntry, BibDatabase> getSortedEntriesFromSortedRefMarks(List<String> referenceMarkNames,
                                                                           Map<String, BibDatabase> linkSourceBase) {
 
         Map<BibEntry, BibDatabase> newList = new LinkedHashMap<>();
-        for (String name : names) {
+        for (String name : referenceMarkNames) {
             Optional<ParsedRefMark> op = parseRefMarkName( name );
             if ( ! op.isPresent() ){ continue; }
             List<String> keys = op.get().citedKeys;
