@@ -1538,7 +1538,7 @@ class OOBibBase {
                 final String namei = referenceMarkNames.get(i);
 
                 BibEntry[] cEntries =
-                    mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei );
+                    mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei, false );
                 assert (cEntries.length == bibtexKeys[i].length) ;
                 citMarkers[i] = rcmCitationMarkerForIsCitationKeyCiteMarkers( cEntries, style );
             }
@@ -1550,7 +1550,7 @@ class OOBibBase {
                 final String namei = referenceMarkNames.get(i);
 
                 BibEntry[] cEntries =
-                    mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei );
+                    mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei, false );
                 assert (cEntries.length == bibtexKeys[i].length) ;
 
                 List<Integer> num ;
@@ -1576,7 +1576,7 @@ class OOBibBase {
                 final String namei = referenceMarkNames.get(i);
 
                 BibEntry[] cEntries =
-                    mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei );
+                    mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei, false );
                 assert (cEntries.length == bibtexKeys[i].length) ;
 
                 // sort itcBlock
@@ -1681,8 +1681,10 @@ class OOBibBase {
                     boolean    needsChange     = false;
                     int[]      firstLimAuthors = new int[nCitedEntries];
                     String[]   uniquif         = new String[nCitedEntries];
-                    // BibEntry[] cEntries        = new BibEntry[nCitedEntries];
-                    BibEntry[] cEntries        = mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei );
+                    BibEntry[] cEntries = mapCiteKeysToBibEntryArray( bibtexKeys[i],
+                                                                      citeKeyToBibEntry,
+                                                                      namei,
+                                                                      true);
 
                     for (int j = 0; j < nCitedEntries; j++) {
                         String currentKey = bibtexKeys[i][j];
