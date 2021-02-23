@@ -682,7 +682,6 @@ class OOBibBase {
     {
         List<String> names = this.getJabRefReferenceMarkNames(documentConnection);
 
-        XNameAccess nameAccess = this.getReferenceMarks();
         List<CitationEntry> citations = new ArrayList(names.size());
         for (String name : names) {
             CitationEntry entry =
@@ -730,7 +729,7 @@ class OOBibBase {
         for (CitationEntry entry : citationEntries) {
             Optional<String> pageInfo = entry.getPageInfo();
             if (pageInfo.isPresent()) {
-                this.setCustomProperty( entry.getRefMarkName(), pageInfo.get() );
+                this.xDocumentConnection.setCustomProperty( entry.getRefMarkName(), pageInfo.get() );
             } else {
                 // TODO: if pageInfo is not present, or is empty:
                 // maybe we should remove it from the document.
@@ -756,10 +755,12 @@ class OOBibBase {
      * Or the first unused in this series, after removals.
      *
      */
-    private String getUniqueReferenceMarkName(String bibtexKey, int itcType)
+    private String getUniqueReferenceMarkName(DocumentConnection documentConnection,
+                                              String bibtexKey,
+                                              int itcType)
         throws NoDocumentException
     {
-        XNameAccess xNamedRefMarks = getReferenceMarks();
+        XNameAccess xNamedRefMarks = xDocumentConnection.getReferenceMarks();
         int i = 0;
         String name = BIB_CITATION + '_' + itcType + '_' + bibtexKey;
         while (xNamedRefMarks.hasByName(name)) {
@@ -894,7 +895,7 @@ class OOBibBase {
                             );
             // Generate unique bookmark-name
             int    citationType = citationTypeFromOptions( withText, inParenthesis );
-            String bName        = getUniqueReferenceMarkName( keyString, citationType );
+            String bName        = getUniqueReferenceMarkName( this.xDocumentConnection, keyString, citationType );
 
             // If we should store metadata for page info, do that now:
             if (pageInfo != null) {
@@ -2175,7 +2176,7 @@ class OOBibBase {
                 String keyString = String.join(",", entries.stream().map(entry -> entry.getCitationKey().orElse(""))
                                                            .collect(Collectors.toList()));
                 // Insert bookmark:
-                String bName = getUniqueReferenceMarkName(keyString, OOBibBase.AUTHORYEAR_PAR);
+                String bName = getUniqueReferenceMarkName(this.xDocumentConnection, keyString, OOBibBase.AUTHORYEAR_PAR);
                 insertReferenceMark(bName, "tmp", mxDocCursor, true, style);
                 names.set(piv + 1, bName);
                 madeModifications = true;
@@ -2242,7 +2243,7 @@ class OOBibBase {
                 int last = keys.size() - 1;
                 int i = 0;
                 for (String key : keys) {
-                    String bName = getUniqueReferenceMarkName(key, OOBibBase.AUTHORYEAR_PAR);
+                    String bName = getUniqueReferenceMarkName(this.xDocumentConnection,key, OOBibBase.AUTHORYEAR_PAR);
                     insertReferenceMark(bName, "tmp", mxDocCursor, true, style);
                     mxDocCursor.collapseToEnd();
                     if (i != last) {
