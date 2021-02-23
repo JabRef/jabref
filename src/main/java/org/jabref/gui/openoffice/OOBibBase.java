@@ -620,7 +620,11 @@ class OOBibBase {
      */
 
     public Optional<String> getCurrentDocumentTitle() {
-        return  this.getDocumentConnectionOrThrow().getDocumentTitle();
+        if ( ! checkDocumentConnection() ){
+            return Optional.empty();
+        } else {
+            return  this.xDocumentConnection.getDocumentTitle();
+        }
     }
 
 
