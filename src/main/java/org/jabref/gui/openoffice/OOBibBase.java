@@ -1594,12 +1594,10 @@ class OOBibBase {
            uniquefiers.clear();
         } else if (style.isNumberEntries()) {
 
-            // // For numbered citation style. Map( citedKey, number )
-            CitationNumberingState cns = new CitationNumberingState();
-
-
 
             if (style.isSortByPosition()) {
+                // // For numbered citation style. Map( citedKey, number )
+                CitationNumberingState cns = new CitationNumberingState();
                 final int minGroupingCount =
                     style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
                 for (int i = 0; i < referenceMarkNames.size(); i++) {
