@@ -1600,20 +1600,24 @@ class OOBibBase {
             final int minGroupingCount =
                 style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
 
-            for (int i = 0; i < referenceMarkNames.size(); i++) {
-                final String namei = referenceMarkNames.get(i);
 
+            if (style.isSortByPosition()) {
+                for (int i = 0; i < referenceMarkNames.size(); i++) {
+                    final String namei = referenceMarkNames.get(i);
 
-                if (style.isSortByPosition()) {
                     BibEntry[] cEntries =
                         mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei, false );
                     assert (cEntries.length == bibtexKeys[i].length) ;
                     List<Integer> num ;
                     num = rcmNumForIsNumberEntriesIsSortByPosition( cEntries, bibtexKeys[i], style, cns );
                     citMarkers[i] = style.getNumCitationMarker(num, minGroupingCount, false);
-                } else {
-                    // An exception: numbered entries that are NOT sorted by position
-                    // exceptional_refmarkorder, entries and cited are sorted
+                } // for
+            } else {
+                // An exception: numbered entries that are NOT sorted by position
+                // exceptional_refmarkorder, entries and cited are sorted
+                for (int i = 0; i < referenceMarkNames.size(); i++) {
+                    final String namei = referenceMarkNames.get(i);
+
                     //
                     // BibEntry[] cEntries =
                     //    mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei, false );
@@ -1621,8 +1625,8 @@ class OOBibBase {
                     List<Integer> num ;
                     num = findCitedEntryIndices( Arrays.asList(bibtexKeys[i]) , cited );
                     citMarkers[i] = style.getNumCitationMarker(num, minGroupingCount, false);
-                }
-            } // for
+                } // for
+            }
             uniquefiers.clear();
 
         } else {
