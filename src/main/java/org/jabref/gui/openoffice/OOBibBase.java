@@ -1729,7 +1729,7 @@ class OOBibBase {
     /**
      *
      */
-    private List<String> getSortedReferenceMarks(DocumentConnection documentConnection)
+    private List<String> getJabRefReferenceMarkNamesSortedByPosition(DocumentConnection documentConnection)
             throws WrappedTargetException,
                    NoSuchElementException
     {
@@ -1790,7 +1790,7 @@ class OOBibBase {
                NoSuchElementException,
                NoDocumentException
     {
-        this.sortedReferenceMarks = getSortedReferenceMarks(getReferenceMarks());
+        this.sortedReferenceMarks = getJabRefReferenceMarkNamesSortedByPosition(getReferenceMarks());
     }
 
 
@@ -2129,7 +2129,7 @@ class OOBibBase {
     {
         XNameAccess nameAccess = getReferenceMarks();
         // TODO: doesn't work for citations in footnotes/tables
-        List<String> names = getSortedReferenceMarks(nameAccess);
+        List<String> names = getJabRefReferenceMarkNamesSortedByPosition(nameAccess);
 
         final XTextRangeCompare compare = unoQI(XTextRangeCompare.class, this.xText);
 
@@ -2219,7 +2219,7 @@ class OOBibBase {
     {
         XNameAccess nameAccess = getReferenceMarks();
         // TODO: doesn't work for citations in footnotes/tables
-        List<String> names = getSortedReferenceMarks(nameAccess);
+        List<String> names = getJabRefReferenceMarkNamesSortedByPosition(nameAccess);
 
         final XTextRangeCompare compare = unoQI(XTextRangeCompare.class, this.xText);
 
