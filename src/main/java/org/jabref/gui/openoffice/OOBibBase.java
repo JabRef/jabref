@@ -1017,7 +1017,7 @@ class OOBibBase {
         List<String> names = getJabRefReferenceMarkNames( documentConnection );
 
         {
-            XNameAccess xNamedMarks = getReferenceMarks();
+            XNameAccess xNamedMarks = documentConnection.getReferenceMarks();
             for (String name1 : names) {
                 // assert it supports XTextContent
                 Object bookmark = xNamedMarks.getByName(name1);
@@ -1191,16 +1191,17 @@ class OOBibBase {
      *                order: from findCitedKeys(),
      *                except for style.isNumberEntries() where reordered as entries
      */
-    private GetSortedCitedEntriesResult getSortedCitedEntries( List<BibDatabase> databases,
-                                                               OOBibStyle style,
-                                                               XNameAccess xReferenceMarks  )
+    private GetSortedCitedEntriesResult getSortedCitedEntries(DocumentConnection documentConnection,
+                                                              List<BibDatabase> databases,
+                                                              OOBibStyle style,
+                                                              XNameAccess xReferenceMarks  )
         throws NoSuchElementException,
                WrappedTargetException,
                NoDocumentException
     {
         Map<String, BibDatabase>   linkSourceBase = new HashMap<>();
 
-        List<String>               cited = findCitedKeys();
+        List<String>               cited = findCitedKeys( documentConnection );
         Map<BibEntry, BibDatabase> entries =
             findCitedEntries(databases, cited, linkSourceBase);
 
