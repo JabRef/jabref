@@ -1905,11 +1905,6 @@ class OOBibBase {
 
         Map<BibEntry, BibDatabase> newList = new LinkedHashMap<>();
         for (String name : names) {
-            /*
-             * Matcher citeMatcher = CITE_PATTERN.matcher(name);
-             *  if (citeMatcher.find()) {
-             *    String[] keys = citeMatcher.group(2).split(",");
-             */
             Optional<ParsedRefMark> op = parseRefMarkName( name );
             if ( ! op.isPresent() ){ continue; }
             List<String> keys = op.get().citedKeys;
