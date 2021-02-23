@@ -861,10 +861,11 @@ class OOBibBase {
                UndefinedParagraphFormatException,
                NoDocumentException
     {
+        DocumentConnection documentConnection = this.xDocumentConnection;
 
         try {
             // Get the cursor positioned by the user.
-            XTextCursor cursor = this.xDocumentConnection.getViewCursor();
+            XTextCursor cursor = documentConnection.getViewCursor();
 
             sortBibEntryList( entries, style );
 
@@ -876,7 +877,7 @@ class OOBibBase {
                             );
             // Generate unique bookmark-name
             int    citationType = citationTypeFromOptions( withText, inParenthesis );
-            String bName        = getUniqueReferenceMarkName( this.xDocumentConnection,
+            String bName        = getUniqueReferenceMarkName( documentConnection,
                                                               keyString,
                                                               citationType );
 
@@ -1426,7 +1427,8 @@ class OOBibBase {
 
             documentConnection.xText.removeTextContent(bookmark);
 
-            insertReferenceMark(names.get(i),
+            insertReferenceMark(documentConnection,
+                                names.get(i),
                                 citMarkers[i],
                                 cursor,
                                 types[i] != OOBibBase.INVISIBLE_CIT,
