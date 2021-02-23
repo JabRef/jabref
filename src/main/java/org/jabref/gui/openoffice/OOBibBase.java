@@ -2273,7 +2273,11 @@ class OOBibBase {
     }
 
     private void italicizeOrBold(XTextCursor position, boolean italicize, int start, int end)
-            throws UnknownPropertyException, PropertyVetoException, IllegalArgumentException, WrappedTargetException {
+            throws UnknownPropertyException,
+                   PropertyVetoException,
+                   IllegalArgumentException,
+                   WrappedTargetException
+    {
         XTextRange range = position.getStart();
         XTextCursor cursor = position.getText().createTextCursorByRange(range);
         cursor.goRight((short) start, false);
@@ -2504,7 +2508,7 @@ class OOBibBase {
         return resultDatabase;
     }
 
-    
+
     private static class ComparableMark implements Comparable<ComparableMark> {
 
         private final String name;
