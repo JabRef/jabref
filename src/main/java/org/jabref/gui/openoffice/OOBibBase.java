@@ -1063,19 +1063,16 @@ class OOBibBase {
 
     /**
      * @return LinkedHashMap, from BibEntry to BibDatabase
-     *         Side effect: add found citedKeys to linkSourceBase
+     *         Side effect: add citedKeys to citeKeyToBibEntry, using UndefinedBibtexEntry if not found.
      *
      *  If a citedKey is not found, BibEntry is new UndefinedBibtexEntry(citedKey), BibDatabase is null.
      *  If citedKey is found, then
      *          BibEntry is what we found, BibDatabase is the database we found it in.
-     *          linkSourceBase.put(citedKey, database); is called.
      *
      *  So:
-     *  - result has an entry for each citedKey, in the same order
+     *  - result has an entry for each citedKey, in the same order as in citedKeys
      *  - citedKey in the entry is the same as the original citedKey
-     *  - on return linkSourceBase has an entry for the citedKey we did find
      *
-     *  - Also fill citeKeyToBibEntry
      */
     private Map<BibEntry, BibDatabase> findCitedEntries(List<BibDatabase> databases,
                                                         List<String> citedKeys,
