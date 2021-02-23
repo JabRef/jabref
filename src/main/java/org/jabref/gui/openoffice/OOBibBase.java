@@ -607,7 +607,7 @@ class OOBibBase {
     }
 
     private DocumentConnection getDocumentConnectionOrThrow()
-        throw NoDocumentException
+        throws NoDocumentException
     {
         if ( ! checkDocumentConnection() ){
             throw new NoDocumentException("Not connected to document");
