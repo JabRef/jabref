@@ -2111,14 +2111,17 @@ class OOBibBase {
              (String) style.getProperty(OOBibStyle.REFERENCE_HEADER_PARAGRAPH_FORMAT)
              );
 
-        insertFullReferenceAtCursor
-            (documentConnection,
-             cursor,
-             entries,
-             style,
-             (String) style.getProperty(OOBibStyle.REFERENCE_PARAGRAPH_FORMAT),
-             uniquefiers
-             );
+        {
+            String refParaFormat =
+                (String) style.getProperty(OOBibStyle.REFERENCE_PARAGRAPH_FORMAT);
+            insertFullReferenceAtCursor(documentConnection,
+                                        cursor,
+                                        entries,
+                                        style,
+                                        refParaFormat,
+                                        uniquefiers
+                                        );
+        }
         insertBookMark(documentConnection, OOBibBase.BIB_SECTION_END_NAME, cursor);
     }
 
