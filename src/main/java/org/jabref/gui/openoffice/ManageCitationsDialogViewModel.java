@@ -61,7 +61,8 @@ public class ManageCitationsDialogViewModel {
                  | NotRemoveableException
                  | PropertyExistException
                  | IllegalTypeException
-                 | IllegalArgumentException ex
+                 | IllegalArgumentException
+                 | NoDocumentException ex
                  )
             {
                 LOGGER.warn("Problem modifying citation", ex);
