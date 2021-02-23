@@ -1195,17 +1195,20 @@ class OOBibBase {
         List<String>               citedKeys;
         Map<BibEntry, BibDatabase> entries;
         List<String>               refMarkNames;
+        Map<String, BibEntry>      citeKeyToBibEntry;
         public GetSortedCitedEntriesResult
             (
              Map<String, BibDatabase>   linkSourceBase,
              List<String>               citedKeys,
              Map<BibEntry, BibDatabase> entries,
-             List<String>               refMarkNames )
+             List<String>               refMarkNames,
+             Map<String, BibEntry> citeKeyToBibEntry)
         {
             this.linkSourceBase = linkSourceBase;
             this.citedKeys      = citedKeys;
             this.entries        = entries;
             this.refMarkNames   = refMarkNames;
+            this.citeKeyToBibEntry = citeKeyToBibEntry;
         }
     }
 
@@ -1238,18 +1241,14 @@ class OOBibBase {
 
         // keys cited in the text
         List<String>               cited = findCitedKeys( documentConnection );
-
         Map<String, BibDatabase>   linkSourceBase = new HashMap<>();
-        Map<String, BibEntry> citeKeyToBibEntry   = new HashMap<>();
-        Map<BibEntry, BibDatabase> entries = findCitedEntries(databases, cited, linkSourceBase, citeKeyToBibEntry);
+        Map<String, BibEntry>      citeKeyToBibEntry   = new HashMap<>();
+        Map<BibEntry, BibDatabase> entries =
+            findCitedEntries(databases, cited, linkSourceBase, citeKeyToBibEntry);
 
 
         List<String> names;
         if (style.isNumberEntries() && ! style.isSortByPosition()) {
-            //
-            // We need to sort the reference marks according to the
-            // sorting of the bibliographic entries:
-            //
             entries = sortEntriesByComparator( entries, entryComparator );
 
             // Rebuild the list of cited keys according to the sort order:
