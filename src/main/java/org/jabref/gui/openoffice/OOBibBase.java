@@ -2183,7 +2183,10 @@ class OOBibBase {
      * @throws WrappedTargetException
      * @throws NoSuchElementException
      */
-    private XTextRange getBookmarkRange(String name) throws NoSuchElementException, WrappedTargetException {
+    private XTextRange getBookmarkRange(String name)
+        throws NoSuchElementException,
+               WrappedTargetException
+    {
         XNameAccess xNamedBookmarks = getBookmarks();
 
         // retrieve bookmark by name
@@ -2196,9 +2199,12 @@ class OOBibBase {
     }
 
     private XNameAccess getBookmarks() {
-        // query XBookmarksSupplier from document model and get bookmarks collection
-        XBookmarksSupplier xBookmarksSupplier = unoQI(XBookmarksSupplier.class, xCurrentComponent);
-        XNameAccess xNamedBookmarks = xBookmarksSupplier.getBookmarks();
+        // query XBookmarksSupplier from document model
+        // and get bookmarks collection
+        XBookmarksSupplier xBookmarksSupplier =
+            unoQI(XBookmarksSupplier.class, xCurrentComponent);
+        XNameAccess xNamedBookmarks =
+            xBookmarksSupplier.getBookmarks();
         return xNamedBookmarks;
     }
 
