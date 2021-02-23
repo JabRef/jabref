@@ -251,6 +251,69 @@ class OOBibBase {
             }
             return  Arrays.asList( names );
         }
+
+        public String getCitationContext(String refMarkName,
+                                         int charBefore,
+                                         int charAfter,
+                                         boolean htmlMarkup)
+            throws NoSuchElementException,
+                   WrappedTargetException
+        {
+            XNameAccess nameAccess = getReferenceMarks();
+            Object referenceMark = nameAccess.getByName(refMarkName);
+            XTextContent bookmark = unoQI(XTextContent.class, referenceMark);
+
+            XTextCursor cursor =
+                bookmark.getAnchor() // the text range to which the content is attached.
+                .getText()
+                .createTextCursorByRange(bookmark.getAnchor());
+
+            String citPart = cursor.getString();
+
+            // extend cursor range left
+            int flex = 8;
+            for (int i = 0; i < charBefore; i++) {
+                try {
+                    cursor.goLeft((short) 1, true);
+                    // If we are close to charBefore and see a space,
+                    // then cut here. Might avoid cutting a word in half.
+                    if ((i >= (charBefore - flex))
+                        && Character.isWhitespace(cursor.getString().charAt(0))) {
+                        break;
+                    }
+                } catch (IndexOutOfBoundsException ex) {
+                    LOGGER.warn("Problem going left", ex);
+                }
+            }
+
+            int lengthWithBefore = cursor.getString().length();
+            int addedBefore = lengthWithBefore - citPart.length();
+
+            cursor.collapseToStart();
+            for (int i = 0; i < (charAfter + lengthWithBefore); i++) {
+                try {
+                    cursor.goRight((short) 1, true);
+                    if (i >= ((charAfter + lengthWithBefore) - flex)) {
+                        String strNow = cursor.getString();
+                        if (Character.isWhitespace(strNow.charAt(strNow.length() - 1))) {
+                            break;
+                        }
+                    }
+                } catch (IndexOutOfBoundsException ex) {
+                    LOGGER.warn("Problem going right", ex);
+                }
+            }
+
+            String result = cursor.getString();
+            if (htmlMarkup) {
+                result =
+                    result.substring(0, addedBefore)
+                    + "<b>" + citPart + "</b>"
+                    + result.substring(lengthWithBefore);
+            }
+            return result.trim();
+        }
+
     } // end DocumentConnection
 
     private DocumentConnection xDocumentConnection;
@@ -624,8 +687,8 @@ class OOBibBase {
         for (String name : names) {
             CitationEntry entry =
                 new CitationEntry(name,
-                                  this.getCitationContext(nameAccess, name, 30, 30, true),
-                                  this.getCustomProperty(name)
+                                  documentConnection.getCitationContext(name, 30, 30, true),
+                                  documentConnection.getCustomProperty(name)
                                   );
             citations.add(entry);
         }
@@ -1801,48 +1864,6 @@ class OOBibBase {
         return newList;
     }
 
-    public String getCitationContext(XNameAccess nameAccess, String refMarkName, int charBefore, int charAfter,
-                                     boolean htmlMarkup)
-            throws NoSuchElementException, WrappedTargetException {
-        Object referenceMark = nameAccess.getByName(refMarkName);
-        XTextContent bookmark = unoQI(XTextContent.class, referenceMark);
-
-        XTextCursor cursor = bookmark.getAnchor().getText().createTextCursorByRange(bookmark.getAnchor());
-        String citPart = cursor.getString();
-        int flex = 8;
-        for (int i = 0; i < charBefore; i++) {
-            try {
-                cursor.goLeft((short) 1, true);
-                if ((i >= (charBefore - flex)) && Character.isWhitespace(cursor.getString().charAt(0))) {
-                    break;
-                }
-            } catch (IndexOutOfBoundsException ex) {
-                LOGGER.warn("Problem going left", ex);
-            }
-        }
-        int length = cursor.getString().length();
-        int added = length - citPart.length();
-        cursor.collapseToStart();
-        for (int i = 0; i < (charAfter + length); i++) {
-            try {
-                cursor.goRight((short) 1, true);
-                if (i >= ((charAfter + length) - flex)) {
-                    String strNow = cursor.getString();
-                    if (Character.isWhitespace(strNow.charAt(strNow.length() - 1))) {
-                        break;
-                    }
-                }
-            } catch (IndexOutOfBoundsException ex) {
-                LOGGER.warn("Problem going right", ex);
-            }
-        }
-
-        String result = cursor.getString();
-        if (htmlMarkup) {
-            result = result.substring(0, added) + "<b>" + citPart + "</b>" + result.substring(length);
-        }
-        return result.trim();
-    }
 
     private void insertFullReferenceAtCursor(XTextCursor cursor, Map<BibEntry, BibDatabase> entries, OOBibStyle style,
                                              String parFormat)
