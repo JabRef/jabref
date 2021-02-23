@@ -1780,10 +1780,11 @@ class OOBibBase {
     /**
      *
      */
-    private List<String> getJabRefReferenceMarkNamesSortedByPosition(DocumentConnection documentConnection)
-            throws WrappedTargetException,
-                   NoSuchElementException,
-                   NoDocumentException
+    private List<String>
+        getJabRefReferenceMarkNamesSortedByPosition(DocumentConnection documentConnection)
+        throws WrappedTargetException,
+               NoSuchElementException,
+               NoDocumentException
     {
 
         List<String> names = getJabRefReferenceMarkNames(documentConnection);
@@ -1981,6 +1982,7 @@ class OOBibBase {
 
             OOUtil.insertParagraphBreak(documentConnection.xText, cursor);
 
+            // insert marker
             if (style.isNumberEntries()) {
                 // NOte: minGroupingCount is pointless here, we are
                 // formatting a single entry.
@@ -1990,13 +1992,14 @@ class OOBibBase {
                                                            minGroupingCount,
                                                            true);
 
-                OOUtil.insertTextAtCurrentLocation
-                    (documentConnection.xText,
-                     cursor,
-                     marker,
-                     Collections.emptyList()
-                     );
+                OOUtil.insertTextAtCurrentLocation(documentConnection.xText,
+                                                   cursor,
+                                                   marker,
+                                                   Collections.emptyList()
+                                                   );
             }
+
+            // insert the actual details.
             Layout layout = style.getReferenceFormat(entry.getKey().getType());
             layout.setPostFormatter(POSTFORMATTER);
             OOUtil.insertFullReferenceAtCurrentLocation
