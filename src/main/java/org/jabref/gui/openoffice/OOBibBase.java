@@ -1597,11 +1597,11 @@ class OOBibBase {
             // // For numbered citation style. Map( citedKey, number )
             CitationNumberingState cns = new CitationNumberingState();
 
-            final int minGroupingCount =
-                style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
 
 
             if (style.isSortByPosition()) {
+                final int minGroupingCount =
+                    style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
                 for (int i = 0; i < referenceMarkNames.size(); i++) {
                     final String namei = referenceMarkNames.get(i);
 
@@ -1615,6 +1615,8 @@ class OOBibBase {
             } else {
                 // An exception: numbered entries that are NOT sorted by position
                 // exceptional_refmarkorder, entries and cited are sorted
+                final int minGroupingCount =
+                    style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
                 for (int i = 0; i < referenceMarkNames.size(); i++) {
                     final String namei = referenceMarkNames.get(i);
 
