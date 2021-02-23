@@ -1810,7 +1810,9 @@ class OOBibBase {
                PropertyVetoException,
                UnknownPropertyException,
                UndefinedParagraphFormatException,
-               NoDocumentException
+               NoDocumentException,
+               UndefinedCharacterFormatException,
+               BibEntryNotFoundException
     {
         updateSortedReferenceMarks(); // NoDocumentException
         List<String> unresolvedKeys = refreshCiteMarkers(databases, style);
