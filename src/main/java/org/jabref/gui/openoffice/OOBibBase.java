@@ -243,7 +243,9 @@ class OOBibBase {
             return true;
         }
 
-        List<String> getReferenceMarknames(){
+        List<String> getReferenceMarknames()
+            throws NoDocumentException
+        {
             XNameAccess nameAccess = getReferenceMarks();
             String[] names = nameAccess.getElementNames();
             if (names == null) {
@@ -257,7 +259,8 @@ class OOBibBase {
                                          int charAfter,
                                          boolean htmlMarkup)
             throws NoSuchElementException,
-                   WrappedTargetException
+                   WrappedTargetException,
+                   NoDocumentException
         {
             XNameAccess nameAccess = getReferenceMarks();
             Object referenceMark = nameAccess.getByName(refMarkName);
@@ -1745,7 +1748,8 @@ class OOBibBase {
      */
     private List<String> getJabRefReferenceMarkNamesSortedByPosition(DocumentConnection documentConnection)
             throws WrappedTargetException,
-                   NoSuchElementException
+                   NoSuchElementException,
+                   NoDocumentException
     {
 
         List<String> names = getJabRefReferenceMarkNames(documentConnection);
