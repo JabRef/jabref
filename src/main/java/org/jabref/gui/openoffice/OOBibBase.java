@@ -1250,11 +1250,7 @@ class OOBibBase {
             // We need to sort the reference marks according to the
             // sorting of the bibliographic entries:
             //
-            SortedMap<BibEntry, BibDatabase> newMap = new TreeMap<>(entryComparator);
-            for (Map.Entry<BibEntry, BibDatabase> ee : entries.entrySet()) {
-                newMap.put(ee.getKey(), ee.getValue());
-            }
-            entries = newMap;
+            entries = sortEntriesByComparator( entries, entryComparator );
 
             // Rebuild the list of cited keys according to the sort order:
             cited.clear();
@@ -1899,18 +1895,22 @@ class OOBibBase {
                  entries
                  );
         } else {
-            SortedMap<BibEntry, BibDatabase> newMap = new TreeMap<>(entryComparator);
-            for (Map.Entry<BibEntry, BibDatabase> kv : entries.entrySet()) {
-                newMap.put(kv.getKey(),
-                           kv.getValue());
-            }
-            entries = newMap;
+            entries = sortEntriesByComparator( entries, entryComparator );
         }
         clearBibTextSectionContent2(documentConnection);
         populateBibTextSection(documentConnection, entries, style, this.xUniquefiers);
     }
 
-
+    SortedMap<BibEntry, BibDatabase> sortEntriesByComparator( Map<BibEntry, BibDatabase> entries,
+                                                              Comparator<BibEntry> entryComparator )
+    {
+        SortedMap<BibEntry, BibDatabase> newMap = new TreeMap<>(entryComparator);
+        for (Map.Entry<BibEntry, BibDatabase> kv : entries.entrySet()) {
+            newMap.put(kv.getKey(),
+                       kv.getValue());
+        }
+        return newMap;
+    }
 
     /**
      * @param referenceMarkNames
