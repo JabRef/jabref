@@ -1040,9 +1040,9 @@ class OOBibBase {
         List<String> names = getJabRefReferenceMarkNames( documentConnection );
 
         {
+            // assert each name provides an XTextContent
             XNameAccess xNamedMarks = documentConnection.getReferenceMarks();
             for (String name1 : names) {
-                // assert it supports XTextContent
                 Object bookmark = xNamedMarks.getByName(name1);
                 assert (null != unoQI(XTextContent.class, bookmark));
             }
@@ -1102,6 +1102,8 @@ class OOBibBase {
                 BibEntry x = new UndefinedBibtexEntry(citedKey);
                 entries.put(x, null);
                 citeKeyToBibEntry.put( citedKey, x );
+                LOGGER.info("Citation key not found: '" + citedKey + "'");
+                // LOGGER.info("Problem with reference mark: '" + name + "'");
             }
         }
         return entries;
@@ -1895,7 +1897,8 @@ class OOBibBase {
             // We need to sort the entries according to their order of appearance:
             entries = getSortedEntriesFromSortedRefMarks(
                  jabRefReferenceMarkNamesSortedByPosition,
-                 linkSourceBase
+                 linkSourceBase,
+                 citeKeyToBibEntry
                  );
         } else {
             // Find them again? Why?
@@ -1923,7 +1926,10 @@ class OOBibBase {
      * iteration order as first appearance in referenceMarkNames.
      */
     private Map<BibEntry, BibDatabase> getSortedEntriesFromSortedRefMarks(List<String> referenceMarkNames,
-                                                                          Map<String, BibDatabase> linkSourceBase) {
+                                                                          Map<String, BibDatabase> linkSourceBase,
+                                                                          Map<String, BibEntry> citeKeyToBibEntry
+                                                                          )
+    {
 
         // LinkedHashMap: iteration order is insertion-order, not
         // affected if a key is re-inserted.
@@ -1934,20 +1940,40 @@ class OOBibBase {
             if ( ! op.isPresent() ){ continue; }
 
             List<String> keys = op.get().citedKeys;
-            for (String key : keys) {
+            /*
+            if ( false ){
+                for (String key : keys) {
                 BibDatabase        database  = linkSourceBase.get(key);
-                if (database != null) {
-                    Optional<BibEntry> origEntry = database.getEntryByCitationKey(key);
-                    if (origEntry.isPresent()) {
-                        BibEntry oe = origEntry.get();
-                        if (!newList.containsKey(oe)) {
-                            newList.put(oe, database);
+                    if (database != null) {
+                        Optional<BibEntry> origEntry = database.getEntryByCitationKey(key);
+                        if (origEntry.isPresent()) {
+                            BibEntry oe = origEntry.get();
+                            if (!newList.containsKey(oe)) {
+                                newList.put(oe, database);
+                            }
                         }
+                    } else {
+                        LOGGER.info("Citation key not found: '" + key + "'");
+                        LOGGER.info("Problem with reference mark: '" + name + "'");
+                        newList.put(new UndefinedBibtexEntry(key), null);
                     }
-                } else {
-                    LOGGER.info("Citation key not found: '" + key + "'");
-                    LOGGER.info("Problem with reference mark: '" + name + "'");
-                    newList.put(new UndefinedBibtexEntry(key), null);
+                }
+            } else
+            */
+                {
+                // no need to look in the database again
+                for (String key : keys) {
+                    BibDatabase database  = linkSourceBase.get(key);
+                    BibEntry origEntry    = citeKeyToBibEntry.get(key);
+                    if (origEntry != null) {
+                        if (!newList.containsKey(origEntry)) {
+                            newList.put(origEntry, database);
+                        }
+                    } else {
+                        LOGGER.info("Citation key not found: '" + key + "'");
+                        LOGGER.info("Problem with reference mark: '" + name + "'");
+                        newList.put(new UndefinedBibtexEntry(key), null);
+                    }
                 }
             }
             /*  } */
@@ -2496,12 +2522,13 @@ class OOBibBase {
                     break;
                 }
             }
+            // key not found.
         }
         resultDatabase.insertEntries(entriesToInsert);
         return resultDatabase;
     }
 
-    
+
     private static class ComparableMark implements Comparable<ComparableMark> {
 
         private final String name;
