@@ -2183,11 +2183,12 @@ class OOBibBase {
      * @throws WrappedTargetException
      * @throws NoSuchElementException
      */
-    private XTextRange getBookmarkRange(String name)
+    private XTextRange getBookmarkRange(DocumentConnection documentConnection,
+                                        String name)
         throws NoSuchElementException,
                WrappedTargetException
     {
-        XNameAccess xNamedBookmarks = getBookmarks();
+        XNameAccess xNamedBookmarks = getBookmarks(documentConnection);
 
         // retrieve bookmark by name
         if (!xNamedBookmarks.hasByName(name)) {
