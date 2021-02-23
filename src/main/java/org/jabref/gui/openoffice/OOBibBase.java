@@ -1583,18 +1583,15 @@ class OOBibBase {
             //
         }
         //
-        String[]   citMarkers     = new String[nRefMarks];
+        String[]   citMarkers; //  = new String[nRefMarks];
         // fill:
         //    citMarkers[i] = what goes in the text
 
 
         // fill citMarkers
         if (style.isCitationKeyCiteMarkers()) {
-
            citMarkers = rcmCitationMarkersForIsCitationKeyCiteMarkers( referenceMarkNames, bibtexKeys, citeKeyToBibEntry, style );
-
-            uniquefiers.clear();
-
+           uniquefiers.clear();
         } else if (style.isNumberEntries()) {
 
             // // For numbered citation style. Map( citedKey, number )
