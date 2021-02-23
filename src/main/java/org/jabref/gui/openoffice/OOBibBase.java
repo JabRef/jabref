@@ -314,6 +314,12 @@ class OOBibBase {
             return result.trim();
         }
 
+        // Get the cursor positioned by the user.
+        public XTextViewCursor getViewCursor(){
+            return this.xViewCursorSupplier.getViewCursor();
+        }
+        
+
     } // end DocumentConnection
 
     private DocumentConnection xDocumentConnection;
