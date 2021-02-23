@@ -1075,10 +1075,13 @@ class OOBibBase {
      *  - result has an entry for each citedKey, in the same order
      *  - citedKey in the entry is the same as the original citedKey
      *  - on return linkSourceBase has an entry for the citedKey we did find
+     *
+     *  - Also fill citeKeyToBibEntry
      */
     private Map<BibEntry, BibDatabase> findCitedEntries(List<BibDatabase> databases,
                                                         List<String> citedKeys,
-                                                        Map<String, BibDatabase> linkSourceBase
+                                                        Map<String, BibDatabase> linkSourceBase,
+                                                        Map<String, BibEntry> citeKeyToBibEntry
                                                         )
     {
         Map<BibEntry, BibDatabase> entries = new LinkedHashMap<>();
@@ -1089,13 +1092,16 @@ class OOBibBase {
                 if (entry.isPresent()) {
                     entries.put(entry.get(), database);
                     linkSourceBase.put(citedKey, database);
+                    citeKeyToBibEntry.put( citedKey, entry.get() );
                     found = true;
                     break;
                 }
             }
 
             if (!found) {
-                entries.put(new UndefinedBibtexEntry(citedKey), null);
+                BibEntry x = new UndefinedBibtexEntry(citedKey);
+                entries.put(x, null);
+                citeKeyToBibEntry.put( citedKey, x );
             }
         }
         return entries;
@@ -1234,8 +1240,8 @@ class OOBibBase {
         List<String>               cited = findCitedKeys( documentConnection );
 
         Map<String, BibDatabase>   linkSourceBase = new HashMap<>();
-
-        Map<BibEntry, BibDatabase> entries = findCitedEntries(databases, cited, linkSourceBase);
+        Map<String, BibEntry> citeKeyToBibEntry   = new HashMap<>();
+        Map<BibEntry, BibDatabase> entries = findCitedEntries(databases, cited, linkSourceBase, citeKeyToBibEntry);
 
 
         List<String> names;
@@ -1879,10 +1885,11 @@ class OOBibBase {
 
         List<String>               cited          = findCitedKeys(documentConnection);
         Map<String, BibDatabase>   linkSourceBase = new HashMap<>();
+        Map<String, BibEntry> citeKeyToBibEntry   = new HashMap<>();
         Map<BibEntry, BibDatabase> entries =
             // Although entries are redefined without use, this also
             // updates linkSourceBase
-            findCitedEntries(databases, cited, linkSourceBase);
+            findCitedEntries(databases, cited, linkSourceBase, citeKeyToBibEntry);
 
         if (style.isSortByPosition()) {
             // We need to sort the entries according to their order of appearance:
@@ -1893,7 +1900,7 @@ class OOBibBase {
         } else {
             // Find them again? Why?
             Map<BibEntry, BibDatabase> entries2 =
-                findCitedEntries(databases, cited, linkSourceBase);
+                findCitedEntries(databases, cited, linkSourceBase, citeKeyToBibEntry);
 
             SortedMap<BibEntry, BibDatabase> newMap = new TreeMap<>(entryComparator);
             for (Map.Entry<BibEntry, BibDatabase> kv : entries2.entrySet()) {
