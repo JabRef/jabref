@@ -1724,45 +1724,63 @@ class OOBibBase {
         return unresolvedKeys;
     }
 
+
+
     /**
      *
      */
-    private List<String> getSortedReferenceMarks(final XNameAccess nameAccess)
+    private List<String> getSortedReferenceMarks(DocumentConnection documentConnection)
             throws WrappedTargetException,
                    NoSuchElementException
     {
-        XTextViewCursorSupplier cursorSupplier =
-            unoQI(XTextViewCursorSupplier.class,
-                  this.mxDoc.getCurrentController());
-
-        XTextViewCursor viewCursor = cursorSupplier.getViewCursor();
-        XTextRange initialPos = viewCursor.getStart();
-        List<String> names = Arrays.asList(nameAccess.getElementNames());
-        List<Point> positions = new ArrayList<>(names.size());
-        for (String name : names) {
-            XTextContent textContent =
-                unoQI(XTextContent.class, nameAccess.getByName(name));
-            XTextRange range = textContent.getAnchor();
-            // Check if we are inside a footnote:
-            if (unoQI(XFootnote.class, range.getText()) != null) {
-                // Find the linking footnote marker:
-                XFootnote footer = unoQI(XFootnote.class, range.getText());
-                // The footnote's anchor gives the correct position in the text:
-                range = footer.getAnchor();
-            }
-
-            positions.add(findPosition(viewCursor, range));
+        // Position as in a document on the screen.
+        // Probably to get the correct order with
+        // referenceMarks in footnotes
+        Point findPosition(XTextViewCursor cursor, XTextRange range) {
+            cursor.gotoRange(range, false);
+            return cursor.getPosition();
+            // the cursor's coordinates relative to the top left position
+            // of the first page of the document.
         }
+
+        List<String> names = getJabRefReferenceMarkNames(documentConnection);
+
+
+        // find coordinates
+        List<Point> positions = new ArrayList<>(names.size());
+        {
+            XTextViewCursor viewCursor = documentConnection.getViewCursor();
+            // initialPos: to be restored before return
+            XTextRange initialPos = viewCursor.getStart();
+            for (String name : names) {
+                XTextContent textContent =
+                    unoQI(XTextContent.class, nameAccess.getByName(name));
+                XTextRange range = textContent.getAnchor();
+
+                // Adjust range if we are inside a footnote:
+                if (unoQI(XFootnote.class, range.getText()) != null) {
+                    // Find the linking footnote marker:
+                    XFootnote footer = unoQI(XFootnote.class, range.getText());
+                    // The footnote's anchor gives the correct position in the text:
+                    range = footer.getAnchor();
+                }
+                positions.add(findPosition(viewCursor, range));
+            }
+            // restore cursor position
+            viewCursor.gotoRange(initialPos, false);
+        }
+
+        // order by position
         Set<ComparableMark> set = new TreeSet<>();
         for (int i = 0; i < positions.size(); i++) {
             set.add(new ComparableMark(names.get(i), positions.get(i)));
         }
 
+        // collect referenceMarkNames in order
         List<String> result = new ArrayList<>(set.size());
         for (ComparableMark mark : set) {
             result.add(mark.getName());
         }
-        viewCursor.gotoRange(initialPos, false);
 
         return result;
     }
@@ -1814,11 +1832,6 @@ class OOBibBase {
         populateBibTextSection(entries, style);
     }
 
-
-    private Point findPosition(XTextViewCursor cursor, XTextRange range) {
-        cursor.gotoRange(range, false);
-        return cursor.getPosition();
-    }
 
 
 
