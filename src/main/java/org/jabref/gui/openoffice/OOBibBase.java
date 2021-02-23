@@ -1367,8 +1367,8 @@ class OOBibBase {
      * @return the (1-based) indices of the cited keys, -1 if a key is not found.
      *         Returns Collections.emptyList() if the ref name could not be resolved as a citation.
      */
-    private List<Integer> findCitedEntryIndices( List<String>  keysCitedHere,
-                                                 List<String> orderedCiteKeys)
+    private List<Integer> findCitedEntryIndices(List<String>  keysCitedHere,
+                                                List<String> orderedCiteKeys)
     {
         List<Integer> result        = new ArrayList<>(keysCitedHere.size());
         for (String key : keysCitedHere) {
