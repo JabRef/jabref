@@ -1076,7 +1076,6 @@ class OOBibBase {
      */
     private Map<BibEntry, BibDatabase> findCitedEntries(List<BibDatabase> databases,
                                                         List<String> citedKeys,
-                                                        Map<String, BibDatabase> linkSourceBase,
                                                         Map<String, BibEntry> citeKeyToBibEntry
                                                         )
     {
@@ -1087,7 +1086,6 @@ class OOBibBase {
                 Optional<BibEntry> entry = database.getEntryByCitationKey(citedKey);
                 if (entry.isPresent()) {
                     entries.put(entry.get(), database);
-                    linkSourceBase.put(citedKey, database);
                     citeKeyToBibEntry.put( citedKey, entry.get() );
                     found = true;
                     break;
@@ -1180,20 +1178,17 @@ class OOBibBase {
     }
 
     private class GetSortedCitedEntriesResult {
-        Map<String, BibDatabase>   linkSourceBase;
         List<String>               citedKeys;
         Map<BibEntry, BibDatabase> entries;
         List<String>               refMarkNames;
         Map<String, BibEntry>      citeKeyToBibEntry;
         public GetSortedCitedEntriesResult
             (
-             Map<String, BibDatabase>   linkSourceBase,
              List<String>               citedKeys,
              Map<BibEntry, BibDatabase> entries,
              List<String>               refMarkNames,
              Map<String, BibEntry> citeKeyToBibEntry)
         {
-            this.linkSourceBase = linkSourceBase;
             this.citedKeys      = citedKeys;
             this.entries        = entries;
             this.refMarkNames   = refMarkNames;
@@ -1205,7 +1200,6 @@ class OOBibBase {
      *
      * @return GetSortedCitedEntriesResult where
      *
-     *    linkSourceBase maps the citedKeys to the database we found it in
      *
      *    refMarkNames : jabRefReferenceMarkNamesSortedByPosition,
      *                   except for style.isNumberEntries(),
@@ -1230,10 +1224,9 @@ class OOBibBase {
 
         // keys cited in the text
         List<String>               cited = findCitedKeys( documentConnection );
-        Map<String, BibDatabase>   linkSourceBase = new HashMap<>();
         Map<String, BibEntry>      citeKeyToBibEntry   = new HashMap<>();
         Map<BibEntry, BibDatabase> entries =
-            findCitedEntries(databases, cited, linkSourceBase, citeKeyToBibEntry);
+            findCitedEntries(databases, cited, citeKeyToBibEntry);
 
 
         List<String> names;
@@ -1256,8 +1249,7 @@ class OOBibBase {
         // Remove all reference marks that don't look like JabRef citations:
         names = filterIsJabRefReferenceMarkName( names );
 
-        return new GetSortedCitedEntriesResult( linkSourceBase,
-                                                cited,
+        return new GetSortedCitedEntriesResult( cited,
                                                 entries,
                                                 names,
                                                 citeKeyToBibEntry
@@ -1514,7 +1506,6 @@ class OOBibBase {
 
         Map<BibEntry, BibDatabase> entries        = sce.entries;
         List<String>               cited          = sce.citedKeys;
-        Map<String, BibDatabase>   linkSourceBase = sce.linkSourceBase;
         Map<String, BibEntry>      citeKeyToBibEntry = sce.citeKeyToBibEntry;
 
         // // For numbered citation style. Map( citedKey, number )
@@ -1614,7 +1605,7 @@ class OOBibBase {
             // changes: citMarkers[i], uniquefiers
             // uses: nRefMarks, normCitMarkers, bibtexKeys,
             //       style (style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST))
-            //       linkSourceBase, entries, types
+            //       citeKeyToBibEntry, entries, types
             //
             if (!style.isCitationKeyCiteMarkers() && !style.isNumberEntries()) {
                 // Only for normal citations. Numbered citations and
@@ -1867,12 +1858,11 @@ class OOBibBase {
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
 
         List<String>               cited             = findCitedKeys(documentConnection);
-        Map<String, BibDatabase>   linkSourceBase    = new HashMap<>();
         Map<String, BibEntry>      citeKeyToBibEntry = new HashMap<>();
         Map<BibEntry, BibDatabase> entries =
             // Although entries are redefined without use, this also
-            // updates linkSourceBase
-            findCitedEntries(databases, cited, linkSourceBase, citeKeyToBibEntry);
+            // updates citeKeyToBibEntry
+            findCitedEntries(databases, cited, citeKeyToBibEntry);
 
         if (style.isSortByPosition()) {
             // We need to sort the entries according to their order of appearance:
@@ -1901,7 +1891,7 @@ class OOBibBase {
 
     /**
      * @param referenceMarkNames
-     * @param linkSourceBase Helps to find the entries
+     * @param citeKeyToBibEntry Helps to find the entries
      *
      * @return LinkedHashMap from BibEntry to BibDatabase with
      * iteration order as first appearance in referenceMarkNames.
@@ -1924,7 +1914,6 @@ class OOBibBase {
             List<String> keys = op.get().citedKeys;
             // no need to look in the database again
             for (String key : keys) {
-                // BibDatabase database  = linkSourceBase.get(key);
                 BibEntry origEntry    = citeKeyToBibEntry.get(key);
                 if (origEntry != null) {
                     if (!newList.containsKey(origEntry)) {
