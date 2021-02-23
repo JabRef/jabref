@@ -1977,10 +1977,17 @@ class OOBibBase {
         return xTextContent;
     }
 
-    private void insertReferenceMark(String name, String citationText, XTextCursor position, boolean withText,
+    private void insertReferenceMark(String name,
+                                     String citationText,
+                                     XTextCursor position,
+                                     boolean withText,
                                      OOBibStyle style)
-            throws UnknownPropertyException, WrappedTargetException,
-            PropertyVetoException, IllegalArgumentException, UndefinedCharacterFormatException, CreationException {
+            throws UnknownPropertyException,
+                   WrappedTargetException,
+                   PropertyVetoException,
+                   IllegalArgumentException,
+                   UndefinedCharacterFormatException,
+                   CreationException {
 
         // Check if there is "page info" stored for this citation. If so, insert it into
         // the citation text before inserting the citation:
