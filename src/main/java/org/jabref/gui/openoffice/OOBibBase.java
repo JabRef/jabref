@@ -1478,15 +1478,15 @@ class OOBibBase {
                BibEntryNotFoundException,
                NoDocumentException
     {
-        XNameAccess xReferenceMarks = documentConnection.getReferenceMarks();
 
-        List<String> referenceMarkNames;
+        List<String> referencenceMarkNames;
 
         if ( style.isSortByPosition() || (!style.isNumberEntries()) ){
             // We sort the reference marks according to their
             // order of appearance:
             referenceMarkNames = jabRefReferenceMarkNamesSortedByPosition;
         } else {
+            XNameAccess xReferenceMarks = documentConnection.getReferenceMarks();
             // isNumberEntries && !isSortByPosition
             referenceMarkNames = Arrays.asList(xReferenceMarks.getElementNames());
             // Remove all reference marks that don't look like JabRef citations:
