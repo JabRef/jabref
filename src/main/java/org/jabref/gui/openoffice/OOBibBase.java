@@ -330,7 +330,7 @@ class OOBibBase {
      */
     private final Map<String, String> xUniquefiers = new HashMap<>();
 
-    private List<String> sortedReferenceMarks;
+    private List<String> jabRefReferenceMarkNamesSortedByPosition;
 
     /** unoQI : short for UnoRuntime.queryInterface
      *
@@ -1209,7 +1209,7 @@ class OOBibBase {
      *
      *    linkSourceBase maps the citedKeys to the database we found it in
      *
-     *    refMarkNames : sortedReferenceMarks,
+     *    refMarkNames : jabRefReferenceMarkNamesSortedByPosition,
      *                   except for style.isNumberEntries(),
      *                   where we keep the order from xReferenceMarks.getElementNames()
      *                   In any case: we apply filterIsJabRefReferenceMarkName.
@@ -1249,6 +1249,7 @@ class OOBibBase {
                 newMap.put(ee.getKey(), ee.getValue());
             }
             entries = newMap;
+
             // Rebuild the list of cited keys according to the sort order:
             cited.clear();
             for (BibEntry entry : entries.keySet()) {
@@ -1259,7 +1260,7 @@ class OOBibBase {
         } else {
             // We need to sort the reference marks according to their
             // order of appearance:
-            names = sortedReferenceMarks;
+            names = jabRefReferenceMarkNamesSortedByPosition;
         }
 
         // Remove all reference marks that don't look like JabRef citations:
@@ -1833,7 +1834,7 @@ class OOBibBase {
                NoDocumentException
     {
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
-        this.sortedReferenceMarks =
+        this.jabRefReferenceMarkNamesSortedByPosition =
             getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
     }
 
@@ -1885,7 +1886,7 @@ class OOBibBase {
 
         if (style.isSortByPosition()) {
             // We need to sort the entries according to their order of appearance:
-            List<String> names = sortedReferenceMarks;
+            List<String> names = jabRefReferenceMarkNamesSortedByPosition;
             entries = getSortedEntriesFromSortedRefMarks(names, linkSourceBase);
         } else {
             // Find them again? Why?
