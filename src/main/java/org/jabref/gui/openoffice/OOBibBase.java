@@ -157,32 +157,32 @@ class OOBibBase {
             return OOBibBase.getDocumentTitle( this.mxDoc );
         }
 
-    private Optional<String> getCustomProperty(String property)
-        throws UnknownPropertyException,
-               WrappedTargetException
-    {
-        assert (this.propertySet != null);
+        private Optional<String> getCustomProperty(String property)
+            throws UnknownPropertyException,
+                   WrappedTargetException
+        {
+            assert (this.propertySet != null);
 
-        XPropertySetInfo psi =
-            this.propertySet
-            .getPropertySetInfo();
-
-        if (psi.hasPropertyByName(property)) {
-            String v =
+            XPropertySetInfo psi =
                 this.propertySet
-                .getPropertyValue(property)
-                .toString();
-            return Optional.ofNullable(v);
-        }
-        return Optional.empty();
-    }
+                .getPropertySetInfo();
 
-    private void setCustomProperty(String property, String value)
-        throws UnknownPropertyException,
-               NotRemoveableException,
-               PropertyExistException,
-               IllegalTypeException,
-               IllegalArgumentException
+            if (psi.hasPropertyByName(property)) {
+                String v =
+                    this.propertySet
+                    .getPropertyValue(property)
+                    .toString();
+                return Optional.ofNullable(v);
+            }
+            return Optional.empty();
+        }
+
+        private void setCustomProperty(String property, String value)
+            throws UnknownPropertyException,
+                   NotRemoveableException,
+                   PropertyExistException,
+                   IllegalTypeException,
+                   IllegalArgumentException
         {
             XPropertySetInfo psi =
                 this.propertySet
