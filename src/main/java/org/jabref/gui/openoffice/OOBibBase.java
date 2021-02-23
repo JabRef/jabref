@@ -1895,8 +1895,9 @@ class OOBibBase {
             // We need to sort the entries according to their order of appearance:
             entries = getSortedEntriesFromSortedRefMarks(
                  jabRefReferenceMarkNamesSortedByPosition,
-                 linkSourceBase,
-                 citeKeyToBibEntry
+                 //linkSourceBase,
+                 citeKeyToBibEntry,
+                 entries
                  );
         } else {
             // // Find them again? Why?
@@ -1924,8 +1925,11 @@ class OOBibBase {
      * iteration order as first appearance in referenceMarkNames.
      */
     private Map<BibEntry, BibDatabase> getSortedEntriesFromSortedRefMarks(List<String> referenceMarkNames,
-                                                                          Map<String, BibDatabase> linkSourceBase,
-                                                                          Map<String, BibEntry> citeKeyToBibEntry) {
+                                                                          // Map<String, BibDatabase> linkSourceBase,
+                                                                          Map<String, BibEntry> citeKeyToBibEntry,
+                                                                          Map<BibEntry, BibDatabase> entries
+                                                                          )
+    {
 
         // LinkedHashMap: iteration order is insertion-order, not
         // affected if a key is re-inserted.
@@ -1938,10 +1942,11 @@ class OOBibBase {
             List<String> keys = op.get().citedKeys;
             // no need to look in the database again
             for (String key : keys) {
-                BibDatabase database  = linkSourceBase.get(key);
+                // BibDatabase database  = linkSourceBase.get(key);
                 BibEntry origEntry    = citeKeyToBibEntry.get(key);
                 if (origEntry != null) {
                     if (!newList.containsKey(origEntry)) {
+                        BibDatabase database = entries.get( origEntry );
                         newList.put(origEntry, database);
                     }
                 } else {
