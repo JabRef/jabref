@@ -1979,17 +1979,25 @@ class OOBibBase {
     }
 
     private void clearBibTextSectionContent2()
-            throws NoSuchElementException, WrappedTargetException, IllegalArgumentException, CreationException {
+        throws NoSuchElementException,
+               WrappedTargetException,
+               IllegalArgumentException,
+               CreationException
+    {
 
         // Check if the section exists:
-        XTextSectionsSupplier supplier = unoQI(XTextSectionsSupplier.class, this.mxDoc);
+        XTextSectionsSupplier supplier =
+            unoQI(XTextSectionsSupplier.class, this.mxDoc);
+
         com.sun.star.container.XNameAccess ts = supplier.getTextSections();
+
         if (ts.hasByName(OOBibBase.BIB_SECTION_NAME)) {
             try {
                 Any a = ((Any) ts.getByName(OOBibBase.BIB_SECTION_NAME));
                 XTextSection section = (XTextSection) a.getObject();
                 // Clear it:
-                XTextCursor cursor = this.xText.createTextCursorByRange(section.getAnchor());
+                XTextCursor cursor =
+                    this.xText.createTextCursorByRange(section.getAnchor());
                 cursor.gotoRange(section.getAnchor(), false);
                 cursor.setString("");
                 return;
