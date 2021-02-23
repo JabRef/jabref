@@ -743,7 +743,8 @@ class OOBibBase {
                NotRemoveableException,
                PropertyExistException,
                IllegalTypeException,
-               IllegalArgumentException
+               IllegalArgumentException,
+               NoDocumentException
     {
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
         // Leave exceptions to the caller.
