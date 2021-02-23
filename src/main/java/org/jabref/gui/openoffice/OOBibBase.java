@@ -1832,7 +1832,8 @@ class OOBibBase {
                UndefinedParagraphFormatException,
                NoDocumentException
     {
-        List<String>               cited          = findCitedKeys(this.xDocumentConnection);
+        DocumentConnection documentConnection = this.xDocumentConnection;
+        List<String>               cited          = findCitedKeys(documentConnection);
         Map<String, BibDatabase>   linkSourceBase = new HashMap<>();
         Map<BibEntry, BibDatabase> entries =
             // Although entries are redefined without use, this also
@@ -1855,8 +1856,8 @@ class OOBibBase {
             }
             entries = newMap;
         }
-        clearBibTextSectionContent2(this.xDocumentConnection);
-        populateBibTextSection(entries, style);
+        clearBibTextSectionContent2(documentConnection);
+        populateBibTextSection(documentConnection, entries, style);
     }
 
 
