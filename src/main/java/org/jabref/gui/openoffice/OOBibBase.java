@@ -427,8 +427,6 @@ class OOBibBase {
         XEnumerationAccess  enumAccess = desktop.getComponents();
         XEnumeration        compEnum   = enumAccess.createEnumeration();
 
-        // TODO: http://api.openoffice.org/docs/DevelopersGuide/OfficeDev/OfficeDev.xhtml#1_1_3_2_1_2_Frame_Hierarchies
-
         while (compEnum.hasMoreElements()) {
             Object       next = compEnum.nextElement();
             XComponent   comp = unoQI(XComponent.class   , next);
@@ -581,7 +579,8 @@ class OOBibBase {
         // TODO: maybe we should install an event handler for document
         // close: addCloseListener
         //
-        // https://www.openoffice.org/api/docs/common/ref/com/sun/star/util/XCloseBroadcaster.html#addCloseListener
+        // https://www.openoffice.org/api/docs/common/ref/com/sun/star/
+        //         util/XCloseBroadcaster.html#addCloseListener
     }
 
     /*
@@ -1695,7 +1694,8 @@ class OOBibBase {
                         // firstLimAuthors will be (-1) except at the first
                         // refMark it appears at, where a positive maxAuthorsFirst
                         // may override. This is why:
-                        // https://discourse.jabref.org/t/number-of-authors-in-citations-style-libreoffice/747/3
+                        // https://discourse.jabref.org/t/
+                        //    number-of-authors-in-citations-style-libreoffice/747/3
                         // "Some citation styles require to list the full
                         // names of the first 4 authors for the first
                         // time. Later it is sufficient to have only maybe
@@ -2414,7 +2414,8 @@ class OOBibBase {
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
 
         // TODO: doesn't work for citations in footnotes/tables
-        List<String> names = getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
+        List<String> names =
+            getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
 
         final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
                                                 documentConnection.xText);
