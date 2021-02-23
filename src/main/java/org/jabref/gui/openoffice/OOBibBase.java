@@ -321,7 +321,6 @@ class OOBibBase {
         public XTextViewCursor getViewCursor(){
             return this.xViewCursorSupplier.getViewCursor();
         }
-        
 
     } // end DocumentConnection
 
