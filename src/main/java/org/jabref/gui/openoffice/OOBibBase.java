@@ -1726,6 +1726,16 @@ class OOBibBase {
 
 
 
+    // Position as in a document on the screen.
+    // Probably to get the correct order with
+    // referenceMarks in footnotes
+    private static Point findPositionOfTextRange(XTextViewCursor cursor, XTextRange range) {
+        cursor.gotoRange(range, false);
+        return cursor.getPosition();
+        // the cursor's coordinates relative to the top left position
+        // of the first page of the document.
+    }
+
     /**
      *
      */
@@ -1733,15 +1743,6 @@ class OOBibBase {
             throws WrappedTargetException,
                    NoSuchElementException
     {
-        // Position as in a document on the screen.
-        // Probably to get the correct order with
-        // referenceMarks in footnotes
-        Point findPosition(XTextViewCursor cursor, XTextRange range) {
-            cursor.gotoRange(range, false);
-            return cursor.getPosition();
-            // the cursor's coordinates relative to the top left position
-            // of the first page of the document.
-        }
 
         List<String> names = getJabRefReferenceMarkNames(documentConnection);
 
@@ -1764,7 +1765,7 @@ class OOBibBase {
                     // The footnote's anchor gives the correct position in the text:
                     range = footer.getAnchor();
                 }
-                positions.add(findPosition(viewCursor, range));
+                positions.add(findPositionOfTextRange(viewCursor, range));
             }
             // restore cursor position
             viewCursor.gotoRange(initialPos, false);
