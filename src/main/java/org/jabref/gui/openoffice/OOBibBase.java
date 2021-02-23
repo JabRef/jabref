@@ -1372,10 +1372,11 @@ class OOBibBase {
      * @param types      itcType codes for each reference mark.
      * @param style
      */
-    private void rcmApplyNewCitationMarkers( List<String> names,
-                                             String[]     citMarkers,
-                                             int[]        types,
-                                             OOBibStyle   style      )
+    private void rcmApplyNewCitationMarkers(DocumentConnection documentConnection,
+                                            List<String> names,
+                                            String[]     citMarkers,
+                                            int[]        types,
+                                            OOBibStyle   style      )
         throws NoDocumentException,
                NoSuchElementException,
                UndefinedCharacterFormatException,
@@ -1388,7 +1389,7 @@ class OOBibBase {
         assert( citMarkers.length == nRefMarks );
         assert( types.length      == nRefMarks );
 
-        XNameAccess xReferenceMarks = getReferenceMarks();
+        XNameAccess xReferenceMarks = documentConnection.getReferenceMarks();
         final boolean hadBibSection = (getBookmarkRange(OOBibBase.BIB_SECTION_NAME) != null);
 
         // If we are supposed to set character format for citations,
@@ -1423,7 +1424,7 @@ class OOBibBase {
                 }
             }
 
-            this.xText.removeTextContent(bookmark);
+            documentConnection.xText.removeTextContent(bookmark);
 
             insertReferenceMark(names.get(i),
                                 citMarkers[i],
