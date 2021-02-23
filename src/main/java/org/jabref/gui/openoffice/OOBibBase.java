@@ -597,11 +597,21 @@ class OOBibBase {
     }
 
     public boolean checkDocumentConnection(){
+        if (this.xDocumentConnection == null){
+            return false;
+        }
         boolean res = this.xDocumentConnection.checkDocumentConnection();
         if ( ! res ){
             forgetDocument();
         }
         return res;
+    }
+    public void checkDocumentConnectionThrow()
+        throw NoDocumentException
+    {
+        if ( ! checkDocumentConnection() ){
+            throw new NoDocumentException("Not connected to document");
+        }
     }
 
     /*
