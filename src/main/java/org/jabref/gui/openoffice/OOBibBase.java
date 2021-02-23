@@ -1463,6 +1463,23 @@ class OOBibBase {
         }
     }
 
+        private static parseRefMarkNamesToArrays( List<String> referenceMarkNames, int[] types, String[][] bibtexKeys ) {
+            final int nRefMarks  = referenceMarkNames.size();
+            assert( types.length == nRefMarks );
+            assert( bibtexKeys.length == nRefMarks );
+            for (int i = 0; i < nRefMarks; i++) {
+                final String namei = referenceMarkNames.get(i);
+                Optional<ParsedRefMark> op = parseRefMarkName( namei );
+                if ( !op.isPresent() ) {
+                    assert( false );
+                    continue;
+                }
+                ParsedRefMark ov = op.get();
+                types[i]      = ov.itcType; // Remember the itcType in case we need to uniquefy.
+                bibtexKeys[i] = ov.citedKeys.stream().toArray(String[]::new);
+            }
+        }
+
     private List<String> refreshCiteMarkersInternal(DocumentConnection documentConnection,
                                                     List<BibDatabase> databases,
                                                     OOBibStyle style,
@@ -1479,19 +1496,24 @@ class OOBibBase {
                NoDocumentException
     {
 
-        List<String> referencenceMarkNames;
+        // Normally we sort the reference marks according to their
+        // order of appearance:
+        List<String> referenceMarkNames = jabRefReferenceMarkNamesSortedByPosition;
 
-        if ( style.isSortByPosition() || (!style.isNumberEntries()) ){
-            // We sort the reference marks according to their
-            // order of appearance:
-            referenceMarkNames = jabRefReferenceMarkNamesSortedByPosition;
-        } else {
-            XNameAccess xReferenceMarks = documentConnection.getReferenceMarks();
-            // isNumberEntries && !isSortByPosition
-            referenceMarkNames = Arrays.asList(xReferenceMarks.getElementNames());
-            // Remove all reference marks that don't look like JabRef citations:
-            referenceMarkNames = filterIsJabRefReferenceMarkName( referenceMarkNames );
-        }
+
+        // An exception: numbered entries that are NOT sorted by position
+        // I think in this case we do not care, since numbering comes from
+        // order in cited
+        //
+        //        if ( false ){
+        //            if (style.isNumberEntries() && ! style.isSortByPosition()) {
+        //                XNameAccess xReferenceMarks = documentConnection.getReferenceMarks();
+        //                // isNumberEntries && !isSortByPosition
+        //                referenceMarkNames = Arrays.asList(xReferenceMarks.getElementNames());
+        //                // Remove all reference marks that don't look like JabRef citations:
+        //                referenceMarkNames = filterIsJabRefReferenceMarkName( referenceMarkNames );
+        //            }
+        //        }
 
         ///***********************
         // keys cited in the text
@@ -1502,9 +1524,7 @@ class OOBibBase {
             findCitedEntries(databases, cited, citeKeyToBibEntry);
         // entries are now in same order as cited
 
-        if ( style.isSortByPosition() || (!style.isNumberEntries()) ){
-        } else {
-            // (style.isNumberEntries() && ! style.isSortByPosition())
+        if (style.isNumberEntries() && ! style.isSortByPosition()) {
 
             // sort entries to order in bibliography
             entries = sortEntriesByComparator( entries, entryComparator );
@@ -1526,21 +1546,11 @@ class OOBibBase {
         int[]      types      = new int[nRefMarks];
         String[][] bibtexKeys = new String[nRefMarks][];
 
+
         // fill:
         //    types[i]      = ov.itcType
         //    bibtexKeys[i] = ov.citedKeys.toArray()
-        for (int i = 0; i < nRefMarks; i++) {
-            final String namei = referenceMarkNames.get(i);
-            Optional<ParsedRefMark> op = parseRefMarkName( namei );
-            if ( !op.isPresent() ) {
-                continue;
-            }
-            ParsedRefMark ov = op.get();
-            types[i]      = ov.itcType; // Remember the itcType in case we need to uniquefy.
-            bibtexKeys[i] = ov.citedKeys.stream().toArray(String[]::new);
-            //
-        }
-
+        parseRefMarkNamesToArrays( referenceMarkNames, types, bibtexKeys );
 
         String[]   citMarkers     = new String[nRefMarks];
         // fill:
@@ -1580,6 +1590,8 @@ class OOBibBase {
                 if (style.isSortByPosition()) {
                     num = rcmNumForIsNumberEntriesIsSortByPosition( cEntries, bibtexKeys[i], style, cns );
                 } else {
+                    // An exception: numbered entries that are NOT sorted by position
+                    // exceptional_refmarkorder, entries and cited are sorted
                     num = findCitedEntryIndices( Arrays.asList(bibtexKeys[i]) , cited );
                 }
                 citMarkers[i] = style.getNumCitationMarker(num, minGroupingCount, false);
