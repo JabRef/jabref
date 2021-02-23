@@ -1676,11 +1676,13 @@ class OOBibBase {
                 final int maxAuthorsFirst = style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST);
                 Set<String> seenBefore = new HashSet<>();
                 for (int i = 0; i < nRefMarks; i++) {
+                    final String namei = referenceMarkNames.get(i);
                     final int  nCitedEntries = bibtexKeys[i].length;
                     boolean    needsChange     = false;
                     int[]      firstLimAuthors = new int[nCitedEntries];
                     String[]   uniquif         = new String[nCitedEntries];
-                    BibEntry[] cEntries        = new BibEntry[nCitedEntries];
+                    // BibEntry[] cEntries        = new BibEntry[nCitedEntries];
+                    BibEntry[] cEntries        = mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei );
 
                     for (int j = 0; j < nCitedEntries; j++) {
                         String currentKey = bibtexKeys[i][j];
@@ -1716,15 +1718,6 @@ class OOBibBase {
                             needsChange = true;
                         }
 
-                        {
-                            BibDatabase database = linkSourceBase.get(currentKey);
-                            if (database != null) {
-                                Optional<BibEntry> tmpEntry = database.getEntryByCitationKey(currentKey);
-                                if (tmpEntry.isPresent()) {
-                                    cEntries[j] = tmpEntry.get();
-                                }
-                            }
-                        }
 
                     } // for j
 
