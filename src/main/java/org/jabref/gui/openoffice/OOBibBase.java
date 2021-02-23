@@ -1463,7 +1463,7 @@ class OOBibBase {
         }
     }
 
-        private static parseRefMarkNamesToArrays( List<String> referenceMarkNames, int[] types, String[][] bibtexKeys ) {
+        private static void parseRefMarkNamesToArrays( List<String> referenceMarkNames, int[] types, String[][] bibtexKeys ) {
             final int nRefMarks  = referenceMarkNames.size();
             assert( types.length == nRefMarks );
             assert( bibtexKeys.length == nRefMarks );
