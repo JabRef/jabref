@@ -2162,12 +2162,12 @@ class OOBibBase {
         position.collapseToEnd();
     }
 
-    private void removeReferenceMark(String name)
+    private void removeReferenceMark(DocumentConnection documentConnection, String name)
         throws NoSuchElementException,
                WrappedTargetException,
                NoDocumentException
     {
-        XNameAccess xReferenceMarks = getReferenceMarks();
+        XNameAccess xReferenceMarks = documentConnection.getReferenceMarks();
         if (xReferenceMarks.hasByName(name)) {
             Object referenceMark = xReferenceMarks.getByName(name);
             XTextContent bookmark = unoQI(XTextContent.class, referenceMark);
