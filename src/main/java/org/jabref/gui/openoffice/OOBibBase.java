@@ -218,9 +218,42 @@ class OOBibBase {
                 throw new NoDocumentException("getReferenceMarks failed");
             }
         }
-    }
 
-    private DocumentConnection documentConnection;
+        public boolean checkDocumentConnection(){
+            boolean res = true;
+            // These are set by selectDocument:
+            if (null == this.xCurrentComponent   ){ res = false; }
+            if (null == this.mxDoc               ){ res = false; }
+            if (null == this.xViewCursorSupplier ){ res = false; }
+            if (null == this.xText               ){ res = false; }
+            if (null == this.mxDocFactory        ){ res = false; }
+            if (null == this.userProperties      ){ res = false; }
+            if (null == this.propertySet         ){ res = false; }
+            //
+            if ( ! res ){
+                return false;
+            }
+            // Attempt to check document is really available
+            // TODO
+            try {
+                getReferenceMarks();
+            } catch (NoDocumentException ex ) {
+                return false;
+            }
+            return true;
+        }
+
+        List<String> getReferenceMarknames(){
+            XNameAccess nameAccess = getReferenceMarks();
+            String[] names = nameAccess.getElementNames();
+            if (names == null) {
+                return new ArrayList<>();
+            }
+            return  Arrays.asList( names );
+        }
+    } // end DocumentConnection
+
+    private DocumentConnection xDocumentConnection;
     /*
      *  uniquefiers : maps bibtexkeys to letters ("a", "b")
      */
@@ -464,7 +497,7 @@ class OOBibBase {
 
         XPropertySet propertySet = unoQI(XPropertySet.class, userProperties);
 
-        this.documentConnection = new DocumentConnection(
+        this.xDocumentConnection = new DocumentConnection(
                                                          mxDocFactory,
                                                          mxDoc,
                                                          text,
@@ -484,37 +517,19 @@ class OOBibBase {
      * TODO: GUI should be notified
      */
     private void forgetDocument(){
-        this.documentConnection   = null ;
+        this.xDocumentConnection   = null ;
     }
 
     public boolean isConnectedToDocument() {
-        return this.documentConnection != null;
+        return this.xDocumentConnection != null;
     }
 
     public boolean checkDocumentConnection(){
-        boolean res = true;
-        // These are set by selectDocument:
-        if (null == this.documentConnection.xCurrentComponent   ){ res = false; }
-        if (null == this.documentConnection.mxDoc               ){ res = false; }
-        if (null == this.documentConnection.xViewCursorSupplier ){ res = false; }
-        if (null == this.documentConnection.xText               ){ res = false; }
-        if (null == this.documentConnection.mxDocFactory        ){ res = false; }
-        if (null == this.documentConnection.userProperties      ){ res = false; }
-        if (null == this.documentConnection.propertySet         ){ res = false; }
-        //
+        boolean res = this.xDocumentConnection.checkDocumentConnection();
         if ( ! res ){
             forgetDocument();
-            return false;
         }
-        // Attempt to check document is really available
-        // TODO
-        try {
-            getReferenceMarks();
-        } catch (NoDocumentException ex ) {
-            forgetDocument();
-            return false;
-        }
-        return true;
+        return res;
     }
 
     /*
@@ -522,7 +537,7 @@ class OOBibBase {
      */
 
     public Optional<String> getCurrentDocumentTitle() {
-        return  this.documentConnection.getDocumentTitle();
+        return  this.xDocumentConnection.getDocumentTitle();
     }
 
 
@@ -580,13 +595,8 @@ class OOBibBase {
     /*
      * called from getCitationEntries(...)
      */
-    private List<String> getJabRefReferenceMarkNames(XNameAccess nameAccess) {
-        String[] names = nameAccess.getElementNames();
-        // Remove all reference marks that don't look like JabRef citations:
-        if (names == null) {
-            return new ArrayList<>();
-        }
-        return filterIsJabRefReferenceMarkName( Arrays.asList( names ) );
+    private List<String> getJabRefReferenceMarkNames(DocumentConnection documentConnection) {
+        return filterIsJabRefReferenceMarkName( documentConnection.getReferenceMarknames() );
     }
 
     /**
@@ -598,8 +608,18 @@ class OOBibBase {
                WrappedTargetException,
                NoDocumentException
     {
+        return this.getCitationEntriesImpl( this.xDocumentConnection );
+    }
+
+    private List<CitationEntry> getCitationEntriesImpl( DocumentConnection documentConnection )
+        throws NoSuchElementException,
+               UnknownPropertyException,
+               WrappedTargetException,
+               NoDocumentException
+    {
         XNameAccess nameAccess = this.getReferenceMarks();
         List<String> names = this.getJabRefReferenceMarkNames(nameAccess);
+
         List<CitationEntry> citations = new ArrayList(names.size());
         for (String name : names) {
             CitationEntry entry =
