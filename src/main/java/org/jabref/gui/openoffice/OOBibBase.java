@@ -1950,21 +1950,24 @@ class OOBibBase {
         }
     }
 
-    private void createBibTextSection2(boolean end)
+    private void createBibTextSection2(DocumentConnection documentConnection,
+                                       boolean end)
             throws IllegalArgumentException,
                    CreationException
     {
 
-        XTextCursor mxDocCursor = this.xText.createTextCursor();
+        XTextCursor mxDocCursor = documentConnection.xText.createTextCursor();
         if (end) {
             mxDocCursor.gotoEnd(false);
         }
-        OOUtil.insertParagraphBreak(this.xText, mxDocCursor);
+        OOUtil.insertParagraphBreak(documentConnection.xText, mxDocCursor);
         // Create a new TextSection from the document factory and access it's XNamed interface
         XNamed xChildNamed;
         try {
             xChildNamed = unoQI(XNamed.class,
-                    this.mxDocFactory.createInstance("com.sun.star.text.TextSection"));
+                                (documentConnection.mxDocFactory
+                                 .createInstance("com.sun.star.text.TextSection"))
+                                );
         } catch (Exception e) {
             throw new CreationException(e.getMessage());
         }
@@ -1972,7 +1975,7 @@ class OOBibBase {
         xChildNamed.setName(OOBibBase.BIB_SECTION_NAME);
         // Access the Child_Section's XTextContent interface and insert it into the document
         XTextContent xChildSection = unoQI(XTextContent.class, xChildNamed);
-        this.xText.insertTextContent(mxDocCursor, xChildSection, false);
+        documentConnection.xText.insertTextContent(mxDocCursor, xChildSection, false);
     }
 
     private void clearBibTextSectionContent2()
