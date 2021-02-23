@@ -1156,7 +1156,7 @@ class OOBibBase {
     private static BibEntry[] linkSourceBaseGetBibEntriesOfCiteKeys
         ( Map<String, BibDatabase> linkSourceBase,
           String[] keys, // citeKeys
-          String namei   // refMarkName
+          String referenceMarkName   // for reporting
           )
         throws BibEntryNotFoundException
     {
@@ -1170,12 +1170,12 @@ class OOBibBase {
                 cEntries[j] = tmpEntry.get();
             } else {
                 LOGGER.info("Citation key not found: '" + kj + '\'');
-                LOGGER.info("Problem with reference mark: '" + namei + '\'');
+                LOGGER.info("Problem with reference mark: '" + referenceMarkName + '\'');
                 String msg = Localization.lang("Could not resolve BibTeX entry"
                                                +" for citation marker '%0'.",
-                                               namei
+                                               referenceMarkName
                                                );
-                throw new BibEntryNotFoundException(namei, msg);
+                throw new BibEntryNotFoundException(referenceMarkName, msg);
             }
         } // for j
         return cEntries;
