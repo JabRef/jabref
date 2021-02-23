@@ -1546,8 +1546,6 @@ class OOBibBase {
         //Map<String, BibEntry>      citeKeyToBibEntry = sce.citeKeyToBibEntry;
 
 
-        final int minGroupingCount =
-            style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
 
         String[]   citMarkers     = new String[nRefMarks];
         // fill:
@@ -1572,6 +1570,9 @@ class OOBibBase {
 
             // // For numbered citation style. Map( citedKey, number )
             CitationNumberingState cns = new CitationNumberingState();
+
+            final int minGroupingCount =
+                style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
 
             for (int i = 0; i < referenceMarkNames.size(); i++) {
                 final String namei = referenceMarkNames.get(i);
