@@ -647,7 +647,7 @@ class OOBibBase {
     private void sortBibEntryArray( BibEntry[] entries,
                                     OOBibStyle style )
     {
-        if (entries.length >= 1) {
+        if (entries.length <= 1) {
             return;
         }
         if (style.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL)) {
