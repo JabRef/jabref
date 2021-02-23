@@ -1379,21 +1379,21 @@ class OOBibBase {
     }
 
     /**
-     *  Visit each reference mark in names,
+     *  Visit each reference mark in referenceMarkNames,
      *  remove its text content,
      *  call insertReferenceMark.
      *
      *  After each insertReferenceMark call check if we lost the
      *  OOBibBase.BIB_SECTION_NAME bookmark and recrate it if we did.
      *
-     * @param names      Reference mark names
+     * @param referenceMarkNames      Reference mark names
      * @param citMarkers Corresponding text for each reference mark,
      *                   that replaces the old text.
      * @param types      itcType codes for each reference mark.
      * @param style
      */
     private void rcmApplyNewCitationMarkers(DocumentConnection documentConnection,
-                                            List<String> names,
+                                            List<String> referenceMarkNames,
                                             String[]     citMarkers,
                                             int[]        types,
                                             OOBibStyle   style      )
@@ -1405,7 +1405,7 @@ class OOBibBase {
                WrappedTargetException,
                PropertyVetoException
     {
-        final int nRefMarks  = names.size();
+        final int nRefMarks  = referenceMarkNames.size();
         assert( citMarkers.length == nRefMarks );
         assert( types.length      == nRefMarks );
 
@@ -1422,7 +1422,7 @@ class OOBibBase {
         boolean mustTestCharFormat = style.isFormatCitations();
 
         for (int i = 0; i < nRefMarks; i++) {
-            Object referenceMark = xReferenceMarks.getByName(names.get(i));
+            Object referenceMark = xReferenceMarks.getByName(referenceMarkNames.get(i));
             XTextContent bookmark = unoQI(XTextContent.class, referenceMark);
 
             XTextCursor cursor =
@@ -1448,7 +1448,7 @@ class OOBibBase {
             documentConnection.xText.removeTextContent(bookmark);
 
             insertReferenceMark(documentConnection,
-                                names.get(i),
+                                referenceMarkNames.get(i),
                                 citMarkers[i],
                                 cursor,
                                 types[i] != OOBibBase.INVISIBLE_CIT,
