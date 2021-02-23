@@ -2324,6 +2324,7 @@ class OOBibBase {
     }
 
     /**
+     * GUI action.
      * Do the opposite of combineCiteMarkers.
      * Combined markers are split, with a space inserted between.
      */
@@ -2339,14 +2340,17 @@ class OOBibBase {
                BibEntryNotFoundException,
                NoDocumentException
     {
-        XNameAccess nameAccess = getReferenceMarks();
-        // TODO: doesn't work for citations in footnotes/tables
-        List<String> names = getJabRefReferenceMarkNamesSortedByPosition(nameAccess);
+        DocumentConnection documentConnection = this.xDocumentConnection;
 
-        final XTextRangeCompare compare = unoQI(XTextRangeCompare.class, this.xText);
+        // TODO: doesn't work for citations in footnotes/tables
+        List<String> names = getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
+
+        final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
+                                                documentConnection.xText);
 
         int piv = 0;
         boolean madeModifications = false;
+        XNameAccess nameAccess = documentConnection.getReferenceMarks();
         while (piv < (names.size())) {
             XTextRange range1 = unoQI(XTextContent.class, nameAccess.getByName(names.get(piv)))
                 .getAnchor();
@@ -2371,14 +2375,17 @@ class OOBibBase {
 
             List<String> keys = parseRefMarkNameToUniqueCitationKeys(names.get(piv));
             if (keys.size() > 1) {
-                removeReferenceMark(names.get(piv));
+                removeReferenceMark(documentConnection, names.get(piv));
                 //
                 // Insert bookmark for each key
                 int last = keys.size() - 1;
                 int i = 0;
                 for (String key : keys) {
-                    String bName = getUniqueReferenceMarkName(this.xDocumentConnection,key, OOBibBase.AUTHORYEAR_PAR);
-                    insertReferenceMark(bName, "tmp", mxDocCursor, true, style);
+                    String bName = getUniqueReferenceMarkName(documentConnection,
+                                                              key,
+                                                              OOBibBase.AUTHORYEAR_PAR
+                                                              );
+                    insertReferenceMark(documentConnection, bName, "tmp", mxDocCursor, true, style);
                     mxDocCursor.collapseToEnd();
                     if (i != last) {
                         mxDocCursor.setString(" ");
