@@ -1793,7 +1793,7 @@ class OOBibBase {
                NoSuchElementException,
                NoDocumentException
     {
-        this.sortedReferenceMarks = getJabRefReferenceMarkNamesSortedByPosition(getReferenceMarks());
+        this.sortedReferenceMarks = getJabRefReferenceMarkNamesSortedByPosition(this.xDocumentConnection);
     }
 
 
