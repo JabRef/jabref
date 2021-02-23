@@ -1886,8 +1886,10 @@ class OOBibBase {
 
         if (style.isSortByPosition()) {
             // We need to sort the entries according to their order of appearance:
-            List<String> names = jabRefReferenceMarkNamesSortedByPosition;
-            entries = getSortedEntriesFromSortedRefMarks(names, linkSourceBase);
+            entries = getSortedEntriesFromSortedRefMarks(
+                 jabRefReferenceMarkNamesSortedByPosition,
+                 linkSourceBase
+                 );
         } else {
             // Find them again? Why?
             Map<BibEntry, BibDatabase> entries2 =
