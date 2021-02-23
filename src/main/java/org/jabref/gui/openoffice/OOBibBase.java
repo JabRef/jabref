@@ -1898,7 +1898,8 @@ class OOBibBase {
     }
 
 
-    private void insertFullReferenceAtCursor(XTextCursor cursor,
+    private void insertFullReferenceAtCursor(DocumentConnection documentConnection,
+                                             XTextCursor cursor,
                                              Map<BibEntry, BibDatabase> entries,
                                              OOBibStyle style,
                                              String parFormat)
@@ -1924,11 +1925,11 @@ class OOBibBase {
             if (entry.getKey() instanceof UndefinedBibtexEntry) {
                 continue;
             }
-            OOUtil.insertParagraphBreak(this.xText, cursor);
+            OOUtil.insertParagraphBreak(documentConnection.xText, cursor);
             if (style.isNumberEntries()) {
                 int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
                 OOUtil.insertTextAtCurrentLocation
-                    (this.xText,
+                    (documentConnection.xText,
                      cursor,
                      style.getNumCitationMarker(Collections.singletonList(number++),
                                                 minGroupingCount, true),
@@ -1938,7 +1939,7 @@ class OOBibBase {
             Layout layout = style.getReferenceFormat(entry.getKey().getType());
             layout.setPostFormatter(POSTFORMATTER);
             OOUtil.insertFullReferenceAtCurrentLocation
-                (this.xText,
+                (documentConnection.xText,
                  cursor,
                  layout,
                  parFormat,
