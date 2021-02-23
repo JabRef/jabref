@@ -2017,17 +2017,43 @@ class OOBibBase {
         }
     }
 
-    private void populateBibTextSection(Map<BibEntry, BibDatabase> entries, OOBibStyle style)
-            throws NoSuchElementException, WrappedTargetException, PropertyVetoException,
-            UnknownPropertyException, UndefinedParagraphFormatException, IllegalArgumentException, CreationException {
-        XTextSectionsSupplier supplier = unoQI(XTextSectionsSupplier.class, this.mxDoc);
-        XTextSection section = (XTextSection) ((Any) supplier.getTextSections().getByName(OOBibBase.BIB_SECTION_NAME))
-                .getObject();
-        XTextCursor cursor = this.xText.createTextCursorByRange(section.getAnchor());
-        OOUtil.insertTextAtCurrentLocation(this.xText, cursor, (String) style.getProperty(OOBibStyle.TITLE),
-                (String) style.getProperty(OOBibStyle.REFERENCE_HEADER_PARAGRAPH_FORMAT));
-        insertFullReferenceAtCursor(cursor, entries, style,
-                (String) style.getProperty(OOBibStyle.REFERENCE_PARAGRAPH_FORMAT));
+    private void populateBibTextSection(Map<BibEntry, BibDatabase> entries,
+                                        OOBibStyle style)
+        throws NoSuchElementException,
+               WrappedTargetException,
+               PropertyVetoException,
+               UnknownPropertyException,
+               UndefinedParagraphFormatException,
+               IllegalArgumentException,
+               CreationException
+    {
+        XTextSectionsSupplier supplier =
+            unoQI(XTextSectionsSupplier.class,
+                  this.mxDoc);
+
+        XTextSection section =
+            (XTextSection) ((Any) supplier
+                            .getTextSections()
+                            .getByName(OOBibBase.BIB_SECTION_NAME))
+            .getObject();
+
+        XTextCursor cursor =
+            this.xText
+            .createTextCursorByRange(section.getAnchor());
+
+        OOUtil.insertTextAtCurrentLocation
+            (this.xText,
+             cursor,
+             (String) style.getProperty(OOBibStyle.TITLE),
+             (String) style.getProperty(OOBibStyle.REFERENCE_HEADER_PARAGRAPH_FORMAT)
+             );
+
+        insertFullReferenceAtCursor
+            (cursor,
+             entries,
+             style,
+             (String) style.getProperty(OOBibStyle.REFERENCE_PARAGRAPH_FORMAT)
+             );
         insertBookMark(OOBibBase.BIB_SECTION_END_NAME, cursor);
     }
 
