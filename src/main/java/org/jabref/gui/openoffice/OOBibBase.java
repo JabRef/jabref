@@ -2227,6 +2227,9 @@ class OOBibBase {
         }
     }
 
+    /**
+     *  GUI action
+     */
     public void combineCiteMarkers(List<BibDatabase> databases, OOBibStyle style)
             throws IOException,
                    WrappedTargetException,
@@ -2239,11 +2242,15 @@ class OOBibBase {
                    BibEntryNotFoundException,
                    NoDocumentException
     {
-        XNameAccess nameAccess = getReferenceMarks();
-        // TODO: doesn't work for citations in footnotes/tables
-        List<String> names = getJabRefReferenceMarkNamesSortedByPosition(nameAccess);
+        DocumentConnection documentConnection = this.xDocumentConnection;
 
-        final XTextRangeCompare compare = unoQI(XTextRangeCompare.class, this.xText);
+        XNameAccess nameAccess = documentConnection.getReferenceMarks();
+        // TODO: doesn't work for citations in footnotes/tables
+        List<String> names =
+            getJabRefReferenceMarkNamesSortedByPosition(documentConnection, nameAccess);
+
+        final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
+                                                documentConnection.xText);
 
         int piv = 0;
         boolean madeModifications = false;
@@ -2284,8 +2291,8 @@ class OOBibBase {
 
                 List<String> keys = parseRefMarkNameToUniqueCitationKeys(names.get(piv));
                 keys.addAll(parseRefMarkNameToUniqueCitationKeys(names.get(piv + 1)));
-                removeReferenceMark(names.get(piv));
-                removeReferenceMark(names.get(piv + 1));
+                removeReferenceMark(documentConnection, names.get(piv));
+                removeReferenceMark(documentConnection, names.get(piv + 1));
                 List<BibEntry> entries = new ArrayList<>();
                 for (String key : keys) {
                     for (BibDatabase database : databases) {
@@ -2300,8 +2307,11 @@ class OOBibBase {
                 String keyString = String.join(",", entries.stream().map(entry -> entry.getCitationKey().orElse(""))
                                                            .collect(Collectors.toList()));
                 // Insert bookmark:
-                String bName = getUniqueReferenceMarkName(this.xDocumentConnection, keyString, OOBibBase.AUTHORYEAR_PAR);
-                insertReferenceMark(bName, "tmp", mxDocCursor, true, style);
+                String bName = getUniqueReferenceMarkName(documentConnection,
+                                                          keyString,
+                                                          OOBibBase.AUTHORYEAR_PAR
+                                                          );
+                insertReferenceMark(documentConnection, bName, "tmp", mxDocCursor, true, style);
                 names.set(piv + 1, bName);
                 madeModifications = true;
             }
