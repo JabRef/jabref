@@ -1412,6 +1412,49 @@ class OOBibBase {
         return citMarkers;
     }
 
+    private String[]
+        rcmCitationMarkersForIsNumberEntriesNotSortByPosition( List<String> referenceMarkNames,
+                                                               String[][] bibtexKeys,
+                                                               Map<BibEntry, BibDatabase> entries,
+                                                               OOBibStyle style  )
+    {
+        assert( style.isNumberEntries() );
+        assert( ! style.isSortByPosition() );
+
+        final int nRefMarks = referenceMarkNames.size();
+        assert( nRefMarks == bibtexKeys.length );
+        String[]   citMarkers     = new String[nRefMarks];
+
+        // An exception: numbered entries that are NOT sorted by position
+        // exceptional_refmarkorder, entries and cited are sorted
+        //if (style.isNumberEntries() && ! style.isSortByPosition()) {
+        //
+        // sort entries to order in bibliography
+        Map<BibEntry, BibDatabase> sortedEntries = sortEntriesByComparator( entries, entryComparator );
+        // adjust order of cited to match
+        List<String> sortedCited = new ArrayList( entries.size() );
+        sortedCited.clear();
+        for (BibEntry entry : sortedEntries.keySet()) {
+            sortedCited.add(entry.getCitationKey().orElse(null));
+        }
+        //}
+
+        final int minGroupingCount =
+            style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
+        for (int i = 0; i < referenceMarkNames.size(); i++) {
+            final String namei = referenceMarkNames.get(i);
+
+            //
+            // BibEntry[] cEntries =
+            //    mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei, false );
+            // assert (cEntries.length == bibtexKeys[i].length) ;
+            List<Integer> num ;
+            num = findCitedEntryIndices( Arrays.asList(bibtexKeys[i]) , sortedCited );
+            citMarkers[i] = style.getNumCitationMarker(num, minGroupingCount, false);
+        } // for
+        return citMarkers;
+    }
+
     /**
      * Resolve the citation key from a citation reference marker name,
      * and look up the index of the key in a list of keys.
@@ -1421,8 +1464,8 @@ class OOBibBase {
      * @return the (1-based) indices of the cited keys, -1 if a key is not found.
      *         Returns Collections.emptyList() if the ref name could not be resolved as a citation.
      */
-    private List<Integer> findCitedEntryIndices(List<String>  keysCitedHere,
-                                                List<String> orderedCiteKeys)
+    private static List<Integer> findCitedEntryIndices(List<String>  keysCitedHere,
+                                                       List<String> orderedCiteKeys)
     {
         List<Integer> result        = new ArrayList<>(keysCitedHere.size());
         for (String key : keysCitedHere) {
@@ -1604,18 +1647,6 @@ class OOBibBase {
         Map<BibEntry, BibDatabase> entries = findCitedEntries(databases, cited, citeKeyToBibEntry);
         // entries are now in same order as cited
         //
-        if (style.isNumberEntries() && ! style.isSortByPosition()) {
-            //
-            // sort entries to order in bibliography
-            entries = sortEntriesByComparator( entries, entryComparator );
-            //
-            // adjust order of cited to match
-            cited.clear();
-            for (BibEntry entry : entries.keySet()) {
-                cited.add(entry.getCitationKey().orElse(null));
-            }
-            //
-        }
         //
         String[]   citMarkers  = new String[nRefMarks];
         // fill:
@@ -1631,21 +1662,9 @@ class OOBibBase {
             if (style.isSortByPosition()) {
                 citMarkers = rcmCitationMarkersForIsNumberEntriesIsSortByPosition(referenceMarkNames, bibtexKeys, citeKeyToBibEntry, style);
             } else {
-                // An exception: numbered entries that are NOT sorted by position
-                // exceptional_refmarkorder, entries and cited are sorted
-                final int minGroupingCount =
-                    style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
-                for (int i = 0; i < referenceMarkNames.size(); i++) {
-                    final String namei = referenceMarkNames.get(i);
 
-                    //
-                    // BibEntry[] cEntries =
-                    //    mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei, false );
-                    // assert (cEntries.length == bibtexKeys[i].length) ;
-                    List<Integer> num ;
-                    num = findCitedEntryIndices( Arrays.asList(bibtexKeys[i]) , cited );
-                    citMarkers[i] = style.getNumCitationMarker(num, minGroupingCount, false);
-                } // for
+                citMarkers = rcmCitationMarkersForIsNumberEntriesNotSortByPosition( referenceMarkNames, bibtexKeys, entries, style  );
+
             }
             uniquefiers.clear();
 
@@ -1965,8 +1984,9 @@ class OOBibBase {
         populateBibTextSection(documentConnection, entries, style, this.xUniquefiers);
     }
 
-    SortedMap<BibEntry, BibDatabase> sortEntriesByComparator( Map<BibEntry, BibDatabase> entries,
-                                                              Comparator<BibEntry> entryComparator )
+    SortedMap<BibEntry, BibDatabase>
+        sortEntriesByComparator( Map<BibEntry, BibDatabase> entries,
+                                 Comparator<BibEntry> entryComparator )
     {
         SortedMap<BibEntry, BibDatabase> newMap = new TreeMap<>(entryComparator);
         for (Map.Entry<BibEntry, BibDatabase> kv : entries.entrySet()) {
