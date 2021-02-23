@@ -876,12 +876,14 @@ class OOBibBase {
                             );
             // Generate unique bookmark-name
             int    citationType = citationTypeFromOptions( withText, inParenthesis );
-            String bName        = getUniqueReferenceMarkName( this.xDocumentConnection, keyString, citationType );
+            String bName        = getUniqueReferenceMarkName( this.xDocumentConnection,
+                                                              keyString,
+                                                              citationType );
 
             // If we should store metadata for page info, do that now:
             if (pageInfo != null) {
                 LOGGER.info("Storing page info: " + pageInfo);
-                setCustomProperty(bName, pageInfo);
+                this.xDocumentConnection.setCustomProperty(bName, pageInfo);
             }
 
             // insert space
