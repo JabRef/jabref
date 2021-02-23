@@ -1006,20 +1006,26 @@ class OOBibBase {
      *   doc.referenceMarks.names.map(parse).flatten.unique
      *
      */
-    private List<String> findCitedKeys()
+    private List<String> findCitedKeys( DocumentConnection documentConnection )
         throws NoSuchElementException,
                WrappedTargetException,
                NoDocumentException
     {
-        XNameAccess xNamedMarks = getReferenceMarks();
-        String[] names          = xNamedMarks.getElementNames();
+
+        List<String> names = getJabRefReferenceMarkNames( documentConnection );
+
+        {
+            XNameAccess xNamedMarks = getReferenceMarks();
+            for (String name1 : names) {
+                // assert it supports XTextContent
+                Object bookmark = xNamedMarks.getByName(name1);
+                assert (null != unoQI(XTextContent.class, bookmark));
+            }
+        }
 
         List<String> keys = new ArrayList<>();
         for (String name1 : names) {
-            Object bookmark = xNamedMarks.getByName(name1);
-            assert (null != unoQI(XTextContent.class, bookmark));
-
-            List<String> newKeys = parseRefMarkNameToUniqueCitationKeys(name1);
+            List<String> newKeys = parseRefMarkNameToUniqueCitationKeys( name1 );
             for (String key : newKeys) {
                 if (!keys.contains(key)) {
                     keys.add(key);
