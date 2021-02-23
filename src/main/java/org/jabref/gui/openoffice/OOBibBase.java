@@ -1040,9 +1040,9 @@ class OOBibBase {
         List<String> names = getJabRefReferenceMarkNames( documentConnection );
 
         {
+            // assert it supports XTextContent
             XNameAccess xNamedMarks = documentConnection.getReferenceMarks();
             for (String name1 : names) {
-                // assert it supports XTextContent
                 Object bookmark = xNamedMarks.getByName(name1);
                 assert (null != unoQI(XTextContent.class, bookmark));
             }
