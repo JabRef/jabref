@@ -1951,7 +1951,9 @@ class OOBibBase {
     }
 
     private void createBibTextSection2(boolean end)
-            throws IllegalArgumentException, CreationException {
+            throws IllegalArgumentException,
+                   CreationException
+    {
 
         XTextCursor mxDocCursor = this.xText.createTextCursor();
         if (end) {
