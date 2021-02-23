@@ -1213,49 +1213,51 @@ class OOBibBase {
      *                order: from findCitedKeys(),
      *                except for style.isNumberEntries() where reordered as entries
      */
-    private GetSortedCitedEntriesResult getSortedCitedEntries(DocumentConnection documentConnection,
-                                                              List<BibDatabase> databases,
-                                                              OOBibStyle style,
-                                                              XNameAccess xReferenceMarks  )
-        throws NoSuchElementException,
-               WrappedTargetException,
-               NoDocumentException
-    {
-
-        // keys cited in the text
-        List<String>               cited = findCitedKeys( documentConnection );
-        Map<String, BibEntry>      citeKeyToBibEntry   = new HashMap<>();
-        Map<BibEntry, BibDatabase> entries =
-            findCitedEntries(databases, cited, citeKeyToBibEntry);
-
-
-        List<String> names;
-        if (style.isNumberEntries() && ! style.isSortByPosition()) {
-            entries = sortEntriesByComparator( entries, entryComparator );
-
-            // Rebuild the list of cited keys according to the sort order:
-            cited.clear();
-            for (BibEntry entry : entries.keySet()) {
-                cited.add(entry.getCitationKey().orElse(null));
-            }
-            //
-            names = Arrays.asList(xReferenceMarks.getElementNames());
-        } else {
-            // We need to sort the reference marks according to their
-            // order of appearance:
-            names = jabRefReferenceMarkNamesSortedByPosition;
-        }
-
-        // Remove all reference marks that don't look like JabRef citations:
-        names = filterIsJabRefReferenceMarkName( names );
-
-        return new GetSortedCitedEntriesResult( cited,
-                                                entries,
-                                                names,
-                                                citeKeyToBibEntry
-                                                );
-    }
-
+    /*
+*    private GetSortedCitedEntriesResult getSortedCitedEntries(DocumentConnection documentConnection,
+*                                                              List<BibDatabase> databases,
+*                                                              OOBibStyle style,
+*                                                              XNameAccess xReferenceMarks  )
+*        throws NoSuchElementException,
+*               WrappedTargetException,
+*               NoDocumentException
+*    {
+*
+*        // keys cited in the text
+*        List<String>               cited = findCitedKeys( documentConnection );
+*        Map<String, BibEntry>      citeKeyToBibEntry   = new HashMap<>();
+*        Map<BibEntry, BibDatabase> entries =
+*            findCitedEntries(databases, cited, citeKeyToBibEntry);
+*
+*
+*        List<String> names;
+*        if (style.isNumberEntries() && ! style.isSortByPosition()) {
+*            entries = sortEntriesByComparator( entries, entryComparator );
+*
+*            // Rebuild the list of cited keys according to the sort order:
+*            cited.clear();
+*            for (BibEntry entry : entries.keySet()) {
+*                cited.add(entry.getCitationKey().orElse(null));
+*            }
+*            //
+*            names = Arrays.asList(xReferenceMarks.getElementNames());
+*        } else {
+*            // We need to sort the reference marks according to their
+*            // order of appearance:
+*            names = jabRefReferenceMarkNamesSortedByPosition;
+*        }
+*
+*        // Remove all reference marks that don't look like JabRef citations:
+*        names = filterIsJabRefReferenceMarkName( names );
+*
+*        return new GetSortedCitedEntriesResult( cited,
+*                                                entries,
+*                                                names,
+*                                                citeKeyToBibEntry
+*                                                );
+*    }
+    */
+ 
     private static String rcmCitationMarkerForIsCitationKeyCiteMarkers( BibEntry[] cEntries,
                                                                         OOBibStyle style )
     {
@@ -1478,11 +1480,46 @@ class OOBibBase {
     {
         XNameAccess xReferenceMarks = documentConnection.getReferenceMarks();
 
-        GetSortedCitedEntriesResult sce =
-            getSortedCitedEntries(documentConnection, databases, style, xReferenceMarks );
+        List<String> referenceMarkNames;
+
+        if ( style.isSortByPosition() || (!style.isNumberEntries()) ){
+            // We sort the reference marks according to their
+            // order of appearance:
+            referenceMarkNames = jabRefReferenceMarkNamesSortedByPosition;
+        } else {
+            // isNumberEntries && !isSortByPosition
+            referenceMarkNames = Arrays.asList(xReferenceMarks.getElementNames());
+            // Remove all reference marks that don't look like JabRef citations:
+            referenceMarkNames = filterIsJabRefReferenceMarkName( referenceMarkNames );
+        }
+
+        ///***********************
+        // keys cited in the text
+
+        List<String>               cited = findCitedKeys( documentConnection );
+        Map<String, BibEntry>      citeKeyToBibEntry   = new HashMap<>();
+        Map<BibEntry, BibDatabase> entries =
+            findCitedEntries(databases, cited, citeKeyToBibEntry);
+        // entries are now in same order as cited
+
+        if ( style.isSortByPosition() || (!style.isNumberEntries()) ){
+        } else {
+            // (style.isNumberEntries() && ! style.isSortByPosition())
+
+            // sort entries to order in bibliography
+            entries = sortEntriesByComparator( entries, entryComparator );
+
+            // adjust order of cited to match
+            cited.clear();
+            for (BibEntry entry : entries.keySet()) {
+                cited.add(entry.getCitationKey().orElse(null));
+            }
+            //
+        }
 
 
-        List<String>               referenceMarkNames          = sce.refMarkNames;
+        //**********************
+
 
         // Compute citation markers for all citations:
         final int nRefMarks  = referenceMarkNames.size();
@@ -1504,9 +1541,9 @@ class OOBibBase {
             //
         }
 
-        Map<BibEntry, BibDatabase> entries        = sce.entries;
-        List<String>               cited          = sce.citedKeys;
-        Map<String, BibEntry>      citeKeyToBibEntry = sce.citeKeyToBibEntry;
+        // Map<BibEntry, BibDatabase> entries        = sce.entries;
+        //List<String>               cited          = sce.citedKeys;
+        //Map<String, BibEntry>      citeKeyToBibEntry = sce.citeKeyToBibEntry;
 
         // // For numbered citation style. Map( citedKey, number )
         CitationNumberingState cns = new CitationNumberingState();
@@ -1528,6 +1565,7 @@ class OOBibBase {
                 BibEntry[] cEntries =
                     mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei, false );
                 assert (cEntries.length == bibtexKeys[i].length) ;
+
                 citMarkers[i] = rcmCitationMarkerForIsCitationKeyCiteMarkers( cEntries, style );
             }
             uniquefiers.clear();
