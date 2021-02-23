@@ -1567,8 +1567,7 @@ class OOBibBase {
         // keys cited in the text
         List<String>               cited = findCitedKeys( documentConnection );
         Map<String, BibEntry>      citeKeyToBibEntry   = new HashMap<>();
-        Map<BibEntry, BibDatabase> entries =
-            findCitedEntries(databases, cited, citeKeyToBibEntry);
+        Map<BibEntry, BibDatabase> entries = findCitedEntries(databases, cited, citeKeyToBibEntry);
         // entries are now in same order as cited
         //
         if (style.isNumberEntries() && ! style.isSortByPosition()) {
