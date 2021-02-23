@@ -1162,8 +1162,8 @@ class OOBibBase {
     }
 
     private static BibEntry[]
-        linkSourceBaseGetBibEntriesOfCiteKeys( Map<String, BibDatabase> linkSourceBase,
-                                               String[] keys, // citeKeys
+        linkSourceBaseGetBibEntriesOfCiteKeys( String[] keys, // citeKeys
+                                               Map<String, BibEntry> citeKeyToBibEntry,
                                                String referenceMarkName   // for reporting
                                                )
         throws BibEntryNotFoundException
@@ -1173,12 +1173,8 @@ class OOBibBase {
         // fill cEntries
         for (int j = 0; j < keys.length; j++) {
             String kj = keys[j];
-            Optional<BibEntry> tmpEntry =
-                linkSourceBaseCiteKeyToBibEntry( linkSourceBase, kj );
-
-            if (tmpEntry.isPresent()) {
-                cEntries[j] = tmpEntry.get();
-            } else {
+            BibEntry tmpEntry = citeKeyToBibEntry.get( kj );
+            if ( tmpEntry == null ){
                 LOGGER.info("Citation key not found: '" + kj + '\'');
                 LOGGER.info("Problem with reference mark: '" + referenceMarkName + '\'');
                 String msg = Localization.lang("Could not resolve BibTeX entry"
@@ -1186,6 +1182,8 @@ class OOBibBase {
                                                referenceMarkName
                                                );
                 throw new BibEntryNotFoundException(referenceMarkName, msg);
+            } else {
+                cEntries[j] = tmpEntry;
             }
 
         } // for j
@@ -1548,7 +1546,7 @@ class OOBibBase {
                 final String namei = referenceMarkNames.get(i);
 
                 BibEntry[] cEntries =
-                    linkSourceBaseGetBibEntriesOfCiteKeys( linkSourceBase, bibtexKeys[i], namei );
+                    linkSourceBaseGetBibEntriesOfCiteKeys( bibtexKeys[i], citeKeyToBibEntry, namei );
                 assert (cEntries.length == bibtexKeys[i].length) ;
                 citMarkers[i] = rcmCitationMarkerForIsCitationKeyCiteMarkers( cEntries, style );
             }
@@ -1560,7 +1558,7 @@ class OOBibBase {
                 final String namei = referenceMarkNames.get(i);
 
                 BibEntry[] cEntries =
-                    linkSourceBaseGetBibEntriesOfCiteKeys( linkSourceBase, bibtexKeys[i], namei );
+                    linkSourceBaseGetBibEntriesOfCiteKeys( bibtexKeys[i], citeKeyToBibEntry, namei );
                 assert (cEntries.length == bibtexKeys[i].length) ;
 
                 List<Integer> num ;
@@ -1586,7 +1584,7 @@ class OOBibBase {
                 final String namei = referenceMarkNames.get(i);
 
                 BibEntry[] cEntries =
-                    linkSourceBaseGetBibEntriesOfCiteKeys( linkSourceBase, bibtexKeys[i], namei );
+                    linkSourceBaseGetBibEntriesOfCiteKeys( bibtexKeys[i], citeKeyToBibEntry, namei );
                 assert (cEntries.length == bibtexKeys[i].length) ;
 
                 // sort itcBlock
