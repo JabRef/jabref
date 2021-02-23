@@ -1161,19 +1161,21 @@ class OOBibBase {
         return res;
     }
 
-    private static BibEntry[] linkSourceBaseGetBibEntriesOfCiteKeys
-        ( Map<String, BibDatabase> linkSourceBase,
-          String[] keys, // citeKeys
-          String referenceMarkName   // for reporting
-          )
+    private static BibEntry[]
+        linkSourceBaseGetBibEntriesOfCiteKeys( Map<String, BibDatabase> linkSourceBase,
+                                               String[] keys, // citeKeys
+                                               String referenceMarkName   // for reporting
+                                               )
         throws BibEntryNotFoundException
     {
         BibEntry[] cEntries = new BibEntry[keys.length];
+
         // fill cEntries
         for (int j = 0; j < keys.length; j++) {
             String kj = keys[j];
             Optional<BibEntry> tmpEntry =
                 linkSourceBaseCiteKeyToBibEntry( linkSourceBase, kj );
+
             if (tmpEntry.isPresent()) {
                 cEntries[j] = tmpEntry.get();
             } else {
@@ -1185,6 +1187,7 @@ class OOBibBase {
                                                );
                 throw new BibEntryNotFoundException(referenceMarkName, msg);
             }
+
         } // for j
         return cEntries;
     }
@@ -1525,6 +1528,7 @@ class OOBibBase {
         Map<BibEntry, BibDatabase> entries        = sce.entries;
         List<String>               cited          = sce.citedKeys;
         Map<String, BibDatabase>   linkSourceBase = sce.linkSourceBase;
+        Map<String, BibEntry>      citeKeyToBibEntry = sce.citeKeyToBibEntry;
 
         // // For numbered citation style. Map( citedKey, number )
         CitationNumberingState cns = new CitationNumberingState();
