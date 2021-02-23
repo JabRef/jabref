@@ -1955,6 +1955,9 @@ class OOBibBase {
     }
 
 
+    /**
+     *  Only called from populateBibTextSection (and that from rebuildBibTextSection)
+     */
     private void insertFullReferenceAtCursor(DocumentConnection documentConnection,
                                              XTextCursor cursor,
                                              Map<BibEntry, BibDatabase> entries,
@@ -1967,20 +1970,9 @@ class OOBibBase {
                    PropertyVetoException,
                    WrappedTargetException
     {
-        Map<BibEntry, BibDatabase> correctEntries;
-        // If we don't have numbered entries, we need to sort the entries before adding them:
-        if (style.isSortByPosition()) {
-            // Use the received map directly
-            correctEntries = entries;
-        } else {
-            // Sort map
-            //Map<BibEntry, BibDatabase> newMap = new TreeMap<>(entryComparator);
-            //newMap.putAll(entries);
-            //correctEntries = newMap;
-            correctEntries = sortEntriesByComparator( entries, entryComparator );
-        }
+
         int number = 1;
-        for (Map.Entry<BibEntry, BibDatabase> entry : correctEntries.entrySet()) {
+        for (Map.Entry<BibEntry, BibDatabase> entry : entries.entrySet()) {
             if (entry.getKey() instanceof UndefinedBibtexEntry) {
                 continue;
             }
@@ -2076,6 +2068,9 @@ class OOBibBase {
         }
     }
 
+    /**
+     * Only called from: rebuildBibTextSection
+     */
     private void populateBibTextSection(DocumentConnection documentConnection,
                                         Map<BibEntry, BibDatabase> entries,
                                         OOBibStyle style,
