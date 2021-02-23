@@ -130,7 +130,7 @@ class OOBibBase {
     /* document-related */
     private XMultiServiceFactory    mxDocFactory;
     private XTextDocument           mxDoc;
-    private XText                   xtext;
+    private XText                   xText;
     private XTextViewCursorSupplier xViewCursorSupplier;
     private XComponent              xCurrentComponent;
     private XPropertySet            propertySet;
@@ -317,7 +317,7 @@ class OOBibBase {
      *     - this.xCurrentComponent
      *     - this.mxDoc
      *     - this.xViewCursorSupplier
-     *     - this.xtext
+     *     - this.xText
      *     - this.mxDocFactory
      *     - this.userProperties
      *     - this.propertySet
@@ -363,7 +363,7 @@ class OOBibBase {
         }
 
         // get a reference to the body text of the document
-        this.xtext = this.mxDoc.getText();
+        this.xText = this.mxDoc.getText();
 
         // Access the text document's multi service factory:
         this.mxDocFactory = unoQI(XMultiServiceFactory.class, this.mxDoc);
@@ -388,7 +388,7 @@ class OOBibBase {
         this.xCurrentComponent   = null ;
         this.mxDoc               = null ;
         this.xViewCursorSupplier = null ;
-        this.xtext               = null ;
+        this.xText               = null ;
         this.mxDocFactory        = null ;
         this.userProperties      = null ;
         this.propertySet         = null ;
@@ -404,7 +404,7 @@ class OOBibBase {
         if (null == this.xCurrentComponent   ){ res = false; }
         if (null == this.mxDoc               ){ res = false; }
         if (null == this.xViewCursorSupplier ){ res = false; }
-        if (null == this.xtext               ){ res = false; }
+        if (null == this.xText               ){ res = false; }
         if (null == this.mxDocFactory        ){ res = false; }
         if (null == this.userProperties      ){ res = false; }
         if (null == this.propertySet         ){ res = false; }
@@ -1316,7 +1316,7 @@ class OOBibBase {
                 }
             }
 
-            this.xtext.removeTextContent(bookmark);
+            this.xText.removeTextContent(bookmark);
 
             insertReferenceMark(names.get(i),
                                 citMarkers[i],
@@ -1329,7 +1329,7 @@ class OOBibBase {
                 // We have overwritten the marker for the start of the reference list.
                 // We need to add it again.
                 cursor.collapseToEnd();
-                OOUtil.insertParagraphBreak(this.xtext, cursor);
+                OOUtil.insertParagraphBreak(this.xText, cursor);
                 insertBookMark(OOBibBase.BIB_SECTION_NAME, cursor);
             }
         }
@@ -1811,15 +1811,15 @@ class OOBibBase {
             if (entry.getKey() instanceof UndefinedBibtexEntry) {
                 continue;
             }
-            OOUtil.insertParagraphBreak(this.xtext, cursor);
+            OOUtil.insertParagraphBreak(this.xText, cursor);
             if (style.isNumberEntries()) {
                 int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
-                OOUtil.insertTextAtCurrentLocation(this.xtext, cursor,
+                OOUtil.insertTextAtCurrentLocation(this.xText, cursor,
                         style.getNumCitationMarker(Collections.singletonList(number++), minGroupingCount, true), Collections.emptyList());
             }
             Layout layout = style.getReferenceFormat(entry.getKey().getType());
             layout.setPostFormatter(POSTFORMATTER);
-            OOUtil.insertFullReferenceAtCurrentLocation(this.xtext, cursor, layout, parFormat, entry.getKey(),
+            OOUtil.insertFullReferenceAtCurrentLocation(this.xText, cursor, layout, parFormat, entry.getKey(),
                     entry.getValue(), uniquefiers.get(entry.getKey().getCitationKey().orElse(null)));
         }
     }
@@ -1827,11 +1827,11 @@ class OOBibBase {
     private void createBibTextSection2(boolean end)
             throws IllegalArgumentException, CreationException {
 
-        XTextCursor mxDocCursor = this.xtext.createTextCursor();
+        XTextCursor mxDocCursor = this.xText.createTextCursor();
         if (end) {
             mxDocCursor.gotoEnd(false);
         }
-        OOUtil.insertParagraphBreak(this.xtext, mxDocCursor);
+        OOUtil.insertParagraphBreak(this.xText, mxDocCursor);
         // Create a new TextSection from the document factory and access it's XNamed interface
         XNamed xChildNamed;
         try {
@@ -1844,7 +1844,7 @@ class OOBibBase {
         xChildNamed.setName(OOBibBase.BIB_SECTION_NAME);
         // Access the Child_Section's XTextContent interface and insert it into the document
         XTextContent xChildSection = unoQI(XTextContent.class, xChildNamed);
-        this.xtext.insertTextContent(mxDocCursor, xChildSection, false);
+        this.xText.insertTextContent(mxDocCursor, xChildSection, false);
     }
 
     private void clearBibTextSectionContent2()
@@ -1858,7 +1858,7 @@ class OOBibBase {
                 Any a = ((Any) ts.getByName(OOBibBase.BIB_SECTION_NAME));
                 XTextSection section = (XTextSection) a.getObject();
                 // Clear it:
-                XTextCursor cursor = this.xtext.createTextCursorByRange(section.getAnchor());
+                XTextCursor cursor = this.xText.createTextCursorByRange(section.getAnchor());
                 cursor.gotoRange(section.getAnchor(), false);
                 cursor.setString("");
                 return;
@@ -1884,8 +1884,8 @@ class OOBibBase {
         XTextSectionsSupplier supplier = unoQI(XTextSectionsSupplier.class, this.mxDoc);
         XTextSection section = (XTextSection) ((Any) supplier.getTextSections().getByName(OOBibBase.BIB_SECTION_NAME))
                 .getObject();
-        XTextCursor cursor = this.xtext.createTextCursorByRange(section.getAnchor());
-        OOUtil.insertTextAtCurrentLocation(this.xtext, cursor, (String) style.getProperty(OOBibStyle.TITLE),
+        XTextCursor cursor = this.xText.createTextCursorByRange(section.getAnchor());
+        OOUtil.insertTextAtCurrentLocation(this.xText, cursor, (String) style.getProperty(OOBibStyle.TITLE),
                 (String) style.getProperty(OOBibStyle.REFERENCE_HEADER_PARAGRAPH_FORMAT));
         insertFullReferenceAtCursor(cursor, entries, style,
                 (String) style.getProperty(OOBibStyle.REFERENCE_PARAGRAPH_FORMAT));
@@ -1907,7 +1907,7 @@ class OOBibBase {
         XTextContent xTextContent = unoQI(XTextContent.class, bookmark);
         // insert bookmark at the end of the document
         // instead of mxDocText.getEnd you could use a text cursor's XTextRange interface or any XTextRange
-        this.xtext.insertTextContent(position, xTextContent, true);
+        this.xText.insertTextContent(position, xTextContent, true);
         position.collapseToEnd();
         return xTextContent;
     }
@@ -1983,7 +1983,7 @@ class OOBibBase {
         if (xReferenceMarks.hasByName(name)) {
             Object referenceMark = xReferenceMarks.getByName(name);
             XTextContent bookmark = unoQI(XTextContent.class, referenceMark);
-            this.xtext.removeTextContent(bookmark);
+            this.xText.removeTextContent(bookmark);
         }
     }
 
@@ -2044,7 +2044,7 @@ class OOBibBase {
         // TODO: doesn't work for citations in footnotes/tables
         List<String> names = getSortedReferenceMarks(nameAccess);
 
-        final XTextRangeCompare compare = unoQI(XTextRangeCompare.class, this.xtext);
+        final XTextRangeCompare compare = unoQI(XTextRangeCompare.class, this.xText);
 
         int piv = 0;
         boolean madeModifications = false;
@@ -2134,7 +2134,7 @@ class OOBibBase {
         // TODO: doesn't work for citations in footnotes/tables
         List<String> names = getSortedReferenceMarks(nameAccess);
 
-        final XTextRangeCompare compare = unoQI(XTextRangeCompare.class, this.xtext);
+        final XTextRangeCompare compare = unoQI(XTextRangeCompare.class, this.xText);
 
         int piv = 0;
         boolean madeModifications = false;
