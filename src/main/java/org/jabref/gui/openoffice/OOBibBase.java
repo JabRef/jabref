@@ -2090,7 +2090,8 @@ class OOBibBase {
         return xTextContent;
     }
 
-    private void insertReferenceMark(String name,
+    private void insertReferenceMark(DocumentConnection documentConnection,
+                                     String name,
                                      String citationText,
                                      XTextCursor position,
                                      boolean withText,
@@ -2104,7 +2105,7 @@ class OOBibBase {
 
         // Check if there is "page info" stored for this citation. If so, insert it into
         // the citation text before inserting the citation:
-        Optional<String> pageInfo = getCustomProperty(name);
+        Optional<String> pageInfo = documentConnection.getCustomProperty(name);
         String citText;
         if ((pageInfo.isPresent()) && !pageInfo.get().isEmpty()) {
             citText = style.insertPageInfo(citationText, pageInfo.get());
@@ -2114,7 +2115,7 @@ class OOBibBase {
 
         Object bookmark;
         try {
-            bookmark = this.mxDocFactory.createInstance("com.sun.star.text.ReferenceMark");
+            bookmark = documentConnection.mxDocFactory.createInstance("com.sun.star.text.ReferenceMark");
         } catch (Exception e) {
             throw new CreationException(e.getMessage());
         }
