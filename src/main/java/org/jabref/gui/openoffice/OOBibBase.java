@@ -1879,9 +1879,9 @@ class OOBibBase {
     {
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
 
-        List<String>               cited          = findCitedKeys(documentConnection);
-        Map<String, BibDatabase>   linkSourceBase = new HashMap<>();
-        Map<String, BibEntry> citeKeyToBibEntry   = new HashMap<>();
+        List<String>               cited             = findCitedKeys(documentConnection);
+        Map<String, BibDatabase>   linkSourceBase    = new HashMap<>();
+        Map<String, BibEntry>      citeKeyToBibEntry = new HashMap<>();
         Map<BibEntry, BibDatabase> entries =
             // Although entries are redefined without use, this also
             // updates linkSourceBase
