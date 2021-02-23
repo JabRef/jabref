@@ -2244,16 +2244,16 @@ class OOBibBase {
     {
         DocumentConnection documentConnection = this.xDocumentConnection;
 
-        XNameAccess nameAccess = documentConnection.getReferenceMarks();
         // TODO: doesn't work for citations in footnotes/tables
         List<String> names =
-            getJabRefReferenceMarkNamesSortedByPosition(documentConnection, nameAccess);
+            getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
 
         final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
                                                 documentConnection.xText);
 
         int piv = 0;
         boolean madeModifications = false;
+        XNameAccess nameAccess = documentConnection.getReferenceMarks();
         while (piv < (names.size() - 1)) {
             XTextRange range1 = unoQI(XTextContent.class, nameAccess.getByName(names.get(piv)))
                                           .getAnchor().getEnd();
