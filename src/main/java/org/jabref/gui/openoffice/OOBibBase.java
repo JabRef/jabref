@@ -1149,18 +1149,6 @@ class OOBibBase {
         }
     }
 
-    private static Optional<BibEntry> linkSourceBaseCiteKeyToBibEntry
-        ( Map<String, BibDatabase> linkSourceBase,
-          String citeKey )
-    {
-        BibDatabase database = linkSourceBase.get(citeKey);
-        Optional<BibEntry> res = ( (database == null)
-                                   ? Optional.empty()
-                                   : database.getEntryByCitationKey(citeKey)
-                                   );
-        return res;
-    }
-
     private static BibEntry[]
         linkSourceBaseGetBibEntriesOfCiteKeys( String[] keys, // citeKeys
                                                Map<String, BibEntry> citeKeyToBibEntry,
