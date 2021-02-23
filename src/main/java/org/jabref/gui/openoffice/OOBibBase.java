@@ -1085,11 +1085,9 @@ class OOBibBase {
      *                order: from findCitedKeys(),
      *                except for style.isNumberEntries() where reordered as entries
      */
-    private GetSortedCitedEntriesResult getSortedCitedEntries
-        ( List<BibDatabase> databases,
-          OOBibStyle style,
-          XNameAccess xReferenceMarks
-          )
+    private GetSortedCitedEntriesResult getSortedCitedEntries( List<BibDatabase> databases,
+                                                               OOBibStyle style,
+                                                               XNameAccess xReferenceMarks  )
         throws NoSuchElementException,
                WrappedTargetException,
                NoDocumentException
@@ -1354,7 +1352,6 @@ class OOBibBase {
         GetSortedCitedEntriesResult sce =
             getSortedCitedEntries( databases, style, xReferenceMarks );
         List<String>               names          = sce.refMarkNames;
-        //*****
 
         // Compute citation markers for all citations:
         final int nRefMarks  = names.size();
