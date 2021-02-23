@@ -1151,9 +1151,10 @@ class OOBibBase {
 
     private static BibEntry[]
         mapCiteKeysToBibEntryArray( String[] keys, // citeKeys
-                                               Map<String, BibEntry> citeKeyToBibEntry,
-                                               String referenceMarkName   // for reporting
-                                               )
+                                    Map<String, BibEntry> citeKeyToBibEntry,
+                                    String referenceMarkName,   // for reporting
+                                    boolean undefinedToNull     // for undefined entries insert NULL
+                                    )
         throws BibEntryNotFoundException
     {
         BibEntry[] cEntries = new BibEntry[keys.length];
@@ -1171,6 +1172,9 @@ class OOBibBase {
                                                );
                 throw new BibEntryNotFoundException(referenceMarkName, msg);
             } else {
+                if ( undefinedToNull && tmpEntry instanceof UndefinedBibtexEntry ){
+                    tmpEntry = null;
+                }
                 cEntries[j] = tmpEntry;
             }
 
