@@ -127,15 +127,100 @@ class OOBibBase {
     private final Comparator<BibEntry> entryComparator;
     private final Comparator<BibEntry> yearAuthorTitleComparator;
 
-    /* document-related */
-    private XMultiServiceFactory    mxDocFactory;
-    private XTextDocument           mxDoc;
-    private XText                   xText;
-    private XTextViewCursorSupplier xViewCursorSupplier;
-    private XComponent              xCurrentComponent;
-    private XPropertySet            propertySet;
-    private XPropertyContainer      userProperties;
+    /* document-connection related */
+    private class DocumentConnection {
+        public XMultiServiceFactory    mxDocFactory;
+        public XTextDocument           mxDoc;
+        public XText                   xText;
+        public XTextViewCursorSupplier xViewCursorSupplier;
+        public XComponent              xCurrentComponent;
+        public XPropertySet            propertySet;
+        public XPropertyContainer      userProperties;
+        DocumentConnection(XMultiServiceFactory    mxDocFactory,
+                           XTextDocument           mxDoc,
+                           XText                   xText,
+                           XTextViewCursorSupplier xViewCursorSupplier,
+                           XComponent              xCurrentComponent,
+                           XPropertySet            propertySet,
+                           XPropertyContainer      userProperties
+                           ) {
+            this.mxDocFactory = mxDocFactory ;
+            this.mxDoc = mxDoc ;
+            this.xText = xText ;
+            this.xViewCursorSupplier = xViewCursorSupplier ;
+            this.xCurrentComponent = xCurrentComponent ;
+            this.propertySet = propertySet ;
+            this.userProperties = userProperties ;
+        }
 
+        public Optional<String> getDocumentTitle() {
+            return OOBibBase.getDocumentTitle( this.mxDoc );
+        }
+
+    private Optional<String> getCustomProperty(String property)
+        throws UnknownPropertyException,
+               WrappedTargetException
+    {
+        assert (this.propertySet != null);
+
+        XPropertySetInfo psi =
+            this.propertySet
+            .getPropertySetInfo();
+
+        if (psi.hasPropertyByName(property)) {
+            String v =
+                this.propertySet
+                .getPropertyValue(property)
+                .toString();
+            return Optional.ofNullable(v);
+        }
+        return Optional.empty();
+    }
+
+    private void setCustomProperty(String property, String value)
+        throws UnknownPropertyException,
+               NotRemoveableException,
+               PropertyExistException,
+               IllegalTypeException,
+               IllegalArgumentException
+        {
+            XPropertySetInfo psi =
+                this.propertySet
+                .getPropertySetInfo();
+            if (psi.hasPropertyByName(property)) {
+                this.userProperties.removeProperty(property);
+            }
+            if (value != null) {
+                this.userProperties
+                    .addProperty(property,
+                                 com.sun.star.beans.PropertyAttribute.REMOVEABLE,
+                                 new Any(Type.STRING, value)
+                                 );
+            }
+        }
+
+        /**
+         *
+         * @throws NoDocumentException
+         *
+         */
+        private XNameAccess getReferenceMarks()
+            throws NoDocumentException
+        {
+            XReferenceMarksSupplier supplier =
+                unoQI(XReferenceMarksSupplier.class,
+                      this.xCurrentComponent);
+            try {
+                XNameAccess res = supplier.getReferenceMarks();
+                return res;
+            } catch ( Exception ex ){
+                LOGGER.warn( "getReferenceMarks caught: ", ex );
+                throw new NoDocumentException("getReferenceMarks failed");
+            }
+        }
+    }
+
+    private DocumentConnection documentConnection;
     /*
      *  uniquefiers : maps bibtexkeys to letters ("a", "b")
      */
@@ -328,6 +413,7 @@ class OOBibBase {
                NoSuchElementException,
                WrappedTargetException
     {
+        XTextDocument mxDoc;
         {
             XTextDocument selected;
             List<XTextDocument> textDocumentList = getTextDocuments(this.xDesktop);
@@ -346,34 +432,47 @@ class OOBibBase {
             if (selected == null) {
                 return;
             }
-            this.xCurrentComponent = unoQI(XComponent.class, selected);
-            this.mxDoc = selected;
+            mxDoc = selected;
         }
+        XComponent component = unoQI(XComponent.class, mxDoc);
 
 
         // TODO: what is the point of the next line? Does it have a side effect?
         if ( run_useless_parts ){
-            unoQI(XDocumentIndexesSupplier.class, xCurrentComponent);
+            unoQI(XDocumentIndexesSupplier.class, component);
         }
 
+        XTextViewCursorSupplier viewCursorSupplier;
         {
-            XModel      mo = unoQI(XModel.class, this.xCurrentComponent);
+            XModel      mo = unoQI(XModel.class, component);
             XController co = mo.getCurrentController();
-            this.xViewCursorSupplier = unoQI(XTextViewCursorSupplier.class, co);
+            viewCursorSupplier = unoQI(XTextViewCursorSupplier.class, co);
         }
 
         // get a reference to the body text of the document
-        this.xText = this.mxDoc.getText();
+        XText text = mxDoc.getText();
 
         // Access the text document's multi service factory:
-        this.mxDocFactory = unoQI(XMultiServiceFactory.class, this.mxDoc);
+        XMultiServiceFactory mxDocFactory = unoQI(XMultiServiceFactory.class, mxDoc);
 
+        XPropertyContainer userProperties;
         {
             XDocumentPropertiesSupplier supp =
-                unoQI(XDocumentPropertiesSupplier.class, this.mxDoc);
-            this.userProperties = supp.getDocumentProperties().getUserDefinedProperties();
+                unoQI(XDocumentPropertiesSupplier.class, mxDoc);
+            userProperties = supp.getDocumentProperties().getUserDefinedProperties();
         }
-        this.propertySet = unoQI(XPropertySet.class, this.userProperties);
+
+        XPropertySet propertySet = unoQI(XPropertySet.class, userProperties);
+
+        this.documentConnection = new DocumentConnection(
+                                                         mxDocFactory,
+                                                         mxDoc,
+                                                         text,
+                                                         viewCursorSupplier,
+                                                         component,
+                                                         propertySet,
+                                                         userProperties
+                                                         );
 
         // TODO: maybe we should install an event handler for document
         // close: addCloseListener
@@ -385,29 +484,23 @@ class OOBibBase {
      * TODO: GUI should be notified
      */
     private void forgetDocument(){
-        this.xCurrentComponent   = null ;
-        this.mxDoc               = null ;
-        this.xViewCursorSupplier = null ;
-        this.xText               = null ;
-        this.mxDocFactory        = null ;
-        this.userProperties      = null ;
-        this.propertySet         = null ;
+        this.documentConnection   = null ;
     }
 
     public boolean isConnectedToDocument() {
-        return this.xCurrentComponent != null;
+        return this.documentConnection != null;
     }
 
     public boolean checkDocumentConnection(){
         boolean res = true;
         // These are set by selectDocument:
-        if (null == this.xCurrentComponent   ){ res = false; }
-        if (null == this.mxDoc               ){ res = false; }
-        if (null == this.xViewCursorSupplier ){ res = false; }
-        if (null == this.xText               ){ res = false; }
-        if (null == this.mxDocFactory        ){ res = false; }
-        if (null == this.userProperties      ){ res = false; }
-        if (null == this.propertySet         ){ res = false; }
+        if (null == this.documentConnection.xCurrentComponent   ){ res = false; }
+        if (null == this.documentConnection.mxDoc               ){ res = false; }
+        if (null == this.documentConnection.xViewCursorSupplier ){ res = false; }
+        if (null == this.documentConnection.xText               ){ res = false; }
+        if (null == this.documentConnection.mxDocFactory        ){ res = false; }
+        if (null == this.documentConnection.userProperties      ){ res = false; }
+        if (null == this.documentConnection.propertySet         ){ res = false; }
         //
         if ( ! res ){
             forgetDocument();
@@ -429,51 +522,10 @@ class OOBibBase {
      */
 
     public Optional<String> getCurrentDocumentTitle() {
-        return OOBibBase.getDocumentTitle( this.mxDoc );
+        return  this.documentConnection.getDocumentTitle();
     }
 
 
-    private Optional<String> getCustomProperty(String property)
-        throws UnknownPropertyException,
-               WrappedTargetException
-    {
-        assert (this.propertySet != null);
-
-        XPropertySetInfo psi =
-            this.propertySet
-            .getPropertySetInfo();
-
-        if (psi.hasPropertyByName(property)) {
-            String v =
-                this.propertySet
-                .getPropertyValue(property)
-                .toString();
-            return Optional.ofNullable(v);
-        }
-        return Optional.empty();
-    }
-
-    private void setCustomProperty(String property, String value)
-        throws UnknownPropertyException,
-               NotRemoveableException,
-               PropertyExistException,
-               IllegalTypeException,
-               IllegalArgumentException
-    {
-        XPropertySetInfo psi =
-            this.propertySet
-            .getPropertySetInfo();
-        if (psi.hasPropertyByName(property)) {
-            this.userProperties.removeProperty(property);
-        }
-        if (value != null) {
-            this.userProperties
-                .addProperty(property,
-                             com.sun.star.beans.PropertyAttribute.REMOVEABLE,
-                             new Any(Type.STRING, value)
-                             );
-        }
-    }
 
     /*
      * === insertEntry
@@ -513,25 +565,6 @@ class OOBibBase {
                  : OOBibBase.AUTHORYEAR_INTEXT );
     }
 
-    /**
-     *
-     * @throws NoDocumentException
-     *
-     */
-    private XNameAccess getReferenceMarks()
-        throws NoDocumentException
-    {
-        XReferenceMarksSupplier supplier =
-            unoQI(XReferenceMarksSupplier.class,
-                  this.xCurrentComponent);
-        try {
-            XNameAccess res = supplier.getReferenceMarks();
-            return res;
-        } catch ( Exception ex ){
-            LOGGER.warn( "getReferenceMarks caught: ", ex );
-            throw new NoDocumentException("getReferenceMarks failed");
-        }
-    }
 
     private static boolean isJabRefReferenceMarkName( String name ){
         return (CITE_PATTERN.matcher(name).find());
