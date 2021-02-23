@@ -1929,9 +1929,8 @@ class OOBibBase {
             List<String> keys = op.get().citedKeys;
             for (String key : keys) {
                 BibDatabase        database  = linkSourceBase.get(key);
-                Optional<BibEntry> origEntry = Optional.empty();
                 if (database != null) {
-                    origEntry = database.getEntryByCitationKey(key);
+                    Optional<BibEntry> origEntry = database.getEntryByCitationKey(key);
                     if (origEntry.isPresent()) {
                         BibEntry oe = origEntry.get();
                         if (!newList.containsKey(oe)) {
