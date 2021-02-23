@@ -1973,17 +1973,27 @@ class OOBibBase {
 
         int number = 1;
         for (Map.Entry<BibEntry, BibDatabase> entry : entries.entrySet()) {
+
+            // skip unresolved entries
             if (entry.getKey() instanceof UndefinedBibtexEntry) {
                 continue;
             }
+
             OOUtil.insertParagraphBreak(documentConnection.xText, cursor);
+
             if (style.isNumberEntries()) {
-                int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
+                // NOte: minGroupingCount is pointless here, we are
+                // formatting a single entry.
+                // int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
+                int minGroupingCount = 2;
+                String marker = style.getNumCitationMarker(Collections.singletonList(number++),
+                                                           minGroupingCount,
+                                                           true);
+
                 OOUtil.insertTextAtCurrentLocation
                     (documentConnection.xText,
                      cursor,
-                     style.getNumCitationMarker(Collections.singletonList(number++),
-                                                minGroupingCount, true),
+                     marker,
                      Collections.emptyList()
                      );
             }
