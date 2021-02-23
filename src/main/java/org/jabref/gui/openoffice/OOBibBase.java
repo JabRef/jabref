@@ -2063,27 +2063,29 @@ class OOBibBase {
         insertBookMark(OOBibBase.BIB_SECTION_END_NAME, cursor);
     }
 
-    private XTextContent insertBookMark(String name,
+    private XTextContent insertBookMark(DocumentConnection documentConnection,
+                                        String name,
                                         XTextCursor position)
         throws IllegalArgumentException,
                CreationException
     {
         Object bookmark;
         try {
-            bookmark = ( this.mxDocFactory
+            bookmark = ( documentConnection.mxDocFactory
                          .createInstance("com.sun.star.text.Bookmark") );
         } catch (Exception e) {
             throw new CreationException(e.getMessage());
         }
+
         // name the bookmark
         XNamed xNamed = unoQI(XNamed.class, bookmark);
         xNamed.setName(name);
+
         // get XTextContent interface
         XTextContent xTextContent = unoQI(XTextContent.class, bookmark);
-        // insert bookmark at the end of the document
-        // instead of mxDocText.getEnd you could use
-        // a text cursor's XTextRange interface or any XTextRange
-        this.xText.insertTextContent(position, xTextContent, true);
+
+        // insert bookmark at position
+        documentConnection.xText.insertTextContent(position, xTextContent, true);
         position.collapseToEnd();
         return xTextContent;
     }
