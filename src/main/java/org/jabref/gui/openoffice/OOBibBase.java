@@ -326,9 +326,9 @@ class OOBibBase {
 
     private DocumentConnection xDocumentConnection;
     /*
-     *  uniquefiers : maps bibtexkeys to letters ("a", "b")
+     *  xUniquefiers : maps bibtexkeys to letters ("a", "b")
      */
-    private final Map<String, String> uniquefiers = new HashMap<>();
+    private final Map<String, String> xUniquefiers = new HashMap<>();
 
     private List<String> sortedReferenceMarks;
 
