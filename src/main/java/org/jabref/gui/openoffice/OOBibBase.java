@@ -667,7 +667,9 @@ class OOBibBase {
     /*
      * called from getCitationEntries(...)
      */
-    private List<String> getJabRefReferenceMarkNames(DocumentConnection documentConnection) {
+    private List<String> getJabRefReferenceMarkNames(DocumentConnection documentConnection)
+        throws NoDocumentException
+    {
         return filterIsJabRefReferenceMarkName( documentConnection.getReferenceMarknames() );
     }
 
