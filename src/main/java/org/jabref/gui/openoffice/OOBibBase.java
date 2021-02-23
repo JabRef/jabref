@@ -1337,10 +1337,8 @@ class OOBibBase {
         }
     }
 
-    private List<String> refreshCiteMarkersInternal
-        ( List<BibDatabase> databases,
-          OOBibStyle style
-          )
+    private List<String> refreshCiteMarkersInternal( List<BibDatabase> databases,
+                                                     OOBibStyle style           )
         throws WrappedTargetException,
                IllegalArgumentException,
                NoSuchElementException,
