@@ -1895,15 +1895,10 @@ class OOBibBase {
             // We need to sort the entries according to their order of appearance:
             entries = getSortedEntriesFromSortedRefMarks(
                  jabRefReferenceMarkNamesSortedByPosition,
-                 //linkSourceBase,
                  citeKeyToBibEntry,
                  entries
                  );
         } else {
-            // // Find them again? Why?
-            // Map<BibEntry, BibDatabase> entries2 =
-            //   findCitedEntries(databases, cited, linkSourceBase, citeKeyToBibEntry);
-
             SortedMap<BibEntry, BibDatabase> newMap = new TreeMap<>(entryComparator);
             for (Map.Entry<BibEntry, BibDatabase> kv : entries.entrySet()) {
                 newMap.put(kv.getKey(),
@@ -1925,7 +1920,6 @@ class OOBibBase {
      * iteration order as first appearance in referenceMarkNames.
      */
     private Map<BibEntry, BibDatabase> getSortedEntriesFromSortedRefMarks(List<String> referenceMarkNames,
-                                                                          // Map<String, BibDatabase> linkSourceBase,
                                                                           Map<String, BibEntry> citeKeyToBibEntry,
                                                                           Map<BibEntry, BibDatabase> entries
                                                                           )
