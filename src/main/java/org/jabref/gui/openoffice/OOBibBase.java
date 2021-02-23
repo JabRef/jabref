@@ -1105,7 +1105,7 @@ class OOBibBase {
                NoDocumentException
     {
         try {
-            return refreshCiteMarkersInternal(databases, style);
+            return refreshCiteMarkersInternal(this.xDocumentConnection, databases, style);
         } catch (DisposedException ex) {
             // We need to catch this one here because the OpenOfficePanel class is
             // loaded before connection, and therefore cannot directly reference
