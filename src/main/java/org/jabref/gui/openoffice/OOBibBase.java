@@ -2403,13 +2403,17 @@ class OOBibBase {
         }
     }
 
+    /**
+     *  Used from GUI.
+     */
     public BibDatabase generateDatabase(List<BibDatabase> databases)
         throws NoSuchElementException,
                WrappedTargetException,
                NoDocumentException
     {
+        DocumentConnection documentConnection = this.xDocumentConnection;
         BibDatabase resultDatabase = new BibDatabase();
-        List<String> cited = findCitedKeys();
+        List<String> cited = findCitedKeys(documentConnection);
         List<BibEntry> entriesToInsert = new ArrayList<>();
 
         // For each cited key
