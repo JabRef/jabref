@@ -1124,7 +1124,10 @@ class OOBibBase {
     {
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
         try {
-            return refreshCiteMarkersInternal(documentConnection, databases, style);
+            return refreshCiteMarkersInternal(documentConnection,
+                                              databases,
+                                              style,
+                                              this.xUniquefiers);
         } catch (DisposedException ex) {
             // We need to catch this one here because the OpenOfficePanel class is
             // loaded before connection, and therefore cannot directly reference
@@ -1467,7 +1470,9 @@ class OOBibBase {
 
     private List<String> refreshCiteMarkersInternal(DocumentConnection documentConnection,
                                                     List<BibDatabase> databases,
-                                                    OOBibStyle style           )
+                                                    OOBibStyle style,
+                                                    final Map<String, String> uniquefiers
+                                                    )
         throws WrappedTargetException,
                IllegalArgumentException,
                NoSuchElementException,
@@ -1884,7 +1889,7 @@ class OOBibBase {
             entries = newMap;
         }
         clearBibTextSectionContent2(documentConnection);
-        populateBibTextSection(documentConnection, entries, style);
+        populateBibTextSection(documentConnection, entries, style, this.xUniquefiers);
     }
 
 
@@ -1930,7 +1935,8 @@ class OOBibBase {
                                              XTextCursor cursor,
                                              Map<BibEntry, BibDatabase> entries,
                                              OOBibStyle style,
-                                             String parFormat)
+                                             String parFormat,
+                                             final Map<String, String> uniquefiers)
             throws UndefinedParagraphFormatException,
                    IllegalArgumentException,
                    UnknownPropertyException,
@@ -2047,7 +2053,8 @@ class OOBibBase {
 
     private void populateBibTextSection(DocumentConnection documentConnection,
                                         Map<BibEntry, BibDatabase> entries,
-                                        OOBibStyle style)
+                                        OOBibStyle style,
+                                        final Map<String, String> uniquefiers)
         throws NoSuchElementException,
                WrappedTargetException,
                PropertyVetoException,
@@ -2085,7 +2092,8 @@ class OOBibBase {
              cursor,
              entries,
              style,
-             (String) style.getProperty(OOBibStyle.REFERENCE_PARAGRAPH_FORMAT)
+             (String) style.getProperty(OOBibStyle.REFERENCE_PARAGRAPH_FORMAT),
+             uniquefiers
              );
         insertBookMark(documentConnection, OOBibBase.BIB_SECTION_END_NAME, cursor);
     }
