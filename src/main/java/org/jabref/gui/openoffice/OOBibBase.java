@@ -1801,8 +1801,8 @@ class OOBibBase {
      *
      * @return unresolvedKeys
      */
-    public List<String>  updateDocument(List<BibDatabase> databases,
-                                        OOBibStyle style)
+    public List<String>  updateDocumentActionHelper(List<BibDatabase> databases,
+                                                    OOBibStyle style)
         throws NoSuchElementException,
                WrappedTargetException,
                IllegalArgumentException,

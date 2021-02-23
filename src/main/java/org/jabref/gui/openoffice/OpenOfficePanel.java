@@ -197,7 +197,7 @@ public class OpenOfficePanel {
                 }
 
                 List<BibDatabase> databases = getBaseList();
-                List<String> unresolvedKeys = ooBase.updateDocument(databases, style);
+                List<String> unresolvedKeys = ooBase.updateDocumentActionHelper(databases, style);
 
                 if (!unresolvedKeys.isEmpty()) {
                     dialogService
