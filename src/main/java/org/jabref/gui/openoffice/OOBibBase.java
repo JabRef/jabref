@@ -1898,10 +1898,16 @@ class OOBibBase {
     }
 
 
-    private void insertFullReferenceAtCursor(XTextCursor cursor, Map<BibEntry, BibDatabase> entries, OOBibStyle style,
+    private void insertFullReferenceAtCursor(XTextCursor cursor,
+                                             Map<BibEntry, BibDatabase> entries,
+                                             OOBibStyle style,
                                              String parFormat)
-            throws UndefinedParagraphFormatException, IllegalArgumentException,
-            UnknownPropertyException, PropertyVetoException, WrappedTargetException {
+            throws UndefinedParagraphFormatException,
+                   IllegalArgumentException,
+                   UnknownPropertyException,
+                   PropertyVetoException,
+                   WrappedTargetException
+    {
         Map<BibEntry, BibDatabase> correctEntries;
         // If we don't have numbered entries, we need to sort the entries before adding them:
         if (style.isSortByPosition()) {
@@ -1921,13 +1927,25 @@ class OOBibBase {
             OOUtil.insertParagraphBreak(this.xText, cursor);
             if (style.isNumberEntries()) {
                 int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
-                OOUtil.insertTextAtCurrentLocation(this.xText, cursor,
-                        style.getNumCitationMarker(Collections.singletonList(number++), minGroupingCount, true), Collections.emptyList());
+                OOUtil.insertTextAtCurrentLocation
+                    (this.xText,
+                     cursor,
+                     style.getNumCitationMarker(Collections.singletonList(number++),
+                                                minGroupingCount, true),
+                     Collections.emptyList()
+                     );
             }
             Layout layout = style.getReferenceFormat(entry.getKey().getType());
             layout.setPostFormatter(POSTFORMATTER);
-            OOUtil.insertFullReferenceAtCurrentLocation(this.xText, cursor, layout, parFormat, entry.getKey(),
-                    entry.getValue(), uniquefiers.get(entry.getKey().getCitationKey().orElse(null)));
+            OOUtil.insertFullReferenceAtCurrentLocation
+                (this.xText,
+                 cursor,
+                 layout,
+                 parFormat,
+                 entry.getKey(),
+                 entry.getValue(),
+                 uniquefiers.get(entry.getKey().getCitationKey().orElse(null))
+                 );
         }
     }
 
