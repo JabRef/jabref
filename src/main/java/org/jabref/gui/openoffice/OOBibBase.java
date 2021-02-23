@@ -2017,7 +2017,8 @@ class OOBibBase {
         }
     }
 
-    private void populateBibTextSection(Map<BibEntry, BibDatabase> entries,
+    private void populateBibTextSection(DocumentConnection documentConnection,
+                                        Map<BibEntry, BibDatabase> entries,
                                         OOBibStyle style)
         throws NoSuchElementException,
                WrappedTargetException,
@@ -2029,20 +2030,23 @@ class OOBibBase {
     {
         XTextSectionsSupplier supplier =
             unoQI(XTextSectionsSupplier.class,
-                  this.mxDoc);
+                  documentConnection.mxDoc);
 
         XTextSection section =
-            (XTextSection) ((Any) supplier
-                            .getTextSections()
-                            .getByName(OOBibBase.BIB_SECTION_NAME))
-            .getObject();
+            ( (XTextSection)
+              ((Any) supplier
+               .getTextSections()
+               .getByName(OOBibBase.BIB_SECTION_NAME)
+               )
+              .getObject()
+              );
 
         XTextCursor cursor =
-            this.xText
+            documentConnection.xText
             .createTextCursorByRange(section.getAnchor());
 
         OOUtil.insertTextAtCurrentLocation
-            (this.xText,
+            (documentConnection.xText,
              cursor,
              (String) style.getProperty(OOBibStyle.TITLE),
              (String) style.getProperty(OOBibStyle.REFERENCE_HEADER_PARAGRAPH_FORMAT)
