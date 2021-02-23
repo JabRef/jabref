@@ -606,12 +606,14 @@ class OOBibBase {
         }
         return res;
     }
-    public void checkDocumentConnectionThrow()
+
+    private DocumentConnection getDocumentConnectionOrThrow()
         throw NoDocumentException
     {
         if ( ! checkDocumentConnection() ){
             throw new NoDocumentException("Not connected to document");
         }
+        return this.xDocumentConnection;
     }
 
     /*
@@ -619,7 +621,7 @@ class OOBibBase {
      */
 
     public Optional<String> getCurrentDocumentTitle() {
-        return  this.xDocumentConnection.getDocumentTitle();
+        return  this.getDocumentConnectionOrThrow().getDocumentTitle();
     }
 
 
@@ -692,7 +694,7 @@ class OOBibBase {
                WrappedTargetException,
                NoDocumentException
     {
-        return this.getCitationEntriesImpl( this.xDocumentConnection );
+        return this.getCitationEntriesImpl( this.getDocumentConnectionOrThrow() );
     }
 
     private List<CitationEntry> getCitationEntriesImpl( DocumentConnection documentConnection )
@@ -740,6 +742,7 @@ class OOBibBase {
                IllegalTypeException,
                IllegalArgumentException
     {
+        DocumentConnection documentConnection = getDocumentConnectionOrThrow();
         // Leave exceptions to the caller.
         //
         // Note: not catching exceptions here means nothing is applied
@@ -750,7 +753,7 @@ class OOBibBase {
         for (CitationEntry entry : citationEntries) {
             Optional<String> pageInfo = entry.getPageInfo();
             if (pageInfo.isPresent()) {
-                this.xDocumentConnection.setCustomProperty( entry.getRefMarkName(), pageInfo.get() );
+                documentConnection.setCustomProperty( entry.getRefMarkName(), pageInfo.get() );
             } else {
                 // TODO: if pageInfo is not present, or is empty:
                 // maybe we should remove it from the document.
@@ -876,7 +879,7 @@ class OOBibBase {
                UndefinedParagraphFormatException,
                NoDocumentException
     {
-        DocumentConnection documentConnection = this.xDocumentConnection;
+        DocumentConnection documentConnection = getDocumentConnectionOrThrow();
 
         try {
             // Get the cursor positioned by the user.
@@ -899,7 +902,7 @@ class OOBibBase {
             // If we should store metadata for page info, do that now:
             if (pageInfo != null) {
                 LOGGER.info("Storing page info: " + pageInfo);
-                this.xDocumentConnection.setCustomProperty(bName, pageInfo);
+                documentConnection.setCustomProperty(bName, pageInfo);
             }
 
             // insert space
@@ -1120,8 +1123,9 @@ class OOBibBase {
                BibEntryNotFoundException,
                NoDocumentException
     {
+        DocumentConnection documentConnection = getDocumentConnectionOrThrow();
         try {
-            return refreshCiteMarkersInternal(this.xDocumentConnection, databases, style);
+            return refreshCiteMarkersInternal(documentConnection, databases, style);
         } catch (DisposedException ex) {
             // We need to catch this one here because the OpenOfficePanel class is
             // loaded before connection, and therefore cannot directly reference
@@ -1813,7 +1817,9 @@ class OOBibBase {
                NoSuchElementException,
                NoDocumentException
     {
-        this.sortedReferenceMarks = getJabRefReferenceMarkNamesSortedByPosition(this.xDocumentConnection);
+        DocumentConnection documentConnection = getDocumentConnectionOrThrow();
+        this.sortedReferenceMarks =
+            getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
     }
 
     /**
@@ -1853,7 +1859,8 @@ class OOBibBase {
                UndefinedParagraphFormatException,
                NoDocumentException
     {
-        DocumentConnection documentConnection = this.xDocumentConnection;
+        DocumentConnection documentConnection = getDocumentConnectionOrThrow();
+
         List<String>               cited          = findCitedKeys(documentConnection);
         Map<String, BibDatabase>   linkSourceBase = new HashMap<>();
         Map<BibEntry, BibDatabase> entries =
@@ -2357,7 +2364,7 @@ class OOBibBase {
                BibEntryNotFoundException,
                NoDocumentException
     {
-        DocumentConnection documentConnection = this.xDocumentConnection;
+        DocumentConnection documentConnection = getDocumentConnectionOrThrow();
 
         // TODO: doesn't work for citations in footnotes/tables
         List<String> names = getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
@@ -2428,7 +2435,8 @@ class OOBibBase {
                WrappedTargetException,
                NoDocumentException
     {
-        DocumentConnection documentConnection = this.xDocumentConnection;
+        DocumentConnection documentConnection = getDocumentConnectionOrThrow();
+
         BibDatabase resultDatabase = new BibDatabase();
         List<String> cited = findCitedKeys(documentConnection);
         List<BibEntry> entriesToInsert = new ArrayList<>();
