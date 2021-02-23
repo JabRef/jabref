@@ -936,7 +936,7 @@ class OOBibBase {
                                               null, // uniquefiers
                                               null  // unlimAuthors
                                               );
-                insertReferenceMark(bName, citeText, cursor, withText, style);
+                insertReferenceMark(documentConnection, bName, citeText, cursor, withText, style);
             }
             //
             // Move to the right of the space and remember this
