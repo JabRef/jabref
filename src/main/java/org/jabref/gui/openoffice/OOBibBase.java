@@ -617,9 +617,9 @@ class OOBibBase {
                WrappedTargetException,
                NoDocumentException
     {
-        XNameAccess nameAccess = this.getReferenceMarks();
-        List<String> names = this.getJabRefReferenceMarkNames(nameAccess);
+        List<String> names = this.getJabRefReferenceMarkNames(documentConnection);
 
+        XNameAccess nameAccess = this.getReferenceMarks();
         List<CitationEntry> citations = new ArrayList(names.size());
         for (String name : names) {
             CitationEntry entry =
