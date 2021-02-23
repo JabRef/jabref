@@ -1483,10 +1483,10 @@ class OOBibBase {
 
         GetSortedCitedEntriesResult sce =
             getSortedCitedEntries(documentConnection, databases, style, xReferenceMarks );
-        List<String>               names          = sce.refMarkNames;
+        List<String>               referenceMarkNames          = sce.refMarkNames;
 
         // Compute citation markers for all citations:
-        final int nRefMarks  = names.size();
+        final int nRefMarks  = referenceMarkNames.size();
         int[]      types      = new int[nRefMarks];
         String[][] bibtexKeys = new String[nRefMarks][];
 
@@ -1494,7 +1494,7 @@ class OOBibBase {
         //    types[i]      = ov.itcType
         //    bibtexKeys[i] = ov.citedKeys.toArray()
         for (int i = 0; i < nRefMarks; i++) {
-            final String namei = names.get(i);
+            final String namei = referenceMarkNames.get(i);
             Optional<ParsedRefMark> op = parseRefMarkName( namei );
             if ( !op.isPresent() ) {
                 continue;
@@ -1523,8 +1523,8 @@ class OOBibBase {
         // fill citMarkers
         if (style.isCitationKeyCiteMarkers()) {
 
-            for (int i = 0; i < names.size(); i++) {
-                final String namei = names.get(i);
+            for (int i = 0; i < referenceMarkNames.size(); i++) {
+                final String namei = referenceMarkNames.get(i);
 
                 BibEntry[] cEntries =
                     linkSourceBaseGetBibEntriesOfCiteKeys( linkSourceBase, bibtexKeys[i], namei );
@@ -1535,8 +1535,8 @@ class OOBibBase {
 
         } else if (style.isNumberEntries()) {
 
-            for (int i = 0; i < names.size(); i++) {
-                final String namei = names.get(i);
+            for (int i = 0; i < referenceMarkNames.size(); i++) {
+                final String namei = referenceMarkNames.get(i);
 
                 BibEntry[] cEntries =
                     linkSourceBaseGetBibEntriesOfCiteKeys( linkSourceBase, bibtexKeys[i], namei );
@@ -1561,8 +1561,8 @@ class OOBibBase {
             //    normCitMarkers[i][j] = for unification
             String[][] normCitMarkers = new String[nRefMarks][];
 
-            for (int i = 0; i < names.size(); i++) {
-                final String namei = names.get(i);
+            for (int i = 0; i < referenceMarkNames.size(); i++) {
+                final String namei = referenceMarkNames.get(i);
 
                 BibEntry[] cEntries =
                     linkSourceBaseGetBibEntriesOfCiteKeys( linkSourceBase, bibtexKeys[i], namei );
@@ -1731,7 +1731,7 @@ class OOBibBase {
 
 
         // Refresh all reference marks with the citation markers we computed:
-        rcmApplyNewCitationMarkers(documentConnection, names, citMarkers, types, style );
+        rcmApplyNewCitationMarkers(documentConnection, referenceMarkNames, citMarkers, types, style );
 
         // Collect and return unresolved citation keys.
         // uses: entries
