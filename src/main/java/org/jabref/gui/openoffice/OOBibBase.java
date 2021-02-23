@@ -1480,6 +1480,21 @@ class OOBibBase {
             }
         }
 
+        private static List<String> unresolvedKeysFromEntries( Map<BibEntry, BibDatabase> entries ){
+            // Collect and return unresolved citation keys.
+            // uses: entries
+            List<String> unresolvedKeys = new ArrayList<>();
+            for (BibEntry entry : entries.keySet()) {
+                if (entry instanceof UndefinedBibtexEntry) {
+                    String key = ((UndefinedBibtexEntry) entry).getKey();
+                    if (!unresolvedKeys.contains(key)) {
+                        unresolvedKeys.add(key);
+                    }
+                }
+            }
+            return unresolvedKeys;
+        }
+
     private List<String> refreshCiteMarkersInternal(DocumentConnection documentConnection,
                                                     List<BibDatabase> databases,
                                                     OOBibStyle style,
@@ -1775,18 +1790,7 @@ class OOBibBase {
         // Refresh all reference marks with the citation markers we computed:
         rcmApplyNewCitationMarkers(documentConnection, referenceMarkNames, citMarkers, types, style );
 
-        // Collect and return unresolved citation keys.
-        // uses: entries
-        List<String> unresolvedKeys = new ArrayList<>();
-        for (BibEntry entry : entries.keySet()) {
-            if (entry instanceof UndefinedBibtexEntry) {
-                String key = ((UndefinedBibtexEntry) entry).getKey();
-                if (!unresolvedKeys.contains(key)) {
-                    unresolvedKeys.add(key);
-                }
-            }
-        }
-        return unresolvedKeys;
+        return unresolvedKeysFromEntries( entries );
     }
 
 
