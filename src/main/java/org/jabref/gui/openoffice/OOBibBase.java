@@ -1541,11 +1541,6 @@ class OOBibBase {
             //
         }
 
-        // Map<BibEntry, BibDatabase> entries        = sce.entries;
-        //List<String>               cited          = sce.citedKeys;
-        //Map<String, BibEntry>      citeKeyToBibEntry = sce.citeKeyToBibEntry;
-
-
 
         String[]   citMarkers     = new String[nRefMarks];
         // fill:
