@@ -1438,7 +1438,7 @@ class OOBibBase {
                 // We need to add it again.
                 cursor.collapseToEnd();
                 OOUtil.insertParagraphBreak(documentConnection.xText, cursor);
-                insertBookMark(OOBibBase.BIB_SECTION_NAME, cursor);
+                insertBookMark(documentConnection, OOBibBase.BIB_SECTION_NAME, cursor);
             }
         }
     }
@@ -2060,7 +2060,7 @@ class OOBibBase {
              style,
              (String) style.getProperty(OOBibStyle.REFERENCE_PARAGRAPH_FORMAT)
              );
-        insertBookMark(OOBibBase.BIB_SECTION_END_NAME, cursor);
+        insertBookMark(documentConnection, OOBibBase.BIB_SECTION_END_NAME, cursor);
     }
 
     private XTextContent insertBookMark(DocumentConnection documentConnection,
