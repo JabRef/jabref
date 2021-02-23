@@ -1978,7 +1978,7 @@ class OOBibBase {
         documentConnection.xText.insertTextContent(mxDocCursor, xChildSection, false);
     }
 
-    private void clearBibTextSectionContent2()
+    private void clearBibTextSectionContent2(DocumentConnection documentConnection)
         throws NoSuchElementException,
                WrappedTargetException,
                IllegalArgumentException,
@@ -1987,7 +1987,7 @@ class OOBibBase {
 
         // Check if the section exists:
         XTextSectionsSupplier supplier =
-            unoQI(XTextSectionsSupplier.class, this.mxDoc);
+            unoQI(XTextSectionsSupplier.class, documentConnection.mxDoc);
 
         com.sun.star.container.XNameAccess ts = supplier.getTextSections();
 
@@ -1997,7 +1997,7 @@ class OOBibBase {
                 XTextSection section = (XTextSection) a.getObject();
                 // Clear it:
                 XTextCursor cursor =
-                    this.xText.createTextCursorByRange(section.getAnchor());
+                    documentConnection.xText.createTextCursorByRange(section.getAnchor());
                 cursor.gotoRange(section.getAnchor(), false);
                 cursor.setString("");
                 return;
