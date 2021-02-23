@@ -1603,17 +1603,21 @@ class OOBibBase {
             for (int i = 0; i < referenceMarkNames.size(); i++) {
                 final String namei = referenceMarkNames.get(i);
 
-                BibEntry[] cEntries =
-                    mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei, false );
-                assert (cEntries.length == bibtexKeys[i].length) ;
 
                 if (style.isSortByPosition()) {
+                    BibEntry[] cEntries =
+                        mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei, false );
+                    assert (cEntries.length == bibtexKeys[i].length) ;
                     List<Integer> num ;
                     num = rcmNumForIsNumberEntriesIsSortByPosition( cEntries, bibtexKeys[i], style, cns );
                     citMarkers[i] = style.getNumCitationMarker(num, minGroupingCount, false);
                 } else {
                     // An exception: numbered entries that are NOT sorted by position
                     // exceptional_refmarkorder, entries and cited are sorted
+                    //
+                    // BibEntry[] cEntries =
+                    //    mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei, false );
+                    // assert (cEntries.length == bibtexKeys[i].length) ;
                     List<Integer> num ;
                     num = findCitedEntryIndices( Arrays.asList(bibtexKeys[i]) , cited );
                     citMarkers[i] = style.getNumCitationMarker(num, minGroupingCount, false);
