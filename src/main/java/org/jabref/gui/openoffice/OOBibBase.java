@@ -102,10 +102,6 @@ class OOBibBase {
 
     private static final String BIB_CITATION = "JR_cite";
     private static final Pattern CITE_PATTERN =
-        Pattern.compile(BIB_CITATION + "\\d*_(\\d*)_(.*)");
-
-    // Another pattern, to also recover the "i" part
-    private static final Pattern CITE_PATTERN2 =
         Pattern.compile(BIB_CITATION + "(\\d*)_(\\d*)_(.*)");
 
     private static final String CHAR_STYLE_NAME = "CharStyleName";
@@ -817,7 +813,7 @@ class OOBibBase {
      *
      */
     private static Optional<ParsedRefMark> parseRefMarkName( String refMarkName ){
-        Matcher citeMatcher = CITE_PATTERN2.matcher(refMarkName);
+        Matcher citeMatcher = CITE_PATTERN.matcher(refMarkName);
         if (!citeMatcher.find()) {
             return Optional.empty();
         }
