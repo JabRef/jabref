@@ -1173,20 +1173,16 @@ class OOBibBase {
         return cEntries;
     }
 
- 
     private static String rcmCitationMarkerForIsCitationKeyCiteMarkers( BibEntry[] cEntries,
                                                                         OOBibStyle style )
     {
-
         assert( style.isCitationKeyCiteMarkers() );
 
-        StringBuilder sb = new StringBuilder();
-        for (int j = 0; j < cEntries.length; j++) {
-            if (j > 0) { sb.append(','); }
-            Optional<String> cejKey = cEntries[j].getCitationKey();
-            sb.append(cejKey.orElse(""));
-        }
-        String citationMarker = sb.toString();
+        String citationMarker =
+            Arrays.stream(cEntries)
+            .map( (c) -> c.getCitationKey().orElse("") )
+            .collect(Collectors.joining(","));
+
         return citationMarker;
     }
 
