@@ -1537,135 +1537,93 @@ class OOBibBase {
             return unresolvedKeys;
         }
 
-    private List<String> refreshCiteMarkersInternal(DocumentConnection documentConnection,
-                                                    List<BibDatabase> databases,
-                                                    OOBibStyle style,
-                                                    final Map<String, String> uniquefiers
-                                                    )
-        throws WrappedTargetException,
-               IllegalArgumentException,
-               NoSuchElementException,
-               UndefinedCharacterFormatException,
-               UnknownPropertyException,
-               PropertyVetoException,
-               CreationException,
-               BibEntryNotFoundException,
-               NoDocumentException
+
+    private class RcmCitationMarkersForNormalStyleResult{
+        public String[]   citMarkers; // main product
+        public String[][] bibtexKeys; // order within referenceMarks may have changed
+        RcmCitationMarkersForNormalStyleResult( String[]   citMarkers,
+                                                String[][] bibtexKeys )
+        {
+            this.citMarkers = citMarkers;
+            this.bibtexKeys = bibtexKeys;
+        }
+    }
+
+    RcmCitationMarkersForNormalStyleResult
+        rcmCitationMarkersForNormalStyle(List<String> referenceMarkNames,
+                                         String[][] bibtexKeysIn,
+                                         Map<String, BibEntry> citeKeyToBibEntry,
+                                         int [] types,
+                                         Map<BibEntry, BibDatabase> entries,
+                                         final Map<String, String> uniquefiers,
+                                         OOBibStyle style
+                                         )
+        throws BibEntryNotFoundException
     {
+        assert( !style.isCitationKeyCiteMarkers() );
+        assert( !style.isNumberEntries() );
+        // Citations in (Au1, Au2 2000) form
 
-        // Normally we sort the reference marks according to their
-        // order of appearance:
-        List<String> referenceMarkNames = jabRefReferenceMarkNamesSortedByPosition;
-        //
-        // Compute citation markers for all citations:
-        final int nRefMarks  = referenceMarkNames.size();
-        int[]      types      = new int[nRefMarks];
-        String[][] bibtexKeys = new String[nRefMarks][];
-        //
-        // fill:
-        //    types[i]      = ov.itcType
-        //    bibtexKeys[i] = ov.citedKeys.toArray()
-        parseRefMarkNamesToArrays( referenceMarkNames, types, bibtexKeys );
-        //
-        // An exception: numbered entries that are NOT sorted by position
-        // I think in this case we do not care, since numbering comes from
-        // order in cited
-        //
-        //        if ( false ){
-        //            if (style.isNumberEntries() && ! style.isSortByPosition()) {
-        //                XNameAccess xReferenceMarks = documentConnection.getReferenceMarks();
-        //                // isNumberEntries && !isSortByPosition
-        //                referenceMarkNames = Arrays.asList(xReferenceMarks.getElementNames());
-        //                // Remove all reference marks that don't look like JabRef citations:
-        //                referenceMarkNames = filterIsJabRefReferenceMarkName( referenceMarkNames );
-        //            }
-        //        }
-        //
+        final int nRefMarks = referenceMarkNames.size();
+        assert( bibtexKeysIn.length == nRefMarks );
+        assert( types.length        == nRefMarks );
+        assertAllKeysInCiteKeyToBibEntry( referenceMarkNames, bibtexKeysIn, citeKeyToBibEntry );
 
+        BibEntry[][] cEntriesForAll =
+            Arrays.stream( bibtexKeysIn )
+            .map( bibtexKeysOfARefererenceMark ->
+                  Arrays.stream( bibtexKeysOfARefererenceMark )
+                  .map( key -> citeKeyToBibEntry.get(key)  )
+                  .sorted( comparatorForMulticite(style) ) // sort within referenceMark
+                  .toArray( BibEntry[]::new )
+                  )
+            .toArray( BibEntry[][]::new );
 
-        // keys cited in the text
-        List<String>               cited = findCitedKeys( documentConnection );
-        Map<String, BibEntry>      citeKeyToBibEntry   = new HashMap<>();
-        Map<BibEntry, BibDatabase> entries = findCitedEntries(databases, cited, citeKeyToBibEntry);
-        // entries are now in same order as cited
-        //
-        //
+        // Update bibtexKeys to match the new sorting (within each referenceMark)
+        String[][] bibtexKeys =
+            Arrays.stream( cEntriesForAll )
+            .map( cEntries ->
+                  Arrays.stream( cEntries )
+                  .map( ce -> ce.getCitationKey().orElse(null) )
+                  .toArray( String[]::new )
+                  )
+            .toArray( String[][]::new );
+
+        assertAllKeysInCiteKeyToBibEntry( referenceMarkNames, bibtexKeysIn, citeKeyToBibEntry );
+        assert( bibtexKeys.length == nRefMarks );
+
         String[]   citMarkers  = new String[nRefMarks];
-        // fill:
-        //    citMarkers[i] = what goes in the text
-
-
-        // fill citMarkers
-        if (style.isCitationKeyCiteMarkers()) {
-           citMarkers = rcmCitationMarkersForIsCitationKeyCiteMarkers( referenceMarkNames, bibtexKeys, citeKeyToBibEntry, style );
-           uniquefiers.clear();
-        } else if (style.isNumberEntries()) {
-
-            if (style.isSortByPosition()) {
-                citMarkers = rcmCitationMarkersForIsNumberEntriesIsSortByPosition(referenceMarkNames, bibtexKeys, citeKeyToBibEntry, style);
-            } else {
-                citMarkers = rcmCitationMarkersForIsNumberEntriesNotSortByPosition(referenceMarkNames, bibtexKeys, entries, style  );
-            }
-            uniquefiers.clear();
-
-        } else {
-
-            assert( !style.isCitationKeyCiteMarkers() );
-            assert( !style.isNumberEntries() );
-            // Citations in (Au1, Au2 2000) form
-
-            //    normCitMarkers[i][j] = for unification
-            String[][] normCitMarkers = new String[nRefMarks][];
-
-            assertAllKeysInCiteKeyToBibEntry( referenceMarkNames, bibtexKeys, citeKeyToBibEntry );
-            BibEntry[][] cEntriesForAll = new BibEntry[nRefMarks][];
-
-            for (int i = 0; i < referenceMarkNames.size(); i++) {
-
-                BibEntry[] cEntries =
-                    Arrays.stream( bibtexKeys[i] )
-                    .map( key -> citeKeyToBibEntry.get(key)  )
-                    .sorted( comparatorForMulticite(style) ) // sort within referenceMark
-                    .toArray( BibEntry[]::new );
-                cEntriesForAll[i] = cEntries;
-            }
-
-            for (int i = 0; i < referenceMarkNames.size(); i++) {
-                BibEntry[] cEntries = cEntriesForAll[i];
-                // Update key list to match the new sorting:
-                bibtexKeys[i] =
-                    Arrays.stream( cEntries )
-                    .map( ce -> ce.getCitationKey().orElse(null) )
-                    .toArray( String[]::new );
-            }
-
-            for (int i = 0; i < referenceMarkNames.size(); i++) {
-                BibEntry[] cEntries = cEntriesForAll[i];
+        for (int i = 0; i < nRefMarks; i++) {
+            BibEntry[] cEntries = cEntriesForAll[i];
+            int        type     = types[i];
                 citMarkers[i] = style.getCitationMarker( Arrays.asList(cEntries), // entries
                                                          entries, // database
-                                                         types[i] == OOBibBase.AUTHORYEAR_PAR,
+                                                         type == OOBibBase.AUTHORYEAR_PAR,
                                                          null, // uniquefiers
                                                          null  // unlimAuthors
                                                          );
-            }
+        }
 
-            for (int i = 0; i < referenceMarkNames.size(); i++) {
-                BibEntry[] cEntries = cEntriesForAll[i];
-                // We need "normalized" (in parenthesis) markers
-                // for uniqueness checking purposes:
-                normCitMarkers[i] =
-                    Arrays.stream( cEntries )
-                    .map( ce ->
-                          style.getCitationMarker( Collections.singletonList(ce),
-                                                   entries,  // database
-                                                   true,     // inParenthesis
-                                                   null,     // uniquefiers
-                                                   new int[] {-1} // unlimAuthors
-                                                   )
-                          )
-                    .toArray( String[]::new );
-            }
-            uniquefiers.clear();
+        //    normCitMarkers[i][j] = for unification
+        String[][] normCitMarkers = new String[nRefMarks][];
+        for (int i = 0; i < nRefMarks; i++) {
+            BibEntry[] cEntries = cEntriesForAll[i];
+            // We need "normalized" (in parenthesis) markers
+            // for uniqueness checking purposes:
+            normCitMarkers[i] =
+                Arrays.stream( cEntries )
+                .map( ce ->
+                      style.getCitationMarker( Collections.singletonList(ce),
+                                               entries,  // database
+                                               true,     // inParenthesis
+                                               null,     // uniquefiers
+                                               new int[] {-1} // unlimAuthors
+                                               )
+                      )
+                .toArray( String[]::new );
+        }
+
+        uniquefiers.clear();
 
             // The following block
             // changes: citMarkers[i], uniquefiers
@@ -1788,6 +1746,103 @@ class OOBibBase {
                     }
                 } // for i
             } // if normalStyle
+            return new RcmCitationMarkersForNormalStyleResult( citMarkers, bibtexKeys );
+    }
+
+    private List<String> refreshCiteMarkersInternal(DocumentConnection documentConnection,
+                                                    List<BibDatabase> databases,
+                                                    OOBibStyle style,
+                                                    final Map<String, String> uniquefiers
+                                                    )
+        throws WrappedTargetException,
+               IllegalArgumentException,
+               NoSuchElementException,
+               UndefinedCharacterFormatException,
+               UnknownPropertyException,
+               PropertyVetoException,
+               CreationException,
+               BibEntryNotFoundException,
+               NoDocumentException
+    {
+
+        // Normally we sort the reference marks according to their
+        // order of appearance:
+        List<String> referenceMarkNames = jabRefReferenceMarkNamesSortedByPosition;
+        //
+        // Compute citation markers for all citations:
+        final int nRefMarks  = referenceMarkNames.size();
+        int[]      types      = new int[nRefMarks];
+        String[][] bibtexKeys = new String[nRefMarks][];
+        //
+        // fill:
+        //    types[i]      = ov.itcType
+        //    bibtexKeys[i] = ov.citedKeys.toArray()
+        parseRefMarkNamesToArrays( referenceMarkNames, types, bibtexKeys );
+        //
+        // An exception: numbered entries that are NOT sorted by position
+        // I think in this case we do not care, since numbering comes from
+        // order in cited
+        //
+        //        if ( false ){
+        //            if (style.isNumberEntries() && ! style.isSortByPosition()) {
+        //                XNameAccess xReferenceMarks = documentConnection.getReferenceMarks();
+        //                // isNumberEntries && !isSortByPosition
+        //                referenceMarkNames = Arrays.asList(xReferenceMarks.getElementNames());
+        //                // Remove all reference marks that don't look like JabRef citations:
+        //                referenceMarkNames = filterIsJabRefReferenceMarkName( referenceMarkNames );
+        //            }
+        //        }
+        //
+
+
+        // keys cited in the text
+        List<String>               cited = findCitedKeys( documentConnection );
+        Map<String, BibEntry>      citeKeyToBibEntry   = new HashMap<>();
+        Map<BibEntry, BibDatabase> entries = findCitedEntries(databases, cited, citeKeyToBibEntry);
+        // entries are now in same order as cited
+        //
+        //
+        String[]   citMarkers  = new String[nRefMarks];
+        // fill:
+        //    citMarkers[i] = what goes in the text
+
+
+        // fill citMarkers
+        uniquefiers.clear();
+        if (style.isCitationKeyCiteMarkers()) {
+           citMarkers =
+               rcmCitationMarkersForIsCitationKeyCiteMarkers(referenceMarkNames,
+                                                             bibtexKeys,
+                                                             citeKeyToBibEntry,
+                                                             style );
+        } else if (style.isNumberEntries()) {
+            if (style.isSortByPosition()) {
+                citMarkers =
+                    rcmCitationMarkersForIsNumberEntriesIsSortByPosition(
+                                                                         referenceMarkNames,
+                                                                         bibtexKeys,
+                                                                         citeKeyToBibEntry,
+                                                                         style);
+            } else {
+                citMarkers =
+                    rcmCitationMarkersForIsNumberEntriesNotSortByPosition(referenceMarkNames,
+                                                                          bibtexKeys,
+                                                                          entries,
+                                                                          style  );
+            }
+        } else {
+
+            RcmCitationMarkersForNormalStyleResult nsr =
+                rcmCitationMarkersForNormalStyle( referenceMarkNames,
+                                                  bibtexKeys,
+                                                  citeKeyToBibEntry,
+                                                  types,
+                                                  entries,
+                                                  uniquefiers,
+                                                  style
+                                                  );
+            citMarkers = nsr.citMarkers;
+            bibtexKeys = nsr.bibtexKeys;
         }
 
 
