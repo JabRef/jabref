@@ -1264,31 +1264,15 @@ class OOBibBase {
      *  Number citations.
      *
      *  @param cEntries  BibEntries to number. Numbering follows this order.
-     *  @param style     To assert we are in the right situation.
      *  @param cns INOUT Tracks keys already seen and their numbers.
      *                   OUT: Updated, the entries in cEntries are seen.
      *
      *  @return An int for each cEntry. (-1) for UndefinedBibtexEntry
      */
     private static List<Integer> numberPossiblyUndefinedBibEntres(  BibEntry[] cEntries,
-                                                                    OOBibStyle style,
                                                                     CitationNumberingState cns )
     {
-        assert (style.isNumberEntries());
-        assert (style.isSortByPosition());
 
-        // Assumption:
-        //
-        // We have sorted the citation markers according to their
-        // order of appearance, so we simply count up for each marker
-        // referring to a new entry:
-        //
-        // nums: Numbers for cEntries, (-1) for none.
-        //       Passed to style.getNumCitationMarker()
-        //
-        //
-        // fill nums while adjusting lastNum and filling numbers
-        //
         if ( false ){
             List<Integer> nums = new ArrayList<>(cEntries.length);
             for (int j = 0; j < cEntries.length; j++) {
@@ -1340,8 +1324,20 @@ class OOBibBase {
                             mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei, false );
             assert (cEntries.length == bibtexKeys[i].length) ;
 
+            // Assumption:
+            //
+            // We have sorted the citation markers according to their
+            // order of appearance, so we simply count up for each marker
+            // referring to a new entry:
+            //
+            // nums: Numbers for cEntries, (-1) for none.
+            //       Passed to style.getNumCitationMarker()
+            //
+            //
+            // fill nums while adjusting lastNum and filling numbers
+            //
             List<Integer> num ;
-            num = numberPossiblyUndefinedBibEntres( cEntries, style, cns );
+            num = numberPossiblyUndefinedBibEntres( cEntries, cns );
             citMarkers[i] = style.getNumCitationMarker(num, minGroupingCount, false);
         } // for
         return citMarkers;
