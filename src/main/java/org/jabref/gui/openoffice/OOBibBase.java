@@ -1311,42 +1311,42 @@ class OOBibBase {
         return cns.getOrAllocateNumber( key );
 
     }
-    /**
-     *  Number citations.
-     *
-     *  @param cEntries  BibEntries to number. Numbering follows this order.
-     *  @param cns INOUT Tracks keys already seen and their numbers.
-     *                   OUT: Updated, the entries in cEntries are seen.
-     *
-     *  @return An int for each cEntry. (-1) for UndefinedBibtexEntry
-     */
-    private static List<Integer> numberPossiblyUndefinedBibEntres(  BibEntry[] cEntries,
-                                                                    CitationNumberingState cns )
-    {
-
-        if ( false ){
-            List<Integer> nums = new ArrayList<>(cEntries.length);
-            for (int j = 0; j < cEntries.length; j++) {
-                BibEntry cej = cEntries[j];
-                String   kj  = cej.getCitationKey().get();
-                int num =
-                    (cej instanceof UndefinedBibtexEntry)
-                    ? (-1)
-                    : cns.getOrAllocateNumber(kj)
-                    ;
-                nums.add(j,num);
-            }
-            return nums;
-        } else {
-            // alt
-            List<Integer> nums =
-                Arrays.stream( cEntries )
-                .map( ce -> numberPossiblyUndefinedBibEntry(ce, cns) )
-                .collect( Collectors.toList() )
-                ;
-            return nums;
-        }
-    }
+//    /**
+//     *  Number citations.
+//     *
+//     *  @param cEntries  BibEntries to number. Numbering follows this order.
+//     *  @param cns INOUT Tracks keys already seen and their numbers.
+//     *                   OUT: Updated, the entries in cEntries are seen.
+//     *
+//     *  @return An int for each cEntry. (-1) for UndefinedBibtexEntry
+//     */
+//    private static List<Integer> numberPossiblyUndefinedBibEntres(  BibEntry[] cEntries,
+//                                                                    CitationNumberingState cns )
+//    {
+//
+//        if ( false ){
+//            List<Integer> nums = new ArrayList<>(cEntries.length);
+//            for (int j = 0; j < cEntries.length; j++) {
+//                BibEntry cej = cEntries[j];
+//                String   kj  = cej.getCitationKey().get();
+//                int num =
+//                    (cej instanceof UndefinedBibtexEntry)
+//                    ? (-1)
+//                    : cns.getOrAllocateNumber(kj)
+//                    ;
+//                nums.add(j,num);
+//            }
+//            return nums;
+//        } else {
+//            // alt
+//            List<Integer> nums =
+//                Arrays.stream( cEntries )
+//                .map( ce -> numberPossiblyUndefinedBibEntry(ce, cns) )
+//                .collect( Collectors.toList() )
+//                ;
+//            return nums;
+//        }
+//    }
 
     /**
      *   @param referenceMarkNames
@@ -1374,6 +1374,8 @@ class OOBibBase {
 
         final int nRefMarks = referenceMarkNames.size();
         assert( nRefMarks == bibtexKeys.length );
+        assertAllKeysInCiteKeyToBibEntry( referenceMarkNames, bibtexKeys, citeKeyToBibEntry );
+
         String[]   citMarkers     = new String[nRefMarks];
 
         CitationNumberingState cns = new CitationNumberingState();
@@ -1384,14 +1386,22 @@ class OOBibBase {
         for (int i = 0; i < referenceMarkNames.size(); i++) {
             final String referenceMarkName = referenceMarkNames.get(i);
 
-            BibEntry[] cEntries =
-                mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, referenceMarkName );
-            assert (cEntries.length == bibtexKeys[i].length) ;
+            // BibEntry[] cEntries =
+            //    mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, referenceMarkName );
+            // assert (cEntries.length == bibtexKeys[i].length);
+            // List<Integer> nums = numberPossiblyUndefinedBibEntres( cEntries, cns );
 
-            //
+            BibEntry[] cEntries =
+                Arrays.stream( bibtexKeys[i] )
+                .map( key -> citeKeyToBibEntry.get(key) )
+                .toArray( BibEntry[]::new );
+            List<Integer> nums =
+                Arrays.stream( cEntries )
+                .map( ce -> numberPossiblyUndefinedBibEntry(ce, cns) )
+                .collect( Collectors.toList() );
+
             // nums: Numbers for cEntries, (-1) for none.
-            //       Passed to style.getNumCitationMarker()
-            List<Integer> nums = numberPossiblyUndefinedBibEntres( cEntries, cns );
+
 
             citMarkers[i] = style.getNumCitationMarker(nums, minGroupingCount, false);
         } // for
