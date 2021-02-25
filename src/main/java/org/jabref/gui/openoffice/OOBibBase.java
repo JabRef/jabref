@@ -1353,8 +1353,8 @@ class OOBibBase {
             // nums: Numbers for cEntries, (-1) for none.
             List<Integer> nums =
                 Arrays.stream( bibtexKeys[i] )
-                .map( key -> citeKeyToBibEntry.get(key) ) // cEntries
-                .map( ce -> numberPossiblyUndefinedBibEntry(ce, cns) )
+                .map( key -> citeKeyToBibEntry.get(key) )
+                .map( ce  -> numberPossiblyUndefinedBibEntry(ce, cns) )
                 .collect( Collectors.toList() );
 
             citMarkers[i] = style.getNumCitationMarker(nums, minGroupingCount, false);
