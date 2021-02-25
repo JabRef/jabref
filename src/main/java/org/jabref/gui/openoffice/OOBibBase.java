@@ -1785,35 +1785,24 @@ class OOBibBase {
         //
         // Compute citation markers for all citations:
         final int nRefMarks  = referenceMarkNames.size();
-        int[]      types      = new int[nRefMarks];
-        String[][] bibtexKeys = new String[nRefMarks][];
-        //
+
         // fill:
         //    types[i]      = ov.itcType
         //    bibtexKeys[i] = ov.citedKeys.toArray()
+        int[]      types      = new int[nRefMarks];
+        String[][] bibtexKeys = new String[nRefMarks][];
         parseRefMarkNamesToArrays( referenceMarkNames, types, bibtexKeys );
-        //
-        // An exception: numbered entries that are NOT sorted by position
-        // I think in this case we do not care, since numbering comes from
-        // order in cited
-        //
-        //        if ( false ){
-        //            if (style.isNumberEntries() && ! style.isSortByPosition()) {
-        //                XNameAccess xReferenceMarks = documentConnection.getReferenceMarks();
-        //                // isNumberEntries && !isSortByPosition
-        //                referenceMarkNames = Arrays.asList(xReferenceMarks.getElementNames());
-        //                // Remove all reference marks that don't look like JabRef citations:
-        //                referenceMarkNames = filterIsJabRefReferenceMarkName( referenceMarkNames );
-        //            }
-        //        }
-        //
 
 
-        // keys cited in the text
-        List<String>               cited              = findCitedKeys( documentConnection );
+
         Map<String, BibEntry>      citeKeyToBibEntry  = new HashMap<>();
-        Map<BibEntry, BibDatabase> entries            = findCitedEntries(databases, cited, citeKeyToBibEntry);
+        Map<BibEntry, BibDatabase> entries =
+            findCitedEntries(databases,
+                             findCitedKeys( documentConnection ),
+                             citeKeyToBibEntry /* citeKeyToBibEntry filled here */
+                             );
         // entries are now in same order as cited
+
 
 
         // citMarkers[i] = what goes in the text
