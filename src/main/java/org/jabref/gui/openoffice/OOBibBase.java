@@ -644,14 +644,6 @@ class OOBibBase {
         }
         entries.sort( comparatorForMulticite(style));
     }
-    private void sortBibEntryArrayForMulticite( BibEntry[] entries,
-                                                OOBibStyle style )
-    {
-        if (entries.length <= 1) {
-            return;
-        }
-        Arrays.sort(entries, comparatorForMulticite(style));
-    }
 
     private static int citationTypeFromOptions( boolean withText, boolean inParenthesis ) {
         if ( !withText ){
@@ -1636,9 +1628,6 @@ class OOBibBase {
                     .map( key -> citeKeyToBibEntry.get(key)  )
                     .sorted( comparatorForMulticite(style) )
                     .toArray( BibEntry[]::new );
-
-                // sort itcBlock
-                //sortBibEntryArrayForMulticite( cEntries, style );
 
                 // Update key list to match the new sorting:
                 for (int j = 0; j < cEntries.length; j++) {
