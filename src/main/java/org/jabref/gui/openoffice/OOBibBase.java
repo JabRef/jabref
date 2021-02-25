@@ -2391,6 +2391,15 @@ class OOBibBase {
         return xNamedBookmarks;
     }
 
+    /**
+     *  Taking ref=position.getStart(), italicize the range (ref+start,ref+end)
+     *
+     *  @param position : position.getStart() is out reference point.
+     *  @param italicize :  if false, applies Bold, not Italic
+     *  @param start
+     *  @param end
+     *
+     */
     private void italicizeOrBold(XTextCursor position, boolean italicize, int start, int end)
             throws UnknownPropertyException,
                    PropertyVetoException,
