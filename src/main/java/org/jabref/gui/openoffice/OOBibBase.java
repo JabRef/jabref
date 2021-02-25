@@ -1196,6 +1196,7 @@ class OOBibBase {
         assert( style.isCitationKeyCiteMarkers() );
         final int nRefMarks = referenceMarkNames.size();
         assert( nRefMarks == bibtexKeys.length );
+
         String[]   citMarkers     = new String[nRefMarks];
         for (int i = 0; i < referenceMarkNames.size(); i++) {
             final String namei = referenceMarkNames.get(i);
