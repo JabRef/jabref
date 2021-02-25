@@ -2528,30 +2528,31 @@ class OOBibBase {
                 testFormatCitations( mxDocCursor, style );
             }
 
-            List<String> keys = parseRefMarkNameToUniqueCitationKeys(names.get(piv));
-            keys.addAll(parseRefMarkNameToUniqueCitationKeys(names.get(piv + 1)));
+            List<String> keys =
+                parseRefMarkNameToUniqueCitationKeys(names.get(piv))
+                .addAll(parseRefMarkNameToUniqueCitationKeys(names.get(piv + 1)));
+
             removeReferenceMark(documentConnection, names.get(piv));
             removeReferenceMark(documentConnection, names.get(piv + 1));
 
             List<BibEntry> entries = lookupEntriesInDatabases(keys, databases);
             Collections.sort(entries, new FieldComparator(StandardField.YEAR));
+
             String keyString =
-                String.join(",",
-                            entries.stream()
-                            .map(entry ->
-                                 entry.getCitationKey().orElse(""))
-                            .collect(Collectors.toList()));
+                entries.stream()
+                .map( c -> c.getCitationKey().orElse(""))
+                .collect(Collectors.joining(","));
 
-                // Insert bookmark:
-                String bName = getUniqueReferenceMarkName(documentConnection,
-                                                          keyString,
-                                                          OOBibBase.AUTHORYEAR_PAR
-                                                          );
-                insertReferenceMark(documentConnection, bName, "tmp", mxDocCursor, true, style);
-                names.set(piv + 1, bName);
-                madeModifications = true;
+            // Insert reference mark:
+            String bName = getUniqueReferenceMarkName(documentConnection,
+                                                      keyString,
+                                                      OOBibBase.AUTHORYEAR_PAR
+                                                      );
+            insertReferenceMark(documentConnection, bName, "tmp", mxDocCursor, true, style);
+            names.set(piv + 1, bName); // <- put in the next-to-be-processed position
+            madeModifications = true;
 
-                piv++;
+            piv++;
         } // while
 
         if (madeModifications) {
