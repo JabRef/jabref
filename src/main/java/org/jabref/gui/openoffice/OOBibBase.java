@@ -1219,18 +1219,6 @@ class OOBibBase {
         }
     }
 
-    private static String rcmCitationMarkerForIsCitationKeyCiteMarkers( BibEntry[] cEntries,
-                                                                        OOBibStyle style )
-    {
-        assert( style.isCitationKeyCiteMarkers() );
-
-        String citationMarker =
-            Arrays.stream(cEntries)
-            .map( (c) -> c.getCitationKey().orElse("") )
-            .collect(Collectors.joining(","));
-
-        return citationMarker;
-    }
 
     private static String[]
         rcmCitationMarkersForIsCitationKeyCiteMarkers( List<String> referenceMarkNames,
@@ -1247,11 +1235,22 @@ class OOBibBase {
         for (int i = 0; i < referenceMarkNames.size(); i++) {
             final String namei = referenceMarkNames.get(i);
 
-            BibEntry[] cEntries =
-                mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei );
-            assert (cEntries.length == bibtexKeys[i].length) ;
+            // inline mapCiteKeysToBibEntryArray
+            assertKeysInCiteKeyToBibEntry( bibtexKeys[i], citeKeyToBibEntry, namei );
 
-            citMarkers[i] = rcmCitationMarkerForIsCitationKeyCiteMarkers( cEntries, style );
+            BibEntry[] cEntries =
+                Arrays.stream( bibtexKeys[i] )
+                .map( key -> (BibEntry) citeKeyToBibEntry.get(key)  )
+                .toArray( BibEntry[]::new );
+
+            // inline rcmCitationMarkerForIsCitationKeyCiteMarkers
+            String citationMarker =
+                Arrays.stream(cEntries)
+                .map( (c) -> c.getCitationKey().orElse("") )
+                .collect(Collectors.joining(","));
+
+            citMarkers[i] = citationMarker;
+
         }
         return citMarkers;
     }
