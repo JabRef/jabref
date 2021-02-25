@@ -1235,17 +1235,11 @@ class OOBibBase {
         for (int i = 0; i < referenceMarkNames.size(); i++) {
             final String namei = referenceMarkNames.get(i);
 
-            // inline mapCiteKeysToBibEntryArray
             assertKeysInCiteKeyToBibEntry( bibtexKeys[i], citeKeyToBibEntry, namei );
 
-            BibEntry[] cEntries =
+            String citationMarker =
                 Arrays.stream( bibtexKeys[i] )
                 .map( key -> (BibEntry) citeKeyToBibEntry.get(key)  )
-                .toArray( BibEntry[]::new );
-
-            // inline rcmCitationMarkerForIsCitationKeyCiteMarkers
-            String citationMarker =
-                Arrays.stream(cEntries)
                 .map( (c) -> c.getCitationKey().orElse("") )
                 .collect(Collectors.joining(","));
 
