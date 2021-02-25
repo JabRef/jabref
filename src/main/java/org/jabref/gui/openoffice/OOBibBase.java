@@ -1371,10 +1371,10 @@ class OOBibBase {
             style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
 
         for (int i = 0; i < referenceMarkNames.size(); i++) {
-            final String namei = referenceMarkNames.get(i);
+            final String referenceMarkName = referenceMarkNames.get(i);
 
             BibEntry[] cEntries =
-                            mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei );
+                mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, referenceMarkName );
             assert (cEntries.length == bibtexKeys[i].length) ;
 
             //
