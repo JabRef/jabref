@@ -1625,11 +1625,17 @@ class OOBibBase {
             //    normCitMarkers[i][j] = for unification
             String[][] normCitMarkers = new String[nRefMarks][];
 
+            assertAllKeysInCiteKeyToBibEntry( referenceMarkNames, bibtexKeys, citeKeyToBibEntry );
+
             for (int i = 0; i < referenceMarkNames.size(); i++) {
                 final String namei = referenceMarkNames.get(i);
 
                 BibEntry[] cEntries =
-                    mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei );
+                    // mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei );
+                    Arrays.stream( bibtexKeys[i] )
+                    .map( key -> (BibEntry) citeKeyToBibEntry.get(key)  )
+                    .toArray( BibEntry[]::new );
+
                 assert (cEntries.length == bibtexKeys[i].length) ;
 
                 // sort itcBlock
