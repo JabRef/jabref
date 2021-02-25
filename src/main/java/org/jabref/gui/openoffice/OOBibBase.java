@@ -1350,16 +1350,12 @@ class OOBibBase {
         for (int i = 0; i < referenceMarkNames.size(); i++) {
             final String referenceMarkName = referenceMarkNames.get(i);
 
-            BibEntry[] cEntries =
-                Arrays.stream( bibtexKeys[i] )
-                .map( key -> citeKeyToBibEntry.get(key) )
-                .toArray( BibEntry[]::new );
+            // nums: Numbers for cEntries, (-1) for none.
             List<Integer> nums =
-                Arrays.stream( cEntries )
+                Arrays.stream( bibtexKeys[i] )
+                .map( key -> citeKeyToBibEntry.get(key) ) // cEntries
                 .map( ce -> numberPossiblyUndefinedBibEntry(ce, cns) )
                 .collect( Collectors.toList() );
-
-            // nums: Numbers for cEntries, (-1) for none.
 
             citMarkers[i] = style.getNumCitationMarker(nums, minGroupingCount, false);
         } // for
