@@ -2293,7 +2293,9 @@ class OOBibBase {
 
         Object bookmark;
         try {
-            bookmark = documentConnection.mxDocFactory.createInstance("com.sun.star.text.ReferenceMark");
+            bookmark =
+                documentConnection.mxDocFactory
+                .createInstance("com.sun.star.text.ReferenceMark");
         } catch (Exception e) {
             throw new CreationException(e.getMessage());
         }
@@ -2311,8 +2313,10 @@ class OOBibBase {
                 String charStyle = style.getCitationCharacterFormat();
                 try {
                     xCursorProps.setPropertyValue(CHAR_STYLE_NAME, charStyle);
-                } catch (UnknownPropertyException | PropertyVetoException | IllegalArgumentException |
-                        WrappedTargetException ex) {
+                } catch (UnknownPropertyException
+                         | PropertyVetoException
+                         | IllegalArgumentException
+                         | WrappedTargetException ex) {
                     throw new UndefinedCharacterFormatException(charStyle);
                 }
             }
