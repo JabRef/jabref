@@ -1219,6 +1219,23 @@ class OOBibBase {
         }
     }
 
+    private static void
+        assertAllKeysInCiteKeyToBibEntry(List<String> referenceMarkNames,
+                                         String[][] bibtexKeys,
+                                         Map<String, BibEntry>  citeKeyToBibEntry)
+        throws BibEntryNotFoundException
+    {
+        final int nRefMarks = referenceMarkNames.size();
+        assert( nRefMarks == bibtexKeys.length );
+
+        for (int i = 0; i < nRefMarks; i++) {
+            final String referenceMarkName = referenceMarkNames.get(i);
+            assertKeysInCiteKeyToBibEntry( bibtexKeys[i],
+                                           citeKeyToBibEntry,
+                                           referenceMarkName );
+        }
+
+    }
 
     private static String[]
         rcmCitationMarkersForIsCitationKeyCiteMarkers( List<String> referenceMarkNames,
@@ -1231,13 +1248,7 @@ class OOBibBase {
 
         final int nRefMarks = referenceMarkNames.size();
         assert( nRefMarks == bibtexKeys.length );
-
-        for (int i = 0; i < nRefMarks; i++) {
-            final String referenceMarkName = referenceMarkNames.get(i);
-            assertKeysInCiteKeyToBibEntry( bibtexKeys[i],
-                                           citeKeyToBibEntry,
-                                           referenceMarkName );
-        }
+        assertAllKeysInCiteKeyToBibEntry( referenceMarkNames, bibtexKeys, citeKeyToBibEntry );
 
         String[] citMarkers = new String[nRefMarks];
         for (int i = 0; i < nRefMarks; i++) {
