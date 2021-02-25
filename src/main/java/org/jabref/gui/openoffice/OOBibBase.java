@@ -1233,9 +1233,10 @@ class OOBibBase {
 
         String[]   citMarkers     = new String[nRefMarks];
         for (int i = 0; i < referenceMarkNames.size(); i++) {
+            final String referenceMarkName = referenceMarkNames.get(i);
             assertKeysInCiteKeyToBibEntry( bibtexKeys[i],
                                            citeKeyToBibEntry,
-                                           referenceMarkNames.get(i) );
+                                           referenceMarkName );
         }
 
         for (int i = 0; i < referenceMarkNames.size(); i++) {
