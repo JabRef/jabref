@@ -1228,10 +1228,11 @@ class OOBibBase {
         throws BibEntryNotFoundException
     {
         assert( style.isCitationKeyCiteMarkers() );
+
         final int nRefMarks = referenceMarkNames.size();
         assert( nRefMarks == bibtexKeys.length );
 
-        for (int i = 0; i < referenceMarkNames.size(); i++) {
+        for (int i = 0; i < nRefMarks; i++) {
             final String referenceMarkName = referenceMarkNames.get(i);
             assertKeysInCiteKeyToBibEntry( bibtexKeys[i],
                                            citeKeyToBibEntry,
@@ -1239,15 +1240,12 @@ class OOBibBase {
         }
 
         String[] citMarkers = new String[nRefMarks];
-        for (int i = 0; i < referenceMarkNames.size(); i++) {
-                String citationMarker =
-                    Arrays.stream( bibtexKeys[i] )
-                    .map( key -> (BibEntry) citeKeyToBibEntry.get(key)  )
-                    .map( (c) -> c.getCitationKey().orElse("") )
-                    .collect(Collectors.joining(","));
-
-                citMarkers[i] = citationMarker;
-
+        for (int i = 0; i < nRefMarks; i++) {
+            citMarkers[i] =
+                Arrays.stream( bibtexKeys[i] )
+                .map( key -> citeKeyToBibEntry.get(key)  )
+                .map( (c) -> c.getCitationKey().orElse("") )
+                .collect(Collectors.joining(","));
         }
         return citMarkers;
     }
