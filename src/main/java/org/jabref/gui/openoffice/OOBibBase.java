@@ -1231,7 +1231,6 @@ class OOBibBase {
         final int nRefMarks = referenceMarkNames.size();
         assert( nRefMarks == bibtexKeys.length );
 
-        String[]   citMarkers     = new String[nRefMarks];
         for (int i = 0; i < referenceMarkNames.size(); i++) {
             final String referenceMarkName = referenceMarkNames.get(i);
             assertKeysInCiteKeyToBibEntry( bibtexKeys[i],
@@ -1239,14 +1238,15 @@ class OOBibBase {
                                            referenceMarkName );
         }
 
+        String[] citMarkers = new String[nRefMarks];
         for (int i = 0; i < referenceMarkNames.size(); i++) {
-            String citationMarker =
-                Arrays.stream( bibtexKeys[i] )
-                .map( key -> (BibEntry) citeKeyToBibEntry.get(key)  )
-                .map( (c) -> c.getCitationKey().orElse("") )
-                .collect(Collectors.joining(","));
+                String citationMarker =
+                    Arrays.stream( bibtexKeys[i] )
+                    .map( key -> (BibEntry) citeKeyToBibEntry.get(key)  )
+                    .map( (c) -> c.getCitationKey().orElse("") )
+                    .collect(Collectors.joining(","));
 
-            citMarkers[i] = citationMarker;
+                citMarkers[i] = citationMarker;
 
         }
         return citMarkers;
