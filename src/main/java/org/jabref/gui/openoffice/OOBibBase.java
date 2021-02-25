@@ -628,17 +628,21 @@ class OOBibBase {
      * === insertEntry
      */
 
+    private Comparator<BibEntry> comparatorForMulticite(OOBibStyle style){
+        if (style.getBooleanCitProperty( OOBibStyle.MULTI_CITE_CHRONOLOGICAL )) {
+            return this.yearAuthorTitleComparator;
+        } else {
+            return this.entryComparator;
+        }
+    }
+
     private void sortBibEntryListForMulticite( List<BibEntry>    entries,
                                                OOBibStyle        style )
     {
         if (entries.size() <= 1){
             return;
         }
-        if (style.getBooleanCitProperty( OOBibStyle.MULTI_CITE_CHRONOLOGICAL )) {
-            entries.sort(this.yearAuthorTitleComparator);
-        } else {
-            entries.sort(this.entryComparator);
-        }
+        entries.sort( comparatorForMulticite(style));
     }
     private void sortBibEntryArrayForMulticite( BibEntry[] entries,
                                                 OOBibStyle style )
@@ -646,11 +650,7 @@ class OOBibBase {
         if (entries.length <= 1) {
             return;
         }
-        if (style.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL)) {
-            Arrays.sort(entries, yearAuthorTitleComparator);
-        } else {
-            Arrays.sort(entries, entryComparator);
-        }
+        Arrays.sort(entries, comparatorForMulticite(style));
     }
 
     private static int citationTypeFromOptions( boolean withText, boolean inParenthesis ) {
