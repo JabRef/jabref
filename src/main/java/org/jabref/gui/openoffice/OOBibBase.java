@@ -1618,6 +1618,7 @@ class OOBibBase {
             String[][] normCitMarkers = new String[nRefMarks][];
 
             assertAllKeysInCiteKeyToBibEntry( referenceMarkNames, bibtexKeys, citeKeyToBibEntry );
+            BibEntry[][] cEntriesForAll = new BibEntry[nRefMarks][];
 
             for (int i = 0; i < referenceMarkNames.size(); i++) {
 
@@ -1626,20 +1627,30 @@ class OOBibBase {
                     .map( key -> citeKeyToBibEntry.get(key)  )
                     .sorted( comparatorForMulticite(style) ) // sort within referenceMark
                     .toArray( BibEntry[]::new );
+                cEntriesForAll[i] = cEntries;
+            }
 
+            for (int i = 0; i < referenceMarkNames.size(); i++) {
+                BibEntry[] cEntries = cEntriesForAll[i];
                 // Update key list to match the new sorting:
                 bibtexKeys[i] =
                     Arrays.stream( cEntries )
                     .map( ce -> ce.getCitationKey().orElse(null) )
                     .toArray( String[]::new );
+            }
 
+            for (int i = 0; i < referenceMarkNames.size(); i++) {
+                BibEntry[] cEntries = cEntriesForAll[i];
                 citMarkers[i] = style.getCitationMarker( Arrays.asList(cEntries), // entries
                                                          entries, // database
                                                          types[i] == OOBibBase.AUTHORYEAR_PAR,
                                                          null, // uniquefiers
                                                          null  // unlimAuthors
                                                          );
+            }
 
+            for (int i = 0; i < referenceMarkNames.size(); i++) {
+                BibEntry[] cEntries = cEntriesForAll[i];
                 // We need "normalized" (in parenthesis) markers
                 // for uniqueness checking purposes:
                 normCitMarkers[i] =
