@@ -2181,10 +2181,10 @@ class OOBibBase {
                 // just above.
                 // Try to create.
                 LOGGER.warn( "Could not get section '"+ OOBibBase.BIB_SECTION_NAME + "'", ex );
-                createBibTextSection2(documentConnection, atEnd);
+                createBibTextSection2(documentConnection, this.atEnd);
             }
         } else {
-            createBibTextSection2(documentConnection, atEnd);
+            createBibTextSection2(documentConnection, this.atEnd);
         }
     }
 
