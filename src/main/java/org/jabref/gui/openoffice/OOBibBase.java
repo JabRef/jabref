@@ -2431,6 +2431,24 @@ class OOBibBase {
         }
         return entries;
     }
+
+    private void testFormatCitations(XTextCursor mxDocCursor, OOBibStyle style )
+        throws UndefinedCharacterFormatException
+    {
+        XPropertySet xCursorProps = unoQI(XPropertySet.class, mxDocCursor);
+        String charStyle = style.getCitationCharacterFormat();
+        try {
+            xCursorProps.setPropertyValue(CHAR_STYLE_NAME, charStyle);
+        } catch (UnknownPropertyException
+                 | PropertyVetoException
+                 | IllegalArgumentException
+                 | WrappedTargetException ex) {
+            // Setting the character format failed, so we throw an exception that
+            // will result in an error message for the user:
+            throw new UndefinedCharacterFormatException(charStyle);
+        }
+    }
+
     /**
      *  GUI action
      */
@@ -2507,18 +2525,7 @@ class OOBibBase {
             // making any changes. This way we can throw an exception before any reference
             // marks are removed, preventing damage to the user's document:
             if (style.isFormatCitations()) {
-                XPropertySet xCursorProps = unoQI(XPropertySet.class, mxDocCursor);
-                String charStyle = style.getCitationCharacterFormat();
-                try {
-                    xCursorProps.setPropertyValue(CHAR_STYLE_NAME, charStyle);
-                } catch (UnknownPropertyException
-                         | PropertyVetoException
-                         | IllegalArgumentException
-                         | WrappedTargetException ex) {
-                    // Setting the character format failed, so we throw an exception that
-                    // will result in an error message for the user:
-                    throw new UndefinedCharacterFormatException(charStyle);
-                }
+                testFormatCitations( mxDocCursor, style );
             }
 
             List<String> keys = parseRefMarkNameToUniqueCitationKeys(names.get(piv));
