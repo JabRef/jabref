@@ -1336,8 +1336,7 @@ class OOBibBase {
             //
             // fill nums while adjusting lastNum and filling numbers
             //
-            List<Integer> num ;
-            num = numberPossiblyUndefinedBibEntres( cEntries, cns );
+            List<Integer> num = numberPossiblyUndefinedBibEntres( cEntries, cns );
             citMarkers[i] = style.getNumCitationMarker(num, minGroupingCount, false);
         } // for
         return citMarkers;
