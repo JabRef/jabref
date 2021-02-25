@@ -1633,10 +1633,8 @@ class OOBibBase {
                 BibEntry[] cEntries =
                     // mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei );
                     Arrays.stream( bibtexKeys[i] )
-                    .map( key -> (BibEntry) citeKeyToBibEntry.get(key)  )
+                    .map( key -> citeKeyToBibEntry.get(key)  )
                     .toArray( BibEntry[]::new );
-
-                assert (cEntries.length == bibtexKeys[i].length) ;
 
                 // sort itcBlock
                 sortBibEntryArrayForMulticite( cEntries, style );
