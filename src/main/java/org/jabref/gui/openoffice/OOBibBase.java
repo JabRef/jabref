@@ -1263,11 +1263,12 @@ class OOBibBase {
     /**
      *  Number citations.
      *
-     *  @param cEntries BibEntries to number. Numbering follows this order.
-     *  @param style
+     *  @param cEntries  BibEntries to number. Numbering follows this order.
+     *  @param style     To assert we are in the right situation.
      *  @param cns INOUT Tracks keys already seen and their numbers.
+     *                   OUT: Updated, the entries in cEntries are seen.
      *
-     *  @return an int for each cEntry. (-1) for UndefinedBibtexEntry
+     *  @return An int for each cEntry. (-1) for UndefinedBibtexEntry
      */
     private static List<Integer> rcmNumForIsNumberEntriesIsSortByPosition(  BibEntry[] cEntries,
                                                                             OOBibStyle style,
@@ -1278,9 +1279,8 @@ class OOBibBase {
 
         // Assumption:
         //
-        // We have sorted the citation markers
-        // according to their order of appearance, so
-        // we simply count up for each marker
+        // We have sorted the citation markers according to their
+        // order of appearance, so we simply count up for each marker
         // referring to a new entry:
         //
         // nums: Numbers for cEntries, (-1) for none.
