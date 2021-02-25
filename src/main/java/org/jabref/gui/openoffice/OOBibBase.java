@@ -1147,10 +1147,36 @@ class OOBibBase {
         return cEntry;
     }
     private static BibEntry[] mapUndefinedBibentriesToNull( BibEntry[] cEntries ){
-        Arrays.stream(cEntries)
+        return
+            Arrays.stream(cEntries)
             .map( OOBibBase::undefinedBibentryToNull )
-            .toArray();
+            .toArray( BibEntry[]::new );
     }
+
+    private static void
+        assertKeysInCiteKeyToBibEntry(  String[] keys, // citeKeys
+                                        Map<String, BibEntry> citeKeyToBibEntry,
+                                        String referenceMarkName   // for reporting
+                                        )
+        throws BibEntryNotFoundException
+    {
+        // check keys
+        List<String> unresovedKeys =
+            Arrays.stream( keys )
+            .filter( key -> null == citeKeyToBibEntry.get(key) )
+            .collect(Collectors.toList());
+
+        for ( String key : unresovedKeys ){
+            LOGGER.info("Citation key not found: '" + key + '\'');
+            LOGGER.info("Problem with reference mark: '" + referenceMarkName + '\'');
+            String msg = Localization.lang("Could not resolve BibTeX entry"
+                                           +" for citation marker '%0'.",
+                                           referenceMarkName
+                                           );
+            throw new BibEntryNotFoundException(referenceMarkName, msg);
+        }
+    }
+
     private static BibEntry[]
         mapCiteKeysToBibEntryArray( String[] keys, // citeKeys
                                     Map<String, BibEntry> citeKeyToBibEntry,
