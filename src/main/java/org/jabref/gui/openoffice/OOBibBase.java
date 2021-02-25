@@ -1210,6 +1210,11 @@ class OOBibBase {
         return citMarkers;
     }
 
+    /**
+     *  Number source for (1-based) numbering of citations.
+     *
+     *
+     */
     private static class CitationNumberingState {
         public Map<String, Integer> numbers;
         public int lastNum;
@@ -1218,13 +1223,28 @@ class OOBibBase {
             Map<String, Integer> numbers = new HashMap<>();
             int lastNum = 0;
         }
+        /**
+         *  The first call returns 1.
+         */
+        public int getOrAllocateNumber( String key ){
+            int result;
+            if (numbers.containsKey(key)) {
+                // Already seen
+                result = numbers.get(key);
+            } else {
+                // First time to see. Allocate number.
+                lastNum++;
+                numbers.put(key, lastNum);
+                result = lastNum;
+            }
+            return result;
+        }
     }
 
     /**
      *  Number citations.
      *
      *  @param cEntries BibEntries to number. Numbering follows this order.
-     *  @param keys : assert( keys[j] == cEntries[j].getCitationKey() )
      *  @param style
      *  @param cns IN:keys already seen mapped to their number, and
      *                lastNum the largest number already used. (0 for
@@ -1261,15 +1281,7 @@ class OOBibBase {
             if (cej instanceof UndefinedBibtexEntry) {
                 num.add(j, -1); // gets no cns.number
             } else {
-                if (cns.numbers.containsKey(kj)) {
-                    // already seen
-                    num.add(j, cns.numbers.get(kj));
-                } else {
-                    // new
-                    cns.lastNum++;  // 1-based
-                    num.add(         j, cns.lastNum);
-                    cns.numbers.put(kj, cns.lastNum);
-                }
+                num.add( j, cns.getOrAllocateNumber(kj) );
             }
         }
         return num;
