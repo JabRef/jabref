@@ -1644,20 +1644,17 @@ class OOBibBase {
 
                 // We need "normalized" (in parenthesis) markers
                 // for uniqueness checking purposes:
-                //
-                // normCitMarker[ cEntries.length ] null if missing
-                String[] normCitMarker = new String[cEntries.length];
-                for (int j = 0; j < cEntries.length; j++) {
-                    List<BibEntry> cej = Collections.singletonList(cEntries[j]);
-                    normCitMarker[j] =
-                        style.getCitationMarker( cej,      // entries
-                                                 entries,  // database
-                                                 true,     // inParenthesis
-                                                 null,     // uniquefiers
-                                                 new int[] {-1} // unlimAuthors
-                                                 );
-                }
-                normCitMarkers[i] = normCitMarker;
+                normCitMarkers[i] =
+                    Arrays.stream( cEntries )
+                    .map( ce ->
+                          style.getCitationMarker( Collections.singletonList(ce),
+                                                   entries,  // database
+                                                   true,     // inParenthesis
+                                                   null,     // uniquefiers
+                                                   new int[] {-1} // unlimAuthors
+                                                   )
+                          )
+                    .toArray( String[]::new );
             }
             uniquefiers.clear();
 
