@@ -2418,6 +2418,19 @@ class OOBibBase {
         }
     }
 
+    List<BibEntry> lookupEntriesInDatabases(List<String> keys, List<BibDatabase> databases){
+        List<BibEntry> entries = new ArrayList<>();
+        for (String key : keys) {
+            for (BibDatabase database : databases) {
+                Optional<BibEntry> entry = database.getEntryByCitationKey(key);
+                if (entry.isPresent()) {
+                    entries.add(entry.get());
+                    break;
+                }
+            }
+        }
+        return entries;
+    }
     /**
      *  GUI action
      */
@@ -2445,58 +2458,83 @@ class OOBibBase {
         int piv = 0;
         boolean madeModifications = false;
         XNameAccess nameAccess = documentConnection.getReferenceMarks();
+
         while (piv < (names.size() - 1)) {
-            XTextRange range1 = unoQI(XTextContent.class, nameAccess.getByName(names.get(piv)))
-                                          .getAnchor().getEnd();
-            XTextRange range2 = unoQI(XTextContent.class, nameAccess.getByName(names.get(piv + 1)))
-                                          .getAnchor().getStart();
+            XTextRange range1 =
+                unoQI(XTextContent.class,
+                      nameAccess.getByName(names.get(piv)))
+                .getAnchor()
+                .getEnd();
+
+            XTextRange range2 =
+                unoQI(XTextContent.class,
+                      nameAccess.getByName(names.get(piv + 1)))
+                .getAnchor()
+                .getStart();
+
             if (range1.getText() != range2.getText()) {
+                /* piv and (piv+1) belong to different XText entities?
+                 * Maybe to different footnotes?
+                 * Cannot combine accross boundaries skip.
+                 */
                 piv++;
                 continue;
             }
-            XTextCursor mxDocCursor = range1.getText().createTextCursorByRange(range1);
+
+            // Start from end of text for piv.
+            XTextCursor mxDocCursor =
+                range1.getText().createTextCursorByRange(range1);
+
+            // Select next character, and more, as long as we can and
+            // do not reach stat of (piv+1), which we now know to be
+            // under the same XText entity.
             mxDocCursor.goRight((short) 1, true);
             boolean couldExpand = true;
             while (couldExpand && (compare.compareRegionEnds(mxDocCursor, range2) > 0)) {
                 couldExpand = mxDocCursor.goRight((short) 1, true);
             }
+
+            // Take what we selected
             String cursorText = mxDocCursor.getString();
-            // Check if the string contains no line breaks and only whitespace:
-            if ((cursorText.indexOf('\n') == -1) && cursorText.trim().isEmpty()) {
 
-                // If we are supposed to set character format for citations, test this before
-                // making any changes. This way we can throw an exception before any reference
-                // marks are removed, preventing damage to the user's document:
-                if (style.isFormatCitations()) {
-                    XPropertySet xCursorProps = unoQI(XPropertySet.class, mxDocCursor);
-                    String charStyle = style.getCitationCharacterFormat();
-                    try {
-                        xCursorProps.setPropertyValue(CHAR_STYLE_NAME, charStyle);
-                    } catch (UnknownPropertyException | PropertyVetoException | IllegalArgumentException |
-                            WrappedTargetException ex) {
-                        // Setting the character format failed, so we throw an exception that
-                        // will result in an error message for the user:
-                        throw new UndefinedCharacterFormatException(charStyle);
-                    }
-                }
+            // Check if the string contains line breaks and any  non-whitespace.
+            if ((cursorText.indexOf('\n') != -1) || !cursorText.trim().isEmpty()){
+                piv++;
+                continue;
+            }
 
-                List<String> keys = parseRefMarkNameToUniqueCitationKeys(names.get(piv));
-                keys.addAll(parseRefMarkNameToUniqueCitationKeys(names.get(piv + 1)));
-                removeReferenceMark(documentConnection, names.get(piv));
-                removeReferenceMark(documentConnection, names.get(piv + 1));
-                List<BibEntry> entries = new ArrayList<>();
-                for (String key : keys) {
-                    for (BibDatabase database : databases) {
-                        Optional<BibEntry> entry = database.getEntryByCitationKey(key);
-                        if (entry.isPresent()) {
-                            entries.add(entry.get());
-                            break;
-                        }
-                    }
+            // If we are supposed to set character format for citations, test this before
+            // making any changes. This way we can throw an exception before any reference
+            // marks are removed, preventing damage to the user's document:
+            if (style.isFormatCitations()) {
+                XPropertySet xCursorProps = unoQI(XPropertySet.class, mxDocCursor);
+                String charStyle = style.getCitationCharacterFormat();
+                try {
+                    xCursorProps.setPropertyValue(CHAR_STYLE_NAME, charStyle);
+                } catch (UnknownPropertyException
+                         | PropertyVetoException
+                         | IllegalArgumentException
+                         | WrappedTargetException ex) {
+                    // Setting the character format failed, so we throw an exception that
+                    // will result in an error message for the user:
+                    throw new UndefinedCharacterFormatException(charStyle);
                 }
-                Collections.sort(entries, new FieldComparator(StandardField.YEAR));
-                String keyString = String.join(",", entries.stream().map(entry -> entry.getCitationKey().orElse(""))
-                                                           .collect(Collectors.toList()));
+            }
+
+            List<String> keys = parseRefMarkNameToUniqueCitationKeys(names.get(piv));
+            keys.addAll(parseRefMarkNameToUniqueCitationKeys(names.get(piv + 1)));
+            removeReferenceMark(documentConnection, names.get(piv));
+            removeReferenceMark(documentConnection, names.get(piv + 1));
+
+            List<BibEntry> entries = lookupEntriesInDatabases(keys, databases);
+            Collections.sort(entries, new FieldComparator(StandardField.YEAR));
+            String keyString =
+                String.join(",",
+                            entries.stream()
+                            .map(entry ->
+                                 entry.getCitationKey().orElse(""))
+                            .collect(Collectors.toList()));
+
                 // Insert bookmark:
                 String bName = getUniqueReferenceMarkName(documentConnection,
                                                           keyString,
@@ -2505,9 +2543,10 @@ class OOBibBase {
                 insertReferenceMark(documentConnection, bName, "tmp", mxDocCursor, true, style);
                 names.set(piv + 1, bName);
                 madeModifications = true;
-            }
-            piv++;
-        }
+
+                piv++;
+        } // while
+
         if (madeModifications) {
             updateSortedReferenceMarks();
             refreshCiteMarkers(databases, style);
