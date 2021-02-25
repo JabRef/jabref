@@ -1820,9 +1820,7 @@ class OOBibBase {
             findCitedEntries(databases,
                              findCitedKeys( documentConnection )
                              );
-        // Map<String, BibEntry>      citeKeyToBibEntry  = new HashMap<>();
-        // Map<BibEntry, BibDatabase> entries =
-        // entries are now in same order as cited
+        // fce.entries are now in same order as returned by findCitedKeys
 
         // citMarkers[i] = what goes in the text at referenceMark[i]
         String[] citMarkers  = new String[nRefMarks];
@@ -1993,12 +1991,7 @@ class OOBibBase {
                              findCitedKeys( documentConnection )
                              );
 
-        //List<String>               cited             = findCitedKeys(documentConnection);
-
         Map<BibEntry, BibDatabase> entries;
-        //    // Although entries are redefined without use, this also
-        //    // updates citeKeyToBibEntry
-        //    findCitedEntries(databases, cited, citeKeyToBibEntry);
 
         if (style.isSortByPosition()) {
             // We need to sort the entries according to their order of appearance:
