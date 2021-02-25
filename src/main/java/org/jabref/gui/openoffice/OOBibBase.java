@@ -1062,11 +1062,32 @@ class OOBibBase {
      *  - citedKey in the entry is the same as the original citedKey
      *
      */
-    private Map<BibEntry, BibDatabase> findCitedEntries(List<BibDatabase> databases,
-                                                        List<String> citedKeys,
-                                                        Map<String, BibEntry> citeKeyToBibEntry
-                                                        )
+    private class FindCitedEntriesResult {
+        /*
+         *  entries : LinkedHashMap with iteration order as the
+         *  citedKeys parameter of findCitedEntries
+         */
+        Map<BibEntry, BibDatabase> entries;
+        /*
+         * citeKeyToBibEntry : HashMap (no order)
+         */
+        Map<String, BibEntry> citeKeyToBibEntry;
+
+        FindCitedEntriesResult( Map<BibEntry, BibDatabase> entries,
+                                Map<String, BibEntry> citeKeyToBibEntry ) {
+            this.entries           = entries;
+            this.citeKeyToBibEntry = citeKeyToBibEntry;
+        }
+    }
+
+    private FindCitedEntriesResult
+        findCitedEntries(List<BibDatabase> databases,
+                         List<String> citedKeys
+                         )
     {
+        Map<String, BibEntry>   citeKeyToBibEntry  = new HashMap<>();
+
+        // LinkedHashMap, iteration order as in citedKeys
         Map<BibEntry, BibDatabase> entries = new LinkedHashMap<>();
         for (String citedKey : citedKeys) {
             boolean found = false;
@@ -1086,7 +1107,7 @@ class OOBibBase {
                 citeKeyToBibEntry.put( citedKey, x );
             }
         }
-        return entries;
+        return new FindCitedEntriesResult( entries, citeKeyToBibEntry );
     }
 
     /**
@@ -1795,15 +1816,12 @@ class OOBibBase {
 
 
 
-        Map<String, BibEntry>      citeKeyToBibEntry  = new HashMap<>();
-        Map<BibEntry, BibDatabase> entries =
+        FindCitedEntriesResult fce =
             findCitedEntries(databases,
-                             findCitedKeys( documentConnection ),
-                             citeKeyToBibEntry /* citeKeyToBibEntry filled here
-                                                * TODO: avoid modifying parameters
-                                                * ModifiesParameter
-                                                */
+                             findCitedKeys( documentConnection )
                              );
+        // Map<String, BibEntry>      citeKeyToBibEntry  = new HashMap<>();
+        // Map<BibEntry, BibDatabase> entries =
         // entries are now in same order as cited
 
         // citMarkers[i] = what goes in the text at referenceMark[i]
@@ -1815,20 +1833,20 @@ class OOBibBase {
            citMarkers =
                rcmCitationMarkersForIsCitationKeyCiteMarkers(referenceMarkNames,
                                                              bibtexKeys,
-                                                             citeKeyToBibEntry,
+                                                             fce.citeKeyToBibEntry,
                                                              style );
         } else if (style.isNumberEntries()) {
             if (style.isSortByPosition()) {
                 citMarkers =
                     rcmCitationMarkersForIsNumberEntriesIsSortByPosition(referenceMarkNames,
                                                                          bibtexKeys,
-                                                                         citeKeyToBibEntry,
+                                                                         fce.citeKeyToBibEntry,
                                                                          style);
             } else {
                 citMarkers =
                     rcmCitationMarkersForIsNumberEntriesNotSortByPosition(referenceMarkNames,
                                                                           bibtexKeys,
-                                                                          entries,
+                                                                          fce.entries,
                                                                           style  );
             }
         } else /* Normal case, (!isCitationKeyCiteMarkers && !isNumberEntries) */ {
@@ -1836,9 +1854,9 @@ class OOBibBase {
             RcmCitationMarkersForNormalStyleResult nsr =
                 rcmCitationMarkersForNormalStyle(referenceMarkNames,
                                                  bibtexKeys,
-                                                 citeKeyToBibEntry,
+                                                 fce.citeKeyToBibEntry,
                                                  types,
-                                                 entries,
+                                                 fce.entries,
                                                  uniquefiers,
                                                  style    );
             citMarkers = nsr.citMarkers;
@@ -1852,7 +1870,7 @@ class OOBibBase {
                                    types,
                                    style );
 
-        return unresolvedKeysFromEntries( entries );
+        return unresolvedKeysFromEntries( fce.entries );
     }
 
 
@@ -1970,22 +1988,27 @@ class OOBibBase {
     {
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
 
-        List<String>               cited             = findCitedKeys(documentConnection);
-        Map<String, BibEntry>      citeKeyToBibEntry = new HashMap<>();
-        Map<BibEntry, BibDatabase> entries =
-            // Although entries are redefined without use, this also
-            // updates citeKeyToBibEntry
-            findCitedEntries(databases, cited, citeKeyToBibEntry);
+        FindCitedEntriesResult fce =
+            findCitedEntries(databases,
+                             findCitedKeys( documentConnection )
+                             );
+
+        //List<String>               cited             = findCitedKeys(documentConnection);
+
+        Map<BibEntry, BibDatabase> entries;
+        //    // Although entries are redefined without use, this also
+        //    // updates citeKeyToBibEntry
+        //    findCitedEntries(databases, cited, citeKeyToBibEntry);
 
         if (style.isSortByPosition()) {
             // We need to sort the entries according to their order of appearance:
             entries = sortEntriesByRefMarkNames(
-                 jabRefReferenceMarkNamesSortedByPosition,
-                 citeKeyToBibEntry,
-                 entries
-                 );
+                                                jabRefReferenceMarkNamesSortedByPosition,
+                                                fce.citeKeyToBibEntry,
+                                                fce.entries
+                                                );
         } else {
-            entries = sortEntriesByComparator( entries, entryComparator );
+            entries = sortEntriesByComparator( fce.entries, entryComparator );
         }
         clearBibTextSectionContent2(documentConnection);
         populateBibTextSection(documentConnection, entries, style, this.xUniquefiers);
