@@ -1799,19 +1799,18 @@ class OOBibBase {
         Map<BibEntry, BibDatabase> entries =
             findCitedEntries(databases,
                              findCitedKeys( documentConnection ),
-                             citeKeyToBibEntry /* citeKeyToBibEntry filled here */
+                             citeKeyToBibEntry /* citeKeyToBibEntry filled here
+                                                * TODO: avoid modifying parameters
+                                                * ModifiesParameter
+                                                */
                              );
         // entries are now in same order as cited
 
-
-
-        // citMarkers[i] = what goes in the text
+        // citMarkers[i] = what goes in the text at referenceMark[i]
         String[] citMarkers  = new String[nRefMarks];
 
-
-
         // fill citMarkers
-        uniquefiers.clear();
+        uniquefiers.clear(); /* ModifiesParameter */
         if (style.isCitationKeyCiteMarkers()) {
            citMarkers =
                rcmCitationMarkersForIsCitationKeyCiteMarkers(referenceMarkNames,
@@ -1821,8 +1820,7 @@ class OOBibBase {
         } else if (style.isNumberEntries()) {
             if (style.isSortByPosition()) {
                 citMarkers =
-                    rcmCitationMarkersForIsNumberEntriesIsSortByPosition(
-                                                                         referenceMarkNames,
+                    rcmCitationMarkersForIsNumberEntriesIsSortByPosition(referenceMarkNames,
                                                                          bibtexKeys,
                                                                          citeKeyToBibEntry,
                                                                          style);
@@ -1833,24 +1831,26 @@ class OOBibBase {
                                                                           entries,
                                                                           style  );
             }
-        } else {
+        } else /* Normal case, (!isCitationKeyCiteMarkers && !isNumberEntries) */ {
 
             RcmCitationMarkersForNormalStyleResult nsr =
-                rcmCitationMarkersForNormalStyle( referenceMarkNames,
-                                                  bibtexKeys,
-                                                  citeKeyToBibEntry,
-                                                  types,
-                                                  entries,
-                                                  uniquefiers,
-                                                  style
-                                                  );
+                rcmCitationMarkersForNormalStyle(referenceMarkNames,
+                                                 bibtexKeys,
+                                                 citeKeyToBibEntry,
+                                                 types,
+                                                 entries,
+                                                 uniquefiers,
+                                                 style    );
             citMarkers = nsr.citMarkers;
             bibtexKeys = nsr.bibtexKeys;
         }
 
-
         // Refresh all reference marks with the citation markers we computed:
-        rcmApplyNewCitationMarkers(documentConnection, referenceMarkNames, citMarkers, types, style );
+        rcmApplyNewCitationMarkers(documentConnection,
+                                   referenceMarkNames,
+                                   citMarkers,
+                                   types,
+                                   style );
 
         return unresolvedKeysFromEntries( entries );
     }
