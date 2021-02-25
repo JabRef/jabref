@@ -1270,9 +1270,9 @@ class OOBibBase {
      *
      *  @return An int for each cEntry. (-1) for UndefinedBibtexEntry
      */
-    private static List<Integer> rcmNumForIsNumberEntriesIsSortByPosition(  BibEntry[] cEntries,
-                                                                            OOBibStyle style,
-                                                                            CitationNumberingState cns )
+    private static List<Integer> numberPossiblyUndefinedBibEntres(  BibEntry[] cEntries,
+                                                                    OOBibStyle style,
+                                                                    CitationNumberingState cns )
     {
         assert (style.isNumberEntries());
         assert (style.isSortByPosition());
@@ -1341,7 +1341,7 @@ class OOBibBase {
             assert (cEntries.length == bibtexKeys[i].length) ;
 
             List<Integer> num ;
-            num = rcmNumForIsNumberEntriesIsSortByPosition( cEntries, style, cns );
+            num = numberPossiblyUndefinedBibEntres( cEntries, style, cns );
             citMarkers[i] = style.getNumCitationMarker(num, minGroupingCount, false);
         } // for
         return citMarkers;
