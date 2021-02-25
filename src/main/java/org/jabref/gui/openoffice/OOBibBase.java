@@ -2128,6 +2128,8 @@ class OOBibBase {
         XTextCursor mxDocCursor = documentConnection.xText.createTextCursor();
         if (end) {
             mxDocCursor.gotoEnd(false);
+        } else {
+            // where does mxDocCursor point to in this branch?
         }
         OOUtil.insertParagraphBreak(documentConnection.xText, mxDocCursor);
         // Create a new TextSection from the document factory and access it's XNamed interface
