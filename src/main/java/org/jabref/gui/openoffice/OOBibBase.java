@@ -1721,8 +1721,8 @@ class OOBibBase {
                     String[]   uniquif         = new String[nCitedEntries];
                     BibEntry[] cEntries = mapCiteKeysToBibEntryArray( bibtexKeys[i],
                                                                       citeKeyToBibEntry,
-                                                                      namei,
-                                                                      true);
+                                                                      namei);
+                    cEntries = mapUndefinedBibentriesToNull( cEntries );
 
                     for (int j = 0; j < nCitedEntries; j++) {
                         String currentKey = bibtexKeys[i][j];
