@@ -1634,10 +1634,11 @@ class OOBibBase {
                     // mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei );
                     Arrays.stream( bibtexKeys[i] )
                     .map( key -> citeKeyToBibEntry.get(key)  )
+                    .sorted( comparatorForMulticite(style) )
                     .toArray( BibEntry[]::new );
 
                 // sort itcBlock
-                sortBibEntryArrayForMulticite( cEntries, style );
+                //sortBibEntryArrayForMulticite( cEntries, style );
 
                 // Update key list to match the new sorting:
                 for (int j = 0; j < cEntries.length; j++) {
