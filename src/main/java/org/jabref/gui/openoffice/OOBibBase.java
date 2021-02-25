@@ -1236,28 +1236,12 @@ class OOBibBase {
      *  @return an int for each cEntry. (-1) for UndefinedBibtexEntry
      */
     private static List<Integer> rcmNumForIsNumberEntriesIsSortByPosition(  BibEntry[] cEntries,
-                                                                            String[] keys,
                                                                             OOBibStyle style,
                                                                             CitationNumberingState cns )
     {
         assert (style.isNumberEntries());
         assert (style.isSortByPosition());
-        assert (cEntries.length == keys.length );
-        if ( true ){
-            /*
-             * TODO: do we need a test case?
-             *
-             * If this never prints (or throws), we can drop the "keys" parameter.
-             */
-            for (int j = 0; j < cEntries.length; j++) {
-                BibEntry cej = cEntries[j];
-                String   kj  = keys[j];
-                if (  kj != cej.getCitationKey().get() ){
-                    System.out.println
-                        ( "keys != cEntries in rcmNumForIsNumberEntriesIsSortByPosition" );
-                }
-            }
-        }
+
         //
         // We have sorted the citation markers
         // according to their order of appearance, so
@@ -1273,7 +1257,7 @@ class OOBibBase {
         //
         for (int j = 0; j < cEntries.length; j++) {
             BibEntry cej = cEntries[j];
-            String   kj  = keys[j]; // cej.getCitationKey().get()
+            String   kj  = cej.getCitationKey().get();
             if (cej instanceof UndefinedBibtexEntry) {
                 num.add(j, -1); // gets no cns.number
             } else {
@@ -1319,7 +1303,7 @@ class OOBibBase {
             assert (cEntries.length == bibtexKeys[i].length) ;
 
             List<Integer> num ;
-            num = rcmNumForIsNumberEntriesIsSortByPosition( cEntries, bibtexKeys[i], style, cns );
+            num = rcmNumForIsNumberEntriesIsSortByPosition( cEntries, style, cns );
             citMarkers[i] = style.getNumCitationMarker(num, minGroupingCount, false);
         } // for
         return citMarkers;
