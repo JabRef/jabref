@@ -1186,19 +1186,7 @@ class OOBibBase {
         throws BibEntryNotFoundException
     {
         if ( true ){
-
-            // check keys
-            Arrays.stream( keys )
-                .filter( key -> null == citeKeyToBibEntry.get(key) )
-                .forEachOrdered( key -> {
-                        LOGGER.info("Citation key not found: '" + key + '\'');
-                        LOGGER.info("Problem with reference mark: '" + referenceMarkName + '\'');
-                        String msg = Localization.lang("Could not resolve BibTeX entry"
-                                                       +" for citation marker '%0'.",
-                                                       referenceMarkName
-                                                       );
-                        throw new BibEntryNotFoundException(referenceMarkName, msg);
-                    });
+            assertKeysInCiteKeyToBibEntry( keys, citeKeyToBibEntry, referenceMarkName );
 
             // process keys
             BibEntry[] cEntries =
