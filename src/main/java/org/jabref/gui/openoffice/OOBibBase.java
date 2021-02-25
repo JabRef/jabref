@@ -1234,7 +1234,7 @@ class OOBibBase {
             final String namei = referenceMarkNames.get(i);
 
             BibEntry[] cEntries =
-                mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei, false );
+                mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei );
             assert (cEntries.length == bibtexKeys[i].length) ;
 
             citMarkers[i] = rcmCitationMarkerForIsCitationKeyCiteMarkers( cEntries, style );
@@ -1366,7 +1366,7 @@ class OOBibBase {
             final String namei = referenceMarkNames.get(i);
 
             BibEntry[] cEntries =
-                            mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei, false );
+                            mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei );
             assert (cEntries.length == bibtexKeys[i].length) ;
 
             //
@@ -1646,7 +1646,7 @@ class OOBibBase {
                 final String namei = referenceMarkNames.get(i);
 
                 BibEntry[] cEntries =
-                    mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei, false );
+                    mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei );
                 assert (cEntries.length == bibtexKeys[i].length) ;
 
                 // sort itcBlock
