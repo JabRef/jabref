@@ -1140,37 +1140,69 @@ class OOBibBase {
         }
     }
 
+    private static BibEntry undefinedBibentryToNull( BibEntry cEntry ){
+        if ( cEntry instanceof UndefinedBibtexEntry ){
+            return null;
+        }
+        return cEntry;
+    }
+    private static BibEntry[] mapUndefinedBibentriesToNull( BibEntry[] cEntries ){
+        Arrays.stream(cEntries)
+            .map( OOBibBase::undefinedBibentryToNull )
+            .toArray();
+    }
     private static BibEntry[]
         mapCiteKeysToBibEntryArray( String[] keys, // citeKeys
                                     Map<String, BibEntry> citeKeyToBibEntry,
-                                    String referenceMarkName,   // for reporting
-                                    boolean undefinedToNull     // for undefined entries insert NULL
+                                    String referenceMarkName   // for reporting
+                                    //boolean undefinedToNull     // for undefined entries insert NULL
                                     )
         throws BibEntryNotFoundException
     {
-        BibEntry[] cEntries = new BibEntry[keys.length];
+        if ( true ){
 
-        // fill cEntries
-        for (int j = 0; j < keys.length; j++) {
-            String kj = keys[j];
-            BibEntry tmpEntry = citeKeyToBibEntry.get( kj );
-            if ( tmpEntry == null ){
-                LOGGER.info("Citation key not found: '" + kj + '\'');
-                LOGGER.info("Problem with reference mark: '" + referenceMarkName + '\'');
-                String msg = Localization.lang("Could not resolve BibTeX entry"
-                                               +" for citation marker '%0'.",
-                                               referenceMarkName
-                                               );
-                throw new BibEntryNotFoundException(referenceMarkName, msg);
-            } else {
-                if ( undefinedToNull && tmpEntry instanceof UndefinedBibtexEntry ){
-                    tmpEntry = null;
+            // check keys
+            Arrays.stream( keys )
+                .filter( key -> null == citeKeyToBibEntry.get(key) )
+                .forEachOrdered( key -> {
+                        LOGGER.info("Citation key not found: '" + key + '\'');
+                        LOGGER.info("Problem with reference mark: '" + referenceMarkName + '\'');
+                        String msg = Localization.lang("Could not resolve BibTeX entry"
+                                                       +" for citation marker '%0'.",
+                                                       referenceMarkName
+                                                       );
+                        throw new BibEntryNotFoundException(referenceMarkName, msg);
+                    });
+
+            // process keys
+            BibEntry[] cEntries =
+                Arrays.stream( keys )
+                .map( key -> (BibEntry) citeKeyToBibEntry.get(key)  )
+                .toArray( BibEntry[]::new );
+            return cEntries;
+
+        } else {
+            BibEntry[] cEntries = new BibEntry[keys.length];
+
+            // fill cEntries
+            for (int j = 0; j < keys.length; j++) {
+                String kj = keys[j];
+                BibEntry tmpEntry = citeKeyToBibEntry.get( kj );
+                if ( tmpEntry == null ){
+                    LOGGER.info("Citation key not found: '" + kj + '\'');
+                    LOGGER.info("Problem with reference mark: '" + referenceMarkName + '\'');
+                    String msg = Localization.lang("Could not resolve BibTeX entry"
+                                                   +" for citation marker '%0'.",
+                                                   referenceMarkName
+                                                   );
+                    throw new BibEntryNotFoundException(referenceMarkName, msg);
+                } else {
+                    cEntries[j] = tmpEntry;
                 }
-                cEntries[j] = tmpEntry;
-            }
 
-        } // for j
-        return cEntries;
+            } // for j
+            return cEntries;
+        }
     }
 
     private static String rcmCitationMarkerForIsCitationKeyCiteMarkers( BibEntry[] cEntries,
