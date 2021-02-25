@@ -1620,10 +1620,8 @@ class OOBibBase {
             assertAllKeysInCiteKeyToBibEntry( referenceMarkNames, bibtexKeys, citeKeyToBibEntry );
 
             for (int i = 0; i < referenceMarkNames.size(); i++) {
-                final String namei = referenceMarkNames.get(i);
 
                 BibEntry[] cEntries =
-                    // mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei );
                     Arrays.stream( bibtexKeys[i] )
                     .map( key -> citeKeyToBibEntry.get(key)  )
                     .sorted( comparatorForMulticite(style) ) // sort within referenceMark
