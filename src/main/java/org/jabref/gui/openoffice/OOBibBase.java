@@ -1549,6 +1549,18 @@ class OOBibBase {
         }
     }
 
+    /**
+     * Produce citMarkers for normal (!isCitationKeyCiteMarkers && !
+     * isNumberEntries) styles.
+     *
+     * @param referenceMarkNames
+     * @param bibtexKeysIn
+     * @param citeKeyToBibEntry
+     * @param types
+     * @param entries
+     * @param uniquefiers Filled with new values
+     * @param style
+     */
     RcmCitationMarkersForNormalStyleResult
         rcmCitationMarkersForNormalStyle(List<String> referenceMarkNames,
                                          String[][] bibtexKeysIn,
@@ -1560,6 +1572,8 @@ class OOBibBase {
                                          )
         throws BibEntryNotFoundException
     {
+        uniquefiers.clear();
+
         assert( !style.isCitationKeyCiteMarkers() );
         assert( !style.isNumberEntries() );
         // Citations in (Au1, Au2 2000) form
@@ -1796,15 +1810,15 @@ class OOBibBase {
 
 
         // keys cited in the text
-        List<String>               cited = findCitedKeys( documentConnection );
-        Map<String, BibEntry>      citeKeyToBibEntry   = new HashMap<>();
-        Map<BibEntry, BibDatabase> entries = findCitedEntries(databases, cited, citeKeyToBibEntry);
+        List<String>               cited              = findCitedKeys( documentConnection );
+        Map<String, BibEntry>      citeKeyToBibEntry  = new HashMap<>();
+        Map<BibEntry, BibDatabase> entries            = findCitedEntries(databases, cited, citeKeyToBibEntry);
         // entries are now in same order as cited
-        //
-        //
-        String[]   citMarkers  = new String[nRefMarks];
-        // fill:
-        //    citMarkers[i] = what goes in the text
+
+
+        // citMarkers[i] = what goes in the text
+        String[] citMarkers  = new String[nRefMarks];
+
 
 
         // fill citMarkers
