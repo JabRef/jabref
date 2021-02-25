@@ -1297,6 +1297,20 @@ class OOBibBase {
         }
     }
 
+    /**
+     *   @param referenceMarkNames
+     *
+     *   @param bibtexKeys Expects bibtexKeys[i] to correspond to
+     *               referenceMarkNames.get(i)
+     *
+     *   @param citeKeyToBibEntry Look up BibEntry by bibtexKey.
+     *               Must contain all bibtexKeys, but may map to UndefinedBibtexEntry.
+     *
+     *   @return Numbered citation markers for bibtexKeys.
+     *
+     *   Numbering is according to first encounter in bibtexKeys[i][j] (for(i){for(j){}} )
+     *
+     */
     private static String []
         rcmCitationMarkersForIsNumberEntriesIsSortByPosition( List<String> referenceMarkNames,
                                                               String[][] bibtexKeys,
@@ -1311,7 +1325,6 @@ class OOBibBase {
         assert( nRefMarks == bibtexKeys.length );
         String[]   citMarkers     = new String[nRefMarks];
 
-        // // For numbered citation style. Map( citedKey, number )
         CitationNumberingState cns = new CitationNumberingState();
 
         final int minGroupingCount =
@@ -1324,20 +1337,12 @@ class OOBibBase {
                             mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei, false );
             assert (cEntries.length == bibtexKeys[i].length) ;
 
-            // Assumption:
-            //
-            // We have sorted the citation markers according to their
-            // order of appearance, so we simply count up for each marker
-            // referring to a new entry:
             //
             // nums: Numbers for cEntries, (-1) for none.
             //       Passed to style.getNumCitationMarker()
-            //
-            //
-            // fill nums while adjusting lastNum and filling numbers
-            //
-            List<Integer> num = numberPossiblyUndefinedBibEntres( cEntries, cns );
-            citMarkers[i] = style.getNumCitationMarker(num, minGroupingCount, false);
+            List<Integer> nums = numberPossiblyUndefinedBibEntres( cEntries, cns );
+
+            citMarkers[i] = style.getNumCitationMarker(nums, minGroupingCount, false);
         } // for
         return citMarkers;
     }
