@@ -1626,13 +1626,14 @@ class OOBibBase {
                     // mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei );
                     Arrays.stream( bibtexKeys[i] )
                     .map( key -> citeKeyToBibEntry.get(key)  )
-                    .sorted( comparatorForMulticite(style) )
+                    .sorted( comparatorForMulticite(style) ) // sort within referenceMark
                     .toArray( BibEntry[]::new );
 
                 // Update key list to match the new sorting:
-                for (int j = 0; j < cEntries.length; j++) {
-                    bibtexKeys[i][j] = cEntries[j].getCitationKey().orElse(null);
-                }
+                bibtexKeys[i] =
+                    Arrays.stream( cEntries )
+                    .map( ce -> ce.getCitationKey().orElse(null) )
+                    .toArray( String[]::new );
 
                 citMarkers[i] = style.getCitationMarker( Arrays.asList(cEntries), // entries
                                                          entries, // database
