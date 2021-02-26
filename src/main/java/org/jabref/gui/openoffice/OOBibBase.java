@@ -1522,6 +1522,14 @@ class OOBibBase {
         }
     }
 
+    /**
+     *  For each name in referenceMarkNames fill types[i] and
+     *  bibtexKeys[i] with values parsed from referenceMarkNames.get(i)
+     *
+     *  @param referenceMarkNames Should only contain parsable names.
+     *  @param types OUT Preallocated, same length as referenceMarkNames.
+     *  @param bibtexKeys OUT First level must be same length as referenceMarkNames.
+     */
     private static void parseRefMarkNamesToArrays( List<String> referenceMarkNames,
                                                    int[] types,
                                                    String[][] bibtexKeys )
@@ -1533,7 +1541,11 @@ class OOBibBase {
             final String namei = referenceMarkNames.get(i);
             Optional<ParsedRefMark> op = parseRefMarkName( namei );
             if ( !op.isPresent() ) {
-                assert( false );
+                // We have a problem. We want types[i] and bibtexKeys[i]
+                // to correspond to referenceMarkNames.get(i).
+                // And do not want null in bibtexKeys (or error code in types)
+                // on return.
+                assert false : "parseRefMarkNamesToArrays expects parsable referenceMarkNames";
                 continue;
             }
             ParsedRefMark ov = op.get();
