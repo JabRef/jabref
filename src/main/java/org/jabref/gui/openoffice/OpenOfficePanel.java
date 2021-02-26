@@ -201,13 +201,13 @@ public class OpenOfficePanel {
 
                 if (!unresolvedKeys.isEmpty()) {
                     dialogService
-			.showErrorDialogAndWait(
-			    Localization.lang
-			    ("Unable to synchronize bibliography"),
-			    Localization.lang
-			    ("Your OpenOffice/LibreOffice document references the citation key '%0', which could not be found in your current library.",
-			     unresolvedKeys.get(0) )
-						);
+                        .showErrorDialogAndWait(
+                            Localization.lang
+                            ("Unable to synchronize bibliography"),
+                            Localization.lang
+                            ("Your OpenOffice/LibreOffice document references the citation key '%0', which could not be found in your current library.",
+                             unresolvedKeys.get(0) )
+                                                );
                 }
             } catch (UndefinedCharacterFormatException ex) {
                 reportUndefinedCharacterFormat(ex);
@@ -254,7 +254,7 @@ public class OpenOfficePanel {
             try {
                 ooBase.unCombineCiteMarkers(getBaseList(), style);
             } catch (NoDocumentException ex) {
-		showNoDocumentErrorMessage();
+                showNoDocumentErrorMessage();
             } catch (UndefinedCharacterFormatException ex) {
                 reportUndefinedCharacterFormat(ex);
             } catch (com.sun.star.lang.IllegalArgumentException | UnknownPropertyException | PropertyVetoException |
@@ -326,8 +326,8 @@ public class OpenOfficePanel {
 
             BibDatabaseContext databaseContext = new BibDatabaseContext(newDatabase);
             this.frame.addTab(databaseContext, true);
-	} catch (NoDocumentException ex ) {
-	    showNoDocumentErrorMessage();
+        } catch (NoDocumentException ex ) {
+            showNoDocumentErrorMessage();
         } catch (BibEntryNotFoundException ex) {
             LOGGER.debug("BibEntry not found", ex);
             dialogService.showErrorDialogAndWait(Localization.lang("Unable to synchronize bibliography"),
@@ -516,14 +516,14 @@ public class OpenOfficePanel {
                         style = loader.getUsedStyle();
                     }
                     ooBase.insertEntry(entries,
-				       database,
-				       getBaseList(),
-				       style,
-				       inParenthesis,
-				       withText,
-				       pageInfo,
+                                       database,
+                                       getBaseList(),
+                                       style,
+                                       inParenthesis,
+                                       withText,
+                                       pageInfo,
                                        ooPrefs.getSyncWhenCiting()
-				       );
+                                       );
                 } catch (FileNotFoundException ex) {
 
                     dialogService.showErrorDialogAndWait(
@@ -603,10 +603,10 @@ public class OpenOfficePanel {
 
     private void showConnectionLostErrorMessage() {
         dialogService.showErrorDialogAndWait
-	    (Localization.lang("Connection lost"),
-	     Localization.lang
-	     ("Connection to OpenOffice/LibreOffice has been lost. "
-	      + "Please make sure OpenOffice/LibreOffice is running, and try to reconnect."));
+            (Localization.lang("Connection lost"),
+             Localization.lang
+             ("Connection to OpenOffice/LibreOffice has been lost. "
+              + "Please make sure OpenOffice/LibreOffice is running, and try to reconnect."));
     }
 
     private void showNoDocumentErrorMessage() {
