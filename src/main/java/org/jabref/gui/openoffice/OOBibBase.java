@@ -792,7 +792,7 @@ class OOBibBase {
      */
     private static class ParsedRefMark {
         public String i; // "", "0", "1" ...
-        public int itcType  // in-text-citation type
+        public int itcType; // in-text-citation type
         public List<String> citedKeys;
         ParsedRefMark( String i, int itcType, List<String> citedKeys ) {
             this.i         = i;
