@@ -2469,38 +2469,38 @@ class OOBibBase {
         final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
                                                 documentConnection.xText);
 
-        int piv = 0;
+        int pivot = 0;
         boolean madeModifications = false;
         XNameAccess nameAccess = documentConnection.getReferenceMarks();
 
-        while (piv < (names.size() - 1)) {
+        while (pivot < (names.size() - 1)) {
             XTextRange range1 =
                 unoQI(XTextContent.class,
-                      nameAccess.getByName(names.get(piv)))
+                      nameAccess.getByName(names.get(pivot)))
                 .getAnchor()
                 .getEnd();
 
             XTextRange range2 =
                 unoQI(XTextContent.class,
-                      nameAccess.getByName(names.get(piv + 1)))
+                      nameAccess.getByName(names.get(pivot + 1)))
                 .getAnchor()
                 .getStart();
 
             if (range1.getText() != range2.getText()) {
-                /* piv and (piv+1) belong to different XText entities?
+                /* pivot and (pivot+1) belong to different XText entities?
                  * Maybe to different footnotes?
                  * Cannot combine accross boundaries skip.
                  */
-                piv++;
+                pivot++;
                 continue;
             }
 
-            // Start from end of text for piv.
+            // Start from end of text for pivot.
             XTextCursor mxDocCursor =
                 range1.getText().createTextCursorByRange(range1);
 
             // Select next character, and more, as long as we can and
-            // do not reach stat of (piv+1), which we now know to be
+            // do not reach stat of (pivot+1), which we now know to be
             // under the same XText entity.
             mxDocCursor.goRight((short) 1, true);
             boolean couldExpand = true;
@@ -2513,7 +2513,7 @@ class OOBibBase {
 
             // Check if the string contains line breaks and any  non-whitespace.
             if ((cursorText.indexOf('\n') != -1) || !cursorText.trim().isEmpty()){
-                piv++;
+                pivot++;
                 continue;
             }
 
@@ -2527,11 +2527,11 @@ class OOBibBase {
             }
 
             List<String> keys =
-                parseRefMarkNameToUniqueCitationKeys(names.get(piv))
-                .addAll(parseRefMarkNameToUniqueCitationKeys(names.get(piv + 1)));
+                parseRefMarkNameToUniqueCitationKeys(names.get(pivot))
+                .addAll(parseRefMarkNameToUniqueCitationKeys(names.get(pivot + 1)));
 
-            removeReferenceMark(documentConnection, names.get(piv));
-            removeReferenceMark(documentConnection, names.get(piv + 1));
+            removeReferenceMark(documentConnection, names.get(pivot));
+            removeReferenceMark(documentConnection, names.get(pivot + 1));
 
             List<BibEntry> entries = lookupEntriesInDatabases(keys, databases);
             Collections.sort(entries, new FieldComparator(StandardField.YEAR));
@@ -2547,10 +2547,10 @@ class OOBibBase {
                                                       OOBibBase.AUTHORYEAR_PAR
                                                       );
             insertReferenceMark(documentConnection, bName, "tmp", mxDocCursor, true, style);
-            names.set(piv + 1, bName); // <- put in the next-to-be-processed position
+            names.set(pivot + 1, bName); // <- put in the next-to-be-processed position
             madeModifications = true;
 
-            piv++;
+            pivot++;
         } // while
 
         if (madeModifications) {
@@ -2584,14 +2584,14 @@ class OOBibBase {
         final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
                                                 documentConnection.xText);
 
-        int piv = 0;
+        int pivot = 0;
         boolean madeModifications = false;
         XNameAccess nameAccess = documentConnection.getReferenceMarks();
 
-        while (piv < (names.size())) {
+        while (pivot < (names.size())) {
             XTextRange range1 =
                 unoQI(XTextContent.class,
-                      nameAccess.getByName(names.get(piv)))
+                      nameAccess.getByName(names.get(pivot)))
                 .getAnchor();
 
             XTextCursor mxDocCursor =
@@ -2606,13 +2606,13 @@ class OOBibBase {
                 testFormatCitations( mxDocCursor, style );
             }
 
-            List<String> keys = parseRefMarkNameToUniqueCitationKeys(names.get(piv));
+            List<String> keys = parseRefMarkNameToUniqueCitationKeys(names.get(pivot));
             if (keys.size() <= 1) {
-                piv++;
+                pivot++;
                 continue;
             }
 
-            removeReferenceMark(documentConnection, names.get(piv));
+            removeReferenceMark(documentConnection, names.get(pivot));
 
             // Insert bookmark for each key
             int last = keys.size() - 1;
@@ -2632,7 +2632,7 @@ class OOBibBase {
             }
             madeModifications = true;
 
-            piv++;
+            pivot++;
         }
         if (madeModifications) {
             updateSortedReferenceMarks();
