@@ -60,6 +60,7 @@ import com.sun.star.frame.XController;
 import com.sun.star.frame.XDesktop;
 import com.sun.star.frame.XFrame;
 import com.sun.star.frame.XModel;
+
 import com.sun.star.lang.DisposedException;
 import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.Locale;
@@ -67,6 +68,7 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.lang.XComponent;
 import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.lang.XMultiServiceFactory;
+
 import com.sun.star.text.XBookmarksSupplier;
 import com.sun.star.text.XDocumentIndexesSupplier;
 import com.sun.star.text.XFootnote;
@@ -81,6 +83,7 @@ import com.sun.star.text.XTextSection;
 import com.sun.star.text.XTextSectionsSupplier;
 import com.sun.star.text.XTextViewCursor;
 import com.sun.star.text.XTextViewCursorSupplier;
+
 import com.sun.star.uno.Any;
 import com.sun.star.uno.Type;
 import com.sun.star.uno.UnoRuntime;
@@ -132,6 +135,7 @@ class OOBibBase {
         public XComponent              xCurrentComponent;
         public XPropertySet            propertySet;
         public XPropertyContainer      userProperties;
+
         DocumentConnection(XMultiServiceFactory    mxDocFactory,
                            XTextDocument           mxDoc,
                            XText                   xText,
@@ -140,13 +144,13 @@ class OOBibBase {
                            XPropertySet            propertySet,
                            XPropertyContainer      userProperties
                            ) {
-            this.mxDocFactory = mxDocFactory ;
-            this.mxDoc = mxDoc ;
-            this.xText = xText ;
-            this.xViewCursorSupplier = xViewCursorSupplier ;
-            this.xCurrentComponent = xCurrentComponent ;
-            this.propertySet = propertySet ;
-            this.userProperties = userProperties ;
+            this.mxDocFactory        = mxDocFactory;
+            this.mxDoc               = mxDoc;
+            this.xText               = xText;
+            this.xViewCursorSupplier = xViewCursorSupplier;
+            this.xCurrentComponent   = xCurrentComponent;
+            this.propertySet         = propertySet;
+            this.userProperties      = userProperties;
         }
 
         public Optional<String> getDocumentTitle() {
@@ -209,26 +213,26 @@ class OOBibBase {
             try {
                 XNameAccess res = supplier.getReferenceMarks();
                 return res;
-            } catch ( Exception ex ){
+            } catch ( Exception ex ) {
                 LOGGER.warn( "getReferenceMarks caught: ", ex );
                 throw new NoDocumentException("getReferenceMarks failed");
             }
         }
 
-        public boolean checkDocumentConnection(){
-            boolean res = true;
-            // These are set by selectDocument:
-            if (null == this.xCurrentComponent   ){ res = false; }
-            if (null == this.mxDoc               ){ res = false; }
-            if (null == this.xViewCursorSupplier ){ res = false; }
-            if (null == this.xText               ){ res = false; }
-            if (null == this.mxDocFactory        ){ res = false; }
-            if (null == this.userProperties      ){ res = false; }
-            if (null == this.propertySet         ){ res = false; }
+        public boolean checkDocumentConnection() {
 
-            if ( ! res ){
-                return false;
-            }
+            // These are set by selectDocument:
+            if (   null == this.xCurrentComponent
+                || null == this.mxDoc
+                || null == this.xViewCursorSupplier
+                || null == this.xText
+                || null == this.mxDocFactory
+                || null == this.userProperties
+                || null == this.propertySet        )
+                {
+                    return false;
+                }
+
             // Attempt to check document is really available
             // TODO
             try {
@@ -247,7 +251,7 @@ class OOBibBase {
             if (names == null) {
                 return new ArrayList<>();
             }
-            return  Arrays.asList( names );
+            return Arrays.asList( names );
         }
 
         public String getCitationContext(String refMarkName,
@@ -314,7 +318,7 @@ class OOBibBase {
         }
 
         // Get the cursor positioned by the user.
-        public XTextViewCursor getViewCursor(){
+        public XTextViewCursor getViewCursor() {
             return this.xViewCursorSupplier.getViewCursor();
         }
 
@@ -347,7 +351,6 @@ class OOBibBase {
     /*
      * Constructor
      */
-
     public OOBibBase(Path loPath,
                      boolean atEnd,
                      DialogService dialogService
