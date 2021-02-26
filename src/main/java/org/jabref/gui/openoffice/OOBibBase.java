@@ -1278,13 +1278,13 @@ class OOBibBase {
             XTextRange range1 = UnoRuntime.queryInterface(XTextContent.class, nameAccess.getByName(names.get(pivot)))
                 .getAnchor();
 
-            XTextCursor mxDocCursor = range1.getText().createTextCursorByRange(range1);
+            XTextCursor textCursor = range1.getText().createTextCursorByRange(range1);
 
             // If we are supposed to set character format for citations, test this before
             // making any changes. This way we can throw an exception before any reference
             // marks are removed, preventing damage to the user's document:
             if (style.isFormatCitations()) {
-                XPropertySet xCursorProps = UnoRuntime.queryInterface(XPropertySet.class, mxDocCursor);
+                XPropertySet xCursorProps = UnoRuntime.queryInterface(XPropertySet.class, textCursor);
                 String charStyle = style.getCitationCharacterFormat();
                 try {
                     xCursorProps.setPropertyValue(CHAR_STYLE_NAME, charStyle);
@@ -1305,11 +1305,11 @@ class OOBibBase {
                 int i = 0;
                 for (String key : keys) {
                     String bName = getUniqueReferenceMarkName(key, OOBibBase.AUTHORYEAR_PAR);
-                    insertReferenceMark(bName, "tmp", mxDocCursor, true, style);
-                    mxDocCursor.collapseToEnd();
+                    insertReferenceMark(bName, "tmp", textCursor, true, style);
+                    textCursor.collapseToEnd();
                     if (i != last) {
-                        mxDocCursor.setString(" ");
-                        mxDocCursor.collapseToEnd();
+                        textCursor.setString(" ");
+                        textCursor.collapseToEnd();
                     }
                     i++;
                 }
