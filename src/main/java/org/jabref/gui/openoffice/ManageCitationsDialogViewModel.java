@@ -1,7 +1,6 @@
 package org.jabref.gui.openoffice;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
@@ -17,7 +16,6 @@ import com.sun.star.beans.NotRemoveableException;
 import com.sun.star.beans.PropertyExistException;
 import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.container.NoSuchElementException;
-import com.sun.star.container.XNameAccess;
 import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.WrappedTargetException;
 import org.slf4j.Logger;
