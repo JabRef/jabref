@@ -1272,10 +1272,10 @@ class OOBibBase {
 
         final XTextRangeCompare compare = UnoRuntime.queryInterface(XTextRangeCompare.class, text);
 
-        int piv = 0;
+        int pivot = 0;
         boolean madeModifications = false;
-        while (piv < (names.size())) {
-            XTextRange range1 = UnoRuntime.queryInterface(XTextContent.class, nameAccess.getByName(names.get(piv)))
+        while (pivot < (names.size())) {
+            XTextRange range1 = UnoRuntime.queryInterface(XTextContent.class, nameAccess.getByName(names.get(pivot)))
                 .getAnchor();
 
             XTextCursor mxDocCursor = range1.getText().createTextCursorByRange(range1);
@@ -1296,9 +1296,9 @@ class OOBibBase {
                 }
             }
 
-            List<String> keys = parseRefMarkName(names.get(piv));
+            List<String> keys = parseRefMarkName(names.get(pivot));
             if (keys.size() > 1) {
-                removeReferenceMark(names.get(piv));
+                removeReferenceMark(names.get(pivot));
 
                 // Insert bookmark for each key
                 int last = keys.size() - 1;
@@ -1315,7 +1315,7 @@ class OOBibBase {
                 }
                 madeModifications = true;
             }
-            piv++;
+            pivot++;
         }
         if (madeModifications) {
             updateSortedReferenceMarks();
