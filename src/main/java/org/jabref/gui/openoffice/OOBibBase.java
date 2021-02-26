@@ -2528,7 +2528,7 @@ class OOBibBase {
 
             List<String> keys =
                 parseRefMarkNameToUniqueCitationKeys(names.get(pivot));
-                keys.addAll(parseRefMarkNameToUniqueCitationKeys(names.get(pivot + 1)));
+            keys.addAll(parseRefMarkNameToUniqueCitationKeys(names.get(pivot + 1)));
 
             removeReferenceMark(documentConnection, names.get(pivot));
             removeReferenceMark(documentConnection, names.get(pivot + 1));
