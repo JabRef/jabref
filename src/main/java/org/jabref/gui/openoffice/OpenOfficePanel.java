@@ -202,11 +202,11 @@ public class OpenOfficePanel {
                 if (!unresolvedKeys.isEmpty()) {
                     dialogService
                         .showErrorDialogAndWait(
-                            Localization.lang
-                            ("Unable to synchronize bibliography"),
-                            Localization.lang
-                            ("Your OpenOffice/LibreOffice document references the citation key '%0', which could not be found in your current library.",
-                             unresolvedKeys.get(0) )
+                            Localization.lang("Unable to synchronize bibliography"),
+                            Localization.lang("Your OpenOffice/LibreOffice document references"
+                                              + " the citation key '%0',"
+                                              + " which could not be found in your current library.",
+                             unresolvedKeys.get(0))
                                                 );
                 }
             } catch (UndefinedCharacterFormatException ex) {
@@ -326,7 +326,7 @@ public class OpenOfficePanel {
 
             BibDatabaseContext databaseContext = new BibDatabaseContext(newDatabase);
             this.frame.addTab(databaseContext, true);
-        } catch (NoDocumentException ex ) {
+        } catch (NoDocumentException ex) {
             showNoDocumentErrorMessage();
         } catch (BibEntryNotFoundException ex) {
             LOGGER.debug("BibEntry not found", ex);
@@ -602,10 +602,8 @@ public class OpenOfficePanel {
     }
 
     private void showConnectionLostErrorMessage() {
-        dialogService.showErrorDialogAndWait
-            (Localization.lang("Connection lost"),
-             Localization.lang
-             ("Connection to OpenOffice/LibreOffice has been lost. "
+        dialogService.showErrorDialogAndWait(Localization.lang("Connection lost"),
+             Localization.lang("Connection to OpenOffice/LibreOffice has been lost. "
               + "Please make sure OpenOffice/LibreOffice is running, and try to reconnect."));
     }
 
