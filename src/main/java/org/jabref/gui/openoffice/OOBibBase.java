@@ -2120,13 +2120,13 @@ class OOBibBase {
                    CreationException
     {
 
-        XTextCursor mxDocCursor = documentConnection.xText.createTextCursor();
+        XTextCursor textCursor = documentConnection.xText.createTextCursor();
         if (end) {
-            mxDocCursor.gotoEnd(false);
+            textCursor.gotoEnd(false);
         } else {
-            // where does mxDocCursor point to in this branch?
+            // where does textCursor point to in this branch?
         }
-        OOUtil.insertParagraphBreak(documentConnection.xText, mxDocCursor);
+        OOUtil.insertParagraphBreak(documentConnection.xText, textCursor);
         // Create a new TextSection from the document factory and access it's XNamed interface
         XNamed xChildNamed;
         try {
@@ -2141,7 +2141,7 @@ class OOBibBase {
         xChildNamed.setName(OOBibBase.BIB_SECTION_NAME);
         // Access the Child_Section's XTextContent interface and insert it into the document
         XTextContent xChildSection = unoQI(XTextContent.class, xChildNamed);
-        documentConnection.xText.insertTextContent(mxDocCursor, xChildSection, false);
+        documentConnection.xText.insertTextContent(textCursor, xChildSection, false);
     }
 
     private void clearBibTextSectionContent2(DocumentConnection documentConnection)
@@ -2428,10 +2428,10 @@ class OOBibBase {
         return entries;
     }
 
-    private void testFormatCitations(XTextCursor mxDocCursor, OOBibStyle style )
+    private void testFormatCitations(XTextCursor textCursor, OOBibStyle style )
         throws UndefinedCharacterFormatException
     {
-        XPropertySet xCursorProps = unoQI(XPropertySet.class, mxDocCursor);
+        XPropertySet xCursorProps = unoQI(XPropertySet.class, textCursor);
         String charStyle = style.getCitationCharacterFormat();
         try {
             xCursorProps.setPropertyValue(CHAR_STYLE_NAME, charStyle);
@@ -2496,20 +2496,20 @@ class OOBibBase {
             }
 
             // Start from end of text for pivot.
-            XTextCursor mxDocCursor =
+            XTextCursor textCursor =
                 range1.getText().createTextCursorByRange(range1);
 
             // Select next character, and more, as long as we can and
             // do not reach stat of (pivot+1), which we now know to be
             // under the same XText entity.
-            mxDocCursor.goRight((short) 1, true);
+            textCursor.goRight((short) 1, true);
             boolean couldExpand = true;
-            while (couldExpand && (compare.compareRegionEnds(mxDocCursor, range2) > 0)) {
-                couldExpand = mxDocCursor.goRight((short) 1, true);
+            while (couldExpand && (compare.compareRegionEnds(textCursor, range2) > 0)) {
+                couldExpand = textCursor.goRight((short) 1, true);
             }
 
             // Take what we selected
-            String cursorText = mxDocCursor.getString();
+            String cursorText = textCursor.getString();
 
             // Check if the string contains line breaks and any  non-whitespace.
             if ((cursorText.indexOf('\n') != -1) || !cursorText.trim().isEmpty()){
@@ -2523,7 +2523,7 @@ class OOBibBase {
             // marks are removed, preventing damage to the user's
             // document:
             if (style.isFormatCitations()) {
-                testFormatCitations( mxDocCursor, style );
+                testFormatCitations( textCursor, style );
             }
 
             List<String> keys =
@@ -2546,7 +2546,7 @@ class OOBibBase {
                                                       keyString,
                                                       OOBibBase.AUTHORYEAR_PAR
                                                       );
-            insertReferenceMark(documentConnection, bName, "tmp", mxDocCursor, true, style);
+            insertReferenceMark(documentConnection, bName, "tmp", textCursor, true, style);
             names.set(pivot + 1, bName); // <- put in the next-to-be-processed position
             madeModifications = true;
 
@@ -2594,7 +2594,7 @@ class OOBibBase {
                       nameAccess.getByName(names.get(pivot)))
                 .getAnchor();
 
-            XTextCursor mxDocCursor =
+            XTextCursor textCursor =
                 range1.getText().createTextCursorByRange(range1);
 
             // If we are supposed to set character format for
@@ -2603,7 +2603,7 @@ class OOBibBase {
             // marks are removed, preventing damage to the user's
             // document:
             if (style.isFormatCitations()) {
-                testFormatCitations( mxDocCursor, style );
+                testFormatCitations( textCursor, style );
             }
 
             List<String> keys = parseRefMarkNameToUniqueCitationKeys(names.get(pivot));
@@ -2622,11 +2622,11 @@ class OOBibBase {
                                                           key,
                                                           OOBibBase.AUTHORYEAR_PAR
                                                           );
-                insertReferenceMark(documentConnection, bName, "tmp", mxDocCursor, true, style);
-                mxDocCursor.collapseToEnd();
+                insertReferenceMark(documentConnection, bName, "tmp", textCursor, true, style);
+                textCursor.collapseToEnd();
                 if (i != last) {
-                    mxDocCursor.setString(" ");
-                    mxDocCursor.collapseToEnd();
+                    textCursor.setString(" ");
+                    textCursor.collapseToEnd();
                 }
                 i++;
             }
