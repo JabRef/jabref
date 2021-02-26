@@ -1,8 +1,19 @@
 package org.jabref.gui.openoffice;
 
 /**
- * Exception used to indicate that the plugin attempted to set a character format that is
- * not defined in the current OpenOffice document.
+ * Exception used to indicate that we cannot manipulate the current
+ * document.
+ *
+ * OOBibBase.selectDocument : NoDocumentException("No Writer documents found");
+ * OOBibBase.getReferenceMarks : NoDocumentException("getReferenceMarks failed");
+ *
+ * Note: similar to ConnectionLostException, but here connection to
+ *       OpenOffice may be intact, e.g. if the document is closed, but
+ *       OpenOffice is not.
+ *
+ *       On the other hand: it is not clear what this distinction buys
+ *       us, since we do not connect to multiple documents.
+ *
  */
 class NoDocumentException extends Exception {
 
