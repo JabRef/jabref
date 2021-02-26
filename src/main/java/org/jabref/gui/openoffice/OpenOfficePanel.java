@@ -249,7 +249,7 @@ public class OpenOfficePanel {
         });
 
         unmerge.setMaxWidth(Double.MAX_VALUE);
-        unmerge.setTooltip(new Tooltip(Localization.lang("UnCombine merged citations")));
+        unmerge.setTooltip(new Tooltip(Localization.lang("Separate merged citations")));
         unmerge.setOnAction(e -> {
             try {
                 ooBase.unCombineCiteMarkers(getBaseList(), style);
