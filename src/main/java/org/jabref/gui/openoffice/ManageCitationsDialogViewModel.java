@@ -32,15 +32,15 @@ public class ManageCitationsDialogViewModel {
     private final DialogService dialogService;
 
     public ManageCitationsDialogViewModel(OOBibBase ooBase,
-					  DialogService dialogService)
-	throws NoSuchElementException,
-	       WrappedTargetException,
-	       UnknownPropertyException,
-	       NoDocumentException {
+                                          DialogService dialogService)
+        throws NoSuchElementException,
+               WrappedTargetException,
+               UnknownPropertyException,
+               NoDocumentException {
         this.ooBase        = ooBase;
         this.dialogService = dialogService;
 
-	List<CitationEntry> cts = ooBase.getCitationEntries();
+        List<CitationEntry> cts = ooBase.getCitationEntries();
         for (CitationEntry entry : cts) {
             CitationEntryViewModel itemViewModelEntry = new CitationEntryViewModel(entry);
             citations.add(itemViewModelEntry);
@@ -55,7 +55,7 @@ public class ManageCitationsDialogViewModel {
             .collect(Collectors.toList());
 
         try {
-	    ooBase.applyCitationEntries(citationEntries);
+            ooBase.applyCitationEntries(citationEntries);
         } catch (UnknownPropertyException
                  | NotRemoveableException
                  | PropertyExistException
