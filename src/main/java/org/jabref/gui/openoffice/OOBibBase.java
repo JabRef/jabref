@@ -1238,7 +1238,7 @@ class OOBibBase {
         throws BibEntryNotFoundException
     {
         final int nRefMarks = referenceMarkNames.size();
-        assert( nRefMarks == bibtexKeys.length );
+        assert ( nRefMarks == bibtexKeys.length );
 
         for (int i = 0; i < nRefMarks; i++) {
             final String referenceMarkName = referenceMarkNames.get(i);
@@ -1606,13 +1606,13 @@ class OOBibBase {
     {
         uniquefiers.clear();
 
-        assert( !style.isCitationKeyCiteMarkers() );
-        assert( !style.isNumberEntries() );
+        assert !style.isCitationKeyCiteMarkers();
+        assert !style.isNumberEntries();
         // Citations in (Au1, Au2 2000) form
 
         final int nRefMarks = referenceMarkNames.size();
-        assert( bibtexKeysIn.length == nRefMarks );
-        assert( types.length        == nRefMarks );
+        assert ( bibtexKeysIn.length == nRefMarks );
+        assert ( types.length        == nRefMarks );
         assertAllKeysInCiteKeyToBibEntry( referenceMarkNames, bibtexKeysIn, citeKeyToBibEntry );
 
         BibEntry[][] cEntriesForAll =
@@ -1636,7 +1636,7 @@ class OOBibBase {
             .toArray(String[][]::new);
 
         assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeysIn, citeKeyToBibEntry);
-        assert(bibtexKeys.length == nRefMarks);
+        assert (bibtexKeys.length == nRefMarks);
 
         String[] citMarkers = new String[nRefMarks];
         for (int i = 0; i < nRefMarks; i++) {
