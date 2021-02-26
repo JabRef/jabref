@@ -1268,7 +1268,6 @@ class OOBibBase {
             UndefinedCharacterFormatException, UnknownPropertyException, PropertyVetoException, CreationException,
             BibEntryNotFoundException {
         XNameAccess nameAccess = getReferenceMarks();
-        // TODO: doesn't work for citations in footnotes/tables
         List<String> names = getSortedReferenceMarks(nameAccess);
 
         final XTextRangeCompare compare = UnoRuntime.queryInterface(XTextRangeCompare.class, text);
