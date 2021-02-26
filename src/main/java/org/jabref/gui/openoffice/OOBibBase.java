@@ -1406,8 +1406,8 @@ class OOBibBase {
         for (int i = 0; i < referenceMarkNames.size(); i++) {
             final String namei = referenceMarkNames.get(i);
 
-            List<Integer> num ;
-            num = findCitedEntryIndices( Arrays.asList(bibtexKeys[i]), sortedCited );
+            List<Integer> num =
+                findCitedEntryIndices( Arrays.asList(bibtexKeys[i]), sortedCited );
             citMarkers[i] = style.getNumCitationMarker(num, minGroupingCount, false);
         }
         return citMarkers;
