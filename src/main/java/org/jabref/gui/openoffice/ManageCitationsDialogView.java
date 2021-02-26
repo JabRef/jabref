@@ -60,8 +60,7 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
         throws NoSuchElementException,
                WrappedTargetException,
                UnknownPropertyException,
-               NoDocumentException
-    {
+               NoDocumentException {
 
         viewModel = new ManageCitationsDialogViewModel(ooBase, dialogService);
 
