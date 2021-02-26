@@ -45,6 +45,7 @@ public class AboutDialogView extends BaseDialog<Void> {
         viewModel = new AboutDialogViewModel(dialogService, clipBoardManager, buildInfo);
 
         textAreaVersions.setText(viewModel.getVersionInfo());
+        this.setResizable(false);
     }
 
     @FXML
@@ -75,6 +76,11 @@ public class AboutDialogView extends BaseDialog<Void> {
     @FXML
     public void openLicense() {
         viewModel.openLicense();
+    }
+
+    @FXML
+    public void openContributors() {
+        viewModel.openContributors();
     }
 
     @FXML

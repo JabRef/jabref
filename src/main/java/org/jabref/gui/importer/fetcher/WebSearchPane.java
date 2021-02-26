@@ -5,6 +5,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -72,16 +73,15 @@ public class WebSearchPane extends SidePaneComponent {
         // Create text field for query input
         TextField query = SearchTextField.create();
         query.getStyleClass().add("searchBar");
-        query.textProperty().addListener((observable, oldValue, newValue) -> viewModel.validateQueryStringAndGiveColorFeedback(query, newValue));
-        query.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-                viewModel.validateQueryStringAndGiveColorFeedback(query, query.getText());
-            } else {
-                viewModel.setPseudoClassToValid(query);
-            }
-        });
 
         viewModel.queryProperty().bind(query.textProperty());
+
+        // Allows to trigger search on pressing enter
+        query.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                viewModel.search();
+            }
+        });
 
         // Create button that triggers search
         Button search = new Button(Localization.lang("Search"));

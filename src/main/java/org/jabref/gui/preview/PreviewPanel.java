@@ -145,6 +145,8 @@ public class PreviewPanel extends VBox {
         MenuItem copyPreview = new MenuItem(Localization.lang("Copy preview"), IconTheme.JabRefIcons.COPY.getGraphicNode());
         keyBindingRepository.getKeyCombination(KeyBinding.COPY_PREVIEW).ifPresent(copyPreview::setAccelerator);
         copyPreview.setOnAction(event -> previewView.copyPreviewToClipBoard());
+        MenuItem copySelection = new MenuItem(Localization.lang("Copy selection"));
+        copySelection.setOnAction(event -> previewView.copySelectionToClipBoard());
         MenuItem printEntryPreview = new MenuItem(Localization.lang("Print entry preview"), IconTheme.JabRefIcons.PRINTED.getGraphicNode());
         printEntryPreview.setOnAction(event -> previewView.print());
         MenuItem previousPreviewLayout = new MenuItem(Localization.lang("Previous preview layout"));
@@ -156,6 +158,7 @@ public class PreviewPanel extends VBox {
 
         ContextMenu menu = new ContextMenu();
         menu.getItems().add(copyPreview);
+        menu.getItems().add(copySelection);
         menu.getItems().add(printEntryPreview);
         menu.getItems().add(new SeparatorMenuItem());
         menu.getItems().add(nextPreviewLayout);

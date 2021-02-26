@@ -86,7 +86,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         MainTablePreferences mainTablePreferences = preferencesService.getMainTablePreferences();
 
         importHandler = new ImportHandler(
-                dialogService, database, externalFileTypes,
+                database, externalFileTypes,
                 preferencesService,
                 Globals.getFileUpdateMonitor(),
                 undoManager,
@@ -137,7 +137,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             }
         }
         */
-       mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
+
+        mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
                     .map(column -> (MainTableColumn<?>) column)
                     .filter(column -> column.getModel().equals(columnModel))
@@ -173,8 +174,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     /**
-     * This is called, if a user starts typing some characters into the keyboard with focus on main table.
-     * The {@link MainTable} will scroll to the cell with the same starting column value and typed string
+     * This is called, if a user starts typing some characters into the keyboard with focus on main table. The {@link
+     * MainTable} will scroll to the cell with the same starting column value and typed string
      *
      * @param sortedColumn The sorted column in {@link MainTable}
      * @param keyEvent     The pressed character
@@ -354,7 +355,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             // Center -> link files to entry
             // Depending on the pressed modifier, move/copy/link files to drop target
             switch (ControlHelper.getDroppingMouseLocation(row, event)) {
-                case TOP, BOTTOM -> importHandler.importAsNewEntries(files);
+                case TOP, BOTTOM -> importHandler.importFilesInBackground(files).executeWith(Globals.TASK_EXECUTOR);
                 case CENTER -> {
                     BibEntry entry = target.getEntry();
                     switch (event.getTransferMode()) {
