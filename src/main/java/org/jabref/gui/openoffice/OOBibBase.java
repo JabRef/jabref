@@ -2582,7 +2582,6 @@ class OOBibBase {
     {
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
 
-        // TODO: doesn't work for citations in footnotes/tables
         List<String> names =
             getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
 
