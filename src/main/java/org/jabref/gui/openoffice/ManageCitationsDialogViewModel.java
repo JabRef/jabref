@@ -36,13 +36,12 @@ public class ManageCitationsDialogViewModel {
 	throws NoSuchElementException,
 	       WrappedTargetException,
 	       UnknownPropertyException,
-	       NoDocumentException
-    {
+	       NoDocumentException {
         this.ooBase        = ooBase;
         this.dialogService = dialogService;
 
 	List<CitationEntry> cts = ooBase.getCitationEntries();
-        for ( CitationEntry entry  : cts ) {
+        for (CitationEntry entry : cts) {
             CitationEntryViewModel itemViewModelEntry = new CitationEntryViewModel(entry);
             citations.add(itemViewModelEntry);
         }
@@ -56,15 +55,14 @@ public class ManageCitationsDialogViewModel {
             .collect(Collectors.toList());
 
         try {
-	    ooBase.applyCitationEntries( citationEntries );
+	    ooBase.applyCitationEntries(citationEntries);
         } catch (UnknownPropertyException
                  | NotRemoveableException
                  | PropertyExistException
                  | IllegalTypeException
                  | IllegalArgumentException
                  | NoDocumentException ex
-                 )
-            {
+                 ) {
                 LOGGER.warn("Problem modifying citation", ex);
                 dialogService.showErrorDialogAndWait(Localization.lang("Problem modifying citation"), ex);
             }
