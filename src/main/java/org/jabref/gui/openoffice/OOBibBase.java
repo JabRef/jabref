@@ -886,14 +886,14 @@ class OOBibBase {
                             );
             // Generate unique bookmark-name
             int    citationType = citationTypeFromOptions( withText, inParenthesis );
-            String bName        = getUniqueReferenceMarkName( documentConnection,
+            String newName        = getUniqueReferenceMarkName( documentConnection,
                                                               keyString,
                                                               citationType );
 
             // If we should store metadata for page info, do that now:
             if (pageInfo != null) {
                 LOGGER.info("Storing page info: " + pageInfo);
-                documentConnection.setCustomProperty(bName, pageInfo);
+                documentConnection.setCustomProperty(newName, pageInfo);
             }
 
             // insert space
@@ -945,7 +945,7 @@ class OOBibBase {
                                               null, // uniquefiers
                                               null  // unlimAuthors
                                               );
-                insertReferenceMark(documentConnection, bName, citeText, cursor, withText, style);
+                insertReferenceMark(documentConnection, newName, citeText, cursor, withText, style);
             }
 
             // Move to the right of the space and remember this
@@ -2542,12 +2542,12 @@ class OOBibBase {
                 .collect(Collectors.joining(","));
 
             // Insert reference mark:
-            String bName = getUniqueReferenceMarkName(documentConnection,
+            String newName = getUniqueReferenceMarkName(documentConnection,
                                                       keyString,
                                                       OOBibBase.AUTHORYEAR_PAR
                                                       );
-            insertReferenceMark(documentConnection, bName, "tmp", textCursor, true, style);
-            names.set(pivot + 1, bName); // <- put in the next-to-be-processed position
+            insertReferenceMark(documentConnection, newName, "tmp", textCursor, true, style);
+            names.set(pivot + 1, newName); // <- put in the next-to-be-processed position
             madeModifications = true;
 
             pivot++;
@@ -2618,11 +2618,11 @@ class OOBibBase {
             int last = keys.size() - 1;
             int i = 0;
             for (String key : keys) {
-                String bName = getUniqueReferenceMarkName(documentConnection,
+                String newName = getUniqueReferenceMarkName(documentConnection,
                                                           key,
                                                           OOBibBase.AUTHORYEAR_PAR
                                                           );
-                insertReferenceMark(documentConnection, bName, "tmp", textCursor, true, style);
+                insertReferenceMark(documentConnection, newName, "tmp", textCursor, true, style);
                 textCursor.collapseToEnd();
                 if (i != last) {
                     textCursor.setString(" ");
