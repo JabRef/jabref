@@ -35,7 +35,7 @@ public class ManageCitationsDialogViewModel {
                WrappedTargetException,
                UnknownPropertyException,
                NoDocumentException {
-        this.ooBase        = ooBase;
+        this.ooBase = ooBase;
         this.dialogService = dialogService;
 
         List<CitationEntry> cts = ooBase.getCitationEntries();
