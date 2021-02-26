@@ -225,7 +225,7 @@ class OOBibBase {
             if (null == this.mxDocFactory        ){ res = false; }
             if (null == this.userProperties      ){ res = false; }
             if (null == this.propertySet         ){ res = false; }
-            //
+
             if ( ! res ){
                 return false;
             }
@@ -574,7 +574,7 @@ class OOBibBase {
 
         // TODO: maybe we should install an event handler for document
         // close: addCloseListener
-        //
+        // Reference:
         // https://www.openoffice.org/api/docs/common/ref/com/sun/star/
         //         util/XCloseBroadcaster.html#addCloseListener
     }
@@ -735,11 +735,11 @@ class OOBibBase {
     {
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
         // Leave exceptions to the caller.
-        //
+
         // Note: not catching exceptions here means nothing is applied
         //       after the first problematic entry. We might catch and
-        //       collect messages here. 
-        //
+        //       collect messages here.
+
         // try {
         for (CitationEntry entry : citationEntries) {
             Optional<String> pageInfo = entry.getPageInfo();
@@ -916,7 +916,7 @@ class OOBibBase {
                         // Setting the character format failed, so we
                         // throw an exception that will result in an
                         // error message for the user.
-                        //
+
                         // Before that, delete the space we inserted:
                         cursor.goLeft((short) 1, true);
                         cursor.setString("");
@@ -947,10 +947,9 @@ class OOBibBase {
                                               );
                 insertReferenceMark(documentConnection, bName, citeText, cursor, withText, style);
             }
-            //
+
             // Move to the right of the space and remember this
             // position: we will come back here in the end.
-            //
             cursor.collapseToEnd();
             cursor.goRight((short) 1, false);
             XTextRange position = cursor.getEnd();
@@ -1375,6 +1374,10 @@ class OOBibBase {
         return citMarkers;
     }
 
+    /**
+     *  Produce citation markers for the case of `numbered entries`
+     *  that are not sorted by position.
+     */
     private String[]
         rcmCitationMarkersForIsNumberEntriesNotSortByPosition( List<String> referenceMarkNames,
                                                                String[][] bibtexKeys,
@@ -1388,33 +1391,25 @@ class OOBibBase {
         assert( nRefMarks == bibtexKeys.length );
         String[]   citMarkers     = new String[nRefMarks];
 
-        // An exception: numbered entries that are NOT sorted by position
-        // exceptional_refmarkorder, entries and cited are sorted
-        //if (style.isNumberEntries() && ! style.isSortByPosition()) {
-        //
         // sort entries to order in bibliography
         Map<BibEntry, BibDatabase> sortedEntries = sortEntriesByComparator( entries, entryComparator );
+
         // adjust order of cited to match
         List<String> sortedCited = new ArrayList( entries.size() );
         sortedCited.clear();
         for (BibEntry entry : sortedEntries.keySet()) {
             sortedCited.add(entry.getCitationKey().orElse(null));
         }
-        //}
 
         final int minGroupingCount =
             style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
         for (int i = 0; i < referenceMarkNames.size(); i++) {
             final String namei = referenceMarkNames.get(i);
 
-            //
-            // BibEntry[] cEntries =
-            //    mapCiteKeysToBibEntryArray( bibtexKeys[i], citeKeyToBibEntry, namei, false );
-            // assert (cEntries.length == bibtexKeys[i].length) ;
             List<Integer> num ;
             num = findCitedEntryIndices( Arrays.asList(bibtexKeys[i]) , sortedCited );
             citMarkers[i] = style.getNumCitationMarker(num, minGroupingCount, false);
-        } // for
+        }
         return citMarkers;
     }
 
@@ -1665,7 +1660,7 @@ class OOBibBase {
             // uses: nRefMarks, normCitMarkers, bibtexKeys,
             //       style (style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST))
             //       citeKeyToBibEntry, entries, types
-            //
+
             if (!style.isCitationKeyCiteMarkers() && !style.isNumberEntries()) {
                 // Only for normal citations. Numbered citations and
                 // citeKeys are already unique.
@@ -1803,7 +1798,7 @@ class OOBibBase {
         // Normally we sort the reference marks according to their
         // order of appearance:
         List<String> referenceMarkNames = jabRefReferenceMarkNamesSortedByPosition;
-        //
+
         // Compute citation markers for all citations:
         final int nRefMarks  = referenceMarkNames.size();
 
@@ -2176,9 +2171,10 @@ class OOBibBase {
                 // NoSuchElementException: is thrown by child access
                 // methods of collections, if the addressed child does
                 // not exist.
-                //
-                // We got this exception from ts.getByName() despite the ts.hasByName() check
-                // just above.
+
+                // We got this exception from ts.getByName() despite
+                // the ts.hasByName() check just above.
+
                 // Try to create.
                 LOGGER.warn( "Could not get section '"+ OOBibBase.BIB_SECTION_NAME + "'", ex );
                 createBibTextSection2(documentConnection, this.atEnd);
