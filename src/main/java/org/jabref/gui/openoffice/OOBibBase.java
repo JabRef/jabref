@@ -93,7 +93,6 @@ import org.slf4j.LoggerFactory;
 @AllowedToUseAwt("Requires AWT for italics and bold")
 class OOBibBase {
 
-
     private static final OOPreFormatter POSTFORMATTER = new OOPreFormatter();
 
     private static final String BIB_SECTION_NAME = "JR_bib";
@@ -115,10 +114,6 @@ class OOBibBase {
     private static final Logger LOGGER =
             LoggerFactory.getLogger(OOBibBase.class);
 
-    /*
-     * Shall we keep calls I suspect to be useless?
-     */
-    private final boolean run_useless_parts = true;
     /* variables  */
     private final DialogService dialogService;
     private final XDesktop xDesktop;
@@ -368,10 +363,7 @@ class OOBibBase {
         }
         XDesktop result = unoQI(XDesktop.class, desktop);
 
-        // TODO: useless call?
-        if (run_useless_parts) {
-            unoQI(XComponentLoader.class, desktop);
-        }
+        unoQI(XComponentLoader.class, desktop);
 
         return result;
     }
@@ -500,10 +492,7 @@ class OOBibBase {
 
         XComponent component = unoQI(XComponent.class, mxDoc);
 
-        // TODO: what is the point of the next line? Does it have a side effect?
-        if (run_useless_parts) {
-            unoQI(XDocumentIndexesSupplier.class, component);
-        }
+        unoQI(XDocumentIndexesSupplier.class, component);
 
         XTextViewCursorSupplier viewCursorSupplier;
 
