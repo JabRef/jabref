@@ -1521,37 +1521,40 @@ class OOBibBase {
         }
     }
 
-        private static void parseRefMarkNamesToArrays( List<String> referenceMarkNames, int[] types, String[][] bibtexKeys ) {
-            final int nRefMarks = referenceMarkNames.size();
-            assert ( types.length      == nRefMarks );
-            assert ( bibtexKeys.length == nRefMarks );
-            for (int i = 0; i < nRefMarks; i++) {
-                final String namei = referenceMarkNames.get(i);
-                Optional<ParsedRefMark> op = parseRefMarkName( namei );
-                if ( !op.isPresent() ) {
-                    assert( false );
-                    continue;
-                }
-                ParsedRefMark ov = op.get();
-                types[i]      = ov.itcType; // Remember the itcType in case we need to uniquefy.
-                bibtexKeys[i] = ov.citedKeys.stream().toArray(String[]::new);
+    private static void parseRefMarkNamesToArrays( List<String> referenceMarkNames,
+                                                   int[] types,
+                                                   String[][] bibtexKeys )
+    {
+        final int nRefMarks = referenceMarkNames.size();
+        assert ( types.length      == nRefMarks );
+        assert ( bibtexKeys.length == nRefMarks );
+        for (int i = 0; i < nRefMarks; i++) {
+            final String namei = referenceMarkNames.get(i);
+            Optional<ParsedRefMark> op = parseRefMarkName( namei );
+            if ( !op.isPresent() ) {
+                assert( false );
+                continue;
             }
+            ParsedRefMark ov = op.get();
+            types[i]      = ov.itcType; // Remember the itcType in case we need to uniquefy.
+            bibtexKeys[i] = ov.citedKeys.stream().toArray(String[]::new);
         }
+    }
 
-        private static List<String> unresolvedKeysFromEntries( Map<BibEntry, BibDatabase> entries ) {
-            // Collect and return unresolved citation keys.
-            // uses: entries
-            List<String> unresolvedKeys = new ArrayList<>();
-            for (BibEntry entry : entries.keySet()) {
-                if (entry instanceof UndefinedBibtexEntry) {
-                    String key = ((UndefinedBibtexEntry) entry).getKey();
-                    if (!unresolvedKeys.contains(key)) {
-                        unresolvedKeys.add(key);
-                    }
+    private static List<String> unresolvedKeysFromEntries( Map<BibEntry, BibDatabase> entries ) {
+        // Collect and return unresolved citation keys.
+        // uses: entries
+        List<String> unresolvedKeys = new ArrayList<>();
+        for (BibEntry entry : entries.keySet()) {
+            if (entry instanceof UndefinedBibtexEntry) {
+                String key = ((UndefinedBibtexEntry) entry).getKey();
+                if (!unresolvedKeys.contains(key)) {
+                    unresolvedKeys.add(key);
                 }
             }
-            return unresolvedKeys;
         }
+        return unresolvedKeys;
+    }
 
 
     private class RcmCitationMarkersForNormalStyleResult {
