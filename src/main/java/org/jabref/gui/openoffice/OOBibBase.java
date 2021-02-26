@@ -1,7 +1,6 @@
 package org.jabref.gui.openoffice;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
