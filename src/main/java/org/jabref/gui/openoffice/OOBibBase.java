@@ -348,6 +348,41 @@ class OOBibBase {
      * Constructor
      */
 
+    public OOBibBase(Path loPath,
+                     boolean atEnd,
+                     DialogService dialogService
+                     ) throws IllegalAccessException,
+                              InvocationTargetException,
+                              BootstrapException,
+                              CreationException,
+                              IOException,
+                              ClassNotFoundException
+    {
+        this.dialogService = dialogService;
+        {
+            FieldComparator a = new FieldComparator(StandardField.AUTHOR);
+            FieldComparator y = new FieldComparator(StandardField.YEAR);
+            FieldComparator t = new FieldComparator(StandardField.TITLE);
+
+            {
+                List<Comparator<BibEntry>> ayt = new ArrayList<>(3);
+                ayt.add(a);
+                ayt.add(y);
+                ayt.add(t);
+                this.entryComparator = new FieldComparatorStack<>(ayt);
+            }
+            {
+                List<Comparator<BibEntry>> yat = new ArrayList<>(3);
+                yat.add(y);
+                yat.add(a);
+                yat.add(t);
+                this.yearAuthorTitleComparator = new FieldComparatorStack<>(yat);
+            }
+        }
+        this.atEnd    = atEnd;
+        this.xDesktop = simpleBootstrap(loPath);
+    }
+
     private XDesktop simpleBootstrap(Path loPath)
         throws CreationException,
                BootstrapException
@@ -374,42 +409,6 @@ class OOBibBase {
         return result;
     }
 
-    public OOBibBase(Path loPath,
-                     boolean atEnd,
-                     DialogService dialogService
-                     ) throws IllegalAccessException,
-                              InvocationTargetException,
-                              BootstrapException,
-                              CreationException,
-                              IOException,
-                              ClassNotFoundException
-    {
-        this.dialogService = dialogService;
-        {
-            FieldComparator a = new FieldComparator(StandardField.AUTHOR);
-            FieldComparator y = new FieldComparator(StandardField.YEAR);
-            FieldComparator t = new FieldComparator(StandardField.TITLE);
-
-            {
-                List<Comparator<BibEntry>> ayt = new ArrayList<>(3);
-                ayt.add(a);
-                ayt.add(y);
-                ayt.add(t);
-                this.entryComparator= new FieldComparatorStack<>(ayt);
-            }
-            {
-                List<Comparator<BibEntry>> yat = new ArrayList<>(3);
-                yat.add(y);
-                yat.add(a);
-                yat.add(t);
-                this.yearAuthorTitleComparator = new FieldComparatorStack<>(yat);
-            }
-        }
-        this.atEnd    = atEnd;
-        this.xDesktop = simpleBootstrap(loPath);
-    }
-
-
     /*
      *  section: selectDocument()
      */
@@ -425,7 +424,7 @@ class OOBibBase {
 
         while (compEnum.hasMoreElements()) {
             Object       next = compEnum.nextElement();
-            XComponent   comp = unoQI(XComponent.class   , next);
+            XComponent   comp = unoQI(XComponent.class, next);
             XTextDocument doc = unoQI(XTextDocument.class, comp);
             if (doc != null) {
                 result.add(doc);
@@ -441,7 +440,7 @@ class OOBibBase {
 
         try {
             XFrame frame           = doc.getCurrentController().getFrame();
-            Object frame_title_obj = OOUtil.getProperty( frame , "Title");
+            Object frame_title_obj = OOUtil.getProperty( frame, "Title" );
             String frame_title_str = String.valueOf(frame_title_obj);
             return  Optional.of(frame_title_str);
         } catch (UnknownPropertyException | WrappedTargetException e) {
@@ -472,6 +471,7 @@ class OOBibBase {
                 return description;
             }
         }
+
         List<DocumentTitleViewModel> viewModel =
             list.stream()
             .map( DocumentTitleViewModel::new )
@@ -536,7 +536,7 @@ class OOBibBase {
 
 
         // TODO: what is the point of the next line? Does it have a side effect?
-        if ( run_useless_parts ){
+        if ( run_useless_parts ) {
             unoQI(XDocumentIndexesSupplier.class, component);
         }
 
@@ -582,20 +582,20 @@ class OOBibBase {
     /*
      * TODO: GUI should be notified
      */
-    private void forgetDocument(){
-        this.xDocumentConnection   = null ;
+    private void forgetDocument() {
+        this.xDocumentConnection = null ;
     }
 
     public boolean isConnectedToDocument() {
         return this.xDocumentConnection != null;
     }
 
-    public boolean checkDocumentConnection(){
-        if (this.xDocumentConnection == null){
+    public boolean checkDocumentConnection() {
+        if (this.xDocumentConnection == null) {
             return false;
         }
         boolean res = this.xDocumentConnection.checkDocumentConnection();
-        if ( ! res ){
+        if ( !res ) {
             forgetDocument();
         }
         return res;
@@ -604,7 +604,7 @@ class OOBibBase {
     private DocumentConnection getDocumentConnectionOrThrow()
         throws NoDocumentException
     {
-        if ( ! checkDocumentConnection() ){
+        if ( !checkDocumentConnection() ) {
             throw new NoDocumentException("Not connected to document");
         }
         return this.xDocumentConnection;
@@ -615,21 +615,19 @@ class OOBibBase {
      */
 
     public Optional<String> getCurrentDocumentTitle() {
-        if ( ! checkDocumentConnection() ){
+        if ( !checkDocumentConnection() ) {
             return Optional.empty();
         } else {
-            return  this.xDocumentConnection.getDocumentTitle();
+            return this.xDocumentConnection.getDocumentTitle();
         }
     }
-
-
 
     /*
      * === insertEntry
      */
 
     private Comparator<BibEntry> comparatorForMulticite(OOBibStyle style){
-        if (style.getBooleanCitProperty( OOBibStyle.MULTI_CITE_CHRONOLOGICAL )) {
+        if ( style.getBooleanCitProperty( OOBibStyle.MULTI_CITE_CHRONOLOGICAL ) ) {
             return this.yearAuthorTitleComparator;
         } else {
             return this.entryComparator;
@@ -639,25 +637,25 @@ class OOBibBase {
     private void sortBibEntryListForMulticite( List<BibEntry>    entries,
                                                OOBibStyle        style )
     {
-        if (entries.size() <= 1){
+        if (entries.size() <= 1) {
             return;
         }
-        entries.sort( comparatorForMulticite(style));
+        entries.sort( comparatorForMulticite(style) );
     }
 
     private static int citationTypeFromOptions( boolean withText, boolean inParenthesis ) {
-        if ( !withText ){
-            return OOBibBase.INVISIBLE_CIT ;
+        if ( !withText ) {
+            return OOBibBase.INVISIBLE_CIT;
         }
         return ( inParenthesis
                  ? OOBibBase.AUTHORYEAR_PAR
                  : OOBibBase.AUTHORYEAR_INTEXT );
     }
 
-
-    private static boolean isJabRefReferenceMarkName( String name ){
+    private static boolean isJabRefReferenceMarkName( String name ) {
         return (CITE_PATTERN.matcher(name).find());
     }
+
     private static List<String> filterIsJabRefReferenceMarkName( List<String> names ) {
         return ( names
                  .stream()
@@ -790,10 +788,10 @@ class OOBibBase {
      *
      */
     private static class ParsedRefMark {
-        public String i ; // "", "0", "1" ...
-        public int itcType ; // in-text-citation type
+        public String i; // "", "0", "1" ...
+        public int itcType  // in-text-citation type
         public List<String> citedKeys;
-        ParsedRefMark( String i, int itcType, List<String> citedKeys ){
+        ParsedRefMark( String i, int itcType, List<String> citedKeys ) {
             this.i         = i;
             this.itcType   = itcType;
             this.citedKeys = citedKeys;
@@ -804,7 +802,7 @@ class OOBibBase {
      * Parse a refMarkName.
      *
      */
-    private static Optional<ParsedRefMark> parseRefMarkName( String refMarkName ){
+    private static Optional<ParsedRefMark> parseRefMarkName( String refMarkName ) {
         Matcher citeMatcher = CITE_PATTERN.matcher(refMarkName);
         if (!citeMatcher.find()) {
             return Optional.empty();
@@ -886,7 +884,7 @@ class OOBibBase {
                             );
             // Generate unique bookmark-name
             int    citationType = citationTypeFromOptions( withText, inParenthesis );
-            String newName        = getUniqueReferenceMarkName( documentConnection,
+            String newName      = getUniqueReferenceMarkName( documentConnection,
                                                               keyString,
                                                               citationType );
 
@@ -976,9 +974,9 @@ class OOBibBase {
                 // Go back to the relevant position:
                 try {
                     cursor.gotoRange(position, false);
-                } catch ( com.sun.star.uno.RuntimeException ex ){
+                } catch ( com.sun.star.uno.RuntimeException ex ) {
                     LOGGER.warn("OOBibBase.insertEntry:"
-                                +" Could not go back to end of in-text citation", ex);
+                                + " Could not go back to end of in-text citation", ex);
                 }
             }
 
@@ -1002,8 +1000,8 @@ class OOBibBase {
      *         If name does not match CITE_PATTERN, an empty List<String> is returned.
      */
     private List<String> parseRefMarkNameToUniqueCitationKeys(String name) {
-        Optional< ParsedRefMark > op = parseRefMarkName( name );
-        if ( op.isPresent() ){
+        Optional<ParsedRefMark> op = parseRefMarkName( name );
+        if ( op.isPresent() ) {
             return op.get().citedKeys.stream().distinct().collect(Collectors.toList());
         }
         return new ArrayList<>();
@@ -1047,7 +1045,6 @@ class OOBibBase {
         return keys;
     }
 
-
     /**
      * @return LinkedHashMap, from BibEntry to BibDatabase
      *         Side effect: add citedKeys to citeKeyToBibEntry, using UndefinedBibtexEntry if not found.
@@ -1084,7 +1081,7 @@ class OOBibBase {
                          List<String> citedKeys
                          )
     {
-        Map<String, BibEntry>   citeKeyToBibEntry  = new HashMap<>();
+        Map<String, BibEntry> citeKeyToBibEntry = new HashMap<>();
 
         // LinkedHashMap, iteration order as in citedKeys
         Map<BibEntry, BibDatabase> entries = new LinkedHashMap<>();
@@ -1152,13 +1149,14 @@ class OOBibBase {
         }
     }
 
-    private static BibEntry undefinedBibentryToNull( BibEntry cEntry ){
-        if ( cEntry instanceof UndefinedBibtexEntry ){
+    private static BibEntry undefinedBibentryToNull( BibEntry cEntry ) {
+        if ( cEntry instanceof UndefinedBibtexEntry ) {
             return null;
         }
         return cEntry;
     }
-    private static BibEntry[] mapUndefinedBibentriesToNull( BibEntry[] cEntries ){
+
+    private static BibEntry[] mapUndefinedBibentriesToNull( BibEntry[] cEntries ) {
         return
             Arrays.stream(cEntries)
             .map( OOBibBase::undefinedBibentryToNull )
@@ -1166,10 +1164,10 @@ class OOBibBase {
     }
 
     private static void
-        assertKeysInCiteKeyToBibEntry(  String[] keys, // citeKeys
-                                        Map<String, BibEntry> citeKeyToBibEntry,
-                                        String referenceMarkName   // for reporting
-                                        )
+        assertKeysInCiteKeyToBibEntry( String[] keys, // citeKeys
+                                       Map<String, BibEntry> citeKeyToBibEntry,
+                                       String referenceMarkName // for reporting
+                                       )
         throws BibEntryNotFoundException
     {
         // check keys
@@ -1178,11 +1176,11 @@ class OOBibBase {
             .filter( key -> null == citeKeyToBibEntry.get(key) )
             .collect(Collectors.toList());
 
-        for ( String key : unresovedKeys ){
+        for ( String key : unresovedKeys ) {
             LOGGER.info("Citation key not found: '" + key + '\'');
             LOGGER.info("Problem with reference mark: '" + referenceMarkName + '\'');
             String msg = Localization.lang("Could not resolve BibTeX entry"
-                                           +" for citation marker '%0'.",
+                                           + " for citation marker '%0'.",
                                            referenceMarkName
                                            );
             throw new BibEntryNotFoundException(referenceMarkName, msg);
