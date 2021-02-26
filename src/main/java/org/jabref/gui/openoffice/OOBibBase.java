@@ -1189,6 +1189,7 @@ class OOBibBase {
         }
     }
 
+    // TODO: is mapCiteKeysToBibEntryArray is still needed?
     private static BibEntry[]
         mapCiteKeysToBibEntryArray( String[] keys, // citeKeys
                                     Map<String, BibEntry> citeKeyToBibEntry,
