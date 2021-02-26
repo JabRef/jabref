@@ -83,7 +83,7 @@ public class OpenOfficePanel {
     private final Button pushEntriesAdvanced = new Button(Localization.lang("Cite special"));
     private final Button update;
     private final Button merge = new Button(Localization.lang("Merge citations"));
-    private final Button unmerge = new Button(Localization.lang("UnMerge citations"));
+    private final Button unmerge = new Button(Localization.lang("Separate citations"));
     private final Button manageCitations = new Button(Localization.lang("Manage citations"));
     private final Button exportCitations = new Button(Localization.lang("Export cited"));
     private final Button settingsB = new Button(Localization.lang("Settings"));
