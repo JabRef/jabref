@@ -1304,8 +1304,8 @@ class OOBibBase {
                 int last = keys.size() - 1;
                 int i = 0;
                 for (String key : keys) {
-                    String bName = getUniqueReferenceMarkName(key, OOBibBase.AUTHORYEAR_PAR);
-                    insertReferenceMark(bName, "tmp", textCursor, true, style);
+                    String newName = getUniqueReferenceMarkName(key, OOBibBase.AUTHORYEAR_PAR);
+                    insertReferenceMark(newName, "tmp", textCursor, true, style);
                     textCursor.collapseToEnd();
                     if (i != last) {
                         textCursor.setString(" ");
