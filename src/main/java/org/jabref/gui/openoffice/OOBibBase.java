@@ -2223,17 +2223,17 @@ class OOBibBase {
              (String) style.getProperty(OOBibStyle.REFERENCE_HEADER_PARAGRAPH_FORMAT)
              );
 
-        {
-            String refParaFormat =
-                (String) style.getProperty(OOBibStyle.REFERENCE_PARAGRAPH_FORMAT);
-            insertFullReferenceAtCursor(documentConnection,
-                                        cursor,
-                                        entries,
-                                        style,
-                                        refParaFormat,
-                                        uniquefiers
-                                        );
-        }
+
+        String refParaFormat =
+            (String) style.getProperty(OOBibStyle.REFERENCE_PARAGRAPH_FORMAT);
+        insertFullReferenceAtCursor(documentConnection,
+                                    cursor,
+                                    entries,
+                                    style,
+                                    refParaFormat,
+                                    uniquefiers
+                                    );
+
         insertBookMark(documentConnection, OOBibBase.BIB_SECTION_END_NAME, cursor);
     }
 
@@ -2241,12 +2241,11 @@ class OOBibBase {
                                         String name,
                                         XTextCursor position)
         throws IllegalArgumentException,
-               CreationException
-    {
+               CreationException {
         Object bookmark;
         try {
-            bookmark = ( documentConnection.mxDocFactory
-                         .createInstance("com.sun.star.text.Bookmark") );
+            bookmark = (documentConnection.mxDocFactory
+                        .createInstance("com.sun.star.text.Bookmark"));
         } catch (Exception e) {
             throw new CreationException(e.getMessage());
         }
@@ -2341,8 +2340,7 @@ class OOBibBase {
     private void removeReferenceMark(DocumentConnection documentConnection, String name)
         throws NoSuchElementException,
                WrappedTargetException,
-               NoDocumentException
-    {
+               NoDocumentException {
         XNameAccess xReferenceMarks = documentConnection.getReferenceMarks();
         if (xReferenceMarks.hasByName(name)) {
             Object referenceMark = xReferenceMarks.getByName(name);
@@ -2362,8 +2360,7 @@ class OOBibBase {
     private XTextRange getBookmarkRange(DocumentConnection documentConnection,
                                         String name)
         throws NoSuchElementException,
-               WrappedTargetException
-    {
+               WrappedTargetException {
         XNameAccess xNamedBookmarks = getBookmarks(documentConnection);
 
         // retrieve bookmark by name
@@ -2400,8 +2397,7 @@ class OOBibBase {
             throws UnknownPropertyException,
                    PropertyVetoException,
                    IllegalArgumentException,
-                   WrappedTargetException
-    {
+                   WrappedTargetException {
         XTextRange range = position.getStart();
         XTextCursor cursor = position.getText().createTextCursorByRange(range);
         cursor.goRight((short) start, false);
@@ -2414,7 +2410,7 @@ class OOBibBase {
         }
     }
 
-    List<BibEntry> lookupEntriesInDatabases(List<String> keys, List<BibDatabase> databases){
+    List<BibEntry> lookupEntriesInDatabases(List<String> keys, List<BibDatabase> databases) {
         List<BibEntry> entries = new ArrayList<>();
         for (String key : keys) {
             for (BibDatabase database : databases) {
@@ -2428,9 +2424,8 @@ class OOBibBase {
         return entries;
     }
 
-    private void testFormatCitations(XTextCursor textCursor, OOBibStyle style )
-        throws UndefinedCharacterFormatException
-    {
+    private void testFormatCitations(XTextCursor textCursor, OOBibStyle style)
+        throws UndefinedCharacterFormatException {
         XPropertySet xCursorProps = unoQI(XPropertySet.class, textCursor);
         String charStyle = style.getCitationCharacterFormat();
         try {
@@ -2458,8 +2453,7 @@ class OOBibBase {
                    PropertyVetoException,
                    CreationException,
                    BibEntryNotFoundException,
-                   NoDocumentException
-    {
+                   NoDocumentException {
         DocumentConnection documentConnection = this.xDocumentConnection;
 
         // TODO: doesn't work for citations in footnotes/tables
@@ -2512,7 +2506,7 @@ class OOBibBase {
             String cursorText = textCursor.getString();
 
             // Check if the string contains line breaks and any  non-whitespace.
-            if ((cursorText.indexOf('\n') != -1) || !cursorText.trim().isEmpty()){
+            if ((cursorText.indexOf('\n') != -1) || !cursorText.trim().isEmpty()) {
                 pivot++;
                 continue;
             }
@@ -2523,7 +2517,7 @@ class OOBibBase {
             // marks are removed, preventing damage to the user's
             // document:
             if (style.isFormatCitations()) {
-                testFormatCitations( textCursor, style );
+                testFormatCitations(textCursor, style);
             }
 
             List<String> keys =
@@ -2538,7 +2532,7 @@ class OOBibBase {
 
             String keyString =
                 entries.stream()
-                .map( c -> c.getCitationKey().orElse(""))
+                .map(c -> c.getCitationKey().orElse(""))
                 .collect(Collectors.joining(","));
 
             // Insert reference mark:
@@ -2574,8 +2568,7 @@ class OOBibBase {
                PropertyVetoException,
                CreationException,
                BibEntryNotFoundException,
-               NoDocumentException
-    {
+               NoDocumentException {
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
 
         List<String> names =
@@ -2603,7 +2596,7 @@ class OOBibBase {
             // marks are removed, preventing damage to the user's
             // document:
             if (style.isFormatCitations()) {
-                testFormatCitations( textCursor, style );
+                testFormatCitations(textCursor, style);
             }
 
             List<String> keys = parseRefMarkNameToUniqueCitationKeys(names.get(pivot));
@@ -2646,8 +2639,7 @@ class OOBibBase {
     public BibDatabase generateDatabase(List<BibDatabase> databases)
         throws NoSuchElementException,
                WrappedTargetException,
-               NoDocumentException
-    {
+               NoDocumentException {
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
 
         BibDatabase resultDatabase = new BibDatabase();
