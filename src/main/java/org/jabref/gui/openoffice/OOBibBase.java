@@ -1204,7 +1204,7 @@ class OOBibBase {
             // process keys
             BibEntry[] cEntries =
                 Arrays.stream( keys )
-                .map( key -> (BibEntry) citeKeyToBibEntry.get(key)  )
+                .map( key -> (BibEntry) citeKeyToBibEntry.get(key) )
                 .toArray( BibEntry[]::new );
             return cEntries;
 
@@ -1215,11 +1215,11 @@ class OOBibBase {
             for (int j = 0; j < keys.length; j++) {
                 String kj = keys[j];
                 BibEntry tmpEntry = citeKeyToBibEntry.get( kj );
-                if ( tmpEntry == null ){
+                if ( tmpEntry == null ) {
                     LOGGER.info("Citation key not found: '" + kj + '\'');
                     LOGGER.info("Problem with reference mark: '" + referenceMarkName + '\'');
                     String msg = Localization.lang("Could not resolve BibTeX entry"
-                                                   +" for citation marker '%0'.",
+                                                   + " for citation marker '%0'.",
                                                    referenceMarkName
                                                    );
                     throw new BibEntryNotFoundException(referenceMarkName, msg);
@@ -1235,7 +1235,7 @@ class OOBibBase {
     private static void
         assertAllKeysInCiteKeyToBibEntry(List<String> referenceMarkNames,
                                          String[][] bibtexKeys,
-                                         Map<String, BibEntry>  citeKeyToBibEntry)
+                                         Map<String, BibEntry> citeKeyToBibEntry)
         throws BibEntryNotFoundException
     {
         final int nRefMarks = referenceMarkNames.size();
@@ -1253,7 +1253,7 @@ class OOBibBase {
     private static String[]
         rcmCitationMarkersForIsCitationKeyCiteMarkers( List<String> referenceMarkNames,
                                                        String[][] bibtexKeys,
-                                                       Map<String, BibEntry>  citeKeyToBibEntry,
+                                                       Map<String, BibEntry> citeKeyToBibEntry,
                                                        OOBibStyle style )
         throws BibEntryNotFoundException
     {
