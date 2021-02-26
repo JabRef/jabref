@@ -1407,7 +1407,7 @@ class OOBibBase {
             final String namei = referenceMarkNames.get(i);
 
             List<Integer> num ;
-            num = findCitedEntryIndices( Arrays.asList(bibtexKeys[i]) , sortedCited );
+            num = findCitedEntryIndices( Arrays.asList(bibtexKeys[i]), sortedCited );
             citMarkers[i] = style.getNumCitationMarker(num, minGroupingCount, false);
         }
         return citMarkers;
@@ -1422,10 +1422,10 @@ class OOBibBase {
      * @return the (1-based) indices of the cited keys, -1 if a key is not found.
      *         Returns Collections.emptyList() if the ref name could not be resolved as a citation.
      */
-    private static List<Integer> findCitedEntryIndices(List<String>  keysCitedHere,
+    private static List<Integer> findCitedEntryIndices(List<String> keysCitedHere,
                                                        List<String> orderedCiteKeys)
     {
-        List<Integer> result        = new ArrayList<>(keysCitedHere.size());
+        List<Integer> result = new ArrayList<>(keysCitedHere.size());
         for (String key : keysCitedHere) {
             int ind = orderedCiteKeys.indexOf(key);
             result.add(ind == -1 ? -1 : 1 + ind);
@@ -1451,7 +1451,8 @@ class OOBibBase {
                                             List<String> referenceMarkNames,
                                             String[]     citMarkers,
                                             int[]        types,
-                                            OOBibStyle   style      )
+                                            OOBibStyle   style
+                                            )
         throws NoDocumentException,
                NoSuchElementException,
                UndefinedCharacterFormatException,
@@ -1460,9 +1461,9 @@ class OOBibBase {
                WrappedTargetException,
                PropertyVetoException
     {
-        final int nRefMarks  = referenceMarkNames.size();
-        assert( citMarkers.length == nRefMarks );
-        assert( types.length      == nRefMarks );
+        final int nRefMarks = referenceMarkNames.size();
+        assert ( citMarkers.length == nRefMarks );
+        assert ( types.length      == nRefMarks );
 
         XNameAccess xReferenceMarks = documentConnection.getReferenceMarks();
         final boolean hadBibSection =
