@@ -1256,17 +1256,17 @@ class OOBibBase {
                                                        OOBibStyle style )
         throws BibEntryNotFoundException
     {
-        assert( style.isCitationKeyCiteMarkers() );
+        assert style.isCitationKeyCiteMarkers();
 
         final int nRefMarks = referenceMarkNames.size();
-        assert( nRefMarks == bibtexKeys.length );
+        assert nRefMarks == bibtexKeys.length;
         assertAllKeysInCiteKeyToBibEntry( referenceMarkNames, bibtexKeys, citeKeyToBibEntry );
 
         String[] citMarkers = new String[nRefMarks];
         for (int i = 0; i < nRefMarks; i++) {
             citMarkers[i] =
                 Arrays.stream( bibtexKeys[i] )
-                .map( key -> citeKeyToBibEntry.get(key)  )
+                .map( key -> citeKeyToBibEntry.get(key) )
                 .map( (c) -> c.getCitationKey().orElse("") )
                 .collect(Collectors.joining(","));
         }
@@ -1281,7 +1281,7 @@ class OOBibBase {
     private static class CitationNumberingState {
         public Map<String, Integer> numbers;
         public int lastNum;
-        CitationNumberingState(){
+        CitationNumberingState() {
             // For numbered citation style. Map( citedKey, number )
             Map<String, Integer> numbers = new HashMap<>();
             int lastNum = 0;
@@ -1289,7 +1289,7 @@ class OOBibBase {
         /**
          *  The first call returns 1.
          */
-        public int getOrAllocateNumber( String key ){
+        public int getOrAllocateNumber( String key ) {
             int result;
             if (numbers.containsKey(key)) {
                 // Already seen
@@ -1313,7 +1313,7 @@ class OOBibBase {
     private static int numberPossiblyUndefinedBibEntry( BibEntry ce,
                                                         CitationNumberingState cns )
     {
-        if (ce instanceof UndefinedBibtexEntry){
+        if (ce instanceof UndefinedBibtexEntry) {
             return (-1);
         }
 
@@ -1338,21 +1338,21 @@ class OOBibBase {
      *   Numbering is according to first encounter in bibtexKeys[i][j] (for(i){for(j){}} )
      *
      */
-    private static String []
+    private static String[]
         rcmCitationMarkersForIsNumberEntriesIsSortByPosition( List<String> referenceMarkNames,
                                                               String[][] bibtexKeys,
-                                                              Map<String, BibEntry>  citeKeyToBibEntry,
+                                                              Map<String, BibEntry> citeKeyToBibEntry,
                                                               OOBibStyle style )
         throws BibEntryNotFoundException
     {
-        assert (style.isNumberEntries());
-        assert (style.isSortByPosition());
+        assert style.isNumberEntries();
+        assert style.isSortByPosition();
 
         final int nRefMarks = referenceMarkNames.size();
-        assert( nRefMarks == bibtexKeys.length );
+        assert ( nRefMarks == bibtexKeys.length );
         assertAllKeysInCiteKeyToBibEntry( referenceMarkNames, bibtexKeys, citeKeyToBibEntry );
 
-        String[]   citMarkers     = new String[nRefMarks];
+        String[] citMarkers = new String[nRefMarks];
 
         CitationNumberingState cns = new CitationNumberingState();
 
@@ -1384,12 +1384,12 @@ class OOBibBase {
                                                                Map<BibEntry, BibDatabase> entries,
                                                                OOBibStyle style  )
     {
-        assert( style.isNumberEntries() );
-        assert( ! style.isSortByPosition() );
+        assert style.isNumberEntries();
+        assert !style.isSortByPosition();
 
         final int nRefMarks = referenceMarkNames.size();
-        assert( nRefMarks == bibtexKeys.length );
-        String[]   citMarkers     = new String[nRefMarks];
+        assert ( nRefMarks == bibtexKeys.length );
+        String[] citMarkers = new String[nRefMarks];
 
         // sort entries to order in bibliography
         Map<BibEntry, BibDatabase> sortedEntries = sortEntriesByComparator( entries, entryComparator );
