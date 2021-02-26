@@ -1279,7 +1279,7 @@ class OOBibBase {
                 .getAnchor();
 
             XTextCursor mxDocCursor = range1.getText().createTextCursorByRange(range1);
-            //
+
             // If we are supposed to set character format for citations, test this before
             // making any changes. This way we can throw an exception before any reference
             // marks are removed, preventing damage to the user's document:
@@ -1299,7 +1299,7 @@ class OOBibBase {
             List<String> keys = parseRefMarkName(names.get(piv));
             if (keys.size() > 1) {
                 removeReferenceMark(names.get(piv));
-                //
+
                 // Insert bookmark for each key
                 int last = keys.size() - 1;
                 int i = 0;
