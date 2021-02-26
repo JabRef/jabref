@@ -127,7 +127,7 @@ class OOBibBase {
     private final Comparator<BibEntry> yearAuthorTitleComparator;
 
     /* document-connection related */
-    private class DocumentConnection {
+    private static class DocumentConnection {
         public XMultiServiceFactory    mxDocFactory;
         public XTextDocument           mxDoc;
         public XText                   xText;
@@ -234,7 +234,6 @@ class OOBibBase {
                 }
 
             // Attempt to check document is really available
-            // TODO
             try {
                 getReferenceMarks();
             } catch (NoDocumentException ex ) {
