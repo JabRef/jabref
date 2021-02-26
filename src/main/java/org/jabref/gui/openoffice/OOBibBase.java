@@ -88,7 +88,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class for manipulating the Bibliography of the currently started document in OpenOffice.
+ * Class for manipulating the Bibliography of the currently started
+ * document in OpenOffice.
  */
 @AllowedToUseAwt("Requires AWT for italics and bold")
 class OOBibBase {
@@ -472,8 +473,6 @@ class OOBibBase {
 
     /**
      * Choose a document to work with.
-     * <p>
-     * inititalized fields: - this.xCurrentComponent - this.mxDoc - this.xViewCursorSupplier - this.xText - this.mxDocFactory - this.userProperties - this.propertySet
      */
     public void selectDocument()
             throws NoDocumentException,
@@ -667,16 +666,20 @@ class OOBibBase {
 
     /**
      * Apply editable parts of citationEntries to the document.
-     * <p>
+     *
      * - Currently the only editable part is pageInfo.
-     * <p>
-     * Since the only call to applyCitationEntries() only changes pageInfo w.r.t those returned by getCitationEntries(), we can do with the following restrictions:
-     * <p>
+     *
+     * Since the only call to applyCitationEntries() only changes
+     * pageInfo w.r.t those returned by getCitationEntries(), we can
+     * do with the following restrictions:
+     *
      * - Missing pageInfo means no action.
-     * <p>
-     * - Missing CitationEntry means no action (no attempt to remove citation from the text).
-     * <p>
-     * - Reference to citation not present in the text evokes no error, and setCustomProperty() is called.
+     *
+     * - Missing CitationEntry means no action (no attempt to remove
+         citation from the text).
+     *
+     * - Reference to citation not present in the text evokes no
+         error, and setCustomProperty() is called.
      */
     public void applyCitationEntries(List<CitationEntry> citationEntries)
             throws UnknownPropertyException,
@@ -715,8 +718,9 @@ class OOBibBase {
     }
 
     /**
-     * The first occurrence of bibtexKey gets no serial number, the second gets 0, the third 1 ...
-     * <p>
+     * The first occurrence of bibtexKey gets no serial number, the
+     * second gets 0, the third 1 ...
+     *
      * Or the first unused in this series, after removals.
      */
     private String getUniqueReferenceMarkName(DocumentConnection documentConnection,
@@ -763,14 +767,19 @@ class OOBibBase {
     }
 
     /**
-     * This method inserts a cite marker in the text (at the cursor) for the given BibEntry, and may refresh the bibliography.
+     * This method inserts a cite marker in the text (at the cursor)
+     * for the given BibEntry, and may refresh the bibliography.
      *
      * @param entries       The entries to cite.
      * @param database      The database the entry belongs to.
      * @param style         The bibliography style we are using.
-     * @param inParenthesis Indicates whether it is an in-text citation or a citation in parenthesis. This is not relevant if numbered citations are used.
-     * @param withText      Indicates whether this should be a normal citation (true) or an empty (invisible) citation (false).
-     * @param sync          Indicates whether the reference list should be refreshed.
+     * @param inParenthesis Indicates whether it is an in-text
+     * citation or a citation in parenthesis. This is not relevant if
+     * numbered citations are used.
+     * @param withText Indicates whether this should be a normal
+     * citation (true) or an empty (invisible) citation (false).
+     * @param sync Indicates whether the reference list should be
+     * refreshed.
      * @throws IllegalTypeException
      * @throws PropertyExistException
      * @throws NotRemoveableException
@@ -782,7 +791,11 @@ class OOBibBase {
      * @throws PropertyVetoException
      * @throws CreationException
      * @throws BibEntryNotFoundException
-     * @throws UndefinedParagraphFormatException TODO: https://www.openoffice.org/api/docs/common/ref/com/sun/star/document/XUndoManager.html Group changes into a single Undo context.
+     * @throws UndefinedParagraphFormatException
+     *
+     * TODO:
+     * https://www.openoffice.org/api/docs/common/ref/com/sun/star/document/XUndoManager.html
+     * Group changes into a single Undo context.
      */
     public void insertEntry(List<BibEntry> entries,
                             BibDatabase database,
@@ -942,9 +955,9 @@ class OOBibBase {
 
     /**
      * Extract citation keys from names of referenceMarks in the document.
-     * <p>
+     *
      * Each citation key is listed only once, in the order of first appearance.
-     * <p>
+     *
      * doc.referenceMarks.names.map(parse).flatten.unique
      */
     private List<String> findCitedKeys(DocumentConnection documentConnection)
@@ -1228,7 +1241,7 @@ class OOBibBase {
 
     /**
      * Get number for a BibEntry. (-1) for UndefinedBibtexEntry
-     * <p>
+     *
      * BibEntry.getCitationKey() must not be Optional.empty().
      */
     private static int numberPossiblyUndefinedBibEntry(BibEntry ce,
@@ -1245,10 +1258,13 @@ class OOBibBase {
 
     /**
      * @param referenceMarkNames
-     * @param bibtexKeys         Expects bibtexKeys[i] to correspond to referenceMarkNames.get(i)
-     * @param citeKeyToBibEntry  Look up BibEntry by bibtexKey. Must contain all bibtexKeys, but may map to UndefinedBibtexEntry.
-     * @return Numbered citation markers for bibtexKeys.
-     * Numbering is according to first encounter in bibtexKeys[i][j] (for(i){for(j){}} )
+     * @param bibtexKeys Expects bibtexKeys[i] to correspond to
+     * referenceMarkNames.get(i)
+     * @param citeKeyToBibEntry Look up BibEntry by bibtexKey. Must
+     * contain all bibtexKeys, but may map to UndefinedBibtexEntry.
+     * @return Numbered citation markers for bibtexKeys.  Numbering is
+     * according to first encounter in bibtexKeys[i][j]
+     * (for(i){for(j){}} )
      */
     private static String[]
     rcmCitationMarkersForIsNumberEntriesIsSortByPosition(List<String> referenceMarkNames,
@@ -1323,11 +1339,15 @@ class OOBibBase {
     }
 
     /**
-     * Resolve the citation key from a citation reference marker name, and look up the index of the key in a list of keys.
+     * Resolve the citation key from a citation reference marker name,
+     * and look up the index of the key in a list of keys.
      *
      * @param keysCitedHere   The citation keys needing indices.
-     * @param orderedCiteKeys A List of citation keys representing the entries in the bibliography.
-     * @return the (1-based) indices of the cited keys, -1 if a key is not found. Returns Collections.emptyList() if the ref name could not be resolved as a citation.
+     * @param orderedCiteKeys A List of citation keys representing the
+     * entries in the bibliography.
+     * @return the (1-based) indices of the cited keys, -1 if a key is
+     * not found. Returns Collections.emptyList() if the ref name
+     * could not be resolved as a citation.
      */
     private static List<Integer> findCitedEntryIndices(List<String> keysCitedHere,
                                                        List<String> orderedCiteKeys) {
@@ -1340,13 +1360,16 @@ class OOBibBase {
     }
 
     /**
-     * Visit each reference mark in referenceMarkNames, remove its text content, call insertReferenceMark.
-     * <p>
-     * After each insertReferenceMark call check if we lost the OOBibBase.BIB_SECTION_NAME bookmark and recrate it if we did.
+     * Visit each reference mark in referenceMarkNames, remove its
+     * text content, call insertReferenceMark.
+     *
+     * After each insertReferenceMark call check if we lost the
+     * OOBibBase.BIB_SECTION_NAME bookmark and recrate it if we did.
      *
      * @param referenceMarkNames Reference mark names
-     * @param citMarkers         Corresponding text for each reference mark, that replaces the old text.
-     * @param types              itcType codes for each reference mark.
+     * @param citMarkers Corresponding text for each reference mark,
+     * that replaces the old text.
+     * @param types itcType codes for each reference mark.
      * @param style
      */
     private void rcmApplyNewCitationMarkers(DocumentConnection documentConnection,
@@ -1424,7 +1447,8 @@ class OOBibBase {
     }
 
     /**
-     * For each name in referenceMarkNames fill types[i] and bibtexKeys[i] with values parsed from referenceMarkNames.get(i)
+     * For each name in referenceMarkNames fill types[i] and
+     * bibtexKeys[i] with values parsed from referenceMarkNames.get(i)
      *
      * @param referenceMarkNames Should only contain parsable names.
      * @param types              OUT Preallocated, same length as referenceMarkNames.
@@ -1915,7 +1939,8 @@ class OOBibBase {
     /**
      * @param referenceMarkNames
      * @param citeKeyToBibEntry  Helps to find the entries
-     * @return LinkedHashMap from BibEntry to BibDatabase with iteration order as first appearance in referenceMarkNames.
+     * @return LinkedHashMap from BibEntry to BibDatabase with
+     * iteration order as first appearance in referenceMarkNames.
      */
     private Map<BibEntry, BibDatabase>
     sortEntriesByRefMarkNames(List<String> referenceMarkNames,
