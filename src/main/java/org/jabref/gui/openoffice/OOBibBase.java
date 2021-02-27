@@ -742,7 +742,7 @@ class OOBibBase {
                                               String bibtexKey,
                                               int itcType)
             throws NoDocumentException {
-        XNameAccess xNamedRefMarks = xDocumentConnection.getReferenceMarks();
+        XNameAccess xNamedRefMarks = documentConnection.getReferenceMarks();
         int i = 0;
         String name = BIB_CITATION + '_' + itcType + '_' + bibtexKey;
         while (xNamedRefMarks.hasByName(name)) {
