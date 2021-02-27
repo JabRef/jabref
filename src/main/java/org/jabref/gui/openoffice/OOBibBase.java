@@ -242,6 +242,18 @@ class OOBibBase {
             return Arrays.asList(names);
         }
 
+        /**
+         *  Get the text belonging to refMarkName with up to
+         *  charBefore and charAfter characters of context.
+         *
+         *  The actual contaxt may be smaller than requested.
+         *
+         *  @param refMarkName Name of a reference mark.
+         *  @param charBefore
+         *  @param charAfter  Number of characters requested.
+         *  @param htmlMarkup If true, the text belonging to the
+         *  reference mark is surrounded by bold html tag.
+         */
         public String getCitationContext(String refMarkName,
                                          int charBefore,
                                          int charAfter,
@@ -304,18 +316,31 @@ class OOBibBase {
             return result.trim();
         }
 
-        // Get the cursor positioned by the user.
+        /**
+         * Get the cursor positioned by the user.
+         *
+         */
         public XTextViewCursor getViewCursor() {
             return this.xViewCursorSupplier.getViewCursor();
         }
     } // end DocumentConnection
 
+    /**
+     * Created when connected to a document.
+     *
+     * Cleared (to null) when we discover we lost the connection.
+     */
     private DocumentConnection xDocumentConnection;
+
     /*
      *  xUniquefiers : maps bibtexkeys to letters ("a", "b")
      */
     private final Map<String, String> xUniquefiers = new HashMap<>();
 
+    /**
+     *
+     *
+     */
     private List<String> jabRefReferenceMarkNamesSortedByPosition;
 
     /*
