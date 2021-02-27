@@ -121,7 +121,9 @@ class OOBibBase {
     private final Comparator<BibEntry> entryComparator;
     private final Comparator<BibEntry> yearAuthorTitleComparator;
 
-    /* document-connection related */
+    /**
+     * Document-connection related variables.
+     */
     private static class DocumentConnection {
         public XMultiServiceFactory mxDocFactory;
         public XTextDocument mxDoc;
