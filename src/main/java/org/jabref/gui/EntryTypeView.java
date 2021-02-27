@@ -174,10 +174,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
             }
         }
 
-        Platform.runLater(() -> {
-            idTextField.requestFocus();
-            visualizer.initVisualization(viewModel.idFieldValidationStatus(), idTextField, true);
-        });
+        Platform.runLater(() -> idTextField.requestFocus());
     }
 
     public EntryType getChoice() {
