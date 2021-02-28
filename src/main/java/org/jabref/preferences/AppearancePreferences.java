@@ -1,18 +1,16 @@
 package org.jabref.preferences;
 
-import java.util.Objects;
-
-import org.jabref.gui.theme.ThemePreference;
+import org.jabref.gui.theme.Theme;
 
 public class AppearancePreferences {
     private final boolean shouldOverrideDefaultFontSize;
     private final int mainFontSize;
-    private final ThemePreference themePreference;
+    private final Theme theme;
 
-    public AppearancePreferences(boolean shouldOverrideDefaultFontSize, int mainFontSize, ThemePreference themePreference) {
+    public AppearancePreferences(boolean shouldOverrideDefaultFontSize, int mainFontSize, Theme theme) {
         this.shouldOverrideDefaultFontSize = shouldOverrideDefaultFontSize;
         this.mainFontSize = mainFontSize;
-        this.themePreference = themePreference;
+        this.theme = theme;
     }
 
     public boolean shouldOverrideDefaultFontSize() {
@@ -23,26 +21,7 @@ public class AppearancePreferences {
         return mainFontSize;
     }
 
-    public ThemePreference getThemePreference() {
-        return themePreference;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        AppearancePreferences that = (AppearancePreferences) o;
-        return shouldOverrideDefaultFontSize == that.shouldOverrideDefaultFontSize &&
-                mainFontSize == that.mainFontSize &&
-                Objects.equals(themePreference, that.themePreference);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(shouldOverrideDefaultFontSize, mainFontSize, themePreference);
+    public Theme getTheme() {
+        return theme;
     }
 }

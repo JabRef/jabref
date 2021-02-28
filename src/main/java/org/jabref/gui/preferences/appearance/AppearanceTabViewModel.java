@@ -10,8 +10,9 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
-import org.jabref.gui.theme.ThemePreference;
+import org.jabref.gui.theme.Theme;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
@@ -39,6 +40,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
+    private final AppearancePreferences initialAppearancePreferences;
 
     private final Validator fontSizeValidator;
     private final Validator customPathToThemeValidator;
@@ -48,6 +50,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     public AppearanceTabViewModel(DialogService dialogService, PreferencesService preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.initialAppearancePreferences = preferences.getAppearancePreferences();
 
         fontSizeValidator = new FunctionBasedValidator<>(
                 fontSizeProperty,
@@ -74,16 +77,15 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        AppearancePreferences appearancePreferences = preferences.getAppearancePreferences();
-        fontOverrideProperty.setValue(appearancePreferences.shouldOverrideDefaultFontSize());
-        fontSizeProperty.setValue(String.valueOf(appearancePreferences.getMainFontSize()));
+        fontOverrideProperty.setValue(initialAppearancePreferences.shouldOverrideDefaultFontSize());
+        fontSizeProperty.setValue(String.valueOf(initialAppearancePreferences.getMainFontSize()));
 
-        ThemePreference currentTheme = appearancePreferences.getThemePreference();
-        if (currentTheme.getType() == ThemePreference.Type.LIGHT) {
+        Theme currentTheme = initialAppearancePreferences.getTheme();
+        if (currentTheme.getType() == Theme.Type.LIGHT) {
             themeLightProperty.setValue(true);
             themeDarkProperty.setValue(false);
             themeCustomProperty.setValue(false);
-        } else if (currentTheme.getType() == ThemePreference.Type.DARK) {
+        } else if (currentTheme.getType() == Theme.Type.DARK) {
             themeLightProperty.setValue(false);
             themeDarkProperty.setValue(true);
             themeCustomProperty.setValue(false);
@@ -97,9 +99,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-
-        AppearancePreferences currentPreferences = preferences.getAppearancePreferences();
-        if (currentPreferences.shouldOverrideDefaultFontSize() != fontOverrideProperty.getValue()) {
+        if (initialAppearancePreferences.shouldOverrideDefaultFontSize() != fontOverrideProperty.getValue()) {
             restartWarnings.add(Localization.lang("Override font settings"));
         }
 
@@ -108,21 +108,20 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
             restartWarnings.add(Localization.lang("Override font size"));
         }
 
-        ThemePreference newTheme = currentPreferences.getThemePreference();
-        if (themeLightProperty.getValue()) {
-            newTheme = ThemePreference.light();
-        } else if (themeDarkProperty.getValue()) {
-            newTheme = ThemePreference.dark();
+        Theme newTheme = Theme.light(); // default;
+        if (themeDarkProperty.getValue()) {
+            newTheme = Theme.dark();
         } else if (themeCustomProperty.getValue()) {
-            newTheme = ThemePreference.custom(customPathToThemeProperty.getValue());
+            newTheme = Theme.custom(customPathToThemeProperty.getValue());
         }
 
-        preferences.storeAppearancePreference(new AppearancePreferences(
+        AppearancePreferences newAppearancePreferences = new AppearancePreferences(
                 fontOverrideProperty.getValue(),
                 newFontSize,
-                newTheme));
+                newTheme);
 
-        preferences.updateTheme();
+        preferences.storeAppearancePreference(newAppearancePreferences);
+        Globals.getThemeManager().updatePreferences(newAppearancePreferences);
     }
 
     public ValidationStatus fontSizeValidationStatus() {

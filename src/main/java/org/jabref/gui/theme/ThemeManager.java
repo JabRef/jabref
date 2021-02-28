@@ -14,7 +14,6 @@ import java.util.function.Consumer;
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 
-import org.jabref.gui.util.ThemeManager;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.AppearancePreferences;
 
@@ -34,26 +33,25 @@ import org.slf4j.LoggerFactory;
  *
  * @see <a href="https://docs.jabref.org/advanced/custom-themes">Custom themes</a> in the Jabref documentation.
  */
-public class ThemeManagerImpl implements ThemeManager {
+public class ThemeManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ThemeManagerImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThemeManager.class);
 
     private final FileUpdateMonitor fileUpdateMonitor;
-
-    private final Consumer<Runnable> updateRunner;
-
     private final StyleSheet baseStyleSheet;
-
     private final AtomicReference<AppearancePreferences> appearancePreferences = new AtomicReference<>();
 
+    private final Consumer<Runnable> updateRunner;
     private final Set<Scene> scenes = Collections.newSetFromMap(new WeakHashMap<>());
     private final Set<WebEngine> webEngines = Collections.newSetFromMap(new WeakHashMap<>());
 
-    public ThemeManagerImpl(AppearancePreferences initialAppearance, FileUpdateMonitor fileUpdateMonitor, Consumer<Runnable> updateRunner) {
+    public ThemeManager(AppearancePreferences initialPreferences,
+                        FileUpdateMonitor fileUpdateMonitor,
+                        Consumer<Runnable> updateRunner) {
         this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
         this.updateRunner = Objects.requireNonNull(updateRunner);
 
-        this.baseStyleSheet = StyleSheet.create(ThemePreference.BASE_CSS);
+        this.baseStyleSheet = StyleSheet.create(Theme.BASE_CSS);
 
         /* Watching base CSS only works in development and test scenarios, where the build system exposes the CSS as a
         file (e.g. for Gradle run task it will be in build/resources/main/org/jabref/gui/Base.css) */
@@ -67,15 +65,14 @@ public class ThemeManagerImpl implements ThemeManager {
             }
         }
 
-        updateAppearancePreferences(Objects.requireNonNull(initialAppearance));
+        updatePreferences(Objects.requireNonNull(initialPreferences));
     }
 
     private StyleSheet additionalStylesheet() {
-        return appearancePreferences.get().getThemePreference().getAdditionalStylesheet();
+        return appearancePreferences.get().getTheme().getAdditionalStylesheet();
     }
 
-    @Override
-    public void updateAppearancePreferences(AppearancePreferences newPreferences) {
+    public void updatePreferences(AppearancePreferences newPreferences) {
 
         if (newPreferences == null) {
             throw new IllegalArgumentException("Theme preference required");
@@ -86,14 +83,14 @@ public class ThemeManagerImpl implements ThemeManager {
             if (!newPreferences.equals(oldPreferences)) {
                 LOGGER.info("Not updating appearance preferences because it hasn't changed");
 
-                Path oldPath = oldPreferences.getThemePreference().getAdditionalStylesheet().getWatchPath();
+                Path oldPath = oldPreferences.getTheme().getAdditionalStylesheet().getWatchPath();
                 if (oldPath != null) {
                     fileUpdateMonitor.removeListener(oldPath, this::additionalCssLiveUpdate);
                     LOGGER.info("No longer watch css {} for live updates", oldPath);
                 }
             }
         }
-        Path newPath = newPreferences.getThemePreference().getAdditionalStylesheet().getWatchPath();
+        Path newPath = newPreferences.getTheme().getAdditionalStylesheet().getWatchPath();
         this.appearancePreferences.set(newPreferences);
 
         if (newPath != null) {
@@ -108,10 +105,15 @@ public class ThemeManagerImpl implements ThemeManager {
         additionalCssLiveUpdate();
 
         LOGGER.info("Theme set to {} with base css {} and additional css {}",
-                newPreferences.getThemePreference(), baseStyleSheet, additionalStylesheet());
+                newPreferences.getTheme(), baseStyleSheet, additionalStylesheet());
     }
 
-    @Override
+    /**
+     * Installs the base css file as a stylesheet in the given scene. Changes in the css file lead to a redraw of the
+     * scene using the new css file.
+     *
+     * @param scene the scene to install the css into
+     */
     public void installCss(Scene scene) {
         updateRunner.accept(() -> {
             if (this.scenes.add(scene)) {
@@ -121,7 +123,12 @@ public class ThemeManagerImpl implements ThemeManager {
         });
     }
 
-    @Override
+    /**
+     * Installs the css file as a stylesheet in the given web engine. Changes in the css file lead to a redraw of the
+     * web engine using the new css file.
+     *
+     * @param webEngine the web engine to install the css into
+     */
     public void installCss(WebEngine webEngine) {
         updateRunner.accept(() -> {
             if (this.webEngines.add(webEngine)) {
@@ -170,7 +177,7 @@ public class ThemeManagerImpl implements ThemeManager {
             stylesheets.remove(1);
         }
         stylesheets.add(1,
-                appearance.getThemePreference().getAdditionalStylesheet().getSceneStylesheet().toExternalForm());
+                appearance.getTheme().getAdditionalStylesheet().getSceneStylesheet().toExternalForm());
 
         if (appearance.shouldOverrideDefaultFontSize()) {
             scene.getRoot().setStyle("-fx-font-size: " + appearance.getMainFontSize() + "pt;");
@@ -179,12 +186,17 @@ public class ThemeManagerImpl implements ThemeManager {
         }
     }
 
-    @Override
     public AppearancePreferences getCurrentAppearancePreferences() {
         return appearancePreferences.get();
     }
 
-    @Override
+    /**
+     * This method allows callers to obtain the theme's additional stylesheet.
+     *
+     * @return called with the stylesheet location if there is an additional stylesheet present and available. The
+     * location will be a local URL. Typically it will be a {@code 'data:'} URL where the CSS is embedded. However for
+     * large themes it can be {@code 'file:'}.
+     */
     @Deprecated(forRemoval = true) // TODO ThemeTest needs updating, and should be based on installCss(WebEngine) instead
     public Optional<String> getAdditionalStylesheet() {
         return Optional.of(additionalStylesheet().getWebEngineStylesheet());

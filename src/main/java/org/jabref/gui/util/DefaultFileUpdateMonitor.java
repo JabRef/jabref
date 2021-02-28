@@ -69,7 +69,8 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
                 Thread.yield();
             }
         } catch (IOException e) {
-            JabRefException exception = new WatchServiceUnavailableException(e.getMessage(), e.getLocalizedMessage(), e.getCause());
+            JabRefException exception = new WatchServiceUnavailableException(
+                    e.getMessage(), e.getLocalizedMessage(), e.getCause());
             filesystemMonitorFailure.set(Optional.of(exception));
             LOGGER.warn(exception.getLocalizedMessage(), e);
         }

@@ -59,10 +59,7 @@ import org.jabref.gui.push.PushToVim;
 import org.jabref.gui.push.PushToWinEdt;
 import org.jabref.gui.search.SearchDisplayMode;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
-import org.jabref.gui.theme.ThemeManagerImpl;
-import org.jabref.gui.theme.ThemePreference;
-import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.gui.util.ThemeManager;
+import org.jabref.gui.theme.Theme;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
@@ -113,7 +110,6 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -409,11 +405,8 @@ public class JabRefPreferences implements PreferencesService {
     private List<MainTableColumnModel> mainTableColumnSortOrder;
     private PreviewPreferences previewPreferences;
     private SidePanePreferences sidePanePreferences;
-
+    private AppearancePreferences appearancePreferences;
     private Set<CustomImporter> customImporters;
-
-    private ThemeManager themeManager;
-    private FileUpdateMonitor fileUpdateMonitor;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -683,7 +676,7 @@ public class JabRefPreferences implements PreferencesService {
                         "</font>__NEWLINE__");
 
         // set default theme
-        defaults.put(FX_THEME, ThemePreference.BASE_CSS);
+        defaults.put(FX_THEME, Theme.BASE_CSS);
 
         setLanguageDependentDefaultValues();
     }
@@ -1119,20 +1112,6 @@ public class JabRefPreferences implements PreferencesService {
         }
 
         putStringList(CLEANUP_FORMATTERS, cleanupPreset.getFormatterCleanups().getAsStringList(OS.NEWLINE));
-    }
-
-    @Override
-    public void setFileUpdateMonitor(FileUpdateMonitor fileUpdateMonitor) {
-        this.fileUpdateMonitor = fileUpdateMonitor;
-    }
-
-    @Override
-    public FileUpdateMonitor getFileUpdateMonitor() {
-        FileUpdateMonitor f = this.fileUpdateMonitor;
-        if (f == null) {
-            f = Globals.getFileUpdateMonitor();
-        }
-        return f;
     }
 
     @Override
@@ -1983,36 +1962,29 @@ public class JabRefPreferences implements PreferencesService {
     // AppearancePreferences
     //*************************************************************************************************************
 
-    private AppearancePreferences createAppearancePreferences() {
-        return new AppearancePreferences(
-                getBoolean(OVERRIDE_DEFAULT_FONT_SIZE),
-                getInt(MAIN_FONT_SIZE),
-                new ThemePreference(get(FX_THEME)));
-    }
-
-    @Override
-    public ThemeManager getThemeManager() {
-        if (themeManager == null) {
-            themeManager = new ThemeManagerImpl(createAppearancePreferences(), getFileUpdateMonitor(), DefaultTaskExecutor::runInJavaFXThread);
-        }
-        return themeManager;
-    }
-
-    @Override
-    public void updateTheme() {
-        getThemeManager().updateAppearancePreferences(createAppearancePreferences());
-    }
-
     @Override
     public AppearancePreferences getAppearancePreferences() {
-        return getThemeManager().getCurrentAppearancePreferences();
+        if (this.appearancePreferences == null) {
+            updateAppearancePreferences();
+        }
+
+        return appearancePreferences;
+    }
+
+    private void updateAppearancePreferences() {
+        this.appearancePreferences = new AppearancePreferences(
+                getBoolean(OVERRIDE_DEFAULT_FONT_SIZE),
+                getInt(MAIN_FONT_SIZE),
+                new Theme(get(FX_THEME)));
     }
 
     @Override
     public void storeAppearancePreference(AppearancePreferences preferences) {
         putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, preferences.shouldOverrideDefaultFontSize());
         putInt(MAIN_FONT_SIZE, preferences.getMainFontSize());
-        put(FX_THEME, preferences.getThemePreference().getName());
+        put(FX_THEME, preferences.getTheme().getName());
+
+        this.appearancePreferences = preferences;
     }
 
     //*************************************************************************************************************

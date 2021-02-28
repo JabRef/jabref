@@ -4,47 +4,46 @@ import java.util.Objects;
 
 import org.jabref.model.strings.StringUtil;
 
-public class ThemePreference {
+public class Theme {
 
     public enum Type {
         LIGHT, DARK, CUSTOM
     }
 
     public static final String BASE_CSS = "Base.css";
-    static final String EMBEDDED_DARK_THEME_CSS = "Dark.css";
+    public static final String EMBEDDED_LIGHT_THEME_CSS = "Light.css";
+    public static final String EMBEDDED_DARK_THEME_CSS = "Dark.css";
 
     private final Type type;
-
     private final String name;
-
     private final StyleSheet additionalStylesheet;
 
-    public ThemePreference(String name) {
+    public Theme(String name) {
         this.name = name != null ? name : "";
-        if (StringUtil.isBlank(this.name) || BASE_CSS.equalsIgnoreCase(this.name)) {
+        if (StringUtil.isBlank(this.name)
+                || BASE_CSS.equalsIgnoreCase(this.name)
+                || EMBEDDED_LIGHT_THEME_CSS.equalsIgnoreCase(this.name)) {
             this.type = Type.LIGHT;
+            this.additionalStylesheet = StyleSheet.create(EMBEDDED_LIGHT_THEME_CSS);
         } else if (EMBEDDED_DARK_THEME_CSS.equalsIgnoreCase(this.name)) {
             this.type = Type.DARK;
+            this.additionalStylesheet = StyleSheet.create(EMBEDDED_DARK_THEME_CSS);
         } else {
             this.type = Type.CUSTOM;
+            this.additionalStylesheet = StyleSheet.create(name);
         }
-        this.additionalStylesheet = switch (type) {
-            case LIGHT -> StyleSheet.create("Light.css");
-            case DARK -> StyleSheet.create("Dark.css");
-            case CUSTOM -> StyleSheet.create(name);
-        };
     }
 
-    public static ThemePreference light() {
-        return new ThemePreference("");
+    public static Theme light() {
+        return new Theme("");
     }
 
-    public static ThemePreference dark() {
-        return new ThemePreference(EMBEDDED_DARK_THEME_CSS);
+    public static Theme dark() {
+        return new Theme(EMBEDDED_DARK_THEME_CSS);
     }
 
-    public static ThemePreference custom(String name) {
-        return new ThemePreference(name);
+    public static Theme custom(String name) {
+        return new Theme(name);
     }
 
     /**
@@ -74,7 +73,7 @@ public class ThemePreference {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ThemePreference that = (ThemePreference) o;
+        Theme that = (Theme) o;
         return type == that.type && name.equals(that.name);
     }
 
@@ -89,7 +88,7 @@ public class ThemePreference {
 
     @Override
     public String toString() {
-        return "ThemePreference{" +
+        return "Theme{" +
                 "type=" + type +
                 ", name='" + name + '\'' +
                 '}';

@@ -17,7 +17,6 @@ import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
-import org.jabref.gui.util.ThemeManager;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
@@ -48,7 +47,6 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.metadata.SaveOrderConfig;
-import org.jabref.model.util.FileUpdateMonitor;
 
 public interface PreferencesService {
 
@@ -123,10 +121,6 @@ public interface PreferencesService {
     CleanupPreset getCleanupPreset();
 
     void setCleanupPreset(CleanupPreset cleanupPreset);
-
-    void setFileUpdateMonitor(FileUpdateMonitor fileUpdateMonitor);
-
-    FileUpdateMonitor getFileUpdateMonitor();
 
     @Deprecated
     String getDefaultsDefaultCitationKeyPattern();
@@ -248,10 +242,6 @@ public interface PreferencesService {
     //*************************************************************************************************************
     // AppearancePreferences
     //*************************************************************************************************************
-
-    ThemeManager getThemeManager();
-
-    void updateTheme();
 
     AppearancePreferences getAppearancePreferences();
 

@@ -12,11 +12,11 @@ import org.slf4j.LoggerFactory;
 
 abstract class StyleSheet {
 
-    static final String DATA_URL_PREFIX = "data:text/css;charset=utf-8;base64,";
-    static final URL LIGHT_SCENE_ADDITIONAL_CSS = JabRefFrame.class.getResource("Light.css");
-    static final String EMPTY_WEBENGINE_CSS = DATA_URL_PREFIX;
+    private static final Logger LOGGER = LoggerFactory.getLogger(StyleSheet.class);
 
-    static final Logger LOGGER = LoggerFactory.getLogger(StyleSheet.class);
+    protected static final String DATA_URL_PREFIX = "data:text/css;charset=utf-8;base64,";
+    protected static final String EMPTY_WEBENGINE_CSS = DATA_URL_PREFIX;
+    protected static final URL LIGHT_SCENE_ADDITIONAL_CSS = JabRefFrame.class.getResource(Theme.EMBEDDED_LIGHT_THEME_CSS);
 
     abstract URL getSceneStylesheet();
 
@@ -58,7 +58,7 @@ abstract class StyleSheet {
         } else if ("file".equals(url.getProtocol())) {
             return new StyleSheetFile(url);
         } else {
-            if ("Base.css".equals(name)) {
+            if (Theme.BASE_CSS.equals(name)) {
                 return new StyleSheetResource(url);
             } else {
                 return new StyleSheetDataUrl(url);

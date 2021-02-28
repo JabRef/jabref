@@ -5,9 +5,11 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import org.jabref.gui.JabRefExecutorService;
+import org.jabref.gui.theme.Theme;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.logic.JabRefException;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.AppearancePreferences;
 
 /**
  * Useful for checking the display of different controls. Not needed inside of JabRef.
@@ -21,14 +23,15 @@ public class StyleTesterMain extends Application {
     @Override
     public void start(Stage stage) throws JabRefException {
         StyleTesterView view = new StyleTesterView();
-        JabRefPreferences preferences = JabRefPreferences.getInstance();
-
         DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
         JabRefExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
-        preferences.setFileUpdateMonitor(fileUpdateMonitor);
+        ThemeManager themeManager = new ThemeManager(
+                new AppearancePreferences(false, 0, new Theme("")),
+                fileUpdateMonitor,
+                Runnable::run);
 
         Scene scene = new Scene(view.getContent());
-        preferences.getThemeManager().installCss(scene);
+        themeManager.installCss(scene);
         stage.setScene(scene);
         stage.show();
     }

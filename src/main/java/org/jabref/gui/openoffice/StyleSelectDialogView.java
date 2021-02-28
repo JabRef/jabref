@@ -13,6 +13,7 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.util.BaseDialog;
@@ -42,8 +43,11 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     @FXML private TableColumn<StyleSelectItemViewModel, Boolean> colDeleteIcon;
     @FXML private Button add;
     @FXML private VBox vbox;
+
     @Inject private PreferencesService preferencesService;
     @Inject private DialogService dialogService;
+    @Inject private StateManager stateManager;
+
     private StyleSelectDialogViewModel viewModel;
     private PreviewViewer previewArticle;
     private PreviewViewer previewBook;
@@ -70,16 +74,16 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     private void initialize() {
         viewModel = new StyleSelectDialogViewModel(dialogService, loader, preferencesService);
 
-        previewArticle = new PreviewViewer(new BibDatabaseContext(), dialogService, Globals.stateManager);
+        previewArticle = new PreviewViewer(new BibDatabaseContext(), dialogService, stateManager);
         previewArticle.setEntry(TestEntry.getTestEntry());
         vbox.getChildren().add(previewArticle);
 
-        previewBook = new PreviewViewer(new BibDatabaseContext(), dialogService, Globals.stateManager);
+        previewBook = new PreviewViewer(new BibDatabaseContext(), dialogService, stateManager);
         previewBook.setEntry(TestEntry.getTestEntryBook());
         vbox.getChildren().add(previewBook);
 
-        previewArticle.setThemeManager(preferencesService.getThemeManager());
-        previewBook.setThemeManager(preferencesService.getThemeManager());
+        previewArticle.setThemeManager(Globals.getThemeManager());
+        previewBook.setThemeManager(Globals.getThemeManager());
 
         colName.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         colJournals.setCellValueFactory(cellData -> cellData.getValue().journalsProperty());

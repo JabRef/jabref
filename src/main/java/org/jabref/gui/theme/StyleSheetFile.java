@@ -68,28 +68,6 @@ final class StyleSheetFile extends StyleSheet {
         embedDataUrl(url, dataUrl::set);
     }
 
-    //    /**
-//     * Installs the base css file as a stylesheet in the given scene. Changes in the css file lead to a redraw of the
-//     * scene using the new css file.
-//     */
-//    @Override
-//    public void install(Scene scene, FileUpdateMonitor fileUpdateMonitor, Consumer<Runnable> runner, int index) {
-//        scene.getStylesheets().add(index, url.toExternalForm());
-//        try {
-//            LOGGER.info("Enabling live reloading of css file {}", path);
-//            fileUpdateMonitor.addListenerForFile(path, () -> {
-//                LOGGER.info("Reload css file {}", path);
-//                updateEmbeddedDataUrl();
-//                runner.accept(() -> {
-//                    scene.getStylesheets().remove(getUrlExternalForm());
-//                    scene.getStylesheets().add(index, getUrlExternalForm());
-//                });
-//            });
-//        } catch (IOException | UnsupportedOperationException e) {
-//            LOGGER.error("Could not watch css file for changes {}", path, e);
-//        }
-//    }
-
     @Override
     public URL getSceneStylesheet() {
 
