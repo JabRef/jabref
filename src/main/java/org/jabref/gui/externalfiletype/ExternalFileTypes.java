@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jabref.gui.Globals;
 import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
@@ -111,6 +112,8 @@ public class ExternalFileTypes {
      *         guaranteed to be returned.
      */
     public Optional<ExternalFileType> getExternalFileTypeByMimeType(String mimeType) {
+        // Ignores parameters according to link: (https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types)
+        mimeType=StringUtils.substringBefore(mimeType,";").trim();
         for (ExternalFileType type : externalFileTypes) {
             if (type.getMimeType().equalsIgnoreCase(mimeType)) {
                 return Optional.of(type);
