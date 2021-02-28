@@ -1,8 +1,7 @@
 package org.jabref.gui.theme;
 
 import java.util.Objects;
-
-import org.jabref.model.strings.StringUtil;
+import java.util.Optional;
 
 public class Theme {
 
@@ -16,15 +15,14 @@ public class Theme {
 
     private final Type type;
     private final String name;
-    private final StyleSheet additionalStylesheet;
+    private final Optional<StyleSheet> additionalStylesheet;
 
     public Theme(String name) {
         this.name = name != null ? name : "";
-        if (StringUtil.isBlank(this.name)
-                || BASE_CSS.equalsIgnoreCase(this.name)
-                || EMBEDDED_LIGHT_THEME_CSS.equalsIgnoreCase(this.name)) {
+        if (this.name.equals("")
+                || BASE_CSS.equalsIgnoreCase(this.name)) {
             this.type = Type.LIGHT;
-            this.additionalStylesheet = StyleSheet.create(EMBEDDED_LIGHT_THEME_CSS);
+            this.additionalStylesheet = Optional.empty();
         } else if (EMBEDDED_DARK_THEME_CSS.equalsIgnoreCase(this.name)) {
             this.type = Type.DARK;
             this.additionalStylesheet = StyleSheet.create(EMBEDDED_DARK_THEME_CSS);
@@ -82,7 +80,7 @@ public class Theme {
         return Objects.hash(type, name);
     }
 
-    public StyleSheet getAdditionalStylesheet() {
+    public Optional<StyleSheet> getAdditionalStylesheet() {
         return additionalStylesheet;
     }
 

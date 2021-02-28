@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import org.jabref.gui.JabRefFrame;
 
@@ -28,7 +29,7 @@ abstract class StyleSheet {
 
     abstract void reload();
 
-    static StyleSheet create(String name) {
+    static Optional<StyleSheet> create(String name) {
         URL url = JabRefFrame.class.getResource(name);
         if (url == null) {
             try {
@@ -54,14 +55,14 @@ abstract class StyleSheet {
         */
 
         if (url == null) {
-            return new StyleSheetDataUrl(LIGHT_SCENE_ADDITIONAL_CSS);
+            return Optional.empty();
         } else if ("file".equals(url.getProtocol())) {
-            return new StyleSheetFile(url);
+            return Optional.of(new StyleSheetFile(url));
         } else {
             if (Theme.BASE_CSS.equals(name)) {
-                return new StyleSheetResource(url);
+                return Optional.of(new StyleSheetResource(url));
             } else {
-                return new StyleSheetDataUrl(url);
+                return Optional.of(new StyleSheetDataUrl(url));
             }
         }
     }
