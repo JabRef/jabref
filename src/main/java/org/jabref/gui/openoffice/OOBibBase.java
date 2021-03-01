@@ -365,21 +365,20 @@ class OOBibBase {
          *  @param htmlMarkup If true, the text belonging to the
          *  reference mark is surrounded by bold html tag.
          */
-        public String getCitationContext(String refMarkName,
-                                         int charBefore,
-                                         int charAfter,
-                                         boolean htmlMarkup)
-                throws NoSuchElementException,
-                WrappedTargetException,
-                NoDocumentException {
-            XNameAccess nameAccess = getReferenceMarks();
-            Object referenceMark = nameAccess.getByName(refMarkName);
-            XTextContent bookmark = unoQI(XTextContent.class, referenceMark);
+        public String
+        getCitationContext(
+            String refMarkName,
+            int charBefore,
+            int charAfter,
+            boolean htmlMarkup)
+            throws
+            NoSuchElementException,
+            WrappedTargetException,
+            NoDocumentException {
 
-            XTextCursor cursor =
-                    bookmark.getAnchor() // the text range to which the content is attached.
-                            .getText()
-                            .createTextCursorByRange(bookmark.getAnchor());
+            XNameAccess nameAccess = getReferenceMarks();
+            XTextContent mark = nameAccessGetTextContentByName(nameAccess, refMarkName);
+            XTextCursor cursor = getTextCursorOfTextContent(mark);
 
             String citPart = cursor.getString();
 
