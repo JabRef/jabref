@@ -316,9 +316,17 @@ public class OpenOfficePanel {
                 style.ensureUpToDate();
             }
 
-            ooBase.updateSortedReferenceMarks(); // NoDocumentException
 
             List<BibDatabase> databases = getBaseList();
+            if ( databases.isEmpty() ){
+                dialogService.showErrorDialogAndWait(
+                    Localization.lang("No database is open"),
+                    Localization.lang("We need a database to export from. Open one.")
+                    );
+                return;
+            }
+
+            ooBase.updateSortedReferenceMarks(); // NoDocumentException
             List<String> unresolvedKeys = ooBase.refreshCiteMarkers(databases, style);
             BibDatabase newDatabase = ooBase.generateDatabase(databases);
             if (!unresolvedKeys.isEmpty()) {
