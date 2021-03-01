@@ -158,59 +158,90 @@ class OOBibBase {
             return OOBibBase.getDocumentTitle(this.mxDoc);
         }
 
-        private Optional<String> getCustomProperty(String property)
-                throws UnknownPropertyException,
-                WrappedTargetException {
+        /**
+         * @param property Name of a custom document property in the
+         *        current document.
+         *
+         * @return The value of the property or Optional.empty()
+         *
+         * These properties are used to store extra data about
+         * individual citation. In particular, the `pageInfo` part.
+         *
+         */
+        private Optional<String>
+        getCustomProperty(String property)
+            throws
+            UnknownPropertyException,
+            WrappedTargetException {
+
             assert (this.propertySet != null);
 
-            XPropertySetInfo psi =
-                    this.propertySet
-                            .getPropertySetInfo();
+            XPropertySetInfo psi = (this.propertySet
+                                    .getPropertySetInfo());
 
             if (psi.hasPropertyByName(property)) {
                 String v =
-                        this.propertySet
-                                .getPropertyValue(property)
-                                .toString();
+                    this.propertySet
+                    .getPropertyValue(property)
+                    .toString();
                 return Optional.ofNullable(v);
             }
             return Optional.empty();
         }
 
-        private void setCustomProperty(String property, String value)
-                throws UnknownPropertyException,
-                NotRemoveableException,
-                PropertyExistException,
-                IllegalTypeException,
-                IllegalArgumentException {
-            XPropertySetInfo psi =
-                    this.propertySet
-                            .getPropertySetInfo();
+        /**
+         * @param property Name of a custom document property in the
+         *        current document.
+         *
+         * @param value The value to be stored.
+         *
+         * @return The value of the property or Optional.empty()
+         */
+        private void
+        setCustomProperty(String property, String value)
+            throws
+            UnknownPropertyException,
+            NotRemoveableException,
+            PropertyExistException,
+            IllegalTypeException,
+            IllegalArgumentException {
+
+            XPropertySetInfo psi = this.propertySet.getPropertySetInfo();
+
             if (psi.hasPropertyByName(property)) {
                 this.userProperties.removeProperty(property);
             }
+
             if (value != null) {
                 this.userProperties
-                        .addProperty(property,
-                                com.sun.star.beans.PropertyAttribute.REMOVEABLE,
-                                new Any(Type.STRING, value)
-                        );
+                    .addProperty(
+                        property,
+                        com.sun.star.beans.PropertyAttribute.REMOVEABLE,
+                        new Any(Type.STRING, value));
             }
         }
 
         /**
          * @throws NoDocumentException If cannot get reference marks
+         *
+         * Note: also used by `documentConnectionMissing` to test if
+         * we have a working connecion.
+         *
          */
-        private XNameAccess getReferenceMarks()
-                throws NoDocumentException {
+        private XNameAccess
+        getReferenceMarks()
+            throws NoDocumentException {
+
             XReferenceMarksSupplier supplier =
-                    unoQI(XReferenceMarksSupplier.class,
-                            this.xCurrentComponent);
+                unoQI(
+                    XReferenceMarksSupplier.class,
+                    this.xCurrentComponent
+                    );
             try {
                 return supplier.getReferenceMarks();
-            } catch (Exception ex) {
-                LOGGER.warn("getReferenceMarks caught: ", ex);
-                throw new NoDocumentException("getReferenceMarks failed");
+            } catch (DisposedException ex) {
+                // LOGGER.warn("getReferenceMarks caught: ", ex);
+                throw new NoDocumentException("getReferenceMarks failed with" + ex);
             }
         }
 
@@ -235,9 +266,15 @@ class OOBibBase {
             }
             return false;
         }
+        /**
+         * Names of all reference marks.
+         *
+         * Empty list for nothing.
+         */
+        List<String>
+        getReferenceMarkNames()
+            throws NoDocumentException {
 
-        List<String> getReferenceMarknames()
-                throws NoDocumentException {
             XNameAccess nameAccess = getReferenceMarks();
             String[] names = nameAccess.getElementNames();
             if (names == null) {
@@ -248,10 +285,16 @@ class OOBibBase {
 
         /**
          * Remove the named reference mark.
+         *
+         * Removes both the text and the mark itself.
          */
-        public void removeReferenceMark(String name)
-            throws WrappedTargetException,
-                   NoDocumentException {
+        public void
+        removeReferenceMark(String name)
+            throws
+            WrappedTargetException,
+            NoDocumentException,
+            NoSuchElementException {
+
             XNameAccess xReferenceMarks = this.getReferenceMarks();
             if (xReferenceMarks.hasByName(name)) {
                 try {
@@ -367,8 +410,9 @@ class OOBibBase {
          * @param name The name of the bookmark to find.
          * @return The XTextRange for the bookmark, or null.
          */
-        public XTextRange getBookmarkRange(String name)
-            throws NoSuchElementException,
+        public XTextRange
+        getBookmarkRange(String name)
+            throws
             WrappedTargetException {
             XNameAccess xNamedBookmarks = this.getBookmarks();
 
@@ -1512,31 +1556,44 @@ class OOBibBase {
     }
 
     /**
-     * Get number for a BibEntry. (-1) for UndefinedBibtexEntry
+     * Gets number for a BibEntry. (-1) for UndefinedBibtexEntry
      *
      * BibEntry.getCitationKey() must not be Optional.empty().
+     *
      */
-    private static int numberPossiblyUndefinedBibEntry(BibEntry ce,
-                                                       CitationNumberingState cns) {
+    private static int
+    numberPossiblyUndefinedBibEntry(
+        BibEntry ce,
+        CitationNumberingState cns
+        ) {
+
         if (ce instanceof UndefinedBibtexEntry) {
             return (-1);
         }
 
-        String key = ce.getCitationKey()
-                       .orElseThrow(IllegalArgumentException::new);
+        String key = (ce.getCitationKey()
+                      .orElseThrow(IllegalArgumentException::new));
 
         return cns.getOrAllocateNumber(key);
     }
 
     /**
+     * Produce citation markers for the case of numbered citations
+     * with bibliography sorted by first appearance in the text.
+     *
      * @param referenceMarkNames Names of reference marks.
+     *
      * @param bibtexKeys Expects bibtexKeys[i] to correspond to
-     * referenceMarkNames.get(i)
-     * @param citeKeyToBibEntry Look up BibEntry by bibtexKey. Must
-     * contain all bibtexKeys, but may map to UndefinedBibtexEntry.
-     * @return Numbered citation markers for bibtexKeys.  Numbering is
-     * according to first encounter in bibtexKeys[i][j]
-     * (for(i){for(j){}} )
+     *                   referenceMarkNames.get(i)
+     *
+     * @param citeKeyToBibEntry Look up BibEntry by bibtexKey.
+     *                          Must contain all bibtexKeys,
+     *                          but may map to UndefinedBibtexEntry.
+     *
+     * @return Numbered citation markers for bibtexKeys.
+     *         Numbering is according to first encounter
+     *         in bibtexKeys[i][j]
+     *
      */
     private static String[]
     rcmCitationMarkersForIsNumberEntriesIsSortByPosition(List<String> referenceMarkNames,
@@ -1556,24 +1613,26 @@ class OOBibBase {
         CitationNumberingState cns = new CitationNumberingState();
 
         final int minGroupingCount =
-                style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
+            style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
 
         for (int i = 0; i < referenceMarkNames.size(); i++) {
 
-            // numbers: Numbers for cEntries, (-1) for none.
+            // numbers: Numbers for cited sources. (-1) for UndefinedBibtexEntry.
             List<Integer> numbers =
-                    Arrays.stream(bibtexKeys[i])
-                          .map(citeKeyToBibEntry::get)
-                          .map(ce -> numberPossiblyUndefinedBibEntry(ce, cns))
-                          .collect(Collectors.toList());
+                Arrays.stream(bibtexKeys[i])
+                .map(citeKeyToBibEntry::get)
+                .map(ce -> numberPossiblyUndefinedBibEntry(ce, cns))
+                .collect(Collectors.toList());
 
-            citMarkers[i] = style.getNumCitationMarker(numbers, minGroupingCount, false);
-        } // for
+            citMarkers[i] =
+                style.getNumCitationMarker(numbers, minGroupingCount, false);
+        }
         return citMarkers;
     }
 
     /**
-     * Produce citation markers for the case of `numbered entries` that are not sorted by position.
+     * Produce citation markers for the case of numbered citations
+     * when the bibliography is not sorted by position.
      */
     private String[]
     rcmCitationMarkersForIsNumberEntriesNotSortByPosition(List<String> referenceMarkNames,
@@ -1644,9 +1703,12 @@ class OOBibBase {
      * OOBibBase.BIB_SECTION_NAME bookmark and recreate it if we did.
      *
      * @param referenceMarkNames Reference mark names
+     *
      * @param citMarkers Corresponding text for each reference mark,
-     * that replaces the old text.
+     *                   that replaces the old text.
+     *
      * @param types itcType codes for each reference mark.
+     *
      * @param style Bibliography style to use.
      */
     private void rcmApplyNewCitationMarkers(DocumentConnection documentConnection,
@@ -1666,9 +1728,11 @@ class OOBibBase {
         assert (citMarkers.length == nRefMarks);
         assert (types.length == nRefMarks);
 
-        XNameAccess xReferenceMarks = documentConnection.getReferenceMarks();
+        XNameAccess nameAccess =
+            documentConnection.getReferenceMarks();
+
         final boolean hadBibSection =
-                (documentConnection.getBookmarkRange(OOBibBase.BIB_SECTION_NAME) != null);
+            (documentConnection.getBookmarkRange(OOBibBase.BIB_SECTION_NAME) != null);
 
         // If we are supposed to set character format for citations,
         // must run a test before we delete old citation
@@ -1971,20 +2035,21 @@ class OOBibBase {
         return citMarkers;
     }
 
-    private List<String> refreshCiteMarkersInternal(DocumentConnection documentConnection,
-                                                    List<BibDatabase> databases,
-                                                    OOBibStyle style,
-                                                    final Map<String, String> uniqueLetters
-    )
-            throws WrappedTargetException,
-            IllegalArgumentException,
-            NoSuchElementException,
-            UndefinedCharacterFormatException,
-            UnknownPropertyException,
-            PropertyVetoException,
-            CreationException,
-            BibEntryNotFoundException,
-            NoDocumentException {
+    private List<String>
+    refreshCiteMarkersInternal(DocumentConnection documentConnection,
+                               List<BibDatabase> databases,
+                               OOBibStyle style,
+                               final Map<String, String> uniqueLetters)
+        throws
+        WrappedTargetException,
+        IllegalArgumentException,
+        NoSuchElementException,
+        UndefinedCharacterFormatException,
+        UnknownPropertyException,
+        PropertyVetoException,
+        CreationException,
+        BibEntryNotFoundException,
+        NoDocumentException {
 
         // Normally we sort the reference marks according to their
         // order of appearance:
@@ -2138,35 +2203,39 @@ class OOBibBase {
      *
      * @return unresolvedKeys
      */
-    public List<String> updateDocumentActionHelper(List<BibDatabase> databases,
-                                                   OOBibStyle style)
-            throws NoSuchElementException,
-            WrappedTargetException,
-            IllegalArgumentException,
-            CreationException,
-            PropertyVetoException,
-            UnknownPropertyException,
-            UndefinedParagraphFormatException,
-            NoDocumentException,
-            UndefinedCharacterFormatException,
-            BibEntryNotFoundException,
-            IOException {
+    public List<String> updateDocumentActionHelper(
+        List<BibDatabase> databases,
+        OOBibStyle style)
+        throws
+        NoSuchElementException,
+        WrappedTargetException,
+        IllegalArgumentException,
+        CreationException,
+        PropertyVetoException,
+        UnknownPropertyException,
+        UndefinedParagraphFormatException,
+        NoDocumentException,
+        UndefinedCharacterFormatException,
+        BibEntryNotFoundException,
+        IOException {
         updateSortedReferenceMarks();
         List<String> unresolvedKeys = refreshCiteMarkers(databases, style);
         rebuildBibTextSection(databases, style);
         return unresolvedKeys;
     }
 
-    public void rebuildBibTextSection(List<BibDatabase> databases,
-                                      OOBibStyle style)
-            throws NoSuchElementException,
-            WrappedTargetException,
-            IllegalArgumentException,
-            CreationException,
-            PropertyVetoException,
-            UnknownPropertyException,
-            UndefinedParagraphFormatException,
-            NoDocumentException {
+    public void rebuildBibTextSection(
+        List<BibDatabase> databases,
+        OOBibStyle style)
+        throws
+        NoSuchElementException,
+        WrappedTargetException,
+        IllegalArgumentException,
+        CreationException,
+        PropertyVetoException,
+        UnknownPropertyException,
+        UndefinedParagraphFormatException,
+        NoDocumentException {
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
 
         FindCitedEntriesResult fce =
@@ -2372,6 +2441,8 @@ class OOBibBase {
 
     /**
      * Only called from: rebuildBibTextSection
+     *
+     * Assumes the section named `OOBibBase.BIB_SECTION_NAME` exists.
      */
     private void populateBibTextSection(DocumentConnection documentConnection,
                                         Map<BibEntry, BibDatabase> entries,
@@ -2398,14 +2469,14 @@ class OOBibBase {
                 );
 
         XTextCursor cursor =
-                documentConnection.xText
-                        .createTextCursorByRange(section.getAnchor());
+            documentConnection.xText
+            .createTextCursorByRange(section.getAnchor());
 
         OOUtil.insertTextAtCurrentLocation(
-                documentConnection.xText,
-                cursor,
-                (String) style.getProperty(OOBibStyle.TITLE),
-                (String) style.getProperty(OOBibStyle.REFERENCE_HEADER_PARAGRAPH_FORMAT)
+            documentConnection.xText,
+            cursor,
+            (String) style.getProperty(OOBibStyle.TITLE),
+            (String) style.getProperty(OOBibStyle.REFERENCE_HEADER_PARAGRAPH_FORMAT)
         );
 
         String refParaFormat =
@@ -2447,15 +2518,20 @@ class OOBibBase {
     }
 
     /**
+     *  Given the name of a reference mark, get the corresponding
+     *  pageInfo text.
+     *
      *  @param documentConnection Connection to a document.
      *  @param name Name of the custom property to query.
      *  @return "" for missing or empty pageInfo
      */
     private static String
-        getPageInfoForReferenceMarkName(DocumentConnection documentConnection,
-                                       String name)
-            throws WrappedTargetException,
-            UnknownPropertyException {
+    getPageInfoForReferenceMarkName(
+        DocumentConnection documentConnection,
+        String name)
+        throws WrappedTargetException,
+        UnknownPropertyException {
+
         Optional<String> pageInfo = documentConnection.getCustomProperty(name);
         if (pageInfo.isEmpty() || pageInfo.get().isEmpty()) {
             return "";
@@ -2555,16 +2631,17 @@ class OOBibBase {
      * @param start     : start of range to italicize w.r.t position.getStart().
      * @param end       : end of range  to italicize w.r.t position.getStart().
      *
-     *  TODO: this is a strange API. Why? Answer: used after finding
-     *  "et al." string in a citation marker.
+     *  Why this API?  This is used after finding "et al." string in a
+     *  citation marker.
      */
     private void italicizeRangeFromPosition(XTextCursor position,
                                             int start,
                                             int end)
-            throws UnknownPropertyException,
-            PropertyVetoException,
-            IllegalArgumentException,
-            WrappedTargetException {
+        throws
+        UnknownPropertyException,
+        PropertyVetoException,
+        IllegalArgumentException,
+        WrappedTargetException {
         XTextRange range = position.getStart();
         XTextCursor cursor = position.getText().createTextCursorByRange(range);
         cursor.goRight((short) start, false);
@@ -2663,7 +2740,6 @@ class OOBibBase {
             NoDocumentException {
         DocumentConnection documentConnection = this.xDocumentConnection;
 
-        // TODO: doesn't work for citations in footnotes/tables
         List<String> names =
                 getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
 
