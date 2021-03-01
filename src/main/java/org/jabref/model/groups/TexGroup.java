@@ -47,12 +47,16 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
 
     public static TexGroup create(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData) throws IOException {
         TexGroup group = new TexGroup(name, context, filePath, auxParser, fileMonitor, metaData);
-        fileMonitor.addListenerForFile(filePath, group);
+        fileMonitor.addListenerForFile(group.getFilePathResolved(), group);
         return group;
     }
 
     public static TexGroup createWithoutFileMonitoring(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData) throws IOException {
         return new TexGroup(name, context, filePath, auxParser, fileMonitor, metaData);
+    }
+
+    public Path getFilePathResolved() {
+        return this.filePath;
     }
 
     @Override

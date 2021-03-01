@@ -1,6 +1,9 @@
 package org.jabref.gui.util;
 
 import java.io.FileFilter;
+import java.io.IOException;
+import java.nio.file.DirectoryStream.Filter;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -62,16 +65,30 @@ public class FileFilterConverter {
     }
 
     public static FileFilter toFileFilter(FileChooser.ExtensionFilter extensionFilter) {
-        List<String> extensionsCleaned = extensionFilter.getExtensions()
-                                                        .stream()
-                                                        .map(extension -> extension.replace(".", "").replace("*", ""))
-                                                        .filter(StringUtil::isNotBlank)
-                                                        .collect(Collectors.toList());
+        return toFileFilter(extensionFilter.getExtensions());
+    }
+
+    public static FileFilter toFileFilter(List<String> extensions) {
+        var filter = toDirFilter(extensions);
+        return file -> {
+            try {
+                return filter.accept(file.toPath());
+            } catch (IOException e) {
+                return false;
+            }
+        };
+    }
+
+    public static Filter<Path> toDirFilter(List<String> extensions) {
+        List<String> extensionsCleaned = extensions.stream()
+                                                   .map(extension -> extension.replace(".", "").replace("*", ""))
+                                                   .filter(StringUtil::isNotBlank)
+                                                   .collect(Collectors.toList());
         if (extensionsCleaned.isEmpty()) {
             // Except every file
-            return pathname -> true;
+            return path -> true;
         } else {
-            return pathname -> FileUtil.getFileExtension(pathname.toPath())
+            return path -> FileUtil.getFileExtension(path)
                                        .map(extensionsCleaned::contains)
                                        .orElse(false);
         }

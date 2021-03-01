@@ -9,17 +9,16 @@ import org.jabref.model.strings.StringUtil;
 /**
  * This is an immutable class that keeps information regarding single author. It is just a container for the information, with very simple methods to access it.
  * <p>
- * Current usage: only methods <code>getLastOnly</code>,
- * <code>getFirstLast</code>, and <code>getLastFirst</code> are used;
- * all other methods are provided for completeness.
+ * Current usage: only methods <code>getLastOnly</code>, <code>getFirstLast</code>, and <code>getLastFirst</code> are used; all other methods are provided for completeness.
  */
 public class Author {
+
     private final String firstPart;
     private final String firstAbbr;
     private final String vonPart;
     private final String lastPart;
     private final String jrPart;
-    private Author latexFree;
+    private String latexFreeLastPart;
 
     /**
      * Creates the Author object. If any part of the name is absent, <CODE>null</CODE> must be passed; otherwise other methods may return erroneous results.
@@ -182,9 +181,9 @@ public class Author {
      * <p>
      * E.g.,
      * <ul>
-     * <li>{Vall{\'e}e Poussin} -> Vall{\'e}e Poussin</li>
-     * <li>{Vall{\'e}e} {Poussin} -> Vall{\'e}e Poussin</li>
-     * <li>Vall{\'e}e Poussin -> Vall{\'e}e Poussin</li>
+     *     <li>{Vall{\'e}e Poussin} -> Vall{\'e}e Poussin</li>
+     *     <li>{Vall{\'e}e} {Poussin} -> Vall{\'e}e Poussin</li>
+     *     <li>Vall{\'e}e Poussin -> Vall{\'e}e Poussin</li>
      * </ul>
      */
     private String removeStartAndEndBraces(String name) {
@@ -275,6 +274,18 @@ public class Author {
     }
 
     /**
+     * Returns the last name of the author stored in this object with resolved latex.
+     *
+     * @return last name of the author (may consist of several tokens)
+     */
+    public Optional<String> getLastLatexFree() {
+        if (latexFreeLastPart == null && lastPart != null) {
+            latexFreeLastPart = LatexToUnicodeAdapter.format(lastPart);
+        }
+        return Optional.ofNullable(latexFreeLastPart);
+    }
+
+    /**
      * Returns the junior part of the author's name stored in this object ("Jr").
      *
      * @return junior part of the author's name (may consist of several tokens) or null if the author does not have a Jr. Part
@@ -299,8 +310,7 @@ public class Author {
     /**
      * Returns the author's name in form 'von Last, Jr., First' with the first name full or abbreviated depending on parameter.
      *
-     * @param abbr <CODE>true</CODE> - abbreviate first name, <CODE>false</CODE> -
-     *             do not abbreviate
+     * @param abbr <CODE>true</CODE> - abbreviate first name, <CODE>false</CODE> - do not abbreviate
      * @return 'von Last, Jr., First' (if <CODE>abbr==false</CODE>) or 'von Last, Jr., F.' (if <CODE>abbr==true</CODE>)
      */
     public String getLastFirst(boolean abbr) {
@@ -317,8 +327,7 @@ public class Author {
     /**
      * Returns the author's name in form 'First von Last, Jr.' with the first name full or abbreviated depending on parameter.
      *
-     * @param abbr <CODE>true</CODE> - abbreviate first name, <CODE>false</CODE> -
-     *             do not abbreviate
+     * @param abbr <CODE>true</CODE> - abbreviate first name, <CODE>false</CODE> - do not abbreviate
      * @return 'First von Last, Jr.' (if <CODE>abbr==false</CODE>) or 'F. von Last, Jr.' (if <CODE>abbr==true</CODE>)
      */
     public String getFirstLast(boolean abbr) {

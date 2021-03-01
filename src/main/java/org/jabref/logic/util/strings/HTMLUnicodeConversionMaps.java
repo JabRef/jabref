@@ -760,7 +760,8 @@ public class HTMLUnicodeConversionMaps {
             {"64259", "", "ffi"}, // ffi ligature (which LaTeX solves by itself)
             {"64260", "", "ffl"}, // ffl ligature (which LaTeX solves by itself)
             {"119978", "Oscr", "$\\mathcal{O}$"}, // script capital O -- possibly use \mathscr
-            {"119984", "Uscr", "$\\mathcal{U}$"} // script capital U -- possibly use \mathscr
+            {"119984", "Uscr", "$\\mathcal{U}$"}, // script capital U -- possibly use \mathscr
+            {"120598", "", "$\\epsilon$"}, // mathematical italic epsilon U+1D716 -- requires amsmath
 
     };
 

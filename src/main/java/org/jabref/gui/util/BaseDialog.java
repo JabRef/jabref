@@ -37,7 +37,7 @@ public class BaseDialog<T> extends Dialog<T> implements org.jabref.gui.Dialog<T>
             }
         });
 
-        setDialogIcon(IconTheme.getJabRefImageFX());
+        setDialogIcon(IconTheme.getJabRefImage());
         setResizable(true);
 
         EasyBind.wrapNullable(dialogPaneProperty())
