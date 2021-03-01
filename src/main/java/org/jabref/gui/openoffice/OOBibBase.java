@@ -1890,9 +1890,12 @@ class OOBibBase {
      * @param types              OUT Must be same length as referenceMarkNames.
      * @param bibtexKeys         OUT First level must be same length as referenceMarkNames.
      */
-    private static void parseRefMarkNamesToArrays(List<String> referenceMarkNames,
-                                                  int[] types,
-                                                  String[][] bibtexKeys) {
+    private static void
+    parseRefMarkNamesToArrays(
+        List<String> referenceMarkNames,
+        int[] types,
+        String[][] bibtexKeys
+        ) {
         final int nRefMarks = referenceMarkNames.size();
         assert (types.length == nRefMarks);
         assert (bibtexKeys.length == nRefMarks);
@@ -1904,8 +1907,9 @@ class OOBibBase {
                 // to correspond to referenceMarkNames.get(i).
                 // And do not want null in bibtexKeys (or error code in types)
                 // on return.
-                assert false : "parseRefMarkNamesToArrays expects parsable referenceMarkNames";
-                continue;
+                throw new IllegalArgumentException(
+                    "parseRefMarkNamesToArrays expects parsable referenceMarkNames"
+                    );
             }
             ParsedRefMark ov = op.get();
             types[i] = ov.itcType;
