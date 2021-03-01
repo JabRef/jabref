@@ -2132,10 +2132,11 @@ class OOBibBase {
         parseRefMarkNamesToArrays(referenceMarkNames, types, bibtexKeys);
 
         FindCitedEntriesResult fce =
-                findCitedEntries(databases,
-                                 findCitedKeys(documentConnection)
-                                 // TODO: why are we scanning the document
-                                 // if we already hev the referenceMarkNames?
+                findCitedEntries(
+                    findCitedKeys(documentConnection),
+                    databases
+                    // TODO: why are we scanning the document
+                    // if we already hev the referenceMarkNames?
                 );
         // fce.entries are in same order as returned by findCitedKeys
 
@@ -2307,8 +2308,9 @@ class OOBibBase {
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
 
         FindCitedEntriesResult fce =
-                findCitedEntries(databases,
-                        findCitedKeys(documentConnection)
+                findCitedEntries(
+                    findCitedKeys(documentConnection),
+                    databases
                 );
 
         Map<BibEntry, BibDatabase> entries;
