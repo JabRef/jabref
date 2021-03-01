@@ -1988,7 +1988,11 @@ class OOBibBase {
     void updateUniqueLetters(
         String bibtexKeys[][],
         String normCitMarkers[][],
-        final Map<String, String> uniqueLetters ) {
+        final Map<String, String> uniqueLetters
+        ) {
+
+        final int nRefMarks = bibtexKeys.length;
+        assert nRefMarks == normCitMarkers.length;
 
         // refKeys: (normCitMarker) to (list of bibtexkeys sharing it).
         //          The entries in the lists are ordered as in
@@ -2038,6 +2042,36 @@ class OOBibBase {
         }
     }
 
+    private String[][]
+    normalizedCitationMarkersForNormalStyle(
+        BibEntry[][] cEntriesForAll,
+        Map<BibEntry, BibDatabase> entries,
+        OOBibStyle style
+        ) {
+
+        final int nRefMarks = cEntriesForAll.length;
+
+        String[][] normCitMarkers = new String[nRefMarks][];
+        for (int i = 0; i < nRefMarks; i++) {
+            BibEntry[] cEntries = cEntriesForAll[i];
+            // We need "normalized" (in parenthesis) markers
+            // for uniqueness checking purposes:
+            normCitMarkers[i] =
+                Arrays.stream(cEntries)
+                .map(ce ->
+                     style.getCitationMarker(
+                         Collections.singletonList(ce),
+                         entries,
+                         true,
+                         null,
+                         new int[] {-1} // no limit on authors
+                         )
+                    )
+                .toArray(String[]::new);
+        }
+        return normCitMarkers;
+    }
+
     /**
      * Produce citMarkers for normal (!isCitationKeyCiteMarkers && ! isNumberEntries) styles.
      *
@@ -2054,7 +2088,7 @@ class OOBibBase {
                                      String[][] bibtexKeysIn,
                                      Map<String, BibEntry> citeKeyToBibEntry,
                                      int[] itcTypes,
-                                     Map<BibEntry, BibDatabase> entries,
+                                         Map<BibEntry, BibDatabase> entries,
                                      final Map<String, String> uniqueLetters,
                                      OOBibStyle style
     )
@@ -2086,26 +2120,8 @@ class OOBibBase {
         }
 
         //    normCitMarkers[i][j] = for unification
-        String[][] normCitMarkers = new String[nRefMarks][];
-        for (int i = 0; i < nRefMarks; i++) {
-            BibEntry[] cEntries = cEntriesForAll[i];
-            // We need "normalized" (in parenthesis) markers
-            // for uniqueness checking purposes:
-            normCitMarkers[i] =
-                    Arrays.stream(cEntries)
-                          .map(ce ->
-                                  style.getCitationMarker(
-                                          Collections.singletonList(ce),
-                                          entries,
-                                          true,
-                                          null,
-                                          new int[] {-1} // no limit on authors
-                                  )
-                          )
-                          .toArray(String[]::new);
-        }
-
-        uniqueLetters.clear();
+        String[][] normCitMarkers =
+            normalizedCitationMarkersForNormalStyle( cEntriesForAll, entries, style );
 
         // The following block
         // changes: citMarkers[i], uniqueLetters
@@ -2113,16 +2129,13 @@ class OOBibBase {
         //       style (style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST))
         //       citeKeyToBibEntry, entries, types
 
-        if (!style.isCitationKeyCiteMarkers() && !style.isNumberEntries()) {
-            // Only for normal citations. Numbered citations and
-            // citeKeys are already unique.
 
-            // Update bibtexKeys to match the new sorting (within each referenceMark)
-            String[][] bibtexKeys = mapBibEntriesToCitationKeysForall( cEntriesForAll );
-            assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeys, citeKeyToBibEntry);
-            assert (bibtexKeys.length == nRefMarks);
+        // Update bibtexKeys to match the new sorting (within each referenceMark)
+        String[][] bibtexKeys = mapBibEntriesToCitationKeysForall( cEntriesForAll );
+        assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeys, citeKeyToBibEntry);
+        assert (bibtexKeys.length == nRefMarks);
 
-            updateUniqueLetters(  bibtexKeys, normCitMarkers, uniqueLetters );
+        updateUniqueLetters(  bibtexKeys, normCitMarkers, uniqueLetters );
 
             // Finally, go through all citation markers, and update
             // those referring to entries in our current list:
@@ -2187,7 +2200,7 @@ class OOBibBase {
                             );
                 }
             } // for i
-        } // if normalStyle
+
         return citMarkers;
     }
 
