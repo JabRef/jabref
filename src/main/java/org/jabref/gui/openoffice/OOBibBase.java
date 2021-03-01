@@ -284,6 +284,22 @@ class OOBibBase {
         }
 
         /**
+         * Create a textcursor for a textContent.
+         *
+         * @return null if makr is null, otherwise cursor.
+         */
+        static XTextCursor
+        getTextCursorOfTextContent(XTextContent mark) {
+            if ( mark == null ){
+                return null;
+            }
+            XTextRange markAnchor = mark.getAnchor();
+            XTextCursor cursor =
+                markAnchor.getText()
+                .createTextCursorByRange(markAnchor);
+            return cursor;
+        }
+        /**
          * Remove the named reference mark.
          *
          * Removes both the text and the mark itself.
