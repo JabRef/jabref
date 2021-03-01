@@ -1917,9 +1917,15 @@ class OOBibBase {
         }
     }
 
-    private static List<String> unresolvedKeysFromEntries(Map<BibEntry, BibDatabase> entries) {
+    /**
+     *  @return The list of citation keys from `instanceof
+     *          UndefinedBibtexEntry` elements of (keys of) `entries`.
+     *
+     *  Intent: Get list of unresolved citation keys.
+     */
+    private static List<String>
+    unresolvedKeysFromEntries(Map<BibEntry, BibDatabase> entries) {
         // Collect and return unresolved citation keys.
-        // uses: entries
         List<String> unresolvedKeys = new ArrayList<>();
         for (BibEntry entry : entries.keySet()) {
             if (entry instanceof UndefinedBibtexEntry) {
