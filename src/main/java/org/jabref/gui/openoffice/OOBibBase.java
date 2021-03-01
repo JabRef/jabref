@@ -2076,7 +2076,7 @@ class OOBibBase {
                 Arrays.stream(cEntries)
                 .map(ce ->
                      style.getCitationMarker(
-                         Collections.singletonList(ce),
+                         Collections.singletonList(undefinedBibentryToNull(ce)),
                          entries,
                          true,
                          null,
