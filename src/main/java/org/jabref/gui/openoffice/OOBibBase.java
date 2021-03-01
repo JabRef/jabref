@@ -343,15 +343,13 @@ class OOBibBase {
             NoSuchElementException {
 
             XNameAccess xReferenceMarks = this.getReferenceMarks();
+
             if (xReferenceMarks.hasByName(name)) {
-                try {
-                    Object referenceMark = xReferenceMarks.getByName(name);
-                    XTextContent bookmark = unoQI(XTextContent.class, referenceMark);
-                    this.xText.removeTextContent(bookmark);
-                } catch (NoSuchElementException ex) {
-                    LOGGER.warn(String.format("referenceMark got NoSuchElementException"
-                            + " for '%s'", name));
+                XTextContent mark = nameAccessGetTextContentByName( xReferenceMarks, name );
+                if ( mark == null ){
+                    return;
                 }
+                this.xText.removeTextContent(mark);
             }
         }
 
