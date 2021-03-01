@@ -2510,11 +2510,18 @@ class OOBibBase {
             IllegalArgumentException,
             CreationException {
 
+    private XNameAccess
+    getTextSections(DocumentConnection documentConnection)
+        throws
+        WrappedTargetException,
+        IllegalArgumentException,
+        CreationException  {
         // Check if the section exists:
         XTextSectionsSupplier supplier =
-                unoQI(XTextSectionsSupplier.class, documentConnection.mxDoc);
+            unoQI(XTextSectionsSupplier.class, documentConnection.mxDoc);
 
-        com.sun.star.container.XNameAccess ts = supplier.getTextSections();
+        return supplier.getTextSections();
+    }
 
         if (!ts.hasByName(OOBibBase.BIB_SECTION_NAME)) {
             createBibTextSection2(documentConnection, this.atEnd);
