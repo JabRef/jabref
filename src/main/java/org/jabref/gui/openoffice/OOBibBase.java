@@ -155,6 +155,38 @@ class OOBibBase {
         }
 
         public Optional<String> getDocumentTitle() {
+        /**
+         *  @return True if we cannot reach the current document.
+         */
+        public boolean
+        documentConnectionMissing() {
+
+            // These are set by selectDocument, via DocumentConnection
+            // constructor.
+            if (null == this.xCurrentComponent
+                || null == this.mxDoc
+                || null == this.xViewCursorSupplier
+                || null == this.xText
+                || null == this.mxDocFactory
+                || null == this.userProperties
+                || null == this.propertySet) {
+                return true;
+            }
+
+            // Attempt to check document is really available
+            try {
+                getReferenceMarks();
+            } catch (NoDocumentException ex) {
+                return true;
+            }
+            return false;
+        }
+
+        /**
+         *  Get the title of the connected document.
+         */
+        public Optional<String>
+        getDocumentTitle() {
             return OOBibBase.getDocumentTitle(this.mxDoc);
         }
 
@@ -245,27 +277,6 @@ class OOBibBase {
             }
         }
 
-        public boolean documentConnectionMissing() {
-
-            // These are set by selectDocument:
-            if (null == this.xCurrentComponent
-                    || null == this.mxDoc
-                    || null == this.xViewCursorSupplier
-                    || null == this.xText
-                    || null == this.mxDocFactory
-                    || null == this.userProperties
-                    || null == this.propertySet) {
-                return true;
-            }
-
-            // Attempt to check document is really available
-            try {
-                getReferenceMarks();
-            } catch (NoDocumentException ex) {
-                return true;
-            }
-            return false;
-        }
         /**
          * Names of all reference marks.
          *
