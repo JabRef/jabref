@@ -2052,7 +2052,7 @@ class OOBibBase {
                     mapCiteKeysToBibEntryArray(bibtexKeys[i],
                                                citeKeyToBibEntry,
                                                referenceMarkName);
-                cEntries = mapUndefinedBibentriesToNull(cEntries);
+                cEntries = mapUndefinedBibEntriesToNull(cEntries);
 
                 for (int j = 0; j < nCitedEntries; j++) {
                     String currentKey = bibtexKeys[i][j];
