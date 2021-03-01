@@ -1812,29 +1812,26 @@ class OOBibBase {
         boolean mustTestCharFormat = style.isFormatCitations();
 
         for (int i = 0; i < nRefMarks; i++) {
-            Object referenceMark = xReferenceMarks.getByName(referenceMarkNames.get(i));
-            XTextContent bookmark = unoQI(XTextContent.class, referenceMark);
+            final String name = referenceMarkNames.get(i);
 
-            XTextCursor cursor =
-                    bookmark
-                            .getAnchor()
-                            .getText()
-                            .createTextCursorByRange(bookmark.getAnchor());
+            XTextContent mark = documentConnection.nameAccessGetTextContentByName(nameAccess, name);
+            XTextCursor cursor = documentConnection.getTextCursorOfTextContent(mark);
 
             if (mustTestCharFormat) {
                 mustTestCharFormat = false; // need to do this only once
                 testFormatCitations(cursor, style);
             }
 
-            documentConnection.xText.removeTextContent(bookmark);
+            documentConnection.xText.removeTextContent(mark);
 
-            insertReferenceMark(documentConnection,
-                    referenceMarkNames.get(i),
-                    citMarkers[i],
-                    cursor,
-                    types[i] != OOBibBase.INVISIBLE_CIT,
-                    style
-            );
+            insertReferenceMark(
+                documentConnection,
+                name,
+                citMarkers[i],
+                cursor,
+                types[i] != OOBibBase.INVISIBLE_CIT,
+                style
+                );
 
             if (hadBibSection
                 && (documentConnection.getBookmarkRange(OOBibBase.BIB_SECTION_NAME) == null)) {
