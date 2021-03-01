@@ -2123,53 +2123,6 @@ class OOBibBase {
             assert (bibtexKeys.length == nRefMarks);
 
             updateUniqueLetters(  bibtexKeys, normCitMarkers, uniqueLetters );
-            // See if there are duplicate citations marks referring to
-            // different entries. If so, we need to use uniqueLetters:
-
-            // refKeys: normCitMarker to list of bibtexkeys sharing it.
-            //          The entries in the lists are ordered as in
-            //          normCitMarkers[i][j]
-            Map<String, List<String>> refKeys = new HashMap<>();
-
-            for (int i = 0; i < nRefMarks; i++) {
-                // Compare normalized markers, since the actual
-                // markers can be different.
-                String[] markers = normCitMarkers[i];
-                for (int j = 0; j < markers.length; j++) {
-                    String marker = markers[j];
-                    String currentKey = bibtexKeys[i][j];
-                    if (refKeys.containsKey(marker)) {
-                        // Ok, we have seen this exact marker before.
-                        if (!refKeys.get(marker).contains(currentKey)) {
-                            // ... but not for this entry.
-                            refKeys.get(marker).add(currentKey);
-                        }
-                    } else {
-                        // add as new entry
-                        List<String> l = new ArrayList<>(1);
-                        l.add(currentKey);
-                        refKeys.put(marker, l);
-                    }
-                }
-            }
-
-            // Go through the collected lists and see where we need to
-            // add unique letters to the year.
-            for (Map.Entry<String, List<String>> stringListEntry : refKeys.entrySet()) {
-                List<String> clashingKeys = stringListEntry.getValue();
-                if (clashingKeys.size() > 1) {
-                    // This marker appears for more than one unique entry:
-                    int nextUniqueLetter = 'a';
-                    for (String key : clashingKeys) {
-                        // Update the map of uniqueLetters for the
-                        // benefit of both the following generation of
-                        // new citation markers, and for the method
-                        // that builds the bibliography:
-                        uniqueLetters.put(key, String.valueOf((char) nextUniqueLetter));
-                        nextUniqueLetter++;
-                    }
-                }
-            }
 
             // Finally, go through all citation markers, and update
             // those referring to entries in our current list:
