@@ -26,9 +26,10 @@ jobs:
         with:
           gource_title: 'JabRef | more information at contribute.jabref.org'
           logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
-          gource_seconds_per_day: 0.01
+          gource_seconds_per_day: 0.5
           gource_start_date: ${{ steps.dates.outputs.start_date }}
           gource_stop_date: ${{ steps.dates.outputs.stop_date }}
+          gource_file_filter: csl$
       - name: 'Store video'
         run: |
           mkdir gource-videos
@@ -44,6 +45,7 @@ jobs:
           # 0.01 leads to a 45 second video for the complete history until end of 2020
           # 0.1 leads to a 8 minute video
           gource_seconds_per_day: 0.1
+          gource_file_filter: csl$
       - name: 'Store video'
         run: |
           mv gource/gource.mp4 gource-videos/jabref-complete.mp4
@@ -52,4 +54,4 @@ jobs:
         with:
           name: Gource
           path: ./gource-videos/
-          retention-days: 100
+          retention-days: 80
