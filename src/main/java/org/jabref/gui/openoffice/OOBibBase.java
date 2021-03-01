@@ -310,6 +310,9 @@ class OOBibBase {
             return cursor;
         }
 
+        /**
+         * (this could be static, except for the LOGGER)
+         */
         XTextContent
         nameAccessGetTextContentByName(XNameAccess nameAccess, String name)
             throws WrappedTargetException {
@@ -2313,7 +2316,10 @@ class OOBibBase {
     }
 
     /**
+     *  Read reference mark names from the document, keep only those
+     *  with JabRef naming convention, get their visual positions,
      *
+     *  @return JabRef reference mark names sorted by these positions.
      */
     private List<String>
     getJabRefReferenceMarkNamesSortedByPosition(
@@ -2335,8 +2341,9 @@ class OOBibBase {
         for (String name : names) {
 
             XTextContent textContent =
-                //documentConnection.nameAccessGetTextContentByName( nameAccess, name );
-                unoQI(XTextContent.class, nameAccess.getByName(name));
+                documentConnection.nameAccessGetTextContentByName( nameAccess, name );
+            // unoQI(XTextContent.class, nameAccess.getByName(name));
+
             XTextRange range = textContent.getAnchor();
 
             // Adjust range if we are inside a footnote:
