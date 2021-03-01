@@ -2107,18 +2107,6 @@ class OOBibBase {
         BibEntry[][] cEntriesForAll =
             getBibEntriesSortedWithinReferenceMarks( bibtexKeysIn, citeKeyToBibEntry, style );
 
-        String[] citMarkers = new String[nRefMarks];
-        for (int i = 0; i < nRefMarks; i++) {
-            BibEntry[] cEntries = cEntriesForAll[i];
-            citMarkers[i] = style.getCitationMarker(
-                Arrays.asList(cEntries), // entries
-                entries, // database
-                itcTypes[i] == OOBibBase.AUTHORYEAR_PAR,
-                null,
-                null
-            );
-        }
-
         // Update bibtexKeys to match the new sorting (within each referenceMark)
         String[][] bibtexKeys = mapBibEntriesToCitationKeysForall( cEntriesForAll );
         assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeys, citeKeyToBibEntry);
@@ -2134,11 +2122,12 @@ class OOBibBase {
         final int maxAuthorsFirst = style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST);
         Set<String> seenBefore = new HashSet<>();
 
+        String[] citMarkers = new String[nRefMarks];
+
         for (int i = 0; i < nRefMarks; i++) {
 
             final String referenceMarkName = referenceMarkNames.get(i);
             final int nCitedEntries = bibtexKeys[i].length;
-            boolean needsChange = false;
             int[] firstLimAuthors = new int[nCitedEntries];
             String[] uniqueLetterForCitedEntry = new String[nCitedEntries];
 
@@ -2148,6 +2137,8 @@ class OOBibBase {
                 .map(citeKeyToBibEntry::get)
                 .map(OOBibBase::undefinedBibentryToNull)
                 .toArray(BibEntry[]::new);
+            // ^^^ Note: pregenerated citMarkers used
+            // BibEntry[] cEntries = cEntriesForAll[i];
 
             for (int j = 0; j < nCitedEntries; j++) {
                 String currentKey = bibtexKeys[i][j];
@@ -2174,24 +2165,18 @@ class OOBibBase {
                     uniqueLetterForCitedEntry[j] = "";
                 } else {
                     uniqueLetterForCitedEntry[j] = uniqueLetterForKey;
-                    needsChange = true;
                 }
 
-                if (firstLimAuthors[j] > 0) {
-                    needsChange = true;
-                }
             } // for j
 
-            if (needsChange) {
-                citMarkers[i] =
-                    style.getCitationMarker(
-                        Arrays.asList(cEntries),
-                        entries,
-                        itcTypes[i] == OOBibBase.AUTHORYEAR_PAR,
-                        uniqueLetterForCitedEntry,
-                        firstLimAuthors
-                        );
-            }
+            citMarkers[i] =
+                style.getCitationMarker(
+                    Arrays.asList(cEntries),
+                    entries,
+                    itcTypes[i] == OOBibBase.AUTHORYEAR_PAR,
+                    uniqueLetterForCitedEntry,
+                    firstLimAuthors
+                    );
         } // for i
 
         return citMarkers;
