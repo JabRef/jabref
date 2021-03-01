@@ -2474,18 +2474,6 @@ class OOBibBase {
         }
     }
 
-    private void createBibTextSection2(DocumentConnection documentConnection,
-                                       boolean end)
-            throws IllegalArgumentException,
-            CreationException {
-
-        XTextCursor textCursor = documentConnection.xText.createTextCursor();
-        if (end) {
-            textCursor.gotoEnd(false);
-        }
-            // where does textCursor point to if end is false?
-            // TODO: are we using this.atEnd == false?
-            // If we do, what happens (or expected to happen) here?
     private void
     createAndInsertSection(
         DocumentConnection documentConnection,
@@ -2514,10 +2502,26 @@ class OOBibBase {
         documentConnection.xText.insertTextContent(textCursor, xChildSection, false);
     }
 
-    private void clearBibTextSectionContent2(DocumentConnection documentConnection)
-            throws WrappedTargetException,
-            IllegalArgumentException,
+    private void createBibTextSection2(DocumentConnection documentConnection,
+                                       boolean end)
+            throws IllegalArgumentException,
             CreationException {
+
+        XTextCursor textCursor = documentConnection.xText.createTextCursor();
+        if (end) {
+            textCursor.gotoEnd(false);
+        }
+        // where does textCursor point to if end is false?
+        // TODO: are we using this.atEnd == false?
+        // If we do, what happens (or expected to happen) here?
+
+        OOUtil.insertParagraphBreak(documentConnection.xText, textCursor);
+        createAndInsertSection(
+            documentConnection,
+            OOBibBase.BIB_SECTION_NAME,
+            textCursor
+            );
+    }
 
     private XNameAccess
     getTextSections(DocumentConnection documentConnection)
@@ -2531,6 +2535,12 @@ class OOBibBase {
 
         return supplier.getTextSections();
     }
+
+    private void clearBibTextSectionContent2(DocumentConnection documentConnection)
+        throws
+        WrappedTargetException,
+        IllegalArgumentException,
+        CreationException {
 
         XNameAccess ts = getTextSections( documentConnection );
         if (!ts.hasByName(OOBibBase.BIB_SECTION_NAME)) {
