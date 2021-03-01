@@ -2229,11 +2229,12 @@ class OOBibBase {
         parseRefMarkNamesToArrays(referenceMarkNames, types, bibtexKeys);
 
         FindCitedEntriesResult fce =
-                findCitedEntries(
-                    findCitedKeys(documentConnection),
-                    databases
-                    // TODO: why are we scanning the document
-                    // if we already have the referenceMarkNames?
+            findCitedEntries(
+                findCitedKeys(documentConnection),
+                databases
+                // TODO: Pass jabRefReferenceMarkNamesSortedByPosition around, and
+                //       also add as a parameter to findCitedKeys,
+                //       to make calls to updateSortedReferenceMarks more visible.
                 );
         // fce.entries are in same order as returned by findCitedKeys
 
@@ -2355,6 +2356,14 @@ class OOBibBase {
         return result;
     }
 
+    /**
+     *  Refresh list of JabRef reference marks (sorts by position).
+     *
+     *  Probably should be called at the start of actions from the GUI,
+     *  that rely on jabRefReferenceMarkNamesSortedByPosition to be up-to-date.
+     *
+     *  TODO: maybe we should pass around a fresh copy?
+     */
     public void updateSortedReferenceMarks()
             throws WrappedTargetException,
             NoSuchElementException,
