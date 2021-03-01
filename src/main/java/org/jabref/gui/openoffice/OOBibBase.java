@@ -1917,9 +1917,14 @@ class OOBibBase {
         }
     }
 
-    private static List<String> unresolvedKeysFromEntries(Map<BibEntry, BibDatabase> entries) {
-        // Collect and return unresolved citation keys.
-        // uses: entries
+    /**
+     *  @return The list of citation keys from `instanceof
+     *          UndefinedBibtexEntry` elements of (keys of) `entries`.
+     *
+     *  Intent: Get list of unresolved citation keys.
+     */
+    private static List<String>
+    unresolvedKeysFromEntries(Map<BibEntry, BibDatabase> entries) {
         List<String> unresolvedKeys = new ArrayList<>();
         for (BibEntry entry : entries.keySet()) {
             if (entry instanceof UndefinedBibtexEntry) {
@@ -1932,28 +1937,111 @@ class OOBibBase {
         return unresolvedKeys;
     }
 
+    /**
+     * Given bibtexKeys for each reference mark and the corresponding
+     * normalized citation markers for each, fills uniqueLetters.
+     *
+     * We expect to see data for all JabRef reference marks here, and
+     * clear uniqueLetters before filling.
+     *
+     * On return: uniqueLetters.get(bibtexkey) provides letter to be
+     * added after the year (null for none).
+     *
+     */
+    void updateUniqueLetters(
+        String bibtexKeys[][],
+        String normCitMarkers[][],
+        final Map<String, String> uniqueLetters ){
+
+        // See if there are duplicate citations marks referring to
+        // different entries. If so, we need to use uniqueLetters.
+
+        // refKeys: (normCitMarker) to (list of bibtexkeys sharing it).
+        //          The entries in the lists are ordered as in
+        //          normCitMarkers[i][j]
+        Map<String, List<String>> refKeys = new HashMap<>();
+
+        for (int i = 0; i < nRefMarks; i++) {
+            // Compare normalized markers, since the actual
+            // markers can be different.
+            String[] markers = normCitMarkers[i];
+            for (int j = 0; j < markers.length; j++) {
+                String marker = markers[j];
+                String currentKey = bibtexKeys[i][j];
+                if (refKeys.containsKey(marker)) {
+                    // Ok, we have seen this exact marker before.
+                    if (!refKeys.get(marker).contains(currentKey)) {
+                        // ... but not for this entry.
+                        refKeys.get(marker).add(currentKey);
+                    }
+                } else {
+                    // add as new entry
+                    List<String> l = new ArrayList<>(1);
+                    l.add(currentKey);
+                    refKeys.put(marker, l);
+                }
+            }
+        }
+
+        uniqueLetters.clear();
+
+        // Go through the collected lists and see where we need to
+        // add unique letters to the year.
+        for (Map.Entry<String, List<String>> stringListEntry : refKeys.entrySet()) {
+            List<String> clashingKeys = stringListEntry.getValue();
+            if (clashingKeys.size() > 1) {
+                // This marker appears for more than one unique entry:
+                int nextUniqueLetter = 'a';
+                for (String key : clashingKeys) {
+                    // Update the map of uniqueLetters for the
+                    // benefit of both the following generation of
+                    // new citation markers, and for the method
+                    // that builds the bibliography:
+                    uniqueLetters.put(key, String.valueOf((char) nextUniqueLetter));
+                    nextUniqueLetter++;
+                }
+            }
+        }
+    }
+
+    private BibEntry[][]
+    getBibEntriesSortedWithinReferenceMarks( String[][] bibtexKeysIn, Map<String, BibEntry> citeKeyToBibEntry, OOBibStyle style ) {
+        return
+            Arrays.stream(bibtexKeysIn)
+            .map(bibtexKeysOfAReferenceMark ->
+                 Arrays.stream(bibtexKeysOfAReferenceMark)
+                 .map(citeKeyToBibEntry::get)
+                 .sorted(comparatorForMulticite(style)) // sort within referenceMark
+                 .toArray(BibEntry[]::new)
+                )
+            .toArray(BibEntry[][]::new);
+    }
+
 
     /**
-     * Produce citMarkers for normal (!isCitationKeyCiteMarkers && ! isNumberEntries) styles.
+     * Produce citation markers for normal
+     *   (!isCitationKeyCiteMarkers && ! isNumberEntries) styles.
      *
      * @param referenceMarkNames Names of reference marks.
      * @param bibtexKeysIn       Bibtex citation keys.
-     * @param citeKeyToBibEntry  Maps citation keys to BibEntry.
+     * @param citeKeyToBibEntry  Maps citation key to BibEntry.
      * @param itcTypes           Citation types.
      * @param entries            Map BibEntry to BibDatabase.
      * @param uniqueLetters      Filled with new values here.
      * @param style              Bibliography style.
      */
     String[]
-    produceCitationMarkersForNormalStyle(List<String> referenceMarkNames,
-                                     String[][] bibtexKeysIn,
-                                     Map<String, BibEntry> citeKeyToBibEntry,
-                                     int[] itcTypes,
-                                     Map<BibEntry, BibDatabase> entries,
-                                     final Map<String, String> uniqueLetters,
-                                     OOBibStyle style
-    )
-            throws BibEntryNotFoundException {
+    produceCitationMarkersForNormalStyle(
+        List<String> referenceMarkNames,
+        String[][] bibtexKeysIn,
+        Map<String, BibEntry> citeKeyToBibEntry,
+        int[] itcTypes,
+        Map<BibEntry, BibDatabase> entries,
+        final Map<String, String> uniqueLetters,
+        OOBibStyle style
+        )
+        throws BibEntryNotFoundException {
+
         uniqueLetters.clear();
 
         assert !style.isCitationKeyCiteMarkers();
@@ -1965,39 +2053,22 @@ class OOBibBase {
         assert (itcTypes.length == nRefMarks);
         assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeysIn, citeKeyToBibEntry);
 
+        // BibEntry for each bibtexKeysIn[i][j], sorted within bibtexKeysIn[i]
         BibEntry[][] cEntriesForAll =
-                Arrays.stream(bibtexKeysIn)
-                      .map(bibtexKeysOfAReferenceMark ->
-                              Arrays.stream(bibtexKeysOfAReferenceMark)
-                                    .map(citeKeyToBibEntry::get)
-                                    .sorted(comparatorForMulticite(style)) // sort within referenceMark
-                                    .toArray(BibEntry[]::new)
-                      )
-                      .toArray(BibEntry[][]::new);
-
-        // Update bibtexKeys to match the new sorting (within each referenceMark)
-        String[][] bibtexKeys =
-                Arrays.stream(cEntriesForAll)
-                      .map(cEntries ->
-                              Arrays.stream(cEntries)
-                                    .map(ce -> ce.getCitationKey().orElse(null))
-                                    .toArray(String[]::new)
-                      )
-                      .toArray(String[][]::new);
-
-        assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeysIn, citeKeyToBibEntry);
-        assert (bibtexKeys.length == nRefMarks);
+            getBibEntriesSortedWithinReferenceMarks(bibtexKeysIn, citeKeyToBibEntry, style);
 
         String[] citMarkers = new String[nRefMarks];
         for (int i = 0; i < nRefMarks; i++) {
             BibEntry[] cEntries = cEntriesForAll[i];
             int type = itcTypes[i];
-            citMarkers[i] = style.getCitationMarker(Arrays.asList(cEntries), // entries
+            citMarkers[i] =
+                style.getCitationMarker(
+                    Arrays.asList(cEntries), // entries
                     entries, // database
                     type == OOBibBase.AUTHORYEAR_PAR,
                     null,
                     null
-            );
+                    );
         }
 
         //    normCitMarkers[i][j] = for unification
@@ -2007,17 +2078,17 @@ class OOBibBase {
             // We need "normalized" (in parenthesis) markers
             // for uniqueness checking purposes:
             normCitMarkers[i] =
-                    Arrays.stream(cEntries)
-                          .map(ce ->
-                                  style.getCitationMarker(
-                                          Collections.singletonList(ce),
-                                          entries,
-                                          true,
-                                          null,
-                                          new int[] {-1} // no limit on authors
-                                  )
-                          )
-                          .toArray(String[]::new);
+                Arrays.stream(cEntries)
+                .map(ce ->
+                     style.getCitationMarker(
+                         Collections.singletonList(ce),
+                         entries,
+                         true,
+                         null,
+                         new int[] {-1} // no limit on authors
+                         )
+                    )
+                .toArray(String[]::new);
         }
 
         uniqueLetters.clear();
@@ -2026,59 +2097,27 @@ class OOBibBase {
         // changes: citMarkers[i], uniqueLetters
         // uses: nRefMarks, normCitMarkers, bibtexKeys,
         //       style (style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST))
-        //       citeKeyToBibEntry, entries, types
+        //       citeKeyToBibEntry, entries, itcTypes
 
         if (!style.isCitationKeyCiteMarkers() && !style.isNumberEntries()) {
             // Only for normal citations. Numbered citations and
             // citeKeys are already unique.
 
-            // See if there are duplicate citations marks referring to
-            // different entries. If so, we need to use uniqueLetters:
+            // Reconstruct bibtexKeys, now sorted within each referenceMark
+            String[][] bibtexKeys =
+                Arrays.stream(cEntriesForAll)
+                .map(cEntries ->
+                     Arrays.stream(cEntries)
+                     .map(ce -> ce.getCitationKey().orElseThrow(IllegalArgumentException::new))
+                     .toArray(String[]::new)
+                    )
+                .toArray(String[][]::new);
 
-            // refKeys: normCitMarker to list of bibtexkeys sharing it.
-            //          The entries in the lists are ordered as in
-            //          normCitMarkers[i][j]
-            Map<String, List<String>> refKeys = new HashMap<>();
+            assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeys, citeKeyToBibEntry);
+            assert (bibtexKeys.length == nRefMarks);
 
-            for (int i = 0; i < nRefMarks; i++) {
-                // Compare normalized markers, since the actual
-                // markers can be different.
-                String[] markers = normCitMarkers[i];
-                for (int j = 0; j < markers.length; j++) {
-                    String marker = markers[j];
-                    String currentKey = bibtexKeys[i][j];
-                    if (refKeys.containsKey(marker)) {
-                        // Ok, we have seen this exact marker before.
-                        if (!refKeys.get(marker).contains(currentKey)) {
-                            // ... but not for this entry.
-                            refKeys.get(marker).add(currentKey);
-                        }
-                    } else {
-                        // add as new entry
-                        List<String> l = new ArrayList<>(1);
-                        l.add(currentKey);
-                        refKeys.put(marker, l);
-                    }
-                }
-            }
+            updateUniqueLetters(  bibtexKeys, normCitMarkers, uniqueLetters );
 
-            // Go through the collected lists and see where we need to
-            // add unique letters to the year.
-            for (Map.Entry<String, List<String>> stringListEntry : refKeys.entrySet()) {
-                List<String> clashingKeys = stringListEntry.getValue();
-                if (clashingKeys.size() > 1) {
-                    // This marker appears for more than one unique entry:
-                    int nextUniqueLetter = 'a';
-                    for (String key : clashingKeys) {
-                        // Update the map of uniqueLetters for the
-                        // benefit of both the following generation of
-                        // new citation markers, and for the method
-                        // that builds the bibliography:
-                        uniqueLetters.put(key, String.valueOf((char) nextUniqueLetter));
-                        nextUniqueLetter++;
-                    }
-                }
-            }
 
             // Finally, go through all citation markers, and update
             // those referring to entries in our current list:
