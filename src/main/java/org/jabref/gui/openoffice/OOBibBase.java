@@ -112,7 +112,7 @@ class OOBibBase {
     private static final int INVISIBLE_CIT = 3;
 
     private static final Logger LOGGER =
-            LoggerFactory.getLogger(OOBibBase.class);
+        LoggerFactory.getLogger(OOBibBase.class);
 
     /* variables  */
     private final DialogService dialogService;
@@ -134,15 +134,16 @@ class OOBibBase {
         public XPropertyContainer userProperties;
         private final Logger LOGGER;
 
-        DocumentConnection(XMultiServiceFactory mxDocFactory,
-                           XTextDocument mxDoc,
-                           XText xText,
-                           XTextViewCursorSupplier xViewCursorSupplier,
-                           XComponent xCurrentComponent,
-                           XPropertySet propertySet,
-                           XPropertyContainer userProperties,
-                           Logger LOGGER
-        ) {
+        DocumentConnection(
+            XMultiServiceFactory mxDocFactory,
+            XTextDocument mxDoc,
+            XText xText,
+            XTextViewCursorSupplier xViewCursorSupplier,
+            XComponent xCurrentComponent,
+            XPropertySet propertySet,
+            XPropertyContainer userProperties,
+            Logger LOGGER
+            ) {
             this.mxDocFactory = mxDocFactory;
             this.mxDoc = mxDoc;
             this.xText = xText;
@@ -302,7 +303,7 @@ class OOBibBase {
                     // If we are close to charBefore and see a space,
                     // then cut here. Might avoid cutting a word in half.
                     if ((i >= (charBefore - flex))
-                            && Character.isWhitespace(cursor.getString().charAt(0))) {
+                        && Character.isWhitespace(cursor.getString().charAt(0))) {
                         break;
                     }
                 } catch (IndexOutOfBoundsException ex) {
@@ -331,9 +332,9 @@ class OOBibBase {
             String result = cursor.getString();
             if (htmlMarkup) {
                 result =
-                        result.substring(0, addedBefore)
-                                + "<b>" + citPart + "</b>"
-                                + result.substring(lengthWithBefore);
+                    result.substring(0, addedBefore)
+                    + "<b>" + citPart + "</b>"
+                    + result.substring(lengthWithBefore);
             }
             return result.trim();
         }
@@ -342,17 +343,21 @@ class OOBibBase {
          * Get the cursor positioned by the user.
          *
          */
-        public XTextViewCursor getViewCursor() {
+        public XTextViewCursor
+        getViewCursor() {
             return this.xViewCursorSupplier.getViewCursor();
         }
 
-        public XNameAccess getBookmarks() {
+        /**
+         * Provides access to bookmarks by name.
+         */
+        public XNameAccess
+        getBookmarks() {
             // query XBookmarksSupplier from document model
             // and get bookmarks collection
             XBookmarksSupplier xBookmarksSupplier =
                 unoQI(XBookmarksSupplier.class,
-                        this.xCurrentComponent
-                      );
+                      this.xCurrentComponent);
             return xBookmarksSupplier.getBookmarks();
         }
 
@@ -385,14 +390,18 @@ class OOBibBase {
      */
     private DocumentConnection xDocumentConnection;
 
-    /*
-     *  xUniqueLetters : maps bibtexkeys to letters ("a", "b") that
+    /**
+     *  Map citation keys to letters ("a", "b") that
      *  make the citation markers unique.
+     *
+     *  Used directly (apart from passing around as `uniqueLetters`):
+     *  refreshCiteMarkers, rebuildBibTextSection.
      */
     private final Map<String, String> xUniqueLetters = new HashMap<>();
 
     /**
-     *
+     * Names of reference marks belonging to JabRef sorted by visual
+     * position.
      *
      */
     private List<String> jabRefReferenceMarkNamesSortedByPosition;
@@ -400,36 +409,42 @@ class OOBibBase {
     /*
      * Constructor
      */
-    public OOBibBase(Path loPath,
-                     boolean atEnd,
-                     DialogService dialogService
-    ) throws BootstrapException,
-            CreationException {
+    public
+    OOBibBase(Path loPath,
+              boolean atEnd,
+              DialogService dialogService)
+        throws
+        BootstrapException,
+        CreationException {
+
         this.dialogService = dialogService;
 
-            FieldComparator a = new FieldComparator(StandardField.AUTHOR);
-            FieldComparator y = new FieldComparator(StandardField.YEAR);
-            FieldComparator t = new FieldComparator(StandardField.TITLE);
+        FieldComparator a = new FieldComparator(StandardField.AUTHOR);
+        FieldComparator y = new FieldComparator(StandardField.YEAR);
+        FieldComparator t = new FieldComparator(StandardField.TITLE);
 
-                List<Comparator<BibEntry>> ayt = new ArrayList<>(3);
-                ayt.add(a);
-                ayt.add(y);
-                ayt.add(t);
-                this.entryComparator = new FieldComparatorStack<>(ayt);
+        List<Comparator<BibEntry>> ayt = new ArrayList<>(3);
+        ayt.add(a);
+        ayt.add(y);
+        ayt.add(t);
+        this.entryComparator = new FieldComparatorStack<>(ayt);
 
-                List<Comparator<BibEntry>> yat = new ArrayList<>(3);
-                yat.add(y);
-                yat.add(a);
-                yat.add(t);
-                this.yearAuthorTitleComparator = new FieldComparatorStack<>(yat);
+        List<Comparator<BibEntry>> yat = new ArrayList<>(3);
+        yat.add(y);
+        yat.add(a);
+        yat.add(t);
+        this.yearAuthorTitleComparator = new FieldComparatorStack<>(yat);
 
         this.atEnd = atEnd;
         this.xDesktop = simpleBootstrap(loPath);
     }
 
-    private XDesktop simpleBootstrap(Path loPath)
-            throws CreationException,
-            BootstrapException {
+    private XDesktop
+    simpleBootstrap(Path loPath)
+        throws
+        CreationException,
+        BootstrapException {
+
         // Get the office component context:
         XComponentContext context = org.jabref.gui.openoffice.Bootstrap.bootstrap(loPath);
         XMultiComponentFactory sem = context.getServiceManager();
@@ -455,18 +470,22 @@ class OOBibBase {
      * @return A reference to the requested UNO interface type if available,
      * otherwise null
      */
-    private static <T> T unoQI(Class<T> zInterface,
-                               Object object) {
+    private static <T> T
+    unoQI(
+        Class<T> zInterface,
+        Object object) {
         return UnoRuntime.queryInterface(zInterface, object);
     }
 
-    /*
-     *  section: selectDocument()
+    /**
+     *  Used by selectDocument
      */
+    private static List<XTextDocument>
+    getTextDocuments(XDesktop desktop)
+        throws
+        NoSuchElementException,
+        WrappedTargetException {
 
-    private static List<XTextDocument> getTextDocuments(XDesktop desktop)
-            throws NoSuchElementException,
-            WrappedTargetException {
         List<XTextDocument> result = new ArrayList<>();
 
         XEnumerationAccess enumAccess = desktop.getComponents();
@@ -483,24 +502,40 @@ class OOBibBase {
         return result;
     }
 
-    private static Optional<String> getDocumentTitle(XTextDocument doc) {
+    /**
+     *  @param doc The XTextDocument we want the title for. Null allowed.
+     *  @return The title or Optional.empty()
+     */
+    private static Optional<String>
+    getDocumentTitle(XTextDocument doc) {
+
         if (doc == null) {
             return Optional.empty();
         }
 
         try {
             XFrame frame = doc.getCurrentController().getFrame();
-            Object frame_title_obj = OOUtil.getProperty(frame, "Title");
-            String frame_title_str = String.valueOf(frame_title_obj);
-            return Optional.of(frame_title_str);
+            Object frameTitleObj = OOUtil.getProperty(frame, "Title");
+            String frameTitleString = String.valueOf(frameTitleObj);
+            return Optional.of(frameTitleString);
         } catch (UnknownPropertyException | WrappedTargetException e) {
             LOGGER.warn("Could not get document title", e);
             return Optional.empty();
         }
     }
 
-    private static XTextDocument selectDocumentDialog(List<XTextDocument> list,
-                                                      DialogService dialogService) {
+    /**
+     *  Run a dialog allowing the user to choose among the documents in `list`.
+     *
+     * @return Null if no document was selected. Otherwise the
+     *         document selected.
+     *
+     */
+    private static XTextDocument
+    selectDocumentDialog(
+        List<XTextDocument> list,
+        DialogService dialogService) {
+
         class DocumentTitleViewModel {
 
             private final XTextDocument xTextDocument;
@@ -522,54 +557,73 @@ class OOBibBase {
         }
 
         List<DocumentTitleViewModel> viewModel =
-                list.stream()
-                    .map(DocumentTitleViewModel::new)
-                    .collect(Collectors.toList());
+            list.stream()
+            .map(DocumentTitleViewModel::new)
+            .collect(Collectors.toList());
 
         // This whole method is part of a background task when
         // auto-detecting instances, so we need to show dialog in FX
         // thread
         Optional<DocumentTitleViewModel> selectedDocument =
-                dialogService
-                        .showChoiceDialogAndWait(
-                                Localization.lang("Select document"),
-                                Localization.lang("Found documents:"),
-                                Localization.lang("Use selected document"),
-                                viewModel
-                        );
+            dialogService
+            .showChoiceDialogAndWait(
+                Localization.lang("Select document"),
+                Localization.lang("Found documents:"),
+                Localization.lang("Use selected document"),
+                viewModel
+                );
+
         return
-                selectedDocument
-                        .map(DocumentTitleViewModel::getXtextDocument)
-                        .orElse(null);
+            selectedDocument
+            .map(DocumentTitleViewModel::getXtextDocument)
+            .orElse(null);
     }
 
     /**
      * Choose a document to work with.
+     *
+     * Assumes we have already connected to Libroffice or OpenOffice.
+     *
+     * If there is a single document to choose from, selects that.
+     * If there are more than one, shows selection dialog.
+     * If there are none, throws NoDocumentException
+     *
+     * After successful selection connects to the selected document
+     * and extracts some frequently used parts (starting points for
+     * managing its content).
+     *
+     * Finally initializes this.xDocumentConnection with the selected
+     * document and parts extracted.
+     *
      */
-    public void selectDocument()
-            throws NoDocumentException,
-            NoSuchElementException,
-            WrappedTargetException {
+    public void
+    selectDocument()
+        throws
+        NoDocumentException,
+        NoSuchElementException,
+        WrappedTargetException {
+
         XTextDocument mxDoc;
 
-            XTextDocument selected;
-            List<XTextDocument> textDocumentList = getTextDocuments(this.xDesktop);
-            if (textDocumentList.isEmpty()) {
-                throw new NoDocumentException("No Writer documents found");
-            } else if (textDocumentList.size() == 1) {
-                // Get the only one
-                selected = textDocumentList.get(0);
-            } else {
-                // Bring up a dialog
-                selected =
-                        OOBibBase.selectDocumentDialog(textDocumentList,
-                                this.dialogService);
-            }
+        XTextDocument selected;
+        List<XTextDocument> textDocumentList = getTextDocuments(this.xDesktop);
+        if (textDocumentList.isEmpty()) {
+            throw new NoDocumentException("No Writer documents found");
+        } else if (textDocumentList.size() == 1) {
+            // Get the only one
+            selected = textDocumentList.get(0);
+        } else {
+            // Bring up a dialog
+            selected =
+                OOBibBase.selectDocumentDialog(
+                    textDocumentList,
+                    this.dialogService);
+        }
 
-            if (selected == null) {
-                return;
-            }
-            mxDoc = selected;
+        if (selected == null) {
+            return;
+        }
+        mxDoc = selected;
 
         XComponent component = unoQI(XComponent.class, mxDoc);
 
@@ -577,9 +631,9 @@ class OOBibBase {
 
         XTextViewCursorSupplier viewCursorSupplier;
 
-            XModel mo = unoQI(XModel.class, component);
-            XController co = mo.getCurrentController();
-            viewCursorSupplier = unoQI(XTextViewCursorSupplier.class, co);
+        XModel mo = unoQI(XModel.class, component);
+        XController co = mo.getCurrentController();
+        viewCursorSupplier = unoQI(XTextViewCursorSupplier.class, co);
 
         // get a reference to the body text of the document
         XText text = mxDoc.getText();
@@ -589,21 +643,21 @@ class OOBibBase {
 
         XPropertyContainer userProperties;
 
-            XDocumentPropertiesSupplier supp =
-                    unoQI(XDocumentPropertiesSupplier.class, mxDoc);
-            userProperties = supp.getDocumentProperties().getUserDefinedProperties();
+        XDocumentPropertiesSupplier supp =
+            unoQI(XDocumentPropertiesSupplier.class, mxDoc);
+        userProperties = supp.getDocumentProperties().getUserDefinedProperties();
 
         XPropertySet propertySet = unoQI(XPropertySet.class, userProperties);
 
         this.xDocumentConnection = new DocumentConnection(
-                mxDocFactory,
-                mxDoc,
-                text,
-                viewCursorSupplier,
-                component,
-                propertySet,
-                userProperties,
-                LOGGER
+            mxDocFactory,
+            mxDoc,
+            text,
+            viewCursorSupplier,
+            component,
+            propertySet,
+            userProperties,
+            LOGGER
         );
 
         // TODO: maybe we should install an event handler for document
@@ -613,13 +667,23 @@ class OOBibBase {
         //         util/XCloseBroadcaster.html#addCloseListener
     }
 
-    /*
+    /**
+     * Mark the current document as missing.
+     *
      * TODO: GUI should be notified
      */
-    private void forgetDocument() {
+    private void
+    forgetDocument() {
         this.xDocumentConnection = null;
     }
 
+    /**
+     * A simple test for document availability.
+     *
+     * See also `documentConnectionMissing` for a test
+     * actually attempting to use teh connection.
+     *
+     */
     public boolean isConnectedToDocument() {
         return this.xDocumentConnection != null;
     }
@@ -638,19 +702,24 @@ class OOBibBase {
         return res;
     }
 
-    private DocumentConnection getDocumentConnectionOrThrow()
-            throws NoDocumentException {
+    /**
+     * Either return a valid DocumentConnection or throw
+     * NoDocumentException.
+     */
+    private DocumentConnection
+    getDocumentConnectionOrThrow()
+        throws NoDocumentException {
         if (documentConnectionMissing()) {
             throw new NoDocumentException("Not connected to document");
         }
         return this.xDocumentConnection;
     }
 
-    /*
-     *  Getters useful after selectDocument()
+    /**
+     *  The title of the current document, or Optional.empty()
      */
-
-    public Optional<String> getCurrentDocumentTitle() {
+    public Optional<String>
+    getCurrentDocumentTitle() {
         if (documentConnectionMissing()) {
             return Optional.empty();
         } else {
@@ -658,11 +727,15 @@ class OOBibBase {
         }
     }
 
-    /*
-     *  insertEntry
+    /**
+     *  The comparator used to sort within a group of merged
+     *  citations.
+     *
+     *  The term used here is "multicite". The option controlling the
+     *  order is "MultiCiteChronological" in style files.
      */
-
-    private Comparator<BibEntry> comparatorForMulticite(OOBibStyle style) {
+    private Comparator<BibEntry>
+    comparatorForMulticite(OOBibStyle style) {
         if (style.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL)) {
             return this.yearAuthorTitleComparator;
         } else {
@@ -670,15 +743,30 @@ class OOBibBase {
         }
     }
 
-    private void sortBibEntryListForMulticite(List<BibEntry> entries,
-                                              OOBibStyle style) {
+    /**
+     * Sort entries within a group of merged citations.
+     *
+     * Note: the sort is inplace, modifies the argument.
+     */
+    private void
+    sortBibEntryListForMulticite(List<BibEntry> entries,
+                                 OOBibStyle style) {
         if (entries.size() <= 1) {
             return;
         }
         entries.sort(comparatorForMulticite(style));
     }
 
-    private static int citationTypeFromOptions(boolean withText, boolean inParenthesis) {
+    /**
+     * Given the withText and inParenthesis options,
+     * return the corresponding itcType.
+     *
+     * @param withText False means invisible citation (no text).
+     * @param inParenthesis True means "(Au and Thor 2000)".
+     *                      False means "Au and Thor (2000)".
+     */
+    private static int
+    citationTypeFromOptions(boolean withText, boolean inParenthesis) {
         if (!withText) {
             return OOBibBase.INVISIBLE_CIT;
         }
@@ -687,11 +775,22 @@ class OOBibBase {
                 : OOBibBase.AUTHORYEAR_INTEXT);
     }
 
-    private static boolean isJabRefReferenceMarkName(String name) {
+    /**
+     * @return true if name matches the pattern used for JabRef
+     * reference mark names.
+     */
+    private static boolean
+    isJabRefReferenceMarkName(String name) {
         return (CITE_PATTERN.matcher(name).find());
     }
 
-    private static List<String> filterIsJabRefReferenceMarkName(List<String> names) {
+    /**
+     * Filter a list of reference mark names by `isJabRefReferenceMarkName`
+     *
+     * @param names The list to be filtered.
+     */
+    private static List<String>
+    filterIsJabRefReferenceMarkName(List<String> names) {
         return (names
                 .stream()
                 .filter(OOBibBase::isJabRefReferenceMarkName)
@@ -699,38 +798,57 @@ class OOBibBase {
         );
     }
 
-    /*
-     * called from getCitationEntries(...)
+    /**
+     * Get reference mark naems from the document matching the pattern
+     * used for JabRef reference mark names.
+     *
+     * Note: the names returned are in arbitrary order.
+     *
+     * See also: `getJabRefReferenceMarkNamesSortedByPosition`
+     *
      */
-    private List<String> getJabRefReferenceMarkNames(DocumentConnection documentConnection)
-            throws NoDocumentException {
-        return filterIsJabRefReferenceMarkName(documentConnection.getReferenceMarknames());
+    private List<String>
+    getJabRefReferenceMarkNames(DocumentConnection documentConnection)
+        throws NoDocumentException {
+        List<String> allNames = documentConnection.getReferenceMarkNames();
+        return filterIsJabRefReferenceMarkName(allNames);
     }
 
     /**
+     * Get a list of CitationEntry objects corresponding to citations
+     * in the document.
      *
+     * @return A list with entries corresponding to citations in the
+     *         text, in arbitrary order (same order as from
+     *         getJabRefReferenceMarkNames).
+     *
+     *         TODO: Note: visual or alphabetic order could be more
+     *               managable for the user. We could provide these
+     *               here, but switching between them needs change on
+     *               GUI (adding a toggle or selector).
+     *
+     *         Wish: selecting an entry in the GUI cold move cursor in
+     *               the document.
      */
-    public List<CitationEntry> getCitationEntries()
-            throws NoSuchElementException,
-            UnknownPropertyException,
-            WrappedTargetException,
-            NoDocumentException {
-        return this.getCitationEntriesImpl(this.getDocumentConnectionOrThrow());
-    }
+    public List<CitationEntry>
+    getCitationEntries()
+        throws
+        NoSuchElementException,
+        UnknownPropertyException,
+        WrappedTargetException,
+        NoDocumentException {
 
-    private List<CitationEntry> getCitationEntriesImpl(DocumentConnection documentConnection)
-            throws NoSuchElementException,
-            UnknownPropertyException,
-            WrappedTargetException,
-            NoDocumentException {
+        DocumentConnection documentConnection = this.getDocumentConnectionOrThrow();
+
         List<String> names = this.getJabRefReferenceMarkNames(documentConnection);
 
         List<CitationEntry> citations = new ArrayList<>(names.size());
         for (String name : names) {
             CitationEntry entry =
-                    new CitationEntry(name,
-                            documentConnection.getCitationContext(name, 30, 30, true),
-                            documentConnection.getCustomProperty(name)
+                new CitationEntry(
+                    name,
+                    documentConnection.getCitationContext(name, 30, 30, true),
+                    documentConnection.getCustomProperty(name)
                     );
             citations.add(entry);
         }
@@ -739,40 +857,37 @@ class OOBibBase {
 
     /**
      * Apply editable parts of citationEntries to the document.
-     *
-     * - Currently the only editable part is pageInfo.
-     *
+     * <p>
+     * Currently the only editable part is pageInfo.
+     * <p>
      * Since the only call to applyCitationEntries() only changes
      * pageInfo w.r.t those returned by getCitationEntries(), we can
      * do with the following restrictions:
-     *
-     * - Missing pageInfo means no action.
-     *
-     * - Missing CitationEntry means no action (no attempt to remove
-         citation from the text).
-     *
-     * - Reference to citation not present in the text evokes no
-         error, and setCustomProperty() is called.
+     * <ul>
+     * <li> Missing pageInfo means no action.</li>
+     * <li> Missing CitationEntry means no action (no attempt to remove
+     *      citation from the text).</li>
+     * </ul>
      */
-    public void applyCitationEntries(List<CitationEntry> citationEntries)
-            throws UnknownPropertyException,
-            NotRemoveableException,
-            PropertyExistException,
-            IllegalTypeException,
-            IllegalArgumentException,
-            NoDocumentException {
+    public void
+    applyCitationEntries(
+        List<CitationEntry> citationEntries)
+        throws
+        UnknownPropertyException,
+        NotRemoveableException,
+        PropertyExistException,
+        IllegalTypeException,
+        IllegalArgumentException,
+        NoDocumentException {
+
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
-        // Leave exceptions to the caller.
 
-        // Note: not catching exceptions here means nothing is applied
-        //       after the first problematic entry. We might catch and
-        //       collect messages here.
-
-        // try {
         for (CitationEntry entry : citationEntries) {
             Optional<String> pageInfo = entry.getPageInfo();
             if (pageInfo.isPresent()) {
-                documentConnection.setCustomProperty(entry.getRefMarkName(), pageInfo.get());
+                documentConnection.setCustomProperty(
+                    entry.getRefMarkName(),
+                    pageInfo.get());
             }
             // TODO: if pageInfo is not present, or is empty:
             // maybe we should remove it from the document.
@@ -780,15 +895,26 @@ class OOBibBase {
     }
 
     /**
+     * Produce a reference mark name for JabRef for the given citation
+     * key and itcType that does not yet appear among the reference
+     * marks of the document.
+     *
+     * @param bibtexKey The citation key.
+     * @param itcType   Encodes the effect of <code>withText</code> and
+     *                  <code>inParenthesis</code> options.
+     *
      * The first occurrence of bibtexKey gets no serial number, the
      * second gets 0, the third 1 ...
      *
      * Or the first unused in this series, after removals.
      */
-    private String getUniqueReferenceMarkName(DocumentConnection documentConnection,
-                                              String bibtexKey,
-                                              int itcType)
-            throws NoDocumentException {
+    private String
+    getUniqueReferenceMarkName(
+        DocumentConnection documentConnection,
+        String bibtexKey,
+        int itcType)
+        throws NoDocumentException {
+
         XNameAccess xNamedRefMarks = documentConnection.getReferenceMarks();
         int i = 0;
         String name = BIB_CITATION + '_' + itcType + '_' + bibtexKey;
@@ -806,8 +932,11 @@ class OOBibBase {
      * number of itcType values.
      */
     private static class ParsedRefMark {
-        public String i; // "", "0", "1" ...
-        public int itcType; // in-text-citation type
+        /**  "", "0", "1" ... */
+        public String i;
+        /** in-text-citation type */
+        public int itcType;
+        /** Citation keys embedded in the reference mark. */
         public List<String> citedKeys;
 
         ParsedRefMark(String i, int itcType, List<String> citedKeys) {
@@ -818,13 +947,19 @@ class OOBibBase {
     }
 
     /**
-     * Parse a refMarkName.
+     * Parse a JabRef reference mark name.
+     *
+     * @return Optional.empty() on failure.
+     *
      */
-    private static Optional<ParsedRefMark> parseRefMarkName(String refMarkName) {
+    private static Optional<ParsedRefMark>
+    parseRefMarkName(String refMarkName) {
+
         Matcher citeMatcher = CITE_PATTERN.matcher(refMarkName);
         if (!citeMatcher.find()) {
             return Optional.empty();
         }
+
         List<String> keys = Arrays.asList(citeMatcher.group(3).split(","));
         String i = citeMatcher.group(1);
         int itcType = Integer.parseInt(citeMatcher.group(2));
@@ -832,47 +967,70 @@ class OOBibBase {
     }
 
     /**
-     * This method inserts a cite marker in the text (at the cursor)
-     * for the given BibEntry, and may refresh the bibliography.
+     * This method inserts a reference mark in the text (at the cursor)
+     * citing the <code>entries</code>, and may refresh the bibliography.
      *
      * @param entries       The entries to cite.
-     * @param database      The database the entry belongs to.
+     *
+     * @param database      The database the entries belong to (all of them).
+     *                      Used when creating the citation mark.
+     *
+     * @param allBases      Used if sync is true. The list of all databases
+     *                      we may need to refresh the document.
+     *
      * @param style         The bibliography style we are using.
      * @param inParenthesis Indicates whether it is an in-text
-     * citation or a citation in parenthesis. This is not relevant if
-     * numbered citations are used.
-     * @param withText Indicates whether this should be a normal
-     * citation (true) or an empty (invisible) citation (false).
-     * @param sync Indicates whether the reference list should be
-     * refreshed.
+     *                      citation or a citation in parenthesis.
+     *                      This is not relevant if
+     *                      numbered citations are used.
+     * @param withText      Indicates whether this should be a visible
+     *                      citation (true) or an empty (invisible) citation (false).
+     *
+     * @param pageInfo      A single pageinfo for these entries. Stored in custom property
+     *                      with the same name as the reference mark.
+     *
+     *                      Related https://latex.org/forum/viewtopic.php?t=14331
+     *
+     *                      Q: What I would like is something like this:
+     *                      (Jones, 2010, p. 12; Smith, 2003, pp. 21 - 23)
+     *                      A: Not in a single \citep, no.
+     *                         Use \citetext{\citealp[p.~12]{jones2010};
+     *                                       \citealp[pp.~21--23]{smith2003}}
+     *
+     * @param sync          Indicates whether the reference list and in-text citations
+     *                      should be refreshed in the document.
      *
      * TODO:
      * https://www.openoffice.org/api/docs/common/ref/com/sun/star/document/XUndoManager.html
      * Group changes into a single Undo context.
      */
-    public void insertEntry(List<BibEntry> entries,
-                            BibDatabase database,
-                            List<BibDatabase> allBases,
-                            OOBibStyle style,
-                            boolean inParenthesis,
-                            boolean withText,
-                            String pageInfo,
-                            boolean sync
-    )
-            throws IllegalArgumentException,
-            UnknownPropertyException,
-            NotRemoveableException,
-            PropertyExistException,
-            IllegalTypeException,
-            UndefinedCharacterFormatException,
-            WrappedTargetException,
-            NoSuchElementException,
-            PropertyVetoException,
-            IOException,
-            CreationException,
-            BibEntryNotFoundException,
-            UndefinedParagraphFormatException,
-            NoDocumentException {
+    public void
+    insertEntry(
+        List<BibEntry> entries,
+        BibDatabase database,
+        List<BibDatabase> allBases,
+        OOBibStyle style,
+        boolean inParenthesis,
+        boolean withText,
+        String pageInfo,
+        boolean sync
+        )
+        throws
+        IllegalArgumentException,
+        UnknownPropertyException,
+        NotRemoveableException,
+        PropertyExistException,
+        IllegalTypeException,
+        UndefinedCharacterFormatException,
+        WrappedTargetException,
+        NoSuchElementException,
+        PropertyVetoException,
+        IOException,
+        CreationException,
+        BibEntryNotFoundException,
+        UndefinedParagraphFormatException,
+        NoDocumentException {
+
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
 
         try {
@@ -882,14 +1040,15 @@ class OOBibBase {
             sortBibEntryListForMulticite(entries, style);
 
             String keyString =
-                    entries.stream()
-                           .map(entry -> entry.getCitationKey().orElse(""))
-                           .collect(Collectors.joining(","));
+                entries.stream()
+                .map(entry -> entry.getCitationKey().orElse(""))
+                .collect(Collectors.joining(","));
             // Generate unique bookmark-name
             int citationType = citationTypeFromOptions(withText, inParenthesis);
-            String newName = getUniqueReferenceMarkName(documentConnection,
-                    keyString,
-                    citationType);
+            String newName = getUniqueReferenceMarkName(
+                documentConnection,
+                keyString,
+                citationType);
 
             // If we should store metadata for page info, do that now:
             if (pageInfo != null) {
@@ -899,10 +1058,11 @@ class OOBibBase {
 
             // insert space
             cursor
-                    .getText()
-                    .insertString(cursor, " ", false);
+                .getText()
+                .insertString(cursor, " ", false);
 
             // format the space inserted
+            // TOOD: extract applyCharacterStyle()
             if (style.isFormatCitations()) {
                 XPropertySet xCursorProps = unoQI(XPropertySet.class, cursor);
                 String charStyle = style.getCitationCharacterFormat();
@@ -927,25 +1087,30 @@ class OOBibBase {
             // go back to before the space
             cursor.goLeft((short) 1, false);
 
-            // Insert bookmark and text
-
+            // Insert rerefence mark and text
+            //{
                 // Create a BibEntry to BibDatabase map (to make
                 // style.getCitationMarker happy?)
                 Map<BibEntry, BibDatabase> databaseMap = new HashMap<>();
                 for (BibEntry entry : entries) {
+                    // Using the same database for each entry.
+                    // Probably the GUI limits selection to a single database.
                     databaseMap.put(entry, database);
                 }
-                // the text we insert?
+
+                // The text we insert
                 String citeText =
-                        style.isNumberEntries()
-                                ? "-" // A dash only. Presumably we expect a refresh later.
-                                : style.getCitationMarker(entries,
-                                databaseMap,
-                                inParenthesis,
-                                null,
-                                null
-                        );
-                insertReferenceMark(documentConnection, newName, citeText, cursor, withText, style);
+                    style.isNumberEntries()
+                    ? "-" // A dash only. Presumably we expect a refresh later.
+                    : style.getCitationMarker(
+                        entries,
+                        databaseMap,
+                        inParenthesis,
+                        null,
+                        null);
+                insertReferenceMark(documentConnection, newName, citeText,
+                                    cursor, withText, style);
+             //} // end of scope for databaseMap, citeText
 
             // Move to the right of the space and remember this
             // position: we will come back here in the end.
@@ -971,6 +1136,9 @@ class OOBibBase {
                  * at org.jabref@100.0.0/org.jabref.gui.openoffice
                  *      .OOBibBase.insertEntry(OOBibBase.java:609)
                  *
+                 * Maybe we should refuse to insert in places to be
+                 * overwritten: bibliography, reference marks.
+                 *
                  */
                 // Go back to the relevant position:
                 try {
@@ -992,17 +1160,26 @@ class OOBibBase {
      * Extract the list of citation keys from a reference mark name.
      *
      * @param name The reference mark name.
-     * @return The list of citation keys encoded in the name. In case of duplicated citation keys,
-     * only the first occurrence. Otherwise their order is preserved.
-     * If name does not match CITE_PATTERN, an empty list of strings is returned.
-     * */
-    private List<String> parseRefMarkNameToUniqueCitationKeys(String name) {
+     * @return The list of citation keys encoded in the name.
+     *
+     *         In case of duplicated citation keys,
+     *         only the first occurrence.
+     *         Otherwise their order is preserved.
+     *
+     *         If name does not match CITE_PATTERN,
+     *         an empty list of strings is returned.
+     */
+    private List<String>
+    parseRefMarkNameToUniqueCitationKeys(String name) {
         Optional<ParsedRefMark> op = parseRefMarkName(name);
-        return op.map(parsedRefMark ->
+        return
+            op.map(
+                parsedRefMark ->
                 parsedRefMark.citedKeys.stream()
-                                       .distinct()
-                                       .collect(Collectors.toList()))
-                 .orElseGet(ArrayList::new);
+                .distinct()
+                .collect(Collectors.toList())
+                )
+            .orElseGet(ArrayList::new);
     }
 
     /**
@@ -1012,10 +1189,12 @@ class OOBibBase {
      *
      * doc.referenceMarks.names.map(parse).flatten.unique
      */
-    private List<String> findCitedKeys(DocumentConnection documentConnection)
-            throws NoSuchElementException,
-            WrappedTargetException,
-            NoDocumentException {
+    private List<String>
+    findCitedKeys(DocumentConnection documentConnection)
+        throws
+        NoSuchElementException,
+        WrappedTargetException,
+        NoDocumentException {
 
         List<String> names = getJabRefReferenceMarkNames(documentConnection);
 
@@ -1026,7 +1205,7 @@ class OOBibBase {
             assert (null != unoQI(XTextContent.class, bookmark));
         }
 
-        //
+        // Collect to a flat list while keep only the first appearance.
         List<String> keys = new ArrayList<>();
         for (String name1 : names) {
             List<String> newKeys = parseRefMarkNameToUniqueCitationKeys(name1);
@@ -1040,19 +1219,25 @@ class OOBibBase {
         return keys;
     }
 
+    /**
+     * The collection of data returned by findCitedKeys.
+     */
     private static class FindCitedEntriesResult {
         /*
          *  entries : LinkedHashMap with iteration order as the
          *  citedKeys parameter of findCitedEntries
          */
         Map<BibEntry, BibDatabase> entries;
+
         /*
          * citeKeyToBibEntry : HashMap (no order)
          */
         Map<String, BibEntry> citeKeyToBibEntry;
 
-        FindCitedEntriesResult(Map<BibEntry, BibDatabase> entries,
-                               Map<String, BibEntry> citeKeyToBibEntry) {
+        FindCitedEntriesResult(
+            Map<BibEntry, BibDatabase> entries,
+            Map<String, BibEntry> citeKeyToBibEntry
+            ) {
             this.entries = entries;
             this.citeKeyToBibEntry = citeKeyToBibEntry;
         }
@@ -1075,8 +1260,9 @@ class OOBibBase {
      * citedKey in the entry is the same as the original citedKey
      */
     private FindCitedEntriesResult
-    findCitedEntries(List<BibDatabase> databases,
-                     List<String> citedKeys
+    findCitedEntries(
+        List<String> citedKeys,
+        List<BibDatabase> databases
     ) {
         Map<String, BibEntry> citeKeyToBibEntry = new HashMap<>();
 
@@ -1110,21 +1296,28 @@ class OOBibBase {
      * @param style     The bibliography style to use.
      * @return A list of those referenced citation keys that could not be resolved.
      */
-    public List<String> refreshCiteMarkers(List<BibDatabase> databases,
-                                           OOBibStyle style)
-            throws WrappedTargetException,
-            IllegalArgumentException,
-            NoSuchElementException,
-            UndefinedCharacterFormatException,
-            UnknownPropertyException,
-            PropertyVetoException,
-            IOException,
-            CreationException,
-            BibEntryNotFoundException,
-            NoDocumentException {
+    public List<String>
+    refreshCiteMarkers(
+        List<BibDatabase> databases,
+        OOBibStyle style)
+        throws
+        WrappedTargetException,
+        IllegalArgumentException,
+        NoSuchElementException,
+        UndefinedCharacterFormatException,
+        UnknownPropertyException,
+        PropertyVetoException,
+        IOException,
+        CreationException,
+        BibEntryNotFoundException,
+        NoDocumentException {
+
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
+
         try {
-            return refreshCiteMarkersInternal(documentConnection,
+            return
+                refreshCiteMarkersInternal(
+                    documentConnection,
                     databases,
                     style,
                     this.xUniqueLetters);
@@ -1136,108 +1329,166 @@ class OOBibBase {
         }
     }
 
-    private static BibEntry undefinedBibentryToNull(BibEntry cEntry) {
+    /**
+     * @return Null if cEntry is an UndefinedBibtexEntry,
+     *         otherwise return cEntry itself.
+     */
+    private static BibEntry
+    undefinedBibentryToNull(BibEntry cEntry) {
         if (cEntry instanceof UndefinedBibtexEntry) {
             return null;
         }
         return cEntry;
     }
 
-    private static BibEntry[] mapUndefinedBibentriesToNull(BibEntry[] cEntries) {
+    /**
+     *  @return A copy of the input with UndefinedBibtexEntry
+     *          instances repalced by null.
+     */
+    private static BibEntry[]
+    mapUndefinedBibEntriesToNull(BibEntry[] cEntries) {
         return
-                Arrays.stream(cEntries)
-                      .map(OOBibBase::undefinedBibentryToNull)
-                      .toArray(BibEntry[]::new);
+            Arrays.stream(cEntries)
+            .map(OOBibBase::undefinedBibentryToNull)
+            .toArray(BibEntry[]::new);
     }
 
+    /**
+     * Checks that keys do appear in citeKeys as keys. Collects the
+     * missing keys, and if there is any, throws BibEntryNotFoundException
+     * (currently mentioning only the first missing key).
+     *
+     * @param keys An array of citation keys, we expect to appear as
+     *             keys in citeKeyToBibEntry.
+     *
+     * @param citeKeyToBibEntry Should map each key in keys to a BibEntry.
+     * @param referenceMarkName The reference mark these keys belong to.
+     *                          Mentioned in the exception.
+     */
     private static void
-    assertKeysInCiteKeyToBibEntry(String[] keys, // citeKeys
-                                  Map<String, BibEntry> citeKeyToBibEntry,
-                                  String referenceMarkName // for reporting
+    assertKeysInCiteKeyToBibEntry(
+        String[] keys, // citeKeys
+        Map<String, BibEntry> citeKeyToBibEntry,
+        String referenceMarkName // for reporting
     )
-            throws BibEntryNotFoundException {
+        throws BibEntryNotFoundException {
+
         // check keys
         List<String> unresolvedKeys =
-                Arrays.stream(keys)
-                      .filter(key -> null == citeKeyToBibEntry.get(key))
-                      .collect(Collectors.toList());
+            Arrays.stream(keys)
+            .filter(key -> null == citeKeyToBibEntry.get(key))
+            .collect(Collectors.toList());
 
         for (String key : unresolvedKeys) {
             LOGGER.info("Citation key not found: '" + key + '\'');
             LOGGER.info("Problem with reference mark: '" + referenceMarkName + '\'');
-            String msg = Localization.lang("Could not resolve BibTeX entry"
-                            + " for citation marker '%0'.",
-                    referenceMarkName
-            );
+            String msg =
+                Localization.lang(
+                    "Could not resolve BibTeX entry"
+                    + " for citation marker '%0'.",
+                    referenceMarkName );
             throw new BibEntryNotFoundException(referenceMarkName, msg);
         }
     }
 
-    // TODO: is mapCiteKeysToBibEntryArray is still needed?
-    private static BibEntry[]
-    mapCiteKeysToBibEntryArray(String[] keys, // citeKeys
-                               Map<String, BibEntry> citeKeyToBibEntry,
-                               String referenceMarkName   // for reporting
-                               // boolean undefinedToNull     // for undefined entries insert NULL
-    )
-            throws BibEntryNotFoundException {
-            assertKeysInCiteKeyToBibEntry(keys, citeKeyToBibEntry, referenceMarkName);
-
-            // process keys
-            return
-                    Arrays.stream(keys)
-                          .map(citeKeyToBibEntry::get)
-                          .toArray(BibEntry[]::new);
-    }
-
+    /**
+     * For each reference mark name check the corresponding part of
+     * bibtexKeys with assertKeysInCiteKeyToBibEntry.
+     */
     private static void
-    assertAllKeysInCiteKeyToBibEntry(List<String> referenceMarkNames,
-                                     String[][] bibtexKeys,
-                                     Map<String, BibEntry> citeKeyToBibEntry)
-            throws BibEntryNotFoundException {
+    assertAllKeysInCiteKeyToBibEntry(
+        List<String> referenceMarkNames,
+        String[][] bibtexKeys,
+        Map<String, BibEntry> citeKeyToBibEntry
+        )
+        throws BibEntryNotFoundException {
+
         final int nRefMarks = referenceMarkNames.size();
         assert (nRefMarks == bibtexKeys.length);
 
         for (int i = 0; i < nRefMarks; i++) {
-            final String referenceMarkName = referenceMarkNames.get(i);
-            assertKeysInCiteKeyToBibEntry(bibtexKeys[i],
-                    citeKeyToBibEntry,
-                    referenceMarkName);
+            assertKeysInCiteKeyToBibEntry(
+                bibtexKeys[i],
+                citeKeyToBibEntry,
+                referenceMarkNames.get(i));
         }
     }
 
+    // TODO: is mapCiteKeysToBibEntryArray is still needed?
+    //       We still have a call site, followed by mapUndefinedBibEntriesToNull
+    /**
+     * Map an array of citation keys to the corresponding BibEntry
+     * objects using citeKeyToBibEntry.
+     *
+     * @param citeKeys
+     * @param citeKeyToBibEntry
+     * @param referenceMarkName For reporting keys missing from citeKeyToBibEntry.
+     */
+    private static BibEntry[]
+    mapCiteKeysToBibEntryArray(
+        String[] citeKeys,
+        Map<String, BibEntry> citeKeyToBibEntry,
+        String referenceMarkName
+        )
+        throws BibEntryNotFoundException {
+
+        assertKeysInCiteKeyToBibEntry(citeKeys, citeKeyToBibEntry, referenceMarkName);
+
+        return
+            Arrays.stream(citeKeys)
+            .map(citeKeyToBibEntry::get)
+            .toArray(BibEntry[]::new);
+    }
+
+    /**
+     *  Produce citation markers for the case when the citation
+     *  markers are the citation keys themselves, separated by commas.
+     */
     private static String[]
-    rcmCitationMarkersForIsCitationKeyCiteMarkers(List<String> referenceMarkNames,
-                                                  String[][] bibtexKeys,
-                                                  Map<String, BibEntry> citeKeyToBibEntry,
-                                                  OOBibStyle style)
-            throws BibEntryNotFoundException {
+    produceCitationMarkersForIsCitationKeyCiteMarkers(
+        List<String> referenceMarkNames,
+        String[][] bibtexKeys,
+        Map<String, BibEntry> citeKeyToBibEntry,
+        OOBibStyle style
+        )
+        throws BibEntryNotFoundException {
+
         assert style.isCitationKeyCiteMarkers();
 
         final int nRefMarks = referenceMarkNames.size();
+
         assert nRefMarks == bibtexKeys.length;
         assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeys, citeKeyToBibEntry);
 
         String[] citMarkers = new String[nRefMarks];
         for (int i = 0; i < nRefMarks; i++) {
             citMarkers[i] =
-                    Arrays.stream(bibtexKeys[i])
-                          .map(citeKeyToBibEntry::get)
-                          .map((c) -> c.getCitationKey().orElse(""))
-                          .collect(Collectors.joining(","));
+                Arrays.stream(bibtexKeys[i])
+                .map(citeKeyToBibEntry::get)
+                .map(c -> c.getCitationKey().orElse(""))
+                .collect(Collectors.joining(","));
         }
         return citMarkers;
     }
 
     /**
      * Number source for (1-based) numbering of citations.
+     *
+     * For numbered citation style with first appearance order.
      */
     private static class CitationNumberingState {
-        public Map<String, Integer> numbers;
-        public int lastNum;
+        /**
+         * numbers : Remembers keys we have seen
+         *           and what number did they receive.
+         */
+        private Map<String, Integer> numbers;
+
+        /**
+         * The highest number we ever allocated.
+         */
+        private int lastNum;
 
         CitationNumberingState() {
-            // For numbered citation style. Map(citedKey, number )
             this.numbers = new HashMap<>();
             this.lastNum = 0;
         }
@@ -1336,21 +1587,23 @@ class OOBibBase {
         assert (nRefMarks == bibtexKeys.length);
         String[] citMarkers = new String[nRefMarks];
 
-        // sort entries to order in bibliography
-        Map<BibEntry, BibDatabase> sortedEntries = sortEntriesByComparator(entries, entryComparator);
+        // Sort entries to order in bibliography
+        Map<BibEntry, BibDatabase> sortedEntries =
+            sortEntriesByComparator(entries, entryComparator);
 
-        // adjust order of cited to match
+        // Adjust order of cited to match sortedEntries
         List<String> sortedCited = new ArrayList<>(entries.size());
         for (BibEntry entry : sortedEntries.keySet()) {
             sortedCited.add(entry.getCitationKey().orElse(null));
         }
 
         final int minGroupingCount =
-                style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
+            style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
+
         for (int i = 0; i < referenceMarkNames.size(); i++) {
-            List<Integer> num =
-                    findCitedEntryIndices(Arrays.asList(bibtexKeys[i]), sortedCited);
-            citMarkers[i] = style.getNumCitationMarker(num, minGroupingCount, false);
+            List<Integer> numbers =
+                findCitedEntryIndices(Arrays.asList(bibtexKeys[i]), sortedCited);
+            citMarkers[i] = style.getNumCitationMarker(numbers, minGroupingCount, false);
         }
         return citMarkers;
     }
@@ -1361,17 +1614,24 @@ class OOBibBase {
      *
      * @param keysCitedHere   The citation keys needing indices.
      * @param orderedCiteKeys A List of citation keys representing the
-     * entries in the bibliography.
-     * @return the (1-based) indices of the cited keys, -1 if a key is
-     * not found. Returns Collections.emptyList() if the ref name
-     * could not be resolved as a citation.
+     *                        entries in the bibliography.
+     *
+     * @return The (1-based) indices of the cited keys,
+     *         or (-1) if a key is not found.
      */
-    private static List<Integer> findCitedEntryIndices(List<String> keysCitedHere,
-                                                       List<String> orderedCiteKeys) {
+    private static List<Integer>
+    findCitedEntryIndices(
+        List<String> keysCitedHere,
+        List<String> orderedCiteKeys
+        ) {
         List<Integer> result = new ArrayList<>(keysCitedHere.size());
         for (String key : keysCitedHere) {
             int ind = orderedCiteKeys.indexOf(key);
-            result.add(ind == -1 ? -1 : 1 + ind);
+            result.add(
+                ind == -1
+                ? -1
+                : 1 + ind // 1-based
+                );
         }
         return result;
     }
@@ -1802,7 +2062,8 @@ class OOBibBase {
     // Position as in a document on the screen.
     // Probably to get the correct order with
     // referenceMarks in footnotes
-    private static Point findPositionOfTextRange(XTextViewCursor cursor, XTextRange range) {
+    private static Point
+    findPositionOfTextRange(XTextViewCursor cursor, XTextRange range) {
         cursor.gotoRange(range, false);
         return cursor.getPosition();
         // the cursor's coordinates relative to the top left position
@@ -1813,37 +2074,40 @@ class OOBibBase {
      *
      */
     private List<String>
-    getJabRefReferenceMarkNamesSortedByPosition(DocumentConnection documentConnection)
-            throws WrappedTargetException,
-            NoSuchElementException,
-            NoDocumentException {
+    getJabRefReferenceMarkNamesSortedByPosition(
+        DocumentConnection documentConnection)
+        throws
+        WrappedTargetException,
+        NoSuchElementException,
+        NoDocumentException {
 
         List<String> names = getJabRefReferenceMarkNames(documentConnection);
 
         // find coordinates
         List<Point> positions = new ArrayList<>(names.size());
 
-            XNameAccess nameAccess = documentConnection.getReferenceMarks();
-            XTextViewCursor viewCursor = documentConnection.getViewCursor();
-            // initialPos: to be restored before return
-            XTextRange initialPos = viewCursor.getStart();
-            for (String name : names) {
+        XNameAccess nameAccess = documentConnection.getReferenceMarks();
+        XTextViewCursor viewCursor = documentConnection.getViewCursor();
+        // initialPos: to be restored before return
+        XTextRange initialPos = viewCursor.getStart();
+        for (String name : names) {
 
-                XTextContent textContent =
-                        unoQI(XTextContent.class, nameAccess.getByName(name));
-                XTextRange range = textContent.getAnchor();
+            XTextContent textContent =
+                //documentConnection.nameAccessGetTextContentByName( nameAccess, name );
+                unoQI(XTextContent.class, nameAccess.getByName(name));
+            XTextRange range = textContent.getAnchor();
 
-                // Adjust range if we are inside a footnote:
-                if (unoQI(XFootnote.class, range.getText()) != null) {
-                    // Find the linking footnote marker:
-                    XFootnote footer = unoQI(XFootnote.class, range.getText());
-                    // The footnote's anchor gives the correct position in the text:
-                    range = footer.getAnchor();
-                }
-                positions.add(findPositionOfTextRange(viewCursor, range));
+            // Adjust range if we are inside a footnote:
+            if (unoQI(XFootnote.class, range.getText()) != null) {
+                // Find the linking footnote marker:
+                XFootnote footer = unoQI(XFootnote.class, range.getText());
+                // The footnote's anchor gives the correct position in the text:
+                range = footer.getAnchor();
             }
-            // restore cursor position
-            viewCursor.gotoRange(initialPos, false);
+            positions.add(findPositionOfTextRange(viewCursor, range));
+        }
+        // restore cursor position
+        viewCursor.gotoRange(initialPos, false);
 
         // order by position
         Set<ComparableMark> set = new TreeSet<>();
@@ -2089,6 +2353,7 @@ class OOBibBase {
             // Clear it:
             XTextCursor cursor =
                 documentConnection.xText.createTextCursorByRange(section.getAnchor());
+
             cursor.gotoRange(section.getAnchor(), false);
             cursor.setString("");
         } catch (NoSuchElementException ex) {
@@ -2364,6 +2629,26 @@ class OOBibBase {
 
     /**
      * GUI action
+     *
+     * combineCiteMarkers does not work with citations in footnotes.
+     *
+     * Note: citations can be inserted in footnotes and they appear in
+     *       the bibliography. They are also updated on style change+refresh
+     *
+     *       The same (insertable, appears in bibliography, update on
+     *       style change) is true for citations in tables.
+     *
+     *       Merge (combineCiteMarkers) and Separate (unCombineCiteMarkers)
+     *       seem to work in a cell of a table.
+     *
+     *       In footnotes: "Separate" (on merged citations inserted by
+     *       selecting multiple entries then "Cite") leaves first of
+     *       two citation marks with text "tmp", which can be
+     *       corrected by a few repetions of pressing the "refresh"
+     *       button.
+     *       With 3 citations, "Separate" left the 2nd and 3rd as "tmp".
+     *       Three refresh corrected the 2nd.  The 4th refresh corrected the 3rd citation.
+     *
      */
     public void combineCiteMarkers(List<BibDatabase> databases, OOBibStyle style)
             throws IOException,
@@ -2390,6 +2675,7 @@ class OOBibBase {
         XNameAccess nameAccess = documentConnection.getReferenceMarks();
 
         while (pivot < (names.size() - 1)) {
+
             XTextRange range1 =
                     unoQI(XTextContent.class,
                             nameAccess.getByName(names.get(pivot)))
@@ -2479,9 +2765,9 @@ class OOBibBase {
             entries.sort(new FieldComparator(StandardField.YEAR));
 
             String keyString =
-                    entries.stream()
-                           .map(c -> c.getCitationKey().orElse(""))
-                           .collect(Collectors.joining(","));
+                entries.stream()
+                .map(c -> c.getCitationKey().orElse(""))
+                .collect(Collectors.joining(","));
 
             // Insert reference mark:
             String newName = getUniqueReferenceMarkName(documentConnection,
@@ -2490,12 +2776,12 @@ class OOBibBase {
             );
 
             insertReferenceMark(
-                    documentConnection,
-                    newName,
-                    "tmp",
-                    textCursor,
-                    true, // withText
-                    style);
+                documentConnection,
+                newName,
+                "tmp",
+                textCursor,
+                true, // withText
+                style);
             names.set(pivot + 1, newName); // <- put in the next-to-be-processed position
             madeModifications = true;
 
@@ -2524,6 +2810,7 @@ class OOBibBase {
             CreationException,
             BibEntryNotFoundException,
             NoDocumentException {
+
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
 
         List<String> names =
