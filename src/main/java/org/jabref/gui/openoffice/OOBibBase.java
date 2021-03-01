@@ -469,6 +469,40 @@ class OOBibBase {
         }
 
         /**
+         * Insert a bookmark with the given name at the cursor provided.
+         *
+         * @param name For the bookmark.
+         * @param position Cursor marking the location or range for
+         * the bookmark. If it is a range, its content will be replaced.
+         */
+        public void
+        insertBookMark(
+            String name,
+            XTextCursor position)
+            throws
+            IllegalArgumentException,
+            CreationException {
+
+            Object bookmark;
+            try {
+                bookmark = (this.mxDocFactory
+                            .createInstance("com.sun.star.text.Bookmark"));
+            } catch (Exception e) {
+                throw new CreationException(e.getMessage());
+            }
+
+            // name the bookmark
+            XNamed xNamed = unoQI(XNamed.class, bookmark);
+            xNamed.setName(name);
+
+            // get XTextContent interface
+            XTextContent xTextContent = unoQI(XTextContent.class, bookmark);
+
+            // insert bookmark at position, overwrite text in position
+            this.xText.insertTextContent(position, xTextContent, true);
+        }
+
+        /**
          *  Get an XTextSection by name.
          */
         public XTextSection
@@ -1839,7 +1873,8 @@ class OOBibBase {
                 // We need to add it again.
                 cursor.collapseToEnd();
                 OOUtil.insertParagraphBreak(documentConnection.xText, cursor);
-                insertBookMark(documentConnection, OOBibBase.BIB_SECTION_NAME, cursor);
+                documentConnection.insertBookMark(OOBibBase.BIB_SECTION_NAME, cursor);
+                cursor.collapseToEnd();
             }
         }
     }
@@ -2550,41 +2585,19 @@ class OOBibBase {
         );
 
         String refParaFormat =
-        insertFullReferenceAtCursor(documentConnection,
-                cursor,
-                entries,
-                style,
-                refParaFormat,
-                uniqueLetters
-        );
             (String) style.getProperty(OOBibStyle.REFERENCE_PARAGRAPH_FORMAT);
 
-        insertBookMark(documentConnection, OOBibBase.BIB_SECTION_END_NAME, cursor);
-    }
+        insertFullReferenceAtCursor(
+            documentConnection,
+            cursor,
+            entries,
+            style,
+            refParaFormat,
+            uniqueLetters
+        );
 
-    private void insertBookMark(DocumentConnection documentConnection,
-                                String name,
-                                XTextCursor position)
-            throws IllegalArgumentException,
-            CreationException {
-        Object bookmark;
-        try {
-            bookmark = (documentConnection.mxDocFactory
-                    .createInstance("com.sun.star.text.Bookmark"));
-        } catch (Exception e) {
-            throw new CreationException(e.getMessage());
-        }
-
-        // name the bookmark
-        XNamed xNamed = unoQI(XNamed.class, bookmark);
-        xNamed.setName(name);
-
-        // get XTextContent interface
-        XTextContent xTextContent = unoQI(XTextContent.class, bookmark);
-
-        // insert bookmark at position
-        documentConnection.xText.insertTextContent(position, xTextContent, true);
-        position.collapseToEnd();
+        documentConnection.insertBookMark(OOBibBase.BIB_SECTION_END_NAME, cursor);
+        cursor.collapseToEnd();
     }
 
     /**
