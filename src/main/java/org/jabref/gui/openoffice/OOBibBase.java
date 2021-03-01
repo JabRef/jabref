@@ -1701,6 +1701,33 @@ class OOBibBase {
     }
 
     /**
+     * @return Citation keys from `entries`, ordered as in the bibliography.
+     */
+    private List<String>
+    citationKeysInBibliographyOrderFromEntries(
+        Map<BibEntry, BibDatabase> entries
+        ) {
+
+        // Citation keys, in the same order as sortedEntries
+        List<String> result = new ArrayList<>(entries.size());
+
+        // Sort entries to order in bibliography
+        Map<BibEntry, BibDatabase> sortedEntries =
+            sortEntriesByComparator(entries, entryComparator);
+
+        return
+            sortedEntries.keySet().stream()
+            .map(
+                entry ->
+                entry.getCitationKey()
+                // entries should have been augmented with UndefinedBibtexEntry
+                // to cover all bibtexKeys
+                .orElseThrow(IllegalArgumentException::new)
+                )
+            .collect(Collectors.toList());
+    }
+
+    /**
      * Produce citation markers for the case of numbered citations
      * when the bibliography is not sorted by position.
      */
@@ -1718,20 +1745,9 @@ class OOBibBase {
         assert (nRefMarks == bibtexKeys.length);
         String[] citMarkers = new String[nRefMarks];
 
-        // Sort entries to order in bibliography
-        Map<BibEntry, BibDatabase> sortedEntries =
-            sortEntriesByComparator(entries, entryComparator);
-
         // Citation keys, in the same order as sortedEntries
-        List<String> sortedCited = new ArrayList<>(entries.size());
-        for (BibEntry entry : sortedEntries.keySet()) {
-            sortedCited.add(
-                entry.getCitationKey()
-                // entries should have been augmented with UndefinedBibtexEntry
-                // to cover all bibtexKeys
-                .orElseThrow(IllegalArgumentException::new)
-                );
-        }
+        List<String> sortedCited =
+            citationKeysInBibliographyOrderFromEntries( entries );
 
         final int minGroupingCount =
             style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
