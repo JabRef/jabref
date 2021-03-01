@@ -2532,6 +2532,7 @@ class OOBibBase {
         return supplier.getTextSections();
     }
 
+        XNameAccess ts = getTextSections( documentConnection );
         if (!ts.hasByName(OOBibBase.BIB_SECTION_NAME)) {
             createBibTextSection2(documentConnection, this.atEnd);
             return;
@@ -2565,9 +2566,6 @@ class OOBibBase {
      *
      * Assumes the section named `OOBibBase.BIB_SECTION_NAME` exists.
      */
-        XTextSectionsSupplier supplier =
-                unoQI(XTextSectionsSupplier.class,
-                        documentConnection.mxDoc);
     private void
     populateBibTextSection(
         DocumentConnection documentConnection,
@@ -2584,13 +2582,7 @@ class OOBibBase {
         CreationException {
 
         XTextSection section =
-                ((XTextSection)
-                        ((Any) supplier
-                                .getTextSections()
-                                .getByName(OOBibBase.BIB_SECTION_NAME)
-                        )
-                                .getObject()
-                );
+            documentConnection.getTextSectionByName(OOBibBase.BIB_SECTION_NAME);
 
         XTextCursor cursor =
             documentConnection.xText
