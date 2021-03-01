@@ -2232,9 +2232,9 @@ class OOBibBase {
 
         final int nRefMarks = referenceMarkNames.size();
 
-        int[] types = new int[nRefMarks];
+        int[] itcTypes = new int[nRefMarks];
         String[][] bibtexKeys = new String[nRefMarks][];
-        parseRefMarkNamesToArrays(referenceMarkNames, types, bibtexKeys);
+        parseRefMarkNamesToArrays(referenceMarkNames, itcTypes, bibtexKeys);
 
         FindCitedEntriesResult fce =
             findCitedEntries(
@@ -2280,7 +2280,7 @@ class OOBibBase {
                     referenceMarkNames,
                     bibtexKeys,
                     fce.citeKeyToBibEntry,
-                    types,
+                    itcTypes,
                     fce.entries,
                     uniqueLetters,
                     style);
@@ -2291,7 +2291,7 @@ class OOBibBase {
             documentConnection,
             referenceMarkNames,
             citMarkers,
-            types,
+            itcTypes,
             style);
 
         return unresolvedKeysFromEntries(fce.entries);
