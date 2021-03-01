@@ -310,6 +310,26 @@ class OOBibBase {
                 .createTextCursorByRange(markAnchor);
             return cursor;
         }
+
+        XTextContent
+        nameAccessGetTextContentByName(XNameAccess nameAccess, String name)
+            throws WrappedTargetException {
+
+            if (!nameAccess.hasByName(name)) {
+                return null;
+            }
+            try {
+                Object referenceMark = nameAccess.getByName(name);
+                XTextContent mark = unoQI(XTextContent.class, referenceMark);
+                return mark;
+            } catch (NoSuchElementException ex) {
+                LOGGER.warn(String.format(
+                                "nameAccessGetTextContentByName got NoSuchElementException"
+                                + " for '%s'", name));
+                return null;
+            }
+        }
+
         /**
          * Remove the named reference mark.
          *
