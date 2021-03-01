@@ -1656,11 +1656,14 @@ class OOBibBase {
      *
      */
     private static String[]
-    rcmCitationMarkersForIsNumberEntriesIsSortByPosition(List<String> referenceMarkNames,
-                                                         String[][] bibtexKeys,
-                                                         Map<String, BibEntry> citeKeyToBibEntry,
-                                                         OOBibStyle style)
-            throws BibEntryNotFoundException {
+    produceCitationMarkersForIsNumberEntriesIsSortByPosition(
+        List<String> referenceMarkNames,
+        String[][] bibtexKeys,
+        Map<String, BibEntry> citeKeyToBibEntry,
+        OOBibStyle style
+        )
+        throws BibEntryNotFoundException {
+
         assert style.isNumberEntries();
         assert style.isSortByPosition();
 
@@ -1695,10 +1698,12 @@ class OOBibBase {
      * when the bibliography is not sorted by position.
      */
     private String[]
-    rcmCitationMarkersForIsNumberEntriesNotSortByPosition(List<String> referenceMarkNames,
-                                                          String[][] bibtexKeys,
-                                                          Map<BibEntry, BibDatabase> entries,
-                                                          OOBibStyle style) {
+    produceCitationMarkersForIsNumberEntriesNotSortByPosition(
+        List<String> referenceMarkNames,
+        String[][] bibtexKeys,
+        Map<BibEntry, BibDatabase> entries,
+        OOBibStyle style
+        ) {
         assert style.isNumberEntries();
         assert !style.isSortByPosition();
 
@@ -1897,7 +1902,7 @@ class OOBibBase {
      * @param style              Bibliography style.
      */
     String[]
-    rcmCitationMarkersForNormalStyle(List<String> referenceMarkNames,
+    produceCitationMarkersForNormalStyle(List<String> referenceMarkNames,
                                      String[][] bibtexKeysIn,
                                      Map<String, BibEntry> citeKeyToBibEntry,
                                      int[] itcTypes,
@@ -2140,37 +2145,38 @@ class OOBibBase {
         uniqueLetters.clear(); /* ModifiesParameter */
         if (style.isCitationKeyCiteMarkers()) {
             citMarkers =
-                    rcmCitationMarkersForIsCitationKeyCiteMarkers(referenceMarkNames,
-                            bibtexKeys,
-                            fce.citeKeyToBibEntry,
-                            style
-                    );
+                produceCitationMarkersForIsCitationKeyCiteMarkers(
+                    referenceMarkNames,
+                    bibtexKeys,
+                    fce.citeKeyToBibEntry,
+                    style);
         } else if (style.isNumberEntries()) {
             if (style.isSortByPosition()) {
                 citMarkers =
-                        rcmCitationMarkersForIsNumberEntriesIsSortByPosition(referenceMarkNames,
-                                bibtexKeys,
-                                fce.citeKeyToBibEntry,
-                                style);
+                    produceCitationMarkersForIsNumberEntriesIsSortByPosition(
+                        referenceMarkNames,
+                        bibtexKeys,
+                        fce.citeKeyToBibEntry,
+                        style);
             } else {
                 citMarkers =
-                        rcmCitationMarkersForIsNumberEntriesNotSortByPosition(referenceMarkNames,
-                                bibtexKeys,
-                                fce.entries,
-                                style
-                        );
+                    produceCitationMarkersForIsNumberEntriesNotSortByPosition(
+                        referenceMarkNames,
+                        bibtexKeys,
+                        fce.entries,
+                        style);
             }
         } else /* Normal case, (!isCitationKeyCiteMarkers && !isNumberEntries) */ {
 
             citMarkers =
-                    rcmCitationMarkersForNormalStyle(referenceMarkNames,
-                            bibtexKeys,
-                            fce.citeKeyToBibEntry,
-                            types,
-                            fce.entries,
-                            uniqueLetters,
-                            style
-                    );
+                produceCitationMarkersForNormalStyle(
+                    referenceMarkNames,
+                    bibtexKeys,
+                    fce.citeKeyToBibEntry,
+                    types,
+                    fce.entries,
+                    uniqueLetters,
+                    style);
 
         }
 
