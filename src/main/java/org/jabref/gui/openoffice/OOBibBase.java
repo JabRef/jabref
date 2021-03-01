@@ -2153,9 +2153,9 @@ class OOBibBase {
 
             // Not valid here, bibtexKeys may contain null:
             // assertKeysInCiteKeyToBibEntry(bibtexKeys[i], citeKeyToBibEntry, referenceMarkName);
+
             BibEntry[] cEntries =
-                Arrays.stream(bibtexKeys[i])
-                .map(citeKeyToBibEntry::get)
+                Arrays.stream(cEntriesForAll[i])
                 .map(OOBibBase::undefinedBibentryToNull)
                 .toArray(BibEntry[]::new);
             // ^^^ Note: pregenerated citMarkers used
