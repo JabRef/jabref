@@ -1745,7 +1745,6 @@ class OOBibBase {
         assert (nRefMarks == bibtexKeys.length);
         String[] citMarkers = new String[nRefMarks];
 
-        // Citation keys, in the same order as sortedEntries
         List<String> sortedCited =
             citationKeysInBibliographyOrderFromEntries( entries );
 
@@ -1754,7 +1753,10 @@ class OOBibBase {
 
         for (int i = 0; i < referenceMarkNames.size(); i++) {
             List<Integer> numbers =
-                findCitedEntryIndices(Arrays.asList(bibtexKeys[i]), sortedCited);
+                findCitedEntryIndices(
+                    Arrays.asList(bibtexKeys[i]),
+                    sortedCited
+                    );
             citMarkers[i] = style.getNumCitationMarker(numbers, minGroupingCount, false);
         }
         return citMarkers;
