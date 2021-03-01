@@ -1401,6 +1401,15 @@ class OOBibBase {
      *    entries : Allows to recover the list of keys in original
      *              order, and finding the corresponding databases.
      *
+     *              Well, it does, but not by a simple
+     *              entry.getCitationKey(), because
+     *              UndefinedBibtexEntry.getCitationKey() returns
+     *              Optional.empty().
+     *
+     *              For UndefinedBibtexEntry,
+     *              UndefinedBibtexEntry.getKey() returns the
+     *              original key we stored.
+     *
      *    citeKeyToBibEntry:
      *
      *        Caches the result of lookup performed here, with "not
@@ -1625,7 +1634,8 @@ class OOBibBase {
     /**
      * Gets number for a BibEntry. (-1) for UndefinedBibtexEntry
      *
-     * BibEntry.getCitationKey() must not be Optional.empty().
+     * BibEntry.getCitationKey() must not be Optional.empty(), except
+     * for UndefinedBibtexEntry.
      *
      */
     private static int
@@ -1704,7 +1714,7 @@ class OOBibBase {
      * @return Citation keys from `entries`, ordered as in the bibliography.
      */
     private List<String>
-    citationKeysInBibliographyOrderFromEntries(
+    citationKeysOrNullInBibliographyOrderFromEntries(
         Map<BibEntry, BibDatabase> entries
         ) {
 
@@ -1722,7 +1732,7 @@ class OOBibBase {
                 entry.getCitationKey()
                 // entries came from looking up by citation key,
                 // so Optional.empty() is not possible here.
-                .orElseThrow(IllegalArgumentException::new)
+                .orElse(null)
                 )
             .collect(Collectors.toList());
     }
@@ -1746,7 +1756,7 @@ class OOBibBase {
         String[] citMarkers = new String[nRefMarks];
 
         List<String> sortedCited =
-            citationKeysInBibliographyOrderFromEntries( entries );
+            citationKeysOrNullInBibliographyOrderFromEntries( entries );
 
         final int minGroupingCount =
             style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
@@ -1984,6 +1994,7 @@ class OOBibBase {
      * On return: uniqueLetters.get(bibtexkey) provides letter to be
      * added after the year (null for none).
      *
+     * Note: bibtexKeys[i][j] may be null (from UndefinedBibtexEntry)
      */
     void updateUniqueLetters(
         String bibtexKeys[][],
@@ -2006,6 +2017,7 @@ class OOBibBase {
             for (int j = 0; j < markers.length; j++) {
                 String marker = markers[j];
                 String currentKey = bibtexKeys[i][j];
+                // containsKey(null) is OK, contains(null) is OK.
                 if (refKeys.containsKey(marker)) {
                     // Ok, we have seen this exact marker before.
                     if (!refKeys.get(marker).contains(currentKey)) {
@@ -2109,7 +2121,11 @@ class OOBibBase {
 
         // Update bibtexKeys to match the new sorting (within each referenceMark)
         String[][] bibtexKeys = mapBibEntriesToCitationKeysOrNullForall( cEntriesForAll );
-        assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeys, citeKeyToBibEntry);
+        // Note: bibtexKeys[i][j] may be null, for UndefinedBibtexEntry
+
+        // String[][] bibtexKeys = mapBibEntriesToCitationKeysOrThrowForall( cEntriesForAll );
+        // assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeys, citeKeyToBibEntry);
+
         assert (bibtexKeys.length == nRefMarks);
 
         String[][] normCitMarkers =
@@ -2217,7 +2233,7 @@ class OOBibBase {
                     findCitedKeys(documentConnection),
                     databases
                     // TODO: why are we scanning the document
-                    // if we already hev the referenceMarkNames?
+                    // if we already have the referenceMarkNames?
                 );
         // fce.entries are in same order as returned by findCitedKeys
 
