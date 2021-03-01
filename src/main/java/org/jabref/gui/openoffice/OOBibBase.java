@@ -1530,7 +1530,7 @@ class OOBibBase {
             .collect(Collectors.toList());
 
         for (String key : unresolvedKeys) {
-            LOGGER.info("Citation key not found: '" + key + '\'');
+            LOGGER.info("assertKeysInCiteKeyToBibEntry: Citation key not found: '" + key + '\'');
             LOGGER.info("Problem with reference mark: '" + referenceMarkName + '\'');
             String msg =
                 Localization.lang(
