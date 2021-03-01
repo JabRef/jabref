@@ -1776,19 +1776,23 @@ class OOBibBase {
      *
      * @param style Bibliography style to use.
      */
-    private void rcmApplyNewCitationMarkers(DocumentConnection documentConnection,
-                                            List<String> referenceMarkNames,
-                                            String[] citMarkers,
-                                            int[] types,
-                                            OOBibStyle style
-    )
-            throws NoDocumentException,
-            NoSuchElementException,
-            UndefinedCharacterFormatException,
-            UnknownPropertyException,
-            CreationException,
-            WrappedTargetException,
-            PropertyVetoException {
+    private void
+    applyNewCitationMarkers(
+        DocumentConnection documentConnection,
+        List<String> referenceMarkNames,
+        String[] citMarkers,
+        int[] types,
+        OOBibStyle style
+        )
+        throws
+        NoDocumentException,
+        NoSuchElementException,
+        UndefinedCharacterFormatException,
+        UnknownPropertyException,
+        CreationException,
+        WrappedTargetException,
+        PropertyVetoException {
+
         final int nRefMarks = referenceMarkNames.size();
         assert (citMarkers.length == nRefMarks);
         assert (types.length == nRefMarks);
@@ -2181,11 +2185,12 @@ class OOBibBase {
         }
 
         // Refresh all reference marks with the citation markers we computed:
-        rcmApplyNewCitationMarkers(documentConnection,
-                referenceMarkNames,
-                citMarkers,
-                types,
-                style);
+        applyNewCitationMarkers(
+            documentConnection,
+            referenceMarkNames,
+            citMarkers,
+            types,
+            style);
 
         return unresolvedKeysFromEntries(fce.entries);
     }
