@@ -1438,7 +1438,7 @@ class OOBibBase {
     }
 
     /**
-     * Refresh all cite markers in the document.
+     * Refresh all citation markers in the document.
      *
      * @param databases The databases to get entries from.
      * @param style     The bibliography style to use.
@@ -1491,7 +1491,7 @@ class OOBibBase {
 
     /**
      *  @return A copy of the input with UndefinedBibtexEntry
-     *          instances repalced by null.
+     *          instances replaced with null.
      */
     private static BibEntry[]
     mapUndefinedBibEntriesToNull(BibEntry[] cEntries) {
@@ -1502,9 +1502,11 @@ class OOBibBase {
     }
 
     /**
-     * Checks that keys do appear in citeKeys as keys. Collects the
-     * missing keys, and if there is any, throws BibEntryNotFoundException
-     * (currently mentioning only the first missing key).
+     * Checks that every element of `keys` can be found in `citeKeyToBibEntry`.
+     *
+     * Collects the missing keys, and if there is any, throws
+     * BibEntryNotFoundException (currently mentioning only the first
+     * missing key).
      *
      * @param keys An array of citation keys, we expect to appear as
      *             keys in citeKeyToBibEntry.
@@ -1540,7 +1542,7 @@ class OOBibBase {
     }
 
     /**
-     * For each reference mark name check the corresponding part of
+     * For each reference mark name: check the corresponding element of
      * bibtexKeys with assertKeysInCiteKeyToBibEntry.
      */
     private static void
