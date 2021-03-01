@@ -2297,15 +2297,19 @@ class OOBibBase {
         return unresolvedKeysFromEntries(fce.entries);
     }
 
-    // Position as in a document on the screen.
-    // Probably to get the correct order with
-    // referenceMarks in footnotes
+    /**
+     *  Given an XTextRange, return its position:
+     *  coordinates relative to the top left position
+     *   of the first page of the document.
+     *
+     * @param range
+     * @param cursor To get the position, we need az XTextViewCursor.
+     *               It will be moved to the range.
+     */
     private static Point
-    findPositionOfTextRange(XTextViewCursor cursor, XTextRange range) {
+    findPositionOfTextRange(XTextRange range, XTextViewCursor cursor) {
         cursor.gotoRange(range, false);
         return cursor.getPosition();
-        // the cursor's coordinates relative to the top left position
-        // of the first page of the document.
     }
 
     /**
@@ -2342,7 +2346,7 @@ class OOBibBase {
                 // The footnote's anchor gives the correct position in the text:
                 range = footer.getAnchor();
             }
-            positions.add(findPositionOfTextRange(viewCursor, range));
+            positions.add(findPositionOfTextRange(range,viewCursor));
         }
         // restore cursor position
         viewCursor.gotoRange(initialPos, false);
