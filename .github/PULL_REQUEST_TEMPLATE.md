@@ -11,7 +11,7 @@ The title of the PR must not reference an issue, because GitHub does not support
 - Please don't remove any items, just leave them unchecked if they are not applicable.
 -->
 
-- [ ] Change in CHANGELOG.md described (if applicable)
+- [ ] Change in `CHANGELOG.md` described in a way that is understandable for the average user (if applicable)
 - [ ] Tests created for changes (if applicable)
 - [ ] Manually tested changed features in running JabRef (always required)
 - [ ] Screenshots added in PR description (for UI changes)
