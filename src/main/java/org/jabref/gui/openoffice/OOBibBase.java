@@ -2108,7 +2108,7 @@ class OOBibBase {
             getBibEntriesSortedWithinReferenceMarks( bibtexKeysIn, citeKeyToBibEntry, style );
 
         // Update bibtexKeys to match the new sorting (within each referenceMark)
-        String[][] bibtexKeys = mapBibEntriesToCitationKeysForall( cEntriesForAll );
+        String[][] bibtexKeys = mapBibEntriesToCitationKeysOrNullForall( cEntriesForAll );
         assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeys, citeKeyToBibEntry);
         assert (bibtexKeys.length == nRefMarks);
 
