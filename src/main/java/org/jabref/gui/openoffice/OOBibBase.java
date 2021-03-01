@@ -2089,17 +2089,25 @@ class OOBibBase {
             // those referring to entries in our current list:
             final int maxAuthorsFirst = style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST);
             Set<String> seenBefore = new HashSet<>();
+
             for (int i = 0; i < nRefMarks; i++) {
                 final String referenceMarkName = referenceMarkNames.get(i);
                 final int nCitedEntries = bibtexKeys[i].length;
                 boolean needsChange = false;
                 int[] firstLimAuthors = new int[nCitedEntries];
                 String[] uniqueLetterForCitedEntry = new String[nCitedEntries];
+
+                assertKeysInCiteKeyToBibEntry(bibtexKeys[i], citeKeyToBibEntry, referenceMarkName);
                 BibEntry[] cEntries =
-                    mapCiteKeysToBibEntryArray(bibtexKeys[i],
-                                               citeKeyToBibEntry,
-                                               referenceMarkName);
-                cEntries = mapUndefinedBibEntriesToNull(cEntries);
+                    Arrays.stream(bibtexKeys[i])
+                    .map(citeKeyToBibEntry::get)
+                    .toArray(BibEntry[]::new);
+
+                cEntries =
+                    Arrays.stream(cEntries)
+                    .map(OOBibBase::undefinedBibentryToNull)
+                    .toArray(BibEntry[]::new);
+
 
                 for (int j = 0; j < nCitedEntries; j++) {
                     String currentKey = bibtexKeys[i][j];
