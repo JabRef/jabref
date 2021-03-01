@@ -458,14 +458,13 @@ class OOBibBase {
         getBookmarkRange(String name)
             throws
             WrappedTargetException {
-            XNameAccess xNamedBookmarks = this.getBookmarks();
 
-            // retrieve bookmark by name
-            if (!xNamedBookmarks.hasByName(name)) {
+            XNameAccess xNamedBookmarks = this.getBookmarks();
+            XTextContent xFoundBookmark =
+                nameAccessGetTextContentByName( xNamedBookmarks, name );
+            if (xFoundBookmark == null){
                 return null;
             }
-            Object foundBookmark = xNamedBookmarks.getByName(name);
-            XTextContent xFoundBookmark = unoQI(XTextContent.class, foundBookmark);
             return xFoundBookmark.getAnchor();
         }
 
