@@ -797,7 +797,7 @@ class OOBibBase {
      */
     public boolean documentConnectionMissing() {
         if (this.xDocumentConnection == null) {
-            return false;
+            return true;
         }
         boolean res = this.xDocumentConnection.documentConnectionMissing();
         if (res) {
