@@ -1586,8 +1586,6 @@ class OOBibBase {
 
     /**
      * Number source for (1-based) numbering of citations.
-     *
-     * For numbered citation style with first appearance order.
      */
     private static class CitationNumberingState {
         /**
@@ -1724,10 +1722,15 @@ class OOBibBase {
         Map<BibEntry, BibDatabase> sortedEntries =
             sortEntriesByComparator(entries, entryComparator);
 
-        // Adjust order of cited to match sortedEntries
+        // Citation keys, in the same order as sortedEntries
         List<String> sortedCited = new ArrayList<>(entries.size());
         for (BibEntry entry : sortedEntries.keySet()) {
-            sortedCited.add(entry.getCitationKey().orElse(null));
+            sortedCited.add(
+                entry.getCitationKey()
+                // entries should have been augmented with UndefinedBibtexEntry
+                // to cover all bibtexKeys
+                .orElseThrow(IllegalArgumentException::new)
+                );
         }
 
         final int minGroupingCount =
