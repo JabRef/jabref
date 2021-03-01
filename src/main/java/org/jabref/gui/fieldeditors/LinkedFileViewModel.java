@@ -446,9 +446,9 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     linkedFiles.set(oldFileIndex, newLinkedFile);
                 }
                 entry.setFiles(linkedFiles);
-                // Notify in bar when the filetype is HTML.
+                // Notify in bar when the file type is HTML.
                 if (newLinkedFile.getFileType().equals(StandardExternalFileType.URL.getName())) {
-                    dialogService.notify("Downloaded a linked HTML file.");
+                    dialogService.notify(Localization.lang("Downloaded website as an HTML file."));
                 }
             });
             downloadProgress.bind(downloadTask.workDonePercentageProperty());
