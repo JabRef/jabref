@@ -1842,10 +1842,14 @@ class OOBibBase {
         boolean mustTestCharFormat = style.isFormatCitations();
 
         for (int i = 0; i < nRefMarks; i++) {
+
             final String name = referenceMarkNames.get(i);
 
-            XTextContent mark = documentConnection.nameAccessGetTextContentByName(nameAccess, name);
-            XTextCursor cursor = documentConnection.getTextCursorOfTextContent(mark);
+            XTextContent mark =
+                documentConnection.nameAccessGetTextContentByName(nameAccess, name);
+
+            XTextCursor cursor =
+                documentConnection.getTextCursorOfTextContent(mark);
 
             if (mustTestCharFormat) {
                 mustTestCharFormat = false; // need to do this only once
@@ -1865,6 +1869,9 @@ class OOBibBase {
 
             if (hadBibSection
                 && (documentConnection.getBookmarkRange(OOBibBase.BIB_SECTION_NAME) == null)) {
+                // TODO: I think we used a *section* for the
+                //       bibliography elsewhere. Here we use a *bookmark*. Relation?
+                //
                 // We have overwritten the marker for the start of the reference list.
                 // We need to add it again.
                 cursor.collapseToEnd();
