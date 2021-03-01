@@ -154,7 +154,6 @@ class OOBibBase {
             this.LOGGER = LOGGER;
         }
 
-        public Optional<String> getDocumentTitle() {
         /**
          *  @return True if we cannot reach the current document.
          */
