@@ -3,16 +3,17 @@ package org.jabref.gui.icon;
 import javafx.scene.Node;
 import javafx.scene.paint.Color;
 
-import de.jensd.fx.glyphs.GlyphIcons;
+import org.kordamp.ikonli.Ikon;
 
-public interface JabRefIcon extends GlyphIcons {
+public interface JabRefIcon {
 
     Node getGraphicNode();
 
-    @Override
     String name();
 
     JabRefIcon withColor(Color color);
 
     JabRefIcon disabled();
+
+    Ikon getIkon();
 }
