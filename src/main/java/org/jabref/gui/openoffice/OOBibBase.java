@@ -2549,20 +2549,23 @@ class OOBibBase {
      *
      * Assumes the section named `OOBibBase.BIB_SECTION_NAME` exists.
      */
-    private void populateBibTextSection(DocumentConnection documentConnection,
-                                        Map<BibEntry, BibDatabase> entries,
-                                        OOBibStyle style,
-                                        final Map<String, String> uniqueLetters)
-            throws NoSuchElementException,
-            WrappedTargetException,
-            PropertyVetoException,
-            UnknownPropertyException,
-            UndefinedParagraphFormatException,
-            IllegalArgumentException,
-            CreationException {
         XTextSectionsSupplier supplier =
                 unoQI(XTextSectionsSupplier.class,
                         documentConnection.mxDoc);
+    private void
+    populateBibTextSection(
+        DocumentConnection documentConnection,
+        Map<BibEntry, BibDatabase> entries,
+        OOBibStyle style,
+        final Map<String, String> uniqueLetters)
+        throws
+        NoSuchElementException,
+        WrappedTargetException,
+        PropertyVetoException,
+        UnknownPropertyException,
+        UndefinedParagraphFormatException,
+        IllegalArgumentException,
+        CreationException {
 
         XTextSection section =
                 ((XTextSection)
