@@ -468,6 +468,23 @@ class OOBibBase {
             return xFoundBookmark.getAnchor();
         }
 
+        /**
+         *  Get an XTextSection by name.
+         */
+        public XTextSection
+        getTextSectionByName(String name)
+            throws
+            NoSuchElementException,
+            WrappedTargetException {
+
+            XTextSectionsSupplier supplier =
+                unoQI(XTextSectionsSupplier.class,
+                      this.mxDoc);
+
+            return ((XTextSection)
+                    ((Any) supplier.getTextSections().getByName(name))
+                    .getObject());
+        }
     } // end DocumentConnection
 
     /**
