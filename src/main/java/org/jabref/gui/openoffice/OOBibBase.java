@@ -1963,12 +1963,12 @@ class OOBibBase {
      *   result[i][j] = cEntriesForAll[i][j].getCitationKey()
      */
     private String[][]
-    mapBibEntriesToCitationKeysForall( BibEntry[][] cEntriesForAll ) {
+    mapBibEntriesToCitationKeysOrNullForall( BibEntry[][] cEntriesForAll ) {
         return
             Arrays.stream(cEntriesForAll)
             .map(cEntries ->
                  Arrays.stream(cEntries)
-                 .map(ce -> ce.getCitationKey().orElseThrow(IllegalArgumentException::new))
+                 .map(ce -> ce.getCitationKey().orElse(null))
                  .toArray(String[]::new)
                 )
             .toArray(String[][]::new);
