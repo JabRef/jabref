@@ -1584,7 +1584,8 @@ class OOBibBase {
         final int nRefMarks = referenceMarkNames.size();
 
         assert nRefMarks == bibtexKeys.length;
-        assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeys, citeKeyToBibEntry, "produceCitationMarkersForIsCitationKeyCiteMarkers");
+        assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeys, citeKeyToBibEntry,
+                                         "produceCitationMarkersForIsCitationKeyCiteMarkers");
 
         String[] citMarkers = new String[nRefMarks];
         for (int i = 0; i < nRefMarks; i++) {
@@ -1690,7 +1691,8 @@ class OOBibBase {
 
         final int nRefMarks = referenceMarkNames.size();
         assert (nRefMarks == bibtexKeys.length);
-        assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeys, citeKeyToBibEntry, "produceCitationMarkersForIsNumberEntriesIsSortByPosition");
+        assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeys, citeKeyToBibEntry,
+                                         "produceCitationMarkersForIsNumberEntriesIsSortByPosition");
 
         String[] citMarkers = new String[nRefMarks];
 
@@ -2100,15 +2102,16 @@ class OOBibBase {
      * @param style              Bibliography style.
      */
     String[]
-    produceCitationMarkersForNormalStyle(List<String> referenceMarkNames,
-                                     String[][] bibtexKeysIn,
-                                     Map<String, BibEntry> citeKeyToBibEntry,
-                                     int[] itcTypes,
-                                         Map<BibEntry, BibDatabase> entries,
-                                     final Map<String, String> uniqueLetters,
-                                     OOBibStyle style
-    )
-            throws BibEntryNotFoundException {
+    produceCitationMarkersForNormalStyle(
+        List<String> referenceMarkNames,
+        String[][] bibtexKeysIn,
+        Map<String, BibEntry> citeKeyToBibEntry,
+        int[] itcTypes,
+        Map<BibEntry, BibDatabase> entries,
+        final Map<String, String> uniqueLetters,
+        OOBibStyle style
+        )
+        throws BibEntryNotFoundException {
         uniqueLetters.clear();
 
         assert !style.isCitationKeyCiteMarkers();
@@ -2118,7 +2121,8 @@ class OOBibBase {
         final int nRefMarks = referenceMarkNames.size();
         assert (bibtexKeysIn.length == nRefMarks);
         assert (itcTypes.length == nRefMarks);
-        assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeysIn, citeKeyToBibEntry, "produceCitationMarkersForNormalStyle");
+        assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeysIn, citeKeyToBibEntry,
+                                         "produceCitationMarkersForNormalStyle");
 
         BibEntry[][] cEntriesForAll =
             getBibEntriesSortedWithinReferenceMarks( bibtexKeysIn, citeKeyToBibEntry, style );
@@ -2126,9 +2130,6 @@ class OOBibBase {
         // Update bibtexKeys to match the new sorting (within each referenceMark)
         String[][] bibtexKeys = mapBibEntriesToCitationKeysOrNullForall( cEntriesForAll );
         // Note: bibtexKeys[i][j] may be null, for UndefinedBibtexEntry
-
-        // String[][] bibtexKeys = mapBibEntriesToCitationKeysOrThrowForall( cEntriesForAll );
-        // assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeys, citeKeyToBibEntry);
 
         assert (bibtexKeys.length == nRefMarks);
 
@@ -2162,13 +2163,13 @@ class OOBibBase {
             // BibEntry[] cEntries = cEntriesForAll[i];
 
             for (int j = 0; j < nCitedEntries; j++) {
-                String currentKey = bibtexKeys[i][j];
+                String currentKey = bibtexKeys[i][j]; // nullable
 
                 // firstLimAuthors will be (-1) except at the first
-                // refMark it appears at, where a positive maxAuthorsFirst
-                // may override. This is why:
+                // refMark it appears at, where a positive
+                // maxAuthorsFirst may override. This is why:
                 // https://discourse.jabref.org/t/
-                //    number-of-authors-in-citations-style-libreoffice/747/3
+                // number-of-authors-in-citations-style-libreoffice/747/3
                 // "Some citation styles require to list the full
                 // names of the first 4 authors for the first
                 // time. Later it is sufficient to have only maybe
@@ -2187,8 +2188,8 @@ class OOBibBase {
                 } else {
                     uniqueLetterForCitedEntry[j] = uniqueLetterForKey;
                 }
+            }
 
-            } // for j
 
             citMarkers[i] =
                 style.getCitationMarker(
