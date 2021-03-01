@@ -2798,7 +2798,7 @@ class OOBibBase {
             CreationException,
             BibEntryNotFoundException,
             NoDocumentException {
-        DocumentConnection documentConnection = this.xDocumentConnection;
+        DocumentConnection documentConnection = this.getDocumentConnectionOrThrow();
 
         List<String> names =
                 getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
