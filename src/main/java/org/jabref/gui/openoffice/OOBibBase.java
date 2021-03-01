@@ -2110,12 +2110,12 @@ class OOBibBase {
         String[] citMarkers = new String[nRefMarks];
         for (int i = 0; i < nRefMarks; i++) {
             BibEntry[] cEntries = cEntriesForAll[i];
-            int type = itcTypes[i];
-            citMarkers[i] = style.getCitationMarker(Arrays.asList(cEntries), // entries
-                    entries, // database
-                    type == OOBibBase.AUTHORYEAR_PAR,
-                    null,
-                    null
+            citMarkers[i] = style.getCitationMarker(
+                Arrays.asList(cEntries), // entries
+                entries, // database
+                itcTypes[i] == OOBibBase.AUTHORYEAR_PAR,
+                null,
+                null
             );
         }
 
@@ -2129,69 +2129,70 @@ class OOBibBase {
 
         updateUniqueLetters(  bibtexKeys, normCitMarkers, uniqueLetters );
 
-            // Finally, go through all citation markers, and update
-            // those referring to entries in our current list:
-            final int maxAuthorsFirst = style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST);
-            Set<String> seenBefore = new HashSet<>();
+        // Finally, go through all citation markers, and update
+        // those referring to entries in our current list:
+        final int maxAuthorsFirst = style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST);
+        Set<String> seenBefore = new HashSet<>();
 
-            for (int i = 0; i < nRefMarks; i++) {
-                final String referenceMarkName = referenceMarkNames.get(i);
-                final int nCitedEntries = bibtexKeys[i].length;
-                boolean needsChange = false;
-                int[] firstLimAuthors = new int[nCitedEntries];
-                String[] uniqueLetterForCitedEntry = new String[nCitedEntries];
+        for (int i = 0; i < nRefMarks; i++) {
 
-                assertKeysInCiteKeyToBibEntry(bibtexKeys[i], citeKeyToBibEntry, referenceMarkName);
-                BibEntry[] cEntries =
-                    Arrays.stream(bibtexKeys[i])
-                    .map(citeKeyToBibEntry::get)
-                    .map(OOBibBase::undefinedBibentryToNull)
-                    .toArray(BibEntry[]::new);
+            final String referenceMarkName = referenceMarkNames.get(i);
+            final int nCitedEntries = bibtexKeys[i].length;
+            boolean needsChange = false;
+            int[] firstLimAuthors = new int[nCitedEntries];
+            String[] uniqueLetterForCitedEntry = new String[nCitedEntries];
 
+            assertKeysInCiteKeyToBibEntry(bibtexKeys[i], citeKeyToBibEntry, referenceMarkName);
+            BibEntry[] cEntries =
+                Arrays.stream(bibtexKeys[i])
+                .map(citeKeyToBibEntry::get)
+                .map(OOBibBase::undefinedBibentryToNull)
+                .toArray(BibEntry[]::new);
 
-                for (int j = 0; j < nCitedEntries; j++) {
-                    String currentKey = bibtexKeys[i][j];
+            for (int j = 0; j < nCitedEntries; j++) {
+                String currentKey = bibtexKeys[i][j];
 
-                    // firstLimAuthors will be (-1) except at the first
-                    // refMark it appears at, where a positive maxAuthorsFirst
-                    // may override. This is why:
-                    // https://discourse.jabref.org/t/
-                    //    number-of-authors-in-citations-style-libreoffice/747/3
-                    // "Some citation styles require to list the full
-                    // names of the first 4 authors for the first
-                    // time. Later it is sufficient to have only maybe
-                    // (Author A and Author B 2019 et al.)"
-                    firstLimAuthors[j] = -1;
-                    if (maxAuthorsFirst > 0) {
-                        if (!seenBefore.contains(currentKey)) {
-                            firstLimAuthors[j] = maxAuthorsFirst;
-                        }
-                        seenBefore.add(currentKey);
+                // firstLimAuthors will be (-1) except at the first
+                // refMark it appears at, where a positive maxAuthorsFirst
+                // may override. This is why:
+                // https://discourse.jabref.org/t/
+                //    number-of-authors-in-citations-style-libreoffice/747/3
+                // "Some citation styles require to list the full
+                // names of the first 4 authors for the first
+                // time. Later it is sufficient to have only maybe
+                // (Author A and Author B 2019 et al.)"
+                firstLimAuthors[j] = -1;
+                if (maxAuthorsFirst > 0) {
+                    if (!seenBefore.contains(currentKey)) {
+                        firstLimAuthors[j] = maxAuthorsFirst;
                     }
-
-                        String uniqueLetterForKey = uniqueLetters.get(currentKey);
-                        if (uniqueLetterForKey == null) {
-                            uniqueLetterForCitedEntry[j] = "";
-                        } else {
-                            uniqueLetterForCitedEntry[j] = uniqueLetterForKey;
-                            needsChange = true;
-                        }
-
-                    if (firstLimAuthors[j] > 0) {
-                        needsChange = true;
-                    }
-                } // for j
-
-                if (needsChange) {
-                    citMarkers[i] =
-                            style.getCitationMarker(Arrays.asList(cEntries),
-                                    entries,
-                                    itcTypes[i] == OOBibBase.AUTHORYEAR_PAR,
-                                    uniqueLetterForCitedEntry,
-                                    firstLimAuthors
-                            );
+                    seenBefore.add(currentKey);
                 }
-            } // for i
+
+                String uniqueLetterForKey = uniqueLetters.get(currentKey);
+                if (uniqueLetterForKey == null) {
+                    uniqueLetterForCitedEntry[j] = "";
+                } else {
+                    uniqueLetterForCitedEntry[j] = uniqueLetterForKey;
+                    needsChange = true;
+                }
+
+                if (firstLimAuthors[j] > 0) {
+                    needsChange = true;
+                }
+            } // for j
+
+            if (needsChange) {
+                citMarkers[i] =
+                    style.getCitationMarker(
+                        Arrays.asList(cEntries),
+                        entries,
+                        itcTypes[i] == OOBibBase.AUTHORYEAR_PAR,
+                        uniqueLetterForCitedEntry,
+                        firstLimAuthors
+                        );
+            }
+        } // for i
 
         return citMarkers;
     }
