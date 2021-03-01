@@ -26,6 +26,7 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> implements PreferencesTab {
 
+    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
     @FXML private ComboBox<Language> language;
     @FXML private ComboBox<Charset> defaultEncoding;
     @FXML private ComboBox<BibDatabaseMode> biblatexMode;
@@ -35,14 +36,14 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private CheckBox memoryStickMode;
     @FXML private CheckBox collectTelemetry;
     @FXML private CheckBox showAdvancedHints;
+    @FXML private CheckBox useCustomDOI;
+    @FXML private TextField useCustomDOIName;
     @FXML private CheckBox markOwner;
     @FXML private TextField markOwnerName;
     @FXML private CheckBox markOwnerOverwrite;
     @FXML private Button markOwnerHelp;
     @FXML private CheckBox addCreationDate;
     @FXML private CheckBox addModificationDate;
-
-    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     public GeneralTab() {
         ViewLoader.view(this)
@@ -82,6 +83,10 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         memoryStickMode.selectedProperty().bindBidirectional(viewModel.memoryStickModeProperty());
         collectTelemetry.selectedProperty().bindBidirectional(viewModel.collectTelemetryProperty());
         showAdvancedHints.selectedProperty().bindBidirectional(viewModel.showAdvancedHintsProperty());
+
+        useCustomDOI.selectedProperty().bindBidirectional(viewModel.markDOIProperty());
+        useCustomDOIName.textProperty().bindBidirectional(viewModel.markDOINameProperty());
+        useCustomDOIName.disableProperty().bind(useCustomDOI.selectedProperty().not());
 
         markOwner.selectedProperty().bindBidirectional(viewModel.markOwnerProperty());
         markOwnerName.textProperty().bindBidirectional(viewModel.markOwnerNameProperty());

@@ -21,6 +21,7 @@ import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Identifier;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -71,6 +72,18 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
                 url -> {
                     try {
                         JabRefDesktop.openBrowser(url);
+                    } catch (IOException ex) {
+                        dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), ex);
+                    }
+                }
+        );
+    }
+
+    public void openDOIWithCustomBase(String baseURI) {
+        identifier.get().map(x -> (DOI) x).flatMap(x -> x.getExternalURIWithCustomBase(baseURI)).ifPresent(
+                uri -> {
+                    try {
+                        JabRefDesktop.openBrowser(uri);
                     } catch (IOException ex) {
                         dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), ex);
                     }

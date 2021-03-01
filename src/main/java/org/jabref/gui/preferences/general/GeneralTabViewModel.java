@@ -19,6 +19,7 @@ import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.database.BibDatabaseMode;
@@ -40,6 +41,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty collectTelemetryProperty = new SimpleBooleanProperty();
     private final BooleanProperty allowIntegerEditionProperty = new SimpleBooleanProperty();
     private final BooleanProperty showAdvancedHintsProperty = new SimpleBooleanProperty();
+    private final BooleanProperty useCustomDOIProperty = new SimpleBooleanProperty();
+    private final StringProperty useCustomDOINameProperty = new SimpleStringProperty("");
     private final BooleanProperty markOwnerProperty = new SimpleBooleanProperty();
     private final StringProperty markOwnerNameProperty = new SimpleStringProperty("");
     private final BooleanProperty markOwnerOverwriteProperty = new SimpleBooleanProperty();
@@ -50,6 +53,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final PreferencesService preferencesService;
     private final GeneralPreferences initialGeneralPreferences;
     private final TelemetryPreferences initialTelemetryPreferences;
+    private final DOIPreferences initialDOIPreferences;
     private final OwnerPreferences initialOwnerPreferences;
     private final TimestampPreferences initialTimestampPreferences;
 
@@ -61,6 +65,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.preferencesService = preferencesService;
         this.initialGeneralPreferences = preferencesService.getGeneralPreferences();
         this.initialTelemetryPreferences = preferencesService.getTelemetryPreferences();
+        this.initialDOIPreferences = preferencesService.getDOIPreferences();
         this.initialOwnerPreferences = preferencesService.getOwnerPreferences();
         this.initialTimestampPreferences = preferencesService.getTimestampPreferences();
     }
@@ -81,6 +86,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         memoryStickModeProperty.setValue(initialGeneralPreferences.isMemoryStickMode());
         collectTelemetryProperty.setValue(initialTelemetryPreferences.shouldCollectTelemetry());
         showAdvancedHintsProperty.setValue(initialGeneralPreferences.shouldShowAdvancedHints());
+
+        useCustomDOIProperty.setValue(initialDOIPreferences.isUseCustom());
+        useCustomDOINameProperty.setValue(initialDOIPreferences.getDefaultBaseURI());
 
         markOwnerProperty.setValue(initialOwnerPreferences.isUseOwner());
         markOwnerNameProperty.setValue(initialOwnerPreferences.getDefaultOwner());
@@ -115,6 +123,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         preferencesService.storeTelemetryPreferences(
                 initialTelemetryPreferences.withCollectTelemetry(collectTelemetryProperty.getValue()));
+
+        preferencesService.storeDOIPreferences(new DOIPreferences(
+                useCustomDOIProperty.getValue(),
+                useCustomDOINameProperty.getValue().trim()));
 
         preferencesService.storeOwnerPreferences(new OwnerPreferences(
                 markOwnerProperty.getValue(),
@@ -182,6 +194,16 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty showAdvancedHintsProperty() {
         return this.showAdvancedHintsProperty;
+    }
+
+    // DOI
+
+    public BooleanProperty markDOIProperty() {
+        return this.useCustomDOIProperty;
+    }
+
+    public StringProperty markDOINameProperty() {
+        return this.useCustomDOINameProperty;
     }
 
     // Entry owner
