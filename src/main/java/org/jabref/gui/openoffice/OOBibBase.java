@@ -2101,10 +2101,6 @@ class OOBibBase {
                 BibEntry[] cEntries =
                     Arrays.stream(bibtexKeys[i])
                     .map(citeKeyToBibEntry::get)
-                    .toArray(BibEntry[]::new);
-
-                cEntries =
-                    Arrays.stream(cEntries)
                     .map(OOBibBase::undefinedBibentryToNull)
                     .toArray(BibEntry[]::new);
 
