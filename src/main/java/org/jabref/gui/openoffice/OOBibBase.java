@@ -1938,7 +1938,27 @@ class OOBibBase {
         return unresolvedKeys;
     }
 
- 
+    /**
+     *  Look up `bibtexkeys` in `citeKeyToBibEntry`, sort result within
+     *  each reference mark.
+     */
+    private BibEntry[][]
+    getBibEntriesSortedWithinReferenceMarks(
+        String[][] bibtexKeys,
+        Map<String, BibEntry> citeKeyToBibEntry,
+        OOBibStyle style
+        ) {
+        return
+            Arrays.stream(bibtexKeys)
+            .map(bibtexKeysOfAReferenceMark ->
+                 Arrays.stream(bibtexKeysOfAReferenceMark)
+                 .map(citeKeyToBibEntry::get)
+                 .sorted(comparatorForMulticite(style)) // sort within referenceMark
+                 .toArray(BibEntry[]::new)
+                )
+            .toArray(BibEntry[][]::new);
+    }
+
     /**
      * Given bibtexKeys for each reference mark and the corresponding
      * normalized citation markers for each, fills uniqueLetters.
@@ -2036,14 +2056,7 @@ class OOBibBase {
         assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeysIn, citeKeyToBibEntry);
 
         BibEntry[][] cEntriesForAll =
-                Arrays.stream(bibtexKeysIn)
-                      .map(bibtexKeysOfAReferenceMark ->
-                              Arrays.stream(bibtexKeysOfAReferenceMark)
-                                    .map(citeKeyToBibEntry::get)
-                                    .sorted(comparatorForMulticite(style)) // sort within referenceMark
-                                    .toArray(BibEntry[]::new)
-                      )
-                      .toArray(BibEntry[][]::new);
+            getBibEntriesSortedWithinReferenceMarks( bibtexKeysIn, citeKeyToBibEntry, style );
 
         // Update bibtexKeys to match the new sorting (within each referenceMark)
         String[][] bibtexKeys =
