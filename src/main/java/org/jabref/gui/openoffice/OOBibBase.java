@@ -2198,11 +2198,23 @@ class OOBibBase {
         return citMarkers;
     }
 
+    /**
+     * Refresh citation markers according to `style`.
+     *
+     * - Requires an uptodate jabRefReferenceMarkNamesSortedByPosition
+     *
+     * @param documentConnection
+     * @param databases For look up by citation key. Must have at least one.
+     * @param style
+     * @param uniqueLetters Will be cleared and potentially filled with new values.
+     */
     private List<String>
-    refreshCiteMarkersInternal(DocumentConnection documentConnection,
-                               List<BibDatabase> databases,
-                               OOBibStyle style,
-                               final Map<String, String> uniqueLetters)
+    refreshCiteMarkersInternal(
+        DocumentConnection documentConnection,
+        List<BibDatabase> databases,
+        OOBibStyle style,
+        final Map<String, String> uniqueLetters
+        )
         throws
         WrappedTargetException,
         IllegalArgumentException,
@@ -2218,12 +2230,8 @@ class OOBibBase {
         // order of appearance:
         List<String> referenceMarkNames = jabRefReferenceMarkNamesSortedByPosition;
 
-        // Compute citation markers for all citations:
         final int nRefMarks = referenceMarkNames.size();
 
-        // fill:
-        //    types[i]      = ov.itcType
-        //    bibtexKeys[i] = ov.citedKeys.toArray()
         int[] types = new int[nRefMarks];
         String[][] bibtexKeys = new String[nRefMarks][];
         parseRefMarkNamesToArrays(referenceMarkNames, types, bibtexKeys);
@@ -2267,7 +2275,6 @@ class OOBibBase {
                         style);
             }
         } else /* Normal case, (!isCitationKeyCiteMarkers && !isNumberEntries) */ {
-
             citMarkers =
                 produceCitationMarkersForNormalStyle(
                     referenceMarkNames,
@@ -2277,7 +2284,6 @@ class OOBibBase {
                     fce.entries,
                     uniqueLetters,
                     style);
-
         }
 
         // Refresh all reference marks with the citation markers we computed:
