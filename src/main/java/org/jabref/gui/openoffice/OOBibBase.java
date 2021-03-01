@@ -1960,6 +1960,21 @@ class OOBibBase {
     }
 
     /**
+     *   result[i][j] = cEntriesForAll[i][j].getCitationKey()
+     */
+    private String[][]
+    mapBibEntriesToCitationKeysForall( BibEntry[][] cEntriesForAll ) {
+        return
+            Arrays.stream(cEntriesForAll)
+            .map(cEntries ->
+                 Arrays.stream(cEntries)
+                 .map(ce -> ce.getCitationKey().orElseThrow(IllegalArgumentException::new))
+                 .toArray(String[]::new)
+                )
+            .toArray(String[][]::new);
+    }
+
+    /**
      * Given bibtexKeys for each reference mark and the corresponding
      * normalized citation markers for each, fills uniqueLetters.
      *
@@ -2058,19 +2073,6 @@ class OOBibBase {
         BibEntry[][] cEntriesForAll =
             getBibEntriesSortedWithinReferenceMarks( bibtexKeysIn, citeKeyToBibEntry, style );
 
-        // Update bibtexKeys to match the new sorting (within each referenceMark)
-        String[][] bibtexKeys =
-                Arrays.stream(cEntriesForAll)
-                      .map(cEntries ->
-                              Arrays.stream(cEntries)
-                                    .map(ce -> ce.getCitationKey().orElse(null))
-                                    .toArray(String[]::new)
-                      )
-                      .toArray(String[][]::new);
-
-        assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeysIn, citeKeyToBibEntry);
-        assert (bibtexKeys.length == nRefMarks);
-
         String[] citMarkers = new String[nRefMarks];
         for (int i = 0; i < nRefMarks; i++) {
             BibEntry[] cEntries = cEntriesForAll[i];
@@ -2114,6 +2116,11 @@ class OOBibBase {
         if (!style.isCitationKeyCiteMarkers() && !style.isNumberEntries()) {
             // Only for normal citations. Numbered citations and
             // citeKeys are already unique.
+
+            // Update bibtexKeys to match the new sorting (within each referenceMark)
+            String[][] bibtexKeys = mapBibEntriesToCitationKeysForall( cEntriesForAll );
+            assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeys, citeKeyToBibEntry);
+            assert (bibtexKeys.length == nRefMarks);
 
             updateUniqueLetters(  bibtexKeys, normCitMarkers, uniqueLetters );
             // See if there are duplicate citations marks referring to
