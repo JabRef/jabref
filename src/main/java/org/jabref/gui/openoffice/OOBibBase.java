@@ -1360,13 +1360,13 @@ class OOBibBase {
      * The collection of data returned by findCitedKeys.
      */
     private static class FindCitedEntriesResult {
-        /*
+        /**
          *  entries : LinkedHashMap with iteration order as the
-         *  citedKeys parameter of findCitedEntries
+         *            citedKeys parameter of findCitedEntries
          */
         Map<BibEntry, BibDatabase> entries;
 
-        /*
+        /**
          * citeKeyToBibEntry : HashMap (no order)
          */
         Map<String, BibEntry> citeKeyToBibEntry;
@@ -1381,20 +1381,31 @@ class OOBibBase {
     }
 
     /**
-     * @return LinkedHashMap, from BibEntry to BibDatabase.
-     * Side effect: adds citedKeys to citeKeyToBibEntry,
-     * using UndefinedBibtexEntry if not found.
+     * @return A FindCitedEntriesResult containing
      *
-     * If a citedKey is not found, then
-     * BibEntry is new UndefinedBibtexEntry(citedKey),
-     * and BibDatabase is null.
-     * If citedKey is found, then BibEntry is what we found,
-     * BibDatabase is the database we found it in.
+     *    entries: A LinkedHashMap, from BibEntry to BibDatabase with
+     *             iteration order as the citedKeys parameter.
      *
-     * So: result has an entry for each citedKey,
-     * in the same order as in citedKeys
+     *             Stores: in which database was the entry found.
      *
-     * citedKey in the entry is the same as the original citedKey
+     *    citeKeyToBibEntry:
+     *            A HashMap from citation key to BibEntry.
+     *            Stores: result of lookup.
+     *
+     *    For citation keys not found, a new
+     *    UndefinedBibtexEntry(citedKey) is created and added to both
+     *    maps, with a null BibDatabase.
+     *
+     *    How is the result used?
+     *
+     *    entries : Allows to recover the list of keys in original
+     *              order, and finding the corresponding databases.
+     *
+     *    citeKeyToBibEntry:
+     *
+     *        Caches the result of lookup performed here, with "not
+     *        found" encoded as an instance of UndefinedBibtexEntry.
+     *
      */
     private FindCitedEntriesResult
     findCitedEntries(
