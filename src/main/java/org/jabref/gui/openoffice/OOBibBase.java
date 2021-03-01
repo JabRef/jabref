@@ -1720,8 +1720,8 @@ class OOBibBase {
             .map(
                 entry ->
                 entry.getCitationKey()
-                // entries should have been augmented with UndefinedBibtexEntry
-                // to cover all bibtexKeys
+                // entries came from looking up by citation key,
+                // so Optional.empty() is not possible here.
                 .orElseThrow(IllegalArgumentException::new)
                 )
             .collect(Collectors.toList());
