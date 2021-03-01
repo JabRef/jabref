@@ -2486,20 +2486,29 @@ class OOBibBase {
             // where does textCursor point to if end is false?
             // TODO: are we using this.atEnd == false?
             // If we do, what happens (or expected to happen) here?
+    private void
+    createAndInsertSection(
+        DocumentConnection documentConnection,
+        String sectionName,
+        XTextCursor textCursor
+        )
+        throws
+        IllegalArgumentException,
+        CreationException {
 
-        OOUtil.insertParagraphBreak(documentConnection.xText, textCursor);
-        // Create a new TextSection from the document factory and access it's XNamed interface
+        // Create a new TextSection from the document factory
+        // and access it's XNamed interface
         XNamed xChildNamed;
         try {
-            xChildNamed = unoQI(XNamed.class,
-                    (documentConnection.mxDocFactory
-                            .createInstance("com.sun.star.text.TextSection"))
-            );
+            xChildNamed =
+                unoQI(XNamed.class,
+                      (documentConnection.mxDocFactory
+                       .createInstance("com.sun.star.text.TextSection")));
         } catch (Exception e) {
             throw new CreationException(e.getMessage());
         }
         // Set the new sections name to 'Child_Section'
-        xChildNamed.setName(OOBibBase.BIB_SECTION_NAME);
+        xChildNamed.setName(sectionName);
         // Access the Child_Section's XTextContent interface and insert it into the document
         XTextContent xChildSection = unoQI(XTextContent.class, xChildNamed);
         documentConnection.xText.insertTextContent(textCursor, xChildSection, false);
