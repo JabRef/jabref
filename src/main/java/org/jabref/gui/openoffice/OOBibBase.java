@@ -1489,17 +1489,6 @@ class OOBibBase {
         return cEntry;
     }
 
-    /**
-     *  @return A copy of the input with UndefinedBibtexEntry
-     *          instances replaced with null.
-     */
-    private static BibEntry[]
-    mapUndefinedBibEntriesToNull(BibEntry[] cEntries) {
-        return
-            Arrays.stream(cEntries)
-            .map(OOBibBase::undefinedBibentryToNull)
-            .toArray(BibEntry[]::new);
-    }
 
     /**
      * Checks that every element of `keys` can be found in `citeKeyToBibEntry`.
@@ -1562,32 +1551,6 @@ class OOBibBase {
                 citeKeyToBibEntry,
                 referenceMarkNames.get(i));
         }
-    }
-
-    // TODO: is mapCiteKeysToBibEntryArray is still needed?
-    //       We still have a call site, followed by mapUndefinedBibEntriesToNull
-    /**
-     * Map an array of citation keys to the corresponding BibEntry
-     * objects using citeKeyToBibEntry.
-     *
-     * @param citeKeys
-     * @param citeKeyToBibEntry
-     * @param referenceMarkName For reporting keys missing from citeKeyToBibEntry.
-     */
-    private static BibEntry[]
-    mapCiteKeysToBibEntryArray(
-        String[] citeKeys,
-        Map<String, BibEntry> citeKeyToBibEntry,
-        String referenceMarkName
-        )
-        throws BibEntryNotFoundException {
-
-        assertKeysInCiteKeyToBibEntry(citeKeys, citeKeyToBibEntry, referenceMarkName);
-
-        return
-            Arrays.stream(citeKeys)
-            .map(citeKeyToBibEntry::get)
-            .toArray(BibEntry[]::new);
     }
 
     /**
