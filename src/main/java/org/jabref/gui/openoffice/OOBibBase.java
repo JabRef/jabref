@@ -2119,21 +2119,13 @@ class OOBibBase {
             );
         }
 
-        //    normCitMarkers[i][j] = for unification
-        String[][] normCitMarkers =
-            normalizedCitationMarkersForNormalStyle( cEntriesForAll, entries, style );
-
-        // The following block
-        // changes: citMarkers[i], uniqueLetters
-        // uses: nRefMarks, normCitMarkers, bibtexKeys,
-        //       style (style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST))
-        //       citeKeyToBibEntry, entries, types
-
-
         // Update bibtexKeys to match the new sorting (within each referenceMark)
         String[][] bibtexKeys = mapBibEntriesToCitationKeysForall( cEntriesForAll );
         assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeys, citeKeyToBibEntry);
         assert (bibtexKeys.length == nRefMarks);
+
+        String[][] normCitMarkers =
+            normalizedCitationMarkersForNormalStyle( cEntriesForAll, entries, style );
 
         updateUniqueLetters(  bibtexKeys, normCitMarkers, uniqueLetters );
 
