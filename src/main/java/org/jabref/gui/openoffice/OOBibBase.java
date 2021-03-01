@@ -2152,16 +2152,6 @@ class OOBibBase {
             int[] firstLimAuthors = new int[nCitedEntries];
             String[] uniqueLetterForCitedEntry = new String[nCitedEntries];
 
-            // Not valid here, bibtexKeys may contain null:
-            // assertKeysInCiteKeyToBibEntry(bibtexKeys[i], citeKeyToBibEntry, referenceMarkName);
-
-            BibEntry[] cEntries =
-                Arrays.stream(cEntriesForAll[i])
-                .map(OOBibBase::undefinedBibentryToNull)
-                .toArray(BibEntry[]::new);
-            // ^^^ Note: pregenerated citMarkers used
-            // BibEntry[] cEntries = cEntriesForAll[i];
-
             for (int j = 0; j < nCitedEntries; j++) {
                 String currentKey = bibtexKeys[i][j]; // nullable
 
@@ -2190,16 +2180,20 @@ class OOBibBase {
                 }
             }
 
+            List<BibEntry> cEntries =
+                Arrays.stream(cEntriesForAll[i])
+                .map(OOBibBase::undefinedBibentryToNull)
+                .collect(Collectors.toList());
 
             citMarkers[i] =
                 style.getCitationMarker(
-                    Arrays.asList(cEntries),
+                    cEntries,
                     entries,
                     itcTypes[i] == OOBibBase.AUTHORYEAR_PAR,
                     uniqueLetterForCitedEntry,
                     firstLimAuthors
                     );
-        } // for i
+        }
 
         return citMarkers;
     }
