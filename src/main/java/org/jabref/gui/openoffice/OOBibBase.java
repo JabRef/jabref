@@ -1517,7 +1517,8 @@ class OOBibBase {
     assertKeysInCiteKeyToBibEntry(
         String[] keys, // citeKeys
         Map<String, BibEntry> citeKeyToBibEntry,
-        String referenceMarkName // for reporting
+        String referenceMarkName, // for reporting
+        String where
     )
         throws BibEntryNotFoundException {
 
@@ -1529,7 +1530,7 @@ class OOBibBase {
 
         for (String key : unresolvedKeys) {
             LOGGER.info("assertKeysInCiteKeyToBibEntry: Citation key not found: '" + key + '\'');
-            LOGGER.info("Problem with reference mark: '" + referenceMarkName + '\'');
+            LOGGER.info("Problem with reference mark: '" + referenceMarkName + "' "+ where);
             String msg =
                 Localization.lang(
                     "Could not resolve BibTeX entry"
@@ -1547,7 +1548,8 @@ class OOBibBase {
     assertAllKeysInCiteKeyToBibEntry(
         List<String> referenceMarkNames,
         String[][] bibtexKeys,
-        Map<String, BibEntry> citeKeyToBibEntry
+        Map<String, BibEntry> citeKeyToBibEntry,
+        String where
         )
         throws BibEntryNotFoundException {
 
@@ -1558,7 +1560,9 @@ class OOBibBase {
             assertKeysInCiteKeyToBibEntry(
                 bibtexKeys[i],
                 citeKeyToBibEntry,
-                referenceMarkNames.get(i));
+                referenceMarkNames.get(i),
+                where
+            );
         }
     }
 
@@ -1580,7 +1584,7 @@ class OOBibBase {
         final int nRefMarks = referenceMarkNames.size();
 
         assert nRefMarks == bibtexKeys.length;
-        assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeys, citeKeyToBibEntry);
+        assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeys, citeKeyToBibEntry, "produceCitationMarkersForIsCitationKeyCiteMarkers");
 
         String[] citMarkers = new String[nRefMarks];
         for (int i = 0; i < nRefMarks; i++) {
@@ -1686,7 +1690,7 @@ class OOBibBase {
 
         final int nRefMarks = referenceMarkNames.size();
         assert (nRefMarks == bibtexKeys.length);
-        assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeys, citeKeyToBibEntry);
+        assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeys, citeKeyToBibEntry, "produceCitationMarkersForIsNumberEntriesIsSortByPosition");
 
         String[] citMarkers = new String[nRefMarks];
 
@@ -2114,7 +2118,7 @@ class OOBibBase {
         final int nRefMarks = referenceMarkNames.size();
         assert (bibtexKeysIn.length == nRefMarks);
         assert (itcTypes.length == nRefMarks);
-        assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeysIn, citeKeyToBibEntry);
+        assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeysIn, citeKeyToBibEntry, "produceCitationMarkersForNormalStyle");
 
         BibEntry[][] cEntriesForAll =
             getBibEntriesSortedWithinReferenceMarks( bibtexKeysIn, citeKeyToBibEntry, style );
@@ -2147,7 +2151,8 @@ class OOBibBase {
             int[] firstLimAuthors = new int[nCitedEntries];
             String[] uniqueLetterForCitedEntry = new String[nCitedEntries];
 
-            assertKeysInCiteKeyToBibEntry(bibtexKeys[i], citeKeyToBibEntry, referenceMarkName);
+            // Not valid here, bibtexKeys may contain null:
+            // assertKeysInCiteKeyToBibEntry(bibtexKeys[i], citeKeyToBibEntry, referenceMarkName);
             BibEntry[] cEntries =
                 Arrays.stream(bibtexKeys[i])
                 .map(citeKeyToBibEntry::get)
@@ -2892,6 +2897,9 @@ class OOBibBase {
      *       With 3 citations, "Separate" left the 2nd and 3rd as "tmp".
      *       Three refresh corrected the 2nd.  The 4th refresh corrected the 3rd citation.
      *
+     * TODO: if the corresponding bib file is not open, this leaves a
+     *       mess: (1) reference marks with "tmp" i the text (2) with
+     *       reference mark name "JR_cite_1_", i.e. without citation key.
      */
     public void combineCiteMarkers(List<BibDatabase> databases, OOBibStyle style)
             throws IOException,
