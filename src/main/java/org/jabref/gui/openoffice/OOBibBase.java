@@ -2550,7 +2550,6 @@ class OOBibBase {
         );
 
         String refParaFormat =
-                (String) style.getProperty(OOBibStyle.REFERENCE_PARAGRAPH_FORMAT);
         insertFullReferenceAtCursor(documentConnection,
                 cursor,
                 entries,
@@ -2558,6 +2557,7 @@ class OOBibBase {
                 refParaFormat,
                 uniqueLetters
         );
+            (String) style.getProperty(OOBibStyle.REFERENCE_PARAGRAPH_FORMAT);
 
         insertBookMark(documentConnection, OOBibBase.BIB_SECTION_END_NAME, cursor);
     }
