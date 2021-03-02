@@ -2904,7 +2904,8 @@ class OOBibBase {
      * @param name Name of the reference mark to be created and also
      *             the name of the custom property holding the pageInfo part.
      */
-    private void insertReferenceMark(
+    private void
+    insertReferenceMark(
         DocumentConnection documentConnection,
         String name,
         String citationText,
@@ -2950,9 +2951,21 @@ class OOBibBase {
 
         documentConnection.insertReferenceMark(name, position);
 
-        // Are we sure that OOBibStyle.ET_AL_STRING cannot be part of author names
-        // in any language?
-        // TODO: could we move italicizing "et al." to a more proper place?
+        // Last minute editing: find "et al." (OOBibStyle.ET_AL_STRING) and
+        //                      format it as italic.
+
+        // Q: Are we sure that OOBibStyle.ET_AL_STRING cannot be part of author names
+        //    in any language?
+        // A: No, but have no examples either.
+
+        // Q: Are we sure, citText does not contain multiple "et al." strings?
+        // A: It *can* contain more than one.
+
+        // TODO: Could we move italicizing "et al." to a more proper place?
+        //       Maybe we could use POSTFORMATTER with "<i>...</i>"
+        //       That might make OOBibStyle.ITALIC_ET_AL superfluous.
+        // TODO: Handle multiple "et al." strings.
+
         // Check if we should italicize the "et al." string in citations:
         boolean italicize = style.getBooleanCitProperty(OOBibStyle.ITALIC_ET_AL);
         if (italicize) {
