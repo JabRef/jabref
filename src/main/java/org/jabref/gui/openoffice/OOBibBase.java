@@ -596,6 +596,50 @@ class OOBibBase {
             }
         }
 
+        /**
+         * Apply direct character format "Italic" to a range of text.
+         *
+         * Ref: https://www.openoffice.org/api/docs/common/ref/com/sun/star/style/CharacterProperties.html
+         */
+        private static void
+        setCharFormatItalic(XTextRange textRange)
+            throws
+            UnknownPropertyException,
+            PropertyVetoException,
+            WrappedTargetException {
+            XPropertySet xcp = unoQI(XPropertySet.class, textRange);
+            xcp.setPropertyValue("CharPosture", com.sun.star.awt.FontSlant.ITALIC);
+        }
+
+        /**
+         * Apply direct character format "Bold" to a range of text.
+         */
+        private static void
+        setCharFormatBold(XTextRange textRange)
+            throws
+            UnknownPropertyException,
+            PropertyVetoException,
+            WrappedTargetException {
+            XPropertySet xcp = unoQI(XPropertySet.class, textRange);
+            xcp.setPropertyValue("CharWeight", com.sun.star.awt.FontWeight.BOLD);
+        }
+
+        /**
+         *  Set language to [None]
+         *
+         *  Note: "zxx" is an https://en.wikipedia.org/wiki/ISO_639 code for
+         *        "No linguistic information at all"
+         */
+        private static void
+        setCharLocaleNone(XTextRange textRange)
+            throws
+            UnknownPropertyException,
+            PropertyVetoException,
+            WrappedTargetException {
+            XPropertySet xcp = unoQI(XPropertySet.class, textRange);
+            xcp.setPropertyValue("CharLocale", new Locale("zxx", "", ""));
+        }
+
     } // end DocumentConnection
 
     /**
@@ -2937,10 +2981,7 @@ class OOBibBase {
 
         if (withText) {
             position.setString(citText);
-            XPropertySet xCursorProps = unoQI(XPropertySet.class, position);
-
-            // Set language to [None]:
-            xCursorProps.setPropertyValue("CharLocale", new Locale("zxx", "", ""));
+            DocumentConnection.setCharLocaleNone(position);
             if (style.isFormatCitations()) {
                 String charStyle = style.getCitationCharacterFormat();
                 DocumentConnection.setCharStyle(position, charStyle);
@@ -3002,8 +3043,9 @@ class OOBibBase {
         cursor.goRight((short) start, false);
         cursor.goRight((short) (end - start), true);
 
-        XPropertySet xcp = unoQI(XPropertySet.class, cursor);
-        xcp.setPropertyValue("CharPosture", com.sun.star.awt.FontSlant.ITALIC);
+        DocumentConnection.setCharFormatItalic( cursor );
+        // XPropertySet xcp = unoQI(XPropertySet.class, cursor);
+        // xcp.setPropertyValue("CharPosture", com.sun.star.awt.FontSlant.ITALIC);
         // xcp.setPropertyValue("CharWeight", com.sun.star.awt.FontWeight.BOLD);
     }
 
