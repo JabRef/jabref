@@ -79,10 +79,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
                   .load()
                   .setAsDialogPane(this);
 
-        ControlHelper.setAction(generateButton, this.getDialogPane(), event -> {
-            viewModel.runFetcherWorker();
-            visualizer.initVisualization(viewModel.idFieldValidationStatus(), idTextField, true);
-        });
+        ControlHelper.setAction(generateButton, this.getDialogPane(), event -> viewModel.runFetcherWorker());
 
         setResultConverter(button -> {
             // The buttonType will always be cancel, even if we pressed one of the entry type buttons
@@ -174,6 +171,9 @@ public class EntryTypeView extends BaseDialog<EntryType> {
             }
         }
 
+        viewModel.idTextProperty().addListener((obs, oldValue, newValue) ->
+                visualizer.initVisualization(viewModel.idFieldValidationStatus(), idTextField, true));
+
         Platform.runLater(() -> idTextField.requestFocus());
     }
 
@@ -200,9 +200,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     }
 
     /**
-     * The description is originating from biblatex manual chapter 2
-     * Biblatex documentation is favored over the bibtex,
-     * since bibtex is a subset of biblatex and biblatex is better documented.
+     * The description is originating from biblatex manual chapter 2 Biblatex documentation is favored over the bibtex, since bibtex is a subset of biblatex and biblatex is better documented.
      */
     public static String getDescription(EntryType selectedType) {
         if (selectedType instanceof StandardEntryType) {
