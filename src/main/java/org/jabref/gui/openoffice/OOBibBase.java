@@ -2668,6 +2668,20 @@ class OOBibBase {
         documentConnection.xText.insertTextContent(textCursor, sectionTextContent, false);
     }
 
+    /**
+     *  @return An XNameAccess to find sections by name.
+     */
+    private XNameAccess
+    getTextSections(DocumentConnection documentConnection)
+        throws
+        WrappedTargetException,
+        IllegalArgumentException,
+        CreationException  {
+
+        XTextSectionsSupplier supplier =
+            unoQI(XTextSectionsSupplier.class, documentConnection.mxDoc);
+
+        return supplier.getTextSections();
     }
 
     /**
@@ -2699,19 +2713,6 @@ class OOBibBase {
             OOBibBase.BIB_SECTION_NAME,
             textCursor
             );
-    }
-
-    private XNameAccess
-    getTextSections(DocumentConnection documentConnection)
-        throws
-        WrappedTargetException,
-        IllegalArgumentException,
-        CreationException  {
-        // Check if the section exists:
-        XTextSectionsSupplier supplier =
-            unoQI(XTextSectionsSupplier.class, documentConnection.mxDoc);
-
-        return supplier.getTextSections();
     }
 
     /**
