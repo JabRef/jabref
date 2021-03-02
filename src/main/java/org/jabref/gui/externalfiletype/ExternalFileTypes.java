@@ -113,7 +113,8 @@ public class ExternalFileTypes {
      */
     public Optional<ExternalFileType> getExternalFileTypeByMimeType(String mimeType) {
         // Ignores parameters according to link: (https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types)
-        mimeType = mimeType.substring(0, mimeType.indexOf(';')).trim();
+        if(mimeType.indexOf(';') != -1)
+            mimeType = mimeType.substring(0, mimeType.indexOf(';')).trim();
         for (ExternalFileType type : externalFileTypes) {
             if (type.getMimeType().equalsIgnoreCase(mimeType)) {
                 return Optional.of(type);
