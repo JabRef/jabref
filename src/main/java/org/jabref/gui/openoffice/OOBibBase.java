@@ -1325,7 +1325,8 @@ class OOBibBase {
     /**
      * Extract citation keys from names of referenceMarks in the document.
      *
-     * Each citation key is listed only once, in the order of first appearance.
+     * Each citation key is listed only once, in the order of first appearance
+     * (in `names`, which itself is in arbitrary order)
      *
      * doc.referenceMarks.names.map(parse).flatten.unique
      */
@@ -2320,6 +2321,11 @@ class OOBibBase {
      *  with JabRef naming convention, get their visual positions,
      *
      *  @return JabRef reference mark names sorted by these positions.
+     *
+     *  Limitation: for two column layout visual (top-down,
+     *        left-right) order does not match the expected (textual)
+     *        order.
+     *
      */
     private List<String>
     getJabRefReferenceMarkNamesSortedByPosition(
@@ -2381,21 +2387,30 @@ class OOBibBase {
      *
      *  TODO: maybe we should pass around a fresh copy?
      */
-    public void updateSortedReferenceMarks()
-            throws WrappedTargetException,
-            NoSuchElementException,
-            NoDocumentException {
+    public void
+    updateSortedReferenceMarks()
+        throws
+        WrappedTargetException,
+        NoSuchElementException,
+        NoDocumentException {
+
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
+
         this.jabRefReferenceMarkNamesSortedByPosition =
-                getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
+            getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
     }
 
     /**
-     * GUI action
+     * GUI action, refreshes citation markers and bibliography.
      *
-     * @return unresolvedKeys
+     * @param databases Must have at least one.
+     * @param style
+     * @return List of unresolved citation keys.
+     *
+     * Note: calls updateSortedReferenceMarks();
      */
-    public List<String> updateDocumentActionHelper(
+    public List<String>
+    updateDocumentActionHelper(
         List<BibDatabase> databases,
         OOBibStyle style)
         throws
@@ -2410,13 +2425,23 @@ class OOBibBase {
         UndefinedCharacterFormatException,
         BibEntryNotFoundException,
         IOException {
+
         updateSortedReferenceMarks();
         List<String> unresolvedKeys = refreshCiteMarkers(databases, style);
         rebuildBibTextSection(databases, style);
         return unresolvedKeys;
     }
 
-    public void rebuildBibTextSection(
+    /**
+     * Rebuilds the bibliography.
+     *
+     * @param databases  Must have at least one.
+     *
+     *  Note: assumes fresh `jabRefReferenceMarkNamesSortedByPosition`
+     *  if `style.isSortByPosition()`
+     */
+    public void
+    rebuildBibTextSection(
         List<BibDatabase> databases,
         OOBibStyle style)
         throws
@@ -2428,53 +2453,79 @@ class OOBibBase {
         UnknownPropertyException,
         UndefinedParagraphFormatException,
         NoDocumentException {
+
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
 
         FindCitedEntriesResult fce =
-                findCitedEntries(
-                    findCitedKeys(documentConnection),
-                    databases
+            findCitedEntries(
+                findCitedKeys(documentConnection),
+                databases
                 );
 
         Map<BibEntry, BibDatabase> entries;
 
         if (style.isSortByPosition()) {
             // We need to sort the entries according to their order of appearance:
-            entries = sortEntriesByRefMarkNames(
+            entries =
+                sortEntriesByRefMarkNames(
                     jabRefReferenceMarkNamesSortedByPosition,
                     fce.citeKeyToBibEntry,
                     fce.entries
-            );
+                    );
         } else {
             entries = sortEntriesByComparator(fce.entries, entryComparator);
         }
+
         clearBibTextSectionContent2(documentConnection);
-        populateBibTextSection(documentConnection, entries, style, this.xUniqueLetters);
+
+        populateBibTextSection(
+            documentConnection,
+            entries,
+            style,
+            this.xUniqueLetters);
     }
 
+    /**
+     *  Return a TreeMap(entryComparator) copy of entries.
+     *
+     *  For sorting the bibliography.
+     */
     SortedMap<BibEntry, BibDatabase>
-    sortEntriesByComparator(Map<BibEntry, BibDatabase> entries,
-                            Comparator<BibEntry> entryComparator) {
+    sortEntriesByComparator(
+        Map<BibEntry, BibDatabase> entries,
+        Comparator<BibEntry> entryComparator
+        ) {
         SortedMap<BibEntry, BibDatabase> newMap = new TreeMap<>(entryComparator);
         for (Map.Entry<BibEntry, BibDatabase> kv : entries.entrySet()) {
-            newMap.put(kv.getKey(),
-                    kv.getValue());
+            newMap.put(
+                kv.getKey(),
+                kv.getValue());
         }
         return newMap;
     }
 
     /**
+     *  Return bibliography entries sorted according to the order of
+     *  first appearance in referenceMarkNames.
+     *
      * @param referenceMarkNames Names of reference marks.
      * @param citeKeyToBibEntry  Helps to find the entries
      * @return LinkedHashMap from BibEntry to BibDatabase with
-     * iteration order as first appearance in referenceMarkNames.
+     *         iteration order as first appearance in referenceMarkNames.
+     *
+     * Note: Within citation group (a reference mark) the order is
+     *       as appears there.
+     *
+     * TODO: The order within a reference mark name is decided on
+     *       construction. Is it updated after a style change?
+     *
      */
     private Map<BibEntry, BibDatabase>
-    sortEntriesByRefMarkNames(List<String> referenceMarkNames,
-                              Map<String, BibEntry> citeKeyToBibEntry,
-                              Map<BibEntry, BibDatabase> entries
-    ) {
-
+    sortEntriesByRefMarkNames(
+        List<String> referenceMarkNames,
+        Map<String, BibEntry> citeKeyToBibEntry,
+        Map<BibEntry, BibDatabase> entries
+        ) {
         // LinkedHashMap: iteration order is insertion-order, not
         // affected if a key is re-inserted.
         Map<BibEntry, BibDatabase> newList = new LinkedHashMap<>();
@@ -2505,19 +2556,32 @@ class OOBibBase {
     }
 
     /**
+     * Insert body of bibliography at `cursor`.
+     *
+     * @param documentConnection
+     * @param cursor  Where to
+     * @param entries Its iteration order defines order in bibliography.
+     * @param style
+     * @param parFormat
+     * @param uniqueLetters
+     *
      * Only called from populateBibTextSection (and that from rebuildBibTextSection)
      */
-    private void insertFullReferenceAtCursor(DocumentConnection documentConnection,
-                                             XTextCursor cursor,
-                                             Map<BibEntry, BibDatabase> entries,
-                                             OOBibStyle style,
-                                             String parFormat,
-                                             final Map<String, String> uniqueLetters)
-            throws UndefinedParagraphFormatException,
-            IllegalArgumentException,
-            UnknownPropertyException,
-            PropertyVetoException,
-            WrappedTargetException {
+    private void
+    insertFullReferenceAtCursor(
+        DocumentConnection documentConnection,
+        XTextCursor cursor,
+        Map<BibEntry, BibDatabase> entries,
+        OOBibStyle style,
+        String parFormat,
+        final Map<String, String> uniqueLetters
+        )
+        throws
+        UndefinedParagraphFormatException,
+        IllegalArgumentException,
+        UnknownPropertyException,
+        PropertyVetoException,
+        WrappedTargetException {
 
         int number = 1;
         for (Map.Entry<BibEntry, BibDatabase> entry : entries.entrySet()) {
@@ -2531,37 +2595,51 @@ class OOBibBase {
 
             // insert marker
             if (style.isNumberEntries()) {
-                // NOte: minGroupingCount is pointless here, we are
+                // Note: minGroupingCount is pointless here, we are
                 // formatting a single entry.
                 // int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
                 int minGroupingCount = 2;
                 List<Integer> numbers = Collections.singletonList(number++);
-                String marker = style.getNumCitationMarker(numbers,
+                String marker =
+                    style.getNumCitationMarker(
+                        numbers,
                         minGroupingCount,
                         true);
 
-                OOUtil.insertTextAtCurrentLocation(documentConnection.xText,
-                        cursor,
-                        marker,
-                        Collections.emptyList()
-                );
+                OOUtil.insertTextAtCurrentLocation(
+                    documentConnection.xText,
+                    cursor,
+                    marker,
+                    Collections.emptyList()
+                    );
             }
 
             // insert the actual details.
             Layout layout = style.getReferenceFormat(entry.getKey().getType());
             layout.setPostFormatter(POSTFORMATTER);
             OOUtil.insertFullReferenceAtCurrentLocation(
-                    documentConnection.xText,
-                    cursor,
-                    layout,
-                    parFormat,
-                    entry.getKey(),
-                    entry.getValue(),
-                    uniqueLetters.get(entry.getKey().getCitationKey().orElse(null))
-            );
+                documentConnection.xText,
+                cursor,
+                layout,
+                parFormat,
+                entry.getKey(),
+                entry.getValue(),
+                uniqueLetters.get(entry.getKey()
+                                  .getCitationKey()
+                                  .orElse(null))
+                );
         }
     }
 
+    /**
+     *  Create a text section with the provided name and insert it at
+     *  the provided cursor.
+     *
+     *  @param sectionName The desired name for the section.
+     *  @param textCursor  The location to insert at.
+     *
+     *  (This could move to DocumentConnection)
+     */
     private void
     createAndInsertSection(
         DocumentConnection documentConnection,
@@ -2590,10 +2668,19 @@ class OOBibBase {
         documentConnection.xText.insertTextContent(textCursor, xChildSection, false);
     }
 
-    private void createBibTextSection2(DocumentConnection documentConnection,
-                                       boolean end)
-            throws IllegalArgumentException,
-            CreationException {
+    /**
+     * Insert a paragraph break and creates a text section for the bibliography.
+     *
+     * @param end If true, insert at the end of the document.
+     *
+     */
+    private void
+    createBibTextSection2(
+        DocumentConnection documentConnection,
+        boolean end)
+        throws
+        IllegalArgumentException,
+        CreationException {
 
         XTextCursor textCursor = documentConnection.xText.createTextCursor();
         if (end) {
@@ -2604,6 +2691,7 @@ class OOBibBase {
         // If we do, what happens (or expected to happen) here?
 
         OOUtil.insertParagraphBreak(documentConnection.xText, textCursor);
+
         createAndInsertSection(
             documentConnection,
             OOBibBase.BIB_SECTION_NAME,
@@ -2624,7 +2712,12 @@ class OOBibBase {
         return supplier.getTextSections();
     }
 
-    private void clearBibTextSectionContent2(DocumentConnection documentConnection)
+    /**
+     *  Find and clear the text section OOBibBase.BIB_SECTION_NAME to "",
+     *  or create it.
+     */
+    private void
+    clearBibTextSectionContent2(DocumentConnection documentConnection)
         throws
         WrappedTargetException,
         IllegalArgumentException,
@@ -2640,6 +2733,7 @@ class OOBibBase {
             Any a = ((Any) ts.getByName(OOBibBase.BIB_SECTION_NAME));
             XTextSection section = (XTextSection) a.getObject();
             // Clear it:
+
             XTextCursor cursor =
                 documentConnection.xText.createTextCursorByRange(section.getAnchor());
 
