@@ -228,8 +228,6 @@ class OOBibBase {
          *        current document.
          *
          * @param value The value to be stored.
-         *
-         * @return The value of the property or Optional.empty()
          */
         private void
         setCustomProperty(String property, String value)
@@ -299,18 +297,17 @@ class OOBibBase {
         /**
          * Create a textcursor for a textContent.
          *
-         * @return null if makr is null, otherwise cursor.
+         * @return null if mark is null, otherwise cursor.
          */
         static XTextCursor
         getTextCursorOfTextContent(XTextContent mark) {
-            if ( mark == null ){
+            if (mark == null) {
                 return null;
             }
             XTextRange markAnchor = mark.getAnchor();
-            XTextCursor cursor =
+            return
                 markAnchor.getText()
                 .createTextCursorByRange(markAnchor);
-            return cursor;
         }
 
         /**
@@ -325,8 +322,7 @@ class OOBibBase {
             }
             try {
                 Object referenceMark = nameAccess.getByName(name);
-                XTextContent mark = unoQI(XTextContent.class, referenceMark);
-                return mark;
+                return unoQI(XTextContent.class, referenceMark);
             } catch (NoSuchElementException ex) {
                 LOGGER.warn(String.format(
                                 "nameAccessGetTextContentByName got NoSuchElementException"
@@ -350,8 +346,9 @@ class OOBibBase {
             XNameAccess xReferenceMarks = this.getReferenceMarks();
 
             if (xReferenceMarks.hasByName(name)) {
-                XTextContent mark = nameAccessGetTextContentByName( xReferenceMarks, name );
-                if ( mark == null ){
+                XTextContent mark =
+                        nameAccessGetTextContentByName(xReferenceMarks, name);
+                if (mark == null) {
                     return;
                 }
                 this.xText.removeTextContent(mark);
@@ -377,7 +374,6 @@ class OOBibBase {
             int charAfter,
             boolean htmlMarkup)
             throws
-            NoSuchElementException,
             WrappedTargetException,
             NoDocumentException {
 
@@ -466,8 +462,8 @@ class OOBibBase {
 
             XNameAccess xNamedBookmarks = this.getBookmarks();
             XTextContent xFoundBookmark =
-                nameAccessGetTextContentByName( xNamedBookmarks, name );
-            if (xFoundBookmark == null){
+                nameAccessGetTextContentByName(xNamedBookmarks, name);
+            if (xFoundBookmark == null) {
                 return null;
             }
             return xFoundBookmark.getAnchor();
@@ -1052,7 +1048,6 @@ class OOBibBase {
     public List<CitationEntry>
     getCitationEntries()
         throws
-        NoSuchElementException,
         UnknownPropertyException,
         WrappedTargetException,
         NoDocumentException {
@@ -1281,13 +1276,11 @@ class OOBibBase {
                 .insertString(cursor, " ", false);
 
             // format the space inserted
-            // TOOD: extract applyCharacterStyle()
             if (style.isFormatCitations()) {
-                XPropertySet xCursorProps = unoQI(XPropertySet.class, cursor);
                 String charStyle = style.getCitationCharacterFormat();
                 try {
                     DocumentConnection.setCharStyle(cursor, charStyle);
-                } catch (UndefinedCharacterFormatException ex ) {
+                } catch (UndefinedCharacterFormatException ex) {
                     // Setting the character format failed, so we
                     // throw an exception that will result in an
                     // error message for the user.
@@ -1302,8 +1295,8 @@ class OOBibBase {
             // go back to before the space
             cursor.goLeft((short) 1, false);
 
-            // Insert rerefence mark and text
-            //{
+            // Insert reference mark and text
+            // {
                 // Create a BibEntry to BibDatabase map (to make
                 // style.getCitationMarker happy?)
                 Map<BibEntry, BibDatabase> databaseMap = new HashMap<>();
@@ -1325,7 +1318,7 @@ class OOBibBase {
                         null);
                 insertReferenceMark(documentConnection, newName, citeText,
                                     cursor, withText, style);
-             //} // end of scope for databaseMap, citeText
+             // } // end of scope for databaseMap, citeText
 
             // Move to the right of the space and remember this
             // position: we will come back here in the end.
@@ -1577,7 +1570,6 @@ class OOBibBase {
         return cEntry;
     }
 
-
     /**
      * Checks that every element of `keys` can be found in `citeKeyToBibEntry`.
      *
@@ -1609,12 +1601,12 @@ class OOBibBase {
 
         for (String key : unresolvedKeys) {
             LOGGER.info("assertKeysInCiteKeyToBibEntry: Citation key not found: '" + key + '\'');
-            LOGGER.info("Problem with reference mark: '" + referenceMarkName + "' "+ where);
+            LOGGER.info("Problem with reference mark: '" + referenceMarkName + "' " + where);
             String msg =
                 Localization.lang(
                     "Could not resolve BibTeX entry"
                     + " for citation marker '%0'.",
-                    referenceMarkName );
+                    referenceMarkName);
             throw new BibEntryNotFoundException(referenceMarkName, msg);
         }
     }
@@ -1685,7 +1677,7 @@ class OOBibBase {
          * numbers : Remembers keys we have seen
          *           and what number did they receive.
          */
-        private Map<String, Integer> numbers;
+        private final Map<String, Integer> numbers;
 
         /**
          * The highest number we ever allocated.
@@ -1803,20 +1795,18 @@ class OOBibBase {
         Map<BibEntry, BibDatabase> entries
         ) {
 
-        // Citation keys, in the same order as sortedEntries
-        List<String> result = new ArrayList<>(entries.size());
-
         // Sort entries to order in bibliography
         Map<BibEntry, BibDatabase> sortedEntries =
             sortEntriesByComparator(entries, entryComparator);
 
+        // Citation keys, in the same order as sortedEntries
         return
             sortedEntries.keySet().stream()
             .map(
                 entry ->
                 entry.getCitationKey()
                 // entries came from looking up by citation key,
-                // so Optional.empty() is not possible here.
+                // so Optional.empty() is only possible here for UndefinedBibtexEntry.
                 .orElse(null)
                 )
             .collect(Collectors.toList());
@@ -1841,7 +1831,7 @@ class OOBibBase {
         String[] citMarkers = new String[nRefMarks];
 
         List<String> sortedCited =
-            citationKeysOrNullInBibliographyOrderFromEntries( entries );
+            citationKeysOrNullInBibliographyOrderFromEntries(entries);
 
         final int minGroupingCount =
             style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
@@ -1944,7 +1934,7 @@ class OOBibBase {
                 documentConnection.nameAccessGetTextContentByName(nameAccess, name);
 
             XTextCursor cursor =
-                documentConnection.getTextCursorOfTextContent(mark);
+                DocumentConnection.getTextCursorOfTextContent(mark);
 
             if (mustTestCharFormat) {
                 mustTestCharFormat = false; // need to do this only once
@@ -2058,7 +2048,7 @@ class OOBibBase {
      *   result[i][j] = cEntriesForAll[i][j].getCitationKey()
      */
     private String[][]
-    mapBibEntriesToCitationKeysOrNullForall( BibEntry[][] cEntriesForAll ) {
+    mapBibEntriesToCitationKeysOrNullForall(BibEntry[][] cEntriesForAll) {
         return
             Arrays.stream(cEntriesForAll)
             .map(cEntries ->
@@ -2082,8 +2072,8 @@ class OOBibBase {
      * Note: bibtexKeys[i][j] may be null (from UndefinedBibtexEntry)
      */
     void updateUniqueLetters(
-        String bibtexKeys[][],
-        String normCitMarkers[][],
+        String[][] bibtexKeys,
+        String[][] normCitMarkers,
         final Map<String, String> uniqueLetters
         ) {
 
@@ -2204,18 +2194,18 @@ class OOBibBase {
                                          "produceCitationMarkersForNormalStyle");
 
         BibEntry[][] cEntriesForAll =
-            getBibEntriesSortedWithinReferenceMarks( bibtexKeysIn, citeKeyToBibEntry, style );
+            getBibEntriesSortedWithinReferenceMarks(bibtexKeysIn, citeKeyToBibEntry, style);
 
         // Update bibtexKeys to match the new sorting (within each referenceMark)
-        String[][] bibtexKeys = mapBibEntriesToCitationKeysOrNullForall( cEntriesForAll );
+        String[][] bibtexKeys = mapBibEntriesToCitationKeysOrNullForall(cEntriesForAll);
         // Note: bibtexKeys[i][j] may be null, for UndefinedBibtexEntry
 
         assert (bibtexKeys.length == nRefMarks);
 
         String[][] normCitMarkers =
-            normalizedCitationMarkersForNormalStyle( cEntriesForAll, entries, style );
+            normalizedCitationMarkersForNormalStyle(cEntriesForAll, entries, style);
 
-        updateUniqueLetters(  bibtexKeys, normCitMarkers, uniqueLetters );
+        updateUniqueLetters(bibtexKeys, normCitMarkers, uniqueLetters);
 
         // Finally, go through all citation markers, and update
         // those referring to entries in our current list:
@@ -2226,7 +2216,6 @@ class OOBibBase {
 
         for (int i = 0; i < nRefMarks; i++) {
 
-            final String referenceMarkName = referenceMarkNames.get(i);
             final int nCitedEntries = bibtexKeys[i].length;
             int[] firstLimAuthors = new int[nCitedEntries];
             String[] uniqueLetterForCitedEntry = new String[nCitedEntries];
@@ -2252,11 +2241,10 @@ class OOBibBase {
                 }
 
                 String uniqueLetterForKey = uniqueLetters.get(currentKey);
-                if (uniqueLetterForKey == null) {
-                    uniqueLetterForCitedEntry[j] = "";
-                } else {
-                    uniqueLetterForCitedEntry[j] = uniqueLetterForKey;
-                }
+                uniqueLetterForCitedEntry[j] =
+                    (uniqueLetterForKey == null
+                     ? ""
+                     : uniqueLetterForKey);
             }
 
             List<BibEntry> cEntries =
@@ -2280,11 +2268,11 @@ class OOBibBase {
     /**
      * Refresh citation markers according to `style`.
      *
-     * - Requires an uptodate jabRefReferenceMarkNamesSortedByPosition
+     * - Requires an up-to-date jabRefReferenceMarkNamesSortedByPosition
      *
-     * @param documentConnection
+     * @param documentConnection Connection.
      * @param databases For look up by citation key. Must have at least one.
-     * @param style
+     * @param style     Style.
      * @param uniqueLetters Will be cleared and potentially filled with new values.
      */
     private List<String>
@@ -2377,11 +2365,11 @@ class OOBibBase {
     }
 
     /**
-     *  Given an XTextRange, return its position:
+     *  Given a location, return its position:
      *  coordinates relative to the top left position
      *   of the first page of the document.
      *
-     * @param range
+     * @param range  Location.
      * @param cursor To get the position, we need az XTextViewCursor.
      *               It will be moved to the range.
      */
@@ -2407,7 +2395,6 @@ class OOBibBase {
         DocumentConnection documentConnection)
         throws
         WrappedTargetException,
-        NoSuchElementException,
         NoDocumentException {
 
         List<String> names = getJabRefReferenceMarkNames(documentConnection);
@@ -2422,7 +2409,7 @@ class OOBibBase {
         for (String name : names) {
 
             XTextContent textContent =
-                documentConnection.nameAccessGetTextContentByName( nameAccess, name );
+                documentConnection.nameAccessGetTextContentByName(nameAccess, name);
             // unoQI(XTextContent.class, nameAccess.getByName(name));
 
             XTextRange range = textContent.getAnchor();
@@ -2434,7 +2421,7 @@ class OOBibBase {
                 // The footnote's anchor gives the correct position in the text:
                 range = footer.getAnchor();
             }
-            positions.add(findPositionOfTextRange(range,viewCursor));
+            positions.add(findPositionOfTextRange(range, viewCursor));
         }
         // restore cursor position
         viewCursor.gotoRange(initialPos, false);
@@ -2479,7 +2466,7 @@ class OOBibBase {
      * GUI action, refreshes citation markers and bibliography.
      *
      * @param databases Must have at least one.
-     * @param style
+     * @param style Style.
      * @return List of unresolved citation keys.
      *
      * Note: calls updateSortedReferenceMarks();
@@ -2633,11 +2620,11 @@ class OOBibBase {
     /**
      * Insert body of bibliography at `cursor`.
      *
-     * @param documentConnection
+     * @param documentConnection Connection.
      * @param cursor  Where to
      * @param entries Its iteration order defines order in bibliography.
-     * @param style
-     * @param parFormat
+     * @param style Style.
+     * @param parFormat Passed to OOUtil.insertFullReferenceAtCurrentLocation
      * @param uniqueLetters
      *
      * Only called from populateBibTextSection (and that from rebuildBibTextSection)
@@ -2753,9 +2740,7 @@ class OOBibBase {
     private XNameAccess
     getTextSections(DocumentConnection documentConnection)
         throws
-        WrappedTargetException,
-        IllegalArgumentException,
-        CreationException  {
+        IllegalArgumentException {
 
         XTextSectionsSupplier supplier =
             unoQI(XTextSectionsSupplier.class, documentConnection.mxDoc);
@@ -2809,7 +2794,7 @@ class OOBibBase {
         IllegalArgumentException,
         CreationException {
 
-        XNameAccess nameAccess = getTextSections( documentConnection );
+        XNameAccess nameAccess = getTextSections(documentConnection);
         if (!nameAccess.hasByName(OOBibBase.BIB_SECTION_NAME)) {
             createBibTextSection2(documentConnection, this.atEnd);
             return;
@@ -2957,7 +2942,7 @@ class OOBibBase {
             xCursorProps.setPropertyValue("CharLocale", new Locale("zxx", "", ""));
             if (style.isFormatCitations()) {
                 String charStyle = style.getCitationCharacterFormat();
-                DocumentConnection.setCharStyle( position, charStyle );
+                DocumentConnection.setCharStyle(position, charStyle);
             }
         } else {
             position.setString("");
@@ -3048,9 +3033,8 @@ class OOBibBase {
     private void testFormatCitations(XTextCursor textCursor, OOBibStyle style)
             throws UndefinedCharacterFormatException {
         String charStyle = style.getCitationCharacterFormat();
-        DocumentConnection.setCharStyle( textCursor, charStyle );
+        DocumentConnection.setCharStyle(textCursor, charStyle);
     }
-
 
     /**
      * GUI action
