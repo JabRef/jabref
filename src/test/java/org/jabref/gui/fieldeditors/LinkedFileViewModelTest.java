@@ -7,11 +7,13 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.gui.util.BackgroundTask;
@@ -24,6 +26,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
 
+import org.jabref.preferences.JabRefPreferences;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,13 +35,8 @@ import org.junit.jupiter.api.io.TempDir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 class LinkedFileViewModelTest {
 
@@ -62,7 +60,9 @@ class LinkedFileViewModelTest {
 
         when(externalFileType.getExternalFileTypeSelection()).thenReturn(new TreeSet<>(ExternalFileTypes.getDefaultExternalFileTypes()));
         when(externalFileType.getExternalFileTypeByMimeType("application/pdf")).thenReturn(Optional.of(StandardExternalFileType.PDF));
+        when(externalFileType.getExternalFileTypeByMimeType(contains("text/html"))).thenReturn(Optional.of(StandardExternalFileType.URL));
         when(externalFileType.getExternalFileTypeByExt("pdf")).thenReturn(Optional.of(StandardExternalFileType.PDF));
+        when(externalFileType.getExternalFileTypeByExt("html")).thenReturn(Optional.of(StandardExternalFileType.URL));
         tempFile = tempFolder.resolve("temporaryFile");
         Files.createFile(tempFile);
     }
@@ -149,6 +149,31 @@ class LinkedFileViewModelTest {
 
         assertFalse(removed);
         assertTrue(Files.exists(tempFile));
+    }
+
+    // Structure taken from deleteWhenDialogCancelledReturnsFalseAndDoesNotRemoveFile method
+    @Test
+    void downloadHtmlFileCausesWarningDisplay() throws MalformedURLException {
+        Globals.prefs = JabRefPreferences.getInstance(); // required for task execution
+
+        // From BibDatabaseContextTest::setUp
+        when(filePreferences.shouldStoreFilesRelativeToBib()).thenReturn(true);
+
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]"); // used in other tests in this class
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]"); // used in movesFileWithFileDirPattern at MoveFilesCleanupTest.java
+
+        databaseContext.setDatabasePath(tempFile);
+
+        URL url = new URL( "https://www.google.com/");
+        String fileType = StandardExternalFileType.URL.getName();
+        linkedFile = new LinkedFile(url, fileType);
+
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, xmpPreferences, filePreferences, externalFileType);
+
+        viewModel.download();
+
+        Pattern warningPattern = Pattern.compile(".*HTML.*", Pattern.CASE_INSENSITIVE);
+        verify(dialogService, atLeastOnce()).notify(matches(warningPattern));
     }
 
     void downloadDoesNotOverwriteFileTypeExtension() throws MalformedURLException {
