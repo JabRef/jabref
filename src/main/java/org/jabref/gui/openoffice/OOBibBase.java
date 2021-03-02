@@ -471,11 +471,58 @@ class OOBibBase {
         }
 
         /**
+         * Insert a new reference mark at the provided cursor
+         * position.
+         *
+         * The text in the cursor range will be the text with gray
+         * background.
+         *
+         * @param name     For the reference mark.
+         * @param position Cursor marking the location or range for
+         *                 the reference mark.
+         *
+         * Note: Almost identical to insertBookMark
+         */
+        public void
+        insertReferenceMark(
+            String name,
+            XTextCursor position
+            )
+            throws
+            CreationException {
+
+            Object bookmark;
+            try {
+                bookmark =
+                    this.mxDocFactory
+                    .createInstance("com.sun.star.text.ReferenceMark");
+            } catch (Exception e) {
+                throw new CreationException(e.getMessage());
+            }
+            // Name the reference
+            XNamed xNamed = unoQI(XNamed.class, bookmark);
+            xNamed.setName(name);
+
+            // get XTextContent interface
+            XTextContent xTextContent = unoQI(XTextContent.class, bookmark);
+
+            position.getText().insertTextContent(position, xTextContent, true);
+        }
+
+        /**
          * Insert a bookmark with the given name at the cursor provided.
          *
-         * @param name For the bookmark.
+         * @param name     For the bookmark.
          * @param position Cursor marking the location or range for
-         * the bookmark. If it is a range, its content will be replaced.
+         *                 the bookmark.
+         *
+         *                 If it is a range, its content will be
+         *                 replaced.
+         *                 TODO: I thought from insertTextContent doc,
+         *                 https://www.openoffice.org/api/docs/common/ref/
+         *                 com/sun/star/text/XText.html#insertTextContent
+         *                 that it will be. But it might depend on the
+         *                 type of textContent.
          */
         public void
         insertBookMark(
@@ -2639,6 +2686,8 @@ class OOBibBase {
      *  @param textCursor  The location to insert at.
      *
      *  (This could move to DocumentConnection)
+     *
+     *  TODO: c.f. DocumentConnection.insertBookMark and DocumentConnection.insertReferenceMark
      */
     private void
     createAndInsertSection(
@@ -2670,6 +2719,8 @@ class OOBibBase {
 
     /**
      *  @return An XNameAccess to find sections by name.
+     *
+     * TODO: c.f. DocumentConnection.getReferenceMarks and DocumentConnection.getBookmarks
      */
     private XNameAccess
     getTextSections(DocumentConnection documentConnection)
@@ -2870,18 +2921,6 @@ class OOBibBase {
             ? citationText
             : style.insertPageInfo(citationText, pageInfo);
 
-        Object bookmark;
-        try {
-            bookmark =
-                documentConnection.mxDocFactory
-                .createInstance("com.sun.star.text.ReferenceMark");
-        } catch (Exception e) {
-            throw new CreationException(e.getMessage());
-        }
-        // Name the reference
-        XNamed xNamed = unoQI(XNamed.class, bookmark);
-        xNamed.setName(name);
-
         if (withText) {
             position.setString(citText);
             XPropertySet xCursorProps = unoQI(XPropertySet.class, position);
@@ -2903,10 +2942,7 @@ class OOBibBase {
             position.setString("");
         }
 
-        // get XTextContent interface
-        XTextContent xTextContent = unoQI(XTextContent.class, bookmark);
-
-        position.getText().insertTextContent(position, xTextContent, true);
+        documentConnection.insertReferenceMark(name, position);
 
         // Are we sure that OOBibStyle.ET_AL_STRING cannot be part of author names
         // in any language?
