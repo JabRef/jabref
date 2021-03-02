@@ -2652,9 +2652,9 @@ class OOBibBase {
 
         // Create a new TextSection from the document factory
         // and access it's XNamed interface
-        XNamed xChildNamed;
+        XNamed sectionNamed;
         try {
-            xChildNamed =
+            sectionNamed =
                 unoQI(XNamed.class,
                       (documentConnection.mxDocFactory
                        .createInstance("com.sun.star.text.TextSection")));
@@ -2662,10 +2662,12 @@ class OOBibBase {
             throw new CreationException(e.getMessage());
         }
         // Set the new sections name to 'Child_Section'
-        xChildNamed.setName(sectionName);
+        sectionNamed.setName(sectionName);
         // Access the Child_Section's XTextContent interface and insert it into the document
-        XTextContent xChildSection = unoQI(XTextContent.class, xChildNamed);
-        documentConnection.xText.insertTextContent(textCursor, xChildSection, false);
+        XTextContent sectionTextContent = unoQI(XTextContent.class, sectionNamed);
+        documentConnection.xText.insertTextContent(textCursor, sectionTextContent, false);
+    }
+
     }
 
     /**
