@@ -1982,7 +1982,8 @@ class OOBibBase {
 
             if (mustTestCharFormat) {
                 mustTestCharFormat = false; // need to do this only once
-                testFormatCitations(cursor, style);
+                String charStyle = style.getCitationCharacterFormat();
+                DocumentConnection.setCharStyle(cursor, charStyle);
             }
 
             documentConnection.xText.removeTextContent(mark);
@@ -3085,12 +3086,6 @@ class OOBibBase {
         return entries;
     }
 
-    private void testFormatCitations(XTextCursor textCursor, OOBibStyle style)
-            throws UndefinedCharacterFormatException {
-        String charStyle = style.getCitationCharacterFormat();
-        DocumentConnection.setCharStyle(textCursor, charStyle);
-    }
-
     /**
      * GUI action
      *
@@ -3191,7 +3186,8 @@ class OOBibBase {
             // marks are removed, preventing damage to the user's
             // document:
             if (style.isFormatCitations()) {
-                testFormatCitations(textCursor, style);
+                String charStyle = style.getCitationCharacterFormat();
+                DocumentConnection.setCharStyle(textCursor, charStyle);
             }
 
             /*
@@ -3301,7 +3297,8 @@ class OOBibBase {
             // marks are removed, preventing damage to the user's
             // document:
             if (style.isFormatCitations()) {
-                testFormatCitations(textCursor, style);
+                String charStyle = style.getCitationCharacterFormat();
+                DocumentConnection.setCharStyle(textCursor, charStyle);
             }
 
             List<String> keys = parseRefMarkNameToUniqueCitationKeys(names.get(pivot));
