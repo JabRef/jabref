@@ -2726,14 +2726,14 @@ class OOBibBase {
         IllegalArgumentException,
         CreationException {
 
-        XNameAccess ts = getTextSections( documentConnection );
-        if (!ts.hasByName(OOBibBase.BIB_SECTION_NAME)) {
+        XNameAccess nameAccess = getTextSections( documentConnection );
+        if (!nameAccess.hasByName(OOBibBase.BIB_SECTION_NAME)) {
             createBibTextSection2(documentConnection, this.atEnd);
             return;
         }
 
         try {
-            Any a = ((Any) ts.getByName(OOBibBase.BIB_SECTION_NAME));
+            Any a = ((Any) nameAccess.getByName(OOBibBase.BIB_SECTION_NAME));
             XTextSection section = (XTextSection) a.getObject();
             // Clear it:
 
@@ -2747,8 +2747,8 @@ class OOBibBase {
             // methods of collections, if the addressed child does
             // not exist.
 
-            // We got this exception from ts.getByName() despite
-            // the ts.hasByName() check just above.
+            // We got this exception from nameAccess.getByName() despite
+            // the nameAccess.hasByName() check just above.
 
             // Try to create.
             LOGGER.warn("Could not get section '" + OOBibBase.BIB_SECTION_NAME + "'", ex);
