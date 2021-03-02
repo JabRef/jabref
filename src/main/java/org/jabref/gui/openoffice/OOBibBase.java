@@ -2689,6 +2689,7 @@ class OOBibBase {
      *
      * @param end If true, insert at the end of the document.
      *
+     * Only called from `clearBibTextSectionContent2`
      */
     private void
     createBibTextSection2(
@@ -2718,6 +2719,9 @@ class OOBibBase {
     /**
      *  Find and clear the text section OOBibBase.BIB_SECTION_NAME to "",
      *  or create it.
+     *
+     * Only called from: `rebuildBibTextSection`
+     *
      */
     private void
     clearBibTextSectionContent2(DocumentConnection documentConnection)
@@ -2757,7 +2761,7 @@ class OOBibBase {
     }
 
     /**
-     * Only called from: rebuildBibTextSection
+     * Only called from: `rebuildBibTextSection`
      *
      * Assumes the section named `OOBibBase.BIB_SECTION_NAME` exists.
      */
@@ -2832,28 +2836,35 @@ class OOBibBase {
      *  Insert a reference mark.
      *
      * @param documentConnection Connection to a document.
+     *
      * @param name Name of the reference mark to be created and also
-     *        the name of the custom property holding the pageInfo part.
+     *             the name of the custom property holding the pageInfo part.
      */
-    private void insertReferenceMark(DocumentConnection documentConnection,
-                                     String name,
-                                     String citationText,
-                                     XTextCursor position,
-                                     boolean withText,
-                                     OOBibStyle style)
-            throws UnknownPropertyException,
-            WrappedTargetException,
-            PropertyVetoException,
-            IllegalArgumentException,
-            UndefinedCharacterFormatException,
-            CreationException {
-        // TODO: last minute editing is hacky. Move pageInfo stuff to
-        //  citation marker generation.
-        // If there is "page info" for this citation, insert it into
-        // the citation text before inserting the citation:
+    private void insertReferenceMark(
+        DocumentConnection documentConnection,
+        String name,
+        String citationText,
+        XTextCursor position,
+        boolean withText,
+        OOBibStyle style
+        )
+        throws
+        UnknownPropertyException,
+        WrappedTargetException,
+        PropertyVetoException,
+        IllegalArgumentException,
+        UndefinedCharacterFormatException,
+        CreationException {
+
+        // Last minute editing: If there is "page info" for this
+        // citation mark, inject it into the citation marker before
+        // inserting.
+
+        // TODO: Consider moving pageInfo stuff to citation marker
+        //       generation.
         String citText;
         String pageInfo =
-                getPageInfoForReferenceMarkName(documentConnection, name);
+            getPageInfoForReferenceMarkName(documentConnection, name);
         citText =
             pageInfo.isEmpty()
             ? citationText
@@ -2862,8 +2873,8 @@ class OOBibBase {
         Object bookmark;
         try {
             bookmark =
-                    documentConnection.mxDocFactory
-                            .createInstance("com.sun.star.text.ReferenceMark");
+                documentConnection.mxDocFactory
+                .createInstance("com.sun.star.text.ReferenceMark");
         } catch (Exception e) {
             throw new CreationException(e.getMessage());
         }
