@@ -102,8 +102,6 @@ class OOBibBase {
     private static final Pattern CITE_PATTERN =
             Pattern.compile(BIB_CITATION + "(\\d*)_(\\d*)_(.*)");
 
-    private static final String CHAR_STYLE_NAME = "CharStyleName";
-
     /* Types of in-text citation. (itcType)
      * Their numeric values are used in reference mark names.
      */
@@ -125,6 +123,11 @@ class OOBibBase {
      * Document-connection related variables.
      */
     private static class DocumentConnection {
+        /** https://wiki.openoffice.org/wiki/Documentation/BASIC_Guide/Structure_of_Text_Documents#Character_Properties
+         *  "CharStyleName" is an OpenOffice Property name.
+         */
+        private static final String CHAR_STYLE_NAME = "CharStyleName";
+
         public XMultiServiceFactory mxDocFactory;
         public XTextDocument mxDoc;
         public XText xText;
@@ -568,6 +571,35 @@ class OOBibBase {
                     ((Any) supplier.getTextSections().getByName(name))
                     .getObject());
         }
+
+        /**
+         *  Apply a character style to a range of text selected by a
+         *  cursor.
+         *
+         * @param position  The range to apply to.
+         * @param charStyle Name of the character style as known by Openoffice.
+         */
+        private static void
+        setCharStyle(
+            XTextCursor position,
+            String charStyle
+            )
+            throws UndefinedCharacterFormatException {
+
+            XPropertySet xCursorProps = unoQI(XPropertySet.class, position);
+
+            try {
+                xCursorProps.setPropertyValue(CHAR_STYLE_NAME, charStyle);
+            } catch (UnknownPropertyException
+                     | PropertyVetoException
+                     | IllegalArgumentException
+                     | WrappedTargetException ex) {
+                throw new UndefinedCharacterFormatException(charStyle);
+                // Setting the character format failed, so we throw an exception that
+                // will result in an error message for the user:
+            }
+        }
+
     } // end DocumentConnection
 
     /**
@@ -1254,12 +1286,8 @@ class OOBibBase {
                 XPropertySet xCursorProps = unoQI(XPropertySet.class, cursor);
                 String charStyle = style.getCitationCharacterFormat();
                 try {
-                    xCursorProps.setPropertyValue(CHAR_STYLE_NAME, charStyle);
-                } catch (UnknownPropertyException
-                        | PropertyVetoException
-                        | IllegalArgumentException
-                        | WrappedTargetException ex
-                ) {
+                    DocumentConnection.setCharStyle(cursor, charStyle);
+                } catch (UndefinedCharacterFormatException ex ) {
                     // Setting the character format failed, so we
                     // throw an exception that will result in an
                     // error message for the user.
@@ -2929,14 +2957,7 @@ class OOBibBase {
             xCursorProps.setPropertyValue("CharLocale", new Locale("zxx", "", ""));
             if (style.isFormatCitations()) {
                 String charStyle = style.getCitationCharacterFormat();
-                try {
-                    xCursorProps.setPropertyValue(CHAR_STYLE_NAME, charStyle);
-                } catch (UnknownPropertyException
-                        | PropertyVetoException
-                        | IllegalArgumentException
-                        | WrappedTargetException ex) {
-                    throw new UndefinedCharacterFormatException(charStyle);
-                }
+                DocumentConnection.setCharStyle( position, charStyle );
             }
         } else {
             position.setString("");
@@ -3026,19 +3047,10 @@ class OOBibBase {
 
     private void testFormatCitations(XTextCursor textCursor, OOBibStyle style)
             throws UndefinedCharacterFormatException {
-        XPropertySet xCursorProps = unoQI(XPropertySet.class, textCursor);
         String charStyle = style.getCitationCharacterFormat();
-        try {
-            xCursorProps.setPropertyValue(CHAR_STYLE_NAME, charStyle);
-        } catch (UnknownPropertyException
-                | PropertyVetoException
-                | IllegalArgumentException
-                | WrappedTargetException ex) {
-            // Setting the character format failed, so we throw an exception that
-            // will result in an error message for the user:
-            throw new UndefinedCharacterFormatException(charStyle);
-        }
+        DocumentConnection.setCharStyle( textCursor, charStyle );
     }
+
 
     /**
      * GUI action
