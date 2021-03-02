@@ -1,5 +1,8 @@
 package org.jabref.gui.fieldeditors;
 
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -8,6 +11,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
+import java.util.List;
 
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
@@ -27,11 +31,13 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
 
 import org.jabref.preferences.JabRefPreferences;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -65,6 +71,15 @@ class LinkedFileViewModelTest {
         when(externalFileType.getExternalFileTypeByExt("html")).thenReturn(Optional.of(StandardExternalFileType.URL));
         tempFile = tempFolder.resolve("temporaryFile");
         Files.createFile(tempFile);
+
+        CookieManager cookieManager = new CookieManager();
+        CookieHandler.setDefault(cookieManager);
+        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
+    }
+
+    @AfterEach
+    void tearDown() {
+        CookieManager.setDefault(null);
     }
 
     @Test
@@ -192,6 +207,38 @@ class LinkedFileViewModelTest {
         });
         task.onFailure(Assertions::fail);
         new CurrentThreadTaskExecutor().execute(task);
+    }
+
+    @Test
+    void downloadHtmlWhenLinkedFilePointsToHtml(@TempDir Path tempDir) throws MalformedURLException{
+        // the link mentioned in issue #7452
+        String url = "https://onlinelibrary.wiley.com/doi/abs/10.1002/0470862106.ia615";
+        String fileType = StandardExternalFileType.URL.getName();
+        linkedFile = new LinkedFile(new URL(url), fileType);
+
+        Globals.prefs = JabRefPreferences.getInstance();
+
+        when(filePreferences.shouldStoreFilesRelativeToBib()).thenReturn(true);
+
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
+
+        databaseContext.setDatabasePath(tempFile);
+
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, xmpPreferences, filePreferences, externalFileType);
+
+        viewModel.download();
+
+        List<LinkedFile> linkedFiles = entry.getFiles();
+
+        for(LinkedFile file: linkedFiles) {
+            if (file.getLink().equalsIgnoreCase("Misc/asdf.html")) {
+                assertEquals("URL", file.getFileType());
+                return;
+            }
+        }
+        // If the file was not found among the linked files to the entry
+        fail();
     }
 
     @Test
