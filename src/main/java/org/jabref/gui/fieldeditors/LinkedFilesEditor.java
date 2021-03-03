@@ -20,7 +20,11 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
@@ -150,9 +154,17 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         progressIndicator.progressProperty().bind(linkedFile.downloadProgressProperty());
         progressIndicator.visibleProperty().bind(linkedFile.downloadOngoingProperty());
 
+
+        Text auto = new Text();
+        auto.visibleProperty().bind(linkedFile.isAutomaticallyFoundProperty());
+        auto.managedProperty().bind(linkedFile.isAutomaticallyFoundProperty());
+        auto.setText("(Auto)");
+        auto.getStyleClass().setAll("file-row-text");
+
         HBox info = new HBox(8);
         info.setStyle("-fx-padding: 0.5em 0 0.5em 0;"); // To align with buttons below which also have 0.5em padding
-        info.getChildren().setAll(icon, link, desc, progressIndicator);
+        info.getChildren().setAll(icon, auto, link, desc, progressIndicator);
+
 
         Button acceptAutoLinkedFile = IconTheme.JabRefIcons.AUTO_LINKED_FILE.asButton();
         acceptAutoLinkedFile.setTooltip(new Tooltip(Localization.lang("This file was found automatically. Do you want to link it to this entry?")));
@@ -168,6 +180,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         HBox container = new HBox(10);
         container.setPrefHeight(Double.NEGATIVE_INFINITY);
+
 
         container.getChildren().addAll(info, acceptAutoLinkedFile, writeXMPMetadata);
 
