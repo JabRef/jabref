@@ -349,7 +349,7 @@ public class JabRefPreferences implements PreferencesService {
     // User
     private static final String USER_ID = "userId";
     private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
-    private final String USER_NAME;
+    private String userName;
 
     // Telemetry collection
     private static final String COLLECT_TELEMETRY = "collectTelemetry";
@@ -680,7 +680,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(FX_THEME, Theme.BASE_CSS);
 
         setLanguageDependentDefaultValues();
-        USER_NAME = getUserName();
     }
 
     /**
@@ -766,7 +765,16 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public String getUser() {
-        return USER_NAME;
+        if (StringUtil.isNotBlank(userName))
+            return userName;
+
+        try {
+            userName = get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
+            return userName;
+        } catch (UnknownHostException ex) {
+            LOGGER.error("Hostname not found.", ex);
+            return get(DEFAULT_OWNER);
+        }
     }
 
     public void setLanguageDependentDefaultValues() {
@@ -784,15 +792,6 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(CUSTOM_TAB_NAME + "_def2", Localization.lang("Comments"));
 
         defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
-    }
-
-    private String getUserName() {
-        try {
-            return get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException ex) {
-            LOGGER.debug("Hostname not found.", ex);
-            return get(DEFAULT_OWNER);
-        }
     }
 
     /**
