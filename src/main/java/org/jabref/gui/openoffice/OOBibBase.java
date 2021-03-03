@@ -3392,12 +3392,24 @@ class OOBibBase {
     }
 
     /**
-     * Used from GUI.
+     * Used from GUI: "Export cited"
+     *
+     * @param databases The databases to look up the citation keys in the document from.
+     * @result A new database, with cloned entries.
+     *
+     * If a key is not found, it is silently ignored.
+     *
+     * Cross references (in StandardField.CROSSREF) are followed (not recursively):
+     * if the referenced entry is found, it is included in the result.
+     * If it is not found, it is silently ignored.
      */
-    public BibDatabase generateDatabase(List<BibDatabase> databases)
-            throws NoSuchElementException,
-            WrappedTargetException,
-            NoDocumentException {
+    public BibDatabase
+    generateDatabase(List<BibDatabase> databases)
+        throws
+        NoSuchElementException,
+        WrappedTargetException,
+        NoDocumentException {
+
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
 
         BibDatabase resultDatabase = new BibDatabase();
@@ -3443,12 +3455,21 @@ class OOBibBase {
                     // Be happy with the first found BibEntry and move on to next key
                     break;
             }
+            // key not found here. No action.
         }
 
         resultDatabase.insertEntries(entriesToInsert);
         return resultDatabase;
     }
 
+    /**
+     * A reference mark name paired with its visual position.
+     *
+     * Comparison is based on (Y,X): vertical compared first, horizontal second.
+     *
+     * Used for sorting reference marks by their visual positions.
+     *
+     */
     private static class ComparableMark implements Comparable<ComparableMark> {
 
         private final String name;
