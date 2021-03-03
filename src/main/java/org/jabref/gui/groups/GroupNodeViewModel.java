@@ -1,7 +1,6 @@
 package org.jabref.gui.groups;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,7 +20,6 @@ import javafx.scene.paint.Color;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.icon.InternalMaterialDesignIcon;
 import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -41,10 +39,8 @@ import org.jabref.model.groups.TexGroup;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 
-import com.google.common.base.Enums;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableList;
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 
 public class GroupNodeViewModel {
 
@@ -213,9 +209,7 @@ public class GroupNodeViewModel {
     }
 
     private Optional<JabRefIcon> parseIcon(String iconCode) {
-        return Enums.getIfPresent(MaterialDesignIcon.class, iconCode.toUpperCase(Locale.ENGLISH))
-                    .toJavaUtil()
-                    .map(icon -> new InternalMaterialDesignIcon(getColor(), icon));
+        return IconTheme.findIcon(iconCode, getColor());
     }
 
     public ObservableList<GroupNodeViewModel> getChildren() {

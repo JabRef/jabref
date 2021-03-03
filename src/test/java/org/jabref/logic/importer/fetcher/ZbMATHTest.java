@@ -8,7 +8,6 @@ import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -44,7 +43,7 @@ class ZbMATHTest {
         donaldsonEntry.setField(StandardField.TITLE, "An application of gauge theory to four dimensional topology");
         donaldsonEntry.setField(StandardField.VOLUME, "18");
         donaldsonEntry.setField(StandardField.YEAR, "1983");
-        donaldsonEntry.setField(new UnknownField("zbl"), "0507.57010");
+        donaldsonEntry.setField(StandardField.ZBL_NUMBER, "0507.57010");
     }
 
     @Test
@@ -57,5 +56,34 @@ class ZbMATHTest {
     void searchByIdFindsEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0507.57010");
         assertEquals(Optional.of(donaldsonEntry), fetchedEntry);
+    }
+
+    @Test
+    void searchByEntryFindsEntry() throws Exception {
+        BibEntry searchEntry = new BibEntry();
+        searchEntry.setField(StandardField.TITLE, "An application of gauge theory to four dimensional topology");
+        searchEntry.setField(StandardField.AUTHOR, "S. K. {Donaldson}");
+
+        List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
+        assertEquals(Collections.singletonList(donaldsonEntry), fetchedEntries);
+    }
+
+    @Test
+    void searchByNoneEntryFindsNothing() throws Exception {
+        BibEntry searchEntry = new BibEntry();
+        searchEntry.setField(StandardField.TITLE, "t");
+        searchEntry.setField(StandardField.AUTHOR, "a");
+
+        List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
+        assertEquals(Collections.emptyList(), fetchedEntries);
+    }
+
+    @Test
+    void searchByIdInEntryFindsEntry() throws Exception {
+        BibEntry searchEntry = new BibEntry();
+        searchEntry.setField(StandardField.ZBL_NUMBER, "0507.57010");
+
+        List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
+        assertEquals(Collections.singletonList(donaldsonEntry), fetchedEntries);
     }
 }

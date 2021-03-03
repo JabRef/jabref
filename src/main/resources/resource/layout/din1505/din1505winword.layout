@@ -1,5 +1,5 @@
-{[\Bibtexkey]:}	
-{\\scaps \format[RTFChars,AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}}
+{[\Bibtexkey]:}
+{\\scaps \format[Authors(Authors(LastFirst,Semicolon,Amp),RTFChars]{\author}}
 : \format[RTFChars]{\title}}
 \begin{journal}
 . In:
@@ -7,7 +7,7 @@
 \end{journal}
 \begin{editor}
 . In:
- {\\scaps \format[RTFChars,AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\editor}} (Hrsg.)
+ {\\scaps \format[Authors(Authors(LastFirst,Semicolon,Amp),RTFChars]{\editor}} (Hrsg.)
 \end{editor}
 \begin{organization}
 , \format[RTFChars]{\organization}
