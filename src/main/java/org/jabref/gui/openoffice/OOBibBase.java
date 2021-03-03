@@ -3374,6 +3374,8 @@ class OOBibBase {
                         style);
                 textCursor.collapseToEnd();
                 if (i != last) {
+                    // TODO: space between citation markers: what style?
+                    // DocumentConnection.setCharStyle(textCursor, "Standard");
                     textCursor.setString(" ");
                     textCursor.collapseToEnd();
                 }
