@@ -20,11 +20,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
@@ -180,7 +176,6 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         HBox container = new HBox(10);
         container.setPrefHeight(Double.NEGATIVE_INFINITY);
-
 
         container.getChildren().addAll(info, acceptAutoLinkedFile, writeXMPMetadata);
 
