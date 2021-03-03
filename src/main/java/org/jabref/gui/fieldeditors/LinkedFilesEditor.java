@@ -150,7 +150,6 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         progressIndicator.progressProperty().bind(linkedFile.downloadProgressProperty());
         progressIndicator.visibleProperty().bind(linkedFile.downloadOngoingProperty());
 
-
         Text auto = new Text();
         auto.visibleProperty().bind(linkedFile.isAutomaticallyFoundProperty());
         auto.managedProperty().bind(linkedFile.isAutomaticallyFoundProperty());
@@ -160,7 +159,6 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         HBox info = new HBox(8);
         info.setStyle("-fx-padding: 0.5em 0 0.5em 0;"); // To align with buttons below which also have 0.5em padding
         info.getChildren().setAll(icon, auto, link, desc, progressIndicator);
-
 
         Button acceptAutoLinkedFile = IconTheme.JabRefIcons.AUTO_LINKED_FILE.asButton();
         acceptAutoLinkedFile.setTooltip(new Tooltip(Localization.lang("This file was found automatically. Do you want to link it to this entry?")));
