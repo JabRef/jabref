@@ -56,6 +56,7 @@ class LinkedFileViewModelTest {
     private final ExternalFileTypes externalFileType = mock(ExternalFileTypes.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final XmpPreferences xmpPreferences = mock(XmpPreferences.class);
+    private CookieManager cookieManager;
 
     @BeforeEach
     void setUp(@TempDir Path tempFolder) throws Exception {
@@ -73,14 +74,19 @@ class LinkedFileViewModelTest {
         tempFile = tempFolder.resolve("temporaryFile");
         Files.createFile(tempFile);
 
-        CookieManager cookieManager = new CookieManager();
-        CookieHandler.setDefault(cookieManager);
+        // Check if there exists a system wide cookie handler
+        if (CookieHandler.getDefault() == null) {
+            cookieManager = new CookieManager();
+            CookieHandler.setDefault(cookieManager);
+        } else {
+            cookieManager = (CookieManager) CookieHandler.getDefault();
+        }
         cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
     }
 
     @AfterEach
     void tearDown() {
-        CookieManager.setDefault(null);
+        cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_NONE);
     }
 
     @Test
@@ -211,7 +217,7 @@ class LinkedFileViewModelTest {
     }
 
     @Test
-    void downloadHtmlWhenLinkedFilePointsToHtml(@TempDir Path tempDir) throws MalformedURLException{
+    void downloadHtmlWhenLinkedFilePointsToHtml() throws MalformedURLException{
         // the link mentioned in issue #7452
         String url = "https://onlinelibrary.wiley.com/doi/abs/10.1002/0470862106.ia615";
         String fileType = StandardExternalFileType.URL.getName();
