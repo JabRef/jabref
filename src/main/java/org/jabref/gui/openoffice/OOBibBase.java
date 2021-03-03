@@ -3219,11 +3219,12 @@ class OOBibBase {
             // way we can throw an exception before any reference
             // marks are removed, preventing damage to the user's
             // document:
-            if (style.isFormatCitations()) {
             // Q: we may have zero characters selected. Is this a valied test
             //    in this case?
+            if (style.isFormatCitations() && !setCharStyleTested) {
                 String charStyle = style.getCitationCharacterFormat();
                 DocumentConnection.setCharStyle(textCursor, charStyle);
+                setCharStyleTested = true;
             }
 
             /*
@@ -3323,6 +3324,7 @@ class OOBibBase {
 
         int pivot = 0;
         boolean madeModifications = false;
+        boolean setCharStyleTested = false;
         XNameAccess nameAccess = documentConnection.getReferenceMarks();
 
         while (pivot < (names.size())) {
@@ -3339,9 +3341,10 @@ class OOBibBase {
             // way we can throw an exception before any reference
             // marks are removed, preventing damage to the user's
             // document:
-            if (style.isFormatCitations()) {
+            if (style.isFormatCitations() && ! setCharStyleTested ) {
                 String charStyle = style.getCitationCharacterFormat();
                 DocumentConnection.setCharStyle(textCursor, charStyle);
+                setCharStyleTested = true;
             }
 
             List<String> keys = parseRefMarkNameToUniqueCitationKeys(names.get(pivot));
