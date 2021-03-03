@@ -29,6 +29,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - The export to MS Office XML now uses the month name for the field `MonthAcessed` instead of the two digit number [#7354](https://github.com/JabRef/jabref/issues/7354)
 - We included some standalone dialogs from the options menu in the main preference dialog and fixed some visual issues in the preferences dialog. [#7384](https://github.com/JabRef/jabref/pull/7384)
 - We improved the linking of the `python3` interpreter via the shebang to dynamically use the systems default Python. Related to [JabRef-Browser-Extension #177](https://github.com/JabRef/JabRef-Browser-Extension/issues/177)
+- We simplified the select entry type form by splitting it into two parts ("Recommended" and "Others") based on internal usage data. [#6730](https://github.com/JabRef/jabref/issues/6730)
 
 ### Fixed
 

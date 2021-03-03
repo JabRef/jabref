@@ -3,6 +3,7 @@ package org.jabref.gui;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -51,13 +52,13 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     @FXML private TextField idTextField;
     @FXML private ComboBox<IdBasedFetcher> idBasedFetchers;
     @FXML private FlowPane biblatexPane;
-    @FXML private FlowPane bibTexPane;
-    @FXML private FlowPane ieeetranPane;
+    @FXML private FlowPane recommendedEntriesPane;
+    @FXML private FlowPane otherEntriesPane;
     @FXML private FlowPane customPane;
     @FXML private FlowPane biblatexSoftwarePane;
     @FXML private TitledPane biblatexTitlePane;
-    @FXML private TitledPane bibTexTitlePane;
-    @FXML private TitledPane ieeeTranTitlePane;
+    @FXML private TitledPane recommendedEntriesTitlePane;
+    @FXML private TitledPane otherEntriesTitlePane;
     @FXML private TitledPane customTitlePane;
     @FXML private TitledPane biblatexSoftwareTitlePane;
 
@@ -138,18 +139,26 @@ public class EntryTypeView extends BaseDialog<EntryType> {
 
         // we set the managed property so that they will only be rendered when they are visble so that the Nodes only take the space when visible
         // avoids removing and adding from the scence graph
-        bibTexTitlePane.managedProperty().bind(bibTexTitlePane.visibleProperty());
-        ieeeTranTitlePane.managedProperty().bind(ieeeTranTitlePane.visibleProperty());
+        recommendedEntriesTitlePane.managedProperty().bind(recommendedEntriesTitlePane.visibleProperty());
+        otherEntriesTitlePane.managedProperty().bind(otherEntriesTitlePane.visibleProperty());
         biblatexTitlePane.managedProperty().bind(biblatexTitlePane.visibleProperty());
         customTitlePane.managedProperty().bind(customTitlePane.visibleProperty());
         biblatexSoftwareTitlePane.managedProperty().bind(biblatexSoftwareTitlePane.visibleProperty());
+
+        otherEntriesTitlePane.expandedProperty().addListener((obs, wasExpanded, isNowExpanded) -> {
+            if (isNowExpanded) {
+                this.setHeight(this.getHeight() + otherEntriesPane.getHeight());
+            } else {
+                this.setHeight(this.getHeight() - otherEntriesPane.getHeight());
+            }
+        });
 
         if (libraryTab.getBibDatabaseContext().isBiblatexMode()) {
             addEntriesToPane(biblatexPane, BiblatexEntryTypeDefinitions.ALL);
             addEntriesToPane(biblatexSoftwarePane, BiblatexSoftwareEntryTypeDefinitions.ALL);
 
-            bibTexTitlePane.setVisible(false);
-            ieeeTranTitlePane.setVisible(false);
+            recommendedEntriesTitlePane.setVisible(false);
+            otherEntriesTitlePane.setVisible(false);
 
             List<BibEntryType> customTypes = Globals.entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBLATEX);
             if (customTypes.isEmpty()) {
@@ -160,8 +169,13 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         } else {
             biblatexTitlePane.setVisible(false);
             biblatexSoftwareTitlePane.setVisible(false);
-            addEntriesToPane(bibTexPane, BibtexEntryTypeDefinitions.ALL);
-            addEntriesToPane(ieeetranPane, IEEETranEntryTypeDefinitions.ALL);
+            addEntriesToPane(recommendedEntriesPane, BibtexEntryTypeDefinitions.RECOMMENDED);
+            addEntriesToPane(otherEntriesPane, IEEETranEntryTypeDefinitions.ALL);
+            List<BibEntryType> otherEntriesBibtex = BibtexEntryTypeDefinitions.ALL
+                .stream()
+                .filter(e -> !BibtexEntryTypeDefinitions.RECOMMENDED.contains(e))
+                .collect(Collectors.toList());
+            addEntriesToPane(otherEntriesPane, otherEntriesBibtex);
 
             List<BibEntryType> customTypes = Globals.entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBTEX);
             if (customTypes.isEmpty()) {
