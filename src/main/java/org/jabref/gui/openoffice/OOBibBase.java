@@ -123,7 +123,8 @@ class OOBibBase {
      * Document-connection related variables.
      */
     private static class DocumentConnection {
-        /** https://wiki.openoffice.org/wiki/Documentation/BASIC_Guide/Structure_of_Text_Documents#Character_Properties
+        /** https://wiki.openoffice.org/wiki/Documentation/BASIC_Guide/
+         *  Structure_of_Text_Documents#Character_Properties
          *  "CharStyleName" is an OpenOffice Property name.
          */
         private static final String CHAR_STYLE_NAME = "CharStyleName";
@@ -257,7 +258,7 @@ class OOBibBase {
          * @throws NoDocumentException If cannot get reference marks
          *
          * Note: also used by `documentConnectionMissing` to test if
-         * we have a working connecion.
+         * we have a working connection.
          *
          */
         private XNameAccess
@@ -295,7 +296,7 @@ class OOBibBase {
         }
 
         /**
-         * Create a textcursor for a textContent.
+         * Create a text cursor for a textContent.
          *
          * @return null if mark is null, otherwise cursor.
          */
@@ -611,9 +612,10 @@ class OOBibBase {
             xcp.setPropertyValue("CharPosture", com.sun.star.awt.FontSlant.ITALIC);
         }
 
-        /**
+        /*
          * Apply direct character format "Bold" to a range of text.
          */
+        /* unused:
         private static void
         setCharFormatBold(XTextRange textRange)
             throws
@@ -623,6 +625,7 @@ class OOBibBase {
             XPropertySet xcp = unoQI(XPropertySet.class, textRange);
             xcp.setPropertyValue("CharWeight", com.sun.star.awt.FontWeight.BOLD);
         }
+        */
 
         /**
          *  Set language to [None]
@@ -841,7 +844,7 @@ class OOBibBase {
     /**
      * Choose a document to work with.
      *
-     * Assumes we have already connected to Libroffice or OpenOffice.
+     * Assumes we have already connected to LibreOffice or OpenOffice.
      *
      * If there is a single document to choose from, selects that.
      * If there are more than one, shows selection dialog.
@@ -1005,7 +1008,7 @@ class OOBibBase {
     /**
      * Sort entries within a group of merged citations.
      *
-     * Note: the sort is inplace, modifies the argument.
+     * Note: the sort is in-place, modifies the argument.
      */
     private void
     sortBibEntryListForMulticite(List<BibEntry> entries,
@@ -1058,7 +1061,7 @@ class OOBibBase {
     }
 
     /**
-     * Get reference mark naems from the document matching the pattern
+     * Get reference mark names from the document matching the pattern
      * used for JabRef reference mark names.
      *
      * Note: the names returned are in arbitrary order.
@@ -1082,7 +1085,7 @@ class OOBibBase {
      *         getJabRefReferenceMarkNames).
      *
      *         TODO: Note: visual or alphabetic order could be more
-     *               managable for the user. We could provide these
+     *               manageable for the user. We could provide these
      *               here, but switching between them needs change on
      *               GUI (adding a toggle or selector).
      *
@@ -1158,8 +1161,8 @@ class OOBibBase {
      * marks of the document.
      *
      * @param bibtexKey The citation key.
-     * @param itcType   Encodes the effect of <code>withText</code> and
-     *                  <code>inParenthesis</code> options.
+     * @param itcType   Encodes the effect of withText and
+     *                  inParenthesis options.
      *
      * The first occurrence of bibtexKey gets no serial number, the
      * second gets 0, the third 1 ...
@@ -1244,7 +1247,7 @@ class OOBibBase {
      * @param withText      Indicates whether this should be a visible
      *                      citation (true) or an empty (invisible) citation (false).
      *
-     * @param pageInfo      A single pageinfo for these entries. Stored in custom property
+     * @param pageInfo      A single page-info for these entries. Stored in custom property
      *                      with the same name as the reference mark.
      *
      *                      Related https://latex.org/forum/viewtopic.php?t=14331
@@ -1607,7 +1610,7 @@ class OOBibBase {
      *         otherwise return cEntry itself.
      */
     private static BibEntry
-    undefinedBibentryToNull(BibEntry cEntry) {
+    undefinedBibEntryToNull(BibEntry cEntry) {
         if (cEntry instanceof UndefinedBibtexEntry) {
             return null;
         }
@@ -2069,8 +2072,11 @@ class OOBibBase {
     }
 
     /**
-     *  Look up `bibtexkeys` in `citeKeyToBibEntry`, sort result within
+     *  Look up citation keys from a map caching earlier look up, sort result within
      *  each reference mark.
+     *
+     * @param bibtexKeys Citation keys, bibtexKeys[i][j] is for the ith reference mark.
+     * @param citeKeyToBibEntry Cached lookup from keys to entries.
      */
     private BibEntry[][]
     getBibEntriesSortedWithinReferenceMarks(
@@ -2093,7 +2099,7 @@ class OOBibBase {
      *   result[i][j] = cEntriesForAll[i][j].getCitationKey()
      */
     private String[][]
-    mapBibEntriesToCitationKeysOrNullForall(BibEntry[][] cEntriesForAll) {
+    mapBibEntriesToCitationKeysOrNullForAll(BibEntry[][] cEntriesForAll) {
         return
             Arrays.stream(cEntriesForAll)
             .map(cEntries ->
@@ -2125,7 +2131,7 @@ class OOBibBase {
         final int nRefMarks = bibtexKeys.length;
         assert nRefMarks == normCitMarkers.length;
 
-        // refKeys: (normCitMarker) to (list of bibtexkeys sharing it).
+        // refKeys: (normCitMarker) to (list of citation keys sharing it).
         //          The entries in the lists are ordered as in
         //          normCitMarkers[i][j]
         Map<String, List<String>> refKeys = new HashMap<>();
@@ -2192,7 +2198,7 @@ class OOBibBase {
                 Arrays.stream(cEntries)
                 .map(ce ->
                      style.getCitationMarker(
-                         Collections.singletonList(undefinedBibentryToNull(ce)),
+                         Collections.singletonList(undefinedBibEntryToNull(ce)),
                          entries,
                          true,
                          null,
@@ -2242,7 +2248,7 @@ class OOBibBase {
             getBibEntriesSortedWithinReferenceMarks(bibtexKeysIn, citeKeyToBibEntry, style);
 
         // Update bibtexKeys to match the new sorting (within each referenceMark)
-        String[][] bibtexKeys = mapBibEntriesToCitationKeysOrNullForall(cEntriesForAll);
+        String[][] bibtexKeys = mapBibEntriesToCitationKeysOrNullForAll(cEntriesForAll);
         // Note: bibtexKeys[i][j] may be null, for UndefinedBibtexEntry
 
         assert (bibtexKeys.length == nRefMarks);
@@ -2294,7 +2300,7 @@ class OOBibBase {
 
             List<BibEntry> cEntries =
                 Arrays.stream(cEntriesForAll[i])
-                .map(OOBibBase::undefinedBibentryToNull)
+                .map(OOBibBase::undefinedBibEntryToNull)
                 .collect(Collectors.toList());
 
             citMarkers[i] =
@@ -3048,7 +3054,7 @@ class OOBibBase {
         cursor.goRight((short) start, false);
         cursor.goRight((short) (end - start), true);
 
-        DocumentConnection.setCharFormatItalic( cursor );
+        DocumentConnection.setCharFormatItalic(cursor);
     }
 
     /**
@@ -3107,7 +3113,7 @@ class OOBibBase {
      *      - [ ] "Separate" (on merged citations inserted by
      *             selecting multiple entries then "Cite")
      *             May leave some of the two citation marks with text "tmp".
-     *             This can be corrected by a few repetions of pressing the "refresh"
+     *             This can be corrected by a few repetitions of pressing the "refresh"
      *             button.
      *
      *   - citations in tables (text tables)
@@ -3146,7 +3152,7 @@ class OOBibBase {
         // must appear as neighbours (and in textual order).
         // We have a bit of a clash here: names is sorted by visual position,
         // but we are testing if they are textually neighbours.
-        // In a two-coloumn layout
+        // In a two-column layout
         //  | a | c |
         //  | b | d |
         // abcd is the textual order, but the visual order is acbd.
@@ -3273,7 +3279,7 @@ class OOBibBase {
                 getUniqueReferenceMarkName(
                     documentConnection,
                     keyString,
-                    OOBibBase.AUTHORYEAR_PAR );
+                    OOBibBase.AUTHORYEAR_PAR);
 
             insertReferenceMark(
                 documentConnection,
@@ -3341,7 +3347,7 @@ class OOBibBase {
             // way we can throw an exception before any reference
             // marks are removed, preventing damage to the user's
             // document:
-            if (style.isFormatCitations() && !setCharStyleTested ) {
+            if (style.isFormatCitations() && !setCharStyleTested) {
                 String charStyle = style.getCitationCharacterFormat();
                 DocumentConnection.setCharStyle(textCursor, charStyle);
                 setCharStyleTested = true;
@@ -3395,7 +3401,7 @@ class OOBibBase {
      * Used from GUI: "Export cited"
      *
      * @param databases The databases to look up the citation keys in the document from.
-     * @result A new database, with cloned entries.
+     * @return A new database, with cloned entries.
      *
      * If a key is not found, it is silently ignored.
      *
