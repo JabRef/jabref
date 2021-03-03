@@ -18,6 +18,7 @@ import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
+import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.StandardExternalFileType;
 import org.jabref.gui.util.BackgroundTask;
@@ -261,5 +262,16 @@ class LinkedFileViewModelTest {
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, taskExecutor, dialogService, xmpPreferences, filePreferences, externalFileType);
         assertTrue(viewModel.isGeneratedPathSameAsOriginal());
+    }
+
+
+    // Tests if added parameters to mimeType gets parsed to correct format.
+    @Test
+    void mimeTypeStringWithParameterIsReturnedAsWithoutParameter() {
+        Globals.prefs = JabRefPreferences.getInstance(); // required for task execution
+        ExternalFileTypes externalFileTypes = ExternalFileTypes.getInstance();
+        Optional<ExternalFileType> test =  externalFileTypes.getExternalFileTypeByMimeType("text/html; charset=UTF-8");
+        String actual = test.get().toString();
+        assertEquals("URL",actual);
     }
 }
