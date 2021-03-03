@@ -55,6 +55,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where a non valid value as font size results in an uncaught exception. [#7415](https://github.com/JabRef/jabref/issues/7415)
 - We fixed an issue where drag and drop of bib files for opening resulted in uncaught exceptions [#7464](https://github.com/JabRef/jabref/issues/7464)
 - We fixed an issue in which a linked online file consisting of a web page was saved as an invalid pdf file upon being downloaded. [#7452](https://github.com/JabRef/jabref/issues/7452)
+- We fixed an issue in which a linked online file consisting of a web page was saved as an invalid pdf file upon being downloaded. The user is now notified when downloading a linked file results in an HTML file. [#7452](https://github.com/JabRef/jabref/issues/7452)
 
 ### Removed
 
