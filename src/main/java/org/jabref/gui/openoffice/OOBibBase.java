@@ -3031,23 +3031,24 @@ class OOBibBase {
      *  Why this API?  This is used after finding "et al." string in a
      *  citation marker.
      */
-    private void italicizeRangeFromPosition(XTextCursor position,
-                                            int start,
-                                            int end)
+    private void
+    italicizeRangeFromPosition(
+        XTextCursor position,
+        int start,
+        int end
+        )
         throws
         UnknownPropertyException,
         PropertyVetoException,
         IllegalArgumentException,
         WrappedTargetException {
+
         XTextRange range = position.getStart();
         XTextCursor cursor = position.getText().createTextCursorByRange(range);
         cursor.goRight((short) start, false);
         cursor.goRight((short) (end - start), true);
 
         DocumentConnection.setCharFormatItalic( cursor );
-        // XPropertySet xcp = unoQI(XPropertySet.class, cursor);
-        // xcp.setPropertyValue("CharPosture", com.sun.star.awt.FontSlant.ITALIC);
-        // xcp.setPropertyValue("CharWeight", com.sun.star.awt.FontWeight.BOLD);
     }
 
     /**
@@ -3057,7 +3058,8 @@ class OOBibBase {
      * @param databases Key is looked up in these, in this order.
      * @return The BibEntry at the first match, or Optional.empty().
      */
-    Optional<BibEntry> lookupEntryInDatabases(String key, List<BibDatabase> databases) {
+    Optional<BibEntry>
+    lookupEntryInDatabases(String key, List<BibDatabase> databases) {
         for (BibDatabase database : databases) {
             Optional<BibEntry> entry = database.getEntryByCitationKey(key);
             if (entry.isPresent()) {
@@ -3068,6 +3070,8 @@ class OOBibBase {
     }
 
     /**
+     *  Look up a list of citation keys in a list of databases.
+     *
      * @param keys Citation keys to look up.
      * @param databases Keys are looked up in these, in this order.
      * @return The BibEntry objects found.
@@ -3077,8 +3081,11 @@ class OOBibBase {
      * necessarily belong to keys.get(i)
      *
      */
-    List<BibEntry> lookupEntriesInDatabasesSkipMissing(List<String> keys,
-                                                       List<BibDatabase> databases) {
+    List<BibEntry>
+    lookupEntriesInDatabasesSkipMissing(
+        List<String> keys,
+        List<BibDatabase> databases
+        ) {
         List<BibEntry> entries = new ArrayList<>();
         for (String key : keys) {
             lookupEntryInDatabases(key, databases).ifPresent(entries::add);
@@ -3087,72 +3094,94 @@ class OOBibBase {
     }
 
     /**
-     * GUI action
+     * GUI action "Merge citations"
      *
-     * combineCiteMarkers does not work with citations in footnotes.
+     * Earlier note: "combineCiteMarkers does not work with citations in footnotes"
      *
-     * Note: citations can be inserted in footnotes and they appear in
-     *       the bibliography. They are also updated on style change+refresh
+     * Note:
+     *    - citations in footnotes
+     *      - [X] can be inserted and
+     *      - [X] they appear in the bibliography.
+     *      - [X] They are also updated on style change+refresh
+     *      - [ ] Merge fails (does not merge).
+     *      - [ ] "Separate" (on merged citations inserted by
+     *             selecting multiple entries then "Cite")
+     *             May leave some of the two citation marks with text "tmp".
+     *             This can be corrected by a few repetions of pressing the "refresh"
+     *             button.
      *
-     *       The same (insertable, appears in bibliography, update on
-     *       style change) is true for citations in tables.
+     *   - citations in tables (text tables)
+     *     - [X] can be inserted
+     *     - [X] they appear in bibliography
+     *     - [X] they are updated on style change+refresh
+     *     - [X} Merge (combineCiteMarkers) works
+     *     - [X} Separate (unCombineCiteMarkers) works
      *
-     *       Merge (combineCiteMarkers) and Separate (unCombineCiteMarkers)
-     *       seem to work in a cell of a table.
-     *
-     *       In footnotes: "Separate" (on merged citations inserted by
-     *       selecting multiple entries then "Cite") leaves first of
-     *       two citation marks with text "tmp", which can be
-     *       corrected by a few repetions of pressing the "refresh"
-     *       button.
-     *       With 3 citations, "Separate" left the 2nd and 3rd as "tmp".
-     *       Three refresh corrected the 2nd.  The 4th refresh corrected the 3rd citation.
-     *
-     * TODO: if the corresponding bib file is not open, this leaves a
-     *       mess: (1) reference marks with "tmp" i the text (2) with
+     * TODO: if the corresponding bib file is not open, Separate (unCombineCiteMarkers) (or Merge?)
+     *       leaves a mess: (1) reference marks with "tmp" in the text (2) with
      *       reference mark name "JR_cite_1_", i.e. without citation key.
+     *
      */
-    public void combineCiteMarkers(List<BibDatabase> databases, OOBibStyle style)
-            throws IOException,
-            WrappedTargetException,
-            NoSuchElementException,
-            IllegalArgumentException,
-            UndefinedCharacterFormatException,
-            UnknownPropertyException,
-            PropertyVetoException,
-            CreationException,
-            BibEntryNotFoundException,
-            NoDocumentException {
+    public void
+    combineCiteMarkers(
+        List<BibDatabase> databases,
+        OOBibStyle style
+        )
+        throws
+        IOException,
+        WrappedTargetException,
+        NoSuchElementException,
+        IllegalArgumentException,
+        UndefinedCharacterFormatException,
+        UnknownPropertyException,
+        PropertyVetoException,
+        CreationException,
+        BibEntryNotFoundException,
+        NoDocumentException {
+
         DocumentConnection documentConnection = this.getDocumentConnectionOrThrow();
 
+        // The testing for whitespace-only between (pivot) and (pivot+1) assumes that
+        // names are in textual order: textually consecutive pairs
+        // must appear as neighbours (and in textual order).
+        // We have a bit of a clash here: names is sorted by visual position,
+        // but we are testing if they are textually neighbours.
+        // In a two-coloumn layout
+        //  | a | c |
+        //  | b | d |
+        // abcd is the textual order, but the visual order is acbd.
+        // So we will not find out that a and b are only separated by white space.
         List<String> names =
-                getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
+            getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
 
+        // XTextRangeCompare: compares the positions of two TextRanges within a Text.
+        // Only TextRange instances within the same Text can be compared.
         final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
-                documentConnection.xText);
+                                                documentConnection.xText);
 
         int pivot = 0;
         boolean madeModifications = false;
+        boolean setCharStyleTested = false;
         XNameAccess nameAccess = documentConnection.getReferenceMarks();
 
         while (pivot < (names.size() - 1)) {
 
             XTextRange range1 =
-                    unoQI(XTextContent.class,
-                            nameAccess.getByName(names.get(pivot)))
-                            .getAnchor()
-                            .getEnd();
+                unoQI(XTextContent.class,
+                      nameAccess.getByName(names.get(pivot)))
+                .getAnchor()
+                .getEnd();
 
             XTextRange range2 =
-                    unoQI(XTextContent.class,
-                            nameAccess.getByName(names.get(pivot + 1)))
-                            .getAnchor()
-                            .getStart();
+                unoQI(XTextContent.class,
+                      nameAccess.getByName(names.get(pivot + 1)))
+                .getAnchor()
+                .getStart(); // end of range2 is the start of (pivot + 1)
 
             if (range1.getText() != range2.getText()) {
-                /* pivot and (pivot+1) belong to different XText entities?
+                /* pivot and (pivot+1) belong to different Text instances.
                  * Maybe to different footnotes?
-                 * Cannot combine across boundaries skip.
+                 * Cannot combine across boundaries, skip.
                  */
                 pivot++;
                 continue;
@@ -3160,11 +3189,16 @@ class OOBibBase {
 
             // Start from end of text for pivot.
             XTextCursor textCursor =
-                    range1.getText().createTextCursorByRange(range1);
+                range1.getText().createTextCursorByRange(range1);
 
-            // Select next character, and more, as long as we can and
-            // do not reach stat of (pivot+1), which we now know to be
-            // under the same XText entity.
+            // Select next character (if possible), and more, as long as we can and
+            // do not reach start of (pivot+1), which we now know to be
+            // in the same Text instance.
+
+            // TODO: If there is no space between the two reference marks,
+            //       the next line moves INTO the next. And probably will
+            //       cover a non-whitespace character, inhibiting the merge.
+            //       Empirically: does not merge. Probably a bug.
             textCursor.goRight((short) 1, true);
             boolean couldExpand = true;
             while (couldExpand && (compare.compareRegionEnds(textCursor, range2) > 0)) {
@@ -3186,6 +3220,8 @@ class OOBibBase {
             // marks are removed, preventing damage to the user's
             // document:
             if (style.isFormatCitations()) {
+            // Q: we may have zero characters selected. Is this a valied test
+            //    in this case?
                 String charStyle = style.getCitationCharacterFormat();
                 DocumentConnection.setCharStyle(textCursor, charStyle);
             }
@@ -3217,7 +3253,7 @@ class OOBibBase {
              *
              */
             List<String> keys =
-                    parseRefMarkNameToUniqueCitationKeys(names.get(pivot));
+                parseRefMarkNameToUniqueCitationKeys(names.get(pivot));
             keys.addAll(parseRefMarkNameToUniqueCitationKeys(names.get(pivot + 1)));
 
             documentConnection.removeReferenceMark(names.get(pivot));
@@ -3232,10 +3268,11 @@ class OOBibBase {
                 .collect(Collectors.joining(","));
 
             // Insert reference mark:
-            String newName = getUniqueReferenceMarkName(documentConnection,
+            String newName =
+                getUniqueReferenceMarkName(
+                    documentConnection,
                     keyString,
-                    OOBibBase.AUTHORYEAR_PAR
-            );
+                    OOBibBase.AUTHORYEAR_PAR );
 
             insertReferenceMark(
                 documentConnection,
@@ -3257,26 +3294,32 @@ class OOBibBase {
     }
 
     /**
-     * GUI action.
+     * GUI action "Separate citations".
+     *
      * Do the opposite of combineCiteMarkers.
      * Combined markers are split, with a space inserted between.
      */
-    public void unCombineCiteMarkers(List<BibDatabase> databases, OOBibStyle style)
-            throws IOException,
-            WrappedTargetException,
-            NoSuchElementException,
-            IllegalArgumentException,
-            UndefinedCharacterFormatException,
-            UnknownPropertyException,
-            PropertyVetoException,
-            CreationException,
-            BibEntryNotFoundException,
-            NoDocumentException {
+    public void
+    unCombineCiteMarkers(
+        List<BibDatabase> databases,
+        OOBibStyle style
+        )
+        throws
+        IOException,
+        WrappedTargetException,
+        NoSuchElementException,
+        IllegalArgumentException,
+        UndefinedCharacterFormatException,
+        UnknownPropertyException,
+        PropertyVetoException,
+        CreationException,
+        BibEntryNotFoundException,
+        NoDocumentException {
 
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
 
         List<String> names =
-                getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
+            getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
 
         int pivot = 0;
         boolean madeModifications = false;
@@ -3284,12 +3327,12 @@ class OOBibBase {
 
         while (pivot < (names.size())) {
             XTextRange range1 =
-                    unoQI(XTextContent.class,
-                            nameAccess.getByName(names.get(pivot)))
-                            .getAnchor();
+                unoQI(XTextContent.class,
+                      nameAccess.getByName(names.get(pivot)))
+                .getAnchor();
 
             XTextCursor textCursor =
-                    range1.getText().createTextCursorByRange(range1);
+                range1.getText().createTextCursorByRange(range1);
 
             // If we are supposed to set character format for
             // citations, test this before making any changes. This
