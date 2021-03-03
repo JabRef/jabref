@@ -3219,7 +3219,7 @@ class OOBibBase {
             // way we can throw an exception before any reference
             // marks are removed, preventing damage to the user's
             // document:
-            // Q: we may have zero characters selected. Is this a valied test
+            // Q: we may have zero characters selected. Is this a valid test
             //    in this case?
             if (style.isFormatCitations() && !setCharStyleTested) {
                 String charStyle = style.getCitationCharacterFormat();
@@ -3341,7 +3341,7 @@ class OOBibBase {
             // way we can throw an exception before any reference
             // marks are removed, preventing damage to the user's
             // document:
-            if (style.isFormatCitations() && ! setCharStyleTested ) {
+            if (style.isFormatCitations() && !setCharStyleTested ) {
                 String charStyle = style.getCitationCharacterFormat();
                 DocumentConnection.setCharStyle(textCursor, charStyle);
                 setCharStyleTested = true;
@@ -3359,10 +3359,10 @@ class OOBibBase {
             int last = keys.size() - 1;
             int i = 0;
             for (String key : keys) {
-                String newName = getUniqueReferenceMarkName(documentConnection,
-                        key,
-                        OOBibBase.AUTHORYEAR_PAR
-                );
+                String newName = getUniqueReferenceMarkName(
+                    documentConnection,
+                    key,
+                    OOBibBase.AUTHORYEAR_PAR);
 
                 insertReferenceMark(
                         documentConnection,
