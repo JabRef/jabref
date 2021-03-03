@@ -32,4 +32,8 @@ public class JournalEditorViewModel extends AbstractEditorViewModel {
             }
         }
     }
+
+    public void getJournalStatistics() {
+        System.out.println("hello world");
+    }
 }

@@ -57,4 +57,9 @@ public class JournalEditor extends HBox implements FieldEditorFX {
     private void toggleAbbreviation() {
         viewModel.toggleAbbreviation();
     }
+
+    @FXML
+    private void getJournalStatistics() {
+        viewModel.getJournalStatistics();
+    }
 }
