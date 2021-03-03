@@ -516,13 +516,8 @@ class OOBibBase {
          * @param position Cursor marking the location or range for
          *                 the bookmark.
          *
-         *                 If it is a range, its content will be
-         *                 replaced.
-         *                 TODO: I thought from insertTextContent doc,
-         *                 https://www.openoffice.org/api/docs/common/ref/
-         *                 com/sun/star/text/XText.html#insertTextContent
-         *                 that it will be. But it might depend on the
-         *                 type of textContent.
+         *                 If it is a range, the bookmark will point
+         *                 to the whole range.
          */
         public void
         insertBookMark(
@@ -547,7 +542,8 @@ class OOBibBase {
             // get XTextContent interface
             XTextContent xTextContent = unoQI(XTextContent.class, bookmark);
 
-            // insert bookmark at position, overwrite text in position
+            // insert bookmark at position. The range of position
+            // becomes the range of the bookmark.
             this.xText.insertTextContent(position, xTextContent, true);
         }
 
