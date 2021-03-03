@@ -117,14 +117,10 @@ public class CitationKeyGenerator extends BracketedPattern {
         Objects.requireNonNull(entry);
         String currentKey = entry.getCitationKey().orElse(null);
 
-        if (currentKey == null || !citationKeyPatternPreferences.shouldAvoidOverwriteCiteKey()) {
-            String newKey = createCitationKeyFromPattern(entry);
-            newKey = replaceWithRegex(newKey);
-            newKey = appendLettersToKey(newKey, currentKey);
-            return cleanKey(newKey, unwantedCharacters);
-        } else {
-            return currentKey;
-        }
+        String newKey = createCitationKeyFromPattern(entry);
+        newKey = replaceWithRegex(newKey);
+        newKey = appendLettersToKey(newKey, currentKey);
+        return cleanKey(newKey, unwantedCharacters);
     }
 
     /**
