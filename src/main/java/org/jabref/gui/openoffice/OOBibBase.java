@@ -403,77 +403,6 @@ class OOBibBase {
             }
         }
 
-        /**
-         *  Get the text belonging to refMarkName with up to
-         *  charBefore and charAfter characters of context.
-         *
-         *  The actual context may be smaller than requested.
-         *
-         *  @param refMarkName Name of a reference mark.
-         *  @param charBefore Number of characters requested.
-         *  @param charAfter  Number of characters requested.
-         *  @param htmlMarkup If true, the text belonging to the
-         *  reference mark is surrounded by bold html tag.
-         */
-        public String
-        getCitationContext(
-            String refMarkName,
-            int charBefore,
-            int charAfter,
-            boolean htmlMarkup)
-            throws
-            WrappedTargetException,
-            NoDocumentException {
-
-            XNameAccess nameAccess = getReferenceMarks();
-            XTextContent mark = nameAccessGetTextContentByName(nameAccess, refMarkName);
-            XTextCursor cursor = getTextCursorOfTextContent(mark);
-
-            String citPart = cursor.getString();
-
-            // extend cursor range left
-            int flex = 8;
-            for (int i = 0; i < charBefore; i++) {
-                try {
-                    cursor.goLeft((short) 1, true);
-                    // If we are close to charBefore and see a space,
-                    // then cut here. Might avoid cutting a word in half.
-                    if ((i >= (charBefore - flex))
-                        && Character.isWhitespace(cursor.getString().charAt(0))) {
-                        break;
-                    }
-                } catch (IndexOutOfBoundsException ex) {
-                    LOGGER.warn("Problem going left", ex);
-                }
-            }
-
-            int lengthWithBefore = cursor.getString().length();
-            int addedBefore = lengthWithBefore - citPart.length();
-
-            cursor.collapseToStart();
-            for (int i = 0; i < (charAfter + lengthWithBefore); i++) {
-                try {
-                    cursor.goRight((short) 1, true);
-                    if (i >= ((charAfter + lengthWithBefore) - flex)) {
-                        String strNow = cursor.getString();
-                        if (Character.isWhitespace(strNow.charAt(strNow.length() - 1))) {
-                            break;
-                        }
-                    }
-                } catch (IndexOutOfBoundsException ex) {
-                    LOGGER.warn("Problem going right", ex);
-                }
-            }
-
-            String result = cursor.getString();
-            if (htmlMarkup) {
-                result =
-                    result.substring(0, addedBefore)
-                    + "<b>" + citPart + "</b>"
-                    + result.substring(lengthWithBefore);
-            }
-            return result.trim();
-        }
 
         /**
          * Get the cursor positioned by the user.
@@ -1166,12 +1095,86 @@ class OOBibBase {
             CitationEntry entry =
                 new CitationEntry(
                     name,
-                    documentConnection.getCitationContext(name, 30, 30, true),
+                    this.getCitationContext(documentConnection, name, 30, 30, true),
                     documentConnection.getCustomProperty(name)
                     );
             citations.add(entry);
         }
         return citations;
+    }
+
+    /**
+     *  Get the text belonging to refMarkName with up to
+     *  charBefore and charAfter characters of context.
+     *
+     *  The actual context may be smaller than requested.
+     *
+     *  @param refMarkName Name of a reference mark.
+     *  @param charBefore Number of characters requested.
+     *  @param charAfter  Number of characters requested.
+     *  @param htmlMarkup If true, the text belonging to the
+     *  reference mark is surrounded by bold html tag.
+     */
+    public String
+    getCitationContext(
+        DocumentConnection documentConnection,
+        String refMarkName,
+        int charBefore,
+        int charAfter,
+        boolean htmlMarkup
+        )
+        throws
+        WrappedTargetException,
+        NoDocumentException {
+
+        XNameAccess nameAccess = documentConnection.getReferenceMarks();
+        XTextContent mark = DocumentConnection.nameAccessGetTextContentByName(nameAccess, refMarkName);
+        XTextCursor cursor = DocumentConnection.getTextCursorOfTextContent(mark);
+
+        String citPart = cursor.getString();
+
+        // extend cursor range left
+        int flex = 8;
+        for (int i = 0; i < charBefore; i++) {
+            try {
+                cursor.goLeft((short) 1, true);
+                // If we are close to charBefore and see a space,
+                // then cut here. Might avoid cutting a word in half.
+                if ((i >= (charBefore - flex))
+                    && Character.isWhitespace(cursor.getString().charAt(0))) {
+                    break;
+                }
+            } catch (IndexOutOfBoundsException ex) {
+                LOGGER.warn("Problem going left", ex);
+            }
+        }
+
+        int lengthWithBefore = cursor.getString().length();
+        int addedBefore = lengthWithBefore - citPart.length();
+
+        cursor.collapseToStart();
+        for (int i = 0; i < (charAfter + lengthWithBefore); i++) {
+            try {
+                cursor.goRight((short) 1, true);
+                if (i >= ((charAfter + lengthWithBefore) - flex)) {
+                    String strNow = cursor.getString();
+                    if (Character.isWhitespace(strNow.charAt(strNow.length() - 1))) {
+                        break;
+                    }
+                }
+            } catch (IndexOutOfBoundsException ex) {
+                LOGGER.warn("Problem going right", ex);
+            }
+        }
+
+        String result = cursor.getString();
+        if (htmlMarkup) {
+            result =
+                result.substring(0, addedBefore)
+                + "<b>" + citPart + "</b>"
+                + result.substring(lengthWithBefore);
+        }
+        return result.trim();
     }
 
     /**
@@ -2064,7 +2067,7 @@ class OOBibBase {
             final String name = referenceMarkNames.get(i);
 
             XTextContent mark =
-                documentConnection.nameAccessGetTextContentByName(nameAccess, name);
+                DocumentConnection.nameAccessGetTextContentByName(nameAccess, name);
 
             XTextCursor cursor =
                 DocumentConnection.getTextCursorOfTextContent(mark);
@@ -2558,7 +2561,7 @@ class OOBibBase {
         for (String name : names) {
 
             XTextContent textContent =
-                documentConnection.nameAccessGetTextContentByName(nameAccess, name);
+                DocumentConnection.nameAccessGetTextContentByName(nameAccess, name);
             // unoQI(XTextContent.class, nameAccess.getByName(name));
 
             XTextRange range = textContent.getAnchor();
