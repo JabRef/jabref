@@ -135,7 +135,9 @@ class OOBibBase {
         public XTextViewCursorSupplier xViewCursorSupplier;
         public XPropertyContainer userProperties;
         public XPropertySet propertySet;
-        private final Logger LOGGER;
+
+        private static final Logger LOGGER =
+            LoggerFactory.getLogger(OOBibBase.DocumentConnection.class);
 
         DocumentConnection(
             XTextDocument mxDoc,
@@ -159,8 +161,6 @@ class OOBibBase {
                 supp.getDocumentProperties().getUserDefinedProperties();
 
             this.propertySet = unoQI(XPropertySet.class, userProperties);
-
-            this.LOGGER = LOGGER;
         }
 
         /**
@@ -359,9 +359,9 @@ class OOBibBase {
         }
 
         /**
-         * (this could be static, except for the LOGGER)
+         *
          */
-        XTextContent
+        static XTextContent
         nameAccessGetTextContentByName(XNameAccess nameAccess, String name)
             throws WrappedTargetException {
 
