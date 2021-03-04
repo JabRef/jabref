@@ -4,6 +4,7 @@ on:
   schedule:
     # run on 1st and 15th of each month
     - cron: '1 2 1,15 * *'
+  workflow_dispatch:
 
 jobs:
   publish:
@@ -37,10 +38,10 @@ jobs:
           git subtree pull --prefix buildres/csl/csl-locales csl-locales master --squash
           cp buildres/csl/csl-locales/locales.json src/main/resources/csl-locales/
           cp buildres/csl/csl-locales/locales-en-US src/main/resources/csl-locales/
-      - uses: ad-m/github-push-action@master
+      - uses: peter-evans/create-pull-request@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: master
+          branch: refresh-csl
       - name: Report issues
         if: failure()
         uses: JasonEtco/create-an-issue@master
@@ -48,3 +49,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           filename: .github/failure-csl-update.md
+          title: "[Bot] Update CSL styles"
