@@ -128,32 +128,38 @@ class OOBibBase {
          */
         private static final String CHAR_STYLE_NAME = "CharStyleName";
 
-        public XMultiServiceFactory mxDocFactory;
         public XTextDocument mxDoc;
+        public XComponent xCurrentComponent;
+        public XMultiServiceFactory mxDocFactory;
         public XText xText;
         public XTextViewCursorSupplier xViewCursorSupplier;
-        public XComponent xCurrentComponent;
-        public XPropertySet propertySet;
         public XPropertyContainer userProperties;
+        public XPropertySet propertySet;
         private final Logger LOGGER;
 
         DocumentConnection(
-            XMultiServiceFactory mxDocFactory,
             XTextDocument mxDoc,
-            XText xText,
-            XTextViewCursorSupplier xViewCursorSupplier,
-            XComponent xCurrentComponent,
-            XPropertySet propertySet,
-            XPropertyContainer userProperties,
             Logger LOGGER
             ) {
-            this.mxDocFactory = mxDocFactory;
             this.mxDoc = mxDoc;
-            this.xText = xText;
-            this.xViewCursorSupplier = xViewCursorSupplier;
-            this.xCurrentComponent = xCurrentComponent;
-            this.propertySet = propertySet;
-            this.userProperties = userProperties;
+            this.xCurrentComponent = unoQI(XComponent.class, mxDoc);
+            this.mxDocFactory = unoQI(XMultiServiceFactory.class, mxDoc);
+            // unoQI(XDocumentIndexesSupplier.class, component);
+
+            // get a reference to the body text of the document
+            this.xText = mxDoc.getText();
+
+            XModel mo = unoQI(XModel.class, this.xCurrentComponent);
+            XController co = mo.getCurrentController();
+            this.xViewCursorSupplier = unoQI(XTextViewCursorSupplier.class, co);
+
+            XDocumentPropertiesSupplier supp =
+                unoQI(XDocumentPropertiesSupplier.class, mxDoc);
+            this.userProperties =
+                supp.getDocumentProperties().getUserDefinedProperties();
+
+            this.propertySet = unoQI(XPropertySet.class, userProperties);
+
             this.LOGGER = LOGGER;
         }
 
@@ -163,25 +169,38 @@ class OOBibBase {
         public boolean
         documentConnectionMissing() {
 
-            // These are set by selectDocument, via DocumentConnection
-            // constructor.
-            if (null == this.xCurrentComponent
-                || null == this.mxDoc
-                || null == this.xViewCursorSupplier
-                || null == this.xText
+            boolean missing = false;
+            // These are set by DocumentConnection constructor.
+            if (null == this.mxDoc
+                || null == this.xCurrentComponent
                 || null == this.mxDocFactory
+                || null == this.xText
+                || null == this.xViewCursorSupplier
                 || null == this.userProperties
                 || null == this.propertySet) {
-                return true;
+                missing = true;
             }
 
             // Attempt to check document is really available
-            try {
-                getReferenceMarks();
-            } catch (NoDocumentException ex) {
-                return true;
+            if ( !missing ){
+                try {
+                    getReferenceMarks();
+                } catch (NoDocumentException ex) {
+                    missing = true;
+                }
             }
-            return false;
+
+            if ( missing ){
+                // release it
+                this.mxDoc = null;
+                this.xCurrentComponent = null;
+                this.mxDocFactory = null;
+                this.xText = null;
+                this.xViewCursorSupplier = null;
+                this.userProperties = null;
+                this.propertySet = null;
+            }
+            return missing;
         }
 
         /**
@@ -936,7 +955,6 @@ class OOBibBase {
         NoSuchElementException,
         WrappedTargetException {
 
-        XTextDocument mxDoc;
 
         XTextDocument selected;
         List<XTextDocument> textDocumentList = getTextDocuments(this.xDesktop);
@@ -956,40 +974,9 @@ class OOBibBase {
         if (selected == null) {
             return;
         }
-        mxDoc = selected;
-
-        XComponent component = unoQI(XComponent.class, mxDoc);
-
-        unoQI(XDocumentIndexesSupplier.class, component);
-
-        XTextViewCursorSupplier viewCursorSupplier;
-
-        XModel mo = unoQI(XModel.class, component);
-        XController co = mo.getCurrentController();
-        viewCursorSupplier = unoQI(XTextViewCursorSupplier.class, co);
-
-        // get a reference to the body text of the document
-        XText text = mxDoc.getText();
-
-        // Access the text document's multi service factory:
-        XMultiServiceFactory mxDocFactory = unoQI(XMultiServiceFactory.class, mxDoc);
-
-        XPropertyContainer userProperties;
-
-        XDocumentPropertiesSupplier supp =
-            unoQI(XDocumentPropertiesSupplier.class, mxDoc);
-        userProperties = supp.getDocumentProperties().getUserDefinedProperties();
-
-        XPropertySet propertySet = unoQI(XPropertySet.class, userProperties);
 
         this.xDocumentConnection = new DocumentConnection(
-            mxDocFactory,
-            mxDoc,
-            text,
-            viewCursorSupplier,
-            component,
-            propertySet,
-            userProperties,
+            selected,
             LOGGER
         );
 
