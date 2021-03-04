@@ -7,7 +7,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import javafx.scene.control.Alert.AlertType;
@@ -27,20 +30,29 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
-
 import org.jabref.preferences.JabRefPreferences;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.matches;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 class LinkedFileViewModelTest {
 
@@ -183,7 +195,7 @@ class LinkedFileViewModelTest {
 
         databaseContext.setDatabasePath(tempFile);
 
-        URL url = new URL( "https://www.google.com/");
+        URL url = new URL("https://www.google.com/");
         String fileType = StandardExternalFileType.URL.getName();
         linkedFile = new LinkedFile(url, fileType);
 
@@ -214,7 +226,7 @@ class LinkedFileViewModelTest {
     }
 
     @Test
-    void downloadHtmlWhenLinkedFilePointsToHtml() throws MalformedURLException{
+    void downloadHtmlWhenLinkedFilePointsToHtml() throws MalformedURLException {
         // the link mentioned in issue #7452
         String url = "https://onlinelibrary.wiley.com/doi/abs/10.1002/0470862106.ia615";
         String fileType = StandardExternalFileType.URL.getName();
@@ -235,7 +247,7 @@ class LinkedFileViewModelTest {
 
         List<LinkedFile> linkedFiles = entry.getFiles();
 
-        for(LinkedFile file: linkedFiles) {
+        for (LinkedFile file: linkedFiles) {
             if (file.getLink().equalsIgnoreCase("Misc/asdf.html")) {
                 assertEquals("URL", file.getFileType());
                 return;
@@ -273,9 +285,9 @@ class LinkedFileViewModelTest {
     void mimeTypeStringWithParameterIsReturnedAsWithoutParameter() {
         Globals.prefs = JabRefPreferences.getInstance(); // required for task execution
         ExternalFileTypes externalFileTypes = ExternalFileTypes.getInstance();
-        Optional<ExternalFileType> test =  externalFileTypes.getExternalFileTypeByMimeType("text/html; charset=UTF-8");
+        Optional<ExternalFileType> test = externalFileTypes.getExternalFileTypeByMimeType("text/html; charset=UTF-8");
         String actual = test.get().toString();
-        assertEquals("URL",actual);
+        assertEquals("URL", actual);
     }
 
     @Test
@@ -283,7 +295,7 @@ class LinkedFileViewModelTest {
         Globals.prefs = JabRefPreferences.getInstance();
         linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "pdf");
 
-        //Needed Mockito stubbing methods to run test
+        // Needed Mockito stubbing methods to run test
         when(filePreferences.shouldStoreFilesRelativeToBib()).thenReturn(true);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
@@ -293,15 +305,15 @@ class LinkedFileViewModelTest {
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, xmpPreferences, filePreferences, externalFileType);
         viewModel.download();
 
-        //Loop through downloaded files to check for filetype='pdf'
+        // Loop through downloaded files to check for filetype='pdf'
         List<LinkedFile> linkedFiles = entry.getFiles();
-        for(LinkedFile files : linkedFiles){
-            if(files.getLink().equalsIgnoreCase("Misc/asdf.pdf")){
-                assertEquals("pdf" , files.getFileType().toLowerCase());
+        for (LinkedFile files : linkedFiles) {
+            if (files.getLink().equalsIgnoreCase("Misc/asdf.pdf")) {
+                assertEquals("pdf", files.getFileType().toLowerCase());
                 return;
             }
         }
-        //Assert fail if no PDF type was found
+        // Assert fail if no PDF type was found
         fail();
     }
 
