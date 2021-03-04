@@ -1,4 +1,4 @@
-package org.jabref.gui.preferences.customisation;
+package org.jabref.gui.preferences.customization;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
@@ -6,15 +6,16 @@ import javafx.scene.control.TextField;
 
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
+import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class CustomisationTab extends AbstractPreferenceTabView<CustomisationTabViewModel> implements PreferencesTab {
+public class CustomizationTab extends AbstractPreferenceTabView<CustomizationTabViewModel> implements PreferencesTab {
 
     @FXML private CheckBox useCustomDOI;
     @FXML private TextField useCustomDOIName;
 
-    public CustomisationTab() {
+    public CustomizationTab() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -23,11 +24,11 @@ public class CustomisationTab extends AbstractPreferenceTabView<CustomisationTab
 
     @Override
     public String getTabName() {
-        return "DOI";
+        return Localization.lang("Customisation");
     }
 
     public void initialize() {
-        this.viewModel = new CustomisationTabViewModel(dialogService, preferencesService);
+        this.viewModel = new CustomizationTabViewModel(dialogService, preferencesService);
 
         useCustomDOI.selectedProperty().bindBidirectional(viewModel.useCustomDOIProperty());
         useCustomDOIName.textProperty().bindBidirectional(viewModel.useCustomDOINameProperty());
