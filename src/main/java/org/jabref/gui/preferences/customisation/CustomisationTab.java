@@ -1,4 +1,4 @@
-package org.jabref.gui.preferences.doi;
+package org.jabref.gui.preferences.customisation;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
@@ -9,12 +9,12 @@ import org.jabref.gui.preferences.PreferencesTab;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class DOITab extends AbstractPreferenceTabView<DOITabViewModel> implements PreferencesTab {
+public class CustomisationTab extends AbstractPreferenceTabView<CustomisationTabViewModel> implements PreferencesTab {
 
     @FXML private CheckBox useCustomDOI;
     @FXML private TextField useCustomDOIName;
 
-    public DOITab() {
+    public CustomisationTab() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -27,7 +27,7 @@ public class DOITab extends AbstractPreferenceTabView<DOITabViewModel> implement
     }
 
     public void initialize() {
-        this.viewModel = new DOITabViewModel(dialogService, preferencesService);
+        this.viewModel = new CustomisationTabViewModel(dialogService, preferencesService);
 
         useCustomDOI.selectedProperty().bindBidirectional(viewModel.useCustomDOIProperty());
         useCustomDOIName.textProperty().bindBidirectional(viewModel.useCustomDOINameProperty());

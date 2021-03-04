@@ -1,4 +1,4 @@
-package org.jabref.gui.preferences.doi;
+package org.jabref.gui.preferences.customisation;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -8,10 +8,9 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.preferences.DOIPreferences;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
-public class DOITabViewModel implements PreferenceTabViewModel {
+public class CustomisationTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty useCustomDOIProperty = new SimpleBooleanProperty();
     private final StringProperty useCustomDOINameProperty = new SimpleStringProperty("");
@@ -20,7 +19,7 @@ public class DOITabViewModel implements PreferenceTabViewModel {
     private final PreferencesService preferencesService;
     private final DOIPreferences initialDOIPreferences;
 
-    public DOITabViewModel(DialogService dialogService, PreferencesService preferencesService) {
+    public CustomisationTabViewModel(DialogService dialogService, PreferencesService preferencesService) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.initialDOIPreferences = preferencesService.getDOIPreferences();
@@ -29,7 +28,6 @@ public class DOITabViewModel implements PreferenceTabViewModel {
     @Override
     public void setValues() {
         useCustomDOIProperty.setValue(initialDOIPreferences.isUseCustom());
-        preferencesService.getDefaults().get(JabRefPreferences.BASE_DOI_URI);
         useCustomDOINameProperty.setValue(initialDOIPreferences.getDefaultBaseURI());
     }
 

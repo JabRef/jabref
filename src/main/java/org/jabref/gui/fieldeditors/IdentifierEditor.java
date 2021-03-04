@@ -29,8 +29,6 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @FXML private Button fetchInformationByIdentifierButton;
     @FXML private Button lookupIdentifierButton;
     private Optional<BibEntry> entry;
-    private PreferencesService preferences;
-    private Field field;
 
     public IdentifierEditor(Field field,
                             TaskExecutor taskExecutor,
@@ -38,9 +36,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                             SuggestionProvider<?> suggestionProvider,
                             FieldCheckers fieldCheckers,
                             PreferencesService preferences) {
-        this.viewModel = new IdentifierEditorViewModel(field, suggestionProvider, taskExecutor, dialogService, fieldCheckers);
-        this.preferences = preferences;
-        this.field = field;
+        this.viewModel = new IdentifierEditorViewModel(field, suggestionProvider, taskExecutor, dialogService, fieldCheckers, preferences);
 
         ViewLoader.view(this)
                   .root(this)
@@ -90,11 +86,6 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
 
     @FXML
     private void openExternalLink() {
-        if (StandardField.DOI.equals(field) && preferences.getDOIPreferences().isUseCustom()) {
-            String baseURL = preferences.getDOIPreferences().getDefaultBaseURI();
-            viewModel.openDOIWithCustomBase(baseURL);
-        } else {
-            viewModel.openExternalLink();
-        }
+        viewModel.openExternalLink();
     }
 }
