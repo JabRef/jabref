@@ -40,7 +40,7 @@ jobs:
           cp buildres/csl/csl-locales/locales-en-US src/main/resources/csl-locales/
       - uses: peter-evans/create-pull-request@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           branch: refresh-csl
       - name: Report issues
         if: failure()
