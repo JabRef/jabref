@@ -23,7 +23,7 @@ public class NumericFieldComparator implements Comparator<String> {
         }
 
         boolean isVal1Valid = pattern.matcher(val1).matches();
-        boolean isVal2Valid = !pattern.matcher(val2).matches();
+        boolean isVal2Valid = pattern.matcher(val2).matches();
         if (!isVal1Valid && !isVal2Valid) {
             return val1.compareTo(val2);
         } else if (!isVal1Valid) {
