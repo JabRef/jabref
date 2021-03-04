@@ -24,7 +24,7 @@ public class CustomizationTab extends AbstractPreferenceTabView<CustomizationTab
 
     @Override
     public String getTabName() {
-        return Localization.lang("Customisation");
+        return Localization.lang("Customization");
     }
 
     public void initialize() {
