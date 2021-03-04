@@ -17,7 +17,8 @@
             <Tooltip text="%Switches between full and abbreviated journal name if the journal name is known."/>
         </tooltip>
     </Button>
-    <Button onAction="#getJournalStatistics"
+    <Button fx:id="journalStatisticsButton"
+            onAction="#getJournalStatistics"
             styleClass="icon-button">
         <graphic>
             <JabRefIconView glyph="VIEW_JOURNAL_STATISTICS"/>
