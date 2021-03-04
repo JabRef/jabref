@@ -272,9 +272,38 @@ class OOBibBase {
             try {
                 return supplier.getReferenceMarks();
             } catch (DisposedException ex) {
-                // LOGGER.warn("getReferenceMarks caught: ", ex);
                 throw new NoDocumentException("getReferenceMarks failed with" + ex);
             }
+        }
+
+        /**
+         * Provides access to bookmarks by name.
+         */
+        private XNameAccess
+        getBookmarks() {
+
+            XBookmarksSupplier supplier =
+                unoQI(
+                    XBookmarksSupplier.class,
+                    this.xCurrentComponent
+                    );
+            return supplier.getBookmarks();
+        }
+
+        /**
+         *  @return An XNameAccess to find sections by name.
+         */
+        private XNameAccess
+        getTextSections()
+            throws
+            IllegalArgumentException {
+
+            XTextSectionsSupplier supplier =
+                unoQI(
+                    XTextSectionsSupplier.class,
+                    this.mxDoc
+                    );
+            return supplier.getTextSections();
         }
 
         /**
@@ -436,18 +465,6 @@ class OOBibBase {
             return this.xViewCursorSupplier.getViewCursor();
         }
 
-        /**
-         * Provides access to bookmarks by name.
-         */
-        public XNameAccess
-        getBookmarks() {
-            // query XBookmarksSupplier from document model
-            // and get bookmarks collection
-            XBookmarksSupplier xBookmarksSupplier =
-                unoQI(XBookmarksSupplier.class,
-                      this.xCurrentComponent);
-            return xBookmarksSupplier.getBookmarks();
-        }
 
         /**
          * Get the XTextRange corresponding to the named bookmark.
@@ -2839,22 +2856,6 @@ class OOBibBase {
     }
 
     /**
-     *  @return An XNameAccess to find sections by name.
-     *
-     * TODO: c.f. DocumentConnection.getReferenceMarks and DocumentConnection.getBookmarks
-     */
-    private XNameAccess
-    getTextSections(DocumentConnection documentConnection)
-        throws
-        IllegalArgumentException {
-
-        XTextSectionsSupplier supplier =
-            unoQI(XTextSectionsSupplier.class, documentConnection.mxDoc);
-
-        return supplier.getTextSections();
-    }
-
-    /**
      * Insert a paragraph break and creates a text section for the bibliography.
      *
      * Only called from `clearBibTextSectionContent2`
@@ -2893,7 +2894,7 @@ class OOBibBase {
         IllegalArgumentException,
         CreationException {
 
-        XNameAccess nameAccess = getTextSections(documentConnection);
+        XNameAccess nameAccess = documentConnection.getTextSections();
         if (!nameAccess.hasByName(OOBibBase.BIB_SECTION_NAME)) {
             createBibTextSection2(documentConnection);
             return;
