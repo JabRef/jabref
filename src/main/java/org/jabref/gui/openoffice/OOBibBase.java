@@ -470,6 +470,63 @@ class OOBibBase {
         }
 
         /**
+         * Insert a new instance of a service at the provided cursor
+         * position.
+         *
+         * @param service For example
+         *                 "com.sun.star.text.ReferenceMark",
+         *                 "com.sun.star.text.Bookmark" or
+         *                 "com.sun.star.text.TextSection".
+         *
+         *                 Passed to this.mxDocFactory.createInstance(service)
+         *                 The result is expected to support the
+         *                 XNamed and XTextContent interfaces.
+         *
+         * @param name     For the ReferenceMark, Bookmark, TextSection.
+         *                 If the name is already in use, LibreOffice
+         *                 may change the name.
+         *
+         * @param range   Marks the location or range for
+         *                the thing to be inserted.
+         *
+         * @param absorb ReferenceMark, Bookmark and TextSection can
+         *               incorporate a text range. If absorb is true,
+         *               the text in the range becomes part of the thing.
+         *               If absorb is false,  the thing is
+         *               inserted at the end of the range.
+         *
+         * @return The XNamed interface, in case we need to check the actual name.
+         *
+         */
+        private XNamed
+        insertNamedTextContent(
+            String service,
+            String name,
+            XTextRange range,
+            boolean absorb
+            )
+            throws
+            CreationException {
+
+            Object xObject;
+            try {
+                xObject =
+                    this.mxDocFactory
+                    .createInstance(service);
+            } catch (Exception e) {
+                throw new CreationException(e.getMessage());
+            }
+
+            XNamed xNamed = unoQI(XNamed.class, xObject);
+            xNamed.setName(name);
+
+            // get XTextContent interface
+            XTextContent xTextContent = unoQI(XTextContent.class, xObject);
+            range.getText().insertTextContent(range, xTextContent, absorb);
+            return xNamed;
+        }
+
+        /**
          * Insert a new reference mark at the provided cursor
          * position.
          *
@@ -477,73 +534,77 @@ class OOBibBase {
          * background.
          *
          * @param name     For the reference mark.
-         * @param position Cursor marking the location or range for
+         * @param range    Cursor marking the location or range for
          *                 the reference mark.
-         *
-         * Note: Almost identical to insertBookMark
          */
-        public void
+        public XNamed
         insertReferenceMark(
             String name,
-            XTextCursor position
+            XTextRange range,
+            boolean absorb
             )
             throws
             CreationException {
-
-            Object bookmark;
-            try {
-                bookmark =
-                    this.mxDocFactory
-                    .createInstance("com.sun.star.text.ReferenceMark");
-            } catch (Exception e) {
-                throw new CreationException(e.getMessage());
-            }
-            // Name the reference
-            XNamed xNamed = unoQI(XNamed.class, bookmark);
-            xNamed.setName(name);
-
-            // get XTextContent interface
-            XTextContent xTextContent = unoQI(XTextContent.class, bookmark);
-
-            position.getText().insertTextContent(position, xTextContent, true);
+            return
+                insertNamedTextContent(
+                    "com.sun.star.text.ReferenceMark",
+                    name,
+                    range,
+                    absorb // was true
+                    );
         }
 
         /**
          * Insert a bookmark with the given name at the cursor provided.
          *
          * @param name     For the bookmark.
-         * @param position Cursor marking the location or range for
+         * @param range    Cursor marking the location or range for
          *                 the bookmark.
+         * @param absorb   Shall we incorporate range?
          *
-         *                 If it is a range, the bookmark will point
-         *                 to the whole range.
          */
-        public void
+        public XNamed
         insertBookMark(
             String name,
-            XTextCursor position)
+            XTextRange range,
+            boolean absorb)
             throws
             IllegalArgumentException,
             CreationException {
 
-            Object bookmark;
-            try {
-                bookmark = (this.mxDocFactory
-                            .createInstance("com.sun.star.text.Bookmark"));
-            } catch (Exception e) {
-                throw new CreationException(e.getMessage());
-            }
+            return
+                insertNamedTextContent(
+                    "com.sun.star.text.Bookmark",
+                    name,
+                    range,
+                    absorb // was true
+                    );
+        }
 
-            // name the bookmark
-            XNamed xNamed = unoQI(XNamed.class, bookmark);
-            xNamed.setName(name);
+        /**
+         *  Create a text section with the provided name and insert it at
+         *  the provided cursor.
+         *
+         *  @param name  The desired name for the section.
+         *  @param range The location to insert at.
+         *
+         */
+        private XNamed
+        insertTextSection(
+            String name,
+            XTextRange range,
+            boolean absorb)
+            throws
+            IllegalArgumentException,
+            CreationException {
 
-            // get XTextContent interface
-            XTextContent xTextContent = unoQI(XTextContent.class, bookmark);
-
-            // insert bookmark at position. The range of position
-            // becomes the range of the bookmark.
-            this.xText.insertTextContent(position, xTextContent, true);
+            return
+                insertNamedTextContent(
+                    "com.sun.star.text.TextSection",
+                    name,
+                    range,
+                    absorb // was false
+                    );
         }
 
         /**
@@ -2042,7 +2103,7 @@ class OOBibBase {
                 // We need to add it again.
                 cursor.collapseToEnd();
                 OOUtil.insertParagraphBreak(documentConnection.xText, cursor);
-                documentConnection.insertBookMark(OOBibBase.BIB_SECTION_NAME, cursor);
+                documentConnection.insertBookMark(OOBibBase.BIB_SECTION_NAME, cursor, true);
                 cursor.collapseToEnd();
             }
         }
@@ -2778,45 +2839,6 @@ class OOBibBase {
     }
 
     /**
-     *  Create a text section with the provided name and insert it at
-     *  the provided cursor.
-     *
-     *  @param sectionName The desired name for the section.
-     *  @param textCursor  The location to insert at.
-     *
-     *  (This could move to DocumentConnection)
-     *
-     *  TODO: c.f. DocumentConnection.insertBookMark and DocumentConnection.insertReferenceMark
-     */
-    private void
-    createAndInsertSection(
-        DocumentConnection documentConnection,
-        String sectionName,
-        XTextCursor textCursor
-        )
-        throws
-        IllegalArgumentException,
-        CreationException {
-
-        // Create a new TextSection from the document factory
-        // and access it's XNamed interface
-        XNamed sectionNamed;
-        try {
-            sectionNamed =
-                unoQI(XNamed.class,
-                      (documentConnection.mxDocFactory
-                       .createInstance("com.sun.star.text.TextSection")));
-        } catch (Exception e) {
-            throw new CreationException(e.getMessage());
-        }
-        // Set the new sections name to 'Child_Section'
-        sectionNamed.setName(sectionName);
-        // Access the Child_Section's XTextContent interface and insert it into the document
-        XTextContent sectionTextContent = unoQI(XTextContent.class, sectionNamed);
-        documentConnection.xText.insertTextContent(textCursor, sectionTextContent, false);
-    }
-
-    /**
      *  @return An XNameAccess to find sections by name.
      *
      * TODO: c.f. DocumentConnection.getReferenceMarks and DocumentConnection.getBookmarks
@@ -2850,10 +2872,10 @@ class OOBibBase {
 
         OOUtil.insertParagraphBreak(documentConnection.xText, textCursor);
 
-        createAndInsertSection(
-            documentConnection,
+        documentConnection.insertTextSection(
             OOBibBase.BIB_SECTION_NAME,
-            textCursor
+            textCursor,
+            false
             );
     }
 
@@ -2961,7 +2983,10 @@ class OOBibBase {
         //       or rather "JR_bib_endN"  where N may increase.
         //       Repeatedly pressing "Refresh" leaves "JR_bib_end" at the start
         //       of the bibliography.
-        documentConnection.insertBookMark(OOBibBase.BIB_SECTION_END_NAME, cursor);
+        documentConnection.insertBookMark(
+            OOBibBase.BIB_SECTION_END_NAME,
+            cursor,
+            true);
         cursor.collapseToEnd();
     }
 
@@ -3039,7 +3064,7 @@ class OOBibBase {
             position.setString("");
         }
 
-        documentConnection.insertReferenceMark(name, position);
+        documentConnection.insertReferenceMark(name, position, true);
 
         // Last minute editing: find "et al." (OOBibStyle.ET_AL_STRING) and
         //                      format it as italic.
