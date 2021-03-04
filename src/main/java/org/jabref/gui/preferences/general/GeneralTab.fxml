@@ -42,12 +42,6 @@
     <CheckBox fx:id="showAdvancedHints"
               text="%Show advanced hints (i.e. helpful tooltips, suggestions and explanation)"/>
 
-    <Label styleClass="sectionHeader" text="DOI"/>
-    <HBox alignment="CENTER_LEFT" spacing="10.0">
-        <CheckBox fx:id="useCustomDOI" text="%Use custom DOI base URI for article access"/>
-        <TextField fx:id="useCustomDOIName" HBox.hgrow="ALWAYS"/>
-    </HBox>
-
     <Label styleClass="sectionHeader" text="%Entry owner"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <CheckBox fx:id="markOwner" text="%Mark new entries with owner name"/>
