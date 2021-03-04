@@ -153,7 +153,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         Text auto = new Text();
         auto.visibleProperty().bind(linkedFile.isAutomaticallyFoundProperty());
         auto.managedProperty().bind(linkedFile.isAutomaticallyFoundProperty());
-        auto.setText("(Auto)");
+        auto.setText(Localization.lang("(Auto)"));
         auto.getStyleClass().setAll("file-row-text");
 
         HBox info = new HBox(8);
