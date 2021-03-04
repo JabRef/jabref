@@ -7,11 +7,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.regex.Pattern;
-import java.util.List;
 
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
@@ -280,4 +277,32 @@ class LinkedFileViewModelTest {
         String actual = test.get().toString();
         assertEquals("URL",actual);
     }
+
+    @Test
+    void downloadPdfFileWhenLinkedFilePointsToPdfUrl() throws MalformedURLException {
+        Globals.prefs = JabRefPreferences.getInstance();
+        linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "pdf");
+
+        //Needed Mockito stubbing methods to run test
+        when(filePreferences.shouldStoreFilesRelativeToBib()).thenReturn(true);
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
+
+        databaseContext.setDatabasePath(tempFile);
+
+        LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, xmpPreferences, filePreferences, externalFileType);
+        viewModel.download();
+
+        //Loop through downloaded files to check for filetype='pdf'
+        List<LinkedFile> linkedFiles = entry.getFiles();
+        for(LinkedFile files : linkedFiles){
+            if(files.getLink().equalsIgnoreCase("Misc/asdf.pdf")){
+                assertEquals("pdf" , files.getFileType().toLowerCase());
+                return;
+            }
+        }
+        //Assert fail if no PDF type was found
+        fail();
+    }
+
 }
