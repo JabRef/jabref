@@ -564,7 +564,7 @@ class OOBibBase {
          *
          */
         public XNamed
-        insertBookMark(
+        insertBookmark(
             String name,
             XTextRange range,
             boolean absorb)
@@ -2103,7 +2103,7 @@ class OOBibBase {
                 // We need to add it again.
                 cursor.collapseToEnd();
                 OOUtil.insertParagraphBreak(documentConnection.xText, cursor);
-                documentConnection.insertBookMark(OOBibBase.BIB_SECTION_NAME, cursor, true);
+                documentConnection.insertBookmark(OOBibBase.BIB_SECTION_NAME, cursor, true);
                 cursor.collapseToEnd();
             }
         }
@@ -2983,7 +2983,7 @@ class OOBibBase {
         //       or rather "JR_bib_endN"  where N may increase.
         //       Repeatedly pressing "Refresh" leaves "JR_bib_end" at the start
         //       of the bibliography.
-        documentConnection.insertBookMark(
+        documentConnection.insertBookmark(
             OOBibBase.BIB_SECTION_END_NAME,
             cursor,
             true);
