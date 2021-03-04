@@ -5,18 +5,23 @@ jobs:
   automerge:
     name: Automerge Dependabot
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]'
+    if: github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]'
     steps:
       - name: 'Wait for status checks'
         id: waitforstatuschecks
         uses: "WyriHaximus/github-action-wait-for-status@v1.3"
         with:
-          ignoreActions: Automerge Dependabot,codecov/project
+          ignoreActions: Automerge Dependabot,Code coverage,Create snapcraft image,Deploy binaries on builds.jabref.org,codecov/project,markdown-link-check
           checkInterval: 13
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Auto approve
+        uses: hmarr/auto-approve-action@v2.0.0
+        if: steps.waitforstatuschecks.outputs.status == 'success'
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
       - name: Merge pull requests
-        uses: pascalgn/automerge-action@v0.13.0
+        uses: pascalgn/automerge-action@v0.13.1
         if: steps.waitforstatuschecks.outputs.status == 'success'
         env:
           MERGE_METHOD: "squash"

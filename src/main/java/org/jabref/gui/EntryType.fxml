@@ -31,14 +31,14 @@
                         <FlowPane fx:id="biblatexSoftwarePane" prefHeight="200.0" prefWidth="200.0"/>
                     </content>
                 </TitledPane>
-                <TitledPane fx:id="bibTexTitlePane" animated="false" collapsible="false" text="BibTeX">
+                <TitledPane fx:id="recommendedEntriesTitlePane" animated="false" collapsible="false" text="Recommended">
                     <content>
-                        <FlowPane fx:id="bibTexPane" prefHeight="200.0" prefWidth="200.0"/>
+                        <FlowPane fx:id="recommendedEntriesPane" prefHeight="50.0" prefWidth="200.0"/>
                     </content>
                 </TitledPane>
-                <TitledPane fx:id="ieeeTranTitlePane" animated="false" collapsible="false" text="IEEETran">
+                <TitledPane fx:id="otherEntriesTitlePane" animated="false" collapsible="true" expanded="false" text="Others">
                     <content>
-                        <FlowPane fx:id="ieeetranPane" prefHeight="200.0" prefWidth="200.0"/>
+                        <FlowPane fx:id="otherEntriesPane" prefHeight="100.0" prefWidth="200.0"/>
                     </content>
                 </TitledPane>
                 <TitledPane fx:id="customTitlePane" animated="false" collapsible="false" text="%Custom">
