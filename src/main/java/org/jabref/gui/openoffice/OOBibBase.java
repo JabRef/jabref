@@ -3557,6 +3557,8 @@ class OOBibBase {
      *
      * Used for sorting reference marks by their visual positions.
      *
+     * Note: for text layouts with two or more columns, this gives the wrong order.
+     *
      */
     private static class ComparableMark implements Comparable<ComparableMark> {
 
