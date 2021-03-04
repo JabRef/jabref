@@ -349,7 +349,6 @@ public class JabRefPreferences implements PreferencesService {
     // User
     private static final String USER_ID = "userId";
     private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
-    private String userName;
 
     // Telemetry collection
     private static final String COLLECT_TELEMETRY = "collectTelemetry";
@@ -408,6 +407,7 @@ public class JabRefPreferences implements PreferencesService {
     private SidePanePreferences sidePanePreferences;
     private Theme globalTheme;
     private Set<CustomImporter> customImporters;
+    private String userName;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -773,7 +773,8 @@ public class JabRefPreferences implements PreferencesService {
             userName = get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
             return userName;
         } catch (UnknownHostException ex) {
-            LOGGER.error("Hostname not found.", ex);
+            LOGGER.error("Hostname not found. Please go to https://docs.jabref.org/ to find possible " +
+                    "problem resolution", ex);
             return get(DEFAULT_OWNER);
         }
     }
