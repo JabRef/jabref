@@ -765,8 +765,9 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public String getUser() {
-        if (StringUtil.isNotBlank(userName))
+        if (StringUtil.isNotBlank(userName)) {
             return userName;
+        }
 
         try {
             userName = get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
