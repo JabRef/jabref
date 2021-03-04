@@ -115,7 +115,6 @@ class OOBibBase {
     /* variables  */
     private final DialogService dialogService;
     private final XDesktop xDesktop;
-    private final boolean atEnd;
     private final Comparator<BibEntry> entryComparator;
     private final Comparator<BibEntry> yearAuthorTitleComparator;
 
@@ -669,7 +668,6 @@ class OOBibBase {
      */
     public
     OOBibBase(Path loPath,
-              boolean atEnd,
               DialogService dialogService)
         throws
         BootstrapException,
@@ -693,7 +691,6 @@ class OOBibBase {
         yat.add(t);
         this.yearAuthorTitleComparator = new FieldComparatorStack<>(yat);
 
-        this.atEnd = atEnd;
         this.xDesktop = simpleBootstrap(loPath);
     }
 
@@ -2838,28 +2835,18 @@ class OOBibBase {
     /**
      * Insert a paragraph break and creates a text section for the bibliography.
      *
-     * @param end If true, insert at the end of the document.
-     *
      * Only called from `clearBibTextSectionContent2`
      */
     private void
-    createBibTextSection2(
-        DocumentConnection documentConnection,
-        boolean end)
+    createBibTextSection2(DocumentConnection documentConnection)
         throws
         IllegalArgumentException,
         CreationException {
 
+        // Always creating at the end of documentConnection.xText
+        // Alternatively, we could receive a cursor.
         XTextCursor textCursor = documentConnection.xText.createTextCursor();
-        if (end) {
-            textCursor.gotoEnd(false);
-        }
-        // where does textCursor point to if end is false?
-        // TODO: are we using this.atEnd == false?
-        // If we do, what happens (or expected to happen) here?
-        // OpenOfficePanel.createBibBase calls
-        //    new OOBibBase(loPath, true, dialogService);
-        // So probably no.
+        textCursor.gotoEnd(false);
 
         OOUtil.insertParagraphBreak(documentConnection.xText, textCursor);
 
@@ -2886,7 +2873,7 @@ class OOBibBase {
 
         XNameAccess nameAccess = getTextSections(documentConnection);
         if (!nameAccess.hasByName(OOBibBase.BIB_SECTION_NAME)) {
-            createBibTextSection2(documentConnection, this.atEnd);
+            createBibTextSection2(documentConnection);
             return;
         }
 
@@ -2910,7 +2897,7 @@ class OOBibBase {
 
             // Try to create.
             LOGGER.warn("Could not get section '" + OOBibBase.BIB_SECTION_NAME + "'", ex);
-            createBibTextSection2(documentConnection, this.atEnd);
+            createBibTextSection2(documentConnection);
         }
     }
 

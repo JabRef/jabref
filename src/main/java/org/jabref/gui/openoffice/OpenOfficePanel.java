@@ -493,7 +493,7 @@ public class OpenOfficePanel {
 
     private OOBibBase createBibBase(Path loPath) throws IOException, InvocationTargetException, IllegalAccessException,
         BootstrapException, CreationException, ClassNotFoundException {
-        return new OOBibBase(loPath, true, dialogService);
+        return new OOBibBase(loPath, dialogService);
     }
 
     private void pushEntries(boolean inParenthesisIn, boolean withText, boolean addPageInfo) {
