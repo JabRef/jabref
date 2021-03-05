@@ -51,16 +51,12 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     @FXML private ButtonType generateButton;
     @FXML private TextField idTextField;
     @FXML private ComboBox<IdBasedFetcher> idBasedFetchers;
-    @FXML private FlowPane biblatexPane;
     @FXML private FlowPane recommendedEntriesPane;
     @FXML private FlowPane otherEntriesPane;
     @FXML private FlowPane customPane;
-    @FXML private FlowPane biblatexSoftwarePane;
-    @FXML private TitledPane biblatexTitlePane;
     @FXML private TitledPane recommendedEntriesTitlePane;
     @FXML private TitledPane otherEntriesTitlePane;
     @FXML private TitledPane customTitlePane;
-    @FXML private TitledPane biblatexSoftwareTitlePane;
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
@@ -141,9 +137,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
         // avoids removing and adding from the scence graph
         recommendedEntriesTitlePane.managedProperty().bind(recommendedEntriesTitlePane.visibleProperty());
         otherEntriesTitlePane.managedProperty().bind(otherEntriesTitlePane.visibleProperty());
-        biblatexTitlePane.managedProperty().bind(biblatexTitlePane.visibleProperty());
         customTitlePane.managedProperty().bind(customTitlePane.visibleProperty());
-        biblatexSoftwareTitlePane.managedProperty().bind(biblatexSoftwareTitlePane.visibleProperty());
 
         otherEntriesTitlePane.expandedProperty().addListener((obs, wasExpanded, isNowExpanded) -> {
             if (isNowExpanded) {
@@ -153,36 +147,33 @@ public class EntryTypeView extends BaseDialog<EntryType> {
             }
         });
 
-        if (libraryTab.getBibDatabaseContext().isBiblatexMode()) {
-            addEntriesToPane(biblatexPane, BiblatexEntryTypeDefinitions.ALL);
-            addEntriesToPane(biblatexSoftwarePane, BiblatexSoftwareEntryTypeDefinitions.ALL);
-
-            recommendedEntriesTitlePane.setVisible(false);
-            otherEntriesTitlePane.setVisible(false);
-
-            List<BibEntryType> customTypes = Globals.entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBLATEX);
-            if (customTypes.isEmpty()) {
-                customTitlePane.setVisible(false);
-            } else {
-                addEntriesToPane(customPane, customTypes);
-            }
-        } else {
-            biblatexTitlePane.setVisible(false);
-            biblatexSoftwareTitlePane.setVisible(false);
-            addEntriesToPane(recommendedEntriesPane, BibtexEntryTypeDefinitions.RECOMMENDED);
-            addEntriesToPane(otherEntriesPane, IEEETranEntryTypeDefinitions.ALL);
-            List<BibEntryType> otherEntriesBibtex = BibtexEntryTypeDefinitions.ALL
+        boolean isBiblatexMode = libraryTab.getBibDatabaseContext().isBiblatexMode();
+        List<BibEntryType> recommendedEntries;
+        List<BibEntryType> otherEntries;
+        if (isBiblatexMode) {
+            recommendedEntries = BiblatexEntryTypeDefinitions.RECOMMENDED;
+            otherEntries = BiblatexEntryTypeDefinitions.ALL
                 .stream()
-                .filter(e -> !BibtexEntryTypeDefinitions.RECOMMENDED.contains(e))
+                .filter(e -> !recommendedEntries.contains(e))
                 .collect(Collectors.toList());
-            addEntriesToPane(otherEntriesPane, otherEntriesBibtex);
+            otherEntries.addAll(BiblatexSoftwareEntryTypeDefinitions.ALL);
+        } else {
+            recommendedEntries = BibtexEntryTypeDefinitions.RECOMMENDED;
+            otherEntries = BibtexEntryTypeDefinitions.ALL
+                .stream()
+                .filter(e -> !recommendedEntries.contains(e))
+                .collect(Collectors.toList());
+            otherEntries.addAll(IEEETranEntryTypeDefinitions.ALL);
+        }
+        addEntriesToPane(recommendedEntriesPane, recommendedEntries);
+        addEntriesToPane(otherEntriesPane, otherEntries);
 
-            List<BibEntryType> customTypes = Globals.entryTypesManager.getAllCustomTypes(BibDatabaseMode.BIBTEX);
-            if (customTypes.isEmpty()) {
-                customTitlePane.setVisible(false);
-            } else {
-                addEntriesToPane(customPane, customTypes);
-            }
+        BibDatabaseMode customTypeDatabaseMode = isBiblatexMode ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX;
+        List<BibEntryType> customTypes = Globals.entryTypesManager.getAllCustomTypes(customTypeDatabaseMode);
+        if (customTypes.isEmpty()) {
+            customTitlePane.setVisible(false);
+        } else {
+            addEntriesToPane(customPane, customTypes);
         }
 
         Platform.runLater(() -> {
