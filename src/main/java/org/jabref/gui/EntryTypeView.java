@@ -51,9 +51,6 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     @FXML private ButtonType generateButton;
     @FXML private TextField idTextField;
     @FXML private ComboBox<IdBasedFetcher> idBasedFetchers;
-    @FXML private FlowPane recommendedEntriesPane;
-    @FXML private FlowPane otherEntriesPane;
-    @FXML private FlowPane customPane;
     @FXML private TitledPane recommendedEntriesTitlePane;
     @FXML private TitledPane otherEntriesTitlePane;
     @FXML private TitledPane customTitlePane;
@@ -176,10 +173,10 @@ public class EntryTypeView extends BaseDialog<EntryType> {
             addEntriesToPane(customPane, customTypes);
         }
 
-        Platform.runLater(() -> {
-            idTextField.requestFocus();
-            visualizer.initVisualization(viewModel.idFieldValidationStatus(), idTextField, true);
-        });
+        viewModel.idTextProperty().addListener((obs, oldValue, newValue) ->
+                visualizer.initVisualization(viewModel.idFieldValidationStatus(), idTextField, true));
+
+        Platform.runLater(() -> idTextField.requestFocus());
     }
 
     public EntryType getChoice() {
@@ -205,9 +202,7 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     }
 
     /**
-     * The description is originating from biblatex manual chapter 2
-     * Biblatex documentation is favored over the bibtex,
-     * since bibtex is a subset of biblatex and biblatex is better documented.
+     * The description is originating from biblatex manual chapter 2 Biblatex documentation is favored over the bibtex, since bibtex is a subset of biblatex and biblatex is better documented.
      */
     public static String getDescription(EntryType selectedType) {
         if (selectedType instanceof StandardEntryType) {
