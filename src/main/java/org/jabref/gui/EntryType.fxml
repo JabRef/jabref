@@ -21,16 +21,6 @@
     <content>
         <VBox prefHeight="200.0" prefWidth="400.0">
             <children>
-                <TitledPane fx:id="biblatexTitlePane" animated="false" collapsible="false" text="Biblatex">
-                    <content>
-                        <FlowPane fx:id="biblatexPane" prefHeight="200.0" prefWidth="200.0"/>
-                    </content>
-                </TitledPane>
-                <TitledPane fx:id="biblatexSoftwareTitlePane" animated="false" collapsible="false" text="Biblatex-Software">
-                    <content>
-                        <FlowPane fx:id="biblatexSoftwarePane" prefHeight="200.0" prefWidth="200.0"/>
-                    </content>
-                </TitledPane>
                 <TitledPane fx:id="recommendedEntriesTitlePane" animated="false" collapsible="false" text="Recommended">
                     <content>
                         <FlowPane fx:id="recommendedEntriesPane" prefHeight="50.0" prefWidth="200.0"/>
