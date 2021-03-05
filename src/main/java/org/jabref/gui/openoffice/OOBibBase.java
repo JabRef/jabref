@@ -343,23 +343,8 @@ class OOBibBase {
         }
 
         /**
-         * Create a text cursor for a textContent.
-         *
-         * @return null if mark is null, otherwise cursor.
-         */
-        static XTextCursor
-        getTextCursorOfTextContent(XTextContent mark) {
-            if (mark == null) {
-                return null;
-            }
-            XTextRange markAnchor = mark.getAnchor();
-            return
-                markAnchor.getText()
-                .createTextCursorByRange(markAnchor);
-        }
-
-        /**
-         *
+         * @return null if name not found, or if the result does not
+         *         support the XTextContent interface.
          */
         static XTextContent
         nameAccessGetTextContentByName(XNameAccess nameAccess, String name)
@@ -377,6 +362,23 @@ class OOBibBase {
                                 + " for '%s'", name));
                 return null;
             }
+        }
+
+        /**
+         * Create a text cursor for a textContent.
+         *
+         * @return null if mark is null, otherwise cursor.
+         *
+         */
+        static XTextCursor
+        getTextCursorOfTextContent(XTextContent mark) {
+            if (mark == null) {
+                return null;
+            }
+            XTextRange markAnchor = mark.getAnchor();
+            return
+                markAnchor.getText()
+                .createTextCursorByRange(markAnchor);
         }
 
         /**
@@ -679,6 +681,8 @@ class OOBibBase {
      *
      *  Used directly (apart from passing around as `uniqueLetters`):
      *  refreshCiteMarkers, rebuildBibTextSection.
+     *
+     *  Depends on: style, citations and their order.
      */
     private final Map<String, String> xUniqueLetters = new HashMap<>();
 
@@ -720,6 +724,12 @@ class OOBibBase {
         this.xDesktop = simpleBootstrap(loPath);
     }
 
+    /* *****************************
+     *
+     *  Establish connection
+     *
+     * *****************************/
+
     private XDesktop
     simpleBootstrap(Path loPath)
         throws
@@ -745,22 +755,6 @@ class OOBibBase {
         return result;
     }
 
-    /**
-     * unoQI : short for UnoRuntime.queryInterface
-     *
-     * @return A reference to the requested UNO interface type if available,
-     * otherwise null
-     */
-    private static <T> T
-    unoQI(
-        Class<T> zInterface,
-        Object object) {
-        return UnoRuntime.queryInterface(zInterface, object);
-    }
-
-    /**
-     *  Used by selectDocument
-     */
     private static List<XTextDocument>
     getTextDocuments(XDesktop desktop)
         throws
@@ -976,52 +970,168 @@ class OOBibBase {
         }
     }
 
-    /**
-     *  The comparator used to sort within a group of merged
-     *  citations.
+    /* ****************************
      *
-     *  The term used here is "multicite". The option controlling the
-     *  order is "MultiCiteChronological" in style files.
+     *           Misc
+     *
+     * ****************************/
+
+    /**
+     * unoQI : short for UnoRuntime.queryInterface
+     *
+     * @return A reference to the requested UNO interface type if available,
+     * otherwise null
      */
-    private Comparator<BibEntry>
-    comparatorForMulticite(OOBibStyle style) {
-        if (style.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL)) {
-            return this.yearAuthorTitleComparator;
-        } else {
-            return this.entryComparator;
+    private static <T> T
+    unoQI(
+        Class<T> zInterface,
+        Object object) {
+        return UnoRuntime.queryInterface(zInterface, object);
+    }
+
+
+    /* ***************************************
+     *
+     *     Storage/retrieve of citations
+     *
+     *
+     *  We store some information in the document about
+     *
+     *    Citations : citation key, pageInfo, citation group.
+     *        Each belongs to exactly one group.
+     *
+     *    Citation groups (in case of multiple citation keys also
+     *       known as "multicite", "merged citations"):
+     *
+     *       Which citations belong to the group.
+     *       Range of text owned (where the citation marks go).
+     *
+     *    From these, the databases and the style we create and update
+     *    the presentation (citation marks)
+     *
+     *    How:
+     *      database lookup yields: (BibEntry,whichDatabase)
+     *                              (UndefinedBibtexEntry,null) if not found
+     *
+     *      Local order
+     *          presentation order within groups from (style,BibEntry)
+     *
+     *      Global order:
+     *          visualPosition (for first appearance order)
+     *          bibliography-order
+     *
+     *      Make them unique
+     *         numbering
+     *         uniqueLetters from (Set<BibEntry>, firstAppearanceOrder, style)
+     *
+     *
+     *  Bibliography uses parts of the information above:
+     *      citation keys,
+     *      location of citation groups (if ordered and/or numbered by first appearance)
+     *
+     *      and
+     *      the range of text controlled (storage)
+     *
+     *      And fills the bibliography (presentation)
+     *
+     * **************************************/
+
+    /**
+     * Produce a reference mark name for JabRef for the given citation
+     * key and itcType that does not yet appear among the reference
+     * marks of the document.
+     *
+     * @param bibtexKey The citation key.
+     * @param itcType   Encodes the effect of withText and
+     *                  inParenthesis options.
+     *
+     * The first occurrence of bibtexKey gets no serial number, the
+     * second gets 0, the third 1 ...
+     *
+     * Or the first unused in this series, after removals.
+     */
+    private String
+    getUniqueReferenceMarkName(
+        DocumentConnection documentConnection,
+        String bibtexKey,
+        int itcType)
+        throws NoDocumentException {
+
+        XNameAccess xNamedRefMarks = documentConnection.getReferenceMarks();
+        int i = 0;
+        String name = BIB_CITATION + '_' + itcType + '_' + bibtexKey;
+        while (xNamedRefMarks.hasByName(name)) {
+            name = BIB_CITATION + i + '_' + itcType + '_' + bibtexKey;
+            i++;
+        }
+        return name;
+    }
+
+    /**
+     * This is what we get back from parsing a refMarkName.
+     *
+     * TODO: We have one itcType per refMarkName. Merge reduces the
+     * number of itcType values.
+     */
+    private static class ParsedRefMark {
+        /**  "", "0", "1" ... */
+        public String i;
+        /** in-text-citation type */
+        public int itcType;
+        /** Citation keys embedded in the reference mark. */
+        public List<String> citedKeys;
+
+        ParsedRefMark(String i, int itcType, List<String> citedKeys) {
+            this.i = i;
+            this.itcType = itcType;
+            this.citedKeys = citedKeys;
         }
     }
 
     /**
-     * Sort entries within a group of merged citations.
+     * Parse a JabRef reference mark name.
      *
-     * Note: the sort is in-place, modifies the argument.
+     * @return Optional.empty() on failure.
+     *
      */
-    private void
-    sortBibEntryListForMulticite(List<BibEntry> entries,
-                                 OOBibStyle style) {
-        if (entries.size() <= 1) {
-            return;
+    private static Optional<ParsedRefMark>
+    parseRefMarkName(String refMarkName) {
+
+        Matcher citeMatcher = CITE_PATTERN.matcher(refMarkName);
+        if (!citeMatcher.find()) {
+            return Optional.empty();
         }
-        entries.sort(comparatorForMulticite(style));
+
+        List<String> keys = Arrays.asList(citeMatcher.group(3).split(","));
+        String i = citeMatcher.group(1);
+        int itcType = Integer.parseInt(citeMatcher.group(2));
+        return (Optional.of(new OOBibBase.ParsedRefMark(i, itcType, keys)));
     }
 
     /**
-     * Given the withText and inParenthesis options,
-     * return the corresponding itcType.
+     * Extract the list of citation keys from a reference mark name.
      *
-     * @param withText False means invisible citation (no text).
-     * @param inParenthesis True means "(Au and Thor 2000)".
-     *                      False means "Au and Thor (2000)".
+     * @param name The reference mark name.
+     * @return The list of citation keys encoded in the name.
+     *
+     *         In case of duplicated citation keys,
+     *         only the first occurrence.
+     *         Otherwise their order is preserved.
+     *
+     *         If name does not match CITE_PATTERN,
+     *         an empty list of strings is returned.
      */
-    private static int
-    citationTypeFromOptions(boolean withText, boolean inParenthesis) {
-        if (!withText) {
-            return OOBibBase.INVISIBLE_CIT;
-        }
-        return (inParenthesis
-                ? OOBibBase.AUTHORYEAR_PAR
-                : OOBibBase.AUTHORYEAR_INTEXT);
+    private List<String>
+    parseRefMarkNameToUniqueCitationKeys(String name) {
+        Optional<ParsedRefMark> op = parseRefMarkName(name);
+        return
+            op.map(
+                parsedRefMark ->
+                parsedRefMark.citedKeys.stream()
+                .distinct()
+                .collect(Collectors.toList())
+                )
+            .orElseGet(ArrayList::new);
     }
 
     /**
@@ -1064,8 +1174,106 @@ class OOBibBase {
     }
 
     /**
-     * Get a list of CitationEntry objects corresponding to citations
+     * For each name in referenceMarkNames set types[i] and
+     * bibtexKeys[i] to values parsed from referenceMarkNames.get(i)
+     *
+     * @param referenceMarkNames Should only contain parsable names.
+     * @param types              OUT Must be same length as referenceMarkNames.
+     * @param bibtexKeys         OUT First level must be same length as referenceMarkNames.
+     */
+    private static void
+    parseRefMarkNamesToArrays(
+        List<String> referenceMarkNames,
+        int[] types,
+        String[][] bibtexKeys
+        ) {
+        final int nRefMarks = referenceMarkNames.size();
+        assert (types.length == nRefMarks);
+        assert (bibtexKeys.length == nRefMarks);
+        for (int i = 0; i < nRefMarks; i++) {
+            final String name = referenceMarkNames.get(i);
+            Optional<ParsedRefMark> op = parseRefMarkName(name);
+            if (op.isEmpty()) {
+                // We have a problem. We want types[i] and bibtexKeys[i]
+                // to correspond to referenceMarkNames.get(i).
+                // And do not want null in bibtexKeys (or error code in types)
+                // on return.
+                throw new IllegalArgumentException(
+                    "parseRefMarkNamesToArrays expects parsable referenceMarkNames"
+                    );
+            }
+            ParsedRefMark ov = op.get();
+            types[i] = ov.itcType;
+            bibtexKeys[i] = ov.citedKeys.toArray(String[]::new);
+        }
+    }
+
+    /**
+     * Extract citation keys from names of referenceMarks in the document.
+     *
+     * Each citation key is listed only once, in the order of first appearance
+     * (in `names`, which itself is in arbitrary order)
+     *
+     * doc.referenceMarks.names.map(parse).flatten.unique
+     */
+    private List<String>
+    findCitedKeys(DocumentConnection documentConnection)
+        throws
+        NoSuchElementException,
+        WrappedTargetException,
+        NoDocumentException {
+
+        List<String> names = getJabRefReferenceMarkNames(documentConnection);
+
+        // assert it supports XTextContent
+        XNameAccess xNamedMarks = documentConnection.getReferenceMarks();
+        for (String name1 : names) {
+            Object bookmark = xNamedMarks.getByName(name1);
+            assert (null != unoQI(XTextContent.class, bookmark));
+        }
+
+        // Collect to a flat list while keep only the first appearance.
+        List<String> keys = new ArrayList<>();
+        for (String name1 : names) {
+            List<String> newKeys = parseRefMarkNameToUniqueCitationKeys(name1);
+            for (String key : newKeys) {
+                if (!keys.contains(key)) {
+                    keys.add(key);
+                }
+            }
+        }
+
+        return keys;
+    }
+
+
+    /**
+     *  Given the name of a reference mark, get the corresponding
+     *  pageInfo text.
+     *
+     *  @param documentConnection Connection to a document.
+     *  @param name Name of the custom property to query.
+     *  @return "" for missing or empty pageInfo
+     */
+    private static String
+    getPageInfoForReferenceMarkName(
+        DocumentConnection documentConnection,
+        String name)
+        throws WrappedTargetException,
+        UnknownPropertyException {
+
+        Optional<String> pageInfo = documentConnection.getCustomProperty(name);
+        if (pageInfo.isEmpty() || pageInfo.get().isEmpty()) {
+            return "";
+        }
+        return pageInfo.get();
+    }
+
+    /**
+     * GUI: Get a list of CitationEntry objects corresponding to citations
      * in the document.
+     *
+     * Called from: ManageCitationsDialogViewModel constructor.
      *
      * @return A list with entries corresponding to citations in the
      *         text, in arbitrary order (same order as from
@@ -1076,8 +1284,27 @@ class OOBibBase {
      *               here, but switching between them needs change on
      *               GUI (adding a toggle or selector).
      *
-     *         Wish: selecting an entry in the GUI cold move cursor in
-     *               the document.
+     *               Note: CitationEntry implements Comparable, where
+     *                     compareTo() and equals() are based on refMarkName.
+     *                     The order used in the "Manage citations" dialog
+     *                     does not seem to use that.
+     *
+     *                     In the "Manage citations" dialog, there are 3 columns,
+     *                     the 3rd is empty, and has no title.
+     *
+     *                     The 1st is labeled "Citation" (show citation in bold,
+     *                     and some context around it).
+     *
+     *                     The columns can be sorted by clicking on the column title.
+     *                     For the "Citation" column, the sorting is based on the content,
+     *                     (the context before the citation), not on the citation itself.
+     *
+     *                     In the "Extra information ..." column some visual indication
+     *                     of the editable part could be helpful.
+     *
+     *         Wish: selecting an entry (or a button in the line) in
+     *               the GUI could move the cursor in the document to
+     *               the entry.
      */
     public List<CitationEntry>
     getCitationEntries()
@@ -1178,7 +1405,14 @@ class OOBibBase {
     }
 
     /**
-     * Apply editable parts of citationEntries to the document.
+     * Apply editable parts of citationEntries to the document: store
+     * pageInfo.
+     *
+     * Does not chaneg presentation.
+     *
+     * GUI: "Manage citations" dialog "OK" button.
+     * Called from: ManageCitationsDialogViewModel.storeSettings
+     *
      * <p>
      * Currently the only editable part is pageInfo.
      * <p>
@@ -1216,76 +1450,1157 @@ class OOBibBase {
         }
     }
 
+    /**************************************
+     *
+     *         Look up in databases
+     *
+     * *************************************/
+
     /**
-     * Produce a reference mark name for JabRef for the given citation
-     * key and itcType that does not yet appear among the reference
-     * marks of the document.
-     *
-     * @param bibtexKey The citation key.
-     * @param itcType   Encodes the effect of withText and
-     *                  inParenthesis options.
-     *
-     * The first occurrence of bibtexKey gets no serial number, the
-     * second gets 0, the third 1 ...
-     *
-     * Or the first unused in this series, after removals.
+     * The collection of data returned by findCitedKeys.
      */
-    private String
-    getUniqueReferenceMarkName(
+    private static class FindCitedEntriesResult {
+        /**
+         *  entries : LinkedHashMap with iteration order as the
+         *            citedKeys parameter of findCitedEntries
+         */
+        Map<BibEntry, BibDatabase> entries;
+
+        /**
+         * citeKeyToBibEntry : HashMap (no order)
+         */
+        Map<String, BibEntry> citeKeyToBibEntry;
+
+        FindCitedEntriesResult(
+            Map<BibEntry, BibDatabase> entries,
+            Map<String, BibEntry> citeKeyToBibEntry
+            ) {
+            this.entries = entries;
+            this.citeKeyToBibEntry = citeKeyToBibEntry;
+        }
+    }
+
+    /**
+     * Look up a single citation key in a list of databases.
+     *
+     * @param key Citation key to look up.
+     * @param databases Key is looked up in these, in this order.
+     * @return The BibEntry at the first match, or Optional.empty().
+     */
+    Optional<BibEntry>
+    lookupEntryInDatabases(String key, List<BibDatabase> databases) {
+        for (BibDatabase database : databases) {
+            Optional<BibEntry> entry = database.getEntryByCitationKey(key);
+            if (entry.isPresent()) {
+                return entry;
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
+     *  Look up a list of citation keys in a list of databases.
+     *
+     * @param keys Citation keys to look up.
+     * @param databases Keys are looked up in these, in this order.
+     * @return The BibEntry objects found.
+     *
+     * The order of keys is kept in the result, but unresolved keys
+     * have no representation in the result, so result.get(i) does not
+     * necessarily belong to keys.get(i)
+     *
+     */
+    List<BibEntry>
+    lookupEntriesInDatabasesSkipMissing(
+        List<String> keys,
+        List<BibDatabase> databases
+        ) {
+        List<BibEntry> entries = new ArrayList<>();
+        for (String key : keys) {
+            lookupEntryInDatabases(key, databases).ifPresent(entries::add);
+        }
+        return entries;
+    }
+
+    /**
+     * @return A FindCitedEntriesResult containing
+     *
+     *    entries: A LinkedHashMap, from BibEntry to BibDatabase with
+     *             iteration order as the citedKeys parameter.
+     *
+     *             Stores: in which database was the entry found.
+     *
+     *    citeKeyToBibEntry:
+     *            A HashMap from citation key to BibEntry.
+     *            Stores: result of lookup.
+     *
+     *    For citation keys not found, a new
+     *    UndefinedBibtexEntry(citedKey) is created and added to both
+     *    maps, with a null BibDatabase.
+     *
+     *    How is the result used?
+     *
+     *    entries : Allows to recover the list of keys in original
+     *              order, and finding the corresponding databases.
+     *
+     *              Well, it does, but not by a simple
+     *              entry.getCitationKey(), because
+     *              UndefinedBibtexEntry.getCitationKey() returns
+     *              Optional.empty().
+     *
+     *              For UndefinedBibtexEntry,
+     *              UndefinedBibtexEntry.getKey() returns the
+     *              original key we stored.
+     *
+     *    citeKeyToBibEntry:
+     *
+     *        Caches the result of lookup performed here, with "not
+     *        found" encoded as an instance of UndefinedBibtexEntry.
+     *
+     */
+    private FindCitedEntriesResult
+    findCitedEntries(
+        List<String> citedKeys,
+        List<BibDatabase> databases
+    ) {
+        Map<String, BibEntry> citeKeyToBibEntry = new HashMap<>();
+
+        // LinkedHashMap, iteration order as in citedKeys
+        Map<BibEntry, BibDatabase> entries = new LinkedHashMap<>();
+        for (String citedKey : citedKeys) {
+            boolean found = false;
+            for (BibDatabase database : databases) {
+                Optional<BibEntry> entry = database.getEntryByCitationKey(citedKey);
+                if (entry.isPresent()) {
+                    entries.put(entry.get(), database);
+                    citeKeyToBibEntry.put(citedKey, entry.get());
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                BibEntry x = new UndefinedBibtexEntry(citedKey);
+                entries.put(x, null);
+                citeKeyToBibEntry.put(citedKey, x);
+            }
+        }
+        return new FindCitedEntriesResult(entries, citeKeyToBibEntry);
+    }
+
+    /**
+     *  @return The list of citation keys from `instanceof
+     *          UndefinedBibtexEntry` elements of (keys of) `entries`.
+     *
+     *  Intent: Get list of unresolved citation keys.
+     */
+    private static List<String>
+    unresolvedKeysFromEntries(Map<BibEntry, BibDatabase> entries) {
+        // Collect and return unresolved citation keys.
+        List<String> unresolvedKeys = new ArrayList<>();
+        for (BibEntry entry : entries.keySet()) {
+            if (entry instanceof UndefinedBibtexEntry) {
+                String key = ((UndefinedBibtexEntry) entry).getKey();
+                if (!unresolvedKeys.contains(key)) {
+                    unresolvedKeys.add(key);
+                }
+            }
+        }
+        return unresolvedKeys;
+    }
+
+    /* ***************************************
+     *
+     *     Local order: Presentation order within citation groups
+     *
+     * **************************************/
+
+    /**
+     *  The comparator used to sort within a group of merged
+     *  citations.
+     *
+     *  The term used here is "multicite". The option controlling the
+     *  order is "MultiCiteChronological" in style files.
+     */
+    private Comparator<BibEntry>
+    comparatorForMulticite(OOBibStyle style) {
+        if (style.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL)) {
+            return this.yearAuthorTitleComparator;
+        } else {
+            return this.entryComparator;
+        }
+    }
+
+    /**
+     * Sort entries within a group of merged citations.
+     *
+     * Note: the sort is in-place, modifies the argument.
+     */
+    private void
+    sortBibEntryListForMulticite(List<BibEntry> entries,
+                                 OOBibStyle style) {
+        if (entries.size() <= 1) {
+            return;
+        }
+        entries.sort(comparatorForMulticite(style));
+    }
+
+
+    /**
+     *  Look up citation keys from a map caching earlier look up, sort result within
+     *  each reference mark.
+     *
+     * @param bibtexKeys Citation keys, bibtexKeys[i][j] is for the ith reference mark.
+     * @param citeKeyToBibEntry Cached lookup from keys to entries.
+     */
+    private BibEntry[][]
+    getBibEntriesSortedWithinReferenceMarks(
+        String[][] bibtexKeys,
+        Map<String, BibEntry> citeKeyToBibEntry,
+        OOBibStyle style
+        ) {
+        return
+            Arrays.stream(bibtexKeys)
+            .map(bibtexKeysOfAReferenceMark ->
+                 Arrays.stream(bibtexKeysOfAReferenceMark)
+                 .map(citeKeyToBibEntry::get)
+                 .sorted(comparatorForMulticite(style)) // sort within referenceMark
+                 .toArray(BibEntry[]::new)
+                )
+            .toArray(BibEntry[][]::new);
+    }
+
+    /* ***************************************
+     *
+     *     Global order: by first appearance or by bibliography order
+     *
+     * **************************************/
+
+    /* bibliography order */
+
+    /**
+     * @return Citation keys from `entries`, ordered as in the bibliography.
+     */
+    private List<String>
+    citationKeysOrNullInBibliographyOrderFromEntries(
+        Map<BibEntry, BibDatabase> entries
+        ) {
+
+        // Sort entries to order in bibliography
+        // Belongs to global order.
+        Map<BibEntry, BibDatabase> sortedEntries =
+            sortEntriesByComparator(entries, entryComparator);
+
+        // Citation keys, in the same order as sortedEntries
+        return
+            sortedEntries.keySet().stream()
+            .map(
+                entry ->
+                entry.getCitationKey()
+                // entries came from looking up by citation key,
+                // so Optional.empty() is only possible here for UndefinedBibtexEntry.
+                .orElse(null)
+                )
+            .collect(Collectors.toList());
+    }
+
+    /**
+     *  Return a TreeMap(entryComparator) copy of entries.
+     *
+     *  For sorting the bibliography.
+     */
+    SortedMap<BibEntry, BibDatabase>
+    sortEntriesByComparator(
+        Map<BibEntry, BibDatabase> entries,
+        Comparator<BibEntry> entryComparator
+        ) {
+        SortedMap<BibEntry, BibDatabase> newMap = new TreeMap<>(entryComparator);
+        for (Map.Entry<BibEntry, BibDatabase> kv : entries.entrySet()) {
+            newMap.put(
+                kv.getKey(),
+                kv.getValue());
+        }
+        return newMap;
+    }
+
+
+    /* first appearance order, based on visual order */
+
+    /**
+     *  Given a location, return its position:
+     *  coordinates relative to the top left position
+     *   of the first page of the document.
+     *
+     * @param range  Location.
+     * @param cursor To get the position, we need az XTextViewCursor.
+     *               It will be moved to the range.
+     */
+    private static Point
+    findPositionOfTextRange(XTextRange range, XTextViewCursor cursor) {
+        cursor.gotoRange(range, false);
+        return cursor.getPosition();
+    }
+
+    /**
+     * A reference mark name paired with its visual position.
+     *
+     * Comparison is based on (Y,X): vertical compared first, horizontal second.
+     *
+     * Used for sorting reference marks by their visual positions.
+     *
+     * Note: for text layouts with two or more columns, this gives the wrong order.
+     *
+     */
+    private static class ComparableMark implements Comparable<ComparableMark> {
+
+        private final String name;
+        private final Point position;
+
+        public ComparableMark(String name, Point position) {
+            this.name = name;
+            this.position = position;
+        }
+
+        @Override
+        public int compareTo(ComparableMark other) {
+            if (position.Y == other.position.Y) {
+                return position.X - other.position.X;
+            } else {
+                return position.Y - other.position.Y;
+            }
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (o instanceof ComparableMark) {
+                ComparableMark other = (ComparableMark) o;
+                return ((this.position.X == other.position.X)
+                        && (this.position.Y == other.position.Y)
+                        && Objects.equals(this.name, other.name));
+            }
+            return false;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(position, name);
+        }
+    }
+
+    /**
+     *  Read reference mark names from the document, keep only those
+     *  with JabRef naming convention, get their visual positions,
+     *
+     *  @return JabRef reference mark names sorted by these positions.
+     *
+     *  Limitation: for two column layout visual (top-down,
+     *        left-right) order does not match the expected (textual)
+     *        order.
+     *
+     */
+    private List<String>
+    getJabRefReferenceMarkNamesSortedByPosition(
+        DocumentConnection documentConnection)
+        throws
+        WrappedTargetException,
+        NoDocumentException {
+
+        List<String> names = getJabRefReferenceMarkNames(documentConnection);
+
+        // find coordinates
+        List<Point> positions = new ArrayList<>(names.size());
+
+        XNameAccess nameAccess = documentConnection.getReferenceMarks();
+        XTextViewCursor viewCursor = documentConnection.getViewCursor();
+        // initialPos: to be restored before return
+        XTextRange initialPos = viewCursor.getStart();
+        for (String name : names) {
+
+            XTextContent textContent =
+                DocumentConnection.nameAccessGetTextContentByName(nameAccess, name);
+            // unoQI(XTextContent.class, nameAccess.getByName(name));
+
+            XTextRange range = textContent.getAnchor();
+
+            // Adjust range if we are inside a footnote:
+            if (unoQI(XFootnote.class, range.getText()) != null) {
+                // Find the linking footnote marker:
+                XFootnote footer = unoQI(XFootnote.class, range.getText());
+                // The footnote's anchor gives the correct position in the text:
+                range = footer.getAnchor();
+            }
+            positions.add(findPositionOfTextRange(range, viewCursor));
+        }
+        // restore cursor position
+        viewCursor.gotoRange(initialPos, false);
+
+        // order by position
+        Set<ComparableMark> set = new TreeSet<>();
+        for (int i = 0; i < positions.size(); i++) {
+            set.add(new ComparableMark(names.get(i), positions.get(i)));
+        }
+
+        // collect referenceMarkNames in order
+        List<String> result = new ArrayList<>(set.size());
+        for (ComparableMark mark : set) {
+            result.add(mark.getName());
+        }
+
+        return result;
+    }
+
+    /**
+     *  Refresh list of JabRef reference marks (sorts by position).
+     *
+     *  Probably should be called at the start of actions from the GUI,
+     *  that rely on jabRefReferenceMarkNamesSortedByPosition to be up-to-date.
+     *
+     *  TODO: maybe we should pass around a fresh copy?
+     */
+    public void
+    updateSortedReferenceMarks()
+        throws
+        WrappedTargetException,
+        NoSuchElementException,
+        NoDocumentException {
+
+        DocumentConnection documentConnection = getDocumentConnectionOrThrow();
+
+        this.jabRefReferenceMarkNamesSortedByPosition =
+            getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
+    }
+
+    /**
+     *  Return bibliography entries sorted according to the order of
+     *  first appearance in referenceMarkNames.
+     *
+     * @param referenceMarkNames Names of reference marks.
+     * @param citeKeyToBibEntry  Helps to find the entries
+     * @return LinkedHashMap from BibEntry to BibDatabase with
+     *         iteration order as first appearance in referenceMarkNames.
+     *
+     * Note: Within citation group (a reference mark) the order is
+     *       as appears there.
+     *
+     * TODO: The order within a reference mark name is decided on
+     *       construction (in insertEntry). Is it updated after a style change?
+     *
+     */
+    private Map<BibEntry, BibDatabase>
+    sortEntriesByRefMarkNames(
+        List<String> referenceMarkNames,
+        Map<String, BibEntry> citeKeyToBibEntry,
+        Map<BibEntry, BibDatabase> entries
+        ) {
+        // LinkedHashMap: iteration order is insertion-order, not
+        // affected if a key is re-inserted.
+        Map<BibEntry, BibDatabase> newList = new LinkedHashMap<>();
+
+        for (String name : referenceMarkNames) {
+            Optional<ParsedRefMark> op = parseRefMarkName(name);
+            if (op.isEmpty()) {
+                continue;
+            }
+
+            List<String> keys = op.get().citedKeys;
+            // no need to look in the database again
+            for (String key : keys) {
+                BibEntry origEntry = citeKeyToBibEntry.get(key);
+                if (origEntry != null) {
+                    if (!newList.containsKey(origEntry)) {
+                        BibDatabase database = entries.get(origEntry);
+                        newList.put(origEntry, database);
+                    }
+                } else {
+                    LOGGER.info("Citation key not found: '" + key + "'");
+                    LOGGER.info("Problem with reference mark: '" + name + "'");
+                    newList.put(new UndefinedBibtexEntry(key), null);
+                }
+            }
+        }
+        return newList;
+    }
+
+    /* ***************************************
+     *
+     *     Make them unique: uniqueLetters or numbers
+     *
+     * **************************************/
+
+    private String[][]
+    normalizedCitationMarkersForNormalStyle(
+        BibEntry[][] cEntriesForAll,
+        Map<BibEntry, BibDatabase> entries,
+        OOBibStyle style
+        ) {
+
+        final int nRefMarks = cEntriesForAll.length;
+
+        String[][] normCitMarkers = new String[nRefMarks][];
+        for (int i = 0; i < nRefMarks; i++) {
+            BibEntry[] cEntries = cEntriesForAll[i];
+            // We need "normalized" (in parenthesis) markers
+            // for uniqueness checking purposes:
+            normCitMarkers[i] =
+                Arrays.stream(cEntries)
+                .map(ce ->
+                     style.getCitationMarker(
+                         Collections.singletonList(undefinedBibEntryToNull(ce)),
+                         entries,
+                         true,
+                         null,
+                         new int[] {-1} // no limit on authors
+                         )
+                    )
+                .toArray(String[]::new);
+        }
+        return normCitMarkers;
+    }
+
+    /**
+     * Given bibtexKeys for each reference mark and the corresponding
+     * normalized citation markers for each, fills uniqueLetters.
+     *
+     * We expect to see data for all JabRef reference marks here, and
+     * clear uniqueLetters before filling.
+     *
+     * On return: uniqueLetters.get(bibtexkey) provides letter to be
+     * added after the year (null for none).
+     *
+     * Note: bibtexKeys[i][j] may be null (from UndefinedBibtexEntry)
+     */
+    void updateUniqueLetters(
+        String[][] bibtexKeys,
+        String[][] normCitMarkers,
+        final Map<String, String> uniqueLetters
+        ) {
+
+        final int nRefMarks = bibtexKeys.length;
+        assert nRefMarks == normCitMarkers.length;
+
+        // refKeys: (normCitMarker) to (list of citation keys sharing it).
+        //          The entries in the lists are ordered as in
+        //          normCitMarkers[i][j]
+        Map<String, List<String>> refKeys = new HashMap<>();
+
+        for (int i = 0; i < nRefMarks; i++) {
+            // Compare normalized markers, since the actual
+            // markers can be different.
+            String[] markers = normCitMarkers[i];
+            for (int j = 0; j < markers.length; j++) {
+                String marker = markers[j];
+                String currentKey = bibtexKeys[i][j];
+                // containsKey(null) is OK, contains(null) is OK.
+                if (refKeys.containsKey(marker)) {
+                    // Ok, we have seen this exact marker before.
+                    if (!refKeys.get(marker).contains(currentKey)) {
+                        // ... but not for this entry.
+                        refKeys.get(marker).add(currentKey);
+                    }
+                } else {
+                    // add as new entry
+                    List<String> l = new ArrayList<>(1);
+                    l.add(currentKey);
+                    refKeys.put(marker, l);
+                }
+            }
+        }
+
+        uniqueLetters.clear();
+
+        // Go through the collected lists and see where we need to
+        // add unique letters to the year.
+        for (Map.Entry<String, List<String>> stringListEntry : refKeys.entrySet()) {
+            List<String> clashingKeys = stringListEntry.getValue();
+            if (clashingKeys.size() > 1) {
+                // This marker appears for more than one unique entry:
+                int nextUniqueLetter = 'a';
+                for (String key : clashingKeys) {
+                    // Update the map of uniqueLetters for the
+                    // benefit of both the following generation of
+                    // new citation markers, and for the method
+                    // that builds the bibliography:
+                    uniqueLetters.put(key, String.valueOf((char) nextUniqueLetter));
+                    nextUniqueLetter++;
+                }
+            }
+        }
+    }
+
+    /**
+     * Number source for (1-based) numbering of citations.
+     */
+    private static class CitationNumberingState {
+        /**
+         * numbers : Remembers keys we have seen
+         *           and what number did they receive.
+         */
+        private final Map<String, Integer> numbers;
+
+        /**
+         * The highest number we ever allocated.
+         */
+        private int lastNum;
+
+        CitationNumberingState() {
+            this.numbers = new HashMap<>();
+            this.lastNum = 0;
+        }
+
+        /**
+         * The first call returns 1.
+         */
+        public int getOrAllocateNumber(String key) {
+            int result;
+            if (numbers.containsKey(key)) {
+                // Already seen
+                result = numbers.get(key);
+            } else {
+                // First time to see. Allocate number.
+                lastNum++;
+                numbers.put(key, lastNum);
+                result = lastNum;
+            }
+            return result;
+        }
+    }
+
+    /**
+     * Gets number for a BibEntry. (-1) for UndefinedBibtexEntry
+     *
+     * BibEntry.getCitationKey() must not be Optional.empty(), except
+     * for UndefinedBibtexEntry.
+     *
+     */
+    private static int
+    numberPossiblyUndefinedBibEntry(
+        BibEntry ce,
+        CitationNumberingState cns
+        ) {
+
+        if (ce instanceof UndefinedBibtexEntry) {
+            return (-1);
+        }
+
+        String key = (ce.getCitationKey()
+                      .orElseThrow(IllegalArgumentException::new));
+
+        return cns.getOrAllocateNumber(key);
+    }
+
+    /**
+     * Resolve the citation key from a citation reference marker name,
+     * and look up the index of the key in a list of keys.
+     *
+     * @param keysCitedHere   The citation keys needing indices.
+     * @param orderedCiteKeys A List of citation keys representing the
+     *                        entries in the bibliography.
+     *
+     * @return The (1-based) indices of the cited keys,
+     *         or (-1) if a key is not found.
+     */
+    private static List<Integer>
+    findCitedEntryIndices(
+        List<String> keysCitedHere,
+        List<String> orderedCiteKeys
+        ) {
+        List<Integer> result = new ArrayList<>(keysCitedHere.size());
+        for (String key : keysCitedHere) {
+            int ind = orderedCiteKeys.indexOf(key);
+            result.add(
+                ind == -1
+                ? -1
+                : 1 + ind // 1-based
+                );
+        }
+        return result;
+    }
+
+
+
+    /* ***************************************
+     *
+     *     Calculate presentation of citation groups
+     *     (create citMarkers)
+     *
+     * **************************************/
+
+    /**
+     * Given the withText and inParenthesis options,
+     * return the corresponding itcType.
+     *
+     * @param withText False means invisible citation (no text).
+     * @param inParenthesis True means "(Au and Thor 2000)".
+     *                      False means "Au and Thor (2000)".
+     */
+    private static int
+    citationTypeFromOptions(boolean withText, boolean inParenthesis) {
+        if (!withText) {
+            return OOBibBase.INVISIBLE_CIT;
+        }
+        return (inParenthesis
+                ? OOBibBase.AUTHORYEAR_PAR
+                : OOBibBase.AUTHORYEAR_INTEXT);
+    }
+
+    /**
+     * @return Null if cEntry is an UndefinedBibtexEntry,
+     *         otherwise return cEntry itself.
+     */
+    private static BibEntry
+    undefinedBibEntryToNull(BibEntry cEntry) {
+        if (cEntry instanceof UndefinedBibtexEntry) {
+            return null;
+        }
+        return cEntry;
+    }
+
+    /**
+     *   result[i][j] = cEntriesForAll[i][j].getCitationKey()
+     */
+    private String[][]
+    mapBibEntriesToCitationKeysOrNullForAll(BibEntry[][] cEntriesForAll) {
+        return
+            Arrays.stream(cEntriesForAll)
+            .map(cEntries ->
+                 Arrays.stream(cEntries)
+                 .map(ce -> ce.getCitationKey().orElse(null))
+                 .toArray(String[]::new)
+                )
+            .toArray(String[][]::new);
+    }
+
+    /**
+     * Checks that every element of `keys` can be found in `citeKeyToBibEntry`.
+     *
+     * Collects the missing keys, and if there is any, throws
+     * BibEntryNotFoundException (currently mentioning only the first
+     * missing key).
+     *
+     * @param keys An array of citation keys, we expect to appear as
+     *             keys in citeKeyToBibEntry.
+     *
+     * @param citeKeyToBibEntry Should map each key in keys to a BibEntry.
+     * @param referenceMarkName The reference mark these keys belong to.
+     *                          Mentioned in the exception.
+     */
+    private static void
+    assertKeysInCiteKeyToBibEntry(
+        String[] keys, // citeKeys
+        Map<String, BibEntry> citeKeyToBibEntry,
+        String referenceMarkName, // for reporting
+        String where
+    )
+        throws BibEntryNotFoundException {
+
+        // check keys
+        List<String> unresolvedKeys =
+            Arrays.stream(keys)
+            .filter(key -> null == citeKeyToBibEntry.get(key))
+            .collect(Collectors.toList());
+
+        for (String key : unresolvedKeys) {
+            LOGGER.info("assertKeysInCiteKeyToBibEntry: Citation key not found: '" + key + '\'');
+            LOGGER.info("Problem with reference mark: '" + referenceMarkName + "' " + where);
+            String msg =
+                Localization.lang(
+                    "Could not resolve BibTeX entry"
+                    + " for citation marker '%0'.",
+                    referenceMarkName);
+            throw new BibEntryNotFoundException(referenceMarkName, msg);
+        }
+    }
+
+    /**
+     * For each reference mark name: check the corresponding element of
+     * bibtexKeys with assertKeysInCiteKeyToBibEntry.
+     */
+    private static void
+    assertAllKeysInCiteKeyToBibEntry(
+        List<String> referenceMarkNames,
+        String[][] bibtexKeys,
+        Map<String, BibEntry> citeKeyToBibEntry,
+        String where
+        )
+        throws BibEntryNotFoundException {
+
+        final int nRefMarks = referenceMarkNames.size();
+        assert (nRefMarks == bibtexKeys.length);
+
+        for (int i = 0; i < nRefMarks; i++) {
+            assertKeysInCiteKeyToBibEntry(
+                bibtexKeys[i],
+                citeKeyToBibEntry,
+                referenceMarkNames.get(i),
+                where
+            );
+        }
+    }
+
+    /**
+     *  Produce citation markers for the case when the citation
+     *  markers are the citation keys themselves, separated by commas.
+     */
+    private static String[]
+    produceCitationMarkersForIsCitationKeyCiteMarkers(
+        List<String> referenceMarkNames,
+        String[][] bibtexKeys,
+        Map<String, BibEntry> citeKeyToBibEntry,
+        OOBibStyle style
+        )
+        throws BibEntryNotFoundException {
+
+        assert style.isCitationKeyCiteMarkers();
+
+        final int nRefMarks = referenceMarkNames.size();
+
+        assert nRefMarks == bibtexKeys.length;
+        assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeys, citeKeyToBibEntry,
+                                         "produceCitationMarkersForIsCitationKeyCiteMarkers");
+
+        String[] citMarkers = new String[nRefMarks];
+        for (int i = 0; i < nRefMarks; i++) {
+            citMarkers[i] =
+                Arrays.stream(bibtexKeys[i])
+                .map(citeKeyToBibEntry::get)
+                .map(c -> c.getCitationKey().orElse(""))
+                .collect(Collectors.joining(","));
+        }
+        return citMarkers;
+    }
+
+
+    /**
+     * Produce citation markers for the case of numbered citations
+     * with bibliography sorted by first appearance in the text.
+     *
+     * @param referenceMarkNames Names of reference marks.
+     *
+     * @param bibtexKeys Expects bibtexKeys[i] to correspond to
+     *                   referenceMarkNames.get(i)
+     *
+     * @param citeKeyToBibEntry Look up BibEntry by bibtexKey.
+     *                          Must contain all bibtexKeys,
+     *                          but may map to UndefinedBibtexEntry.
+     *
+     * @return Numbered citation markers for bibtexKeys.
+     *         Numbering is according to first encounter
+     *         in bibtexKeys[i][j]
+     *
+     */
+    private static String[]
+    produceCitationMarkersForIsNumberEntriesIsSortByPosition(
+        List<String> referenceMarkNames,
+        String[][] bibtexKeys,
+        Map<String, BibEntry> citeKeyToBibEntry,
+        OOBibStyle style
+        )
+        throws BibEntryNotFoundException {
+
+        assert style.isNumberEntries();
+        assert style.isSortByPosition();
+
+        final int nRefMarks = referenceMarkNames.size();
+        assert (nRefMarks == bibtexKeys.length);
+        assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeys, citeKeyToBibEntry,
+                                         "produceCitationMarkersForIsNumberEntriesIsSortByPosition");
+
+        String[] citMarkers = new String[nRefMarks];
+
+        CitationNumberingState cns = new CitationNumberingState();
+
+        final int minGroupingCount =
+            style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
+
+        for (int i = 0; i < referenceMarkNames.size(); i++) {
+
+            // numbers: Numbers for cited sources. (-1) for UndefinedBibtexEntry.
+            List<Integer> numbers =
+                Arrays.stream(bibtexKeys[i])
+                .map(citeKeyToBibEntry::get)
+                .map(ce -> numberPossiblyUndefinedBibEntry(ce, cns))
+                .collect(Collectors.toList());
+
+            citMarkers[i] =
+                style.getNumCitationMarker(numbers, minGroupingCount, false);
+        }
+        return citMarkers;
+    }
+
+
+    /**
+     * Produce citation markers for the case of numbered citations
+     * when the bibliography is not sorted by position.
+     */
+    private String[]
+    produceCitationMarkersForIsNumberEntriesNotSortByPosition(
+        List<String> referenceMarkNames,
+        String[][] bibtexKeys,
+        Map<BibEntry, BibDatabase> entries,
+        OOBibStyle style
+        ) {
+        assert style.isNumberEntries();
+        assert !style.isSortByPosition();
+
+        final int nRefMarks = referenceMarkNames.size();
+        assert (nRefMarks == bibtexKeys.length);
+        String[] citMarkers = new String[nRefMarks];
+
+        List<String> sortedCited =
+            citationKeysOrNullInBibliographyOrderFromEntries(entries);
+
+        final int minGroupingCount =
+            style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
+
+        for (int i = 0; i < referenceMarkNames.size(); i++) {
+            List<Integer> numbers =
+                findCitedEntryIndices(
+                    Arrays.asList(bibtexKeys[i]),
+                    sortedCited
+                    );
+            citMarkers[i] = style.getNumCitationMarker(numbers, minGroupingCount, false);
+        }
+        return citMarkers;
+    }
+
+
+    /**
+     * Produce citMarkers for normal (!isCitationKeyCiteMarkers && ! isNumberEntries) styles.
+     *
+     * @param referenceMarkNames Names of reference marks.
+     * @param bibtexKeysIn       Bibtex citation keys.
+     * @param citeKeyToBibEntry  Maps citation keys to BibEntry.
+     * @param itcTypes           Citation types.
+     * @param entries            Map BibEntry to BibDatabase.
+     * @param uniqueLetters      Filled with new values here.
+     * @param style              Bibliography style.
+     */
+    String[]
+    produceCitationMarkersForNormalStyle(
+        List<String> referenceMarkNames,
+        String[][] bibtexKeysIn,
+        Map<String, BibEntry> citeKeyToBibEntry,
+        int[] itcTypes,
+        Map<BibEntry, BibDatabase> entries,
+        final Map<String, String> uniqueLetters,
+        OOBibStyle style
+        )
+        throws BibEntryNotFoundException {
+        uniqueLetters.clear();
+
+        assert !style.isCitationKeyCiteMarkers();
+        assert !style.isNumberEntries();
+        // Citations in (Au1, Au2 2000) form
+
+        final int nRefMarks = referenceMarkNames.size();
+        assert (bibtexKeysIn.length == nRefMarks);
+        assert (itcTypes.length == nRefMarks);
+        assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeysIn, citeKeyToBibEntry,
+                                         "produceCitationMarkersForNormalStyle");
+
+        BibEntry[][] cEntriesForAll =
+            getBibEntriesSortedWithinReferenceMarks(bibtexKeysIn, citeKeyToBibEntry, style);
+
+        // Update bibtexKeys to match the new sorting (within each referenceMark)
+        String[][] bibtexKeys = mapBibEntriesToCitationKeysOrNullForAll(cEntriesForAll);
+        // Note: bibtexKeys[i][j] may be null, for UndefinedBibtexEntry
+
+        assert (bibtexKeys.length == nRefMarks);
+
+        String[][] normCitMarkers =
+            normalizedCitationMarkersForNormalStyle(cEntriesForAll, entries, style);
+
+        updateUniqueLetters(bibtexKeys, normCitMarkers, uniqueLetters);
+
+        // Finally, go through all citation markers, and update
+        // those referring to entries in our current list:
+        final int maxAuthorsFirst = style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST);
+        Set<String> seenBefore = new HashSet<>();
+
+        String[] citMarkers = new String[nRefMarks];
+
+        for (int i = 0; i < nRefMarks; i++) {
+
+            final int nCitedEntries = bibtexKeys[i].length;
+            int[] firstLimAuthors = new int[nCitedEntries];
+            String[] uniqueLetterForCitedEntry = new String[nCitedEntries];
+
+            for (int j = 0; j < nCitedEntries; j++) {
+                String currentKey = bibtexKeys[i][j]; // nullable
+
+                // firstLimAuthors will be (-1) except at the first
+                // refMark it appears at, where a positive
+                // maxAuthorsFirst may override. This is why:
+                // https://discourse.jabref.org/t/
+                // number-of-authors-in-citations-style-libreoffice/747/3
+                // "Some citation styles require to list the full
+                // names of the first 4 authors for the first
+                // time. Later it is sufficient to have only maybe
+                // (Author A and Author B 2019 et al.)"
+                firstLimAuthors[j] = -1;
+                if (maxAuthorsFirst > 0) {
+                    if (!seenBefore.contains(currentKey)) {
+                        firstLimAuthors[j] = maxAuthorsFirst;
+                    }
+                    seenBefore.add(currentKey);
+                }
+
+                String uniqueLetterForKey = uniqueLetters.get(currentKey);
+                uniqueLetterForCitedEntry[j] =
+                    (uniqueLetterForKey == null
+                     ? ""
+                     : uniqueLetterForKey);
+            }
+
+            List<BibEntry> cEntries =
+                Arrays.stream(cEntriesForAll[i])
+                .map(OOBibBase::undefinedBibEntryToNull)
+                .collect(Collectors.toList());
+
+            citMarkers[i] =
+                style.getCitationMarker(
+                    cEntries,
+                    entries,
+                    itcTypes[i] == OOBibBase.AUTHORYEAR_PAR,
+                    uniqueLetterForCitedEntry,
+                    firstLimAuthors
+                    );
+        }
+
+        return citMarkers;
+    }
+
+
+    /* ***********************************
+     *
+     *  modifies both storage and presentation
+     *
+     * ***********************************/
+
+    /**
+     *
+     *  Insert a reference mark: creates and fills it.
+     *
+     * @param documentConnection Connection to a document.
+     *
+     * @param name Name of the reference mark to be created and also
+     *             the name of the custom property holding the pageInfo part.
+     */
+    private void
+    insertReferenceMark(
         DocumentConnection documentConnection,
-        String bibtexKey,
-        int itcType)
-        throws NoDocumentException {
+        String name,
+        String citationText,
+        XTextCursor position,
+        boolean withText,
+        OOBibStyle style
+        )
+        throws
+        UnknownPropertyException,
+        WrappedTargetException,
+        PropertyVetoException,
+        IllegalArgumentException,
+        UndefinedCharacterFormatException,
+        CreationException {
 
-        XNameAccess xNamedRefMarks = documentConnection.getReferenceMarks();
-        int i = 0;
-        String name = BIB_CITATION + '_' + itcType + '_' + bibtexKey;
-        while (xNamedRefMarks.hasByName(name)) {
-            name = BIB_CITATION + i + '_' + itcType + '_' + bibtexKey;
-            i++;
+        // Last minute editing: If there is "page info" for this
+        // citation mark, inject it into the citation marker before
+        // inserting.
+
+        // TODO: Consider moving pageInfo stuff to citation marker
+        //       generation. May need to modify getCitationMarker,
+        // at ./jabref/src/main/java/org/jabref/logic/openoffice/OOBibStyle.java 492:
+        //       to emit html code.
+        String citText;
+        String pageInfo =
+            getPageInfoForReferenceMarkName(documentConnection, name);
+        citText =
+            pageInfo.isEmpty()
+            ? citationText
+            : style.insertPageInfo(citationText, pageInfo);
+
+        if (withText) {
+            position.setString(citText);
+            DocumentConnection.setCharLocaleNone(position);
+            if (style.isFormatCitations()) {
+                String charStyle = style.getCitationCharacterFormat();
+                DocumentConnection.setCharStyle(position, charStyle);
+            }
+        } else {
+            position.setString("");
         }
-        return name;
+
+        documentConnection.insertReferenceMark(name, position, true);
+
+        // Last minute editing: find "et al." (OOBibStyle.ET_AL_STRING) and
+        //                      format it as italic.
+
+        // Q: Are we sure that OOBibStyle.ET_AL_STRING cannot be part of author names
+        //    in any language?
+        // A: No, but have no examples either.
+
+        // Q: Are we sure, citText does not contain multiple "et al." strings?
+        // A: It *can* contain more than one.
+
+        // TODO: Could we move italicizing "et al." to a more proper place?
+        //       Maybe we could use POSTFORMATTER with "<i>...</i>"
+        //       That might make OOBibStyle.ITALIC_ET_AL superfluous.
+        //       Maybe
+        //       insertOOFormattedTextAtCurrentLocation could be used
+        //       to do the insert (if paragraph style manipulation
+        //       is removed)
+
+        // TODO: Handle multiple "et al." strings.
+
+        // Check if we should italicize the "et al." string in citations:
+        boolean italicize = style.getBooleanCitProperty(OOBibStyle.ITALIC_ET_AL);
+        if (italicize) {
+            String etAlString = style.getStringCitProperty(OOBibStyle.ET_AL_STRING);
+            int index = citText.indexOf(etAlString);
+            if (index >= 0) {
+                italicizeRangeFromPosition(position, index, index + etAlString.length());
+            }
+        }
+
+        position.collapseToEnd();
     }
 
     /**
-     * This is what we get back from parsing a refMarkName.
+     * Taking position.getStart() as a reference point, italicize the range (ref+start,ref+end)
      *
-     * TODO: We have one itcType per refMarkName. Merge reduces the
-     * number of itcType values.
+     * @param position  : position.getStart() is out reference point.
+     * @param start     : start of range to italicize w.r.t position.getStart().
+     * @param end       : end of range  to italicize w.r.t position.getStart().
+     *
+     *  Why this API?  This is used after finding "et al." string in a
+     *  citation marker.
      */
-    private static class ParsedRefMark {
-        /**  "", "0", "1" ... */
-        public String i;
-        /** in-text-citation type */
-        public int itcType;
-        /** Citation keys embedded in the reference mark. */
-        public List<String> citedKeys;
+    private void
+    italicizeRangeFromPosition(
+        XTextCursor position,
+        int start,
+        int end
+        )
+        throws
+        UnknownPropertyException,
+        PropertyVetoException,
+        IllegalArgumentException,
+        WrappedTargetException {
 
-        ParsedRefMark(String i, int itcType, List<String> citedKeys) {
-            this.i = i;
-            this.itcType = itcType;
-            this.citedKeys = citedKeys;
-        }
-    }
+        XTextRange range = position.getStart();
+        XTextCursor cursor = position.getText().createTextCursorByRange(range);
+        cursor.goRight((short) start, false);
+        cursor.goRight((short) (end - start), true);
 
-    /**
-     * Parse a JabRef reference mark name.
-     *
-     * @return Optional.empty() on failure.
-     *
-     */
-    private static Optional<ParsedRefMark>
-    parseRefMarkName(String refMarkName) {
-
-        Matcher citeMatcher = CITE_PATTERN.matcher(refMarkName);
-        if (!citeMatcher.find()) {
-            return Optional.empty();
-        }
-
-        List<String> keys = Arrays.asList(citeMatcher.group(3).split(","));
-        String i = citeMatcher.group(1);
-        int itcType = Integer.parseInt(citeMatcher.group(2));
-        return (Optional.of(new OOBibBase.ParsedRefMark(i, itcType, keys)));
+        DocumentConnection.setCharFormatItalic(cursor);
     }
 
     /**
@@ -1368,7 +2683,7 @@ class OOBibBase {
 
             // TODO: (style-dependent) sorting entries for presentation
             //       affects the storage order of citation keys.
-            //       - (1) presentation order shoudl be decided
+            //       - (1) presentation order should be decided
             //             when generating the presentation
             //       - (2) storage order should keep the order
             //             provided by the user.
@@ -1385,10 +2700,11 @@ class OOBibBase {
             // Generate unique bookmark-name
             // TODO: citationType is itcType elsewhere
             int citationType = citationTypeFromOptions(withText, inParenthesis);
-            String newName = getUniqueReferenceMarkName(
-                documentConnection,
-                keyString,
-                citationType);
+            String newName =
+                getUniqueReferenceMarkName(
+                    documentConnection,
+                    keyString,
+                    citationType);
 
             // If we should store metadata for page info, do that now:
             if (pageInfo != null) {
@@ -1500,162 +2816,18 @@ class OOBibBase {
         }
     }
 
-    /**
-     * Extract the list of citation keys from a reference mark name.
-     *
-     * @param name The reference mark name.
-     * @return The list of citation keys encoded in the name.
-     *
-     *         In case of duplicated citation keys,
-     *         only the first occurrence.
-     *         Otherwise their order is preserved.
-     *
-     *         If name does not match CITE_PATTERN,
-     *         an empty list of strings is returned.
-     */
-    private List<String>
-    parseRefMarkNameToUniqueCitationKeys(String name) {
-        Optional<ParsedRefMark> op = parseRefMarkName(name);
-        return
-            op.map(
-                parsedRefMark ->
-                parsedRefMark.citedKeys.stream()
-                .distinct()
-                .collect(Collectors.toList())
-                )
-            .orElseGet(ArrayList::new);
-    }
 
-    /**
-     * Extract citation keys from names of referenceMarks in the document.
+    /* **************************************************
      *
-     * Each citation key is listed only once, in the order of first appearance
-     * (in `names`, which itself is in arbitrary order)
+     *  modifies both storage and presentation, but should only affect presentation
      *
-     * doc.referenceMarks.names.map(parse).flatten.unique
-     */
-    private List<String>
-    findCitedKeys(DocumentConnection documentConnection)
-        throws
-        NoSuchElementException,
-        WrappedTargetException,
-        NoDocumentException {
+     * **************************************************/
 
-        List<String> names = getJabRefReferenceMarkNames(documentConnection);
-
-        // assert it supports XTextContent
-        XNameAccess xNamedMarks = documentConnection.getReferenceMarks();
-        for (String name1 : names) {
-            Object bookmark = xNamedMarks.getByName(name1);
-            assert (null != unoQI(XTextContent.class, bookmark));
-        }
-
-        // Collect to a flat list while keep only the first appearance.
-        List<String> keys = new ArrayList<>();
-        for (String name1 : names) {
-            List<String> newKeys = parseRefMarkNameToUniqueCitationKeys(name1);
-            for (String key : newKeys) {
-                if (!keys.contains(key)) {
-                    keys.add(key);
-                }
-            }
-        }
-
-        return keys;
-    }
-
-    /**
-     * The collection of data returned by findCitedKeys.
-     */
-    private static class FindCitedEntriesResult {
-        /**
-         *  entries : LinkedHashMap with iteration order as the
-         *            citedKeys parameter of findCitedEntries
-         */
-        Map<BibEntry, BibDatabase> entries;
-
-        /**
-         * citeKeyToBibEntry : HashMap (no order)
-         */
-        Map<String, BibEntry> citeKeyToBibEntry;
-
-        FindCitedEntriesResult(
-            Map<BibEntry, BibDatabase> entries,
-            Map<String, BibEntry> citeKeyToBibEntry
-            ) {
-            this.entries = entries;
-            this.citeKeyToBibEntry = citeKeyToBibEntry;
-        }
-    }
-
-    /**
-     * @return A FindCitedEntriesResult containing
-     *
-     *    entries: A LinkedHashMap, from BibEntry to BibDatabase with
-     *             iteration order as the citedKeys parameter.
-     *
-     *             Stores: in which database was the entry found.
-     *
-     *    citeKeyToBibEntry:
-     *            A HashMap from citation key to BibEntry.
-     *            Stores: result of lookup.
-     *
-     *    For citation keys not found, a new
-     *    UndefinedBibtexEntry(citedKey) is created and added to both
-     *    maps, with a null BibDatabase.
-     *
-     *    How is the result used?
-     *
-     *    entries : Allows to recover the list of keys in original
-     *              order, and finding the corresponding databases.
-     *
-     *              Well, it does, but not by a simple
-     *              entry.getCitationKey(), because
-     *              UndefinedBibtexEntry.getCitationKey() returns
-     *              Optional.empty().
-     *
-     *              For UndefinedBibtexEntry,
-     *              UndefinedBibtexEntry.getKey() returns the
-     *              original key we stored.
-     *
-     *    citeKeyToBibEntry:
-     *
-     *        Caches the result of lookup performed here, with "not
-     *        found" encoded as an instance of UndefinedBibtexEntry.
-     *
-     */
-    private FindCitedEntriesResult
-    findCitedEntries(
-        List<String> citedKeys,
-        List<BibDatabase> databases
-    ) {
-        Map<String, BibEntry> citeKeyToBibEntry = new HashMap<>();
-
-        // LinkedHashMap, iteration order as in citedKeys
-        Map<BibEntry, BibDatabase> entries = new LinkedHashMap<>();
-        for (String citedKey : citedKeys) {
-            boolean found = false;
-            for (BibDatabase database : databases) {
-                Optional<BibEntry> entry = database.getEntryByCitationKey(citedKey);
-                if (entry.isPresent()) {
-                    entries.put(entry.get(), database);
-                    citeKeyToBibEntry.put(citedKey, entry.get());
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) {
-                BibEntry x = new UndefinedBibtexEntry(citedKey);
-                entries.put(x, null);
-                citeKeyToBibEntry.put(citedKey, x);
-            }
-        }
-        return new FindCitedEntriesResult(entries, citeKeyToBibEntry);
-    }
 
     /**
      * Refresh all citation markers in the document.
+     *
+     * GUI: called as part of "Export cited"
      *
      * @param databases The databases to get entries from.
      * @param style     The bibliography style to use.
@@ -1694,322 +2866,6 @@ class OOBibBase {
         }
     }
 
-    /**
-     * @return Null if cEntry is an UndefinedBibtexEntry,
-     *         otherwise return cEntry itself.
-     */
-    private static BibEntry
-    undefinedBibEntryToNull(BibEntry cEntry) {
-        if (cEntry instanceof UndefinedBibtexEntry) {
-            return null;
-        }
-        return cEntry;
-    }
-
-    /**
-     * Checks that every element of `keys` can be found in `citeKeyToBibEntry`.
-     *
-     * Collects the missing keys, and if there is any, throws
-     * BibEntryNotFoundException (currently mentioning only the first
-     * missing key).
-     *
-     * @param keys An array of citation keys, we expect to appear as
-     *             keys in citeKeyToBibEntry.
-     *
-     * @param citeKeyToBibEntry Should map each key in keys to a BibEntry.
-     * @param referenceMarkName The reference mark these keys belong to.
-     *                          Mentioned in the exception.
-     */
-    private static void
-    assertKeysInCiteKeyToBibEntry(
-        String[] keys, // citeKeys
-        Map<String, BibEntry> citeKeyToBibEntry,
-        String referenceMarkName, // for reporting
-        String where
-    )
-        throws BibEntryNotFoundException {
-
-        // check keys
-        List<String> unresolvedKeys =
-            Arrays.stream(keys)
-            .filter(key -> null == citeKeyToBibEntry.get(key))
-            .collect(Collectors.toList());
-
-        for (String key : unresolvedKeys) {
-            LOGGER.info("assertKeysInCiteKeyToBibEntry: Citation key not found: '" + key + '\'');
-            LOGGER.info("Problem with reference mark: '" + referenceMarkName + "' " + where);
-            String msg =
-                Localization.lang(
-                    "Could not resolve BibTeX entry"
-                    + " for citation marker '%0'.",
-                    referenceMarkName);
-            throw new BibEntryNotFoundException(referenceMarkName, msg);
-        }
-    }
-
-    /**
-     * For each reference mark name: check the corresponding element of
-     * bibtexKeys with assertKeysInCiteKeyToBibEntry.
-     */
-    private static void
-    assertAllKeysInCiteKeyToBibEntry(
-        List<String> referenceMarkNames,
-        String[][] bibtexKeys,
-        Map<String, BibEntry> citeKeyToBibEntry,
-        String where
-        )
-        throws BibEntryNotFoundException {
-
-        final int nRefMarks = referenceMarkNames.size();
-        assert (nRefMarks == bibtexKeys.length);
-
-        for (int i = 0; i < nRefMarks; i++) {
-            assertKeysInCiteKeyToBibEntry(
-                bibtexKeys[i],
-                citeKeyToBibEntry,
-                referenceMarkNames.get(i),
-                where
-            );
-        }
-    }
-
-    /**
-     *  Produce citation markers for the case when the citation
-     *  markers are the citation keys themselves, separated by commas.
-     */
-    private static String[]
-    produceCitationMarkersForIsCitationKeyCiteMarkers(
-        List<String> referenceMarkNames,
-        String[][] bibtexKeys,
-        Map<String, BibEntry> citeKeyToBibEntry,
-        OOBibStyle style
-        )
-        throws BibEntryNotFoundException {
-
-        assert style.isCitationKeyCiteMarkers();
-
-        final int nRefMarks = referenceMarkNames.size();
-
-        assert nRefMarks == bibtexKeys.length;
-        assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeys, citeKeyToBibEntry,
-                                         "produceCitationMarkersForIsCitationKeyCiteMarkers");
-
-        String[] citMarkers = new String[nRefMarks];
-        for (int i = 0; i < nRefMarks; i++) {
-            citMarkers[i] =
-                Arrays.stream(bibtexKeys[i])
-                .map(citeKeyToBibEntry::get)
-                .map(c -> c.getCitationKey().orElse(""))
-                .collect(Collectors.joining(","));
-        }
-        return citMarkers;
-    }
-
-    /**
-     * Number source for (1-based) numbering of citations.
-     */
-    private static class CitationNumberingState {
-        /**
-         * numbers : Remembers keys we have seen
-         *           and what number did they receive.
-         */
-        private final Map<String, Integer> numbers;
-
-        /**
-         * The highest number we ever allocated.
-         */
-        private int lastNum;
-
-        CitationNumberingState() {
-            this.numbers = new HashMap<>();
-            this.lastNum = 0;
-        }
-
-        /**
-         * The first call returns 1.
-         */
-        public int getOrAllocateNumber(String key) {
-            int result;
-            if (numbers.containsKey(key)) {
-                // Already seen
-                result = numbers.get(key);
-            } else {
-                // First time to see. Allocate number.
-                lastNum++;
-                numbers.put(key, lastNum);
-                result = lastNum;
-            }
-            return result;
-        }
-    }
-
-    /**
-     * Gets number for a BibEntry. (-1) for UndefinedBibtexEntry
-     *
-     * BibEntry.getCitationKey() must not be Optional.empty(), except
-     * for UndefinedBibtexEntry.
-     *
-     */
-    private static int
-    numberPossiblyUndefinedBibEntry(
-        BibEntry ce,
-        CitationNumberingState cns
-        ) {
-
-        if (ce instanceof UndefinedBibtexEntry) {
-            return (-1);
-        }
-
-        String key = (ce.getCitationKey()
-                      .orElseThrow(IllegalArgumentException::new));
-
-        return cns.getOrAllocateNumber(key);
-    }
-
-    /**
-     * Produce citation markers for the case of numbered citations
-     * with bibliography sorted by first appearance in the text.
-     *
-     * @param referenceMarkNames Names of reference marks.
-     *
-     * @param bibtexKeys Expects bibtexKeys[i] to correspond to
-     *                   referenceMarkNames.get(i)
-     *
-     * @param citeKeyToBibEntry Look up BibEntry by bibtexKey.
-     *                          Must contain all bibtexKeys,
-     *                          but may map to UndefinedBibtexEntry.
-     *
-     * @return Numbered citation markers for bibtexKeys.
-     *         Numbering is according to first encounter
-     *         in bibtexKeys[i][j]
-     *
-     */
-    private static String[]
-    produceCitationMarkersForIsNumberEntriesIsSortByPosition(
-        List<String> referenceMarkNames,
-        String[][] bibtexKeys,
-        Map<String, BibEntry> citeKeyToBibEntry,
-        OOBibStyle style
-        )
-        throws BibEntryNotFoundException {
-
-        assert style.isNumberEntries();
-        assert style.isSortByPosition();
-
-        final int nRefMarks = referenceMarkNames.size();
-        assert (nRefMarks == bibtexKeys.length);
-        assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeys, citeKeyToBibEntry,
-                                         "produceCitationMarkersForIsNumberEntriesIsSortByPosition");
-
-        String[] citMarkers = new String[nRefMarks];
-
-        CitationNumberingState cns = new CitationNumberingState();
-
-        final int minGroupingCount =
-            style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
-
-        for (int i = 0; i < referenceMarkNames.size(); i++) {
-
-            // numbers: Numbers for cited sources. (-1) for UndefinedBibtexEntry.
-            List<Integer> numbers =
-                Arrays.stream(bibtexKeys[i])
-                .map(citeKeyToBibEntry::get)
-                .map(ce -> numberPossiblyUndefinedBibEntry(ce, cns))
-                .collect(Collectors.toList());
-
-            citMarkers[i] =
-                style.getNumCitationMarker(numbers, minGroupingCount, false);
-        }
-        return citMarkers;
-    }
-
-    /**
-     * @return Citation keys from `entries`, ordered as in the bibliography.
-     */
-    private List<String>
-    citationKeysOrNullInBibliographyOrderFromEntries(
-        Map<BibEntry, BibDatabase> entries
-        ) {
-
-        // Sort entries to order in bibliography
-        Map<BibEntry, BibDatabase> sortedEntries =
-            sortEntriesByComparator(entries, entryComparator);
-
-        // Citation keys, in the same order as sortedEntries
-        return
-            sortedEntries.keySet().stream()
-            .map(
-                entry ->
-                entry.getCitationKey()
-                // entries came from looking up by citation key,
-                // so Optional.empty() is only possible here for UndefinedBibtexEntry.
-                .orElse(null)
-                )
-            .collect(Collectors.toList());
-    }
-
-    /**
-     * Produce citation markers for the case of numbered citations
-     * when the bibliography is not sorted by position.
-     */
-    private String[]
-    produceCitationMarkersForIsNumberEntriesNotSortByPosition(
-        List<String> referenceMarkNames,
-        String[][] bibtexKeys,
-        Map<BibEntry, BibDatabase> entries,
-        OOBibStyle style
-        ) {
-        assert style.isNumberEntries();
-        assert !style.isSortByPosition();
-
-        final int nRefMarks = referenceMarkNames.size();
-        assert (nRefMarks == bibtexKeys.length);
-        String[] citMarkers = new String[nRefMarks];
-
-        List<String> sortedCited =
-            citationKeysOrNullInBibliographyOrderFromEntries(entries);
-
-        final int minGroupingCount =
-            style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
-
-        for (int i = 0; i < referenceMarkNames.size(); i++) {
-            List<Integer> numbers =
-                findCitedEntryIndices(
-                    Arrays.asList(bibtexKeys[i]),
-                    sortedCited
-                    );
-            citMarkers[i] = style.getNumCitationMarker(numbers, minGroupingCount, false);
-        }
-        return citMarkers;
-    }
-
-    /**
-     * Resolve the citation key from a citation reference marker name,
-     * and look up the index of the key in a list of keys.
-     *
-     * @param keysCitedHere   The citation keys needing indices.
-     * @param orderedCiteKeys A List of citation keys representing the
-     *                        entries in the bibliography.
-     *
-     * @return The (1-based) indices of the cited keys,
-     *         or (-1) if a key is not found.
-     */
-    private static List<Integer>
-    findCitedEntryIndices(
-        List<String> keysCitedHere,
-        List<String> orderedCiteKeys
-        ) {
-        List<Integer> result = new ArrayList<>(keysCitedHere.size());
-        for (String key : keysCitedHere) {
-            int ind = orderedCiteKeys.indexOf(key);
-            result.add(
-                ind == -1
-                ? -1
-                : 1 + ind // 1-based
-                );
-        }
-        return result;
-    }
 
     /**
      * Visit each reference mark in referenceMarkNames, remove its
@@ -2026,6 +2882,9 @@ class OOBibBase {
      * @param types itcType codes for each reference mark.
      *
      * @param style Bibliography style to use.
+     *
+     * TODO: should not modify storage (i.e. call insertReferenceMark)
+     * TODO: do not mess with bibliography here
      */
     private void
     applyNewCitationMarkers(
@@ -2114,307 +2973,6 @@ class OOBibBase {
                 cursor.collapseToEnd();
             }
         }
-    }
-
-    /**
-     * For each name in referenceMarkNames set types[i] and
-     * bibtexKeys[i] to values parsed from referenceMarkNames.get(i)
-     *
-     * @param referenceMarkNames Should only contain parsable names.
-     * @param types              OUT Must be same length as referenceMarkNames.
-     * @param bibtexKeys         OUT First level must be same length as referenceMarkNames.
-     */
-    private static void
-    parseRefMarkNamesToArrays(
-        List<String> referenceMarkNames,
-        int[] types,
-        String[][] bibtexKeys
-        ) {
-        final int nRefMarks = referenceMarkNames.size();
-        assert (types.length == nRefMarks);
-        assert (bibtexKeys.length == nRefMarks);
-        for (int i = 0; i < nRefMarks; i++) {
-            final String name = referenceMarkNames.get(i);
-            Optional<ParsedRefMark> op = parseRefMarkName(name);
-            if (op.isEmpty()) {
-                // We have a problem. We want types[i] and bibtexKeys[i]
-                // to correspond to referenceMarkNames.get(i).
-                // And do not want null in bibtexKeys (or error code in types)
-                // on return.
-                throw new IllegalArgumentException(
-                    "parseRefMarkNamesToArrays expects parsable referenceMarkNames"
-                    );
-            }
-            ParsedRefMark ov = op.get();
-            types[i] = ov.itcType;
-            bibtexKeys[i] = ov.citedKeys.toArray(String[]::new);
-        }
-    }
-
-    /**
-     *  @return The list of citation keys from `instanceof
-     *          UndefinedBibtexEntry` elements of (keys of) `entries`.
-     *
-     *  Intent: Get list of unresolved citation keys.
-     */
-    private static List<String>
-    unresolvedKeysFromEntries(Map<BibEntry, BibDatabase> entries) {
-        // Collect and return unresolved citation keys.
-        List<String> unresolvedKeys = new ArrayList<>();
-        for (BibEntry entry : entries.keySet()) {
-            if (entry instanceof UndefinedBibtexEntry) {
-                String key = ((UndefinedBibtexEntry) entry).getKey();
-                if (!unresolvedKeys.contains(key)) {
-                    unresolvedKeys.add(key);
-                }
-            }
-        }
-        return unresolvedKeys;
-    }
-
-    /**
-     *  Look up citation keys from a map caching earlier look up, sort result within
-     *  each reference mark.
-     *
-     * @param bibtexKeys Citation keys, bibtexKeys[i][j] is for the ith reference mark.
-     * @param citeKeyToBibEntry Cached lookup from keys to entries.
-     */
-    private BibEntry[][]
-    getBibEntriesSortedWithinReferenceMarks(
-        String[][] bibtexKeys,
-        Map<String, BibEntry> citeKeyToBibEntry,
-        OOBibStyle style
-        ) {
-        return
-            Arrays.stream(bibtexKeys)
-            .map(bibtexKeysOfAReferenceMark ->
-                 Arrays.stream(bibtexKeysOfAReferenceMark)
-                 .map(citeKeyToBibEntry::get)
-                 .sorted(comparatorForMulticite(style)) // sort within referenceMark
-                 .toArray(BibEntry[]::new)
-                )
-            .toArray(BibEntry[][]::new);
-    }
-
-    /**
-     *   result[i][j] = cEntriesForAll[i][j].getCitationKey()
-     */
-    private String[][]
-    mapBibEntriesToCitationKeysOrNullForAll(BibEntry[][] cEntriesForAll) {
-        return
-            Arrays.stream(cEntriesForAll)
-            .map(cEntries ->
-                 Arrays.stream(cEntries)
-                 .map(ce -> ce.getCitationKey().orElse(null))
-                 .toArray(String[]::new)
-                )
-            .toArray(String[][]::new);
-    }
-
-    /**
-     * Given bibtexKeys for each reference mark and the corresponding
-     * normalized citation markers for each, fills uniqueLetters.
-     *
-     * We expect to see data for all JabRef reference marks here, and
-     * clear uniqueLetters before filling.
-     *
-     * On return: uniqueLetters.get(bibtexkey) provides letter to be
-     * added after the year (null for none).
-     *
-     * Note: bibtexKeys[i][j] may be null (from UndefinedBibtexEntry)
-     */
-    void updateUniqueLetters(
-        String[][] bibtexKeys,
-        String[][] normCitMarkers,
-        final Map<String, String> uniqueLetters
-        ) {
-
-        final int nRefMarks = bibtexKeys.length;
-        assert nRefMarks == normCitMarkers.length;
-
-        // refKeys: (normCitMarker) to (list of citation keys sharing it).
-        //          The entries in the lists are ordered as in
-        //          normCitMarkers[i][j]
-        Map<String, List<String>> refKeys = new HashMap<>();
-
-        for (int i = 0; i < nRefMarks; i++) {
-            // Compare normalized markers, since the actual
-            // markers can be different.
-            String[] markers = normCitMarkers[i];
-            for (int j = 0; j < markers.length; j++) {
-                String marker = markers[j];
-                String currentKey = bibtexKeys[i][j];
-                // containsKey(null) is OK, contains(null) is OK.
-                if (refKeys.containsKey(marker)) {
-                    // Ok, we have seen this exact marker before.
-                    if (!refKeys.get(marker).contains(currentKey)) {
-                        // ... but not for this entry.
-                        refKeys.get(marker).add(currentKey);
-                    }
-                } else {
-                    // add as new entry
-                    List<String> l = new ArrayList<>(1);
-                    l.add(currentKey);
-                    refKeys.put(marker, l);
-                }
-            }
-        }
-
-        uniqueLetters.clear();
-
-        // Go through the collected lists and see where we need to
-        // add unique letters to the year.
-        for (Map.Entry<String, List<String>> stringListEntry : refKeys.entrySet()) {
-            List<String> clashingKeys = stringListEntry.getValue();
-            if (clashingKeys.size() > 1) {
-                // This marker appears for more than one unique entry:
-                int nextUniqueLetter = 'a';
-                for (String key : clashingKeys) {
-                    // Update the map of uniqueLetters for the
-                    // benefit of both the following generation of
-                    // new citation markers, and for the method
-                    // that builds the bibliography:
-                    uniqueLetters.put(key, String.valueOf((char) nextUniqueLetter));
-                    nextUniqueLetter++;
-                }
-            }
-        }
-    }
-
-    private String[][]
-    normalizedCitationMarkersForNormalStyle(
-        BibEntry[][] cEntriesForAll,
-        Map<BibEntry, BibDatabase> entries,
-        OOBibStyle style
-        ) {
-
-        final int nRefMarks = cEntriesForAll.length;
-
-        String[][] normCitMarkers = new String[nRefMarks][];
-        for (int i = 0; i < nRefMarks; i++) {
-            BibEntry[] cEntries = cEntriesForAll[i];
-            // We need "normalized" (in parenthesis) markers
-            // for uniqueness checking purposes:
-            normCitMarkers[i] =
-                Arrays.stream(cEntries)
-                .map(ce ->
-                     style.getCitationMarker(
-                         Collections.singletonList(undefinedBibEntryToNull(ce)),
-                         entries,
-                         true,
-                         null,
-                         new int[] {-1} // no limit on authors
-                         )
-                    )
-                .toArray(String[]::new);
-        }
-        return normCitMarkers;
-    }
-
-    /**
-     * Produce citMarkers for normal (!isCitationKeyCiteMarkers && ! isNumberEntries) styles.
-     *
-     * @param referenceMarkNames Names of reference marks.
-     * @param bibtexKeysIn       Bibtex citation keys.
-     * @param citeKeyToBibEntry  Maps citation keys to BibEntry.
-     * @param itcTypes           Citation types.
-     * @param entries            Map BibEntry to BibDatabase.
-     * @param uniqueLetters      Filled with new values here.
-     * @param style              Bibliography style.
-     */
-    String[]
-    produceCitationMarkersForNormalStyle(
-        List<String> referenceMarkNames,
-        String[][] bibtexKeysIn,
-        Map<String, BibEntry> citeKeyToBibEntry,
-        int[] itcTypes,
-        Map<BibEntry, BibDatabase> entries,
-        final Map<String, String> uniqueLetters,
-        OOBibStyle style
-        )
-        throws BibEntryNotFoundException {
-        uniqueLetters.clear();
-
-        assert !style.isCitationKeyCiteMarkers();
-        assert !style.isNumberEntries();
-        // Citations in (Au1, Au2 2000) form
-
-        final int nRefMarks = referenceMarkNames.size();
-        assert (bibtexKeysIn.length == nRefMarks);
-        assert (itcTypes.length == nRefMarks);
-        assertAllKeysInCiteKeyToBibEntry(referenceMarkNames, bibtexKeysIn, citeKeyToBibEntry,
-                                         "produceCitationMarkersForNormalStyle");
-
-        BibEntry[][] cEntriesForAll =
-            getBibEntriesSortedWithinReferenceMarks(bibtexKeysIn, citeKeyToBibEntry, style);
-
-        // Update bibtexKeys to match the new sorting (within each referenceMark)
-        String[][] bibtexKeys = mapBibEntriesToCitationKeysOrNullForAll(cEntriesForAll);
-        // Note: bibtexKeys[i][j] may be null, for UndefinedBibtexEntry
-
-        assert (bibtexKeys.length == nRefMarks);
-
-        String[][] normCitMarkers =
-            normalizedCitationMarkersForNormalStyle(cEntriesForAll, entries, style);
-
-        updateUniqueLetters(bibtexKeys, normCitMarkers, uniqueLetters);
-
-        // Finally, go through all citation markers, and update
-        // those referring to entries in our current list:
-        final int maxAuthorsFirst = style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST);
-        Set<String> seenBefore = new HashSet<>();
-
-        String[] citMarkers = new String[nRefMarks];
-
-        for (int i = 0; i < nRefMarks; i++) {
-
-            final int nCitedEntries = bibtexKeys[i].length;
-            int[] firstLimAuthors = new int[nCitedEntries];
-            String[] uniqueLetterForCitedEntry = new String[nCitedEntries];
-
-            for (int j = 0; j < nCitedEntries; j++) {
-                String currentKey = bibtexKeys[i][j]; // nullable
-
-                // firstLimAuthors will be (-1) except at the first
-                // refMark it appears at, where a positive
-                // maxAuthorsFirst may override. This is why:
-                // https://discourse.jabref.org/t/
-                // number-of-authors-in-citations-style-libreoffice/747/3
-                // "Some citation styles require to list the full
-                // names of the first 4 authors for the first
-                // time. Later it is sufficient to have only maybe
-                // (Author A and Author B 2019 et al.)"
-                firstLimAuthors[j] = -1;
-                if (maxAuthorsFirst > 0) {
-                    if (!seenBefore.contains(currentKey)) {
-                        firstLimAuthors[j] = maxAuthorsFirst;
-                    }
-                    seenBefore.add(currentKey);
-                }
-
-                String uniqueLetterForKey = uniqueLetters.get(currentKey);
-                uniqueLetterForCitedEntry[j] =
-                    (uniqueLetterForKey == null
-                     ? ""
-                     : uniqueLetterForKey);
-            }
-
-            List<BibEntry> cEntries =
-                Arrays.stream(cEntriesForAll[i])
-                .map(OOBibBase::undefinedBibEntryToNull)
-                .collect(Collectors.toList());
-
-            citMarkers[i] =
-                style.getCitationMarker(
-                    cEntries,
-                    entries,
-                    itcTypes[i] == OOBibBase.AUTHORYEAR_PAR,
-                    uniqueLetterForCitedEntry,
-                    firstLimAuthors
-                    );
-        }
-
-        return citMarkers;
     }
 
     /**
@@ -2516,135 +3074,11 @@ class OOBibBase {
         return unresolvedKeysFromEntries(fce.entries);
     }
 
-    /**
-     *  Given a location, return its position:
-     *  coordinates relative to the top left position
-     *   of the first page of the document.
+    /* **************************************************
      *
-     * @param range  Location.
-     * @param cursor To get the position, we need az XTextViewCursor.
-     *               It will be moved to the range.
-     */
-    private static Point
-    findPositionOfTextRange(XTextRange range, XTextViewCursor cursor) {
-        cursor.gotoRange(range, false);
-        return cursor.getPosition();
-    }
-
-    /**
-     *  Read reference mark names from the document, keep only those
-     *  with JabRef naming convention, get their visual positions,
+     *     Bibliography: needs uniqueLetters or numbers
      *
-     *  @return JabRef reference mark names sorted by these positions.
-     *
-     *  Limitation: for two column layout visual (top-down,
-     *        left-right) order does not match the expected (textual)
-     *        order.
-     *
-     */
-    private List<String>
-    getJabRefReferenceMarkNamesSortedByPosition(
-        DocumentConnection documentConnection)
-        throws
-        WrappedTargetException,
-        NoDocumentException {
-
-        List<String> names = getJabRefReferenceMarkNames(documentConnection);
-
-        // find coordinates
-        List<Point> positions = new ArrayList<>(names.size());
-
-        XNameAccess nameAccess = documentConnection.getReferenceMarks();
-        XTextViewCursor viewCursor = documentConnection.getViewCursor();
-        // initialPos: to be restored before return
-        XTextRange initialPos = viewCursor.getStart();
-        for (String name : names) {
-
-            XTextContent textContent =
-                DocumentConnection.nameAccessGetTextContentByName(nameAccess, name);
-            // unoQI(XTextContent.class, nameAccess.getByName(name));
-
-            XTextRange range = textContent.getAnchor();
-
-            // Adjust range if we are inside a footnote:
-            if (unoQI(XFootnote.class, range.getText()) != null) {
-                // Find the linking footnote marker:
-                XFootnote footer = unoQI(XFootnote.class, range.getText());
-                // The footnote's anchor gives the correct position in the text:
-                range = footer.getAnchor();
-            }
-            positions.add(findPositionOfTextRange(range, viewCursor));
-        }
-        // restore cursor position
-        viewCursor.gotoRange(initialPos, false);
-
-        // order by position
-        Set<ComparableMark> set = new TreeSet<>();
-        for (int i = 0; i < positions.size(); i++) {
-            set.add(new ComparableMark(names.get(i), positions.get(i)));
-        }
-
-        // collect referenceMarkNames in order
-        List<String> result = new ArrayList<>(set.size());
-        for (ComparableMark mark : set) {
-            result.add(mark.getName());
-        }
-
-        return result;
-    }
-
-    /**
-     *  Refresh list of JabRef reference marks (sorts by position).
-     *
-     *  Probably should be called at the start of actions from the GUI,
-     *  that rely on jabRefReferenceMarkNamesSortedByPosition to be up-to-date.
-     *
-     *  TODO: maybe we should pass around a fresh copy?
-     */
-    public void
-    updateSortedReferenceMarks()
-        throws
-        WrappedTargetException,
-        NoSuchElementException,
-        NoDocumentException {
-
-        DocumentConnection documentConnection = getDocumentConnectionOrThrow();
-
-        this.jabRefReferenceMarkNamesSortedByPosition =
-            getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
-    }
-
-    /**
-     * GUI action, refreshes citation markers and bibliography.
-     *
-     * @param databases Must have at least one.
-     * @param style Style.
-     * @return List of unresolved citation keys.
-     *
-     * Note: calls updateSortedReferenceMarks();
-     */
-    public List<String>
-    updateDocumentActionHelper(
-        List<BibDatabase> databases,
-        OOBibStyle style)
-        throws
-        NoSuchElementException,
-        WrappedTargetException,
-        IllegalArgumentException,
-        CreationException,
-        PropertyVetoException,
-        UnknownPropertyException,
-        UndefinedParagraphFormatException,
-        NoDocumentException,
-        UndefinedCharacterFormatException,
-        BibEntryNotFoundException,
-        IOException {
-
-        updateSortedReferenceMarks();
-        List<String> unresolvedKeys = refreshCiteMarkers(databases, style);
-        rebuildBibTextSection(databases, style);
-        return unresolvedKeys;
-    }
+     * **************************************************/
 
     /**
      * Rebuilds the bibliography.
@@ -2697,76 +3131,6 @@ class OOBibBase {
             entries,
             style,
             this.xUniqueLetters);
-    }
-
-    /**
-     *  Return a TreeMap(entryComparator) copy of entries.
-     *
-     *  For sorting the bibliography.
-     */
-    SortedMap<BibEntry, BibDatabase>
-    sortEntriesByComparator(
-        Map<BibEntry, BibDatabase> entries,
-        Comparator<BibEntry> entryComparator
-        ) {
-        SortedMap<BibEntry, BibDatabase> newMap = new TreeMap<>(entryComparator);
-        for (Map.Entry<BibEntry, BibDatabase> kv : entries.entrySet()) {
-            newMap.put(
-                kv.getKey(),
-                kv.getValue());
-        }
-        return newMap;
-    }
-
-    /**
-     *  Return bibliography entries sorted according to the order of
-     *  first appearance in referenceMarkNames.
-     *
-     * @param referenceMarkNames Names of reference marks.
-     * @param citeKeyToBibEntry  Helps to find the entries
-     * @return LinkedHashMap from BibEntry to BibDatabase with
-     *         iteration order as first appearance in referenceMarkNames.
-     *
-     * Note: Within citation group (a reference mark) the order is
-     *       as appears there.
-     *
-     * TODO: The order within a reference mark name is decided on
-     *       construction (in insertEntry). Is it updated after a style change?
-     *
-     */
-    private Map<BibEntry, BibDatabase>
-    sortEntriesByRefMarkNames(
-        List<String> referenceMarkNames,
-        Map<String, BibEntry> citeKeyToBibEntry,
-        Map<BibEntry, BibDatabase> entries
-        ) {
-        // LinkedHashMap: iteration order is insertion-order, not
-        // affected if a key is re-inserted.
-        Map<BibEntry, BibDatabase> newList = new LinkedHashMap<>();
-
-        for (String name : referenceMarkNames) {
-            Optional<ParsedRefMark> op = parseRefMarkName(name);
-            if (op.isEmpty()) {
-                continue;
-            }
-
-            List<String> keys = op.get().citedKeys;
-            // no need to look in the database again
-            for (String key : keys) {
-                BibEntry origEntry = citeKeyToBibEntry.get(key);
-                if (origEntry != null) {
-                    if (!newList.containsKey(origEntry)) {
-                        BibDatabase database = entries.get(origEntry);
-                        newList.put(origEntry, database);
-                    }
-                } else {
-                    LOGGER.info("Citation key not found: '" + key + "'");
-                    LOGGER.info("Problem with reference mark: '" + name + "'");
-                    newList.put(new UndefinedBibtexEntry(key), null);
-                }
-            }
-        }
-        return newList;
     }
 
     /**
@@ -2981,186 +3345,14 @@ class OOBibBase {
         cursor.collapseToEnd();
     }
 
-    /**
-     *  Given the name of a reference mark, get the corresponding
-     *  pageInfo text.
+
+    /**************************
      *
-     *  @param documentConnection Connection to a document.
-     *  @param name Name of the custom property to query.
-     *  @return "" for missing or empty pageInfo
-     */
-    private static String
-    getPageInfoForReferenceMarkName(
-        DocumentConnection documentConnection,
-        String name)
-        throws WrappedTargetException,
-        UnknownPropertyException {
-
-        Optional<String> pageInfo = documentConnection.getCustomProperty(name);
-        if (pageInfo.isEmpty() || pageInfo.get().isEmpty()) {
-            return "";
-        }
-        return pageInfo.get();
-    }
-
-    /**
-     *  Insert a reference mark.
+     *   GUI level
      *
-     * @param documentConnection Connection to a document.
-     *
-     * @param name Name of the reference mark to be created and also
-     *             the name of the custom property holding the pageInfo part.
-     */
-    private void
-    insertReferenceMark(
-        DocumentConnection documentConnection,
-        String name,
-        String citationText,
-        XTextCursor position,
-        boolean withText,
-        OOBibStyle style
-        )
-        throws
-        UnknownPropertyException,
-        WrappedTargetException,
-        PropertyVetoException,
-        IllegalArgumentException,
-        UndefinedCharacterFormatException,
-        CreationException {
+     **************************/
 
-        // Last minute editing: If there is "page info" for this
-        // citation mark, inject it into the citation marker before
-        // inserting.
-
-        // TODO: Consider moving pageInfo stuff to citation marker
-        //       generation. May need to modify getCitationMarker,
-        // at ./jabref/src/main/java/org/jabref/logic/openoffice/OOBibStyle.java 492:
-        //       to emit html code.
-        String citText;
-        String pageInfo =
-            getPageInfoForReferenceMarkName(documentConnection, name);
-        citText =
-            pageInfo.isEmpty()
-            ? citationText
-            : style.insertPageInfo(citationText, pageInfo);
-
-        if (withText) {
-            position.setString(citText);
-            DocumentConnection.setCharLocaleNone(position);
-            if (style.isFormatCitations()) {
-                String charStyle = style.getCitationCharacterFormat();
-                DocumentConnection.setCharStyle(position, charStyle);
-            }
-        } else {
-            position.setString("");
-        }
-
-        documentConnection.insertReferenceMark(name, position, true);
-
-        // Last minute editing: find "et al." (OOBibStyle.ET_AL_STRING) and
-        //                      format it as italic.
-
-        // Q: Are we sure that OOBibStyle.ET_AL_STRING cannot be part of author names
-        //    in any language?
-        // A: No, but have no examples either.
-
-        // Q: Are we sure, citText does not contain multiple "et al." strings?
-        // A: It *can* contain more than one.
-
-        // TODO: Could we move italicizing "et al." to a more proper place?
-        //       Maybe we could use POSTFORMATTER with "<i>...</i>"
-        //       That might make OOBibStyle.ITALIC_ET_AL superfluous.
-        //       Maybe
-        //       insertOOFormattedTextAtCurrentLocation could be used
-        //       to do the insert (if paragraph style manipulation
-        //       is removed)
-
-        // TODO: Handle multiple "et al." strings.
-
-        // Check if we should italicize the "et al." string in citations:
-        boolean italicize = style.getBooleanCitProperty(OOBibStyle.ITALIC_ET_AL);
-        if (italicize) {
-            String etAlString = style.getStringCitProperty(OOBibStyle.ET_AL_STRING);
-            int index = citText.indexOf(etAlString);
-            if (index >= 0) {
-                italicizeRangeFromPosition(position, index, index + etAlString.length());
-            }
-        }
-
-        position.collapseToEnd();
-    }
-
-    /**
-     * Taking position.getStart() as a reference point, italicize the range (ref+start,ref+end)
-     *
-     * @param position  : position.getStart() is out reference point.
-     * @param start     : start of range to italicize w.r.t position.getStart().
-     * @param end       : end of range  to italicize w.r.t position.getStart().
-     *
-     *  Why this API?  This is used after finding "et al." string in a
-     *  citation marker.
-     */
-    private void
-    italicizeRangeFromPosition(
-        XTextCursor position,
-        int start,
-        int end
-        )
-        throws
-        UnknownPropertyException,
-        PropertyVetoException,
-        IllegalArgumentException,
-        WrappedTargetException {
-
-        XTextRange range = position.getStart();
-        XTextCursor cursor = position.getText().createTextCursorByRange(range);
-        cursor.goRight((short) start, false);
-        cursor.goRight((short) (end - start), true);
-
-        DocumentConnection.setCharFormatItalic(cursor);
-    }
-
-    /**
-     * Look up a single citation key in a list of databases.
-     *
-     * @param key Citation key to look up.
-     * @param databases Key is looked up in these, in this order.
-     * @return The BibEntry at the first match, or Optional.empty().
-     */
-    Optional<BibEntry>
-    lookupEntryInDatabases(String key, List<BibDatabase> databases) {
-        for (BibDatabase database : databases) {
-            Optional<BibEntry> entry = database.getEntryByCitationKey(key);
-            if (entry.isPresent()) {
-                return entry;
-            }
-        }
-        return Optional.empty();
-    }
-
-    /**
-     *  Look up a list of citation keys in a list of databases.
-     *
-     * @param keys Citation keys to look up.
-     * @param databases Keys are looked up in these, in this order.
-     * @return The BibEntry objects found.
-     *
-     * The order of keys is kept in the result, but unresolved keys
-     * have no representation in the result, so result.get(i) does not
-     * necessarily belong to keys.get(i)
-     *
-     */
-    List<BibEntry>
-    lookupEntriesInDatabasesSkipMissing(
-        List<String> keys,
-        List<BibDatabase> databases
-        ) {
-        List<BibEntry> entries = new ArrayList<>();
-        for (String key : keys) {
-            lookupEntryInDatabases(key, databases).ifPresent(entries::add);
-        }
-        return entries;
-    }
+    /* GUI: Manage citations */
 
     /**
      * GUI action "Merge citations"
@@ -3540,57 +3732,37 @@ class OOBibBase {
         return resultDatabase;
     }
 
+
     /**
-     * A reference mark name paired with its visual position.
+     * GUI action, refreshes citation markers and bibliography.
      *
-     * Comparison is based on (Y,X): vertical compared first, horizontal second.
+     * @param databases Must have at least one.
+     * @param style Style.
+     * @return List of unresolved citation keys.
      *
-     * Used for sorting reference marks by their visual positions.
-     *
-     * Note: for text layouts with two or more columns, this gives the wrong order.
-     *
+     * Note: calls updateSortedReferenceMarks();
      */
-    private static class ComparableMark implements Comparable<ComparableMark> {
+    public List<String>
+    updateDocumentActionHelper(
+        List<BibDatabase> databases,
+        OOBibStyle style)
+        throws
+        NoSuchElementException,
+        WrappedTargetException,
+        IllegalArgumentException,
+        CreationException,
+        PropertyVetoException,
+        UnknownPropertyException,
+        UndefinedParagraphFormatException,
+        NoDocumentException,
+        UndefinedCharacterFormatException,
+        BibEntryNotFoundException,
+        IOException {
 
-        private final String name;
-        private final Point position;
-
-        public ComparableMark(String name, Point position) {
-            this.name = name;
-            this.position = position;
-        }
-
-        @Override
-        public int compareTo(ComparableMark other) {
-            if (position.Y == other.position.Y) {
-                return position.X - other.position.X;
-            } else {
-                return position.Y - other.position.Y;
-            }
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-
-            if (o instanceof ComparableMark) {
-                ComparableMark other = (ComparableMark) o;
-                return ((this.position.X == other.position.X)
-                        && (this.position.Y == other.position.Y)
-                        && Objects.equals(this.name, other.name));
-            }
-            return false;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(position, name);
-        }
+        updateSortedReferenceMarks();
+        List<String> unresolvedKeys = refreshCiteMarkers(databases, style);
+        rebuildBibTextSection(databases, style);
+        return unresolvedKeys;
     }
-}
+
+} // end of OOBibBase
