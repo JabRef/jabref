@@ -1,14 +1,12 @@
 package org.jabref.gui.util.comparator;
 
 import java.util.Comparator;
-import java.util.regex.Pattern;
 
 /**
  * Comparator for numeric cases. The purpose of this class is to add the numeric comparison, because values are sorted
  * as if they were strings.
  */
 public class NumericFieldComparator implements Comparator<String> {
-    private Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
 
     @Override
     public int compare(String val1, String val2) {
@@ -22,8 +20,8 @@ public class NumericFieldComparator implements Comparator<String> {
             return 1;
         }
 
-        boolean isVal1Valid = pattern.matcher(val1).matches();
-        boolean isVal2Valid = pattern.matcher(val2).matches();
+        boolean isVal1Valid = isNumber(val1);
+        boolean isVal2Valid = isNumber(val2);
         if (!isVal1Valid && !isVal2Valid) {
             return val1.compareTo(val2);
         } else if (!isVal1Valid) {
@@ -38,5 +36,16 @@ public class NumericFieldComparator implements Comparator<String> {
 
         // If we arrive at this stage then both values are actually numeric !
         return valInt1 - valInt2;
+    }
+
+    private static boolean isNumber(String number) {
+        for (int i = 0; i < number.length(); i++) {
+            char c = number.charAt(i);
+            if ((i == 0 && c != '-') && (c < '0' || c > '9')) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

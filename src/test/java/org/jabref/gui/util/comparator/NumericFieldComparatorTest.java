@@ -42,4 +42,9 @@ public class NumericFieldComparatorTest {
     public void compareIntegerWithString() {
         assertEquals(1, comparator.compare("4", "hi"));
     }
+
+    @Test
+    public void compareNegativeInteger() {
+        assertEquals(1, comparator.compare("-4", "-5"));
+    }
 }
