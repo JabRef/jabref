@@ -127,7 +127,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.9.1'
     implementation 'org.antlr:antlr4-runtime:4.9.1'
 
-    implementation (group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.8.0') {
+    implementation (group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.8.1') {
         exclude group: 'org.apache.lucene', module: 'lucene-sandbox'
     }
 
@@ -158,11 +158,11 @@ dependencies {
     implementation 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
     implementation 'de.saxsys:mvvmfx:1.8.0'
     implementation 'com.tobiasdiez:easybind:2.1.0'
-    implementation 'org.fxmisc.flowless:flowless:0.6.2'
+    implementation 'org.fxmisc.flowless:flowless:0.6.3'
     implementation 'org.fxmisc.richtext:richtextfx:0.10.4'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
     implementation 'com.jfoenix:jfoenix:9.0.10'
-    implementation 'org.controlsfx:controlsfx:11.0.3'
+    implementation 'org.controlsfx:controlsfx:11.1.0'
 
     implementation 'org.jsoup:jsoup:1.13.1'
     implementation 'com.konghq:unirest-java:3.11.11'
@@ -202,7 +202,7 @@ dependencies {
     testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.21'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:3.7.7'
+    testImplementation 'org.mockito:mockito-core:3.8.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.8.2'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.8.2'
     testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.17.0'
@@ -211,7 +211,7 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.40'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.41'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.3'
 }
 
