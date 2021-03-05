@@ -51,6 +51,9 @@ public class EntryTypeView extends BaseDialog<EntryType> {
     @FXML private ButtonType generateButton;
     @FXML private TextField idTextField;
     @FXML private ComboBox<IdBasedFetcher> idBasedFetchers;
+    @FXML private FlowPane recommendedEntriesPane;
+    @FXML private FlowPane otherEntriesPane;
+    @FXML private FlowPane customPane;
     @FXML private TitledPane recommendedEntriesTitlePane;
     @FXML private TitledPane otherEntriesTitlePane;
     @FXML private TitledPane customTitlePane;
