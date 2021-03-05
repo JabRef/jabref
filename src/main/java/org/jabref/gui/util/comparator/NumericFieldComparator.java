@@ -39,6 +39,9 @@ public class NumericFieldComparator implements Comparator<String> {
     }
 
     private static boolean isNumber(String number) {
+        if (number.isEmpty()) {
+            return false;
+        }
         for (int i = 0; i < number.length(); i++) {
             char c = number.charAt(i);
             if ((i == 0 && c != '-') && (c < '0' || c > '9')) {
