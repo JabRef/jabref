@@ -21,7 +21,6 @@ public class CustomizationTab extends AbstractPreferenceTabView<CustomizationTab
                   .load();
     }
 
-
     @Override
     public String getTabName() {
         return Localization.lang("Customization");
@@ -34,5 +33,4 @@ public class CustomizationTab extends AbstractPreferenceTabView<CustomizationTab
         useCustomDOIName.textProperty().bindBidirectional(viewModel.useCustomDOINameProperty());
         useCustomDOIName.disableProperty().bind(useCustomDOI.selectedProperty().not());
     }
-
 }
