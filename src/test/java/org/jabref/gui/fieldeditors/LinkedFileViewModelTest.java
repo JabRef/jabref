@@ -65,6 +65,7 @@ class LinkedFileViewModelTest {
     private final ExternalFileTypes externalFileType = mock(ExternalFileTypes.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final XmpPreferences xmpPreferences = mock(XmpPreferences.class);
+    private final JabRefPreferences jabRefPreferences = mock(JabRefPreferences.class);
     private CookieManager cookieManager;
 
     @BeforeEach
@@ -185,7 +186,7 @@ class LinkedFileViewModelTest {
     // Structure taken from deleteWhenDialogCancelledReturnsFalseAndDoesNotRemoveFile method
     @Test
     void downloadHtmlFileCausesWarningDisplay() throws MalformedURLException {
-        Globals.prefs = JabRefPreferences.getInstance(); // required for task execution
+        Globals.prefs = jabRefPreferences.getInstance(); // required for task execution
 
         // From BibDatabaseContextTest::setUp
         when(filePreferences.shouldStoreFilesRelativeToBib()).thenReturn(true);
@@ -232,7 +233,7 @@ class LinkedFileViewModelTest {
         String fileType = StandardExternalFileType.URL.getName();
         linkedFile = new LinkedFile(new URL(url), fileType);
 
-        Globals.prefs = JabRefPreferences.getInstance();
+        Globals.prefs = jabRefPreferences.getInstance();
 
         when(filePreferences.shouldStoreFilesRelativeToBib()).thenReturn(true);
 
@@ -283,16 +284,16 @@ class LinkedFileViewModelTest {
     // Tests if added parameters to mimeType gets parsed to correct format.
     @Test
     void mimeTypeStringWithParameterIsReturnedAsWithoutParameter() {
-        Globals.prefs = JabRefPreferences.getInstance(); // required for task execution
-        ExternalFileTypes externalFileTypes = ExternalFileTypes.getInstance();
-        Optional<ExternalFileType> test = externalFileTypes.getExternalFileTypeByMimeType("text/html; charset=UTF-8");
+        Globals.prefs = jabRefPreferences.getInstance(); // required for task execution
+        ExternalFileTypes externalFileTypesInstance = externalFileType.getInstance();
+        Optional<ExternalFileType> test = externalFileTypesInstance.getExternalFileTypeByMimeType("text/html; charset=UTF-8");
         String actual = test.get().toString();
         assertEquals("URL", actual);
     }
 
     @Test
     void downloadPdfFileWhenLinkedFilePointsToPdfUrl() throws MalformedURLException {
-        Globals.prefs = JabRefPreferences.getInstance();
+        Globals.prefs = jabRefPreferences.getInstance();
         linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "pdf");
 
         // Needed Mockito stubbing methods to run test
