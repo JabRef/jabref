@@ -619,6 +619,24 @@ class OOBibBase {
         }
 
         /**
+         *  If original is in a footnote, return a range containing
+         *  the corresponding footnote marker.
+         *
+         *  Returns null if not in a footnote.
+         */
+        static XTextRange
+        getFootnoteMarkRangeOrNull(XTextRange original) {
+            // If we are inside a footnote:
+            if (unoQI(XFootnote.class, original.getText()) != null) {
+                // Find the linking footnote marker:
+                XFootnote footer = unoQI(XFootnote.class, original.getText());
+                // The footnote's anchor gives the correct position in the text:
+                return footer.getAnchor();
+            }
+            return null;
+        }
+
+        /**
          *  Apply a character style to a range of text selected by a
          *  cursor.
          *
