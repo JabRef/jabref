@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.jabref.gui.Globals;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -64,8 +64,9 @@ class FieldValueSuggestionProviderTest {
     @Test
     void completeOnIgnoredFieldReturnsNothing() {
         AutoCompletePreferences autoCompletePreferences = mock(AutoCompletePreferences.class);
+        JournalAbbreviationRepository journalAbbreviationRepository = mock(JournalAbbreviationRepository.class);
         when(autoCompletePreferences.getCompleteFields()).thenReturn(new HashSet<>(Set.of(StandardField.AUTHOR)));
-        SuggestionProviders suggestionProviders = new SuggestionProviders(database, Globals.journalAbbreviationRepository, autoCompletePreferences);
+        SuggestionProviders suggestionProviders = new SuggestionProviders(database, journalAbbreviationRepository, autoCompletePreferences);
 
         SuggestionProvider<String> autoCompleter = (SuggestionProvider<String>) suggestionProviders.getForField(StandardField.TITLE);
 
