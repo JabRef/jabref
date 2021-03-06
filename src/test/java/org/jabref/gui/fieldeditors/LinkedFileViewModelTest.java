@@ -17,7 +17,6 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.externalfiletype.StandardExternalFileType;
@@ -30,7 +29,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.FilePreferences;
-import org.jabref.preferences.JabRefPreferences;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -65,7 +63,6 @@ class LinkedFileViewModelTest {
     private final ExternalFileTypes externalFileType = mock(ExternalFileTypes.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final XmpPreferences xmpPreferences = mock(XmpPreferences.class);
-    private final JabRefPreferences jabRefPreferences = mock(JabRefPreferences.class);
     private CookieManager cookieManager;
 
     @BeforeEach
@@ -186,11 +183,8 @@ class LinkedFileViewModelTest {
     // Structure taken from deleteWhenDialogCancelledReturnsFalseAndDoesNotRemoveFile method
     @Test
     void downloadHtmlFileCausesWarningDisplay() throws MalformedURLException {
-        Globals.prefs = jabRefPreferences.getInstance(); // required for task execution
-
         // From BibDatabaseContextTest::setUp
         when(filePreferences.shouldStoreFilesRelativeToBib()).thenReturn(true);
-
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]"); // used in other tests in this class
         when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]"); // used in movesFileWithFileDirPattern at MoveFilesCleanupTest.java
 
@@ -233,10 +227,7 @@ class LinkedFileViewModelTest {
         String fileType = StandardExternalFileType.URL.getName();
         linkedFile = new LinkedFile(new URL(url), fileType);
 
-        Globals.prefs = jabRefPreferences.getInstance();
-
         when(filePreferences.shouldStoreFilesRelativeToBib()).thenReturn(true);
-
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
 
@@ -284,18 +275,14 @@ class LinkedFileViewModelTest {
     // Tests if added parameters to mimeType gets parsed to correct format.
     @Test
     void mimeTypeStringWithParameterIsReturnedAsWithoutParameter() {
-        Globals.prefs = jabRefPreferences.getInstance(); // required for task execution
-        ExternalFileTypes externalFileTypesInstance = externalFileType.getInstance();
-        Optional<ExternalFileType> test = externalFileTypesInstance.getExternalFileTypeByMimeType("text/html; charset=UTF-8");
+        Optional<ExternalFileType> test = externalFileType.getExternalFileTypeByMimeType("text/html; charset=UTF-8");
         String actual = test.get().toString();
         assertEquals("URL", actual);
     }
 
     @Test
     void downloadPdfFileWhenLinkedFilePointsToPdfUrl() throws MalformedURLException {
-        Globals.prefs = jabRefPreferences.getInstance();
         linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "pdf");
-
         // Needed Mockito stubbing methods to run test
         when(filePreferences.shouldStoreFilesRelativeToBib()).thenReturn(true);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
