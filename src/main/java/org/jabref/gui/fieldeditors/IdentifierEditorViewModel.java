@@ -95,7 +95,7 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void openDOIWithCustomBase(String baseURI) {
-        identifier.get().map(x -> (DOI) x).flatMap(x -> x.getExternalURIWithCustomBase(baseURI)).ifPresent(
+        identifier.get().map(identifier -> (DOI) identifier).flatMap(doi -> doi.getExternalURIWithCustomBase(baseURI)).ifPresent(
                 uri -> {
                     try {
                         JabRefDesktop.openBrowser(uri);
