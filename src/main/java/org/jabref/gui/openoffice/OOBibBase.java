@@ -40,6 +40,7 @@ import org.jabref.model.entry.field.StandardField;
 import com.sun.star.awt.Point;
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
+import com.sun.star.beans.Property;
 import com.sun.star.beans.PropertyExistException;
 import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.beans.UnknownPropertyException;
@@ -206,6 +207,20 @@ class OOBibBase {
         public Optional<String>
         getDocumentTitle() {
             return OOBibBase.getDocumentTitle(this.mxDoc);
+        }
+
+        List<String>
+        getCustomPropertyNames() {
+            assert (this.propertySet != null);
+
+            XPropertySetInfo psi = (this.propertySet
+                                    .getPropertySetInfo());
+
+            List<String> names = new ArrayList<>();
+            for (Property p : psi.getProperties()) {
+                names.add(p.Name);
+            }
+            return names;
         }
 
         /**
