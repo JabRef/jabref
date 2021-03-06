@@ -66,7 +66,6 @@ import com.sun.star.lang.XComponent;
 import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.text.XBookmarksSupplier;
-import com.sun.star.text.XDocumentIndexesSupplier;
 import com.sun.star.text.XFootnote;
 import com.sun.star.text.XReferenceMarksSupplier;
 import com.sun.star.text.XText;
@@ -92,7 +91,6 @@ import org.slf4j.LoggerFactory;
  */
 @AllowedToUseAwt("Requires AWT for italics and bold")
 class OOBibBase {
-
     private static final OOPreFormatter POSTFORMATTER = new OOPreFormatter();
 
     private static final String BIB_SECTION_NAME = "JR_bib";
@@ -127,6 +125,9 @@ class OOBibBase {
          *  "CharStyleName" is an OpenOffice Property name.
          */
         private static final String CHAR_STYLE_NAME = "CharStyleName";
+        private static final Logger LOGGER =
+            LoggerFactory.getLogger(OOBibBase.DocumentConnection.class);
+
 
         public XTextDocument mxDoc;
         public XComponent xCurrentComponent;
@@ -136,12 +137,8 @@ class OOBibBase {
         public XPropertyContainer userProperties;
         public XPropertySet propertySet;
 
-        private static final Logger LOGGER =
-            LoggerFactory.getLogger(OOBibBase.DocumentConnection.class);
-
         DocumentConnection(
-            XTextDocument mxDoc,
-            Logger LOGGER
+            XTextDocument mxDoc
             ) {
             this.mxDoc = mxDoc;
             this.xCurrentComponent = unoQI(XComponent.class, mxDoc);
@@ -182,7 +179,7 @@ class OOBibBase {
             }
 
             // Attempt to check document is really available
-            if ( !missing ){
+            if (!missing) {
                 try {
                     getReferenceMarks();
                 } catch (NoDocumentException ex) {
@@ -190,7 +187,7 @@ class OOBibBase {
                 }
             }
 
-            if ( missing ){
+            if (missing) {
                 // release it
                 this.mxDoc = null;
                 this.xCurrentComponent = null;
@@ -347,7 +344,7 @@ class OOBibBase {
          *         support the XTextContent interface.
          */
         static XTextContent
-        nameAccessGetTextContentByName(XNameAccess nameAccess, String name)
+        nameAccessGetTextContentByNameOrNull(XNameAccess nameAccess, String name)
             throws WrappedTargetException {
 
             if (!nameAccess.hasByName(name)) {
@@ -358,7 +355,7 @@ class OOBibBase {
                 return unoQI(XTextContent.class, referenceMark);
             } catch (NoSuchElementException ex) {
                 LOGGER.warn(String.format(
-                                "nameAccessGetTextContentByName got NoSuchElementException"
+                                "nameAccessGetTextContentByNameOrNull got NoSuchElementException"
                                 + " for '%s'", name));
                 return null;
             }
@@ -397,14 +394,13 @@ class OOBibBase {
 
             if (xReferenceMarks.hasByName(name)) {
                 XTextContent mark =
-                        nameAccessGetTextContentByName(xReferenceMarks, name);
+                        nameAccessGetTextContentByNameOrNull(xReferenceMarks, name);
                 if (mark == null) {
                     return;
                 }
                 this.xText.removeTextContent(mark);
             }
         }
-
 
         /**
          * Get the cursor positioned by the user.
@@ -415,7 +411,6 @@ class OOBibBase {
             return this.xViewCursorSupplier.getViewCursor();
         }
 
-
         /**
          * Get the XTextRange corresponding to the named bookmark.
          *
@@ -423,17 +418,32 @@ class OOBibBase {
          * @return The XTextRange for the bookmark, or null.
          */
         public XTextRange
-        getBookmarkRange(String name)
+        getBookmarkRangeOrNull(String name)
             throws
             WrappedTargetException {
 
-            XNameAccess xNamedBookmarks = this.getBookmarks();
-            XTextContent xFoundBookmark =
-                nameAccessGetTextContentByName(xNamedBookmarks, name);
-            if (xFoundBookmark == null) {
+            XNameAccess nameAccess = this.getBookmarks();
+            XTextContent textContent =
+                nameAccessGetTextContentByNameOrNull(nameAccess, name);
+            if (textContent == null) {
                 return null;
             }
-            return xFoundBookmark.getAnchor();
+            return textContent.getAnchor();
+        }
+
+        public XTextRange
+        getReferenceMarkRangeOrNull(String name)
+            throws
+            NoDocumentException,
+            WrappedTargetException {
+
+            XNameAccess nameAccess = this.getReferenceMarks();
+            XTextContent textContent =
+                nameAccessGetTextContentByNameOrNull(nameAccess, name);
+            if (textContent == null) {
+                return null;
+            }
+            return textContent.getAnchor();
         }
 
         /**
@@ -522,7 +532,8 @@ class OOBibBase {
         }
 
         /**
-         * Insert a bookmark with the given name at the cursor provided.
+         * Insert a bookmark with the given name at the cursor provided,
+         * or with another name if the one we asked for is already in use.
          *
          * @param name     For the bookmark.
          * @param range    Cursor marking the location or range for
@@ -878,7 +889,6 @@ class OOBibBase {
         NoSuchElementException,
         WrappedTargetException {
 
-
         XTextDocument selected;
         List<XTextDocument> textDocumentList = getTextDocuments(this.xDesktop);
         if (textDocumentList.isEmpty()) {
@@ -898,16 +908,8 @@ class OOBibBase {
             return;
         }
 
-        this.xDocumentConnection = new DocumentConnection(
-            selected,
-            LOGGER
-        );
+        this.xDocumentConnection = new DocumentConnection(selected);
 
-        // TODO: maybe we should install an event handler for document
-        // close: addCloseListener
-        // Reference:
-        // https://www.openoffice.org/api/docs/common/ref/com/sun/star/
-        //         util/XCloseBroadcaster.html#addCloseListener
     }
 
     /**
@@ -988,7 +990,6 @@ class OOBibBase {
         Object object) {
         return UnoRuntime.queryInterface(zInterface, object);
     }
-
 
     /* ***************************************
      *
@@ -1246,7 +1247,6 @@ class OOBibBase {
         return keys;
     }
 
-
     /**
      *  Given the name of a reference mark, get the corresponding
      *  pageInfo text.
@@ -1355,7 +1355,16 @@ class OOBibBase {
         NoDocumentException {
 
         XNameAccess nameAccess = documentConnection.getReferenceMarks();
-        XTextContent mark = DocumentConnection.nameAccessGetTextContentByName(nameAccess, refMarkName);
+        XTextContent mark =
+            DocumentConnection.nameAccessGetTextContentByNameOrNull(nameAccess, refMarkName);
+        if (null == mark) {
+            LOGGER.warn(String.format(
+                    "OOBibBase.getCitationContext:"
+                    + " lost reference mark: '%s'",
+                    refMarkName
+            ));
+            return String.format("(Could not retrieve context for %s)", refMarkName);
+        }
         XTextCursor cursor = DocumentConnection.getTextCursorOfTextContent(mark);
 
         String citPart = cursor.getString();
@@ -1450,7 +1459,7 @@ class OOBibBase {
         }
     }
 
-    /**************************************
+    /* *************************************
      *
      *         Look up in databases
      *
@@ -1645,7 +1654,6 @@ class OOBibBase {
         entries.sort(comparatorForMulticite(style));
     }
 
-
     /**
      *  Look up citation keys from a map caching earlier look up, sort result within
      *  each reference mark.
@@ -1722,7 +1730,6 @@ class OOBibBase {
         }
         return newMap;
     }
-
 
     /* first appearance order, based on visual order */
 
@@ -1825,8 +1832,16 @@ class OOBibBase {
         for (String name : names) {
 
             XTextContent textContent =
-                DocumentConnection.nameAccessGetTextContentByName(nameAccess, name);
+                DocumentConnection.nameAccessGetTextContentByNameOrNull(nameAccess, name);
             // unoQI(XTextContent.class, nameAccess.getByName(name));
+            if (null == textContent) {
+                LOGGER.warn(String.format(
+                        "OOBibBase.getJabRefReferenceMarkNames:"
+                        + " could not retrieve reference mark: '%s'",
+                        name
+                ));
+                continue; // just skip it
+            }
 
             XTextRange range = textContent.getAnchor();
 
@@ -2124,8 +2139,6 @@ class OOBibBase {
         return result;
     }
 
-
-
     /* ***************************************
      *
      *     Calculate presentation of citation groups
@@ -2277,7 +2290,6 @@ class OOBibBase {
         return citMarkers;
     }
 
-
     /**
      * Produce citation markers for the case of numbered citations
      * with bibliography sorted by first appearance in the text.
@@ -2334,7 +2346,6 @@ class OOBibBase {
         }
         return citMarkers;
     }
-
 
     /**
      * Produce citation markers for the case of numbered citations
@@ -2477,7 +2488,6 @@ class OOBibBase {
 
         return citMarkers;
     }
-
 
     /* ***********************************
      *
@@ -2768,7 +2778,7 @@ class OOBibBase {
                         inParenthesis,
                         null,
                         null);
-                if ( citeText == "" ){
+                if (citeText.equals("")) {
                     citeText = "[?]";
                 }
                 insertReferenceMark(
@@ -2829,13 +2839,11 @@ class OOBibBase {
         }
     }
 
-
     /* **************************************************
      *
      *  modifies both storage and presentation, but should only affect presentation
      *
      * **************************************************/
-
 
     /**
      * Refresh all citation markers in the document.
@@ -2878,7 +2886,6 @@ class OOBibBase {
             throw new ConnectionLostException(ex.getMessage());
         }
     }
-
 
     /**
      * Visit each reference mark in referenceMarkNames, remove its
@@ -2924,7 +2931,7 @@ class OOBibBase {
             documentConnection.getReferenceMarks();
 
         final boolean hadBibSection =
-            (documentConnection.getBookmarkRange(OOBibBase.BIB_SECTION_NAME) != null);
+            (documentConnection.getBookmarkRangeOrNull(OOBibBase.BIB_SECTION_NAME) != null);
 
         // If we are supposed to set character format for citations,
         // must run a test before we delete old citation
@@ -2939,7 +2946,15 @@ class OOBibBase {
             final String name = referenceMarkNames.get(i);
 
             XTextContent mark =
-                DocumentConnection.nameAccessGetTextContentByName(nameAccess, name);
+                DocumentConnection.nameAccessGetTextContentByNameOrNull(nameAccess, name);
+            if (null == mark) {
+                LOGGER.warn(String.format(
+                               "OOBibBase.applyNewCitationMarkers:"
+                               + " lost reference mark '%s'",
+                               name
+                               ));
+                continue;
+            }
 
             XTextCursor cursor =
                 DocumentConnection.getTextCursorOfTextContent(mark);
@@ -2962,7 +2977,7 @@ class OOBibBase {
                 );
 
             if (hadBibSection
-                && (documentConnection.getBookmarkRange(OOBibBase.BIB_SECTION_NAME) == null)) {
+                && (documentConnection.getBookmarkRangeOrNull(OOBibBase.BIB_SECTION_NAME) == null)) {
                 // TODO: I think we used a *section* for the
                 //       bibliography elsewhere. Here we use a *bookmark*. Relation?
                 //        applyNewCitationMarkers:
@@ -3358,8 +3373,7 @@ class OOBibBase {
         cursor.collapseToEnd();
     }
 
-
-    /**************************
+    /* *************************
      *
      *   GUI level
      *
@@ -3745,7 +3759,6 @@ class OOBibBase {
         return resultDatabase;
     }
 
-
     /**
      * GUI action, refreshes citation markers and bibliography.
      *
@@ -3771,6 +3784,7 @@ class OOBibBase {
         UndefinedCharacterFormatException,
         BibEntryNotFoundException,
         IOException {
+        DocumentConnection documentConnection = getDocumentConnectionOrThrow();
 
         updateSortedReferenceMarks();
         List<String> unresolvedKeys = refreshCiteMarkers(databases, style);
