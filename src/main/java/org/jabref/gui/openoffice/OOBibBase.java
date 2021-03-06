@@ -4142,8 +4142,13 @@ class OOBibBase {
         NoDocumentException,
         UndefinedCharacterFormatException,
         BibEntryNotFoundException,
-        IOException {
+        IOException,
+        JabRefException {
+
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
+        boolean requireSeparation = false; // may loose citation without requireSeparation=true
+        CitationGroups cg = new CitationGroups(documentConnection);
+        cg.checkRangeOverlaps(this.xDocumentConnection, requireSeparation);
 
         updateSortedReferenceMarks();
         List<String> unresolvedKeys = refreshCiteMarkers(databases, style);

@@ -40,6 +40,7 @@ import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.help.HelpFile;
@@ -209,6 +210,11 @@ public class OpenOfficePanel {
                              unresolvedKeys.get(0))
                                                 );
                 }
+            } catch (JabRefException ex) {
+                dialogService.showErrorDialogAndWait(
+                    Localization.lang("JabRefException"),
+                    ex.getLocalizedMessage()
+                    );
             } catch (UndefinedCharacterFormatException ex) {
                 reportUndefinedCharacterFormat(ex);
             } catch (UndefinedParagraphFormatException ex) {
