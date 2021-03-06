@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.logic.l10n.Localization;
@@ -1301,6 +1302,331 @@ class OOBibBase {
         }
         return pageInfo.get();
     }
+
+    /*
+     * At the start of GUI actions we may want to check the state of the document.
+     */
+    class CitationGroups {
+        private final Map<String, Integer> indexByName;
+        private final String[] names;
+        // After parsing
+        private final int[] itcTypes;
+        private final String[][] citationKeys;
+
+        // Probably wrong, but currently pageInfo belongs to the group
+        private final String[] pageInfo;
+
+        // For custom properties belonging to us, but
+        // without a corresponding reference mark.
+        // These can be deleted.
+        private List<String> pageInfoThrash;
+
+        // After database lookup:
+        // private BibEntry[][] entries;
+        // private BibDatabase[][] entryDatabases;
+
+        public CitationGroups(DocumentConnection documentConnection)
+            throws NoDocumentException {
+            // Get the names
+            this.names =
+                getJabRefReferenceMarkNames(documentConnection)
+                .toArray(String[]::new);
+
+            // Fill indexByName
+            this.indexByName = new HashMap<>();
+            for (int i = 0; i < this.names.length; i++) {
+                indexByName.put(names[i], i);
+            }
+            // collect pageInfo
+            this.pageInfo = new String[names.length];
+            List<String> jabrefPropertyNames =
+                documentConnection.getCustomPropertyNames()
+                .stream()
+                .filter(OOBibBase::isJabRefReferenceMarkName)
+                .collect(Collectors.toList());
+            // For each name: either put into place or
+            // put into thrash collector.
+            this.pageInfoThrash = new ArrayList<>();
+            for (String n : jabrefPropertyNames) {
+                if (indexByName.containsKey(n)) {
+                    int i = indexByName.get(n);
+                    pageInfo[i] = n;
+                } else {
+                    pageInfoThrash.add(n);
+                }
+            }
+            // parse names
+            this.itcTypes = new int[names.length];
+            this.citationKeys = new String[names.length][];
+            for (int i = 0; i < names.length; i++) {
+                final String name = names[i];
+                Optional<ParsedRefMark> op = parseRefMarkName(name);
+                if (op.isEmpty()) {
+                    // We have a problem. We want types[i] and bibtexKeys[i]
+                    // to correspond to referenceMarkNames.get(i).
+                    // And do not want null in bibtexKeys (or error code in types)
+                    // on return.
+                    throw new IllegalArgumentException(
+                        "citationGroups: found unparsable referenceMarkName"
+                        );
+                }
+                ParsedRefMark ov = op.get();
+                itcTypes[i] = ov.itcType;
+                citationKeys[i] = ov.citedKeys.toArray(String[]::new);
+            }
+            // Now we have almost every information from the document about citations.
+            // What is left out: the ranges controlled by the reference marks.
+            // But (I guess) those change too easily, so we only ask when actually needed.
+        }
+
+        /*
+         * ranges controlled by citation groups should not overlap with each other.
+         *
+         *
+         */
+        public XTextRange
+        getReferenceMarkRangeOrNull(DocumentConnection documentConnection, int i)
+            throws
+            NoDocumentException,
+            WrappedTargetException {
+            return documentConnection.getReferenceMarkRangeOrNull(names[i]);
+        }
+
+        class RangeForOverlapCheck {
+            final static int REFERENCE_MARK_KIND = 0;
+            final static int FOOTNOTE_MARK_KIND = 1;
+
+            XTextRange range;
+            int i;
+            int kind;
+            String description;
+
+            RangeForOverlapCheck(XTextRange range, int i, int kind, String description) {
+                this.range = range;
+                this.i = i;
+                this.kind = kind;
+                this.description = description;
+            }
+
+            String format() {
+                return description;
+                //    String[] prefixes = { "", "FootnoteMark for " } ;
+                //    return prefixes[kind] + names[ this.i ];
+            }
+
+        } // class X
+
+        /**
+         * Assumes a.getText() == b.getText(), and both belong to documentConnection.xText
+         */
+        public int
+        compareRegionStarts(RangeForOverlapCheck a,
+                            RangeForOverlapCheck b) {
+            //
+            // XTextRange cannot be compared, only == or != is available.
+            //
+            // XTextRangeCompare: compares the positions of two TextRanges within a Text.
+            // Only TextRange instances within the same Text can be compared.
+            // final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
+            //                                         documentConnection.xText);
+
+            XTextRange ra = a.range;
+            XTextRange rb = b.range;
+            if (ra.getText() != rb.getText()) {
+                throw new RuntimeException(
+                    String.format(
+                        "OOBibBase.CitationGroups.compareRegionStarts:"
+                        + " incomparable regions: %s %s",
+                        a.format(),
+                        b.format())
+                    );
+            }
+
+            /*
+             * documentConnection.xText cannot compare two ranges in
+             * the same footnote. We must use XTextRangeCompare interface
+             * of the ranges themselves.
+             */
+            final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
+                                                    ra.getText());
+
+            try {
+                return (-1) * compare.compareRegionStarts(ra, rb);
+            } catch (IllegalArgumentException ex) {
+                throw new RuntimeException(
+                    String.format(
+                        "OOBibBase.CitationGroups.compareRegionStarts:"
+                        + " caught IllegalArgumentException: %s %s",
+                        a.format(),
+                        b.format()
+                        )
+                    );
+            }
+        }
+
+        public int
+        compareRegionEndToStart(RangeForOverlapCheck a,
+                                RangeForOverlapCheck b) {
+
+            XTextRange ra = a.range.getEnd();
+            XTextRange rb = b.range.getStart();
+            final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
+                                                    ra.getText());
+            return (-1) * compare.compareRegionStarts(ra, rb);
+        }
+
+        /**
+         * @return A RangeForOverlapCheck for each citation group.
+         */
+        List<RangeForOverlapCheck>
+        citationRanges(DocumentConnection documentConnection)
+            throws
+            NoDocumentException,
+            WrappedTargetException {
+
+            List<RangeForOverlapCheck> xs = new ArrayList<>(names.length);
+            for (int i = 0; i < names.length; i++) {
+                XTextRange r = this.getReferenceMarkRangeOrNull(documentConnection, i);
+                xs.add(new RangeForOverlapCheck(
+                           r, i,
+                           RangeForOverlapCheck.REFERENCE_MARK_KIND,
+                           names[i]
+                           ));
+            }
+            return xs;
+        }
+
+        /**
+         * @return A range for each footnote mark where the footnote
+         *         contains at least one citation group.
+         *
+         *  Purpose: We do not want markers of footnotes containing
+         *  reference marks to overlap with reference
+         *  marks. Overwriting these footnote marks might kill our
+         *  reference marks in the footnote.
+         *
+         */
+        List<RangeForOverlapCheck>
+        footnoteMarkRanges(DocumentConnection documentConnection)
+            throws
+            NoDocumentException,
+            WrappedTargetException {
+            // Avoid inserting the same mark twice.
+            List<XTextRange> seen = new ArrayList<>();
+            final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
+                                                    documentConnection.xText);
+
+            List<RangeForOverlapCheck> xs = new ArrayList<>();
+            for (int i = 0; i < names.length; i++) {
+                XTextRange r = this.getReferenceMarkRangeOrNull(documentConnection, i);
+                XTextRange footnoteMarkRange =
+                    DocumentConnection.getFootnoteMarkRangeOrNull(r);
+
+                if (footnoteMarkRange != null) {
+                    // Problem: quadratic complexity. Each new footnoteMarkRange
+                    // is compared to all we have seen before.
+                    boolean seenContains = false;
+                    for (XTextRange s : seen) {
+                        if (s.getText() == footnoteMarkRange.getText() &&
+                            compare.compareRegionStarts(s, footnoteMarkRange) == 0 &&
+                            compare.compareRegionEnds(s, footnoteMarkRange) == 0) {
+                            seenContains = true;
+                            break;
+                        }
+                    }
+                    if (!seenContains) {
+                    seen.add(footnoteMarkRange);
+                    xs.add(new RangeForOverlapCheck(
+                               footnoteMarkRange,
+                               i, // index of citation group
+                               RangeForOverlapCheck.FOOTNOTE_MARK_KIND,
+                               "FootnoteMark for " + names[i]
+                               ));
+                    }
+                }
+            }
+            return xs;
+        }
+
+        private Map<XText, List<RangeForOverlapCheck>>
+        partitionByGetText(List<RangeForOverlapCheck> xs) {
+            Map<XText, List<RangeForOverlapCheck>> xxs = new HashMap<>();
+            for (RangeForOverlapCheck x : xs) {
+                XTextRange xr = x.range;
+                XText t = xr.getText();
+                if (xxs.containsKey(t)) {
+                    xxs.get(t).add(x);
+                } else {
+                    xxs.put(t, new ArrayList<>(List.of(x)));
+                }
+            }
+            return xxs;
+        }
+
+        private List<RangeForOverlapCheck>
+        sortPartitionByRegionStart(List<RangeForOverlapCheck> xs) {
+            return
+                xs.stream()
+                .sorted(this::compareRegionStarts)
+                .collect(Collectors.toList());
+        }
+
+        private void
+        checkSortedPartitionForOverlap(boolean requireSeparation,
+                                       List<RangeForOverlapCheck> oxs)
+            throws JabRefException {
+            for (int i = 0; (i + 1) < oxs.size(); i++) {
+                RangeForOverlapCheck a = oxs.get(i);
+                RangeForOverlapCheck b = oxs.get(i + 1);
+                int cmp = compareRegionEndToStart(a, b);
+                if (cmp > 0) {
+                    // found overlap
+                    throw new JabRefException(
+                        "Range overlap found",
+                        Localization.lang(
+                            "Ranges of '%0' and '%1' overlap", a.format(), b.format())
+                        );
+                }
+                if (requireSeparation && cmp == 0) {
+                    throw new JabRefException(
+                        "Ranges with no gap found",
+                        Localization.lang(
+                            "Ranges of '%0' and '%1' are not separated",
+                                a.format(), b.format())
+                        );
+                }
+            }
+        }
+
+        public void
+        checkRangeOverlaps(DocumentConnection documentConnection,
+                           boolean requireSeparation)
+            throws
+            NoDocumentException,
+            WrappedTargetException,
+            JabRefException {
+
+            List<RangeForOverlapCheck> xs = citationRanges(documentConnection);
+            xs.addAll(footnoteMarkRanges(documentConnection));
+
+            // We can only compare ranges with equal .getText(),
+            // so partition the list.
+            Map<XText, List<RangeForOverlapCheck>> xxs = partitionByGetText(xs);
+            // Sort xs by x.getText() and x.getStart()
+            // Then, within each getText() value, we need x[i].getEnd() <= x[i+1].getStart()
+            // final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
+            //                                        documentConnection.xText);
+            for (List<RangeForOverlapCheck> partition : xxs.values()) {
+                List<RangeForOverlapCheck> oxs =
+                    sortPartitionByRegionStart(partition);
+                System.out.println("partition");
+                for (RangeForOverlapCheck r : oxs) {
+                    System.out.println("  " + r.format());
+                }
+                checkSortedPartitionForOverlap(requireSeparation, oxs);
+            }
+        }
+    } // class citationGroups
 
     /**
      * GUI: Get a list of CitationEntry objects corresponding to citations
