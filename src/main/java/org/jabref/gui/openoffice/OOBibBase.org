@@ -1,0 +1,231 @@
+
+* Notes for OOBibBase.java
+
+** Feature: notify GUI on document close, LO close
+
+- Gray out buttons that are not usable without connection.
+
+- On the OO side we could install an event handler for document
+  close: addCloseListener
+
+  Reference: [[https://www.openoffice.org/api/docs/common/ref/com/sun/star/util/XCloseBroadcaster.html#addCloseListener][(OO-API:addCloseListener)]]
+
+- On the GUI side: events [[https://jabref.readthedocs.io/en/latest/getting-into-the-code/code-howtos/#event-handling-in-jabref][Event handling in JabRef]]
+
+** Feature: give feedback "No entry to cite, please select some."
+.
+** Feature: Undo in LO
+
+   Wrap modifications during a GUI action into
+   Undo blocks. If possible.
+
+   [[https://www.openoffice.org/api/docs/common/ref/com/sun/star/document/XUndoManager.html][OO-API:XUndoManager]]
+   [[https://www.openoffice.org/api/docs/common/ref/com/sun/star/document/XUndoManagerSupplier.html#getUndoManager][OO-API:XUndoManagerSupplier]]
+
+** DONE Bug: when "[Settings]/[Automatically sync...]" is off, the placeholders may be confusing
+
+- In numbered style the placeholder is "-". This is inserted in OOBibBase.insertEntry.
+- Otherwise "" (empty).  This suggests that the call to style.getCitationMarker()
+  returned empty string. Or withText is false there.
+
+Resolved: improve-reversibility branch: commit e159a1d8ce40d1045e73d7fbfca24390bba44706
+
+** Bug: consecutive citations in footnotes
+
+The 2nd of two concecutive citations is missed in footnotes by updateDocumentActionHelper
+
+Situation:
+
+- place to citations in a footnote, separated by a space
+- change style (to numbered)
+- press the refresh button
+
+The 1st citation is updated, but not the 2nd
+
+** Bug: Find and resolve overlapping citations
+
+   It is too easy to create overlapping citations (and hard to resolve by the user)
+
+Situation
+- insert a citation
+- backspace
+- insert another citation
+
+In LO the text looks the same as in (insert,insert,remove-space-between),
+but the reference markers now overlap. Probably the second citation
+is embedded in the first, just before its end.
+
+(User-level workaround: remove the second citation.)
+
+Potential attacks:
+
+- Find overlapping ranges,
+  try to modify them so that they do not overlap.
+
+  Need to consider
+  - citation-citation overlap
+  - footnote-marks overlapping with citations.
+  - I hope, LO already resolves footnoteMark-footnoteMark overlaps.
+
+** Wish: Copy-paste citations
+
+    Copy-paste does not work for citations
+
+Situation
+- insert a citation
+- copy-paste it to another location
+- change style
+- refresh
+
+The copy is not updated. It is not a recognized citation anymore.
+
+*** Interestingly, Cut-and-paste preserves citations.
+
+It will also pick up pageInfo after the paste, since the name of the
+reference mark is preserved. This, however will cease to work if we
+decide to clean up unused pageInfo entries in GUI actions and the user
+calls to us.
+
+On the other hand, if we do not clean them up, we should be careful
+in "Cite" to avoid reusing not only names of reference marks, but also
+names of pageInfo entries.
+
+*** Design problem: Stable names are not compatible with Copy-paste
+
+We use reference mark names to identify the citation groups.
+
+In LO,
+- Copy-paste of a **reference marked** text places no reference mark
+  on the copy.
+
+- Copy-paste of a **bookmarked** region creates a new bookmark, with a
+  different name. Could be better.
+
+- **Comments** have no name. Can be moved and copied.
+
+- Other possibilities? (Markup in hidden text?)
+
+** Bug: Citations without intervening space
+
+May lose first of consecutive citations without intervening space
+
+Situation
+
+- place two individual citations in the text, remove the space separating them
+- press the refresh button
+
+The first of the two citations is lost.
+
+** Bug: two-column numbering
+
+Citations are numbered in top-down left-to-right order even in
+two-column layout
+
+Consequence: citations higher in the 2nd column get lower numbers than
+those at the bottom of the first.
+
+The problem behind: the main text can contain several XTextContent kinds,
+for example footnotes, frames. It is not always clear where should we
+insert their content into the firstAppearance order.
+
+Footnotes are already handled specially and their content is
+considered to be at the location of the footnote mark.
+
+Frames however can be anchored in several ways, with multiple options
+for wrapping. The question is: how to decide where the content of a
+frame should reside in firstAppearance order.
+
+The current solution (visual top-down left-to-right) gives an answer
+for this, but is arguably wrong with multi-column layout.
+
+Ideas:
+
+- LibreOffice already has a solution to this numbering question. Can
+  we reuse their solution?
+
+  What does LibreOffice do?
+
+  - Multicolumn handled
+  - Citation in figure caption: [0] unless citation to the same source
+    also appears in the text.
+  - Citation in footnote: ...
+
+** Bibliography:
+*** Does it need a section?
+
+Currently we create a Section ("JR_bib", child of the section "text")
+for the bibliography.
+
+
+- This might be handy, if a change of page style for the bibliography
+  is intended. But probably it is not always wanted.
+
+- If the user removes the section: the text of the bibliography
+  remains intact, but the connection is lost: the next refresh will
+  create a new bibliography.
+
+- Saving in LO to docx, then opening the result: the section name
+  "JR_bib" is lost (renamed to e.g. "Section1")
+
+Suggestion:
+
+- Use bookmark instead of section. Seems to survive better, and does
+  not force the document layout.
+
+*** yield header to user
+
+Currently the title of the Bibliography is deleted and recreated on
+each refresh.
+
+- If user wants a different title or paragraph style,
+  we overwrite his changes, forcing him to edit the style.
+
+- This could be avoided if after the initial creation of the
+  bibliography we only changed the body of the bibliography.
+
+  - In case the user deletes our bibliography markers (probably one or
+    two bookmarks around the body) we will create the head again (not
+    knowing that it is already there)
+
+** Design questions
+
+Wished features
+
+- Reliability
+  - Do not lose citations
+  - Do not overwrite user input
+  - Minimize data loss
+
+- Edit
+  - Copy-paste text with citations
+  - Change citation type (inpara/intext/nocite) without delete-reinsert
+
+- Survive conversion to docx and back
+
+- Better interaction with LO [Edit]/[Track changes]/[Record]
+
+  - Reference marks to deleted-but-notYetAccepted parts
+    (also known as [[https://wiki.openoffice.org/wiki/Documentation/DevGuide/Text/Redline][OO-Wiki:RedLine]])
+    cause a refresh to reinstate the conceptually deleted citations.
+
+
+
+*** How do others work?
+
+- https://docs.jabref.org/cite/openofficeintegration
+
+  - Note: JabRef does not use OpenOffice's built-in bibliography
+    system, because of the limitations of that system. A document
+    containing citations inserted from JabRef will not generally be
+    compatible with other reference managers such as *Bibus* and *Zotero*.
+
+- https://docs.jabref.org/cite/openofficeintegration#known-issues
+
+  - Make sure to save your Writer document in OpenDocument format
+    (odt). *Saving to Word format will lose your reference marks.*
+
+    - Otherwise try to use the external tool
+      [[https://github.com/teertinker/JabRef_LibreOffice_Converter][JabRef LibreOffice Converter]].
+      This LibreOffice extension converts the reference
+      marks to code that can be saved.
+
