@@ -47,4 +47,9 @@ public class NumericFieldComparatorTest {
     public void compareNegativeInteger() {
         assertEquals(1, comparator.compare("-4", "-5"));
     }
+
+    @Test
+    public void compareWithMinusString() {
+        assertEquals(-1, comparator.compare("-", "-5"));
+    }
 }
