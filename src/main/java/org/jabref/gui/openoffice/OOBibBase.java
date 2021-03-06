@@ -2527,18 +2527,23 @@ class OOBibBase {
             ? citationText
             : style.insertPageInfo(citationText, pageInfo);
 
+        /*
+         * We had a problem here, position.setString() not inserting the text.
+         * The solution seems to be: create a new cursor (c2), and use that.
+         */
+        XTextCursor c2 = position.getText().createTextCursorByRange(position);
         if (withText) {
-            position.setString(citText);
-            DocumentConnection.setCharLocaleNone(position);
+            c2.setString(citText);
+            DocumentConnection.setCharLocaleNone(c2);
             if (style.isFormatCitations()) {
                 String charStyle = style.getCitationCharacterFormat();
-                DocumentConnection.setCharStyle(position, charStyle);
+                DocumentConnection.setCharStyle(c2, charStyle);
             }
         } else {
-            position.setString("");
+            c2.setString("");
         }
 
-        documentConnection.insertReferenceMark(name, position, true);
+        documentConnection.insertReferenceMark(name, c2, true);
 
         // Last minute editing: find "et al." (OOBibStyle.ET_AL_STRING) and
         //                      format it as italic.
@@ -2566,7 +2571,7 @@ class OOBibBase {
             String etAlString = style.getStringCitProperty(OOBibStyle.ET_AL_STRING);
             int index = citText.indexOf(etAlString);
             if (index >= 0) {
-                italicizeRangeFromPosition(position, index, index + etAlString.length());
+                italicizeRangeFromPosition(c2, index, index + etAlString.length());
             }
         }
 
@@ -2717,7 +2722,7 @@ class OOBibBase {
             // may have removed the citation, thus the reference mark,
             // but pageInfo stored separately stays there.
 
-            // insert space
+            // insert space: we will write our citation before this space.
             cursor
                 .getText()
                 .insertString(cursor, " ", false);
@@ -2756,15 +2761,23 @@ class OOBibBase {
                 // The text we insert
                 String citeText =
                     style.isNumberEntries()
-                    ? "-" // A dash only. Presumably we expect a refresh later.
+                    ? "[-]" // A dash only. Presumably we expect a refresh later.
                     : style.getCitationMarker(
                         entries,
                         databaseMap,
                         inParenthesis,
                         null,
                         null);
-                insertReferenceMark(documentConnection, newName, citeText,
-                                    cursor, withText, style);
+                if ( citeText == "" ){
+                    citeText = "[?]";
+                }
+                insertReferenceMark(
+                    documentConnection,
+                    newName,
+                    citeText,
+                    cursor,
+                    withText,
+                    style);
              // } // end of scope for databaseMap, citeText
 
             // Move to the right of the space and remember this
