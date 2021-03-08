@@ -142,6 +142,7 @@ public class WebFetchers {
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new CrossRef());
         set.add(new WorldcatFetcher(fetcherApiPreferences.getWorldcatKey()));
+        set.add(new ZbMATH(importFormatPreferences));
         return set;
     }
 
