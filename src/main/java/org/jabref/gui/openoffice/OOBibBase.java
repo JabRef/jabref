@@ -949,7 +949,6 @@ class OOBibBase {
     /**
      * Mark the current document as missing.
      *
-     * TODO: GUI should be notified
      */
     private void
     forgetDocument() {
@@ -1105,8 +1104,6 @@ class OOBibBase {
     /**
      * This is what we get back from parsing a refMarkName.
      *
-     * TODO: We have one itcType per refMarkName. Merge reduces the
-     * number of itcType values.
      */
     private static class ParsedRefMark {
         /**  "", "0", "1" ... */
@@ -1638,7 +1635,7 @@ class OOBibBase {
      *         text, in arbitrary order (same order as from
      *         getJabRefReferenceMarkNames).
      *
-     *         TODO: Note: visual or alphabetic order could be more
+     *               Note: visual or alphabetic order could be more
      *               manageable for the user. We could provide these
      *               here, but switching between them needs change on
      *               GUI (adding a toggle or selector).
@@ -1647,9 +1644,6 @@ class OOBibBase {
      *                     compareTo() and equals() are based on refMarkName.
      *                     The order used in the "Manage citations" dialog
      *                     does not seem to use that.
-     *
-     *                     In the "Manage citations" dialog, there are 3 columns,
-     *                     the 3rd is empty, and has no title.
      *
      *                     The 1st is labeled "Citation" (show citation in bold,
      *                     and some context around it).
@@ -1813,8 +1807,6 @@ class OOBibBase {
                     entry.getRefMarkName(),
                     pageInfo.get());
             }
-            // TODO: if pageInfo is not present, or is empty:
-            // maybe we should remove it from the document.
         }
     }
 
@@ -2236,8 +2228,6 @@ class OOBibBase {
      *
      *  Probably should be called at the start of actions from the GUI,
      *  that rely on jabRefReferenceMarkNamesSortedByPosition to be up-to-date.
-     *
-     *  TODO: maybe we should pass around a fresh copy?
      */
     public void
     updateSortedReferenceMarks()
@@ -2263,9 +2253,6 @@ class OOBibBase {
      *
      * Note: Within citation group (a reference mark) the order is
      *       as appears there.
-     *
-     * TODO: The order within a reference mark name is decided on
-     *       construction (in insertEntry). Is it updated after a style change?
      *
      */
     private Map<BibEntry, BibDatabase>
@@ -2884,10 +2871,6 @@ class OOBibBase {
         // citation mark, inject it into the citation marker before
         // inserting.
 
-        // TODO: Consider moving pageInfo stuff to citation marker
-        //       generation. May need to modify getCitationMarker,
-        // at ./jabref/src/main/java/org/jabref/logic/openoffice/OOBibStyle.java 492:
-        //       to emit html code.
         String citText;
         String pageInfo =
             getPageInfoForReferenceMarkName(documentConnection, name);
@@ -2916,23 +2899,6 @@ class OOBibBase {
 
         // Last minute editing: find "et al." (OOBibStyle.ET_AL_STRING) and
         //                      format it as italic.
-
-        // Q: Are we sure that OOBibStyle.ET_AL_STRING cannot be part of author names
-        //    in any language?
-        // A: No, but have no examples either.
-
-        // Q: Are we sure, citText does not contain multiple "et al." strings?
-        // A: It *can* contain more than one.
-
-        // TODO: Could we move italicizing "et al." to a more proper place?
-        //       Maybe we could use POSTFORMATTER with "<i>...</i>"
-        //       That might make OOBibStyle.ITALIC_ET_AL superfluous.
-        //       Maybe
-        //       insertOOFormattedTextAtCurrentLocation could be used
-        //       to do the insert (if paragraph style manipulation
-        //       is removed)
-
-        // TODO: Handle multiple "et al." strings.
 
         // Check if we should italicize the "et al." string in citations:
         boolean italicize = style.getBooleanCitProperty(OOBibStyle.ITALIC_ET_AL);
@@ -3016,11 +2982,7 @@ class OOBibBase {
      * @param sync          Indicates whether the reference list and in-text citations
      *                      should be refreshed in the document.
      *
-     * TODO: Group changes into a single Undo context.
-     * https://www.openoffice.org/api/docs/common/ref/com/sun/star/document/XUndoManager.html
      *
-     * TODO: centralize inserting a citation group in a way that is
-     *       also suitable for combineCiteMarkers, unCombineCiteMarkers (Is there any other to consider?)
      */
     public void
     insertEntry(
@@ -3055,30 +3017,19 @@ class OOBibBase {
             // Get the cursor positioned by the user.
             XTextCursor cursor = documentConnection.getViewCursor();
 
-            // TODO: (style-dependent) sorting entries for presentation
-            //       affects the storage order of citation keys.
-            //       - (1) presentation order should be decided
-            //             when generating the presentation
-            //       - (2) storage order should keep the order
-            //             provided by the user.
             sortBibEntryListForMulticite(entries, style);
 
-            // TODO: consistent handling of citation groups (merged citations).
-            // keyString generation differs from the one in combineCiteMarkers
-            // Here we get A,,C for (A,B,C) where could not look up B
-            // There we get A,C
             String keyString =
                 entries.stream()
                 .map(entry -> entry.getCitationKey().orElse(""))
                 .collect(Collectors.joining(","));
             // Generate unique bookmark-name
-            // TODO: citationType is itcType elsewhere
-            int citationType = citationTypeFromOptions(withText, inParenthesis);
+            int itcType = citationTypeFromOptions(withText, inParenthesis);
             String newName =
                 getUniqueReferenceMarkName(
                     documentConnection,
                     keyString,
-                    citationType);
+                    itcType);
 
             // If we should store metadata for page info, do that now:
             if (pageInfo != null) {
@@ -3086,7 +3037,7 @@ class OOBibBase {
                 documentConnection.setCustomProperty(newName, pageInfo);
             }
             // else: branch ???
-            // TODO: if (pageInfo is null), we might inadvertently
+            // Note: if (pageInfo is null), we might inadvertently
             // pick up a pageInfo from an earlier citation. The user
             // may have removed the citation, thus the reference mark,
             // but pageInfo stored separately stays there.
@@ -3165,22 +3116,8 @@ class OOBibBase {
                 rebuildBibTextSection(allBases, style);
 
                 /*
-                 * TODO: inserting a reference in the "References" section
-                 * provokes an "Unknown Source" exception here, because
-                 * position was deleted by rebuildBibTextSection()
-                 *
-                 * at com.sun.proxy.$Proxy44.gotoRange(Unknown Source)
-                 * at org.jabref@100.0.0/org.jabref.gui.openoffice
-                 *      .OOBibBase.insertEntry(OOBibBase.java:609)
-                 *
-                 * Idea: Maybe we should refuse to insert in places to be
-                 *       overwritten: bibliography, reference marks.
-                 *
-                 *       Needs: (preferably accurate) knowledge of the forbidden ranges.
-                 *       Limitation: the user can still Cut and Paste to these parts.
-                 *                   Q: Can we make them readonly inside, while allowing
-                 *                      to move them around as a unit?
-                 *
+                 * Problem: insertEntry in bibliography
+                 * Reference is destroyed when we want to get there.
                  */
                 // Go back to the relevant position:
                 try {
@@ -3262,8 +3199,6 @@ class OOBibBase {
      *
      * @param style Bibliography style to use.
      *
-     * TODO: should not modify storage (i.e. call insertReferenceMark)
-     * TODO: do not mess with bibliography here
      */
     private void
     applyNewCitationMarkers(
@@ -3337,21 +3272,6 @@ class OOBibBase {
 
             if (hadBibSection
                 && (documentConnection.getBookmarkRangeOrNull(OOBibBase.BIB_SECTION_NAME) == null)) {
-                // TODO: I think we used a *section* for the
-                //       bibliography elsewhere. Here we use a *bookmark*. Relation?
-                //        applyNewCitationMarkers:
-                //                looks for: Bookmark
-                //                creates: paragraph + Bookmark
-                //        createBibTextSection2:
-                //                creates: paragraph + Section
-                //        clearBibTextSectionContent2:
-                //                looks for: Section, calls createBibTextSection2
-                //                sets to "": Section
-                //        populateBibTextSection:
-                //                looks for: Section
-                //                insert Bookmark BIB_SECTION_END_NAME
-                //                       after the body.
-
                 // We have overwritten the marker for the start of the reference list.
                 // We need to add it again.
                 cursor.collapseToEnd();
@@ -3404,9 +3324,6 @@ class OOBibBase {
             findCitedEntries(
                 findCitedKeys(documentConnection),
                 databases
-                // TODO: Pass jabRefReferenceMarkNamesSortedByPosition around, and
-                //       also add as a parameter to findCitedKeys,
-                //       to make calls to updateSortedReferenceMarks more visible.
                 );
         // fce.entries are in same order as returned by findCitedKeys
 
@@ -3692,15 +3609,6 @@ class OOBibBase {
             documentConnection.xText
             .createTextCursorByRange(section.getAnchor());
 
-        // TODO: I think creating a Section, inserting TITLE and formatting
-        //       it without question, is an overreach.
-        //       These could be left to the user's discretion.
-        //       - Section has problems with docx conversion (?)
-        //       - Do we need a different style to replace "References" with "Bibliography"?
-        //       - Do we want to edit the style to change "Heading 1" to "Heading 2"
-        //       To do (the important part of) our job, it is sufficient to get
-        //       a range marker for the body of the bibliography.
-        //       Maybe an "Insert bibliogrgaphy at the cursor"?
         OOUtil.insertTextAtCurrentLocation(
             documentConnection.xText,
             cursor,
@@ -3720,11 +3628,6 @@ class OOBibBase {
             uniqueLetters
         );
 
-        // TODO: Do not insert Bookmark without testing if it already
-        //       exists. LibreOffice creates "JR_bib_end1" instead of "JR_bib_end",
-        //       or rather "JR_bib_endN"  where N may increase.
-        //       Repeatedly pressing "Refresh" leaves "JR_bib_end" at the start
-        //       of the bibliography.
         documentConnection.insertBookmark(
             OOBibBase.BIB_SECTION_END_NAME,
             cursor,
@@ -3742,31 +3645,6 @@ class OOBibBase {
 
     /**
      * GUI action "Merge citations"
-     *
-     * Earlier note: "combineCiteMarkers does not work with citations in footnotes"
-     *
-     * Note:
-     *    - citations in footnotes
-     *      - [X] can be inserted and
-     *      - [X] they appear in the bibliography.
-     *      - [X] They are also updated on style change+refresh
-     *      - [ ] Merge fails (does not merge).
-     *      - [ ] "Separate" (on merged citations inserted by
-     *             selecting multiple entries then "Cite")
-     *             May leave some of the two citation marks with text "tmp".
-     *             This can be corrected by a few repetitions of pressing the "refresh"
-     *             button.
-     *
-     *   - citations in tables (text tables)
-     *     - [X] can be inserted
-     *     - [X] they appear in bibliography
-     *     - [X] they are updated on style change+refresh
-     *     - [X} Merge (combineCiteMarkers) works
-     *     - [X} Separate (unCombineCiteMarkers) works
-     *
-     * TODO: if the corresponding bib file is not open, Separate (unCombineCiteMarkers) (or Merge?)
-     *       leaves a mess: (1) reference marks with "tmp" in the text (2) with
-     *       reference mark name "JR_cite_1_", i.e. without citation key.
      *
      */
     public void
@@ -3842,10 +3720,10 @@ class OOBibBase {
             // do not reach start of (pivot+1), which we now know to be
             // in the same Text instance.
 
-            // TODO: If there is no space between the two reference marks,
-            //       the next line moves INTO the next. And probably will
-            //       cover a non-whitespace character, inhibiting the merge.
-            //       Empirically: does not merge. Probably a bug.
+            // If there is no space between the two reference marks,
+            // the next line moves INTO the next. And probably will
+            // cover a non-whitespace character, inhibiting the merge.
+            // Empirically: does not merge. Probably a bug.
             textCursor.goRight((short) 1, true);
             boolean couldExpand = true;
             while (couldExpand && (compare.compareRegionEnds(textCursor, range2) > 0)) {
@@ -3881,8 +3759,8 @@ class OOBibBase {
              * AUTHORYEAR_INTEXT: "X and Y (2000)"
              * INVISIBLE_CIT: ""
              *
-             * TODO: We probably only want to collect citations with
-             *       AUTHORYEAR_PAR itcType.
+             *  We probably only want to collect citations with
+             *  AUTHORYEAR_PAR itcType.
              *
              *       No, "X and Y (2000,2001)" appears a meaningful
              *       case as well.
@@ -3903,7 +3781,8 @@ class OOBibBase {
 
             // Note: silently drops duplicate keys.
             //       What if they have different pageInfo fields?
-            // TODO: combineCiteMarkers: merging for same citation keys,
+
+            //  combineCiteMarkers: merging for same citation keys,
             //       but different pageInfo looses information.
             List<String> keys =
                 parseRefMarkNameToUniqueCitationKeys(names.get(pivot));
@@ -4025,12 +3904,12 @@ class OOBibBase {
                         newName,
                         "tmp",
                         textCursor,
-                        /* TODO: withText should be itcType != OOBibBase.INVISIBLE_CIT */
+                        /* withText should be itcType != OOBibBase.INVISIBLE_CIT */
                         true,
                         style);
                 textCursor.collapseToEnd();
                 if (i != last) {
-                    // TODO: space between citation markers: what style?
+                    // space between citation markers: what style?
                     // DocumentConnection.setCharStyle(textCursor, "Standard");
                     textCursor.setString(" ");
                     textCursor.collapseToEnd();
@@ -4091,8 +3970,12 @@ class OOBibBase {
                     .ifPresent(crossReference -> {
                             // If the crossReference entry is not already in the database
 
-                            // TODO: broken logic here: we just created resultDatabase,
-                            // and added nothing yet. Question: why do we use
+                            // broken logic here:
+
+                            // we just created resultDatabase, and
+                            // added nothing yet.
+
+                            // Question: why do we use
                             // entriesToInsert instead of directly adding to resultDatabase?
                             // And why do we not look for it in entriesToInsert?
                             // With the present code we are always adding it.
