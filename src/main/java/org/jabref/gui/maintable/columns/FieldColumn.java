@@ -32,7 +32,7 @@ public class FieldColumn extends MainTableColumn<String> {
                 .install(this);
 
         if (fields.size() == 1) {
-            //comparator can't parse more than one value
+            // comparator can't parse more than one value
             Field field = Iterables.getOnlyElement(fields);
 
             if (field instanceof UnknownField || field.isNumeric()) {
