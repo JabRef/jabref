@@ -15,8 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class for working with <a href="https://en.wikipedia.org/wiki/Digital_object_identifier">Digital object identifiers
- * (DOIs)</a> and <a href="http://shortdoi.org">Short DOIs</a>
+ * Class for working with <a href="https://en.wikipedia.org/wiki/Digital_object_identifier">Digital object identifiers (DOIs)</a> and <a href="http://shortdoi.org">Short DOIs</a>
  */
 public class DOI implements Identifier {
 
@@ -24,8 +23,7 @@ public class DOI implements Identifier {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DOI.class);
 
-    // DOI/Short DOI resolver
-    private static final URI RESOLVER = URI.create("https://doi.org");
+    private static final URI RESOLVER = URI.create("https://doi.org/");
 
     // Regex
     // (see http://www.doi.org/doi_handbook/2_Numbering.html)
@@ -147,8 +145,7 @@ public class DOI implements Identifier {
     /**
      * Creates an Optional&lt;DOI> from various schemes including URL, URN, and plain DOIs.
      * <p>
-     * Useful for suppressing the <c>IllegalArgumentException</c> of the Constructor and checking for
-     * Optional.isPresent() instead.
+     * Useful for suppressing the <c>IllegalArgumentException</c> of the Constructor and checking for Optional.isPresent() instead.
      *
      * @param doi the DOI/Short DOI string
      * @return an Optional containing the DOI or an empty Optional
@@ -233,8 +230,16 @@ public class DOI implements Identifier {
      */
     @Override
     public Optional<URI> getExternalURI() {
+        return getExternalURIFromBase(RESOLVER);
+    }
+
+    public Optional<URI> getExternalURIWithCustomBase(String customBase) {
+        return getExternalURIFromBase(URI.create(customBase));
+    }
+
+    private Optional<URI> getExternalURIFromBase(URI base) {
         try {
-            URI uri = new URI(RESOLVER.getScheme(), RESOLVER.getHost(), "/" + doi, null);
+            URI uri = new URI(base.getScheme(), base.getHost(), "/" + doi, null);
             return Optional.of(uri);
         } catch (URISyntaxException e) {
             // should never happen

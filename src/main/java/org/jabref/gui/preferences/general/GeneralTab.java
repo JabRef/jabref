@@ -26,6 +26,7 @@ import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> implements PreferencesTab {
 
+    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
     @FXML private ComboBox<Language> language;
     @FXML private ComboBox<Charset> defaultEncoding;
     @FXML private ComboBox<BibDatabaseMode> biblatexMode;
@@ -41,8 +42,6 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private Button markOwnerHelp;
     @FXML private CheckBox addCreationDate;
     @FXML private CheckBox addModificationDate;
-
-    private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
     public GeneralTab() {
         ViewLoader.view(this)

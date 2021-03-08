@@ -3,7 +3,9 @@ package org.jabref.gui.autocompleter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -14,6 +16,8 @@ import org.junit.jupiter.api.Test;
 import static org.jabref.gui.autocompleter.AutoCompleterUtil.getRequest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class FieldValueSuggestionProviderTest {
 
@@ -53,6 +57,23 @@ class FieldValueSuggestionProviderTest {
         database.insertEntry(entry);
 
         Collection<String> result = autoCompleter.provideSuggestions(getRequest(("test")));
+        assertEquals(Collections.emptyList(), result);
+    }
+
+    @Test
+    void completeOnIgnoredFieldReturnsNothing() {
+        AutoCompletePreferences autoCompletePreferences = mock(AutoCompletePreferences.class);
+        JournalAbbreviationRepository journalAbbreviationRepository = mock(JournalAbbreviationRepository.class);
+        when(autoCompletePreferences.getCompleteFields()).thenReturn(Set.of(StandardField.AUTHOR));
+        SuggestionProviders suggestionProviders = new SuggestionProviders(database, journalAbbreviationRepository, autoCompletePreferences);
+
+        SuggestionProvider<String> autoCompleter = (SuggestionProvider<String>) suggestionProviders.getForField(StandardField.TITLE);
+
+        BibEntry entry = new BibEntry();
+        entry.setField(StandardField.TITLE, "testValue");
+        database.insertEntry(entry);
+
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("testValue")));
         assertEquals(Collections.emptyList(), result);
     }
 
