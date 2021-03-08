@@ -1,23 +1,25 @@
 package org.jabref.gui.fieldeditors;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Optional;
 
+import org.jabref.logic.journals.JournalStatistics;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JournalEditorPopOverTest {
 
     private Path tempFolder;
-    private final String testEntry = "1, 28773, CA - A Cancer Journal for Clinicians, journal, 15424863, 00079235, 88,192, Q1, 156, 36, 129, 2924, 22644, 89, 255.73, 81.22, United States, Northern America, Wiley-Blackwell, 1950-2020, Hematology (Q1); Oncology (Q1)";
+    private final String testEntry = "1;28773;CA - A Cancer Journal for Clinicians;journal;15424863, 00079235;88,192;Q1;156;36;129;2924;22644;89;255,73;81,22;United States;Northern America;Wiley-Blackwell;1950-2020;Hematology (Q1), Oncology (Q1)";
+    private JournalStatistics jsReader;
     // Create object that loads in data from file
 
     /**
@@ -43,11 +45,14 @@ class JournalEditorPopOverTest {
         Files.writeString(file,
                 testEntry, StandardOpenOption.CREATE); // Write the test entry to temp file
 
+        int ISSN = 15424863;
+
+        jsReader = new JournalStatistics(file);
         // Call method with valid ISSN with the object created during setup
-        String expectedJournalName = ""; // This variable should hold a method call to finding the correct journal given a valid ISSN
+        boolean found = jsReader.getTitleByISSN(ISSN); // This variable should hold a method call to finding the correct journal given a valid ISSN
         String trueJournalName = "CA - A Cancer Journal for Clinicians"; // true title of the found journal
 
-        assertEquals(trueJournalName, expectedJournalName);
+        assertTrue(found);
     }
 
     /**
@@ -60,11 +65,15 @@ class JournalEditorPopOverTest {
         Files.writeString(file,
                 testEntry, StandardOpenOption.CREATE); // Write test entry to temp file
 
+        int ISSN = 12300000;
+
+        jsReader = new JournalStatistics(file);
+        boolean found = jsReader.getTitleByISSN(ISSN);
         // Call method with invalid ISSN with the object created during setup
         String expectedJournalName = ""; // This variable is suppose to hold the title of the journal for the invalid ISSN
         String trueJournalName = "Nature Reviews Genetics"; // Or empty String
 
-        assertEquals(expectedJournalName, trueJournalName);
+        assertFalse(found);
     }
 
     /**
