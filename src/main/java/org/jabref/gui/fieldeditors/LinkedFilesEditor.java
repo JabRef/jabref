@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
+import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -137,12 +138,16 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     }
 
     private static Node createFileDisplay(LinkedFileViewModel linkedFile) {
+        PseudoClass opacity = PseudoClass.getPseudoClass("opacity");
+
         Node icon = linkedFile.getTypeIcon().getGraphicNode();
         icon.setOnMouseClicked(event -> linkedFile.open());
+
         Text link = new Text();
-        link.opacityProperty().bind(linkedFile.opacityProperty());
         link.textProperty().bind(linkedFile.linkProperty());
         link.getStyleClass().setAll("file-row-text");
+        link.pseudoClassStateChanged(opacity, linkedFile.isAutomaticallyFound());
+
         Text desc = new Text();
         desc.textProperty().bind(linkedFile.descriptionProperty());
         desc.getStyleClass().setAll("file-row-text");
@@ -159,7 +164,10 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         acceptAutoLinkedFile.setTooltip(new Tooltip(Localization.lang("This file was found automatically. Do you want to link it to this entry?")));
         acceptAutoLinkedFile.visibleProperty().bind(linkedFile.isAutomaticallyFoundProperty());
         acceptAutoLinkedFile.managedProperty().bind(linkedFile.isAutomaticallyFoundProperty());
-        acceptAutoLinkedFile.setOnAction(event -> linkedFile.acceptAsLinked());
+        acceptAutoLinkedFile.setOnAction(event -> {
+            linkedFile.acceptAsLinked();
+            link.pseudoClassStateChanged(opacity, linkedFile.isAutomaticallyFound());
+        });
         acceptAutoLinkedFile.getStyleClass().setAll("icon-button");
 
         Button writeXMPMetadata = IconTheme.JabRefIcons.IMPORT.asButton();

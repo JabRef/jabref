@@ -74,7 +74,6 @@ public class LinkedFileViewModel extends AbstractViewModel {
     private final XmpPreferences xmpPreferences;
     private final LinkedFileHandler linkedFileHandler;
     private final ExternalFileTypes externalFileTypes;
-    private final DoubleProperty opacityProperty = new SimpleDoubleProperty(1.0);
 
     private final Validator fileExistsValidator;
 
@@ -177,12 +176,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public void markAsAutomaticallyFound() {
         isAutomaticallyFound.setValue(true);
-        opacityProperty.setValue(0.7);
     }
 
     public void acceptAsLinked() {
         isAutomaticallyFound.setValue(false);
-        opacityProperty.setValue(1.0);
     }
 
     public Observable[] getObservables() {
@@ -510,13 +507,5 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public ValidationStatus fileExistsValidationStatus() {
         return fileExistsValidator.getValidationStatus();
-    }
-
-    public DoubleProperty opacityProperty() {
-        return opacityProperty;
-    }
-
-    public void setOpacityProperty(double v) {
-        opacityProperty.setValue(v);
     }
 }
