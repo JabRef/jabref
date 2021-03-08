@@ -196,6 +196,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                         preferences.getFilePreferences(),
                         externalFileTypes);
                 newLinkedFile.markAsAutomaticallyFound();
+                newLinkedFile.setOpacityProperty(0.3);
                 result.add(newLinkedFile);
             }
         } catch (IOException e) {

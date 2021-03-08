@@ -140,6 +140,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         Node icon = linkedFile.getTypeIcon().getGraphicNode();
         icon.setOnMouseClicked(event -> linkedFile.open());
         Text link = new Text();
+        link.opacityProperty().bind(linkedFile.opacityProperty());
         link.textProperty().bind(linkedFile.linkProperty());
         link.getStyleClass().setAll("file-row-text");
         Text desc = new Text();
@@ -150,20 +151,18 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         progressIndicator.progressProperty().bind(linkedFile.downloadProgressProperty());
         progressIndicator.visibleProperty().bind(linkedFile.downloadOngoingProperty());
 
-        Text auto = new Text();
-        auto.visibleProperty().bind(linkedFile.isAutomaticallyFoundProperty());
-        auto.managedProperty().bind(linkedFile.isAutomaticallyFoundProperty());
-        auto.setText(Localization.lang("(Auto)"));
-        auto.getStyleClass().setAll("file-row-text");
-
         HBox info = new HBox(8);
         info.setStyle("-fx-padding: 0.5em 0 0.5em 0;"); // To align with buttons below which also have 0.5em padding
-        info.getChildren().setAll(icon, auto, link, desc, progressIndicator);
+        info.getChildren().setAll(icon, link, desc, progressIndicator);
 
         Button acceptAutoLinkedFile = IconTheme.JabRefIcons.AUTO_LINKED_FILE.asButton();
         acceptAutoLinkedFile.setTooltip(new Tooltip(Localization.lang("This file was found automatically. Do you want to link it to this entry?")));
         acceptAutoLinkedFile.visibleProperty().bind(linkedFile.isAutomaticallyFoundProperty());
-        acceptAutoLinkedFile.setOnAction(event -> linkedFile.acceptAsLinked());
+        acceptAutoLinkedFile.managedProperty().bind(linkedFile.isAutomaticallyFoundProperty());
+        acceptAutoLinkedFile.setOnAction(event -> {
+            linkedFile.acceptAsLinked();
+            linkedFile.setOpacityProperty(1.0);
+        });
         acceptAutoLinkedFile.getStyleClass().setAll("icon-button");
 
         Button writeXMPMetadata = IconTheme.JabRefIcons.IMPORT.asButton();
@@ -175,7 +174,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         HBox container = new HBox(10);
         container.setPrefHeight(Double.NEGATIVE_INFINITY);
 
-        container.getChildren().addAll(info, acceptAutoLinkedFile, writeXMPMetadata);
+        container.getChildren().addAll(acceptAutoLinkedFile, info, writeXMPMetadata);
 
         return container;
     }
