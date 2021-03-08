@@ -29,7 +29,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - The export to MS Office XML now uses the month name for the field `MonthAcessed` instead of the two digit number [#7354](https://github.com/JabRef/jabref/issues/7354)
 - We included some standalone dialogs from the options menu in the main preference dialog and fixed some visual issues in the preferences dialog. [#7384](https://github.com/JabRef/jabref/pull/7384)
 - We improved the linking of the `python3` interpreter via the shebang to dynamically use the systems default Python. Related to [JabRef-Browser-Extension #177](https://github.com/JabRef/JabRef-Browser-Extension/issues/177)
-- Automatically found pdf files now have the linking button to the far left and uses the icon LINK_PLUS instead of BRIEFCASE_CHECK. The file name also has lowered opacity(70%) until added. [#3607](https://github.com/JabRef/JabRef-Browser-Extension/issues/3607)
+- Automatically found pdf files now have the linking button to the far left and uses a link icon with a plus instead of a briefcase. The file name also has lowered opacity(70%) until added. [#3607](https://github.com/JabRef/JabRef-Browser-Extension/issues/3607)
 
 ### Fixed
 

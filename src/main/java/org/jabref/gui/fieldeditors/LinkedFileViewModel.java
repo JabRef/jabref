@@ -177,10 +177,12 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
     public void markAsAutomaticallyFound() {
         isAutomaticallyFound.setValue(true);
+        opacityProperty.setValue(0.7);
     }
 
     public void acceptAsLinked() {
         isAutomaticallyFound.setValue(false);
+        opacityProperty.setValue(1.0);
     }
 
     public Observable[] getObservables() {
