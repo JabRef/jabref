@@ -52,4 +52,9 @@ public class NumericFieldComparatorTest {
     public void compareWithMinusString() {
         assertEquals(-1, comparator.compare("-", "-5"));
     }
+
+    @Test
+    public void compareWordWithMinus() {
+        assertEquals(-1, comparator.compare("-abc", "-5"));
+    }
 }

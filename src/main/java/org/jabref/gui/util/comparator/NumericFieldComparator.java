@@ -53,7 +53,9 @@ public class NumericFieldComparator implements Comparator<String> {
         }
         for (int i = 0; i < number.length(); i++) {
             char c = number.charAt(i);
-            if ((i == 0 && c != '-') && (c < '0' || c > '9')) {
+            if (i == 0 && (c == '-' || c == '+')) {
+                continue;
+            } else if (!Character.isDigit(c)) {
                 return false;
             }
         }
