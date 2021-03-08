@@ -329,7 +329,7 @@ Idea: Maybe we should refuse to insert in places to be
      - Apart from
        - construction and
        - parsing,
-       - probably marking (or calulating) the originals as "in use" for
+       - probably marking (or calculating) the originals as "in use" for
          getUniqueReferenceMarkName() would be needed.
 
     - file:OOBibBase.java::/getUniqueReferenceMarkName/
