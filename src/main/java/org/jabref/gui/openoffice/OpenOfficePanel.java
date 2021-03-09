@@ -557,6 +557,11 @@ public class OpenOfficePanel {
                     reportUndefinedCharacterFormat(ex);
                 } catch (UndefinedParagraphFormatException ex) {
                     reportUndefinedParagraphFormat(ex);
+                } catch (JabRefException ex) {
+                    dialogService.showErrorDialogAndWait(
+                        Localization.lang("JabRefException"),
+                        ex.getLocalizedMessage()
+                        );
                 } catch (com.sun.star.lang.IllegalArgumentException | UnknownPropertyException | PropertyVetoException |
                          CreationException | NoSuchElementException | WrappedTargetException | IOException |
                          BibEntryNotFoundException | IllegalTypeException | PropertyExistException |

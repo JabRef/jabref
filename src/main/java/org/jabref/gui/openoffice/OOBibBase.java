@@ -2996,6 +2996,7 @@ class OOBibBase {
         boolean sync
         )
         throws
+        JabRefException,
         IllegalArgumentException,
         UnknownPropertyException,
         NotRemoveableException,
@@ -3014,8 +3015,18 @@ class OOBibBase {
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
 
         try {
+            XTextCursor cursor;
             // Get the cursor positioned by the user.
-            XTextCursor cursor = documentConnection.getViewCursor();
+            try {
+                cursor = documentConnection.getViewCursor();
+            } catch (RuntimeException ex){
+                // com.sun.star.uno.RuntimeException
+                throw new JabRefException(
+                    "Could not get the cursor",
+                    Localization.lang(
+                        "Could not get the cursor.")
+                    );
+            }
 
             sortBibEntryListForMulticite(entries, style);
 
