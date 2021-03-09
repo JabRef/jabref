@@ -47,9 +47,8 @@ public class SmartConstrainedResizePolicy implements Callback<TableView.ResizeFe
                     // Just to make sure that we are staying under the total table width (due to rounding errors)
                     currPrefWidth += newSize;
                     if (currPrefWidth > tableWidth) {
-                        double surplus = currPrefWidth - tableWidth;
-                        newSize -= surplus;
-                        currPrefWidth -= surplus;
+                        newSize -= currPrefWidth - tableWidth;
+                        currPrefWidth -= tableWidth;
                     }
 
                     resize(col, newSize - col.getWidth());
