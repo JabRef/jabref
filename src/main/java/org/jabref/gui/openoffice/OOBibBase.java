@@ -355,6 +355,13 @@ class OOBibBase {
             return Arrays.asList(names);
         }
 
+        static XTextContent
+        asTextContent( Object mark ){
+            if ( mark == null ){
+                return null;
+            }
+            return unoQI(XTextContent.class, mark);
+        }
         /**
          * @return null if name not found, or if the result does not
          *         support the XTextContent interface.
@@ -368,7 +375,7 @@ class OOBibBase {
             }
             try {
                 Object referenceMark = nameAccess.getByName(name);
-                return unoQI(XTextContent.class, referenceMark);
+                return asTextContent(referenceMark);
             } catch (NoSuchElementException ex) {
                 LOGGER.warn(String.format(
                                 "nameAccessGetTextContentByNameOrNull got NoSuchElementException"
@@ -1261,7 +1268,7 @@ class OOBibBase {
         XNameAccess xNamedMarks = documentConnection.getReferenceMarks();
         for (String name1 : names) {
             Object bookmark = xNamedMarks.getByName(name1);
-            assert (null != unoQI(XTextContent.class, bookmark));
+            assert (null != DocumentConnection.asTextContent(bookmark));
         }
 
         // Collect to a flat list while keep only the first appearance.
@@ -3703,13 +3710,13 @@ class OOBibBase {
         while (pivot < (names.size() - 1)) {
 
             XTextRange range1 =
-                unoQI(XTextContent.class,
-                      nameAccess.getByName(names.get(pivot)))
+                DocumentConnection.asTextContent(
+                    nameAccess.getByName(names.get(pivot)))
                 .getAnchor()
                 .getEnd();
 
             XTextRange range2 =
-                unoQI(XTextContent.class,
+                DocumentConnection.asTextContent(
                       nameAccess.getByName(names.get(pivot + 1)))
                 .getAnchor()
                 .getStart(); // end of range2 is the start of (pivot + 1)
@@ -3873,8 +3880,8 @@ class OOBibBase {
 
         while (pivot < (names.size())) {
             XTextRange range1 =
-                unoQI(XTextContent.class,
-                      nameAccess.getByName(names.get(pivot)))
+                DocumentConnection.asTextContent(
+                    nameAccess.getByName(names.get(pivot)))
                 .getAnchor();
 
             XTextCursor textCursor =
