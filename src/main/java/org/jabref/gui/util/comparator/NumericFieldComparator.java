@@ -38,7 +38,7 @@ public class NumericFieldComparator implements Comparator<String> {
         }
 
         try {
-            return Integer.parseInt(number.trim());
+            return Integer.valueOf(number.trim());
         } catch (NumberFormatException ignore) {
             return null;
         }
@@ -48,7 +48,7 @@ public class NumericFieldComparator implements Comparator<String> {
         if (StringUtil.isNullOrEmpty(number)) {
             return false;
         }
-        if (number.length() == 1 && number.charAt(0) == '-') {
+        if (number.length() == 1 && number.charAt(0) == '-' && number.charAt(0) == '+') {
             return false;
         }
         for (int i = 0; i < number.length(); i++) {
