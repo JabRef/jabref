@@ -3488,12 +3488,21 @@ class OOBibBase {
 
             if (hadBibSection
                 && (documentConnection.getBookmarkRangeOrNull(OOBibBase.BIB_SECTION_NAME) == null)) {
-                // We have overwritten the marker for the start of the reference list.
-                // We need to add it again.
-                cursor.collapseToEnd();
-                OOUtil.insertParagraphBreak(documentConnection.xText, cursor);
-                documentConnection.insertBookmark(OOBibBase.BIB_SECTION_NAME, cursor, true);
-                cursor.collapseToEnd();
+                if (true){
+                    // Overwriting text already there is too harsh.
+                    // I am making it an error, to see if we ever get here.
+                    throw new RuntimeException(
+                        "OOBibBase.applyNewCitationMarkers:"
+                        + " just overwrote the bibsection marker. Sorry.");
+                } else {
+                    // We have overwritten the marker for the start of the reference list.
+                    // We need to add it again.
+                    // ---
+                    // cursor.collapseToEnd();
+                    // OOUtil.insertParagraphBreak(documentConnection.xText, cursor);
+                    // documentConnection.insertBookmark(OOBibBase.BIB_SECTION_NAME, cursor, true);
+                    // cursor.collapseToEnd();
+                }
             }
         }
     }
