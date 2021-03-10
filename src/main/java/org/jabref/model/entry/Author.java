@@ -18,7 +18,6 @@ public class Author {
     private final String vonPart;
     private final String lastPart;
     private final String jrPart;
-    private String latexFreeLastPart;
 
     /**
      * Creates the Author object. If any part of the name is absent, <CODE>null</CODE> must be passed; otherwise other methods may return erroneous results.
@@ -274,18 +273,6 @@ public class Author {
     }
 
     /**
-     * Returns the last name of the author stored in this object with resolved latex.
-     *
-     * @return last name of the author (may consist of several tokens)
-     */
-    public Optional<String> getLastLatexFree() {
-        if (latexFreeLastPart == null && lastPart != null) {
-            latexFreeLastPart = LatexToUnicodeAdapter.format(lastPart);
-        }
-        return Optional.ofNullable(latexFreeLastPart);
-    }
-
-    /**
      * Returns the junior part of the author's name stored in this object ("Jr").
      *
      * @return junior part of the author's name (may consist of several tokens) or null if the author does not have a Jr. Part
@@ -371,14 +358,11 @@ public class Author {
     }
 
     public Author latexFree() {
-        if (latexFree == null) {
             String first = getFirst().map(LatexToUnicodeAdapter::format).orElse(null);
             String firstabbr = getFirstAbbr().map(LatexToUnicodeAdapter::format).orElse(null);
             String von = getVon().map(LatexToUnicodeAdapter::format).orElse(null);
             String last = getLast().map(LatexToUnicodeAdapter::format).orElse(null);
             String jr = getJr().map(LatexToUnicodeAdapter::format).orElse(null);
-            latexFree = new Author(first, firstabbr, von, last, jr);
-        }
-        return latexFree;
+            return new Author(first, firstabbr, von, last, jr);
     }
 }
