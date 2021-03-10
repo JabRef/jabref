@@ -30,17 +30,15 @@ public class AuthorListTest {
             new Author("Kurt", "K.", null, "G{\\\"{o}}del", null);
     private static final Author BANU_MOSA =
             new Author(null, null, null, "{The Ban\\={u} M\\={u}s\\={a} brothers}", null);
-    private static final AuthorList EMPTY_AUTHOR = new AuthorList(Collections.emptyList());
+    private static final AuthorList EMPTY_AUTHOR = AuthorList.of(Collections.emptyList());
     private static final AuthorList ONE_AUTHOR_WITH_LATEX = AuthorList.of(MUHAMMAD_ALKHWARIZMI);
-    private static final AuthorList TWO_AUTHORS_WITH_LATEX = AuthorList.of(List.of(MUHAMMAD_ALKHWARIZMI, CORRADO_BOHM));
-    private static final AuthorList THREE_AUTHORS_WITH_LATEX = new AuthorList(
-            List.of(MUHAMMAD_ALKHWARIZMI, CORRADO_BOHM, KURT_GODEL));
+    private static final AuthorList TWO_AUTHORS_WITH_LATEX = AuthorList.of(MUHAMMAD_ALKHWARIZMI, CORRADO_BOHM);
+    private static final AuthorList THREE_AUTHORS_WITH_LATEX = AuthorList.of(MUHAMMAD_ALKHWARIZMI, CORRADO_BOHM, KURT_GODEL);
     private static final AuthorList ONE_INSTITUTION_WITH_LATEX = AuthorList.of(BANU_MOSA);
     private static final AuthorList ONE_INSTITUTION_WITH_STARTING_PARANTHESIS = AuthorList.of(new Author(
             null, null, null, "{{\\L{}}ukasz Micha\\l{}}", null));
     private static final AuthorList TWO_INSTITUTIONS_WITH_LATEX = AuthorList.of(BANU_MOSA, BANU_MOSA);
-    private static final AuthorList MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX = new AuthorList(
-            List.of(BANU_MOSA, CORRADO_BOHM));
+    private static final AuthorList MIXED_AUTHOR_AND_INSTITUTION_WITH_LATEX = AuthorList.of(BANU_MOSA, CORRADO_BOHM);
 
     public static int size(String bibtex) {
         return AuthorList.parse(bibtex).getNumberOfAuthors();
