@@ -64,7 +64,7 @@ We recommend to install IntelliJ IDEA using [JetBrains Toolbox App](https://www.
 
 On Ubuntu Linux, you can follow the [documentation from the Ubuntu Community](https://help.ubuntu.com/community/EclipseIDE#Download_Eclipse) or the [step-by-step guideline from Krizna](https://www.krizna.com/ubuntu/install-eclipse-in-ubuntu-12-04/) to install Eclipse. On Windows, download it from [www.eclipse.org](http://www.eclipse.org/downloads/) and run the installer.
 
-Eclipse JEE 2020-09 or newer is required. For Eclipse 2020-09 you need to install [Java 15 Support](https://marketplace.eclipse.org/content/java-15-support-eclipse-2020-09-417).
+Eclipse JEE 2020-12 or newer is required.
 
 ### Other Tooling
 
