@@ -1,56 +1,52 @@
-name: Refresh Journal Lists
+name: Refresh Citation Style Language Files
 
 on:
+  schedule:
+    # run on 1st and 15th of each month
+    - cron: '1 2 1,15 * *'
   workflow_dispatch:
-    # Allow to run manually
 
 jobs:
   publish:
-    name: Refresh Journal List Files
+    name: Refresh Citation Style Language Files
     runs-on: ubuntu-latest
+    if: github.repository == 'JabRef/jabref'
     steps:
-      - name: Fetch all history for all tags and branches
+      - name: Checkout source
         uses: actions/checkout@v2
         with:
           ref: master
-          persist-credentials: false
           fetch-depth: 0
-      - name: Set up JDK
-        uses: actions/setup-java@v1
-        with:
-          java-version: 14
-      - uses: actions/cache@v1
-        name: Restore gradle wrapper
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-      - name: Update journal lists
+      - name: Initialize git
         run: |
-          set +o pipefail
-
-          # prepare journal lists
-          cd /tmp
-          git clone --depth=1 https://github.com/JabRef/abbrv.jabref.org.git
-          cd abbrv.jabref.org/journals
-
-          # remove all lists without dot in them
-          # we use abbrevatiation lists containing dots in them only (to be consistent)
-          rm journal_abbreviations_entrez.csv
-          rm journal_abbreviations_medicus.csv
-          rm journal_abbreviations_webofscience-dots.csv
-
-          # prepare building
-          mkdir -p $GITHUB_WORKSPACE/build/journals
-          cp * $GITHUB_WORKSPACE/build/journals/
-
-          # create .mv file
-          cd $GITHUB_WORKSPACE
-          ./gradlew generateJournalAbbreviationList
-
-          # git commit
+          git checkout master
+          git config --local core.editor /usr/bin/cat
+          git config user.name "github actions"
           git config user.email "jabrefmail+webfeedback@gmail.com"
-          git config user.name "JabRef refresh journal lists [bot]"
-          git add . && git commit -m"Update journalList.mv"
-      - uses: ad-m/github-push-action@master
+      - name: Add csl-styles remote
+        run: git remote add -f csl-styles https://github.com/citation-style-language/styles.git
+      - name: Update csl-styles
+        run: |
+          git subtree pull --prefix buildres/csl/csl-styles csl-styles master --squash
+          cp buildres/csl/csl-styles/acm-siggraph.csl src/main/resources/csl-styles/
+          cp buildres/csl/csl-styles/ieee.csl src/main/resources/csl-styles/
+          cp buildres/csl/csl-styles/turabian-author-date.csl src/main/resources/csl-styles/
+      - name: Add csl-locales remote
+        run: git remote add -f csl-locales https://github.com/citation-style-language/locales.git
+      - name: Update csl-locales
+        run: |
+          git subtree pull --prefix buildres/csl/csl-locales csl-locales master --squash
+          cp buildres/csl/csl-locales/locales.json src/main/resources/csl-locales/
+          cp buildres/csl/csl-locales/locales-en-US src/main/resources/csl-locales/
+      - uses: peter-evans/create-pull-request@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: refresh-csl
+      - name: Report issues
+        if: failure()
+        uses: JasonEtco/create-an-issue@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          filename: .github/failure-csl-update.md
+          title: "[Bot] Update CSL styles"
