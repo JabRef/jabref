@@ -646,6 +646,10 @@
     -fx-fill: -jr-search-text;
 }
 
+.file-row-text:opacity{
+    -fx-fill: derive(-jr-search-text, 70%);
+}
+
 .combo-box-base {
     -fx-background-color: -fx-outer-border, -fx-control-inner-background;
     -fx-background-insets: 0, 1;
