@@ -127,7 +127,7 @@ public class AuthorList {
      *
      * @param authors the list of authors which should underlie this instance
      */
-    public AuthorList(List<Author> authors) {
+    private AuthorList(List<Author> authors) {
         this.authors = Objects.requireNonNull(authors);
     }
 
