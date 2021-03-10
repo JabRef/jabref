@@ -194,6 +194,11 @@ class OOBibBase {
             mo.unlockControllers();
         }
 
+        boolean hasControllersLocked(){
+            XModel mo = unoQI(XModel.class, this.xCurrentComponent);
+            return mo.hasControllersLocked();
+        }
+
         /**
          *  @return True if we cannot reach the current document.
          */
@@ -2221,6 +2226,14 @@ class OOBibBase {
         WrappedTargetException,
         NoDocumentException {
 
+        if ( documentConnection.hasControllersLocked() ) {
+            LOGGER.warn(
+                "getJabRefReferenceMarkNamesSortedByPosition:"
+                + " with ControllersLocked, viewCursor.gotoRange"
+                + " is pobably useless"
+                );
+        }
+
         List<String> names = getJabRefReferenceMarkNames(documentConnection);
 
         // find coordinates
@@ -3930,10 +3943,14 @@ class OOBibBase {
         BibEntryNotFoundException,
         NoDocumentException {
 
+        Objects.requireNonNull(databases);
+        Objects.requireNonNull(style);
+
+        final boolean useLockControllers = true;
         DocumentConnection documentConnection = this.getDocumentConnectionOrThrow();
+        boolean madeModifications = false;
 
         try {
-            documentConnection.lockControllers();
 
             // The testing for whitespace-only between (pivot) and (pivot+1) assumes that
             // names are in textual order: textually consecutive pairs
@@ -3948,13 +3965,15 @@ class OOBibBase {
             List<String> names =
                 getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
 
+            if (useLockControllers) {
+                documentConnection.lockControllers();
+            }
             // XTextRangeCompare: compares the positions of two TextRanges within a Text.
             // Only TextRange instances within the same Text can be compared.
             final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
                                                     documentConnection.xText);
 
             int pivot = 0;
-            boolean madeModifications = false;
             boolean setCharStyleTested = false;
             XNameAccess nameAccess = documentConnection.getReferenceMarks();
 
@@ -4092,12 +4111,14 @@ class OOBibBase {
                 pivot++;
             } // while
 
-            if (madeModifications) {
-                updateSortedReferenceMarks();
-                refreshCiteMarkers(databases, style);
-            }
         } finally {
-            documentConnection.unlockControllers();
+            if (useLockControllers) {
+                documentConnection.unlockControllers();
+            }
+        }
+        if (madeModifications) {
+            updateSortedReferenceMarks();
+            refreshCiteMarkers(databases, style);
         }
     }
 
@@ -4124,15 +4145,20 @@ class OOBibBase {
         BibEntryNotFoundException,
         NoDocumentException {
 
-        DocumentConnection documentConnection = getDocumentConnectionOrThrow();
-        try {
-            documentConnection.lockControllers();
+        Objects.requireNonNull(databases);
+        Objects.requireNonNull(style);
 
-            List<String> names =
-                getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
+        final boolean useLockControllers = true;
+        DocumentConnection documentConnection = getDocumentConnectionOrThrow();
+        boolean madeModifications = false;
+        List<String> names =
+            getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
+        try {
+            if (useLockControllers) {
+                documentConnection.lockControllers();
+            }
 
             int pivot = 0;
-            boolean madeModifications = false;
             boolean setCharStyleTested = false;
             XNameAccess nameAccess = documentConnection.getReferenceMarks();
 
@@ -4199,14 +4225,26 @@ class OOBibBase {
 
                 pivot++;
             }
-            if (madeModifications) {
-                updateSortedReferenceMarks();
-                refreshCiteMarkers(databases, style);
-            }
         } finally {
-            documentConnection.unlockControllers();
+            if (useLockControllers) {
+                documentConnection.unlockControllers();
+            }
+        }
+        if (madeModifications) {
+            updateSortedReferenceMarks();
+            try {
+                if (useLockControllers) {
+                    documentConnection.lockControllers();
+                }
+                refreshCiteMarkers(databases, style);
+            } finally {
+                if (useLockControllers) {
+                    documentConnection.unlockControllers();
+                }
+            }
         }
     }
+
     /**
      * Used from GUI: "Export cited"
      *
@@ -4313,14 +4351,19 @@ class OOBibBase {
         boolean requireSeparation = false; // may loose citation without requireSeparation=true
         CitationGroups cg = new CitationGroups(documentConnection);
         cg.checkRangeOverlaps(this.xDocumentConnection, requireSeparation);
+        final boolean useLockControllers = true;
         try {
-            documentConnection.lockControllers();
             updateSortedReferenceMarks();
+            if (useLockControllers){
+                documentConnection.lockControllers();
+            }
             List<String> unresolvedKeys = refreshCiteMarkers(databases, style);
             rebuildBibTextSection(databases, style);
             return unresolvedKeys;
         } finally {
-            documentConnection.unlockControllers();
+            if (useLockControllers){
+                documentConnection.unlockControllers();
+            }
         }
     }
 
