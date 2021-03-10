@@ -174,6 +174,26 @@ class OOBibBase {
             this.propertySet = unoQI(XPropertySet.class, userProperties);
         }
 
+        /*
+         * Disable screen refresh.
+         *
+         * Must be paired with unlockControllers()
+         *
+         * https://www.openoffice.org/api/docs/common/ref/com/sun/star/frame/XModel.html
+         *
+         * While there is at least one lock remaining, some
+         * notifications for display updates are not broadcasted.
+         */
+        void lockControllers() {
+            XModel mo = unoQI(XModel.class, this.xCurrentComponent);
+            mo.lockControllers();
+        }
+
+        void unlockControllers() {
+            XModel mo = unoQI(XModel.class, this.xCurrentComponent);
+            mo.unlockControllers();
+        }
+
         /**
          *  @return True if we cannot reach the current document.
          */
@@ -3254,6 +3274,7 @@ class OOBibBase {
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
 
         try {
+            documentConnection.lockControllers();
             XTextCursor cursor;
             // Get the cursor positioned by the user.
             try {
@@ -3361,6 +3382,8 @@ class OOBibBase {
             // loaded before connection, and therefore cannot directly reference
             // or catch a DisposedException (which is in a OO JAR file).
             throw new ConnectionLostException(ex.getMessage());
+        } finally {
+            documentConnection.unlockControllers();
         }
     }
 
@@ -3915,6 +3938,8 @@ class OOBibBase {
         XNameAccess nameAccess = documentConnection.getReferenceMarks();
 
         while (pivot < (names.size() - 1)) {
+        try {
+            documentConnection.lockControllers();
 
             XTextRange range1 =
                 DocumentConnection.asTextContent(
@@ -4051,6 +4076,8 @@ class OOBibBase {
         if (madeModifications) {
             updateSortedReferenceMarks();
             refreshCiteMarkers(databases, style);
+        } finally {
+            documentConnection.unlockControllers();
         }
     }
 
@@ -4078,6 +4105,8 @@ class OOBibBase {
         NoDocumentException {
 
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
+        try {
+            documentConnection.lockControllers();
 
         List<String> names =
             getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
@@ -4153,6 +4182,8 @@ class OOBibBase {
         if (madeModifications) {
             updateSortedReferenceMarks();
             refreshCiteMarkers(databases, style);
+        } finally {
+            documentConnection.unlockControllers();
         }
     }
 
@@ -4262,11 +4293,15 @@ class OOBibBase {
         boolean requireSeparation = false; // may loose citation without requireSeparation=true
         CitationGroups cg = new CitationGroups(documentConnection);
         cg.checkRangeOverlaps(this.xDocumentConnection, requireSeparation);
-
-        updateSortedReferenceMarks();
-        List<String> unresolvedKeys = refreshCiteMarkers(databases, style);
-        rebuildBibTextSection(databases, style);
-        return unresolvedKeys;
+        try {
+            documentConnection.lockControllers();
+            updateSortedReferenceMarks();
+            List<String> unresolvedKeys = refreshCiteMarkers(databases, style);
+            rebuildBibTextSection(databases, style);
+            return unresolvedKeys;
+        } finally {
+            documentConnection.unlockControllers();
+        }
     }
 
 } // end of OOBibBase
