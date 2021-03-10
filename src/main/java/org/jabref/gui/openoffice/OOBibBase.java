@@ -3137,6 +3137,19 @@ class OOBibBase {
         position.collapseToEnd();
     }
 
+    /**
+     * Test if we have a problem applying character style prescribe by
+     * the style.
+     *
+     * If the style prescribes an character style, we insert a
+     * character, format it and delete it.
+     *
+     * An UndefinedCharacterFormatException may be raised, indicating
+     * that the style requested is not available in the document.
+     *
+     * @param cursor Provides location where we insert, format and
+     * remove a character.
+     */
     void assertCitationCharacterFormatIsOK(
         XTextCursor cursor,
         OOBibStyle style
@@ -3147,7 +3160,7 @@ class OOBibBase {
             return;
         }
 
-        /* Do not mess with the cursor passed in, use a copy. */
+        /* We do not want to change the cursor passed in, so using a copy. */
         XTextCursor c2 =
             cursor.getText().createTextCursorByRange(cursor.getEnd());
 
@@ -3158,14 +3171,13 @@ class OOBibBase {
         String charStyle = style.getCitationCharacterFormat();
         try {
             c2.goLeft((short) 1, true);
+            // The next line may throw
+            // UndefinedCharacterFormatException(charStyle).
+            // We let that propagate.
             DocumentConnection.setCharStyle(c2, charStyle);
-        } catch (UndefinedCharacterFormatException ex) {
-            // Setting the character format failed, so we
-            // throw an exception that will result in an
-            // error message for the user.
-            throw new UndefinedCharacterFormatException(charStyle);
         } finally {
-            // Before returning, delete the character we inserted:
+            // Before leaving this scope, always delete the character we
+            // inserted:
             c2.setString("");
         }
     }
@@ -3401,8 +3413,8 @@ class OOBibBase {
     }
 
     /**
-     * Visit each reference mark in referenceMarkNames, remove its
-     * text content, call insertReferenceMark.
+     * Visit each reference mark in referenceMarkNames, overwrite its
+     * text content.
      *
      * After each insertReferenceMark call check if we lost the
      * OOBibBase.BIB_SECTION_NAME bookmark and recreate it if we did.
@@ -3473,26 +3485,6 @@ class OOBibBase {
                 types[i] != OOBibBase.INVISIBLE_CIT, // withText,
                 style
                 );
-
-            /*
-             *            XTextCursor cursor =
-             *                DocumentConnection.getTextCursorOfTextContent(mark);
-             *
-             *            if (mustTestCharFormat) {
-             *                assertCitationCharacterFormatIsOK( cursor, style );
-             *            }
-             *
-             *            documentConnection.xText.removeTextContent(mark);
-             *
-             *            insertReferenceMark(
-             *                documentConnection,
-             *                name,
-             *                citMarkers[i],
-             *                cursor,
-             *                types[i] != OOBibBase.INVISIBLE_CIT,
-             *                style
-             *                );
-             */
 
             if (hadBibSection
                 && (documentConnection.getBookmarkRangeOrNull(OOBibBase.BIB_SECTION_NAME) == null)) {
