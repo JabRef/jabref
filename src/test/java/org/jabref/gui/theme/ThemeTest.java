@@ -39,7 +39,8 @@ public class ThemeTest {
         Theme theme = new Theme(".");
 
         assertEquals(Theme.Type.LIGHT, theme.getType());
-        assertEquals(Optional.empty(), theme.getAdditionalStylesheet(), "didn't expect additional stylesheet to be available when location is a directory");
+        assertEquals(Optional.empty(), theme.getAdditionalStylesheet(),
+                "didn't expect additional stylesheet to be available when location is a directory");
     }
 
     @Test
@@ -47,6 +48,7 @@ public class ThemeTest {
         Theme theme = new Theme("\0\0\0");
 
         assertEquals(Theme.Type.LIGHT, theme.getType());
-        assertEquals(Optional.empty(), theme.getAdditionalStylesheet(), "didn't expect additional stylesheet when CSS location is just some null terminators!");
+        assertEquals(Optional.empty(), theme.getAdditionalStylesheet(),
+                "didn't expect additional stylesheet when CSS location is just some null terminators!");
     }
 }

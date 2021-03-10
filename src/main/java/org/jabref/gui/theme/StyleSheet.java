@@ -19,7 +19,6 @@ abstract class StyleSheet {
 
     protected static final String DATA_URL_PREFIX = "data:text/css;charset=utf-8;base64,";
     protected static final String EMPTY_WEBENGINE_CSS = DATA_URL_PREFIX;
-    protected static final URL LIGHT_SCENE_ADDITIONAL_CSS = JabRefFrame.class.getResource(Theme.EMBEDDED_LIGHT_THEME_CSS);
 
     abstract URL getSceneStylesheet();
 

@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
 import java.util.Optional;
@@ -70,17 +69,6 @@ final class StyleSheetFile extends StyleSheet {
 
     @Override
     public URL getSceneStylesheet() {
-
-        if (!Files.exists(path)) {
-            LOGGER.warn("Not loading additional css file {} because it could not be found", path);
-            return LIGHT_SCENE_ADDITIONAL_CSS;
-        }
-
-        if (Files.isDirectory(path)) {
-            LOGGER.warn("Not loading additional css file {} because it is a directory", path);
-            return LIGHT_SCENE_ADDITIONAL_CSS;
-        }
-
         return url;
     }
 

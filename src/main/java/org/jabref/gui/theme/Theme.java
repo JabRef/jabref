@@ -10,7 +10,6 @@ public class Theme {
     }
 
     public static final String BASE_CSS = "Base.css";
-    public static final String EMBEDDED_LIGHT_THEME_CSS = "Light.css";
     public static final String EMBEDDED_DARK_THEME_CSS = "Dark.css";
 
     private final Type type;

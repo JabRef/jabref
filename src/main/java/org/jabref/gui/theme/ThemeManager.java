@@ -1,6 +1,7 @@
 package org.jabref.gui.theme;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -103,13 +104,15 @@ public class ThemeManager {
 
         newPreferences.getTheme().getAdditionalStylesheet().ifPresent(styleSheet -> {
             Path newPath = styleSheet.getWatchPath();
-            if (newPath != null) {
+            if (newPath != null && !Files.isDirectory(newPath) && Files.exists(newPath)) {
                 try {
                     fileUpdateMonitor.addListenerForFile(newPath, this::additionalCssLiveUpdate);
                     LOGGER.info("Watching additional css {} for live updates", newPath);
                 } catch (IOException e) {
                     LOGGER.warn("Cannot watch additional css path {} for live updates", newPath, e);
                 }
+            } else {
+                LOGGER.warn("Cannot watch additional css path {} for live updates, since this is no valid file", newPath);
             }
         });
 
