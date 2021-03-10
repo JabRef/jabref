@@ -19,16 +19,15 @@ public class Theme {
 
     public Theme(String name) {
         this.name = name != null ? name : "";
-        if (this.name.equals("")
-                || BASE_CSS.equalsIgnoreCase(this.name)) {
-            this.type = Type.LIGHT;
+        if (this.name.equals("") || BASE_CSS.equalsIgnoreCase(this.name)) {
             this.additionalStylesheet = Optional.empty();
+            this.type = Type.LIGHT;
         } else if (EMBEDDED_DARK_THEME_CSS.equalsIgnoreCase(this.name)) {
-            this.type = Type.DARK;
             this.additionalStylesheet = StyleSheet.create(EMBEDDED_DARK_THEME_CSS);
+            this.type = this.additionalStylesheet.isPresent() ? Type.DARK : Type.LIGHT;
         } else {
-            this.type = Type.CUSTOM;
             this.additionalStylesheet = StyleSheet.create(name);
+            this.type = this.additionalStylesheet.isPresent() ? Type.CUSTOM : Type.LIGHT;
         }
     }
 

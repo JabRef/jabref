@@ -38,7 +38,7 @@ public class ThemeTest {
     public void customThemeIgnoredIfDirectory() {
         Theme theme = new Theme(".");
 
-        assertEquals(Theme.Type.CUSTOM, theme.getType());
+        assertEquals(Theme.Type.LIGHT, theme.getType());
         assertEquals(Optional.empty(), theme.getAdditionalStylesheet(), "didn't expect additional stylesheet to be available when location is a directory");
     }
 
@@ -46,7 +46,7 @@ public class ThemeTest {
     public void customThemeIgnoredIfInvalidPath() {
         Theme theme = new Theme("\0\0\0");
 
-        assertEquals(Theme.Type.CUSTOM, theme.getType());
+        assertEquals(Theme.Type.LIGHT, theme.getType());
         assertEquals(Optional.empty(), theme.getAdditionalStylesheet(), "didn't expect additional stylesheet when CSS location is just some null terminators!");
     }
 }

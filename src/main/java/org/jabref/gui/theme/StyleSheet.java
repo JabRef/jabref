@@ -1,7 +1,9 @@
 package org.jabref.gui.theme;
 
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -39,6 +41,17 @@ abstract class StyleSheet {
                 url = null;
             } catch (MalformedURLException e) {
                 LOGGER.warn("Cannot load additional css url {} because it is a malformed url: {}", name, e.getLocalizedMessage());
+                url = null;
+            }
+        }
+
+        if (url != null) {
+            try {
+                Path path = Path.of(url.toURI());
+                if (Files.isDirectory(path) || !Files.exists(path)) {
+                    url = null;
+                }
+            } catch (URISyntaxException ignored) {
                 url = null;
             }
         }
