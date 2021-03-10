@@ -102,6 +102,18 @@ class OOBibBase {
     private static final Pattern CITE_PATTERN =
             Pattern.compile(BIB_CITATION + "(\\d*)_(\\d*)_(.*)");
 
+    private static final boolean debug = true;
+
+    private static final String zeroWidthSpace = "\u200b";
+    // for debugging we may want visible bracket
+    private static final boolean referenceMarkUseInvisibleBrackets = !debug;
+    // Note we are relying on referenceMarkLeftBracket and referenceMarkRightBracket
+    // to be single-character strings that do not appear in reference mark content.
+    private static final String referenceMarkLeftBracket =
+        referenceMarkUseInvisibleBrackets ?  zeroWidthSpace : "<";
+    private static final String referenceMarkRightBracket =
+        referenceMarkUseInvisibleBrackets ? zeroWidthSpace : ">";
+
     /* Types of in-text citation. (itcType)
      * Their numeric values are used in reference mark names.
      */
@@ -454,15 +466,24 @@ class OOBibBase {
             return textContent.getAnchor();
         }
 
+        public XTextContent
+        getReferenceMarkAsTextContentOrNull(String name)
+            throws
+            NoDocumentException,
+            WrappedTargetException {
+
+            XNameAccess nameAccess = this.getReferenceMarks();
+            return nameAccessGetTextContentByNameOrNull(nameAccess, name);
+        }
+
         public XTextRange
         getReferenceMarkRangeOrNull(String name)
             throws
             NoDocumentException,
             WrappedTargetException {
 
-            XNameAccess nameAccess = this.getReferenceMarks();
             XTextContent textContent =
-                nameAccessGetTextContentByNameOrNull(nameAccess, name);
+                getReferenceMarkAsTextContentOrNull(name);
             if (textContent == null) {
                 return null;
             }
@@ -1623,9 +1644,11 @@ class OOBibBase {
             for (List<RangeForOverlapCheck> partition : xxs.values()) {
                 List<RangeForOverlapCheck> oxs =
                     sortPartitionByRegionStart(partition);
-                System.out.println("partition");
-                for (RangeForOverlapCheck r : oxs) {
-                    System.out.println("  " + r.format());
+                if ( debug ){
+                    System.out.println("partition");
+                    for (RangeForOverlapCheck r : oxs) {
+                        System.out.println("  " + r.format());
+                    }
                 }
                 checkSortedPartitionForOverlap(requireSeparation, oxs);
             }
@@ -2849,20 +2872,144 @@ class OOBibBase {
      * ***********************************/
 
     /**
+     *  Create an (empty) reference mark with the given name, at the
+     *  end of position.
      *
-     *  Insert a reference mark: creates and fills it.
+     *  @param documentConnection
+     *  @param name For the reference mark.
+     *  @param position Collapsed to its end.
+     *  @param insertSpaceAfter We insert a space after the mark, that
+     *                          carries on format of characters from
+     *                          the original position.
      *
-     * @param documentConnection Connection to a document.
+     *  @return XTextCursor for the text to be inserted.
      *
-     * @param name Name of the reference mark to be created and also
-     *             the name of the custom property holding the pageInfo part.
+     *  On return position is collapsed, and is after the inserted space,
+     *  or at the end of the (empty) range allocated for the text.
+     *
      */
-    private void
-    insertReferenceMark(
+    private static XTextCursor
+    createReferenceMarkForCitationGroup(
         DocumentConnection documentConnection,
         String name,
-        String citationText,
         XTextCursor position,
+        boolean insertSpaceAfter,
+        String initialText
+        )
+        throws
+        CreationException {
+
+        // The cursor we received: we push it before us.
+        position.collapseToEnd();
+
+        XTextCursor cursor = position.getText().createTextCursorByRange(position.getEnd());
+        if ( insertSpaceAfter ){
+            cursor.getText().insertString(cursor, " ", false);
+            // go back to before the space
+            cursor.goLeft((short) 1, false);
+        }
+
+        final String left = referenceMarkLeftBracket;
+        final String right = referenceMarkRightBracket;
+        String text = left + initialText + right;
+        cursor.getText().insertString(cursor, text, true);
+        XNamed mark = documentConnection.insertReferenceMark(name, cursor, true);
+        // Need a cursor that excludes left and right
+        XTextCursor full = cursor;
+            // DocumentConnection.getTextCursorOfTextContent(
+            //    DocumentConnection.asTextContent(mark));
+        full.collapseToStart();
+        full.goRight( (short)1, false );
+        full.goRight( (short)initialText.length(), true );
+        return full; // yield a cursor in the bracket
+    }
+
+    private static XTextCursor
+    getFillCursorForCitationGroup(
+        DocumentConnection documentConnection,
+        String name // Identifies group
+        )
+        throws
+        NoDocumentException,
+        WrappedTargetException,
+        CreationException {
+        final String left = referenceMarkLeftBracket;
+        final String right = referenceMarkRightBracket;
+
+        XTextContent markAsTextContent =
+            documentConnection.getReferenceMarkAsTextContentOrNull( name );
+
+        if (markAsTextContent == null){
+            throw new RuntimeException(
+                String.format(
+                    "getFillCursorForCitationGroup: markAsTextContent(%s) == null",
+                    name
+                    ));
+        }
+        XTextCursor full =
+            DocumentConnection.getTextCursorOfTextContent(
+                markAsTextContent);
+        if (full == null ){
+            throw new RuntimeException(
+                "getFillCursorForCitationGroup: full == null"
+                );
+        }
+        String fulltext = full.getString();
+        if ( debug ){
+            System.out.println(String.format("getFillCursor: fulltext = '%s'", fulltext));
+        }
+
+        if (fulltext.length() < 2 || !fulltext.startsWith(left) || !fulltext.endsWith(right)){
+            // damaged, recreate
+            if ( debug ){
+                System.out.println(String.format("getFillCursor: damaged, recreate"));
+            }
+            full.setString("");
+            if ( true ){
+                if ( debug ){
+                    System.out.println(String.format("getFillCursor: removeReferenceMark go"));
+                }
+                try {
+                    documentConnection.removeReferenceMark(name);
+                } catch (NoSuchElementException ex) {
+                    LOGGER.warn(String.format(
+                                "getFillCursorForCitationGroup got NoSuchElementException"
+                                + " for '%s'", name));
+                }
+            } else {
+                if ( debug ){
+                    System.out.println(String.format("getFillCursor: removeReferenceMark skipped"));
+                }
+            }
+            // What shall we put in the recreated version?
+            // User might have inserted stuff before or after?
+            String trimmedtext = fulltext.replaceAll( "[" + left + right +"]", "" );
+            if (debug){
+                System.out.println(String.format("getFillCursor: trimmedtext = '%s'", trimmedtext));
+            }
+            return createReferenceMarkForCitationGroup(
+                documentConnection,
+                name,
+                full,
+                false, // insertSpaceAfter
+                trimmedtext );
+        } else {
+            if (debug){
+                System.out.println(String.format("getFillCursor: intact, reuse"));
+            }
+            full.collapseToStart();
+            full.goRight( (short)1, false );
+            full.goRight( (short)(fulltext.length()-2), true );
+            return full; // yield a cursor in the bracket
+        }
+    }
+
+    private static void
+    fillCitationMarkInCursor(
+        DocumentConnection documentConnection,
+        String name, // citationGroup
+        XTextCursor cursor,
+        String citationText,
         boolean withText,
         OOBibStyle style
         )
@@ -2874,10 +3021,6 @@ class OOBibBase {
         UndefinedCharacterFormatException,
         CreationException {
 
-        // Last minute editing: If there is "page info" for this
-        // citation mark, inject it into the citation marker before
-        // inserting.
-
         String citText;
         String pageInfo =
             getPageInfoForReferenceMarkName(documentConnection, name);
@@ -2886,23 +3029,19 @@ class OOBibBase {
             ? citationText
             : style.insertPageInfo(citationText, pageInfo);
 
-        /*
-         * We had a problem here, position.setString() not inserting the text.
-         * The solution seems to be: create a new cursor (c2), and use that.
-         */
-        XTextCursor c2 = position.getText().createTextCursorByRange(position);
         if (withText) {
-            c2.setString(citText);
-            DocumentConnection.setCharLocaleNone(c2);
+            // setString: All styles are removed when applying this method.
+            cursor.setString(citText);
+            DocumentConnection.setCharLocaleNone(cursor);
             if (style.isFormatCitations()) {
                 String charStyle = style.getCitationCharacterFormat();
-                DocumentConnection.setCharStyle(c2, charStyle);
+                DocumentConnection.setCharStyle(cursor, charStyle);
             }
         } else {
-            c2.setString("");
+            cursor.setString("");
         }
 
-        documentConnection.insertReferenceMark(name, c2, true);
+        // documentConnection.insertReferenceMark(name, cursor, true);
 
         // Last minute editing: find "et al." (OOBibStyle.ET_AL_STRING) and
         //                      format it as italic.
@@ -2911,13 +3050,12 @@ class OOBibBase {
         boolean italicize = style.getBooleanCitProperty(OOBibStyle.ITALIC_ET_AL);
         if (italicize) {
             String etAlString = style.getStringCitProperty(OOBibStyle.ET_AL_STRING);
-            int index = citText.indexOf(etAlString);
-            if (index >= 0) {
-                italicizeRangeFromPosition(c2, index, index + etAlString.length());
+            for (int index = citText.indexOf(etAlString) ;
+                 index >= 0 ;
+                 index = citText.indexOf(etAlString, index + 1)) {
+                italicizeRangeFromPosition(cursor, index, index + etAlString.length());
             }
         }
-
-        position.collapseToEnd();
     }
 
     /**
@@ -2930,7 +3068,7 @@ class OOBibBase {
      *  Why this API?  This is used after finding "et al." string in a
      *  citation marker.
      */
-    private void
+    private static void
     italicizeRangeFromPosition(
         XTextCursor position,
         int start,
@@ -2948,6 +3086,89 @@ class OOBibBase {
         cursor.goRight((short) (end - start), true);
 
         DocumentConnection.setCharFormatItalic(cursor);
+    }
+
+    /**
+     *
+     *  Insert a reference mark: creates and fills it.
+     *
+     * @param documentConnection Connection to a document.
+     *
+     * @param name Name of the reference mark to be created and also
+     *             the name of the custom property holding the pageInfo part.
+     *
+     * @param position OUT: left collapsed, just after the space inserted,
+     *                      or after the reference mark inserted.
+     * xxx
+     */
+    private void
+    insertReferenceMark(
+        DocumentConnection documentConnection,
+        String name,
+        String citationText,
+        XTextCursor position,
+        boolean withText,
+        OOBibStyle style,
+        boolean insertSpaceAfter
+        )
+        throws
+        UnknownPropertyException,
+        WrappedTargetException,
+        PropertyVetoException,
+        IllegalArgumentException,
+        UndefinedCharacterFormatException,
+        CreationException {
+
+        // Last minute editing: If there is "page info" for this
+        // citation mark, inject it into the citation marker before
+        // inserting.
+
+        XTextCursor c2 = createReferenceMarkForCitationGroup(documentConnection,
+                                                             name,
+                                                             position,
+                                                             insertSpaceAfter,
+                                                             "");
+
+        fillCitationMarkInCursor( documentConnection,
+                                  name,
+                                  c2,
+                                  citationText,
+                                  withText,
+                                  style );
+        position.collapseToEnd();
+    }
+
+    void assertCitationCharacterFormatIsOK(
+        XTextCursor cursor,
+        OOBibStyle style
+        )
+        throws UndefinedCharacterFormatException {
+
+        if (!style.isFormatCitations()) {
+            return;
+        }
+
+        /* Do not mess with the cursor passed in, use a copy. */
+        XTextCursor c2 =
+            cursor.getText().createTextCursorByRange(cursor.getEnd());
+
+        c2
+         .getText()
+         .insertString(c2, "@", false);
+
+        String charStyle = style.getCitationCharacterFormat();
+        try {
+            c2.goLeft((short) 1, true);
+            DocumentConnection.setCharStyle(c2, charStyle);
+        } catch (UndefinedCharacterFormatException ex) {
+            // Setting the character format failed, so we
+            // throw an exception that will result in an
+            // error message for the user.
+            throw new UndefinedCharacterFormatException(charStyle);
+        } finally {
+            // Before returning, delete the character we inserted:
+            c2.setString("");
+        }
     }
 
     /**
@@ -3060,30 +3281,7 @@ class OOBibBase {
             // may have removed the citation, thus the reference mark,
             // but pageInfo stored separately stays there.
 
-            // insert space: we will write our citation before this space.
-            cursor
-                .getText()
-                .insertString(cursor, " ", false);
-
-            // format the space inserted
-            if (style.isFormatCitations()) {
-                String charStyle = style.getCitationCharacterFormat();
-                try {
-                    DocumentConnection.setCharStyle(cursor, charStyle);
-                } catch (UndefinedCharacterFormatException ex) {
-                    // Setting the character format failed, so we
-                    // throw an exception that will result in an
-                    // error message for the user.
-
-                    // Before that, delete the space we inserted:
-                    cursor.goLeft((short) 1, true);
-                    cursor.setString("");
-                    throw new UndefinedCharacterFormatException(charStyle);
-                }
-            }
-
-            // go back to before the space
-            cursor.goLeft((short) 1, false);
+            assertCitationCharacterFormatIsOK( cursor, style );
 
             // Insert reference mark and text
             // {
@@ -3115,13 +3313,15 @@ class OOBibBase {
                     citeText,
                     cursor,
                     withText,
-                    style);
-             // } // end of scope for databaseMap, citeText
+                    style,
+                    true // insertSpaceAfter
+                    );
+                // } // end of scope for databaseMap, citeText
 
-            // Move to the right of the space and remember this
-            // position: we will come back here in the end.
-            cursor.collapseToEnd();
-            cursor.goRight((short) 1, false);
+                // Move to the right of the space and remember this
+                // position: we will come back here in the end.
+                // cursor.collapseToEnd();
+                // cursor.goRight((short) 1, false);
             XTextRange position = cursor.getEnd();
 
             if (sync) {
@@ -3239,8 +3439,6 @@ class OOBibBase {
         assert (citMarkers.length == nRefMarks);
         assert (types.length == nRefMarks);
 
-        XNameAccess nameAccess =
-            documentConnection.getReferenceMarks();
 
         final boolean hadBibSection =
             (documentConnection.getBookmarkRangeOrNull(OOBibBase.BIB_SECTION_NAME) != null);
@@ -3257,36 +3455,45 @@ class OOBibBase {
 
             final String name = referenceMarkNames.get(i);
 
-            XTextContent mark =
-                DocumentConnection.nameAccessGetTextContentByNameOrNull(nameAccess, name);
-            if (null == mark) {
-                LOGGER.warn(String.format(
-                               "OOBibBase.applyNewCitationMarkers:"
-                               + " lost reference mark '%s'",
-                               name
-                               ));
-                continue;
-            }
-
             XTextCursor cursor =
-                DocumentConnection.getTextCursorOfTextContent(mark);
+                getFillCursorForCitationGroup(
+                    documentConnection,
+                    name // Identifies group
+                    );
 
             if (mustTestCharFormat) {
-                mustTestCharFormat = false; // need to do this only once
-                String charStyle = style.getCitationCharacterFormat();
-                DocumentConnection.setCharStyle(cursor, charStyle);
+                assertCitationCharacterFormatIsOK( cursor, style );
+                mustTestCharFormat = false;
             }
 
-            documentConnection.xText.removeTextContent(mark);
-
-            insertReferenceMark(
+            fillCitationMarkInCursor(
                 documentConnection,
-                name,
-                citMarkers[i],
+                name, // citationGroup
                 cursor,
-                types[i] != OOBibBase.INVISIBLE_CIT,
+                citMarkers[i], // citationText,
+                types[i] != OOBibBase.INVISIBLE_CIT, // withText,
                 style
                 );
+
+            /*
+             *            XTextCursor cursor =
+             *                DocumentConnection.getTextCursorOfTextContent(mark);
+             *
+             *            if (mustTestCharFormat) {
+             *                assertCitationCharacterFormatIsOK( cursor, style );
+             *            }
+             *
+             *            documentConnection.xText.removeTextContent(mark);
+             *
+             *            insertReferenceMark(
+             *                documentConnection,
+             *                name,
+             *                citMarkers[i],
+             *                cursor,
+             *                types[i] != OOBibBase.INVISIBLE_CIT,
+             *                style
+             *                );
+             */
 
             if (hadBibSection
                 && (documentConnection.getBookmarkRangeOrNull(OOBibBase.BIB_SECTION_NAME) == null)) {
@@ -3825,14 +4032,16 @@ class OOBibBase {
                     documentConnection,
                     keyString,
                     OOBibBase.AUTHORYEAR_PAR);
-
+            // xxx
             insertReferenceMark(
                 documentConnection,
                 newName,
                 "tmp",
                 textCursor,
                 true, // withText
-                style);
+                style,
+                true // insertSpaceAfter
+                );
             names.set(pivot + 1, newName); // <- put in the next-to-be-processed position
             madeModifications = true;
 
@@ -3917,6 +4126,7 @@ class OOBibBase {
                     key,
                     OOBibBase.AUTHORYEAR_PAR);
 
+                boolean insertSpaceAfter = (i != last);
                 insertReferenceMark(
                         documentConnection,
                         newName,
@@ -3924,14 +4134,16 @@ class OOBibBase {
                         textCursor,
                         /* withText should be itcType != OOBibBase.INVISIBLE_CIT */
                         true,
-                        style);
+                        style,
+                        true // insertSpaceAfter
+                    );
                 textCursor.collapseToEnd();
-                if (i != last) {
-                    // space between citation markers: what style?
-                    // DocumentConnection.setCharStyle(textCursor, "Standard");
-                    textCursor.setString(" ");
-                    textCursor.collapseToEnd();
-                }
+                // if (i != last) {
+                //    // space between citation markers: what style?
+                //    // DocumentConnection.setCharStyle(textCursor, "Standard");
+                //    textCursor.setString(" ");
+                //    textCursor.collapseToEnd();
+                // }
                 i++;
             }
             madeModifications = true;

@@ -1,5 +1,39 @@
 * Notes for OOBibBase.java
 
+** Separation of createReferenceMarkForCitationGroup and fillCitationMarkInCursor
+
+   Problem: the model of cursor vs text in LO:
+
+   - Cursor positions and boundaries of a textrange are between
+     characters. Good.
+   - When inserting text at a point, character properties
+     are usually inherited from the left side of the cursor.
+   - Problems
+     - (1) Apparently we *cannot insert text into an empty range*. With a
+       reference mark pointing to an empty range we either wrote the
+       text BEFORE or AFTER the empty content in the mark.
+       - We can however "absorb" text when creating the mark.
+
+     - (2) citation mark at the start or end of a paragraph
+       - Similar to other character properties, (e.g. highlight color,
+         font color)
+         - when cursor is at the start, properties are copied from the right
+         - when cursor is at the end, properties are copied from the left, the last character
+         - For character properties, the new character can be
+           reformatted, or reset to default by Ctrl-M.
+         - For a reference mark or character style Ctrl-M does not help.
+           - But can set the default character style after we inserted some characters.
+           - After the old text setting character style on the cursor works.
+           - At the start, it does not.
+           - For reference marks I found nothing analogous.
+     Possible solutions:
+   - For (1):
+     - (currently) recreate the mark instead of filling
+     - Ensure, that we bracket the content, and fill within that.
+       - We could probably use a zero-width space
+         e.g. \u200b (or any character formatted as "hidden")
+     - Do we have to bracket, or a single character is enough?
+
 ** unCombineCiteMarkers: formatting space inserted between citations
 
    [[file:OOBibBase.java::/space between citation markers: what style/]]
@@ -7,6 +41,8 @@
    - style.getCitationCharacterFormat(); should not be applied to
      these spaces.
 
+   [[file:OOBibBase.java::/insertReferenceMark(/]]
+   
    - c.f. behaviour of insertEntry with multiple entries
      - A: Not applicable to spaces between: it inserts merged citations.
      - The space inserted after:
