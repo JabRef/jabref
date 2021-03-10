@@ -3175,7 +3175,6 @@ class OOBibBase {
         OOBibStyle style
         )
         throws UndefinedCharacterFormatException {
-
         if (!style.isFormatCitations()) {
             return;
         }
@@ -3239,12 +3238,13 @@ class OOBibBase {
      *                      with the same name as the reference mark.
      *
      *                      Related https://latex.org/forum/viewtopic.php?t=14331
-     *
+     *                      """
      *                      Q: What I would like is something like this:
      *                      (Jones, 2010, p. 12; Smith, 2003, pp. 21 - 23)
      *                      A: Not in a single \citep, no.
      *                         Use \citetext{\citealp[p.~12]{jones2010};
      *                                       \citealp[pp.~21--23]{smith2003}}
+     *                      """
      *
      * @param sync          Indicates whether the reference list and in-text citations
      *                      should be refreshed in the document.
@@ -3311,6 +3311,16 @@ class OOBibBase {
                     itcType);
 
             // If we should store metadata for page info, do that now:
+            //
+            // Note: the (single) pageInfo here gets associated with
+            //       the citation group. At presentation it is inject
+            //       to before the final parenthesis, appearing to
+            //       belong to the last entry added here.
+            //
+            // But: (1) the last entry depends on the above
+            //      sortBibEntryListForMulticite call; (2) On
+            //      "Separate" it belongs to nobody.
+            //
             if (pageInfo != null) {
                 LOGGER.info("Storing page info: " + pageInfo);
                 documentConnection.setCustomProperty(newName, pageInfo);
@@ -3922,93 +3932,94 @@ class OOBibBase {
 
         DocumentConnection documentConnection = this.getDocumentConnectionOrThrow();
 
-        // The testing for whitespace-only between (pivot) and (pivot+1) assumes that
-        // names are in textual order: textually consecutive pairs
-        // must appear as neighbours (and in textual order).
-        // We have a bit of a clash here: names is sorted by visual position,
-        // but we are testing if they are textually neighbours.
-        // In a two-column layout
-        //  | a | c |
-        //  | b | d |
-        // abcd is the textual order, but the visual order is acbd.
-        // So we will not find out that a and b are only separated by white space.
-        List<String> names =
-            getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
-
-        // XTextRangeCompare: compares the positions of two TextRanges within a Text.
-        // Only TextRange instances within the same Text can be compared.
-        final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
-                                                documentConnection.xText);
-
-        int pivot = 0;
-        boolean madeModifications = false;
-        boolean setCharStyleTested = false;
-        XNameAccess nameAccess = documentConnection.getReferenceMarks();
-
-        while (pivot < (names.size() - 1)) {
         try {
             documentConnection.lockControllers();
 
-            XTextRange range1 =
-                DocumentConnection.asTextContent(
-                    nameAccess.getByName(names.get(pivot)))
-                .getAnchor()
-                .getEnd();
+            // The testing for whitespace-only between (pivot) and (pivot+1) assumes that
+            // names are in textual order: textually consecutive pairs
+            // must appear as neighbours (and in textual order).
+            // We have a bit of a clash here: names is sorted by visual position,
+            // but we are testing if they are textually neighbours.
+            // In a two-column layout
+            //  | a | c |
+            //  | b | d |
+            // abcd is the textual order, but the visual order is acbd.
+            // So we will not find out that a and b are only separated by white space.
+            List<String> names =
+                getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
 
-            XTextRange range2 =
-                DocumentConnection.asTextContent(
-                      nameAccess.getByName(names.get(pivot + 1)))
-                .getAnchor()
-                .getStart(); // end of range2 is the start of (pivot + 1)
+            // XTextRangeCompare: compares the positions of two TextRanges within a Text.
+            // Only TextRange instances within the same Text can be compared.
+            final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
+                                                    documentConnection.xText);
 
-            if (range1.getText() != range2.getText()) {
-                /* pivot and (pivot+1) belong to different Text instances.
-                 * Maybe to different footnotes?
-                 * Cannot combine across boundaries, skip.
-                 */
-                pivot++;
-                continue;
-            }
+            int pivot = 0;
+            boolean madeModifications = false;
+            boolean setCharStyleTested = false;
+            XNameAccess nameAccess = documentConnection.getReferenceMarks();
 
-            // Start from end of text for pivot.
-            XTextCursor textCursor =
-                range1.getText().createTextCursorByRange(range1);
+            while (pivot < (names.size() - 1)) {
 
-            // Select next character (if possible), and more, as long as we can and
-            // do not reach start of (pivot+1), which we now know to be
-            // in the same Text instance.
+                XTextRange range1 =
+                    DocumentConnection.asTextContent(
+                        nameAccess.getByName(names.get(pivot)))
+                    .getAnchor()
+                    .getEnd();
 
-            // If there is no space between the two reference marks,
-            // the next line moves INTO the next. And probably will
-            // cover a non-whitespace character, inhibiting the merge.
-            // Empirically: does not merge. Probably a bug.
-            textCursor.goRight((short) 1, true);
-            boolean couldExpand = true;
-            while (couldExpand && (compare.compareRegionEnds(textCursor, range2) > 0)) {
-                couldExpand = textCursor.goRight((short) 1, true);
-            }
+                XTextRange range2 =
+                    DocumentConnection.asTextContent(
+                        nameAccess.getByName(names.get(pivot + 1)))
+                    .getAnchor()
+                    .getStart(); // end of range2 is the start of (pivot + 1)
 
-            // Take what we selected
-            String cursorText = textCursor.getString();
+                if (range1.getText() != range2.getText()) {
+                    /* pivot and (pivot+1) belong to different Text instances.
+                     * Maybe to different footnotes?
+                     * Cannot combine across boundaries, skip.
+                     */
+                    pivot++;
+                    continue;
+                }
 
-            // Check if the string contains line breaks and any  non-whitespace.
-            if ((cursorText.indexOf('\n') != -1) || !cursorText.trim().isEmpty()) {
-                pivot++;
-                continue;
-            }
+                // Start from end of text for pivot.
+                XTextCursor textCursor =
+                    range1.getText().createTextCursorByRange(range1);
 
-            // If we are supposed to set character format for
-            // citations, test this before making any changes. This
-            // way we can throw an exception before any reference
-            // marks are removed, preventing damage to the user's
-            // document:
-            // Q: we may have zero characters selected. Is this a valid test
-            //    in this case?
-            if (style.isFormatCitations() && !setCharStyleTested) {
-                String charStyle = style.getCitationCharacterFormat();
-                DocumentConnection.setCharStyle(textCursor, charStyle);
-                setCharStyleTested = true;
-            }
+                // Select next character (if possible), and more, as long as we can and
+                // do not reach start of (pivot+1), which we now know to be
+                // in the same Text instance.
+
+                // If there is no space between the two reference marks,
+                // the next line moves INTO the next. And probably will
+                // cover a non-whitespace character, inhibiting the merge.
+                // Empirically: does not merge. Probably a bug.
+                textCursor.goRight((short) 1, true);
+                boolean couldExpand = true;
+                while (couldExpand && (compare.compareRegionEnds(textCursor, range2) > 0)) {
+                    couldExpand = textCursor.goRight((short) 1, true);
+                }
+
+                // Take what we selected
+                String cursorText = textCursor.getString();
+
+                // Check if the string contains line breaks and any  non-whitespace.
+                if ((cursorText.indexOf('\n') != -1) || !cursorText.trim().isEmpty()) {
+                    pivot++;
+                    continue;
+                }
+
+                // If we are supposed to set character format for
+                // citations, test this before making any changes. This
+                // way we can throw an exception before any reference
+                // marks are removed, preventing damage to the user's
+                // document:
+                // Q: we may have zero characters selected. Is this a valid test
+                //    in this case?
+                if (style.isFormatCitations() && !setCharStyleTested) {
+                    String charStyle = style.getCitationCharacterFormat();
+                    DocumentConnection.setCharStyle(textCursor, charStyle);
+                    setCharStyleTested = true;
+                }
 
             /*
              * This only gets the keys: itcType is discarded.
@@ -4042,48 +4053,49 @@ class OOBibBase {
 
             //  combineCiteMarkers: merging for same citation keys,
             //       but different pageInfo looses information.
-            List<String> keys =
-                parseRefMarkNameToUniqueCitationKeys(names.get(pivot));
-            keys.addAll(parseRefMarkNameToUniqueCitationKeys(names.get(pivot + 1)));
+                List<String> keys =
+                    parseRefMarkNameToUniqueCitationKeys(names.get(pivot));
+                keys.addAll(parseRefMarkNameToUniqueCitationKeys(names.get(pivot + 1)));
 
-            documentConnection.removeReferenceMark(names.get(pivot));
-            documentConnection.removeReferenceMark(names.get(pivot + 1));
+                documentConnection.removeReferenceMark(names.get(pivot));
+                documentConnection.removeReferenceMark(names.get(pivot + 1));
 
-            // Note: citation keys not found are silently left out from the
-            //       combined reference mark name. Loosing information.
-            List<BibEntry> entries = lookupEntriesInDatabasesSkipMissing(keys, databases);
-            entries.sort(new FieldComparator(StandardField.YEAR));
+                // Note: citation keys not found are silently left out from the
+                //       combined reference mark name. Loosing information.
+                List<BibEntry> entries = lookupEntriesInDatabasesSkipMissing(keys, databases);
+                entries.sort(new FieldComparator(StandardField.YEAR));
 
-            String keyString =
-                entries.stream()
-                .map(c -> c.getCitationKey().orElse(""))
-                .collect(Collectors.joining(","));
+                String keyString =
+                    entries.stream()
+                    .map(c -> c.getCitationKey().orElse(""))
+                    .collect(Collectors.joining(","));
 
-            // Insert reference mark:
-            String newName =
-                getUniqueReferenceMarkName(
+                // Insert reference mark:
+                String newName =
+                    getUniqueReferenceMarkName(
+                        documentConnection,
+                        keyString,
+                        OOBibBase.AUTHORYEAR_PAR);
+                // xxx
+                insertReferenceMark(
                     documentConnection,
-                    keyString,
-                    OOBibBase.AUTHORYEAR_PAR);
-            // xxx
-            insertReferenceMark(
-                documentConnection,
-                newName,
-                "tmp",
-                textCursor,
-                true, // withText
-                style,
-                true // insertSpaceAfter
-                );
-            names.set(pivot + 1, newName); // <- put in the next-to-be-processed position
-            madeModifications = true;
+                    newName,
+                    "tmp",
+                    textCursor,
+                    true, // withText
+                    style,
+                    true // insertSpaceAfter
+                    );
+                names.set(pivot + 1, newName); // <- put in the next-to-be-processed position
+                madeModifications = true;
 
-            pivot++;
-        } // while
+                pivot++;
+            } // while
 
-        if (madeModifications) {
-            updateSortedReferenceMarks();
-            refreshCiteMarkers(databases, style);
+            if (madeModifications) {
+                updateSortedReferenceMarks();
+                refreshCiteMarkers(databases, style);
+            }
         } finally {
             documentConnection.unlockControllers();
         }
@@ -4116,55 +4128,55 @@ class OOBibBase {
         try {
             documentConnection.lockControllers();
 
-        List<String> names =
-            getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
+            List<String> names =
+                getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
 
-        int pivot = 0;
-        boolean madeModifications = false;
-        boolean setCharStyleTested = false;
-        XNameAccess nameAccess = documentConnection.getReferenceMarks();
+            int pivot = 0;
+            boolean madeModifications = false;
+            boolean setCharStyleTested = false;
+            XNameAccess nameAccess = documentConnection.getReferenceMarks();
 
-        while (pivot < (names.size())) {
-            XTextRange range1 =
-                DocumentConnection.asTextContent(
-                    nameAccess.getByName(names.get(pivot)))
-                .getAnchor();
+            while (pivot < (names.size())) {
+                XTextRange range1 =
+                    DocumentConnection.asTextContent(
+                        nameAccess.getByName(names.get(pivot)))
+                    .getAnchor();
 
-            XTextCursor textCursor =
-                range1.getText().createTextCursorByRange(range1);
+                XTextCursor textCursor =
+                    range1.getText().createTextCursorByRange(range1);
 
-            // If we are supposed to set character format for
-            // citations, test this before making any changes. This
-            // way we can throw an exception before any reference
-            // marks are removed, preventing damage to the user's
-            // document:
-            if (style.isFormatCitations() && !setCharStyleTested) {
-                String charStyle = style.getCitationCharacterFormat();
-                DocumentConnection.setCharStyle(textCursor, charStyle);
-                setCharStyleTested = true;
-            }
+                // If we are supposed to set character format for
+                // citations, test this before making any changes. This
+                // way we can throw an exception before any reference
+                // marks are removed, preventing damage to the user's
+                // document:
+                if (style.isFormatCitations() && !setCharStyleTested) {
+                    String charStyle = style.getCitationCharacterFormat();
+                    DocumentConnection.setCharStyle(textCursor, charStyle);
+                    setCharStyleTested = true;
+                }
 
-            List<String> keys = parseRefMarkNameToUniqueCitationKeys(names.get(pivot));
-            if (keys.size() <= 1) {
-                pivot++;
-                continue;
-            }
+                List<String> keys = parseRefMarkNameToUniqueCitationKeys(names.get(pivot));
+                if (keys.size() <= 1) {
+                    pivot++;
+                    continue;
+                }
 
-            documentConnection.removeReferenceMark(names.get(pivot));
+                documentConnection.removeReferenceMark(names.get(pivot));
 
-            // Insert bookmark for each key
-            int last = keys.size() - 1;
-            int i = 0;
-            for (String key : keys) {
-                // Note: instead of generating a new name, we should explicitly
-                //       recover the original. Otherwise ...
-                String newName = getUniqueReferenceMarkName(
-                    documentConnection,
-                    key,
-                    OOBibBase.AUTHORYEAR_PAR);
+                // Insert bookmark for each key
+                int last = keys.size() - 1;
+                int i = 0;
+                for (String key : keys) {
+                    // Note: instead of generating a new name, we should explicitly
+                    //       recover the original. Otherwise ...
+                    String newName = getUniqueReferenceMarkName(
+                        documentConnection,
+                        key,
+                        OOBibBase.AUTHORYEAR_PAR);
 
-                boolean insertSpaceAfter = (i != last);
-                insertReferenceMark(
+                    boolean insertSpaceAfter = (i != last);
+                    insertReferenceMark(
                         documentConnection,
                         newName,
                         "tmp",
@@ -4173,28 +4185,28 @@ class OOBibBase {
                         true,
                         style,
                         true // insertSpaceAfter
-                    );
-                textCursor.collapseToEnd();
-                // if (i != last) {
-                //    // space between citation markers: what style?
-                //    // DocumentConnection.setCharStyle(textCursor, "Standard");
-                //    textCursor.setString(" ");
-                //    textCursor.collapseToEnd();
-                // }
-                i++;
-            }
-            madeModifications = true;
+                        );
+                    textCursor.collapseToEnd();
+                    // if (i != last) {
+                    //    // space between citation markers: what style?
+                    //    // DocumentConnection.setCharStyle(textCursor, "Standard");
+                    //    textCursor.setString(" ");
+                    //    textCursor.collapseToEnd();
+                    // }
+                    i++;
+                }
+                madeModifications = true;
 
-            pivot++;
-        }
-        if (madeModifications) {
-            updateSortedReferenceMarks();
-            refreshCiteMarkers(databases, style);
+                pivot++;
+            }
+            if (madeModifications) {
+                updateSortedReferenceMarks();
+                refreshCiteMarkers(databases, style);
+            }
         } finally {
             documentConnection.unlockControllers();
         }
     }
-
     /**
      * Used from GUI: "Export cited"
      *
