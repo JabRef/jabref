@@ -3184,13 +3184,19 @@ class OOBibBase {
         XTextCursor c2 =
             cursor.getText().createTextCursorByRange(cursor.getEnd());
 
+        /*
+         * Inserting, formatting and removing a single character
+         * still leaves a style change in place.
+         * Let us try with two characters, formatting only the first.
+         */
         c2
          .getText()
-         .insertString(c2, "@", false);
+         .insertString(c2, "@*", false);
 
         String charStyle = style.getCitationCharacterFormat();
         try {
-            c2.goLeft((short) 1, true);
+            c2.goLeft((short) 1, false); // step over '*'
+            c2.goLeft((short) 1, true);  // select '@'
             // The next line may throw
             // UndefinedCharacterFormatException(charStyle).
             // We let that propagate.
@@ -3198,6 +3204,8 @@ class OOBibBase {
         } finally {
             // Before leaving this scope, always delete the character we
             // inserted:
+            c2.collapseToStart();
+            c2.goRight((short) 2, true);  // select '@*'
             c2.setString("");
         }
     }
