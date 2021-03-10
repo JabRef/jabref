@@ -46,6 +46,8 @@ public class UnknownField implements Field {
 
     @Override
     public String toString() {
-        return name;
+        return "UnknownField{" +
+                "name='" + name + '\'' +
+                '}';
     }
 }

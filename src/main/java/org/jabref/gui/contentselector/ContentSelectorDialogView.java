@@ -16,7 +16,9 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -68,6 +70,9 @@ public class ContentSelectorDialogView extends BaseDialog<Void> {
     private void initFieldNameComponents() {
         initListView(fieldsListView, viewModel::getFieldNamesBackingList);
         viewModel.selectedFieldProperty().bind(fieldsListView.getSelectionModel().selectedItemProperty());
+        new ViewModelListCellFactory<Field>()
+                .withText(Field::getDisplayName)
+                .install(fieldsListView);
         removeFieldNameButton.disableProperty().bind(viewModel.isNoFieldNameSelected());
         EasyBind.subscribe(viewModel.selectedFieldProperty(), viewModel::populateKeywords);
     }
