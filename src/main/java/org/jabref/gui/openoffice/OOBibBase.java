@@ -3021,6 +3021,10 @@ class OOBibBase {
         UndefinedCharacterFormatException,
         CreationException {
 
+        // Last minute editing: If there is "page info" for this
+        // citation mark, we should inject it into the citation marker
+        // when creating.
+
         String citText;
         String pageInfo =
             getPageInfoForReferenceMarkName(documentConnection, name);
@@ -3099,7 +3103,6 @@ class OOBibBase {
      *
      * @param position OUT: left collapsed, just after the space inserted,
      *                      or after the reference mark inserted.
-     * xxx
      */
     private void
     insertReferenceMark(
@@ -3118,10 +3121,6 @@ class OOBibBase {
         IllegalArgumentException,
         UndefinedCharacterFormatException,
         CreationException {
-
-        // Last minute editing: If there is "page info" for this
-        // citation mark, inject it into the citation marker before
-        // inserting.
 
         XTextCursor c2 = createReferenceMarkForCitationGroup(documentConnection,
                                                              name,
