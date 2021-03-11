@@ -4218,10 +4218,11 @@ class OOBibBase {
 
                 // Note: citation keys not found are silently left out from the
                 //       combined reference mark name. Loosing information.
-                boolean oldStrategy = false;
+                boolean oldStrategy = false; //xxx
                 List<BibEntry> entries ;
                 String keyString;
                 if (oldStrategy) {
+                    //xxx
                     entries = lookupEntriesInDatabasesSkipMissing(uniqueKeys, databases);
                     entries.sort(new FieldComparator(StandardField.YEAR));
                     keyString =
