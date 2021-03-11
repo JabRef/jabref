@@ -4015,149 +4015,232 @@ class OOBibBase {
         Objects.requireNonNull(databases);
         Objects.requireNonNull(style);
 
+
+        final boolean debugCombineCiteMarkers = true;
+
         final boolean useLockControllers = true;
         DocumentConnection documentConnection = this.getDocumentConnectionOrThrow();
         boolean madeModifications = false;
 
-        try {
+        // The testing for whitespace-only between (pivot) and (pivot+1) assumes that
+        // referenceMarkNames are in textual order: textually consecutive pairs
+        // must appear as neighbours (and in textual order).
+        // We have a bit of a clash here: referenceMarkNames is sorted by visual position,
+        // but we are testing if they are textually neighbours.
+        // In a two-column layout
+        //  | a | c |
+        //  | b | d |
+        // abcd is the textual order, but the visual order is acbd.
+        // So we will not find out that a and b are only separated by white space.
+        List<String> referenceMarkNames =
+            getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
 
-            // The testing for whitespace-only between (pivot) and (pivot+1) assumes that
-            // names are in textual order: textually consecutive pairs
-            // must appear as neighbours (and in textual order).
-            // We have a bit of a clash here: names is sorted by visual position,
-            // but we are testing if they are textually neighbours.
-            // In a two-column layout
-            //  | a | c |
-            //  | b | d |
-            // abcd is the textual order, but the visual order is acbd.
-            // So we will not find out that a and b are only separated by white space.
-            List<String> names =
-                getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
+        final int nRefMarks = referenceMarkNames.size();
+        int[] itcTypes = new int[nRefMarks];
+        String[][] bibtexKeys = new String[nRefMarks][];
+        parseRefMarkNamesToArrays(referenceMarkNames, itcTypes, bibtexKeys);
+
+
+        try {
 
             if (useLockControllers) {
                 documentConnection.lockControllers();
             }
             // XTextRangeCompare: compares the positions of two TextRanges within a Text.
             // Only TextRange instances within the same Text can be compared.
-            final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
-                                                    documentConnection.xText);
+            //final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
+            //                                        documentConnection.xText);
 
-            int pivot = 0;
-            boolean setCharStyleTested = false;
-            XNameAccess nameAccess = documentConnection.getReferenceMarks();
-
-            while (pivot < (names.size() - 1)) {
-
-                XTextRange range1 =
-                    DocumentConnection.asTextContent(
-                        nameAccess.getByName(names.get(pivot)))
-                    .getAnchor()
-                    .getEnd();
-
-                XTextRange range2 =
-                    DocumentConnection.asTextContent(
-                        nameAccess.getByName(names.get(pivot + 1)))
-                    .getAnchor()
-                    .getStart(); // end of range2 is the start of (pivot + 1)
-
-                if (range1.getText() != range2.getText()) {
-                    /* pivot and (pivot+1) belong to different Text instances.
-                     * Maybe to different footnotes?
-                     * Cannot combine across boundaries, skip.
-                     */
-                    pivot++;
-                    continue;
-                }
-
-                // Start from end of text for pivot.
-                XTextCursor textCursor =
-                    range1.getText().createTextCursorByRange(range1);
-
-                // Select next character (if possible), and more, as long as we can and
-                // do not reach start of (pivot+1), which we now know to be
-                // in the same Text instance.
-
-                // If there is no space between the two reference marks,
-                // the next line moves INTO the next. And probably will
-                // cover a non-whitespace character, inhibiting the merge.
-                // Empirically: does not merge. Probably a bug.
-                //textCursor.goRight((short) 1, true);
-                boolean couldExpand = true;
-                while (couldExpand && (compare.compareRegionEnds(textCursor, range2) > 0)) {
-                    couldExpand = textCursor.goRight((short) 1, true);
-                }
-
-                // Take what we selected
-                String cursorText = textCursor.getString();
-
-                // Check if the string contains line breaks and any  non-whitespace.
-                if ((cursorText.indexOf('\n') != -1) || !cursorText.trim().isEmpty()) {
-                    pivot++;
-                    continue;
-                }
-
-                // If we are supposed to set character format for
-                // citations, test this before making any changes. This
-                // way we can throw an exception before any reference
-                // marks are removed, preventing damage to the user's
-                // document:
-                // Q: we may have zero characters selected. Is this a valid test
-                //    in this case?
-                if (!setCharStyleTested) {
-                    assertCitationCharacterFormatIsOK(textCursor, style);
-                    setCharStyleTested = true;
-                }
+            // XNameAccess nameAccess = documentConnection.getReferenceMarks();
 
             /*
-             * This only gets the keys: itcType is discarded.
+             * joinableGroups collects lists of indices of referenceMarkNames
+             * that we think are joinable.
              *
-             * AUTHORYEAR_PAR:   "(X and Y 2000)"
-             * AUTHORYEAR_INTEXT: "X and Y (2000)"
-             * INVISIBLE_CIT: ""
-             *
-             *  We probably only want to collect citations with
-             *  AUTHORYEAR_PAR itcType.
-             *
-             *       No, "X and Y (2000,2001)" appears a meaningful
-             *       case as well.
-             *
-             *       Proposed rules:
-             *       (1) Do not combine citations with different itcType
-             *       (2) INVISIBLE_CIT: leave it alone
-             *       (3) AUTHORYEAR_PAR: combine, present as AUTHORYEAR_PAR
-             *
-             *       (4) AUTHORYEAR_INTEXT: Same list of authors with
-             *           same or different years, possibly with
-             *           uniqueLetters could be done.
-             *           But with different list of authors?
-             *           "(X, Y et al 2000) (X, Y et al 2001)"
-             *           will depend on authors not shown here.
-             *
+             * joinableGroupsCursors provides the range for each group
+             */
+            List<List<Integer>> joinableGroups = new ArrayList<>();
+            List<XTextCursor>   joinableGroupsCursors = new ArrayList<>();
+
+            // current group
+            List<Integer> currentGroup = new ArrayList<>();
+            XTextCursor currentGroupCursor = null;
+            XTextCursor cursorBetween = null;
+            Integer prev = null;
+
+            for ( int i=0; i < referenceMarkNames.size(); i++ ) {
+                final String name = referenceMarkNames.get(i);
+
+
+                boolean addToGroup = true;
+                /*
+                 * Decide if we add name to the group
+                 */
+
+                // Only combine (Author 2000) type citations
+                if ( itcTypes[i] != OOBibBase.AUTHORYEAR_PAR ) {
+                    addToGroup = false;
+                }
+
+                // Even if we combined other types of citations, we would not mix them
+                if (addToGroup &&  (prev != null) ) {
+                    if ( itcTypes[i] != itcTypes[prev] ){
+                        addToGroup = false;
+                    }
+                }
+
+                if (addToGroup && (cursorBetween != null)) {
+                    Objects.requireNonNull(currentGroupCursor);
+                    // assume: currentGroupCursor.getEnd() == cursorBetween.getEnd()
+                    if (DocumentConnection.compareRegionEnds(cursorBetween, currentGroupCursor) != 0) {
+                        throw new RuntimeException(
+                            "combineCiteMarkers: cursorBetween.end != currentGroupCursor.end");
+                    }
+
+                    XTextRange range2 =
+                        documentConnection.getReferenceMarkRangeOrNull(name);
+                    XTextRange range2Start = range2.getStart();
+
+                    boolean couldExpand = true;
+                    XTextCursor thisCharCursor =
+                            range2.getText().createTextCursorByRange(cursorBetween.getEnd());
+                    while (couldExpand &&
+                           (DocumentConnection.compareRegionEnds(cursorBetween, range2Start) > 0)) {
+                        couldExpand = cursorBetween.goRight((short) 1, true);
+                        currentGroupCursor.goRight((short) 1, true);
+                        //
+                        thisCharCursor.goRight((short) 1, true);
+                        String thisChar = thisCharCursor.getString();
+                        thisCharCursor.collapseToEnd();
+                        if (thisChar.isEmpty()
+                            || thisChar == "\n"
+                            ||  !thisChar.trim().isEmpty() ) {
+                            couldExpand = false;
+                        }
+                    }
+
+                    if (!couldExpand) {
+                        addToGroup = false;
+                    }
+                    if (DocumentConnection.compareRegionEnds(cursorBetween, currentGroupCursor) != 0) {
+                        throw new RuntimeException(
+                            "combineCiteMarkers: "
+                            + "cursorBetween.end != currentGroupCursor.end (after expand)" );
+                    }
+                }
+
+                /*
+                 * Even if we do not add it to an existing group, we might use it toi start
+                 * a new group.
+                 */
+                // can it start a new group?
+                boolean canStartGroup = ( itcTypes[i] == OOBibBase.AUTHORYEAR_PAR );
+
+                if (debugCombineCiteMarkers){
+                    System.out.println(String.format(
+                                          "key '%s' addToGroup %s canStartGroup %s",
+                                          name, addToGroup, canStartGroup
+                                          ));
+                }
+
+                if (!addToGroup){
+                    // close currentGroup
+                    if (currentGroup.size() > 1) {
+                        joinableGroups.add( currentGroup );
+                        joinableGroupsCursors.add( currentGroupCursor );
+                    }
+                    // Start a new, empty group
+                    currentGroup = new ArrayList<>();
+                    currentGroupCursor = null;
+                    cursorBetween = null;
+                    prev = null;
+                }
+
+                if ( addToGroup || canStartGroup ) {
+                    // Add the current entry to a group.
+                    currentGroup.add(i);
+                    // Set up cursorBetween
+                    XTextRange range1Full =
+                        documentConnection.getReferenceMarkRangeOrNull(name);
+                    XTextRange range1End = range1Full.getEnd();
+                    cursorBetween = range1Full.getText().createTextCursorByRange(range1Full.getEnd());
+                    // currentGroupCursor
+                    if ( currentGroupCursor == null ) {
+                        currentGroupCursor =
+                            range1Full.getText().createTextCursorByRange(range1Full.getStart());
+                    }
+                    // include self in currentGroupCursor
+                    currentGroupCursor.goRight( (short)( range1Full.getString().length() ), true );
+                    prev = i;
+                }
+            }
+
+            if (joinableGroups.size() > 0) {
+                XTextCursor textCursor = joinableGroupsCursors.get(0);
+                assertCitationCharacterFormatIsOK(textCursor, style);
+            }
+
+            /*
+             * Now we can process the joinable groups
              */
 
-            // Note: silently drops duplicate keys.
-            //       What if they have different pageInfo fields?
+            for (int gi = 0; gi < joinableGroups.size(); gi++ ){
 
-            //  combineCiteMarkers: merging for same citation keys,
-            //       but different pageInfo looses information.
-                List<String> keys =
-                    parseRefMarkNameToUniqueCitationKeys(names.get(pivot));
-                keys.addAll(parseRefMarkNameToUniqueCitationKeys(names.get(pivot + 1)));
+                List<String> allKeys = new  ArrayList<>();
+                for (int gj = 0; gj < joinableGroups.get(gi).size(); gj++) {
+                    int rk = joinableGroups.get(gi).get(gj);
+                    allKeys.addAll( Arrays.asList( bibtexKeys[rk] ) );
+                }
 
+                // Note: silently drops duplicate keys.
+                //       What if they have different pageInfo fields?
+
+                //  combineCiteMarkers: merging for same citation keys,
+                //       but different pageInfo looses information.
+                List<String> uniqueKeys =
+                    (allKeys.stream()
+                     .distinct()
+                     .collect(Collectors.toList()));
+
+                if (true) {
+                    // Removing the old referenceMarkNames from the document
+                    // is covered by removing the text.
+                    // We might want somehting similar 
+                    for (int gj = 0; gj < joinableGroups.get(gi).size(); gj++) {
+                        int rk = joinableGroups.get(gi).get(gj);
+                        documentConnection.removeReferenceMark(referenceMarkNames.get(rk));
+                    }
+                }
+                XTextCursor textCursor = joinableGroupsCursors.get(gi);
                 // Should also remove the spaces between.
                 textCursor.setString("");
-                documentConnection.removeReferenceMark(names.get(pivot));
-                documentConnection.removeReferenceMark(names.get(pivot + 1));
 
                 // Note: citation keys not found are silently left out from the
                 //       combined reference mark name. Loosing information.
-                List<BibEntry> entries = lookupEntriesInDatabasesSkipMissing(keys, databases);
-                entries.sort(new FieldComparator(StandardField.YEAR));
-
-                String keyString =
-                    entries.stream()
-                    .map(c -> c.getCitationKey().orElse(""))
-                    .collect(Collectors.joining(","));
+                boolean oldStrategy = false;
+                List<BibEntry> entries ;
+                String keyString;
+                if (oldStrategy) {
+                    entries = lookupEntriesInDatabasesSkipMissing(uniqueKeys, databases);
+                    entries.sort(new FieldComparator(StandardField.YEAR));
+                    keyString =
+                        entries.stream()
+                        .map(c -> c.getCitationKey().orElse(""))
+                        .collect(Collectors.joining(","));
+                } else {
+                    FindCitedEntriesResult fcr = findCitedEntries( uniqueKeys, databases );
+                    // entries contains UndefinedBibtexEntry for keys not found in databases
+                    entries = new ArrayList<>();
+                    for (Map.Entry<BibEntry, BibDatabase> kv : fcr.entries.entrySet()) {
+                        entries.add( kv.getKey() );
+                    }
+                    // Now we do not sort the entries here.
+                    // entries.sort(new FieldComparator(StandardField.YEAR));
+                    keyString =
+                        entries.stream()
+                        .map(OOBibBase::recoverCitationKeyFromPossiblyUndefinedBibEntry)
+                        .collect(Collectors.joining(","));
+                }
 
                 // Insert reference mark:
                 String newName =
@@ -4173,19 +4256,151 @@ class OOBibBase {
                     textCursor,
                     true, // withText
                     style,
-                    true // insertSpaceAfter
+                    false // insertSpaceAfter: no, it is already there (or could be)
                     );
-                names.set(pivot + 1, newName); // <- put in the next-to-be-processed position
-                madeModifications = true;
+            } // for gi
 
-                pivot++;
-            } // while
+            madeModifications = (joinableGroups.size() > 0);
+
+
+//            int pivot = 0;
+//            while (pivot < (referenceMarkNames.size() - 1)) {
+//
+//                XTextRange range1_full =
+//                    documentConnection.getReferenceMarkRangeOrNull(referenceMarkNames.get(pivot));
+//                XTextRange range1 = range1_full.getEnd();
+//
+//                XTextRange range2_full =
+//                    documentConnection.getReferenceMarkRangeOrNull(referenceMarkNames.get(pivot + 1));
+//                XTextRange range2 = range2_full.getStart();
+//
+//                if ( !DocumentConnection.comparable(range1, range2)) {
+//                    /* pivot and (pivot+1) belong to different Text instances.
+//                     * Maybe to different footnotes?
+//                     * Cannot combine across boundaries, skip.
+//                     */
+//                    pivot++;
+//                    continue;
+//                }
+//
+//                // Start from end of text for pivot.
+//                XTextCursor textCursor =
+//                    range1.getText().createTextCursorByRange(range1);
+//
+//                // Select next character (if possible), and more, as long as we can and
+//                // do not reach start of (pivot+1), which we now know to be
+//                // in the same Text instance.
+//
+//                // If there is no space between the two reference marks,
+//                // the next line moves INTO the next. And probably will
+//                // cover a non-whitespace character, inhibiting the merge.
+//                // Empirically: does not merge. Probably a bug.
+//                //textCursor.goRight((short) 1, true);
+//                boolean couldExpand = true;
+//                while (couldExpand && (DocumentConnection.compareRegionEnds(textCursor, range2) > 0)) {
+//                    couldExpand = textCursor.goRight((short) 1, true);
+//                }
+//
+//                // Take what we selected
+//                String cursorText = textCursor.getString();
+//
+//                // Check if the string contains line breaks or any  non-whitespace.
+//                if ((cursorText.indexOf('\n') != -1) || !cursorText.trim().isEmpty()) {
+//                    pivot++;
+//                    continue;
+//                }
+//
+//                // If we are supposed to set character format for
+//                // citations, test this before making any changes. This
+//                // way we can throw an exception before any reference
+//                // marks are removed, preventing damage to the user's
+//                // document:
+//                // Q: we may have zero characters selected. Is this a valid test
+//                //    in this case?
+//                if (!setCharStyleTested) {
+//                    assertCitationCharacterFormatIsOK(textCursor, style);
+//                    setCharStyleTested = true;
+//                }
+//
+//            /*
+//             * This only gets the keys: itcType is discarded.
+//             *
+//             * AUTHORYEAR_PAR:   "(X and Y 2000)"
+//             * AUTHORYEAR_INTEXT: "X and Y (2000)"
+//             * INVISIBLE_CIT: ""
+//             *
+//             *  We probably only want to collect citations with
+//             *  AUTHORYEAR_PAR itcType.
+//             *
+//             *       No, "X and Y (2000,2001)" appears a meaningful
+//             *       case as well.
+//             *
+//             *       Proposed rules:
+//             *       (1) Do not combine citations with different itcType
+//             *       (2) INVISIBLE_CIT: leave it alone
+//             *       (3) AUTHORYEAR_PAR: combine, present as AUTHORYEAR_PAR
+//             *
+//             *       (4) AUTHORYEAR_INTEXT: Same list of authors with
+//             *           same or different years, possibly with
+//             *           uniqueLetters could be done.
+//             *           But with different list of authors?
+//             *           "(X, Y et al 2000) (X, Y et al 2001)"
+//             *           will depend on authors not shown here.
+//             *
+//             */
+//
+//            // Note: silently drops duplicate keys.
+//            //       What if they have different pageInfo fields?
+//
+//            //  combineCiteMarkers: merging for same citation keys,
+//            //       but different pageInfo looses information.
+//                List<String> keys =
+//                    parseRefMarkNameToUniqueCitationKeys(referenceMarkNames.get(pivot));
+//                keys.addAll(parseRefMarkNameToUniqueCitationKeys(referenceMarkNames.get(pivot + 1)));
+//
+//                // Should also remove the spaces between.
+//                textCursor.setString("");
+//                documentConnection.removeReferenceMark(referenceMarkNames.get(pivot));
+//                documentConnection.removeReferenceMark(referenceMarkNames.get(pivot + 1));
+//
+//                // Note: citation keys not found are silently left out from the
+//                //       combined reference mark name. Loosing information.
+//                List<BibEntry> entries = lookupEntriesInDatabasesSkipMissing(keys, databases);
+//                entries.sort(new FieldComparator(StandardField.YEAR));
+//
+//                String keyString =
+//                    entries.stream()
+//                    .map(c -> c.getCitationKey().orElse(""))
+//                    .collect(Collectors.joining(","));
+//
+//                // Insert reference mark:
+//                String newName =
+//                    getUniqueReferenceMarkName(
+//                        documentConnection,
+//                        keyString,
+//                        OOBibBase.AUTHORYEAR_PAR);
+//                // xxx
+//                insertReferenceMark(
+//                    documentConnection,
+//                    newName,
+//                    "tmp",
+//                    textCursor,
+//                    true, // withText
+//                    style,
+//                    true // insertSpaceAfter: TODO should be false if last to be merged
+//                    );
+//                referenceMarkNames.set(pivot + 1, newName); // <- put in the next-to-be-processed position
+//                madeModifications = true;
+//
+//                pivot++;
+//            } // while
 
         } finally {
             if (useLockControllers) {
                 documentConnection.unlockControllers();
             }
         }
+
         if (madeModifications) {
             updateSortedReferenceMarks();
             try {
