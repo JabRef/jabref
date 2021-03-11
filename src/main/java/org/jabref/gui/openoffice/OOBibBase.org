@@ -1,8 +1,30 @@
 * Notes for OOBibBase.java
 
-** Separation of createReferenceMarkForCitationGroup and fillCitationMarkInCursor
 
-   Problem: the model of cursor vs text in LO:
+** Feature: Undo in LO
+
+   Wrap modifications during a GUI action into
+   Undo blocks. If possible.
+
+   [[https://www.openoffice.org/api/docs/common/ref/com/sun/star/document/XUndoManager.html][OO-API:XUndoManager]]
+   [[https://www.openoffice.org/api/docs/common/ref/com/sun/star/document/XUndoManagerSupplier.html#getUndoManager][OO-API:XUndoManagerSupplier]]
+
+
+
+** combineCiteMarkers
+   - reimplemented to collect data first, then apply
+   - problem: altough we keep the Unresolved entries here,
+     refreshCiteMarkers() destroys them
+ 
+** createReferenceMarkForCitationGroup corner cases
+
+   - [ ] just-after a citation marker:
+     Solution: newpara,insert,removepara
+
+   - [ ] at start-of-para just-before a citation marker
+     - Solution: newpara,insert,removepara
+
+*** Problem: the model of cursor vs text in LO:
 
    - Cursor positions and boundaries of a textrange are between
      characters. Good.
@@ -28,11 +50,23 @@
            - For reference marks I found nothing analogous.
      Possible solutions:
    - For (1):
-     - (currently) recreate the mark instead of filling
-     - Ensure, that we bracket the content, and fill within that.
-       - We could probably use a zero-width space
-         e.g. \u200b (or any character formatted as "hidden")
-     - Do we have to bracket, or a single character is enough?
+     - (was) recreate the mark instead of filling
+     - (currently) Ensure, that we bracket the content, and fill
+       within that.
+       - We either use a zero-width space (\u200b) or,
+         for making the bracketing visible (debugging): "<>"
+   - For(2):
+     - We might just refuse to insert citation when touching an existing one.
+     - Or do the hoops: new-paragraph, insert, join paragraphs.
+
+
+** "Cite in-text" with multiple entries
+
+   - inserts "Au (2000); Bu (2001)"
+   - Separate works, but modifies from in-text to in-paren: "(Au 2000) (Bu 2001)"
+   - combineCiteMarkers currently refuses to Merge
+
+
 
 ** unCombineCiteMarkers: formatting space inserted between citations
 
@@ -406,15 +440,7 @@ Idea: Maybe we should refuse to insert in places to be
 
 - On the GUI side: events [[https://jabref.readthedocs.io/en/latest/getting-into-the-code/code-howtos/#event-handling-in-jabref][Event handling in JabRef]]
 
-** Feature: give feedback "No entry to cite, please select some."
-** Feature: Undo in LO
-
-   Wrap modifications during a GUI action into
-   Undo blocks. If possible.
-
-   [[https://www.openoffice.org/api/docs/common/ref/com/sun/star/document/XUndoManager.html][OO-API:XUndoManager]]
-   [[https://www.openoffice.org/api/docs/common/ref/com/sun/star/document/XUndoManagerSupplier.html#getUndoManager][OO-API:XUndoManagerSupplier]]
-
+** DONE Feature: give feedback "No entry to cite, please select some."
 ** Feature: ManageCitationsDialog visual cue on editable parts
    - the pageInfo part is editable, but no visual cue is provided
 
@@ -809,3 +835,5 @@ code.
 Resolved: improve-reversibility branch: commit e159a1d8ce40d1045e73d7fbfca24390bba44706
 
 
+
+** DONE Separation of createReferenceMarkForCitationGroup and fillCitationMarkInCursor
