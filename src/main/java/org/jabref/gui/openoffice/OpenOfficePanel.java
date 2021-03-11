@@ -519,6 +519,50 @@ public class OpenOfficePanel {
         }
 
         Boolean inParenthesis = inParenthesisIn;
+
+        LibraryTab libraryTab = frame.getCurrentLibraryTab();
+        final BibDatabase database =
+            (libraryTab == null
+             ? null
+             : libraryTab.getDatabase());
+
+        if (database == null) {
+            dialogService.showErrorDialogAndWait(
+                Localization.lang("No database"),
+                Localization.lang(
+                    "No bibliography database is open for citation.\n"
+                    + "Open one before citing."
+                    )
+                );
+            return;
+        }
+
+        List<BibEntry> entries = libraryTab.getSelectedEntries();
+        if (entries.isEmpty()){
+            dialogService.showErrorDialogAndWait(
+                Localization.lang("No entries selected for citation"),
+                Localization.lang(
+                    "No bibliography entries are selected for citation.\n"
+                    + "Select some before citing."
+                    )
+                );
+            return;
+        }
+
+        if (style == null) {
+            style = loader.getUsedStyle();
+            if (style == null) {
+                dialogService.showErrorDialogAndWait(
+                    Localization.lang("No style for citation"),
+                    Localization.lang(
+                        "No bibliography style is selected for citation.\n"
+                        + "Select one before citing."
+                        )
+                    );
+                return;
+            }
+        }
+
         String pageInfo = null;
         if (addPageInfo) {
 
@@ -533,16 +577,9 @@ public class OpenOfficePanel {
             }
         }
 
-        LibraryTab libraryTab = frame.getCurrentLibraryTab();
-        if (libraryTab != null) {
-            final BibDatabase database = libraryTab.getDatabase();
-            List<BibEntry> entries = libraryTab.getSelectedEntries();
-            if (!entries.isEmpty() && checkThatEntriesHaveKeys(entries)) {
+        if (!entries.isEmpty() && checkThatEntriesHaveKeys(entries)) {
 
                 try {
-                    if (style == null) {
-                        style = loader.getUsedStyle();
-                    }
                     ooBase.insertCitation(
                         entries,
                         database,
@@ -580,7 +617,6 @@ public class OpenOfficePanel {
                     LOGGER.warn("Could not insert entry", ex);
                 }
             }
-        }
     }
 
     /**

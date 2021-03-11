@@ -3293,6 +3293,18 @@ class OOBibBase {
         NoDocumentException {
 
         styleIsRequired(style);
+
+        if ( entries == null ||  entries.size() == 0 ) {
+            // System.out.println("insertCitation: throwing JabRefException");
+            throw new JabRefException(
+                "No bibliography entries selected",
+                Localization.lang(
+                    "No bibliography entries are selected for citation.\n"
+                    + "Select some before citing."
+                    )
+                );
+        }
+
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
 
         try {
