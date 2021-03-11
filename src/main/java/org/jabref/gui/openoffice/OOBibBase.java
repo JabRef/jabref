@@ -3301,6 +3301,11 @@ class OOBibBase {
      * "Cite", "Cite in-text", "Cite special" and "Insert empty
      * citation".
      *
+     * Uses LO undo context "Insert citation".
+     *
+     * Note: Undo does not remove custom properties. Presumably
+     * neither does it reestablish them.
+     *
      * This method inserts a reference mark in the text (at the
      * cursor) citing the entries, and (if sync is true) refreshes the
      * citation markers and the bibliography.
@@ -3364,7 +3369,8 @@ class OOBibBase {
         CreationException,
         BibEntryNotFoundException,
         UndefinedParagraphFormatException,
-        NoDocumentException {
+        NoDocumentException,
+        InvalidStateException {
 
         styleIsRequired(style);
 
@@ -3382,6 +3388,7 @@ class OOBibBase {
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
 
         try {
+            documentConnection.enterUndoContext("Insert citation");
             XTextCursor cursor;
             // Get the cursor positioned by the user.
             try {
@@ -3506,6 +3513,8 @@ class OOBibBase {
             // loaded before connection, and therefore cannot directly reference
             // or catch a DisposedException (which is in a OO JAR file).
             throw new ConnectionLostException(ex.getMessage());
+        } finally {
+            documentConnection.leaveUndoContext();
         }
     }
 
@@ -4560,11 +4569,15 @@ class OOBibBase {
         UndefinedCharacterFormatException,
         BibEntryNotFoundException,
         IOException,
-        JabRefException {
+        JabRefException,
+        InvalidStateException {
 
         styleIsRequired(style);
 
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
+        try {
+            documentConnection.enterUndoContext("Refresh bibliography");
+
         boolean requireSeparation = false; // may loose citation without requireSeparation=true
         CitationGroups cg = new CitationGroups(documentConnection);
         cg.checkRangeOverlaps(this.xDocumentConnection, requireSeparation);
@@ -4581,6 +4594,9 @@ class OOBibBase {
             if (useLockControllers){
                 documentConnection.unlockControllers();
             }
+        }
+        } finally {
+            documentConnection.leaveUndoContext();
         }
     }
 

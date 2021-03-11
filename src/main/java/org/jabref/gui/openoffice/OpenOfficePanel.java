@@ -234,6 +234,7 @@ public class OpenOfficePanel {
                                                                                                                                 "Your OpenOffice/LibreOffice document references the citation key '%0', which could not be found in your current library.",
                                                                                                                                 ex.getCitationKey()));
             } catch (com.sun.star.lang.IllegalArgumentException | PropertyVetoException | UnknownPropertyException | WrappedTargetException | NoSuchElementException |
+                     InvalidStateException |
                      CreationException ex) {
                 LOGGER.warn("Could not update bibliography", ex);
             }
@@ -616,6 +617,7 @@ public class OpenOfficePanel {
                 } catch (com.sun.star.lang.IllegalArgumentException | UnknownPropertyException | PropertyVetoException |
                          CreationException | NoSuchElementException | WrappedTargetException | IOException |
                          BibEntryNotFoundException | IllegalTypeException | PropertyExistException |
+                         InvalidStateException |
                          NotRemoveableException ex) {
                     LOGGER.warn("Could not insert entry", ex);
                 }
