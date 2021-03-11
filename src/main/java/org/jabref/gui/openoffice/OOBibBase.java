@@ -3357,9 +3357,9 @@ class OOBibBase {
             throw new JabRefException(
                 "No bibliography entries selected",
                 Localization.lang(
-                    "No bibliography entries are selected for citation.\n"
-                    + "Select some before citing."
-                    )
+                    "No bibliography entries are selected for citation.")
+                + "\n"
+                + Localization.lang("Select some before citing.")
                 );
         }
 
@@ -4564,16 +4564,14 @@ class OOBibBase {
         return resultDatabase;
     }
 
-
     void styleIsRequired( OOBibStyle style )
         throws JabRefException {
         if ( style == null ) {
             throw new JabRefException(
                 "This operation requires a style",
-                Localization.lang(
-                    "This operation  requires a style.\n"
-                    + "Please select one."
-                    )
+                Localization.lang("This operation requires a style.")
+                + "\n"
+                + Localization.lang("Please select one.")
                 );
         }
     }

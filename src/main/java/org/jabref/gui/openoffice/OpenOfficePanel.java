@@ -207,8 +207,9 @@ public class OpenOfficePanel {
                             Localization.lang("Unable to synchronize bibliography"),
                             Localization.lang("Your OpenOffice/LibreOffice document references"
                                               + " citation keys which could not be found"
-                                              + " in your current library: %0",
-                                              String.join(" ", unresolvedKeys)));
+                                              + " in your current library.")
+                            + "\n"
+                            + String.join(" ", unresolvedKeys));
                 }
             } catch (JabRefException ex) {
                 dialogService.showErrorDialogAndWait(
@@ -547,9 +548,9 @@ public class OpenOfficePanel {
             dialogService.showErrorDialogAndWait(
                 Localization.lang("No database"),
                 Localization.lang(
-                    "No bibliography database is open for citation.\n"
-                    + "Open one before citing."
-                    )
+                    "No bibliography database is open for citation.")
+                + "\n"
+                + Localization.lang("Open one before citing.")
                 );
             return;
         }
@@ -559,9 +560,9 @@ public class OpenOfficePanel {
             dialogService.showErrorDialogAndWait(
                 Localization.lang("No entries selected for citation"),
                 Localization.lang(
-                    "No bibliography entries are selected for citation.\n"
-                    + "Select some before citing."
-                    )
+                    "No bibliography entries are selected for citation.")
+                + "\n"
+                + Localization.lang("Select some before citing.")
                 );
             return;
         }
@@ -572,9 +573,10 @@ public class OpenOfficePanel {
                 dialogService.showErrorDialogAndWait(
                     Localization.lang("No style for citation"),
                     Localization.lang(
-                        "No bibliography style is selected for citation.\n"
-                        + "Select one before citing."
-                        )
+                        "No bibliography style is selected for citation.")
+                    + "\n"
+                    + Localization.lang(
+                        "Select one before citing.")
                     );
                 return;
             }
