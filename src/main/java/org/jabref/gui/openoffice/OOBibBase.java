@@ -2969,6 +2969,8 @@ class OOBibBase {
         NoDocumentException,
         WrappedTargetException,
         CreationException {
+
+        final boolean debugThisFun = false;
         final String left = referenceMarkLeftBracket;
         final String right = referenceMarkRightBracket;
 
@@ -2991,18 +2993,18 @@ class OOBibBase {
                 );
         }
         String fulltext = full.getString();
-        if ( debug ){
+        if ( debugThisFun ){
             System.out.println(String.format("getFillCursor: fulltext = '%s'", fulltext));
         }
 
         if (fulltext.length() < 2 || !fulltext.startsWith(left) || !fulltext.endsWith(right)){
             // damaged, recreate
-            if ( debug ){
+            if ( debugThisFun ){
                 System.out.println(String.format("getFillCursor: damaged, recreate"));
             }
             full.setString("");
             if ( true ){
-                if ( debug ){
+                if ( debugThisFun ){
                     System.out.println(String.format("getFillCursor: removeReferenceMark go"));
                 }
                 try {
@@ -3013,14 +3015,14 @@ class OOBibBase {
                                 + " for '%s'", name));
                 }
             } else {
-                if ( debug ){
+                if ( debugThisFun ){
                     System.out.println(String.format("getFillCursor: removeReferenceMark skipped"));
                 }
             }
             // What shall we put in the recreated version?
             // User might have inserted stuff before or after?
             String trimmedtext = fulltext.replaceAll( "[" + left + right +"]", "" );
-            if (debug){
+            if (debugThisFun){
                 System.out.println(String.format("getFillCursor: trimmedtext = '%s'", trimmedtext));
             }
             return createReferenceMarkForCitationGroup(
@@ -3030,7 +3032,7 @@ class OOBibBase {
                 false, // insertSpaceAfter
                 trimmedtext );
         } else {
-            if (debug){
+            if (debugThisFun){
                 System.out.println(String.format("getFillCursor: intact, reuse"));
             }
             full.collapseToStart();
