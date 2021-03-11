@@ -3293,9 +3293,7 @@ class OOBibBase {
         NoDocumentException {
 
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
-
         try {
-            documentConnection.lockControllers();
             XTextCursor cursor;
             // Get the cursor positioned by the user.
             try {
@@ -3391,10 +3389,17 @@ class OOBibBase {
                 // To account for numbering and for uniqueLetters, we
                 // must refresh the cite markers:
                 updateSortedReferenceMarks();
-                refreshCiteMarkers(allBases, style);
 
-                // Insert it at the current position:
-                rebuildBibTextSection(allBases, style);
+                try {
+                    documentConnection.lockControllers();
+
+                    refreshCiteMarkers(allBases, style);
+
+                    // Insert it at the current position:
+                    rebuildBibTextSection(allBases, style);
+                } finally {
+                    documentConnection.unlockControllers();
+                }
 
                 /*
                  * Problem: insertEntry in bibliography
@@ -3413,8 +3418,6 @@ class OOBibBase {
             // loaded before connection, and therefore cannot directly reference
             // or catch a DisposedException (which is in a OO JAR file).
             throw new ConnectionLostException(ex.getMessage());
-        } finally {
-            documentConnection.unlockControllers();
         }
     }
 
@@ -4118,7 +4121,16 @@ class OOBibBase {
         }
         if (madeModifications) {
             updateSortedReferenceMarks();
-            refreshCiteMarkers(databases, style);
+            try {
+                if (useLockControllers) {
+                    documentConnection.lockControllers();
+                }
+                refreshCiteMarkers(databases, style);
+            } finally {
+                if (useLockControllers) {
+                    documentConnection.unlockControllers();
+                }
+            }
         }
     }
 
