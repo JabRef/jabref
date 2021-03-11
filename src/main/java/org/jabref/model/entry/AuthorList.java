@@ -314,10 +314,7 @@ public class AuthorList {
      * @return formatted list of authors.
      */
     public String getAsNatbib() {
-        return getAsNatbib(getAuthors());
-    }
-
-    private static String getAsNatbib(List<Author> authors) {
+        var authors = getAuthors();
         return switch (authors.size()) {
             case 0 -> "";
             case 1 -> authors.get(0).getLastOnly();
