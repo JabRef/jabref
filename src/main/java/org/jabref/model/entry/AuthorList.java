@@ -143,10 +143,6 @@ public class AuthorList {
         return Collectors.collectingAndThen(Collectors.toUnmodifiableList(), AuthorList::new);
     }
 
-    public static Collector<Author, ?, String> andCoordinatedConjunction(Function<Author, String> style, boolean oxfordComma) {
-        return Collectors.collectingAndThen(Collectors.toUnmodifiableList(), list -> andCoordinatedConjunction(list, style, oxfordComma));
-    }
-
     private static String andCoordinatedConjunction(List<Author> authors, Function<Author, String> style, boolean oxfordComma) {
         var formattedAuthors = authors.stream().map(style).collect(Collectors.toUnmodifiableList());
         return andCoordinatedConjunction(formattedAuthors, oxfordComma);
