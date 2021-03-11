@@ -3575,13 +3575,13 @@ class OOBibBase {
     /**
      * Refresh all citation markers in the document.
      *
-     * GUI: called as part of "Export cited"
+     * Called from exportCitedHelper
      *
      * @param databases The databases to get entries from.
      * @param style     The bibliography style to use.
      * @return A list of those referenced citation keys that could not be resolved.
      */
-    public List<String>
+    private List<String>
     refreshCiteMarkers(
         List<BibDatabase> databases,
         OOBibStyle style)
