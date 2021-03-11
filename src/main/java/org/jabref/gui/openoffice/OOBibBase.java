@@ -3536,6 +3536,12 @@ class OOBibBase {
         BibDatabase newDatabase;
     }
 
+    /**
+     * Helper for GUI action "Export cited"
+     *
+     * Refreshes citation markers, (although the user did not ask for that).
+     * Does not refresh the bibliography.
+     */
     public ExportCitedHelperResult exportCitedHelper(
         List<BibDatabase> databases,
         OOBibStyle style
@@ -3549,13 +3555,20 @@ class OOBibBase {
         PropertyVetoException,
         IOException,
         CreationException,
-        BibEntryNotFoundException {
+        BibEntryNotFoundException,
+        InvalidStateException {
+
         ExportCitedHelperResult res = new ExportCitedHelperResult();
+        DocumentConnection documentConnection = getDocumentConnectionOrThrow();
+        try {
+            documentConnection.enterUndoContext("Changes during \"Export cited\"");
 
-        this.updateSortedReferenceMarks(); // NoDocumentException
-        res.unresolvedKeys = this.refreshCiteMarkers(databases, style);
-        res.newDatabase = this.generateDatabase(databases);
-
+            this.updateSortedReferenceMarks(); // NoDocumentException
+            res.unresolvedKeys = this.refreshCiteMarkers(databases, style);
+            res.newDatabase = this.generateDatabase(databases);
+        } finally {
+            documentConnection.leaveUndoContext();
+        }
         return res;
     }
 

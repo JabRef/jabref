@@ -379,6 +379,7 @@ public class OpenOfficePanel {
                  | NoSuchElementException
                  | WrappedTargetException
                  | IOException
+                 | InvalidStateException
                  | CreationException e
             ) {
             LOGGER.warn("Problem generating new database.", e);
