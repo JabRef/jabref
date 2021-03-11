@@ -4100,6 +4100,8 @@ class OOBibBase {
                     parseRefMarkNameToUniqueCitationKeys(names.get(pivot));
                 keys.addAll(parseRefMarkNameToUniqueCitationKeys(names.get(pivot + 1)));
 
+                // Should also remove the spaces between.
+                textCursor.setString("");
                 documentConnection.removeReferenceMark(names.get(pivot));
                 documentConnection.removeReferenceMark(names.get(pivot + 1));
 
