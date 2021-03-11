@@ -4162,6 +4162,20 @@ class OOBibBase {
                 }
             }
 
+            if (true) {
+                // close currentGroup
+                if (currentGroup.size() > 1) {
+                    joinableGroups.add( currentGroup );
+                    joinableGroupsCursors.add( currentGroupCursor );
+                }
+                // clean variables
+                currentGroup = null;
+                currentGroupCursor = null;
+                cursorBetween = null;
+                prev = null;
+            }
+
+
             if (joinableGroups.size() > 0) {
                 XTextCursor textCursor = joinableGroupsCursors.get(0);
                 assertCitationCharacterFormatIsOK(textCursor, style);
