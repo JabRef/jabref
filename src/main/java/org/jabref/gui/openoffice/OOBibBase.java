@@ -843,13 +843,6 @@ class OOBibBase {
      */
     private final Map<String, String> xUniqueLetters = new HashMap<>();
 
-    /**
-     * Names of reference marks belonging to JabRef sorted by visual
-     * position.
-     *
-     */
-    private List<String> jabRefReferenceMarkNamesSortedByPosition;
-
     /*
      * Constructor
      */
@@ -2363,25 +2356,6 @@ class OOBibBase {
     }
 
     /**
-     *  Refresh list of JabRef reference marks (sorts by position).
-     *
-     *  Probably should be called at the start of actions from the GUI,
-     *  that rely on jabRefReferenceMarkNamesSortedByPosition to be up-to-date.
-     */
-    public void
-    updateSortedReferenceMarks()
-        throws
-        WrappedTargetException,
-        NoSuchElementException,
-        NoDocumentException {
-
-        DocumentConnection documentConnection = getDocumentConnectionOrThrow();
-
-        this.jabRefReferenceMarkNamesSortedByPosition =
-            getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
-    }
-
-    /**
      *  Return bibliography entries sorted according to the order of
      *  first appearance in referenceMarkNames.
      *
@@ -3487,15 +3461,16 @@ class OOBibBase {
             if (sync) {
                 // To account for numbering and for uniqueLetters, we
                 // must refresh the cite markers:
-                updateSortedReferenceMarks();
+                List<String> jabRefReferenceMarkNamesSortedByPosition =
+                    getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
 
                 try {
                     documentConnection.lockControllers();
 
-                    refreshCiteMarkers(allBases, style);
+                    refreshCiteMarkers(allBases, style, jabRefReferenceMarkNamesSortedByPosition);
 
                     // Insert it at the current position:
-                    rebuildBibTextSection(allBases, style);
+                    rebuildBibTextSection(allBases, style, jabRefReferenceMarkNamesSortedByPosition);
                 } finally {
                     documentConnection.unlockControllers();
                 }
@@ -3563,8 +3538,12 @@ class OOBibBase {
         try {
             documentConnection.enterUndoContext("Changes during \"Export cited\"");
 
-            this.updateSortedReferenceMarks(); // NoDocumentException
-            res.unresolvedKeys = this.refreshCiteMarkers(databases, style);
+            List<String> jabRefReferenceMarkNamesSortedByPosition =
+                getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
+            res.unresolvedKeys =
+                this.refreshCiteMarkers(databases,
+                                        style,
+                                        jabRefReferenceMarkNamesSortedByPosition);
             res.newDatabase = this.generateDatabase(databases);
         } finally {
             documentConnection.leaveUndoContext();
@@ -3584,7 +3563,8 @@ class OOBibBase {
     private List<String>
     refreshCiteMarkers(
         List<BibDatabase> databases,
-        OOBibStyle style)
+        OOBibStyle style,
+        List<String> jabRefReferenceMarkNamesSortedByPosition)
         throws
         WrappedTargetException,
         IllegalArgumentException,
@@ -3605,7 +3585,8 @@ class OOBibBase {
                     documentConnection,
                     databases,
                     style,
-                    this.xUniqueLetters);
+                    this.xUniqueLetters,
+                    jabRefReferenceMarkNamesSortedByPosition);
         } catch (DisposedException ex) {
             // We need to catch this one here because the OpenOfficePanel class is
             // loaded before connection, and therefore cannot directly reference
@@ -3724,7 +3705,8 @@ class OOBibBase {
         DocumentConnection documentConnection,
         List<BibDatabase> databases,
         OOBibStyle style,
-        final Map<String, String> uniqueLetters
+        final Map<String, String> uniqueLetters,
+        List<String> jabRefReferenceMarkNamesSortedByPosition
         )
         throws
         WrappedTargetException,
@@ -3822,7 +3804,9 @@ class OOBibBase {
     public void
     rebuildBibTextSection(
         List<BibDatabase> databases,
-        OOBibStyle style)
+        OOBibStyle style,
+        List<String> jabRefReferenceMarkNamesSortedByPosition
+        )
         throws
         NoSuchElementException,
         WrappedTargetException,
@@ -4356,12 +4340,13 @@ class OOBibBase {
         }
 
         if (madeModifications) {
-            updateSortedReferenceMarks();
+            List<String> jabRefReferenceMarkNamesSortedByPosition =
+                getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
             try {
                 if (useLockControllers) {
                     documentConnection.lockControllers();
                 }
-                refreshCiteMarkers(databases, style);
+                refreshCiteMarkers(databases, style, jabRefReferenceMarkNamesSortedByPosition);
             } finally {
                 if (useLockControllers) {
                     documentConnection.unlockControllers();
@@ -4486,12 +4471,13 @@ class OOBibBase {
             }
         }
         if (madeModifications) {
-            updateSortedReferenceMarks();
+            List<String> jabRefReferenceMarkNamesSortedByPosition =
+                getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
             try {
                 if (useLockControllers) {
                     documentConnection.lockControllers();
                 }
-                refreshCiteMarkers(databases, style);
+                refreshCiteMarkers(databases, style, jabRefReferenceMarkNamesSortedByPosition);
             } finally {
                 if (useLockControllers) {
                     documentConnection.unlockControllers();
@@ -4599,7 +4585,6 @@ class OOBibBase {
      * @param style Style.
      * @return List of unresolved citation keys.
      *
-     * Note: calls updateSortedReferenceMarks();
      */
     public List<String>
     updateDocumentActionHelper(
@@ -4631,12 +4616,16 @@ class OOBibBase {
         cg.checkRangeOverlaps(this.xDocumentConnection, requireSeparation);
         final boolean useLockControllers = true;
         try {
-            updateSortedReferenceMarks();
+            List<String> jabRefReferenceMarkNamesSortedByPosition =
+                getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
             if (useLockControllers){
                 documentConnection.lockControllers();
             }
-            List<String> unresolvedKeys = refreshCiteMarkers(databases, style);
-            rebuildBibTextSection(databases, style);
+            List<String> unresolvedKeys =
+                refreshCiteMarkers(databases,
+                                   style,
+                                   jabRefReferenceMarkNamesSortedByPosition);
+            rebuildBibTextSection(databases, style, jabRefReferenceMarkNamesSortedByPosition);
             return unresolvedKeys;
         } finally {
             if (useLockControllers){
