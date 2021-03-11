@@ -29,7 +29,7 @@ public class CollectionOfComputerScienceBibliographiesQueryTransformer extends A
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return journalTitle;
+        return String.format("\"%s\"", journalTitle);
     }
 
     @Override
@@ -39,6 +39,6 @@ public class CollectionOfComputerScienceBibliographiesQueryTransformer extends A
 
     @Override
     protected String handleUnFieldedTerm(String term) {
-        return term;
+        return String.format("\"%s\"", term);
     }
 }

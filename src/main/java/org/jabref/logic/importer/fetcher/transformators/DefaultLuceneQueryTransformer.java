@@ -42,6 +42,6 @@ public class DefaultLuceneQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleUnFieldedTerm(String term) {
-        return term;
+        return "\"" + term + "\"";
     }
 }

@@ -39,6 +39,9 @@ public class JstorQueryTransformer extends AbstractQueryTransformer {
     @Override
     protected String handleYearRange(String yearRange) {
         String[] split = yearRange.split("-");
+        if (split.length != 2) {
+            return yearRange;
+        }
         return "sd:" + split[0] + getLogicalAndOperator() + "ed:" + split[1];
     }
 

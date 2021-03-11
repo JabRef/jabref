@@ -7,16 +7,16 @@ import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxPars
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class JstorQueryTransformerTest implements InfixTransformerTest {
+class DefaultLuceneQueryTransformerTest implements InfixTransformerTest {
 
     @Override
     public AbstractQueryTransformer getTransformer() {
-        return new JstorQueryTransformer();
+        return new DefaultLuceneQueryTransformer();
     }
 
     @Override
     public String getAuthorPrefix() {
-        return "au:";
+        return "author:";
     }
 
     @Override
@@ -26,12 +26,12 @@ class JstorQueryTransformerTest implements InfixTransformerTest {
 
     @Override
     public String getJournalPrefix() {
-        return "pt:";
+        return "journal:";
     }
 
     @Override
     public String getTitlePrefix() {
-        return "ti:";
+        return "title:";
     }
 
     @Override
@@ -57,4 +57,5 @@ class JstorQueryTransformerTest implements InfixTransformerTest {
         assertEquals(2018, transformer.getStartYear());
         assertEquals(2021, transformer.getEndYear());
     }
+
 }

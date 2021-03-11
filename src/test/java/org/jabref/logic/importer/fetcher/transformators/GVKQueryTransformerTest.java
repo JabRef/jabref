@@ -37,7 +37,6 @@ class GVKQueryTransformerTest implements InfixTransformerTest {
 
     @Override
     public void convertYearField() throws Exception {
-
         String queryString = "year:2018";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         Optional<String> query = getTransformer().transformLuceneQuery(luceneQuery);
