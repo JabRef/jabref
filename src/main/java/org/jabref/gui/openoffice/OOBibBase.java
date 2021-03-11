@@ -3292,7 +3292,9 @@ class OOBibBase {
         UndefinedParagraphFormatException,
         NoDocumentException {
 
+        styleIsRequired(style);
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
+
         try {
             XTextCursor cursor;
             // Get the cursor positioned by the user.
@@ -3944,7 +3946,10 @@ class OOBibBase {
         PropertyVetoException,
         CreationException,
         BibEntryNotFoundException,
-        NoDocumentException {
+        NoDocumentException,
+        JabRefException {
+
+        styleIsRequired(style);
 
         Objects.requireNonNull(databases);
         Objects.requireNonNull(style);
@@ -4154,8 +4159,10 @@ class OOBibBase {
         PropertyVetoException,
         CreationException,
         BibEntryNotFoundException,
-        NoDocumentException {
+        NoDocumentException,
+        JabRefException {
 
+        styleIsRequired(style);
         Objects.requireNonNull(databases);
         Objects.requireNonNull(style);
 
@@ -4330,6 +4337,20 @@ class OOBibBase {
         return resultDatabase;
     }
 
+
+    void styleIsRequired( OOBibStyle style )
+        throws JabRefException {
+        if ( style == null ) {
+            throw new JabRefException(
+                "This operation requires a style",
+                Localization.lang(
+                    "This operation  requires a style.\n"
+                    + "Please select one."
+                    )
+                );
+        }
+    }
+
     /**
      * GUI action, refreshes citation markers and bibliography.
      *
@@ -4356,6 +4377,8 @@ class OOBibBase {
         BibEntryNotFoundException,
         IOException,
         JabRefException {
+
+        styleIsRequired(style);
 
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
         boolean requireSeparation = false; // may loose citation without requireSeparation=true

@@ -243,6 +243,11 @@ public class OpenOfficePanel {
         merge.setOnAction(e -> {
             try {
                 ooBase.combineCiteMarkers(getBaseList(), style);
+            } catch (JabRefException ex) {
+                dialogService.showErrorDialogAndWait(
+                    Localization.lang("JabRefException"),
+                    ex.getLocalizedMessage()
+                    );
             } catch (UndefinedCharacterFormatException ex) {
                 reportUndefinedCharacterFormat(ex);
             } catch (NoDocumentException ex) {
@@ -259,6 +264,11 @@ public class OpenOfficePanel {
         unmerge.setOnAction(e -> {
             try {
                 ooBase.unCombineCiteMarkers(getBaseList(), style);
+            } catch (JabRefException ex) {
+                dialogService.showErrorDialogAndWait(
+                    Localization.lang("JabRefException"),
+                    ex.getLocalizedMessage()
+                    );
             } catch (NoDocumentException ex) {
                 showNoDocumentErrorMessage();
             } catch (UndefinedCharacterFormatException ex) {
