@@ -4015,7 +4015,7 @@ class OOBibBase {
                 // the next line moves INTO the next. And probably will
                 // cover a non-whitespace character, inhibiting the merge.
                 // Empirically: does not merge. Probably a bug.
-                textCursor.goRight((short) 1, true);
+                //textCursor.goRight((short) 1, true);
                 boolean couldExpand = true;
                 while (couldExpand && (compare.compareRegionEnds(textCursor, range2) > 0)) {
                     couldExpand = textCursor.goRight((short) 1, true);
