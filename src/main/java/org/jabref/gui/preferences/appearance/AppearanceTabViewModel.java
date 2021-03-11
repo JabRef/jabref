@@ -10,9 +10,9 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.theme.Theme;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
@@ -40,6 +40,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
+    private final ThemeManager themeManager;
     private final AppearancePreferences initialAppearancePreferences;
 
     private final Validator fontSizeValidator;
@@ -47,9 +48,10 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     private final List<String> restartWarnings = new ArrayList<>();
 
-    public AppearanceTabViewModel(DialogService dialogService, PreferencesService preferences) {
+    public AppearanceTabViewModel(DialogService dialogService, PreferencesService preferences, ThemeManager themeManager) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.themeManager = themeManager;
         this.initialAppearancePreferences = preferences.getAppearancePreferences();
 
         fontSizeValidator = new FunctionBasedValidator<>(
@@ -121,7 +123,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
                 newTheme);
 
         preferences.storeAppearancePreference(newAppearancePreferences);
-        Globals.getThemeManager().updatePreferences(newAppearancePreferences);
+        themeManager.updatePreferences(newAppearancePreferences);
     }
 
     public ValidationStatus fontSizeValidationStatus() {

@@ -12,10 +12,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preview.PreviewViewer;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
@@ -47,6 +47,7 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     @Inject private PreferencesService preferencesService;
     @Inject private DialogService dialogService;
     @Inject private StateManager stateManager;
+    @Inject private ThemeManager themeManager;
 
     private StyleSelectDialogViewModel viewModel;
     private PreviewViewer previewArticle;
@@ -82,8 +83,8 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
         previewBook.setEntry(TestEntry.getTestEntryBook());
         vbox.getChildren().add(previewBook);
 
-        previewArticle.setThemeManager(Globals.getThemeManager());
-        previewBook.setThemeManager(Globals.getThemeManager());
+        previewArticle.setThemeManager(themeManager);
+        previewBook.setThemeManager(themeManager);
 
         colName.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         colJournals.setCellValueFactory(cellData -> cellData.getValue().journalsProperty());

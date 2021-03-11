@@ -29,6 +29,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.preview.PreviewViewer;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
@@ -57,6 +58,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
     @FXML private CodeArea editArea;
 
     @Inject private StateManager stateManager;
+    @Inject private ThemeManager themeManager;
 
     private final ContextMenu contextMenu = new ContextMenu();
 
@@ -149,7 +151,7 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         ((PreviewViewer) previewTab.getContent()).setEntry(TestEntry.getTestEntry());
         EasyBind.subscribe(viewModel.layoutProperty(), value -> ((PreviewViewer) previewTab.getContent()).setLayout(value));
         previewTab.getContent().visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull());
-        ((PreviewViewer) previewTab.getContent()).setThemeManager(Globals.getThemeManager());
+        ((PreviewViewer) previewTab.getContent()).setThemeManager(themeManager);
 
         editArea.clear();
         editArea.setParagraphGraphicFactory(LineNumberFactory.get(editArea));

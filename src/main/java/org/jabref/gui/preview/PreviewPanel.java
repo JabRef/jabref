@@ -17,13 +17,13 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.model.database.BibDatabaseContext;
@@ -51,7 +51,8 @@ public class PreviewPanel extends VBox {
                         ExternalFileTypes externalFileTypes,
                         KeyBindingRepository keyBindingRepository,
                         PreferencesService preferences,
-                        StateManager stateManager) {
+                        StateManager stateManager,
+                        ThemeManager themeManager) {
         this.keyBindingRepository = keyBindingRepository;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
@@ -62,7 +63,7 @@ public class PreviewPanel extends VBox {
         previewView = new PreviewViewer(database, dialogService, stateManager);
         previewView.setLayout(previewPreferences.getCurrentPreviewStyle());
         previewView.setContextMenu(createPopupMenu());
-        previewView.setThemeManager(Globals.getThemeManager());
+        previewView.setThemeManager(themeManager);
         previewView.setOnDragDetected(event -> {
             previewView.startFullDrag();
 

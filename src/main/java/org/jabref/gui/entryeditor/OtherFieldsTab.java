@@ -16,6 +16,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -39,6 +40,7 @@ public class OtherFieldsTab extends FieldsEditorTab {
                           DialogService dialogService,
                           PreferencesService preferences,
                           StateManager stateManager,
+                          ThemeManager themeManager,
                           BibEntryTypesManager entryTypesManager,
                           ExternalFileTypes externalFileTypes,
                           TaskExecutor taskExecutor,
@@ -50,6 +52,7 @@ public class OtherFieldsTab extends FieldsEditorTab {
                 dialogService,
                 preferences,
                 stateManager,
+                themeManager,
                 externalFileTypes,
                 taskExecutor,
                 journalAbbreviationRepository);
