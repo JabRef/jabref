@@ -841,7 +841,7 @@ class OOBibBase {
      *
      *  Depends on: style, citations and their order.
      */
-    private final Map<String, String> xUniqueLetters = new HashMap<>();
+    // private final Map<String, String> xUniqueLetters = new HashMap<>();
 
     /*
      * Constructor
@@ -2451,10 +2451,10 @@ class OOBibBase {
      *
      * Note: bibtexKeys[i][j] may be null (from UndefinedBibtexEntry)
      */
-    void updateUniqueLetters(
+    Map<String, String>
+    createUniqueLetters(
         String[][] bibtexKeys,
-        String[][] normCitMarkers,
-        final Map<String, String> uniqueLetters
+        String[][] normCitMarkers
         ) {
 
         final int nRefMarks = bibtexKeys.length;
@@ -2488,7 +2488,8 @@ class OOBibBase {
             }
         }
 
-        uniqueLetters.clear();
+        // uniqueLetters.clear();
+        Map<String, String> uniqueLetters = new HashMap<>();
 
         // Go through the collected lists and see where we need to
         // add unique letters to the year.
@@ -2507,6 +2508,7 @@ class OOBibBase {
                 }
             }
         }
+        return uniqueLetters;
     }
 
     /**
@@ -2853,18 +2855,27 @@ class OOBibBase {
      * @param uniqueLetters      Filled with new values here.
      * @param style              Bibliography style.
      */
-    String[]
+    class CitationMarkersWithUniqueLetters {
+        String[] citMarkers;
+        Map<String, String> uniqueLetters;
+        CitationMarkersWithUniqueLetters(
+            String[] citMarkers,
+            Map<String, String> uniqueLetters ) {
+            this.citMarkers = citMarkers;
+            this.uniqueLetters = uniqueLetters;
+        }
+    }
+
+    CitationMarkersWithUniqueLetters
     produceCitationMarkersForNormalStyle(
         List<String> referenceMarkNames,
         String[][] bibtexKeysIn,
         Map<String, BibEntry> citeKeyToBibEntry,
         int[] itcTypes,
         Map<BibEntry, BibDatabase> entries,
-        final Map<String, String> uniqueLetters,
         OOBibStyle style
         )
         throws BibEntryNotFoundException {
-        uniqueLetters.clear();
 
         assert !style.isCitationKeyCiteMarkers();
         assert !style.isNumberEntries();
@@ -2888,7 +2899,8 @@ class OOBibBase {
         String[][] normCitMarkers =
             normalizedCitationMarkersForNormalStyle(cEntriesForAll, entries, style);
 
-        updateUniqueLetters(bibtexKeys, normCitMarkers, uniqueLetters);
+        Map<String, String> uniqueLetters =
+            createUniqueLetters(bibtexKeys, normCitMarkers);
 
         // Finally, go through all citation markers, and update
         // those referring to entries in our current list:
@@ -2945,7 +2957,7 @@ class OOBibBase {
                     );
         }
 
-        return citMarkers;
+        return new CitationMarkersWithUniqueLetters( citMarkers, uniqueLetters );
     }
 
     /* ***********************************
@@ -3386,7 +3398,7 @@ class OOBibBase {
                 entries.stream()
                 .map(entry -> entry.getCitationKey().orElse(""))
                 .collect(Collectors.joining(","));
-            // Generate unique bookmark-name
+            // Generate unique mark-name
             int itcType = citationTypeFromOptions(withText, inParenthesis);
             String newName =
                 getUniqueReferenceMarkName(
@@ -3461,16 +3473,35 @@ class OOBibBase {
             if (sync) {
                 // To account for numbering and for uniqueLetters, we
                 // must refresh the cite markers:
-                List<String> jabRefReferenceMarkNamesSortedByPosition =
-                    getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
+                //List<String> jabRefReferenceMarkNamesSortedByPosition =
+                //    getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
+                ProduceCitationMarkersResult x =
+                    produceCitationMarkers(
+                        documentConnection,
+                        allBases,
+                        style
+                        );
 
                 try {
                     documentConnection.lockControllers();
 
-                    refreshCiteMarkers(allBases, style, jabRefReferenceMarkNamesSortedByPosition);
+                    //refreshCiteMarkers(allBases, style, jabRefReferenceMarkNamesSortedByPosition);
+                    applyNewCitationMarkers(
+                        documentConnection,
+                        x.jabRefReferenceMarkNamesSortedByPosition,
+                        x.citMarkers,
+                        x.itcTypes,
+                        style);
 
                     // Insert it at the current position:
-                    rebuildBibTextSection(allBases, style, jabRefReferenceMarkNamesSortedByPosition);
+                    rebuildBibTextSection(
+                        documentConnection,
+                        allBases,
+                        style,
+                        x.jabRefReferenceMarkNamesSortedByPosition,
+                        x.uniqueLetters,
+                        x.fce
+                        );
                 } finally {
                     documentConnection.unlockControllers();
                 }
@@ -3540,11 +3571,13 @@ class OOBibBase {
 
             List<String> jabRefReferenceMarkNamesSortedByPosition =
                 getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
-            res.unresolvedKeys =
-                this.refreshCiteMarkers(databases,
-                                        style,
-                                        jabRefReferenceMarkNamesSortedByPosition);
-            res.newDatabase = this.generateDatabase(databases);
+                ProduceCitationMarkersResult x =
+                produceCitationMarkers(
+                    documentConnection,
+                    databases,
+                    style);
+                res.unresolvedKeys = x.unresolvedKeys;
+                res.newDatabase = this.generateDatabase(databases);
         } finally {
             documentConnection.leaveUndoContext();
         }
@@ -3556,15 +3589,18 @@ class OOBibBase {
      *
      * Called from exportCitedHelper
      *
+     * @param documentConnection Connection.
      * @param databases The databases to get entries from.
      * @param style     The bibliography style to use.
      * @return A list of those referenced citation keys that could not be resolved.
      */
-    private List<String>
+    /*
+    private ProduceCitationMarkersResult
     refreshCiteMarkers(
+        DocumentConnection documentConnection,
         List<BibDatabase> databases,
-        OOBibStyle style,
-        List<String> jabRefReferenceMarkNamesSortedByPosition)
+        OOBibStyle style
+        )
         throws
         WrappedTargetException,
         IllegalArgumentException,
@@ -3577,16 +3613,25 @@ class OOBibBase {
         BibEntryNotFoundException,
         NoDocumentException {
 
-        DocumentConnection documentConnection = getDocumentConnectionOrThrow();
 
         try {
-            return
-                refreshCiteMarkersInternal(
+            ProduceCitationMarkersResult x =
+                produceCitationMarkers(
                     documentConnection,
                     databases,
-                    style,
-                    this.xUniqueLetters,
-                    jabRefReferenceMarkNamesSortedByPosition);
+                    style
+                    );
+
+            // Refresh all reference marks with the citation markers
+            // we computed:
+            applyNewCitationMarkers(
+                documentConnection,
+                x.referenceMarkNames,
+                x.citMarkers,
+                x.itcTypes,
+                style);
+            return x;
+
         } catch (DisposedException ex) {
             // We need to catch this one here because the OpenOfficePanel class is
             // loaded before connection, and therefore cannot directly reference
@@ -3594,7 +3639,8 @@ class OOBibBase {
             throw new ConnectionLostException(ex.getMessage());
         }
     }
-
+    */
+    
     /**
      * Visit each reference mark in referenceMarkNames, overwrite its
      * text content.
@@ -3690,6 +3736,7 @@ class OOBibBase {
         }
     }
 
+
     /**
      * Refresh citation markers according to `style`.
      *
@@ -3700,13 +3747,41 @@ class OOBibBase {
      * @param style     Style.
      * @param uniqueLetters Will be cleared and potentially filled with new values.
      */
-    private List<String>
-    refreshCiteMarkersInternal(
+
+    class ProduceCitationMarkersResult {
+        List<String> jabRefReferenceMarkNamesSortedByPosition;
+        int[] itcTypes;
+        String[][] bibtexKeys;
+        String[] citMarkers;
+        Map<String, String> uniqueLetters;
+        FindCitedEntriesResult fce;
+        List<String> unresolvedKeys;
+        ProduceCitationMarkersResult(
+            List<String> jabRefReferenceMarkNamesSortedByPosition,
+            int[] itcTypes,
+            String[][] bibtexKeys,
+            String[] citMarkers,
+            Map<String, String> uniqueLetters,
+            FindCitedEntriesResult fce,
+            List<String> unresolvedKeys
+            ) {
+            this.jabRefReferenceMarkNamesSortedByPosition = jabRefReferenceMarkNamesSortedByPosition;
+            this.itcTypes = itcTypes;
+            this.bibtexKeys = bibtexKeys;
+            this.citMarkers = citMarkers;
+            this.uniqueLetters = uniqueLetters;
+            this.fce = fce;
+            this.unresolvedKeys = unresolvedKeys;
+        }
+    }
+
+    private ProduceCitationMarkersResult
+    produceCitationMarkers(
         DocumentConnection documentConnection,
         List<BibDatabase> databases,
-        OOBibStyle style,
-        final Map<String, String> uniqueLetters,
-        List<String> jabRefReferenceMarkNamesSortedByPosition
+        OOBibStyle style
+        // Map<String, String> uniqueLetters,
+        // List<String> jabRefReferenceMarkNamesSortedByPosition
         )
         throws
         WrappedTargetException,
@@ -3721,6 +3796,10 @@ class OOBibBase {
 
         // Normally we sort the reference marks according to their
         // order of appearance:
+
+        List<String> jabRefReferenceMarkNamesSortedByPosition =
+            getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
+
         List<String> referenceMarkNames = jabRefReferenceMarkNamesSortedByPosition;
 
         final int nRefMarks = referenceMarkNames.size();
@@ -3740,6 +3819,7 @@ class OOBibBase {
         String[] citMarkers;
 
         // fill citMarkers
+        Map<String, String> uniqueLetters = new HashMap<>();
         uniqueLetters.clear(); /* ModifiesParameter */
         if (style.isCitationKeyCiteMarkers()) {
             citMarkers =
@@ -3765,27 +3845,30 @@ class OOBibBase {
                         style);
             }
         } else /* Normal case, (!isCitationKeyCiteMarkers && !isNumberEntries) */ {
-            citMarkers =
+            CitationMarkersWithUniqueLetters x =
                 produceCitationMarkersForNormalStyle(
                     referenceMarkNames,
                     bibtexKeys,
                     fce.citeKeyToBibEntry,
                     itcTypes,
                     fce.entries,
-                    uniqueLetters,
                     style);
+                citMarkers = x.citMarkers;
+                uniqueLetters = x.uniqueLetters;
         }
 
-        // Refresh all reference marks with the citation markers we computed:
-        applyNewCitationMarkers(
-            documentConnection,
-            referenceMarkNames,
-            citMarkers,
+        return new ProduceCitationMarkersResult(
+            jabRefReferenceMarkNamesSortedByPosition,
             itcTypes,
-            style);
-
-        return unresolvedKeysFromEntries(fce.entries);
+            bibtexKeys,
+            citMarkers,
+            uniqueLetters,
+            fce,
+            unresolvedKeysFromEntries(fce.entries)
+            );
     }
+
+
 
     /* **************************************************
      *
@@ -3801,11 +3884,14 @@ class OOBibBase {
      *  Note: assumes fresh `jabRefReferenceMarkNamesSortedByPosition`
      *  if `style.isSortByPosition()`
      */
-    public void
+    private void
     rebuildBibTextSection(
+        DocumentConnection documentConnection,
         List<BibDatabase> databases,
         OOBibStyle style,
-        List<String> jabRefReferenceMarkNamesSortedByPosition
+        List<String> jabRefReferenceMarkNamesSortedByPosition,
+        final Map<String, String> uniqueLetters,
+        FindCitedEntriesResult fce
         )
         throws
         NoSuchElementException,
@@ -3817,13 +3903,15 @@ class OOBibBase {
         UndefinedParagraphFormatException,
         NoDocumentException {
 
-        DocumentConnection documentConnection = getDocumentConnectionOrThrow();
+        // DocumentConnection documentConnection = getDocumentConnectionOrThrow();
 
+        /*
         FindCitedEntriesResult fce =
             findCitedEntries(
                 findCitedKeys(documentConnection),
                 databases
                 );
+        */
 
         Map<BibEntry, BibDatabase> entries;
 
@@ -3845,7 +3933,7 @@ class OOBibBase {
             documentConnection,
             entries,
             style,
-            this.xUniqueLetters);
+            uniqueLetters);
     }
 
     /**
@@ -4340,13 +4428,25 @@ class OOBibBase {
         }
 
         if (madeModifications) {
-            List<String> jabRefReferenceMarkNamesSortedByPosition =
-                getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
+            // List<String> jabRefReferenceMarkNamesSortedByPosition =
+            //    getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
+            ProduceCitationMarkersResult x =
+                produceCitationMarkers(
+                    documentConnection,
+                    databases,
+                    style
+                    );
             try {
                 if (useLockControllers) {
                     documentConnection.lockControllers();
                 }
-                refreshCiteMarkers(databases, style, jabRefReferenceMarkNamesSortedByPosition);
+                // refreshCiteMarkers(databases, style, jabRefReferenceMarkNamesSortedByPosition);
+                applyNewCitationMarkers(
+                    documentConnection,
+                    x.jabRefReferenceMarkNamesSortedByPosition,
+                    x.citMarkers,
+                    x.itcTypes,
+                    style);
             } finally {
                 if (useLockControllers) {
                     documentConnection.unlockControllers();
@@ -4471,13 +4571,25 @@ class OOBibBase {
             }
         }
         if (madeModifications) {
-            List<String> jabRefReferenceMarkNamesSortedByPosition =
-                getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
+            // List<String> jabRefReferenceMarkNamesSortedByPosition =
+            //    getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
+            ProduceCitationMarkersResult x =
+                produceCitationMarkers(
+                    documentConnection,
+                    databases,
+                    style
+                    );
             try {
                 if (useLockControllers) {
                     documentConnection.lockControllers();
                 }
-                refreshCiteMarkers(databases, style, jabRefReferenceMarkNamesSortedByPosition);
+                // refreshCiteMarkers(databases, style, jabRefReferenceMarkNamesSortedByPosition);
+                applyNewCitationMarkers(
+                    documentConnection,
+                    x.jabRefReferenceMarkNamesSortedByPosition,
+                    x.citMarkers,
+                    x.itcTypes,
+                    style);
             } finally {
                 if (useLockControllers) {
                     documentConnection.unlockControllers();
@@ -4614,17 +4726,31 @@ class OOBibBase {
         cg.checkRangeOverlaps(this.xDocumentConnection, requireSeparation);
         final boolean useLockControllers = true;
         try {
-            List<String> jabRefReferenceMarkNamesSortedByPosition =
-                getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
+            ProduceCitationMarkersResult x =
+                produceCitationMarkers(
+                    documentConnection,
+                    databases,
+                    style
+                    );
+
             if (useLockControllers){
                 documentConnection.lockControllers();
             }
-            List<String> unresolvedKeys =
-                refreshCiteMarkers(databases,
-                                   style,
-                                   jabRefReferenceMarkNamesSortedByPosition);
-            rebuildBibTextSection(databases, style, jabRefReferenceMarkNamesSortedByPosition);
-            return unresolvedKeys;
+            applyNewCitationMarkers(
+                documentConnection,
+                x.jabRefReferenceMarkNamesSortedByPosition,
+                x.citMarkers,
+                x.itcTypes,
+                style);
+            rebuildBibTextSection(
+                documentConnection,
+                databases,
+                style,
+                x.jabRefReferenceMarkNamesSortedByPosition,
+                x.uniqueLetters,
+                x.fce
+                );
+            return x.unresolvedKeys;
         } finally {
             if (useLockControllers){
                 documentConnection.unlockControllers();
