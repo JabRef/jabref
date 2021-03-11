@@ -543,15 +543,16 @@ public class OpenOfficePanel {
                     if (style == null) {
                         style = loader.getUsedStyle();
                     }
-                    ooBase.insertEntry(entries,
-                                       database,
-                                       getBaseList(),
-                                       style,
-                                       inParenthesis,
-                                       withText,
-                                       pageInfo,
-                                       ooPrefs.getSyncWhenCiting()
-                                       );
+                    ooBase.insertCitation(
+                        entries,
+                        database,
+                        getBaseList(),
+                        style,
+                        inParenthesis,
+                        withText,
+                        pageInfo,
+                        ooPrefs.getSyncWhenCiting()
+                        );
                 } catch (FileNotFoundException ex) {
 
                     dialogService.showErrorDialogAndWait(

@@ -3265,7 +3265,7 @@ class OOBibBase {
      *
      */
     public void
-    insertEntry(
+    insertCitation(
         List<BibEntry> entries,
         BibDatabase database,
         List<BibDatabase> allBases,
