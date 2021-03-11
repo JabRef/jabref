@@ -4046,12 +4046,6 @@ class OOBibBase {
             if (useLockControllers) {
                 documentConnection.lockControllers();
             }
-            // XTextRangeCompare: compares the positions of two TextRanges within a Text.
-            // Only TextRange instances within the same Text can be compared.
-            //final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
-            //                                        documentConnection.xText);
-
-            // XNameAccess nameAccess = documentConnection.getReferenceMarks();
 
             /*
              * joinableGroups collects lists of indices of referenceMarkNames
@@ -4060,7 +4054,7 @@ class OOBibBase {
              * joinableGroupsCursors provides the range for each group
              */
             List<List<Integer>> joinableGroups = new ArrayList<>();
-            List<XTextCursor>   joinableGroupsCursors = new ArrayList<>();
+            List<XTextCursor> joinableGroupsCursors = new ArrayList<>();
 
             // current group
             List<Integer> currentGroup = new ArrayList<>();
@@ -4135,13 +4129,6 @@ class OOBibBase {
                  */
                 // can it start a new group?
                 boolean canStartGroup = ( itcTypes[i] == OOBibBase.AUTHORYEAR_PAR );
-
-                if (debugCombineCiteMarkers){
-                    System.out.println(String.format(
-                                          "key '%s' addToGroup %s canStartGroup %s",
-                                          name, addToGroup, canStartGroup
-                                          ));
-                }
 
                 if (!addToGroup){
                     // close currentGroup
@@ -4248,7 +4235,7 @@ class OOBibBase {
                         documentConnection,
                         keyString,
                         OOBibBase.AUTHORYEAR_PAR);
-                // xxx
+
                 insertReferenceMark(
                     documentConnection,
                     newName,
@@ -4261,139 +4248,6 @@ class OOBibBase {
             } // for gi
 
             madeModifications = (joinableGroups.size() > 0);
-
-
-//            int pivot = 0;
-//            while (pivot < (referenceMarkNames.size() - 1)) {
-//
-//                XTextRange range1_full =
-//                    documentConnection.getReferenceMarkRangeOrNull(referenceMarkNames.get(pivot));
-//                XTextRange range1 = range1_full.getEnd();
-//
-//                XTextRange range2_full =
-//                    documentConnection.getReferenceMarkRangeOrNull(referenceMarkNames.get(pivot + 1));
-//                XTextRange range2 = range2_full.getStart();
-//
-//                if ( !DocumentConnection.comparable(range1, range2)) {
-//                    /* pivot and (pivot+1) belong to different Text instances.
-//                     * Maybe to different footnotes?
-//                     * Cannot combine across boundaries, skip.
-//                     */
-//                    pivot++;
-//                    continue;
-//                }
-//
-//                // Start from end of text for pivot.
-//                XTextCursor textCursor =
-//                    range1.getText().createTextCursorByRange(range1);
-//
-//                // Select next character (if possible), and more, as long as we can and
-//                // do not reach start of (pivot+1), which we now know to be
-//                // in the same Text instance.
-//
-//                // If there is no space between the two reference marks,
-//                // the next line moves INTO the next. And probably will
-//                // cover a non-whitespace character, inhibiting the merge.
-//                // Empirically: does not merge. Probably a bug.
-//                //textCursor.goRight((short) 1, true);
-//                boolean couldExpand = true;
-//                while (couldExpand && (DocumentConnection.compareRegionEnds(textCursor, range2) > 0)) {
-//                    couldExpand = textCursor.goRight((short) 1, true);
-//                }
-//
-//                // Take what we selected
-//                String cursorText = textCursor.getString();
-//
-//                // Check if the string contains line breaks or any  non-whitespace.
-//                if ((cursorText.indexOf('\n') != -1) || !cursorText.trim().isEmpty()) {
-//                    pivot++;
-//                    continue;
-//                }
-//
-//                // If we are supposed to set character format for
-//                // citations, test this before making any changes. This
-//                // way we can throw an exception before any reference
-//                // marks are removed, preventing damage to the user's
-//                // document:
-//                // Q: we may have zero characters selected. Is this a valid test
-//                //    in this case?
-//                if (!setCharStyleTested) {
-//                    assertCitationCharacterFormatIsOK(textCursor, style);
-//                    setCharStyleTested = true;
-//                }
-//
-//            /*
-//             * This only gets the keys: itcType is discarded.
-//             *
-//             * AUTHORYEAR_PAR:   "(X and Y 2000)"
-//             * AUTHORYEAR_INTEXT: "X and Y (2000)"
-//             * INVISIBLE_CIT: ""
-//             *
-//             *  We probably only want to collect citations with
-//             *  AUTHORYEAR_PAR itcType.
-//             *
-//             *       No, "X and Y (2000,2001)" appears a meaningful
-//             *       case as well.
-//             *
-//             *       Proposed rules:
-//             *       (1) Do not combine citations with different itcType
-//             *       (2) INVISIBLE_CIT: leave it alone
-//             *       (3) AUTHORYEAR_PAR: combine, present as AUTHORYEAR_PAR
-//             *
-//             *       (4) AUTHORYEAR_INTEXT: Same list of authors with
-//             *           same or different years, possibly with
-//             *           uniqueLetters could be done.
-//             *           But with different list of authors?
-//             *           "(X, Y et al 2000) (X, Y et al 2001)"
-//             *           will depend on authors not shown here.
-//             *
-//             */
-//
-//            // Note: silently drops duplicate keys.
-//            //       What if they have different pageInfo fields?
-//
-//            //  combineCiteMarkers: merging for same citation keys,
-//            //       but different pageInfo looses information.
-//                List<String> keys =
-//                    parseRefMarkNameToUniqueCitationKeys(referenceMarkNames.get(pivot));
-//                keys.addAll(parseRefMarkNameToUniqueCitationKeys(referenceMarkNames.get(pivot + 1)));
-//
-//                // Should also remove the spaces between.
-//                textCursor.setString("");
-//                documentConnection.removeReferenceMark(referenceMarkNames.get(pivot));
-//                documentConnection.removeReferenceMark(referenceMarkNames.get(pivot + 1));
-//
-//                // Note: citation keys not found are silently left out from the
-//                //       combined reference mark name. Loosing information.
-//                List<BibEntry> entries = lookupEntriesInDatabasesSkipMissing(keys, databases);
-//                entries.sort(new FieldComparator(StandardField.YEAR));
-//
-//                String keyString =
-//                    entries.stream()
-//                    .map(c -> c.getCitationKey().orElse(""))
-//                    .collect(Collectors.joining(","));
-//
-//                // Insert reference mark:
-//                String newName =
-//                    getUniqueReferenceMarkName(
-//                        documentConnection,
-//                        keyString,
-//                        OOBibBase.AUTHORYEAR_PAR);
-//                // xxx
-//                insertReferenceMark(
-//                    documentConnection,
-//                    newName,
-//                    "tmp",
-//                    textCursor,
-//                    true, // withText
-//                    style,
-//                    true // insertSpaceAfter: TODO should be false if last to be merged
-//                    );
-//                referenceMarkNames.set(pivot + 1, newName); // <- put in the next-to-be-processed position
-//                madeModifications = true;
-//
-//                pivot++;
-//            } // while
 
         } finally {
             if (useLockControllers) {
