@@ -36,7 +36,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                             SuggestionProvider<?> suggestionProvider,
                             FieldCheckers fieldCheckers,
                             PreferencesService preferences) {
-        this.viewModel = new IdentifierEditorViewModel(field, suggestionProvider, taskExecutor, dialogService, fieldCheckers);
+        this.viewModel = new IdentifierEditorViewModel(field, suggestionProvider, taskExecutor, dialogService, fieldCheckers, preferences);
 
         ViewLoader.view(this)
                   .root(this)
@@ -50,6 +50,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                 new Tooltip(Localization.lang("Look up %0", field.getDisplayName())));
 
         if (field.equals(StandardField.DOI)) {
+
             textArea.initContextMenu(EditorMenus.getDOIMenu(textArea));
         } else {
             textArea.initContextMenu(new DefaultMenu(textArea));
