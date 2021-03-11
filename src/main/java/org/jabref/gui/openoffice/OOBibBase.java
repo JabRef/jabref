@@ -2040,6 +2040,16 @@ class OOBibBase {
         return new FindCitedEntriesResult(entries, citeKeyToBibEntry);
     }
 
+    static String
+    recoverCitationKeyFromPossiblyUndefinedBibEntry( BibEntry entry ) {
+        if (entry instanceof UndefinedBibtexEntry) {
+            return ((UndefinedBibtexEntry) entry).getKey();
+        } else {
+            Optional<String> optKey = entry.getCitationKey();
+            return optKey.get(); // may throw, but should not happen
+        }
+    }
+
     /**
      *  @return The list of citation keys from `instanceof
      *          UndefinedBibtexEntry` elements of (keys of) `entries`.
