@@ -106,7 +106,7 @@ class OOBibBase {
 
     private static final String zeroWidthSpace = "\u200b";
     // for debugging we may want visible bracket
-    private static final boolean referenceMarkUseInvisibleBrackets = !debug;
+    private static final boolean referenceMarkUseInvisibleBrackets = false; // !debug;
     // Note we are relying on referenceMarkLeftBracket and referenceMarkRightBracket
     // to be single-character strings that do not appear in reference mark content.
     private static final String referenceMarkLeftBracket =
