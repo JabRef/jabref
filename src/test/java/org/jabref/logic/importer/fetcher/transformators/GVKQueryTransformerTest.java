@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class GVKQueryTransformerTest implements InfixTransformerTest {
 
     @Override
-    public AbstractQueryTransformer getTransformator() {
+    public AbstractQueryTransformer getTransformer() {
         return new GVKQueryTransformer();
     }
 
@@ -40,7 +40,7 @@ class GVKQueryTransformerTest implements InfixTransformerTest {
 
         String queryString = "year:2018";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> query = getTransformator().transformLuceneQuery(luceneQuery);
+        Optional<String> query = getTransformer().transformLuceneQuery(luceneQuery);
 
         Optional<String> expected = Optional.of("ver:2018");
         assertEquals(expected, query);

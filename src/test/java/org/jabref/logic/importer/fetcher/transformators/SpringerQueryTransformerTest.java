@@ -15,7 +15,7 @@ class SpringerQueryTransformerTest implements InfixTransformerTest {
     }
 
     @Override
-    public AbstractQueryTransformer getTransformator() {
+    public AbstractQueryTransformer getTransformer() {
         return new SpringerQueryTransformer();
     }
 
@@ -38,7 +38,7 @@ class SpringerQueryTransformerTest implements InfixTransformerTest {
     public void convertYearField() throws Exception {
         String queryString = "year:2015";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformator().transformLuceneQuery(luceneQuery);
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
 
         Optional<String> expected = Optional.of("date:2015*");
         assertEquals(expected, searchQuery);
@@ -48,7 +48,7 @@ class SpringerQueryTransformerTest implements InfixTransformerTest {
     public void convertYearRangeField() throws Exception {
         String queryString = "year-range:2012-2015";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformator().transformLuceneQuery(luceneQuery);
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
 
         Optional<String> expected = Optional.of("date:2012* OR date:2013* OR date:2014* OR date:2015*");
         assertEquals(expected, searchQuery);

@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class IEEEQueryTransformerTest implements InfixTransformerTest {
 
     @Override
-    public AbstractQueryTransformer getTransformator() {
+    public AbstractQueryTransformer getTransformer() {
         return new IEEEQueryTransformer();
     }
 
@@ -34,7 +34,7 @@ class IEEEQueryTransformerTest implements InfixTransformerTest {
 
     @Override
     public void convertJournalField() throws Exception {
-        IEEEQueryTransformer transformer = ((IEEEQueryTransformer) getTransformator());
+        IEEEQueryTransformer transformer = ((IEEEQueryTransformer) getTransformer());
 
         String queryString = "journal:Nature";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
@@ -45,7 +45,7 @@ class IEEEQueryTransformerTest implements InfixTransformerTest {
 
     @Override
     public void convertYearField() throws Exception {
-        IEEEQueryTransformer transformer = ((IEEEQueryTransformer) getTransformator());
+        IEEEQueryTransformer transformer = ((IEEEQueryTransformer) getTransformer());
 
         String queryString = "year:2021";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
@@ -58,7 +58,7 @@ class IEEEQueryTransformerTest implements InfixTransformerTest {
     @Override
     public void convertYearRangeField() throws Exception {
 
-        IEEEQueryTransformer transformer = ((IEEEQueryTransformer) getTransformator());
+        IEEEQueryTransformer transformer = ((IEEEQueryTransformer) getTransformer());
 
         String queryString = "year-range:2018-2021";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);

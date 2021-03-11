@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class DBLPQueryTransformerTest implements InfixTransformerTest {
 
     @Override
-    public AbstractQueryTransformer getTransformator() {
+    public AbstractQueryTransformer getTransformer() {
         return new DBLPQueryTransformer();
     }
 
@@ -38,7 +38,7 @@ class DBLPQueryTransformerTest implements InfixTransformerTest {
     public void convertYearField() throws Exception {
         String queryString = "year:2015";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformator().transformLuceneQuery(luceneQuery);
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
         Optional<String> expected = Optional.of("2015");
         assertEquals(expected, searchQuery);
     }
@@ -47,7 +47,7 @@ class DBLPQueryTransformerTest implements InfixTransformerTest {
     public void convertYearRangeField() throws Exception {
         String queryString = "year-range:2012-2015";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformator().transformLuceneQuery(luceneQuery);
+        Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
         Optional<String> expected = Optional.of("2012|2013|2014|2015");
         assertEquals(expected, searchQuery);
     }

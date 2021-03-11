@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ArXivQueryTransformerTest implements InfixTransformerTest {
 
     @Override
-    public AbstractQueryTransformer getTransformator() {
+    public AbstractQueryTransformer getTransformer() {
         return new ArXivQueryTransformer();
     }
 
@@ -36,7 +36,7 @@ class ArXivQueryTransformerTest implements InfixTransformerTest {
 
     @Override
     public void convertYearField() throws Exception {
-        ArXivQueryTransformer transformer = ((ArXivQueryTransformer) getTransformator());
+        ArXivQueryTransformer transformer = ((ArXivQueryTransformer) getTransformer());
         String queryString = "2018";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         Optional<String> query = transformer.transformLuceneQuery(luceneQuery);
@@ -48,7 +48,7 @@ class ArXivQueryTransformerTest implements InfixTransformerTest {
 
     @Override
     public void convertYearRangeField() throws Exception {
-        ArXivQueryTransformer transformer = ((ArXivQueryTransformer) getTransformator());
+        ArXivQueryTransformer transformer = ((ArXivQueryTransformer) getTransformer());
 
         String queryString = "year-range:2018-2021";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);

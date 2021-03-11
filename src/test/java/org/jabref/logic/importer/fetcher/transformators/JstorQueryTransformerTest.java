@@ -3,7 +3,7 @@ package org.jabref.logic.importer.fetcher.transformators;
 class JstorQueryTransformerTest implements InfixTransformerTest {
 
     @Override
-    public AbstractQueryTransformer getTransformator() {
+    public AbstractQueryTransformer getTransformer() {
         return new JstorQueryTransformer();
     }
 
