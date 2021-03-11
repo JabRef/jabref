@@ -63,7 +63,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where Content selector does not seem to work for custom fields. [#6819](https://github.com/JabRef/jabref/issues/6819)
 - We fixed an issue where font size of the preferences dialog does not update with the rest of the GUI. [#7416](https://github.com/JabRef/jabref/issues/7416)
 
-
 ### Removed
 
 ## [5.2] – 2020-12-24
