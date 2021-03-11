@@ -105,11 +105,6 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
             restartWarnings.add(Localization.lang("Override font settings"));
         }
 
-        int newFontSize = Integer.parseInt(fontSizeProperty.getValue());
-        if (initialAppearancePreferences.getMainFontSize() != newFontSize) {
-            restartWarnings.add(Localization.lang("Override font size"));
-        }
-
         Theme newTheme = Theme.light(); // default;
         if (themeDarkProperty.getValue()) {
             newTheme = Theme.dark();
@@ -119,7 +114,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
         AppearancePreferences newAppearancePreferences = new AppearancePreferences(
                 fontOverrideProperty.getValue(),
-                newFontSize,
+                Integer.parseInt(fontSizeProperty.getValue()),
                 newTheme);
 
         preferences.storeAppearancePreference(newAppearancePreferences);
