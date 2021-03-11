@@ -55,6 +55,8 @@ import com.sun.star.container.XEnumerationAccess;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.container.XNamed;
 import com.sun.star.document.XDocumentPropertiesSupplier;
+import com.sun.star.document.XUndoManagerSupplier;
+import com.sun.star.document.XUndoManager;
 import com.sun.star.frame.XComponentLoader;
 import com.sun.star.frame.XController;
 import com.sun.star.frame.XDesktop;
@@ -84,6 +86,7 @@ import com.sun.star.uno.Any;
 import com.sun.star.uno.Type;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
+import com.sun.star.util.InvalidStateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,6 +162,8 @@ class OOBibBase {
             this.mxDocFactory = unoQI(XMultiServiceFactory.class, mxDoc);
             // unoQI(XDocumentIndexesSupplier.class, component);
 
+            
+
             // get a reference to the body text of the document
             this.xText = mxDoc.getText();
 
@@ -172,6 +177,26 @@ class OOBibBase {
                 supp.getDocumentProperties().getUserDefinedProperties();
 
             this.propertySet = unoQI(XPropertySet.class, userProperties);
+        }
+
+        /**
+         * Each call to enterUndoContext must be paired by a call to
+         * leaveUndoContext, otherwise, the document's undo stack is
+         * left in an inconsistent state.
+         */
+        void enterUndoContext(String title) {
+            XUndoManagerSupplier mxUndoManagerSupplier = unoQI(XUndoManagerSupplier.class, mxDoc);
+            XUndoManager um = mxUndoManagerSupplier.getUndoManager();
+            // https://www.openoffice.org/api/docs/common/ref/com/sun/star/document/XUndoManager.html
+            um.enterUndoContext( title );
+        }
+
+        void leaveUndoContext()
+            throws InvalidStateException {
+            XUndoManagerSupplier mxUndoManagerSupplier = unoQI(XUndoManagerSupplier.class, mxDoc);
+            XUndoManager um = mxUndoManagerSupplier.getUndoManager();
+            // https://www.openoffice.org/api/docs/common/ref/com/sun/star/document/XUndoManager.html
+            um.leaveUndoContext();
         }
 
         /*
