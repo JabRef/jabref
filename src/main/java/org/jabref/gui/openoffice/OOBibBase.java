@@ -3528,6 +3528,37 @@ class OOBibBase {
      *
      * **************************************************/
 
+    class ExportCitedHelperResult {
+        /**
+         * null: not done; isempty: no unresolved
+         */
+        List<String> unresolvedKeys;
+        BibDatabase newDatabase;
+    }
+
+    public ExportCitedHelperResult exportCitedHelper(
+        List<BibDatabase> databases,
+        OOBibStyle style
+        )
+        throws
+        WrappedTargetException,
+        NoSuchElementException,
+        NoDocumentException,
+        UndefinedCharacterFormatException,
+        UnknownPropertyException,
+        PropertyVetoException,
+        IOException,
+        CreationException,
+        BibEntryNotFoundException {
+        ExportCitedHelperResult res = new ExportCitedHelperResult();
+
+        this.updateSortedReferenceMarks(); // NoDocumentException
+        res.unresolvedKeys = this.refreshCiteMarkers(databases, style);
+        res.newDatabase = this.generateDatabase(databases);
+
+        return res;
+    }
+
     /**
      * Refresh all citation markers in the document.
      *

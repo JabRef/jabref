@@ -346,28 +346,41 @@ public class OpenOfficePanel {
                 return;
             }
 
-            ooBase.updateSortedReferenceMarks(); // NoDocumentException
-            List<String> unresolvedKeys = ooBase.refreshCiteMarkers(databases, style);
-            BibDatabase newDatabase = ooBase.generateDatabase(databases);
-            if (!unresolvedKeys.isEmpty()) {
+            OOBibBase.ExportCitedHelperResult r = ooBase.exportCitedHelper( databases, style );
+            if ( r.unresolvedKeys == null ){
+                throw new RuntimeException("OpenOfficePanel.exportEntries: r.unresolvedKeys is null");
+            }
+            if ( r.newDatabase == null ){
+                throw new RuntimeException("OpenOfficePanel.exportEntries: r.newDatabase is null");
+            }
+            if (!r.unresolvedKeys.isEmpty()) {
 
                 dialogService.showErrorDialogAndWait(Localization.lang("Unable to generate new library"),
                                                      Localization.lang("Your OpenOffice/LibreOffice document references the citation key '%0', which could not be found in your current library.",
-                                                                       unresolvedKeys.get(0)));
+                                                                       r.unresolvedKeys.get(0)));
             }
 
-            BibDatabaseContext databaseContext = new BibDatabaseContext(newDatabase);
+            BibDatabaseContext databaseContext = new BibDatabaseContext(r.newDatabase);
             this.frame.addTab(databaseContext, true);
-        } catch (NoDocumentException ex) {
+            } catch (NoDocumentException ex) {
             showNoDocumentErrorMessage();
         } catch (BibEntryNotFoundException ex) {
             LOGGER.debug("BibEntry not found", ex);
-            dialogService.showErrorDialogAndWait(Localization.lang("Unable to synchronize bibliography"),
-                                                 Localization.lang("Your OpenOffice/LibreOffice document references the citation key '%0', which could not be found in your current library.",
-                                                                   ex.getCitationKey()));
-        } catch (com.sun.star.lang.IllegalArgumentException | UnknownPropertyException | PropertyVetoException |
-                 UndefinedCharacterFormatException | NoSuchElementException | WrappedTargetException | IOException |
-                 CreationException e) {
+            dialogService.showErrorDialogAndWait(
+                Localization.lang("Unable to synchronize bibliography"),
+                Localization.lang(
+                    "Your OpenOffice/LibreOffice document references the citation key '%0',"
+                    + " which could not be found in your current library.",
+                    ex.getCitationKey()));
+        } catch (com.sun.star.lang.IllegalArgumentException
+                 | UnknownPropertyException
+                 | PropertyVetoException
+                 | UndefinedCharacterFormatException
+                 | NoSuchElementException
+                 | WrappedTargetException
+                 | IOException
+                 | CreationException e
+            ) {
             LOGGER.warn("Problem generating new database.", e);
         }
     }
