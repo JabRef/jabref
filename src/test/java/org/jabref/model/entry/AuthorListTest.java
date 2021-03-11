@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -51,25 +50,11 @@ public class AuthorListTest {
                 .fixAuthorNatbib("John Smith and Black Brown, Peter"));
         assertEquals("von Neumann et al.", AuthorList
                 .fixAuthorNatbib("John von Neumann and John Smith and Black Brown, Peter"));
-
-        // Is not cached!
-        /*
-        assertSame(AuthorList
-                .fixAuthorNatbib("John von Neumann and John Smith and Black Brown, Peter"), AuthorList
-                .fixAuthorNatbib("John von Neumann and John Smith and Black Brown, Peter"));
-
-         */
     }
 
     @Test
     public void getAsNatbibLatexFreeEmptyAuthorStringForEmptyInput() {
         assertEquals("", EMPTY_AUTHOR.latexFree().getAsNatbib());
-    }
-
-    @Test
-    public void getAsNatbibLatexFreeCachesLatexFreeString() {
-        String cachedString = ONE_AUTHOR_WITH_LATEX.latexFree().getAsNatbib();
-        assertSame(cachedString, ONE_AUTHOR_WITH_LATEX.latexFree().getAsNatbib());
     }
 
     @Test
@@ -115,11 +100,19 @@ public class AuthorListTest {
     }
 
     @Test
-    public void testGetAuthorList() {
+    public void parseCachesOneAuthor() {
         // Test caching in authorCache.
-        AuthorList al = AuthorList.parse("John Smith");
-        assertEquals(al, AuthorList.parse("John Smith"));
-        assertNotEquals(al, AuthorList.parse("Smith"));
+        AuthorList authorList = AuthorList.parse("John Smith");
+        assertSame(authorList, AuthorList.parse("John Smith"));
+        assertNotSame(authorList, AuthorList.parse("Smith"));
+    }
+
+    @Test
+    public void parseCachesOneLatexFreeAuthor() {
+        // Test caching in authorCache.
+        AuthorList authorList = AuthorList.parse("John Smith").latexFree();
+        assertSame(authorList, AuthorList.parse("John Smith").latexFree());
+        assertNotSame(authorList, AuthorList.parse("Smith").latexFree());
     }
 
     @Test
@@ -192,13 +185,6 @@ public class AuthorListTest {
         assertEquals("", EMPTY_AUTHOR.latexFree().getAsFirstLastNames(true, false));
     }
 
-    @Disabled
-    @Test
-    public void getAsFirstLastNamesLatexFreeCachesLatexFreeStringAbbreviate() {
-        String cachedString = ONE_AUTHOR_WITH_LATEX.latexFree().getAsFirstLastNames(true, false);
-        assertSame(cachedString, ONE_AUTHOR_WITH_LATEX.latexFree().getAsFirstLastNames(true, false));
-    }
-
     @Test
     public void getAsFirstLastNamesLatexFreeUnicodeOneAuthorNameFromLatexAbbreviate() {
         assertEquals("M. al-Khwārizmī",
@@ -255,13 +241,6 @@ public class AuthorListTest {
     @Test
     public void getAsFirstLastNamesLatexFreeEmptyAuthorStringForEmptyInput() {
         assertEquals("", EMPTY_AUTHOR.latexFree().getAsFirstLastNames(false, false));
-    }
-
-    @Disabled
-    @Test
-    public void getAsFirstLastNamesLatexFreeCachesLatexFreeString() {
-        String cachedString = ONE_AUTHOR_WITH_LATEX.latexFree().getAsFirstLastNames(false, false);
-        assertSame(cachedString, ONE_AUTHOR_WITH_LATEX.latexFree().getAsFirstLastNames(false, false));
     }
 
     @Test
@@ -397,13 +376,6 @@ public class AuthorListTest {
         assertEquals("", EMPTY_AUTHOR.latexFree().getAsLastFirstNames(true, false));
     }
 
-    @Disabled
-    @Test
-    public void getAsLastFirstNamesLatexFreeCachesLatexFreeStringAbbr() {
-        String cachedString = ONE_AUTHOR_WITH_LATEX.latexFree().getAsLastFirstNames(true, false);
-        assertSame(cachedString, ONE_AUTHOR_WITH_LATEX.latexFree().getAsLastFirstNames(true, false));
-    }
-
     @Test
     public void getAsLastFirstNamesLatexFreeUnicodeOneAuthorNameFromLatexAbbr() {
         assertEquals("al-Khwārizmī, M.",
@@ -449,13 +421,6 @@ public class AuthorListTest {
     @Test
     public void getAsLastFirstNamesLatexFreeEmptyAuthorStringForEmptyInput() {
         assertEquals("", EMPTY_AUTHOR.latexFree().getAsLastFirstNames(false, false));
-    }
-
-    @Disabled
-    @Test
-    public void getAsLastFirstNamesLatexFreeCachesLatexFreeString() {
-        String cachedString = ONE_AUTHOR_WITH_LATEX.latexFree().getAsLastFirstNames(false, false);
-        assertSame(cachedString, ONE_AUTHOR_WITH_LATEX.latexFree().getAsLastFirstNames(false, false));
     }
 
     @Test
@@ -505,13 +470,6 @@ public class AuthorListTest {
         assertEquals("", EMPTY_AUTHOR.latexFree().getAsLastFirstNames(true, true));
     }
 
-    @Disabled
-    @Test
-    public void getAsLastFirstNamesLatexFreeCachesLatexFreeStringAbbrOxfordComma() {
-        String cachedString = ONE_AUTHOR_WITH_LATEX.latexFree().getAsLastFirstNames(true, true);
-        assertSame(cachedString, ONE_AUTHOR_WITH_LATEX.latexFree().getAsLastFirstNames(true, true));
-    }
-
     @Test
     public void getAsLastFirstNamesLatexFreeUnicodeOneAuthorNameFromLatexAbbrOxfordComma() {
         assertEquals("al-Khwārizmī, M.",
@@ -557,13 +515,6 @@ public class AuthorListTest {
     @Test
     public void getAsLastFirstNamesLatexFreeEmptyAuthorStringForEmptyInputOxfordComma() {
         assertEquals("", EMPTY_AUTHOR.latexFree().getAsLastFirstNames(false, true));
-    }
-
-    @Disabled
-    @Test
-    public void getAsLastFirstNamesLatexFreeCachesLatexFreeStringOxfordComma() {
-        String cachedString = ONE_AUTHOR_WITH_LATEX.latexFree().getAsLastFirstNames(false, true);
-        assertSame(cachedString, ONE_AUTHOR_WITH_LATEX.latexFree().getAsLastFirstNames(false, true));
     }
 
     @Test
@@ -690,12 +641,6 @@ public class AuthorListTest {
         assertEquals("von Neumann, Smith, and Black Brown", AuthorList
                 .fixAuthorLastNameOnlyCommas(
                         "John von Neumann and John Smith and Black Brown, Peter", true));
-    }
-
-    @Test
-    public void getAsLastNamesLatexFreeCachesLatexFreeString() {
-        String cachedString = ONE_AUTHOR_WITH_LATEX.latexFree().getAsLastNames(false);
-        assertSame(cachedString, ONE_AUTHOR_WITH_LATEX.latexFree().getAsLastNames(false));
     }
 
     @Test
@@ -977,15 +922,6 @@ public class AuthorListTest {
                 "John von Neumann and John Smith and Black Brown, Peter").getAsLastFirstNamesWithAnd(true));
         assertEquals("von Last, Jr, F.", AuthorList.parse("von Last, Jr ,First")
                                                    .getAsLastFirstNamesWithAnd(true));
-    }
-
-    @Test
-    public void testGetAuthorsLastFirstAndsCaching() {
-        // getAsLastFirstNamesWithAnd caches its results, therefore we call the method twice using the same arguments
-        assertEquals("Smith, John", AuthorList.parse("John Smith").getAsLastFirstNamesWithAnd(false));
-        assertEquals("Smith, John", AuthorList.parse("John Smith").getAsLastFirstNamesWithAnd(false));
-        assertEquals("Smith, J.", AuthorList.parse("John Smith").getAsLastFirstNamesWithAnd(true));
-        assertEquals("Smith, J.", AuthorList.parse("John Smith").getAsLastFirstNamesWithAnd(true));
     }
 
     @Test
