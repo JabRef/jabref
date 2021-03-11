@@ -1887,7 +1887,11 @@ class OOBibBase {
      * Apply editable parts of citationEntries to the document: store
      * pageInfo.
      *
-     * Does not chaneg presentation.
+     * Does not change presentation.
+     *
+     * Note: we use no undo context here, beacuse only
+     *       documentConnection.setCustomProperty() is called,
+     *       and Undo in LO will not undo that.
      *
      * GUI: "Manage citations" dialog "OK" button.
      * Called from: ManageCitationsDialogViewModel.storeSettings
