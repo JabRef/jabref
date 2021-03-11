@@ -206,10 +206,9 @@ public class OpenOfficePanel {
                         .showErrorDialogAndWait(
                             Localization.lang("Unable to synchronize bibliography"),
                             Localization.lang("Your OpenOffice/LibreOffice document references"
-                                              + " the citation key '%0',"
-                                              + " which could not be found in your current library.",
-                             unresolvedKeys.get(0))
-                                                );
+                                              + " citation keys which could not be found"
+                                              + " in your current library: %0",
+                                              String.join(" ", unresolvedKeys)));
                 }
             } catch (JabRefException ex) {
                 dialogService.showErrorDialogAndWait(
