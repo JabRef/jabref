@@ -175,6 +175,8 @@ dependencies {
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     annotationProcessor group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
 
+    // SNAPSHOT is required because of plain-java support
+    // See https://github.com/michel-kraemer/citeproc-java/issues/92 for details
     implementation 'de.undercouch:citeproc-java:3.0.0-SNAPSHOT'
 
     implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '1.2.1'
