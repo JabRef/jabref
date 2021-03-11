@@ -1656,6 +1656,8 @@ class OOBibBase {
             WrappedTargetException,
             JabRefException {
 
+            final boolean debugPartitions = false;
+
             List<RangeForOverlapCheck> xs = citationRanges(documentConnection);
             xs.addAll(footnoteMarkRanges(documentConnection));
 
@@ -1669,7 +1671,8 @@ class OOBibBase {
             for (List<RangeForOverlapCheck> partition : xxs.values()) {
                 List<RangeForOverlapCheck> oxs =
                     sortPartitionByRegionStart(partition);
-                if ( debug ){
+
+                if ( debugPartitions ){
                     System.out.println("partition");
                     for (RangeForOverlapCheck r : oxs) {
                         System.out.println("  " + r.format());
