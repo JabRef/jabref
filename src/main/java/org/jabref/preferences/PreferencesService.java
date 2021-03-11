@@ -36,6 +36,7 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
@@ -143,6 +144,10 @@ public interface PreferencesService {
     TelemetryPreferences getTelemetryPreferences();
 
     void storeTelemetryPreferences(TelemetryPreferences preferences);
+
+    DOIPreferences getDOIPreferences();
+
+    void storeDOIPreferences(DOIPreferences preferences);
 
     OwnerPreferences getOwnerPreferences();
 

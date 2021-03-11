@@ -2,6 +2,7 @@ package org.jabref.gui.contentselector;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -153,8 +154,8 @@ class ContentSelectorDialogViewModel extends AbstractViewModel {
 
         List<String> existingKeywords = fieldKeywordsMap.getOrDefault(field, new ArrayList<>());
         existingKeywords.add(keywordToAdd);
+        existingKeywords.sort(Comparator.naturalOrder());
         fieldKeywordsMap.put(field, existingKeywords);
-        keywords.add(keywordToAdd);
         populateKeywords(field);
     }
 
