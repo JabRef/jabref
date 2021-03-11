@@ -277,6 +277,7 @@ public class OpenOfficePanel {
                 reportUndefinedCharacterFormat(ex);
             } catch (com.sun.star.lang.IllegalArgumentException | UnknownPropertyException | PropertyVetoException |
                      CreationException | NoSuchElementException | WrappedTargetException | IOException |
+                     InvalidStateException |
                      BibEntryNotFoundException ex) {
                 LOGGER.warn("Problem uncombining cite markers", ex);
             }

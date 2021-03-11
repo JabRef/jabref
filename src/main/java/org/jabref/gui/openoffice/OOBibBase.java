@@ -4338,7 +4338,8 @@ class OOBibBase {
         CreationException,
         BibEntryNotFoundException,
         NoDocumentException,
-        JabRefException {
+        JabRefException,
+        InvalidStateException {
 
         styleIsRequired(style);
         Objects.requireNonNull(databases);
@@ -4346,6 +4347,8 @@ class OOBibBase {
 
         final boolean useLockControllers = true;
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
+        try {
+            documentConnection.enterUndoContext("Separate citations");
         boolean madeModifications = false;
         List<String> names =
             getJabRefReferenceMarkNamesSortedByPosition(documentConnection);
@@ -4437,6 +4440,9 @@ class OOBibBase {
                     documentConnection.unlockControllers();
                 }
             }
+        }
+        } finally {
+            documentConnection.leaveUndoContext();
         }
     }
 
