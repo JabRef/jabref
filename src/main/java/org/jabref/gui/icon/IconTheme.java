@@ -230,7 +230,7 @@ public class IconTheme {
         RENAME(MaterialDesignR.RENAME_BOX),
         DELETE_FILE(MaterialDesignD.DELETE_FOREVER),
         REMOVE_LINK(MaterialDesignL.LINK_OFF),
-        AUTO_LINKED_FILE(MaterialDesignB.BRIEFCASE_CHECK),
+        AUTO_LINKED_FILE(MaterialDesignL.LINK_PLUS),
         QUALITY_ASSURED(MaterialDesignC.CERTIFICATE),
         QUALITY(MaterialDesignC.CERTIFICATE),
         OPEN(MaterialDesignF.FOLDER_OUTLINE),
