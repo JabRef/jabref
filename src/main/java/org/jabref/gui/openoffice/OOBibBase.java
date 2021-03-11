@@ -764,6 +764,40 @@ class OOBibBase {
             xcp.setPropertyValue("CharLocale", new Locale("zxx", "", ""));
         }
 
+        private static boolean
+        comparable(
+            XTextRange a,
+            XTextRange b
+            ) {
+            return a.getText() == b.getText();
+        }
+
+        /**
+         * @return 1 if  (a &lt; b), 0 if same start, (-1) if (b &lt; a)
+         */
+        private static int
+        compareRegionStarts( XTextRange a, XTextRange b ) {
+            if ( !comparable( a, b ) ){
+                throw new RuntimeException( "compareRegionStarts: got incomparable regions" );
+            }
+            final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
+                                                    a.getText());
+            return compare.compareRegionStarts(a, b);
+        }
+
+        /**
+         * @return 1 if  (a &lt; b), 0 if same start, (-1) if (b &lt; a)
+         */
+        private static int
+        compareRegionEnds( XTextRange a, XTextRange b ) {
+            if ( !comparable( a, b ) ){
+                throw new RuntimeException( "compareRegionEnds: got incomparable regions" );
+            }
+            final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
+                                                    a.getText());
+            return compare.compareRegionEnds(a, b);
+        }
+
     } // end DocumentConnection
 
     /**
