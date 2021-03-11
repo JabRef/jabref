@@ -795,6 +795,11 @@ hand, for consistent behaviour it is probably better to use the same
 code.
 
 
+** Bug: "Cite special" cites on Cancel
+
+   - should show default citation type
+   - "[Cancel]" should not cite
+
 ** DONE Bug: when "[Settings]/[Automatically sync...]" is off, the placeholders may be confusing
 
 - In numbered style the placeholder is "-". This is inserted in OOBibBase.insertEntry.
