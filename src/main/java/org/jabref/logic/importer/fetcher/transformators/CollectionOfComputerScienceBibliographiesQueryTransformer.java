@@ -4,7 +4,7 @@ public class CollectionOfComputerScienceBibliographiesQueryTransformer extends A
 
     @Override
     protected String getLogicalAndOperator() {
-        return " AND ";
+        return " ";
     }
 
     @Override
@@ -39,6 +39,10 @@ public class CollectionOfComputerScienceBibliographiesQueryTransformer extends A
 
     @Override
     protected String handleUnFieldedTerm(String term) {
-        return String.format("\"%s\"", term);
+        if (term.contains(" ")) {
+            return String.format("\"%s\"", term);
+        } else {
+            return term;
+        }
     }
 }
