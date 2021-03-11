@@ -288,6 +288,9 @@ public class AuthorList {
         return authors;
     }
 
+    /**
+     * Returns a LaTeX-free version of this `AuthorList`.
+     */
     public AuthorList latexFree() {
         if (latexFreeAuthors == null) {
             latexFreeAuthors = new AuthorList(authors.stream()
@@ -388,6 +391,11 @@ public class AuthorList {
                            .collect(Collectors.joining(" and "));
     }
 
+    /**
+     * Returns a list of authors separated with "and". The first author is formatted with {@link Author#getLastFirst(boolean)} and each subsequent author is formatted with {@link Author#getFirstLast(boolean)}.
+     *
+     * @param abbreviate first names.
+     */
     public String getAsLastFirstFirstLastNamesWithAnd(boolean abbreviate) {
         return switch (authors.size()) {
             case 0 -> "";

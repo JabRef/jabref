@@ -357,6 +357,9 @@ public class Author {
         return res.toString();
     }
 
+    /**
+     * Returns a LaTeX-free version of this `Author`.
+     */
     public Author latexFree() {
             String first = getFirst().map(LatexToUnicodeAdapter::format).orElse(null);
             String firstabbr = getFirstAbbr().map(LatexToUnicodeAdapter::format).orElse(null);
