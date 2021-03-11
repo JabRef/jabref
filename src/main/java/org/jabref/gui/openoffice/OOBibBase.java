@@ -4033,18 +4033,21 @@ class OOBibBase {
         CreationException,
         BibEntryNotFoundException,
         NoDocumentException,
-        JabRefException {
+        JabRefException,
+        InvalidStateException {
 
         styleIsRequired(style);
 
         Objects.requireNonNull(databases);
         Objects.requireNonNull(style);
 
-
         final boolean debugCombineCiteMarkers = true;
 
         final boolean useLockControllers = true;
         DocumentConnection documentConnection = this.getDocumentConnectionOrThrow();
+        try {
+            documentConnection.enterUndoContext("Merge citations");
+
         boolean madeModifications = false;
 
         // The testing for whitespace-only between (pivot) and (pivot+1) assumes that
@@ -4307,6 +4310,9 @@ class OOBibBase {
                     documentConnection.unlockControllers();
                 }
             }
+        }
+        } finally {
+            documentConnection.leaveUndoContext();
         }
     }
 

@@ -63,6 +63,7 @@ import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
+import com.sun.star.util.InvalidStateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -254,6 +255,7 @@ public class OpenOfficePanel {
                 showNoDocumentErrorMessage();
             } catch (com.sun.star.lang.IllegalArgumentException | UnknownPropertyException | PropertyVetoException |
                      CreationException | NoSuchElementException | WrappedTargetException | IOException |
+                     InvalidStateException |
                      BibEntryNotFoundException ex) {
                 LOGGER.warn("Problem combining cite markers", ex);
             }
