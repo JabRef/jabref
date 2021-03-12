@@ -110,7 +110,7 @@ public enum Month {
      * @return the corresponding month instance, empty if input is not in German
      *         form
      */
-    private static Optional<Month> parseGermanShortMonth(String value) {
+    public static Optional<Month> parseGermanShortMonth(String value) {
         value = value.toLowerCase();
         switch (value) {
             case "jan":
