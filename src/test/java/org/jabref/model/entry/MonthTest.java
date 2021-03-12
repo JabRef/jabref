@@ -248,7 +248,6 @@ public class MonthTest {
         assertEquals("oct", Month.OCTOBER.getShortName());
         assertEquals("nov", Month.NOVEMBER.getShortName());
         assertEquals("dec", Month.DECEMBER.getShortName());
-
     }
 
     @Test
