@@ -4268,15 +4268,15 @@ class OOBibBase {
                             ||  !thisChar.trim().isEmpty() ) {
                             couldExpand = false;
                         }
+                        if (DocumentConnection.compareRegionEnds(cursorBetween, currentGroupCursor) != 0) {
+                            throw new RuntimeException(
+                                "combineCiteMarkers: "
+                                + "cursorBetween.end != currentGroupCursor.end (during expand)" );
+                        }
                     }
 
                     if (!couldExpand) {
                         addToGroup = false;
-                    }
-                    if (DocumentConnection.compareRegionEnds(cursorBetween, currentGroupCursor) != 0) {
-                        throw new RuntimeException(
-                            "combineCiteMarkers: "
-                            + "cursorBetween.end != currentGroupCursor.end (after expand)" );
                     }
                 }
 
@@ -4303,18 +4303,50 @@ class OOBibBase {
                 if ( addToGroup || canStartGroup ) {
                     // Add the current entry to a group.
                     currentGroup.add(i);
+                    // ... and start new cursorBetween
                     // Set up cursorBetween
                     XTextRange range1Full =
                         documentConnection.getReferenceMarkRangeOrNull(name);
+                    //
                     XTextRange range1End = range1Full.getEnd();
                     cursorBetween = range1Full.getText().createTextCursorByRange(range1Full.getEnd());
-                    // currentGroupCursor
+                    // If new group, create currentGroupCursor
                     if ( currentGroupCursor == null ) {
                         currentGroupCursor =
                             range1Full.getText().createTextCursorByRange(range1Full.getStart());
                     }
                     // include self in currentGroupCursor
                     currentGroupCursor.goRight( (short)( range1Full.getString().length() ), true );
+
+                    if (DocumentConnection.compareRegionEnds(cursorBetween, currentGroupCursor) != 0) {
+                        /*
+                         * A problem discovered using this check: when
+                         * viewing the document in
+                         * two-pages-side-by-side mode, our visual
+                         * firstAppearanceOrder follows the visual
+                         * ordering on the screen. The problem this
+                         * caused: it sees a citation on the 2nd line
+                         * of the 1st page as appearing after one at
+                         * the 1st line of 2nd page. Since we create
+                         * cursorBetween at the end of range1Full (on
+                         * 1st page), it is now BEFORE
+                         * currentGroupCursor (on 2nd page).
+                         */
+                        throw new RuntimeException(
+                            String.format(
+                                "combineCiteMarkers: "
+                                + "cursorBetween.end != currentGroupCursor.end"
+                                + " (after addToGroup || canStartGroup)"
+                                + "%d\n"
+                                + "a: %s\n"
+                                + "b: %s\n"
+                                + "c: %s\n"
+                                , DocumentConnection.compareRegionEnds(cursorBetween, currentGroupCursor)
+                                , cursorBetween.getString()
+                                , range1Full.getString()
+                                , currentGroupCursor.getString()
+                                ));
+                    }
                     prev = i;
                 }
             }

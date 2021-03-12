@@ -1,21 +1,36 @@
 * Notes for OOBibBase.java
 
-
-** Feature: Undo in LO
-
-   Wrap modifications during a GUI action into
-   Undo blocks. If possible.
-
-   [[https://www.openoffice.org/api/docs/common/ref/com/sun/star/document/XUndoManager.html][OO-API:XUndoManager]]
-   [[https://www.openoffice.org/api/docs/common/ref/com/sun/star/document/XUndoManagerSupplier.html#getUndoManager][OO-API:XUndoManagerSupplier]]
-
-
-
 ** combineCiteMarkers
    - reimplemented to collect data first, then apply
-   - problem: altough we keep the Unresolved entries here,
+*** TODO problem: altough we keep the Unresolved entries here,
      refreshCiteMarkers() destroys them
- 
+
+*** problem: using visual order of appearance trips our solution
+
+    using visual order of appearance trips our solution with
+    two-column layout and also when viewing two pages side-by-side:
+    When it believes the order is "A,B", textually B may be before A,
+    or may appear in the same text (as in getText()) a page later.
+
+    Possible solutions:
+    - (1) Hack visualOrder: make a copy of the document, turn off
+      two-column and two-pages-side-by-side.
+      - But: changing layout to single column may change
+        ordering relation to frames.
+
+    - (2) For the purpose of combineCiteMarkers:
+      - we can only group markers in the same getText part
+      - within a getText part, textual order is perfect for us.
+
+        Procedure:
+        - getJabRefReferenceMarkNams
+        - partition by getText
+        - sort within partitions.
+        - unlike citation numbering, here
+          we do not need to decide where should
+          footnotes to be "inserted" in the main text:
+          we can just handle the partitions separately.
+
 ** createReferenceMarkForCitationGroup corner cases
 
    - [ ] just-after a citation marker:
@@ -66,9 +81,9 @@
    - Separate works, but modifies from in-text to in-paren: "(Au 2000) (Bu 2001)"
    - combineCiteMarkers currently refuses to Merge
 
-
-
 ** unCombineCiteMarkers: formatting space inserted between citations
+
+   Note: insertEntry inserts merged, so this question is not applicable there.
 
    [[file:OOBibBase.java::/space between citation markers: what style/]]
 
@@ -76,7 +91,7 @@
      these spaces.
 
    [[file:OOBibBase.java::/insertReferenceMark(/]]
-   
+
    - c.f. behaviour of insertEntry with multiple entries
      - A: Not applicable to spaces between: it inserts merged citations.
      - The space inserted after:
@@ -185,13 +200,6 @@ The 1st citation is updated, but not the 2nd
 
    Testing fresh, empty database for content.
 
-** Space inserted between citation markers: what style?
-
-   - unCombineCiteMarkers
-     [[file:OOBibBase.java::/space between citation markers: what style?/]]
-
-   - insertEntry
-
 ** combineCiteMarkers in footnotes
 
 Earlier note: "combineCiteMarkers does not work with citations in footnotes"
@@ -273,19 +281,6 @@ populateBibTextSection should only fill the gaps.
      insertReferenceMark)
 
    - also: applyNewCitationMarkers should not mess with the bibliography.
-
-** Refactor: pass around jabRefReferenceMarkNamesSortedByPosition
-
-   - Currently it is hard to follow if it is up-to-date or not.
-
-   - file:OOBibBase.java::/updateSortedReferenceMarks/
-   - file:OOBibBase.java::/getJabRefReferenceMarkNamesSortedByPosition/
-   - file:OOBibBase.java::/jabRefReferenceMarkNamesSortedByPosition/
-
-   - in refreshCiteMarkersInternal we take
-     - referenceMarkNames = jabRefReferenceMarkNamesSortedByPosition;
-     - then call findCitedKeys, implicitly listing the same
-       reference marks.
 
 ** Refactor: pageInfo dataflow
 
@@ -528,7 +523,14 @@ In LO,
 ** Bug: two-column numbering                              :orderOfAppearance:
 
 Citations are numbered in top-down left-to-right order even in
-two-column layout
+two-column layout.
+
+Surprisingly: even with *single column layout*, but viewing in
+two-pages side-by-side mode, citations are numbered in top-down
+left-to-right order as seen on the screen: citations in the top half
+of the 2nd page get before citations in the bottom half of the 1st
+page.
+
 
 Consequences:
 
@@ -837,3 +839,24 @@ Resolved: improve-reversibility branch: commit e159a1d8ce40d1045e73d7fbfca24390b
 
 
 ** DONE Separation of createReferenceMarkForCitationGroup and fillCitationMarkInCursor
+** DONE Feature: Undo in LO
+
+   Wrap modifications during a GUI action into
+   Undo blocks. If possible.
+
+   [[https://www.openoffice.org/api/docs/common/ref/com/sun/star/document/XUndoManager.html][OO-API:XUndoManager]]
+   [[https://www.openoffice.org/api/docs/common/ref/com/sun/star/document/XUndoManagerSupplier.html#getUndoManager][OO-API:XUndoManagerSupplier]]
+.
+** DONE Refactor: pass around jabRefReferenceMarkNamesSortedByPosition
+
+   - Currently it is hard to follow if it is up-to-date or not.
+
+   - file:OOBibBase.java::/updateSortedReferenceMarks/
+   - file:OOBibBase.java::/getJabRefReferenceMarkNamesSortedByPosition/
+   - file:OOBibBase.java::/jabRefReferenceMarkNamesSortedByPosition/
+
+   - in refreshCiteMarkersInternal we take
+     - referenceMarkNames = jabRefReferenceMarkNamesSortedByPosition;
+     - then call findCitedKeys, implicitly listing the same
+       reference marks.
+.
