@@ -1,9 +1,19 @@
 * Notes for OOBibBase.java
 
+
+** bug: refreshCiteMarkers destroys unresolved entries
+
+   - When opening the wrong library, we get many unresolved entries.
+
+     Click on "Refresh" will remove reference
+     to some of the unresolved entries from the document.
+
 ** combineCiteMarkers
    - reimplemented to collect data first, then apply
-*** TODO problem: altough we keep the Unresolved entries here,
+
+*** problem: altough we keep the Unresolved entries here,
      refreshCiteMarkers() destroys them
+     [[bug: refreshCiteMarkers destroys unresolved entries]]
 
 *** problem: using visual order of appearance trips our solution
 
