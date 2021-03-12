@@ -4218,10 +4218,12 @@ class OOBibBase {
             XTextCursor currentGroupCursor = null;
             XTextCursor cursorBetween = null;
             Integer prev = null;
+            XTextRange prevRange = null;
 
             for ( int i=0; i < referenceMarkNames.size(); i++ ) {
                 final String name = referenceMarkNames.get(i);
-
+                XTextRange  currentRange = documentConnection.getReferenceMarkRangeOrNull(name);
+                Objects.requireNonNull(currentRange);
 
                 boolean addToGroup = true;
                 /*
@@ -4229,14 +4231,41 @@ class OOBibBase {
                  */
 
                 // Only combine (Author 2000) type citations
-                if ( itcTypes[i] != OOBibBase.AUTHORYEAR_PAR ) {
+                if ( itcTypes[i] != OOBibBase.AUTHORYEAR_PAR
+                     // allow "Author (2000)"
+                     // && itcTypes[i] != OOBibBase.AUTHORYEAR_INTEXT
+                    ) {
                     addToGroup = false;
                 }
 
-                // Even if we combined other types of citations, we would not mix them
+                // Even if we combine AUTHORYEAR_INTEXT citations, we
+                // would not mix them with AUTHORYEAR_PAR
                 if (addToGroup &&  (prev != null) ) {
                     if ( itcTypes[i] != itcTypes[prev] ){
                         addToGroup = false;
+                    }
+                }
+
+                if ( addToGroup && prev != null ) {
+                    Objects.requireNonNull(prevRange);
+                    Objects.requireNonNull(currentRange);
+                    if ( ! DocumentConnection.comparable( prevRange, currentRange ) ) {
+                        addToGroup = false;
+                    } else {
+                        int textOrder = DocumentConnection.compareRegionStarts(prevRange,
+                                                                               currentRange);
+                        if ( textOrder != 1 ) {
+                            String msg = String.format(
+                                "combineCiteMarkers: \"%s\" supposed to be followed by \"%s\", but %s",
+                                prevRange.getString(),
+                                currentRange.getString(),
+                                ((textOrder == 0)
+                                 ? "they start at the same position"
+                                 : "the latter precedes the first")
+                                );
+                            LOGGER.warn(msg);
+                            addToGroup = false;
+                        }
                     }
                 }
 
@@ -4248,15 +4277,13 @@ class OOBibBase {
                             "combineCiteMarkers: cursorBetween.end != currentGroupCursor.end");
                     }
 
-                    XTextRange range2 =
-                        documentConnection.getReferenceMarkRangeOrNull(name);
-                    XTextRange range2Start = range2.getStart();
+                    XTextRange rangeStart = currentRange.getStart();
 
                     boolean couldExpand = true;
                     XTextCursor thisCharCursor =
-                            range2.getText().createTextCursorByRange(cursorBetween.getEnd());
+                            currentRange.getText().createTextCursorByRange(cursorBetween.getEnd());
                     while (couldExpand &&
-                           (DocumentConnection.compareRegionEnds(cursorBetween, range2Start) > 0)) {
+                           (DocumentConnection.compareRegionEnds(cursorBetween, rangeStart) > 0)) {
                         couldExpand = cursorBetween.goRight((short) 1, true);
                         currentGroupCursor.goRight((short) 1, true);
                         //
@@ -4298,6 +4325,7 @@ class OOBibBase {
                     currentGroupCursor = null;
                     cursorBetween = null;
                     prev = null;
+                    prevRange = null;
                 }
 
                 if ( addToGroup || canStartGroup ) {
@@ -4305,18 +4333,16 @@ class OOBibBase {
                     currentGroup.add(i);
                     // ... and start new cursorBetween
                     // Set up cursorBetween
-                    XTextRange range1Full =
-                        documentConnection.getReferenceMarkRangeOrNull(name);
                     //
-                    XTextRange range1End = range1Full.getEnd();
-                    cursorBetween = range1Full.getText().createTextCursorByRange(range1Full.getEnd());
+                    XTextRange rangeEnd = currentRange.getEnd();
+                    cursorBetween = currentRange.getText().createTextCursorByRange(rangeEnd);
                     // If new group, create currentGroupCursor
                     if ( currentGroupCursor == null ) {
                         currentGroupCursor =
-                            range1Full.getText().createTextCursorByRange(range1Full.getStart());
+                            currentRange.getText().createTextCursorByRange(currentRange.getStart());
                     }
                     // include self in currentGroupCursor
-                    currentGroupCursor.goRight( (short)( range1Full.getString().length() ), true );
+                    currentGroupCursor.goRight( (short)( currentRange.getString().length() ), true );
 
                     if (DocumentConnection.compareRegionEnds(cursorBetween, currentGroupCursor) != 0) {
                         /*
@@ -4333,25 +4359,31 @@ class OOBibBase {
                          * currentGroupCursor (on 2nd page).
                          */
                         throw new RuntimeException(
-                            String.format(
-                                "combineCiteMarkers: "
-                                + "cursorBetween.end != currentGroupCursor.end"
-                                + " (after addToGroup || canStartGroup)"
-                                + "%d\n"
-                                + "a: %s\n"
-                                + "b: %s\n"
-                                + "c: %s\n"
-                                , DocumentConnection.compareRegionEnds(cursorBetween, currentGroupCursor)
-                                , cursorBetween.getString()
-                                , range1Full.getString()
-                                , currentGroupCursor.getString()
-                                ));
+                            "combineCiteMarkers: "
+                            + "cursorBetween.end != currentGroupCursor.end"
+                            + String.format(
+                                " (after %s", addToGroup ? "addToGroup" : "startGroup")
+                            + (addToGroup
+                               ? String.format(
+                                   "comparisonResult: %d\n"
+                                   + "cursorBetween: %s\n"
+                                   + "currentRange: %s\n"
+                                   + "currentGroupCursor: %s\n"
+                                   , DocumentConnection.compareRegionEnds(
+                                       cursorBetween, currentGroupCursor)
+                                   , cursorBetween.getString()
+                                   , currentRange.getString()
+                                   , currentGroupCursor.getString()
+                                   )
+                               : "")
+                            );
                     }
                     prev = i;
-                }
-            }
+                    prevRange = currentRange;
+            } // for i
+        } // try
 
-            if (true) {
+        if (true) {
                 // close currentGroup
                 if (currentGroup.size() > 1) {
                     joinableGroups.add( currentGroup );
@@ -4362,6 +4394,7 @@ class OOBibBase {
                 currentGroupCursor = null;
                 cursorBetween = null;
                 prev = null;
+                prevRange = null;
             }
 
 

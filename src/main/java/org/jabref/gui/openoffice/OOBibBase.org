@@ -41,6 +41,10 @@
           footnotes to be "inserted" in the main text:
           we can just handle the partitions separately.
 
+    As a stopgap we test for wrong textual order, and disable
+    merging for pairs in the wrong order. Far-away, but correct order
+    is already handled by checking only-spaces-between.
+
 ** createReferenceMarkForCitationGroup corner cases
 
    - [ ] just-after a citation marker:
