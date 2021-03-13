@@ -173,4 +173,97 @@ public class FieldComparatorTest {
 
         assertEquals(1, comparator.compare(bigger, smaller));
     }
+
+    @Test
+    public void compareNumericFieldsIdentity() throws Exception {
+        FieldComparator comparator = new FieldComparator(StandardField.PMID);
+        BibEntry equal = new BibEntry();
+        equal.setField(StandardField.PMID, "123456");
+
+        assertEquals(0, comparator.compare(equal, equal));
+    }
+
+    @Test
+    public void compareNumericFieldsEquality() throws Exception {
+        FieldComparator comparator = new FieldComparator(StandardField.PMID);
+        BibEntry equal = new BibEntry();
+        equal.setField(StandardField.PMID, "123456");
+        BibEntry equal2 = new BibEntry();
+        equal2.setField(StandardField.PMID, "123456");
+
+        assertEquals(0, comparator.compare(equal, equal2));
+    }
+
+    @Test
+    public void compareNumericFieldsBiggerAscending() throws Exception {
+        FieldComparator comparator = new FieldComparator(StandardField.PMID);
+        BibEntry bigger = new BibEntry();
+        bigger.setField(StandardField.PMID, "234567");
+        BibEntry smaller = new BibEntry();
+        smaller.setField(StandardField.PMID, "123456");
+
+        assertEquals(1, comparator.compare(bigger, smaller));
+    }
+
+    @Test
+    public void compareNumericFieldsBiggerDescending() throws Exception {
+        FieldComparator comparator = new FieldComparator(new OrFields(StandardField.PMID), true);
+        BibEntry smaller = new BibEntry();
+        smaller.setField(StandardField.PMID, "234567");
+        BibEntry bigger = new BibEntry();
+        bigger.setField(StandardField.PMID, "123456");
+
+        assertEquals(1, comparator.compare(bigger, smaller));
+    }
+
+    @Test
+    public void compareParsableWithNonParsableNumericFieldDescending() throws Exception {
+        FieldComparator comparator = new FieldComparator(new OrFields(StandardField.PMID), true);
+        BibEntry parsable = new BibEntry();
+        parsable.setField(StandardField.PMID, "123456");
+        BibEntry unparsable = new BibEntry();
+        unparsable.setField(StandardField.PMID, "abc##z");
+
+        assertEquals(1, comparator.compare(parsable, unparsable));
+    }
+
+    @Test
+    public void compareNonParsableWithParsableFieldAscending() throws Exception {
+        FieldComparator comparator = new FieldComparator(StandardField.PMID);
+        BibEntry nonparsable = new BibEntry();
+        nonparsable.setField(StandardField.PMID, "abc##z");
+        BibEntry parsable = new BibEntry();
+        parsable.setField(StandardField.PMID, "123456");
+
+        assertEquals(1, comparator.compare(nonparsable, parsable));
+    }
+
+    @Test
+    public void compareEmptyFieldsAscending() throws Exception {
+        FieldComparator comparator = new FieldComparator(StandardField.PMID);
+        BibEntry empty1 = new BibEntry();
+        BibEntry empty2 = new BibEntry();
+
+        assertEquals(0, comparator.compare(empty1, empty2));
+    }
+
+    @Test
+    public void compareEmptyWithAssignedFieldAscending() throws Exception {
+        FieldComparator comparator = new FieldComparator(StandardField.PMID);
+        BibEntry empty1 = new BibEntry();
+        BibEntry assigned = new BibEntry();
+        assigned.setField(StandardField.PMID, "123456");
+
+        assertEquals(1, comparator.compare(empty1, assigned));
+    }
+
+    @Test
+    public void compareAssignedWithEmptyFieldAscending() throws Exception {
+        FieldComparator comparator = new FieldComparator(StandardField.PMID);
+        BibEntry assigned = new BibEntry();
+        assigned.setField(StandardField.PMID, "123456");
+        BibEntry empty = new BibEntry();
+
+        assertEquals(-1, comparator.compare(assigned, empty));
+    }
 }
