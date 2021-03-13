@@ -1,13 +1,6 @@
 * Notes for OOBibBase.java
 
 
-** bug: refreshCiteMarkers destroys unresolved entries
-
-   - When opening the wrong library, we get many unresolved entries.
-
-     Click on "Refresh" will remove reference
-     to some of the unresolved entries from the document.
-
 ** combineCiteMarkers
    - reimplemented to collect data first, then apply
 
@@ -15,7 +8,7 @@
      refreshCiteMarkers() destroys them
      [[bug: refreshCiteMarkers destroys unresolved entries]]
 
-*** problem: using visual order of appearance trips our solution
+*** TODO problem: using visual order of appearance trips our solution
 
     using visual order of appearance trips our solution with
     two-column layout and also when viewing two pages side-by-side:
@@ -41,9 +34,47 @@
           footnotes to be "inserted" in the main text:
           we can just handle the partitions separately.
 
-    As a stopgap we test for wrong textual order, and disable
+    As a *stopgap* we test for wrong textual order, and disable
     merging for pairs in the wrong order. Far-away, but correct order
     is already handled by checking only-spaces-between.
+
+
+** bug: backwordCompatibility OO_storage_v001
+
+   OO_storage_v001 (representation of citations in JabRef 5.2)
+   - find location of citation groups: by reference marks
+     - the location marked for a citation mark contains the citation mark only (no brackets)
+     - citation mark fill-in:
+       - recreates the reference mark, but avoids adding space after
+         - consequence: change of character format before (or after) the marker can flow into
+           the citation marker (inherit-from-left or inherit-from-right-at-paragraph-start)
+           - Note: if the citation marker alredy has direct formatting
+             (of e.g. highlight color), then that feature does not
+             flow into it: probably the empty cursor remaining after
+             deletion remembers the direct formatting and keeps those.
+             At the same time other direct formatting features
+             (e.g. font color) do flow in and override defaults.
+
+   - citation keys: encoded in reference mark name
+   - citation type: encoded in reference mark name
+   - pageInfo :
+     - one pageInfo per citation group
+     - store: in CustomProperties LO:[File]/[Properties]/[Custom Properties]
+       - name: same as reference mark
+     - merge: leaves pageInfo around.
+       - Bug: New citation may pick up one of these.
+
+   OO_storage_v002: changes since OO_storage_v001
+     - the location marked for a citation mark contains the citation mark *and brackets*
+       - [ ] for OO_storage_v001 compat mode, we need a bracketless version
+
+
+** bug: refreshCiteMarkers destroys unresolved entries
+
+   - When opening the wrong library, we get many unresolved entries.
+
+     Click on "Refresh" will remove reference
+     to some of the unresolved entries from the document.
 
 ** createReferenceMarkForCitationGroup corner cases
 
