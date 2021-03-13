@@ -15,10 +15,10 @@ import org.slf4j.LoggerFactory;
 
 abstract class StyleSheet {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(StyleSheet.class);
-
     protected static final String DATA_URL_PREFIX = "data:text/css;charset=utf-8;base64,";
     protected static final String EMPTY_WEBENGINE_CSS = DATA_URL_PREFIX;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(StyleSheet.class);
 
     abstract URL getSceneStylesheet();
 

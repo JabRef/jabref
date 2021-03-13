@@ -17,17 +17,28 @@ public class Theme {
     private final Optional<StyleSheet> additionalStylesheet;
 
     public Theme(String name) {
-        this.name = name != null ? name : "";
-        if (this.name.equals("") || BASE_CSS.equalsIgnoreCase(this.name)) {
+        String themeName = name != null ? name : "";
+
+        if (themeName.equals("") || BASE_CSS.equalsIgnoreCase(themeName)) {
             this.additionalStylesheet = Optional.empty();
             this.type = Type.LIGHT;
-        } else if (EMBEDDED_DARK_THEME_CSS.equalsIgnoreCase(this.name)) {
+            themeName = "";
+        } else if (EMBEDDED_DARK_THEME_CSS.equalsIgnoreCase(themeName)) {
             this.additionalStylesheet = StyleSheet.create(EMBEDDED_DARK_THEME_CSS);
             this.type = this.additionalStylesheet.isPresent() ? Type.DARK : Type.LIGHT;
+            themeName = EMBEDDED_DARK_THEME_CSS;
         } else {
             this.additionalStylesheet = StyleSheet.create(name);
-            this.type = this.additionalStylesheet.isPresent() ? Type.CUSTOM : Type.LIGHT;
+            if (this.additionalStylesheet.isPresent()) {
+                this.type = Type.CUSTOM;
+                themeName = name;
+            } else {
+                this.type = Type.LIGHT;
+                themeName = "";
+            }
         }
+
+        this.name = themeName;
     }
 
     public static Theme light() {

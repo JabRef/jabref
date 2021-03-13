@@ -101,7 +101,7 @@ public class Globals {
         return clipBoardManager;
     }
 
-    public static ThemeManager getThemeManager() {
+    public static synchronized ThemeManager getThemeManager() {
         if (themeManager == null) {
             themeManager = new ThemeManager(
                     prefs.getAppearancePreferences(),
