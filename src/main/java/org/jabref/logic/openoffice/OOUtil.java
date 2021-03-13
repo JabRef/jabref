@@ -98,7 +98,13 @@ public class OOUtil {
     }
 
     /**
-     * Insert a text with formatting indicated by HTML-like tags, into a text at the position given by a cursor.
+     * Insert a text with formatting indicated by HTML-like tags, into
+     * a text at the position given by a cursor.
+     *
+     * Set {@code parStyle}, process {@code ltext} in chunks between
+     * HTML-tags, while updating current formatting state at HTML-tags.
+     *
+     * Finally: {@code cursor.collapseToEnd()}
      *
      * @param text     The text to insert in.
      * @param cursor   The cursor giving the insert location.
@@ -184,6 +190,18 @@ public class OOUtil {
         cursor.collapseToEnd();
     }
 
+    /**
+     * Set cursor range content to {@code string}, apply {@code
+     * formatting} to it, {@code cursor.collapseToEnd()}.
+     *
+     * Insert {@code string} into {@code text} at {@code cursor}, while removing the content
+     * of the cursor's range. The cursor's content is {@code string} now.
+     *
+     * Apply character direct formatting from {@code
+     * formatting}. Features not in {@code formatting} are removed by setting to NONE.
+     *
+     * Finally: {@code cursor.collapseToEnd();}
+     */
     public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string,
                                                    List<Formatting> formatting)
             throws UnknownPropertyException, PropertyVetoException, WrappedTargetException,
@@ -258,6 +276,17 @@ public class OOUtil {
         cursor.collapseToEnd();
     }
 
+    /**
+     * Set cursor range content to {@code string}, apply {@code
+     * parStyle} to it, {@code cursor.collapseToEnd()}.
+     *
+     * Insert {@code string} into {@code text} at {@code cursor}, while removing the content
+     * of the cursor's range. The cursor's content is {@code string} now.
+     *
+     * Set paragraph style to {@code parStyle}
+     *
+     * Finally: {@code cursor.collapseToEnd();}
+     */
     public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string, String parStyle)
             throws WrappedTargetException, PropertyVetoException, UnknownPropertyException,
             UndefinedParagraphFormatException {
