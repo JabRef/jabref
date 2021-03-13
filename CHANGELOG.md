@@ -34,7 +34,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We simplified the select entry type form by splitting it into two parts ("Recommended" and "Others") based on internal usage data. [#6730](https://github.com/JabRef/jabref/issues/6730)
 
 ### Fixed
-- We fixed an issue where Double-click onto PDF in file list should just open the file. [#7465](https://github.com/JabRef/jabref/issues/7465)
+- We fixed an issue where Double-click onto PDF in file list open the file associated to an entry under the 'General' tab. [#7465](https://github.com/JabRef/jabref/issues/7465)
 - We fixed an issue where choosing the fields on which autocompletion should not work in "Entry editor" preferences had no effect. [#7320](https://github.com/JabRef/jabref/issues/7320)
 - We fixed an issue where the "Normalize page numbers" formatter did not replace en-dashes or em-dashes with a hyphen-minus sign. [#7239](https://github.com/JabRef/jabref/issues/7239)
 - We fixed an issue with the style of highlighted check boxes while searching in preferences. [#7226](https://github.com/JabRef/jabref/issues/7226)
