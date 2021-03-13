@@ -798,12 +798,13 @@ class OOBibBase {
         }
 
         /**
-         * @return 1 if  (a &lt; b), 0 if same start, (-1) if (b &lt; a)
+         * @return follows OO conventions, the opposite of java conventions:
+         *  1 if (a &lt; b), 0 if same start, (-1) if (b &lt; a)
          */
         private static int
-        compareRegionStarts( XTextRange a, XTextRange b ) {
+        ooCompareRegionStarts( XTextRange a, XTextRange b ) {
             if ( !comparable( a, b ) ){
-                throw new RuntimeException( "compareRegionStarts: got incomparable regions" );
+                throw new RuntimeException( "ooCompareRegionStarts: got incomparable regions" );
             }
             final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
                                                     a.getText());
@@ -811,18 +812,35 @@ class OOBibBase {
         }
 
         /**
-         * @return 1 if  (a &lt; b), 0 if same start, (-1) if (b &lt; a)
+         * @return follows OO conventions, the opposite of java conventions:
+         *  1 if  (a &lt; b), 0 if same start, (-1) if (b &lt; a)
          */
         private static int
-        compareRegionEnds( XTextRange a, XTextRange b ) {
+        ooCompareRegionEnds( XTextRange a, XTextRange b ) {
             if ( !comparable( a, b ) ){
-                throw new RuntimeException( "compareRegionEnds: got incomparable regions" );
+                throw new RuntimeException( "ooCompareRegionEnds: got incomparable regions" );
             }
             final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
                                                     a.getText());
             return compare.compareRegionEnds(a, b);
         }
 
+        /**
+         * @return follows java conventions
+         *
+         */
+        private static int
+        javaCompareRegionStarts( XTextRange a, XTextRange b ) {
+            return (-1) * ooCompareRegionStarts(a, b);
+        }
+
+        /**
+         * @return follows java conventions
+         */
+        private static int
+        javaCompareRegionEnds( XTextRange a, XTextRange b ) {
+            return (-1) * ooCompareRegionEnds(a, b);
+        }
     } // end DocumentConnection
 
     /**
@@ -1518,12 +1536,24 @@ class OOBibBase {
 
         } // class X
 
+
         /**
          * Assumes a.getText() == b.getText(), and both belong to documentConnection.xText
+         *
+         * Note: OpenOffice XTextRangeCompare and java use different
+         *       (opposite) conventions. The "java" prefix in the
+         *       functions name is intended to emphasize, that the
+         *       value returned is adjusted to use java conventions
+         *       (by muliplying the result with (-1)).
+         *
+         * @return -1 for (a &lt; b), 1 for (a &gt; b); 0 for equal.
+         *
+         * @throws RuntimeException if a and b are not comparable
+         *
          */
         public int
-        compareRegionStarts(RangeForOverlapCheck a,
-                            RangeForOverlapCheck b) {
+        javaCompareRegionStarts(RangeForOverlapCheck a,
+                                RangeForOverlapCheck b) {
             //
             // XTextRange cannot be compared, only == or != is available.
             //
@@ -1537,27 +1567,19 @@ class OOBibBase {
             if (ra.getText() != rb.getText()) {
                 throw new RuntimeException(
                     String.format(
-                        "OOBibBase.CitationGroups.compareRegionStarts:"
+                        "OOBibBase.CitationGroups.javaCompareRegionStarts:"
                         + " incomparable regions: %s %s",
                         a.format(),
                         b.format())
                     );
             }
 
-            /*
-             * documentConnection.xText cannot compare two ranges in
-             * the same footnote. We must use XTextRangeCompare interface
-             * of the ranges themselves.
-             */
-            final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
-                                                    ra.getText());
-
             try {
-                return (-1) * compare.compareRegionStarts(ra, rb);
+                return DocumentConnection.javaCompareRegionStarts(ra, rb);
             } catch (IllegalArgumentException ex) {
                 throw new RuntimeException(
                     String.format(
-                        "OOBibBase.CitationGroups.compareRegionStarts:"
+                        "OOBibBase.CitationGroups.javaCompareRegionStarts:"
                         + " caught IllegalArgumentException: %s %s",
                         a.format(),
                         b.format()
@@ -1566,15 +1588,37 @@ class OOBibBase {
             }
         }
 
+        /**
+         *
+         */
         public int
-        compareRegionEndToStart(RangeForOverlapCheck a,
-                                RangeForOverlapCheck b) {
+        javaCompareRegionEndToStart(RangeForOverlapCheck a,
+                                    RangeForOverlapCheck b) {
 
-            XTextRange ra = a.range.getEnd();
-            XTextRange rb = b.range.getStart();
-            final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
-                                                    ra.getText());
-            return (-1) * compare.compareRegionStarts(ra, rb);
+            XTextRange ra = a.range;
+            XTextRange rb = b.range;
+            if (ra.getText() != rb.getText()) {
+                throw new RuntimeException(
+                    String.format(
+                        "OOBibBase.CitationGroups.javaCompareRegionEndToStart:"
+                        + " incomparable regions: %s %s",
+                        a.format(),
+                        b.format())
+                    );
+            }
+
+            try {
+                return DocumentConnection.javaCompareRegionStarts(ra.getEnd(), rb.getStart());
+            } catch (IllegalArgumentException ex) {
+                throw new RuntimeException(
+                    String.format(
+                        "OOBibBase.CitationGroups.javaCompareRegionEndToStart:"
+                        + " caught IllegalArgumentException: %s %s",
+                        a.format(),
+                        b.format()
+                        )
+                    );
+            }
         }
 
         /**
@@ -1669,7 +1713,7 @@ class OOBibBase {
         sortPartitionByRegionStart(List<RangeForOverlapCheck> xs) {
             return
                 xs.stream()
-                .sorted(this::compareRegionStarts)
+                .sorted(this::javaCompareRegionStarts)
                 .collect(Collectors.toList());
         }
 
@@ -1680,7 +1724,7 @@ class OOBibBase {
             for (int i = 0; (i + 1) < oxs.size(); i++) {
                 RangeForOverlapCheck a = oxs.get(i);
                 RangeForOverlapCheck b = oxs.get(i + 1);
-                int cmp = compareRegionEndToStart(a, b);
+                int cmp = javaCompareRegionEndToStart(a, b); //xxx
                 if (cmp > 0) {
                     // found overlap
                     throw new JabRefException(
@@ -4252,8 +4296,12 @@ class OOBibBase {
                     if ( ! DocumentConnection.comparable( prevRange, currentRange ) ) {
                         addToGroup = false;
                     } else {
-                        int textOrder = DocumentConnection.compareRegionStarts(prevRange,
-                                                                               currentRange);
+
+                        int textOrder =
+                            DocumentConnection.javaCompareRegionStarts(
+                                prevRange,
+                                currentRange);
+
                         if ( textOrder != 1 ) {
                             String msg = String.format(
                                 "combineCiteMarkers: \"%s\" supposed to be followed by \"%s\", but %s",
@@ -4272,7 +4320,8 @@ class OOBibBase {
                 if (addToGroup && (cursorBetween != null)) {
                     Objects.requireNonNull(currentGroupCursor);
                     // assume: currentGroupCursor.getEnd() == cursorBetween.getEnd()
-                    if (DocumentConnection.compareRegionEnds(cursorBetween, currentGroupCursor) != 0) {
+                    if (DocumentConnection.javaCompareRegionEnds(
+                            cursorBetween, currentGroupCursor) != 0) {
                         throw new RuntimeException(
                             "combineCiteMarkers: cursorBetween.end != currentGroupCursor.end");
                     }
@@ -4283,7 +4332,8 @@ class OOBibBase {
                     XTextCursor thisCharCursor =
                             currentRange.getText().createTextCursorByRange(cursorBetween.getEnd());
                     while (couldExpand &&
-                           (DocumentConnection.compareRegionEnds(cursorBetween, rangeStart) > 0)) {
+                           (DocumentConnection.javaCompareRegionEnds(
+                               cursorBetween, rangeStart) > 0)) {
                         couldExpand = cursorBetween.goRight((short) 1, true);
                         currentGroupCursor.goRight((short) 1, true);
                         //
@@ -4295,7 +4345,8 @@ class OOBibBase {
                             ||  !thisChar.trim().isEmpty() ) {
                             couldExpand = false;
                         }
-                        if (DocumentConnection.compareRegionEnds(cursorBetween, currentGroupCursor) != 0) {
+                        if (DocumentConnection.javaCompareRegionEnds(
+                                cursorBetween, currentGroupCursor) != 0) {
                             throw new RuntimeException(
                                 "combineCiteMarkers: "
                                 + "cursorBetween.end != currentGroupCursor.end (during expand)" );
@@ -4344,7 +4395,8 @@ class OOBibBase {
                     // include self in currentGroupCursor
                     currentGroupCursor.goRight( (short)( currentRange.getString().length() ), true );
 
-                    if (DocumentConnection.compareRegionEnds(cursorBetween, currentGroupCursor) != 0) {
+                    if (DocumentConnection.javaCompareRegionEnds(
+                            cursorBetween, currentGroupCursor) != 0) {
                         /*
                          * A problem discovered using this check: when
                          * viewing the document in
@@ -4369,7 +4421,7 @@ class OOBibBase {
                                    + "cursorBetween: %s\n"
                                    + "currentRange: %s\n"
                                    + "currentGroupCursor: %s\n"
-                                   , DocumentConnection.compareRegionEnds(
+                                   , DocumentConnection.javaCompareRegionEnds(
                                        cursorBetween, currentGroupCursor)
                                    , cursorBetween.getString()
                                    , currentRange.getString()
