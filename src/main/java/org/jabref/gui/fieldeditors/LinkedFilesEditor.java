@@ -234,7 +234,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
         if (event.getButton().equals(MouseButton.PRIMARY) && (event.getClickCount() == 2)) {
             // Double click -> edit
-            linkedFile.edit();
+            linkedFile.open();
         }
     }
 
