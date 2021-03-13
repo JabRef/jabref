@@ -109,13 +109,15 @@ class OOBibBase {
 
     private static final String zeroWidthSpace = "\u200b";
     // for debugging we may want visible bracket
-    private static final boolean referenceMarkUseInvisibleBrackets = false; // !debug;
-    // Note we are relying on referenceMarkLeftBracket and referenceMarkRightBracket
+    private static final boolean REFERENCE_MARK_USE_INVISIBLE_BRACKETS = false; // !debug;
+
+    // Note we were relying on referenceMarkLeftBracket and referenceMarkRightBracket
     // to be single-character strings that do not appear in reference mark content.
-    private static final String referenceMarkLeftBracket =
-        referenceMarkUseInvisibleBrackets ?  zeroWidthSpace : "<";
-    private static final String referenceMarkRightBracket =
-        referenceMarkUseInvisibleBrackets ? zeroWidthSpace : ">";
+    // Now we probably rely on this no more, empty, or longar brackets should work as well.
+    private static final String REFERENCE_MARK_LEFT_BRACKET =
+        REFERENCE_MARK_USE_INVISIBLE_BRACKETS ? ZERO_WIDTH_SPACE : "<";
+    private static final String REFERENCE_MARK_RIGHT_BRACKET =
+        REFERENCE_MARK_USE_INVISIBLE_BRACKETS ? ZERO_WIDTH_SPACE : ">";
 
     /* Types of in-text citation. (itcType)
      * Their numeric values are used in reference mark names.
@@ -3048,18 +3050,27 @@ class OOBibBase {
             cursor.goLeft((short) 1, false);
         }
 
-        final String left = referenceMarkLeftBracket;
-        final String right = referenceMarkRightBracket;
+        final String left = REFERENCE_MARK_LEFT_BRACKET;
+        final String right = REFERENCE_MARK_RIGHT_BRACKET;
+        final short  leftLength = (short) left.length();
+        final short  rightLength = (short) right.length();
+
         String text = left + initialText + right;
         cursor.getText().insertString(cursor, text, true);
-        XNamed mark = documentConnection.insertReferenceMark(name, cursor, true);
+        XNamed mark = documentConnection.insertReferenceMark(
+            name,
+            cursor,
+            true // absorb
+            );
         // Need a cursor that excludes left and right
         XTextCursor full = cursor;
             // DocumentConnection.getTextCursorOfTextContent(
             //    DocumentConnection.asTextContent(mark));
-        full.collapseToStart();
-        full.goRight( (short)1, false );
-        full.goRight( (short)initialText.length(), true );
+        if (leftLength + rightLength > 0 ) {
+            full.collapseToStart();
+            full.goRight((short) left.length(), false);
+            full.goRight((short) initialText.length(), true);
+        }
         return full; // yield a cursor in the bracket
     }
 
@@ -3074,8 +3085,10 @@ class OOBibBase {
         CreationException {
 
         final boolean debugThisFun = false;
-        final String left = referenceMarkLeftBracket;
-        final String right = referenceMarkRightBracket;
+        final String left = REFERENCE_MARK_LEFT_BRACKET;
+        final String right = REFERENCE_MARK_RIGHT_BRACKET;
+        final short  leftLength = (short) left.length();
+        final short  rightLength = (short) right.length();
 
         XTextContent markAsTextContent =
             documentConnection.getReferenceMarkAsTextContentOrNull( name );
@@ -3100,15 +3113,18 @@ class OOBibBase {
             System.out.println(String.format("getFillCursor: fulltext = '%s'", fulltext));
         }
 
-        if (fulltext.length() < 2 || !fulltext.startsWith(left) || !fulltext.endsWith(right)){
+
+        if (fullText.length() < (leftLength+rightLength)
+            || !fullText.startsWith(left)
+            || !fullText.endsWith(right)) {
             // damaged, recreate
-            if ( debugThisFun ){
-                System.out.println(String.format("getFillCursor: damaged, recreate"));
+            if (debugThisFun) {
+                System.out.println("getFillCursor: damaged, recreate");
             }
             full.setString("");
-            if ( true ){
-                if ( debugThisFun ){
-                    System.out.println(String.format("getFillCursor: removeReferenceMark go"));
+            if (true) {
+                if (debugThisFun) {
+                    System.out.println("getFillCursor: removeReferenceMark go");
                 }
                 try {
                     documentConnection.removeReferenceMark(name);
@@ -3124,9 +3140,17 @@ class OOBibBase {
             }
             // What shall we put in the recreated version?
             // User might have inserted stuff before or after?
-            String trimmedtext = fulltext.replaceAll( "[" + left + right +"]", "" );
-            if (debugThisFun){
-                System.out.println(String.format("getFillCursor: trimmedtext = '%s'", trimmedtext));
+            // We try to remove only brackets of exactly 1 character,
+            // not of length zero or more than one.
+            String trimmedText = fullText;
+            if (leftLength == 1) {
+                trimmedText = trimmedText.replaceAll("[" + left + "]", "");
+            }
+            if (rightLength == 1) {
+                trimmedText = trimmedText.replaceAll("[" + right + "]", "");
+            }
+            if (debugThisFun) {
+                System.out.println(String.format("getFillCursor: trimmedText = '%s'", trimmedText));
             }
             return createReferenceMarkForCitationGroup(
                 documentConnection,
@@ -3138,9 +3162,11 @@ class OOBibBase {
             if (debugThisFun){
                 System.out.println(String.format("getFillCursor: intact, reuse"));
             }
-            full.collapseToStart();
-            full.goRight( (short)1, false );
-            full.goRight( (short)(fulltext.length()-2), true );
+            if (leftLength + rightLength > 0) {
+                full.collapseToStart();
+                full.goRight((short) left.length(), false);
+                full.goRight((short) (fullText.length() - (left.length()+right.length())), true);
+            }
             return full; // yield a cursor in the bracket
         }
     }
