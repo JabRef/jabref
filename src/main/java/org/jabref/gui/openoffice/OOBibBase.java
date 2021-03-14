@@ -845,6 +845,7 @@ class OOBibBase {
         /**
          * @return follows java conventions
          *
+         * 1 if  (a &gt; b); (-1) if (a &lt; b)
          */
         private static int
         javaCompareRegionStarts(XTextRange a, XTextRange b) {
@@ -4245,14 +4246,14 @@ class OOBibBase {
                                     prevRange,
                                     currentRange);
 
-                            if (textOrder != 1) {
+                            if (textOrder != (-1)) {
                                 String msg = String.format(
                                     "combineCiteMarkers: \"%s\" supposed to be followed by \"%s\", but %s",
                                     prevRange.getString(),
                                     currentRange.getString(),
                                     ((textOrder == 0)
                                      ? "they start at the same position"
-                                     : "the latter precedes the first")
+                                     : "the start of the latter precedes the start of the first")
                                     );
                                 LOGGER.warn(msg);
                                 addToGroup = false;
@@ -4277,7 +4278,7 @@ class OOBibBase {
                             .createTextCursorByRange(cursorBetween.getEnd());
                         while (couldExpand &&
                                (DocumentConnection.javaCompareRegionEnds(
-                                   cursorBetween, rangeStart) > 0)) {
+                                   cursorBetween, rangeStart) < 0)) {
                             couldExpand = cursorBetween.goRight((short) 1, true);
                             currentGroupCursor.goRight((short) 1, true);
                             //
@@ -4363,13 +4364,13 @@ class OOBibBase {
                                 "combineCiteMarkers: "
                                 + "cursorBetween.end != currentGroupCursor.end"
                                 + String.format(
-                                    " (after %s", addToGroup ? "addToGroup" : "startGroup")
+                                    " (after %s)", addToGroup ? "addToGroup" : "startGroup")
                                 + (addToGroup
                                    ? String.format(
-                                       "comparisonResult: %d\n"
-                                       + "cursorBetween: %s\n"
-                                       + "currentRange: %s\n"
-                                       + "currentGroupCursor: %s\n",
+                                       " comparisonResult: %d\n"
+                                       + "cursorBetween: '%s'\n"
+                                       + "currentRange: '%s'\n"
+                                       + "currentGroupCursor: '%s'\n",
                                        DocumentConnection.javaCompareRegionEnds(
                                            cursorBetween, currentGroupCursor),
                                        cursorBetween.getString(),
