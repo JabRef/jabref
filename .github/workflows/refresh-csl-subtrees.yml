@@ -42,6 +42,10 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: refresh-csl
+          commit-message: Update CSL styles
+          title: "[Bot] Update CSL styles"
+
+
       - name: Report issues
         if: failure()
         uses: JasonEtco/create-an-issue@v2
@@ -49,4 +53,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           filename: .github/failure-csl-update.md
-          title: "[Bot] Update CSL styles"
