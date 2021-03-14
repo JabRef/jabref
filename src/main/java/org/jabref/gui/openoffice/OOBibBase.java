@@ -106,16 +106,16 @@ class OOBibBase {
             Pattern.compile(BIB_CITATION + "(\\d*)_(\\d*)_(.*)");
 
     private static final String ZERO_WIDTH_SPACE = "\u200b";
-    // for debugging we may want visible bracket
-    private static final boolean REFERENCE_MARK_USE_INVISIBLE_BRACKETS = false; // !debug;
 
-    // Note we were relying on referenceMarkLeftBracket and referenceMarkRightBracket
-    // to be single-character strings that do not appear in reference mark content.
-    // Now we probably rely on this no more, empty, or longer brackets should work as well.
-    private static final String REFERENCE_MARK_LEFT_BRACKET =
-        REFERENCE_MARK_USE_INVISIBLE_BRACKETS ? ZERO_WIDTH_SPACE : "<";
-    private static final String REFERENCE_MARK_RIGHT_BRACKET =
-        REFERENCE_MARK_USE_INVISIBLE_BRACKETS ? ZERO_WIDTH_SPACE : ">";
+    // for debugging we may want visible bracket
+    private static final boolean
+    REFERENCE_MARK_USE_INVISIBLE_BRACKETS = true; // !debug;
+
+    private static final String
+    REFERENCE_MARK_LEFT_BRACKET =  REFERENCE_MARK_USE_INVISIBLE_BRACKETS ? ZERO_WIDTH_SPACE : "<";
+
+    private static final String
+    REFERENCE_MARK_RIGHT_BRACKET = REFERENCE_MARK_USE_INVISIBLE_BRACKETS ? ZERO_WIDTH_SPACE : ">";
 
     /* Types of in-text citation. (itcType)
      * Their numeric values are used in reference mark names.
@@ -3028,8 +3028,68 @@ class OOBibBase {
      * ***********************************/
 
     /**
-     *  Create an (empty) reference mark with the given name, at the
+     *  Insert {@code n} spaces in a way that reference
+     *  marks just before or just after the cursor are not affected.
+     *
+     *  This is based on the observation, that starting two
+     *  new paragraphs separates us from a reference mark on either side.
+     *
+     *  The pattern used is:
+     *  {@code safeInsertSpaces(n): para, para, left, space(n), right-delete, left(n), left-delete}
+     *
+     *  @param position Where to insert (at position.getStart())
+     *  @param n  Number of spaces to insert.
+     *
+     *  @return a new cursor, covering the just-inserted spaces.
+     *
+     *  This could be generalized to insert arbitrary text safely
+     *  between two reference marks. But we do not need that now.
+     */
+    private static XTextCursor
+    safeInsertSpacesBetweenReferencMarks(XTextRange position, int n) {
+        // Start with an empty cursor at position.getStart();
+        XText text = position.getText();
+        XTextCursor cursor = text.createTextCursorByRange(position.getStart());
+        text.insertString(cursor,"\r\r",false); // para, para
+        cursor.goLeft((short) 1,false); // left
+        text.insertString(cursor," ".repeat(n),false); // space(n)
+        cursor.goRight((short) 1,true); cursor.setString(""); // right-delete
+        cursor.goLeft((short) n,false); // left(n)
+        cursor.goLeft((short) 1,true); cursor.setString(""); // left-delete
+        cursor.goRight((short) n,true);
+        return cursor;
+    }
+
+    /**
+     *  Create a reference mark with the given name, at the
      *  end of position.
+     *
+     *  Change of plan: to reduce the difference from the original
+     *  representation, we only insist on having at least two
+     *  characters inside. These may be ZERO_WIDTH_SPACE characters or other
+     *  placeholder not likely to appear in a citation mark.
+     *
+     *  This placeholder is only needed if the citation mark is
+     *  otherwise empty (e.g. when we just create it).
+     *
+     *  getFillCursorForCitationGroup yields a bracketed cursor, that
+     *  can be used to fill in / overwrite the value inside.
+     *
+     *  After each getFillCursorForCitationGroup, we require a call to
+     *  cleanFillCursorForCitationGroup, which removes the brackets,
+     *  unless if it would make the content less
+     *  than two characters. If we need only one placeholder, we keep the left bracket.
+     *  If we need two, then the content is empty.
+     *
+     *  Thus the only user-visible difference in citation marks is
+     *  that instead of empty marks we use two brackets, for
+     *  single-character marks we add a left bracket before.
+     *
+     *  Character-attribute inheritance: updates inherit from the
+     *  first character inside, not from the left.
+     *
+     *  On return {@code position} is collapsed, and is after the
+     *  inserted space, or at the end of the reference mark.
      *
      *  @param documentConnection Connection to document.
      *  @param name For the reference mark.
@@ -3038,57 +3098,141 @@ class OOBibBase {
      *                          carries on format of characters from
      *                          the original position.
      *
-     *  @return XTextCursor for the text to be inserted.
-     *
-     *  On return position is collapsed, and is after the inserted space,
-     *  or at the end of the (empty) range allocated for the text.
+     *  @return Nothing (was: XTextCursor for the text to be inserted)
      *
      */
-    private static XTextCursor
+    private static void
     createReferenceMarkForCitationGroup(
         DocumentConnection documentConnection,
         String name,
         XTextCursor position,
-        boolean insertSpaceAfter,
-        String initialText
+        boolean insertSpaceAfter
         )
         throws
-        CreationException {
+        CreationException,
+        NoDocumentException,
+        WrappedTargetException {
 
         // The cursor we received: we push it before us.
         position.collapseToEnd();
 
-        XTextCursor cursor = position.getText().createTextCursorByRange(position.getEnd());
-        if (insertSpaceAfter) {
-            cursor.getText().insertString(cursor, " ", false);
+        XTextCursor cursor = safeInsertSpacesBetweenReferencMarks(position.getEnd(), 2);
 
-            // space between citation markers: what style?
-            // DocumentConnection.setCharStyle(cursor, "Standard");
+        // cursors before the first and after the last space
+        XTextCursor cursorBefore =
+            cursor.getText().createTextCursorByRange(cursor.getStart());
+        XTextCursor cursorAfter =
+            cursor.getText().createTextCursorByRange(cursor.getEnd());
 
-            // go back to before the space
-            cursor.goLeft((short) 1, false);
-        }
+        cursor.collapseToStart();
+        cursor.goRight( (short) 1, false );
+        // now we are between two spaces
 
         final String left = REFERENCE_MARK_LEFT_BRACKET;
         final String right = REFERENCE_MARK_RIGHT_BRACKET;
         final short leftLength = (short) left.length();
         final short rightLength = (short) right.length();
 
-        String text = left + initialText + right;
-        cursor.getText().insertString(cursor, text, true);
+        cursor.getText().insertString(
+            cursor,
+            left+right,
+            true);
         /* XNamed mark = */ documentConnection.insertReferenceMark(
             name,
             cursor,
             true // absorb
             );
-        // Need a cursor that excludes left and right
-        XTextCursor full = cursor;
-        if (leftLength + rightLength > 0) {
-            full.collapseToStart();
-            full.goRight((short) left.length(), false);
-            full.goRight((short) initialText.length(), true);
+
+        cursorBefore.goRight((short) 1, true); cursorBefore.setString("");
+        if ( !insertSpaceAfter ) {
+            cursorAfter.goLeft((short) 1, true); cursorAfter.setString("");
         }
-        return full; // yield a cursor in the bracket
+    }
+
+    /**
+     * Remove brackets, but if the result would become empty, leave
+     * them; if the result would be a single characer, leave the left bracket.
+     */
+    private static void
+    cleanFillCursorForCitationGroup(
+        DocumentConnection documentConnection,
+        String name // Identifies group
+        )
+        throws
+        NoDocumentException,
+        WrappedTargetException,
+        CreationException {
+
+        final String left = REFERENCE_MARK_LEFT_BRACKET;
+        final String right = REFERENCE_MARK_RIGHT_BRACKET;
+        final short leftLength = (short) left.length();
+        final short rightLength = (short) right.length();
+
+        XTextContent markAsTextContent =
+            documentConnection.getReferenceMarkAsTextContentOrNull(name);
+
+        if (markAsTextContent == null) {
+            throw new RuntimeException(
+                String.format(
+                    "cleanFillCursorForCitationGroup: markAsTextContent(%s) == null",
+                    name
+                    ));
+        }
+        XTextCursor full =
+            DocumentConnection.getTextCursorOfTextContent(
+                markAsTextContent);
+        if (full == null) {
+            throw new RuntimeException(
+                "cleanFillCursorForCitationGroup: full == null"
+                );
+        }
+        String fullText = full.getString();
+
+        XTextCursor alpha = full.getText().createTextCursorByRange(full);
+        alpha.collapseToStart();
+
+        XTextCursor beta  = full.getText().createTextCursorByRange(full);
+        beta.collapseToStart();
+        beta.goRight(leftLength, false);
+
+        XTextCursor omega = full.getText().createTextCursorByRange(full);
+        omega.collapseToEnd();
+
+        if (!fullText.startsWith( left )) {
+            throw new RuntimeException(
+                String.format(
+                    "cleanFillCursorForCitationGroup:"
+                    + " (%s) does not start with REFERENCE_MARK_LEFT_BRACKET",
+                    name
+                    ));
+        }
+
+        if (!fullText.endsWith( right )) {
+            throw new RuntimeException(
+                String.format(
+                    "cleanFillCursorForCitationGroup:"
+                    + " (%s) does not end with REFERENCE_MARK_RIGHT_BRACKET",
+                    name
+                    ));
+        }
+
+        if ( fullText.length() < (leftLength + rightLength)) {
+            throw new RuntimeException(
+                String.format(
+                    "cleanFillCursorForCitationGroup: length(%s) < (leftLength + rightLength)",
+                    name
+                    ));
+        }
+
+        if ( fullText.length() >= (leftLength + rightLength + 1)) {
+            // have at least 1 character content
+            omega.goLeft((short) rightLength, true); omega.setString("");
+        }
+
+        if ( fullText.length() >= (leftLength + rightLength + 2)) {
+            // have at least 2 character content
+            alpha.goRight((short) leftLength, true); alpha.setString("");
+        }
     }
 
     private static XTextCursor
@@ -3107,78 +3251,101 @@ class OOBibBase {
         final short leftLength = (short) left.length();
         final short rightLength = (short) right.length();
 
-        XTextContent markAsTextContent =
-            documentConnection.getReferenceMarkAsTextContentOrNull(name);
+        XTextCursor full=null;
+        String fullText=null;
+        for (int i = 1; i <= 2; i++) {
+            XTextContent markAsTextContent =
+                documentConnection.getReferenceMarkAsTextContentOrNull(name);
 
-        if (markAsTextContent == null) {
-            throw new RuntimeException(
-                String.format(
-                    "getFillCursorForCitationGroup: markAsTextContent(%s) == null",
-                    name
-                    ));
+            if (markAsTextContent == null) {
+                throw new RuntimeException(
+                    String.format(
+                        "getFillCursorForCitationGroup: markAsTextContent(%s) == null (attempt %d)",
+                        name, i
+                        ));
+            }
+            full =
+                DocumentConnection.getTextCursorOfTextContent(
+                    markAsTextContent);
+            if (full == null) {
+                throw new RuntimeException(
+                    String.format(
+                        "getFillCursorForCitationGroup: full == null (attempt %d)", i
+                        )
+                    );
+            }
+
+            fullText = full.getString();
+            if (debugThisFun) {
+                System.out.printf("getFillCursor: fulltext = '%s'%n", fullText);
+            }
+
+            if (fullText.length() >= 2) {
+                break;
+            } else {
+                // (fullText.length() < 2)
+                if (i == 2) {
+                    throw new RuntimeException(
+                        String.format(
+                            "getFillCursorForCitationGroup:"
+                            + " (fullText.length() < 2) (attempt %d)", i
+                            )
+                        );
+                }
+                // too short, recreate
+                if (debugThisFun) {
+                    System.out.println("getFillCursor: too short, recreate");
+                }
+                full.setString("");
+                try {
+                    documentConnection.removeReferenceMark(name);
+                } catch (NoSuchElementException ex) {
+                    LOGGER.warn(String.format(
+                                    "getFillCursorForCitationGroup got NoSuchElementException"
+                                    + " for '%s'", name));
+                }
+                createReferenceMarkForCitationGroup(
+                    documentConnection,
+                    name,
+                    full,
+                    false // insertSpaceAfter
+                    );
+            }
         }
-        XTextCursor full =
-            DocumentConnection.getTextCursorOfTextContent(
-                markAsTextContent);
+
         if (full == null) {
             throw new RuntimeException(
-                "getFillCursorForCitationGroup: full == null"
+                "getFillCursorForCitationGroup: full == null (after loop)"
                 );
         }
-        String fullText = full.getString();
-        if (debugThisFun) {
-            System.out.printf("getFillCursor: fulltext = '%s'%n", fullText);
+        if (fullText == null) {
+            throw new RuntimeException(
+                "getFillCursorForCitationGroup: fullText == null (after loop)"
+                );
         }
 
-        if (fullText.length() < (leftLength + rightLength)
-            || !fullText.startsWith(left)
-            || !fullText.endsWith(right)) {
-            // damaged, recreate
-            if (debugThisFun) {
-                System.out.println("getFillCursor: damaged, recreate");
-            }
-            full.setString("");
-            try {
-                documentConnection.removeReferenceMark(name);
-            } catch (NoSuchElementException ex) {
-                LOGGER.warn(String.format(
-                                "getFillCursorForCitationGroup got NoSuchElementException"
-                                + " for '%s'", name));
-            }
-            // What shall we put in the recreated version?
-            // User might have inserted stuff before or after?
-            // We try to remove only brackets of exactly 1 character,
-            // not of length zero or more than one.
-            String trimmedText = fullText;
-            if (leftLength == 1) {
-                trimmedText = trimmedText.replaceAll("[" + left + "]", "");
-            }
-            if (rightLength == 1) {
-                trimmedText = trimmedText.replaceAll("[" + right + "]", "");
-            }
-            if (debugThisFun) {
-                System.out.printf("getFillCursor: trimmedText = '%s'%n", trimmedText);
-            }
-            return createReferenceMarkForCitationGroup(
-                documentConnection,
-                name,
-                full,
-                false, // insertSpaceAfter
-                trimmedText);
-        } else {
-            if (debugThisFun) {
-                System.out.println("getFillCursor: intact, reuse");
-            }
-            if (leftLength + rightLength > 0) {
-                full.collapseToStart();
-                full.goRight((short) left.length(), false);
-                short contentLength =
-                    (short) (fullText.length() - (left.length() + right.length()));
-                full.goRight(contentLength, true);
-            }
-            return full; // yield a cursor in the bracket
-        }
+        // we have at least two characters inside
+        XTextCursor alpha = full.getText().createTextCursorByRange(full);
+        alpha.collapseToStart();
+        XTextCursor omega = full.getText().createTextCursorByRange(full);
+        omega.collapseToEnd();
+
+        XTextCursor beta = full.getText().createTextCursorByRange(full);
+        beta.collapseToStart();
+        beta.goRight((short) 1, false);
+        beta.goRight((short) (fullText.length()-2), true);
+        beta.setString(left+right);
+        beta.collapseToEnd();
+        beta.goLeft(rightLength, false);
+        // drop the inital character
+        alpha.goRight((short) 1, true);
+        alpha.setString("");
+        // drop the last character
+        omega.goLeft((short) 1, true);
+        omega.setString("");
+        return beta;
     }
+
 
     private static void
     fillCitationMarkInCursor(
@@ -3295,13 +3462,16 @@ class OOBibBase {
         PropertyVetoException,
         IllegalArgumentException,
         UndefinedCharacterFormatException,
-        CreationException {
+        CreationException,
+        NoDocumentException {
 
-        XTextCursor c2 = createReferenceMarkForCitationGroup(documentConnection,
-                                                             name,
-                                                             position,
-                                                             insertSpaceAfter,
-                                                             "");
+        createReferenceMarkForCitationGroup(documentConnection,
+                                            name,
+                                            position,
+                                            insertSpaceAfter);
+
+        XTextCursor c2 = getFillCursorForCitationGroup(documentConnection,
+                                                       name);
 
         fillCitationMarkInCursor(documentConnection,
                                  name,
@@ -3309,6 +3479,9 @@ class OOBibBase {
                                  citationText,
                                  withText,
                                  style);
+
+        cleanFillCursorForCitationGroup(documentConnection,
+                                        name);
         position.collapseToEnd();
     }
 
@@ -3455,8 +3628,12 @@ class OOBibBase {
 
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
 
+        boolean useUndoContext = true;
+
         try {
-            documentConnection.enterUndoContext("Insert citation");
+            if (useUndoContext) {
+                documentConnection.enterUndoContext("Insert citation");
+            }
             XTextCursor cursor;
             // Get the cursor positioned by the user.
             try {
@@ -3598,7 +3775,9 @@ class OOBibBase {
             // or catch a DisposedException (which is in a OO JAR file).
             throw new ConnectionLostException(ex.getMessage());
         } finally {
-            documentConnection.leaveUndoContext();
+            if (useUndoContext) {
+                documentConnection.leaveUndoContext();
+            }
         }
     }
 
@@ -3727,6 +3906,9 @@ class OOBibBase {
                 types[i] != OOBibBase.INVISIBLE_CIT, // withText,
                 style
                 );
+
+            cleanFillCursorForCitationGroup(documentConnection,
+                                            name);
 
             if (hadBibSection
                 && (documentConnection.getBookmarkRangeOrNull(OOBibBase.BIB_SECTION_NAME) == null)) {
