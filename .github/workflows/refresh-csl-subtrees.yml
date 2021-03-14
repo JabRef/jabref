@@ -28,6 +28,7 @@ jobs:
       - name: Update csl-styles
         run: |
           git subtree pull --prefix buildres/csl/csl-styles csl-styles master --squash
+          git subtree pull --prefix buildres/csl/csl-styles csl-styles master --squash
           cp buildres/csl/csl-styles/acm-siggraph.csl src/main/resources/csl-styles/
           cp buildres/csl/csl-styles/ieee.csl src/main/resources/csl-styles/
           cp buildres/csl/csl-styles/turabian-author-date.csl src/main/resources/csl-styles/
@@ -37,7 +38,7 @@ jobs:
         run: |
           git subtree pull --prefix buildres/csl/csl-locales csl-locales master --squash
           cp buildres/csl/csl-locales/locales.json src/main/resources/csl-locales/
-          cp buildres/csl/csl-locales/locales-en-US src/main/resources/csl-locales/
+          cp buildres/csl/csl-locales/locales-en-US.xml src/main/resources/csl-locales/
       - uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
