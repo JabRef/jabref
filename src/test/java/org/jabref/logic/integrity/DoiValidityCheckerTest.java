@@ -17,6 +17,11 @@ class DoiValidityCheckerTest {
     }
 
     @Test
+    void doiAcceptsEmptyInput() {
+        assertEquals(Optional.empty(), checker.checkValue(""));
+    }
+
+    @Test
     void doiAcceptsValidInputWithNotOnlyNumbers() {
         assertEquals(Optional.empty(), checker.checkValue("10.17487/rfc1436"));
     }
@@ -31,4 +36,19 @@ class DoiValidityCheckerTest {
         assertNotEquals(Optional.empty(), checker.checkValue("asdf"));
     }
 
+    @Test
+    void doiDoesNotAcceptInputWithTypoInFirstPart() {
+        assertNotEquals(Optional.empty(), checker.checkValue("11.1000/182"));
+        assertNotEquals(Optional.empty(), checker.checkValue("01.1000/182"));
+        assertNotEquals(Optional.empty(), checker.checkValue("100.1000/182"));
+        assertNotEquals(Optional.empty(), checker.checkValue("110.1000/182"));
+        assertNotEquals(Optional.empty(), checker.checkValue("a10.1000/182"));
+        assertNotEquals(Optional.empty(), checker.checkValue("10a.1000/182"));
+    }
+
+    @Test
+    void doiDoesNotAcceptInputWithTypoInSecondPart() {
+        assertNotEquals(Optional.empty(), checker.checkValue("10.a1000/182"));
+        assertNotEquals(Optional.empty(), checker.checkValue("10.1000a/182"));
+    }
 }
