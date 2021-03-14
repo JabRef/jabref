@@ -38,6 +38,9 @@
     merging for pairs in the wrong order. Far-away, but correct order
     is already handled by checking only-spaces-between.
 
+*** implement option (2)
+    - sortRangesWithinGetTextPartitions 
+
 
 ** bug: backwordCompatibility OO_storage_v001
 
@@ -63,6 +66,11 @@
        - name: same as reference mark
      - merge: leaves pageInfo around.
        - Bug: New citation may pick up one of these.
+   - Bibliography:
+     - JabRef 5.2 creates XTextSection "JR_bib" and bookmark
+       "JR_bib_end". On refresh, lookks for XTextSection "JR_bib",
+       creates cursor for the whole section,
+       
 
    OO_storage_v002: changes since OO_storage_v001
      - the location marked for a citation mark contains the citation mark *and brackets*
