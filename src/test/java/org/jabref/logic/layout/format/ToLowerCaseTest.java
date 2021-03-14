@@ -31,4 +31,19 @@ public class ToLowerCaseTest {
     public void testMixedCase() {
         assertEquals("abcd efg", new ToLowerCase().format("abCD eFg"));
     }
+
+    @Test
+    public void includeNumbersInString() {
+        assertEquals("abcd123efg", new ToLowerCase().format("abCD123eFg"));
+    }
+
+    @Test
+    public void includeSpecialCharactersInString() {
+        assertEquals("hello!*#", new ToLowerCase().format("Hello!*#"));
+    }
+
+    @Test
+    public void includeOnlyNumbersAndSpecialCharacters() {
+        assertEquals("123*%&456", new ToLowerCase().format("123*%&456"));
+    }
 }
