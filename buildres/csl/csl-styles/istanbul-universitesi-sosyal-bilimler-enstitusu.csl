@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" delimiter-precedes-et-al="never" page-range-format="expanded" default-locale="tr-TR">
   <info>
-    <title>İstanbul Üniversitesi Sosyal Bilimler Enstitüsü (Turkish)</title>
+    <title>İstanbul Üniversitesi Sosyal Bilimler Enstitüsü (Türkçe)</title>
     <id>http://www.zotero.org/styles/istanbul-universitesi-sosyal-bilimler-enstitusu</id>
     <link href="http://www.zotero.org/styles/istanbul-universitesi-sosyal-bilimler-enstitusu" rel="self"/>
     <link href="http://www.zotero.org/styles/chicago-fullnote-bibliography" rel="template"/>
@@ -227,7 +227,8 @@
           <text term="version"/>
           <text variable="version"/>
         </group>
-      </else-if>      <else-if type="book graphic motion_picture song manuscript" match="any">
+      </else-if>
+      <else-if type="book graphic motion_picture song manuscript" match="any">
         <text variable="title" text-case="title" font-style="normal" font-weight="bold"/>
         <group delimiter=" " prefix=", ">
           <text term="version"/>
@@ -244,11 +245,10 @@
         <text variable="title" text-case="title" quotes="true"/>
       </else>
     </choose>
-
-         <choose>
-        <if type="entry-encyclopedia" match="any">
-          <text variable="container-title" prefix=", " text-case="title" font-style="normal" font-weight="bold"/>
-        </if>
+    <choose>
+      <if type="entry-encyclopedia" match="any">
+        <text variable="container-title" prefix=", " text-case="title" font-style="normal" font-weight="bold"/>
+      </if>
     </choose>
   </macro>
   <macro name="title">
@@ -299,25 +299,24 @@
       </else>
     </choose>
     <choose>
-        <if type="entry-encyclopedia" match="any">
-          <text variable="container-title" prefix=" " text-case="title" font-style="normal" font-weight="bold"/>
-        </if>
+      <if type="entry-encyclopedia" match="any">
+        <text variable="container-title" prefix=" " text-case="title" font-style="normal" font-weight="bold"/>
+      </if>
     </choose>
-        <group>
-
+    <group>
+      <choose>
+        <if match="any" variable="volume">
           <choose>
-            <if match="any" variable="volume">
-          <choose>
-                <if type="article-journal" variable="volume" match="all">
+            <if type="article-journal" variable="volume" match="all">
                 </if>
-                <else>
-        <label plural="never" prefix=", " suffix=" " variable="volume" form="short"/>
+            <else>
+              <label plural="never" prefix=", " suffix=" " variable="volume" form="short"/>
               <text variable="volume"/>
-                </else>
+            </else>
           </choose>
-            </if>
-          </choose>
-        </group>
+        </if>
+      </choose>
+    </group>
   </macro>
   <macro name="title-short">
     <choose>
@@ -352,20 +351,20 @@
     </choose>
   </macro>
   <macro name="description-note">
-        <group>
+    <group>
+      <choose>
+        <if match="any" variable="volume">
           <choose>
-            <if match="any" variable="volume">
-          <choose>
-                              <if type="article-journal" variable="volume" match="all">
+            <if type="article-journal" variable="volume" match="all">
                 </if>
-                <else>
-        <label plural="never" prefix="" suffix=" " variable="volume" form="short"/>
+            <else>
+              <label plural="never" prefix="" suffix=" " variable="volume" form="short"/>
               <text variable="volume"/>
-                </else>
+            </else>
           </choose>
-            </if>
-          </choose>
-        </group>
+        </if>
+      </choose>
+    </group>
     <group delimiter=", ">
       <text macro="interviewer-note"/>
       <text variable="medium"/>
@@ -414,10 +413,8 @@
         <if type="bill entry-encyclopedia legislation legal_case" match="none">
           <text variable="container-title" text-case="title" font-style="normal" font-weight="bold"/>
         </if>
-
         <else-if type="entry-encyclopedia" match="any">
         </else-if>
-
       </choose>
     </group>
   </macro>
@@ -438,10 +435,8 @@
             </choose>
           </group>
         </if>
-
-<else-if type="entry-encyclopedia" match="any">
+        <else-if type="entry-encyclopedia" match="any">
 </else-if>
-
       </choose>
     </group>
   </macro>
@@ -920,12 +915,10 @@
       <if type="article-journal chapter" match="none">
         <text macro="point-locators"/>
       </if>
-
       <else-if type="chapter" match="any">
-          <label plural="never" suffix=" " variable="locator" form="short"/>
-          <text variable="locator"/>
+        <label plural="never" suffix=" " variable="locator" form="short"/>
+        <text variable="locator"/>
       </else-if>
-
       <else-if variable="volume issue" match="none">
         <text macro="point-locators"/>
       </else-if>
@@ -961,7 +954,6 @@
               </choose>
             </group>
           </else-if>
-
           <else-if type="chapter entry-encyclopedia" match="any">
             <group>
               <choose>
@@ -980,7 +972,6 @@
               </choose>
             </group>
           </else-if>
-
         </choose>
       </if>
       <else-if type="article-journal">
@@ -1008,9 +999,6 @@
       </else-if>
       <else>
         <group delimiter=" ">
-
-
-
           <label plural="never" suffix=" " variable="locator" form="short"/>
           <text variable="locator"/>
         </group>
@@ -1050,13 +1038,10 @@
         <label plural="never" suffix=" " variable="page" form="short"/>
         <text variable="page"/>
       </else-if>
-
       <else-if type="chapter entry-encyclopedia" match="any">
         <label plural="never" prefix=", " suffix=" " variable="page" form="short"/>
         <text variable="page"/>
       </else-if>
-
-
       <else-if type="paper-conference" match="any">
         <group>
           <choose>
@@ -1161,7 +1146,6 @@
       </else-if>
       <else-if variable="publisher-place event-place publisher genre" match="any">
         <group delimiter=", ">
-
           <text macro="event-note"/>
           <group delimiter=", ">
             <text macro="originally-published"/>
@@ -1169,15 +1153,15 @@
               <text macro="reprint-note"/>
               <text macro="publisher"/>
             </group>
-          <choose>
-            <if variable="title" match="none"/>
-            <else-if type="thesis" match="any">
-              <text variable="genre" prefix="" suffix=" Tezi"/>
-            </else-if>
-            <else-if type="manuscript speech" match="any">
-              <text variable="genre" prefix="(" suffix=")"/>
-            </else-if>
-          </choose>
+            <choose>
+              <if variable="title" match="none"/>
+              <else-if type="thesis" match="any">
+                <text variable="genre" prefix="" suffix=" Tezi"/>
+              </else-if>
+              <else-if type="manuscript speech" match="any">
+                <text variable="genre" prefix="(" suffix=")"/>
+              </else-if>
+            </choose>
           </group>
           <text macro="issued"/>
         </group>
@@ -1312,10 +1296,10 @@
               <text variable="DOI" prefix="doi:"/>
             </if>
             <else>
-          <group delimiter="">
-              <text variable="URL" prefix="(Çevrimiçi) "/>
-            <date form="numeric" variable="accessed" prefix=", "/>
-          </group>
+              <group delimiter="">
+                <text variable="URL" prefix="(Çevrimiçi) "/>
+                <date form="numeric" variable="accessed" prefix=", "/>
+              </group>
             </else>
           </choose>
         </if>
@@ -1346,12 +1330,11 @@
               <text variable="DOI" prefix=", doi:"/>
             </if>
             <else>
-          <group delimiter="">
-              <text variable="URL" prefix=", (Çevrimiçi) "/>
-            <date form="numeric" variable="accessed" prefix=", "/>
-          </group>
+              <group delimiter="">
+                <text variable="URL" prefix=", (Çevrimiçi) "/>
+                <date form="numeric" variable="accessed" prefix=", "/>
+              </group>
             </else>
-
           </choose>
         </if>
       </choose>
@@ -1395,30 +1378,27 @@
             <text macro="point-locators-subsequent"/>
           </group>
         </if>
-
         <else-if position="ibid">
- <choose>
-<if variable="container-author author" match="none">
-         <group delimiter=", ">
-          <text term="ibid" text-case="lowercase" font-weight="bold"/>
-          </group>
-</if>
-<else>
-          <group delimiter=", ">
-            <text macro="contributors-short"/>
-          <text term="ibid" text-case="lowercase" font-weight="bold"/>
-          </group>
-</else>
-</choose>
+          <choose>
+            <if variable="container-author author" match="none">
+              <group delimiter=", ">
+                <text term="ibid" text-case="lowercase" font-weight="bold"/>
+              </group>
+            </if>
+            <else>
+              <group delimiter=", ">
+                <text macro="contributors-short"/>
+                <text term="ibid" text-case="lowercase" font-weight="bold"/>
+              </group>
+            </else>
+          </choose>
         </else-if>
-
-<else-if position="near-note">
+        <else-if position="near-note">
           <group delimiter=", ">
             <text macro="contributors-short"/>
             <group delimiter=" ">
               <group delimiter=", ">
                 <text macro="title-short"/>
-
                 <text macro="case-locator-subsequent"/>
               </group>
               <text macro="case-pinpoint-subsequent"/>
@@ -1430,14 +1410,12 @@
             </choose>
           </group>
         </else-if>
-
         <else-if position="subsequent">
           <group delimiter=", ">
             <text macro="contributors-short"/>
             <group delimiter=" ">
               <group delimiter=", ">
                 <text macro="title-short"/>
-
                 <text macro="case-locator-subsequent"/>
               </group>
               <text macro="case-pinpoint-subsequent"/>
@@ -1462,8 +1440,8 @@
                           <text macro="title-note" suffix=","/>
                         </group>
                         <text macro="description-note"/>
-                        <text macro="secondary-contributors-note"/>                        <text macro="container-title-note" suffix=","/>
-
+                        <text macro="secondary-contributors-note"/>
+                        <text macro="container-title-note" suffix=","/>
                         <text macro="container-contributors-note"/>
                       </group>
                       <text macro="locators-note-join-with-space"/>

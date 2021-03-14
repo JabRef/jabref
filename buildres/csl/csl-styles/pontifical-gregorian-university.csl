@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" initialize-with-hyphen="true" page-range-format="expanded" demote-non-dropping-particle="sort-only" name-delimiter=" &#8211; " names-delimiter=" &#8211; " delimiter-precedes-last="always" et-al-min="4" et-al-use-first="1" name-form="long" initialize-with=". " sort-separator=", " default-locale="it-IT">
   <info>
-    <title>Pontifical Gregorian University (Italian)</title>
+    <title>Pontifical Gregorian University (Italiano)</title>
     <id>http://www.zotero.org/styles/pontifical-gregorian-university</id>
     <link href="http://www.zotero.org/styles/pontifical-gregorian-university" rel="self"/>
     <link href="http://www.unigre.it" rel="documentation"/>

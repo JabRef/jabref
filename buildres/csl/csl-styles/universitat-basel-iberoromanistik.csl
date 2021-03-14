@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="es-ES">
   <info>
-    <title>Universität Basel - Iberoromanistik (Spanish)</title>
+    <title>Universität Basel - Iberoromanistik (Español)</title>
     <id>http://www.zotero.org/styles/universitat-basel-iberoromanistik</id>
     <link href="http://www.zotero.org/styles/universitat-basel-iberoromanistik" rel="self"/>
     <link href="http://www.zotero.org/styles/universitat-bremen-institut-fur-politikwissenschaft" rel="template"/>
@@ -13,7 +13,7 @@
     <category field="linguistics"/>
     <category field="humanities"/>
     <summary>Citation style as per the guidelines from the 7th edition, Oct 2018.</summary>
-    <updated>2018-10-19T10:11:49+00:00</updated>
+    <updated>2021-02-09T11:21:54+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="es">
@@ -88,7 +88,7 @@
   <macro name="title">
     <choose>
       <if type="chapter paper-conference" match="any">
-        <text variable="title" quotes="false" font-style="italic" suffix="."/>
+        <text variable="title" quotes="true" suffix=","/>
       </if>
       <else-if type="book" match="any">
         <group delimiter=". " suffix=".">
@@ -202,7 +202,7 @@
     <choose>
       <if type="chapter paper-conference" match="any">
         <group delimiter=". " prefix=" " suffix=".">
-          <text variable="container-title" text-case="title"/>
+          <text variable="container-title" text-case="title" font-style="italic"/>
           <text macro="number-of-volumes"/>
         </group>
       </if>
