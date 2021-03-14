@@ -24,16 +24,29 @@ public class CitationTest {
 
     @Test
     public void constructorLineSmallerEqualZeroTest() {
-        Exception e = assertThrows(IllegalArgumentException.class, () -> new Citation(path, 0, 1, 5, "lineText"));
-        assertEquals("Line has to be greater than 0.", e.getMessage());
+        Exception e1 = assertThrows(IllegalArgumentException.class, () -> new Citation(path, -1, 1, 5, "lineText"));
+        assertEquals("Line has to be greater than 0.", e1.getMessage());
+        Exception e2 = assertThrows(IllegalArgumentException.class, () -> new Citation(path, 0, 1, 5, "lineText"));
+        assertEquals("Line has to be greater than 0.", e2.getMessage());
+    }
+
+    @Test
+    public void constructorLineLargerZeroTest() {
+        Citation citation1 = new Citation(path, 1, 1, 5, "lineText");
     }
 
     @Test
     public void constructorColStartColEndNotInBoundsTest() {
-        Exception e1 = assertThrows(IllegalArgumentException.class, () -> new Citation(path, 10, -3, 2, "lineText"));
+        Exception e1 = assertThrows(IllegalArgumentException.class, () -> new Citation(path, 10, -1, 2, "lineText"));
         assertEquals("Citation has to be between 0 and line length.", e1.getMessage());
-        Exception e2 = assertThrows(IllegalArgumentException.class, () -> new Citation(path, 10, 1, 10, "lineText"));
+        Exception e2 = assertThrows(IllegalArgumentException.class, () -> new Citation(path, 10, 1, 9, "lineText"));
         assertEquals("Citation has to be between 0 and line length.", e2.getMessage());
+    }
+
+    @Test
+    public void constructorColStartColEndInBoundsTest() {
+        Citation citation1 = new Citation(path, 10, 0, 2, "lineText");
+        Citation citation2 = new Citation(path, 10, 1, 8, "lineText");
     }
 
     @Test
