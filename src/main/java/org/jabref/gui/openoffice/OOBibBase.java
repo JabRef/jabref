@@ -4199,196 +4199,196 @@ class OOBibBase {
             List<List<Integer>> joinableGroups = new ArrayList<>();
             List<XTextCursor> joinableGroupsCursors = new ArrayList<>();
 
-            // current group
-            List<Integer> currentGroup = new ArrayList<>();
-            XTextCursor currentGroupCursor = null;
-            XTextCursor cursorBetween = null;
-            Integer prev = null;
-            XTextRange prevRange = null;
+            if (referenceMarkNames.size() > 0) {
+                // current group
+                List<Integer> currentGroup = new ArrayList<>();
+                XTextCursor currentGroupCursor = null;
+                XTextCursor cursorBetween = null;
+                Integer prev = null;
+                XTextRange prevRange = null;
 
-            for ( int i=0; i < referenceMarkNames.size(); i++ ) {
-                final String name = referenceMarkNames.get(i);
-                XTextRange  currentRange = documentConnection.getReferenceMarkRangeOrNull(name);
-                Objects.requireNonNull(currentRange);
+                for (int i = 0; i < referenceMarkNames.size(); i++) {
+                    final String name = referenceMarkNames.get(i);
+                    XTextRange currentRange = documentConnection.getReferenceMarkRangeOrNull(name);
+                    Objects.requireNonNull(currentRange);
 
-                boolean addToGroup = true;
-                /*
-                 * Decide if we add name to the group
-                 */
+                    boolean addToGroup = true;
+                    /*
+                     * Decide if we add name to the group
+                     */
 
-                // Only combine (Author 2000) type citations
-                if ( itcTypes[i] != OOBibBase.AUTHORYEAR_PAR
-                     // allow "Author (2000)"
-                     // && itcTypes[i] != OOBibBase.AUTHORYEAR_INTEXT
-                    ) {
-                    addToGroup = false;
-                }
-
-                // Even if we combine AUTHORYEAR_INTEXT citations, we
-                // would not mix them with AUTHORYEAR_PAR
-                if (addToGroup &&  (prev != null) ) {
-                    if ( itcTypes[i] != itcTypes[prev] ){
+                    // Only combine (Author 2000) type citations
+                    if (itcTypes[i] != OOBibBase.AUTHORYEAR_PAR
+                        // allow "Author (2000)"
+                        // && itcTypes[i] != OOBibBase.AUTHORYEAR_INTEXT
+                        ) {
                         addToGroup = false;
                     }
-                }
 
-                if ( addToGroup && prev != null ) {
-                    Objects.requireNonNull(prevRange);
-                    Objects.requireNonNull(currentRange);
-                    if ( ! DocumentConnection.comparable( prevRange, currentRange ) ) {
-                        addToGroup = false;
-                    } else {
-
-                        int textOrder =
-                            DocumentConnection.javaCompareRegionStarts(
-                                prevRange,
-                                currentRange);
-
-                        if ( textOrder != 1 ) {
-                            String msg = String.format(
-                                "combineCiteMarkers: \"%s\" supposed to be followed by \"%s\", but %s",
-                                prevRange.getString(),
-                                currentRange.getString(),
-                                ((textOrder == 0)
-                                 ? "they start at the same position"
-                                 : "the latter precedes the first")
-                                );
-                            LOGGER.warn(msg);
+                    // Even if we combine AUTHORYEAR_INTEXT citations, we
+                    // would not mix them with AUTHORYEAR_PAR
+                    if (addToGroup && (prev != null)) {
+                        if (itcTypes[i] != itcTypes[prev]) {
                             addToGroup = false;
                         }
                     }
-                }
 
-                if (addToGroup && (cursorBetween != null)) {
-                    Objects.requireNonNull(currentGroupCursor);
-                    // assume: currentGroupCursor.getEnd() == cursorBetween.getEnd()
-                    if (DocumentConnection.javaCompareRegionEnds(
-                            cursorBetween, currentGroupCursor) != 0) {
-                        throw new RuntimeException(
-                            "combineCiteMarkers: cursorBetween.end != currentGroupCursor.end");
+                    if (addToGroup && prev != null) {
+                        Objects.requireNonNull(prevRange);
+                        Objects.requireNonNull(currentRange);
+                        if (!DocumentConnection.comparable(prevRange, currentRange)) {
+                            addToGroup = false;
+                        } else {
+
+                            int textOrder =
+                                DocumentConnection.javaCompareRegionStarts(
+                                    prevRange,
+                                    currentRange);
+
+                            if (textOrder != 1) {
+                                String msg = String.format(
+                                    "combineCiteMarkers: \"%s\" supposed to be followed by \"%s\", but %s",
+                                    prevRange.getString(),
+                                    currentRange.getString(),
+                                    ((textOrder == 0)
+                                     ? "they start at the same position"
+                                     : "the latter precedes the first")
+                                    );
+                                LOGGER.warn(msg);
+                                addToGroup = false;
+                            }
+                        }
                     }
 
-                    XTextRange rangeStart = currentRange.getStart();
-
-                    boolean couldExpand = true;
-                    XTextCursor thisCharCursor =
-                            currentRange.getText().createTextCursorByRange(cursorBetween.getEnd());
-                    while (couldExpand &&
-                           (DocumentConnection.javaCompareRegionEnds(
-                               cursorBetween, rangeStart) > 0)) {
-                        couldExpand = cursorBetween.goRight((short) 1, true);
-                        currentGroupCursor.goRight((short) 1, true);
-                        //
-                        thisCharCursor.goRight((short) 1, true);
-                        String thisChar = thisCharCursor.getString();
-                        thisCharCursor.collapseToEnd();
-                        if (thisChar.isEmpty()
-                            || thisChar == "\n"
-                            ||  !thisChar.trim().isEmpty() ) {
-                            couldExpand = false;
-                        }
+                    if (addToGroup && (cursorBetween != null)) {
+                        Objects.requireNonNull(currentGroupCursor);
+                        // assume: currentGroupCursor.getEnd() == cursorBetween.getEnd()
                         if (DocumentConnection.javaCompareRegionEnds(
                                 cursorBetween, currentGroupCursor) != 0) {
                             throw new RuntimeException(
-                                "combineCiteMarkers: "
-                                + "cursorBetween.end != currentGroupCursor.end (during expand)" );
+                                "combineCiteMarkers: cursorBetween.end != currentGroupCursor.end");
+                        }
+
+                        XTextRange rangeStart = currentRange.getStart();
+
+                        boolean couldExpand = true;
+                        XTextCursor thisCharCursor =
+                            currentRange.getText()
+                            .createTextCursorByRange(cursorBetween.getEnd());
+                        while (couldExpand &&
+                               (DocumentConnection.javaCompareRegionEnds(
+                                   cursorBetween, rangeStart) > 0)) {
+                            couldExpand = cursorBetween.goRight((short) 1, true);
+                            currentGroupCursor.goRight((short) 1, true);
+                            //
+                            thisCharCursor.goRight((short) 1, true);
+                            String thisChar = thisCharCursor.getString();
+                            thisCharCursor.collapseToEnd();
+                            if (thisChar.isEmpty()
+                                || thisChar.equals("\n")
+                                || !thisChar.trim().isEmpty()) {
+                                couldExpand = false;
+                            }
+                            if (DocumentConnection.javaCompareRegionEnds(
+                                    cursorBetween, currentGroupCursor) != 0) {
+                                throw new RuntimeException(
+                                    "combineCiteMarkers:"
+                                    + " cursorBetween.end != currentGroupCursor.end"
+                                    + " (during expand)");
+                            }
+                        }
+
+                        if (!couldExpand) {
+                            addToGroup = false;
                         }
                     }
 
-                    if (!couldExpand) {
-                        addToGroup = false;
+                    /*
+                     * Even if we do not add it to an existing group,
+                     * we might use it to start a new group.
+                     *
+                     * Can it start a new group?
+                     */
+                    boolean canStartGroup = (itcTypes[i] == OOBibBase.AUTHORYEAR_PAR);
+
+                    if (!addToGroup) {
+                        // close currentGroup
+                        if (currentGroup.size() > 1) {
+                            joinableGroups.add(currentGroup);
+                            joinableGroupsCursors.add(currentGroupCursor);
+                        }
+                        // Start a new, empty group
+                        currentGroup = new ArrayList<>();
+                        currentGroupCursor = null;
+                        cursorBetween = null;
+                        prev = null;
+                        prevRange = null;
+                    }
+
+                    if (addToGroup || canStartGroup) {
+                        // Add the current entry to a group.
+                        currentGroup.add(i);
+                        // ... and start new cursorBetween
+                        // Set up cursorBetween
+                        //
+                        XTextRange rangeEnd = currentRange.getEnd();
+                        cursorBetween =
+                            currentRange.getText().createTextCursorByRange(rangeEnd);
+                        // If new group, create currentGroupCursor
+                        if (currentGroupCursor == null) {
+                            currentGroupCursor =
+                                currentRange.getText()
+                                .createTextCursorByRange(currentRange.getStart());
+                        }
+                        // include self in currentGroupCursor
+                        currentGroupCursor.goRight(
+                            (short) (currentRange.getString().length()), true);
+
+                        if (DocumentConnection.javaCompareRegionEnds(
+                                cursorBetween, currentGroupCursor) != 0) {
+                            /*
+                             * A problem discovered using this check: when
+                             * viewing the document in
+                             * two-pages-side-by-side mode, our visual
+                             * firstAppearanceOrder follows the visual
+                             * ordering on the screen. The problem this
+                             * caused: it sees a citation on the 2nd line
+                             * of the 1st page as appearing after one at
+                             * the 1st line of 2nd page. Since we create
+                             * cursorBetween at the end of range1Full (on
+                             * 1st page), it is now BEFORE
+                             * currentGroupCursor (on 2nd page).
+                             */
+                            throw new RuntimeException(
+                                "combineCiteMarkers: "
+                                + "cursorBetween.end != currentGroupCursor.end"
+                                + String.format(
+                                    " (after %s", addToGroup ? "addToGroup" : "startGroup")
+                                + (addToGroup
+                                   ? String.format(
+                                       "comparisonResult: %d\n"
+                                       + "cursorBetween: %s\n"
+                                       + "currentRange: %s\n"
+                                       + "currentGroupCursor: %s\n",
+                                       DocumentConnection.javaCompareRegionEnds(
+                                           cursorBetween, currentGroupCursor),
+                                       cursorBetween.getString(),
+                                       currentRange.getString(),
+                                       currentGroupCursor.getString()
+                                       )
+                                   : "")
+                                );
+                        }
+                        prev = i;
+                        prevRange = currentRange;
                     }
                 }
 
-                /*
-                 * Even if we do not add it to an existing group, we might use it toi start
-                 * a new group.
-                 */
-                // can it start a new group?
-                boolean canStartGroup = ( itcTypes[i] == OOBibBase.AUTHORYEAR_PAR );
-
-                if (!addToGroup){
-                    // close currentGroup
-                    if (currentGroup.size() > 1) {
-                        joinableGroups.add( currentGroup );
-                        joinableGroupsCursors.add( currentGroupCursor );
-                    }
-                    // Start a new, empty group
-                    currentGroup = new ArrayList<>();
-                    currentGroupCursor = null;
-                    cursorBetween = null;
-                    prev = null;
-                    prevRange = null;
-                }
-
-                if ( addToGroup || canStartGroup ) {
-                    // Add the current entry to a group.
-                    currentGroup.add(i);
-                    // ... and start new cursorBetween
-                    // Set up cursorBetween
-                    //
-                    XTextRange rangeEnd = currentRange.getEnd();
-                    cursorBetween = currentRange.getText().createTextCursorByRange(rangeEnd);
-                    // If new group, create currentGroupCursor
-                    if ( currentGroupCursor == null ) {
-                        currentGroupCursor =
-                            currentRange.getText().createTextCursorByRange(currentRange.getStart());
-                    }
-                    // include self in currentGroupCursor
-                    currentGroupCursor.goRight( (short)( currentRange.getString().length() ), true );
-
-                    if (DocumentConnection.javaCompareRegionEnds(
-                            cursorBetween, currentGroupCursor) != 0) {
-                        /*
-                         * A problem discovered using this check: when
-                         * viewing the document in
-                         * two-pages-side-by-side mode, our visual
-                         * firstAppearanceOrder follows the visual
-                         * ordering on the screen. The problem this
-                         * caused: it sees a citation on the 2nd line
-                         * of the 1st page as appearing after one at
-                         * the 1st line of 2nd page. Since we create
-                         * cursorBetween at the end of range1Full (on
-                         * 1st page), it is now BEFORE
-                         * currentGroupCursor (on 2nd page).
-                         */
-                        throw new RuntimeException(
-                            "combineCiteMarkers: "
-                            + "cursorBetween.end != currentGroupCursor.end"
-                            + String.format(
-                                " (after %s", addToGroup ? "addToGroup" : "startGroup")
-                            + (addToGroup
-                               ? String.format(
-                                   "comparisonResult: %d\n"
-                                   + "cursorBetween: %s\n"
-                                   + "currentRange: %s\n"
-                                   + "currentGroupCursor: %s\n"
-                                   , DocumentConnection.javaCompareRegionEnds(
-                                       cursorBetween, currentGroupCursor)
-                                   , cursorBetween.getString()
-                                   , currentRange.getString()
-                                   , currentGroupCursor.getString()
-                                   )
-                               : "")
-                            );
-                    }
-                    prev = i;
-                    prevRange = currentRange;
-            } // for i
-        } // try
-
-        if (true) {
                 // close currentGroup
                 if (currentGroup.size() > 1) {
-                    joinableGroups.add( currentGroup );
-                    joinableGroupsCursors.add( currentGroupCursor );
+                    joinableGroups.add(currentGroup);
+                    joinableGroupsCursors.add(currentGroupCursor);
                 }
-                // clean variables
-                currentGroup = null;
-                currentGroupCursor = null;
-                cursorBetween = null;
-                prev = null;
-                prevRange = null;
             }
 
             if (joinableGroups.size() > 0) {
