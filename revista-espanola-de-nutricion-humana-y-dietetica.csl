@@ -2,11 +2,11 @@
 <style xmlns="http://purl.org/net/xbiblio/csl" page-range-format="minimal" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="es-ES">
   <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
   <info>
-    <title>Revista Espanola de Nutricion Humana y Dietetica (Spanish)</title>
+    <title>Revista Espanola de Nutricion Humana y Dietetica (Español)</title>
     <title-short>RENHYD</title-short>
     <id>http://www.zotero.org/styles/revista-espanola-de-nutricion-humana-y-dietetica</id>
-    <link rel="self" href="http://www.zotero.org/styles/revista-espanola-de-nutricion-humana-y-dietetica"/>
-    <link rel="template" href="http://www.zotero.org/styles/angiologia"/>
+    <link href="http://www.zotero.org/styles/revista-espanola-de-nutricion-humana-y-dietetica" rel="self"/>
+    <link href="http://www.zotero.org/styles/angiologia" rel="template"/>
     <category citation-format="numeric"/>
     <category field="medicine"/>
     <issn>2173-1292</issn>
@@ -61,7 +61,7 @@
     <choose>
       <if variable="issued">
         <date variable="issued">
-          <date-part name="year" form="long" range-delimiter="–"/>
+          <date-part name="year" form="long" range-delimiter="&#8211;"/>
         </date>
       </if>
       <else>

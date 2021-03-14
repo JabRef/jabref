@@ -20,7 +20,7 @@ The primary components of the CSL ecosystem are:
 This README describes our official curated repository of CSL styles, hosted at https://github.com/citation-style-language/styles/.
 CSL locale files, which provide default localization data for CSL styles (such as translations and date formats), can be found at https://github.com/citation-style-language/locales.
 
-For more information about CSL and CSL styles, check out https://citationstyles.org/ and the [repository wiki](https://github.com/citation-style-language/styles/wiki).
+For more information about CSL and CSL styles, check out https://citationstyles.org/ and the information files in this repository ([Style Requirements](https://github.com/citation-style-language/styles/blob/master/STYLE_REQUIREMENTS.md), [Style Development](https://github.com/citation-style-language/styles/blob/master/STYLE_DEVELOPMENT.md), [Requesting Styles](https://github.com/citation-style-language/styles/blob/master/REQUESTING.md), [Contributing Styles](https://github.com/citation-style-language/styles/blob/master/CONTRIBUTING.md), and [Quality Control](https://github.com/citation-style-language/styles/blob/master/QUALITY_CONTROL.md)).
 
 Criteria for inclusion
 ----------------------
@@ -29,7 +29,7 @@ The official CSL style repository is the only repository of its kind, is used by
 The popularity of this repository is in large part due to its crowd-sourced nature, and, we believe, also due to our careful curation.
 While we evaluate style submissions on a case-by-case basis, we generally use the following criteria for inclusion in the CSL style repository:
 
-* Styles must be of sufficient quality and meet our [Style Requirements](https://github.com/citation-style-language/styles/wiki/Style-Requirements).
+* Styles must be of sufficient quality and meet our [style requirements](https://github.com/citation-style-language/styles/blob/master/STYLE_REQUIREMENTS.md).
   While we may be able to assist with this, its ultimately the submitter's responsibility to provide a style that meets our standards.
 * Styles should be based on an official style guide (and link to the style guide in online or printed form).
 * Styles should be of interest to a wider audience.

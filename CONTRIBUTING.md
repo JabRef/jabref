@@ -4,11 +4,11 @@ The CSL style repository is the central location on the web for collecting and m
 Software products like Zotero, Mendeley, and Papers all draw their styles from our repository.
 
 We welcome style submissions (and corrections), and are particularly interested in styles for journals and published style guides.
-If you wish to submit a different type of style, please first check our [Criteria for Accepting Styles](https://github.com/citation-style-language/styles/wiki/Criteria-for-Accepting-Styles).
+If you wish to submit a different type of style, please first check our [Criteria for Accepting Styles](https://github.com/citation-style-language/styles/blob/master/README.md#criteria-for-inclusion).
 
 To submit a style, please follow the following steps (for locale files, follow the same steps in the  [locales](https://github.com/citation-style-language/locales) repository):
 
-#### 1. Check that your style meets all our [style requirements](https://github.com/citation-style-language/styles/wiki/Style-Requirements)
+#### 1. Check that your style meets all our [style requirements](https://github.com/citation-style-language/styles/blob/master/STYLE_REQUIREMENTS.md)
 
 #### 2. [Validate](https://validator.citationstyles.org/) your style against the CSL schema, and correct any validation errors
 
@@ -20,7 +20,7 @@ To start, create a GitHub account and sign in.
 ##### 3a. Submitting a new style
 
 1. Visit https://github.com/citation-style-language/styles and click the "Create new file" button.
-   When submitting a [dependent style](https://github.com/citation-style-language/styles/wiki/Requesting-Styles#dependent-styles), first navigate to the [dependent](https://github.com/citation-style-language/styles/tree/master/dependent) subdirectory.
+   When submitting a [dependent style](https://github.com/citation-style-language/styles/blob/master/REQUESTING.md#dependent-styles), first navigate to the [dependent](https://github.com/citation-style-language/styles/tree/master/dependent) subdirectory.
 2. Type in the file name of the style in the "Name your file..." text field at the top.
    Don't forget to add the ".csl" extension (e.g., "journal-of-results.csl" instead of just "journal-of-results")!
 3. Paste the style code into the "<> Edit new file" tab below.
@@ -28,7 +28,7 @@ To start, create a GitHub account and sign in.
 5. In the next window, click the "Create pull request" button.
    Describe the changes you've made, and click the "Create pull request" button once more.
 
-(for more help, see GitHub's instructions on [Creating new files](https://help.github.com/articles/creating-new-files))
+(For more help, see GitHub's instructions on [Creating new files](https://help.github.com/articles/creating-new-files).)
 
 ##### 3b. Submitting changes to an existing style
 
@@ -41,7 +41,7 @@ To start, create a GitHub account and sign in.
 5. In the next window, click the "Create pull request" button.
    Describe the changes you've made, and click the "Create pull request" button once more.
 
-(for more help, see GitHub's instructions on [Editing files in another user's repository](https://help.github.com/articles/editing-files-in-another-user-s-repository))
+(For more help, see GitHub's instructions on [Editing files in another user's repository](https://help.github.com/articles/editing-files-in-another-user-s-repository).)
 
 Instead of relying solely on the GitHub website, you can also use a git client, such as [GitHub Desktop](https://desktop.github.com/) for Mac and Windows, or [SmartGit](http://www.syntevo.com/smartgit/).
 When using a client, [fork](https://help.github.com/articles/fork-a-repo/) the [style repository](https://github.com/citation-style-language/styles), create a branch off of "master", commit your changes, and then create a [pull request](https://help.github.com/articles/using-pull-requests/).

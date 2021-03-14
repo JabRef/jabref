@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" class="note" demote-non-dropping-particle="sort-only" default-locale="cs-CZ">
   <info>
-    <title>ISO-690 (full note, Czech)</title>
+    <title>ISO-690 (full note, Čeština)</title>
     <id>http://www.zotero.org/styles/iso690-full-note-cs</id>
     <link href="http://www.zotero.org/styles/iso690-full-note-cs" rel="self"/>
     <link href="http://www.zotero.org/styles/iso690-full-note-sk" rel="template"/>
@@ -14,7 +14,7 @@
     <category citation-format="note"/>
     <category field="law"/>
     <summary>Czech ISO-690, full note.</summary>
-    <updated>2020-10-07T01:38:13+00:00</updated>
+    <updated>2021-03-07T01:38:13+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="cs">
@@ -343,7 +343,7 @@
         <if position="ibid-with-locator">
           <group delimiter=", ">
             <text term="ibid"/>
-            <text prefix="s. " variable="locator" suffix="."/>
+            <text macro="citation-locator" suffix="."/>
           </group>
         </if>
         <else-if position="ibid">
