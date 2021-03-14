@@ -1,7 +1,9 @@
 package org.jabref.logic.integrity;
 
 import java.util.Collections;
+import java.util.List;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
@@ -23,4 +25,28 @@ public class CitationKeyCheckerTest {
         assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
+    @Test
+    void bibTexAcceptsKeyFromAuthorAndTitle() {
+        entry.setField(InternalField.KEY_FIELD, "BrownTheTitle");
+        entry.setField(StandardField.AUTHOR, "Brown");
+        entry.setField(StandardField.TITLE, "The Title");
+        assertEquals(Collections.emptyList(), checker.check(entry));
+    }
+
+    @Test
+    void bibTexAcceptsKeyFromTitleAndYear() {
+        entry.setField(InternalField.KEY_FIELD, "TheTitle2021");
+        entry.setField(StandardField.TITLE, "The Title");
+        entry.setField(StandardField.YEAR, "2021");
+        assertEquals(Collections.emptyList(), checker.check(entry));
+    }
+
+    @Test
+    void emptyCitationKey() {
+        entry.setField(StandardField.AUTHOR, "Brown");
+        entry.setField(StandardField.TITLE, "The Title");
+        entry.setField(StandardField.YEAR, "2021");
+        List<IntegrityMessage> expected = Collections.singletonList(new IntegrityMessage(Localization.lang("empty citation key") + ": " + entry.getAuthorTitleYear(100), entry, InternalField.KEY_FIELD));
+        assertEquals(expected, checker.check(entry));
+    }
 }
