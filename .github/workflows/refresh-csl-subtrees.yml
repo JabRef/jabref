@@ -28,7 +28,6 @@ jobs:
       - name: Update csl-styles
         run: |
           git subtree pull --prefix buildres/csl/csl-styles csl-styles master --squash || true
-          git subtree pull --prefix buildres/csl/csl-styles csl-styles master --squash
           cp buildres/csl/csl-styles/acm-siggraph.csl src/main/resources/csl-styles/
           cp buildres/csl/csl-styles/ieee.csl src/main/resources/csl-styles/
           cp buildres/csl/csl-styles/turabian-author-date.csl src/main/resources/csl-styles/
@@ -36,6 +35,7 @@ jobs:
         run: git remote add -f csl-locales https://github.com/citation-style-language/locales.git
       - name: Update csl-locales
         run: |
+          git subtree pull --prefix buildres/csl/csl-locales csl-locales master --squash || true
           git subtree pull --prefix buildres/csl/csl-locales csl-locales master --squash
           cp buildres/csl/csl-locales/locales.json src/main/resources/csl-locales/
           cp buildres/csl/csl-locales/locales-en-US.xml src/main/resources/csl-locales/
@@ -45,12 +45,3 @@ jobs:
           branch: refresh-csl
           commit-message: Update CSL styles
           title: "[Bot] Update CSL styles"
-
-
-      - name: Report issues
-        if: failure()
-        uses: JasonEtco/create-an-issue@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          filename: .github/failure-csl-update.md
