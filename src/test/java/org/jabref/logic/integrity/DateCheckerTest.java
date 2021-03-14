@@ -11,6 +11,11 @@ class DateCheckerTest {
     private final DateChecker checker = new DateChecker();
 
     @Test
+    void acceptsEmptyInput() {
+        assertEquals(Optional.empty(), checker.checkValue(""));
+    }
+
+    @Test
     void complainsAboutInvalidIsoLikeDate() {
         assertEquals(Optional.of("incorrect format"), checker.checkValue("2018-04-21TZ"));
     }
