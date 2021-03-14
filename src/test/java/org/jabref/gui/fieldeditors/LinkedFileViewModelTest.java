@@ -11,8 +11,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
-import java.util.regex.Pattern;
-
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 
@@ -43,7 +41,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -180,14 +177,11 @@ class LinkedFileViewModelTest {
         assertTrue(Files.exists(tempFile));
     }
 
-    // Structure taken from deleteWhenDialogCancelledReturnsFalseAndDoesNotRemoveFile method
     @Test
     void downloadHtmlFileCausesWarningDisplay() throws MalformedURLException {
-        // From BibDatabaseContextTest::setUp
         when(filePreferences.shouldStoreFilesRelativeToBib()).thenReturn(true);
-        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]"); // used in other tests in this class
-        when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]"); // used in movesFileWithFileDirPattern at MoveFilesCleanupTest.java
-
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("[entrytype]");
         databaseContext.setDatabasePath(tempFile);
 
         URL url = new URL("https://www.google.com/");
@@ -198,22 +192,23 @@ class LinkedFileViewModelTest {
 
         viewModel.download();
 
-        Pattern warningPattern = Pattern.compile(".*HTML.*", Pattern.CASE_INSENSITIVE);
-        verify(dialogService, atLeastOnce()).notify(matches(warningPattern));
+        verify(dialogService, atLeastOnce()).notify("Downloaded website as an HTML file.");
     }
 
+    @Test
     void downloadDoesNotOverwriteFileTypeExtension() throws MalformedURLException {
         linkedFile = new LinkedFile(new URL("http://arxiv.org/pdf/1207.0408v1"), "");
 
         databaseContext = mock(BibDatabaseContext.class);
         when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("");
 
         LinkedFileViewModel viewModel = new LinkedFileViewModel(linkedFile, entry, databaseContext, new CurrentThreadTaskExecutor(), dialogService, xmpPreferences, filePreferences, externalFileType);
 
         BackgroundTask<Path> task = viewModel.prepareDownloadTask(tempFile.getParent(), new URLDownload("http://arxiv.org/pdf/1207.0408v1"));
         task.onSuccess(destination -> {
             LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, Collections.singletonList(tempFile.getParent()), externalFileType);
-            assertEquals("asdf.PDF", newLinkedFile.getLink());
+            assertEquals("asdf.pdf", newLinkedFile.getLink());
             assertEquals("PDF", newLinkedFile.getFileType());
         });
         task.onFailure(Assertions::fail);
