@@ -27,7 +27,7 @@ jobs:
         run: git remote add -f csl-styles https://github.com/citation-style-language/styles.git
       - name: Update csl-styles
         run: |
-          git subtree pull --prefix buildres/csl/csl-styles csl-styles master --squash
+          git subtree pull --prefix buildres/csl/csl-styles csl-styles master --squash || true
           git subtree pull --prefix buildres/csl/csl-styles csl-styles master --squash
           cp buildres/csl/csl-styles/acm-siggraph.csl src/main/resources/csl-styles/
           cp buildres/csl/csl-styles/ieee.csl src/main/resources/csl-styles/
