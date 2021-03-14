@@ -17,8 +17,37 @@ public class ShortMonthFormatterTest {
     }
 
     @Test
-    public void testFormat() {
-        assertEquals("jan", formatter.format("01"));
+    public void formatShortName() {
+        assertEquals("jan", formatter.format("jan"));
+    }
+
+    @Test
+    public void formatFullName() {
+        assertEquals("jan", formatter.format("January"));
+    }
+
+    @Test
+    public void formatGermanFullName() {
         assertEquals("jan", formatter.format("Januar"));
+    }
+
+    @Test
+    public void formatMonthNumber() {
+        assertEquals("jan", formatter.format("01"));
+    }
+
+    @Test
+    public void formatRandomInput() {
+        assertEquals("", formatter.format("Invented Month"));
+    }
+
+    @Test
+    public void formatNullInput() {
+        assertEquals("", formatter.format(null));
+    }
+
+    @Test
+    public void formatEmptyInput() {
+        assertEquals("", formatter.format(""));
     }
 }
