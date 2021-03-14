@@ -26,7 +26,7 @@ public class CitationKeyCheckerTest {
     }
 
     @Test
-    void bibTexAcceptsKeyFromAuthorAndTitle() {
+    void KeyFromAuthorAndTitle() {
         entry.setField(InternalField.KEY_FIELD, "BrownTheTitle");
         entry.setField(StandardField.AUTHOR, "Brown");
         entry.setField(StandardField.TITLE, "The Title");
@@ -34,7 +34,7 @@ public class CitationKeyCheckerTest {
     }
 
     @Test
-    void bibTexAcceptsKeyFromTitleAndYear() {
+    void KeyFromTitleAndYear() {
         entry.setField(InternalField.KEY_FIELD, "TheTitle2021");
         entry.setField(StandardField.TITLE, "The Title");
         entry.setField(StandardField.YEAR, "2021");
