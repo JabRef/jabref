@@ -40,4 +40,29 @@ class DateTest {
     void parseDateNull() {
         assertThrows(NullPointerException.class, () -> Date.parse(null));
     }
+
+    @Test
+    void emptyInputValue() {
+        assertEquals(Optional.empty(), Date.parse(""));
+    }
+
+    @Test
+    void nonExistentDayOfMonthUpperOffPoint() {
+        assertEquals(Optional.empty(), Date.parse("32-06-2014"));
+    }
+
+    @Test
+    void nonExistentDayOfMonthLowerOffPoint() {
+        assertEquals(Optional.empty(), Date.parse("00-06-2014"));
+    }
+
+    @Test
+    void nonExistentMonthUpperOffPoint() {
+        assertEquals(Optional.empty(), Date.parse("30-13-2014"));
+    }
+
+    @Test
+    void nonExistentMonthLowerOffPoint() {
+        assertEquals(Optional.empty(), Date.parse("30-00-2014"));
+    }
 }
