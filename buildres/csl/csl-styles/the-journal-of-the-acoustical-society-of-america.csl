@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-US">
   <info>
-    <title>The Journal of the Acoustical Society of America</title>
+    <title>The Journal of the Acoustical Society of America (author-date)</title>
+    <title-short>JASA</title-short>
     <id>http://www.zotero.org/styles/the-journal-of-the-acoustical-society-of-america</id>
     <link href="http://www.zotero.org/styles/the-journal-of-the-acoustical-society-of-america" rel="self"/>
     <link href="http://www.zotero.org/styles/apa" rel="template"/>

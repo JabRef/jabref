@@ -15,7 +15,7 @@
     <category citation-format="author-date"/>
     <category field="medicine"/>
     <summary>Zitierstil entsprechend den Zitierrichtlinien für die Dissertation, Medizinische Fakultät Carl Gustav Carus, Technische Universität Dresden. Stil basiert auf dem Zitierstil der Zeitschrift Human Mutation</summary>
-    <updated>2015-08-28T17:01:17+00:00</updated>
+    <updated>2021-01-31T18:08:43+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="de">
@@ -152,7 +152,7 @@
       <date-part name="day" suffix="."/>
     </date>
   </macro>
-  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-names="true" disambiguate-add-givenname="true" disambiguate-add-year-suffix="true">
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true">
     <sort>
       <key macro="year-date"/>
       <key variable="author"/>

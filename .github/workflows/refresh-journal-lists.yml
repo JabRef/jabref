@@ -52,3 +52,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: update-journallist
           title: "[Bot] Update Journal abbrev list"
+          commit-message: Update journal abbrev list
