@@ -105,7 +105,7 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         for (Field field : fields) {
             FieldEditorFX fieldEditor = FieldEditors.getForField(field, taskExecutor, dialogService,
                     journalAbbreviationRepository,
-                    preferences, databaseContext, entry.getType(), suggestionProviders, undoManager);
+                    preferences, databaseContext, entry.getType(), suggestionProviders, stateManager, undoManager);
             fieldEditor.bindToEntry(entry);
 
             editors.put(field, fieldEditor);
