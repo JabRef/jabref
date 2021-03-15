@@ -117,6 +117,10 @@ class OOBibBase {
     private static final String
     REFERENCE_MARK_RIGHT_BRACKET = REFERENCE_MARK_USE_INVISIBLE_BRACKETS ? ZERO_WIDTH_SPACE : ">";
 
+    /** Should we always fully remove reference mark brackets? */
+    private static final boolean
+    REFERENCE_MARK_ALWAYS_REMOVE_BRACKETS = true;
+
     /* Types of in-text citation. (itcType)
      * Their numeric values are used in reference mark names.
      */
@@ -3064,9 +3068,9 @@ class OOBibBase {
      *  Create a reference mark with the given name, at the
      *  end of position.
      *
-     *  Change of plan: to reduce the difference from the original
-     *  representation, we only insist on having at least two
-     *  characters inside. These may be ZERO_WIDTH_SPACE characters or other
+     *  To reduce the difference from the original representation, we
+     *  only insist on having at least two characters inside reference
+     *  marks. These may be ZERO_WIDTH_SPACE characters or other
      *  placeholder not likely to appear in a citation mark.
      *
      *  This placeholder is only needed if the citation mark is
@@ -3077,9 +3081,15 @@ class OOBibBase {
      *
      *  After each getFillCursorForCitationGroup, we require a call to
      *  cleanFillCursorForCitationGroup, which removes the brackets,
-     *  unless if it would make the content less
-     *  than two characters. If we need only one placeholder, we keep the left bracket.
-     *  If we need two, then the content is empty.
+     *  unless if it would make the content less than two
+     *  characters. If we need only one placeholder, we keep the left
+     *  bracket.  If we need two, then the content is empty. The
+     *  removeBracketsFromEmpty parameter of
+     *  cleanFillCursorForCitationGroup overrides this, and for empty
+     *  citations it will remove the brackets, leaving an empty
+     *  reference mark. The idea behind this is that we do not need to
+     *  refill empty marks (itcTypes INVISIBLE_CIT), and the caller
+     *  can tell us that we are dealing with one of these.
      *
      *  Thus the only user-visible difference in citation marks is
      *  that instead of empty marks we use two brackets, for
@@ -3098,6 +3108,9 @@ class OOBibBase {
      *                          carries on format of characters from
      *                          the original position.
      *
+     *  @param withoutBrackets  Force empty reference mark (no brackets).
+     *                          For use with INVISIBLE_CIT.
+     *
      *  @return Nothing (was: XTextCursor for the text to be inserted)
      *
      */
@@ -3106,7 +3119,8 @@ class OOBibBase {
         DocumentConnection documentConnection,
         String name,
         XTextCursor position,
-        boolean insertSpaceAfter
+        boolean insertSpaceAfter,
+        boolean withoutBrackets
         )
         throws
         CreationException,
@@ -3132,11 +3146,15 @@ class OOBibBase {
         final String right = REFERENCE_MARK_RIGHT_BRACKET;
         final short leftLength = (short) left.length();
         final short rightLength = (short) right.length();
+        String bracketedContent = (withoutBrackets
+                                   ? ""
+                                   : left+right);
 
         cursor.getText().insertString(
             cursor,
-            left+right,
+            bracketedContent,
             true);
+
         /* XNamed mark = */ documentConnection.insertReferenceMark(
             name,
             cursor,
@@ -3152,11 +3170,16 @@ class OOBibBase {
     /**
      * Remove brackets, but if the result would become empty, leave
      * them; if the result would be a single characer, leave the left bracket.
+     *
+     * @param removeBracketsFromEmpty is intended to force removal if
+     *        we are working on an "Empty citation" (INVISIBLE_CIT).
      */
     private static void
     cleanFillCursorForCitationGroup(
         DocumentConnection documentConnection,
-        String name // Identifies group
+        String name, // Identifies group
+        boolean removeBracketsFromEmpty,
+        boolean alwaysRemoveBrackets
         )
         throws
         NoDocumentException,
@@ -3186,7 +3209,8 @@ class OOBibBase {
                 "cleanFillCursorForCitationGroup: full == null"
                 );
         }
-        String fullText = full.getString();
+        final String fullText = full.getString();
+        final int fullTextLength = fullText.length();
 
         XTextCursor alpha = full.getText().createTextCursorByRange(full);
         alpha.collapseToStart();
@@ -3216,21 +3240,33 @@ class OOBibBase {
                     ));
         }
 
-        if ( fullText.length() < (leftLength + rightLength)) {
+        final int contentLength = (fullTextLength - (leftLength + rightLength));
+        if ( contentLength < 0) {
             throw new RuntimeException(
                 String.format(
-                    "cleanFillCursorForCitationGroup: length(%s) < (leftLength + rightLength)",
+                    "cleanFillCursorForCitationGroup: length(%s) < 0",
                     name
                     ));
         }
 
-        if ( fullText.length() >= (leftLength + rightLength + 1)) {
+        boolean removeRight = (
             // have at least 1 character content
+            (contentLength >=  1)
+            || ((contentLength == 0) && removeBracketsFromEmpty)
+            || alwaysRemoveBrackets
+            );
+        boolean removeLeft = (
+            // have at least 2 character content
+            (contentLength >= 2)
+            || ((contentLength == 0) && removeBracketsFromEmpty)
+            || alwaysRemoveBrackets
+            );
+
+        if (removeRight) {
             omega.goLeft((short) rightLength, true); omega.setString("");
         }
 
-        if ( fullText.length() >= (leftLength + rightLength + 2)) {
-            // have at least 2 character content
+        if (removeLeft) {
             alpha.goRight((short) leftLength, true); alpha.setString("");
         }
     }
@@ -3308,7 +3344,8 @@ class OOBibBase {
                     documentConnection,
                     name,
                     full,
-                    false // insertSpaceAfter
+                    false, // insertSpaceAfter
+                    false  // withoutBrackets
                     );
             }
         }
@@ -3468,20 +3505,25 @@ class OOBibBase {
         createReferenceMarkForCitationGroup(documentConnection,
                                             name,
                                             position,
-                                            insertSpaceAfter);
+                                            insertSpaceAfter,
+                                            !withText);
 
-        XTextCursor c2 = getFillCursorForCitationGroup(documentConnection,
-                                                       name);
+        if (withText) {
+            XTextCursor c2 = getFillCursorForCitationGroup(documentConnection,
+                                                           name);
 
-        fillCitationMarkInCursor(documentConnection,
-                                 name,
-                                 c2,
-                                 citationText,
-                                 withText,
-                                 style);
+            fillCitationMarkInCursor(documentConnection,
+                                     name,
+                                     c2,
+                                     citationText,
+                                     withText,
+                                     style);
 
-        cleanFillCursorForCitationGroup(documentConnection,
-                                        name);
+            cleanFillCursorForCitationGroup(documentConnection,
+                                            name,
+                                            !withText,
+                                            REFERENCE_MARK_ALWAYS_REMOVE_BRACKETS);
+        }
         position.collapseToEnd();
     }
 
@@ -3887,28 +3929,33 @@ class OOBibBase {
 
             final String name = referenceMarkNames.get(i);
 
-            XTextCursor cursor =
-                getFillCursorForCitationGroup(
+            boolean withText = (types[i] != OOBibBase.INVISIBLE_CIT);
+            if (withText) {
+                XTextCursor cursor =
+                    getFillCursorForCitationGroup(
+                        documentConnection,
+                        name // Identifies group
+                        );
+
+                if (mustTestCharFormat) {
+                    assertCitationCharacterFormatIsOK(cursor, style);
+                    mustTestCharFormat = false;
+                }
+
+                fillCitationMarkInCursor(
                     documentConnection,
-                    name // Identifies group
+                    name, // citationGroup
+                    cursor,
+                    citMarkers[i], // citationText,
+                    withText,
+                    style
                     );
 
-            if (mustTestCharFormat) {
-                assertCitationCharacterFormatIsOK(cursor, style);
-                mustTestCharFormat = false;
+                cleanFillCursorForCitationGroup(documentConnection,
+                                                name,
+                                                !withText,
+                                                REFERENCE_MARK_ALWAYS_REMOVE_BRACKETS);
             }
-
-            fillCitationMarkInCursor(
-                documentConnection,
-                name, // citationGroup
-                cursor,
-                citMarkers[i], // citationText,
-                types[i] != OOBibBase.INVISIBLE_CIT, // withText,
-                style
-                );
-
-            cleanFillCursorForCitationGroup(documentConnection,
-                                            name);
 
             if (hadBibSection
                 && (documentConnection.getBookmarkRangeOrNull(OOBibBase.BIB_SECTION_NAME) == null)) {
