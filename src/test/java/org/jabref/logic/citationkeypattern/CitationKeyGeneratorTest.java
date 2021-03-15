@@ -747,6 +747,9 @@ class CitationKeyGeneratorTest {
         assertEquals("97", CitationKeyGenerator.lastPage("7,41,73--97"));
         assertEquals("97", CitationKeyGenerator.lastPage("7,41,97--73"));
         assertEquals("43", CitationKeyGenerator.lastPage("43+"));
+        assertEquals("0", CitationKeyGenerator.lastPage("00--0"));
+        assertEquals("1", CitationKeyGenerator.lastPage("1--1"));
+
     }
 
     @SuppressWarnings("ConstantConditions")

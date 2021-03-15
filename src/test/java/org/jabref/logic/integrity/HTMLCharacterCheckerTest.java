@@ -7,13 +7,24 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class HTMLCharacterCheckerTest {
 
     private final HTMLCharacterChecker checker = new HTMLCharacterChecker();
     private final BibEntry entry = new BibEntry();
+
+    @Test
+    void fieldNullValueCheck() {
+        Exception exception = assertThrows(
+                NullPointerException.class,
+                () -> entry.setField(StandardField.AUTHOR, null),
+                "field value must not be null"
+        );
+    }
 
     @Test
     void titleAcceptsNonHTMLEncodedCharacters() {
