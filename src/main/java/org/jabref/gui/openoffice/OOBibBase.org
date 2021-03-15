@@ -1,5 +1,17 @@
 * Notes for OOBibBase.java
 
+- file:../../logic/openoffice/
+- file:../../gui/openoffice/
+- file:../../../../../resources/l10n/JabRef_en.properties
+
+  
+** TODO separate responsibilites
+
+- clarify what belongs to
+  - the storage backend
+  - style
+  - (anything else?)
+
 ** combineCiteMarkers
    - reimplemented to collect data first, then apply
 
