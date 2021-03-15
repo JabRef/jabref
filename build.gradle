@@ -125,7 +125,7 @@ dependencies {
     implementation 'org.antlr:antlr-runtime:3.5.2'
 
     antlr4 'org.antlr:antlr4:4.9.1'
-    implementation 'org.antlr:antlr4-runtime:4.9.1'
+    implementation 'org.antlr:antlr4-runtime:4.9.2'
 
     implementation (group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.8.1') {
         exclude group: 'org.apache.lucene', module: 'lucene-sandbox'
