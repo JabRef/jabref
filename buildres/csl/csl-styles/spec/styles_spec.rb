@@ -35,7 +35,7 @@ shared_examples "style" do |basename, (filename, path, style, error), in_depende
         end
       end
 
-      unless CITATION_FORMAT_FILTER.include?(basename)
+      unless FILTER['CITATION_FORMAT'].include?(basename)
 
         it 'must define a citation-format (<category citation-format="..."/>)' do
           expect(style.citation_format).not_to be_nil
@@ -58,7 +58,7 @@ shared_examples "style" do |basename, (filename, path, style, error), in_depende
         end
       end
 
-      unless UNUSED_MACROS_FILTER.include?(basename)
+      unless FILTER['UNUSED_MACROS'].include?(basename)
         it "may not have any unused macros" do
           available_macros = style.macros.keys.sort
 

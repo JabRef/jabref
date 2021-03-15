@@ -14,7 +14,7 @@
     <category citation-format="note"/>
     <category field="law"/>
     <summary>Masaryk University, Faculty of Law</summary>
-    <updated>2020-06-10T10:00:00+00:00</updated>
+    <updated>2021-03-07T10:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="cs">
@@ -330,7 +330,7 @@
         <if position="ibid-with-locator">
           <group delimiter=", ">
             <text term="ibid"/>
-            <text prefix="s. " variable="locator" suffix="."/>
+            <text macro="citation-locator" suffix="."/>
           </group>
         </if>
         <else-if position="ibid">
