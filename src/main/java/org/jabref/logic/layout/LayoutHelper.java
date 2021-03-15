@@ -44,7 +44,21 @@ public class LayoutHelper {
     }
 
     public Layout getLayoutFromText() throws IOException {
-        parse();
+        parse(true);
+
+        for (StringInt parsedEntry : parsedEntries) {
+            if ((parsedEntry.i == LayoutHelper.IS_SIMPLE_COMMAND) || (parsedEntry.i == LayoutHelper.IS_FIELD_START)
+                    || (parsedEntry.i == LayoutHelper.IS_FIELD_END) || (parsedEntry.i == LayoutHelper.IS_GROUP_START)
+                    || (parsedEntry.i == LayoutHelper.IS_GROUP_END)) {
+                parsedEntry.s = parsedEntry.s.trim().toLowerCase(Locale.ROOT);
+            }
+        }
+
+        return new Layout(parsedEntries, prefs);
+    }
+
+    public Layout getLayoutFromTextDuringModify() throws IOException {
+        parse(false);
 
         for (StringInt parsedEntry : parsedEntries) {
             if ((parsedEntry.i == LayoutHelper.IS_SIMPLE_COMMAND) || (parsedEntry.i == LayoutHelper.IS_FIELD_START)
@@ -188,7 +202,7 @@ public class LayoutHelper {
         }
     }
 
-    private void parse() throws IOException, StringIndexOutOfBoundsException {
+    private void parse(boolean saveFlag) throws IOException, StringIndexOutOfBoundsException {
         skipWhitespace();
 
         int c;
@@ -217,7 +231,7 @@ public class LayoutHelper {
                     buffer = null;
                 }
 
-                parseField();
+                parseField(saveFlag);
 
                 // To make sure the next character, if it is a backslash,
                 // doesn't get ignored, since "previous" now holds a backslash:
@@ -236,7 +250,7 @@ public class LayoutHelper {
         }
     }
 
-    private void parseField() throws IOException {
+    private void parseField(boolean saveFlag) throws IOException {
         int c;
         StringBuilder buffer = null;
         String name;
@@ -258,8 +272,10 @@ public class LayoutHelper {
                             parsedEntries.size() - 1)) {
                         lastFive.append(entry.s);
                     }
-                    throw new StringIndexOutOfBoundsException(
-                            "Backslash parsing error near \'" + lastFive.toString().replace("\n", " ") + '\'');
+                    if (saveFlag) {
+                        throw new StringIndexOutOfBoundsException(
+                                "Backslash parsing error near \'" + lastFive.toString().replace("\n", " ") + '\'');
+                    }
                 }
 
                 if ("begin".equalsIgnoreCase(name)) {

@@ -24,7 +24,7 @@ public class TextBasedPreviewLayout implements PreviewLayout {
 
     public TextBasedPreviewLayout(String text, LayoutFormatterPreferences layoutFormatterPreferences) {
         this.layoutFormatterPreferences = layoutFormatterPreferences;
-        setText(text);
+        setText(text, true);
     }
 
     public TextBasedPreviewLayout(Layout layout) {
@@ -32,11 +32,16 @@ public class TextBasedPreviewLayout implements PreviewLayout {
         this.text = layout.getText();
     }
 
-    public void setText(String text) {
+    public void setText(String text, boolean saveFlag) {
         this.text = text;
         StringReader sr = new StringReader(text.replace("__NEWLINE__", "\n"));
         try {
-            layout = new LayoutHelper(sr, layoutFormatterPreferences).getLayoutFromText();
+            LayoutHelper layoutHelper = new LayoutHelper(sr, layoutFormatterPreferences);
+            if (saveFlag) {
+                layout = layoutHelper.getLayoutFromText();
+            } else {
+                layout = layoutHelper.getLayoutFromTextDuringModify();
+            }
         } catch (IOException e) {
             LOGGER.error("Could not generate layout", e);
         }
