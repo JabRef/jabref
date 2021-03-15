@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" page-range-format="chicago" demote-non-dropping-particle="sort-only">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" page-range-format="chicago" demote-non-dropping-particle="sort-only" initialize-with=".">
   <info>
     <title>Early Christianity</title>
     <title-short>EC</title-short>
@@ -16,7 +16,7 @@
     <issn>1868-7032</issn>
     <eissn>1868-8020</eissn>
     <summary>Early Christianity</summary>
-    <updated>2015-08-25T09:08:29+00:00</updated>
+    <updated>2021-02-22T21:28:33+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -459,7 +459,10 @@
     </group>
   </macro>
   <macro name="publisher">
-    <text variable="publisher-place"/>
+    <group delimiter=": ">
+      <text variable="publisher-place"/>
+      <text variable="publisher"/>
+    </group>
   </macro>
   <macro name="issued">
     <choose>
@@ -589,7 +592,7 @@
     <choose>
       <if type="article-journal">
         <text variable="volume" prefix=" "/>
-        <text variable="issue" prefix="/"/>
+        <text variable="issue" prefix="."/>
         <text macro="issued" prefix=" (" suffix=")"/>
       </if>
       <else-if variable="publisher-place publisher" match="any">
@@ -717,24 +720,30 @@
         <if position="ibid-with-locator">
           <group delimiter=", ">
             <text macro="contributors-short"/>
-            <text macro="title-short"/>
-            <text variable="first-reference-note-number" prefix="(see n. " suffix=")"/>
+            <group delimiter=" ">
+              <text macro="title-short"/>
+              <text variable="first-reference-note-number" prefix="(see n. " suffix=")"/>
+            </group>
             <text macro="point-locators-subsequent"/>
           </group>
         </if>
         <else-if position="ibid">
           <group delimiter=", ">
             <text macro="contributors-short"/>
-            <text macro="title-short"/>
-            <text variable="first-reference-note-number" prefix="(see n. " suffix=")"/>
+            <group delimiter=" ">
+              <text macro="title-short"/>
+              <text variable="first-reference-note-number" prefix="(see n. " suffix=")"/>
+            </group>
             <text macro="point-locators-subsequent"/>
           </group>
         </else-if>
         <else-if position="subsequent">
           <group delimiter=", ">
             <text macro="contributors-short"/>
-            <text macro="title-short"/>
-            <text variable="first-reference-note-number" prefix="(see n. " suffix=")"/>
+            <group delimiter=" ">
+              <text macro="title-short"/>
+              <text variable="first-reference-note-number" prefix="(see n. " suffix=")"/>
+            </group>
             <text macro="point-locators-subsequent"/>
           </group>
         </else-if>

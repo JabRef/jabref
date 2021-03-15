@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="minimal" default-locale="en-US">
   <info>
-    <title>Aviation, Space, and Environmental Medicine</title>
-    <title-short>ASEM</title-short>
-    <id>http://www.zotero.org/styles/aviation-space-and-environmental-medicine</id>
-    <link href="http://www.zotero.org/styles/aviation-space-and-environmental-medicine" rel="self"/>
-    <link href="https://www.editorialmanager.com/asem/account/AUTHOR_INSTRUCTIONS.pdf" rel="documentation"/>
+    <title>Aerospace Medicine and Human Performance</title>
+    <id>http://www.zotero.org/styles/aerospace-medicine-and-human-performance</id>
+    <link href="http://www.zotero.org/styles/aerospace-medicine-and-human-performance" rel="self"/>
+    <link href="http://www.asma.org/journal/submit-an-article" rel="documentation"/>
+    <link href="http://www.asma.org/asma/media/AsMA/pdf-journal/Info-4-authors_AMHP-2021.pdf" rel="documentation"/>
     <author>
       <name>Sebastian Karcher</name>
     </author>
@@ -17,11 +17,14 @@
       <name>Michael Berkowitz</name>
       <email>mberkowi@gmu.edu</email>
     </contributor>
+    <contributor>
+      <name>Patrick O'Brien</name>
+    </contributor>
     <category citation-format="numeric"/>
     <category field="medicine"/>
-    <issn>0095-6562</issn>
-    <summary>Vancouver style for the ASEM journal</summary>
-    <updated>2012-09-27T22:06:38+00:00</updated>
+    <issn>2375-6314</issn>
+    <eissn>2375-6322</eissn>
+    <updated>2021-02-25T09:04:38+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="author">
@@ -65,7 +68,7 @@
   </macro>
   <macro name="access">
     <choose>
-      <if variable="URL">
+      <if type="webpage post post-weblog" match="any">
         <group delimiter=" ">
           <text term="retrieved" text-case="capitalize-first"/>
           <text macro="accessed-date"/>
@@ -85,9 +88,7 @@
   <macro name="journal-title">
     <choose>
       <if type="article-journal article-magazine" match="any">
-        <group suffix=" ">
-          <text variable="container-title" form="short" strip-periods="true"/>
-        </group>
+        <text variable="container-title" form="short" strip-periods="true"/>
       </if>
       <else>
         <text variable="container-title" suffix=". " form="short"/>
@@ -121,7 +122,7 @@
     <sort>
       <key variable="citation-number"/>
     </sort>
-    <layout prefix="(" suffix=")" delimiter=",">
+    <layout vertical-align="sup" delimiter=",">
       <text variable="citation-number"/>
     </layout>
   </citation>
@@ -152,15 +153,20 @@
           <text variable="page" prefix=":" suffix="."/>
         </else-if>
         <else>
-          <text macro="journal-title"/>
-          <group suffix="; ">
-            <date variable="issued">
-              <date-part name="year"/>
-            </date>
-          </group>
-          <group suffix=". ">
-            <text variable="volume"/>
-            <text variable="page" prefix=":"/>
+          <group delimiter=". ">
+            <text macro="journal-title"/>
+            <group delimiter="; ">
+              <date variable="issued">
+                <date-part name="year"/>
+              </date>
+              <group delimiter=":">
+                <group>
+                  <text variable="volume"/>
+                  <text variable="issue" prefix="(" suffix=")"/>
+                </group>
+                <text variable="page"/>
+              </group>
+            </group>
           </group>
         </else>
       </choose>
