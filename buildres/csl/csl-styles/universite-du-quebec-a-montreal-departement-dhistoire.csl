@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="note" default-locale="fr-CA" version="1.0" page-range-format="expanded">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" page-range-format="expanded" default-locale="fr-CA">
   <info>
-    <title>Université du Québec à Montréal - Département d’histoire (French - Canada)</title>
+    <title>Université du Québec à Montréal - Département d’histoire (Français - Canada)</title>
     <title-short>UQAM - histoire</title-short>
     <id>http://www.zotero.org/styles/universite-du-quebec-a-montreal-departement-dhistoire</id>
     <link href="http://www.zotero.org/styles/universite-du-quebec-a-montreal-departement-dhistoire" rel="self"/>
@@ -15,7 +15,7 @@
     </contributor>
     <category citation-format="note"/>
     <category field="history"/>
-    <updated>2017-12-18T05:25:46+00:00</updated>
+    <updated>2021-02-20T11:25:46+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
@@ -34,7 +34,7 @@
       <if variable="author">
         <names variable="author">
           <name form="long" and="text" delimiter-precedes-last="never" sort-separator=" " font-style="normal">
-            <name-part name="family" prefix=""/>
+            <name-part name="family" text-case="capitalize-first" prefix=""/>
           </name>
         </names>
       </if>
@@ -53,7 +53,7 @@
       <if variable="author">
         <names variable="author">
           <name initialize-with="." and="text" delimiter-precedes-last="never" sort-separator=" " font-style="normal">
-            <name-part name="family" font-variant="small-caps"/>
+            <name-part name="family" text-case="capitalize-first"/>
           </name>
         </names>
       </if>
@@ -131,7 +131,7 @@
       <else-if type="article-journal article-newspaper article-magazine paper-conference" match="any">
         <group delimiter=", ">
           <!--<text variable="title" form="short" text-case="capitalize-first" quotes="false"/>-->
-          <text variable="title" text-case="capitalize-first" quotes="true"/>
+          <text variable="title" text-case="title" quotes="true"/>
           <text variable="container-title" font-style="italic"/>
         </group>
       </else-if>
@@ -172,14 +172,16 @@
       <else-if type="webpage" match="any">
         <group delimiter=", ">
           <text variable="title" text-case="capitalize-first" quotes="true" font-style="normal"/>
-          <text variable="container-title" text-case="capitalize-first" font-style="italic"/>
+          <text variable="container-title" text-case="capitalize-first"/>
           <date variable="issued">
             <date-part name="day" suffix=" "/>
             <date-part name="month" suffix=" "/>
             <date-part name="year"/>
           </date>
-          <text variable="URL" prefix="&lt;" suffix="&gt;"/>
-          <date form="text" variable="accessed" prefix="(" suffix=")"/>
+          <group delimiter=" ">
+            <text variable="URL"/>
+            <date form="text" variable="accessed" prefix="(" suffix=")"/>
+          </group>
         </group>
       </else-if>
       <else>
@@ -411,7 +413,7 @@
     <choose>
       <if is-numeric="collection-number">
         <group prefix=" coll.">
-          <text variable="collection-title" quotes="true"/>
+          <text variable="collection-title" quotes="true" suffix="#160;"/>
         </group>
         <text variable="collection-number" prefix=", n˚&#160;"/>
       </if>
@@ -437,14 +439,6 @@
         <else-if position="subsequent">
           <group delimiter=", ">
             <text macro="author-opcit"/>
-            <choose>
-              <if type="bill book graphic legal_case legislation motion_picture report song thesis" match="any">
-                <text variable="title" form="short" font-style="italic" suffix="..."/>
-              </if>
-              <else>
-                <text variable="title" quotes="true" text-case="capitalize-first" form="short" suffix="..." font-style="normal"/>
-              </else>
-            </choose>
             <text term="cited" font-style="italic" suffix="."/>
             <text variable="locator" prefix="p.&#160;"/>
           </group>
@@ -519,9 +513,9 @@
                 <text macro="translator"/>
                 <text macro="pub-place"/>
                 <text macro="publisher"/>
+                <text macro="collection"/>
                 <text macro="yearpage-bib"/>
                 <text macro="volume"/>
-                <text macro="collection"/>
                 <text macro="page-nbr"/>
               </group>
             </else>
@@ -617,9 +611,9 @@
             <text macro="translator"/>
             <text macro="pub-place"/>
             <text macro="publisher"/>
+            <text macro="collection"/>
             <text macro="yearpage-bib"/>
             <text macro="volume"/>
-            <text macro="collection"/>
             <text macro="nbr-page"/>
           </group>
         </else-if>

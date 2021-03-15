@@ -14,6 +14,10 @@
       <name>Steve Kronmiller</name>
       <email>skronmiller@scisoc.org</email>
     </contributor>
+    <contributor>
+      <name>Anuj Sharma</name>
+      <email>rknx@outlook.com</email>
+    </contributor>
     <category citation-format="author-date"/>
     <summary>The American Phytopathological Society style.</summary>
     <updated>2012-09-27T22:06:38+00:00</updated>
@@ -80,18 +84,16 @@
     </group>
   </macro>
   <macro name="year-date">
-    <group prefix=" ">
-      <choose>
-        <if variable="issued">
-          <date variable="issued">
-            <date-part name="year"/>
-          </date>
-        </if>
-        <else>
-          <text term="no date" form="short"/>
-        </else>
-      </choose>
-    </group>
+    <choose>
+      <if variable="issued">
+        <date variable="issued">
+          <date-part name="year"/>
+        </date>
+      </if>
+      <else>
+        <text term="no date" form="short"/>
+      </else>
+    </choose>
   </macro>
   <macro name="edition">
     <choose>
@@ -106,7 +108,7 @@
       </else>
     </choose>
   </macro>
-  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true" collapse="year">
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" collapse="year">
     <layout prefix="(" suffix=")" delimiter="; ">
       <group delimiter=", ">
         <group delimiter=" ">
