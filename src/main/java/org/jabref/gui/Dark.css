@@ -62,6 +62,10 @@
     color: #7d8591; /* -fx-mid-text-color*/
 }
 
+.custom-color-dialog {
+    -fx-background-color: -fx-control-inner-background;
+}
+
 .table-view .groupColumnBackground {
     -fx-stroke: -jr-gray-3;
 }
