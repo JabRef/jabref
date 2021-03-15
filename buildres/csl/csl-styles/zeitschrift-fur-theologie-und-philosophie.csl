@@ -8,41 +8,38 @@
     <link href="http://www.zotero.org/styles/zeitschrift-fur-theologie-und-philosophie" rel="self"/>
     <link href="http://www.zotero.org/styles/theologie-und-philosophie" rel="template"/>
     <link href="https://ztp.jesuiten.org/" rel="documentation"/>
-    <link href="https://webapp.uibk.ac.at/ojs2/index.php/ZTP/about/submissions#authorGuidelines" rel="documentation"/>
+    <link href="https://ztp.jesuiten.org/ojs2/index.php/ZTP/about/submissions#authorGuidelines" rel="documentation"/>
     <author>
       <name>Bernhard Knorn SJ</name>
-      <email>b.knorn AT jesuits DOT net</email>
+      <email>bksj AT gmx DOT net</email>
     </author>
     <category citation-format="note"/>
     <category field="theology"/>
     <category field="philosophy"/>
-    <!-- ISSN not yet issued -->
+    <issn>2709-8427</issn>
     <summary>English and German full note style for Zeitschrift für Theologie und Philosophie (ZTP).</summary>
-    <updated>2020-05-20T09:20:00+01:00</updated>
+    <updated>2021-01-26T15:30:00+01:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="de">
     <terms>
       <term name="accessed">Stand:</term>
-      <term name="editor" form="short">
-        <single>Hg.</single>
-        <multiple>Hg.</multiple>
-      </term>
-      <term name="editortranslator" form="verb-short">hg. und übers. von</term>
-      <term name="et-al">u.&#8239;a.</term>
+      <term name="editor" form="short">Hg.</term>
+      <term name="editor" form="verb-short">hg. v.</term>
+      <term name="translator" form="verb-short">übers. v.</term>
+      <term name="editortranslator" form="verb-short">hg. u. übers. v.</term>
+      <term name="et-al">u.a.</term>
       <term name="reviewed-author">Rez.</term>
       <term name="folio" form="short">fol.</term>
       <term name="note" form="short">Anm.</term>
+      <term name="and">u.</term>
       <term name="at">hier</term>
     </terms>
   </locale>
   <locale xml:lang="en">
     <terms>
       <term name="accessed"/>
-      <term name="editortranslator" form="verb-short">
-        <single>ed. and trans. by</single>
-        <multiple>ed. and trans. by</multiple>
-      </term>
+      <term name="editortranslator" form="verb-short">ed. and trans. by</term>
       <term name="reviewed-author">Review of</term>
     </terms>
   </locale>
@@ -55,9 +52,9 @@
       </substitute>
     </names>
   </macro>
-  <macro name="author-init">
+  <macro name="author-long">
     <names variable="author">
-      <name initialize-with=". " delimiter=" / "/>
+      <name delimiter=" / "/>
       <label form="short" prefix=" (" suffix=")"/>
       <et-al font-variant="normal"/>
       <substitute>
@@ -67,7 +64,7 @@
   </macro>
   <macro name="author-short">
     <names variable="author">
-      <name form="short" delimiter=" / "/>
+      <name form="short" delimiter="/"/>
       <label form="short" prefix=" (" suffix=")"/>
       <et-al font-variant="normal"/>
       <substitute>
@@ -81,22 +78,10 @@
       <name delimiter-precedes-last="never" and="text"/>
     </names>
   </macro>
-  <macro name="translator-init">
-    <names variable="translator">
-      <label form="verb-short" suffix=" "/>
-      <name initialize-with=". " delimiter-precedes-last="never" and="text"/>
-    </names>
-  </macro>
   <macro name="editor-transl">
     <names variable="editor translator" delimiter=", ">
       <label form="verb-short" suffix=" "/>
       <name delimiter-precedes-last="never" and="text"/>
-    </names>
-  </macro>
-  <macro name="editor-transl-init">
-    <names variable="editor translator" delimiter=", ">
-      <label form="verb-short" suffix=" "/>
-      <name initialize-with=". " delimiter-precedes-last="never" and="text"/>
     </names>
   </macro>
   <macro name="title">
@@ -138,7 +123,6 @@
     </choose>
   </macro>
   <macro name="original-date">
-    <!--Extra field = "original-date: 1880"-->
     <group delimiter=" " prefix=" [" suffix="]">
       <choose>
         <if is-uncertain-date="original-date">
@@ -165,6 +149,16 @@
       <else>
         <text variable="volume"/>
       </else>
+    </choose>
+  </macro>
+  <macro name="access-note">
+    <choose>
+      <if type="article-journal book chapter entry-encyclopedia entry-dictionary" match="any">
+        <text variable="DOI" prefix=", DOI: "/>
+      </if>
+      <else-if type="speech post-weblog webpage" match="any">
+        <text variable="URL" prefix=", "/>
+      </else-if>
     </choose>
   </macro>
   <macro name="point-locators">
@@ -233,7 +227,7 @@
       </if>
     </choose>
   </macro>
-  <citation et-al-min="4" et-al-use-first="3" delimiter-precedes-et-al="never">
+  <citation et-al-min="4" et-al-use-first="1" delimiter-precedes-et-al="never">
     <layout suffix="." delimiter="; ">
       <choose>
         <if position="ibid-with-locator">
@@ -251,15 +245,15 @@
           <text macro="point-locators-subsequent"/>
         </else-if>
         <else>
-          <text macro="author-init" suffix=", "/>
+          <text macro="author-long" suffix=", "/>
           <text macro="title"/>
           <text macro="original-date"/>
           <choose>
             <if type="article-newspaper article-magazine chapter manuscript speech post-weblog webpage" match="any">
-              <text macro="translator-init" prefix=", "/>
+              <text macro="translator" prefix=", "/>
             </if>
             <else-if type="article-journal entry-dictionary entry-encyclopedia" match="any">
-              <text macro="editor-transl-init" prefix=", "/>
+              <text macro="editor-transl" prefix=", "/>
               <text term="in" prefix=", " suffix=": "/>
               <text variable="container-title" form="short"/>
             </else-if>
@@ -277,19 +271,17 @@
                 <text term="accessed"/>
                 <text macro="date"/>
               </group>
-              <text variable="URL" prefix=", "/>
             </if>
             <else-if type="speech">
               <group prefix=". " delimiter=", ">
                 <text variable="genre"/>
                 <text variable="publisher-place"/>
                 <text macro="date"/>
-                <text variable="URL"/>
               </group>
             </else-if>
             <else-if type="manuscript">
               <text variable="genre" prefix=". "/>
-              <text variable="publisher-place" prefix=". "/>
+              <text variable="publisher-place" prefix=", "/>
               <text macro="date" prefix=", "/>
               <group delimiter=", " prefix=". ">
                 <text variable="archive"/>
@@ -313,7 +305,7 @@
             <else-if type="chapter">
               <text term="in" prefix=", " suffix=": "/>
               <names variable="editor" suffix=", ">
-                <name initialize-with=". " delimiter=" / "/>
+                <name delimiter=" / "/>
                 <label form="short" prefix=" (" suffix=")"/>
               </names>
               <text variable="container-title"/>
@@ -322,14 +314,14 @@
                 <text variable="collection-title" form="short"/>
                 <text variable="collection-number"/>
               </group>
-              <text variable="publisher-place" prefix=". " suffix=" "/>
+              <text variable="publisher-place" prefix=", " suffix=" "/>
               <text variable="edition" vertical-align="sup"/>
               <text macro="year-date"/>
             </else-if>
             <else>
               <text macro="volume" prefix=", "/>
               <group delimiter=", " prefix=", ">
-                <text macro="editor-transl-init"/>
+                <text macro="editor-transl"/>
                 <text variable="annote"/>
                 <!--Extra field = "annote: Einleitung von ..."-->
               </group>
@@ -338,19 +330,19 @@
                 <text variable="collection-title" form="short"/>
                 <text variable="collection-number"/>
               </group>
-              <text variable="publisher-place" prefix=". " suffix=" "/>
+              <text variable="publisher-place" prefix=", " suffix=" "/>
               <text variable="edition" vertical-align="sup"/>
               <text macro="year-date"/>
             </else>
           </choose>
           <text variable="page" prefix=", "/>
           <text macro="point-locators"/>
-          <text variable="DOI" prefix=", https://doi.org/"/>
+          <text macro="access-note"/>
         </else>
       </choose>
     </layout>
   </citation>
-  <bibliography et-al-min="4" et-al-use-first="3" delimiter-precedes-et-al="never" subsequent-author-substitute="&#8212;&#8212;&#8212;" entry-spacing="0" hanging-indent="true">
+  <bibliography et-al-min="4" et-al-use-first="1" delimiter-precedes-et-al="never" subsequent-author-substitute="&#8212;" entry-spacing="0" hanging-indent="true">
     <sort>
       <key macro="author-inv"/>
       <key variable="title"/>
@@ -358,7 +350,7 @@
       <key macro="date"/>
     </sort>
     <layout suffix=".">
-      <text macro="author-inv" suffix=": "/>
+      <text macro="author-inv" suffix=", "/>
       <text macro="title"/>
       <text macro="original-date"/>
       <choose>
@@ -382,19 +374,17 @@
             <text term="accessed"/>
             <text macro="date"/>
           </group>
-          <text variable="URL" prefix=", "/>
         </if>
         <else-if type="speech">
           <group prefix=". " delimiter=", ">
             <text variable="genre"/>
             <text variable="publisher-place"/>
             <text macro="date"/>
-            <text variable="URL"/>
           </group>
         </else-if>
         <else-if type="manuscript">
           <text variable="genre" prefix=". "/>
-          <text variable="publisher-place" prefix=". "/>
+          <text variable="publisher-place" prefix=", "/>
           <text macro="date" prefix=", "/>
           <group delimiter=", " prefix=". ">
             <text variable="archive"/>
@@ -427,10 +417,7 @@
             <text variable="collection-title" form="short"/>
             <text variable="collection-number"/>
           </group>
-          <group delimiter=": " prefix=". " suffix=" ">
-            <text variable="publisher-place"/>
-            <text variable="publisher"/>
-          </group>
+          <text variable="publisher-place" prefix=", " suffix=" "/>
           <text variable="edition" vertical-align="sup"/>
           <text macro="year-date"/>
         </else-if>
@@ -445,16 +432,13 @@
             <text variable="collection-title" form="short"/>
             <text variable="collection-number"/>
           </group>
-          <group delimiter=": " prefix=". " suffix=" ">
-            <text variable="publisher-place"/>
-            <text variable="publisher"/>
-          </group>
+          <text variable="publisher-place" prefix=", " suffix=" "/>
           <text variable="edition" vertical-align="sup"/>
           <text macro="year-date"/>
         </else>
       </choose>
       <text variable="page" prefix=", "/>
-      <text variable="DOI" prefix=", https://doi.org/"/>
+      <text macro="access-note"/>
     </layout>
   </bibliography>
 </style>

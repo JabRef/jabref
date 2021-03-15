@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" default-locale="cs-CZ">
   <info>
-    <title>ISO-690 (numeric, parentheses, Czech)</title>
+    <title>ISO-690 (numeric, parentheses, Čeština)</title>
     <id>http://www.zotero.org/styles/iso690-numeric-cs</id>
     <link href="http://www.zotero.org/styles/iso690-numeric-cs" rel="self"/>
     <link href="http://www.zotero.org/styles/iso690-numeric-en" rel="template"/>
