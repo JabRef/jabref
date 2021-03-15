@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="sort-only" initialize-with-hyphen="true" page-range-format="expanded" default-locale="it-IT">
   <info>
-    <title>AIB studi (Italian)</title>
+    <title>AIB studi (Italiano)</title>
     <id>http://www.zotero.org/styles/aib-studi</id>
     <link href="http://www.zotero.org/styles/aib-studi" rel="self"/>
     <link href="http://www.zotero.org/styles/civilta-italiana" rel="template"/>

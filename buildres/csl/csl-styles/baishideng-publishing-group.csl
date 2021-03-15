@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-GB">
   <info>
-    <title>World Journal of Hepatology</title>
-    <id>http://www.zotero.org/styles/world-journal-of-hepatology</id>
-    <link href="http://www.zotero.org/styles/world-journal-of-hepatology" rel="self"/>
+    <title>Baishideng Publishing Group</title>
+    <id>http://www.zotero.org/styles/baishideng-publishing-group</id>
+    <link href="http://www.zotero.org/styles/baishideng-publishing-group" rel="self"/>
     <link href="http://www.zotero.org/styles/hypertension-research" rel="template"/>
     <link href="https://www.wjgnet.com/1948-5182/" rel="documentation"/>
     <link href="https://bsdwebstorage.blob.core.windows.net/bpggerinfo/Guidelines_for_Manuscript_Preparation_and_Submission-Basic_Study.pdf" rel="documentation"/>
@@ -12,8 +12,7 @@
       <name>Patrick O'Brien</name>
     </author>
     <category citation-format="numeric"/>
-    <category field="medicine"/>
-    <eissn>1948-5182</eissn>
+    <category field="generic-base"/>
     <updated>2020-12-21T08:23:53+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>

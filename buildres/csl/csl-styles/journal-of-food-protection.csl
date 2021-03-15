@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" default-locale="en-US">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" default-locale="en-GB">
   <info>
     <title>Journal of Food Protection</title>
+    <title-short>JFP</title-short>
     <id>http://www.zotero.org/styles/journal-of-food-protection</id>
     <link href="http://www.zotero.org/styles/journal-of-food-protection" rel="self"/>
     <link href="http://www.foodprotection.org/publications/instructions-for-authors/pdf/jfp-author-instructions.pdf" rel="documentation"/>
@@ -26,7 +27,7 @@
     <issn>0362-028X</issn>
     <eissn>1944-9097</eissn>
     <summary>Style for the Journal of Food Protection, published by IAFP</summary>
-    <updated>2012-09-27T22:06:38+00:00</updated>
+    <updated>2021-03-10T07:53:06+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="author">
@@ -114,6 +115,22 @@
       </if>
     </choose>
   </macro>
+  <macro name="access">
+    <choose>
+      <if type="webpage post post-weblog" match="any">
+        <group delimiter=". ">
+          <group delimiter=": ">
+            <text term="available at" text-case="capitalize-first"/>
+            <text variable="URL"/>
+          </group>
+          <group delimiter=" ">
+            <text term="accessed" text-case="capitalize-first"/>
+            <date form="text" variable="accessed"/>
+          </group>
+        </group>
+      </if>
+    </choose>
+  </macro>
   <citation>
     <sort>
       <key variable="citation-number"/>
@@ -138,6 +155,7 @@
       <text macro="edition"/>
       <text macro="publisher"/>
       <text macro="locators"/>
+      <text macro="access" prefix=". "/>
     </layout>
   </bibliography>
 </style>

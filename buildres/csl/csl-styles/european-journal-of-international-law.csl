@@ -139,7 +139,7 @@
       <key macro="author"/>
       <key variable="issued"/>
     </sort>
-    <layout suffix=".">
+    <layout delimiter="; " suffix=".">
       <choose>
         <if position="first">
           <choose>

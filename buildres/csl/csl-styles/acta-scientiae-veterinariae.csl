@@ -6,21 +6,21 @@
     <link href="http://www.zotero.org/styles/acta-scientiae-veterinariae" rel="self"/>
     <link href="http://www.zotero.org/styles/world-applied-sciences-journal" rel="template"/>
     <link href="http://www.ufrgs.br/actavet/instrucoes.htm" rel="documentation"/>
+    <link href="http://www.ufrgs.br/actavet/Instructions-case-ASV-English.pdf" rel="documentation"/>
     <author>
       <name>Patrick O'Brien</name>
-      <email>obrienpat86@gmail.com</email>
     </author>
     <category citation-format="numeric"/>
     <category field="biology"/>
     <issn>1678-0345</issn>
     <eissn>1679-9216</eissn>
-    <updated>2018-07-24T08:33:45+00:00</updated>
+    <updated>2021-01-14T09:09:46+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="author">
     <names variable="author">
-      <name and="symbol" delimiter-precedes-last="never" initialize-with="." name-as-sort-order="first"/>
-      <label form="short" prefix=", "/>
+      <name and="symbol" delimiter-precedes-last="never" initialize-with="." name-as-sort-order="all" sort-separator=" "/>
+      <label form="short" text-case="capitalize-first" strip-periods="true" prefix=" (" suffix=")"/>
       <substitute>
         <names variable="editor"/>
         <names variable="translator"/>
@@ -30,7 +30,7 @@
   </macro>
   <macro name="editor">
     <names variable="editor">
-      <name initialize-with="." delimiter=", " delimiter-precedes-last="always"/>
+      <name and="symbol" initialize-with="." name-as-sort-order="all" sort-separator=" "/>
       <label form="short" text-case="capitalize-first" strip-periods="true" prefix=" (" suffix=")"/>
     </names>
   </macro>
@@ -58,9 +58,7 @@
   </macro>
   <citation collapse="citation-number">
     <sort>
-      <key variable="author"/>
       <key variable="citation-number"/>
-      <key variable="issued"/>
     </sort>
     <layout prefix="[" suffix="]" delimiter=",">
       <text variable="citation-number"/>
@@ -99,10 +97,12 @@
           </group>
         </if>
         <else-if type="chapter paper-conference" match="any">
-          <text variable="title" suffix=", "/>
-          <text term="in" text-case="capitalize-first" suffix=": "/>
           <group delimiter=". ">
-            <text macro="editor"/>
+            <text variable="title"/>
+            <group delimiter=": ">
+              <text term="in" text-case="capitalize-first"/>
+              <text macro="editor"/>
+            </group>
             <text variable="container-title" form="short" text-case="title" font-style="italic"/>
             <text macro="edition"/>
             <group delimiter=", ">
@@ -127,7 +127,7 @@
             <text variable="publisher"/>
           </group>
         </else-if>
-        <else-if type="webpage post-weblog" match="any">
+        <else-if type="webpage post-weblog post" match="any">
           <group delimiter=". ">
             <text variable="title"/>
             <text variable="container-title" font-style="italic"/>
