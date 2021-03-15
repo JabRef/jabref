@@ -41,7 +41,7 @@ class SuggestionProvidersTest {
       entry.setField(specialEntryField, "2000");
       database.insertEntry(entry);
 
-      assertSame("org.jabref.gui.autocompleter.EmptrySuggestionProvider", empty.getForField(personEntryField).getClass().getName());
+      assertSame("org.jabref.gui.autocompleter.EmptySuggestionProvider", empty.getForField(personEntryField).getClass().getName());
       assertSame("org.jabref.gui.autocompleter.PersonNameSuggestionProvider", sp.getForField(personEntryField).getClass().getName());
       assertSame("org.jabref.gui.autocompleter.BibEntrySuggestionProvider", sp.getForField(singleEntryField).getClass().getName());
       assertSame("org.jabref.gui.autocompleter.BibEntrySuggestionProvider", sp.getForField(multipleEntryField).getClass().getName());
