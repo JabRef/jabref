@@ -1,44 +1,44 @@
 package org.jabref.gui.openoffice;
 
-import java.io.IOException;
-import java.nio.file.Path;
+// import java.io.IOException;
+// import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
+// import java.util.Collections;
+// import java.util.Comparator;
+// import java.util.HashMap;
+// import java.util.HashSet;
+// import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+// import java.util.Map;
+// import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+// import java.util.Set;
+// import java.util.SortedMap;
+// import java.util.TreeMap;
+// import java.util.TreeSet;
+// import java.util.regex.Matcher;
+// import java.util.regex.Pattern;
+// import java.util.stream.Collectors;
 
-import org.jabref.architecture.AllowedToUseAwt;
-import org.jabref.gui.DialogService;
-import org.jabref.logic.JabRefException;
-import org.jabref.logic.bibtex.comparator.FieldComparator;
-import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.Layout;
-import org.jabref.logic.openoffice.CitationEntry;
-import org.jabref.logic.openoffice.OOBibStyle;
-import org.jabref.logic.openoffice.OOPreFormatter;
+// import org.jabref.architecture.AllowedToUseAwt;
+// import org.jabref.gui.DialogService;
+// import org.jabref.logic.JabRefException;
+// import org.jabref.logic.bibtex.comparator.FieldComparator;
+// import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
+// import org.jabref.logic.l10n.Localization;
+// import org.jabref.logic.layout.Layout;
+// import org.jabref.logic.openoffice.CitationEntry;
+// import org.jabref.logic.openoffice.OOBibStyle;
+// import org.jabref.logic.openoffice.OOPreFormatter;
 import org.jabref.logic.openoffice.OOUtil;
-import org.jabref.logic.openoffice.UndefinedBibtexEntry;
-import org.jabref.logic.openoffice.UndefinedParagraphFormatException;
-import org.jabref.model.database.BibDatabase;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.StandardField;
+// import org.jabref.logic.openoffice.UndefinedBibtexEntry;
+// import org.jabref.logic.openoffice.UndefinedParagraphFormatException;
+// import org.jabref.model.database.BibDatabase;
+// import org.jabref.model.entry.BibEntry;
+// import org.jabref.model.entry.field.StandardField;
 
-import com.sun.star.awt.Point;
+// import com.sun.star.awt.Point;
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
 import com.sun.star.beans.Property;
@@ -48,18 +48,18 @@ import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.beans.XPropertyContainer;
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.beans.XPropertySetInfo;
-import com.sun.star.comp.helper.BootstrapException;
+// import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
-import com.sun.star.container.XEnumeration;
-import com.sun.star.container.XEnumerationAccess;
+// import com.sun.star.container.XEnumeration;
+// import com.sun.star.container.XEnumerationAccess;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.container.XNamed;
 import com.sun.star.document.XDocumentPropertiesSupplier;
 import com.sun.star.document.XUndoManager;
 import com.sun.star.document.XUndoManagerSupplier;
-import com.sun.star.frame.XComponentLoader;
+// import com.sun.star.frame.XComponentLoader;
 import com.sun.star.frame.XController;
-import com.sun.star.frame.XDesktop;
+// import com.sun.star.frame.XDesktop;
 import com.sun.star.frame.XFrame;
 import com.sun.star.frame.XModel;
 import com.sun.star.lang.DisposedException;
@@ -67,7 +67,7 @@ import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.Locale;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.lang.XComponent;
-import com.sun.star.lang.XMultiComponentFactory;
+// import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.text.XBookmarksSupplier;
 import com.sun.star.text.XFootnote;
@@ -85,7 +85,7 @@ import com.sun.star.text.XTextViewCursorSupplier;
 import com.sun.star.uno.Any;
 import com.sun.star.uno.Type;
 import com.sun.star.uno.UnoRuntime;
-import com.sun.star.uno.XComponentContext;
+// import com.sun.star.uno.XComponentContext;
 import com.sun.star.util.InvalidStateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -728,7 +728,7 @@ class DocumentConnection {
      *
      *  Returns null if not in a footnote.
      */
-    static XTextRange
+    public static XTextRange
     getFootnoteMarkRangeOrNull(XTextRange original) {
         // If we are inside a footnote:
         if (unoQI(XFootnote.class, original.getText()) != null) {
@@ -817,11 +817,33 @@ class DocumentConnection {
      * the same getText()).
      */
     public static boolean
-    comparable(
+    comparableRanges(
         XTextRange a,
         XTextRange b
         ) {
         return a.getText() == b.getText();
+    }
+
+    /**
+     * Test if two XTextRange values are equal.
+     */
+    public static boolean
+    equalRanges(
+        XTextRange a,
+        XTextRange b
+        ) {
+        if (!comparableRanges(a,b)) {
+            return false;
+        }
+        final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
+                                                a.getText());
+        if (compare.compareRegionStarts(a, b) != 0) {
+            return false;
+        }
+        if (compare.compareRegionEnds(a, b) != 0) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -830,7 +852,7 @@ class DocumentConnection {
      */
     private static int
     ooCompareRegionStarts(XTextRange a, XTextRange b) {
-        if (!comparable(a, b)) {
+        if (!comparableRanges(a, b)) {
             throw new RuntimeException("ooCompareRegionStarts: got incomparable regions");
         }
         final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
@@ -844,7 +866,7 @@ class DocumentConnection {
      */
     private static int
     ooCompareRegionEnds(XTextRange a, XTextRange b) {
-        if (!comparable(a, b)) {
+        if (!comparableRanges(a, b)) {
             throw new RuntimeException("ooCompareRegionEnds: got incomparable regions");
         }
         final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,

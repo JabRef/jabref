@@ -20,10 +20,12 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.openoffice.DocumentConnection;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
@@ -785,30 +787,6 @@ class OOBibBase {
             return documentConnection.getReferenceMarkRangeOrNull(names[i]);
         }
 
-        class RangeForOverlapCheck {
-            final static int REFERENCE_MARK_KIND = 0;
-            final static int FOOTNOTE_MARK_KIND = 1;
-
-            XTextRange range;
-            int i;
-            int kind;
-            String description;
-
-            RangeForOverlapCheck(XTextRange range, int i, int kind, String description) {
-                this.range = range;
-                this.i = i;
-                this.kind = kind;
-                this.description = description;
-            }
-
-            String format() {
-                return description;
-                //    String[] prefixes = { "", "FootnoteMark for " } ;
-                //    return prefixes[kind] + names[ this.i ];
-            }
-
-        } // class X
-
         /**
          * Assumes a.getText() == b.getText(), and both belong to documentConnection.xText
          *
@@ -823,6 +801,7 @@ class OOBibBase {
          * @throws RuntimeException if a and b are not comparable
          *
          */
+        /*
         public int
         javaCompareRegionStarts(RangeForOverlapCheck a,
                                 RangeForOverlapCheck b) {
@@ -858,10 +837,11 @@ class OOBibBase {
                     );
             }
         }
-
+        */
         /**
          *
          */
+        /*
         public int
         javaCompareRegionEndToStart(RangeForOverlapCheck a,
                                     RangeForOverlapCheck b) {
@@ -891,6 +871,7 @@ class OOBibBase {
                     );
             }
         }
+        */
 
         /**
          * @return A RangeForOverlapCheck for each citation group.
@@ -928,31 +909,25 @@ class OOBibBase {
             throws
             NoDocumentException,
             WrappedTargetException {
+
             // Avoid inserting the same mark twice.
-            List<XTextRange> seen = new ArrayList<>();
-            final XTextRangeCompare compare = unoQI(XTextRangeCompare.class,
-                                                    documentConnection.xText);
+            // Could use RangeSet if we had that.
+            RangeKeyedMap<Boolean> seen = new RangeKeyedMap<>();
 
             List<RangeForOverlapCheck> xs = new ArrayList<>();
+
             for (int i = 0; i < names.length; i++) {
                 XTextRange r = this.getReferenceMarkRangeOrNull(documentConnection, i);
+
                 XTextRange footnoteMarkRange =
                     DocumentConnection.getFootnoteMarkRangeOrNull(r);
 
                 if (footnoteMarkRange != null) {
                     // Problem: quadratic complexity. Each new footnoteMarkRange
                     // is compared to all we have seen before.
-                    boolean seenContains = false;
-                    for (XTextRange s : seen) {
-                        if (s.getText() == footnoteMarkRange.getText() &&
-                            compare.compareRegionStarts(s, footnoteMarkRange) == 0 &&
-                            compare.compareRegionEnds(s, footnoteMarkRange) == 0) {
-                            seenContains = true;
-                            break;
-                        }
-                    }
+                    boolean seenContains = seen.containsKey( footnoteMarkRange );
                     if (!seenContains) {
-                    seen.add(footnoteMarkRange);
+                        seen.put(footnoteMarkRange, true);
                     xs.add(new RangeForOverlapCheck(
                                footnoteMarkRange,
                                i, // index of citation group
@@ -965,88 +940,69 @@ class OOBibBase {
             return xs;
         }
 
-        private Map<XText, List<RangeForOverlapCheck>>
-        partitionByGetText(List<RangeForOverlapCheck> xs) {
-            Map<XText, List<RangeForOverlapCheck>> xxs = new HashMap<>();
-            for (RangeForOverlapCheck x : xs) {
-                XTextRange xr = x.range;
-                XText t = xr.getText();
-                if (xxs.containsKey(t)) {
-                    xxs.get(t).add(x);
-                } else {
-                    xxs.put(t, new ArrayList<>(List.of(x)));
-                }
-            }
-            return xxs;
-        }
-
-        private List<RangeForOverlapCheck>
-        sortPartitionByRegionStart(List<RangeForOverlapCheck> xs) {
-            return
-                xs.stream()
-                .sorted(this::javaCompareRegionStarts)
-                .collect(Collectors.toList());
-        }
-
-        private void
-        checkSortedPartitionForOverlap(boolean requireSeparation,
-                                       List<RangeForOverlapCheck> oxs)
-            throws JabRefException {
-            for (int i = 0; (i + 1) < oxs.size(); i++) {
-                RangeForOverlapCheck a = oxs.get(i);
-                RangeForOverlapCheck b = oxs.get(i + 1);
-                int cmp = javaCompareRegionEndToStart(a, b);
-                if (cmp > 0) {
-                    // found overlap
-                    throw new JabRefException(
-                        "Range overlap found",
-                        Localization.lang(
-                            "Ranges of '%0' and '%1' overlap", a.format(), b.format())
-                        );
-                }
-                if (requireSeparation && cmp == 0) {
-                    throw new JabRefException(
-                        "Ranges with no gap found",
-                        Localization.lang(
-                            "Ranges of '%0' and '%1' are not separated",
-                                a.format(), b.format())
-                        );
-                }
-            }
-        }
-
-        public void
-        checkRangeOverlaps(DocumentConnection documentConnection,
-                           boolean requireSeparation)
-            throws
-            NoDocumentException,
-            WrappedTargetException,
-            JabRefException {
-
-            final boolean debugPartitions = false;
-
-            List<RangeForOverlapCheck> xs = citationRanges(documentConnection);
-            xs.addAll(footnoteMarkRanges(documentConnection));
-
-            // We can only compare ranges with equal .getText(),
-            // so partition the list.
-            Map<XText, List<RangeForOverlapCheck>> xxs = partitionByGetText(xs);
-            // Sort xs by x.getText() and x.getStart()
-            // Then, within each getText() value, we need x[i].getEnd() <= x[i+1].getStart()
-            for (List<RangeForOverlapCheck> partition : xxs.values()) {
-                List<RangeForOverlapCheck> oxs =
-                    sortPartitionByRegionStart(partition);
-
-                if (debugPartitions) {
-                    System.out.println("partition");
-                    for (RangeForOverlapCheck r : oxs) {
-                        System.out.println("  " + r.format());
-                    }
-                }
-                checkSortedPartitionForOverlap(requireSeparation, oxs);
-            }
-        }
     } // class citationGroups
+
+
+
+    /**
+     * @param requireSeparation Report range pairs that only share a boundary.
+     * @param atMost Limit number of overlaps reported (0 for no limit)
+     */
+    public void
+    checkRangeOverlaps(
+        CitationGroups cgs,
+        DocumentConnection documentConnection,
+        boolean requireSeparation,
+        int atMost
+        )
+        throws
+        NoDocumentException,
+        WrappedTargetException,
+        JabRefException {
+
+        final boolean debugPartitions = false;
+
+        List<RangeForOverlapCheck> xs = cgs.citationRanges(documentConnection);
+        xs.addAll(cgs.footnoteMarkRanges(documentConnection));
+
+        RangeKeyedMapList<RangeForOverlapCheck> xall = new RangeKeyedMapList<>();
+        for (RangeForOverlapCheck x : xs) {
+            XTextRange key = x.range;
+            xall.add(key,x);
+        }
+
+        List<RangeKeyedMapList<RangeForOverlapCheck>.RangeOverlap> ovs =
+            xall.findOverlappingRanges(atMost, requireSeparation);
+
+        //checkSortedPartitionForOverlap(requireSeparation, oxs);
+        if (ovs.size() > 0) {
+            String msg = "";
+            for (RangeKeyedMapList<RangeForOverlapCheck>.RangeOverlap e : ovs) {
+                String l =
+                    (": "
+                     + (e.vs.stream()
+                        .map(v -> String.format("'%s'", v.format()))
+                        .collect(Collectors.joining(", ")))
+                     + "\n");
+
+                switch (e.kind) {
+                case EQUAL_RANGE:
+                    msg = msg + Localization.lang("Found identical ranges") + l;
+                    break;
+                case OVERLAP:
+                    msg = msg + Localization.lang("Found overlapping ranges") + l;
+                    break;
+                case TOUCH:
+                    msg = msg + Localization.lang("Found touching ranges") + l;
+                    break;
+                }
+            }
+            throw new JabRefException(
+                "Found overlapping or touching ranges",
+                msg
+                );
+        }
+    }
 
     /**
      * GUI: Get a list of CitationEntry objects corresponding to citations
@@ -2390,7 +2346,7 @@ class OOBibBase {
             cursor.getText().createTextCursorByRange(cursor.getEnd());
 
         cursor.collapseToStart();
-        cursor.goRight( (short) 1, false );
+        cursor.goRight((short) 1, false);
         // now we are between two spaces
 
         final String left = REFERENCE_MARK_LEFT_BRACKET;
@@ -2399,7 +2355,7 @@ class OOBibBase {
         final short rightLength = (short) right.length();
         String bracketedContent = (withoutBrackets
                                    ? ""
-                                   : left+right);
+                                   : left + right);
 
         cursor.getText().insertString(
             cursor,
@@ -2412,9 +2368,11 @@ class OOBibBase {
             true // absorb
             );
 
-        cursorBefore.goRight((short) 1, true); cursorBefore.setString("");
-        if ( !insertSpaceAfter ) {
-            cursorAfter.goLeft((short) 1, true); cursorAfter.setString("");
+        cursorBefore.goRight((short) 1, true);
+        cursorBefore.setString("");
+        if (!insertSpaceAfter) {
+            cursorAfter.goLeft((short) 1, true);
+            cursorAfter.setString("");
         }
     }
 
@@ -2466,14 +2424,14 @@ class OOBibBase {
         XTextCursor alpha = full.getText().createTextCursorByRange(full);
         alpha.collapseToStart();
 
-        XTextCursor beta  = full.getText().createTextCursorByRange(full);
+        XTextCursor beta = full.getText().createTextCursorByRange(full);
         beta.collapseToStart();
         beta.goRight(leftLength, false);
 
         XTextCursor omega = full.getText().createTextCursorByRange(full);
         omega.collapseToEnd();
 
-        if (!fullText.startsWith( left )) {
+        if (!fullText.startsWith(left)) {
             throw new RuntimeException(
                 String.format(
                     "cleanFillCursorForCitationGroup:"
@@ -2482,7 +2440,7 @@ class OOBibBase {
                     ));
         }
 
-        if (!fullText.endsWith( right )) {
+        if (!fullText.endsWith(right)) {
             throw new RuntimeException(
                 String.format(
                     "cleanFillCursorForCitationGroup:"
@@ -2492,7 +2450,7 @@ class OOBibBase {
         }
 
         final int contentLength = (fullTextLength - (leftLength + rightLength));
-        if ( contentLength < 0) {
+        if (contentLength < 0) {
             throw new RuntimeException(
                 String.format(
                     "cleanFillCursorForCitationGroup: length(%s) < 0",
@@ -2502,7 +2460,7 @@ class OOBibBase {
 
         boolean removeRight = (
             // have at least 1 character content
-            (contentLength >=  1)
+            (contentLength >= 1)
             || ((contentLength == 0) && removeBracketsFromEmpty)
             || alwaysRemoveBrackets
             );
@@ -2514,11 +2472,13 @@ class OOBibBase {
             );
 
         if (removeRight) {
-            omega.goLeft((short) rightLength, true); omega.setString("");
+            omega.goLeft(rightLength, true);
+            omega.setString("");
         }
 
         if (removeLeft) {
-            alpha.goRight((short) leftLength, true); alpha.setString("");
+            alpha.goRight(leftLength, true);
+            alpha.setString("");
         }
     }
 
@@ -2538,8 +2498,8 @@ class OOBibBase {
         final short leftLength = (short) left.length();
         final short rightLength = (short) right.length();
 
-        XTextCursor full=null;
-        String fullText=null;
+        XTextCursor full = null;
+        String fullText = null;
         for (int i = 1; i <= 2; i++) {
             XTextContent markAsTextContent =
                 documentConnection.getReferenceMarkAsTextContentOrNull(name);
@@ -2621,11 +2581,11 @@ class OOBibBase {
         XTextCursor beta = full.getText().createTextCursorByRange(full);
         beta.collapseToStart();
         beta.goRight((short) 1, false);
-        beta.goRight((short) (fullText.length()-2), true);
-        beta.setString(left+right);
+        beta.goRight((short) (fullText.length() - 2), true);
+        beta.setString(left + right);
         beta.collapseToEnd();
         beta.goLeft(rightLength, false);
-        // drop the inital character
+        // drop the initial character
         alpha.goRight((short) 1, true);
         alpha.setString("");
         // drop the last character
@@ -2633,7 +2593,6 @@ class OOBibBase {
         omega.setString("");
         return beta;
     }
-
 
     private static void
     fillCitationMarkInCursor(
@@ -3717,7 +3676,7 @@ class OOBibBase {
                     if (addToGroup && prev != null) {
                         Objects.requireNonNull(prevRange);
                         Objects.requireNonNull(currentRange);
-                        if (!DocumentConnection.comparable(prevRange, currentRange)) {
+                        if (!DocumentConnection.comparableRanges(prevRange, currentRange)) {
                             addToGroup = false;
                         } else {
 
@@ -4256,8 +4215,9 @@ class OOBibBase {
             documentConnection.enterUndoContext("Refresh bibliography");
 
         boolean requireSeparation = false; // may loose citation without requireSeparation=true
-        CitationGroups cg = new CitationGroups(documentConnection);
-        cg.checkRangeOverlaps(this.xDocumentConnection, requireSeparation);
+        CitationGroups cgs = new CitationGroups(documentConnection);
+        int maxReportedOverlaps = 10;
+        checkRangeOverlaps(cgs, this.xDocumentConnection, requireSeparation, maxReportedOverlaps);
         final boolean useLockControllers = true;
         try {
             ProduceCitationMarkersResult x =
