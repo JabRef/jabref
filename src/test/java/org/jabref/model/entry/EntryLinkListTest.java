@@ -9,8 +9,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EntryLinkListTest {
 
@@ -21,6 +20,7 @@ public class EntryLinkListTest {
     private ParsedEntryLink link;
     private BibEntry source;
     private BibEntry target;
+    private BibEntry entry;
 
     @BeforeEach
     public void before() {
@@ -29,6 +29,7 @@ public class EntryLinkListTest {
         link = links.get(0);
         source = create("source");
         target = create("target");
+        entry = create("entry");
     }
 
     private BibEntry create(String citeKey) {
@@ -57,6 +58,11 @@ public class EntryLinkListTest {
     public void givenFieldValueAndDatabaseWhenParsingThenExpectLink() {
         ParsedEntryLink expected = new ParsedEntryLink(KEY, database);
         assertEquals(expected, link);
+    }
+    @Test
+    public void givenBibEntryWhenParsingThenExpectLink() {
+      ParsedEntryLink expected = new ParsedEntryLink(entry);
+      assertFalse(expected.getLinkedEntry().isEmpty());
     }
 
     @Test

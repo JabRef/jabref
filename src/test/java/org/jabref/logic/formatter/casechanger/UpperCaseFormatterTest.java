@@ -24,6 +24,9 @@ public class UpperCaseFormatterTest {
         assertEquals("UPPER", formatter.format("UPPER"));
         assertEquals("UPPER {lower}", formatter.format("upper {lower}"));
         assertEquals("UPPER {l}OWER", formatter.format("upper {l}ower"));
+        assertEquals("1", formatter.format("1"));
+        assertEquals("!", formatter.format("!"));
+
     }
 
     @Test
