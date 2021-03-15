@@ -1,6 +1,5 @@
 * Notes for OOBibBase.java
 
-
 ** combineCiteMarkers
    - reimplemented to collect data first, then apply
 
@@ -68,13 +67,24 @@
        - Bug: New citation may pick up one of these.
    - Bibliography:
      - JabRef 5.2 creates XTextSection "JR_bib" and bookmark
-       "JR_bib_end". On refresh, lookks for XTextSection "JR_bib",
+       "JR_bib_end". On refresh, looks for XTextSection "JR_bib",
        creates cursor for the whole section,
-       
+
 
    OO_storage_v002: changes since OO_storage_v001
-     - the location marked for a citation mark contains the citation mark *and brackets*
-       - [ ] for OO_storage_v001 compat mode, we need a bracketless version
+
+     - the location marked for a citation mark contains the citation
+       mark, and if it is shorter than 2 characters, left bracket; or
+       if it is empty, left and right brackets. The left and right
+       brackets are zero-width spaces at the start or end of the
+       citation marker, respectively.
+       - Note: 1-character content *can* happen if using numbered citations
+         without parentheses (e.g. in superscripts).
+       - If the user leaves less than two characters of the citation
+         mark (without destroying the reference mark), the reference
+         mark is recreated at the same location, otherwise it is reused.
+       - [X] for OO_storage_v001 compat mode, we need a bracketless version
+         - added REFERENCE_MARK_ALWAYS_REMOVE_BRACKETS=true
 
 
 ** bug: refreshCiteMarkers destroys unresolved entries
@@ -84,55 +94,12 @@
      Click on "Refresh" will remove reference
      to some of the unresolved entries from the document.
 
-** createReferenceMarkForCitationGroup corner cases
-
-   - [ ] just-after a citation marker:
-     Solution: newpara,insert,removepara
-
-   - [ ] at start-of-para just-before a citation marker
-     - Solution: newpara,insert,removepara
-
-*** Problem: the model of cursor vs text in LO:
-
-   - Cursor positions and boundaries of a textrange are between
-     characters. Good.
-   - When inserting text at a point, character properties
-     are usually inherited from the left side of the cursor.
-   - Problems
-     - (1) Apparently we *cannot insert text into an empty range*. With a
-       reference mark pointing to an empty range we either wrote the
-       text BEFORE or AFTER the empty content in the mark.
-       - We can however "absorb" text when creating the mark.
-
-     - (2) citation mark at the start or end of a paragraph
-       - Similar to other character properties, (e.g. highlight color,
-         font color)
-         - when cursor is at the start, properties are copied from the right
-         - when cursor is at the end, properties are copied from the left, the last character
-         - For character properties, the new character can be
-           reformatted, or reset to default by Ctrl-M.
-         - For a reference mark or character style Ctrl-M does not help.
-           - But can set the default character style after we inserted some characters.
-           - After the old text setting character style on the cursor works.
-           - At the start, it does not.
-           - For reference marks I found nothing analogous.
-     Possible solutions:
-   - For (1):
-     - (was) recreate the mark instead of filling
-     - (currently) Ensure, that we bracket the content, and fill
-       within that.
-       - We either use a zero-width space (\u200b) or,
-         for making the bracketing visible (debugging): "<>"
-   - For(2):
-     - We might just refuse to insert citation when touching an existing one.
-     - Or do the hoops: new-paragraph, insert, join paragraphs.
-
 
 ** "Cite in-text" with multiple entries
 
    - inserts "Au (2000); Bu (2001)"
    - Separate works, but modifies from in-text to in-paren: "(Au 2000) (Bu 2001)"
-   - combineCiteMarkers currently refuses to Merge
+
 
 ** unCombineCiteMarkers: formatting space inserted between citations
 
@@ -371,20 +338,8 @@ populateBibTextSection should only fill the gaps.
    - If done, may obsolete OOBibStyle.ITALIC_ET_AL,
      since we can just put "<i>et al.</i>" into ET_AL_STRING
 
+
 ** Bug: Find and resolve overlapping citations
-
-   It is too easy to create overlapping citations (and hard to resolve by the user)
-
-Situation
-- insert a citation
-- backspace
-- insert another citation
-
-In LO the text looks the same as in (insert,insert,remove-space-between),
-but the reference markers now overlap. Probably the second citation
-is embedded in the first, just before its end.
-
-(User-level workaround: remove the second citation.)
 
 Potential attacks:
 
@@ -417,6 +372,15 @@ Idea: Maybe we should refuse to insert in places to be
       Limitation: the user can still Cut and Paste to these parts.
                   Q: Can we make them readonly inside, while allowing
                      to move them around as a unit?
+
+** Could we use TextUserDefinedAttributes to store pageInfo?        :storage:
+
+  https://www.openoffice.org/api/docs/common/ref/com/sun/star/style/CharacterProperties.html#TextUserDefinedAttributes
+
+  This property stores XML attributes. They will be saved to and restored from automatic styles inside XML files.
+
+  - https://www.openoffice.org/api/docs/common/ref/com/sun/star/xml/UserDefinedAttributesSupplier.html
+  - https://www.openoffice.org/api/docs/common/ref/com/sun/star/xml/AttributeData.html
 
 
 ** Feature: Behaviour of Merge on itcType                           :storage:
@@ -468,15 +432,6 @@ Idea: Maybe we should refuse to insert in places to be
       may pick up a pageInfo left around when pageInfo is null.
 
 
-** Refactor: distinguish storage order and presentation order       :storage:
-
-   - combineCiteMarkers orders the merged entries by year (I am not
-     sure why).  The original order is lost.
-     - insertEntry calls sortBibEntryListForMulticite(entries, style);
-     - Apparently this order is not changed when the style changes.
-   - TODO: create presentation order when needed, not when storing
-
-
 ** Feature: notify GUI on document close, LO close
 
 - Gray out buttons that are not usable without connection.
@@ -488,7 +443,6 @@ Idea: Maybe we should refuse to insert in places to be
 
 - On the GUI side: events [[https://jabref.readthedocs.io/en/latest/getting-into-the-code/code-howtos/#event-handling-in-jabref][Event handling in JabRef]]
 
-** DONE Feature: give feedback "No entry to cite, please select some."
 ** Feature: ManageCitationsDialog visual cue on editable parts
    - the pageInfo part is editable, but no visual cue is provided
 
@@ -865,7 +819,7 @@ Wished features
 
 - But "Guly{\'{a}}s" works,  becomes "Gulyás"
 
-
+.
 ** Feature: connect LO extension to JabRef
 
 Some operations, for example "Merge citations", "Separate citations",
@@ -875,11 +829,14 @@ It would be more convenient to do these from within LO.  On the other
 hand, for consistent behaviour it is probably better to use the same
 code.
 
-
+.
 ** Bug: "Cite special" cites on Cancel
 
    - should show default citation type
    - "[Cancel]" should not cite
+.
+
+* Closed
 
 ** DONE Bug: when "[Settings]/[Automatically sync...]" is off, the placeholders may be confusing
 
@@ -889,7 +846,7 @@ code.
 
 Resolved: improve-reversibility branch: commit e159a1d8ce40d1045e73d7fbfca24390bba44706
 
-
+.
 
 ** DONE Separation of createReferenceMarkForCitationGroup and fillCitationMarkInCursor
 ** DONE Feature: Undo in LO
@@ -913,3 +870,82 @@ Resolved: improve-reversibility branch: commit e159a1d8ce40d1045e73d7fbfca24390b
      - then call findCitedKeys, implicitly listing the same
        reference marks.
 .
+** DONE createReferenceMarkForCitationGroup corner cases
+
+   - [X] just-after a citation marker
+   - [X] at start-of-para just-before a citation marker
+     - Solution: safeInsertSpaces
+
+** DONE Problem: the model of cursor vs text in LO:
+
+   - Cursor positions and boundaries of a textrange are between
+     characters. Good.
+
+   - When inserting text at a point, character properties
+     are usually inherited from the left side of the cursor.
+
+   - [X] (1) How to fill
+     - Apparently we *cannot insert text into an empty range*. With a
+       reference mark pointing to an empty range we either wrote the
+       text BEFORE or AFTER the empty content in the mark.
+       - We can however "absorb" text when creating the mark.
+
+     - Solutions considered:
+       - (was) recreate the mark instead of filling
+       - (new) Ensure, that we bracket the content, and fill
+          within that.
+       - We either use a zero-width space (\u200b) or,
+         for making the bracketing visible (debugging): "<>"
+
+     - Resolved:
+       - Reuse if possible, otherwise recreate
+       - getFillCursorForCitationGroup provides bracketed cursor
+       - cleanFillCursorForCitationGroup removes brackets
+
+   - [X] (2) citation mark at the start or end of a paragraph
+     - Similar to other character properties, (e.g. highlight color,
+       font color)
+       - when cursor is at the start, properties are copied from the right
+       - when cursor is at the end, properties are copied from the left, the last character
+       - For character properties, the new character can be
+         reformatted, or reset to default by Ctrl-M.
+       - For a reference mark or character style Ctrl-M does not help.
+         - But can set the default character style after we inserted some characters.
+         - After the old text setting character style on the cursor works.
+         - At the start, it does not.
+         - For reference marks I found nothing analogous.
+     - Resolved:
+       - use safeInsertSpaces to avoid overlap with surrounding reference marks
+         - This even breaks up a reference mark we are inserting into,
+           leaves text of citation marker after the cursor as plain text.
+           - Easy to clean up by user. Later we might refuse to insert into.
+.
+
+** DONE Feature: give feedback "No entry to cite, please select some."
+** DONE Refactor: distinguish storage order and presentation order  :storage:
+
+   - combineCiteMarkers orders the merged entries by year (I am not
+     sure why).  The original order is lost.
+     - insertEntry calls sortBibEntryListForMulticite(entries, style);
+     - Apparently this order is not changed when the style changes.
+   - TODO: create presentation order when needed, not when storing
+
+   - Resolved:
+     - rewrote combineCiteMarkers
+     - creating presentation order was already in place.
+** DONE Bug: It is too easy to create overlapping citations (and hard to resolve by the user)
+
+Situation
+- insert a citation
+- backspace
+- insert another citation
+
+In LO the text looks the same as in (insert,insert,remove-space-between),
+but the reference markers now overlap. Probably the second citation
+is embedded in the first, just before its end.
+
+(User-level workaround: remove the second citation.)
+
+Resolved: using safeInsertSpaces avoid creating overlapping citations this way.
+
+
