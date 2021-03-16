@@ -1,6 +1,7 @@
 package org.jabref.logic.util.strings;
 
 import java.util.Locale;
+
 import info.debatty.java.stringsimilarity.Levenshtein;
 
 public class StringSimilarity {
