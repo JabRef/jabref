@@ -186,7 +186,6 @@ class RTFCharsTest {
         assertEquals(expectedResult, formattedStr);
     }
 
-
     @Test
     void testRTFCharacters() {
         assertEquals("\\'e0", formatter.format("\\`{a}"));

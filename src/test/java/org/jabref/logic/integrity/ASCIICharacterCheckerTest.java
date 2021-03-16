@@ -36,7 +36,7 @@ public class ASCIICharacterCheckerTest {
     @Test
     void fieldAcceptsOnlyAsciiCharacters() {
         String field = "";
-        for(int i = 32; i <= 127; i++) {
+        for (int i = 32; i <= 127; i++) {
             field += Character.toString(i);
         }
         entry.setField(StandardField.TITLE, field);
