@@ -2,7 +2,7 @@
     -jr-theme: #2c9490;
     -jr-accent: #255652;
     -jr-selected: -jr-accent;
-    -jr-hover: #fff1;
+    -jr-hover: #212330;
 
 
     -jr-red: #b71c1f;
@@ -64,6 +64,22 @@
 
 .custom-color-dialog {
     -fx-background-color: -fx-control-inner-background;
+}
+
+.table-row-cell: odd{
+    -fx-background-color:#272b38 ;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-padding: 0.0em;
+}
+.table-row-cell: even{
+    -fx-background-color: #fff1 ;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-padding: 0.0em;
+}
+
+.table-row-cell:hover,
+.tree-table-row-cell:hover {
+    -fx-background-color: -jr-hover;
 }
 
 .table-view .groupColumnBackground {
