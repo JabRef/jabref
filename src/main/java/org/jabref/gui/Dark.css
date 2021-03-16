@@ -84,7 +84,7 @@
 }
 
 .numberColumn > .hits:any-selected {
-    -fx-background-color: derive(-jr-gray-3, 70%);
+    -fx-background-color: derive(-jr-gray-3, 25%);
 }
 
 .numberColumn > .hits:all-selected {
