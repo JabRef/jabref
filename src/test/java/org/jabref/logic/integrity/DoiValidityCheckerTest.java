@@ -3,6 +3,8 @@ package org.jabref.logic.integrity;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -36,19 +38,15 @@ class DoiValidityCheckerTest {
         assertNotEquals(Optional.empty(), checker.checkValue("asdf"));
     }
 
-    @Test
-    void doiDoesNotAcceptInputWithTypoInFirstPart() {
-        assertNotEquals(Optional.empty(), checker.checkValue("11.1000/182"));
-        assertNotEquals(Optional.empty(), checker.checkValue("01.1000/182"));
-        assertNotEquals(Optional.empty(), checker.checkValue("100.1000/182"));
-        assertNotEquals(Optional.empty(), checker.checkValue("110.1000/182"));
-        assertNotEquals(Optional.empty(), checker.checkValue("a10.1000/182"));
-        assertNotEquals(Optional.empty(), checker.checkValue("10a.1000/182"));
+    @ParameterizedTest
+    @ValueSource(strings = {"11.1000/182", "01.1000/182", "100.1000/182", "110.1000/182", "a10.1000/182", "10a.1000/182"})
+    void doiDoesNotAcceptInputWithTypoInFirstPart(String s) {
+        assertNotEquals(Optional.empty(), checker.checkValue(s));
     }
 
-    @Test
-    void doiDoesNotAcceptInputWithTypoInSecondPart() {
-        assertNotEquals(Optional.empty(), checker.checkValue("10.a1000/182"));
-        assertNotEquals(Optional.empty(), checker.checkValue("10.1000a/182"));
+    @ParameterizedTest
+    @ValueSource(strings = {"10.a1000/182", "10.1000a/182", "10.10a00/182"})
+    void doiDoesNotAcceptInputWithTypoInSecondPart(String s) {
+        assertNotEquals(Optional.empty(), checker.checkValue(s));
     }
 }

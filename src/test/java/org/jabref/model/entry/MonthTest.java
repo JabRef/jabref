@@ -3,6 +3,8 @@ package org.jabref.model.entry;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -197,18 +199,16 @@ public class MonthTest {
         assertEquals(Optional.of(Month.DECEMBER), Month.getMonthByNumber(12));
     }
 
-    @Test
-    public void getMonthByInvalidNumberTest() {
-        assertEquals(Optional.empty(), Month.getMonthByNumber(-1));
-        assertEquals(Optional.empty(), Month.getMonthByNumber(0));
-        assertEquals(Optional.empty(), Month.getMonthByNumber(13));
+    @ParameterizedTest
+    @ValueSource(ints = {-1, 0, 13})
+    public void getMonthByInvalidNumberTest(int i) {
+        assertEquals(Optional.empty(), Month.getMonthByNumber(i));
     }
 
-    @Test
-    public void getMonthByShortNameCaseSensitivityTest() {
-        assertEquals(Optional.of(Month.JANUARY), Month.getMonthByShortName("jan"));
-        assertEquals(Optional.of(Month.JANUARY), Month.getMonthByShortName("JAN"));
-        assertEquals(Optional.of(Month.JANUARY), Month.getMonthByShortName("Jan"));
+    @ParameterizedTest
+    @ValueSource(strings = {"jan", "JAN", "Jan"})
+    public void getMonthByShortNameCaseSensitivityTest(String s) {
+        assertEquals(Optional.of(Month.JANUARY), Month.getMonthByShortName(s));
     }
 
     @Test
@@ -227,11 +227,10 @@ public class MonthTest {
         assertEquals(Optional.of(Month.DECEMBER), Month.getMonthByShortName("dec"));
     }
 
-    @Test
-    public void getMonthByShortNameSpecialCharactersTest() {
-        assertEquals(Optional.empty(), Month.getMonthByShortName(""));
-        assertEquals(Optional.empty(), Month.getMonthByShortName("dez"));
-        assertEquals(Optional.empty(), Month.getMonthByShortName("+*ç%&/()=.,:;-${}![]^'?~¦@#°§¬|¢äüö"));
+    @ParameterizedTest
+    @ValueSource(strings = {"", "dez", "+*ç%&/()=.,:;-${}![]^'?~¦@#°§¬|¢äüö"})
+    public void getMonthByShortNameSpecialCharactersTest(String s) {
+        assertEquals(Optional.empty(), Month.getMonthByShortName(s));
     }
 
     @Test

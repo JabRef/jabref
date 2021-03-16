@@ -3,6 +3,8 @@ package org.jabref.logic.integrity;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -15,37 +17,15 @@ class DateCheckerTest {
         assertEquals(Optional.empty(), checker.checkValue(""));
     }
 
-    @Test
-    void acceptsValidDates() {
-        assertEquals(Optional.empty(), checker.checkValue("2018-04-21"));
-        assertEquals(Optional.empty(), checker.checkValue("2018-04"));
-        assertEquals(Optional.empty(), checker.checkValue("21-04-2018"));
-        assertEquals(Optional.empty(), checker.checkValue("04-2018"));
-        assertEquals(Optional.empty(), checker.checkValue("04/18"));
-        assertEquals(Optional.empty(), checker.checkValue("04/2018"));
-        assertEquals(Optional.empty(), checker.checkValue("April 21, 2018"));
-        assertEquals(Optional.empty(), checker.checkValue("April, 2018"));
-        assertEquals(Optional.empty(), checker.checkValue("21.04.2018"));
-        assertEquals(Optional.empty(), checker.checkValue("2018.04.21"));
-        assertEquals(Optional.empty(), checker.checkValue("2018"));
+    @ParameterizedTest
+    @ValueSource(strings = {"2018-04-21", "2018-04", "21-04-2018", "04-2018", "04/18", "04/2018", "April 21, 2018", "April, 2018", "21.04.2018", "2018.04.21", "2018"})
+    void acceptsValidDates(String s) {
+        assertEquals(Optional.empty(), checker.checkValue(s));
     }
 
-    @Test
-    void complainsAboutInvalidIsoLikeDate() {
-        assertEquals(Optional.of("incorrect format"), checker.checkValue("2018-04-21TZ"));
-    }
-
-    @Test
-    void complainsAboutLetterInput() {
-        assertEquals(Optional.of("incorrect format"), checker.checkValue("2018-Apr-21"));
-        assertEquals(Optional.of("incorrect format"), checker.checkValue("2018-Apr-Twentyone"));
-        assertEquals(Optional.of("incorrect format"), checker.checkValue("2018-Apr-Twentyfirst"));
-    }
-
-    @Test
-    void complainsAboutSpecialCharacterInput() {
-        assertEquals(Optional.of("incorrect format"), checker.checkValue("2018_04_21"));
-        assertEquals(Optional.of("incorrect format"), checker.checkValue("2018 04 21"));
-        assertEquals(Optional.of("incorrect format"), checker.checkValue("2018~04~21"));
+    @ParameterizedTest
+    @ValueSource(strings = {"2018-04-21TZ", "2018-Apr-21", "2018-Apr-Twentyone", "2018-Apr-Twentyfirst", "2018_04_21", "2018 04 21", "2018~04~21"})
+    void complainsAboutInvalidInput(String s) {
+        assertEquals(Optional.of("incorrect format"), checker.checkValue(s));
     }
 }
