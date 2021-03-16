@@ -35,6 +35,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Fixed
 
+- We fixed an issue where double-click onto PDF in file list under the 'General' tab section should just open the file. [#7465](https://github.com/JabRef/jabref/issues/7465)
+- We fixed an issue where the dark theme did not extend to a group's custom color picker. [#7481](https://github.com/JabRef/jabref/issues/7481)
 - We fixed an issue where choosing the fields on which autocompletion should not work in "Entry editor" preferences had no effect. [#7320](https://github.com/JabRef/jabref/issues/7320)
 - We fixed an issue where the "Normalize page numbers" formatter did not replace en-dashes or em-dashes with a hyphen-minus sign. [#7239](https://github.com/JabRef/jabref/issues/7239)
 - We fixed an issue with the style of highlighted check boxes while searching in preferences. [#7226](https://github.com/JabRef/jabref/issues/7226)
@@ -60,6 +62,9 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where a non valid value as font size results in an uncaught exception. [#7415](https://github.com/JabRef/jabref/issues/7415)
 - We fixed an issue where "Merge citations" in the Openoffice/Libreoffice integration panel did not have a corresponding opposite. [#7454](https://github.com/JabRef/jabref/issues/7454)
 - We fixed an issue where drag and drop of bib files for opening resulted in uncaught exceptions [#7464](https://github.com/JabRef/jabref/issues/7464)
+- We fixed an issue where columns shrink in width when we try to enlarge JabRef window. [#6818](https://github.com/JabRef/jabref/issues/6818)
+- We fixed an issue where Content selector does not seem to work for custom fields. [#6819](https://github.com/JabRef/jabref/issues/6819)
+- We fixed an issue in which a linked online file consisting of a web page was saved as an invalid pdf file upon being downloaded. The user is now notified when downloading a linked file results in an HTML file. [#7452](https://github.com/JabRef/jabref/issues/7452)
 
 ### Removed
 
@@ -96,6 +101,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We changed the title of the window  "Manage field names and content":  to have the same title as the corresponding menu item  [#6895](https://github.com/JabRef/jabref/pull/6895)
 - We improved the detection of "short" DOIs [6880](https://github.com/JabRef/jabref/issues/6880)
 - We improved the duplicate detection when identifiers like DOI or arxiv are semantiaclly the same, but just syntactically differ (e.g. with or without http(s):// prefix). [#6707](https://github.com/JabRef/jabref/issues/6707)
+- We improved JabRef start up time [6057](https://github.com/JabRef/jabref/issues/6057)
 - We changed in the group interface "Generate groups from keywords in a BibTeX field" by "Generate groups from keywords in the following field". [#6983](https://github.com/JabRef/jabref/issues/6983)
 - We changed the name of a group type from "Searching for keywords" to "Searching for a keyword". [6995](https://github.com/JabRef/jabref/pull/6995)
 - We changed the way JabRef displays the title of a tab and of the window. [4161](https://github.com/JabRef/jabref/issues/4161)

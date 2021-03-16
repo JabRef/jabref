@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="never" default-locale="it-IT">
   <info>
-    <title>Mimesis Edizioni (Italian)</title>
+    <title>Mimesis Edizioni (Italiano)</title>
     <id>http://www.zotero.org/styles/mimesis-edizioni</id>
     <link href="http://www.zotero.org/styles/mimesis-edizioni" rel="self"/>
     <link href="http://www.zotero.org/styles/association-de-science-regionale-de-langue-francaise" rel="template"/>
@@ -12,30 +12,18 @@
     </author>
     <category citation-format="note"/>
     <category field="generic-base"/>
-    <updated>2018-05-05T21:58:46+00:00</updated>
+    <updated>2021-01-09T10:48:22+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
-  <locale xml:lang="it-IT">
-    <terms>
-      <term name="editor" form="short">dir.</term>
-      <term name="editortranslator" form="short">dir. &amp; trans.</term>
-      <term name="translator" form="short">trad.</term>
-      <term name="no date" form="short">s.d.</term>
-      <term name="retrieved">repéré</term>
-      <term name="from">de</term>
-      <term name="presented at">communication présentée au</term>
-      <term name="page" form="short">pp.</term>
-    </terms>
-  </locale>
   <macro name="container-contributors">
     <choose>
       <if type="chapter paper-conference" match="any">
         <names variable="editor translator" delimiter=", " suffix=", ">
-          <name delimiter-precedes-last="never" initialize-with=". ">
+          <label form="verb"/>
+          <name prefix=" " delimiter-precedes-last="never" initialize-with=". ">
             <name-part name="family"/>
           </name>
           <et-al font-style="italic"/>
-          <label form="short" prefix=" (" suffix=")"/>
         </names>
       </if>
     </choose>
@@ -55,7 +43,7 @@
     <names variable="author">
       <name delimiter-precedes-last="never" initialize-with=". "/>
       <et-al font-style="italic"/>
-      <label form="short" prefix=" (" suffix=")"/>
+      <label form="verb" prefix=" (" suffix=")"/>
       <substitute>
         <names variable="editor"/>
         <names variable="translator"/>
@@ -76,10 +64,11 @@
       <if variable="DOI"/>
       <else>
         <choose>
-          <if type="webpage">
+          <if type="webpage post post-weblog" match="any">
             <group delimiter=" ">
               <text variable="URL"/>
-              <group prefix="(page consultée le " suffix=")">
+              <group delimiter=" " prefix="(" suffix=")">
+                <text term="accessed"/>
                 <date form="numeric" variable="accessed">
                   <date-part name="year" form="short"/>
                 </date>
@@ -329,11 +318,6 @@
   </macro>
   <macro name="container">
     <group>
-      <choose>
-        <if type="chapter paper-conference entry-encyclopedia" match="any">
-          <text term="in" suffix=" "/>
-        </if>
-      </choose>
       <text macro="container-contributors"/>
       <text macro="container-title"/>
     </group>
@@ -382,6 +366,12 @@
       </else>
     </choose>
   </macro>
+  <macro name="cite-locator">
+    <group delimiter=" ">
+      <label variable="locator" form="short"/>
+      <text variable="locator"/>
+    </group>
+  </macro>
   <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" givenname-disambiguation-rule="primary-name" collapse="year">
     <sort>
       <key macro="author"/>
@@ -392,10 +382,7 @@
         <if position="ibid-with-locator">
           <group delimiter=", ">
             <text term="ibid"/>
-            <group delimiter=" ">
-              <label variable="locator" form="short"/>
-              <text variable="locator"/>
-            </group>
+            <text macro="cite-locator"/>
           </group>
         </if>
         <else-if position="ibid">
@@ -405,10 +392,7 @@
           <group delimiter=", ">
             <text macro="author"/>
             <text macro="title"/>
-            <group delimiter=" ">
-              <label variable="locator" form="short"/>
-              <text variable="locator"/>
-            </group>
+            <text macro="cite-locator"/>
             <text value="cit."/>
           </group>
         </else-if>
@@ -425,6 +409,7 @@
             </group>
             <text macro="locators"/>
           </group>
+          <text macro="cite-locator" prefix=", "/>
           <text macro="access" prefix=" "/>
         </else>
       </choose>
