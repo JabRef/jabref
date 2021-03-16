@@ -1,11 +1,9 @@
 package org.jabref.logic.formatter.casechanger;
 
-import org.jabref.logic.layout.format.RisMonth;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**

@@ -1,11 +1,9 @@
 package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
-
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.Optional;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -18,28 +16,34 @@ public class ShortMonthFormatterTest {
         formatter = new ShortMonthFormatter();
     }
 
-    @Test
-    public void testFormat() {
-        assertEquals("jan", formatter.format("1"));
-        assertEquals("feb", formatter.format("2"));
-        assertEquals("mar", formatter.format("3"));
-        assertEquals("apr", formatter.format("4"));
-        assertEquals("may", formatter.format("5"));
-        assertEquals("jun", formatter.format("6"));
-        assertEquals("jul", formatter.format("7"));
-        assertEquals("aug", formatter.format("8"));
-        assertEquals("sep", formatter.format("9"));
-        assertEquals("oct", formatter.format("10"));
-        assertEquals("nov", formatter.format("11"));
-        assertEquals("dec", formatter.format("12"));
-        assertEquals("jan", formatter.format("Januar"));
+    @ParameterizedTest(name = "formattedStr={0}, input={1}")
+    @CsvSource({
+            "jan, 1", // jan
+            "feb, 2", // feb
+            "mar, 3", // mar
+            "apr, 4", // apr
+            "may, 5", // may
+            "jun, 6", // jun
+            "jul, 7", // jul
+            "aug, 8", // aug
+            "sep, 9", // sep
+            "oct, 10", // oct
+            "nov, 11", // nov
+            "dec, 12", // dec
+            "jan, Januar" // jan
+    })
+    public void testValidFormat(String expectedResult, String input) {
+        assertEquals(expectedResult, formatter.format(input));
     }
 
-    @Test
-    public void testInvalidFormat() {
-        assertEquals("", formatter.format("-1"));
-        assertEquals("", formatter.format("0"));
-        assertEquals("", formatter.format("13"));
-        assertEquals("", formatter.format("abc"));
+    @ParameterizedTest(name = "formattedStr={0}, input={1}")
+    @CsvSource({
+            "'', -1", // -1
+            "'', 0", // 0
+            "'', 13", // 13
+            "'', abc", // abc
+    })
+    public void testInvalidFormat(String expectedResult, String input) {
+        assertEquals(expectedResult, formatter.format(input));
     }
 }
