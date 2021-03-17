@@ -7,7 +7,6 @@ import java.util.Set;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.ContentSelectorSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
@@ -42,7 +41,6 @@ public class FieldEditors {
                                             final BibDatabaseContext databaseContext,
                                             final EntryType entryType,
                                             final SuggestionProviders suggestionProviders,
-                                            final StateManager stateManager,
                                             final UndoManager undoManager) {
         final Set<FieldProperty> fieldProperties = field.getProperties();
 
@@ -69,7 +67,7 @@ public class FieldEditors {
         } else if (field == StandardField.OWNER) {
             return new OwnerEditor(field, preferences, suggestionProvider, fieldCheckers);
         } else if (fieldProperties.contains(FieldProperty.FILE_EDITOR)) {
-            return new LinkedFilesEditor(field, dialogService, databaseContext, taskExecutor, suggestionProvider, fieldCheckers, stateManager, preferences);
+            return new LinkedFilesEditor(field, dialogService, databaseContext, taskExecutor, suggestionProvider, fieldCheckers, preferences);
         } else if (fieldProperties.contains(FieldProperty.YES_NO)) {
             return new OptionEditor<>(new YesNoEditorViewModel(field, suggestionProvider, fieldCheckers));
         } else if (fieldProperties.contains(FieldProperty.MONTH)) {
