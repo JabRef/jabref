@@ -64,6 +64,9 @@ public class ArgumentProcessor {
     private boolean noGUINeeded;
 
     public ArgumentProcessor(String[] args, Mode startupMode) throws org.apache.commons.cli.ParseException {
+        for (String s:args) {
+            LOGGER.info("constructor arg = " + s);
+        }
         cli = new JabRefCLI(args);
         this.startupMode = startupMode;
         parserResults = processArguments();
@@ -318,6 +321,7 @@ public class ArgumentProcessor {
                 // Leftover arguments that have a "bib" extension are interpreted as
                 // BIB files to open. Other files, and files that could not be opened
                 // as bib, we try to import instead.
+                LOGGER.info("aLeftOver = " + aLeftOver);
                 boolean bibExtension = aLeftOver.toLowerCase(Locale.ENGLISH).endsWith("bib");
                 ParserResult pr = new ParserResult();
                 if (bibExtension) {

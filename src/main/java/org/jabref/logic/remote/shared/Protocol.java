@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Arrays;
 
 import javafx.util.Pair;
 
@@ -38,6 +39,7 @@ public class Protocol implements AutoCloseable {
     }
 
     public void sendMessage(RemoteMessage type, Object argument) throws IOException {
+        LOGGER.info("send arg: " + argument.toString());
         out.writeObject(type);
         out.writeObject(argument);
         out.write('\0');
@@ -49,6 +51,13 @@ public class Protocol implements AutoCloseable {
             RemoteMessage type = (RemoteMessage) in.readObject();
             Object argument = in.readObject();
             int endOfMessage = in.read();
+
+            LOGGER.info("recv type: " + type.toString());
+            if (argument instanceof String[]) {
+                LOGGER.info(Arrays.toString((String[]) argument));
+//                argument = StringUtil.join((String[]) argument, " ", 0, ((String[]) argument).length);
+//                argument = new String[]{(String) argument};
+            }
 
             if (endOfMessage != '\0') {
                 throw new IOException("Message didn't end on correct end of message identifier. Got " + endOfMessage);

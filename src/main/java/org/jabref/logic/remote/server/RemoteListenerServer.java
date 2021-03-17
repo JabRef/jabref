@@ -58,6 +58,9 @@ public class RemoteListenerServer implements Runnable {
                 break;
             case SEND_COMMAND_LINE_ARGUMENTS:
                 if (argument instanceof String[]) {
+                    for (String s:(String[]) argument) {
+                        LOGGER.info("arg: " + s);
+                    }
                     messageHandler.handleCommandLineArguments((String[]) argument);
                     protocol.sendMessage(RemoteMessage.OK);
                 } else {

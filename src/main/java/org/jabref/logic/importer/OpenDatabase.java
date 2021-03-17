@@ -61,6 +61,7 @@ public class OpenDatabase {
      */
     public static ParserResult loadDatabase(Path fileToOpen, ImportFormatPreferences importFormatPreferences, TimestampPreferences timestampPreferences, FileUpdateMonitor fileMonitor)
             throws IOException {
+        LOGGER.info("db path: " + fileToOpen.toString());
         ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(fileToOpen,
                 importFormatPreferences.getEncoding());
 
