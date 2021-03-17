@@ -68,7 +68,7 @@ public class CSLAdapter {
         if ((cslInstance == null) || !Objects.equals(newStyle, style)) {
             // lang and forceLang are set to the default values of other CSL constructors
             cslInstance = new CSL(dataProvider, new JabRefLocaleProvider(),
-                    new DefaultAbbreviationProvider(), null, newStyle, "en-US", false, true);
+                    new DefaultAbbreviationProvider(), newStyle, "en-US");
             style = newStyle;
         }
 

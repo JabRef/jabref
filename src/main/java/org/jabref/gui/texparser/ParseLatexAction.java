@@ -1,9 +1,12 @@
 package org.jabref.gui.texparser;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.model.database.BibDatabaseContext;
+
+import com.airhacks.afterburner.injection.Injector;
 
 public class ParseLatexAction extends SimpleCommand {
 
@@ -16,8 +19,8 @@ public class ParseLatexAction extends SimpleCommand {
 
     @Override
     public void execute() {
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
         BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(NullPointerException::new);
-        ParseLatexDialogView dialog = new ParseLatexDialogView(database);
-        dialog.showAndWait();
+        dialogService.showCustomDialogAndWait(new ParseLatexDialogView(database));
     }
 }

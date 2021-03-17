@@ -43,4 +43,9 @@ public class UnknownFileType implements FileType {
     public int hashCode() {
         return Objects.hash(extensions);
     }
+
+    @Override
+    public String getName() {
+        return "Unknown File Type" + extensions.toString();
+    }
 }

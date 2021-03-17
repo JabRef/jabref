@@ -31,10 +31,10 @@ public class BibtexExtractorViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibtexExtractorViewModel.class);
 
     private final StringProperty inputTextProperty = new SimpleStringProperty("");
-    private DialogService dialogService;
-    private GrobidCitationFetcher currentCitationfetcher;
-    private TaskExecutor taskExecutor;
-    private ImportHandler importHandler;
+    private final DialogService dialogService;
+    private final GrobidCitationFetcher currentCitationfetcher;
+    private final TaskExecutor taskExecutor;
+    private final ImportHandler importHandler;
 
     public BibtexExtractorViewModel(BibDatabaseContext bibdatabaseContext,
                                     DialogService dialogService,
@@ -48,7 +48,6 @@ public class BibtexExtractorViewModel {
         currentCitationfetcher = new GrobidCitationFetcher(preferencesService.getImportFormatPreferences());
         this.taskExecutor = taskExecutor;
         this.importHandler = new ImportHandler(
-                dialogService,
                 bibdatabaseContext,
                 ExternalFileTypes.getInstance(),
                 preferencesService,

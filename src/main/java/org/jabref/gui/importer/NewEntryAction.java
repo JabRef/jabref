@@ -57,7 +57,7 @@ public class NewEntryAction extends SimpleCommand {
             jabRefFrame.getCurrentLibraryTab().insertEntry(new BibEntry(type.get()));
         } else {
             EntryTypeView typeChoiceDialog = new EntryTypeView(jabRefFrame.getCurrentLibraryTab(), dialogService, preferences);
-            EntryType selectedType = typeChoiceDialog.showAndWait().orElse(null);
+            EntryType selectedType = dialogService.showCustomDialogAndWait(typeChoiceDialog).orElse(null);
             if (selectedType == null) {
                 return;
             }

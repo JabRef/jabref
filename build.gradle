@@ -10,11 +10,11 @@ import org.jabref.build.xjc.XjcTask
 plugins {
     id 'application'
     id "com.simonharrer.modernizer" version '2.1.0-1'
-    id 'me.champeau.gradle.jmh' version '0.5.2'
-    id 'com.github.ben-manes.versions' version '0.36.0'
+    id 'me.champeau.gradle.jmh' version '0.5.3'
+    id 'com.github.ben-manes.versions' version '0.38.0'
     id 'org.javamodularity.moduleplugin' version '1.7.0'
     id 'org.openjfx.javafxplugin' version '0.0.9'
-    id 'org.beryx.jlink' version '2.23.1'
+    id 'org.beryx.jlink' version '2.23.3'
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
     id 'com.adarshr.test-logger' version '2.1.1'
@@ -42,6 +42,7 @@ java {
 
 application {
     mainClassName = "org.jabref.gui.JabRefLauncher"
+    mainModule = 'org.jabref'
 }
 
 // TODO: Ugly workaround to temporarily ignore build errors to dependencies of latex2unicode
@@ -49,6 +50,10 @@ application {
 modularity.patchModule("test", "fastparse_2.12-1.0.0.jar")
 modularity.patchModule("test2", "fastparse-utils_2.12-1.0.0.jar")
 modularity.patchModule("test3", "sourcecode_2.12-0.1.4.jar")
+
+// Workaround for https://github.com/openjfx/javafx-gradle-plugin/issues/89
+// See also https://github.com/java9-modularity/gradle-modules-plugin/issues/165
+modularity.disableEffectiveArgumentsAdjustment()
 
 sourceSets {
     main {
@@ -88,7 +93,7 @@ configurations {
 }
 
 javafx {
-    version = "15"
+    version = "16"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.swing' ]
 }
 
@@ -110,8 +115,8 @@ dependencies {
 
     implementation 'commons-cli:commons-cli:1.4'
 
-    implementation 'org.libreoffice:libreoffice:7.0.3'
-    implementation 'org.libreoffice:unoloader:7.0.4'
+    implementation 'org.libreoffice:libreoffice:7.1.1'
+    implementation 'org.libreoffice:unoloader:7.1.1'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.9'
     implementation 'info.debatty:java-string-similarity:2.0.0'
@@ -119,18 +124,21 @@ dependencies {
     antlr3 'org.antlr:antlr:3.5.2'
     implementation 'org.antlr:antlr-runtime:3.5.2'
 
-    antlr4 'org.antlr:antlr4:4.9'
-    implementation 'org.antlr:antlr4-runtime:4.9'
+    antlr4 'org.antlr:antlr4:4.9.2'
+    implementation 'org.antlr:antlr4-runtime:4.9.2'
 
-    implementation (group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.7.0') {
+    implementation (group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.8.1') {
         exclude group: 'org.apache.lucene', module: 'lucene-sandbox'
     }
 
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.10.0.202012080955-r'
 
-    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.1'
+    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.12.2'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.2'
 
-    implementation 'org.postgresql:postgresql:42.2.18'
+    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.2'
+
+    implementation 'org.postgresql:postgresql:42.2.19'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
@@ -145,19 +153,19 @@ dependencies {
     implementation group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: '1.3.5'
 
     // JavaFX stuff
-    implementation 'de.jensd:fontawesomefx-commons:11.0'
-    implementation 'de.jensd:fontawesomefx-materialdesignfont:1.7.22-11'
+    implementation 'org.kordamp.ikonli:ikonli-javafx:12.2.0'
+    implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.2.0'
     implementation 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
     implementation 'de.saxsys:mvvmfx:1.8.0'
     implementation 'com.tobiasdiez:easybind:2.1.0'
-    implementation 'org.fxmisc.flowless:flowless:0.6.2'
+    implementation 'org.fxmisc.flowless:flowless:0.6.3'
     implementation 'org.fxmisc.richtext:richtextfx:0.10.4'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
     implementation 'com.jfoenix:jfoenix:9.0.10'
-    implementation 'org.controlsfx:controlsfx:11.0.3'
+    implementation 'org.controlsfx:controlsfx:11.1.0'
 
     implementation 'org.jsoup:jsoup:1.13.1'
-    implementation 'com.konghq:unirest-java:3.11.09'
+    implementation 'com.konghq:unirest-java:3.11.11'
 
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
@@ -167,7 +175,9 @@ dependencies {
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     annotationProcessor group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
 
-    implementation 'de.undercouch:citeproc-java:2.1.0-SNAPSHOT'
+    // SNAPSHOT is required because of plain-java support
+    // See https://github.com/michel-kraemer/citeproc-java/issues/92 for details
+    implementation 'de.undercouch:citeproc-java:3.0.0-SNAPSHOT'
 
     implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '1.2.1'
     implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '2.3.2'
@@ -186,24 +196,24 @@ dependencies {
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.62.2'
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.62.2'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.98'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.0'
-    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.7.0'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.7.0'
+    testImplementation 'io.github.classgraph:classgraph:4.8.102'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.7.1'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.7.1'
 
-    testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.19'
+    testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.22'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:3.6.28'
+    testImplementation 'org.mockito:mockito-core:3.8.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.8.2'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.8.2'
-    testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.15.0'
-    testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.15.0'
+    testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.17.0'
+    testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.17.0'
     testImplementation "org.testfx:testfx-core:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.38'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.41'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.3'
 }
 
@@ -220,11 +230,6 @@ dependencyUpdates.resolutionStrategy = {
             }
             if (rejected) {
                 selection.reject('Release candidate')
-            }
-        }
-        rules.withModule("de.jensd:fontawesomefx-materialdesignfont") { ComponentSelection selection ->
-            if (selection.candidate.version ==~ /2.0.26.*/) {
-                selection.reject('1.7.22-11 is actually newer (strange version system)')
             }
         }
         rules.withModule("org.javamodularity.moduleplugin:org.javamodularity.moduleplugin.gradle.plugin") { ComponentSelection selection ->
@@ -257,17 +262,23 @@ clean {
 }
 
 processResources {
+    gradle.taskGraph.whenReady {
+        if (gradle.taskGraph.hasTask(":jpackage")) {
+            logger.info('Adding buildres/csl to resources')
+            from("buildres/csl")
+        }
+    }
+
     filteringCharset = 'UTF-8'
 
     filesMatching("build.properties") {
         expand(version: project.findProperty('projVersionInfo') ?: '100.0.0',
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
-                "authors": new File('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
-                "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "),
-                "azureInstrumentationKey": System.getenv('AzureInstrumentationKey'),
-                "springerNatureAPIKey": System.getenv('SpringerNatureAPIKey'),
-                "astrophysicsDataSystemAPIKey": System.getenv('AstrophysicsDataSystemAPIKey'),
-                "ieeeAPIKey": System.getenv('IEEEAPIKey')
+                "maintainers": new File('MAINTAINERS').readLines().findAll { !it.startsWith("#") }.join(", "),
+                "azureInstrumentationKey": System.getenv('AzureInstrumentationKey') ? System.getenv('AzureInstrumentationKey') : '',
+                "springerNatureAPIKey": System.getenv('SpringerNatureAPIKey') ? System.getenv('SpringerNatureAPIKey') : '',
+                "astrophysicsDataSystemAPIKey": System.getenv('AstrophysicsDataSystemAPIKey') ? System.getenv('AstrophysicsDataSystemAPIKey') : '',
+                "ieeeAPIKey": System.getenv('IEEEAPIKey') ? System.getenv('IEEEAPIKey') : ''
         )
         filteringCharset = 'UTF-8'
     }
@@ -380,7 +391,6 @@ run {
                 'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
 
                 'javafx.controls/com.sun.javafx.scene.control.behavior' : 'com.jfoenix',
-                'com.oracle.truffle.regex/com.oracle.truffle.regex' : 'org.graalvm.truffle',
 
                 // Not sure why we need to restate the controlfx exports
                 // Taken from here: https://github.com/controlsfx/controlsfx/blob/9.0.0/build.gradle#L1
@@ -557,56 +567,51 @@ jlink {
     // The module descriptor automatically generated by the plugin for the merged module contained some invalid entries.
     // Execute ./gradlew suggestMergedModuleInfo and include the suggested directives here.
     mergedModule {
-        requires 'java.xml'
-        requires 'com.sun.xml.txw2'
-        requires 'java.desktop'
-        requires 'org.objectweb.asm'
-        requires 'jdk.jfr'
-        requires 'jdk.unsupported'
-        requires 'com.google.gson'
-        requires 'java.management'
-        requires 'java.naming'
-        requires 'java.security.sasl'
-        requires 'jdk.security.jgss'
-        requires 'java.logging'
-        requires 'jdk.xml.dom'
-        requires 'java.sql'
-        requires 'java.rmi'
-        requires 'java.security.jgss'
-        requires 'com.oracle.truffle.regex'
-        requires 'jdk.jsobject'
-        requires 'jdk.management'
-        requires 'jdk.unsupported.desktop'
-        requires 'org.objectweb.asm.util'
-        requires 'java.scripting'
-        requires 'org.objectweb.asm.commons'
-        requires 'org.graalvm.truffle'
-        requires 'java.datatransfer'
-        requires 'java.compiler'
-        requires 'java.sql.rowset'
-        requires 'java.transaction.xa'
-        requires 'org.graalvm.sdk'
+        requires 'java.compiler';
+        requires 'java.datatransfer';
+        requires 'java.desktop';
+        requires 'java.logging';
+        requires 'java.management';
+        requires 'java.naming';
+        requires 'java.net.http';
+        requires 'java.scripting';
+        requires 'java.security.jgss';
+        requires 'java.security.sasl';
+        requires 'java.sql';
+        requires 'java.sql.rowset';
+        requires 'java.transaction.xa';
+        requires 'java.rmi';
+        requires 'java.xml';
+        requires 'jdk.jfr';
+        requires 'jdk.jsobject';
+        requires 'jdk.unsupported';
+        requires 'jdk.unsupported.desktop';
+        requires 'jdk.security.jgss';
+        requires 'jdk.xml.dom';
+        requires 'com.google.gson';
+        requires 'com.sun.xml.fastinfoset';
+        requires 'com.sun.xml.txw2';
         requires 'org.slf4j'
         uses 'org.apache.logging.log4j.util.PropertySource'
         uses 'org.apache.logging.log4j.core.util.WatchEventService'
         uses 'org.apache.logging.log4j.plugins.processor.PluginService'
         uses 'org.controlsfx.glyphfont.GlyphFont'
         uses 'com.airhacks.afterburner.views.ResourceLocator'
-        uses 'com.oracle.truffle.js.runtime.Evaluator'
         uses 'org.apache.logging.log4j.message.ThreadDumpMessage.ThreadInfoFactory'
         uses 'com.airhacks.afterburner.injection.PresenterFactory'
-        uses 'com.oracle.truffle.js.runtime.builtins.JSFunctionLookup'
         uses 'org.apache.logging.log4j.spi.Provider'
         uses 'org.mariadb.jdbc.credential.CredentialPlugin'
         uses 'org.mariadb.jdbc.tls.TlsSocketPlugin'
         uses 'org.mariadb.jdbc.LocalInfileInterceptor'
+        uses 'org.eclipse.jgit.transport.SshSessionFactory';
+        uses 'org.eclipse.jgit.lib.GpgSigner';
         uses 'javax.xml.bind.JAXBContextFactory'
+        provides 'org.apache.lucene.codecs.DocValuesFormat' with 'org.apache.lucene.codecs.lucene80.Lucene80DocValuesFormat';
         provides 'javax.annotation.processing.Processor' with 'org.apache.logging.log4j.plugins.processor.PluginProcessor'
         provides 'org.controlsfx.glyphfont.GlyphFont' with 'org.controlsfx.glyphfont.FontAwesome'
         provides 'org.apache.logging.log4j.message.ThreadDumpMessage.ThreadInfoFactory' with 'org.apache.logging.log4j.core.message.ExtendedThreadInfoFactory'
         provides 'org.mariadb.jdbc.tls.TlsSocketPlugin' with 'org.mariadb.jdbc.internal.protocol.tls.DefaultTlsSocketPlugin'
         provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ServerProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyServerProvider'
-        provides 'com.oracle.truffle.js.runtime.Evaluator' with 'com.oracle.truffle.js.parser.GraalJSEvaluator'
         provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.NameResolverProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.internal.DnsNameResolverProvider'
         provides 'org.apache.logging.log4j.util.PropertySource' with 'org.apache.logging.log4j.util.EnvironmentPropertySource',
                 'org.apache.logging.log4j.util.SystemPropertiesPropertySource'
@@ -629,7 +634,6 @@ jlink {
         provides 'java.security.Provider' with 'org.bouncycastle.jce.provider.BouncyCastleProvider',
                 'org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider'
         provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ManagedChannelProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyChannelProvider'
-        provides 'com.oracle.truffle.js.runtime.builtins.JSFunctionLookup' with 'com.oracle.truffle.js.builtins.JSDefaultBuiltinLookup'
     }
 
     jpackage {
