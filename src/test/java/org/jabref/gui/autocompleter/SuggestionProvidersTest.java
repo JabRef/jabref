@@ -7,12 +7,10 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
+
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
 
 class SuggestionProvidersTest {
@@ -28,9 +26,8 @@ class SuggestionProvidersTest {
       Field journalEntryField = StandardField.JOURNAL;
       Field publisherEntryField = StandardField.PUBLISHER;
       Field specialEntryField = SpecialField.PRINTED;
-      AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(true,AutoCompleteFirstNameMode.BOTH, AutoCompletePreferences.NameFormat.BOTH, FieldFactory.parseFieldList
-              (personEntryField.getName()+";"+singleEntryField.getName()+";"+multipleEntryField.getName()+";"+journalEntryField.getName()+";"+publisherEntryField.getName()+";"+specialEntryField.getName()), null);
-      SuggestionProviders sp = new SuggestionProviders(database,abbreviationRepository,autoCompletePreferences);
+      AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(true, AutoCompleteFirstNameMode.BOTH, AutoCompletePreferences.NameFormat.BOTH, FieldFactory.parseFieldList(personEntryField.getName() + ";" + singleEntryField.getName() + ";" + multipleEntryField.getName() + ";" + journalEntryField.getName() + ";" + publisherEntryField.getName() + ";" + specialEntryField.getName()), null);
+      SuggestionProviders sp = new SuggestionProviders(database, abbreviationRepository, autoCompletePreferences);
       SuggestionProviders empty = new SuggestionProviders();
 
       entry.setField(personEntryField, "Goethe");

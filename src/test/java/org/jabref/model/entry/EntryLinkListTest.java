@@ -9,7 +9,9 @@ import org.jabref.model.entry.field.StandardField;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EntryLinkListTest {
 
@@ -59,6 +61,7 @@ public class EntryLinkListTest {
         ParsedEntryLink expected = new ParsedEntryLink(KEY, database);
         assertEquals(expected, link);
     }
+
     @Test
     public void givenBibEntryWhenParsingThenExpectLink() {
       ParsedEntryLink expected = new ParsedEntryLink(entry);

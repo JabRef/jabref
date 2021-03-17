@@ -3,10 +3,12 @@ package org.jabref.model;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.junit.jupiter.api.BeforeAll;
+
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FieldChangeTest {
 
@@ -15,7 +17,7 @@ class FieldChangeTest {
   @Test
   void testHashCode() {
     FieldChange fcNull = new FieldChange(null, null, null, null);
-    assertEquals(923521,fcNull.hashCode());
+    assertEquals(923521, fcNull.hashCode());
   }
 
   @Test
