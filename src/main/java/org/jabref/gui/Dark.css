@@ -2,7 +2,7 @@
     -jr-theme: #2c9490;
     -jr-accent: #255652;
     -jr-selected: -jr-accent;
-    -jr-hover: #212330;
+    -jr-hover: #fff1;
 
 
     -jr-red: #b71c1f;
@@ -67,14 +67,11 @@
 }
 
 .table-row-cell: odd{
-    -fx-background-color:#272b38 ;
-    -fx-background-insets: 0, 0 0 1 0;
-    -fx-padding: 0.0em;
+    -fx-background-color:#272b38;
 }
+
 .table-row-cell: even{
-    -fx-background-color: #fff1 ;
-    -fx-background-insets: 0, 0 0 1 0;
-    -fx-padding: 0.0em;
+    -fx-background-color: #212330;
 }
 
 .table-row-cell:hover,
