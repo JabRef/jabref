@@ -26,10 +26,6 @@ public class JabRefCLI {
 
         this.cl = new DefaultParser().parse(options, args, true);
         this.leftOver = cl.getArgList();
-
-        for (String s:args) {
-            LOGGER.info("constructor arg = " + s);
-        }
     }
 
     public static String getExportMatchesSyntax() {

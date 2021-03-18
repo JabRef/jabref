@@ -54,10 +54,12 @@ public class RemoteClient {
      */
     public boolean sendCommandLineArguments(String[] args) {
         try (Protocol protocol = openNewConnection()) {
+
             String[] encodedArgs = args.clone();
             for (int i = 0; i < encodedArgs.length; i++) {
                 encodedArgs[i] = URLEncoder.encode(encodedArgs[i], StandardCharsets.UTF_8);
             }
+
             protocol.sendMessage(RemoteMessage.SEND_COMMAND_LINE_ARGUMENTS, encodedArgs);
             Pair<RemoteMessage, Object> response = protocol.receiveMessage();
             return response.getKey() == RemoteMessage.OK;

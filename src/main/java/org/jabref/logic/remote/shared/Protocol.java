@@ -6,7 +6,6 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 import javafx.util.Pair;
 
@@ -41,10 +40,6 @@ public class Protocol implements AutoCloseable {
     }
 
     public void sendMessage(RemoteMessage type, Object argument) throws IOException {
-        LOGGER.info("send arg: " + argument.toString());
-//        if (type == RemoteMessage.SEND_COMMAND_LINE_ARGUMENTS && argument instanceof String) {
-//            argument = URLEncoder.encode((String) argument, StandardCharsets.UTF_8);
-//        }
         out.writeObject(type);
         out.writeObject(argument);
         out.write('\0');
@@ -57,17 +52,10 @@ public class Protocol implements AutoCloseable {
             Object argument = in.readObject();
             int endOfMessage = in.read();
 
-            LOGGER.info("recv type: " + type.toString());
             if (type == RemoteMessage.SEND_COMMAND_LINE_ARGUMENTS) {
                 for (int i = 0; i < ((String[]) argument).length; i++) {
                     ((String[]) argument)[i] = URLDecoder.decode(((String[]) argument)[i], StandardCharsets.UTF_8);
                 }
-            }
-//            if (type == RemoteMessage.SEND_COMMAND_LINE_ARGUMENTS && argument instanceof String) {
-//                argument = URLDecoder.decode((String) argument, StandardCharsets.UTF_8);
-//            }
-            if (argument instanceof String[]) {
-                LOGGER.info(Arrays.toString((String[]) argument));
             }
 
             if (endOfMessage != '\0') {

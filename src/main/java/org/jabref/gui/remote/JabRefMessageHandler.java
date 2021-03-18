@@ -18,9 +18,6 @@ public class JabRefMessageHandler implements MessageHandler {
 
     @Override
     public void handleCommandLineArguments(String[] message) {
-        for (String s:message) {
-            LOGGER.info("message = " + s);
-        }
         try {
             ArgumentProcessor argumentProcessor = new ArgumentProcessor(message, ArgumentProcessor.Mode.REMOTE_START);
 
