@@ -197,7 +197,7 @@ public class ClipBoardManager {
             return fetchByDOI(doi.get());
         }
         Optional<ArXivIdentifier> arXiv = ArXivIdentifier.parse(data);
-        if(arXiv.isPresent()) {
+        if (arXiv.isPresent()) {
             return fetchByArXiv(arXiv.get());
         }
 
