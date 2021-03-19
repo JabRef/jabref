@@ -51,7 +51,7 @@ class RemoteCommunicationTest {
     void commandLineArgumentSinglePassedToServer() {
         final String[] message = new String[]{"my message"};
 
-        client.sendCommandLineArguments(message);
+        client.sendCommandLineArguments(message.clone());
 
         verify(server).handleCommandLineArguments(message);
     }
@@ -60,7 +60,7 @@ class RemoteCommunicationTest {
     void commandLineArgumentTwoPassedToServer() {
         final String[] message = new String[]{"my message", "second"};
 
-        client.sendCommandLineArguments(message);
+        client.sendCommandLineArguments(message.clone());
 
         verify(server).handleCommandLineArguments(message);
     }
@@ -69,7 +69,17 @@ class RemoteCommunicationTest {
     void commandLineArgumentMultiLinePassedToServer() {
         final String[] message = new String[]{"my message\n second line", "second \r and third"};
 
-        client.sendCommandLineArguments(message);
+        client.sendCommandLineArguments(message.clone());
+
+        verify(server).handleCommandLineArguments(message);
+    }
+
+    @Test
+    void commandLineArgumentEncodingAndDecoding() {
+        final String[] message = new String[]{"D:\\T EST\\测试te st.bib"};
+
+        // will be encoded as "D%3A%5CT+EST%5C%E6%B5%8B%E8%AF%95te+st.bib"
+        client.sendCommandLineArguments(message.clone());
 
         verify(server).handleCommandLineArguments(message);
     }
