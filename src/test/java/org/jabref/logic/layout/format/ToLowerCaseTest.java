@@ -19,7 +19,7 @@ public class ToLowerCaseTest {
 
     @Test
     public void testLowerCase() {
-        assertEquals("abcd efg", new ToLowerCase().format("abcd efg"));
+        assertEquals("abcd efg ", new ToLowerCase().format("abcd efg "));
     }
 
     @Test
