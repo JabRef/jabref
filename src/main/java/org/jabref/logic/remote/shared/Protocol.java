@@ -41,16 +41,20 @@ public class Protocol implements AutoCloseable {
     }
 
     public void sendMessage(RemoteMessage type, Object argument) throws IOException {
-        // encode the commandline arguments to handle special characters (eg. space and Chinese characters)
+        out.writeObject(type);
+
+        // encode the commandline arguments to handle special characters (eg. spaces and Chinese characters)
         // related to issue #6487
         if (type == RemoteMessage.SEND_COMMAND_LINE_ARGUMENTS) {
-            for (int i = 0; i < ((String[]) argument).length; i++) {
-                ((String[]) argument)[i] = URLEncoder.encode(((String[]) argument)[i], StandardCharsets.UTF_8);
+            String[] encodedArgs = ((String[]) argument).clone();
+            for (int i = 0; i < encodedArgs.length; i++) {
+                encodedArgs[i] = URLEncoder.encode(encodedArgs[i], StandardCharsets.UTF_8);
             }
+            out.writeObject(encodedArgs);
+        } else {
+            out.writeObject(argument);
         }
 
-        out.writeObject(type);
-        out.writeObject(argument);
         out.write('\0');
         out.flush();
     }
