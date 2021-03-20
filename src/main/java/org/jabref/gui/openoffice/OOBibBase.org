@@ -5,6 +5,7 @@
 - file:../../../../../resources/l10n/JabRef_en.properties
 
 
+
 ** TODO separate responsibilites
 
 - clarify what belongs to
@@ -12,6 +13,11 @@
   - style
   - (anything else?)
 
+** combineCiteMarkers: with a numbered style, the user has no visual clue
+
+   With a numbered style, the user has no visual clue to distinguish
+   AUTHORYEAR_PAR and AUTHORYEAR_INTEXT. It may be confusing why
+   we do not "Merge" when thay are mixed.
 
 ** combineCiteMarkers / unCombineCiteMarkers (aka Merge/Separate)
 

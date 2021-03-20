@@ -34,7 +34,8 @@ class RangeKeyedMap<V> {
 
     public boolean
     containsKey(XTextRange r) {
-        return xxs.containsKey( r.getText() ) && xxs.get(r).containsKey(r);
+        return xxs.containsKey( r.getText() )
+            && xxs.get(r).containsKey(r);
     }
 
     public V
@@ -60,6 +61,7 @@ class RangeKeyedMap<V> {
         TreeMap<XTextRange,V> xs = xxs.get(r.getText());
         if ( xs == null ){
             xs = new TreeMap<>( RangeKeyedMap::comparator );
+            xxs.put( r.getText(), xs );
         }
         return xs.put( r, value );
     }

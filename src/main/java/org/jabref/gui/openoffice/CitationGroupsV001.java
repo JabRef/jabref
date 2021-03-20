@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -229,6 +230,16 @@ class CitationGroupsV001 {
      */
     private Optional<CitedKeys> bibliography;
 
+    public void show() {
+        System.out.printf("CitationGroupsV001%n");
+        System.out.printf("  citationGroups.size: %d%n", citationGroups.size());
+        System.out.printf("  pageInfoThrash.size: %d%n", pageInfoThrash.size());
+        System.out.printf("  globalOrder: %s%n",
+                           globalOrder.isEmpty()
+                           ? "isEmpty"
+                           : String.format( "%d", globalOrder.get().size() )
+            );
+    }
 
     /**
      * Constructor
@@ -275,6 +286,7 @@ class CitationGroupsV001 {
         // What is left out: the ranges controlled by the reference marks.
         // But (I guess) those change too easily, so we only ask when actually needed.
 
+        this.globalOrder = Optional.empty();
         this.citedKeysAfterDatabaseLookup = Optional.empty();
         this.bibliography = Optional.empty();
     }
@@ -332,12 +344,12 @@ class CitationGroupsV001 {
     }
 
     class CitedKey {
-        String key;
+        String key;  // TODO: rename to citationKey
         LinkedHashSet<CitationPath> where;
         Optional<DatabaseLookupResult> db;
-        Optional<Integer> number;
-        Optional<String> uniqueLetter;
-        Optional<String> normCitMarker;
+        Optional<Integer> number; // For Numbered citation styles.
+        Optional<String> uniqueLetter; // For AuthorYear citation styles.
+        Optional<String> normCitMarker;  // For AuthorYear citation styles.
 
         CitedKey( String key, CitationPath p, Citation cit ) {
             this.key = key;
@@ -390,6 +402,9 @@ class CitationGroupsV001 {
 
     class CitedKeys {
 
+        /**
+         * Order-preserving map from citation keys to associated data.
+         */
         LinkedHashMap<String,CitedKey> data;
 
         CitedKeys(LinkedHashMap<String, CitedKey> data) {
@@ -647,37 +662,48 @@ class CitationGroupsV001 {
 
     public void
     setGlobalOrder( List<CitationGroupID> globalOrder ) {
+        Objects.requireNonNull(globalOrder);
+        if (globalOrder.size() != citationGroups.size() ){
+            throw new RuntimeException(
+                "CitationGroupsV001.setGlobalOrder: globalOrder.size() != citationGroups.size()"
+                );
+        }
         this.globalOrder = Optional.of(globalOrder);
     }
 
-    public Optional<CitationGroup>
-    getCitationGroup(CitationGroupID cgid) {
+    public Optional<CitationGroup> getCitationGroup(CitationGroupID cgid) {
         CitationGroup e = citationGroups.get(cgid);
         return Optional.ofNullable(e);
     }
 
-    private Optional<String>
-    getReferenceMarkName(CitationGroupID cgid) {
+    /**
+     * Call this when the citation group is unquestionably there.
+     */
+    public CitationGroup getCitationGroupOrThrow(CitationGroupID cgid) {
+        CitationGroup e = citationGroups.get(cgid);
+        if (e == null) {
+            throw new RuntimeException("CitationGroupsV001.getCitationGroupOrThrow:"
+                                       + " the requested CitationGroup is not available");
+        }
+        return e;
+    }
+
+    private Optional<String> getReferenceMarkName(CitationGroupID cgid) {
         return getCitationGroup(cgid).map(cg -> cg.referenceMarkName);
     }
 
-    private Optional<Integer>
-    getItcType(CitationGroupID cgid) {
+    private Optional<Integer> getItcType(CitationGroupID cgid) {
         return getCitationGroup(cgid).map(cg -> cg.itcType);
     }
 
-    public int
-    numberOfCitationGroups() {
+    public int numberOfCitationGroups() {
         return citationGroups.size();
     }
 
-    public Optional<String>
-    getPageInfo(CitationGroupID cgid) {
-        return (
-            getCitationGroup(cgid)
-            .map(cg -> cg.pageInfo)
-            .flatMap(x -> x)
-            );
+    public Optional<String> getPageInfo(CitationGroupID cgid) {
+        return (getCitationGroup(cgid)
+                .map(cg -> cg.pageInfo)
+                .flatMap(x -> x));
     }
 
     public Optional<List<Citation>>
