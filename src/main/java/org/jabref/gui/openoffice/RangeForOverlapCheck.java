@@ -16,16 +16,16 @@ import com.sun.star.text.XTextRange;
  * corresponding tables.
  *
  */
-class RangeForOverlapCheck {
+class RangeForOverlapCheck<T> {
     final static int REFERENCE_MARK_KIND = 0;
     final static int FOOTNOTE_MARK_KIND = 1;
 
     XTextRange range;
     int kind;
-    int i;
+    T i; // TODO: rename to content if identifier or cgid
     String description;
 
-    RangeForOverlapCheck(XTextRange range, int i, int kind, String description) {
+    RangeForOverlapCheck(XTextRange range, T i, int kind, String description) {
         this.range = range;
         this.kind = kind;
         this.i = i;

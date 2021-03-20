@@ -25,7 +25,7 @@ public class ManageCitationsDialogViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ManageCitationsDialogViewModel.class);
 
-    private final ListProperty<CitationEntryViewModel> citations = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<ManageCitationsEntryViewModel> citations = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final OOBibBase ooBase;
     private final DialogService dialogService;
 
@@ -38,10 +38,18 @@ public class ManageCitationsDialogViewModel {
         this.ooBase = ooBase;
         this.dialogService = dialogService;
 
-        List<CitationEntry> cts = ooBase.getCitationEntries();
-        for (CitationEntry entry : cts) {
-            CitationEntryViewModel itemViewModelEntry = new CitationEntryViewModel(entry);
-            citations.add(itemViewModelEntry);
+        try {
+            List<CitationEntry> cts = ooBase.getCitationEntries();
+            for (CitationEntry entry : cts) {
+                ManageCitationsEntryViewModel itemViewModelEntry = new ManageCitationsEntryViewModel(entry);
+                citations.add(itemViewModelEntry);
+            }
+        } catch (UnknownPropertyException
+                 | WrappedTargetException
+                 | NoDocumentException
+                 | CreationException ex) {
+            LOGGER.warn("Problem collecting citations", ex);
+            dialogService.showErrorDialogAndWait(Localization.lang("Problem collecting citations"), ex);
         }
     }
 
@@ -49,7 +57,7 @@ public class ManageCitationsDialogViewModel {
 
         List<CitationEntry> citationEntries =
             citations.stream()
-            .map(CitationEntryViewModel::toCitationEntry)
+            .map(ManageCitationsEntryViewModel::toCitationEntry)
             .collect(Collectors.toList());
 
         try {
@@ -66,7 +74,7 @@ public class ManageCitationsDialogViewModel {
             }
     }
 
-    public ListProperty<CitationEntryViewModel> citationsProperty() {
+    public ListProperty<ManageCitationsEntryViewModel> citationsProperty() {
         return citations;
     }
 }

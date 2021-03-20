@@ -4,7 +4,7 @@
 - file:../../gui/openoffice/
 - file:../../../../../resources/l10n/JabRef_en.properties
 
-  
+
 ** TODO separate responsibilites
 
 - clarify what belongs to
@@ -12,10 +12,30 @@
   - style
   - (anything else?)
 
-** combineCiteMarkers
+
+** combineCiteMarkers / unCombineCiteMarkers (aka Merge/Separate)
+
+The reason for implementing unCombineCiteMarkers (Separate citations)
+was to be able to add/remove citations to the group.
+
+- we will move pageInfo to the citations, but still there is the question
+  of a group prefix (some text within the parentheses, before the citations)
+
+  - What we really need is the ability to add/remove/reorder citations within
+    a group.
+    - This could be done with a textual representation,
+    - and maybe we could provide "Open group"/"Close group" for editing
+      without losing the groups identity (and attached data)
+
+    - Instead of trying to be clever and decide how to merge pageInfo,
+      we could just warn the user about duplicate keys in a group and
+      let him decide the appropriate action. For this we need editable
+      presentation of pageInfo.
+
+** combineCiteMarkers                                         :group_and_ungroup:
    - reimplemented to collect data first, then apply
 
-*** problem: altough we keep the Unresolved entries here,
+*** problem: although we keep the Unresolved entries here,
      refreshCiteMarkers() destroys them
      [[bug: refreshCiteMarkers destroys unresolved entries]]
 
@@ -52,7 +72,7 @@
 *** implement option (2)
     - sortRangesWithinGetTextPartitions 
 
-
+.
 ** bug: backwordCompatibility OO_storage_v001
 
    OO_storage_v001 (representation of citations in JabRef 5.2)
@@ -97,8 +117,7 @@
          mark is recreated at the same location, otherwise it is reused.
        - [X] for OO_storage_v001 compat mode, we need a bracketless version
          - added REFERENCE_MARK_ALWAYS_REMOVE_BRACKETS=true
-
-
+.
 ** bug: refreshCiteMarkers destroys unresolved entries
 
    - When opening the wrong library, we get many unresolved entries.
@@ -106,14 +125,13 @@
      Click on "Refresh" will remove reference
      to some of the unresolved entries from the document.
 
-
-** "Cite in-text" with multiple entries
+.
+** "Cite in-text" with multiple entries                   :group_and_ungroup:
 
    - inserts "Au (2000); Bu (2001)"
    - Separate works, but modifies from in-text to in-paren: "(Au 2000) (Bu 2001)"
 
-
-** unCombineCiteMarkers: formatting space inserted between citations
+** unCombineCiteMarkers: formatting space inserted between citations :group_and_ungroup:
 
    Note: insertEntry inserts merged, so this question is not applicable there.
 
@@ -163,7 +181,7 @@
        - Q: may need care when filling in during refresh.
      - apply the style to the citation marker without affecting
        the surroundings
-
+.
 ** Bug: character style applied by one style is left in place
 
    - Test
@@ -172,7 +190,7 @@
      - Select another style, that does not prescribe a character style.
      - refresh: the style is left in place.
 
-** combineCiteMarkers same key different pageInfo
+** combineCiteMarkers same key different pageInfo :group_and_ungroup:
 
    [[file:OOBibBase.java::/combineCiteMarkers: merging for same citation keys]]
 
@@ -196,13 +214,13 @@
 
      - Maybe do the same with "Merge citations"
 
-** combineCiteMarkers / Merge walk into next mark
+** combineCiteMarkers / Merge walk into next mark :group_and_ungroup:
 
    [[file:OOBibBase.java::/If there is no space between the two reference marks/]]
 
    - consequence: with no space between, citations are not merged
 
-** Bug: Citations without intervening space
+** Bug: CitationGroups without intervening space
 
  May lose first of consecutive citations without intervening space
 
@@ -215,7 +233,7 @@
 
 ** Bug: consecutive citations in footnotes
 
-The 2nd of two concecutive citations is missed in footnotes by updateDocumentActionHelper
+The 2nd of two consecutive citations is missed in footnotes by updateDocumentActionHelper
 
 Situation:
 
@@ -242,6 +260,15 @@ Note:
      - [X] they appear in the bibliography.
      - [X] They are also updated on style change+refresh
      - [ ] Merge fails (does not merge).
+
+           - This may be because for visual ordering rerefence mark
+             ranges in footnotes are replaced by the
+             footnotemark. Since they appear at the same position,
+             visual ordering may leave them in arbitrary order.
+
+             If this is the cause, introducing indexInPosition should
+             fix it. (not tested yet)
+
      - [ ] "Separate" (on merged citations inserted by
             selecting multiple entries then "Cite")
             May leave some of the two citation marks with text "tmp".
@@ -252,10 +279,8 @@ Note:
     - [X] can be inserted
     - [X] they appear in bibliography
     - [X] they are updated on style change+refresh
-    - [X} Merge (combineCiteMarkers) works
-    - [X} Separate (unCombineCiteMarkers) works
-
-
+    - [X] Merge (combineCiteMarkers) works
+    - [X] Separate (unCombineCiteMarkers) works
 
 ** Bug: no database mess
 
@@ -351,7 +376,7 @@ populateBibTextSection should only fill the gaps.
      since we can just put "<i>et al.</i>" into ET_AL_STRING
 
 
-** Bug: Find and resolve overlapping citations
+** Bug: Find and resolve overlapping citation groups
 
 Potential attacks:
 
@@ -645,7 +670,6 @@ each refresh.
   - In case the user deletes our bibliography markers (probably one or
     two bookmarks around the body) we will create the head again (not
     knowing that it is already there)
-
 
 *** Possibilities (not settled, seems overcomplicated)
 

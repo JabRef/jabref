@@ -294,7 +294,7 @@ class DocumentConnection {
     public Optional<String>
     getCustomProperty(String property)
         throws
-        UnknownPropertyException,
+    // UnknownPropertyException,
         WrappedTargetException {
 
         assert (this.propertySet != null);
@@ -303,11 +303,17 @@ class DocumentConnection {
                                 .getPropertySetInfo());
 
         if (psi.hasPropertyByName(property)) {
-            String v =
-                this.propertySet
-                .getPropertyValue(property)
-                .toString();
-            return Optional.ofNullable(v);
+            try {
+                String v =
+                    this.propertySet
+                    .getPropertyValue(property)
+                    .toString();
+                return Optional.ofNullable(v);
+            } catch (UnknownPropertyException ex) {
+                // LOGGER.warn("getCustomProperty: cought UnknownPropertyException: ", ex);
+                // return Optional.empty();
+                throw new RuntimeException("getCustomProperty: cought UnknownPropertyException");
+            }
         }
         return Optional.empty();
     }

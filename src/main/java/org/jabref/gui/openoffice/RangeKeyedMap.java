@@ -64,6 +64,9 @@ class RangeKeyedMap<V> {
         return xs.put( r, value );
     }
 
+    /**
+     * @return A list of the partitions.
+     */
     public List<TreeMap<XTextRange,V>>
     partitionValues() {
         return new ArrayList(xxs.values());

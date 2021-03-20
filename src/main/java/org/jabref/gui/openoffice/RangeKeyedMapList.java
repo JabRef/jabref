@@ -59,6 +59,14 @@ class RangeKeyedMapList<V> {
             this.kind = kind;
             this.vs = vs;
         }
+    };
+
+    /**
+     * @return A list of the partitions.
+     */
+    public List<TreeMap<XTextRange,List<V>>>
+    partitionValues() {
+        return this.xxs.partitionValues();
     }
 
     /**
