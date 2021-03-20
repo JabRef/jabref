@@ -285,7 +285,7 @@ public class IconTheme {
         TWITTER(MaterialDesignT.TWITTER),
         BLOG(MaterialDesignR.RSS),
         DATE_PICKER(MaterialDesignC.CALENDAR),
-        DEFAULT_GROUP_ICON_COLORED(MaterialDesignC.CIRCLE),
+        DEFAULT_GROUP_ICON_COLORED(MaterialDesignR.RECORD),
         DEFAULT_GROUP_ICON(MaterialDesignL.LABEL_OUTLINE),
         ALL_ENTRIES_GROUP_ICON(MaterialDesignD.DATABASE),
         IMPORT(MaterialDesignC.CALL_RECEIVED),
