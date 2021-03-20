@@ -43,7 +43,11 @@ public class InternalMaterialDesignIcon implements JabRefIcon {
         Ikon icon = icons.get(0);
         FontIcon fontIcon = FontIcon.of(icon);
         fontIcon.getStyleClass().add("glyph-icon");
-        color.ifPresent(color -> fontIcon.setStyle(fontIcon.getStyle() + String.format("-fx-fill: %s;", ColorUtil.toRGBCode(color))));
+
+//      Override the default color from the css files
+        color.ifPresent(color -> fontIcon.setStyle(fontIcon.getStyle() +
+                String.format("-fx-fill: %s;", ColorUtil.toRGBCode(color))));
+
         return fontIcon;
     }
 
