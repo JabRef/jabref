@@ -4,7 +4,36 @@
 - file:../../gui/openoffice/
 - file:../../../../../resources/l10n/JabRef_en.properties
 
+** "Separate" with multiples citations in same footnote
 
+java.lang.RuntimeException: CitationGroupsV001.setGlobalOrder: globalOrder.size() != citationGroups.size()
+	at org.jabref@100.0.0/org.jabref.gui.openoffice.CitationGroupsV001.setGlobalOrder(CitationGroupsV001.java:682)
+	at org.jabref@100.0.0/org.jabref.gui.openoffice.OOBibBase.produceCitationMarkers(OOBibBase.java:2090)
+	at org.jabref@100.0.0/org.jabref.gui.openoffice.OOBibBase.unCombineCiteMarkers(OOBibBase.java:3177)
+	at org.jabref@100.0.0/org.jabref.gui.openoffice.OpenOfficePanel.lambda$initPanel$11(OpenOfficePanel.java:283)
+
+*** "Refresh"
+
+java.lang.NullPointerException
+	at org.jabref@100.0.0/org.jabref.gui.openoffice.RangeKeyedMap.containsKey(RangeKeyedMap.java:38)
+	at org.jabref@100.0.0/org.jabref.gui.openoffice.CitationGroupsV001.footnoteMarkRanges(CitationGroupsV001.java:1558)
+	at org.jabref@100.0.0/org.jabref.gui.openoffice.OOBibBase.checkRangeOverlaps(OOBibBase.java:476)
+	at org.jabref@100.0.0/org.jabref.gui.openoffice.OOBibBase.updateDocumentActionHelper(OOBibBase.java:3427)
+	at org.jabref@100.0.0/org.jabref.gui.openoffice.OpenOfficePanel.lambda$initPanel$9(OpenOfficePanel.java:202)
+
+*** "Merge" seem to work
+
+
+** feature: unresolved references are not thrown away
+
+   - Instead they appear in text and bibliography.
+
+   - For AuthorYear, they are sorted as first (both in text and
+     bibliography) and shown as "Unresolved(citationKey)"
+
+   - In the bibliography, Unresolved(citationKey) is followed by
+     "(Cited on pages: 1, 1)" where the page numbers a clickable
+     crossreferences to to corresponding citation groups.
 
 ** TODO separate responsibilites
 

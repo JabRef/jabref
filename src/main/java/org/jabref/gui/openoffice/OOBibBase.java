@@ -71,6 +71,8 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.lang.XComponent;
 import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.lang.XMultiServiceFactory;
+import com.sun.star.text.ReferenceFieldSource;
+import com.sun.star.text.ReferenceFieldPart;
 import com.sun.star.text.XBookmarksSupplier;
 import com.sun.star.text.XFootnote;
 import com.sun.star.text.XReferenceMarksSupplier;
@@ -84,11 +86,14 @@ import com.sun.star.text.XTextSection;
 import com.sun.star.text.XTextSectionsSupplier;
 import com.sun.star.text.XTextViewCursor;
 import com.sun.star.text.XTextViewCursorSupplier;
+//import com.sun.star.text.textfield.GetReference;
+//import com.sun.star.text.GetReference;
 import com.sun.star.uno.Any;
 import com.sun.star.uno.Type;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 import com.sun.star.util.InvalidStateException;
+import com.sun.star.util.XRefreshable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1870,6 +1875,7 @@ class OOBibBase {
                         // Insert it at the current position:
                         rebuildBibTextSection(documentConnection,
                                               style,
+                                              x.cgs,
                                               x.getBibliography());
                     } finally {
                         documentConnection.unlockControllers();
@@ -2158,6 +2164,7 @@ class OOBibBase {
     private void
     rebuildBibTextSection(DocumentConnection documentConnection,
                           OOBibStyle style,
+                          CitationGroupsV001 cgs,
                           CitationGroupsV001.CitedKeys bibliography)
         throws
         NoSuchElementException,
@@ -2171,6 +2178,7 @@ class OOBibBase {
         clearBibTextSectionContent2(documentConnection);
 
         populateBibTextSection(documentConnection,
+                               cgs,
                                bibliography,
                                style);
     }
@@ -2206,6 +2214,7 @@ class OOBibBase {
     private void
     insertFullReferenceAtCursor(DocumentConnection documentConnection,
                                 XTextCursor cursor,
+                                CitationGroupsV001 cgs,
                                 CitationGroupsV001.CitedKeys bibliography,
                                 OOBibStyle style,
                                 String parFormat)
@@ -2214,9 +2223,181 @@ class OOBibBase {
         IllegalArgumentException,
         UnknownPropertyException,
         PropertyVetoException,
-        WrappedTargetException {
+        WrappedTargetException,
+        CreationException {
 
         final boolean debugThisFun = false;
+
+
+
+        /*
+        List<String> ss =
+            Arrays.asList(documentConnection.mxDocFactory.getAvailableServiceNames());
+        for ( String s : ss ) {
+            System.out.printf("%s\n", s);
+        }
+        /*
+
+
+-------
+          com.sun.star.form.component.TextField
+          com.sun.star.text.TextEmbeddedObject
+          com.sun.star.text.Bookmark
+          com.sun.star.text.Footnote
+          com.sun.star.text.Endnote
+          com.sun.star.text.ReferenceMark
+com.sun.star.style.CharacterStyle
+com.sun.star.style.ParagraphStyle
+com.sun.star.style.FrameStyle
+com.sun.star.style.PageStyle
+com.sun.star.style.NumberingStyle
+com.sun.star.text.ContentIndexMark
+com.sun.star.text.ContentIndex
+com.sun.star.text.UserIndexMark
+com.sun.star.text.UserIndex
+com.sun.star.text.TextSection
+com.sun.star.text.TextField.DateTime
+com.sun.star.text.TextField.User
+com.sun.star.text.TextField.SetExpression
+com.sun.star.text.TextField.GetExpression
+com.sun.star.text.TextField.FileName
+com.sun.star.text.TextField.PageNumber
+com.sun.star.text.TextField.Author
+com.sun.star.text.TextField.Chapter
+com.sun.star.text.TextField.GetReference
+com.sun.star.text.TextField.ConditionalText
+com.sun.star.text.TextField.Annotation
+com.sun.star.text.TextField.Input
+com.sun.star.text.TextField.Macro
+com.sun.star.text.TextField.DDE
+com.sun.star.text.TextField.HiddenParagraph
+com.sun.star.text.TextField.TemplateName
+com.sun.star.text.TextField.ExtendedUser
+com.sun.star.text.TextField.ReferencePageSet
+com.sun.star.text.TextField.ReferencePageGet
+com.sun.star.text.TextField.JumpEdit
+com.sun.star.text.TextField.Script
+com.sun.star.text.TextField.DatabaseNextSet
+com.sun.star.text.TextField.DatabaseNumberOfSet
+com.sun.star.text.TextField.DatabaseSetNumber
+com.sun.star.text.TextField.Database
+com.sun.star.text.TextField.DatabaseName
+com.sun.star.text.TextField.TableFormula
+com.sun.star.text.TextField.PageCount
+com.sun.star.text.TextField.ParagraphCount
+com.sun.star.text.TextField.WordCount
+com.sun.star.text.TextField.CharacterCount
+com.sun.star.text.TextField.TableCount
+com.sun.star.text.TextField.GraphicObjectCount
+com.sun.star.text.TextField.EmbeddedObjectCount
+com.sun.star.text.TextField.DocInfo.ChangeAuthor
+com.sun.star.text.TextField.DocInfo.ChangeDateTime
+com.sun.star.text.TextField.DocInfo.EditTime
+com.sun.star.text.TextField.DocInfo.Description
+com.sun.star.text.TextField.DocInfo.CreateAuthor
+com.sun.star.text.TextField.DocInfo.CreateDateTime
+com.sun.star.text.TextField.DocInfo.Custom
+com.sun.star.text.TextField.DocInfo.PrintAuthor
+com.sun.star.text.TextField.DocInfo.PrintDateTime
+com.sun.star.text.TextField.DocInfo.KeyWords
+com.sun.star.text.TextField.DocInfo.Subject
+com.sun.star.text.TextField.DocInfo.Title
+com.sun.star.text.TextField.DocInfo.Revision
+com.sun.star.text.TextField.Bibliography
+com.sun.star.text.TextField.CombinedCharacters
+com.sun.star.text.TextField.DropDown
+com.sun.star.text.textfield.MetadataField
+com.sun.star.text.FieldMaster.User
+com.sun.star.text.FieldMaster.DDE
+com.sun.star.text.FieldMaster.SetExpression
+com.sun.star.text.FieldMaster.Database
+com.sun.star.text.FieldMaster.Bibliography
+com.sun.star.text.IllustrationsIndex
+com.sun.star.text.ObjectIndex
+com.sun.star.text.TableIndex
+com.sun.star.text.Bibliography
+com.sun.star.text.Paragraph
+com.sun.star.text.TextField.InputUser
+com.sun.star.text.TextField.HiddenText
+com.sun.star.style.ConditionalParagraphStyle
+com.sun.star.text.NumberingRules
+com.sun.star.text.TextColumns
+com.sun.star.text.IndexHeaderSection
+com.sun.star.text.Defaults
+com.sun.star.image.ImageMapRectangleObject
+com.sun.star.image.ImageMapCircleObject
+com.sun.star.image.ImageMapPolygonObject
+com.sun.star.text.TextGraphicObject
+com.sun.star.chart2.data.DataProvider
+com.sun.star.text.Fieldmark
+com.sun.star.text.FormFieldmark
+com.sun.star.text.InContentMetadata
+ooo.vba.VBAObjectModuleObjectProvider
+ooo.vba.VBACodeNameProvider
+ooo.vba.VBAProjectNameProvider
+ooo.vba.VBAGlobals
+com.sun.star.text.textfield.DateTime
+com.sun.star.text.textfield.User
+com.sun.star.text.textfield.SetExpression
+com.sun.star.text.textfield.GetExpression
+com.sun.star.text.textfield.FileName
+com.sun.star.text.textfield.PageNumber
+com.sun.star.text.textfield.Author
+com.sun.star.text.textfield.Chapter
+com.sun.star.text.textfield.GetReference
+com.sun.star.text.textfield.ConditionalText
+com.sun.star.text.textfield.Annotation
+com.sun.star.text.textfield.Input
+com.sun.star.text.textfield.Macro
+com.sun.star.text.textfield.DDE
+com.sun.star.text.textfield.HiddenParagraph
+com.sun.star.text.textfield.TemplateName
+com.sun.star.text.textfield.ExtendedUser
+com.sun.star.text.textfield.ReferencePageSet
+com.sun.star.text.textfield.ReferencePageGet
+com.sun.star.text.textfield.JumpEdit
+com.sun.star.text.textfield.Script
+com.sun.star.text.textfield.DatabaseNextSet
+com.sun.star.text.textfield.DatabaseNumberOfSet
+com.sun.star.text.textfield.DatabaseSetNumber
+com.sun.star.text.textfield.Database
+com.sun.star.text.textfield.DatabaseName
+com.sun.star.text.textfield.TableFormula
+com.sun.star.text.textfield.PageCount
+com.sun.star.text.textfield.ParagraphCount
+com.sun.star.text.textfield.WordCount
+com.sun.star.text.textfield.CharacterCount
+com.sun.star.text.textfield.TableCount
+com.sun.star.text.textfield.GraphicObjectCount
+com.sun.star.text.textfield.EmbeddedObjectCount
+com.sun.star.text.textfield.docinfo.ChangeAuthor
+com.sun.star.text.textfield.docinfo.ChangeDateTime
+com.sun.star.text.textfield.docinfo.EditTime
+com.sun.star.text.textfield.docinfo.Description
+com.sun.star.text.textfield.docinfo.CreateAuthor
+com.sun.star.text.textfield.docinfo.CreateDateTime
+com.sun.star.text.textfield.docinfo.PrintAuthor
+com.sun.star.text.textfield.docinfo.PrintDateTime
+com.sun.star.text.textfield.docinfo.KeyWords
+com.sun.star.text.textfield.docinfo.Subject
+com.sun.star.text.textfield.docinfo.Title
+com.sun.star.text.textfield.docinfo.Revision
+com.sun.star.text.textfield.docinfo.Custom
+com.sun.star.text.textfield.Bibliography
+com.sun.star.text.textfield.CombinedCharacters
+com.sun.star.text.textfield.DropDown
+com.sun.star.text.textfield.InputUser
+com.sun.star.text.textfield.HiddenText
+com.sun.star.text.fieldmaster.User
+com.sun.star.text.fieldmaster.DDE
+com.sun.star.text.fieldmaster.SetExpression
+com.sun.star.text.fieldmaster.Database
+com.sun.star.text.fieldmaster.Bibliography
+com.sun.star.style.TableStyle
+com.sun.star.style.CellStyle
+
+         */
+
         /*
          *  Map<BibEntry, BibDatabase> entries;
          *
@@ -2283,7 +2464,40 @@ class OOBibBase {
                                                    cursor,
                                                    String.format("Unresolved(%s)", ck.key),
                                                    Collections.emptyList());
-                //    continue;
+                // Try to list citations:
+                if (true) {
+
+                    OOUtil.insertTextAtCurrentLocation(
+                        documentConnection.xText,
+                        cursor,
+                        String.format(" %s ", Localization.lang("CitedOnPagesPrefix")),
+                        Collections.emptyList());
+
+                    int last = ck.where.size();
+                    int i=0;
+                    for (CitationGroupsV001.CitationPath p : ck.where) {
+                        CitationGroupsV001.CitationGroupID cgid = p.group;
+                        CitationGroupsV001.CitationGroup cg = cgs.getCitationGroupOrThrow(cgid);
+                        String refMarkName = cg.referenceMarkName;
+
+                        if (i > 0) {
+                            OOUtil.insertTextAtCurrentLocation(documentConnection.xText,
+                                                               cursor,
+                                                               String.format(", "),
+                                                               Collections.emptyList());
+                        }
+                        documentConnection
+                            .insertGetreferenceToPageNumberOfReferenceMark(refMarkName,cursor);
+                        i++;
+                    }
+                    documentConnection.refresh();
+
+                    OOUtil.insertTextAtCurrentLocation(
+                        documentConnection.xText,
+                        cursor,
+                        String.format("%s", Localization.lang("CitedOnPagesSuffix")),
+                        Collections.emptyList());
+                }
             } else {
 
                 BibEntry bibentry = ck.db.get().entry;
@@ -2381,6 +2595,7 @@ class OOBibBase {
     private void
     populateBibTextSection(
         DocumentConnection documentConnection,
+        CitationGroupsV001 cgs,
         CitationGroupsV001.CitedKeys bibliography,
         // Map<BibEntry, BibDatabase> entries,
         OOBibStyle style
@@ -2415,6 +2630,7 @@ class OOBibBase {
         insertFullReferenceAtCursor(
             documentConnection,
             cursor,
+            cgs,
             bibliography,
             // entries,
             style,
@@ -3019,27 +3235,13 @@ class OOBibBase {
         BibEntryNotFoundException,
         InvalidStateException {
 
-        // ExportCitedHelperResult res = new ExportCitedHelperResult();
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
         try {
             documentConnection.enterUndoContext("Changes during \"Export cited\"");
-
-            // CitationGroupsV001 cgs = new CitationGroupsV001(documentConnection);
-            /*
-            ProduceCitationMarkersResult x =
-                produceCitationMarkers(
-                    // cgs,
-                    documentConnection,
-                    databases,
-                    style);
-                res.unresolvedKeys = x.unresolvedKeys;
-                res.newDatabase = this.generateDatabase(databases, documentConnection);
-            */
             return this.generateDatabase(databases, documentConnection);
         } finally {
             documentConnection.leaveUndoContext();
         }
-        //return res;
     }
 
     /**
@@ -3237,6 +3439,7 @@ class OOBibBase {
                                         style);
                 rebuildBibTextSection(documentConnection,
                                       style,
+                                      x.cgs,
                                       x.getBibliography());
                 return x.getUnresolvedKeys();
             } finally {
