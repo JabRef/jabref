@@ -203,6 +203,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Fixed
 
+- We fixed an issue preventing files from being drag & dropeed into an empty library. [#6851](https://github.com/JabRef/jabref/issues/6851) 
 - We fixed an issue where entry preview tab has no name in drop down list. [#6591](https://github.com/JabRef/jabref/issues/6591)
 - We fixed to only search file links in the BIB file location directory when preferences has corresponding checkbox checked. [#5891](https://github.com/JabRef/jabref/issues/5891)
 - We fixed wrong button order (Apply and Cancel) in ManageProtectedTermsDialog.
