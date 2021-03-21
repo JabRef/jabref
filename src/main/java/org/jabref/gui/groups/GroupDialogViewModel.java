@@ -149,7 +149,7 @@ public class GroupDialogViewModel {
                     }
                     return true;
                 },
-                ValidationMessage.error(Localization.lang("There exists already a group with the same name.")));
+                ValidationMessage.warning(Localization.lang("There exists already a group with the same name.\nIf you use it, it will inherit all entries from this other group.")));
 
         keywordRegexValidator = new FunctionBasedValidator<>(
                 keywordGroupSearchTermProperty,
