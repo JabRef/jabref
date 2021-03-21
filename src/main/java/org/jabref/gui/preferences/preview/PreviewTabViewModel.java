@@ -92,12 +92,12 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         initialPreviewPreferences = preferences.getPreviewPreferences();
 
         sourceTextProperty.addListener((observable, oldValue, newValue) -> {
-            try{
+            try {
                 var currentLayout = getCurrentLayout();
                 if (currentLayout instanceof TextBasedPreviewLayout) {
                     ((TextBasedPreviewLayout) currentLayout).setText(sourceTextProperty.getValue().replace("\n", "__NEWLINE__"));
                 }
-            }catch (StringIndexOutOfBoundsException e){
+            } catch (StringIndexOutOfBoundsException e) {
                 // catch this error but not give to user [when typing]
             }
         });
@@ -114,7 +114,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         );
     }
 
-    public void checkParseWhenSave(){
+    public void checkParseWhenSave() {
         var currentLayout = getCurrentLayout();
         if (currentLayout instanceof TextBasedPreviewLayout) {
             ((TextBasedPreviewLayout) currentLayout).setText(sourceTextProperty.getValue().replace("\n", "__NEWLINE__"));
