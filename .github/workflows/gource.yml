@@ -26,16 +26,14 @@ jobs:
         with:
           gource_title: 'JabRef | more information at contribute.jabref.org'
           logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
-          gource_seconds_per_day: 0.5
+          # 5s * 365 / 4 = 7.5min
+          gource_seconds_per_day: 5
           gource_start_date: ${{ steps.dates.outputs.start_date }}
           gource_stop_date: ${{ steps.dates.outputs.stop_date }}
           gource_file_filter: csl$
       - name: 'Store video'
         run: |
           mkdir gource-videos
-          ls -la
-          ls -la gource
-          ls -la gource-videos
           mv ./gource/gource.mp4 ./gource-videos/jabref-${{ steps.dates.outputs.quarter }}.mp4
       - name: 'Complete development history'
         uses: nbprojekt/gource-action@v1
