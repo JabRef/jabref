@@ -164,6 +164,9 @@ class CitationGroupsV001 {
             }
         }
 
+        /**
+         * Sort citations for presentation within a CitationGroup.
+         */
         class SortCitations implements  Comparator<CitationAndIndex> {
 
             Comparator<BibEntry> entryComparator;
@@ -174,17 +177,21 @@ class CitationGroupsV001 {
 
             public int compare(CitationAndIndex a, CitationAndIndex b) {
                 if ( a.c.db.isEmpty() &&  b.c.db.isEmpty() ){
-                    // compare by citation key
+                    // Both are unresolved: compare them by citation key.
                     String ack = a.c.citationKey;
                     String bck = b.c.citationKey;
                     return ack.compareTo(bck);
                 }
+                // Comparing unresolved and real entry
+                final boolean unresolvedComesFirst = true;
+                final int mul = unresolvedComesFirst ? (+1) : (-1);
                 if ( a.c.db.isEmpty() ){
-                    return 1;
+                    return -1*mul;
                 }
                 if ( b.c.db.isEmpty() ){
-                    return -1;
+                    return +1*mul;
                 }
+                // Proper comparison of entries
                 return entryComparator.compare(
                     a.c.db.get().entry,
                     b.c.db.get().entry
@@ -419,6 +426,9 @@ class CitationGroupsV001 {
             return new ArrayList<>(data.values());
         }
 
+        /**
+         * Sort entries for the bibliography.
+         */
         class SortCitedKeys implements  Comparator<CitedKey> {
 
             Comparator<BibEntry> entryComparator;
@@ -429,14 +439,19 @@ class CitationGroupsV001 {
 
             public int compare(CitedKey a, CitedKey b) {
                 if (a.db.isEmpty() &&  b.db.isEmpty()) {
+                    // Both are unresolved: compare them by citation key.
                     return a.key.compareTo(b.key);
                 }
+                // Comparing unresolved and real entry
+                final boolean unresolvedComesFirst = true;
+                final int mul = unresolvedComesFirst ? (+1) : (-1);
                 if (a.db.isEmpty()){
-                    return 1;
+                    return -1*mul;
                 }
                 if (b.db.isEmpty()){
-                    return -1;
+                    return +1*mul;
                 }
+                // Proper comparison of entries
                 return entryComparator.compare(a.db.get().entry,
                                                b.db.get().entry);
             }
@@ -603,11 +618,11 @@ class CitationGroupsV001 {
     }
 
     public void
-    createNumberedBibliogaphySortedInOrderOfAppearance() {
+    createNumberedBibliographySortedInOrderOfAppearance() {
         CitationGroupsV001 cgs = this;
         if (!cgs.bibliography.isEmpty()) {
             throw new RuntimeException(
-                "createNumberedBibliogaphySortedInOrderOfAppearance: already have a bibliography"
+                "createNumberedBibliographySortedInOrderOfAppearance: already have a bibliography"
                 );
         }
         CitationGroupsV001.CitedKeys sortedCitedKeys =
@@ -618,11 +633,11 @@ class CitationGroupsV001 {
     }
 
     public void
-    createNumberedBibliogaphySortedByComparator( Comparator<BibEntry> entryComparator ) {
+    createNumberedBibliographySortedByComparator( Comparator<BibEntry> entryComparator ) {
         CitationGroupsV001 cgs = this;
         if (!cgs.bibliography.isEmpty()) {
             throw new RuntimeException(
-                "createNumberedBibliogaphySortedByComparator: already have a bibliography"
+                "createNumberedBibliographySortedByComparator: already have a bibliography"
                 );
         }
         CitationGroupsV001.CitedKeys citedKeys = cgs.getCitedKeys();
@@ -633,11 +648,11 @@ class CitationGroupsV001 {
     }
 
     public void
-    createPlainBibliogaphySortedByComparator( Comparator<BibEntry> entryComparator ) {
+    createPlainBibliographySortedByComparator( Comparator<BibEntry> entryComparator ) {
         CitationGroupsV001 cgs = this;
         if (!this.bibliography.isEmpty()) {
             throw new RuntimeException(
-                "createPlainBibliogaphySortedByComparator: already have a bibliography"
+                "createPlainBibliographySortedByComparator: already have a bibliography"
                 );
         }
         CitationGroupsV001.CitedKeys citedKeys = cgs.getCitedKeys();

@@ -1217,7 +1217,7 @@ class OOBibBase {
 
         assert style.isCitationKeyCiteMarkers();
 
-        cgs.createPlainBibliogaphySortedByComparator(OOBibBase.entryComparator);
+        cgs.createPlainBibliographySortedByComparator(OOBibBase.entryComparator);
 
         Map<CitationGroupsV001.CitationGroupID,String> citMarkers = new HashMap<>();
 
@@ -1258,7 +1258,7 @@ class OOBibBase {
         assert style.isNumberEntries();
         assert style.isSortByPosition();
 
-        cgs.createNumberedBibliogaphySortedInOrderOfAppearance();
+        cgs.createNumberedBibliographySortedInOrderOfAppearance();
 
         final int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
 
@@ -1284,7 +1284,7 @@ class OOBibBase {
         assert style.isNumberEntries();
         assert !style.isSortByPosition();
 
-        cgs.createNumberedBibliogaphySortedByComparator( entryComparator );
+        cgs.createNumberedBibliographySortedByComparator( entryComparator );
 
         final int minGroupingCount =
             style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
@@ -1325,7 +1325,7 @@ class OOBibBase {
 
         createNormalizedCitationMarkersForNormalStyle(sortedCitedKeys, style);
         createUniqueLetters(sortedCitedKeys, cgs); // calls distributeUniqueLetters(cgs)
-        cgs.createPlainBibliogaphySortedByComparator(entryComparator);
+        cgs.createPlainBibliographySortedByComparator(entryComparator);
 
         // Finally, go through all citation markers, and update
         // those referring to entries in our current list:
@@ -2168,27 +2168,28 @@ class OOBibBase {
         UnknownPropertyException,
         UndefinedParagraphFormatException {
 
-        /*
-         *  Map<BibEntry, BibDatabase> entries;
-         *
-         *  if (style.isSortByPosition()) {
-         *      // We need to sort the entries according to their order of appearance:
-         *      entries =
-         *          sortEntriesByRefMarkNames(
-         *              jabRefReferenceMarkNamesSortedByPosition,
-         *              fce.citeKeyToBibEntry,
-         *              fce.entries
-         *              );
-         *  } else {
-         *      entries = sortEntriesByComparator(fce.entries, entryComparator);
-         *  }
-         */
         clearBibTextSectionContent2(documentConnection);
 
         populateBibTextSection(documentConnection,
                                bibliography,
                                style);
     }
+
+    /*
+    enum BibliographyOrder {
+        Unspecified,
+        ByFirstAppearanceInTheText,
+        ByEntryComparator
+    }
+
+    BibliographyOrder bibliographyOrderOfStyle( OOBibStyle style ) {
+        if (style.isSortByPosition()) {
+            return ByFirstAppearanceInTheText;
+        } else {
+            return ByEntryComparator;
+        }
+    }
+    */
 
     /**
      * Insert body of bibliography at `cursor`.
@@ -2215,66 +2216,77 @@ class OOBibBase {
         PropertyVetoException,
         WrappedTargetException {
 
+        final boolean debugThisFun = false;
+        /*
+         *  Map<BibEntry, BibDatabase> entries;
+         *
+         *  if (style.isSortByPosition()) {
+         *      // We need to sort the entries according to their order of appearance:
+         *      entries =
+         *          sortEntriesByRefMarkNames(
+         *              jabRefReferenceMarkNamesSortedByPosition,
+         *              fce.citeKeyToBibEntry,
+         *              fce.entries
+         *              );
+         *  } else {
+         *      entries = sortEntriesByComparator(fce.entries, entryComparator);
+         *  }
+         */
+
+        if (debugThisFun) {
+            System.out.printf("Ref isSortByPosition %s\n", style.isSortByPosition());
+            System.out.printf("Ref isNumberEntries  %s\n", style.isNumberEntries());
+        }
+
         for (CitationGroupsV001.CitedKey ck : bibliography.values()) {
 
-            int number = 1;
-            int nUnresolved = 0;
 
-            // for (Map.Entry<BibEntry, BibDatabase> entry : entries.entrySet()) {
-            //
-            // Optional<CitationGroupsV001.DatabaseLookupResult> db = ck.db;
-            //
-            // BibEntry bibentry = entry.getKey();
-            // BibDatabase database = entry.getValue();
-            // // skip unresolved entries
-            // if (bibentry instanceof UndefinedBibtexEntry) {
-            // continue;
-            // }
+            if (debugThisFun) {
+                System.out.printf("Ref cit %-20s ck.number %7s%n",
+                                  String.format("'%s'",ck.key),
+                                  (ck.number.isEmpty()
+                                   ? "(empty)"
+                                   : String.format("%02d",ck.number.get())));
+            }
+
+            OOUtil.insertParagraphBreak(documentConnection.xText, cursor);
+
+            // insert marker "[1]"
+            if (style.isNumberEntries()) {
+
+                if ( ck.number.isEmpty() ) {
+                    throw new RuntimeException(
+                        "insertFullReferenceAtCursor: numbered style, but found unnumbered entry");
+                }
+
+                // Note: minGroupingCount is pointless here, we are
+                // formatting a single entry.
+                // int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
+                int minGroupingCount = 2;
+                List<Integer> numbers = Collections.singletonList(ck.number.get());
+                String marker = style.getNumCitationMarker(numbers,
+                                                           minGroupingCount,
+                                                           true);
+
+                OOUtil.insertTextAtCurrentLocation(documentConnection.xText,
+                                                   cursor,
+                                                   marker,
+                                                   Collections.emptyList());
+            } else {
+                // !style.isNumberEntries() : emit no prefix
+                // TODO: We might want [citationKey] prefix for style.isCitationKeyCiteMarkers();
+            }
 
             if ( ck.db.isEmpty() ) {
                 // skip unresolved entries
-                nUnresolved++;
-                continue;
+                OOUtil.insertTextAtCurrentLocation(documentConnection.xText,
+                                                   cursor,
+                                                   String.format("Unresolved(%s)", ck.key),
+                                                   Collections.emptyList());
+                //    continue;
             } else {
 
                 BibEntry bibentry = ck.db.get().entry;
-                BibDatabase database = ck.db.get().database;
-
-                OOUtil.insertParagraphBreak(documentConnection.xText, cursor);
-
-                // insert marker
-                if (style.isNumberEntries()) {
-
-                    if ( ck.number.isEmpty() ) {
-                        throw new RuntimeException(
-                            "insertFullReferenceAtCursor: numbered style, but found unnumbered entry"
-                            );
-                    } else {
-                        if ( ck.number.get() != (number + nUnresolved) ) {
-                            throw new RuntimeException(
-                                "insertFullReferenceAtCursor: numbering is not in sync"
-                                );
-                        }
-                    }
-
-                    // Note: minGroupingCount is pointless here, we are
-                    // formatting a single entry.
-                    // int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
-                    int minGroupingCount = 2;
-                    List<Integer> numbers = Collections.singletonList(number++);
-                    String marker =
-                        style.getNumCitationMarker(
-                            numbers,
-                            minGroupingCount,
-                            true);
-
-                    OOUtil.insertTextAtCurrentLocation(
-                        documentConnection.xText,
-                        cursor,
-                        marker,
-                        Collections.emptyList()
-                        );
-                }
 
                 // insert the actual details.
                 Layout layout = style.getReferenceFormat(bibentry.getType());
@@ -2285,7 +2297,7 @@ class OOBibBase {
                     layout,
                     parFormat,
                     bibentry,
-                    database,
+                    ck.db.get().database,
                     ck.uniqueLetter.orElse(null)
                     );
             }

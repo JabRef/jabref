@@ -205,9 +205,10 @@ public class OpenOfficePanel {
                     dialogService
                         .showErrorDialogAndWait(
                             Localization.lang("Unable to synchronize bibliography"),
-                            Localization.lang("Your OpenOffice/LibreOffice document references"
-                                              + " citation keys which could not be found"
-                                              + " in your current library.")
+                            Localization.lang(
+                                "Your OpenOffice/LibreOffice document references"
+                                + " citation keys which could not be found"
+                                + " in your current library.")
                             + "\n"
                             + String.join(" ", unresolvedKeys));
                 }
@@ -226,22 +227,35 @@ public class OpenOfficePanel {
                 showNoDocumentErrorMessage();
             } catch (IOException ex) {
                 LOGGER.warn("Problem with style file", ex);
-                dialogService.showErrorDialogAndWait(Localization.lang("No valid style file defined"),
-                                                     Localization.lang("You must select either a valid style file, or use one of the default styles."));
+                dialogService.showErrorDialogAndWait(
+                    Localization.lang("No valid style file defined"),
+                    Localization.lang("You must select either a valid style file,"
+                                      + " or use one of the default styles."));
             } catch (BibEntryNotFoundException ex) {
                 LOGGER.debug("BibEntry not found", ex);
-                dialogService.showErrorDialogAndWait(Localization.lang("Unable to synchronize bibliography"), Localization.lang(
-                                                                                                                                "Your OpenOffice/LibreOffice document references the citation key '%0', which could not be found in your current library.",
-                                                                                                                                ex.getCitationKey()));
-            } catch (com.sun.star.lang.IllegalArgumentException | PropertyVetoException | UnknownPropertyException | WrappedTargetException | NoSuchElementException |
-                     InvalidStateException |
-                     CreationException ex) {
+                dialogService.showErrorDialogAndWait(
+                    Localization.lang("Unable to synchronize bibliography"),
+                    Localization.lang("Your OpenOffice/LibreOffice document"
+                                      + " references the citation key '%0',"
+                                      + " which could not be found in your current library.",
+                                      ex.getCitationKey()));
+            } catch (com.sun.star.lang.IllegalArgumentException
+                     | PropertyVetoException
+                     | UnknownPropertyException
+                     | WrappedTargetException
+                     | NoSuchElementException
+                     | InvalidStateException
+                     | CreationException ex) {
                 LOGGER.warn("Could not update bibliography", ex);
             }
         });
 
         merge.setMaxWidth(Double.MAX_VALUE);
-        merge.setTooltip(new Tooltip(Localization.lang("Combine pairs of citations that are separated by spaces only")));
+        merge.setTooltip(
+            new Tooltip(
+                Localization.lang(
+                    "Combine pairs of citations"
+                    + " that are separated by spaces only")));
         merge.setOnAction(e -> {
             try {
                 ooBase.combineCiteMarkers(getBaseList(), style);
