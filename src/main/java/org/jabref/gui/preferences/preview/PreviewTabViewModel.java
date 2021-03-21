@@ -93,10 +93,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
         sourceTextProperty.addListener((observable, oldValue, newValue) -> {
             try {
-                var currentLayout = getCurrentLayout();
-                if (currentLayout instanceof TextBasedPreviewLayout) {
-                    ((TextBasedPreviewLayout) currentLayout).setText(sourceTextProperty.getValue().replace("\n", "__NEWLINE__"));
-                }
+                layoutParse();
             } catch (StringIndexOutOfBoundsException e) {
                 // catch this error but not give to user [when typing]
             }
@@ -114,7 +111,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         );
     }
 
-    public void checkParseWhenSave() {
+    private void layoutParse() {
         var currentLayout = getCurrentLayout();
         if (currentLayout instanceof TextBasedPreviewLayout) {
             ((TextBasedPreviewLayout) currentLayout).setText(sourceTextProperty.getValue().replace("\n", "__NEWLINE__"));
@@ -244,7 +241,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public boolean validateSettings() {
-        checkParseWhenSave();
+        layoutParse();
         ValidationStatus validationStatus = chosenListValidationStatus();
         if (!validationStatus.isValid()) {
             if (validationStatus.getHighestMessage().isPresent()) {
@@ -316,7 +313,6 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     public void resetDefaultLayout() {
         PreviewLayout defaultLayout = findLayoutByName("Preview");
-        System.out.println("resetDefaultLayout");
         if (defaultLayout instanceof TextBasedPreviewLayout) {
             ((TextBasedPreviewLayout) defaultLayout).setText(preferences.getPreviewPreferences().getDefaultPreviewStyle());
         }
