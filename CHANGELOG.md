@@ -23,6 +23,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Changed
 
+- We fixed an issue preventing files from being dragged & dropped into an empty library. [#6851](https://github.com/JabRef/jabref/issues/6851) 
 - The keywords added via "Manage content selectors" are now displayed in alphabetical order. [#3791](https://github.com/JabRef/jabref/issues/3791)
 - We improved the "Find unlinked files" dialog to show import results for each file. [#7209](https://github.com/JabRef/jabref/pull/7209)
 - The content of the field `timestamp` is migrated to `creationdate`. In case one configured "udpate timestampe", it is migrated to `modificationdate`. [koppor#130](https://github.com/koppor/jabref/issues/130)
@@ -203,7 +204,6 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Fixed
 
-- We fixed an issue preventing files from being drag & dropeed into an empty library. [#6851](https://github.com/JabRef/jabref/issues/6851) 
 - We fixed an issue where entry preview tab has no name in drop down list. [#6591](https://github.com/JabRef/jabref/issues/6591)
 - We fixed to only search file links in the BIB file location directory when preferences has corresponding checkbox checked. [#5891](https://github.com/JabRef/jabref/issues/5891)
 - We fixed wrong button order (Apply and Cancel) in ManageProtectedTermsDialog.
