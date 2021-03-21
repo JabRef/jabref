@@ -94,7 +94,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         sourceTextProperty.addListener((observable, oldValue, newValue) -> {
             var currentLayout = getCurrentLayout();
             if (currentLayout instanceof TextBasedPreviewLayout) {
-                ((TextBasedPreviewLayout) currentLayout).setText(sourceTextProperty.getValue().replace("\n", "__NEWLINE__"), false);
+                ((TextBasedPreviewLayout) currentLayout).setText(sourceTextProperty.getValue().replace("\n", "__NEWLINE__"));
             }
         });
 
@@ -305,7 +305,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     public void resetDefaultLayout() {
         PreviewLayout defaultLayout = findLayoutByName("Preview");
         if (defaultLayout instanceof TextBasedPreviewLayout) {
-            ((TextBasedPreviewLayout) defaultLayout).setText(preferences.getPreviewPreferences().getDefaultPreviewStyle(), true);
+            ((TextBasedPreviewLayout) defaultLayout).setText(preferences.getPreviewPreferences().getDefaultPreviewStyle());
         }
         refreshPreview();
     }
