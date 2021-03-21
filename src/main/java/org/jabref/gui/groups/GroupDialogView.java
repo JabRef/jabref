@@ -136,7 +136,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         Platform.runLater(() -> {
             validationVisualizer.initVisualization(viewModel.nameValidationStatus(), nameField);
             validationVisualizer.initVisualization(viewModel.nameContainsDelimiterValidationStatus(), nameField, false);
-            validationVisualizer.initVisualization(viewModel.sameNameValidationStatus(), nameField);
+            // validationVisualizer.initVisualization(viewModel.sameNameValidationStatus(), nameField);
             validationVisualizer.initVisualization(viewModel.searchRegexValidationStatus(), searchGroupSearchTerm);
             validationVisualizer.initVisualization(viewModel.searchSearchTermEmptyValidationStatus(), searchGroupSearchTerm);
             validationVisualizer.initVisualization(viewModel.keywordRegexValidationStatus(), keywordGroupSearchTerm);

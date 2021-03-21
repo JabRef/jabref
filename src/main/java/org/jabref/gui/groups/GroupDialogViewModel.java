@@ -234,7 +234,7 @@ public class GroupDialogViewModel {
                 },
                 ValidationMessage.error(Localization.lang("Please provide a valid aux file.")));
 
-        validator.addValidators(nameValidator, sameNameValidator);
+        // validator.addValidators(nameValidator, sameNameValidator);
 
         typeSearchProperty.addListener((obs, _oldValue, isSelected) -> {
             if (isSelected) {
