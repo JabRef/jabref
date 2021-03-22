@@ -236,6 +236,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
             /// TODO: Add undo
             // final UndoableModifySubtree undo = new UndoableModifySubtree(getGroupTreeRoot(), node, "Remove subgroups");
             // panel.getUndoManager().addEdit(undo);
+            for (GroupNodeViewModel child : group.getChildren()) {
+                removeGroupsAndSubGroupsFromEntries(child);
+            }
             group.getGroupNode().removeAllChildren();
             dialogService.notify(Localization.lang("Removed all subgroups of group \"%0\".", group.getDisplayName()));
             writeGroupChangesToMetaData();
