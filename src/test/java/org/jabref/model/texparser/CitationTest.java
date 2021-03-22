@@ -1,7 +1,6 @@
 package org.jabref.model.texparser;
 
 import java.nio.file.Path;
-import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
