@@ -145,7 +145,7 @@ dependencies {
         exclude module: 'oraclepki'
     }
 
-    implementation ('com.google.guava:guava:30.1-jre') {
+    implementation ('com.google.guava:guava:30.1.1-jre') {
         // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
         exclude module: "jsr305"
     }
