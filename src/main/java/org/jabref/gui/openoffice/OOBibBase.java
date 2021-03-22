@@ -42,6 +42,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
 import com.sun.star.awt.Point;
+import com.sun.star.awt.Selection;
+import com.sun.star.awt.XTextComponent;
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
 import com.sun.star.beans.Property;
@@ -71,8 +73,10 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.lang.XComponent;
 import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.lang.XMultiServiceFactory;
+import com.sun.star.lang.XServiceInfo;
 import com.sun.star.text.ReferenceFieldSource;
 import com.sun.star.text.ReferenceFieldPart;
+// import com.sun.star.text.TextRanges;
 import com.sun.star.text.XBookmarksSupplier;
 import com.sun.star.text.XFootnote;
 import com.sun.star.text.XReferenceMarksSupplier;
@@ -92,8 +96,10 @@ import com.sun.star.uno.Any;
 import com.sun.star.uno.Type;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
+import com.sun.star.uno.XInterface;
 import com.sun.star.util.InvalidStateException;
 import com.sun.star.util.XRefreshable;
+import com.sun.star.view.XSelectionSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -585,20 +591,6 @@ class OOBibBase {
         NoDocumentException,
         CreationException {
 
-        /*
-        XNameAccess nameAccess = documentConnection.getReferenceMarks();
-        XTextContent mark =
-            DocumentConnection.nameAccessGetTextContentByNameOrNull(nameAccess, refMarkName);
-        if (null == mark) {
-            LOGGER.warn(String.format(
-                    "OOBibBase.getCitationContext:"
-                    + " lost reference mark: '%s'",
-                    refMarkName
-            ));
-            return String.format("(Could not retrieve context for %s)", refMarkName);
-        }
-        XTextCursor cursor = DocumentConnection.getTextCursorOfTextContent(mark);
-        */
         XTextCursor cursor = cgs.getRawCursorForCitationGroup(cgid, documentConnection);
 
         String citPart = cursor.getString();
@@ -909,6 +901,21 @@ class OOBibBase {
         }
     }
 
+    /**
+     * Creates a list of {@code XTextRange} values for our {@code
+     * CitationGroup} values, to be passed to {@code visualSort}
+     *
+     * The elements of the returned list are actually of type {@code
+     * VisualSortEntry<CitationGroupID>}
+     *
+     * @param cgs The source of CitationGroup values.
+     * @param documentConnection Connection to the document.
+     * @param mapFootnotesToFootnoteMarks If true, replace ranges in
+     *        footnotes with the range of the corresponding footnote
+     *        mark. This is used for numbering the citations.
+     *
+     *
+     */
     List<VisualSortable<CitationGroupsV001.CitationGroupID>>
     createVisualSortInput(CitationGroupsV001 cgs,
                           DocumentConnection documentConnection,
@@ -916,8 +923,6 @@ class OOBibBase {
         throws
         NoDocumentException,
         WrappedTargetException {
-
-        // final int nMarks = cgs.numberOfCitationGroups();
 
         List<CitationGroupsV001.CitationGroupID> cgids =
             new ArrayList<>(cgs.getCitationGroupIDs());
@@ -994,17 +999,12 @@ class OOBibBase {
         return res.stream().map(e -> e).collect(Collectors.toList());
     }
 
-    private <T> List<VisualSortable<T>>
-    visualSort(
-        // getJabRefReferenceMarkNamesSortedByPosition(
-        // CitationGroupsV001 cgs,
-        List<VisualSortable<T>> vses,
-        DocumentConnection documentConnection
-        //boolean mapFootnotesToFootnoteMarks
-        )
+    private <T> List<VisualSortable<T>> visualSort(List<VisualSortable<T>> vses,
+                                                   DocumentConnection documentConnection)
         throws
         WrappedTargetException,
-        NoDocumentException {
+        NoDocumentException,
+        JabRefException {
 
         final int nCitationGroups = vses.size();
 
@@ -1016,27 +1016,96 @@ class OOBibBase {
                 );
         }
 
+        /*
+         * A problem with XTextViewCursor: if it is not in text,
+         * then we get a crippled version that does not support
+         * viewCursor.getStart() or viewCursor.gotoRange(range,false),
+         * and will throw an exception instead.
+         *
+         * Our hope is that either we can move the cursor with a
+         * page- or scrolling-based method that does not throw, (see
+         * https://docs.libreoffice.org/sw/html/unotxvw_8cxx_source.html#l00896
+         * ) or that we can manipulate the cursor via getSelection and
+         * select (of XSelectionSupplier).
+         *
+         * Here we implemented the second, selection-based method.
+         * Seems to work when the user selected a frame or image.
+         * In these cases restoring the selection works, too.
+         *
+         * Still, we have a problem when the cursor is in a comment
+         * (referred to as "annotation" in OO API): in this case
+         * initialSelection is null, and documentConnection.select()
+         * does not help to get a function viewCursor. Having no
+         * better idea, we ask the user to move the cursor into the
+         * document.
+         */
+
+        /*
+         *  Selection-based
+         */
+        final boolean debugThisFun = false;
+
+        XServiceInfo initialSelection =  documentConnection.getSelectionAsServiceInfo();
+
+        if (initialSelection != null) {
+            if (Arrays.stream(initialSelection.getSupportedServiceNames())
+                .anyMatch("com.sun.star.text.TextRanges"::equals)) {
+                // we are probably OK with the viewCursor
+                if (debugThisFun) {
+                    LOGGER.info("visualSort: initialSelection supports TextRanges: no action needed.");
+                }
+            } else {
+                if (debugThisFun) {
+                    LOGGER.info("visualSort: initialSelection does not support TextRanges."
+                                + " We need to change the viewCursor.");
+                }
+                XTextRange newSelection = documentConnection.xText.getStart();
+                documentConnection.select( newSelection );
+            }
+        } else {
+            if (debugThisFun) {
+                LOGGER.info("visualSort: initialSelection is null: no idea what to do.");
+            }
+            /*
+             * XTextRange newSelection = documentConnection.xText.getStart();
+             * boolean res = documentConnection.select( newSelection );
+             * XServiceInfo sel2 =  documentConnection.getSelectionAsServiceInfo();
+             * LOGGER.info(
+             * String.format("visualSort: initialSelection is null: result of select: %s, isNull: %s%n",
+             *                   res,
+             *                   sel2 == null));
+             * // ^^^ prints true, true
+             */
+        }
+
         XTextViewCursor viewCursor = documentConnection.getViewCursor();
-        // initialPos: to be restored before return
-        XTextRange initialPos = viewCursor.getStart();
-        // for (String name : names) {
-
-
-        //final int nMarks = vses.size();
+        Objects.requireNonNull(viewCursor);
+        try {
+            viewCursor.getStart();
+        } catch (com.sun.star.uno.RuntimeException ex) {
+            throw new JabRefException(
+                Localization.lang("Please move the cursor into the document text.")
+                + "\n"
+                + Localization.lang("To get the visual positions of your citations"
+                                    + " I need to move the cursor around,"
+                                    + " but could not get it."),
+                ex);
+        }
 
         // find coordinates
         List<Point> positions = new ArrayList<>(vses.size());
 
         for (VisualSortable<T> v : vses) {
-            positions.add(
-                findPositionOfTextRange(
-                    v.getRange(),
-                    viewCursor)
-                );
+            positions.add(findPositionOfTextRange(v.getRange(),
+                                                  viewCursor));
         }
 
-        // restore cursor position
-        viewCursor.gotoRange(initialPos, false);
+        /*
+         * Restore initial state of selection (and thus viewCursor)
+         */
+        if (initialSelection != null) {
+            documentConnection.select(initialSelection);
+        }
 
         if ( positions.size() != nCitationGroups ) {
             throw new RuntimeException("visualSort: positions.size() != nCitationGroups");
@@ -1055,7 +1124,6 @@ class OOBibBase {
         }
 
         if ( set.size() != nCitationGroups ) {
-            // *** Fired ***
             throw new RuntimeException("visualSort: set.size() != nCitationGroups");
         }
 
@@ -1080,7 +1148,8 @@ class OOBibBase {
         boolean mapFootnotesToFootnoteMarks )
         throws
         WrappedTargetException,
-        NoDocumentException {
+        NoDocumentException,
+        JabRefException {
 
         List<VisualSortable<CitationGroupsV001.CitationGroupID>> vses =
             createVisualSortInput(
@@ -1803,6 +1872,18 @@ class OOBibBase {
                     );
             }
 
+            // Check for crippled XTextViewCursor
+            Objects.requireNonNull(cursor);
+            try {
+                cursor.getStart();
+            } catch (com.sun.star.uno.RuntimeException ex) {
+                throw new JabRefException(
+                    Localization.lang("Please move the cursor to the location for the new citation.")
+                    + "\n"
+                    + Localization.lang("I cannot insert to the cursors current location."),
+                    ex);
+            }
+
             sortBibEntryListForMulticite(entries, style);
 
             /*
@@ -2086,7 +2167,8 @@ class OOBibBase {
         NoSuchElementException,
         BibEntryNotFoundException,
         NoDocumentException,
-        UnknownPropertyException {
+        UnknownPropertyException,
+        JabRefException {
 
         CitationGroupsV001 cgs = new CitationGroupsV001(documentConnection);
 
@@ -2211,21 +2293,6 @@ class OOBibBase {
                                style);
     }
 
-    /*
-    enum BibliographyOrder {
-        Unspecified,
-        ByFirstAppearanceInTheText,
-        ByEntryComparator
-    }
-
-    BibliographyOrder bibliographyOrderOfStyle( OOBibStyle style ) {
-        if (style.isSortByPosition()) {
-            return ByFirstAppearanceInTheText;
-        } else {
-            return ByEntryComparator;
-        }
-    }
-    */
 
     /**
      * Insert body of bibliography at `cursor`.

@@ -69,6 +69,7 @@ import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.lang.XComponent;
 // import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.lang.XMultiServiceFactory;
+import com.sun.star.lang.XServiceInfo;
 import com.sun.star.text.ReferenceFieldSource;
 import com.sun.star.text.ReferenceFieldPart;
 import com.sun.star.text.XBookmarksSupplier;
@@ -90,6 +91,7 @@ import com.sun.star.uno.UnoRuntime;
 // import com.sun.star.uno.XComponentContext;
 import com.sun.star.util.InvalidStateException;
 import com.sun.star.util.XRefreshable;
+import com.sun.star.view.XSelectionSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,9 +109,19 @@ class DocumentConnection {
 
 
     public XTextDocument mxDoc;
+
+    // unoQI(XComponent.class, mxDoc);
     public XComponent xCurrentComponent;
+
+    // unoQI(XMultiServiceFactory.class, mxDoc);
     public XMultiServiceFactory mxDocFactory;
+
+    // XModel mo = unoQI(XModel.class, this.xCurrentComponent);
+    // XController co = mo.getCurrentController();
+
     public XText xText;
+
+    // xViewCursorSupplier = unoQI(XTextViewCursorSupplier.class, co);
     public XTextViewCursorSupplier xViewCursorSupplier;
     public XPropertyContainer userProperties;
     public XPropertySet propertySet;
@@ -135,6 +147,126 @@ class DocumentConnection {
             supp.getDocumentProperties().getUserDefinedProperties();
 
         this.propertySet = unoQI(XPropertySet.class, userProperties);
+    }
+
+    /**
+     * @param An uno object, hopefully implementing XServiceInfo
+     */
+    public static void
+    printServiceInfo(Object o) {
+        XServiceInfo xserviceinfo =  unoQI(XServiceInfo.class, o );
+        System.out.printf("*** xserviceinfo%n");
+        System.out.printf("    object       is %s%n",            o == null ? "null" : "OK");
+        System.out.printf("    xserviceinfo is %s%n", xserviceinfo == null ? "null" : "OK");
+        if ( xserviceinfo != null ){
+            System.out.printf("        .getImplementationName: \"%s\"%n",
+                              xserviceinfo.getImplementationName());
+            System.out.printf("        .getSupportedServiceNames:%n");
+            for ( String s : xserviceinfo.getSupportedServiceNames() ) {
+                System.out.printf("              \"%s\"%n", s);
+            }
+        }
+    }
+
+    public XModel
+    getModel() {
+        return unoQI(XModel.class, this.xCurrentComponent);
+    }
+
+    public XController
+    getCurrentController() {
+        return this.getModel().getCurrentController();
+    }
+
+    public XSelectionSupplier
+    getSelectionSupplier() {
+        return unoQI(XSelectionSupplier.class,
+                     this.getCurrentController());
+    }
+
+    /**
+     * @return may be null, or some type supporting XServiceInfo
+     *
+     * Experiments using printServiceInfo with cursor in various
+     * positions in the document:
+     *
+     * With cursor within the frame, in text:
+     * *** xserviceinfo.getImplementationName: "SwXTextRanges"
+     *      "com.sun.star.text.TextRanges"
+     *
+     * With cursor somewehe else in text:
+     * *** xserviceinfo.getImplementationName: "SwXTextRanges"
+     *      "com.sun.star.text.TextRanges"
+     *
+     * With cursor in comment (AKA annotation):
+     * *** XSelectionSupplier is OK
+     * *** Object initialSelection is null
+     * *** xserviceinfo is null
+     *
+     * With frame selected:
+     * *** xserviceinfo.getImplementationName: "SwXTextFrame"
+     *     "com.sun.star.text.BaseFrame"
+     *     "com.sun.star.text.TextContent"
+     *     "com.sun.star.document.LinkTarget"
+     *     "com.sun.star.text.TextFrame"
+     *     "com.sun.star.text.Text"
+     *
+     * With cursor selecting an inserted image:
+     * *** XSelectionSupplier is OK
+     * *** Object initialSelection is OK
+     * *** xserviceinfo is OK
+     * *** xserviceinfo.getImplementationName: "SwXTextGraphicObject"
+     *      "com.sun.star.text.BaseFrame"
+     *      "com.sun.star.text.TextContent"
+     *      "com.sun.star.document.LinkTarget"
+     *      "com.sun.star.text.TextGraphicObject"
+     *
+     */
+    public Object
+    getSelectionAsObject() {
+        XSelectionSupplier xss = this.getSelectionSupplier();
+        return xss.getSelection();
+    }
+
+    /**
+     * So far it seems teh first thing we have to do
+     * with a selection is to decide what do we have.
+     *
+     * One way to do that is accessing its XServiceInfo interface.
+     *
+     * Note: may return null.
+     */
+    public XServiceInfo
+    getSelectionAsServiceInfo() {
+        Object o = getSelectionAsObject();
+        if (o == null) {
+            return null;
+        }
+        XServiceInfo xserviceinfo =  unoQI(XServiceInfo.class, o );
+        if (xserviceinfo == null) {
+            // I do not know if this is possible: make a note
+            // if it is.
+            LOGGER.warn("DocumentConnection.getSelectionAsObject:"
+                        + " XServiceInfo is null when Object is not");
+        }
+        return xserviceinfo;
+    }
+
+    /**
+     * Select the object represented by {@code newSelection} if it is
+     * known and selectable in this {@code XSelectionSupplier} object.
+     *
+     * Presumably result from {@code XSelectionSupplier.getSelection()} is
+     * usually OK. It also accepted
+     * {@code XTextRange newSelection = documentConnection.xText.getStart();}
+     *
+     * @return Apparently always returns true.
+     *
+     */
+    public boolean
+    select(Object newSelection) {
+        XSelectionSupplier xss = this.getSelectionSupplier();
+        return xss.select(newSelection);
     }
 
     /**
@@ -172,7 +304,7 @@ class DocumentConnection {
         um.leaveUndoContext();
     }
 
-    /*
+    /**
      * Disable screen refresh.
      *
      * Must be paired with unlockControllers()

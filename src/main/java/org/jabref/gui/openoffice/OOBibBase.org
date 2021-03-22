@@ -4,6 +4,100 @@
 - file:../../gui/openoffice/
 - file:../../../../../resources/l10n/JabRef_en.properties
 
+
+
+** bug: missing visual cursor?
+
+ref:
+- file:OOBibBase.java::1021
+- file:OOBibBase.java::/XTextViewCursor/
+- file:DocumentConnection.java::/XTextViewCursor/
+
+*** How to provoke:
+
+- Create a frame
+- Select it, so that the 'anchor' icon is visible.
+  - Now there is no cursor in the normal sense,
+    it is on the frame (but not within)
+- Click "Refresh"
+  - viewCursor.getStart();  throws
+
+   com.sun.star.uno.RuntimeException: no text selection
+
+	at org.libreoffice.uno/com.sun.star.lib.uno.environments.remote.Job.remoteUnoRequestRaisedException(Job.java:158)
+	at org.libreoffice.uno/com.sun.star.lib.uno.environments.remote.Job.execute(Job.java:122)
+	at org.libreoffice.uno/com.sun.star.lib.uno.environments.remote.JobQueue.enter(JobQueue.java:312)
+	at org.libreoffice.uno/com.sun.star.lib.uno.environments.remote.JobQueue.enter(JobQueue.java:281)
+	at org.libreoffice.uno/com.sun.star.lib.uno.environments.remote.JavaThreadPool.enter(JavaThreadPool.java:81)
+	at org.libreoffice.uno/com.sun.star.lib.uno.bridges.java_remote.java_remote_bridge.sendRequest(java_remote_bridge.java:619)
+	at org.libreoffice.uno/com.sun.star.lib.uno.bridges.java_remote.ProxyFactory$Handler.request(ProxyFactory.java:145)
+	at org.libreoffice.uno/com.sun.star.lib.uno.bridges.java_remote.ProxyFactory$Handler.invoke(ProxyFactory.java:129)
+
+	at com.sun.proxy.$Proxy52.getStart(Unknown Source)
+
+	at org.jabref@100.0.0/org.jabref.gui.openoffice.OOBibBase.visualSort(OOBibBase.java:1021)
+	at org.jabref@100.0.0/org.jabref.gui.openoffice.OOBibBase.getVisuallySortedCitationGroupIDs(OOBibBase.java:1097)
+	at org.jabref@100.0.0/org.jabref.gui.openoffice.OOBibBase.produceCitationMarkers(OOBibBase.java:2115)
+	at org.jabref@100.0.0/org.jabref.gui.openoffice.OOBibBase.updateDocumentActionHelper(OOBibBase.java:3286)
+	at org.jabref@100.0.0/org.jabref.gui.openoffice.OpenOfficePanel.lambda$initPanel$9(OpenOfficePanel.java:202)
+
+*** Gave up on initialPos, but now
+
+    findPositionOfTextRange(OOBibBase.java:792) throws:
+
+    com.sun.star.uno.RuntimeException: no text selection
+	at com.sun.star.lib.uno.environments.remote.Job.remoteUnoRequestRaisedException(Job.java:158) ~[libreoffice-7.1.0.jar:?]
+	at com.sun.star.lib.uno.environments.remote.Job.execute(Job.java:122) ~[libreoffice-7.1.0.jar:?]
+	at com.sun.star.lib.uno.environments.remote.JobQueue.enter(JobQueue.java:312) ~[libreoffice-7.1.0.jar:?]
+	at com.sun.star.lib.uno.environments.remote.JobQueue.enter(JobQueue.java:281) ~[libreoffice-7.1.0.jar:?]
+	at com.sun.star.lib.uno.environments.remote.JavaThreadPool.enter(JavaThreadPool.java:81) ~[libreoffice-7.1.0.jar:?]
+	at com.sun.star.lib.uno.bridges.java_remote.java_remote_bridge.sendRequest(java_remote_bridge.java:619) ~[libreoffice-7.1.0.jar:?]
+	at com.sun.star.lib.uno.bridges.java_remote.ProxyFactory$Handler.request(ProxyFactory.java:145) ~[libreoffice-7.1.0.jar:?]
+	at com.sun.star.lib.uno.bridges.java_remote.ProxyFactory$Handler.invoke(ProxyFactory.java:129) ~[libreoffice-7.1.0.jar:?]
+
+    at com.sun.proxy.$Proxy52.gotoRange(Unknown Source) ~[?:?]
+	at org.jabref.gui.openoffice.OOBibBase.findPositionOfTextRange(OOBibBase.java:792) ~[JabRef-100.0.0.jar:?]
+	at org.jabref.gui.openoffice.OOBibBase.visualSort(OOBibBase.java:1042) ~[JabRef-100.0.0.jar:?]
+	at org.jabref.gui.openoffice.OOBibBase.getVisuallySortedCitationGroupIDs(OOBibBase.java:1109) ~[JabRef-100.0.0.jar:?]
+	at org.jabref.gui.openoffice.OOBibBase.produceCitationMarkers(OOBibBase.java:2127) ~[JabRef-100.0.0.jar:?]
+	at org.jabref.gui.openoffice.OOBibBase.updateDocumentActionHelper(OOBibBase.java:3298) ~[JabRef-100.0.0.jar:?]
+	at org.jabref.gui.openoffice.OpenOfficePanel.lambda$initPanel$9(OpenOfficePanel.java:202) ~[JabRef-100.0.0.jar:?]
+
+*** xxx
+
+    Comment above https://docs.libreoffice.org/sw/html/unotxvw_8cxx_source.html#l00896
+
+    The problem seems to be that some methods, (e.g. getEnd()) require "text selection",
+    but we have some other kind.
+
+*** Question: How to get a functional XTextViewCursor
+
+In an .odt document:
+- create a frame
+- select the frame (click on it, so that the anchor is shown)
+- At this point there is no visible text cursor, I see green rectangles on the corners
+  and edges of the frame.
+
+- Connect with UNO (only succeeded with LibreOffice), get an XTextViewCursor cursor
+- cursor.isVisible() returns true
+- try cursor.gotoRange(range, false);
+- or  cursor.getStart()
+  It throws: com.sun.star.uno.RuntimeException: no text selection
+
+Comment above https://docs.libreoffice.org/sw/html/unotxvw_8cxx_source.html#l00896
+seems to suggest that the problem is that I have a selection that is not the "text selection" kind.
+
+The question is: is there a way to get an XTextViewCursor supporting
+cursor.gotoRange(range, false); and
+cursor.getPosition();
+without asking the user to click somewhere else?
+
+.
+** Question: visualSort can we get XTextViewCursor when user is in a comment? 
+
+   Can we do something to get an XTextViewCursor, to cover the case when
+   the user left the cursor in a comment?
+.
 ** bug: frame anchored to a character of our reference mark is killed
 
    - A frame anchored to a character of our reference mark is killed without
@@ -11,14 +105,17 @@
 
 ** feature: unresolved references are not thrown away
 
-   - Instead they appear in text and bibliography.
+   - [X] Instead they appear in text and bibliography.
 
-   - For AuthorYear, they are sorted as first (both in text and
+   - [X] For AuthorYear, they are sorted as first (both in text and
      bibliography) and shown as "Unresolved(citationKey)"
 
-   - In the bibliography, Unresolved(citationKey) is followed by
+   - [X] In the bibliography, Unresolved(citationKey) is followed by
      "(Cited on pages: 1, 1)" where the page numbers a clickable
      crossreferences to to corresponding citation groups.
+
+   - [ ] maybe we should use hyperlinks? That allows arbitrary label,
+         but the target cannot be a reference mark (but can be a bookmark)
 
 ** TODO separate responsibilites
 
@@ -634,6 +731,16 @@ Ideas:
   - Citation in figure caption: [0] unless citation to the same source
     also appears in the text.
   - Citation in footnote: ...
+
+
+*** related
+
+- "Trying to understand Anchors (XTextRange)"
+  https://forum.openoffice.org/en/forum/viewtopic.php?f=25&t=82792&hilit=xtextviewcursor
+  Discussion on how to linearize OO doc content.
+  - It ends with XTextViewCursor
+
+
 
 ** Bibliography:
 
