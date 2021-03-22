@@ -296,7 +296,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             if (rootGroup.isPresent()) {
                 groupsWithSameName = rootGroup.get().findChildrenSatisfying(g -> g.getName().equals(name)).size();
             }
-            if( groupsWithSameName < 2 ) {
+            if (groupsWithSameName < 2) {
                 List<BibEntry> entriesInGroup = group.getGroupNode().getEntriesInGroup(this.currentDatabase.get().getEntries());
                 group.getGroupNode().removeEntriesFromGroup(entriesInGroup);
             }
