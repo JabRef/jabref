@@ -102,7 +102,7 @@ dependencies {
     implementation fileTree(dir: 'lib', includes: ['*.jar'])
 
     implementation 'org.apache.pdfbox:pdfbox:2.0.22'
-    implementation 'org.apache.pdfbox:fontbox:2.0.22'
+    implementation 'org.apache.pdfbox:fontbox:2.0.23'
     implementation 'org.apache.pdfbox:xmpbox:2.0.23'
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
