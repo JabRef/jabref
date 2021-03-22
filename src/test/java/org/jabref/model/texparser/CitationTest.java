@@ -99,20 +99,10 @@ public class CitationTest {
     }
 
     @Test
-    public void toStringTest() {
-        assertEquals("Citation{path=test, line=10, colStart=1, colEnd=4, lineText='lineText'}", citation.toString());
-    }
-
-    @Test
     public void equalsTest() {
         Citation citation1 = new Citation(path, 10, 1, 4, "lineText");
         Citation citation2 = null;
         assertTrue(citation.equals(citation1));
         assertFalse(citation.equals(citation2));
-    }
-
-    @Test
-    public void hashCodeTest() {
-        assertEquals(Objects.hash(path, 10, 1, 4, "lineText"), citation.hashCode());
     }
 }
