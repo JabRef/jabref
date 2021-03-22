@@ -4,25 +4,10 @@
 - file:../../gui/openoffice/
 - file:../../../../../resources/l10n/JabRef_en.properties
 
-** "Separate" with multiples citations in same footnote
+** bug: frame anchored to a character of our reference mark is killed
 
-java.lang.RuntimeException: CitationGroupsV001.setGlobalOrder: globalOrder.size() != citationGroups.size()
-	at org.jabref@100.0.0/org.jabref.gui.openoffice.CitationGroupsV001.setGlobalOrder(CitationGroupsV001.java:682)
-	at org.jabref@100.0.0/org.jabref.gui.openoffice.OOBibBase.produceCitationMarkers(OOBibBase.java:2090)
-	at org.jabref@100.0.0/org.jabref.gui.openoffice.OOBibBase.unCombineCiteMarkers(OOBibBase.java:3177)
-	at org.jabref@100.0.0/org.jabref.gui.openoffice.OpenOfficePanel.lambda$initPanel$11(OpenOfficePanel.java:283)
-
-*** "Refresh"
-
-java.lang.NullPointerException
-	at org.jabref@100.0.0/org.jabref.gui.openoffice.RangeKeyedMap.containsKey(RangeKeyedMap.java:38)
-	at org.jabref@100.0.0/org.jabref.gui.openoffice.CitationGroupsV001.footnoteMarkRanges(CitationGroupsV001.java:1558)
-	at org.jabref@100.0.0/org.jabref.gui.openoffice.OOBibBase.checkRangeOverlaps(OOBibBase.java:476)
-	at org.jabref@100.0.0/org.jabref.gui.openoffice.OOBibBase.updateDocumentActionHelper(OOBibBase.java:3427)
-	at org.jabref@100.0.0/org.jabref.gui.openoffice.OpenOfficePanel.lambda$initPanel$9(OpenOfficePanel.java:202)
-
-*** "Merge" seem to work
-
+   - A frame anchored to a character of our reference mark is killed without
+     warning.
 
 ** feature: unresolved references are not thrown away
 
@@ -1019,4 +1004,11 @@ is embedded in the first, just before its end.
 
 Resolved: using safeInsertSpaces avoid creating overlapping citations this way.
 
+
+
+** DONE bug: "Separate" with multiples citations in same footnote
+
+java.lang.RuntimeException: CitationGroupsV001.setGlobalOrder: globalOrder.size() != citationGroups.size()
+
+- resolved: createVisualSortInput numbered within locations, not in Text partitions
 

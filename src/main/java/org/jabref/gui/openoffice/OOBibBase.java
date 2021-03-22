@@ -851,7 +851,7 @@ class OOBibBase {
 
         @Override
         public int hashCode() {
-            return Objects.hash(position, content);
+            return Objects.hash(position, indexInPosition, content);
         }
     }
 
@@ -967,12 +967,13 @@ class OOBibBase {
 
             List<XTextRange> oxs = new ArrayList<>(xs.keySet());
 
+            int indexInPartition = 0;
             for (int i = 0; i < oxs.size(); i++) {
                 XTextRange a = oxs.get(i);
                 List<VisualSortEntry<CitationGroupsV001.CitationGroupID>> avs = xs.get(a);
                 for (int j = 0; j < avs.size(); j++){
                     VisualSortEntry<CitationGroupsV001.CitationGroupID> v = avs.get(j);
-                    v.indexInPosition = j;
+                    v.indexInPosition = indexInPartition++;
                     if ( mapFootnotesToFootnoteMarks ) {
                         // Adjust range if we are inside a footnote:
                         if (unoQI(XFootnote.class, v.range.getText()) != null) {
@@ -1005,6 +1006,8 @@ class OOBibBase {
         WrappedTargetException,
         NoDocumentException {
 
+        final int nCitationGroups = vses.size();
+
         if (documentConnection.hasControllersLocked()) {
             LOGGER.warn(
                 "visualSort:"
@@ -1035,6 +1038,10 @@ class OOBibBase {
         // restore cursor position
         viewCursor.gotoRange(initialPos, false);
 
+        if ( positions.size() != nCitationGroups ) {
+            throw new RuntimeException("visualSort: positions.size() != nCitationGroups");
+        }
+
         // order by position
         Set<ComparableMark<VisualSortable<T>>> set = new TreeSet<>();
         for (int i = 0; i < vses.size(); i++) {
@@ -1047,11 +1054,21 @@ class OOBibBase {
                 );
         }
 
+        if ( set.size() != nCitationGroups ) {
+            // *** Fired ***
+            throw new RuntimeException("visualSort: set.size() != nCitationGroups");
+        }
+
         // collect CitationGroupIDs in order
         List<VisualSortable<T>> result = new ArrayList<>(set.size());
         for (ComparableMark<VisualSortable<T>> mark : set) {
             result.add(mark.getContent());
         }
+
+        if ( result.size() != nCitationGroups ) {
+            throw new RuntimeException("visualSort: result.size() != nCitationGroups");
+        }
+
         return result;
     }
 
@@ -1071,12 +1088,23 @@ class OOBibBase {
                 documentConnection,
                 mapFootnotesToFootnoteMarks);
 
-          List<VisualSortable<CitationGroupsV001.CitationGroupID>> sorted =
-              visualSort( vses, documentConnection );
+        if ( vses.size() != cgs.citationGroups.size() ) {
+            throw new RuntimeException("getVisuallySortedCitationGroupIDs:"
+                                       + " vses.size() != cgs.citationGroups.size()");
+        }
 
-          return (sorted.stream()
-                  .map(e -> e.getContent())
-                  .collect(Collectors.toList()));
+        List<VisualSortable<CitationGroupsV001.CitationGroupID>> sorted =
+            visualSort( vses, documentConnection );
+
+        if ( sorted.size() != cgs.citationGroups.size() ) {
+            // This Fired
+            throw new RuntimeException("getVisuallySortedCitationGroupIDs:"
+                                       + " sorted.size() != cgs.citationGroups.size()");
+        }
+
+        return (sorted.stream()
+                .map(e -> e.getContent())
+                .collect(Collectors.toList()));
     }
 
     /* ***************************************
@@ -2228,176 +2256,6 @@ class OOBibBase {
 
         final boolean debugThisFun = false;
 
-
-
-        /*
-        List<String> ss =
-            Arrays.asList(documentConnection.mxDocFactory.getAvailableServiceNames());
-        for ( String s : ss ) {
-            System.out.printf("%s\n", s);
-        }
-        /*
-
-
--------
-          com.sun.star.form.component.TextField
-          com.sun.star.text.TextEmbeddedObject
-          com.sun.star.text.Bookmark
-          com.sun.star.text.Footnote
-          com.sun.star.text.Endnote
-          com.sun.star.text.ReferenceMark
-com.sun.star.style.CharacterStyle
-com.sun.star.style.ParagraphStyle
-com.sun.star.style.FrameStyle
-com.sun.star.style.PageStyle
-com.sun.star.style.NumberingStyle
-com.sun.star.text.ContentIndexMark
-com.sun.star.text.ContentIndex
-com.sun.star.text.UserIndexMark
-com.sun.star.text.UserIndex
-com.sun.star.text.TextSection
-com.sun.star.text.TextField.DateTime
-com.sun.star.text.TextField.User
-com.sun.star.text.TextField.SetExpression
-com.sun.star.text.TextField.GetExpression
-com.sun.star.text.TextField.FileName
-com.sun.star.text.TextField.PageNumber
-com.sun.star.text.TextField.Author
-com.sun.star.text.TextField.Chapter
-com.sun.star.text.TextField.GetReference
-com.sun.star.text.TextField.ConditionalText
-com.sun.star.text.TextField.Annotation
-com.sun.star.text.TextField.Input
-com.sun.star.text.TextField.Macro
-com.sun.star.text.TextField.DDE
-com.sun.star.text.TextField.HiddenParagraph
-com.sun.star.text.TextField.TemplateName
-com.sun.star.text.TextField.ExtendedUser
-com.sun.star.text.TextField.ReferencePageSet
-com.sun.star.text.TextField.ReferencePageGet
-com.sun.star.text.TextField.JumpEdit
-com.sun.star.text.TextField.Script
-com.sun.star.text.TextField.DatabaseNextSet
-com.sun.star.text.TextField.DatabaseNumberOfSet
-com.sun.star.text.TextField.DatabaseSetNumber
-com.sun.star.text.TextField.Database
-com.sun.star.text.TextField.DatabaseName
-com.sun.star.text.TextField.TableFormula
-com.sun.star.text.TextField.PageCount
-com.sun.star.text.TextField.ParagraphCount
-com.sun.star.text.TextField.WordCount
-com.sun.star.text.TextField.CharacterCount
-com.sun.star.text.TextField.TableCount
-com.sun.star.text.TextField.GraphicObjectCount
-com.sun.star.text.TextField.EmbeddedObjectCount
-com.sun.star.text.TextField.DocInfo.ChangeAuthor
-com.sun.star.text.TextField.DocInfo.ChangeDateTime
-com.sun.star.text.TextField.DocInfo.EditTime
-com.sun.star.text.TextField.DocInfo.Description
-com.sun.star.text.TextField.DocInfo.CreateAuthor
-com.sun.star.text.TextField.DocInfo.CreateDateTime
-com.sun.star.text.TextField.DocInfo.Custom
-com.sun.star.text.TextField.DocInfo.PrintAuthor
-com.sun.star.text.TextField.DocInfo.PrintDateTime
-com.sun.star.text.TextField.DocInfo.KeyWords
-com.sun.star.text.TextField.DocInfo.Subject
-com.sun.star.text.TextField.DocInfo.Title
-com.sun.star.text.TextField.DocInfo.Revision
-com.sun.star.text.TextField.Bibliography
-com.sun.star.text.TextField.CombinedCharacters
-com.sun.star.text.TextField.DropDown
-com.sun.star.text.textfield.MetadataField
-com.sun.star.text.FieldMaster.User
-com.sun.star.text.FieldMaster.DDE
-com.sun.star.text.FieldMaster.SetExpression
-com.sun.star.text.FieldMaster.Database
-com.sun.star.text.FieldMaster.Bibliography
-com.sun.star.text.IllustrationsIndex
-com.sun.star.text.ObjectIndex
-com.sun.star.text.TableIndex
-com.sun.star.text.Bibliography
-com.sun.star.text.Paragraph
-com.sun.star.text.TextField.InputUser
-com.sun.star.text.TextField.HiddenText
-com.sun.star.style.ConditionalParagraphStyle
-com.sun.star.text.NumberingRules
-com.sun.star.text.TextColumns
-com.sun.star.text.IndexHeaderSection
-com.sun.star.text.Defaults
-com.sun.star.image.ImageMapRectangleObject
-com.sun.star.image.ImageMapCircleObject
-com.sun.star.image.ImageMapPolygonObject
-com.sun.star.text.TextGraphicObject
-com.sun.star.chart2.data.DataProvider
-com.sun.star.text.Fieldmark
-com.sun.star.text.FormFieldmark
-com.sun.star.text.InContentMetadata
-ooo.vba.VBAObjectModuleObjectProvider
-ooo.vba.VBACodeNameProvider
-ooo.vba.VBAProjectNameProvider
-ooo.vba.VBAGlobals
-com.sun.star.text.textfield.DateTime
-com.sun.star.text.textfield.User
-com.sun.star.text.textfield.SetExpression
-com.sun.star.text.textfield.GetExpression
-com.sun.star.text.textfield.FileName
-com.sun.star.text.textfield.PageNumber
-com.sun.star.text.textfield.Author
-com.sun.star.text.textfield.Chapter
-com.sun.star.text.textfield.GetReference
-com.sun.star.text.textfield.ConditionalText
-com.sun.star.text.textfield.Annotation
-com.sun.star.text.textfield.Input
-com.sun.star.text.textfield.Macro
-com.sun.star.text.textfield.DDE
-com.sun.star.text.textfield.HiddenParagraph
-com.sun.star.text.textfield.TemplateName
-com.sun.star.text.textfield.ExtendedUser
-com.sun.star.text.textfield.ReferencePageSet
-com.sun.star.text.textfield.ReferencePageGet
-com.sun.star.text.textfield.JumpEdit
-com.sun.star.text.textfield.Script
-com.sun.star.text.textfield.DatabaseNextSet
-com.sun.star.text.textfield.DatabaseNumberOfSet
-com.sun.star.text.textfield.DatabaseSetNumber
-com.sun.star.text.textfield.Database
-com.sun.star.text.textfield.DatabaseName
-com.sun.star.text.textfield.TableFormula
-com.sun.star.text.textfield.PageCount
-com.sun.star.text.textfield.ParagraphCount
-com.sun.star.text.textfield.WordCount
-com.sun.star.text.textfield.CharacterCount
-com.sun.star.text.textfield.TableCount
-com.sun.star.text.textfield.GraphicObjectCount
-com.sun.star.text.textfield.EmbeddedObjectCount
-com.sun.star.text.textfield.docinfo.ChangeAuthor
-com.sun.star.text.textfield.docinfo.ChangeDateTime
-com.sun.star.text.textfield.docinfo.EditTime
-com.sun.star.text.textfield.docinfo.Description
-com.sun.star.text.textfield.docinfo.CreateAuthor
-com.sun.star.text.textfield.docinfo.CreateDateTime
-com.sun.star.text.textfield.docinfo.PrintAuthor
-com.sun.star.text.textfield.docinfo.PrintDateTime
-com.sun.star.text.textfield.docinfo.KeyWords
-com.sun.star.text.textfield.docinfo.Subject
-com.sun.star.text.textfield.docinfo.Title
-com.sun.star.text.textfield.docinfo.Revision
-com.sun.star.text.textfield.docinfo.Custom
-com.sun.star.text.textfield.Bibliography
-com.sun.star.text.textfield.CombinedCharacters
-com.sun.star.text.textfield.DropDown
-com.sun.star.text.textfield.InputUser
-com.sun.star.text.textfield.HiddenText
-com.sun.star.text.fieldmaster.User
-com.sun.star.text.fieldmaster.DDE
-com.sun.star.text.fieldmaster.SetExpression
-com.sun.star.text.fieldmaster.Database
-com.sun.star.text.fieldmaster.Bibliography
-com.sun.star.style.TableStyle
-com.sun.star.style.CellStyle
-
-         */
-
         /*
          *  Map<BibEntry, BibDatabase> entries;
          *
@@ -2466,11 +2324,10 @@ com.sun.star.style.CellStyle
                                                    Collections.emptyList());
                 // Try to list citations:
                 if (true) {
-
                     OOUtil.insertTextAtCurrentLocation(
                         documentConnection.xText,
                         cursor,
-                        String.format(" %s ", Localization.lang("CitedOnPagesPrefix")),
+                        String.format(" (%s: ", Localization.lang("Cited on pages")),
                         Collections.emptyList());
 
                     int last = ck.where.size();
@@ -2495,7 +2352,7 @@ com.sun.star.style.CellStyle
                     OOUtil.insertTextAtCurrentLocation(
                         documentConnection.xText,
                         cursor,
-                        String.format("%s", Localization.lang("CitedOnPagesSuffix")),
+                        ")",
                         Collections.emptyList());
                 }
             } else {
@@ -3426,10 +3283,10 @@ com.sun.star.style.CellStyle
             int maxReportedOverlaps = 10;
             checkRangeOverlaps(cgs, this.xDocumentConnection, requireSeparation, maxReportedOverlaps);
             final boolean useLockControllers = true;
+            ProduceCitationMarkersResult x = produceCitationMarkers(documentConnection,
+                                                                    databases,
+                                                                    style);
             try {
-                ProduceCitationMarkersResult x = produceCitationMarkers(documentConnection,
-                                                                        databases,
-                                                                        style);
                 if (useLockControllers) {
                     documentConnection.lockControllers();
                 }
@@ -3443,7 +3300,9 @@ com.sun.star.style.CellStyle
                                       x.getBibliography());
                 return x.getUnresolvedKeys();
             } finally {
-                if (useLockControllers) {
+                if (useLockControllers
+                    // && documentConnection.hasControllersLocked()
+                    ) {
                     documentConnection.unlockControllers();
                 }
             }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import java.util.TreeMap;
 import com.sun.star.text.XText;
@@ -34,8 +35,12 @@ class RangeKeyedMap<V> {
 
     public boolean
     containsKey(XTextRange r) {
-        return xxs.containsKey( r.getText() )
-            && xxs.get(r).containsKey(r);
+        Objects.requireNonNull(r);
+        XText partitionKey = r.getText();
+        if ( !xxs.containsKey(partitionKey)) {
+            return false;
+        }
+        return xxs.get(partitionKey).containsKey(r);
     }
 
     public V

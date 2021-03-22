@@ -1554,17 +1554,20 @@ class CitationGroupsV001 {
             XTextRange footnoteMarkRange =
                 DocumentConnection.getFootnoteMarkRangeOrNull(r);
 
-            if (footnoteMarkRange != null) {
-                boolean seenContains = seen.containsKey( footnoteMarkRange );
-                if (!seenContains) {
-                    seen.put(footnoteMarkRange, true);
-                    xs.add(new RangeForOverlapCheck(
-                               footnoteMarkRange,
-                               base.i, // cgid :: identifies of citation group
-                               RangeForOverlapCheck.FOOTNOTE_MARK_KIND,
-                               "FootnoteMark for " + base.description
-                               ));
-                }
+            if (footnoteMarkRange == null) {
+                // not in footnote
+                continue;
+            }
+
+            boolean seenContains = seen.containsKey( footnoteMarkRange );
+            if (!seenContains) {
+                seen.put(footnoteMarkRange, true);
+                xs.add(new RangeForOverlapCheck(
+                           footnoteMarkRange,
+                           base.i, // cgid :: identifies of citation group
+                           RangeForOverlapCheck.FOOTNOTE_MARK_KIND,
+                           "FootnoteMark for " + base.description
+                           ));
             }
         }
         return xs;
