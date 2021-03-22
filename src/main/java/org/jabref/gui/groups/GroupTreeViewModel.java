@@ -290,8 +290,16 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
         // only remove explicit groups from the entries, keyword groups should not be deleted
         if (group.getGroupNode().getGroup() instanceof ExplicitGroup) {
-            List<BibEntry> entriesInGroup = group.getGroupNode().getEntriesInGroup(this.currentDatabase.get().getEntries());
-            group.getGroupNode().removeEntriesFromGroup(entriesInGroup);
+            int groupsWithSameName = 0;
+            String name = group.getGroupNode().getGroup().getName();
+            Optional<GroupTreeNode> rootGroup = currentDatabase.get().getMetaData().getGroups();
+            if (rootGroup.isPresent()) {
+                groupsWithSameName = rootGroup.get().findChildrenSatisfying(g -> g.getName().equals(name)).size();
+            }
+            if( groupsWithSameName < 2 ) {
+                List<BibEntry> entriesInGroup = group.getGroupNode().getEntriesInGroup(this.currentDatabase.get().getEntries());
+                group.getGroupNode().removeEntriesFromGroup(entriesInGroup);
+            }
         }
     }
 
