@@ -159,7 +159,7 @@ dependencies {
     implementation 'de.saxsys:mvvmfx:1.8.0'
     implementation 'com.tobiasdiez:easybind:2.1.0'
     implementation 'org.fxmisc.flowless:flowless:0.6.3'
-    implementation 'org.fxmisc.richtext:richtextfx:0.10.4'
+    implementation 'org.fxmisc.richtext:richtextfx:0.10.6'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
     implementation 'com.jfoenix:jfoenix:9.0.10'
     implementation 'org.controlsfx:controlsfx:11.1.0'
