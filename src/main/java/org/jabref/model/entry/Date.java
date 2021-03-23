@@ -24,17 +24,17 @@ public class Date {
 
     static {
         List<String> formatStrings = Arrays.asList(
-                "uuuu-M-d",
-                "uuuu-M",
-                "d-M-uuuu",
-                "M-uuuu",
-                "M/uu",
-                "M/uuuu",
-                "MMMM d, uuuu",
-                "MMMM, uuuu",
-                "d.M.uuuu",
-                "uuuu.M.d", "uuuu",
-                "MMM, uuuu");
+                "yyyy-M-d",
+                "yyyy-M",
+                "d-M-yyyy",
+                "M-yyyy",
+                "M/yy",
+                "M/yyyy",
+                "MMMM d, yyyy",
+                "MMMM, yyyy",
+                "d.M.yyyy",
+                "yyyy.M.d", "yyyy",
+                "MMM, yyyy");
 
         for (String formatString : formatStrings) {
             // Locale is required for parsing month names correctly. Currently this expects the month names to be in English
@@ -43,6 +43,8 @@ public class Date {
             SIMPLE_DATE_FORMATS.add(simpleDateFormat);
         }
     }
+
+    public static final DateTimeFormatter NORMALIZED_DATE_FORMATTER = DateTimeFormatter.ofPattern("uuuu[-MM][-dd]");
 
     public Date(int year, int month, int dayOfMonth) {
         this(LocalDate.of(year, month, dayOfMonth));
@@ -122,8 +124,7 @@ public class Date {
     }
 
     public String getNormalized() {
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("uuuu[-MM][-dd]");
-        return dateFormatter.format(date);
+        return NORMALIZED_DATE_FORMATTER.format(date);
     }
 
     public Optional<Integer> getYear() {
