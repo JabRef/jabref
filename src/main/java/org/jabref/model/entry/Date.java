@@ -1,12 +1,15 @@
 package org.jabref.model.entry;
 
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Year;
 import java.time.YearMonth;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -16,6 +19,30 @@ import java.util.Optional;
 public class Date {
 
     private final TemporalAccessor date;
+
+    private static final List<SimpleDateFormat> SIMPLE_DATE_FORMATS = new ArrayList<>();
+
+    static {
+        List<String> formatStrings = Arrays.asList(
+                "uuuu-M-d",
+                "uuuu-M",
+                "d-M-uuuu",
+                "M-uuuu",
+                "M/uu",
+                "M/uuuu",
+                "MMMM d, uuuu",
+                "MMMM, uuuu",
+                "d.M.uuuu",
+                "uuuu.M.d", "uuuu",
+                "MMM, uuuu");
+
+        for (String formatString : formatStrings) {
+            // Locale is required for parsing month names correctly. Currently this expects the month names to be in English
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(formatString, Locale.US);
+            simpleDateFormat.setLenient(false);
+            SIMPLE_DATE_FORMATS.add(simpleDateFormat);
+        }
+    }
 
     public Date(int year, int month, int dayOfMonth) {
         this(LocalDate.of(year, month, dayOfMonth));
@@ -35,37 +62,27 @@ public class Date {
 
     /**
      * Try to parse the following formats
-     *  - "M/y" (covers 9/15, 9/2015, and 09/2015)
-     *  - "MMMM (dd), yyyy" (covers September 1, 2015 and September, 2015)
-     *  - "yyyy-MM-dd" (covers 2009-1-15)
-     *  - "dd-MM-yyyy" (covers 15-1-2009)
-     *  - "d.M.uuuu" (covers 15.1.2015)
-     *  - "uuuu.M.d" (covers 2015.1.15)
-     *  - "MMM, uuuu" (covers Jan, 2020)
-     * The code is essentially taken from http://stackoverflow.com/questions/4024544/how-to-parse-dates-in-multiple-formats-using-simpledateformat.
+     * - "M/y" (covers 9/15, 9/2015, and 09/2015)
+     * - "MMMM (dd), yyyy" (covers September 1, 2015 and September, 2015)
+     * - "yyyy-MM-dd" (covers 2009-1-15)
+     * - "dd-MM-yyyy" (covers 15-1-2009)
+     * - "d.M.uuuu" (covers 15.1.2015)
+     * - "uuuu.M.d" (covers 2015.1.15)
+     * - "MMM, uuuu" (covers Jan, 2020)
      */
     public static Optional<Date> parse(String dateString) {
-        Objects.requireNonNull(dateString);
-        List<String> formatStrings = Arrays.asList(
-                "uuuu-M-d",
-                "uuuu-M",
-                "d-M-uuuu",
-                "M-uuuu",
-                "M/uu",
-                "M/uuuu",
-                "MMMM d, uuuu",
-                "MMMM, uuuu",
-                "d.M.uuuu",
-                "uuuu.M.d", "uuuu",
-                "MMM, uuuu");
+        if (dateString == null || dateString.isEmpty()) {
+            return Optional.empty();
+        }
 
-        for (String formatString : formatStrings) {
-            try {
-                // Locale is required for parsing month names correctly. Currently this expects the month names to be in English
-                TemporalAccessor parsedDate = DateTimeFormatter.ofPattern(formatString).withLocale(Locale.US).parse(dateString);
-                return Optional.of(new Date(parsedDate));
-            } catch (DateTimeParseException ignored) {
-                // Ignored
+        for (SimpleDateFormat formatter : SIMPLE_DATE_FORMATS) {
+            java.util.Date date = formatter.parse(dateString, new ParsePosition(0));
+            if (date != null) {
+                LocalDate localDate = date
+                        .toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate();
+                return Optional.of(new Date(localDate));
             }
         }
 
