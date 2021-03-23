@@ -5,6 +5,40 @@
 - file:../../../../../resources/l10n/JabRef_en.properties
 
 
+** bug:  Numbered citation groups: show an extra "; " after the last number.
+
+   No, that is the empty pageInfo added by "Manage citations"
+
+*** feature or bug? : Manage citations creates empty pageInfo fields
+
+"Manage citations" creates empty pageInfo fields for citation groups
+with no pageInfo.
+
+- good: If the user knows where to find these, then can edit them
+  without having to construct or reproduce the property name.
+- bad: Since we do not cleanup unused properties, ...
+
+** doc: pageInfo with numbered style
+
+   Documentation should probably warn: for numbered citations the
+   reader cannot distinguish [1; 15] as in citing [1] and [15] from
+   [1] with pageInfo "15".
+
+   Question: what can go into pageInfo?
+   - (a) page numbers, page ranges
+     - Q: format?
+     - Q: extra "pp." added? If so, how to customize this?
+     - good: might attempt to merge when the same source appears twice in a citation group.
+     - bad: may be unnecessarily complicated
+   - (b) any text
+     - Need to warn user when the same source appears twice in a
+       citation group, and offer a way to merge them by hand.
+     - good: less restrictive for the user
+
+     - Note: as we stand now, "The chapter on H<sub>2</sub>O" does not
+       fit in, although it could be done.
+       - The the next question: can ask the user to type "<sub>2</sub>",
+         or shall we offer a GUI instead? If so: how?
 
 ** bug: missing visual cursor?
 
