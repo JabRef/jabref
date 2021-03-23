@@ -5,13 +5,7 @@
 - file:../../../../../resources/l10n/JabRef_en.properties
 
 
-** DONE bug:  Numbered citation groups: show an extra "; " after the last number.
-
-   No, that is the empty pageInfo added by "Manage citations"
-
-   - location: [[file:OOBibBase.java::/Last minute editing.*page info/]]
-
-*** feature or bug? : Manage citations creates empty pageInfo fields
+** feature or bug? : Manage citations creates empty pageInfo fields :storage:
 
 "Manage citations" creates empty pageInfo fields for citation groups
 with no pageInfo.
@@ -20,13 +14,20 @@ with no pageInfo.
   without having to construct or reproduce the property name.
 - bad: Since we do not cleanup unused properties, ...
 
-** doc: pageInfo with numbered style
+** doc: pageInfo with numbered style                          :documentation:
 
-   Documentation should probably warn: for numbered citations the
-   reader cannot distinguish [1; 15] as in citing [1] and [15] from
-   [1] with pageInfo "15".
+   - [ ] Documentation should probably warn: for numbered citations
+     the reader cannot distinguish [1; 15] as in citing [1] and [15]
+     from [1] with pageInfo "15".
 
-   Question: what can go into pageInfo?
+   - [ ] Shall we document ?
+
+     - Page infos ("Extra information" under "Cite special") are
+       stored under [File]/[Properies]/[Custom properties]
+
+     - Delayed: Wait for storage decisions.
+
+** Question: what can go into pageInfo?                             :storage:
    - (a) page numbers, page ranges
      - Q: format?
      - Q: extra "pp." added? If so, how to customize this?
@@ -35,100 +36,13 @@ with no pageInfo.
    - (b) any text
      - Need to warn user when the same source appears twice in a
        citation group, and offer a way to merge them by hand.
-     - good: less restrictive for the user
+     - good: less restrictive (and less surprising) for the user
 
      - Note: as we stand now, "The chapter on H<sub>2</sub>O" does not
        fit in, although it could be done.
        - The the next question: can ask the user to type "<sub>2</sub>",
          or shall we offer a GUI instead? If so: how?
 
-** bug: missing visual cursor?
-
-ref:
-- file:OOBibBase.java::1021
-- file:OOBibBase.java::/XTextViewCursor/
-- file:DocumentConnection.java::/XTextViewCursor/
-
-*** How to provoke:
-
-- Create a frame
-- Select it, so that the 'anchor' icon is visible.
-  - Now there is no cursor in the normal sense,
-    it is on the frame (but not within)
-- Click "Refresh"
-  - viewCursor.getStart();  throws
-
-   com.sun.star.uno.RuntimeException: no text selection
-
-	at org.libreoffice.uno/com.sun.star.lib.uno.environments.remote.Job.remoteUnoRequestRaisedException(Job.java:158)
-	at org.libreoffice.uno/com.sun.star.lib.uno.environments.remote.Job.execute(Job.java:122)
-	at org.libreoffice.uno/com.sun.star.lib.uno.environments.remote.JobQueue.enter(JobQueue.java:312)
-	at org.libreoffice.uno/com.sun.star.lib.uno.environments.remote.JobQueue.enter(JobQueue.java:281)
-	at org.libreoffice.uno/com.sun.star.lib.uno.environments.remote.JavaThreadPool.enter(JavaThreadPool.java:81)
-	at org.libreoffice.uno/com.sun.star.lib.uno.bridges.java_remote.java_remote_bridge.sendRequest(java_remote_bridge.java:619)
-	at org.libreoffice.uno/com.sun.star.lib.uno.bridges.java_remote.ProxyFactory$Handler.request(ProxyFactory.java:145)
-	at org.libreoffice.uno/com.sun.star.lib.uno.bridges.java_remote.ProxyFactory$Handler.invoke(ProxyFactory.java:129)
-
-	at com.sun.proxy.$Proxy52.getStart(Unknown Source)
-
-	at org.jabref@100.0.0/org.jabref.gui.openoffice.OOBibBase.visualSort(OOBibBase.java:1021)
-	at org.jabref@100.0.0/org.jabref.gui.openoffice.OOBibBase.getVisuallySortedCitationGroupIDs(OOBibBase.java:1097)
-	at org.jabref@100.0.0/org.jabref.gui.openoffice.OOBibBase.produceCitationMarkers(OOBibBase.java:2115)
-	at org.jabref@100.0.0/org.jabref.gui.openoffice.OOBibBase.updateDocumentActionHelper(OOBibBase.java:3286)
-	at org.jabref@100.0.0/org.jabref.gui.openoffice.OpenOfficePanel.lambda$initPanel$9(OpenOfficePanel.java:202)
-
-*** Gave up on initialPos, but now
-
-    findPositionOfTextRange(OOBibBase.java:792) throws:
-
-    com.sun.star.uno.RuntimeException: no text selection
-	at com.sun.star.lib.uno.environments.remote.Job.remoteUnoRequestRaisedException(Job.java:158) ~[libreoffice-7.1.0.jar:?]
-	at com.sun.star.lib.uno.environments.remote.Job.execute(Job.java:122) ~[libreoffice-7.1.0.jar:?]
-	at com.sun.star.lib.uno.environments.remote.JobQueue.enter(JobQueue.java:312) ~[libreoffice-7.1.0.jar:?]
-	at com.sun.star.lib.uno.environments.remote.JobQueue.enter(JobQueue.java:281) ~[libreoffice-7.1.0.jar:?]
-	at com.sun.star.lib.uno.environments.remote.JavaThreadPool.enter(JavaThreadPool.java:81) ~[libreoffice-7.1.0.jar:?]
-	at com.sun.star.lib.uno.bridges.java_remote.java_remote_bridge.sendRequest(java_remote_bridge.java:619) ~[libreoffice-7.1.0.jar:?]
-	at com.sun.star.lib.uno.bridges.java_remote.ProxyFactory$Handler.request(ProxyFactory.java:145) ~[libreoffice-7.1.0.jar:?]
-	at com.sun.star.lib.uno.bridges.java_remote.ProxyFactory$Handler.invoke(ProxyFactory.java:129) ~[libreoffice-7.1.0.jar:?]
-
-    at com.sun.proxy.$Proxy52.gotoRange(Unknown Source) ~[?:?]
-	at org.jabref.gui.openoffice.OOBibBase.findPositionOfTextRange(OOBibBase.java:792) ~[JabRef-100.0.0.jar:?]
-	at org.jabref.gui.openoffice.OOBibBase.visualSort(OOBibBase.java:1042) ~[JabRef-100.0.0.jar:?]
-	at org.jabref.gui.openoffice.OOBibBase.getVisuallySortedCitationGroupIDs(OOBibBase.java:1109) ~[JabRef-100.0.0.jar:?]
-	at org.jabref.gui.openoffice.OOBibBase.produceCitationMarkers(OOBibBase.java:2127) ~[JabRef-100.0.0.jar:?]
-	at org.jabref.gui.openoffice.OOBibBase.updateDocumentActionHelper(OOBibBase.java:3298) ~[JabRef-100.0.0.jar:?]
-	at org.jabref.gui.openoffice.OpenOfficePanel.lambda$initPanel$9(OpenOfficePanel.java:202) ~[JabRef-100.0.0.jar:?]
-
-*** xxx
-
-    Comment above https://docs.libreoffice.org/sw/html/unotxvw_8cxx_source.html#l00896
-
-    The problem seems to be that some methods, (e.g. getEnd()) require "text selection",
-    but we have some other kind.
-
-*** Question: How to get a functional XTextViewCursor
-
-In an .odt document:
-- create a frame
-- select the frame (click on it, so that the anchor is shown)
-- At this point there is no visible text cursor, I see green rectangles on the corners
-  and edges of the frame.
-
-- Connect with UNO (only succeeded with LibreOffice), get an XTextViewCursor cursor
-- cursor.isVisible() returns true
-- try cursor.gotoRange(range, false);
-- or  cursor.getStart()
-  It throws: com.sun.star.uno.RuntimeException: no text selection
-
-Comment above https://docs.libreoffice.org/sw/html/unotxvw_8cxx_source.html#l00896
-seems to suggest that the problem is that I have a selection that is not the "text selection" kind.
-
-The question is: is there a way to get an XTextViewCursor supporting
-cursor.gotoRange(range, false); and
-cursor.getPosition();
-without asking the user to click somewhere else?
-
-.
 ** Question: visualSort can we get XTextViewCursor when user is in a comment? 
 
    Can we do something to get an XTextViewCursor, to cover the case when
@@ -136,22 +50,88 @@ without asking the user to click somewhere else?
 .
 ** bug: frame anchored to a character of our reference mark is killed
 
-   - A frame anchored to a character of our reference mark is killed without
+   - (a) A frame anchored to a character of our reference mark is killed without
      warning.
+   - related: (b) feature: no citing within protected ranges
 
-** feature: unresolved references are not thrown away
+   - (a) needs: check content of protected ranges for stuff that
+     we might not want to remove.
+     - plain text: we will not be able to decide
+     - anchors: we should move these out of the protected ranges
+       - there may be references in those anchored things,
+         and we would get confused by their removal
+       - also, the user may become upset if we throw away these
+     - Alternatively: if we could get LO to protect our ranges for
+       us... But how?
 
-   - [X] Instead they appear in text and bibliography.
+   - (b) as long as the only way to cite is via clicking "Cite",
+     we can check if the cursor is in a protected part.
+     - But with e.g. "textual representation" (like "\cite{key}"),
+       the user can insert citations without starting JabRef,
+       and can do this in the middle of an existing citation.
 
-   - [X] For AuthorYear, they are sorted as first (both in text and
-     bibliography) and shown as "Unresolved(citationKey)"
+   Summary: the main options seem to be:
 
-   - [X] In the bibliography, Unresolved(citationKey) is followed by
-     "(Cited on pages: 1, 1)" where the page numbers a clickable
-     crossreferences to to corresponding citation groups.
+   - Make our protected ranges protected by LO (how?)
+     - Note: protected in the sense that their content should not be changed.
+       We allow deletion, move, copy (if we can).
+   - Check the content of citation marks for stuff that may have been
+     inserted there while we were not watching.
 
-   - [ ] maybe we should use hyperlinks? That allows arbitrary label,
-         but the target cannot be a reference mark (but can be a bookmark)
+   - [[Question: can we make LO to protect our ranges?]]
+   - [[Question: can we check if an XTextRange contains an anchor?]]
+
+** Question: can we make LO to protect our ranges?
+
+   Note: protected in the sense that their content should not be changed.
+   We allow deletion, move, copy (if we can).
+
+   - TextField: OO/LO has several variants of text fields,
+     inserting content fro somewhere else.
+     - good: 
+
+** Question: can we check if an XTextRange contains an anchor?
+
+** feature: better overview and navigation for unresolved references 
+
+   - Currently:
+     - in text, AuthorYear shows Unresolved(key),
+       Numbered shows [n]
+     - in bibliography
+       - AuthorYear brings Unresolved(key) forward
+       - Numbered/FirstAppearance keeps them between the others
+       - Both: provide "(Cited on pages: 1)" links.
+
+     - Best strategy for the user: find "Unresolved(key)" in
+       bibliography and either find a database providing the key,
+       or follow the provided links to remove the in-text citations.
+
+       - The step "follow the provided links" seems problematic:
+
+         - user leaves the location where the links are collected
+
+           - (a) Maybe hyperlink with "Open in new window?"
+             - No, "_blank" has no effect within LO
+             - No, filling "Document path" with the location of current document
+               does not open a new window either.
+               - Seems to work when we start from a different
+                 document, though.
+                 - We could create a new doc with links to locations
+                   (bookmarks, not refmarks) in the original.
+
+           - (b) Some kind of java dialog?
+             - good: calls back to JabRef, so we could offer
+               "visit citation" and "remove all citations to this source".
+               Maybe even "locate this key in known bib sources"
+
+           - (c) Well, there is a "Back" button in LO, so getting back to
+             the list in the bibliography is not that hard.
+             - Users may need education (mention in the doc), because
+               following internal links within an ODT and then going
+               back is probably not common. (At least I did not think
+               about it at first)
+             - But of course JabRef/[Refresh] will rebuild the bibliography,
+               which raises the question: "Back to where?"
 
 ** TODO separate responsibilites
 
@@ -164,7 +144,7 @@ without asking the user to click somewhere else?
 
    With a numbered style, the user has no visual clue to distinguish
    AUTHORYEAR_PAR and AUTHORYEAR_INTEXT. It may be confusing why
-   we do not "Merge" when thay are mixed.
+   we do not "Merge" when they are mixed.
 
 ** combineCiteMarkers / unCombineCiteMarkers (aka Merge/Separate)
 
@@ -271,14 +251,9 @@ was to be able to add/remove citations to the group.
        - [X] for OO_storage_v001 compat mode, we need a bracketless version
          - added REFERENCE_MARK_ALWAYS_REMOVE_BRACKETS=true
 .
-** bug: refreshCiteMarkers destroys unresolved entries
+** feature: overview Unresolved
 
-   - When opening the wrong library, we get many unresolved entries.
 
-     Click on "Refresh" will remove reference
-     to some of the unresolved entries from the document.
-
-.
 ** "Cite in-text" with multiple entries                   :group_and_ungroup:
 
    - inserts "Au (2000); Bu (2001)"
@@ -373,17 +348,6 @@ was to be able to add/remove citations to the group.
 
    - consequence: with no space between, citations are not merged
 
-** Bug: CitationGroups without intervening space
-
- May lose first of consecutive citations without intervening space
-
- Situation
-
- - place two individual citations in the text, remove the space separating them
- - press the refresh button
-
- The first of the two citations is lost.
-
 ** Bug: consecutive citations in footnotes
 
 The 2nd of two consecutive citations is missed in footnotes by updateDocumentActionHelper
@@ -461,25 +425,6 @@ ref: file:OOBibBase.java::/OOBibBase.BIB_SECTION_END_NAME/
 
 Also: we should mark the end of the bibliography at creation.
 populateBibTextSection should only fill the gaps.
-
-** Refactor: createCitationGroup
-
-   Citation groups are created in
-   - combineCiteMarkers
-   - unCombineCiteMarkers
-   - insertEntry
-
-   Extract the common part, separate creation and fill-in
-
-   - creation of reference mark name differs between
-     combineCiteMarkers and insertEntry
-
-     TODO: consistent handling of citation groups (merged citations).
-     keyString generation differs from the one in combineCiteMarkers
-     in OOBibBase.insertEntry we get A,,C for (A,B,C) where could not look up B
-     In combineCiteMarkers we get A,C
-
-     In both cases, we are throwing away unresolved citation keys silently.
 
 ** Refactor: separate storage and presentation operations :storage_separation:
 
@@ -1147,11 +1092,174 @@ is embedded in the first, just before its end.
 
 Resolved: using safeInsertSpaces avoid creating overlapping citations this way.
 
-
-
+.
 ** DONE bug: "Separate" with multiples citations in same footnote
 
 java.lang.RuntimeException: CitationGroupsV001.setGlobalOrder: globalOrder.size() != citationGroups.size()
 
 - resolved: createVisualSortInput numbered within locations, not in Text partitions
+
+** DONE bug:  Numbered citation groups: show an extra "; " after the last number.
+
+   No, that is the empty pageInfo added by "Manage citations"
+
+   - location: [[file:OOBibBase.java::/Last minute editing.*page info/]]
+.
+** DONE bug: missing visual cursor?
+
+ref:
+- file:OOBibBase.java::1021
+- file:OOBibBase.java::/XTextViewCursor/
+- file:DocumentConnection.java::/XTextViewCursor/
+
+*** How to provoke:
+
+- Create a frame
+- Select it, so that the 'anchor' icon is visible.
+  - Now there is no cursor in the normal sense,
+    it is on the frame (but not within)
+- Click "Refresh"
+  - viewCursor.getStart();  throws
+
+   com.sun.star.uno.RuntimeException: no text selection
+
+	at org.libreoffice.uno/com.sun.star.lib.uno.environments.remote.Job.remoteUnoRequestRaisedException(Job.java:158)
+	at org.libreoffice.uno/com.sun.star.lib.uno.environments.remote.Job.execute(Job.java:122)
+	at org.libreoffice.uno/com.sun.star.lib.uno.environments.remote.JobQueue.enter(JobQueue.java:312)
+	at org.libreoffice.uno/com.sun.star.lib.uno.environments.remote.JobQueue.enter(JobQueue.java:281)
+	at org.libreoffice.uno/com.sun.star.lib.uno.environments.remote.JavaThreadPool.enter(JavaThreadPool.java:81)
+	at org.libreoffice.uno/com.sun.star.lib.uno.bridges.java_remote.java_remote_bridge.sendRequest(java_remote_bridge.java:619)
+	at org.libreoffice.uno/com.sun.star.lib.uno.bridges.java_remote.ProxyFactory$Handler.request(ProxyFactory.java:145)
+	at org.libreoffice.uno/com.sun.star.lib.uno.bridges.java_remote.ProxyFactory$Handler.invoke(ProxyFactory.java:129)
+
+	at com.sun.proxy.$Proxy52.getStart(Unknown Source)
+
+	at org.jabref@100.0.0/org.jabref.gui.openoffice.OOBibBase.visualSort(OOBibBase.java:1021)
+	at org.jabref@100.0.0/org.jabref.gui.openoffice.OOBibBase.getVisuallySortedCitationGroupIDs(OOBibBase.java:1097)
+	at org.jabref@100.0.0/org.jabref.gui.openoffice.OOBibBase.produceCitationMarkers(OOBibBase.java:2115)
+	at org.jabref@100.0.0/org.jabref.gui.openoffice.OOBibBase.updateDocumentActionHelper(OOBibBase.java:3286)
+	at org.jabref@100.0.0/org.jabref.gui.openoffice.OpenOfficePanel.lambda$initPanel$9(OpenOfficePanel.java:202)
+
+*** Gave up on initialPos, but now
+
+    findPositionOfTextRange(OOBibBase.java:792) throws:
+
+    com.sun.star.uno.RuntimeException: no text selection
+	at com.sun.star.lib.uno.environments.remote.Job.remoteUnoRequestRaisedException(Job.java:158) ~[libreoffice-7.1.0.jar:?]
+	at com.sun.star.lib.uno.environments.remote.Job.execute(Job.java:122) ~[libreoffice-7.1.0.jar:?]
+	at com.sun.star.lib.uno.environments.remote.JobQueue.enter(JobQueue.java:312) ~[libreoffice-7.1.0.jar:?]
+	at com.sun.star.lib.uno.environments.remote.JobQueue.enter(JobQueue.java:281) ~[libreoffice-7.1.0.jar:?]
+	at com.sun.star.lib.uno.environments.remote.JavaThreadPool.enter(JavaThreadPool.java:81) ~[libreoffice-7.1.0.jar:?]
+	at com.sun.star.lib.uno.bridges.java_remote.java_remote_bridge.sendRequest(java_remote_bridge.java:619) ~[libreoffice-7.1.0.jar:?]
+	at com.sun.star.lib.uno.bridges.java_remote.ProxyFactory$Handler.request(ProxyFactory.java:145) ~[libreoffice-7.1.0.jar:?]
+	at com.sun.star.lib.uno.bridges.java_remote.ProxyFactory$Handler.invoke(ProxyFactory.java:129) ~[libreoffice-7.1.0.jar:?]
+
+    at com.sun.proxy.$Proxy52.gotoRange(Unknown Source) ~[?:?]
+	at org.jabref.gui.openoffice.OOBibBase.findPositionOfTextRange(OOBibBase.java:792) ~[JabRef-100.0.0.jar:?]
+	at org.jabref.gui.openoffice.OOBibBase.visualSort(OOBibBase.java:1042) ~[JabRef-100.0.0.jar:?]
+	at org.jabref.gui.openoffice.OOBibBase.getVisuallySortedCitationGroupIDs(OOBibBase.java:1109) ~[JabRef-100.0.0.jar:?]
+	at org.jabref.gui.openoffice.OOBibBase.produceCitationMarkers(OOBibBase.java:2127) ~[JabRef-100.0.0.jar:?]
+	at org.jabref.gui.openoffice.OOBibBase.updateDocumentActionHelper(OOBibBase.java:3298) ~[JabRef-100.0.0.jar:?]
+	at org.jabref.gui.openoffice.OpenOfficePanel.lambda$initPanel$9(OpenOfficePanel.java:202) ~[JabRef-100.0.0.jar:?]
+
+*** xxx
+
+    Comment above https://docs.libreoffice.org/sw/html/unotxvw_8cxx_source.html#l00896
+
+    The problem seems to be that some methods, (e.g. getEnd()) require "text selection",
+    but we have some other kind.
+
+*** Question: How to get a functional XTextViewCursor
+
+In an .odt document:
+- create a frame
+- select the frame (click on it, so that the anchor is shown)
+- At this point there is no visible text cursor, I see green rectangles on the corners
+  and edges of the frame.
+
+- Connect with UNO (only succeeded with LibreOffice), get an XTextViewCursor cursor
+- cursor.isVisible() returns true
+- try cursor.gotoRange(range, false);
+- or  cursor.getStart()
+  It throws: com.sun.star.uno.RuntimeException: no text selection
+
+Comment above https://docs.libreoffice.org/sw/html/unotxvw_8cxx_source.html#l00896
+seems to suggest that the problem is that I have a selection that is not the "text selection" kind.
+
+The question is: is there a way to get an XTextViewCursor supporting
+cursor.gotoRange(range, false); and
+cursor.getPosition();
+without asking the user to click somewhere else?
+
+*** resolved; use XSelectionSupplier.getSelection and XSelectionSupplier.select
+
+    - by using XSelectionSupplier.getSelection and XSelectionSupplier.select
+      in visualSort() we can now get a functional visual cursor
+      when the user selected a Frame or an Image. We can also restore
+      the selection after.
+
+    - remaining problem: when the cursor is in a comment (annotation),
+      we get no selection, and the above does not work.
+      - Current workaround: ask the user to move the cursor.
+.
+** DONE bug: refreshCiteMarkers destroys unresolved entries
+
+   - When opening the wrong library, we get many unresolved entries.
+
+     Click on "Refresh" will remove reference
+     to some of the unresolved entries from the document.
+
+   - resolved: I believe this has been solved during reorganization.
+
+.
+** DONE Bug: CitationGroups without intervening space
+
+ May lose first of consecutive citations without intervening space
+
+ Situation
+
+ - place two individual citations in the text, remove the space separating them
+ - press the refresh button
+
+ The first of the two citations is lost.
+** DONE feature: unresolved references are not thrown away
+
+   - [X] Instead they appear in text and bibliography.
+
+   - [X] For AuthorYear, they are sorted as first (both in text and
+     bibliography) and shown as "Unresolved(citationKey)"
+
+   - [X] In the bibliography, Unresolved(citationKey) is followed by
+     "(Cited on pages: 1, 1)" where the page numbers a clickable
+     crossreferences to to corresponding citation groups.
+
+   - [ ] maybe we should use hyperlinks? That allows arbitrary label,
+         but the target cannot be a reference mark (but can be a bookmark)
+.
+
+
+** DONE refactor: createCitationGroup
+
+   Citation groups are created in
+   - combineCiteMarkers
+   - unCombineCiteMarkers
+   - insertEntry
+
+   Extract the common part, separate creation and fill-in
+
+   - creation of reference mark name differs between
+     combineCiteMarkers and insertEntry
+
+     TODO: consistent handling of citation groups (merged citations).
+     keyString generation differs from the one in combineCiteMarkers
+     in OOBibBase.insertEntry we get A,,C for (A,B,C) where could not look up B
+     In combineCiteMarkers we get A,C
+
+     In both cases, we are throwing away unresolved citation keys silently.
+
+   Resolved
+   - combineCiteMarkers: calls insertReferenceMark
+   - unCombineCiteMarkers: calls insertReferenceMark
+   - insertCitation (renamed from insertEntry) calls insertReferenceMark
+     - and does not sort the entries
 

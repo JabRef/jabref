@@ -1884,7 +1884,7 @@ class OOBibBase {
                     ex);
             }
 
-            sortBibEntryListForMulticite(entries, style);
+            // sortBibEntryListForMulticite(entries, style);
 
             /*
              * String keyString =
