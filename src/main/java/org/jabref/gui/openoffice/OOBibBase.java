@@ -1568,7 +1568,7 @@ class OOBibBase {
         String citText;
         // String pageInfo = getPageInfoForReferenceMarkName(documentConnection, name);
         Optional<String> pageInfo = cgs.getPageInfo(cgid);
-        citText = (pageInfo.isEmpty()
+        citText = ((pageInfo.isEmpty() || pageInfo.get().equals(""))
                    ? citationText
                    : style.insertPageInfo(citationText, pageInfo.get()));
 

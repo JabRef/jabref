@@ -5,9 +5,11 @@
 - file:../../../../../resources/l10n/JabRef_en.properties
 
 
-** bug:  Numbered citation groups: show an extra "; " after the last number.
+** DONE bug:  Numbered citation groups: show an extra "; " after the last number.
 
    No, that is the empty pageInfo added by "Manage citations"
+
+   - location: [[file:OOBibBase.java::/Last minute editing.*page info/]]
 
 *** feature or bug? : Manage citations creates empty pageInfo fields
 
