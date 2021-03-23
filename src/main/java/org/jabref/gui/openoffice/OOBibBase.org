@@ -4,6 +4,87 @@
 - file:../../gui/openoffice/
 - file:../../../../../resources/l10n/JabRef_en.properties
 
+** Bug: two-column numbering                              :orderOfAppearance:
+
+Citations are numbered in top-down left-to-right order even in
+two-column layout.
+
+Surprisingly: even with *single column layout*, but viewing in
+two-pages side-by-side mode, citations are numbered in top-down
+left-to-right order as seen on the screen: citations in the top half
+of the 2nd page get before citations in the bottom half of the 1st
+page.
+
+
+Consequences:
+
+- citations higher in the 2nd column get lower numbers than those at
+  the bottom of the first.
+
+- combineCiteMarkers / Merge will miss opportunities in two-column layout
+
+  Since combineCiteMarkers checks relation in visual order, it will
+  not see otherwise consecutive citation marks as such, and does not
+  even try to combine them.
+
+*** The problem behind
+
+The main text can contain several XTextContent kinds,
+for example footnotes, frames. It is not always clear where should we
+insert their content into the firstAppearance order.
+
+Footnotes are already handled specially and their content is
+considered to be at the location of the footnote mark.
+
+Frames however can be anchored in several ways, with multiple options
+for wrapping. The question is: how to decide where the content of a
+frame should reside in firstAppearance order.
+
+The current solution (visual top-down left-to-right) gives an answer
+for this, but is arguably wrong with multi-column layout.
+
+Ideas:
+
+- LibreOffice already has a solution to this numbering question. Can
+  we reuse their solution?
+
+  What does LibreOffice do?
+
+  - Multicolumn handled
+  - Citation in figure caption: [0] unless citation to the same source
+    also appears in the text.
+  - Citation in footnote: ...
+
+
+*** related
+
+- "Trying to understand Anchors (XTextRange)"
+  https://forum.openoffice.org/en/forum/viewtopic.php?f=25&t=82792&hilit=xtextviewcursor
+  Discussion on how to linearize OO doc content.
+  - It ends with XTextViewCursor
+
+
+
+
+** Question: can we make LO to protect our ranges?
+
+   Note: protected in the sense that their content should not be changed.
+   We allow deletion, move, copy (if we can).
+
+   - TextField: OO/LO has several variants of text fields,
+     inserting content from somewhere else (variables, reference mark ...).
+
+     - good: these behave as a unit, no insert inside
+
+     - bad: no formatting inside
+       - Even a TextField repeating text from a reference mark or title
+         does not allow e.g. "H<sub>2</sub>O" or other formatting.
+
+   - hyperlink
+     - interestingly, can be inserted into a TextBox.
+       There, it behaves like a TextField (single unit, no formatting)
+
+** Question: can we check if an XTextRange contains an anchor?
 
 ** feature or bug? : Manage citations creates empty pageInfo fields :storage:
 
@@ -80,18 +161,25 @@ with no pageInfo.
 
    - [[Question: can we make LO to protect our ranges?]]
    - [[Question: can we check if an XTextRange contains an anchor?]]
+.
+** Question: "(Cited on pages: 1)"
 
-** Question: can we make LO to protect our ranges?
+   - currently "Cited on pages" is in Localization.lang.
+     - In case its use is extended to resolved citations,
+       the format should probably move to the style.
+       - Or somewhere else?
 
-   Note: protected in the sense that their content should not be changed.
-   We allow deletion, move, copy (if we can).
+** feature: link from citation to bibliography
 
-   - TextField: OO/LO has several variants of text fields,
-     inserting content fro somewhere else.
-     - good: 
+   - problem: needs support from OOBibStyle
+     - "[1-7]" : link to "[1]"
+     - "[Smith 2001a-c]" : link to "Smith 2001a"
+     - "[Smith 2001; Jones 2002]" we do not want to parse these in
+       OOBibBase, so probably OOBibStyle should tell us about the available parts.
 
-** Question: can we check if an XTextRange contains an anchor?
-
+   - hyperlink in a reference mark (or bookmark)? Seems doable. Needs bookmarks for
+     individual entries in the bibliography.
+.
 ** feature: better overview and navigation for unresolved references 
 
    - Currently:
@@ -661,66 +749,6 @@ In LO,
 - **Comments** have no name. Can be moved and copied.
 
 - Other possibilities? (Markup in hidden text?)
-
-** Bug: two-column numbering                              :orderOfAppearance:
-
-Citations are numbered in top-down left-to-right order even in
-two-column layout.
-
-Surprisingly: even with *single column layout*, but viewing in
-two-pages side-by-side mode, citations are numbered in top-down
-left-to-right order as seen on the screen: citations in the top half
-of the 2nd page get before citations in the bottom half of the 1st
-page.
-
-
-Consequences:
-
-- citations higher in the 2nd column get lower numbers than those at
-  the bottom of the first.
-
-- combineCiteMarkers / Merge will miss opportunities in two-column layout
-
-  Since combineCiteMarkers checks relation in visual order, it will
-  not see otherwise consecutive citation marks as such, and does not
-  even try to combine them.
-
-*** The problem behind
-
-The main text can contain several XTextContent kinds,
-for example footnotes, frames. It is not always clear where should we
-insert their content into the firstAppearance order.
-
-Footnotes are already handled specially and their content is
-considered to be at the location of the footnote mark.
-
-Frames however can be anchored in several ways, with multiple options
-for wrapping. The question is: how to decide where the content of a
-frame should reside in firstAppearance order.
-
-The current solution (visual top-down left-to-right) gives an answer
-for this, but is arguably wrong with multi-column layout.
-
-Ideas:
-
-- LibreOffice already has a solution to this numbering question. Can
-  we reuse their solution?
-
-  What does LibreOffice do?
-
-  - Multicolumn handled
-  - Citation in figure caption: [0] unless citation to the same source
-    also appears in the text.
-  - Citation in footnote: ...
-
-
-*** related
-
-- "Trying to understand Anchors (XTextRange)"
-  https://forum.openoffice.org/en/forum/viewtopic.php?f=25&t=82792&hilit=xtextviewcursor
-  Discussion on how to linearize OO doc content.
-  - It ends with XTextViewCursor
-
 
 
 ** Bibliography:
