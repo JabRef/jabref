@@ -121,27 +121,111 @@ class BibDatabaseTest {
     }
 
     @Test
-    void insertStringUpdatesStringList() {
+    void databaseHasStringAfterInsertion() {
         BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         database.addString(string);
         assertFalse(database.hasNoStrings());
+    }
+
+    @Test
+    void databaseStringKeySetIncreasesAfterStringInsertion() {
+        assertEquals(0, database.getStringKeySet().size());
+
+        BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
+        database.addString(string);
+
         assertEquals(1, database.getStringKeySet().size());
+    }
+
+    @Test
+    void databaseStringCountIncreasesAfterStringInsertion() {
+        assertEquals(0, database.getStringCount());
+
+        BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
+        database.addString(string);
+
         assertEquals(1, database.getStringCount());
+    }
+
+    @Test
+    void databaseContainsNewStringInStringValues() {
+        BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
+        database.addString(string);
+
         assertTrue(database.getStringValues().contains(string));
+    }
+
+    @Test
+    void retrieveInsertedStringById() {
+        BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
+        database.addString(string);
+
         assertTrue(database.getStringKeySet().contains(string.getId()));
+    }
+
+    @Test
+    void stringIsNotModifiedAfterInsertion() {
+        BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
+        database.addString(string);
+
         assertEquals(string, database.getString(string.getId()));
     }
 
     @Test
-    void removeStringUpdatesStringList() {
+    void databaseHasNoStringsAfterRemoval() {
         BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
         database.addString(string);
+        assertFalse(database.hasNoStrings());
+
         database.removeString(string.getId());
         assertTrue(database.hasNoStrings());
+    }
+
+    @Test
+    void stringKeySizeIsEmptyAfterRemoval() {
+        BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
+        database.addString(string);
+
+        database.removeString(string.getId());
         assertEquals(0, database.getStringKeySet().size());
+    }
+
+    @Test
+    void stringCountIsZeroAfterRemoval() {
+        BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
+        database.addString(string);
+        assertEquals(1, database.getStringCount());
+
+        database.removeString(string.getId());
         assertEquals(0, database.getStringCount());
+    }
+
+    @Test
+    void stringValuesDoesNotContainStringAfterRemoval() {
+        BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
+        database.addString(string);
+        assertTrue(database.getStringValues().contains(string));
+
+        database.removeString(string.getId());
         assertFalse(database.getStringValues().contains(string));
+    }
+
+    @Test
+    void stringKeySetDoesNotContainStringIdAfterRemoval() {
+        BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
+        database.addString(string);
+        assertTrue(database.getStringKeySet().contains(string.getId()));
+
+        database.removeString(string.getId());
         assertFalse(database.getStringKeySet().contains(string.getId()));
+
+    @Test
+    void databaseReturnsNullForRemovedString() {
+        BibtexString string = new BibtexString("DSP", "Digital Signal Processing");
+        database.addString(string);
+        assertEquals(string, database.getString(string.getId()));
+
+        database.removeString(string.getId());
         assertNull(database.getString(string.getId()));
     }
 
