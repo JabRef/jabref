@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.gui.Globals;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.exporter.AtomicFileWriter;
@@ -39,8 +40,6 @@ import org.jabref.model.util.FileUpdateMonitor;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.jabref.gui.Globals.entryTypesManager;
 
 /**
  * This class manages all aspects of the study process related to the repository.
@@ -422,7 +421,7 @@ class StudyRepository {
             databaseWriter.saveDatabase(new BibDatabaseContext(entries));
         }
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(pathToFile, savePreferences.getEncoding(), savePreferences.shouldMakeBackup())) {
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, savePreferences, entryTypesManager);
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, savePreferences, Globals.entryTypesManager);
             databaseWriter.saveDatabase(new BibDatabaseContext(entries));
         } catch (UnsupportedCharsetException ex) {
             throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", savePreferences.getEncoding().displayName()), ex);

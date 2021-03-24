@@ -116,7 +116,7 @@ public class SlrGitHandler extends GitHandler {
                 content = true;
                 continue;
             }
-            // Only add "new" lines to diff (no context lines
+            // Only add "new" lines to diff (no context lines)
             if (content && currentToken.startsWith("+")) {
                 // Do not include + sign
                 if (joiner != null) {
