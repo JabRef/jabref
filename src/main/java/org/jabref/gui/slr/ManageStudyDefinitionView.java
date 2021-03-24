@@ -130,9 +130,9 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         addQueryButton.setTooltip(new Tooltip(Localization.lang("Add")));
         helpIcon.setTooltip(new Tooltip(new StringJoiner("\n")
                 .add(Localization.lang("Query terms are separated by spaces."))
-                .add(Localization.lang("All query terms are joined using the logical AND, and OR operators."))
-                .add(Localization.lang("If the sequence of terms is relevant wrap them in double quotes (\")."))
-                .add(Localization.lang("An example: ") + "rain AND (clouds OR drops) AND \"precipitation distribution\"")
+                .add(Localization.lang("All query terms are joined using the logical AND, and OR operators") + ".")
+                .add(Localization.lang("If the sequence of terms is relevant wrap them in double quotes") + "(\").")
+                .add(Localization.lang("An example:") + " rain AND (clouds OR drops) AND \"precipitation distribution\"")
                 .toString()));
     }
 
