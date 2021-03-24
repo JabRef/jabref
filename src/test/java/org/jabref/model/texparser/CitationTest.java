@@ -11,9 +11,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 public class CitationTest {
@@ -101,7 +100,7 @@ public class CitationTest {
     public void equalsTest() {
         Citation citation1 = new Citation(path, 10, 1, 4, "lineText");
         Citation citation2 = null;
-        assertTrue(citation.equals(citation1));
-        assertFalse(citation.equals(citation2));
+        assertEquals(citation, citation1);
+        assertNotEquals(citation, citation2);
     }
 }
