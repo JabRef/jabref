@@ -218,6 +218,7 @@ class BibDatabaseTest {
 
         database.removeString(string.getId());
         assertFalse(database.getStringKeySet().contains(string.getId()));
+    }
 
     @Test
     void databaseReturnsNullForRemovedString() {
