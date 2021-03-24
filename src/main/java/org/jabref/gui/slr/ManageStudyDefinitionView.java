@@ -42,6 +42,9 @@ import com.airhacks.afterburner.views.ViewLoader;
  * defined in the FXML file.
  */
 public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> {
+    Path workingDirectory;
+    DialogService dialogService;
+
     private final ManageStudyDefinitionViewModel viewModel;
 
     @FXML private TextField studyTitle;
@@ -70,21 +73,18 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @FXML private TableColumn<StudyDatabase, StudyDatabase> enabledTableEntry;
     @FXML private TableColumn<StudyDatabase, StudyDatabase> removeTableEntry;
 
-    Path workingDirectory;
-    DialogService dialogService;
-
     /**
      * This can be used to either create new study objects or edit existing ones.
      *
-     * @param study null if a new study is created. Otherwise the study object to edit.
+     * @param study          null if a new study is created. Otherwise the study object to edit.
      * @param studyDirectory the directory where the study to edit is located (null if a new study is created)
      */
     public ManageStudyDefinitionView(Study study, Path studyDirectory, ImportFormatPreferences importFormatPreferences, DialogService dialogService, Path workingDirectory) {
         // If an existing study is edited, open the directory dialog at the directory the study is stored
         this.workingDirectory = Objects.isNull(studyDirectory) ? workingDirectory : studyDirectory;
-        this.setTitle(Objects.isNull(studyDirectory) ? Localization.lang("Define study parameters") : Localization.lang("Manage study definition") );
+        this.setTitle(Objects.isNull(studyDirectory) ? Localization.lang("Define study parameters") : Localization.lang("Manage study definition"));
         this.dialogService = dialogService;
-        viewModel = new ManageStudyDefinitionViewModel(study, studyDirectory,importFormatPreferences);
+        viewModel = new ManageStudyDefinitionViewModel(study, studyDirectory, importFormatPreferences);
         ViewLoader.view(this).load().setAsDialogPane(this);
 
         saveButton = ((Button) this.getDialogPane().lookupButton(saveButtonType));

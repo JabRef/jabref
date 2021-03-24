@@ -143,7 +143,7 @@ public class SlrGitHandler extends GitHandler {
                 if (currentContent.startsWith("% Encoding:")) {
                     int endOfEncoding = currentContent.indexOf("\n");
                     // Include Encoding and the empty line
-                    prefix = currentContent.substring(0,endOfEncoding + 1) + "\n";
+                    prefix = currentContent.substring(0, endOfEncoding + 1) + "\n";
                     currentContent = currentContent.substring(endOfEncoding + 2);
                 }
                 Files.writeString(path, prefix + patch.get(path) + currentContent, StandardCharsets.UTF_8);

@@ -52,7 +52,7 @@ public class ManageStudyDefinitionViewModel {
         queries.addAll(study.getQueries().stream().map(StudyQuery::getQuery).collect(Collectors.toList()));
         databases.addAll(study.getDatabases());
         computeNonSelectedDatabases(importFormatPreferences);
-        if(!Objects.isNull(studyDirectory)) {
+        if (!Objects.isNull(studyDirectory)) {
             this.directory.set(studyDirectory.toString());
         }
     }

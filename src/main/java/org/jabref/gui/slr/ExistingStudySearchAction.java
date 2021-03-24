@@ -32,6 +32,8 @@ public class ExistingStudySearchAction extends SimpleCommand {
     protected final DialogService dialogService;
     protected final Path workingDirectory;
 
+    Path studyDirectory;
+
     private final JabRefFrame frame;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
@@ -39,7 +41,6 @@ public class ExistingStudySearchAction extends SimpleCommand {
     private final ImportFormatPreferences importFormatPreferneces;
     private final SavePreferences savePreferences;
     // This can be either populated before crawl is called or is populated in the call using the directory dialog. This is helpful if the directory is selected in a previous dialog/UI element
-    Path studyDirectory;
 
     public ExistingStudySearchAction(JabRefFrame frame, FileUpdateMonitor fileUpdateMonitor, TaskExecutor taskExecutor, PreferencesService preferencesService) {
         this.frame = frame;
