@@ -320,7 +320,6 @@ public class AuthorListTest {
 
         // Check caching
         assertEquals(a, b);
-        // assertSame(a, b);
 
         assertEquals("Smith, John and Black Brown, Peter",
                 AuthorList.fixAuthorLastNameFirstCommas("John Smith and Black Brown, Peter", false, false));
