@@ -1,0 +1,798 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" class="note" demote-non-dropping-particle="sort-only" initialize-with-hyphen="true">
+  <info>
+    <title>Södertörns högskola - Oxford</title>
+    <title-short>SHO</title-short>
+    <id>http://www.zotero.org/styles/sodertorns-hogskola-oxford</id>
+    <link href="http://www.zotero.org/styles/sodertorns-hogskola-oxford" rel="self"/>
+    <link href="http://www.zotero.org/styles/masarykova-univerzita-pravnicka-fakulta" rel="template"/>
+    <link href="https://www.sh.se/download/18.43876c7216bc1b505089d2fe/1565955201844/Oxford_referenser_1.1_2019.pdf" rel="documentation"/>
+    <author>
+      <name>Saga Nylund</name>
+      <email>saga_nylund@hotmail.com</email>
+    </author>
+    <category citation-format="note"/>
+    <category field="humanities"/>
+    <category field="social_science"/>
+    <summary>Södertörn University Oxford style without ibid</summary>
+    <updated>2021-02-18T14:14:20+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+  <locale xml:lang="sv">
+    <terms>
+      <term name="accessed">hämtad</term>
+    </terms>
+  </locale>
+  <macro name="page-range">
+    <label variable="page" form="short" suffix=" "/>
+    <text variable="page"/>
+  </macro>
+  <macro name="locator-or-period">
+    <choose>
+      <if variable="locator" match="none">
+        <text value="."/>
+      </if>
+      <else>
+        <text prefix=", " macro="citation-locator" suffix="."/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="contributors-full">
+    <choose>
+      <if variable="author">
+        <names variable="author">
+          <name name-as-sort-order="all" sort-separator=",&#160;" and="symbol" delimiter=", " delimiter-precedes-last="never">
+            <name-part name="family"/>
+          </name>
+        </names>
+      </if>
+      <else-if variable="editor">
+        <names variable="editor">
+          <name name-as-sort-order="all" sort-separator=",&#160;" and="symbol" delimiter=", " delimiter-precedes-last="never">
+            <name-part name="family"/>
+          </name>
+          <label prefix=" (" form="short" plural="contextual" suffix=")."/>
+        </names>
+      </else-if>
+      <else-if variable="composer">
+        <names variable="composer">
+          <name name-as-sort-order="all" sort-separator=",&#160;" and="symbol" delimiter=", " delimiter-precedes-last="never">
+            <name-part name="family"/>
+          </name>
+        </names>
+      </else-if>
+    </choose>
+  </macro>
+  <macro name="contributors-long">
+    <choose>
+      <if variable="author">
+        <names variable="author">
+          <name sort-separator=",&#160;" and="symbol" delimiter=", " delimiter-precedes-last="never">
+            <name-part name="family"/>
+          </name>
+        </names>
+      </if>
+      <else-if variable="editor">
+        <names variable="editor">
+          <name sort-separator=",&#160;" and="symbol" delimiter=", " delimiter-precedes-last="never">
+            <name-part name="family"/>
+          </name>
+          <label prefix=" (" form="short" plural="contextual" suffix=")."/>
+        </names>
+      </else-if>
+      <else-if variable="composer">
+        <names variable="composer">
+          <name sort-separator=",&#160;" and="symbol" delimiter=", " delimiter-precedes-last="never">
+            <name-part name="family"/>
+          </name>
+        </names>
+      </else-if>
+    </choose>
+  </macro>
+  <macro name="contributors-short">
+    <choose>
+      <if variable="author">
+        <names variable="author">
+          <name sort-separator=",&#160;" and="symbol" delimiter=", " delimiter-precedes-last="never" form="short">
+            <name-part name="family"/>
+          </name>
+        </names>
+      </if>
+      <else-if variable="editor">
+        <names variable="editor">
+          <name sort-separator=",&#160;" and="symbol" delimiter=", " delimiter-precedes-last="never">
+            <name-part name="family"/>
+          </name>
+          <label prefix=" (" form="short" plural="contextual" suffix=")."/>
+        </names>
+      </else-if>
+      <else-if variable="composer">
+        <names variable="composer">
+          <name sort-separator=",&#160;" and="symbol" delimiter=", " delimiter-precedes-last="never" form="short">
+            <name-part name="family"/>
+          </name>
+        </names>
+      </else-if>
+    </choose>
+  </macro>
+  <macro name="container-contributors">
+    <choose>
+      <if variable="container-author">
+        <names variable="container-author">
+          <name name-as-sort-order="all" sort-separator=",&#160;" and="symbol" delimiter=", " delimiter-precedes-last="never">
+            <name-part name="family"/>
+          </name>
+        </names>
+      </if>
+      <else>
+        <choose>
+          <if type="chapter paper-conference" match="any">
+            <names variable="editor">
+              <label prefix=" " form="short" plural="contextual" suffix=". "/>
+              <name sort-separator=",&#160;" and="symbol" delimiter=", " delimiter-precedes-last="never">
+                <name-part name="family"/>
+              </name>
+            </names>
+          </if>
+        </choose>
+      </else>
+    </choose>
+  </macro>
+  <macro name="sort-bibliography">
+    <choose>
+      <if variable="author editor composer" match="any">
+        <text macro="contributors-full"/>
+      </if>
+      <else>
+        <text variable="title"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="title-long">
+    <text variable="title"/>
+  </macro>
+  <macro name="title-short">
+    <group delimiter=". ">
+      <text variable="title" form="short"/>
+    </group>
+  </macro>
+  <macro name="container">
+    <choose>
+      <if type="chapter entry entry-dictionary entry-encyclopedia" match="any">
+        <choose>
+          <if type="chapter entry entry-dictionary entry-encyclopedia" match="any">
+            <text term="in" suffix=" "/>
+          </if>
+        </choose>
+        <choose>
+          <if variable="container-title">
+            <text variable="container-title" font-style="italic"/>
+            <choose>
+              <if type="chapter entry entry-dictionary entry-encyclopedia" match="any">
+                <text prefix=", " macro="medium"/>
+              </if>
+            </choose>
+            <text prefix=", " macro="container-contributors"/>
+            <choose>
+              <if variable="edition" match="any">
+                <text prefix=", " variable="edition"/>
+                <text prefix=" " term="edition" form="short"/>
+              </if>
+            </choose>
+          </if>
+          <else-if variable="volume">
+            <text prefix=", " term="volume" form="long" suffix=". "/>
+            <text variable="volume"/>
+          </else-if>
+        </choose>
+      </if>
+      <else-if type="article-journal article-magazine article-newspaper paper-conference" match="any">
+        <text variable="container-title" font-style="italic"/>
+        <text prefix=" " macro="medium"/>
+      </else-if>
+      <else-if type="webpage post post-weblog" match="any">
+        <text variable="container-title" suffix=", "/>
+      </else-if>
+    </choose>
+  </macro>
+  <macro name="container-full">
+    <choose>
+      <if type="chapter entry entry-dictionary entry-encyclopedia" match="any">
+        <choose>
+          <if type="chapter entry entry-dictionary entry-encyclopedia" match="any">
+            <text term="in" suffix=" "/>
+          </if>
+        </choose>
+        <choose>
+          <if variable="container-title">
+            <text variable="container-title" font-style="italic"/>
+            <choose>
+              <if type="chapter entry entry-dictionary entry-encyclopedia" match="any">
+                <text prefix=", " macro="medium"/>
+              </if>
+            </choose>
+            <text prefix=", " macro="container-contributors"/>
+            <choose>
+              <if variable="edition" match="any">
+                <text prefix=", " variable="edition"/>
+                <text prefix=" " term="edition" form="short"/>
+              </if>
+            </choose>
+          </if>
+          <else-if variable="volume">
+            <text prefix=", " term="volume" form="long" suffix=". "/>
+            <text variable="volume"/>
+          </else-if>
+        </choose>
+      </if>
+      <else-if type="article-journal article-magazine article-newspaper paper-conference" match="any">
+        <text variable="container-title" font-style="italic"/>
+        <text prefix=" " macro="medium"/>
+      </else-if>
+      <else-if type="webpage post post-weblog" match="any">
+        <text variable="container-title" suffix=", "/>
+      </else-if>
+    </choose>
+  </macro>
+  <macro name="publisher-place">
+    <group delimiter="; ">
+      <choose>
+        <if variable="publisher-place URL" match="any">
+          <text variable="publisher-place"/>
+        </if>
+      </choose>
+    </group>
+  </macro>
+  <macro name="printers">
+    <group delimiter="; ">
+      <choose>
+        <if variable="publisher URL" match="any">
+          <text variable="publisher"/>
+        </if>
+      </choose>
+    </group>
+  </macro>
+  <macro name="publisher">
+    <choose>
+      <if type="book report chapter entry entry-dictionary entry-encyclopedia paper-conference thesis map figure graphic" match="any">
+        <text prefix="(" macro="publisher-place" suffix=": "/>
+        <text macro="printers" suffix=", "/>
+        <text macro="issued-year" suffix=")"/>
+      </if>
+      <else>
+        <text macro="printers"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="issued-year">
+    <choose>
+      <if variable="issued" match="none">
+        <text term="no date" form="short"/>
+      </if>
+      <else>
+        <date variable="issued">
+          <date-part name="year"/>
+        </date>
+      </else>
+    </choose>
+  </macro>
+  <macro name="issued">
+    <choose>
+      <if type="article-journal" match="any">
+        <choose>
+          <if variable="volume" match="none">
+            <text prefix=" " term="issue" form="short" suffix="&#160;"/>
+            <text variable="issue" suffix=" "/>
+          </if>
+          <else-if variable="issue" match="none">
+            <text prefix=" " term="volume" form="short" suffix="&#160;"/>
+            <text variable="volume" suffix=" "/>
+          </else-if>
+          <else>
+            <text variable="volume"/>
+            <text prefix=":" variable="issue" suffix=" "/>
+          </else>
+        </choose>
+        <choose>
+          <if variable="issued" match="any">
+            <date prefix="(" variable="issued" suffix=")">
+              <date-part name="year" range-delimiter="&#8211;"/>
+            </date>
+          </if>
+        </choose>
+      </if>
+      <else-if type="article-magazine article-newspaper" match="any">
+        <choose>
+          <if variable="issued" match="any">
+            <date variable="issued">
+              <date-part name="day" suffix="/"/>
+              <date-part name="month" form="numeric"/>
+              <date-part prefix=" " name="year"/>
+            </date>
+          </if>
+        </choose>
+        <choose>
+          <if variable="volume">
+            <text prefix=", " term="volume" form="short" suffix="&#160;"/>
+            <text variable="volume"/>
+          </if>
+        </choose>
+        <choose>
+          <if variable="issue">
+            <text prefix=", " term="issue" form="short" suffix="&#160;"/>
+            <text variable="issue"/>
+          </if>
+        </choose>
+      </else-if>
+      <else-if type="post post-weblog broadcast personal_communication interview manuscript" match="any">
+        <date variable="issued">
+          <date-part name="day" suffix="/"/>
+          <date-part name="month" suffix=" " form="numeric"/>
+          <date-part name="year"/>
+        </date>
+      </else-if>
+      <else>
+        <date variable="issued">
+          <date-part name="year" range-delimiter="&#8211;"/>
+        </date>
+      </else>
+    </choose>
+  </macro>
+  <macro name="citation-locator">
+    <label variable="locator" form="short" suffix="&#160;"/>
+    <text variable="locator"/>
+  </macro>
+  <macro name="collection">
+    <text variable="collection-title"/>
+    <choose>
+      <if type="report" match="any">
+        <text prefix=" " variable="number"/>
+      </if>
+      <else>
+        <text prefix=" " variable="collection-number"/>
+      </else>
+    </choose>
+    <choose>
+      <if variable="collection-editor">
+        <text prefix=", " term="editor" form="verb-short" text-case="capitalize-first" suffix=" "/>
+      </if>
+    </choose>
+  </macro>
+  <macro name="identifier">
+    <group delimiter="; ">
+      <choose>
+        <if variable="URL">
+          <text variable="URL"/>
+        </if>
+      </choose>
+    </group>
+  </macro>
+  <macro name="medium">
+    <choose>
+      <if type="motion_picture musical_score song broadcast" match="any">
+        <text prefix="[" variable="medium" suffix="]"/>
+      </if>
+      <else>
+        <text variable="medium"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="genre">
+    <choose>
+      <if type="thesis manuscript speech" match="none">
+        <text prefix="[" variable="genre" suffix="]"/>
+      </if>
+      <else>
+        <text variable="genre"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="archive">
+    <choose>
+      <if variable="archive" match="any">
+        <text variable="archive"/>
+        <text prefix=", " variable="archive_location"/>
+      </if>
+      <else>
+        <text variable="source"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="quoted">
+    <group prefix="[" suffix="]">
+      <text term="accessed" form="short" suffix="&#160;"/>
+      <date variable="accessed">
+        <date-part name="year" suffix="-"/>
+        <date-part name="month" suffix="-" form="numeric"/>
+        <date-part name="day"/>
+      </date>
+    </group>
+  </macro>
+  <citation et-al-min="20" et-al-use-first="1" disambiguate-add-names="true">
+    <layout delimiter="; ">
+      <choose>
+        <if position="subsequent">
+          <choose>
+            <if variable="author editor composer" match="none">
+              <choose>
+                <if type="entry entry-dictionary entry-encyclopedia article-magazine article-journal" match="any">
+                  <text prefix="&quot;" macro="title-short" suffix="&quot;, "/>
+                  <text variable="container-title" font-style="italic"/>
+                </if>
+                <else>
+                  <text macro="container"/>
+                  <text macro="title-short" font-style="italic"/>
+                  <choose>
+                    <if type="webpage" match="none">
+                      <text prefix=" " macro="issued-year"/>
+                    </if>
+                  </choose>
+                </else>
+              </choose>
+            </if>
+            <else>
+              <text macro="contributors-short"/>
+              <text prefix=" " macro="issued-year"/>
+            </else>
+          </choose>
+          <text macro="locator-or-period"/>
+        </if>
+        <else>
+          <choose>
+            <if type="chapter entry entry-dictionary entry-encyclopedia" match="any">
+              <text macro="contributors-long" suffix=", "/>
+              <text prefix="&quot;" macro="title-long" suffix="&quot;, "/>
+              <text macro="container"/>
+              <text prefix=", " variable="volume" text-case="capitalize-first"/>
+              <text prefix=" " macro="publisher"/>
+              <text macro="locator-or-period"/>
+            </if>
+            <else-if type="book" match="any">
+              <text macro="contributors-long" suffix=", "/>
+              <text macro="title-long" font-style="italic"/>
+              <choose>
+                <if variable="edition" match="any">
+                  <text prefix=", " variable="edition"/>
+                  <text prefix=" " term="edition" form="short" suffix=" "/>
+                </if>
+              </choose>
+              <text prefix=" " macro="publisher"/>
+              <text macro="locator-or-period"/>
+            </else-if>
+            <else-if type="webpage post post-weblog" match="any">
+              <choose>
+                <if variable="author" match="none">
+                  <text macro="container"/>
+                </if>
+                <else>
+                  <text macro="contributors-long" suffix=", "/>
+                </else>
+              </choose>
+              <text macro="title-long" font-style="italic" suffix=", "/>
+              <text macro="genre" suffix=", "/>
+              <text macro="issued"/>
+              <choose>
+                <if variable="URL" match="any">
+                  <text prefix=", " macro="page-range"/>
+                  <text prefix=", " macro="identifier"/>
+                  <text prefix=" " macro="quoted" suffix="."/>
+                </if>
+                <else>
+                  <text prefix=", " macro="page-range" suffix="."/>
+                </else>
+              </choose>
+            </else-if>
+            <else-if type="article-magazine article-newspaper" match="any">
+              <text macro="contributors-long" suffix=", "/>
+              <text prefix="&quot;" macro="title-long" suffix="&quot;, "/>
+              <text macro="container-full"/>
+              <text prefix=", " macro="issued"/>
+              <choose>
+                <if variable="URL" match="any">
+                  <text prefix=", " macro="page-range"/>
+                  <text prefix=", " macro="identifier"/>
+                  <text prefix=" " macro="quoted" suffix="."/>
+                </if>
+                <else>
+                  <text prefix=", " macro="page-range" suffix="."/>
+                </else>
+              </choose>
+            </else-if>
+            <else-if type="article-journal" match="any">
+              <text macro="contributors-long" suffix=", "/>
+              <text prefix="&quot;" macro="title-long" suffix="&quot;, "/>
+              <text macro="container"/>
+              <text prefix=" " macro="issued"/>
+              <text prefix=", doi:" variable="DOI"/>
+              <text macro="locator-or-period"/>
+            </else-if>
+            <else-if type="paper-conference speech" match="any">
+              <text macro="contributors-long" suffix=", "/>
+              <text prefix="&quot;" macro="title-long" suffix="&quot;, "/>
+              <text prefix=" " macro="genre" suffix=", "/>
+              <text variable="event"/>
+              <text prefix=", " macro="container"/>
+              <text prefix=" " macro="publisher"/>
+              <choose>
+                <if variable="DOI" match="any">
+                  <text prefix=", doi:" variable="DOI"/>
+                </if>
+              </choose>
+              <text macro="locator-or-period"/>
+            </else-if>
+            <else-if type="thesis" match="any">
+              <text macro="contributors-long" suffix=", "/>
+              <text macro="title-long" font-style="italic"/>
+              <text prefix=", " macro="genre"/>
+              <text prefix=" " macro="publisher"/>
+              <text macro="locator-or-period"/>
+            </else-if>
+            <else-if type="report" match="any">
+              <text macro="contributors-full" suffix=", "/>
+              <choose>
+                <if variable="author" match="none">
+                  <text macro="printers" suffix=", "/>
+                </if>
+              </choose>
+              <text macro="title-long" font-style="italic"/>
+              <text prefix=", " macro="collection"/>
+              <text prefix=" " macro="publisher"/>
+              <choose>
+                <if variable="URL" match="any">
+                  <text prefix=", " macro="identifier"/>
+                  <text prefix=" " macro="quoted"/>
+                </if>
+              </choose>
+              <text macro="locator-or-period"/>
+            </else-if>
+            <else-if type="map figure graphic" match="any">
+              <text macro="contributors-full" suffix=", "/>
+              <text macro="title-long" font-style="italic"/>
+              <text prefix=", " macro="medium"/>
+              <text prefix=", " macro="genre"/>
+              <text prefix=", " variable="scale"/>
+              <choose>
+                <if variable="publisher publisher-place" match="any">
+                  <text prefix=" " macro="publisher"/>
+                </if>
+                <else>
+                  <text prefix=", " macro="issued-year"/>
+                </else>
+              </choose>
+              <text prefix=", " variable="archive"/>
+              <text prefix=", " variable="source"/>
+              <choose>
+                <if variable="URL" match="any">
+                  <text prefix=", " macro="identifier"/>
+                  <text prefix=" " macro="quoted" suffix="."/>
+                </if>
+                <else>
+                  <text value="."/>
+                </else>
+              </choose>
+            </else-if>
+            <else>
+              <text macro="contributors-long" suffix=", "/>
+              <text macro="title-long" font-style="italic"/>
+              <text prefix=", " macro="genre"/>
+              <text prefix=", " macro="medium"/>
+              <choose>
+                <if variable="URL" match="any">
+                  <text prefix=", " macro="issued"/>
+                  <text prefix=", " macro="publisher"/>
+                  <text prefix=", " macro="citation-locator"/>
+                  <text prefix=", " macro="identifier"/>
+                  <text prefix=" " macro="quoted" suffix="."/>
+                </if>
+                <else-if variable="issued" match="none">
+                  <choose>
+                    <if variable="publisher publisher-place" match="any">
+                      <text prefix=", " macro="publisher"/>
+                    </if>
+                  </choose>
+                  <choose>
+                    <if variable="locator" match="none">
+                      <text value="."/>
+                    </if>
+                    <else>
+                      <text prefix=", " macro="citation-locator" suffix="."/>
+                    </else>
+                  </choose>
+                </else-if>
+                <else>
+                  <text prefix=", " macro="publisher"/>
+                  <text prefix=", " macro="issued"/>
+                  <text prefix=", " macro="archive"/>
+                  <choose>
+                    <if variable="locator" match="none">
+                      <text value="."/>
+                    </if>
+                    <else>
+                      <text prefix=", " macro="citation-locator" suffix="."/>
+                    </else>
+                  </choose>
+                </else>
+              </choose>
+            </else>
+          </choose>
+        </else>
+      </choose>
+    </layout>
+  </citation>
+  <bibliography et-al-min="20" et-al-use-first="1">
+    <sort>
+      <key macro="sort-bibliography" names-min="3" names-use-first="3"/>
+      <key macro="title-long"/>
+    </sort>
+    <layout>
+      <choose>
+        <if type="chapter entry entry-dictionary entry-encyclopedia" match="any">
+          <text macro="contributors-full" suffix=", "/>
+          <text prefix="&quot;" macro="title-long" suffix="&quot;, "/>
+          <text macro="container-full"/>
+          <text prefix=", " variable="volume" text-case="capitalize-first"/>
+          <text prefix=" " macro="publisher"/>
+          <text prefix=", " macro="collection"/>
+          <text prefix=", " macro="page-range"/>
+          <text value="."/>
+        </if>
+        <else-if type="book" match="any">
+          <text macro="contributors-full" suffix=", "/>
+          <text macro="title-long" font-style="italic"/>
+          <choose>
+            <if variable="edition" match="any">
+              <text prefix=", " variable="edition"/>
+              <text prefix=" " term="edition" form="short"/>
+            </if>
+          </choose>
+          <text prefix=" " macro="publisher" suffix="."/>
+        </else-if>
+        <else-if type="webpage post post-weblog" match="any">
+          <choose>
+            <if variable="author" match="none">
+              <text macro="container-full"/>
+            </if>
+            <else>
+              <text macro="contributors-full" suffix=", "/>
+            </else>
+          </choose>
+          <text macro="title-long" font-style="italic" suffix=", "/>
+          <text macro="genre" suffix=", "/>
+          <text macro="issued"/>
+          <choose>
+            <if variable="URL" match="any">
+              <text prefix=", " macro="page-range"/>
+              <text prefix=", " macro="identifier"/>
+              <text prefix=" " macro="quoted" suffix="."/>
+            </if>
+            <else>
+              <text prefix=", " macro="page-range" suffix="."/>
+            </else>
+          </choose>
+        </else-if>
+        <else-if type="article-magazine article-newspaper" match="any">
+          <text macro="contributors-full" suffix=", "/>
+          <text prefix="&quot;" macro="title-long" suffix="&quot;, "/>
+          <text macro="container-full"/>
+          <text prefix=", " macro="issued"/>
+          <choose>
+            <if variable="URL" match="any">
+              <text prefix=", " macro="page-range"/>
+              <text prefix=", " macro="identifier"/>
+              <text prefix=" " macro="quoted" suffix="."/>
+            </if>
+            <else>
+              <text prefix=", " macro="page-range" suffix="."/>
+            </else>
+          </choose>
+        </else-if>
+        <else-if type="article-journal" match="any">
+          <text macro="contributors-full" suffix=", "/>
+          <text prefix="&quot;" macro="title-long" suffix="&quot;, "/>
+          <text macro="container-full"/>
+          <text prefix=" " macro="issued"/>
+          <text prefix=", " macro="page-range"/>
+          <text prefix=", doi:" variable="DOI"/>
+          <text value="."/>
+        </else-if>
+        <else-if type="paper-conference speech" match="any">
+          <text macro="contributors-full" suffix=", "/>
+          <text prefix="&quot;" macro="title-long" suffix="&quot;, "/>
+          <text prefix=" " macro="genre" suffix=", "/>
+          <text variable="event"/>
+          <text prefix=", " macro="container-full"/>
+          <text prefix=" " macro="publisher"/>
+          <choose>
+            <if variable="DOI" match="any">
+              <text prefix=", " macro="page-range"/>
+              <text prefix=", doi:" variable="DOI" suffix="."/>
+            </if>
+            <else>
+              <text prefix=", " macro="page-range"/>
+              <text value="."/>
+            </else>
+          </choose>
+        </else-if>
+        <else-if type="thesis" match="any">
+          <text macro="contributors-full" suffix=", "/>
+          <text macro="title-long" font-style="italic"/>
+          <text prefix=", " macro="genre"/>
+          <text prefix=" " macro="publisher" suffix="."/>
+        </else-if>
+        <else-if type="report" match="any">
+          <text macro="contributors-full" suffix=", "/>
+          <choose>
+            <if variable="author" match="none">
+              <text macro="printers" suffix=", "/>
+            </if>
+          </choose>
+          <text macro="title-long" font-style="italic"/>
+          <text prefix=", " macro="collection"/>
+          <text prefix=" " macro="publisher"/>
+          <choose>
+            <if variable="URL" match="any">
+              <text prefix=", " macro="identifier"/>
+              <text prefix=" " macro="quoted"/>
+            </if>
+          </choose>
+          <text value="."/>
+        </else-if>
+        <else-if type="map figure graphic" match="any">
+          <text macro="contributors-full" suffix=", "/>
+          <text macro="title-long" font-style="italic"/>
+          <text prefix=", " macro="medium"/>
+          <text prefix=", " macro="genre"/>
+          <text prefix=", " variable="scale"/>
+          <choose>
+            <if variable="publisher publisher-place" match="any">
+              <text prefix=" " macro="publisher"/>
+            </if>
+            <else>
+              <text prefix=", " macro="issued-year"/>
+            </else>
+          </choose>
+          <text prefix=", " variable="archive"/>
+          <text prefix=", " variable="source"/>
+          <choose>
+            <if variable="URL" match="any">
+              <text prefix=", " macro="identifier"/>
+              <text prefix=" " macro="quoted" suffix="."/>
+            </if>
+            <else>
+              <text value="."/>
+            </else>
+          </choose>
+        </else-if>
+        <else-if type="bill legal_case legislation personal_communication" match="none">
+          <text macro="contributors-full" suffix=", "/>
+          <text macro="title-long" font-style="italic"/>
+          <text prefix=", " macro="genre"/>
+          <text prefix=", " macro="medium"/>
+          <choose>
+            <if variable="URL" match="any">
+              <text prefix=", " macro="issued"/>
+              <text prefix=", " macro="publisher"/>
+              <text prefix=", " macro="identifier"/>
+              <text prefix=" " macro="quoted" suffix="."/>
+            </if>
+            <else-if variable="issued" match="none">
+              <choose>
+                <if variable="publisher publisher-place" match="any">
+                  <text prefix=", " macro="publisher"/>
+                </if>
+              </choose>
+              <text prefix=", " macro="collection"/>
+              <text value="."/>
+            </else-if>
+            <else>
+              <text prefix=", " macro="publisher"/>
+              <text prefix=", " macro="issued"/>
+              <text prefix=", " macro="archive"/>
+              <text value="."/>
+            </else>
+          </choose>
+        </else-if>
+      </choose>
+    </layout>
+  </bibliography>
+</style>

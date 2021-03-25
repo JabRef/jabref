@@ -12,7 +12,7 @@
     <category citation-format="author-date"/>
     <category field="literature"/>
     <issn>1520-9857</issn>
-    <updated>2020-11-30T03:34:58+00:00</updated>
+    <updated>2021-01-29T15:20:44+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor">
@@ -60,9 +60,15 @@
       <choose>
         <if type="webpage post-weblog">
           <group delimiter=" ">
-            <text term="retrieved" text-case="capitalize-first"/>
-            <date variable="accessed" form="text"/>
-            <text prefix="(" suffix=")" variable="URL"/>
+            <text variable="URL"/>
+            <group delimiter=" " prefix="(" suffix=")">
+              <text term="accessed"/>
+              <date variable="accessed">
+                <date-part name="month" form="numeric"/>
+                <date-part name="day" prefix="/"/>
+                <date-part name="year" form="short" prefix="/"/>
+              </date>
+            </group>
           </group>
         </if>
       </choose>
@@ -117,6 +123,7 @@
         <text term="no date" form="short"/>
       </else>
     </choose>
+    <text variable="year-suffix" font-style="italic"/>
   </macro>
   <macro name="year-sort">
     <choose>
@@ -169,7 +176,7 @@
       <key macro="year-sort"/>
     </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
-      <group delimiter=":">
+      <group delimiter=": ">
         <group delimiter=" ">
           <text macro="author-short"/>
           <text macro="year-date"/>
@@ -178,7 +185,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography hanging-indent="true">
+  <bibliography subsequent-author-substitute="&#8212;&#8212;&#8212;" hanging-indent="true">
     <sort>
       <key macro="author"/>
       <key macro="year-sort"/>
@@ -259,7 +266,7 @@
           </group>
           <group prefix=" " suffix="." delimiter=" ">
             <text variable="container-title" font-style="italic" text-case="title"/>
-            <group delimiter=":">
+            <group delimiter=": ">
               <group delimiter=", ">
                 <text variable="volume"/>
                 <group delimiter=" ">

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" default-locale="fr-FR">
   <info>
-    <title>ISO-690 (author-date, no abstract, French)</title>
+    <title>ISO-690 (author-date, no abstract, Français)</title>
     <id>http://www.zotero.org/styles/iso690-author-date-fr-no-abstract</id>
     <link href="http://www.zotero.org/styles/iso690-author-date-fr-no-abstract" rel="self"/>
     <link href="https://github.com/citation-style-language/styles/pull/405" rel="documentation"/>

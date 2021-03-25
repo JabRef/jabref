@@ -6,7 +6,7 @@
     <id>http://www.zotero.org/styles/british-journal-of-anaesthesia</id>
     <link href="http://www.zotero.org/styles/british-journal-of-anaesthesia" rel="self"/>
     <link href="http://www.zotero.org/styles/vancouver" rel="template"/>
-    <link href="http://www.oxfordjournals.org/our_journals/bjaint/for_authors/index.html" rel="documentation"/>
+    <link href="https://bjanaesthesia.org/content/authorinfo" rel="documentation"/>
     <author>
       <name>Charles Parnot</name>
       <uri>http://twitter.com/cparnot</uri>
@@ -215,7 +215,7 @@
     <sort>
       <key variable="citation-number"/>
     </sort>
-    <layout delimiter=" " vertical-align="sup">
+    <layout delimiter=", " vertical-align="sup">
       <text variable="citation-number"/>
     </layout>
   </citation>

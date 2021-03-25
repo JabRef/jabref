@@ -428,7 +428,7 @@
         <text macro="author-short"/>
         <text macro="year"/>
         <group>
-          <label variable="locator" form="short"/>
+          <label variable="locator" form="short" suffix=" "/>
           <text variable="locator"/>
         </group>
       </group>

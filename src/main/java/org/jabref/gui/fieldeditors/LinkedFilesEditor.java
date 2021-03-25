@@ -3,6 +3,7 @@ package org.jabref.gui.fieldeditors;
 import java.util.Optional;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
@@ -48,6 +49,7 @@ import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.optional.ObservableOptionalValue;
 
 public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
@@ -58,6 +60,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     private final BibDatabaseContext databaseContext;
     private final UiThreadObservableList<LinkedFileViewModel> decoratedModelList;
     private final PreferencesService preferencesService;
+
+    private ObservableOptionalValue<BibEntry> bibEntry = EasyBind.wrapNullable(new SimpleObjectProperty<>());
 
     public LinkedFilesEditor(Field field,
                              DialogService dialogService,
@@ -207,6 +211,7 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     @Override
     public void bindToEntry(BibEntry entry) {
+        bibEntry = EasyBind.wrapNullable(new SimpleObjectProperty<>(entry));
         viewModel.bindToEntry(entry);
     }
 
@@ -233,8 +238,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     private void handleItemMouseClick(LinkedFileViewModel linkedFile, MouseEvent event) {
 
         if (event.getButton().equals(MouseButton.PRIMARY) && (event.getClickCount() == 2)) {
-            // Double click -> edit
-            linkedFile.edit();
+            // Double click -> open
+            linkedFile.open();
         }
     }
 
@@ -281,19 +286,19 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                                 () -> !linkedFile.getFile().isOnlineLink()
                                         && linkedFile.getFile().findIn(databaseContext, preferencesService.getFilePreferences()).isPresent()
                                         && !linkedFile.isGeneratedNameSameAsOriginal(),
-                                linkedFile.getFile().linkProperty());
+                                linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
                         case MOVE_FILE_TO_FOLDER -> Bindings.createBooleanBinding(
                                 () -> !linkedFile.getFile().isOnlineLink()
                                         && linkedFile.getFile().findIn(databaseContext, preferencesService.getFilePreferences()).isPresent()
                                         && !linkedFile.isGeneratedPathSameAsOriginal(),
-                                linkedFile.getFile().linkProperty());
+                                linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
                         case DOWNLOAD_FILE -> Bindings.createBooleanBinding(
                                 () -> linkedFile.getFile().isOnlineLink(),
-                                linkedFile.getFile().linkProperty());
+                                linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
                         case OPEN_FILE, OPEN_FOLDER, RENAME_FILE_TO_NAME, DELETE_FILE -> Bindings.createBooleanBinding(
                                 () -> !linkedFile.getFile().isOnlineLink()
                                         && linkedFile.getFile().findIn(databaseContext, preferencesService.getFilePreferences()).isPresent(),
-                                linkedFile.getFile().linkProperty());
+                                linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
                         default -> BindingsHelper.constantOf(true);
                     });
         }

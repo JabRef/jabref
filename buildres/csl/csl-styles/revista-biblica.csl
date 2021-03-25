@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" name-delimiter=" &#8211; " delimiter-precedes-last="always" et-al-min="4" et-al-use-first="1" initialize-with=". " names-delimiter=" &#8211; " page-range-format="expanded" demote-non-dropping-particle="sort-only" default-locale="es-ES">
   <info>
-    <title>Revista Bíblica (Spanish)</title>
+    <title>Revista Bíblica (Español)</title>
     <id>http://www.zotero.org/styles/revista-biblica</id>
     <link href="http://www.zotero.org/styles/revista-biblica" rel="self"/>
     <link href="http://www.zotero.org/styles/pontifical-gregorian-university" rel="template"/>
