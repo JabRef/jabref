@@ -12,12 +12,12 @@ import org.jabref.model.strings.StringUtil;
  * Current usage: only methods <code>getLastOnly</code>, <code>getFirstLast</code>, and <code>getLastFirst</code> are used; all other methods are provided for completeness.
  */
 public class Author {
-
     private final String firstPart;
     private final String firstAbbr;
     private final String vonPart;
     private final String lastPart;
     private final String jrPart;
+    private Author latexFreeAuthor;
 
     /**
      * Creates the Author object. If any part of the name is absent, <CODE>null</CODE> must be passed; otherwise other methods may return erroneous results.
@@ -361,11 +361,15 @@ public class Author {
      * Returns a LaTeX-free version of this `Author`.
      */
     public Author latexFree() {
+        if (latexFreeAuthor == null) {
             String first = getFirst().map(LatexToUnicodeAdapter::format).orElse(null);
             String firstabbr = getFirstAbbr().map(LatexToUnicodeAdapter::format).orElse(null);
             String von = getVon().map(LatexToUnicodeAdapter::format).orElse(null);
             String last = getLast().map(LatexToUnicodeAdapter::format).orElse(null);
             String jr = getJr().map(LatexToUnicodeAdapter::format).orElse(null);
-            return new Author(first, firstabbr, von, last, jr);
+            latexFreeAuthor = new Author(first, firstabbr, von, last, jr);
+            latexFreeAuthor.latexFreeAuthor = latexFreeAuthor;
+        }
+        return latexFreeAuthor;
     }
 }
