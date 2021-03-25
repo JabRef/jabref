@@ -3,6 +3,8 @@ package org.jabref.logic.integrity;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -14,6 +16,11 @@ class DoiValidityCheckerTest {
     @Test
     void doiAcceptsValidInput() {
         assertEquals(Optional.empty(), checker.checkValue("10.1023/A:1022883727209"));
+    }
+
+    @Test
+    void doiAcceptsEmptyInput() {
+        assertEquals(Optional.empty(), checker.checkValue(""));
     }
 
     @Test
@@ -31,4 +38,15 @@ class DoiValidityCheckerTest {
         assertNotEquals(Optional.empty(), checker.checkValue("asdf"));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"11.1000/182", "01.1000/182", "100.1000/182", "110.1000/182", "a10.1000/182", "10a.1000/182"})
+    void doiDoesNotAcceptInputWithTypoInFirstPart(String s) {
+        assertNotEquals(Optional.empty(), checker.checkValue(s));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"10.a1000/182", "10.1000a/182", "10.10a00/182"})
+    void doiDoesNotAcceptInputWithTypoInSecondPart(String s) {
+        assertNotEquals(Optional.empty(), checker.checkValue(s));
+    }
 }
