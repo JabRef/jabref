@@ -601,6 +601,7 @@ jlink {
         uses 'com.airhacks.afterburner.injection.PresenterFactory'
         uses 'org.apache.logging.log4j.spi.Provider'
         uses 'org.mariadb.jdbc.credential.CredentialPlugin'
+        uses 'org.mariadb.jdbc.authentication.AuthenticationPlugin'
         uses 'org.mariadb.jdbc.tls.TlsSocketPlugin'
         uses 'org.mariadb.jdbc.LocalInfileInterceptor'
         uses 'org.eclipse.jgit.transport.SshSessionFactory';
