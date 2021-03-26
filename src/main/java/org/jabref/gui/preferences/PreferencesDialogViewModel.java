@@ -23,6 +23,7 @@ import org.jabref.gui.preferences.file.FileTab;
 import org.jabref.gui.preferences.general.GeneralTab;
 import org.jabref.gui.preferences.groups.GroupsTab;
 import org.jabref.gui.preferences.importer.ImportCustomizationTab;
+import org.jabref.gui.preferences.importer.ImportSettingsTab;
 import org.jabref.gui.preferences.journals.JournalAbbreviationsTab;
 import org.jabref.gui.preferences.keybindings.KeyBindingsTab;
 import org.jabref.gui.preferences.linkedfiles.LinkedFilesTab;
@@ -80,6 +81,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new CitationKeyPatternTab(),
                 new LinkedFilesTab(),
                 new NameFormatterTab(),
+                new ImportSettingsTab(),
                 new ImportCustomizationTab(),
                 new ExportCustomizationTab(),
                 new XmpPrivacyTab(),
