@@ -53,7 +53,7 @@ class NoBibTexFieldCheckerTest {
     }
 
     @Test
-    void instituationIsNotRecognizedAsBiblatexOnlyField() {
+    void institutionIsNotRecognizedAsBiblatexOnlyField() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.INSTITUTION, "test");
         assertEquals(Collections.emptyList(), checker.check(entry));
@@ -67,7 +67,7 @@ class NoBibTexFieldCheckerTest {
     }
 
     @Test
-    void journaltitleIsRecognizedAsBiblatexOnlyField() {
+    void journalTitleIsRecognizedAsBiblatexOnlyField() {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.JOURNALTITLE, "test");
         IntegrityMessage message = new IntegrityMessage("biblatex field only", entry, StandardField.JOURNALTITLE);
