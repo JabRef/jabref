@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JabRefCLITest {
 
-    private String bibtex = "@article{test, title=\"test title\"}";
+    private final String bibtex = "@article{test, title=\"test title\"}";
 
     @Test
     void emptyCLILeftOversLongOptions() throws Exception {
@@ -108,5 +108,4 @@ class JabRefCLITest {
 
         assertEquals(bibtex, cli.getBibtexImport());
     }
-
 }
