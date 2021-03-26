@@ -1,6 +1,5 @@
 package org.jabref.logic.formatter.minifier;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,12 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MinifyNameListFormatterTest {
 
-    private MinifyNameListFormatter formatter;
-
-    @BeforeEach
-    public void setUp() {
-        formatter = new MinifyNameListFormatter();
-    }
+    private static final MinifyNameListFormatter formatter = new MinifyNameListFormatter();
 
     @Test
     public void minifyAuthorNames() {
