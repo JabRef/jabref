@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class UnprotectTermsFormatterTest {
 
-    private UnprotectTermsFormatter formatter = new UnprotectTermsFormatter();
+    private static final UnprotectTermsFormatter formatter = new UnprotectTermsFormatter();
 
     private static Stream<Arguments> terms() throws IOException {
         return Stream.of(

@@ -5,7 +5,6 @@ import java.util.Collections;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -15,14 +14,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class ProtectTermsFormatterTest {
 
-    private ProtectTermsFormatter formatter;
-
-    @BeforeEach
-    public void setUp() {
-        formatter = new ProtectTermsFormatter(
-                new ProtectedTermsLoader(new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(),
-                        Collections.emptyList(), Collections.emptyList(), Collections.emptyList())));
-    }
+    private static final ProtectTermsFormatter formatter = new ProtectTermsFormatter(
+            new ProtectedTermsLoader(new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(),
+                    Collections.emptyList(), Collections.emptyList(), Collections.emptyList())));
 
     @Test
     public void testSingleWord() {

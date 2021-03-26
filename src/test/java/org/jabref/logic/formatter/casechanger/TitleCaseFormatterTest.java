@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class TitleCaseFormatterTest {
 
-    private final TitleCaseFormatter formatter = new TitleCaseFormatter();
+    private static final TitleCaseFormatter formatter = new TitleCaseFormatter();
 
     private static Stream<Arguments> testData() {
         return Stream.of(

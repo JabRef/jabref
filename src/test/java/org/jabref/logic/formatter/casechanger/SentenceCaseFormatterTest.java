@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class SentenceCaseFormatterTest {
 
-    private final SentenceCaseFormatter formatter = new SentenceCaseFormatter();
+    private static final SentenceCaseFormatter formatter = new SentenceCaseFormatter();
 
     private static Stream<Arguments> testData() {
         return Stream.of(
