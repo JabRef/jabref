@@ -218,6 +218,4 @@ public class MainTableColumnModel {
     public String toString() {
         return "MainTableColumnModel [typeProperty=" + typeProperty + ", qualifierProperty=" + qualifierProperty + ", widthProperty=" + widthProperty + ", sortTypeProperty=" + sortTypeProperty + "]";
     }
-
-
 }
