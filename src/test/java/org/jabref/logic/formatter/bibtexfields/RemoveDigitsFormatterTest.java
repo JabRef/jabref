@@ -1,18 +1,12 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RemoveDigitsFormatterTest {
 
-    private RemoveDigitsFormatter formatter;
-
-    @BeforeEach
-    public void setUp() {
-        formatter = new RemoveDigitsFormatter();
-    }
+    private static final RemoveDigitsFormatter formatter = new RemoveDigitsFormatter();
 
     @Test
     public void doNothingIfSingleSpace() {

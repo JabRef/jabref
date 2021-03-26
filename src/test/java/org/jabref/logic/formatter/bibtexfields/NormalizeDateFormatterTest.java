@@ -1,6 +1,5 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,12 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class NormalizeDateFormatterTest {
 
-    private NormalizeDateFormatter formatter;
-
-    @BeforeEach
-    public void setUp() {
-        formatter = new NormalizeDateFormatter();
-    }
+    private static final NormalizeDateFormatter formatter = new NormalizeDateFormatter();
 
     @Test
     public void formatDateYYYYMM0D() {

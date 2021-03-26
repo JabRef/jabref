@@ -1,6 +1,5 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,12 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class RemoveBracesFormatterTest {
 
-    private RemoveBracesFormatter formatter;
-
-    @BeforeEach
-    public void setUp() {
-        formatter = new RemoveBracesFormatter();
-    }
+    private static final RemoveBracesFormatter formatter = new RemoveBracesFormatter();
 
     @Test
     public void formatRemovesSingleEnclosingBraces() {

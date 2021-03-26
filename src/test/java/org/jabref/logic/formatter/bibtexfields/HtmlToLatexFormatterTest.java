@@ -1,6 +1,5 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,12 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class HtmlToLatexFormatterTest {
 
-    private HtmlToLatexFormatter formatter;
-
-    @BeforeEach
-    public void setUp() {
-        formatter = new HtmlToLatexFormatter();
-    }
+    private static final HtmlToLatexFormatter formatter = new HtmlToLatexFormatter();
 
     @Test
     public void formatWithoutHtmlCharactersReturnsSameString() {

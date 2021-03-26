@@ -1,18 +1,12 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class LatexCleanupFormatterTest {
 
-    private LatexCleanupFormatter formatter;
-
-    @BeforeEach
-    void setUp() {
-        formatter = new LatexCleanupFormatter();
-    }
+    private static final LatexCleanupFormatter formatter = new LatexCleanupFormatter();
 
     @Test
     void test() {

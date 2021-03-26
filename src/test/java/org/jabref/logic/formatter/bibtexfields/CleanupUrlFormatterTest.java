@@ -1,6 +1,5 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,12 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class CleanupUrlFormatterTest {
 
-    private CleanupUrlFormatter formatter;
-
-    @BeforeEach
-    void setUp() {
-        formatter = new CleanupUrlFormatter();
-    }
+    private static final CleanupUrlFormatter formatter = new CleanupUrlFormatter();
 
     @Test
     void removeSpecialSymbolsFromURLLink() {

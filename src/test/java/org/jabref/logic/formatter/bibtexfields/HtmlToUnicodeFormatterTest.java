@@ -1,18 +1,12 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HtmlToUnicodeFormatterTest {
 
-    private HtmlToUnicodeFormatter formatter;
-
-    @BeforeEach
-    public void setUp() {
-        formatter = new HtmlToUnicodeFormatter();
-    }
+    private static final HtmlToUnicodeFormatter formatter = new HtmlToUnicodeFormatter();
 
     @Test
     public void formatWithoutHtmlCharactersReturnsSameString() {

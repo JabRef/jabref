@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class NormalizePagesFormatterTest {
 
-    private final NormalizePagesFormatter formatter = new NormalizePagesFormatter();
+    private static final NormalizePagesFormatter formatter = new NormalizePagesFormatter();
 
     private static Stream<Arguments> tests() {
         return Stream.of(

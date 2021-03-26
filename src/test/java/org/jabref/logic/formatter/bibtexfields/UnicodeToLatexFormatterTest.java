@@ -1,18 +1,12 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class UnicodeToLatexFormatterTest {
 
-    private UnicodeToLatexFormatter formatter;
-
-    @BeforeEach
-    void setUp() {
-        formatter = new UnicodeToLatexFormatter();
-    }
+    private static final UnicodeToLatexFormatter formatter = new UnicodeToLatexFormatter();
 
     @Test
     void formatWithoutUnicodeCharactersReturnsSameString() {

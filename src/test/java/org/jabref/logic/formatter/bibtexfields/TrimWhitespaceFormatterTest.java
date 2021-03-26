@@ -1,19 +1,12 @@
-
 package org.jabref.logic.formatter.bibtexfields;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TrimWhitespaceFormatterTest {
 
-    private TrimWhitespaceFormatter formatter;
-
-    @BeforeEach
-    public void setUp() {
-        formatter = new TrimWhitespaceFormatter();
-    }
+    private static final TrimWhitespaceFormatter formatter = new TrimWhitespaceFormatter();
 
     @Test
     public void removeHorizontalTabulations() {
