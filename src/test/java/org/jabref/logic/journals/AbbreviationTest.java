@@ -113,7 +113,8 @@ class AbbreviationTest {
     @Test
     void testEquals() {
       Abbreviation abbreviation = new Abbreviation("Long Name", "L N", "LN");
-      assertTrue(abbreviation.equals(abbreviation));
+      Abbreviation otherAbbreviation = new Abbreviation("Long Name", "L N", "LN");
+      assertTrue(abbreviation.equals(otherAbbreviation));
       assertFalse(abbreviation.equals("String"));
     }
 }
