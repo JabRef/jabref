@@ -213,4 +213,11 @@ public class MainTableColumnModel {
 
         return new MainTableColumnModel(type, qualifier);
     }
+
+    @Override
+    public String toString() {
+        return "MainTableColumnModel [typeProperty=" + typeProperty + ", qualifierProperty=" + qualifierProperty + ", widthProperty=" + widthProperty + ", sortTypeProperty=" + sortTypeProperty + "]";
+    }
+
+
 }

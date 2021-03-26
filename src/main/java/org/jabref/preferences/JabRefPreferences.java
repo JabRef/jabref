@@ -1934,10 +1934,11 @@ public class JabRefPreferences implements PreferencesService {
         columnPreferences.getColumns().forEach(column -> columnSortTypesInOrder.add(column.sortTypeProperty().getValue().toString()));
         putStringList(COLUMN_SORT_TYPES, columnSortTypesInOrder);
 
-        putStringList(COLUMN_SORT_ORDER, columnPreferences
-                .getColumnSortOrder().stream()
-                .map(MainTableColumnModel::getName)
-                .collect(Collectors.toList()));
+        var columnSortOrder = columnPreferences
+            .getColumnSortOrder().stream()
+            .map(MainTableColumnModel::getName)
+            .collect(Collectors.toList());
+        putStringList(COLUMN_SORT_ORDER, columnSortOrder);
 
         // Update cache
         mainTableColumns = columnPreferences.getColumns();
