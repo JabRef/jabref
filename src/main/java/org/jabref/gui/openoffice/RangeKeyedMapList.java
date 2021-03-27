@@ -34,6 +34,12 @@ class RangeKeyedMapList<V> {
         }
     }
 
+    /**
+     * @return A list of the partitions.
+     */
+    public List<TreeMap<XTextRange,List<V>>> partitionValues() {
+        return this.xxs.partitionValues();
+    }
     enum OverlapKind {
         TOUCH,
         OVERLAP,
@@ -55,14 +61,6 @@ class RangeKeyedMapList<V> {
             this.vs = vs;
         }
     };
-
-    /**
-     * @return A list of the partitions.
-     */
-    public List<TreeMap<XTextRange,List<V>>>
-    partitionValues() {
-        return this.xxs.partitionValues();
-    }
 
     /**
      * Report identical, overlapping or touching ranges.
