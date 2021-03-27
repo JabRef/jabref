@@ -72,6 +72,7 @@ public class JabRefDialogService implements DialogService {
 
     private final Window mainWindow;
     private final JFXSnackbar statusLine;
+    private JFXSnackbarLayout currSnackbarLayout;
 
     public JabRefDialogService(Window mainWindow, Pane mainPane, PreferencesService preferences) {
         this.mainWindow = mainWindow;
@@ -336,7 +337,13 @@ public class JabRefDialogService implements DialogService {
     @Override
     public void notify(String message) {
         LOGGER.info(message);
-        statusLine.fireEvent(new SnackbarEvent(new JFXSnackbarLayout(message), TOAST_MESSAGE_DISPLAY_TIME, null));
+        SnackbarEvent currEvent = statusLine.getCurrentEvent();
+        if (currEvent == null) {
+            currSnackbarLayout = new JFXSnackbarLayout(message);
+            statusLine.fireEvent(new SnackbarEvent(currSnackbarLayout, TOAST_MESSAGE_DISPLAY_TIME));
+        } else if (currSnackbarLayout != null) {
+            currSnackbarLayout.setToast(message + "\n\n" + currSnackbarLayout.getToast());
+        }
     }
 
     @Override
