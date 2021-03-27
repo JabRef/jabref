@@ -26,6 +26,7 @@ import java.util.function.Predicate;
 
 import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.openoffice.RangeSortVisual;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
@@ -757,422 +758,6 @@ class OOBibBase {
         return newMap;
     }
 
-    /* first appearance order, based on visual order */
-
-    /**
-     *  Given a location, return its position: coordinates relative to
-     *  the top left position of the first page of the document.
-     *
-     * Note: for text layouts with two or more columns, this gives the
-     *       wrong order: top-down/left-to-right does not match
-     *       reading order.
-     *
-     * Note: The "relative to the top left position of the first page"
-     *       is meant "as it appears on the screen".
-     *
-     *       In particular: when viewing pages side-by-side, the top
-     *       half of the right page is higher than the lower half of
-     *       the left page. Again, top-down/left-to-right does not
-     *       match reading order.
-     *
-     * @param range  Location.
-     * @param cursor To get the position, we need az XTextViewCursor.
-     *               It will be moved to the range.
-     */
-    private static Point
-    findPositionOfTextRange(XTextRange range, XTextViewCursor cursor) {
-        cursor.gotoRange(range, false);
-        return cursor.getPosition();
-    }
-
-    /**
-     * A reference mark name paired with its visual position.
-     *
-     * Comparison is based on (Y,X,indexInPosition): vertical compared
-     * first, horizontal second, indexInPosition third.
-     *
-     * Used for sorting reference marks by their visual positions.
-     *
-     *
-     *
-     */
-    private static class ComparableMark<T> implements Comparable<ComparableMark<T>> {
-
-        private final Point position;
-        private final int indexInPosition;
-        private final T content;
-
-        public ComparableMark(Point position, int indexInPosition, T content) {
-            this.position = position;
-            this.indexInPosition = indexInPosition;
-            this.content = content;
-        }
-
-        @Override
-        public int compareTo(ComparableMark other) {
-
-            if (position.Y != other.position.Y) {
-                return position.Y - other.position.Y;
-            }
-            if (position.X != other.position.X) {
-                return position.X - other.position.X;
-            }
-            return indexInPosition - other.indexInPosition;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-
-            if (o instanceof ComparableMark) {
-                ComparableMark other = (ComparableMark) o;
-                return ((this.position.X == other.position.X)
-                        && (this.position.Y == other.position.Y)
-                        && (this.indexInPosition == other.indexInPosition)
-                        && Objects.equals(this.content, other.content)
-                    );
-            }
-            return false;
-        }
-
-        public T getContent() {
-            return content;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(position, indexInPosition, content);
-        }
-    }
-
-    /**
-     *
-     */
-    interface VisualSortable<T> {
-        public XTextRange getRange();
-        public int getIndexInPosition();
-        public T getContent();
-    }
-
-    /**
-     *  Read reference mark names from the document, keep only those
-     *  with JabRef naming convention, get their visual positions,
-     *
-     *  @return JabRef reference mark names sorted by these positions.
-     *
-     *  Limitation: for two column layout visual (top-down,
-     *        left-right) order does not match the expected (textual)
-     *        order.
-     *
-     *  TODO: refmarks in the same footnote get the same position.
-     *  After sorting, they may get the wrong order.
-     *
-     */
-    class VisualSortEntry<T> implements VisualSortable<T> {
-        public XTextRange range;
-        public int indexInPosition;
-        public T content;
-
-        VisualSortEntry(
-            XTextRange range,
-            int indexInPosition,
-            T content
-            ) {
-            this.range = range;
-            this.indexInPosition = indexInPosition;
-            this.content = content;
-        }
-
-        @Override
-        public XTextRange getRange() {
-            return range;
-        }
-
-        @Override
-        public int getIndexInPosition() {
-            return indexInPosition;
-        }
-
-        @Override
-        public T getContent() {
-            return content;
-        }
-    }
-
-    /**
-     * Creates a list of {@code XTextRange} values for our {@code
-     * CitationGroup} values, to be passed to {@code visualSort}
-     *
-     * The elements of the returned list are actually of type {@code
-     * VisualSortEntry<CitationGroupID>}
-     *
-     * @param cgs The source of CitationGroup values.
-     * @param documentConnection Connection to the document.
-     * @param mapFootnotesToFootnoteMarks If true, replace ranges in
-     *        footnotes with the range of the corresponding footnote
-     *        mark. This is used for numbering the citations.
-     *
-     *
-     */
-    List<VisualSortable<CitationGroupsV001.CitationGroupID>>
-    createVisualSortInput(CitationGroupsV001 cgs,
-                          DocumentConnection documentConnection,
-                          boolean mapFootnotesToFootnoteMarks)
-        throws
-        NoDocumentException,
-        WrappedTargetException {
-
-        List<CitationGroupsV001.CitationGroupID> cgids =
-            new ArrayList<>(cgs.getCitationGroupIDs());
-
-        List<VisualSortEntry> vses = new ArrayList<>();
-        for (CitationGroupsV001.CitationGroupID cgid : cgids) {
-            XTextRange range = cgs.getReferenceMarkRangeOrNull(documentConnection, cgid);
-            if (range == null) {
-                throw new RuntimeException( "getReferenceMarkRangeOrNull returned null" );
-            }
-            vses.add( new VisualSortEntry(range, 0, cgid) );
-        }
-
-        /*
-         *  At this point we are almost ready to return vses.
-         *
-         *  For example we may want to number citations in a footnote
-         *  as if it appeared where the footnote mark is.
-         *
-         *  The following code replaces ranges within footnotes with
-         *  the range for the corresponding footnote mark.
-         *
-         *  This brings further ambiguity if we have multiple
-         *  citations within the same footnote: for the comparison
-         *  they become indistinguishable. Numbering between them is
-         *  not controlled. Also combineCiteMarkers will see them in
-         *  the wrong order (if we use this comparison), and will not
-         *  be able to merge. To avoid these, we sort textually within
-         *  each .getText() partition and add indexInPosition
-         *  accordingly.
-         *
-         */
-
-        // Sort within partitions
-        RangeKeyedMapList<VisualSortEntry<CitationGroupsV001.CitationGroupID>> xxs
-            = new RangeKeyedMapList<>();
-
-        for (VisualSortEntry v : vses) {
-            xxs.add( v.getRange(), v );
-        }
-
-        // build final list
-        List<VisualSortEntry<CitationGroupsV001.CitationGroupID>> res = new ArrayList<>();
-
-        for (TreeMap<XTextRange,List<VisualSortEntry<CitationGroupsV001.CitationGroupID>>>
-                 xs : xxs.partitionValues()) {
-
-            List<XTextRange> oxs = new ArrayList<>(xs.keySet());
-
-            int indexInPartition = 0;
-            for (int i = 0; i < oxs.size(); i++) {
-                XTextRange a = oxs.get(i);
-                List<VisualSortEntry<CitationGroupsV001.CitationGroupID>> avs = xs.get(a);
-                for (int j = 0; j < avs.size(); j++){
-                    VisualSortEntry<CitationGroupsV001.CitationGroupID> v = avs.get(j);
-                    v.indexInPosition = indexInPartition++;
-                    if ( mapFootnotesToFootnoteMarks ) {
-                        // Adjust range if we are inside a footnote:
-                        if (unoQI(XFootnote.class, v.range.getText()) != null) {
-                            // Find the linking footnote marker:
-                            XFootnote footer = unoQI(XFootnote.class, v.range.getText());
-                            // The footnote's anchor gives the correct position in the text:
-                            v.range = footer.getAnchor();
-                        }
-                    }
-                    res.add(v);
-                }
-            }
-        }
-        // convert
-        // List<VisualSortEntry<CitationGroupsV001.CitationGroupID>>
-        // to
-        // List<VisualSortable<CitationGroupsV001.CitationGroupID>>
-        return res.stream().map(e -> e).collect(Collectors.toList());
-    }
-
-    private <T> List<VisualSortable<T>> visualSort(List<VisualSortable<T>> vses,
-                                                   DocumentConnection documentConnection)
-        throws
-        WrappedTargetException,
-        NoDocumentException,
-        JabRefException {
-
-        final int nCitationGroups = vses.size();
-
-        if (documentConnection.hasControllersLocked()) {
-            LOGGER.warn(
-                "visualSort:"
-                + " with ControllersLocked, viewCursor.gotoRange"
-                + " is probably useless"
-                );
-        }
-
-        /*
-         * A problem with XTextViewCursor: if it is not in text,
-         * then we get a crippled version that does not support
-         * viewCursor.getStart() or viewCursor.gotoRange(range,false),
-         * and will throw an exception instead.
-         *
-         * Our hope is that either we can move the cursor with a
-         * page- or scrolling-based method that does not throw, (see
-         * https://docs.libreoffice.org/sw/html/unotxvw_8cxx_source.html#l00896
-         * ) or that we can manipulate the cursor via getSelection and
-         * select (of XSelectionSupplier).
-         *
-         * Here we implemented the second, selection-based method.
-         * Seems to work when the user selected a frame or image.
-         * In these cases restoring the selection works, too.
-         *
-         * Still, we have a problem when the cursor is in a comment
-         * (referred to as "annotation" in OO API): in this case
-         * initialSelection is null, and documentConnection.select()
-         * does not help to get a function viewCursor. Having no
-         * better idea, we ask the user to move the cursor into the
-         * document.
-         */
-
-        /*
-         *  Selection-based
-         */
-        final boolean debugThisFun = false;
-
-        XServiceInfo initialSelection =  documentConnection.getSelectionAsServiceInfo();
-
-        if (initialSelection != null) {
-            if (Arrays.stream(initialSelection.getSupportedServiceNames())
-                .anyMatch("com.sun.star.text.TextRanges"::equals)) {
-                // we are probably OK with the viewCursor
-                if (debugThisFun) {
-                    LOGGER.info("visualSort: initialSelection supports TextRanges: no action needed.");
-                }
-            } else {
-                if (debugThisFun) {
-                    LOGGER.info("visualSort: initialSelection does not support TextRanges."
-                                + " We need to change the viewCursor.");
-                }
-                XTextRange newSelection = documentConnection.xText.getStart();
-                documentConnection.select( newSelection );
-            }
-        } else {
-            if (debugThisFun) {
-                LOGGER.info("visualSort: initialSelection is null: no idea what to do.");
-            }
-            /*
-             * XTextRange newSelection = documentConnection.xText.getStart();
-             * boolean res = documentConnection.select( newSelection );
-             * XServiceInfo sel2 =  documentConnection.getSelectionAsServiceInfo();
-             * LOGGER.info(
-             * String.format("visualSort: initialSelection is null: result of select: %s, isNull: %s%n",
-             *                   res,
-             *                   sel2 == null));
-             * // ^^^ prints true, true
-             */
-        }
-
-        XTextViewCursor viewCursor = documentConnection.getViewCursor();
-        Objects.requireNonNull(viewCursor);
-        try {
-            viewCursor.getStart();
-        } catch (com.sun.star.uno.RuntimeException ex) {
-            throw new JabRefException(
-                Localization.lang("Please move the cursor into the document text.")
-                + "\n"
-                + Localization.lang("To get the visual positions of your citations"
-                                    + " I need to move the cursor around,"
-                                    + " but could not get it."),
-                ex);
-        }
-
-        // find coordinates
-        List<Point> positions = new ArrayList<>(vses.size());
-
-        for (VisualSortable<T> v : vses) {
-            positions.add(findPositionOfTextRange(v.getRange(),
-                                                  viewCursor));
-        }
-
-        /*
-         * Restore initial state of selection (and thus viewCursor)
-         */
-        if (initialSelection != null) {
-            documentConnection.select(initialSelection);
-        }
-
-        if ( positions.size() != nCitationGroups ) {
-            throw new RuntimeException("visualSort: positions.size() != nCitationGroups");
-        }
-
-        // order by position
-        Set<ComparableMark<VisualSortable<T>>> set = new TreeSet<>();
-        for (int i = 0; i < vses.size(); i++) {
-            set.add(
-                new ComparableMark<>(
-                    positions.get(i),
-                    vses.get(i).getIndexInPosition(),
-                    vses.get(i)
-                    )
-                );
-        }
-
-        if ( set.size() != nCitationGroups ) {
-            throw new RuntimeException("visualSort: set.size() != nCitationGroups");
-        }
-
-        // collect CitationGroupIDs in order
-        List<VisualSortable<T>> result = new ArrayList<>(set.size());
-        for (ComparableMark<VisualSortable<T>> mark : set) {
-            result.add(mark.getContent());
-        }
-
-        if ( result.size() != nCitationGroups ) {
-            throw new RuntimeException("visualSort: result.size() != nCitationGroups");
-        }
-
-        return result;
-    }
-
-
-    private List<CitationGroupsV001.CitationGroupID>
-    getVisuallySortedCitationGroupIDs(CitationGroupsV001 cgs,
-                                      DocumentConnection documentConnection,
-                                      boolean mapFootnotesToFootnoteMarks)
-        throws
-        WrappedTargetException,
-        NoDocumentException,
-        JabRefException {
-
-        List<VisualSortable<CitationGroupsV001.CitationGroupID>> vses =
-            createVisualSortInput(cgs,
-                                  documentConnection,
-                                  mapFootnotesToFootnoteMarks);
-
-        if ( vses.size() != cgs.citationGroups.size() ) {
-            throw new RuntimeException("getVisuallySortedCitationGroupIDs:"
-                                       + " vses.size() != cgs.citationGroups.size()");
-        }
-
-        List<VisualSortable<CitationGroupsV001.CitationGroupID>> sorted =
-            visualSort( vses, documentConnection );
-
-        if ( sorted.size() != cgs.citationGroups.size() ) {
-            // This Fired
-            throw new RuntimeException("getVisuallySortedCitationGroupIDs:"
-                                       + " sorted.size() != cgs.citationGroups.size()");
-        }
-
-        return (sorted.stream()
-                .map(e -> e.getContent())
-                .collect(Collectors.toList()));
-    }
 
     /* ***************************************
      *
@@ -2192,9 +1777,8 @@ class OOBibBase {
         {
             boolean mapFootnotesToFootnoteMarks = true;
             List<CitationGroupsV001.CitationGroupID> sortedCitationGroupIDs =
-                getVisuallySortedCitationGroupIDs(cgs,
-                                                  documentConnection,
-                                                  mapFootnotesToFootnoteMarks);
+                cgs.getVisuallySortedCitationGroupIDs(documentConnection,
+                                                      mapFootnotesToFootnoteMarks);
             cgs.setGlobalOrder(sortedCitationGroupIDs);
         }
         // localOrder and globalOrder together gives us order-of-appearance of citations
@@ -2602,29 +2186,11 @@ class OOBibBase {
 
             boolean madeModifications = false;
 
-            // The testing for whitespace-only between (pivot) and (pivot+1) assumes that
-            // referenceMarkNames are in textual order: textually consecutive pairs
-            // must appear as neighbours (and in textual order).
-            //
-            // We have a bit of a clash here: referenceMarkNames is sorted by visual position,
-            // but we are testing if they are textually neighbours.
-            // In a two-column layout
-            //  | a | c |
-            //  | b | d |
-            // abcd is the textual order, but the visual order is acbd.
-            // So we will not find out that a and b are only separated by white space.
 
-            boolean mapFootnotesToFootnoteMarks = false;
-            List<CitationGroupsV001.CitationGroupID> referenceMarkNames =
-                // TODO: we probably want textually sorted partions here
-                getVisuallySortedCitationGroupIDs(cgs,
-                                                  documentConnection,
-                                                  mapFootnotesToFootnoteMarks);
+            List<CitationGroupsV001.CitationGroupID>
+                referenceMarkNames = cgs.getCitationGroupIDsSortedWithinPartitions(documentConnection);
 
             final int nRefMarks = referenceMarkNames.size();
-            // int[] itcTypes = new int[nRefMarks];
-            // String[][] bibtexKeys = new String[nRefMarks][];
-            // parseRefMarkNamesToArrays(referenceMarkNames, itcTypes, bibtexKeys);
 
         try {
 
@@ -2796,17 +2362,18 @@ class OOBibBase {
                         if (DocumentConnection.javaCompareRegionEnds(
                                 cursorBetween, currentGroupCursor) != 0) {
                             /*
-                             * A problem discovered using this check: when
-                             * viewing the document in
+                             * A problem discovered using this check:
+                             * when viewing the document in
                              * two-pages-side-by-side mode, our visual
                              * firstAppearanceOrder follows the visual
-                             * ordering on the screen. The problem this
-                             * caused: it sees a citation on the 2nd line
-                             * of the 1st page as appearing after one at
-                             * the 1st line of 2nd page. Since we create
-                             * cursorBetween at the end of range1Full (on
-                             * 1st page), it is now BEFORE
-                             * currentGroupCursor (on 2nd page).
+                             * ordering on the screen. The problem
+                             * this caused: it sees a citation on the
+                             * 2nd line of the 1st page as appearing
+                             * after one at the 1st line of 2nd
+                             * page. Since we create cursorBetween at
+                             * the end of range1Full (on 1st page), it
+                             * is now BEFORE currentGroupCursor (on
+                             * 2nd page).
                              */
                             throw new RuntimeException(
                                 "combineCiteMarkers: "

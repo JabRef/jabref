@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -22,12 +23,16 @@ import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.lang.WrappedTargetException;
+import com.sun.star.text.XFootnote;
 import com.sun.star.text.XText;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextContent;
 import com.sun.star.text.XTextRange;
+import com.sun.star.uno.UnoRuntime;
 import com.sun.star.util.InvalidStateException;
 
+import org.jabref.logic.JabRefException;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.slf4j.Logger;
@@ -66,6 +71,17 @@ class CitationGroupsV001 {
     /** Should we always fully remove reference mark brackets? */
     public static final boolean
     REFERENCE_MARK_ALWAYS_REMOVE_BRACKETS = true;
+
+    /**
+     * unoQI : short for UnoRuntime.queryInterface
+     *
+     * @return A reference to the requested UNO interface type if
+     *         available, otherwise null.
+     */
+    private static <T> T unoQI(Class<T> zInterface,
+                               Object object) {
+        return UnoRuntime.queryInterface(zInterface, object);
+    }
 
     class CitationGroupID {
         String id;
@@ -667,6 +683,198 @@ class CitationGroupsV001 {
         return citationGroups.keySet();
     }
 
+    /**
+     *  Read reference mark names from the document, keep only those
+     *  with JabRef naming convention, get their visual positions,
+     *
+     *  @return JabRef reference mark names sorted by these positions.
+     *
+     *  Limitation: for two column layout visual (top-down,
+     *        left-right) order does not match the expected (textual)
+     *        order.
+     *
+     *  TODO: refmarks in the same footnote get the same position.
+     *  After sorting, they may get the wrong order.
+     *
+     */
+
+    /**
+     * Creates a list of {@code
+     * VisualSortable<CitationGroupsV001.CitationGroupID>} values for
+     * our {@code CitationGroup} values. Originally designed to be
+     * passed to {@code visualSort}.
+     *
+     * The elements of the returned list are actually of type {@code
+     * VisualSortEntry<CitationGroupID>}.
+     *
+     * The result is sorted within {@code XTextRange.getText()}
+     * partitions of the citation groups according to their {@code
+     * XTextRange} (before mapping to footnote marks).
+     *
+     * In the result, VisualSortable.getIndexInPosition() contains
+     * unique indexes within the original partition (not after
+     * mapFootnotesToFootnoteMarks).
+     *
+     * @param cgs The source of CitationGroup values.
+     * @param documentConnection Connection to the document.
+     * @param mapFootnotesToFootnoteMarks If true, replace ranges in
+     *        footnotes with the range of the corresponding footnote
+     *        mark. This is used for numbering the citations.
+     *
+     */
+    private static List<RangeSortVisual.VisualSortable<CitationGroupsV001.CitationGroupID>>
+    createVisualSortInput(CitationGroupsV001 cgs,
+                          DocumentConnection documentConnection,
+                          boolean mapFootnotesToFootnoteMarks)
+        throws
+        NoDocumentException,
+        WrappedTargetException {
+
+        List<CitationGroupsV001.CitationGroupID> cgids =
+            new ArrayList<>(cgs.getCitationGroupIDs());
+
+        List<RangeSortVisual.VisualSortEntry> vses = new ArrayList<>();
+        for (CitationGroupsV001.CitationGroupID cgid : cgids) {
+            XTextRange range = cgs.getReferenceMarkRangeOrNull(documentConnection, cgid);
+            if (range == null) {
+                throw new RuntimeException( "getReferenceMarkRangeOrNull returned null" );
+            }
+            vses.add( new RangeSortVisual.VisualSortEntry(range, 0, cgid) );
+        }
+
+        /*
+         *  At this point we are almost ready to return vses.
+         *
+         *  For example we may want to number citations in a footnote
+         *  as if it appeared where the footnote mark is.
+         *
+         *  The following code replaces ranges within footnotes with
+         *  the range for the corresponding footnote mark.
+         *
+         *  This brings further ambiguity if we have multiple
+         *  citations within the same footnote: for the comparison
+         *  they become indistinguishable. Numbering between them is
+         *  not controlled. Also combineCiteMarkers will see them in
+         *  the wrong order (if we use this comparison), and will not
+         *  be able to merge. To avoid these, we sort textually within
+         *  each .getText() partition and add indexInPosition
+         *  accordingly.
+         *
+         */
+
+        // Sort within partitions
+        RangeKeyedMapList<RangeSortVisual.VisualSortEntry<CitationGroupsV001.CitationGroupID>> xxs
+            = new RangeKeyedMapList<>();
+
+        for (RangeSortVisual.VisualSortEntry v : vses) {
+            xxs.add( v.getRange(), v );
+        }
+
+        // build final list
+        List<RangeSortVisual.VisualSortEntry<CitationGroupsV001.CitationGroupID>> res = new ArrayList<>();
+
+        for (TreeMap<XTextRange,List<RangeSortVisual.VisualSortEntry<CitationGroupsV001.CitationGroupID>>>
+                 xs : xxs.partitionValues()) {
+
+            List<XTextRange> oxs = new ArrayList<>(xs.keySet());
+
+            int indexInPartition = 0;
+            for (int i = 0; i < oxs.size(); i++) {
+                XTextRange a = oxs.get(i);
+                List<RangeSortVisual.VisualSortEntry<CitationGroupsV001.CitationGroupID>> avs = xs.get(a);
+                for (int j = 0; j < avs.size(); j++){
+                    RangeSortVisual.VisualSortEntry<CitationGroupsV001.CitationGroupID> v = avs.get(j);
+                    v.indexInPosition = indexInPartition++;
+                    if ( mapFootnotesToFootnoteMarks ) {
+                        // Adjust range if we are inside a footnote:
+                        if (unoQI(XFootnote.class, v.range.getText()) != null) {
+                            // Find the linking footnote marker:
+                            XFootnote footer = unoQI(XFootnote.class, v.range.getText());
+                            // The footnote's anchor gives the correct position in the text:
+                            v.range = footer.getAnchor();
+                        }
+                    }
+                    res.add(v);
+                }
+            }
+        }
+        // convert
+        // List<VisualSortEntry<CitationGroupsV001.CitationGroupID>>
+        // to
+        // List<VisualSortable<CitationGroupsV001.CitationGroupID>>
+        return res.stream().map(e -> e).collect(Collectors.toList());
+    }
+
+    public List<CitationGroupsV001.CitationGroupID>
+    getVisuallySortedCitationGroupIDs(DocumentConnection documentConnection,
+                                      boolean mapFootnotesToFootnoteMarks)
+        throws
+        WrappedTargetException,
+        NoDocumentException,
+        JabRefException {
+        CitationGroupsV001 cgs = this;
+        List<RangeSortVisual.VisualSortable<CitationGroupsV001.CitationGroupID>> vses =
+            createVisualSortInput(cgs,
+                                  documentConnection,
+                                  mapFootnotesToFootnoteMarks);
+
+        if ( vses.size() != cgs.citationGroups.size() ) {
+            throw new RuntimeException("getVisuallySortedCitationGroupIDs:"
+                                       + " vses.size() != cgs.citationGroups.size()");
+        }
+
+        String messageOnFailureToObtainAFunctionalXTextViewCursor =
+            Localization.lang("Please move the cursor into the document text.")
+            + "\n"
+            + Localization.lang("To get the visual positions of your citations"
+                                + " I need to move the cursor around,"
+                                + " but could not get it.");
+        List<RangeSortVisual.VisualSortable<CitationGroupsV001.CitationGroupID>> sorted =
+            RangeSortVisual.visualSort( vses,
+                                        documentConnection,
+                                        messageOnFailureToObtainAFunctionalXTextViewCursor );
+
+        if ( sorted.size() != cgs.citationGroups.size() ) {
+            // This Fired
+            throw new RuntimeException("getVisuallySortedCitationGroupIDs:"
+                                       + " sorted.size() != cgs.citationGroups.size()");
+        }
+
+        return (sorted.stream()
+                .map(e -> e.getContent())
+                .collect(Collectors.toList()));
+    }
+
+    /**
+     * Calculate and return citation group IDs in visual order.
+     */
+    public List<CitationGroupID>
+    getCitationGroupIDsSortedWithinPartitions(DocumentConnection documentConnection)
+        throws
+        NoDocumentException,
+        WrappedTargetException
+        {
+        // This is like getVisuallySortedCitationGroupIDs,
+        // but we skip the visualSort part.
+        CitationGroupsV001 cgs = this;
+        boolean mapFootnotesToFootnoteMarks = false;
+        List<RangeSortVisual.VisualSortable<CitationGroupID>> vses =
+            CitationGroupsV001.createVisualSortInput(cgs,
+                                                     documentConnection,
+                                                     mapFootnotesToFootnoteMarks);
+
+        if ( vses.size() != cgs.citationGroups.size() ) {
+            throw new RuntimeException("getCitationGroupIDsSortedWithinPartitions:"
+                                       + " vses.size() != cgs.citationGroups.size()");
+        }
+        return (vses.stream()
+                .map(e -> e.getContent())
+                .collect(Collectors.toList()));
+    }
+
+    /**
+     * Citation group IDs in {@code globalOrder}
+     */
     public List<CitationGroupID>
     getSortedCitationGroupIDs() {
         if ( globalOrder.isEmpty() ) {
