@@ -40,6 +40,22 @@ class RangeKeyedMapList<V> {
     public List<TreeMap<XTextRange,List<V>>> partitionValues() {
         return this.xxs.partitionValues();
     }
+
+    /**
+     * Lis of all values: partitions in arbitrary order, ranges are
+     * sorted within partitions, values under the same range are in
+     * the order they were added.
+     */
+    public List<V> flatListOfValues() {
+        List<V> result = new ArrayList<>();
+        for (TreeMap<XTextRange,List<V>> partition : partitionValues() ) {
+            for (List<V> valuesUnderARange : partition.values() ) {
+                result.addAll(valuesUnderARange);
+            }
+        }
+        return result;
+    }
+
     enum OverlapKind {
         TOUCH,
         OVERLAP,
