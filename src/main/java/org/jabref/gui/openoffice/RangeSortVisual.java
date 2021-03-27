@@ -36,6 +36,7 @@ import com.sun.star.text.XTextViewCursorSupplier;
 import com.sun.star.util.InvalidStateException;
 
 import org.jabref.logic.JabRefException;
+import org.jabref.gui.openoffice.RangeSort;
 // import org.jabref.model.database.BibDatabase;
 // import org.jabref.model.entry.BibEntry;
 import org.slf4j.Logger;
@@ -148,48 +149,6 @@ class RangeSortVisual {
         }
     }
 
-    /**
-     * This is what {@code visualSort} needs in its input.
-     */
-    public interface VisualSortable<T> {
-        public XTextRange getRange();
-        public int getIndexInPosition();
-        public T getContent();
-    }
-
-    /**
-     * A simple implementation of {@code VisualSortable}
-     */
-    public static class VisualSortEntry<T> implements VisualSortable<T> {
-        public XTextRange range;
-        public int indexInPosition;
-        public T content;
-
-        VisualSortEntry(
-            XTextRange range,
-            int indexInPosition,
-            T content
-            ) {
-            this.range = range;
-            this.indexInPosition = indexInPosition;
-            this.content = content;
-        }
-
-        @Override
-        public XTextRange getRange() {
-            return range;
-        }
-
-        @Override
-        public int getIndexInPosition() {
-            return indexInPosition;
-        }
-
-        @Override
-        public T getContent() {
-            return content;
-        }
-    }
 
     /**
      * Sort its input {@code vses} visually.
@@ -206,8 +165,8 @@ class RangeSortVisual {
      * @return The input, sorted by the elements XTextRange and
      *          getIndexInPosition.
      */
-    public static <T> List<VisualSortable<T>>
-    visualSort(List<VisualSortable<T>> vses,
+    public static <T> List<RangeSort.RangeSortable<T>>
+    visualSort(List<RangeSort.RangeSortable<T>> vses,
                DocumentConnection documentConnection,
                String messageOnFailureToObtainAFunctionalXTextViewCursor)
         throws
@@ -310,7 +269,7 @@ class RangeSortVisual {
         // find coordinates
         List<Point> positions = new ArrayList<>(vses.size());
 
-        for (VisualSortable<T> v : vses) {
+        for (RangeSort.RangeSortable<T> v : vses) {
             positions.add(findPositionOfTextRange(v.getRange(),
                                                   viewCursor));
         }
@@ -327,7 +286,7 @@ class RangeSortVisual {
         }
 
         // order by position
-        Set<ComparableMark<VisualSortable<T>>> set = new TreeSet<>();
+        Set<ComparableMark<RangeSort.RangeSortable<T>>> set = new TreeSet<>();
         for (int i = 0; i < vses.size(); i++) {
             set.add(
                 new ComparableMark<>(
@@ -343,8 +302,8 @@ class RangeSortVisual {
         }
 
         // collect CitationGroupIDs in order
-        List<VisualSortable<T>> result = new ArrayList<>(set.size());
-        for (ComparableMark<VisualSortable<T>> mark : set) {
+        List<RangeSort.RangeSortable<T>> result = new ArrayList<>(set.size());
+        for (ComparableMark<RangeSort.RangeSortable<T>> mark : set) {
             result.add(mark.getContent());
         }
 

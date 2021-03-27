@@ -700,18 +700,18 @@ class CitationGroupsV001 {
 
     /**
      * Creates a list of {@code
-     * VisualSortable<CitationGroupsV001.CitationGroupID>} values for
+     * RangeSortable<CitationGroupsV001.CitationGroupID>} values for
      * our {@code CitationGroup} values. Originally designed to be
      * passed to {@code visualSort}.
      *
      * The elements of the returned list are actually of type {@code
-     * VisualSortEntry<CitationGroupID>}.
+     * RangeSortEntry<CitationGroupID>}.
      *
      * The result is sorted within {@code XTextRange.getText()}
      * partitions of the citation groups according to their {@code
      * XTextRange} (before mapping to footnote marks).
      *
-     * In the result, VisualSortable.getIndexInPosition() contains
+     * In the result, RangeSortable.getIndexInPosition() contains
      * unique indexes within the original partition (not after
      * mapFootnotesToFootnoteMarks).
      *
@@ -722,7 +722,7 @@ class CitationGroupsV001 {
      *        mark. This is used for numbering the citations.
      *
      */
-    private static List<RangeSortVisual.VisualSortable<CitationGroupsV001.CitationGroupID>>
+    private static List<RangeSort.RangeSortable<CitationGroupsV001.CitationGroupID>>
     createVisualSortInput(CitationGroupsV001 cgs,
                           DocumentConnection documentConnection,
                           boolean mapFootnotesToFootnoteMarks)
@@ -733,13 +733,13 @@ class CitationGroupsV001 {
         List<CitationGroupsV001.CitationGroupID> cgids =
             new ArrayList<>(cgs.getCitationGroupIDs());
 
-        List<RangeSortVisual.VisualSortEntry> vses = new ArrayList<>();
+        List<RangeSort.RangeSortEntry> vses = new ArrayList<>();
         for (CitationGroupsV001.CitationGroupID cgid : cgids) {
             XTextRange range = cgs.getReferenceMarkRangeOrNull(documentConnection, cgid);
             if (range == null) {
                 throw new RuntimeException( "getReferenceMarkRangeOrNull returned null" );
             }
-            vses.add( new RangeSortVisual.VisualSortEntry(range, 0, cgid) );
+            vses.add( new RangeSort.RangeSortEntry(range, 0, cgid) );
         }
 
         /*
@@ -763,17 +763,17 @@ class CitationGroupsV001 {
          */
 
         // Sort within partitions
-        RangeKeyedMapList<RangeSortVisual.VisualSortEntry<CitationGroupsV001.CitationGroupID>> xxs
+        RangeKeyedMapList<RangeSort.RangeSortEntry<CitationGroupsV001.CitationGroupID>> xxs
             = new RangeKeyedMapList<>();
 
-        for (RangeSortVisual.VisualSortEntry v : vses) {
+        for (RangeSort.RangeSortEntry v : vses) {
             xxs.add( v.getRange(), v );
         }
 
         // build final list
-        List<RangeSortVisual.VisualSortEntry<CitationGroupsV001.CitationGroupID>> res = new ArrayList<>();
+        List<RangeSort.RangeSortEntry<CitationGroupsV001.CitationGroupID>> res = new ArrayList<>();
 
-        for (TreeMap<XTextRange,List<RangeSortVisual.VisualSortEntry<CitationGroupsV001.CitationGroupID>>>
+        for (TreeMap<XTextRange,List<RangeSort.RangeSortEntry<CitationGroupsV001.CitationGroupID>>>
                  xs : xxs.partitionValues()) {
 
             List<XTextRange> oxs = new ArrayList<>(xs.keySet());
@@ -781,9 +781,9 @@ class CitationGroupsV001 {
             int indexInPartition = 0;
             for (int i = 0; i < oxs.size(); i++) {
                 XTextRange a = oxs.get(i);
-                List<RangeSortVisual.VisualSortEntry<CitationGroupsV001.CitationGroupID>> avs = xs.get(a);
+                List<RangeSort.RangeSortEntry<CitationGroupsV001.CitationGroupID>> avs = xs.get(a);
                 for (int j = 0; j < avs.size(); j++){
-                    RangeSortVisual.VisualSortEntry<CitationGroupsV001.CitationGroupID> v = avs.get(j);
+                    RangeSort.RangeSortEntry<CitationGroupsV001.CitationGroupID> v = avs.get(j);
                     v.indexInPosition = indexInPartition++;
                     if ( mapFootnotesToFootnoteMarks ) {
                         // Adjust range if we are inside a footnote:
@@ -799,9 +799,9 @@ class CitationGroupsV001 {
             }
         }
         // convert
-        // List<VisualSortEntry<CitationGroupsV001.CitationGroupID>>
+        // List<RangeSortEntry<CitationGroupsV001.CitationGroupID>>
         // to
-        // List<VisualSortable<CitationGroupsV001.CitationGroupID>>
+        // List<RangeSortable<CitationGroupsV001.CitationGroupID>>
         return res.stream().map(e -> e).collect(Collectors.toList());
     }
 
@@ -813,7 +813,7 @@ class CitationGroupsV001 {
         NoDocumentException,
         JabRefException {
         CitationGroupsV001 cgs = this;
-        List<RangeSortVisual.VisualSortable<CitationGroupsV001.CitationGroupID>> vses =
+        List<RangeSort.RangeSortable<CitationGroupsV001.CitationGroupID>> vses =
             createVisualSortInput(cgs,
                                   documentConnection,
                                   mapFootnotesToFootnoteMarks);
@@ -829,7 +829,7 @@ class CitationGroupsV001 {
             + Localization.lang("To get the visual positions of your citations"
                                 + " I need to move the cursor around,"
                                 + " but could not get it.");
-        List<RangeSortVisual.VisualSortable<CitationGroupsV001.CitationGroupID>> sorted =
+        List<RangeSort.RangeSortable<CitationGroupsV001.CitationGroupID>> sorted =
             RangeSortVisual.visualSort( vses,
                                         documentConnection,
                                         messageOnFailureToObtainAFunctionalXTextViewCursor );
@@ -858,7 +858,7 @@ class CitationGroupsV001 {
         // but we skip the visualSort part.
         CitationGroupsV001 cgs = this;
         boolean mapFootnotesToFootnoteMarks = false;
-        List<RangeSortVisual.VisualSortable<CitationGroupID>> vses =
+        List<RangeSort.RangeSortable<CitationGroupID>> vses =
             CitationGroupsV001.createVisualSortInput(cgs,
                                                      documentConnection,
                                                      mapFootnotesToFootnoteMarks);
