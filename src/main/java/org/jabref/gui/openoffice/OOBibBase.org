@@ -21,11 +21,6 @@ Consequences:
 - citations higher in the 2nd column get lower numbers than those at
   the bottom of the first.
 
-- combineCiteMarkers / Merge will miss opportunities in two-column layout
-
-  Since combineCiteMarkers checks relation in visual order, it will
-  not see otherwise consecutive citation marks as such, and does not
-  even try to combine them.
 
 *** The problem behind
 
@@ -252,47 +247,6 @@ was to be able to add/remove citations to the group.
       we could just warn the user about duplicate keys in a group and
       let him decide the appropriate action. For this we need editable
       presentation of pageInfo.
-
-** combineCiteMarkers                                         :group_and_ungroup:
-   - reimplemented to collect data first, then apply
-
-*** problem: although we keep the Unresolved entries here,
-     refreshCiteMarkers() destroys them
-     [[bug: refreshCiteMarkers destroys unresolved entries]]
-
-*** TODO problem: using visual order of appearance trips our solution
-
-    using visual order of appearance trips our solution with
-    two-column layout and also when viewing two pages side-by-side:
-    When it believes the order is "A,B", textually B may be before A,
-    or may appear in the same text (as in getText()) a page later.
-
-    Possible solutions:
-    - (1) Hack visualOrder: make a copy of the document, turn off
-      two-column and two-pages-side-by-side.
-      - But: changing layout to single column may change
-        ordering relation to frames.
-
-    - (2) For the purpose of combineCiteMarkers:
-      - we can only group markers in the same getText part
-      - within a getText part, textual order is perfect for us.
-
-        Procedure:
-        - getJabRefReferenceMarkNams
-        - partition by getText
-        - sort within partitions.
-        - unlike citation numbering, here
-          we do not need to decide where should
-          footnotes to be "inserted" in the main text:
-          we can just handle the partitions separately.
-
-    As a *stopgap* we test for wrong textual order, and disable
-    merging for pairs in the wrong order. Far-away, but correct order
-    is already handled by checking only-spaces-between.
-
-*** implement option (2)
-    - sortRangesWithinGetTextPartitions 
-
 .
 ** bug: backwordCompatibility OO_storage_v001
 
@@ -322,7 +276,6 @@ was to be able to add/remove citations to the group.
      - JabRef 5.2 creates XTextSection "JR_bib" and bookmark
        "JR_bib_end". On refresh, looks for XTextSection "JR_bib",
        creates cursor for the whole section,
-
 
    OO_storage_v002: changes since OO_storage_v001
 
@@ -1290,4 +1243,48 @@ without asking the user to click somewhere else?
    - unCombineCiteMarkers: calls insertReferenceMark
    - insertCitation (renamed from insertEntry) calls insertReferenceMark
      - and does not sort the entries
+** DONE bug: combineCiteMarkers problem: using visual order of appearance trips our solution
+
+    using visual order of appearance trips our solution with
+    two-column layout and also when viewing two pages side-by-side:
+    When it believes the order is "A,B", textually B may be before A,
+    or may appear in the same text (as in getText()) a page later.
+
+    Possible solutions:
+    - (1) Hack visualOrder: make a copy of the document, turn off
+      two-column and two-pages-side-by-side.
+      - But: changing layout to single column may change
+        ordering relation to frames.
+
+    - (2) For the purpose of combineCiteMarkers:
+      - we can only group markers in the same getText part
+      - within a getText part, textual order is perfect for us.
+
+        Procedure:
+        - getJabRefReferenceMarkNams
+        - partition by getText
+        - sort within partitions.
+        - unlike citation numbering, here
+          we do not need to decide where should
+          footnotes to be "inserted" in the main text:
+          we can just handle the partitions separately.
+
+    As a *stopgap* we test for wrong textual order, and disable
+    merging for pairs in the wrong order. Far-away, but correct order
+    is already handled by checking only-spaces-between.
+
+*** implement option (2)
+    - sortRangesWithinGetTextPartitions 
+
+*** resolved: combineCiteMarkers is now based on textual order
+
+This makes it independent of visual order and its problems.
+
+In particular, even though the numbers in a two-column layout
+are still like
+
+|12|34|
+|56|78|
+
+now (1256) and (3478) are considered as joinable groups.
 
