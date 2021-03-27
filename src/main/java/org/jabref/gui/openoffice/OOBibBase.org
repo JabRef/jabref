@@ -41,7 +41,7 @@ for wrapping. The question is: how to decide where the content of a
 frame should reside in firstAppearance order.
 
 The current solution (visual top-down left-to-right) gives an answer
-for this, but is arguably wrong with multi-column layout.
+to this, but is arguably wrong with multi-column layout.
 
 Ideas:
 

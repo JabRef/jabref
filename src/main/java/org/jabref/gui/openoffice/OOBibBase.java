@@ -1142,20 +1142,18 @@ class OOBibBase {
 
 
     private List<CitationGroupsV001.CitationGroupID>
-    getVisuallySortedCitationGroupIDs(
-        CitationGroupsV001 cgs,
-        DocumentConnection documentConnection,
-        boolean mapFootnotesToFootnoteMarks )
+    getVisuallySortedCitationGroupIDs(CitationGroupsV001 cgs,
+                                      DocumentConnection documentConnection,
+                                      boolean mapFootnotesToFootnoteMarks)
         throws
         WrappedTargetException,
         NoDocumentException,
         JabRefException {
 
         List<VisualSortable<CitationGroupsV001.CitationGroupID>> vses =
-            createVisualSortInput(
-                cgs,
-                documentConnection,
-                mapFootnotesToFootnoteMarks);
+            createVisualSortInput(cgs,
+                                  documentConnection,
+                                  mapFootnotesToFootnoteMarks);
 
         if ( vses.size() != cgs.citationGroups.size() ) {
             throw new RuntimeException("getVisuallySortedCitationGroupIDs:"
@@ -2271,11 +2269,10 @@ class OOBibBase {
      *  Note: assumes fresh `jabRefReferenceMarkNamesSortedByPosition`
      *  if `style.isSortByPosition()`
      */
-    private void
-    rebuildBibTextSection(DocumentConnection documentConnection,
-                          OOBibStyle style,
-                          CitationGroupsV001 cgs,
-                          CitationGroupsV001.CitedKeys bibliography)
+    private void rebuildBibTextSection(DocumentConnection documentConnection,
+                                       OOBibStyle style,
+                                       CitationGroupsV001 cgs,
+                                       CitationGroupsV001.CitedKeys bibliography)
         throws
         NoSuchElementException,
         WrappedTargetException,
@@ -2306,13 +2303,12 @@ class OOBibBase {
      *
      * Only called from populateBibTextSection (and that from rebuildBibTextSection)
      */
-    private void
-    insertFullReferenceAtCursor(DocumentConnection documentConnection,
-                                XTextCursor cursor,
-                                CitationGroupsV001 cgs,
-                                CitationGroupsV001.CitedKeys bibliography,
-                                OOBibStyle style,
-                                String parFormat)
+    private void insertFullReferenceAtCursor(DocumentConnection documentConnection,
+                                             XTextCursor cursor,
+                                             CitationGroupsV001 cgs,
+                                             CitationGroupsV001.CitedKeys bibliography,
+                                             OOBibStyle style,
+                                             String parFormat)
         throws
         UndefinedParagraphFormatException,
         IllegalArgumentException,
@@ -2447,8 +2443,7 @@ class OOBibBase {
      *
      * Only called from `clearBibTextSectionContent2`
      */
-    private void
-    createBibTextSection2(DocumentConnection documentConnection)
+    private void createBibTextSection2(DocumentConnection documentConnection)
         throws
         IllegalArgumentException,
         CreationException {
@@ -2474,8 +2469,7 @@ class OOBibBase {
      * Only called from: `rebuildBibTextSection`
      *
      */
-    private void
-    clearBibTextSectionContent2(DocumentConnection documentConnection)
+    private void clearBibTextSectionContent2(DocumentConnection documentConnection)
         throws
         WrappedTargetException,
         IllegalArgumentException,
@@ -2516,15 +2510,10 @@ class OOBibBase {
      *
      * Assumes the section named `OOBibBase.BIB_SECTION_NAME` exists.
      */
-    private void
-    populateBibTextSection(
-        DocumentConnection documentConnection,
-        CitationGroupsV001 cgs,
-        CitationGroupsV001.CitedKeys bibliography,
-        // Map<BibEntry, BibDatabase> entries,
-        OOBibStyle style
-        // final Map<String, String> uniqueLetters
-        )
+    private void populateBibTextSection(DocumentConnection documentConnection,
+                                        CitationGroupsV001 cgs,
+                                        CitationGroupsV001.CitedKeys bibliography,
+                                        OOBibStyle style)
         throws
         NoSuchElementException,
         WrappedTargetException,
@@ -2583,11 +2572,8 @@ class OOBibBase {
      * GUI action "Merge citations"
      *
      */
-    public void
-    combineCiteMarkers(
-        List<BibDatabase> databases,
-        OOBibStyle style
-        )
+    public void combineCiteMarkers(List<BibDatabase> databases,
+                                   OOBibStyle style)
         throws
         IOException,
         WrappedTargetException,
@@ -2619,6 +2605,7 @@ class OOBibBase {
             // The testing for whitespace-only between (pivot) and (pivot+1) assumes that
             // referenceMarkNames are in textual order: textually consecutive pairs
             // must appear as neighbours (and in textual order).
+            //
             // We have a bit of a clash here: referenceMarkNames is sorted by visual position,
             // but we are testing if they are textually neighbours.
             // In a two-column layout

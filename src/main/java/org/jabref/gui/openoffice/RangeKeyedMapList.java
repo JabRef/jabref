@@ -11,23 +11,19 @@ import com.sun.star.text.XTextRange;
 class RangeKeyedMapList<V> {
     RangeKeyedMap<List<V>> xxs;
 
-    public
-    RangeKeyedMapList() {
+    public RangeKeyedMapList() {
         this.xxs = new RangeKeyedMap<>();
     }
 
-    public boolean
-    containsKey(XTextRange r) {
+    public boolean containsKey(XTextRange r) {
         return xxs.containsKey(r);
     }
 
-    public List<V>
-    get(XTextRange r) {
+    public List<V> get(XTextRange r) {
         return xxs.get(r);
     }
 
-    public void
-    add( XTextRange r, V value) {
+    public void add(XTextRange r, V value) {
         List<V> vs = xxs.get(r);
         if (vs == null){
             vs = new ArrayList<>();
@@ -54,8 +50,7 @@ class RangeKeyedMapList<V> {
         OverlapKind kind;
         List<V> vs;
 
-        public
-        RangeOverlap( OverlapKind kind, List<V> vs ) {
+        public RangeOverlap( OverlapKind kind, List<V> vs ) {
             this.kind = kind;
             this.vs = vs;
         }
@@ -78,8 +73,7 @@ class RangeKeyedMapList<V> {
      * @param atMost Limit the number of records returneed to atMost.
      *        Zero or negative {@code atMost} means no limit.
      */
-    List<RangeOverlap>
-    findOverlappingRanges(int atMost, boolean includeTouching) {
+    List<RangeOverlap> findOverlappingRanges(int atMost, boolean includeTouching) {
         List<RangeOverlap> res = new ArrayList<>();
         for (TreeMap<XTextRange,List<V>> xs : xxs.partitionValues()) {
             List<XTextRange> oxs = new ArrayList<>(xs.keySet());
@@ -121,5 +115,4 @@ class RangeKeyedMapList<V> {
         }
         return res;
     }
-
 }
