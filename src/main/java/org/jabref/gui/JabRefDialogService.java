@@ -7,8 +7,11 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Queue;
+import java.util.StringJoiner;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -67,17 +70,21 @@ public class JabRefDialogService implements DialogService {
     public static final int DIALOG_SIZE_LIMIT = 300;
 
     private static final Duration TOAST_MESSAGE_DISPLAY_TIME = Duration.millis(3000);
+    private static final int MAX_TOASTS_DISPLAYED = 5;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefDialogService.class);
     private static PreferencesService preferences;
 
     private final Window mainWindow;
     private final JFXSnackbar statusLine;
     private JFXSnackbarLayout currSnackbarLayout;
+    private Queue<String> snackbarMsgs;
 
     public JabRefDialogService(Window mainWindow, Pane mainPane, PreferencesService preferences) {
         this.mainWindow = mainWindow;
         this.statusLine = new JFXSnackbar(mainPane);
         JabRefDialogService.preferences = preferences;
+        this.snackbarMsgs = new LinkedList<>();
     }
 
     private FXDialog createDialog(AlertType type, String title, String content) {
@@ -339,10 +346,16 @@ public class JabRefDialogService implements DialogService {
         LOGGER.info(message);
         SnackbarEvent currEvent = statusLine.getCurrentEvent();
         if (currEvent == null) {
+            snackbarMsgs.clear();
+            snackbarMsgs.add(message);
             currSnackbarLayout = new JFXSnackbarLayout(message);
             statusLine.fireEvent(new SnackbarEvent(currSnackbarLayout, TOAST_MESSAGE_DISPLAY_TIME));
         } else if (currSnackbarLayout != null) {
-            currSnackbarLayout.setToast(message + "\n\n" + currSnackbarLayout.getToast());
+            snackbarMsgs.add(message);
+            while (snackbarMsgs.size() > MAX_TOASTS_DISPLAYED) {
+                snackbarMsgs.poll();
+            }
+            currSnackbarLayout.setToast(String.join("\n\n", snackbarMsgs));
         }
     }
 
