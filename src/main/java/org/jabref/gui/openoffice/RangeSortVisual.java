@@ -41,6 +41,18 @@ import org.jabref.logic.JabRefException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Sort XTextRange values visually (top-down,left-to-right).
+ *
+ * Requires functional XTextViewCursor.
+ *
+ * Problem: for multicolumn layout and view pages side-by-side mode of
+ *          LO, the (top-down,left-to-right) order interpreted
+ *          as-on-the-screen: an XTextRange at the top of the second
+ *          column or second page is sorted before one at the bottom
+ *          of the first column of the first page.
+ *
+ */
 class RangeSortVisual {
 
     private static final Logger LOGGER =
@@ -203,7 +215,7 @@ class RangeSortVisual {
         NoDocumentException,
         JabRefException {
 
-        final int nCitationGroups = vses.size();
+        final int inputSize = vses.size();
 
         // if ( messageOnFailureToObtainAFunctionalXTextViewCursor == null ) {
         //     messageOnFailureToObtainAFunctionalXTextViewCursor =
@@ -310,8 +322,8 @@ class RangeSortVisual {
             documentConnection.select(initialSelection);
         }
 
-        if ( positions.size() != nCitationGroups ) {
-            throw new RuntimeException("visualSort: positions.size() != nCitationGroups");
+        if ( positions.size() != inputSize ) {
+            throw new RuntimeException("visualSort: positions.size() != inputSize");
         }
 
         // order by position
@@ -326,8 +338,8 @@ class RangeSortVisual {
                 );
         }
 
-        if ( set.size() != nCitationGroups ) {
-            throw new RuntimeException("visualSort: set.size() != nCitationGroups");
+        if ( set.size() != inputSize ) {
+            throw new RuntimeException("visualSort: set.size() != inputSize");
         }
 
         // collect CitationGroupIDs in order
@@ -336,8 +348,8 @@ class RangeSortVisual {
             result.add(mark.getContent());
         }
 
-        if ( result.size() != nCitationGroups ) {
-            throw new RuntimeException("visualSort: result.size() != nCitationGroups");
+        if ( result.size() != inputSize ) {
+            throw new RuntimeException("visualSort: result.size() != inputSize");
         }
 
         return result;
