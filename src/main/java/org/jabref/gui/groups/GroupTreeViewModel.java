@@ -195,6 +195,16 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 boolean removePreviousAssignments = (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup)
                         && (group instanceof ExplicitGroup);
 
+                int groupsWithSameName = 0;
+                Optional<GroupTreeNode> databaseRootGroup = currentDatabase.get().getMetaData().getGroups();
+                if (databaseRootGroup.isPresent()) {
+                    String name = oldGroup.getGroupNode().getGroup().getName();
+                    groupsWithSameName = databaseRootGroup.get().findChildrenSatisfying(g -> g.getName().equals(name)).size();
+                }
+                if (groupsWithSameName >= 2) {
+                    removePreviousAssignments = false;
+                }
+
                 oldGroup.getGroupNode().setGroup(
                         group,
                         keepPreviousAssignments,
