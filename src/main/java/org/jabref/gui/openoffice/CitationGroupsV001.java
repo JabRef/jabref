@@ -293,38 +293,6 @@ class CitationGroupsV001 {
         /**
          * Sort entries for the bibliography.
          */
-        /*
-        class SortCitedKeys implements Comparator<CitedKey> {
-
-            Comparator<BibEntry> entryComparator;
-            boolean unresolvedComesFirst;
-
-            SortCitedKeys(Comparator<BibEntry> entryComparator,
-                          boolean unresolvedComesFirst) {
-                this.entryComparator = entryComparator;
-                this.unresolvedComesFirst = unresolvedComesFirst;
-            }
-
-            public int compare(CitedKey a, CitedKey b) {
-                if (a.db.isEmpty() && b.db.isEmpty()) {
-                    // Both are unresolved: compare them by citation key.
-                    return a.key.compareTo(b.key);
-                }
-                // Comparing unresolved and real entry
-                final int mul = unresolvedComesFirst ? (+1) : (-1);
-                if (a.db.isEmpty()) {
-                    return -mul;
-                }
-                if (b.db.isEmpty()) {
-                    return mul;
-                }
-                // Proper comparison of entries
-                return entryComparator.compare(a.db.get().entry,
-                                               b.db.get().entry);
-            }
-        }
-        */
-
         void sortByComparator(Comparator<BibEntry> entryComparator) {
             List<CitedKey> cks = new ArrayList<>(data.values());
             cks.sort(new CitationSort.CitationComparator(entryComparator, true));
