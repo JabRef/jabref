@@ -1267,8 +1267,7 @@ class OOBibBase {
 
             cgs.cleanFillCursorForCitationGroup(documentConnection,
                                                 cgid,
-                                                !withText,
-                                                cgs.REFERENCE_MARK_ALWAYS_REMOVE_BRACKETS);
+                                                !withText);
         }
         position.collapseToEnd();
     }
@@ -1685,8 +1684,7 @@ class OOBibBase {
 
                 cgs.cleanFillCursorForCitationGroup(documentConnection,
                                                     cgid,
-                                                    !withText,
-                                                    cgs.REFERENCE_MARK_ALWAYS_REMOVE_BRACKETS);
+                                                    !withText);
             }
 
             if (hadBibSection
@@ -2188,7 +2186,9 @@ class OOBibBase {
 
 
             List<CitationGroupsV001.CitationGroupID>
-                referenceMarkNames = cgs.getCitationGroupIDsSortedWithinPartitions(documentConnection);
+                referenceMarkNames =
+                cgs.getCitationGroupIDsSortedWithinPartitions(documentConnection,
+                                                              false /* mapFootnotesToFootnoteMarks */);
 
             final int nRefMarks = referenceMarkNames.size();
 
