@@ -54,18 +54,6 @@ class CitationGroupsV001 {
     private static final Pattern CITE_PATTERN =
             Pattern.compile(BIB_CITATION + "(\\d*)_(\\d*)_(.*)");
 
-    private static final String ZERO_WIDTH_SPACE = "\u200b";
-
-    // for debugging we may want visible bracket
-    private static final boolean
-    REFERENCE_MARK_USE_INVISIBLE_BRACKETS = true; // !debug;
-
-    private static final String
-    REFERENCE_MARK_LEFT_BRACKET = REFERENCE_MARK_USE_INVISIBLE_BRACKETS ? ZERO_WIDTH_SPACE : "<";
-
-    private static final String
-    REFERENCE_MARK_RIGHT_BRACKET = REFERENCE_MARK_USE_INVISIBLE_BRACKETS ? ZERO_WIDTH_SPACE : ">";
-
 
     /**
      *  Original CitationGroups Data
@@ -904,8 +892,8 @@ class CitationGroupsV001 {
         cursor.goRight((short) 1, false);
         // now we are between two spaces
 
-        final String left = REFERENCE_MARK_LEFT_BRACKET;
-        final String right = REFERENCE_MARK_RIGHT_BRACKET;
+        final String left = StorageBaseRefMark.REFERENCE_MARK_LEFT_BRACKET;
+        final String right = StorageBaseRefMark.REFERENCE_MARK_RIGHT_BRACKET;
         final short leftLength = (short) left.length();
         final short rightLength = (short) right.length();
         String bracketedContent = (withoutBrackets
@@ -975,16 +963,17 @@ class CitationGroupsV001 {
      *        we are working on an "Empty citation" (INVISIBLE_CIT).
      */
     public void cleanFillCursorForCitationGroup(DocumentConnection documentConnection,
-                                                CitationGroupID cgid,
-                                                boolean removeBracketsFromEmpty)
+                                                CitationGroupID cgid)
         throws
         NoDocumentException,
         WrappedTargetException,
         CreationException {
 
         boolean alwaysRemoveBrackets = true;
-        final String left = REFERENCE_MARK_LEFT_BRACKET;
-        final String right = REFERENCE_MARK_RIGHT_BRACKET;
+        boolean removeBracketsFromEmpty = false;
+
+        final String left = StorageBaseRefMark.REFERENCE_MARK_LEFT_BRACKET;
+        final String right = StorageBaseRefMark.REFERENCE_MARK_RIGHT_BRACKET;
         final short leftLength = (short) left.length();
         final short rightLength = (short) right.length();
 
@@ -1086,8 +1075,8 @@ class CitationGroupsV001 {
         String name = this.getReferenceMarkName(cgid).orElseThrow(RuntimeException::new);
 
         final boolean debugThisFun = false;
-        final String left = REFERENCE_MARK_LEFT_BRACKET;
-        final String right = REFERENCE_MARK_RIGHT_BRACKET;
+        final String left = StorageBaseRefMark.REFERENCE_MARK_LEFT_BRACKET;
+        final String right = StorageBaseRefMark.REFERENCE_MARK_RIGHT_BRACKET;
         final short leftLength = (short) left.length();
         final short rightLength = (short) right.length();
 
@@ -1398,6 +1387,8 @@ class CitationGroupsV001 {
      *
      * @param cgid : Must be known.
      * @return Null if the reference mark is missing.
+     *
+     * TODO: getReferenceMarkRangeOrNull vs getRawCursorForCitationGroup
      */
     public XTextRange getReferenceMarkRangeOrNull(DocumentConnection documentConnection,
                                                   CitationGroupID cgid)

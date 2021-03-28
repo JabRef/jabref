@@ -1250,7 +1250,7 @@ class OOBibBase {
                                     itcType,
                                     position,
                                     insertSpaceAfter,
-                                    !withText);
+                                    !withText /* withoutBrackets */);
 
         if (withText) {
             XTextCursor c2 =
@@ -1265,9 +1265,7 @@ class OOBibBase {
                                      withText,
                                      style);
 
-            cgs.cleanFillCursorForCitationGroup(documentConnection,
-                                                cgid,
-                                                !withText);
+            cgs.cleanFillCursorForCitationGroup(documentConnection, cgid);
         }
         position.collapseToEnd();
     }
@@ -1682,9 +1680,7 @@ class OOBibBase {
                                          withText,
                                          style);
 
-                cgs.cleanFillCursorForCitationGroup(documentConnection,
-                                                    cgid,
-                                                    !withText);
+                cgs.cleanFillCursorForCitationGroup(documentConnection, cgid);
             }
 
             if (hadBibSection
