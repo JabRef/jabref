@@ -49,9 +49,6 @@ class CitationGroupsV001 {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(CitedKeys.class);
 
-
-
-
     static class Citation  implements CitationSort.ComparableCitation {
 
         /** key in database */
@@ -924,49 +921,6 @@ class CitationGroupsV001 {
             CitationGroup cg = this.getCitationGroup(cgid).orElseThrow(RuntimeException::new);
             return cg.cgRangeStorage.getFillCursor(documentConnection);
         }
-
-
-
-//    /**
-//     * Extract citation keys from names of referenceMarks in the document.
-//     *
-//     * Each citation key is listed only once, in the order of first appearance
-//     * (in `names`, which itself is in arbitrary order)
-//     *
-//     * doc.referenceMarks.names.map(parse).flatten.unique
-//     *
-//     * TODO: avoid direct reference mark manipulation
-//     */
-//    private List<String> findCitedKeys(DocumentConnection documentConnection)
-//        throws
-//        NoSuchElementException,
-//        WrappedTargetException,
-//        NoDocumentException {
-//
-//        List<String> names =
-//            Codec.getJabRefReferenceMarkNames(this.citationStorageManager,
-//                                              documentConnection);
-//
-//        // assert it supports XTextContent
-//        XNameAccess xNamedMarks = documentConnection.getReferenceMarks();
-//        for (String name1 : names) {
-//            Object bookmark = xNamedMarks.getByName(name1);
-//            assert (null != DocumentConnection.asTextContent(bookmark));
-//        }
-//
-//        // Collect to a flat list while keep only the first appearance.
-//        List<String> keys = new ArrayList<>();
-//        for (String name1 : names) {
-//            List<String> newKeys = Codec.parseRefMarkNameToUniqueCitationKeys(name1);
-//            for (String key : newKeys) {
-//                if (!keys.contains(key)) {
-//                    keys.add(key);
-//                }
-//            }
-//        }
-//
-//        return keys;
-//    }
 
     /**
      *  Given the name of a reference mark, get the corresponding

@@ -108,28 +108,6 @@ class Codec {
         return (Optional.of(new Codec.ParsedRefMark(i, itcType, keys)));
     }
 
-//    /**
-//     * Extract the list of citation keys from a reference mark name.
-//     *
-//     * @param name The reference mark name.
-//     * @return The list of citation keys encoded in the name.
-//     *
-//     *         In case of duplicated citation keys,
-//     *         only the first occurrence.
-//     *         Otherwise their order is preserved.
-//     *
-//     *         If name does not match CITE_PATTERN,
-//     *         an empty list of strings is returned.
-//     */
-//    private static List<String> parseRefMarkNameToUniqueCitationKeys(String name) {
-//        Optional<ParsedRefMark> op = parseRefMarkName(name);
-//        return (op.map(parsedRefMark ->
-//                       parsedRefMark.citationKeys.stream()
-//                       .distinct()
-//                       .collect(Collectors.toList()))
-//                .orElseGet(ArrayList::new));
-//    }
-
     /**
      * @return true if name matches the pattern used for JabRef
      * reference mark names.
@@ -165,36 +143,4 @@ class Codec {
         List<String> allNames = manager.getUsedNames(documentConnection);
         return filterIsJabRefReferenceMarkName(allNames);
     }
-
-//    /**
-//     * For each name in referenceMarkNames set types[i] and
-//     * bibtexKeys[i] to values parsed from referenceMarkNames.get(i)
-//     *
-//     * @param referenceMarkNames Should only contain parsable names.
-//     * @param types              OUT Must be same length as referenceMarkNames.
-//     * @param bibtexKeys         OUT First level must be same length as referenceMarkNames.
-//     */
-//    private static void parseRefMarkNamesToArrays(List<String> referenceMarkNames,
-//                                                  int[] types,
-//                                                  String[][] bibtexKeys) {
-//
-//        final int nRefMarks = referenceMarkNames.size();
-//        assert (types.length == nRefMarks);
-//        assert (bibtexKeys.length == nRefMarks);
-//        for (int i = 0; i < nRefMarks; i++) {
-//            final String name = referenceMarkNames.get(i);
-//            Optional<ParsedRefMark> op = parseRefMarkName(name);
-//            if (op.isEmpty()) {
-//                // We have a problem. We want types[i] and bibtexKeys[i]
-//                // to correspond to referenceMarkNames.get(i).
-//                // And do not want null in bibtexKeys (or error code in types)
-//                // on return.
-//                throw new IllegalArgumentException(
-//                    "parseRefMarkNamesToArrays expects parsable referenceMarkNames");
-//            }
-//            ParsedRefMark ov = op.get();
-//            types[i] = ov.itcType;
-//            bibtexKeys[i] = ov.citationKeys.toArray(String[]::new);
-//        }
-//    }
 }
