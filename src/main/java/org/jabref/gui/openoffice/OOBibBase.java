@@ -768,7 +768,7 @@ class OOBibBase {
     private String normalizedCitationMarkerForNormalStyle(CitationGroupsV001.CitedKey ck,
                                                           OOBibStyle style) {
         if (ck.db.isEmpty()){
-            return String.format("(Unresolved(%s))", ck.key);
+            return String.format("(Unresolved(%s))", ck.citationKey);
         }
         BibEntry ce = ck.db.get().entry;
         Map<BibEntry, BibDatabase> entries = new HashMap<>();
@@ -825,7 +825,7 @@ class OOBibBase {
         Map<String, List<String>> ncm2clks = new HashMap<>();
         for (CitationGroupsV001.CitedKey ck : sortedCitedKeys.values()) {
             String ncm = ck.normCitMarker.get();
-            String citationKey = ck.key;
+            String citationKey = ck.citationKey;
 
             if (!ncm2clks.containsKey(ncm)) {
                 // Found new normCitMarker
@@ -1728,7 +1728,7 @@ class OOBibBase {
             List<String> unresolvedKeys = new ArrayList<>();
             for (CitationGroupsV001.CitedKey ck : bib.values()) {
                 if ( ck.db.isEmpty() ) {
-                    unresolvedKeys.add(ck.key);
+                    unresolvedKeys.add(ck.citationKey);
                 }
             }
             return unresolvedKeys;
@@ -1923,7 +1923,7 @@ class OOBibBase {
 
             if (debugThisFun) {
                 System.out.printf("Ref cit %-20s ck.number %7s%n",
-                                  String.format("'%s'",ck.key),
+                                  String.format("'%s'",ck.citationKey),
                                   (ck.number.isEmpty()
                                    ? "(empty)"
                                    : String.format("%02d",ck.number.get())));
@@ -1961,7 +1961,7 @@ class OOBibBase {
                 // skip unresolved entries
                 OOUtil.insertTextAtCurrentLocation(documentConnection.xText,
                                                    cursor,
-                                                   String.format("Unresolved(%s)", ck.key),
+                                                   String.format("Unresolved(%s)", ck.citationKey),
                                                    Collections.emptyList());
                 // Try to list citations:
                 if (true) {
@@ -2754,7 +2754,7 @@ class OOBibBase {
 
         for (CitationGroupsV001.CitedKey ck : cks.values()) {
             if ( ck.db.isEmpty() ) {
-                unresolvedKeys.add(ck.key);
+                unresolvedKeys.add(ck.citationKey);
                 continue;
             } else {
                 BibEntry entry = ck.db.get().entry;

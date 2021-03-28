@@ -205,15 +205,15 @@ class CitationGroupsV001 {
 
 
     class CitedKey implements CitationSort.ComparableCitation {
-        String key;  // TODO: rename to citationKey
+        String citationKey;
         LinkedHashSet<CitationPath> where;
         Optional<CitationDatabaseLookup.Result> db;
         Optional<Integer> number; // For Numbered citation styles.
         Optional<String> uniqueLetter; // For AuthorYear citation styles.
         Optional<String> normCitMarker;  // For AuthorYear citation styles.
 
-        CitedKey(String key, CitationPath p, Citation cit) {
-            this.key = key;
+        CitedKey(String citationKey, CitationPath p, Citation cit) {
+            this.citationKey = citationKey;
             this.where = new LinkedHashSet<>(); // remember order
             this.where.add(p);
             this.db = cit.db;
@@ -224,7 +224,7 @@ class CitationGroupsV001 {
 
         @Override
         public String getCitationKey(){
-            return key;
+            return citationKey;
         }
 
         @Override
@@ -251,7 +251,7 @@ class CitationGroupsV001 {
         }
 
         void lookupInDatabases(List<BibDatabase> databases) {
-            this.db = CitationDatabaseLookup.lookup(databases, this.key);
+            this.db = CitationDatabaseLookup.lookup(databases, this.citationKey);
         }
 
         void distributeDatabaseLookupResult(CitationGroupsV001 cgs) {
@@ -294,7 +294,7 @@ class CitationGroupsV001 {
             cks.sort(new CitationSort.CitationComparator(entryComparator, true));
             LinkedHashMap<String, CitedKey> newData = new LinkedHashMap<>();
             for (CitedKey ck : cks) {
-                newData.put(ck.key, ck);
+                newData.put(ck.citationKey, ck);
             }
             data = newData;
         }
