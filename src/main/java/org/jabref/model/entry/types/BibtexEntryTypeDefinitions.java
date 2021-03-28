@@ -180,6 +180,8 @@ public class BibtexEntryTypeDefinitions {
     public static final List<BibEntryType> ALL = Arrays.asList(ARTICLE, INBOOK, BOOK, BOOKLET, INCOLLECTION, CONFERENCE,
             INPROCEEDINGS, PROCEEDINGS, MANUAL, MASTERSTHESIS, PHDTHESIS, TECHREPORT, UNPUBLISHED, MISC);
 
+    public static final List<BibEntryType> RECOMMENDED = Arrays.asList(ARTICLE, BOOK, INPROCEEDINGS, TECHREPORT, MISC);
+
     private BibtexEntryTypeDefinitions() {
     }
 }

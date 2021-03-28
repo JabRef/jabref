@@ -15,8 +15,18 @@ open module org.jabref {
     requires afterburner.fx;
     requires com.jfoenix;
     requires de.saxsys.mvvmfx;
-    requires de.jensd.fx.fontawesomefx.commons;
-    requires de.jensd.fx.fontawesomefx.materialdesignicons;
+
+    requires org.kordamp.ikonli.core;
+    requires org.kordamp.ikonli.javafx;
+    requires org.kordamp.ikonli.materialdesign2;
+    uses org.kordamp.ikonli.IkonHandler;
+    uses org.kordamp.ikonli.IkonProvider;
+
+    provides org.kordamp.ikonli.IkonHandler
+            with org.jabref.gui.icon.JabRefIkonHandler;
+    provides org.kordamp.ikonli.IkonProvider
+            with org.jabref.gui.icon.JabrefIconProvider;
+
     requires org.controlsfx.controls;
     requires org.fxmisc.richtext;
     requires com.tobiasdiez.easybind;
@@ -61,11 +71,6 @@ open module org.jabref {
     requires jbibtex;
     requires citeproc.java;
     requires antlr.runtime;
-    requires org.graalvm.truffle;
-    requires org.graalvm.sdk;
-    requires transitive org.graalvm.js;
-    requires java.scripting;
-    requires jdk.internal.vm.compiler;
     requires org.apache.xmpbox;
     requires de.saxsys.mvvmfx.validation;
     requires com.google.gson;
@@ -93,4 +98,7 @@ open module org.jabref {
     requires lucene.queryparser;
     requires lucene.core;
     requires org.eclipse.jgit;
+    requires com.fasterxml.jackson.databind;
+    requires com.fasterxml.jackson.dataformat.yaml;
+    requires com.fasterxml.jackson.datatype.jsr310;
 }

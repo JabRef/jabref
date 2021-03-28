@@ -52,6 +52,8 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
         ControlHelper.setAction(saveButton, getDialogPane(), event -> savePreferencesAndCloseDialog());
 
+        this.getDialogPane().setStyle("-fx-font-size: " + preferencesService.getAppearancePreferences().getMainFontSize() + "pt;");
+
         // ToDo: After conversion of all tabs to mvvm, rework interface and make validSettings bindable
         // Button btnSave = (Button) this.getDialogPane().lookupButton(saveButton);
         // btnSave.disableProperty().bind(viewModel.validSettings().validProperty().not());
@@ -82,6 +84,8 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
                 preferencesContainer.setContent(null);
             } else {
                 preferencesContainer.setContent(tab.getBuilder());
+                ((AbstractPreferenceTabView<?>) tab).prefWidthProperty().bind(preferencesContainer.widthProperty());
+                ((AbstractPreferenceTabView<?>) tab).getStyleClass().add("preferencesTab");
             }
         });
 

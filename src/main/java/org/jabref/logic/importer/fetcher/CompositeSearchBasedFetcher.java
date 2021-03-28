@@ -13,6 +13,7 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,13 +37,23 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(ComplexSearchQuery complexSearchQuery) {
+    public String getName() {
+        return "SearchAll";
+    }
+
+    @Override
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.empty();
+    }
+
+    @Override
+    public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
         ImportCleanup cleanup = new ImportCleanup(BibDatabaseMode.BIBTEX);
         // All entries have to be converted into one format, this is necessary for the format conversion
         return fetchers.parallelStream()
                        .flatMap(searchBasedFetcher -> {
                            try {
-                               return searchBasedFetcher.performSearch(complexSearchQuery).stream();
+                               return searchBasedFetcher.performSearch(luceneQuery).stream();
                            } catch (FetcherException e) {
                                LOGGER.warn(String.format("%s API request failed", searchBasedFetcher.getName()), e);
                                return Stream.empty();
@@ -51,15 +62,5 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
                        .limit(maximumNumberOfReturnedResults)
                        .map(cleanup::doPostCleanup)
                        .collect(Collectors.toList());
-    }
-
-    @Override
-    public String getName() {
-        return "SearchAll";
-    }
-
-    @Override
-    public Optional<HelpFile> getHelpPage() {
-        return Optional.empty();
     }
 }

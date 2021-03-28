@@ -187,7 +187,7 @@ public class BracketedPattern {
      * @param database         The {@link BibDatabase} for field resolving. May be null.
      * @return a function accepting a bracketed expression and returning the result of expanding it
      */
-    private static Function<String, String> expandBracketContent(Character keywordDelimiter, BibEntry entry, BibDatabase database) {
+    public static Function<String, String> expandBracketContent(Character keywordDelimiter, BibEntry entry, BibDatabase database) {
         return (String bracket) -> {
             String expandedPattern;
             List<String> fieldParts = parseFieldAndModifiers(bracket);
@@ -491,23 +491,22 @@ public class BracketedPattern {
      * @return an {@link AuthorList} consisting of authors and institution keys with resolved latex.
      */
     private static AuthorList createAuthorList(String unparsedAuthors) {
-        AuthorList authorList = new AuthorList();
-        for (Author author : AuthorList.parse(unparsedAuthors).getAuthors()) {
-            // If the author is an institution, use an institution key instead of the full name
-            String lastName = author.getLast()
-                                    .map(lastPart -> isInstitution(author) ?
-                                            generateInstitutionKey(lastPart) :
-                                            LatexToUnicodeAdapter.format(lastPart))
-                                    .orElse(null);
-            authorList.addAuthor(
-                    author.getFirst().map(LatexToUnicodeAdapter::format).orElse(null),
-                    author.getFirstAbbr().map(LatexToUnicodeAdapter::format).orElse(null),
-                    author.getVon().map(LatexToUnicodeAdapter::format).orElse(null),
-                    lastName,
-                    author.getJr().map(LatexToUnicodeAdapter::format).orElse(null)
-            );
-        }
-        return authorList;
+        return AuthorList.parse(unparsedAuthors).getAuthors().stream()
+                         .map((author) -> {
+                             // If the author is an institution, use an institution key instead of the full name
+                             String lastName = author.getLast()
+                                                     .map(lastPart -> isInstitution(author) ?
+                                                             generateInstitutionKey(lastPart) :
+                                                             LatexToUnicodeAdapter.format(lastPart))
+                                                     .orElse(null);
+                             return new Author(
+                                     author.getFirst().map(LatexToUnicodeAdapter::format).orElse(null),
+                                     author.getFirstAbbr().map(LatexToUnicodeAdapter::format).orElse(null),
+                                     author.getVon().map(LatexToUnicodeAdapter::format).orElse(null),
+                                     lastName,
+                                     author.getJr().map(LatexToUnicodeAdapter::format).orElse(null));
+                         })
+                         .collect(AuthorList.collect());
     }
 
     /**

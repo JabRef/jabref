@@ -47,10 +47,9 @@ jobs:
           cd $GITHUB_WORKSPACE
           ./gradlew generateJournalAbbreviationList
 
-          # git commit
-          git config user.email "jabrefmail+webfeedback@gmail.com"
-          git config user.name "JabRef refresh journal lists [bot]"
-          git add . && git commit -m"Update journalList.mv"
-      - uses: ad-m/github-push-action@master
+      - uses: peter-evans/create-pull-request@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: update-journallist
+          title: "[Bot] Update Journal abbrev list"
+          commit-message: Update journal abbrev list

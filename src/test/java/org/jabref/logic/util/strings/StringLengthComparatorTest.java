@@ -20,4 +20,26 @@ public class StringLengthComparatorTest {
         assertEquals(0, slc.compare("AA", "AA"));
         assertEquals(1, slc.compare("AA", "AAA"));
     }
+
+    @Test
+    public void emptyStringTest() {
+        assertEquals(-1, slc.compare("A", ""));
+        assertEquals(0, slc.compare("", ""));
+        assertEquals(1, slc.compare("", "A"));
+    }
+
+    @Test
+    public void backslashTest() {
+        assertEquals(-1, slc.compare("\\\\", "A"));
+        assertEquals(0, slc.compare("\\", "A"));
+        assertEquals(0, slc.compare("\\", "\\"));
+        assertEquals(0, slc.compare("A", "\\"));
+        assertEquals(1, slc.compare("A", "\\\\"));
+    }
+
+    @Test
+    public void emptyStringAndBackslashTest() {
+        assertEquals(-1, slc.compare("\\", ""));
+        assertEquals(1, slc.compare("", "\\"));
+    }
 }

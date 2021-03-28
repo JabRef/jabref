@@ -2,8 +2,7 @@ package org.jabref.gui.openoffice;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -129,7 +128,7 @@ class OOBibBase {
 
     private final DialogService dialogService;
 
-    public OOBibBase(List<URL> jarUrls, boolean atEnd, DialogService dialogService) throws IllegalAccessException, InvocationTargetException, BootstrapException, CreationException, IOException, ClassNotFoundException {
+    public OOBibBase(Path loPath, boolean atEnd, DialogService dialogService) throws IllegalAccessException, InvocationTargetException, BootstrapException, CreationException, IOException, ClassNotFoundException {
 
         this.dialogService = dialogService;
 
@@ -146,7 +145,7 @@ class OOBibBase {
 
         this.atEnd = atEnd;
 
-        xDesktop = simpleBootstrap(jarUrls);
+        xDesktop = simpleBootstrap(loPath);
     }
 
     public boolean isConnectedToDocument() {
@@ -155,7 +154,7 @@ class OOBibBase {
 
     public XTextDocument selectComponent(List<XTextDocument> list) {
         List<DocumentTitleViewModel> viewModel = list.stream().map(DocumentTitleViewModel::new).collect(Collectors.toList());
-        // this whole method is part of a background task when autodecting instances, so we need to show dialog in FX thread
+        // this whole method is part of a background task when auto-detecting instances, so we need to show dialog in FX thread
         Optional<DocumentTitleViewModel> selectedDocument = dialogService.showChoiceDialogAndWait(Localization.lang("Select document"), Localization.lang("Found documents:"), Localization.lang("Use selected document"), viewModel);
         return selectedDocument.map(DocumentTitleViewModel::getXtextDocument).orElse(null);
     }
@@ -232,14 +231,11 @@ class OOBibBase {
         return result;
     }
 
-    private XDesktop simpleBootstrap(List<URL> jarUrls)
+    private XDesktop simpleBootstrap(Path loPath)
             throws CreationException, BootstrapException {
 
-        URL[] urls = jarUrls.toArray(new URL[1]);
-        URLClassLoader loader = new URLClassLoader(urls, null);
-
         // Get the office component context:
-        XComponentContext xContext = org.jabref.gui.openoffice.Bootstrap.bootstrap(loader);
+        XComponentContext xContext = org.jabref.gui.openoffice.Bootstrap.bootstrap(loPath);
         // Get the office service manager:
         XMultiComponentFactory xServiceManager = xContext.getServiceManager();
         // Create the desktop, which is the root frame of the
@@ -1256,6 +1252,70 @@ class OOBibBase {
                 madeModifications = true;
             }
             piv++;
+        }
+        if (madeModifications) {
+            updateSortedReferenceMarks();
+            refreshCiteMarkers(databases, style);
+        }
+    }
+
+    /**
+     * Do the opposite of combineCiteMarkers.
+     * Combined markers are split, with a space inserted between.
+     */
+    public void unCombineCiteMarkers(List<BibDatabase> databases, OOBibStyle style)
+            throws IOException, WrappedTargetException, NoSuchElementException, IllegalArgumentException,
+            UndefinedCharacterFormatException, UnknownPropertyException, PropertyVetoException, CreationException,
+            BibEntryNotFoundException {
+        XNameAccess nameAccess = getReferenceMarks();
+        List<String> names = getSortedReferenceMarks(nameAccess);
+
+        final XTextRangeCompare compare = UnoRuntime.queryInterface(XTextRangeCompare.class, text);
+
+        int pivot = 0;
+        boolean madeModifications = false;
+        while (pivot < (names.size())) {
+            XTextRange range1 = UnoRuntime.queryInterface(XTextContent.class, nameAccess.getByName(names.get(pivot)))
+                .getAnchor();
+
+            XTextCursor textCursor = range1.getText().createTextCursorByRange(range1);
+
+            // If we are supposed to set character format for citations, test this before
+            // making any changes. This way we can throw an exception before any reference
+            // marks are removed, preventing damage to the user's document:
+            if (style.isFormatCitations()) {
+                XPropertySet xCursorProps = UnoRuntime.queryInterface(XPropertySet.class, textCursor);
+                String charStyle = style.getCitationCharacterFormat();
+                try {
+                    xCursorProps.setPropertyValue(CHAR_STYLE_NAME, charStyle);
+                } catch (UnknownPropertyException | PropertyVetoException | IllegalArgumentException |
+                         WrappedTargetException ex) {
+                    // Setting the character format failed, so we throw an exception that
+                    // will result in an error message for the user:
+                        throw new UndefinedCharacterFormatException(charStyle);
+                }
+            }
+
+            List<String> keys = parseRefMarkName(names.get(pivot));
+            if (keys.size() > 1) {
+                removeReferenceMark(names.get(pivot));
+
+                // Insert bookmark for each key
+                int last = keys.size() - 1;
+                int i = 0;
+                for (String key : keys) {
+                    String newName = getUniqueReferenceMarkName(key, OOBibBase.AUTHORYEAR_PAR);
+                    insertReferenceMark(newName, "tmp", textCursor, true, style);
+                    textCursor.collapseToEnd();
+                    if (i != last) {
+                        textCursor.setString(" ");
+                        textCursor.collapseToEnd();
+                    }
+                    i++;
+                }
+                madeModifications = true;
+            }
+            pivot++;
         }
         if (madeModifications) {
             updateSortedReferenceMarks();

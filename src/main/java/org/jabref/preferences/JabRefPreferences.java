@@ -76,6 +76,7 @@ import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fileformat.CustomImporter;
+import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
@@ -87,6 +88,7 @@ import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.StyleLoader;
+import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.preview.PreviewLayout;
@@ -201,15 +203,20 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SHOW_ADVANCED_HINTS = "showAdvancedHints";
     public static final String DEFAULT_ENCODING = "defaultEncoding";
 
+    public static final String BASE_DOI_URI = "baseDOIURI";
+    public static final String USE_CUSTOM_DOI_URI = "useCustomDOIURI";
+
     public static final String USE_OWNER = "useOwner";
     public static final String DEFAULT_OWNER = "defaultOwner";
     public static final String OVERWRITE_OWNER = "overwriteOwner";
 
-    public static final String USE_TIME_STAMP = "useTimeStamp";
+    // Required for migration from pre-v5.3 only
     public static final String UPDATE_TIMESTAMP = "updateTimestamp";
     public static final String TIME_STAMP_FIELD = "timeStampField";
     public static final String TIME_STAMP_FORMAT = "timeStampFormat";
-    public static final String OVERWRITE_TIME_STAMP = "overwriteTimeStamp";
+
+    public static final String ADD_CREATION_DATE = "addCreationDate";
+    public static final String ADD_MODIFICATION_DATE = "addModificationDate";
 
     public static final String WARN_ABOUT_DUPLICATES_IN_INSPECTION = "warnAboutDuplicatesInInspection";
     public static final String NON_WRAPPABLE_FIELDS = "nonWrappableFields";
@@ -229,6 +236,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SEARCH_DISPLAY_MODE = "searchDisplayMode";
     public static final String SEARCH_CASE_SENSITIVE = "caseSensitiveSearch";
     public static final String SEARCH_REG_EXP = "regExpSearch";
+
+    public static final String GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
 
     // Currently, it is not possible to specify defaults for specific entry types
     // When this should be made possible, the code to inspect is org.jabref.gui.preferences.CitationKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getCiteKeyPattern(); etc
@@ -288,7 +297,6 @@ public class JabRefPreferences implements PreferencesService {
      */
     public static final String OO_EXECUTABLE_PATH = "ooExecutablePath";
     public static final String OO_PATH = "ooPath";
-    public static final String OO_JARS_PATH = "ooJarsPath";
     public static final String OO_SHOW_PANEL = "showOOPanel";
     public static final String OO_SYNC_WHEN_CITING = "syncOOWhenCiting";
     public static final String OO_USE_ALL_OPEN_BASES = "useAllOpenBases";
@@ -406,6 +414,7 @@ public class JabRefPreferences implements PreferencesService {
     private SidePanePreferences sidePanePreferences;
     private Theme globalTheme;
     private Set<CustomImporter> customImporters;
+    private String userName;
 
     // The constructor is made private to enforce this as a singleton class:
     private JabRefPreferences() {
@@ -430,6 +439,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
 
+        defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
+
         defaults.put(PUSH_TEXMAKER_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
         defaults.put(PUSH_WINEDT_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
         defaults.put(PUSH_TEXSTUDIO_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texstudio", "TeXstudio"));
@@ -442,6 +453,9 @@ public class JabRefPreferences implements PreferencesService {
 
         // Set DOI to be the default ID entry generator
         defaults.put(ID_ENTRY_GENERATOR, DoiFetcher.NAME);
+
+        defaults.put(USE_CUSTOM_DOI_URI, Boolean.FALSE);
+        defaults.put(BASE_DOI_URI, "https://doi.org");
 
         if (OS.OS_X) {
             defaults.put(FONT_FAMILY, "SansSerif");
@@ -503,8 +517,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SIDE_PANE_COMPONENT_NAMES, "");
         defaults.put(SIDE_PANE_COMPONENT_PREFERRED_POSITIONS, "");
 
-        defaults.put(COLUMN_NAMES, "groups;files;linked_id;field:entrytype;field:author/editor;field:title;field:year;field:journal/booktitle;field:citationkey");
-        defaults.put(COLUMN_WIDTHS, "28;28;28;75;300;470;60;130;100");
+        defaults.put(COLUMN_NAMES, "groups;files;linked_id;field:entrytype;field:author/editor;field:title;field:year;field:journal/booktitle;special:ranking;special:readstatus;special:priority");
+        defaults.put(COLUMN_WIDTHS, "28;28;28;75;300;470;60;130;50;50;50");
 
         defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
         defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
@@ -553,15 +567,12 @@ public class JabRefPreferences implements PreferencesService {
         if (OS.WINDOWS) {
             defaults.put(OO_PATH, OpenOfficePreferences.DEFAULT_WINDOWS_PATH);
             defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_WIN_EXEC_PATH);
-            defaults.put(OO_JARS_PATH, OpenOfficePreferences.DEFAULT_WINDOWS_PATH);
         } else if (OS.OS_X) {
             defaults.put(OO_PATH, OpenOfficePreferences.DEFAULT_OSX_PATH);
             defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_OSX_EXEC_PATH);
-            defaults.put(OO_JARS_PATH, OpenOfficePreferences.DEFAULT_OSX_PATH);
         } else { // Linux
             defaults.put(OO_PATH, OpenOfficePreferences.DEFAULT_LINUX_PATH);
             defaults.put(OO_EXECUTABLE_PATH, OpenOfficePreferences.DEFAULT_LINUX_EXEC_PATH);
-            defaults.put(OO_JARS_PATH, OpenOfficePreferences.DEFAULT_LINUX_PATH);
         }
 
         defaults.put(OO_SYNC_WHEN_CITING, Boolean.TRUE);
@@ -585,14 +596,13 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(RESOLVE_STRINGS_ALL_FIELDS, Boolean.FALSE);
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn");
         defaults.put(WARN_ABOUT_DUPLICATES_IN_INSPECTION, Boolean.TRUE);
-        defaults.put(USE_TIME_STAMP, Boolean.FALSE);
-        defaults.put(OVERWRITE_TIME_STAMP, Boolean.FALSE);
+        defaults.put(ADD_CREATION_DATE, Boolean.FALSE);
+        defaults.put(ADD_MODIFICATION_DATE, Boolean.FALSE);
 
+        defaults.put(UPDATE_TIMESTAMP, Boolean.FALSE);
+        defaults.put(TIME_STAMP_FIELD, StandardField.TIMESTAMP.getName());
         // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
         defaults.put(TIME_STAMP_FORMAT, "yyyy-MM-dd");
-
-        defaults.put(TIME_STAMP_FIELD, StandardField.TIMESTAMP.getName());
-        defaults.put(UPDATE_TIMESTAMP, Boolean.FALSE);
 
         defaults.put(GENERATE_KEYS_BEFORE_SAVING, Boolean.FALSE);
 
@@ -767,10 +777,16 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public String getUser() {
+        if (StringUtil.isNotBlank(userName)) {
+            return userName;
+        }
+
         try {
-            return get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
+            userName = get(DEFAULT_OWNER) + '-' + InetAddress.getLocalHost().getHostName();
+            return userName;
         } catch (UnknownHostException ex) {
-            LOGGER.debug("Hostname not found.", ex);
+            LOGGER.error("Hostname not found. Please go to https://docs.jabref.org/ to find possible " +
+                    "problem resolution", ex);
             return get(DEFAULT_OWNER);
         }
     }
@@ -1050,7 +1066,6 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public OpenOfficePreferences getOpenOfficePreferences() {
         return new OpenOfficePreferences(
-                get(OO_JARS_PATH),
                 get(OO_EXECUTABLE_PATH),
                 get(OO_PATH),
                 getBoolean(OO_USE_ALL_OPEN_BASES),
@@ -1062,7 +1077,6 @@ public class JabRefPreferences implements PreferencesService {
 
     @Override
     public void setOpenOfficePreferences(OpenOfficePreferences openOfficePreferences) {
-        put(OO_JARS_PATH, openOfficePreferences.getJarsPath());
         put(OO_EXECUTABLE_PATH, openOfficePreferences.getExecutablePath());
         put(OO_PATH, openOfficePreferences.getInstallationPath());
         putBoolean(OO_USE_ALL_OPEN_BASES, openOfficePreferences.getUseAllDatabases());
@@ -1360,6 +1374,19 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
+    public DOIPreferences getDOIPreferences() {
+        return new DOIPreferences(
+                getBoolean(USE_CUSTOM_DOI_URI),
+                get(BASE_DOI_URI));
+    }
+
+    @Override
+    public void storeDOIPreferences(DOIPreferences preferences) {
+        putBoolean(USE_CUSTOM_DOI_URI, preferences.isUseCustom());
+        put(BASE_DOI_URI, preferences.getDefaultBaseURI());
+    }
+
+    @Override
     public OwnerPreferences getOwnerPreferences() {
         return new OwnerPreferences(
                 getBoolean(USE_OWNER),
@@ -1377,20 +1404,17 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public TimestampPreferences getTimestampPreferences() {
         return new TimestampPreferences(
-                getBoolean(USE_TIME_STAMP),
+                getBoolean(ADD_CREATION_DATE),
+                getBoolean(ADD_MODIFICATION_DATE),
                 getBoolean(UPDATE_TIMESTAMP),
                 FieldFactory.parseField(get(TIME_STAMP_FIELD)),
-                get(TIME_STAMP_FORMAT),
-                getBoolean(OVERWRITE_TIME_STAMP));
+                get(TIME_STAMP_FORMAT));
     }
 
     @Override
     public void storeTimestampPreferences(TimestampPreferences preferences) {
-        putBoolean(USE_TIME_STAMP, preferences.shouldUseTimestamps());
-        putBoolean(UPDATE_TIMESTAMP, preferences.shouldUpdateTimestamp());
-        put(TIME_STAMP_FIELD, preferences.getTimestampField().getName());
-        put(TIME_STAMP_FORMAT, preferences.getTimestampFormat());
-        putBoolean(OVERWRITE_TIME_STAMP, preferences.shouldOverwriteTimestamp());
+        putBoolean(ADD_CREATION_DATE, preferences.shouldAddCreationDate());
+        putBoolean(ADD_MODIFICATION_DATE, preferences.shouldAddModificationDate());
     }
 
     //*************************************************************************************************************
@@ -1995,7 +2019,7 @@ public class JabRefPreferences implements PreferencesService {
     public void storeAppearancePreference(AppearancePreferences preferences) {
         putBoolean(OVERRIDE_DEFAULT_FONT_SIZE, preferences.shouldOverrideDefaultFontSize());
         putInt(MAIN_FONT_SIZE, preferences.getMainFontSize());
-        put(FX_THEME, preferences.getTheme().getPath().toString());
+        put(FX_THEME, preferences.getTheme().getCssPathString());
     }
 
     //*************************************************************************************************************
@@ -2662,5 +2686,21 @@ public class JabRefPreferences implements PreferencesService {
         putStringList(PROTECTED_TERMS_DISABLED_EXTERNAL, preferences.getDisabledExternalTermLists());
         putStringList(PROTECTED_TERMS_ENABLED_INTERNAL, preferences.getEnabledInternalTermLists());
         putStringList(PROTECTED_TERMS_DISABLED_INTERNAL, preferences.getDisabledInternalTermLists());
+    }
+
+    //*************************************************************************************************************
+    // Import preferences
+    //*************************************************************************************************************
+
+    @Override
+    public void storeImportSettingsPreferences(ImportSettingsPreferences preferences) {
+        putBoolean(GENERATE_KEY_ON_IMPORT, preferences.generateNewKeyOnImport());
+    }
+
+    @Override
+    public ImportSettingsPreferences getImportSettingsPreferences() {
+        return new ImportSettingsPreferences(
+                getBoolean(GENERATE_KEY_ON_IMPORT)
+        );
     }
 }
