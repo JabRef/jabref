@@ -39,13 +39,15 @@ import org.slf4j.LoggerFactory;
 /**
  *  How and what is encoded in a mark names.
  *
- *  - pageInfo does not appear here.
- *  - should not depend on the type of marks (reference mark of bookmark) used.
+ *  - pageInfo does not appear here. It is not encoded in the mark name.
+ *  - Does not depend on the type of marks (reference mark of bookmark) used.
  */
 class Codec {
     private static final String BIB_CITATION = "JR_cite";
     private static final Pattern CITE_PATTERN =
-        Pattern.compile(BIB_CITATION + "(\\d*)_(\\d*)_(.*)");
+        // Pattern.compile(BIB_CITATION + "(\\d*)_(\\d*)_(.*)");
+        // itcType is always "0" "1" or "2"
+        Pattern.compile(BIB_CITATION + "(\\d*)_([012])_(.*)");
 
     /**
      * This is what we get back from parsing a refMarkName.
