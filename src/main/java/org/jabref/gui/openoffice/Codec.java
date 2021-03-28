@@ -96,12 +96,12 @@ class Codec {
     }
 
     /**
-     * Parse a JabRef reference mark name.
+     * Parse a JabRef (reference) mark name.
      *
      * @return Optional.empty() on failure.
      *
      */
-    public static Optional<ParsedMarkName> parseRefMarkName(String refMarkName) {
+    public static Optional<ParsedMarkName> parseMarkName(String refMarkName) {
 
         Matcher citeMatcher = CITE_PATTERN.matcher(refMarkName);
         if (!citeMatcher.find()) {

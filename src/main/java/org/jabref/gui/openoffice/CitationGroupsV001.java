@@ -300,7 +300,7 @@ class CitationGroupsV001 {
             WrappedTargetException,
             NoDocumentException {
 
-            Optional<Codec.ParsedMarkName> op = Codec.parseRefMarkName(refMarkName);
+            Optional<Codec.ParsedMarkName> op = Codec.parseMarkName(refMarkName);
             if (op.isEmpty()) {
                 // We have a problem. We want types[i] and bibtexKeys[i]
                 // to correspond to referenceMarkNames.get(i).
