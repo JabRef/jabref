@@ -290,7 +290,7 @@ was to be able to add/remove citations to the group.
          mark (without destroying the reference mark), the reference
          mark is recreated at the same location, otherwise it is reused.
        - [X] for OO_storage_v001 compat mode, we need a bracketless version
-         - added REFERENCE_MARK_ALWAYS_REMOVE_BRACKETS=true
+         - added alwaysRemoveBrackets=true to cleanFillCursorForCitationGroup
 .
 ** feature: overview Unresolved
 
