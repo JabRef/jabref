@@ -2,12 +2,11 @@ package org.jabref.gui.openoffice;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Collections;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -19,27 +18,25 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.logic.JabRefException;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.BibEntry;
+
 import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XFootnote;
 import com.sun.star.text.XText;
-import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextContent;
+import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextRange;
 import com.sun.star.uno.UnoRuntime;
-import com.sun.star.util.InvalidStateException;
-
-import org.jabref.logic.JabRefException;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabase;
-import org.jabref.model.entry.BibEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-/*
+/**
  * At the start of GUI actions we may want to check the state of the document.
  *
  * Operations:
@@ -68,174 +65,11 @@ class CitationGroupsV001 {
     private static final String
     REFERENCE_MARK_RIGHT_BRACKET = REFERENCE_MARK_USE_INVISIBLE_BRACKETS ? ZERO_WIDTH_SPACE : ">";
 
-    /** Should we always fully remove reference mark brackets? */
-    public static final boolean
-    REFERENCE_MARK_ALWAYS_REMOVE_BRACKETS = true;
-
-    /**
-     * unoQI : short for UnoRuntime.queryInterface
-     *
-     * @return A reference to the requested UNO interface type if
-     *         available, otherwise null.
-     */
-    private static <T> T unoQI(Class<T> zInterface,
-                               Object object) {
-        return UnoRuntime.queryInterface(zInterface, object);
-    }
-
-    class CitationGroupID {
-        String id;
-        CitationGroupID(String id){
-            this.id = id;
-        }
-
-        /**
-         *  CitationEntry needs refMark or other identifying string
-         */
-        String asString() {
-            return id;
-        }
-
-        CitationGroupID fromString(String s) {
-            return new CitationGroupID(s);
-        }
-    }
-
-
-    class Citation {
-
-        /** key in database */
-        String citationKey;
-        Optional<DatabaseLookupResult> db;
-        Optional<Integer> number;
-        Optional<String> uniqueLetter;
-
-        /* missing: something that differentiates this from other
-         * citations of the same citationKey
-         */
-
-        Citation( String citationKey ) {
-            this.citationKey = citationKey;
-            this.db = Optional.empty();
-            this.number = Optional.empty();
-            this.uniqueLetter = Optional.empty();
-        }
-    }
-
-    List<Integer> makeIndices( int n ) {
-        return Stream.iterate(0, i -> i + 1).limit(n).collect(Collectors.toList());
-    }
-
-    class CitationGroup {
-        CitationGroupID cgid;
-        int itcType;
-        List<Citation> citations;
-        List<Integer>  localOrder;
-        // Currently pageInfo belongs to the group
-        Optional<String> pageInfo;
-        /**
-         * Locator in document
-         */
-        String referenceMarkName;
-
-        CitationGroup(
-            CitationGroupID cgid,
-            int itcType,
-            List<Citation> citations,
-            Optional<String> pageInfo,
-            String referenceMarkName) {
-            this.cgid = cgid;
-            this.itcType = itcType;
-            this.citations = citations;
-            this.pageInfo = pageInfo;
-            this.referenceMarkName = referenceMarkName;
-            this.localOrder = makeIndices( citations.size() );
-        }
-
-        List<Citation>
-        getSortedCitations() {
-            List<Citation> res = new ArrayList<>(citations.size());
-            for (int i : localOrder) {
-                res.add(citations.get(i));
-            }
-            return res;
-        }
-
-        List<Integer>
-        getSortedNumbers() {
-            List<Citation> cits = getSortedCitations();
-            List<Integer> numbers =
-                cits.stream()
-                .map( cit -> cit.number.get() )
-                .collect(Collectors.toList());
-            return numbers;
-        }
-
-        class CitationAndIndex {
-            Citation c;
-            int i;
-            CitationAndIndex( Citation c, int i ){
-                this.c = c;
-                this.i = i;
-            }
-        }
-
-        /**
-         * Sort citations for presentation within a CitationGroup.
-         */
-        class SortCitations implements  Comparator<CitationAndIndex> {
-
-            Comparator<BibEntry> entryComparator;
-
-            SortCitations(Comparator<BibEntry> entryComparator) {
-                this.entryComparator = entryComparator;
-            }
-
-            public int compare(CitationAndIndex a, CitationAndIndex b) {
-                if ( a.c.db.isEmpty() &&  b.c.db.isEmpty() ){
-                    // Both are unresolved: compare them by citation key.
-                    String ack = a.c.citationKey;
-                    String bck = b.c.citationKey;
-                    return ack.compareTo(bck);
-                }
-                // Comparing unresolved and real entry
-                final boolean unresolvedComesFirst = true;
-                final int mul = unresolvedComesFirst ? (+1) : (-1);
-                if ( a.c.db.isEmpty() ){
-                    return -1*mul;
-                }
-                if ( b.c.db.isEmpty() ){
-                    return +1*mul;
-                }
-                // Proper comparison of entries
-                return entryComparator.compare(
-                    a.c.db.get().entry,
-                    b.c.db.get().entry
-                    );
-            }
-        }
-
-        void
-        imposeLocalOrderByComparator(Comparator<BibEntry> entryComparator) {
-            List<CitationAndIndex> cks = new ArrayList<>();
-            for (int i = 0; i < citations.size(); i++) {
-                Citation c = citations.get(i);
-                cks.add( new CitationAndIndex(c,i) );
-            }
-            Collections.sort(cks, new SortCitations(entryComparator));
-
-            List<Integer> o = new ArrayList<>();
-            for (CitationAndIndex ck : cks) {
-                o.add(ck.i);
-            }
-            this.localOrder = o;
-        }
-    }
 
     /**
      *  Original CitationGroups Data
      */
-    Map<CitationGroupID,CitationGroup> citationGroups;
+    Map<CitationGroupID, CitationGroup> citationGroups;
 
     /**
      *  Extra Data
@@ -253,17 +87,6 @@ class CitationGroupsV001 {
      */
     private Optional<CitedKeys> bibliography;
 
-    public void show() {
-        System.out.printf("CitationGroupsV001%n");
-        System.out.printf("  citationGroups.size: %d%n", citationGroups.size());
-        System.out.printf("  pageInfoThrash.size: %d%n", pageInfoThrash.size());
-        System.out.printf("  globalOrder: %s%n",
-                           globalOrder.isEmpty()
-                           ? "isEmpty"
-                           : String.format( "%d", globalOrder.get().size() )
-            );
-    }
-
     /**
      * Constructor
      */
@@ -273,38 +96,14 @@ class CitationGroupsV001 {
         WrappedTargetException {
 
         // Get the citationGroupNames
-        List<String> citationGroupNames =
-            getJabRefReferenceMarkNames(documentConnection);
+        List<String> citationGroupNames = getJabRefReferenceMarkNames(documentConnection);
 
-        {
-            // Collect unused jabrefPropertyNames
-            Set<String> citationGroupNamesSet =
-                citationGroupNames.stream().collect(Collectors.toSet());
+        this.pageInfoThrash = findUnusedJabrefPropertyNames(documentConnection,
+                                                            citationGroupNames);
 
-            List<String> pageInfoThrash = new ArrayList<>();
-            List<String> jabrefPropertyNames =
-                documentConnection.getCustomPropertyNames()
-                .stream()
-                .filter(CitationGroupsV001::isJabRefReferenceMarkName)
-                .collect(Collectors.toList());
-            for (String pn : jabrefPropertyNames) {
-                if (!citationGroupNamesSet.contains(pn)) {
-                    pageInfoThrash.add(pn);
-                }
-            }
-            this.pageInfoThrash = pageInfoThrash;
-        }
+        this.citationGroups = readCitationGroupsFromDocument(documentConnection,
+                                                             citationGroupNames);
 
-        {
-            Map<CitationGroupID,CitationGroup> citationGroups = new HashMap<>();
-            for (int i = 0; i < citationGroupNames.size(); i++) {
-                final String name = citationGroupNames.get(i);
-                CitationGroup cg =
-                    readCitationGroupFromDocumentOrThrow(documentConnection, name);
-                citationGroups.put(cg.cgid, cg);
-            }
-            this.citationGroups = citationGroups;
-        }
         // Now we have almost every information from the document about citations.
         // What is left out: the ranges controlled by the reference marks.
         // But (I guess) those change too easily, so we only ask when actually needed.
@@ -314,7 +113,43 @@ class CitationGroupsV001 {
         this.bibliography = Optional.empty();
     }
 
-    private CitationGroup
+    private static List<String> findUnusedJabrefPropertyNames(DocumentConnection documentConnection,
+                                                              List<String> citationGroupNames) {
+        // Collect unused jabrefPropertyNames
+        Set<String> citationGroupNamesSet =
+            citationGroupNames.stream().collect(Collectors.toSet());
+
+        List<String> pageInfoThrash = new ArrayList<>();
+        List<String> jabrefPropertyNames =
+            documentConnection.getCustomPropertyNames()
+            .stream()
+            .filter(CitationGroupsV001::isJabRefReferenceMarkName)
+            .collect(Collectors.toList());
+        for (String pn : jabrefPropertyNames) {
+            if (!citationGroupNamesSet.contains(pn)) {
+                pageInfoThrash.add(pn);
+            }
+        }
+        return pageInfoThrash;
+    }
+
+    private static Map<CitationGroupID, CitationGroup>
+    readCitationGroupsFromDocument(DocumentConnection documentConnection,
+                                   List<String> citationGroupNames)
+        throws
+        WrappedTargetException {
+
+        Map<CitationGroupID, CitationGroup> citationGroups = new HashMap<>();
+        for (int i = 0; i < citationGroupNames.size(); i++) {
+            final String name = citationGroupNames.get(i);
+            CitationGroup cg =
+                readCitationGroupFromDocumentOrThrow(documentConnection, name);
+            citationGroups.put(cg.cgid, cg);
+        }
+        return citationGroups;
+    }
+
+    private static CitationGroup
     readCitationGroupFromDocumentOrThrow(DocumentConnection documentConnection,
                                          String refMarkName)
         throws
@@ -360,13 +195,13 @@ class CitationGroupsV001 {
     class DatabaseLookupResult {
         BibEntry entry;
         BibDatabase database;
-        DatabaseLookupResult( BibEntry entry, BibDatabase database ) {
+        DatabaseLookupResult(BibEntry entry, BibDatabase database) {
             this.entry = entry;
             this.database = database;
         }
     }
 
-    class CitedKey {
+    class CitedKey implements SortableCitation {
         String key;  // TODO: rename to citationKey
         LinkedHashSet<CitationPath> where;
         Optional<DatabaseLookupResult> db;
@@ -374,7 +209,7 @@ class CitationGroupsV001 {
         Optional<String> uniqueLetter; // For AuthorYear citation styles.
         Optional<String> normCitMarker;  // For AuthorYear citation styles.
 
-        CitedKey( String key, CitationPath p, Citation cit ) {
+        CitedKey(String key, CitationPath p, Citation cit) {
             this.key = key;
             this.where = new LinkedHashSet<>(); // remember order
             this.where.add(p);
@@ -384,7 +219,19 @@ class CitationGroupsV001 {
             this.normCitMarker = Optional.empty();
         }
 
-        void addPath( CitationPath p, Citation cit ) {
+        @Override
+        public String getCitationKey(){
+            return key;
+        }
+
+        @Override
+        public Optional<BibEntry> getBibEntry(){
+            return (db.isPresent()
+                    ? Optional.of(db.get().entry)
+                    : Optional.empty());
+        }
+
+        void addPath(CitationPath p, Citation cit) {
             this.where.add(p);
             if (cit.db != this.db) {
                 throw new RuntimeException("CitedKey.addPath: mismatch on cit.db");
@@ -423,12 +270,53 @@ class CitationGroupsV001 {
         }
     }
 
+    interface SortableCitation {
+        public String getCitationKey();
+        public Optional<BibEntry> getBibEntry();
+    }
+
+    static class CitationComparator implements Comparator<SortableCitation> {
+
+        Comparator<BibEntry> entryComparator;
+        boolean unresolvedComesFirst;
+
+        CitationComparator(Comparator<BibEntry> entryComparator,
+                       boolean unresolvedComesFirst) {
+            this.entryComparator = entryComparator;
+            this.unresolvedComesFirst = unresolvedComesFirst;
+        }
+
+        public int compare(SortableCitation a, SortableCitation b) {
+            Optional<BibEntry> abe = a.getBibEntry();
+            Optional<BibEntry> bbe = b.getBibEntry();
+
+            if (abe.isEmpty() && bbe.isEmpty()) {
+                // Both are unresolved: compare them by citation key.
+                String ack = a.getCitationKey();
+                String bck = b.getCitationKey();
+                return ack.compareTo(bck);
+            }
+            // Comparing unresolved and real entry
+
+            final int mul = unresolvedComesFirst ? (+1) : (-1);
+            if (abe.isEmpty()) {
+                return -mul;
+            }
+            if (bbe.isEmpty()) {
+                return mul;
+            }
+            // Proper comparison of entries
+            return entryComparator.compare(abe.get(),
+                                           bbe.get());
+        }
+    }
+
     class CitedKeys {
 
         /**
          * Order-preserving map from citation keys to associated data.
          */
-        LinkedHashMap<String,CitedKey> data;
+        LinkedHashMap<String, CitedKey> data;
 
         CitedKeys(LinkedHashMap<String, CitedKey> data) {
             this.data = data;
@@ -437,64 +325,64 @@ class CitationGroupsV001 {
         /**
          *  The cited keys in sorted order.
          */
-        public List<CitedKey>
-        values() {
+        public List<CitedKey> values() {
             return new ArrayList<>(data.values());
         }
 
         /**
          * Sort entries for the bibliography.
          */
-        class SortCitedKeys implements  Comparator<CitedKey> {
+        /*
+        class SortCitedKeys implements Comparator<CitedKey> {
 
             Comparator<BibEntry> entryComparator;
+            boolean unresolvedComesFirst;
 
-            SortCitedKeys(Comparator<BibEntry> entryComparator) {
+            SortCitedKeys(Comparator<BibEntry> entryComparator,
+                          boolean unresolvedComesFirst) {
                 this.entryComparator = entryComparator;
+                this.unresolvedComesFirst = unresolvedComesFirst;
             }
 
             public int compare(CitedKey a, CitedKey b) {
-                if (a.db.isEmpty() &&  b.db.isEmpty()) {
+                if (a.db.isEmpty() && b.db.isEmpty()) {
                     // Both are unresolved: compare them by citation key.
                     return a.key.compareTo(b.key);
                 }
                 // Comparing unresolved and real entry
-                final boolean unresolvedComesFirst = true;
                 final int mul = unresolvedComesFirst ? (+1) : (-1);
-                if (a.db.isEmpty()){
-                    return -1*mul;
+                if (a.db.isEmpty()) {
+                    return -mul;
                 }
-                if (b.db.isEmpty()){
-                    return +1*mul;
+                if (b.db.isEmpty()) {
+                    return mul;
                 }
                 // Proper comparison of entries
                 return entryComparator.compare(a.db.get().entry,
                                                b.db.get().entry);
             }
         }
+        */
 
-        void
-        sortByComparator(Comparator<BibEntry> entryComparator) {
-            List<CitedKey> cks = new ArrayList(data.values());
-            Collections.sort(cks, new SortCitedKeys(entryComparator));
-            LinkedHashMap<String,CitedKey> newData = new LinkedHashMap<>();
+        void sortByComparator(Comparator<BibEntry> entryComparator) {
+            List<CitedKey> cks = new ArrayList<>(data.values());
+            cks.sort(new CitationComparator(entryComparator, true));
+            LinkedHashMap<String, CitedKey> newData = new LinkedHashMap<>();
             for (CitedKey ck : cks) {
                 newData.put(ck.key, ck);
             }
             data = newData;
         }
 
-        void
-        numberCitedKeysInCurrentOrder() {
-            int i=1;
+        void numberCitedKeysInCurrentOrder() {
+            int i = 1;
             for (CitedKey ck : data.values()) {
                 ck.number = Optional.of(i); // was: -1 for UndefinedBibtexEntry
                 i++;
             }
         }
 
-        void
-        lookupInDatabases(List<BibDatabase> databases) {
+        void lookupInDatabases(List<BibDatabase> databases) {
             for (CitedKey ck : this.data.values()) {
                 ck.lookupInDatabases(databases);
             }
@@ -520,12 +408,11 @@ class CitationGroupsV001 {
 
     }
 
-    public void
-    setDatabaseLookupResults(Set<CitationPath> where,
-                             Optional<DatabaseLookupResult> db) {
+    public void setDatabaseLookupResults(Set<CitationPath> where,
+                                         Optional<DatabaseLookupResult> db) {
         for (CitationPath p : where) {
             CitationGroup cg = this.citationGroups.get(p.group);
-            if (cg == null){
+            if (cg == null) {
                 LOGGER.warn("CitationGroups.setDatabaseLookupResult: group missing");
                 continue;
             }
@@ -534,8 +421,7 @@ class CitationGroupsV001 {
         }
     }
 
-    public CitationGroupsV001.CitedKeys
-    lookupEntriesInDatabases(List<BibDatabase> databases) {
+    public CitationGroupsV001.CitedKeys lookupEntriesInDatabases(List<BibDatabase> databases) {
         CitationGroupsV001 cgs = this;
 
         CitationGroupsV001.CitedKeys cks = cgs.getCitedKeys();
@@ -548,12 +434,11 @@ class CitationGroupsV001 {
         return cks;
     }
 
-    public void
-    setNumbers(Set<CitationPath> where,
-               Optional<Integer> number) {
+    public void setNumbers(Set<CitationPath> where,
+                           Optional<Integer> number) {
         for (CitationPath p : where) {
             CitationGroup cg = this.citationGroups.get(p.group);
-            if (cg == null){
+            if (cg == null) {
                 LOGGER.warn("CitationGroups.setNumbers: group missing");
                 continue;
             }
@@ -562,9 +447,8 @@ class CitationGroupsV001 {
         }
     }
 
-    public void
-    setUniqueLetters(Set<CitationPath> where,
-                     Optional<String> uniqueLetter) {
+    public void setUniqueLetters(Set<CitationPath> where,
+                                 Optional<String> uniqueLetter) {
         for (CitationPath p : where) {
             CitationGroup cg = this.citationGroups.get(p.group);
             if (cg == null) {
@@ -576,25 +460,23 @@ class CitationGroupsV001 {
         }
     }
 
-    public void
-    imposeLocalOrderByComparator(Comparator<BibEntry> entryComparator) {
+    public void imposeLocalOrderByComparator(Comparator<BibEntry> entryComparator) {
         for (CitationGroup cg : citationGroups.values()) {
             cg.imposeLocalOrderByComparator(entryComparator);
         }
     }
 
-    public CitedKeys
-    getCitedKeys() {
-        LinkedHashMap<String,CitedKey> res = new LinkedHashMap<>();
+    public CitedKeys getCitedKeys() {
+        LinkedHashMap<String, CitedKey> res = new LinkedHashMap<>();
         for (CitationGroup cg : citationGroups.values()) {
             int storageIndexInGroup = 0;
             for (Citation cit : cg.citations) {
                 String key = cit.citationKey;
                 CitationPath p = new CitationPath(cg.cgid, storageIndexInGroup);
-                if ( res.containsKey(key) ) {
-                    res.get(key).addPath(p,cit);
+                if (res.containsKey(key)) {
+                    res.get(key).addPath(p, cit);
                 } else {
-                    res.put(key, new CitedKey( key, p, cit ));
+                    res.put(key, new CitedKey(key, p, cit));
                 }
                 storageIndexInGroup++;
             }
@@ -602,13 +484,11 @@ class CitationGroupsV001 {
         return new CitedKeys(res);
     }
 
-
     /**
      * CitedKeys created iterating citations in (globalOrder,localOrder)
      */
-    public CitedKeys
-    getCitedKeysSortedInOrderOfAppearance() {
-        LinkedHashMap<String,CitedKey> res = new LinkedHashMap<>();
+    public CitedKeys getCitedKeysSortedInOrderOfAppearance() {
+        LinkedHashMap<String, CitedKey> res = new LinkedHashMap<>();
         if (globalOrder.isEmpty()) {
             throw new RuntimeException("getSortedCitedKeys: no globalOrder");
         }
@@ -618,9 +498,9 @@ class CitationGroupsV001 {
             for (int i : cg.localOrder) {
                 Citation cit = cg.citations.get(i);
                 String citationKey = cit.citationKey;
-                CitationPath p = new CitationPath(cgid,i);
+                CitationPath p = new CitationPath(cgid, i);
                 if (res.containsKey(citationKey)) {
-                    res.get(citationKey).addPath(p,cit);
+                    res.get(citationKey).addPath(p, cit);
                 } else {
                     res.put(citationKey, new CitedKey(citationKey, p, cit));
                 }
@@ -633,13 +513,11 @@ class CitationGroupsV001 {
         return bibliography;
     }
 
-    public void
-    createNumberedBibliographySortedInOrderOfAppearance() {
+    public void createNumberedBibliographySortedInOrderOfAppearance() {
         CitationGroupsV001 cgs = this;
         if (!cgs.bibliography.isEmpty()) {
             throw new RuntimeException(
-                "createNumberedBibliographySortedInOrderOfAppearance: already have a bibliography"
-                );
+                "createNumberedBibliographySortedInOrderOfAppearance: already have a bibliography");
         }
         CitationGroupsV001.CitedKeys sortedCitedKeys =
             cgs.getCitedKeysSortedInOrderOfAppearance();
@@ -648,55 +526,37 @@ class CitationGroupsV001 {
         cgs.bibliography = Optional.of(sortedCitedKeys);
     }
 
-    public void
-    createNumberedBibliographySortedByComparator( Comparator<BibEntry> entryComparator ) {
+    public void createNumberedBibliographySortedByComparator(Comparator<BibEntry> entryComparator) {
         CitationGroupsV001 cgs = this;
         if (!cgs.bibliography.isEmpty()) {
             throw new RuntimeException(
-                "createNumberedBibliographySortedByComparator: already have a bibliography"
-                );
+                "createNumberedBibliographySortedByComparator: already have a bibliography");
         }
         CitationGroupsV001.CitedKeys citedKeys = cgs.getCitedKeys();
-        citedKeys.sortByComparator( entryComparator ); // TODO: must be after database lookup
+        citedKeys.sortByComparator(entryComparator); // TODO: must be after database lookup
         citedKeys.numberCitedKeysInCurrentOrder();
         citedKeys.distributeNumbers(cgs);
         this.bibliography = Optional.of(citedKeys);
     }
 
     public void
-    createPlainBibliographySortedByComparator( Comparator<BibEntry> entryComparator ) {
+    createPlainBibliographySortedByComparator(Comparator<BibEntry> entryComparator) {
         CitationGroupsV001 cgs = this;
         if (!this.bibliography.isEmpty()) {
             throw new RuntimeException(
-                "createPlainBibliographySortedByComparator: already have a bibliography"
-                );
+                "createPlainBibliographySortedByComparator: already have a bibliography");
         }
         CitationGroupsV001.CitedKeys citedKeys = cgs.getCitedKeys();
-        citedKeys.sortByComparator( entryComparator ); // TODO: must be after database lookup
+        citedKeys.sortByComparator(entryComparator); // TODO: must be after database lookup
         // citedKeys.numberCitedKeysInCurrentOrder();
         // citedKeys.distributeNumbers();
         this.bibliography = Optional.of(citedKeys);
     }
- 
+
     public Set<CitationGroupID>
     getCitationGroupIDs() {
         return citationGroups.keySet();
     }
-
-    /**
-     *  Read reference mark names from the document, keep only those
-     *  with JabRef naming convention, get their visual positions,
-     *
-     *  @return JabRef reference mark names sorted by these positions.
-     *
-     *  Limitation: for two column layout visual (top-down,
-     *        left-right) order does not match the expected (textual)
-     *        order.
-     *
-     *  TODO: refmarks in the same footnote get the same position.
-     *  After sorting, they may get the wrong order.
-     *
-     */
 
     /**
      * Creates a list of {@code
@@ -737,9 +597,9 @@ class CitationGroupsV001 {
         for (CitationGroupsV001.CitationGroupID cgid : cgids) {
             XTextRange range = cgs.getReferenceMarkRangeOrNull(documentConnection, cgid);
             if (range == null) {
-                throw new RuntimeException( "getReferenceMarkRangeOrNull returned null" );
+                throw new RuntimeException("getReferenceMarkRangeOrNull returned null");
             }
-            vses.add( new RangeSort.RangeSortEntry(range, 0, cgid) );
+            vses.add(new RangeSort.RangeSortEntry(range, 0, cgid));
         }
 
         /*
@@ -767,13 +627,13 @@ class CitationGroupsV001 {
             = new RangeKeyedMapList<>();
 
         for (RangeSort.RangeSortEntry v : vses) {
-            xxs.add( v.getRange(), v );
+            xxs.add(v.getRange(), v);
         }
 
         // build final list
         List<RangeSort.RangeSortEntry<CitationGroupsV001.CitationGroupID>> res = new ArrayList<>();
 
-        for (TreeMap<XTextRange,List<RangeSort.RangeSortEntry<CitationGroupsV001.CitationGroupID>>>
+        for (TreeMap<XTextRange, List<RangeSort.RangeSortEntry<CitationGroupsV001.CitationGroupID>>>
                  xs : xxs.partitionValues()) {
 
             List<XTextRange> oxs = new ArrayList<>(xs.keySet());
@@ -782,10 +642,10 @@ class CitationGroupsV001 {
             for (int i = 0; i < oxs.size(); i++) {
                 XTextRange a = oxs.get(i);
                 List<RangeSort.RangeSortEntry<CitationGroupsV001.CitationGroupID>> avs = xs.get(a);
-                for (int j = 0; j < avs.size(); j++){
+                for (int j = 0; j < avs.size(); j++) {
                     RangeSort.RangeSortEntry<CitationGroupsV001.CitationGroupID> v = avs.get(j);
                     v.indexInPosition = indexInPartition++;
-                    if ( mapFootnotesToFootnoteMarks ) {
+                    if (mapFootnotesToFootnoteMarks) {
                         // Adjust range if we are inside a footnote:
                         if (unoQI(XFootnote.class, v.range.getText()) != null) {
                             // Find the linking footnote marker:
@@ -805,6 +665,20 @@ class CitationGroupsV001 {
         return res.stream().map(e -> e).collect(Collectors.toList());
     }
 
+    /**
+     *  Return JabRef reference mark names sorted by their visual positions.
+     *
+     *  @param mapFootnotesToFootnoteMarks If true, sort reference
+     *         marks in footnotes as if they appeared at the
+     *         corresponding footnote mark.
+     *
+     *  @return JabRef reference mark names sorted by these positions.
+     *
+     *  Limitation: for two column layout visual (top-down,
+     *        left-right) order does not match the expected (textual)
+     *        order.
+     *
+     */
     public List<CitationGroupsV001.CitationGroupID>
     getVisuallySortedCitationGroupIDs(DocumentConnection documentConnection,
                                       boolean mapFootnotesToFootnoteMarks)
@@ -818,7 +692,7 @@ class CitationGroupsV001 {
                                   documentConnection,
                                   mapFootnotesToFootnoteMarks);
 
-        if ( vses.size() != cgs.citationGroups.size() ) {
+        if (vses.size() != cgs.citationGroups.size()) {
             throw new RuntimeException("getVisuallySortedCitationGroupIDs:"
                                        + " vses.size() != cgs.citationGroups.size()");
         }
@@ -830,11 +704,11 @@ class CitationGroupsV001 {
                                 + " I need to move the cursor around,"
                                 + " but could not get it.");
         List<RangeSort.RangeSortable<CitationGroupsV001.CitationGroupID>> sorted =
-            RangeSortVisual.visualSort( vses,
-                                        documentConnection,
-                                        messageOnFailureToObtainAFunctionalXTextViewCursor );
+            RangeSortVisual.visualSort(vses,
+                                       documentConnection,
+                                       messageOnFailureToObtainAFunctionalXTextViewCursor);
 
-        if ( sorted.size() != cgs.citationGroups.size() ) {
+        if (sorted.size() != cgs.citationGroups.size()) {
             // This Fired
             throw new RuntimeException("getVisuallySortedCitationGroupIDs:"
                                        + " sorted.size() != cgs.citationGroups.size()");
@@ -849,21 +723,21 @@ class CitationGroupsV001 {
      * Calculate and return citation group IDs in visual order.
      */
     public List<CitationGroupID>
-    getCitationGroupIDsSortedWithinPartitions(DocumentConnection documentConnection)
+    getCitationGroupIDsSortedWithinPartitions(DocumentConnection documentConnection,
+                                              boolean mapFootnotesToFootnoteMarks)
         throws
         NoDocumentException,
-        WrappedTargetException
-        {
+        WrappedTargetException {
         // This is like getVisuallySortedCitationGroupIDs,
         // but we skip the visualSort part.
         CitationGroupsV001 cgs = this;
-        boolean mapFootnotesToFootnoteMarks = false;
+        // boolean mapFootnotesToFootnoteMarks = false;
         List<RangeSort.RangeSortable<CitationGroupID>> vses =
             CitationGroupsV001.createVisualSortInput(cgs,
                                                      documentConnection,
                                                      mapFootnotesToFootnoteMarks);
 
-        if ( vses.size() != cgs.citationGroups.size() ) {
+        if (vses.size() != cgs.citationGroups.size()) {
             throw new RuntimeException("getCitationGroupIDsSortedWithinPartitions:"
                                        + " vses.size() != cgs.citationGroups.size()");
         }
@@ -877,19 +751,18 @@ class CitationGroupsV001 {
      */
     public List<CitationGroupID>
     getSortedCitationGroupIDs() {
-        if ( globalOrder.isEmpty() ) {
+        if (globalOrder.isEmpty()) {
             throw new RuntimeException("getSortedCitationGroupIDs: not ordered yet");
         }
         return globalOrder.get();
     }
 
     public void
-    setGlobalOrder( List<CitationGroupID> globalOrder ) {
+    setGlobalOrder(List<CitationGroupID> globalOrder) {
         Objects.requireNonNull(globalOrder);
-        if (globalOrder.size() != citationGroups.size() ){
+        if (globalOrder.size() != citationGroups.size()) {
             throw new RuntimeException(
-                "CitationGroupsV001.setGlobalOrder: globalOrder.size() != citationGroups.size()"
-                );
+                "CitationGroupsV001.setGlobalOrder: globalOrder.size() != citationGroups.size()");
         }
         this.globalOrder = Optional.of(globalOrder);
     }
@@ -937,12 +810,11 @@ class CitationGroupsV001 {
     public List<Citation>
     getSortedCitations(CitationGroupID cgid) {
         Optional<CitationGroup> cg = getCitationGroup(cgid);
-        if ( cg.isEmpty() ) {
-            throw new RuntimeException( "getSortedCitations: invalid cgid" );
+        if (cg.isEmpty()) {
+            throw new RuntimeException("getSortedCitations: invalid cgid");
         }
         return cg.get().getSortedCitations();
     }
-
 
     /* ***********************************
      *
@@ -1023,7 +895,6 @@ class CitationGroupsV001 {
      *  inserted space, or at the end of the reference mark.
      *
      *  @param documentConnection Connection to document.
-     *  @param name For the reference mark.
      *  @param position Collapsed to its end.
      *  @param insertSpaceAfter We insert a space after the mark, that
      *                          carries on format of characters from
@@ -1033,16 +904,13 @@ class CitationGroupsV001 {
      *                          For use with INVISIBLE_CIT.
      *
      */
-    public CitationGroupID
-    createCitationGroup(
-        DocumentConnection documentConnection,
-        List<String> citationKeys,
-        Optional<String> pageInfo,
-        int itcType,
-        XTextCursor position,
-        boolean insertSpaceAfter,
-        boolean withoutBrackets
-        )
+    public CitationGroupID createCitationGroup(DocumentConnection documentConnection,
+                                               List<String> citationKeys,
+                                               Optional<String> pageInfo,
+                                               int itcType,
+                                               XTextCursor position,
+                                               boolean insertSpaceAfter,
+                                               boolean withoutBrackets)
         throws
         CreationException,
         NoDocumentException,
@@ -1053,11 +921,9 @@ class CitationGroupsV001 {
             .collect(Collectors.joining(","));
 
         String refMarkName =
-            getUniqueReferenceMarkName(
-                documentConnection,
-                xkey,
-                itcType
-            );
+            getUniqueReferenceMarkName(documentConnection,
+                                       xkey,
+                                       itcType);
 
         CitationGroupID cgid = new CitationGroupID(refMarkName);
 
@@ -1069,7 +935,7 @@ class CitationGroupsV001 {
         /*
         new ArrayList<>(citationKeys.size());
         for (int j = 0; j < ov.citationKeys.size(); j++) {
-            citatitons.add( new Citation( citationKeys.get(j) ) );
+            citatitons.add(new Citation(citationKeys.get(j)));
         }
         */
 
@@ -1080,7 +946,7 @@ class CitationGroupsV001 {
                                              refMarkName);
 
         // add to our data
-        this.citationGroups.put( cgid, cg );
+        this.citationGroups.put(cgid, cg);
         // invalidate globalOrder.
         // TODO: look out for localOrder!
         this.globalOrder = Optional.empty();
@@ -1098,14 +964,11 @@ class CitationGroupsV001 {
         return cgid;
     }
 
-    private static void
-    createReferenceMarkForCitationGroup(
-        DocumentConnection documentConnection,
-        String refMarkName,
-        XTextCursor position,
-        boolean insertSpaceAfter,
-        boolean withoutBrackets
-        )
+    private static void createReferenceMarkForCitationGroup(DocumentConnection documentConnection,
+                                                            String refMarkName,
+                                                            XTextCursor position,
+                                                            boolean insertSpaceAfter,
+                                                            boolean withoutBrackets)
         throws
         CreationException {
 
@@ -1137,11 +1000,9 @@ class CitationGroupsV001 {
             bracketedContent,
             true);
 
-        /* XNamed mark = */ documentConnection.insertReferenceMark(
-            refMarkName,
-            cursor,
-            true // absorb
-            );
+        documentConnection.insertReferenceMark(refMarkName,
+                                               cursor,
+                                               true /* absorb */);
 
         cursorBefore.goRight((short) 1, true);
         cursorBefore.setString("");
@@ -1159,8 +1020,7 @@ class CitationGroupsV001 {
      *       not know how the bibliography was generated: it was partially done
      *       outside CitationGroupsV001, and we did not store how.
      */
-    public void
-    removeCitationGroups( List<CitationGroup> cgs, DocumentConnection documentConnection )
+    public void removeCitationGroups(List<CitationGroup> cgs, DocumentConnection documentConnection)
         throws
         WrappedTargetException,
         NoDocumentException,
@@ -1175,20 +1035,19 @@ class CitationGroupsV001 {
             this.citedKeysAfterDatabaseLookup = Optional.empty();
             this.bibliography = Optional.empty();
             /*
-             * this.citedKeysAfterDatabaseLookup.map(cks -> cks.forgetCitationGroup(cg.cgid) );
+             * this.citedKeysAfterDatabaseLookup.map(cks -> cks.forgetCitationGroup(cg.cgid));
              * this.bibliography.map(cks -> cks.forgetCitationGroup(cg.cgid));
              */
         }
     }
 
-    public void
-    removeCitationGroup( CitationGroup cg, DocumentConnection documentConnection )
+    public void removeCitationGroup(CitationGroup cg, DocumentConnection documentConnection)
         throws
         WrappedTargetException,
         NoDocumentException,
         NoSuchElementException {
 
-        removeCitationGroups( Collections.singletonList(cg), documentConnection );
+        removeCitationGroups(Collections.singletonList(cg), documentConnection);
     }
 
     /**
@@ -1198,44 +1057,21 @@ class CitationGroupsV001 {
      * @param removeBracketsFromEmpty is intended to force removal if
      *        we are working on an "Empty citation" (INVISIBLE_CIT).
      */
-    public void
-    cleanFillCursorForCitationGroup(
-        DocumentConnection documentConnection,
-        CitationGroupID cgid, // String name, // Identifies group
-        boolean removeBracketsFromEmpty,
-        boolean alwaysRemoveBrackets
-        )
+    public void cleanFillCursorForCitationGroup(DocumentConnection documentConnection,
+                                                CitationGroupID cgid,
+                                                boolean removeBracketsFromEmpty)
         throws
         NoDocumentException,
         WrappedTargetException,
         CreationException {
 
+        boolean alwaysRemoveBrackets = true;
         final String left = REFERENCE_MARK_LEFT_BRACKET;
         final String right = REFERENCE_MARK_RIGHT_BRACKET;
         final short leftLength = (short) left.length();
         final short rightLength = (short) right.length();
 
         CitationGroupsV001 cgs = this;
-        /*
-        // XTextContent markAsTextContent = documentConnection.getReferenceMarkAsTextContentOrNull(name);
-        XTextContent markAsTextContent = cgs.getReferenceMarkRangeOrNull(cgid,documentConnection);
-
-        if (markAsTextContent == null) {
-            throw new RuntimeException(
-                String.format(
-                    "cleanFillCursorForCitationGroup: markAsTextContent(%s) == null",
-                    name
-                    ));
-        }
-        XTextCursor full =
-            DocumentConnection.getTextCursorOfTextContent(
-                markAsTextContent);
-        if (full == null) {
-            throw new RuntimeException(
-                "cleanFillCursorForCitationGroup: full == null"
-                );
-        }
-        */
         String name = cgs.getReferenceMarkName(cgid).orElseThrow(RuntimeException::new);
 
         XTextCursor full = cgs.getRawCursorForCitationGroup(cgid, documentConnection);
@@ -1254,43 +1090,32 @@ class CitationGroupsV001 {
 
         if (!fullText.startsWith(left)) {
             throw new RuntimeException(
-                String.format(
-                    "cleanFillCursorForCitationGroup:"
-                    + " (%s) does not start with REFERENCE_MARK_LEFT_BRACKET",
-                    name
-                    ));
+                String.format("cleanFillCursorForCitationGroup:"
+                              + " (%s) does not start with REFERENCE_MARK_LEFT_BRACKET",
+                              name));
         }
 
         if (!fullText.endsWith(right)) {
             throw new RuntimeException(
-                String.format(
-                    "cleanFillCursorForCitationGroup:"
-                    + " (%s) does not end with REFERENCE_MARK_RIGHT_BRACKET",
-                    name
-                    ));
+                String.format("cleanFillCursorForCitationGroup:"
+                              + " (%s) does not end with REFERENCE_MARK_RIGHT_BRACKET",
+                              name));
         }
 
         final int contentLength = (fullTextLength - (leftLength + rightLength));
         if (contentLength < 0) {
             throw new RuntimeException(
-                String.format(
-                    "cleanFillCursorForCitationGroup: length(%s) < 0",
-                    name
-                    ));
+                String.format("cleanFillCursorForCitationGroup: length(%s) < 0",
+                              name));
         }
 
-        boolean removeRight = (
-            // have at least 1 character content
-            (contentLength >= 1)
-            || ((contentLength == 0) && removeBracketsFromEmpty)
-            || alwaysRemoveBrackets
-            );
-        boolean removeLeft = (
-            // have at least 2 character content
-            (contentLength >= 2)
-            || ((contentLength == 0) && removeBracketsFromEmpty)
-            || alwaysRemoveBrackets
-            );
+        boolean removeRight = ((contentLength >= 1)
+                               || ((contentLength == 0) && removeBracketsFromEmpty)
+                               || alwaysRemoveBrackets);
+
+        boolean removeLeft = ((contentLength >= 2)
+                              || ((contentLength == 0) && removeBracketsFromEmpty)
+                              || alwaysRemoveBrackets);
 
         if (removeRight) {
             omega.goLeft(rightLength, true);
@@ -1307,11 +1132,8 @@ class CitationGroupsV001 {
      * Cursor for the reference marks as is, not prepared for filling,
      * but does not need cleanFillCursorForCitationGroup either.
      */
-    public XTextCursor
-    getRawCursorForCitationGroup(
-        CitationGroupID cgid,  // Identifies group
-        DocumentConnection documentConnection
-        )
+    public XTextCursor getRawCursorForCitationGroup(CitationGroupID cgid,
+                                                    DocumentConnection documentConnection)
         throws
         NoDocumentException,
         WrappedTargetException,
@@ -1327,25 +1149,18 @@ class CitationGroupsV001 {
             throw new RuntimeException(
                 String.format(
                     "getRawCursorForCitationGroup: markAsTextContent(%s) == null",
-                    name
-                    ));
+                    name));
         }
-        full =
-            DocumentConnection.getTextCursorOfTextContent(
-                markAsTextContent);
+
+        full = DocumentConnection.getTextCursorOfTextContent(markAsTextContent);
         if (full == null) {
-            throw new RuntimeException(
-                    "getRawCursorForCitationGroup: full == null"
-                    );
+            throw new RuntimeException("getRawCursorForCitationGroup: full == null");
         }
         return full;
     }
 
-    public XTextCursor
-    getFillCursorForCitationGroup(
-        DocumentConnection documentConnection,
-        CitationGroupID cgid  // Identifies group
-        )
+    public XTextCursor getFillCursorForCitationGroup(DocumentConnection documentConnection,
+                                                     CitationGroupID cgid)
         throws
         NoDocumentException,
         WrappedTargetException,
@@ -1367,23 +1182,20 @@ class CitationGroupsV001 {
 
             if (markAsTextContent == null) {
                 throw new RuntimeException(
-                    String.format(
-                        "getFillCursorForCitationGroup: markAsTextContent(%s) == null (attempt %d)",
-                        name, i
-                        ));
+                    String.format("getFillCursorForCitationGroup:"
+                                  + " markAsTextContent(%s) == null (attempt %d)",
+                                  name,
+                                  i));
             }
-            full =
-                DocumentConnection.getTextCursorOfTextContent(
-                    markAsTextContent);
+
+            full = DocumentConnection.getTextCursorOfTextContent(markAsTextContent);
             if (full == null) {
                 throw new RuntimeException(
-                    String.format(
-                        "getFillCursorForCitationGroup: full == null (attempt %d)", i
-                        )
-                    );
+                    String.format("getFillCursorForCitationGroup: full == null (attempt %d)", i));
             }
 
             fullText = full.getString();
+
             if (debugThisFun) {
                 System.out.printf("getFillCursor: fulltext = '%s'%n", fullText);
             }
@@ -1394,11 +1206,9 @@ class CitationGroupsV001 {
                 // (fullText.length() < 2)
                 if (i == 2) {
                     throw new RuntimeException(
-                        String.format(
-                            "getFillCursorForCitationGroup:"
-                            + " (fullText.length() < 2) (attempt %d)", i
-                            )
-                        );
+                        String.format("getFillCursorForCitationGroup:"
+                                      + " (fullText.length() < 2) (attempt %d)",
+                                      i));
                 }
                 // too short, recreate
                 if (debugThisFun) {
@@ -1408,29 +1218,25 @@ class CitationGroupsV001 {
                 try {
                     documentConnection.removeReferenceMark(name);
                 } catch (NoSuchElementException ex) {
-                    LOGGER.warn(String.format(
-                                    "getFillCursorForCitationGroup got NoSuchElementException"
-                                    + " for '%s'", name));
+                    LOGGER.warn(
+                        String.format("getFillCursorForCitationGroup got NoSuchElementException"
+                                      + " for '%s'",
+                                      name));
                 }
                 createReferenceMarkForCitationGroup(
                     documentConnection,
                     name,
                     full,
-                    false, // insertSpaceAfter
-                    false  // withoutBrackets
-                    );
+                    false, /* insertSpaceAfter */
+                    false  /* withoutBrackets */);
             }
         }
 
         if (full == null) {
-            throw new RuntimeException(
-                "getFillCursorForCitationGroup: full == null (after loop)"
-                );
+            throw new RuntimeException("getFillCursorForCitationGroup: full == null (after loop)");
         }
         if (fullText == null) {
-            throw new RuntimeException(
-                "getFillCursorForCitationGroup: fullText == null (after loop)"
-                );
+            throw new RuntimeException("getFillCursorForCitationGroup: fullText == null (after loop)");
         }
 
         // we have at least two characters inside
@@ -1454,7 +1260,7 @@ class CitationGroupsV001 {
         omega.setString("");
         return beta;
     }
-    
+
     /**
      * Produce a reference mark name for JabRef for the given citation
      * key and itcType that does not yet appear among the reference
@@ -1469,11 +1275,9 @@ class CitationGroupsV001 {
      *
      * Or the first unused in this series, after removals.
      */
-    private String
-    getUniqueReferenceMarkName(
-        DocumentConnection documentConnection,
-        String bibtexKey,
-        int itcType)
+    private String getUniqueReferenceMarkName(DocumentConnection documentConnection,
+                                              String bibtexKey,
+                                              int itcType)
         throws NoDocumentException {
 
         XNameAccess xNamedRefMarks = documentConnection.getReferenceMarks();
@@ -1511,8 +1315,7 @@ class CitationGroupsV001 {
      * @return Optional.empty() on failure.
      *
      */
-    private static Optional<ParsedRefMark>
-    parseRefMarkName(String refMarkName) {
+    private static Optional<ParsedRefMark> parseRefMarkName(String refMarkName) {
 
         Matcher citeMatcher = CITE_PATTERN.matcher(refMarkName);
         if (!citeMatcher.find()) {
@@ -1538,25 +1341,20 @@ class CitationGroupsV001 {
      *         If name does not match CITE_PATTERN,
      *         an empty list of strings is returned.
      */
-    private List<String>
-    parseRefMarkNameToUniqueCitationKeys(String name) {
+    private List<String> parseRefMarkNameToUniqueCitationKeys(String name) {
         Optional<ParsedRefMark> op = parseRefMarkName(name);
-        return
-            op.map(
-                parsedRefMark ->
-                parsedRefMark.citationKeys.stream()
-                .distinct()
-                .collect(Collectors.toList())
-                )
-            .orElseGet(ArrayList::new);
+        return (op.map(parsedRefMark ->
+                       parsedRefMark.citationKeys.stream()
+                       .distinct()
+                       .collect(Collectors.toList()))
+                .orElseGet(ArrayList::new));
     }
 
     /**
      * @return true if name matches the pattern used for JabRef
      * reference mark names.
      */
-    private static boolean
-    isJabRefReferenceMarkName(String name) {
+    private static boolean isJabRefReferenceMarkName(String name) {
         return (CITE_PATTERN.matcher(name).find());
     }
 
@@ -1565,13 +1363,11 @@ class CitationGroupsV001 {
      *
      * @param names The list to be filtered.
      */
-    private static List<String>
-    filterIsJabRefReferenceMarkName(List<String> names) {
+    private static List<String> filterIsJabRefReferenceMarkName(List<String> names) {
         return (names
                 .stream()
                 .filter(CitationGroupsV001::isJabRefReferenceMarkName)
-                .collect(Collectors.toList())
-        );
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -1583,9 +1379,9 @@ class CitationGroupsV001 {
      *
      *
      */
-    private List<String>
-    getJabRefReferenceMarkNames(DocumentConnection documentConnection)
-        throws NoDocumentException {
+    private List<String> getJabRefReferenceMarkNames(DocumentConnection documentConnection)
+        throws
+        NoDocumentException {
         List<String> allNames = documentConnection.getReferenceMarkNames();
         return filterIsJabRefReferenceMarkName(allNames);
     }
@@ -1598,12 +1394,10 @@ class CitationGroupsV001 {
      * @param types              OUT Must be same length as referenceMarkNames.
      * @param bibtexKeys         OUT First level must be same length as referenceMarkNames.
      */
-    private static void
-    parseRefMarkNamesToArrays(
-        List<String> referenceMarkNames,
-        int[] types,
-        String[][] bibtexKeys
-        ) {
+    private static void parseRefMarkNamesToArrays(List<String> referenceMarkNames,
+                                                  int[] types,
+                                                  String[][] bibtexKeys) {
+
         final int nRefMarks = referenceMarkNames.size();
         assert (types.length == nRefMarks);
         assert (bibtexKeys.length == nRefMarks);
@@ -1616,8 +1410,7 @@ class CitationGroupsV001 {
                 // And do not want null in bibtexKeys (or error code in types)
                 // on return.
                 throw new IllegalArgumentException(
-                    "parseRefMarkNamesToArrays expects parsable referenceMarkNames"
-                    );
+                    "parseRefMarkNamesToArrays expects parsable referenceMarkNames");
             }
             ParsedRefMark ov = op.get();
             types[i] = ov.itcType;
@@ -1633,8 +1426,7 @@ class CitationGroupsV001 {
      *
      * doc.referenceMarks.names.map(parse).flatten.unique
      */
-    private List<String>
-    findCitedKeys(DocumentConnection documentConnection)
+    private List<String> findCitedKeys(DocumentConnection documentConnection)
         throws
         NoSuchElementException,
         WrappedTargetException,
@@ -1663,8 +1455,6 @@ class CitationGroupsV001 {
         return keys;
     }
 
-
-
     /**
      *  Given the name of a reference mark, get the corresponding
      *  pageInfo text.
@@ -1673,11 +1463,10 @@ class CitationGroupsV001 {
      *  @param name Name of the custom property to query.
      *  @return "" for missing or empty pageInfo
      */
-    private static String
-    getPageInfoForReferenceMarkName(
-        DocumentConnection documentConnection,
-        String name)
-        throws WrappedTargetException,
+    private static String getPageInfoForReferenceMarkName(DocumentConnection documentConnection,
+                                                          String name)
+        throws
+        WrappedTargetException,
         UnknownPropertyException {
 
         Optional<String> pageInfo = documentConnection.getCustomProperty(name);
@@ -1687,20 +1476,19 @@ class CitationGroupsV001 {
         return pageInfo.get();
     }
 
-
     /*
      * ranges controlled by citation groups should not overlap with each other.
      *
      * @param cgid : Must be known.
      * @return Null if the reference mark is missing.
      */
-    public XTextRange
-    getReferenceMarkRangeOrNull(DocumentConnection documentConnection, CitationGroupID cgid)
+    public XTextRange getReferenceMarkRangeOrNull(DocumentConnection documentConnection,
+                                                  CitationGroupID cgid)
         throws
         NoDocumentException,
         WrappedTargetException {
-        String name = this.getReferenceMarkName( cgid )
-            .orElseThrow(RuntimeException::new);
+        String name = (this.getReferenceMarkName(cgid)
+                       .orElseThrow(RuntimeException::new));
         return documentConnection.getReferenceMarkRangeOrNull(name);
     }
 
@@ -1709,8 +1497,7 @@ class CitationGroupsV001 {
      *
      *  result.size() == nRefMarks
      */
-    List<RangeForOverlapCheck>
-    citationRanges(DocumentConnection documentConnection)
+    List<RangeForOverlapCheck> citationRanges(DocumentConnection documentConnection)
         throws
         NoDocumentException,
         WrappedTargetException {
@@ -1726,8 +1513,7 @@ class CitationGroupsV001 {
             xs.add(new RangeForOverlapCheck(
                        r, cgid,
                        RangeForOverlapCheck.REFERENCE_MARK_KIND,
-                       name
-                       ));
+                       name));
         }
         return xs;
     }
@@ -1742,8 +1528,7 @@ class CitationGroupsV001 {
      *  reference marks in the footnote.
      *
      */
-    List<RangeForOverlapCheck>
-    footnoteMarkRanges(DocumentConnection documentConnection)
+    List<RangeForOverlapCheck> footnoteMarkRanges(DocumentConnection documentConnection)
         throws
         NoDocumentException,
         WrappedTargetException {
@@ -1767,18 +1552,206 @@ class CitationGroupsV001 {
                 continue;
             }
 
-            boolean seenContains = seen.containsKey( footnoteMarkRange );
+            boolean seenContains = seen.containsKey(footnoteMarkRange);
             if (!seenContains) {
                 seen.put(footnoteMarkRange, true);
                 xs.add(new RangeForOverlapCheck(
                            footnoteMarkRange,
                            base.i, // cgid :: identifies of citation group
                            RangeForOverlapCheck.FOOTNOTE_MARK_KIND,
-                           "FootnoteMark for " + base.description
-                           ));
+                           "FootnoteMark for " + base.description));
             }
         }
         return xs;
+    }
+
+    /**
+     * unoQI : short for UnoRuntime.queryInterface
+     *
+     * @return A reference to the requested UNO interface type if
+     *         available, otherwise null.
+     */
+    private static <T> T unoQI(Class<T> zInterface,
+                               Object object) {
+        return UnoRuntime.queryInterface(zInterface, object);
+    }
+
+    static class CitationGroupID {
+        String id;
+        CitationGroupID(String id) {
+            this.id = id;
+        }
+
+        /**
+         *  CitationEntry needs refMark or other identifying string
+         */
+        String asString() {
+            return id;
+        }
+    }
+
+    static class Citation  implements SortableCitation {
+
+        /** key in database */
+        String citationKey;
+        Optional<DatabaseLookupResult> db;
+        Optional<Integer> number;
+        Optional<String> uniqueLetter;
+
+        /* missing: something that differentiates this from other
+         * citations of the same citationKey
+         */
+
+        Citation(String citationKey) {
+            this.citationKey = citationKey;
+            this.db = Optional.empty();
+            this.number = Optional.empty();
+            this.uniqueLetter = Optional.empty();
+        }
+
+        @Override
+        public String getCitationKey(){
+            return citationKey;
+        }
+
+        @Override
+        public Optional<BibEntry> getBibEntry(){
+            return (db.isPresent()
+                    ? Optional.of(db.get().entry)
+                    : Optional.empty());
+        }
+    }
+
+    static List<Integer> makeIndices(int n) {
+        return Stream.iterate(0, i -> i + 1).limit(n).collect(Collectors.toList());
+    }
+
+    static class CitationGroup {
+        CitationGroupID cgid;
+        int itcType;
+        List<Citation> citations;
+        List<Integer> localOrder;
+        // Currently pageInfo belongs to the group
+        Optional<String> pageInfo;
+
+        /**
+         * Locator in document
+         */
+        String referenceMarkName;
+
+        CitationGroup(
+            CitationGroupID cgid,
+            int itcType,
+            List<Citation> citations,
+            Optional<String> pageInfo,
+            String referenceMarkName) {
+            this.cgid = cgid;
+            this.itcType = itcType;
+            this.citations = citations;
+            this.pageInfo = pageInfo;
+            this.referenceMarkName = referenceMarkName;
+            this.localOrder = makeIndices(citations.size());
+        }
+
+        List<Citation>
+        getSortedCitations() {
+            List<Citation> res = new ArrayList<>(citations.size());
+            for (int i : localOrder) {
+                res.add(citations.get(i));
+            }
+            return res;
+        }
+
+        List<Integer>
+        getSortedNumbers() {
+            List<Citation> cits = getSortedCitations();
+            return (cits.stream()
+                    .map(cit -> cit.number.orElseThrow(RuntimeException::new))
+                    .collect(Collectors.toList()));
+        }
+
+        class CitationAndIndex implements SortableCitation {
+            Citation c;
+            int i;
+            CitationAndIndex(Citation c, int i) {
+                this.c = c;
+                this.i = i;
+            }
+
+            @Override
+            public String getCitationKey(){
+                return c.getCitationKey();
+            }
+
+            @Override
+            public Optional<BibEntry> getBibEntry(){
+                return c.getBibEntry();
+            }
+        }
+
+        /**
+         * Sort citations for presentation within a CitationGroup.
+         */
+        /*
+        class SortCitations implements Comparator<CitationAndIndex> {
+
+            Comparator<BibEntry> entryComparator;
+            boolean unresolvedComesFirst;
+
+            SortCitations(Comparator<BibEntry> entryComparator,
+                          boolean unresolvedComesFirst) {
+                this.entryComparator = entryComparator;
+                this.unresolvedComesFirst = unresolvedComesFirst;
+            }
+
+            public int compare(CitationAndIndex a, CitationAndIndex b) {
+                if (a.c.db.isEmpty() && b.c.db.isEmpty()) {
+                    // Both are unresolved: compare them by citation key.
+                    String ack = a.c.citationKey;
+                    String bck = b.c.citationKey;
+                    return ack.compareTo(bck);
+                }
+                // Comparing unresolved and real entry
+                final boolean unresolvedComesFirst = true;
+                final int mul = unresolvedComesFirst ? (+1) : (-1);
+                if (a.c.db.isEmpty()) {
+                    return -mul;
+                }
+                if (b.c.db.isEmpty()) {
+                    return mul;
+                }
+                // Proper comparison of entries
+                return entryComparator.compare(a.c.db.get().entry,
+                                               b.c.db.get().entry);
+            }
+        }
+        */
+
+        void imposeLocalOrderByComparator(Comparator<BibEntry> entryComparator) {
+            List<CitationAndIndex> cks = new ArrayList<>();
+            for (int i = 0; i < citations.size(); i++) {
+                Citation c = citations.get(i);
+                cks.add(new CitationAndIndex(c, i));
+            }
+            // Collections.sort(cks, new SortCitations(entryComparator, true));
+            Collections.sort(cks, new CitationComparator(entryComparator, true));
+
+            List<Integer> o = new ArrayList<>();
+            for (CitationAndIndex ck : cks) {
+                o.add(ck.i);
+            }
+            this.localOrder = o;
+        }
+    }
+
+    public void show() {
+        System.out.printf("CitationGroupsV001%n");
+        System.out.printf("  citationGroups.size: %d%n", citationGroups.size());
+        System.out.printf("  pageInfoThrash.size: %d%n", pageInfoThrash.size());
+        System.out.printf("  globalOrder: %s%n",
+                          (globalOrder.isEmpty()
+                           ? "isEmpty"
+                           : String.format("%d", globalOrder.get().size())));
     }
 
 } // class citationGroups
