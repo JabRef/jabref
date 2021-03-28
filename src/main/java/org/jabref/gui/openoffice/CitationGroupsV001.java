@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.gui.openoffice.CitationSort;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
@@ -201,7 +202,7 @@ class CitationGroupsV001 {
         }
     }
 
-    class CitedKey implements SortableCitation {
+    class CitedKey implements CitationSort.ComparableCitation {
         String key;  // TODO: rename to citationKey
         LinkedHashSet<CitationPath> where;
         Optional<DatabaseLookupResult> db;
@@ -270,46 +271,6 @@ class CitationGroupsV001 {
         }
     }
 
-    interface SortableCitation {
-        public String getCitationKey();
-        public Optional<BibEntry> getBibEntry();
-    }
-
-    static class CitationComparator implements Comparator<SortableCitation> {
-
-        Comparator<BibEntry> entryComparator;
-        boolean unresolvedComesFirst;
-
-        CitationComparator(Comparator<BibEntry> entryComparator,
-                       boolean unresolvedComesFirst) {
-            this.entryComparator = entryComparator;
-            this.unresolvedComesFirst = unresolvedComesFirst;
-        }
-
-        public int compare(SortableCitation a, SortableCitation b) {
-            Optional<BibEntry> abe = a.getBibEntry();
-            Optional<BibEntry> bbe = b.getBibEntry();
-
-            if (abe.isEmpty() && bbe.isEmpty()) {
-                // Both are unresolved: compare them by citation key.
-                String ack = a.getCitationKey();
-                String bck = b.getCitationKey();
-                return ack.compareTo(bck);
-            }
-            // Comparing unresolved and real entry
-
-            final int mul = unresolvedComesFirst ? (+1) : (-1);
-            if (abe.isEmpty()) {
-                return -mul;
-            }
-            if (bbe.isEmpty()) {
-                return mul;
-            }
-            // Proper comparison of entries
-            return entryComparator.compare(abe.get(),
-                                           bbe.get());
-        }
-    }
 
     class CitedKeys {
 
@@ -366,7 +327,7 @@ class CitationGroupsV001 {
 
         void sortByComparator(Comparator<BibEntry> entryComparator) {
             List<CitedKey> cks = new ArrayList<>(data.values());
-            cks.sort(new CitationComparator(entryComparator, true));
+            cks.sort(new CitationSort.CitationComparator(entryComparator, true));
             LinkedHashMap<String, CitedKey> newData = new LinkedHashMap<>();
             for (CitedKey ck : cks) {
                 newData.put(ck.key, ck);
@@ -1590,7 +1551,7 @@ class CitationGroupsV001 {
         }
     }
 
-    static class Citation  implements SortableCitation {
+    static class Citation  implements CitationSort.ComparableCitation {
 
         /** key in database */
         String citationKey;
@@ -1670,7 +1631,7 @@ class CitationGroupsV001 {
                     .collect(Collectors.toList()));
         }
 
-        class CitationAndIndex implements SortableCitation {
+        class CitationAndIndex implements CitationSort.ComparableCitation {
             Citation c;
             int i;
             CitationAndIndex(Citation c, int i) {
@@ -1692,49 +1653,13 @@ class CitationGroupsV001 {
         /**
          * Sort citations for presentation within a CitationGroup.
          */
-        /*
-        class SortCitations implements Comparator<CitationAndIndex> {
-
-            Comparator<BibEntry> entryComparator;
-            boolean unresolvedComesFirst;
-
-            SortCitations(Comparator<BibEntry> entryComparator,
-                          boolean unresolvedComesFirst) {
-                this.entryComparator = entryComparator;
-                this.unresolvedComesFirst = unresolvedComesFirst;
-            }
-
-            public int compare(CitationAndIndex a, CitationAndIndex b) {
-                if (a.c.db.isEmpty() && b.c.db.isEmpty()) {
-                    // Both are unresolved: compare them by citation key.
-                    String ack = a.c.citationKey;
-                    String bck = b.c.citationKey;
-                    return ack.compareTo(bck);
-                }
-                // Comparing unresolved and real entry
-                final boolean unresolvedComesFirst = true;
-                final int mul = unresolvedComesFirst ? (+1) : (-1);
-                if (a.c.db.isEmpty()) {
-                    return -mul;
-                }
-                if (b.c.db.isEmpty()) {
-                    return mul;
-                }
-                // Proper comparison of entries
-                return entryComparator.compare(a.c.db.get().entry,
-                                               b.c.db.get().entry);
-            }
-        }
-        */
-
         void imposeLocalOrderByComparator(Comparator<BibEntry> entryComparator) {
             List<CitationAndIndex> cks = new ArrayList<>();
             for (int i = 0; i < citations.size(); i++) {
                 Citation c = citations.get(i);
                 cks.add(new CitationAndIndex(c, i));
             }
-            // Collections.sort(cks, new SortCitations(entryComparator, true));
-            Collections.sort(cks, new CitationComparator(entryComparator, true));
+            Collections.sort(cks, new CitationSort.CitationComparator(entryComparator, true));
 
             List<Integer> o = new ArrayList<>();
             for (CitationAndIndex ck : cks) {
