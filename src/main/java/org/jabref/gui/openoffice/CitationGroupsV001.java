@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jabref.gui.openoffice.CitationSort;
+//import org.jabref.gui.openoffice.CitationSort;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
@@ -70,7 +70,7 @@ class CitationGroupsV001 {
     /**
      *  Original CitationGroups Data
      */
-    Map<CitationGroupID, CitationGroup> citationGroups;
+    private Map<CitationGroupID, CitationGroup> citationGroups;
 
     /**
      *  Extra Data
@@ -83,6 +83,7 @@ class CitationGroupsV001 {
     private Optional<List<CitationGroupID>> globalOrder;
 
     private Optional<CitedKeys> citedKeysAfterDatabaseLookup;
+
     /**
      *  This is going to be the bibliography
      */
@@ -183,6 +184,10 @@ class CitationGroupsV001 {
         return cg;
     }
 
+    /**
+     * Identifies a citation with the citation group containing it and
+     * its storage index within.
+     */
     class CitationPath {
         CitationGroupID group;
         int storageIndexInGroup;
@@ -193,19 +198,11 @@ class CitationGroupsV001 {
         }
     }
 
-    class DatabaseLookupResult {
-        BibEntry entry;
-        BibDatabase database;
-        DatabaseLookupResult(BibEntry entry, BibDatabase database) {
-            this.entry = entry;
-            this.database = database;
-        }
-    }
 
     class CitedKey implements CitationSort.ComparableCitation {
         String key;  // TODO: rename to citationKey
         LinkedHashSet<CitationPath> where;
-        Optional<DatabaseLookupResult> db;
+        Optional<CitationDatabaseLookup.Result> db;
         Optional<Integer> number; // For Numbered citation styles.
         Optional<String> uniqueLetter; // For AuthorYear citation styles.
         Optional<String> normCitMarker;  // For AuthorYear citation styles.
@@ -246,16 +243,7 @@ class CitationGroupsV001 {
         }
 
         void lookupInDatabases(List<BibDatabase> databases) {
-            Optional<DatabaseLookupResult> res = Optional.empty();
-            for (BibDatabase database : databases) {
-                Optional<BibEntry> entry = database.getEntryByCitationKey(key);
-                if (entry.isPresent()) {
-                    res = Optional.of(new DatabaseLookupResult(entry.get(), database));
-                    break;
-                }
-            }
-            // store result
-            this.db = res;
+            this.db = CitationDatabaseLookup.lookup(databases, this.key);
         }
 
         void distributeDatabaseLookupResult(CitationGroupsV001 cgs) {
@@ -338,7 +326,7 @@ class CitationGroupsV001 {
     }
 
     public void setDatabaseLookupResults(Set<CitationPath> where,
-                                         Optional<DatabaseLookupResult> db) {
+                                         Optional<CitationDatabaseLookup.Result> db) {
         for (CitationPath p : where) {
             CitationGroup cg = this.citationGroups.get(p.group);
             if (cg == null) {
@@ -1523,7 +1511,7 @@ class CitationGroupsV001 {
 
         /** key in database */
         String citationKey;
-        Optional<DatabaseLookupResult> db;
+        Optional<CitationDatabaseLookup.Result> db;
         Optional<Integer> number;
         Optional<String> uniqueLetter;
 
@@ -1627,7 +1615,7 @@ class CitationGroupsV001 {
                 Citation c = citations.get(i);
                 cks.add(new CitationAndIndex(c, i));
             }
-            Collections.sort(cks, new CitationSort.CitationComparator(entryComparator, true));
+            cks.sort(new CitationSort.CitationComparator(entryComparator, true));
 
             List<Integer> o = new ArrayList<>();
             for (CitationAndIndex ck : cks) {
