@@ -158,11 +158,25 @@ class StorageBaseRefMark implements StorageBase.NamedRange {
         return new StorageBaseRefMark( refMarkName );
     }
 
+    private static StorageBaseRefMark getFromDocumentOrNull(DocumentConnection documentConnection,
+                                                            String refMarkName)
+        throws
+        NoDocumentException,
+        WrappedTargetException {
+        XTextRange r = documentConnection.getReferenceMarkRangeOrNull(refMarkName);
+        if (r == null) {
+            return null;
+        } else {
+            return new StorageBaseRefMark( refMarkName );
+        }
+    }
+
     /*
      * Remove it from the document.
      *
      * See: removeCitationGroups
      */
+    @Override
     public void removeFromDocument(DocumentConnection documentConnection)
         throws
         WrappedTargetException,
@@ -439,6 +453,15 @@ class StorageBaseRefMark implements StorageBase.NamedRange {
             throws
             NoDocumentException {
             return StorageBaseRefMark.getUsedNames(documentConnection);
+        }
+
+        @Override
+        public StorageBase.NamedRange getFromDocumentOrNull(DocumentConnection documentConnection,
+                                                            String refMarkName)
+            throws
+            NoDocumentException,
+            WrappedTargetException {
+            return StorageBaseRefMark.getFromDocumentOrNull(documentConnection, refMarkName);
         }
     }
 }

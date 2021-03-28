@@ -54,6 +54,7 @@ class CitationGroupsV001 {
     private static final Pattern CITE_PATTERN =
             Pattern.compile(BIB_CITATION + "(\\d*)_(\\d*)_(.*)");
 
+    private StorageBase.NamedRangeManager citationStorageManager;
 
     /**
      *  Original CitationGroups Data
@@ -85,13 +86,17 @@ class CitationGroupsV001 {
         NoDocumentException,
         WrappedTargetException {
 
+        this.citationStorageManager = new StorageBaseRefMark.Manager();
+
         // Get the citationGroupNames
-        List<String> citationGroupNames = getJabRefReferenceMarkNames(documentConnection);
+        List<String> citationGroupNames = getJabRefReferenceMarkNames(this.citationStorageManager,
+                                                                      documentConnection);
 
         this.pageInfoThrash = findUnusedJabrefPropertyNames(documentConnection,
                                                             citationGroupNames);
 
-        this.citationGroups = readCitationGroupsFromDocument(documentConnection,
+        this.citationGroups = readCitationGroupsFromDocument(this.citationStorageManager,
+                                                             documentConnection,
                                                              citationGroupNames);
 
         // Now we have almost every information from the document about citations.
@@ -124,26 +129,30 @@ class CitationGroupsV001 {
     }
 
     private static Map<CitationGroupID, CitationGroup>
-    readCitationGroupsFromDocument(DocumentConnection documentConnection,
+    readCitationGroupsFromDocument(StorageBase.NamedRangeManager citationStorageManager,
+                                   DocumentConnection documentConnection,
                                    List<String> citationGroupNames)
         throws
-        WrappedTargetException {
+        WrappedTargetException,
+        NoDocumentException {
 
         Map<CitationGroupID, CitationGroup> citationGroups = new HashMap<>();
         for (int i = 0; i < citationGroupNames.size(); i++) {
             final String name = citationGroupNames.get(i);
             CitationGroup cg =
-                readCitationGroupFromDocumentOrThrow(documentConnection, name);
+                readCitationGroupFromDocumentOrThrow(citationStorageManager, documentConnection, name);
             citationGroups.put(cg.cgid, cg);
         }
         return citationGroups;
     }
 
     private static CitationGroup
-    readCitationGroupFromDocumentOrThrow(DocumentConnection documentConnection,
+    readCitationGroupFromDocumentOrThrow(StorageBase.NamedRangeManager citationStorageManager,
+                                         DocumentConnection documentConnection,
                                          String refMarkName)
         throws
-        WrappedTargetException {
+        WrappedTargetException,
+        NoDocumentException {
 
         Optional<ParsedRefMark> op = parseRefMarkName(refMarkName);
         if (op.isEmpty()) {
@@ -164,7 +173,16 @@ class CitationGroupsV001 {
 
         Optional<String> pageInfo = documentConnection.getCustomProperty(refMarkName);
 
+        StorageBase.NamedRange sr = citationStorageManager.getFromDocumentOrNull(documentConnection,
+                                                                                 refMarkName);
+
+        if (sr == null) {
+            throw new IllegalArgumentException(
+                "readCitationGroupFromDocumentOrThrow: referenceMarkName is not in the document");
+        }
+
         CitationGroup cg = new CitationGroup(id,
+                                             sr,
                                              ov.itcType,
                                              citations,
                                              pageInfo,
@@ -745,22 +763,22 @@ class CitationGroupsV001 {
      *  This could be generalized to insert arbitrary text safely
      *  between two reference marks. But we do not need that now.
      */
-    private static XTextCursor
-    safeInsertSpacesBetweenReferenceMarks(XTextRange position, int n) {
-        // Start with an empty cursor at position.getStart();
-        XText text = position.getText();
-        XTextCursor cursor = text.createTextCursorByRange(position.getStart());
-        text.insertString(cursor, "\r\r", false); // para, para
-        cursor.goLeft((short) 1, false); // left
-        text.insertString(cursor, " ".repeat(n), false); // space(n)
-        cursor.goRight((short) 1, true);
-        cursor.setString(""); // right-delete
-        cursor.goLeft((short) n, false); // left(n)
-        cursor.goLeft((short) 1, true);
-        cursor.setString(""); // left-delete
-        cursor.goRight((short) n, true);
-        return cursor;
-    }
+//    private static XTextCursor
+//    safeInsertSpacesBetweenReferenceMarks(XTextRange position, int n) {
+//        // Start with an empty cursor at position.getStart();
+//        XText text = position.getText();
+//        XTextCursor cursor = text.createTextCursorByRange(position.getStart());
+//        text.insertString(cursor, "\r\r", false); // para, para
+//        cursor.goLeft((short) 1, false); // left
+//        text.insertString(cursor, " ".repeat(n), false); // space(n)
+//        cursor.goRight((short) 1, true);
+//        cursor.setString(""); // right-delete
+//        cursor.goLeft((short) n, false); // left(n)
+//        cursor.goLeft((short) 1, true);
+//        cursor.setString(""); // left-delete
+//        cursor.goRight((short) n, true);
+//        return cursor;
+//    }
 
     /**
      *  Create a reference mark with the given name, at the
@@ -838,13 +856,19 @@ class CitationGroupsV001 {
             .collect(Collectors.toList());
 
         /*
-        new ArrayList<>(citationKeys.size());
-        for (int j = 0; j < ov.citationKeys.size(); j++) {
-            citatitons.add(new Citation(citationKeys.get(j)));
-        }
-        */
+         * Apply to document
+         */
+
+        StorageBase.NamedRange sr = createReferenceMarkForCitationGroup(
+            this.citationStorageManager,
+            documentConnection,
+            refMarkName,
+            position,
+            insertSpaceAfter,
+            withoutBrackets);
 
         CitationGroup cg = new CitationGroup(cgid,
+                                             sr,
                                              itcType,
                                              citations,
                                              pageInfo,
@@ -856,65 +880,63 @@ class CitationGroupsV001 {
         // TODO: look out for localOrder!
         this.globalOrder = Optional.empty();
 
-        /*
-         * Apply to document
-         */
-
-        createReferenceMarkForCitationGroup(
-            documentConnection,
-            refMarkName,
-            position,
-            insertSpaceAfter,
-            withoutBrackets);
         return cgid;
     }
 
-    private static void createReferenceMarkForCitationGroup(DocumentConnection documentConnection,
-                                                            String refMarkName,
-                                                            XTextCursor position,
-                                                            boolean insertSpaceAfter,
-                                                            boolean withoutBrackets)
+    private static StorageBase.NamedRange
+    createReferenceMarkForCitationGroup(StorageBase.NamedRangeManager manager,
+                                        DocumentConnection documentConnection,
+                                        String refMarkName,
+                                        XTextCursor position,
+                                        boolean insertSpaceAfter,
+                                        boolean withoutBrackets)
         throws
         CreationException {
 
-        // The cursor we received: we push it before us.
-        position.collapseToEnd();
+        return manager.create(documentConnection,
+                              refMarkName,
+                              position,
+                              insertSpaceAfter,
+                              withoutBrackets);
 
-        XTextCursor cursor = safeInsertSpacesBetweenReferenceMarks(position.getEnd(), 2);
-
-        // cursors before the first and after the last space
-        XTextCursor cursorBefore =
-            cursor.getText().createTextCursorByRange(cursor.getStart());
-        XTextCursor cursorAfter =
-            cursor.getText().createTextCursorByRange(cursor.getEnd());
-
-        cursor.collapseToStart();
-        cursor.goRight((short) 1, false);
-        // now we are between two spaces
-
-        final String left = StorageBaseRefMark.REFERENCE_MARK_LEFT_BRACKET;
-        final String right = StorageBaseRefMark.REFERENCE_MARK_RIGHT_BRACKET;
-        final short leftLength = (short) left.length();
-        final short rightLength = (short) right.length();
-        String bracketedContent = (withoutBrackets
-                                   ? ""
-                                   : left + right);
-
-        cursor.getText().insertString(
-            cursor,
-            bracketedContent,
-            true);
-
-        documentConnection.insertReferenceMark(refMarkName,
-                                               cursor,
-                                               true /* absorb */);
-
-        cursorBefore.goRight((short) 1, true);
-        cursorBefore.setString("");
-        if (!insertSpaceAfter) {
-            cursorAfter.goLeft((short) 1, true);
-            cursorAfter.setString("");
-        }
+//        // The cursor we received: we push it before us.
+//        position.collapseToEnd();
+//
+//        XTextCursor cursor = safeInsertSpacesBetweenReferenceMarks(position.getEnd(), 2);
+//
+//        // cursors before the first and after the last space
+//        XTextCursor cursorBefore =
+//            cursor.getText().createTextCursorByRange(cursor.getStart());
+//        XTextCursor cursorAfter =
+//            cursor.getText().createTextCursorByRange(cursor.getEnd());
+//
+//        cursor.collapseToStart();
+//        cursor.goRight((short) 1, false);
+//        // now we are between two spaces
+//
+//        final String left = StorageBaseRefMark.REFERENCE_MARK_LEFT_BRACKET;
+//        final String right = StorageBaseRefMark.REFERENCE_MARK_RIGHT_BRACKET;
+//        final short leftLength = (short) left.length();
+//        final short rightLength = (short) right.length();
+//        String bracketedContent = (withoutBrackets
+//                                   ? ""
+//                                   : left + right);
+//
+//        cursor.getText().insertString(
+//            cursor,
+//            bracketedContent,
+//            true);
+//
+//        documentConnection.insertReferenceMark(refMarkName,
+//                                               cursor,
+//                                               true /* absorb */);
+//
+//        cursorBefore.goRight((short) 1, true);
+//        cursorBefore.setString("");
+//        if (!insertSpaceAfter) {
+//            cursorAfter.goLeft((short) 1, true);
+//            cursorAfter.setString("");
+//        }
     }
 
     /*
@@ -932,7 +954,8 @@ class CitationGroupsV001 {
         NoSuchElementException {
 
         for (CitationGroup cg : cgs) {
-            documentConnection.removeReferenceMark(cg.referenceMarkName);
+            //documentConnection.removeReferenceMark(cg.referenceMarkName);
+            cg.cgRangeStorage.removeFromDocument(documentConnection);
             this.citationGroups.remove(cg.cgid);
             this.globalOrder.map(l -> l.remove(cg.cgid));
 
@@ -969,69 +992,72 @@ class CitationGroupsV001 {
         WrappedTargetException,
         CreationException {
 
-        boolean alwaysRemoveBrackets = true;
-        boolean removeBracketsFromEmpty = false;
+        CitationGroup cg = this.getCitationGroup(cgid).orElseThrow(RuntimeException::new);
+        cg.cgRangeStorage.cleanFillCursor(documentConnection);
 
-        final String left = StorageBaseRefMark.REFERENCE_MARK_LEFT_BRACKET;
-        final String right = StorageBaseRefMark.REFERENCE_MARK_RIGHT_BRACKET;
-        final short leftLength = (short) left.length();
-        final short rightLength = (short) right.length();
-
-        CitationGroupsV001 cgs = this;
-        String name = cgs.getReferenceMarkName(cgid).orElseThrow(RuntimeException::new);
-
-        XTextCursor full = cgs.getRawCursorForCitationGroup(cgid, documentConnection);
-        final String fullText = full.getString();
-        final int fullTextLength = fullText.length();
-
-        XTextCursor alpha = full.getText().createTextCursorByRange(full);
-        alpha.collapseToStart();
-
-        XTextCursor beta = full.getText().createTextCursorByRange(full);
-        beta.collapseToStart();
-        beta.goRight(leftLength, false);
-
-        XTextCursor omega = full.getText().createTextCursorByRange(full);
-        omega.collapseToEnd();
-
-        if (!fullText.startsWith(left)) {
-            throw new RuntimeException(
-                String.format("cleanFillCursorForCitationGroup:"
-                              + " (%s) does not start with REFERENCE_MARK_LEFT_BRACKET",
-                              name));
-        }
-
-        if (!fullText.endsWith(right)) {
-            throw new RuntimeException(
-                String.format("cleanFillCursorForCitationGroup:"
-                              + " (%s) does not end with REFERENCE_MARK_RIGHT_BRACKET",
-                              name));
-        }
-
-        final int contentLength = (fullTextLength - (leftLength + rightLength));
-        if (contentLength < 0) {
-            throw new RuntimeException(
-                String.format("cleanFillCursorForCitationGroup: length(%s) < 0",
-                              name));
-        }
-
-        boolean removeRight = ((contentLength >= 1)
-                               || ((contentLength == 0) && removeBracketsFromEmpty)
-                               || alwaysRemoveBrackets);
-
-        boolean removeLeft = ((contentLength >= 2)
-                              || ((contentLength == 0) && removeBracketsFromEmpty)
-                              || alwaysRemoveBrackets);
-
-        if (removeRight) {
-            omega.goLeft(rightLength, true);
-            omega.setString("");
-        }
-
-        if (removeLeft) {
-            alpha.goRight(leftLength, true);
-            alpha.setString("");
-        }
+//        boolean alwaysRemoveBrackets = true;
+//        boolean removeBracketsFromEmpty = false;
+//
+//        final String left = StorageBaseRefMark.REFERENCE_MARK_LEFT_BRACKET;
+//        final String right = StorageBaseRefMark.REFERENCE_MARK_RIGHT_BRACKET;
+//        final short leftLength = (short) left.length();
+//        final short rightLength = (short) right.length();
+//
+//        CitationGroupsV001 cgs = this;
+//        String name = cgs.getReferenceMarkName(cgid).orElseThrow(RuntimeException::new);
+//
+//        XTextCursor full = cgs.getRawCursorForCitationGroup(cgid, documentConnection);
+//        final String fullText = full.getString();
+//        final int fullTextLength = fullText.length();
+//
+//        XTextCursor alpha = full.getText().createTextCursorByRange(full);
+//        alpha.collapseToStart();
+//
+//        XTextCursor beta = full.getText().createTextCursorByRange(full);
+//        beta.collapseToStart();
+//        beta.goRight(leftLength, false);
+//
+//        XTextCursor omega = full.getText().createTextCursorByRange(full);
+//        omega.collapseToEnd();
+//
+//        if (!fullText.startsWith(left)) {
+//            throw new RuntimeException(
+//                String.format("cleanFillCursorForCitationGroup:"
+//                              + " (%s) does not start with REFERENCE_MARK_LEFT_BRACKET",
+//                              name));
+//        }
+//
+//        if (!fullText.endsWith(right)) {
+//            throw new RuntimeException(
+//                String.format("cleanFillCursorForCitationGroup:"
+//                              + " (%s) does not end with REFERENCE_MARK_RIGHT_BRACKET",
+//                              name));
+//        }
+//
+//        final int contentLength = (fullTextLength - (leftLength + rightLength));
+//        if (contentLength < 0) {
+//            throw new RuntimeException(
+//                String.format("cleanFillCursorForCitationGroup: length(%s) < 0",
+//                              name));
+//        }
+//
+//        boolean removeRight = ((contentLength >= 1)
+//                               || ((contentLength == 0) && removeBracketsFromEmpty)
+//                               || alwaysRemoveBrackets);
+//
+//        boolean removeLeft = ((contentLength >= 2)
+//                              || ((contentLength == 0) && removeBracketsFromEmpty)
+//                              || alwaysRemoveBrackets);
+//
+//        if (removeRight) {
+//            omega.goLeft(rightLength, true);
+//            omega.setString("");
+//        }
+//
+//        if (removeLeft) {
+//            alpha.goRight(leftLength, true);
+//            alpha.setString("");
+//        }
     }
 
     /**
@@ -1045,24 +1071,27 @@ class CitationGroupsV001 {
         WrappedTargetException,
         CreationException {
 
-        String name = this.getReferenceMarkName(cgid).orElseThrow(RuntimeException::new);
-        XTextCursor full = null;
+        CitationGroup cg = this.getCitationGroup(cgid).orElseThrow(RuntimeException::new);
+        return cg.cgRangeStorage.getRawCursor(documentConnection);
 
-        XTextContent markAsTextContent =
-            documentConnection.getReferenceMarkAsTextContentOrNull(name);
-
-        if (markAsTextContent == null) {
-            throw new RuntimeException(
-                String.format(
-                    "getRawCursorForCitationGroup: markAsTextContent(%s) == null",
-                    name));
-        }
-
-        full = DocumentConnection.getTextCursorOfTextContent(markAsTextContent);
-        if (full == null) {
-            throw new RuntimeException("getRawCursorForCitationGroup: full == null");
-        }
-        return full;
+//        String name = this.getReferenceMarkName(cgid).orElseThrow(RuntimeException::new);
+//        XTextCursor full = null;
+//
+//        XTextContent markAsTextContent =
+//            documentConnection.getReferenceMarkAsTextContentOrNull(name);
+//
+//        if (markAsTextContent == null) {
+//            throw new RuntimeException(
+//                String.format(
+//                    "getRawCursorForCitationGroup: markAsTextContent(%s) == null",
+//                    name));
+//        }
+//
+//        full = DocumentConnection.getTextCursorOfTextContent(markAsTextContent);
+//        if (full == null) {
+//            throw new RuntimeException("getRawCursorForCitationGroup: full == null");
+//        }
+//        return full;
     }
 
     public XTextCursor getFillCursorForCitationGroup(DocumentConnection documentConnection,
@@ -1072,99 +1101,102 @@ class CitationGroupsV001 {
         WrappedTargetException,
         CreationException {
 
-        String name = this.getReferenceMarkName(cgid).orElseThrow(RuntimeException::new);
+        CitationGroup cg = this.getCitationGroup(cgid).orElseThrow(RuntimeException::new);
+        return cg.cgRangeStorage.getFillCursor(documentConnection);
 
-        final boolean debugThisFun = false;
-        final String left = StorageBaseRefMark.REFERENCE_MARK_LEFT_BRACKET;
-        final String right = StorageBaseRefMark.REFERENCE_MARK_RIGHT_BRACKET;
-        final short leftLength = (short) left.length();
-        final short rightLength = (short) right.length();
-
-        XTextCursor full = null;
-        String fullText = null;
-        for (int i = 1; i <= 2; i++) {
-            XTextContent markAsTextContent =
-                documentConnection.getReferenceMarkAsTextContentOrNull(name);
-
-            if (markAsTextContent == null) {
-                throw new RuntimeException(
-                    String.format("getFillCursorForCitationGroup:"
-                                  + " markAsTextContent(%s) == null (attempt %d)",
-                                  name,
-                                  i));
-            }
-
-            full = DocumentConnection.getTextCursorOfTextContent(markAsTextContent);
-            if (full == null) {
-                throw new RuntimeException(
-                    String.format("getFillCursorForCitationGroup: full == null (attempt %d)", i));
-            }
-
-            fullText = full.getString();
-
-            if (debugThisFun) {
-                System.out.printf("getFillCursor: fulltext = '%s'%n", fullText);
-            }
-
-            if (fullText.length() >= 2) {
-                break;
-            } else {
-                // (fullText.length() < 2)
-                if (i == 2) {
-                    throw new RuntimeException(
-                        String.format("getFillCursorForCitationGroup:"
-                                      + " (fullText.length() < 2) (attempt %d)",
-                                      i));
-                }
-                // too short, recreate
-                if (debugThisFun) {
-                    System.out.println("getFillCursor: too short, recreate");
-                }
-                full.setString("");
-                try {
-                    documentConnection.removeReferenceMark(name);
-                } catch (NoSuchElementException ex) {
-                    LOGGER.warn(
-                        String.format("getFillCursorForCitationGroup got NoSuchElementException"
-                                      + " for '%s'",
-                                      name));
-                }
-                createReferenceMarkForCitationGroup(
-                    documentConnection,
-                    name,
-                    full,
-                    false, /* insertSpaceAfter */
-                    false  /* withoutBrackets */);
-            }
-        }
-
-        if (full == null) {
-            throw new RuntimeException("getFillCursorForCitationGroup: full == null (after loop)");
-        }
-        if (fullText == null) {
-            throw new RuntimeException("getFillCursorForCitationGroup: fullText == null (after loop)");
-        }
-
-        // we have at least two characters inside
-        XTextCursor alpha = full.getText().createTextCursorByRange(full);
-        alpha.collapseToStart();
-        XTextCursor omega = full.getText().createTextCursorByRange(full);
-        omega.collapseToEnd();
-
-        XTextCursor beta = full.getText().createTextCursorByRange(full);
-        beta.collapseToStart();
-        beta.goRight((short) 1, false);
-        beta.goRight((short) (fullText.length() - 2), true);
-        beta.setString(left + right);
-        beta.collapseToEnd();
-        beta.goLeft(rightLength, false);
-        // drop the initial character
-        alpha.goRight((short) 1, true);
-        alpha.setString("");
-        // drop the last character
-        omega.goLeft((short) 1, true);
-        omega.setString("");
-        return beta;
+//        String name = this.getReferenceMarkName(cgid).orElseThrow(RuntimeException::new);
+//
+//        final boolean debugThisFun = false;
+//        final String left = StorageBaseRefMark.REFERENCE_MARK_LEFT_BRACKET;
+//        final String right = StorageBaseRefMark.REFERENCE_MARK_RIGHT_BRACKET;
+//        final short leftLength = (short) left.length();
+//        final short rightLength = (short) right.length();
+//
+//        XTextCursor full = null;
+//        String fullText = null;
+//        for (int i = 1; i <= 2; i++) {
+//            XTextContent markAsTextContent =
+//                documentConnection.getReferenceMarkAsTextContentOrNull(name);
+//
+//            if (markAsTextContent == null) {
+//                throw new RuntimeException(
+//                    String.format("getFillCursorForCitationGroup:"
+//                                  + " markAsTextContent(%s) == null (attempt %d)",
+//                                  name,
+//                                  i));
+//            }
+//
+//            full = DocumentConnection.getTextCursorOfTextContent(markAsTextContent);
+//            if (full == null) {
+//                throw new RuntimeException(
+//                    String.format("getFillCursorForCitationGroup: full == null (attempt %d)", i));
+//            }
+//
+//            fullText = full.getString();
+//
+//            if (debugThisFun) {
+//                System.out.printf("getFillCursor: fulltext = '%s'%n", fullText);
+//            }
+//
+//            if (fullText.length() >= 2) {
+//                break;
+//            } else {
+//                // (fullText.length() < 2)
+//                if (i == 2) {
+//                    throw new RuntimeException(
+//                        String.format("getFillCursorForCitationGroup:"
+//                                      + " (fullText.length() < 2) (attempt %d)",
+//                                      i));
+//                }
+//                // too short, recreate
+//                if (debugThisFun) {
+//                    System.out.println("getFillCursor: too short, recreate");
+//                }
+//                full.setString("");
+//                try {
+//                    documentConnection.removeReferenceMark(name);
+//                } catch (NoSuchElementException ex) {
+//                    LOGGER.warn(
+//                        String.format("getFillCursorForCitationGroup got NoSuchElementException"
+//                                      + " for '%s'",
+//                                      name));
+//                }
+//                createReferenceMarkForCitationGroup(
+//                    documentConnection,
+//                    name,
+//                    full,
+//                    false, /* insertSpaceAfter */
+//                    false  /* withoutBrackets */);
+//            }
+//        }
+//
+//        if (full == null) {
+//            throw new RuntimeException("getFillCursorForCitationGroup: full == null (after loop)");
+//        }
+//        if (fullText == null) {
+//            throw new RuntimeException("getFillCursorForCitationGroup: fullText == null (after loop)");
+//        }
+//
+//        // we have at least two characters inside
+//        XTextCursor alpha = full.getText().createTextCursorByRange(full);
+//        alpha.collapseToStart();
+//        XTextCursor omega = full.getText().createTextCursorByRange(full);
+//        omega.collapseToEnd();
+//
+//        XTextCursor beta = full.getText().createTextCursorByRange(full);
+//        beta.collapseToStart();
+//        beta.goRight((short) 1, false);
+//        beta.goRight((short) (fullText.length() - 2), true);
+//        beta.setString(left + right);
+//        beta.collapseToEnd();
+//        beta.goLeft(rightLength, false);
+//        // drop the initial character
+//        alpha.goRight((short) 1, true);
+//        alpha.setString("");
+//        // drop the last character
+//        omega.goLeft((short) 1, true);
+//        omega.setString("");
+//        return beta;
     }
 
     /**
@@ -1285,10 +1317,11 @@ class CitationGroupsV001 {
      *
      *
      */
-    private List<String> getJabRefReferenceMarkNames(DocumentConnection documentConnection)
+    private List<String> getJabRefReferenceMarkNames(StorageBase.NamedRangeManager manager,
+                                                     DocumentConnection documentConnection)
         throws
         NoDocumentException {
-        List<String> allNames = documentConnection.getReferenceMarkNames();
+        List<String> allNames = manager.getUsedNames(documentConnection);
         return filterIsJabRefReferenceMarkName(allNames);
     }
 
@@ -1338,7 +1371,8 @@ class CitationGroupsV001 {
         WrappedTargetException,
         NoDocumentException {
 
-        List<String> names = getJabRefReferenceMarkNames(documentConnection);
+        List<String> names = getJabRefReferenceMarkNames(this.citationStorageManager,
+                                                         documentConnection);
 
         // assert it supports XTextContent
         XNameAccess xNamedMarks = documentConnection.getReferenceMarks();
@@ -1536,6 +1570,7 @@ class CitationGroupsV001 {
 
     static class CitationGroup {
         CitationGroupID cgid;
+        StorageBase.NamedRange cgRangeStorage;
         int itcType;
         List<Citation> citations;
         List<Integer> localOrder;
@@ -1549,11 +1584,13 @@ class CitationGroupsV001 {
 
         CitationGroup(
             CitationGroupID cgid,
+            StorageBase.NamedRange cgRangeStorage,
             int itcType,
             List<Citation> citations,
             Optional<String> pageInfo,
             String referenceMarkName) {
             this.cgid = cgid;
+            this.cgRangeStorage = cgRangeStorage;
             this.itcType = itcType;
             this.citations = citations;
             this.pageInfo = pageInfo;

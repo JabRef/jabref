@@ -79,7 +79,11 @@ class StorageBase {
             WrappedTargetException,
             CreationException ;
 
-        // public void removeFromDocument(DocumentConnection documentConnection)
+        public void removeFromDocument(DocumentConnection documentConnection)
+            throws
+            WrappedTargetException,
+            NoDocumentException,
+            NoSuchElementException;
     }
 
     interface NamedRange extends HasName, HasTextRange {
@@ -98,5 +102,11 @@ class StorageBase {
         public List<String> getUsedNames(DocumentConnection documentConnection)
             throws
             NoDocumentException;
+
+        public NamedRange getFromDocumentOrNull(DocumentConnection documentConnection,
+                                                String refMarkName)
+            throws
+            NoDocumentException,
+            WrappedTargetException ;
     }
 }
