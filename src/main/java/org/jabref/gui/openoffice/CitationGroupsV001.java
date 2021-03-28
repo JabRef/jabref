@@ -49,30 +49,30 @@ class CitationGroupsV001 {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(CitedKeys.class);
 
-    /**
-     * This is what we get back from parsing a refMarkName.
-     *
-     */
-    private static class ParsedRefMark {
-        /**  "", "0", "1" ... */
-        public String i;
-        /** in-text-citation type */
-        public int itcType;
-        /** Citation keys embedded in the reference mark. */
-        public List<String> citationKeys;
-
-        ParsedRefMark(String i, int itcType, List<String> citationKeys) {
-            this.i = i;
-            this.itcType = itcType;
-            this.citationKeys = citationKeys;
-        }
-    }
 
     private static class Codec {
         private static final String BIB_CITATION = "JR_cite";
         private static final Pattern CITE_PATTERN =
             Pattern.compile(BIB_CITATION + "(\\d*)_(\\d*)_(.*)");
 
+        /**
+         * This is what we get back from parsing a refMarkName.
+         *
+         */
+        private static class ParsedRefMark {
+            /**  "", "0", "1" ... */
+            public String i;
+            /** in-text-citation type */
+            public int itcType;
+            /** Citation keys embedded in the reference mark. */
+            public List<String> citationKeys;
+
+            ParsedRefMark(String i, int itcType, List<String> citationKeys) {
+                this.i = i;
+                this.itcType = itcType;
+                this.citationKeys = citationKeys;
+            }
+        }
 
         /**
          * Produce a reference mark name for JabRef for the given citation
@@ -119,7 +119,7 @@ class CitationGroupsV001 {
             List<String> keys = Arrays.asList(citeMatcher.group(3).split(","));
             String i = citeMatcher.group(1);
             int itcType = Integer.parseInt(citeMatcher.group(2));
-            return (Optional.of(new CitationGroupsV001.ParsedRefMark(i, itcType, keys)));
+            return (Optional.of(new Codec.ParsedRefMark(i, itcType, keys)));
         }
 
         /**
@@ -448,7 +448,7 @@ class CitationGroupsV001 {
             WrappedTargetException,
             NoDocumentException {
 
-            Optional<ParsedRefMark> op = Codec.parseRefMarkName(refMarkName);
+            Optional<Codec.ParsedRefMark> op = Codec.parseRefMarkName(refMarkName);
             if (op.isEmpty()) {
                 // We have a problem. We want types[i] and bibtexKeys[i]
                 // to correspond to referenceMarkNames.get(i).
@@ -457,7 +457,7 @@ class CitationGroupsV001 {
                 throw new IllegalArgumentException("readCitationGroupFromDocumentOrThrow:"
                                                    + " found unparsable referenceMarkName");
             }
-            ParsedRefMark ov = op.get();
+            Codec.ParsedRefMark ov = op.get();
             CitationGroupID id = new CitationGroupID(refMarkName);
             List<Citation> citations = ((ov.citationKeys == null)
                                         ? new ArrayList<>()
