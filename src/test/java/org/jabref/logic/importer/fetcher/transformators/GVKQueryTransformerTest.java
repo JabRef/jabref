@@ -48,6 +48,5 @@ class GVKQueryTransformerTest implements InfixTransformerTest {
     @Disabled("Not supported by GVK")
     @Override
     public void convertYearRangeField() throws Exception {
-
     }
 }

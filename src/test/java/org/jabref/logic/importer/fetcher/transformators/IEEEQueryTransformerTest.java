@@ -57,7 +57,6 @@ class IEEEQueryTransformerTest implements InfixTransformerTest {
 
     @Override
     public void convertYearRangeField() throws Exception {
-
         IEEEQueryTransformer transformer = ((IEEEQueryTransformer) getTransformer());
 
         String queryString = "year-range:2018-2021";

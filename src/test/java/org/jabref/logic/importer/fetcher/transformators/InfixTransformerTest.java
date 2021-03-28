@@ -18,6 +18,7 @@ public interface InfixTransformerTest {
     /* All prefixes have to include the used separator
      * Example in the case of ':': <code>"author:"</code>
      */
+
     String getAuthorPrefix();
 
     String getUnFieldedPrefix();

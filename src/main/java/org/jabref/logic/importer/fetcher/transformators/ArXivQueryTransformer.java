@@ -17,10 +17,6 @@ public class ArXivQueryTransformer extends AbstractQueryTransformer {
         return " OR ";
     }
 
-    /**
-     * Check whether this works as an unary operator
-     * @return
-     */
     @Override
     protected String getLogicalNotOperator() {
         return " ANDNOT ";
@@ -52,7 +48,9 @@ public class ArXivQueryTransformer extends AbstractQueryTransformer {
     }
 
     /**
-     * Currently not supported
+     * The arXiv API does not support querying for a year range.
+     * Nevertheless, we store the start year and end year,
+     * because we filter it after fetching all results
      */
     @Override
     protected String handleYearRange(String yearRange) {
