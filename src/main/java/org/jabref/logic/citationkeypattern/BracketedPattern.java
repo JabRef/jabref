@@ -491,23 +491,22 @@ public class BracketedPattern {
      * @return an {@link AuthorList} consisting of authors and institution keys with resolved latex.
      */
     private static AuthorList createAuthorList(String unparsedAuthors) {
-        AuthorList authorList = new AuthorList();
-        for (Author author : AuthorList.parse(unparsedAuthors).getAuthors()) {
-            // If the author is an institution, use an institution key instead of the full name
-            String lastName = author.getLast()
-                                    .map(lastPart -> isInstitution(author) ?
-                                            generateInstitutionKey(lastPart) :
-                                            LatexToUnicodeAdapter.format(lastPart))
-                                    .orElse(null);
-            authorList.addAuthor(
-                    author.getFirst().map(LatexToUnicodeAdapter::format).orElse(null),
-                    author.getFirstAbbr().map(LatexToUnicodeAdapter::format).orElse(null),
-                    author.getVon().map(LatexToUnicodeAdapter::format).orElse(null),
-                    lastName,
-                    author.getJr().map(LatexToUnicodeAdapter::format).orElse(null)
-            );
-        }
-        return authorList;
+        return AuthorList.parse(unparsedAuthors).getAuthors().stream()
+                         .map((author) -> {
+                             // If the author is an institution, use an institution key instead of the full name
+                             String lastName = author.getLast()
+                                                     .map(lastPart -> isInstitution(author) ?
+                                                             generateInstitutionKey(lastPart) :
+                                                             LatexToUnicodeAdapter.format(lastPart))
+                                                     .orElse(null);
+                             return new Author(
+                                     author.getFirst().map(LatexToUnicodeAdapter::format).orElse(null),
+                                     author.getFirstAbbr().map(LatexToUnicodeAdapter::format).orElse(null),
+                                     author.getVon().map(LatexToUnicodeAdapter::format).orElse(null),
+                                     lastName,
+                                     author.getJr().map(LatexToUnicodeAdapter::format).orElse(null));
+                         })
+                         .collect(AuthorList.collect());
     }
 
     /**

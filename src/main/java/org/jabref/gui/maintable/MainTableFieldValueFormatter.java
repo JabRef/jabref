@@ -70,18 +70,18 @@ public class MainTableFieldValueFormatter {
         if (((displayStyle == DisplayStyle.FIRSTNAME_LASTNAME)
                 || (displayStyle == DisplayStyle.LASTNAME_FIRSTNAME))
                 && abbreviationStyle == AbbreviationStyle.LASTNAME_ONLY) {
-            return authors.getAsLastNamesLatexFree(false);
+            return authors.latexFree().getAsLastNames(false);
         }
 
         return switch (displayStyle) {
             default -> nameToFormat;
-            case FIRSTNAME_LASTNAME -> authors.getAsFirstLastNamesLatexFree(
+            case FIRSTNAME_LASTNAME -> authors.latexFree().getAsFirstLastNames(
                     abbreviationStyle == AbbreviationStyle.FULL,
                     false);
-            case LASTNAME_FIRSTNAME -> authors.getAsLastFirstNamesLatexFree(
+            case LASTNAME_FIRSTNAME -> authors.latexFree().getAsLastFirstNames(
                     abbreviationStyle == AbbreviationStyle.FULL,
                     false);
-            case NATBIB -> authors.getAsNatbibLatexFree();
+            case NATBIB -> authors.latexFree().getAsNatbib();
         };
     }
 }
