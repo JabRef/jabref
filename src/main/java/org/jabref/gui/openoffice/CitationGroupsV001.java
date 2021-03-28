@@ -214,19 +214,6 @@ class CitationGroupsV001 {
 
     }
 
-    static class CitationGroupID {
-        String id;
-        CitationGroupID(String id) {
-            this.id = id;
-        }
-
-        /**
-         *  CitationEntry needs refMark or other identifying string
-         */
-        String asString() {
-            return id;
-        }
-    }
 
     static class Citation  implements CitationSort.ComparableCitation {
 
@@ -647,7 +634,7 @@ class CitationGroupsV001 {
 
         /**
          * Creates a list of {@code
-         * RangeSortable<CitationGroupsV001.CitationGroupID>} values for
+         * RangeSortable<CitationGroupID>} values for
          * our {@code CitationGroup} values. Originally designed to be
          * passed to {@code visualSort}.
          *
@@ -669,7 +656,7 @@ class CitationGroupsV001 {
          *        mark. This is used for numbering the citations.
          *
          */
-        private static List<RangeSort.RangeSortable<CitationGroupsV001.CitationGroupID>>
+        private static List<RangeSort.RangeSortable<CitationGroupID>>
         createVisualSortInput(CitationGroupsV001.CitationGroups cgs,
                               DocumentConnection documentConnection,
                               boolean mapFootnotesToFootnoteMarks)
@@ -677,11 +664,11 @@ class CitationGroupsV001 {
             NoDocumentException,
             WrappedTargetException {
 
-            List<CitationGroupsV001.CitationGroupID> cgids =
+            List<CitationGroupID> cgids =
                 new ArrayList<>(cgs.getCitationGroupIDs());
 
             List<RangeSort.RangeSortEntry> vses = new ArrayList<>();
-            for (CitationGroupsV001.CitationGroupID cgid : cgids) {
+            for (CitationGroupID cgid : cgids) {
                 XTextRange range = cgs.getReferenceMarkRangeOrNull(documentConnection, cgid);
                 if (range == null) {
                     throw new RuntimeException("getReferenceMarkRangeOrNull returned null");
@@ -710,7 +697,7 @@ class CitationGroupsV001 {
              */
 
             // Sort within partitions
-            RangeKeyedMapList<RangeSort.RangeSortEntry<CitationGroupsV001.CitationGroupID>> xxs
+            RangeKeyedMapList<RangeSort.RangeSortEntry<CitationGroupID>> xxs
                 = new RangeKeyedMapList<>();
 
             for (RangeSort.RangeSortEntry v : vses) {
@@ -718,9 +705,9 @@ class CitationGroupsV001 {
             }
 
             // build final list
-            List<RangeSort.RangeSortEntry<CitationGroupsV001.CitationGroupID>> res = new ArrayList<>();
+            List<RangeSort.RangeSortEntry<CitationGroupID>> res = new ArrayList<>();
 
-            for (TreeMap<XTextRange, List<RangeSort.RangeSortEntry<CitationGroupsV001.CitationGroupID>>>
+            for (TreeMap<XTextRange, List<RangeSort.RangeSortEntry<CitationGroupID>>>
                      xs : xxs.partitionValues()) {
 
                 List<XTextRange> oxs = new ArrayList<>(xs.keySet());
@@ -728,9 +715,9 @@ class CitationGroupsV001 {
                 int indexInPartition = 0;
                 for (int i = 0; i < oxs.size(); i++) {
                     XTextRange a = oxs.get(i);
-                    List<RangeSort.RangeSortEntry<CitationGroupsV001.CitationGroupID>> avs = xs.get(a);
+                    List<RangeSort.RangeSortEntry<CitationGroupID>> avs = xs.get(a);
                     for (int j = 0; j < avs.size(); j++) {
-                        RangeSort.RangeSortEntry<CitationGroupsV001.CitationGroupID> v = avs.get(j);
+                        RangeSort.RangeSortEntry<CitationGroupID> v = avs.get(j);
                         v.indexInPosition = indexInPartition++;
                         if (mapFootnotesToFootnoteMarks) {
                             // Adjust range if we are inside a footnote:
@@ -746,9 +733,9 @@ class CitationGroupsV001 {
                 }
             }
             // convert
-            // List<RangeSortEntry<CitationGroupsV001.CitationGroupID>>
+            // List<RangeSortEntry<CitationGroupID>>
             // to
-            // List<RangeSortable<CitationGroupsV001.CitationGroupID>>
+            // List<RangeSortable<CitationGroupID>>
             return res.stream().map(e -> e).collect(Collectors.toList());
         }
 
@@ -766,7 +753,7 @@ class CitationGroupsV001 {
          *        order.
          *
          */
-        public List<CitationGroupsV001.CitationGroupID>
+        public List<CitationGroupID>
         getVisuallySortedCitationGroupIDs(DocumentConnection documentConnection,
                                           boolean mapFootnotesToFootnoteMarks)
             throws
@@ -774,7 +761,7 @@ class CitationGroupsV001 {
             NoDocumentException,
             JabRefException {
             CitationGroupsV001.CitationGroups cgs = this;
-            List<RangeSort.RangeSortable<CitationGroupsV001.CitationGroupID>> vses =
+            List<RangeSort.RangeSortable<CitationGroupID>> vses =
                 createVisualSortInput(cgs,
                                       documentConnection,
                                       mapFootnotesToFootnoteMarks);
@@ -790,7 +777,7 @@ class CitationGroupsV001 {
                 + Localization.lang("To get the visual positions of your citations"
                                     + " I need to move the cursor around,"
                                     + " but could not get it.");
-            List<RangeSort.RangeSortable<CitationGroupsV001.CitationGroupID>> sorted =
+            List<RangeSort.RangeSortable<CitationGroupID>> sorted =
                 RangeSortVisual.visualSort(vses,
                                            documentConnection,
                                            messageOnFailureToObtainAFunctionalXTextViewCursor);
@@ -1195,7 +1182,7 @@ class CitationGroupsV001 {
 
         List<RangeForOverlapCheck> xs = new ArrayList<>(numberOfCitationGroups());
 
-        List<CitationGroupsV001.CitationGroupID> cgids =
+        List<CitationGroupID> cgids =
             new ArrayList<>(this.getCitationGroupIDs());
 
         for (CitationGroupID cgid : cgids) {

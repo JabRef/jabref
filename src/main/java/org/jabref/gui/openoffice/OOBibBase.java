@@ -557,7 +557,7 @@ class OOBibBase {
 
         int n = cgs.numberOfCitationGroups();
         List<CitationEntry> citations = new ArrayList<>(n);
-        for (CitationGroupsV001.CitationGroupID cgid : cgs.getCitationGroupIDs()) {
+        for (CitationGroupID cgid : cgs.getCitationGroupIDs()) {
             String name = cgid.asString();
             CitationEntry entry =
                 new CitationEntry(
@@ -582,7 +582,7 @@ class OOBibBase {
      *  reference mark is surrounded by bold html tag.
      */
     private String getCitationContext(CitationGroupsV001.CitationGroups cgs,
-                                      CitationGroupsV001.CitationGroupID cgid,
+                                      CitationGroupID cgid,
                                       DocumentConnection documentConnection,
                                       int charBefore,
                                       int charAfter,
@@ -894,7 +894,7 @@ class OOBibBase {
      *  Produce citation markers for the case when the citation
      *  markers are the citation keys themselves, separated by commas.
      */
-    private static Map<CitationGroupsV001.CitationGroupID,String>
+    private static Map<CitationGroupID,String>
     produceCitationMarkersForIsCitationKeyCiteMarkers(CitationGroupsV001.CitationGroups cgs,
                                                       OOBibStyle style)
         throws
@@ -904,9 +904,9 @@ class OOBibBase {
 
         cgs.createPlainBibliographySortedByComparator(OOBibBase.entryComparator);
 
-        Map<CitationGroupsV001.CitationGroupID,String> citMarkers = new HashMap<>();
+        Map<CitationGroupID,String> citMarkers = new HashMap<>();
 
-        for (CitationGroupsV001.CitationGroupID cgid : cgs.getSortedCitationGroupIDs()) {
+        for (CitationGroupID cgid : cgs.getSortedCitationGroupIDs()) {
             List<CitationGroupsV001.Citation> cits = cgs.getSortedCitations(cgid);
             String citMarker = (cits.stream()
                                 .map(cit -> cit.citationKey)
@@ -934,7 +934,7 @@ class OOBibBase {
      *         in bibtexKeys[i][j]
      *
      */
-    private static Map<CitationGroupsV001.CitationGroupID,String>
+    private static Map<CitationGroupID,String>
     produceCitationMarkersForIsNumberEntriesIsSortByPosition(CitationGroupsV001.CitationGroups cgs,
                                                              OOBibStyle style)
         throws
@@ -947,9 +947,9 @@ class OOBibBase {
 
         final int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
 
-        Map<CitationGroupsV001.CitationGroupID,String> citMarkers = new HashMap<>();
+        Map<CitationGroupID,String> citMarkers = new HashMap<>();
 
-        for (CitationGroupsV001.CitationGroupID cgid : cgs.getSortedCitationGroupIDs()) {
+        for (CitationGroupID cgid : cgs.getSortedCitationGroupIDs()) {
             CitationGroupsV001.CitationGroup cg = cgs.getCitationGroupOrThrow(cgid);
             List<Integer> numbers = cg.getSortedNumbers();
             citMarkers.put(cgid,
@@ -963,7 +963,7 @@ class OOBibBase {
      * Produce citation markers for the case of numbered citations
      * when the bibliography is not sorted by position.
      */
-    private Map<CitationGroupsV001.CitationGroupID,String>
+    private Map<CitationGroupID,String>
     produceCitationMarkersForIsNumberEntriesNotSortByPosition(CitationGroupsV001.CitationGroups cgs,
                                                               OOBibStyle style) {
         assert style.isNumberEntries();
@@ -974,9 +974,9 @@ class OOBibBase {
         final int minGroupingCount =
             style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
 
-        Map<CitationGroupsV001.CitationGroupID,String> citMarkers = new HashMap<>();
+        Map<CitationGroupID,String> citMarkers = new HashMap<>();
 
-        for (CitationGroupsV001.CitationGroupID cgid : cgs.getSortedCitationGroupIDs()) {
+        for (CitationGroupID cgid : cgs.getSortedCitationGroupIDs()) {
             CitationGroupsV001.CitationGroup cg = cgs.getCitationGroupOrThrow(cgid);
             List<Integer> numbers = cg.getSortedNumbers();
             citMarkers.put(cgid,
@@ -996,7 +996,7 @@ class OOBibBase {
      * @param entries            Map BibEntry to BibDatabase.
      * @param style              Bibliography style.
      */
-    private Map<CitationGroupsV001.CitationGroupID,String>
+    private Map<CitationGroupID,String>
     produceCitationMarkersForNormalStyle(CitationGroupsV001.CitationGroups cgs,
                                          OOBibStyle style)
         throws
@@ -1017,9 +1017,9 @@ class OOBibBase {
         final int maxAuthorsFirst = style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST);
         Set<String> seenBefore = new HashSet<>();
 
-        Map<CitationGroupsV001.CitationGroupID,String> citMarkers = new HashMap<>();
+        Map<CitationGroupID,String> citMarkers = new HashMap<>();
 
-        for (CitationGroupsV001.CitationGroupID cgid : cgs.getSortedCitationGroupIDs()) {
+        for (CitationGroupID cgid : cgs.getSortedCitationGroupIDs()) {
             CitationGroupsV001.CitationGroup cg = cgs.getCitationGroupOrThrow(cgid);
             List<CitationGroupsV001.Citation> cits = cg.getSortedCitations();
             final int nCitedEntries = cits.size();
@@ -1125,7 +1125,7 @@ class OOBibBase {
 
     private static void fillCitationMarkInCursor(DocumentConnection documentConnection,
                                                  CitationGroupsV001.CitationGroups cgs,
-                                                 CitationGroupsV001.CitationGroupID cgid,
+                                                 CitationGroupID cgid,
                                                  XTextCursor cursor,
                                                  String citationText,
                                                  boolean withText,
@@ -1243,7 +1243,7 @@ class OOBibBase {
         CreationException,
         NoDocumentException {
 
-        CitationGroupsV001.CitationGroupID cgid =
+        CitationGroupID cgid =
             cgs.createCitationGroup(documentConnection,
                                     citationKeys,
                                     pageInfo,
@@ -1620,7 +1620,7 @@ class OOBibBase {
      */
     private void applyNewCitationMarkers(DocumentConnection documentConnection,
                                          CitationGroupsV001.CitationGroups cgs,
-                                         Map<CitationGroupsV001.CitationGroupID,String> citMarkers,
+                                         Map<CitationGroupID,String> citMarkers,
                                          OOBibStyle style)
         throws
         NoDocumentException,
@@ -1648,9 +1648,9 @@ class OOBibBase {
         // catastrophic consequences for the user.
         boolean mustTestCharFormat = style.isFormatCitations();
 
-        for (Map.Entry<CitationGroupsV001.CitationGroupID,String> kv : citMarkers.entrySet() ) {
+        for (Map.Entry<CitationGroupID,String> kv : citMarkers.entrySet() ) {
 
-            CitationGroupsV001.CitationGroupID cgid = kv.getKey();
+            CitationGroupID cgid = kv.getKey();
             Objects.requireNonNull(cgid);
 
             String citationText = kv.getValue();
@@ -1702,10 +1702,10 @@ class OOBibBase {
         CitationGroupsV001.CitationGroups cgs;
 
         /** citation markers */
-        Map<CitationGroupsV001.CitationGroupID,String> citMarkers;
+        Map<CitationGroupID,String> citMarkers;
 
         ProduceCitationMarkersResult(CitationGroupsV001.CitationGroups cgs,
-                                     Map<CitationGroupsV001.CitationGroupID,String> citMarkers) {
+                                     Map<CitationGroupID,String> citMarkers) {
             this.cgs = cgs;
             this.citMarkers = citMarkers;
             if ( cgs.getBibliography().isEmpty() ) {
@@ -1770,7 +1770,7 @@ class OOBibBase {
         //
         {
             boolean mapFootnotesToFootnoteMarks = true;
-            List<CitationGroupsV001.CitationGroupID> sortedCitationGroupIDs =
+            List<CitationGroupID> sortedCitationGroupIDs =
                 cgs.getVisuallySortedCitationGroupIDs(documentConnection,
                                                       mapFootnotesToFootnoteMarks);
             cgs.setGlobalOrder(sortedCitationGroupIDs);
@@ -1779,7 +1779,7 @@ class OOBibBase {
 
         // citMarkers[i] = what goes in the text at referenceMark[i]
         // String[] citMarkers;
-        Map<CitationGroupsV001.CitationGroupID,String> citMarkers;
+        Map<CitationGroupID,String> citMarkers;
 
         // fill citMarkers
         Map<String, String> uniqueLetters = new HashMap<>();
@@ -1827,7 +1827,7 @@ class OOBibBase {
     sortEntriesByRefMarkNames(CitationGroupsV001.CitationGroups cgs) {
         Set<String> seen = new HashSet<>();
         List<CitationGroupsV001.Citation> res = new ArrayList<>();
-        for (CitationGroupsV001.CitationGroupID  cgid : cgs.getSortedCitationGroupIDs()) {
+        for (CitationGroupID  cgid : cgs.getSortedCitationGroupIDs()) {
             List<CitationGroupsV001.Citation> cits = cgs.getSortedCitations(cgid);
 
             // no need to look in the database again
@@ -1975,7 +1975,7 @@ class OOBibBase {
                     int last = ck.where.size();
                     int i=0;
                     for (CitationGroupsV001.CitationPath p : ck.where) {
-                        CitationGroupsV001.CitationGroupID cgid = p.group;
+                        CitationGroupID cgid = p.group;
                         CitationGroupsV001.CitationGroup cg = cgs.getCitationGroupOrThrow(cgid);
                         String refMarkName = cg.referenceMarkName;
 
@@ -2182,7 +2182,7 @@ class OOBibBase {
             boolean madeModifications = false;
 
 
-            List<CitationGroupsV001.CitationGroupID>
+            List<CitationGroupID>
                 referenceMarkNames =
                 cgs.getCitationGroupIDsSortedWithinPartitions(documentConnection,
                                                               false /* mapFootnotesToFootnoteMarks */);
@@ -2218,7 +2218,7 @@ class OOBibBase {
                 CitationGroupsV001.CitationGroup prev = null;
                 XTextRange prevRange = null;
 
-                for (CitationGroupsV001.CitationGroupID cgid : referenceMarkNames) {
+                for (CitationGroupID cgid : referenceMarkNames) {
                     CitationGroupsV001.CitationGroup cg = cgs.getCitationGroupOrThrow(cgid);
 
                     XTextRange currentRange = cgs.getReferenceMarkRangeOrNull(documentConnection, cgid);
@@ -2555,11 +2555,11 @@ class OOBibBase {
             boolean madeModifications = false;
 
             // boolean mapFootnotesToFootnoteMarks = true;
-            // List<CitationGroupsV001.CitationGroupID> names =
+            // List<CitationGroupID> names =
             // getVisuallySortedCitationGroupIDs(cgs, documentConnection, mapFootnotesToFootnoteMarks);
             //
             // {@code names} does not need to be sorted.
-            List<CitationGroupsV001.CitationGroupID> names = new ArrayList<>(cgs.getCitationGroupIDs());
+            List<CitationGroupID> names = new ArrayList<>(cgs.getCitationGroupIDs());
 
             try {
                 if (useLockControllers) {
@@ -2570,7 +2570,7 @@ class OOBibBase {
                 boolean setCharStyleTested = false;
 
                 while (pivot < (names.size())) {
-                    CitationGroupsV001.CitationGroupID cgid = names.get(pivot);
+                    CitationGroupID cgid = names.get(pivot);
                     CitationGroupsV001.CitationGroup cg = cgs.getCitationGroupOrThrow(cgid);
                     XTextRange range1 = cgs.getReferenceMarkRangeOrNull(documentConnection,cgid);
                     XTextCursor textCursor = range1.getText().createTextCursorByRange(range1);
