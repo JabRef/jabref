@@ -36,6 +36,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Fixed
 
+- We fixed an issue where the value of the field `school` or `institution` would be printed twice in the HTML Export [forum#2634](https://discourse.jabref.org/t/problem-with-exporting-techreport-phdthesis-mastersthesis-to-html/2634)
 - We fixed an issue preventing to connect to a shared database. [#7570](https://github.com/JabRef/jabref/pull/7570)
 - We fixed an issue preventing files from being dragged & dropped into an empty library. [#6851](https://github.com/JabRef/jabref/issues/6851)
 - We fixed an issue where double-click onto PDF in file list under the 'General' tab section should just open the file. [#7465](https://github.com/JabRef/jabref/issues/7465)
@@ -68,6 +69,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where drag and drop of bib files for opening resulted in uncaught exceptions [#7464](https://github.com/JabRef/jabref/issues/7464)
 - We fixed an issue where columns shrink in width when we try to enlarge JabRef window. [#6818](https://github.com/JabRef/jabref/issues/6818)
 - We fixed an issue where Content selector does not seem to work for custom fields. [#6819](https://github.com/JabRef/jabref/issues/6819)
+- We fixed an issue where font size of the preferences dialog does not update with the rest of the GUI. [#7416](https://github.com/JabRef/jabref/issues/7416)
 - We fixed an issue in which a linked online file consisting of a web page was saved as an invalid pdf file upon being downloaded. The user is now notified when downloading a linked file results in an HTML file. [#7452](https://github.com/JabRef/jabref/issues/7452)
 - We fixed an issue where opening BibTex file (doubleclick) from Folder with spaces not working. [#6487](https://github.com/JabRef/jabref/issues/6487)
 
