@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-//import org.jabref.gui.openoffice.CitationSort;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
@@ -160,8 +159,8 @@ class CitationGroupsV001 {
             // to correspond to referenceMarkNames.get(i).
             // And do not want null in bibtexKeys (or error code in types)
             // on return.
-            throw new IllegalArgumentException(
-                "citationGroups: found unparsable referenceMarkName");
+            throw new IllegalArgumentException("readCitationGroupFromDocumentOrThrow:"
+                                               + " found unparsable referenceMarkName");
         }
         ParsedRefMark ov = op.get();
         CitationGroupID id = new CitationGroupID(refMarkName);
@@ -235,6 +234,9 @@ class CitationGroupsV001 {
                     : Optional.empty());
         }
 
+        /**
+         * Appends to end of {@code where}
+         */
         void addPath(CitationPath p, Citation cit) {
             this.where.add(p);
             if (cit.db != this.db) {
