@@ -40,8 +40,8 @@ public class MainTableColumnModel {
 
         public static final EnumSet<Type> ICON_COLUMNS = EnumSet.of(EXTRAFILE, FILES, GROUPS, LINKED_IDENTIFIER);
 
-        private String name;
-        private String displayName;
+        private final String name;
+        private final String displayName;
 
         Type(String name) {
             this.name = name;
@@ -212,10 +212,5 @@ public class MainTableColumnModel {
         }
 
         return new MainTableColumnModel(type, qualifier);
-    }
-
-    @Override
-    public String toString() {
-        return "MainTableColumnModel [typeProperty=" + typeProperty + ", qualifierProperty=" + qualifierProperty + ", widthProperty=" + widthProperty + ", sortTypeProperty=" + sortTypeProperty + "]";
     }
 }
