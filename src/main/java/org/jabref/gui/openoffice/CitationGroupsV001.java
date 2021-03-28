@@ -50,6 +50,7 @@ class CitationGroupsV001 {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(CitedKeys.class);
 
+
     static class Citation  implements CitationSort.ComparableCitation {
 
         /** key in database */
@@ -213,13 +214,12 @@ class CitationGroupsV001 {
             throws
             NoDocumentException,
             WrappedTargetException {
-            
+
             this.citationStorageManager = new StorageBaseRefMark.Manager();
 
             // Get the citationGroupNames
-            List<String> citationGroupNames =
-                Codec.getJabRefReferenceMarkNames(this.citationStorageManager,
-                                                  documentConnection);
+            List<String> citationGroupNames = getJabRefReferenceMarkNames(this.citationStorageManager,
+                                                                          documentConnection);
 
             this.pageInfoThrash = findUnusedJabrefPropertyNames(documentConnection,
                                                                 citationGroupNames);
@@ -236,6 +236,23 @@ class CitationGroupsV001 {
             this.citedKeysAfterDatabaseLookup = Optional.empty();
             this.bibliography = Optional.empty();
         }
+
+        /**
+         * Get reference mark names from the document matching the pattern
+         * used for JabRef reference mark names.
+         *
+         * Note: the names returned are in arbitrary order.
+         *
+         *
+         *
+         */
+        public static List<String> getJabRefReferenceMarkNames(StorageBase.NamedRangeManager manager,
+                                                               DocumentConnection documentConnection)
+        throws
+        NoDocumentException {
+        List<String> allNames = manager.getUsedNames(documentConnection);
+        return Codec.filterIsJabRefReferenceMarkName(allNames);
+    }
 
         private static List<String> findUnusedJabrefPropertyNames(DocumentConnection documentConnection,
                                                                   List<String> citationGroupNames) {

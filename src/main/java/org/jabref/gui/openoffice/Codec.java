@@ -133,20 +133,4 @@ class Codec {
                 .filter(Codec::isJabRefReferenceMarkName)
                 .collect(Collectors.toList()));
     }
-    /**
-     * Get reference mark names from the document matching the pattern
-     * used for JabRef reference mark names.
-     *
-     * Note: the names returned are in arbitrary order.
-     *
-     *
-     *
-     */
-    public static List<String> getJabRefReferenceMarkNames(StorageBase.NamedRangeManager manager,
-                                                           DocumentConnection documentConnection)
-        throws
-        NoDocumentException {
-        List<String> allNames = manager.getUsedNames(documentConnection);
-        return filterIsJabRefReferenceMarkName(allNames);
-    }
 }
