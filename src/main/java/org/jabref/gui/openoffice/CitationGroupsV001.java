@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -282,7 +283,7 @@ class CitationGroupsV001 {
             WrappedTargetException,
             NoDocumentException {
 
-            Optional<Codec.ParsedRefMark> op = Codec.parseRefMarkName(refMarkName);
+            Optional<Codec.ParsedMarkName> op = Codec.parseRefMarkName(refMarkName);
             if (op.isEmpty()) {
                 // We have a problem. We want types[i] and bibtexKeys[i]
                 // to correspond to referenceMarkNames.get(i).
@@ -291,7 +292,7 @@ class CitationGroupsV001 {
                 throw new IllegalArgumentException("readCitationGroupFromDocumentOrThrow:"
                                                    + " found unparsable referenceMarkName");
             }
-            Codec.ParsedRefMark ov = op.get();
+            Codec.ParsedMarkName ov = op.get();
             CitationGroupID id = new CitationGroupID(refMarkName);
             List<Citation> citations = ((ov.citationKeys == null)
                                         ? new ArrayList<>()
@@ -783,10 +784,12 @@ class CitationGroupsV001 {
                 citationKeys.stream()
                 .collect(Collectors.joining(","));
 
+            Set<String> usedNames = new HashSet<>( this.citationStorageManager
+                                                   .getUsedNames(documentConnection) );
             String refMarkName =
-                Codec.getUniqueReferenceMarkName(documentConnection,
-                                                 xkey,
-                                                 itcType);
+                Codec.getUniqueMarkName(usedNames,
+                                        xkey,
+                                        itcType);
 
             CitationGroupID cgid = new CitationGroupID(refMarkName);
 

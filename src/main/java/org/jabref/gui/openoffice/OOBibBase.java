@@ -2604,18 +2604,9 @@ class OOBibBase {
                     int last = keys.size() - 1;
                     int i = 0;
                     for (String key : keys) {
-                        // Note: instead of generating a new name, we should explicitly
-                        //       recover the original. Otherwise ...
-                        /*
-                          String newName = getUniqueReferenceMarkName(
-                          documentConnection,
-                          key,
-                          OOBibBase.AUTHORYEAR_PAR);
-                        */
-
                         // Note: by using insertReferenceMark (and not something
                         //       that accepts List<Citation>, we lose the extra
-                        //       info stored in teh citations.
+                        //       info stored in the citations.
                         //       We just reread below.
                         List<String> citationKeys = new ArrayList<>(1);
                         citationKeys.add( key );

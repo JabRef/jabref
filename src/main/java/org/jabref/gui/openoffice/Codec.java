@@ -36,6 +36,12 @@ import com.sun.star.uno.UnoRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ *  How and what is encoded in a mark names.
+ *
+ *  - pageInfo does not appear here.
+ *  - should not depend on the type of marks (reference mark of bookmark) used.
+ */
 class Codec {
     private static final String BIB_CITATION = "JR_cite";
     private static final Pattern CITE_PATTERN =
@@ -45,7 +51,7 @@ class Codec {
      * This is what we get back from parsing a refMarkName.
      *
      */
-    public static class ParsedRefMark {
+    public static class ParsedMarkName {
         /**  "", "0", "1" ... */
         public String i;
         /** in-text-citation type */
@@ -53,7 +59,7 @@ class Codec {
         /** Citation keys embedded in the reference mark. */
         public List<String> citationKeys;
 
-        ParsedRefMark(String i, int itcType, List<String> citationKeys) {
+        ParsedMarkName(String i, int itcType, List<String> citationKeys) {
             this.i = i;
             this.itcType = itcType;
             this.citationKeys = citationKeys;
@@ -74,15 +80,15 @@ class Codec {
      *
      * Or the first unused in this series, after removals.
      */
-    public static String getUniqueReferenceMarkName(DocumentConnection documentConnection,
-                                                    String bibtexKey,
-                                                    int itcType)
+    public static String getUniqueMarkName(Set<String> usedNames,
+                                           String bibtexKey,
+                                           int itcType)
         throws NoDocumentException {
 
-        XNameAccess xNamedRefMarks = documentConnection.getReferenceMarks();
+        // XNameAccess xNamedRefMarks = documentConnection.getReferenceMarks();
         int i = 0;
         String name = BIB_CITATION + '_' + itcType + '_' + bibtexKey;
-        while (xNamedRefMarks.hasByName(name)) {
+        while (usedNames.contains(name)) {
             name = BIB_CITATION + i + '_' + itcType + '_' + bibtexKey;
             i++;
         }
@@ -95,7 +101,7 @@ class Codec {
      * @return Optional.empty() on failure.
      *
      */
-    public static Optional<ParsedRefMark> parseRefMarkName(String refMarkName) {
+    public static Optional<ParsedMarkName> parseRefMarkName(String refMarkName) {
 
         Matcher citeMatcher = CITE_PATTERN.matcher(refMarkName);
         if (!citeMatcher.find()) {
@@ -105,7 +111,7 @@ class Codec {
         List<String> keys = Arrays.asList(citeMatcher.group(3).split(","));
         String i = citeMatcher.group(1);
         int itcType = Integer.parseInt(citeMatcher.group(2));
-        return (Optional.of(new Codec.ParsedRefMark(i, itcType, keys)));
+        return (Optional.of(new Codec.ParsedMarkName(i, itcType, keys)));
     }
 
     /**
