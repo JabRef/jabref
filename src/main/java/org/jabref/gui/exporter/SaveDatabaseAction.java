@@ -67,7 +67,7 @@ public class SaveDatabaseAction {
         this.dialogService = frame.getDialogService();
         this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
-        this.saveManager = GlobalSaveManager.start(libraryTab.getBibDatabaseContext());
+        this.saveManager = GlobalSaveManager.INSTANCE;
     }
 
     public boolean save() {
@@ -213,23 +213,21 @@ public class SaveDatabaseAction {
     }
 
     private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType) throws SaveException {
-        SavePreferences preferences = this.preferences.getSavePreferences()
+        SavePreferences savePrefs = this.preferences.getSavePreferences()
                                                       .withEncoding(encoding)
                                                       .withSaveType(saveType);
 
-        Future<SaveResult> saved = this.saveManager.save(file, selectedOnly, libraryTab.getSelectedEntries(), preferences);
-
+        Future<SaveResult> saved = this.saveManager.save(libraryTab.getBibDatabaseContext(), file, selectedOnly, libraryTab.getSelectedEntries(), savePrefs);
         SaveResult result;
         try {
-           if(saved.isCancelled())
-           {
-               return false;
-           }
+            if (saved.isCancelled()) {
+                return false;
+            }
             result = saved.get();
             libraryTab.registerUndoableChanges(result.getFieldChanges());
 
             if (!result.getEncodingProblems().isEmpty()) {
-                saveWithDifferentEncoding(file, selectedOnly, preferences.getEncoding(), result.getEncodingProblems(), saveType);
+                saveWithDifferentEncoding(file, selectedOnly, savePrefs.getEncoding(), result.getEncodingProblems(), saveType);
             }
             return true;
         } catch (InterruptedException | ExecutionException e ) {

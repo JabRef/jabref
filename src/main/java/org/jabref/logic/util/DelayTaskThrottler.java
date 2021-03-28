@@ -64,7 +64,9 @@ public class DelayTaskThrottler<T> {
 
     // Cancel scheduled Runnable gracefully
     public void cancel() {
-        scheduledTask.cancel(false);
+        var canceled = scheduledTask.cancel(false);
+        LOGGER.debug("Canceled {}", canceled );
+
     }
 
     public ScheduledFuture<?> schedule(Runnable command) {
