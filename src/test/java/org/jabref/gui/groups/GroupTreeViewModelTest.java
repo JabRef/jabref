@@ -40,7 +40,7 @@ class GroupTreeViewModelTest {
     @Test
     void rootGroupIsAllEntriesByDefault() throws Exception {
         AllEntriesGroup allEntriesGroup = new AllEntriesGroup("All entries");
-        assertEquals(new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, allEntriesGroup, new CustomLocalDragboard(), mock(PreferencesService.class)), groupTree.rootGroupProperty().getValue()"New group view model is not set to all entries by default.");
+        assertEquals(new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, allEntriesGroup, new CustomLocalDragboard(), mock(PreferencesService.class)), groupTree.rootGroupProperty().getValue(),"New group view model is not set to all entries by default.");
     }
 
     @Test
