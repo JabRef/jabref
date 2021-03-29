@@ -31,6 +31,8 @@ jobs:
           cp buildres/csl/csl-styles/acm-siggraph.csl src/main/resources/csl-styles/
           cp buildres/csl/csl-styles/ieee.csl src/main/resources/csl-styles/
           cp buildres/csl/csl-styles/turabian-author-date.csl src/main/resources/csl-styles/
+          git add .
+          git commit -m"Refresh example styles" || true
       - name: Add csl-locales remote
         run: git remote add -f csl-locales https://github.com/citation-style-language/locales.git
       - name: Update csl-locales
@@ -39,6 +41,8 @@ jobs:
           git subtree pull --prefix buildres/csl/csl-locales csl-locales master --squash
           cp buildres/csl/csl-locales/locales.json src/main/resources/csl-locales/
           cp buildres/csl/csl-locales/locales-en-US.xml src/main/resources/csl-locales/
+          git add .
+          git commit -m"Refresh example styles" || true
       - uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
