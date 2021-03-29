@@ -46,7 +46,8 @@ jobs:
           git commit -m"Refresh example styles" || true
       - uses: peter-evans/create-pull-request@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_TOKEN_UPDATE_GRADLE_WRAPPER }}
           branch: refresh-csl
           commit-message: Update CSL styles
           title: "[Bot] Update CSL styles"
+          labels: dependencies
