@@ -1,7 +1,6 @@
 package org.jabref.logic.importer;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -19,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -28,19 +28,24 @@ class OpenDatabaseTest {
     private final Charset defaultEncoding = StandardCharsets.UTF_8;
     private ImportFormatPreferences importFormatPreferences;
     private TimestampPreferences timestampPreferences;
-    private final Path bibNoHeader;
-    private final Path bibWrongHeader;
-    private final Path bibHeader;
-    private final Path bibHeaderAndSignature;
-    private final Path bibEncodingWithoutNewline;
+    private Path bibNoHeader = null;
+    private Path bibWrongHeader = null;
+    private Path bibHeader = null;
+    private Path bibHeaderAndSignature = null;
+    private Path bibEncodingWithoutNewline = null;
     private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
 
-    OpenDatabaseTest() throws URISyntaxException {
+    OpenDatabaseTest() {
+      try{
         bibNoHeader = Path.of(OpenDatabaseTest.class.getResource("headerless.bib").toURI());
         bibWrongHeader = Path.of(OpenDatabaseTest.class.getResource("wrong-header.bib").toURI());
         bibHeader = Path.of(OpenDatabaseTest.class.getResource("encoding-header.bib").toURI());
         bibHeaderAndSignature = Path.of(OpenDatabaseTest.class.getResource("jabref-header.bib").toURI());
         bibEncodingWithoutNewline = Path.of(OpenDatabaseTest.class.getResource("encodingWithoutNewline.bib").toURI());
+      } catch (Exception e){
+        //Ignore Tests if utility files could not be located
+        assumeTrue(false);
+      }
     }
 
     @BeforeEach
