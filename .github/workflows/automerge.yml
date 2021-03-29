@@ -3,7 +3,7 @@ on: [pull_request]
 
 jobs:
   automerge:
-    name: Automerge Dependabot
+    name: Automerge Dependency Updates
     runs-on: ubuntu-latest
     if: github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]' || contains(github.event.pull_request.labels.*.name, 'dependencies')
     steps:
