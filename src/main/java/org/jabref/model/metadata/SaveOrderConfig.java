@@ -141,7 +141,6 @@ public class SaveOrderConfig {
          * @param descending Must be a boolean value as string, e.g. "true", "false"
          */
         public SortCriterion(Field field, String descending) {
-
             this.field = field;
             this.descending = Boolean.parseBoolean(descending);
         }
