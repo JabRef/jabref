@@ -462,7 +462,7 @@ class DocumentConnection {
     public void
     setCustomProperty(String property, String value)
         throws
-        UnknownPropertyException,
+    // UnknownPropertyException,
         NotRemoveableException,
         PropertyExistException,
         IllegalTypeException,
@@ -471,7 +471,7 @@ class DocumentConnection {
         XPropertySetInfo psi = this.propertySet.getPropertySetInfo();
 
         if (psi.hasPropertyByName(property)) {
-            this.userProperties.removeProperty(property);
+            this.removeCustomProperty(property);
         }
 
         if (value != null) {
@@ -480,6 +480,30 @@ class DocumentConnection {
                     property,
                     com.sun.star.beans.PropertyAttribute.REMOVEABLE,
                     new Any(Type.STRING, value));
+        }
+    }
+
+    /**
+     * @param property Name of a custom document property in the
+     *        current document.
+     */
+    public void removeCustomProperty(String property)
+        throws
+    // UnknownPropertyException,
+        NotRemoveableException,
+        PropertyExistException,
+        IllegalTypeException,
+        IllegalArgumentException {
+
+        XPropertySetInfo psi = this.propertySet.getPropertySetInfo();
+
+        if (psi.hasPropertyByName(property)) {
+            try {
+                this.userProperties.removeProperty(property);
+            } catch (UnknownPropertyException ex) {
+                throw new RuntimeException("removeCustomProperty caught UnknownPropertyException"
+                                           + " (should be impossible)");
+            }
         }
     }
 

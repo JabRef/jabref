@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
  *  - pageInfo does not appear here. It is not encoded in the mark name.
  *  - Does not depend on the type of marks (reference mark of bookmark) used.
  */
-class Codec {
+class Codec52 {
     private static final String BIB_CITATION = "JR_cite";
     private static final Pattern CITE_PATTERN =
         // Pattern.compile(BIB_CITATION + "(\\d*)_(\\d*)_(.*)");
@@ -113,7 +113,7 @@ class Codec {
         List<String> keys = Arrays.asList(citeMatcher.group(3).split(","));
         String i = citeMatcher.group(1);
         int itcType = Integer.parseInt(citeMatcher.group(2));
-        return (Optional.of(new Codec.ParsedMarkName(i, itcType, keys)));
+        return (Optional.of(new Codec52.ParsedMarkName(i, itcType, keys)));
     }
 
     /**
@@ -132,7 +132,7 @@ class Codec {
     public static List<String> filterIsJabRefReferenceMarkName(List<String> names) {
         return (names
                 .stream()
-                .filter(Codec::isJabRefReferenceMarkName)
+                .filter(Codec52::isJabRefReferenceMarkName)
                 .collect(Collectors.toList()));
     }
 }

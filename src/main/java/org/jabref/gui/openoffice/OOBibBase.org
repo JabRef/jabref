@@ -4,6 +4,16 @@
 - file:../../gui/openoffice/
 - file:../../../../../resources/l10n/JabRef_en.properties
 
+
+** NOW: try to use unified data repr
+
+   In particular: both CitationGroup and Citation has
+   Optional<String> pageInfo, and CitationGroups.dataModel
+   tells us which one is to be used.
+
+   I am hoping to localize which parts of the code depends on
+   dataModel.
+
 ** Bug: two-column numbering                              :orderOfAppearance:
 
 Citations are numbered in top-down left-to-right order even in

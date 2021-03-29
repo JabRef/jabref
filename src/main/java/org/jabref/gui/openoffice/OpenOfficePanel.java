@@ -268,10 +268,18 @@ public class OpenOfficePanel {
                 reportUndefinedCharacterFormat(ex);
             } catch (NoDocumentException ex) {
                 showNoDocumentErrorMessage();
-            } catch (com.sun.star.lang.IllegalArgumentException | UnknownPropertyException | PropertyVetoException |
-                     CreationException | NoSuchElementException | WrappedTargetException | IOException |
-                     InvalidStateException |
-                     BibEntryNotFoundException ex) {
+            } catch (com.sun.star.lang.IllegalArgumentException
+                     | UnknownPropertyException
+                     | PropertyVetoException
+                     | PropertyExistException
+                     | CreationException
+                     | NoSuchElementException
+                     | NotRemoveableException
+                     | IllegalTypeException
+                     | WrappedTargetException
+                     | IOException
+                     | InvalidStateException
+                     | BibEntryNotFoundException ex) {
                 LOGGER.warn("Problem combining cite markers", ex);
             }
         });
@@ -290,10 +298,18 @@ public class OpenOfficePanel {
                 showNoDocumentErrorMessage();
             } catch (UndefinedCharacterFormatException ex) {
                 reportUndefinedCharacterFormat(ex);
-            } catch (com.sun.star.lang.IllegalArgumentException | UnknownPropertyException | PropertyVetoException |
-                     CreationException | NoSuchElementException | WrappedTargetException | IOException |
-                     InvalidStateException |
-                     BibEntryNotFoundException ex) {
+            } catch (com.sun.star.lang.IllegalArgumentException
+                     | UnknownPropertyException
+                     | PropertyVetoException
+                     | PropertyExistException
+                     | IllegalTypeException
+                     | NotRemoveableException
+                     | CreationException
+                     | NoSuchElementException
+                     | WrappedTargetException
+                     | IOException
+                     | InvalidStateException
+                     | BibEntryNotFoundException ex) {
                 LOGGER.warn("Problem uncombining cite markers", ex);
             }
         });
