@@ -46,7 +46,7 @@ jobs:
         with:
           access_token: ${{ github.token }}
       - name: Cancel on missing secrets
-        if: ${{ matrix.os == "macOS-latest" && secrets.OSX_SIGNING_CERT == "" }}
+        if: ${{ matrix.os == 'macOS-latest' && secrets.OSX_SIGNING_CERT == '' }}
         run: exit 0
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v2
