@@ -1,15 +1,13 @@
 package org.jabref.model.entry;
 
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Year;
 import java.time.YearMonth;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -20,31 +18,31 @@ public class Date {
 
     private final TemporalAccessor date;
 
-    private static final List<SimpleDateFormat> SIMPLE_DATE_FORMATS = new ArrayList<>();
+    private static final DateTimeFormatter NORMALIZED_DATE_FORMATTER = DateTimeFormatter.ofPattern("uuuu[-MM][-dd]");
+    private static final DateTimeFormatter SIMPLE_DATE_FORMATS;
 
     static {
         List<String> formatStrings = Arrays.asList(
-                "yyyy-M-d",
-                "yyyy-M",
-                "d-M-yyyy",
-                "M-yyyy",
-                "M/yy",
-                "M/yyyy",
-                "MMMM d, yyyy",
-                "MMMM, yyyy",
-                "d.M.yyyy",
-                "yyyy.M.d", "yyyy",
-                "MMM, yyyy");
+                "uuuu-M-d", // covers 2009-1-15
+                "uuuu-M",  // covers 2009-11
+                "d-M-uuuu", // covers 15-1-2012
+                "M-uuuu", // covers 1-2012
+                "M/uuuu", // covers 9/2015 and 09/2015
+                "M/uu", // covers 9/15
+                "MMMM d, uuuu", // covers September 1, 2015
+                "MMMM, uuuu", // covers September, 2015
+                "d.M.uuuu", // covers 15.1.2015
+                "uuuu.M.d", // covers 2015.1.15
+                "uuuu", // covers 2015
+                "MMM, uuuu"); // covers Jan, 2020
 
-        for (String formatString : formatStrings) {
-            // Locale is required for parsing month names correctly. Currently this expects the month names to be in English
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(formatString, Locale.US);
-            simpleDateFormat.setLenient(false);
-            SIMPLE_DATE_FORMATS.add(simpleDateFormat);
-        }
+        SIMPLE_DATE_FORMATS = formatStrings.stream()
+                                           .map(DateTimeFormatter::ofPattern)
+                                           .reduce(new DateTimeFormatterBuilder(),
+                                                   DateTimeFormatterBuilder::appendOptional,
+                                                   (builder, formatterBuilder) -> builder.append(formatterBuilder.toFormatter()))
+                                           .toFormatter(Locale.US);
     }
-
-    public static final DateTimeFormatter NORMALIZED_DATE_FORMATTER = DateTimeFormatter.ofPattern("uuuu[-MM][-dd]");
 
     public Date(int year, int month, int dayOfMonth) {
         this(LocalDate.of(year, month, dayOfMonth));
@@ -62,33 +60,21 @@ public class Date {
         this.date = date;
     }
 
-    /**
-     * Try to parse the following formats
-     * - "M/y" (covers 9/15, 9/2015, and 09/2015)
-     * - "MMMM (dd), yyyy" (covers September 1, 2015 and September, 2015)
-     * - "yyyy-MM-dd" (covers 2009-1-15)
-     * - "dd-MM-yyyy" (covers 15-1-2009)
-     * - "d.M.uuuu" (covers 15.1.2015)
-     * - "uuuu.M.d" (covers 2015.1.15)
-     * - "MMM, uuuu" (covers Jan, 2020)
-     */
     public static Optional<Date> parse(String dateString) {
-        if (dateString == null || dateString.isEmpty()) {
+        if (dateString == null) {
+            throw new NullPointerException();
+        }
+
+        if (dateString.isEmpty()) {
             return Optional.empty();
         }
 
-        for (SimpleDateFormat formatter : SIMPLE_DATE_FORMATS) {
-            java.util.Date date = formatter.parse(dateString, new ParsePosition(0));
-            if (date != null) {
-                LocalDate localDate = date
-                        .toInstant()
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalDate();
-                return Optional.of(new Date(localDate));
-            }
+        try {
+            TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(dateString);
+            return Optional.of(new Date(parsedDate));
+        } catch (DateTimeParseException ignored) {
+            return Optional.empty();
         }
-
-        return Optional.empty();
     }
 
     public static Optional<Date> parse(Optional<String> yearValue, Optional<String> monthValue,
