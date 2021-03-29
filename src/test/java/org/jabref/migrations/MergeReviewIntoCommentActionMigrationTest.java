@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MergeReviewIntoCommentActionMigrationTest {
+
     private MergeReviewIntoCommentMigration action;
     private BibEntry entry;
     private BibEntry expectedEntry;
