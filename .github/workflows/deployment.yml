@@ -39,15 +39,13 @@ jobs:
             displayName: macOS
             archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
     runs-on: ${{ matrix.os }}
+    if: ${{ matrix.os != 'macOS-latest' || (matrix.os == 'macOS-latest' && OSXCERT =! '') }}
     name: Create installer and portable version for ${{ matrix.displayName }}
     steps:
       - name: Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.8.0
         with:
           access_token: ${{ github.token }}
-      - name: Cancel on missing secrets
-        if: ${{ matrix.os == 'macOS-latest' && secrets.OSX_SIGNING_CERT == '' }}
-        run: exit 0
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v2
         with:
