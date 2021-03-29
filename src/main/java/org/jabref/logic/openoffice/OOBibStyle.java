@@ -977,11 +977,11 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
             sb.append(andString);
             sb.append(getAuthorLastName(al, nAuthors - 1));
 
-        } else if (nAuthors > maxAuthors) {
+        } else if (nAuthors > maxAuthors && nAuthors > 1) {
             // maxAuthors  nAuthors result
-            //  0            1       "Smith et al"  Seems wrong
-            // -1            1       "Smith et al"  Seems wrong
-            // -1            0       "et al"        Why not ""?
+            //  0            1       "Smith"
+            // -1            1       "Smith"
+            // -1            0       ""
             sb.append(etAlString);
         }
         sb.append(yearSep);
