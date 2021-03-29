@@ -60,9 +60,7 @@ public class Date {
     }
 
     public static Optional<Date> parse(String dateString) {
-        if (dateString == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(dateString);
 
         if (dateString.isEmpty()) {
             return Optional.empty();
