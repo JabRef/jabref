@@ -63,7 +63,6 @@ public class TooltipTextUtilTest {
 
     @Test
     public void testCreateTextMonospaced() {
-        String testText = "this is a test text";
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.MONOSPACED);
         assertEquals("tooltip-text-monospaced", text.getStyleClass().toString());
         assertEquals(testText, text.getText());
@@ -129,7 +128,6 @@ public class TooltipTextUtilTest {
         String expectedString = "this<br>is a<br>test text";
 
         assertTrue(htmlString.equals(expectedString));
-        // assertEquals("this<br>is a<br>test text", htmlString);
     }
 
     @Test
