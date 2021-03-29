@@ -1144,7 +1144,7 @@ class OOBibBase {
         Objects.requireNonNull(citationText);
         Objects.requireNonNull(style);
 
-        // Last minute editing: If there is "page info" for this
+        // TODO: Last minute editing: If there is "page info" for this
         // citation mark, we should inject it into the citation marker
         // when creating.
 
@@ -1165,8 +1165,6 @@ class OOBibBase {
         } else {
             cursor.setString("");
         }
-
-        // documentConnection.insertReferenceMark(name, cursor, true);
 
         // Last minute editing: find "et al." (OOBibStyle.ET_AL_STRING) and
         //                      format it as italic.
@@ -2735,8 +2733,6 @@ class OOBibBase {
         NoDocumentException,
         UnknownPropertyException {
 
-        // DocumentConnection documentConnection = getDocumentConnectionOrThrow();
-
         CitationGroups cgs = new CitationGroups(documentConnection);
         CitedKeys cks = cgs.getCitedKeys();
         cks.lookupInDatabases( databases );
@@ -2744,10 +2740,9 @@ class OOBibBase {
 
         List<String> unresolvedKeys = new ArrayList<>();
         BibDatabase resultDatabase = new BibDatabase();
-        // List<String> cited = findCitedKeys(documentConnection);
 
         List<BibEntry> entriesToInsert = new ArrayList<>();
-        Set<String> seen = new HashSet<>();
+        Set<String> seen = new HashSet<>(); // Only add crossReference once.
 
         for (CitedKey ck : cks.values()) {
             if ( ck.db.isEmpty() ) {
@@ -2767,23 +2762,6 @@ class OOBibBase {
                 clonedEntry
                     .getField(StandardField.CROSSREF)
                     .ifPresent(crossReference -> {
-                            // If the crossReference entry is not already in the database
-
-                            // broken logic here:
-
-                            // we just created resultDatabase, and
-                            // added nothing yet.
-
-                            // Question: why do we use
-                            // entriesToInsert instead of directly adding to resultDatabase?
-                            // And why do we not look for it in entriesToInsert?
-                            // With the present code we are always adding it.
-                            // How does BibDatabase handle this situation?
-                            /*
-                            boolean isNew = (resultDatabase
-                                             .getEntryByCitationKey(crossReference)
-                                             .isEmpty());
-                            */
                             boolean isNew = !seen.contains( crossReference );
                             if (isNew) {
                                 // Add it if it is in the current library
@@ -2795,55 +2773,6 @@ class OOBibBase {
                         });
             }
         }
-
-        /*
-        // For each cited key
-        for (String key : cited) {
-            // Loop through the available databases
-            for (BibDatabase loopDatabase : databases) {
-                Optional<BibEntry> entry = loopDatabase.getEntryByCitationKey(key);
-                if (entry.isEmpty()) {
-                    continue;
-                }
-                // If entry found
-                BibEntry clonedEntry = (BibEntry) entry.get().clone();
-
-                // Insert a copy of the entry
-                entriesToInsert.add(clonedEntry);
-
-                // Check if the cloned entry has a cross-reference field
-                clonedEntry
-                    .getField(StandardField.CROSSREF)
-                    .ifPresent(crossReference -> {
-                            // If the crossReference entry is not already in the database
-
-                            // broken logic here:
-
-                            // we just created resultDatabase, and
-                            // added nothing yet.
-
-                            // Question: why do we use
-                            // entriesToInsert instead of directly adding to resultDatabase?
-                            // And why do we not look for it in entriesToInsert?
-                            // With the present code we are always adding it.
-                            // How does BibDatabase handle this situation?
-                            boolean isNew = (resultDatabase
-                                             .getEntryByCitationKey(crossReference)
-                                             .isEmpty());
-                            if (isNew) {
-                                // Add it if it is in the current library
-                                loopDatabase
-                                    .getEntryByCitationKey(crossReference)
-                                    .ifPresent(entriesToInsert::add);
-                            }
-                        });
-
-                    // Be happy with the first found BibEntry and move on to next key
-                    break;
-            }
-            // key not found here. No action.
-        }
-        */
 
         resultDatabase.insertEntries(entriesToInsert);
         return new ExportCitedHelperResult( unresolvedKeys, resultDatabase );
@@ -2895,20 +2824,6 @@ class OOBibBase {
             boolean requireSeparation = false;
             CitationGroups cgs = new CitationGroups(documentConnection);
 
-            if (false) {
-                // Check unused Custom Properties.
-                // Problem: annoying and not helpful.
-                // We could offer cleanup, or do it silently,
-                // but that would destroy potentially recoverable data.
-                //
-                // What we would prefer is to keep pageInfo with the range,
-                // preferably in a copy-pastable form.
-                String healthReport = cgs.healthReport(documentConnection);
-                if (healthReport != null){
-                    dialogService.showInformationDialogAndWait( "Note", healthReport );
-                }
-            }
-
             // Check Range overlaps
             int maxReportedOverlaps = 10;
             checkRangeOverlaps(cgs, this.xDocumentConnection, requireSeparation, maxReportedOverlaps);
@@ -2931,9 +2846,7 @@ class OOBibBase {
                                       x.getBibliography());
                 return x.getUnresolvedKeys();
             } finally {
-                if (useLockControllers
-                    // && documentConnection.hasControllersLocked()
-                    ) {
+                if (useLockControllers && documentConnection.hasControllersLocked()) {
                     documentConnection.unlockControllers();
                 }
             }
