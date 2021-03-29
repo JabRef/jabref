@@ -66,10 +66,6 @@ class CitationGroups {
     /**
      *  Extra Data
      */
-    // For custom properties belonging to us, but
-    // without a corresponding reference mark.
-    // These can be deleted.
-    private List<String> pageInfoThrash;
 
     private Optional<List<CitationGroupID>> globalOrder;
 
@@ -96,9 +92,6 @@ class CitationGroups {
         // Get the citationGroupNames
         List<String> citationGroupNames = this.backend.getJabRefReferenceMarkNames(documentConnection);
 
-        this.pageInfoThrash =
-            this.backend.findUnusedJabrefPropertyNames(documentConnection,
-                                                       citationGroupNames);
 
         this.citationGroups = readCitationGroupsFromDocument(this.backend,
                                                              documentConnection,
@@ -114,6 +107,13 @@ class CitationGroups {
     }
 
 
+    public String healthReport(DocumentConnection documentConnection)
+        throws
+        NoDocumentException {
+        String r1 = backend.healthReport(documentConnection);
+        // add more?
+        return r1;
+    }
 
     private static Map<CitationGroupID, CitationGroup>
     readCitationGroupsFromDocument(Backend52 backend,
@@ -318,9 +318,9 @@ class CitationGroups {
 
         List<RangeSort.RangeSortEntry> vses = new ArrayList<>();
         for (CitationGroupID cgid : cgids) {
-            XTextRange range = cgs.getReferenceMarkRangeOrNull(documentConnection, cgid);
+            XTextRange range = cgs.getMarkRangeOrNull(documentConnection, cgid);
             if (range == null) {
-                throw new RuntimeException("getReferenceMarkRangeOrNull returned null");
+                throw new RuntimeException("getMarkRangeOrNull returned null");
             }
             vses.add(new RangeSort.RangeSortEntry(range, 0, cgid));
         }
@@ -627,15 +627,23 @@ class CitationGroups {
         }
     }
 
-    /*
-     * Remove it both from {@code this} and the document.
+    /**
+     * Remove {@code cg} both from {@code this} and the document.
      *
-     * TODO: either invalidate or update the extra data we are storing
-     *       (bibliography). Update may be complicated, since we do
-     *       not know how the bibliography was generated: it was partially done
-     *       outside CitationGroupsV001, and we did not store how.
+     * Note: we invalidate the extra data we are storing
+     *       (bibliography).
+     *
+     *       Update would be complicated, since we do not know how the
+     *       bibliography was generated: it was partially done outside
+     *       CitationGroups, and we did not store how.
+     *
+     *       So we stay with invalidating.
+     *       Note: localOrder, numbering, uniqueLetters are not adjusted,
+     *             it is easier to reread everything for a refresh.
+     *
      */
-    public void removeCitationGroup(CitationGroup cg, DocumentConnection documentConnection)
+    public void removeCitationGroup(CitationGroup cg,
+                                    DocumentConnection documentConnection)
         throws
         WrappedTargetException,
         NoDocumentException,
@@ -644,18 +652,60 @@ class CitationGroups {
         PropertyExistException,
         IllegalTypeException {
 
-        // documentConnection.removeReferenceMark(cg.referenceMarkName);
+        // Apply
         backend.removeCitationGroup(cg, documentConnection);
         this.citationGroups.remove(cg.cgid);
+
+        // Update what we can.
         this.globalOrder.map(l -> l.remove(cg.cgid));
 
-        // Invalidate CitedKeys
+        // Invalidate what we cannot update: CitedKeys
         this.citedKeysAfterDatabaseLookup = Optional.empty();
         this.bibliography = Optional.empty();
-        /*
-         * this.citedKeysAfterDatabaseLookup.map(cks -> cks.forgetCitationGroup(cg.cgid));
-         * this.bibliography.map(cks -> cks.forgetCitationGroup(cg.cgid));
-         */
+        // Could also: reset citation.number, citation.uniqueLetter.
+    }
+
+    /**
+     * ranges controlled by citation groups should not overlap with each other.
+     *
+     * @param cgid : Must be known, throws if not.
+     * @return Null if the reference mark is missing.
+     *
+     */
+    public XTextRange getMarkRangeOrNull(DocumentConnection documentConnection,
+                                         CitationGroupID cgid)
+        throws
+        NoDocumentException,
+        WrappedTargetException {
+
+        CitationGroup cg = this.getCitationGroup(cgid).orElseThrow(RuntimeException::new);
+        return backend.getMarkRangeOrNull(cg, documentConnection);
+    }
+
+    /**
+     * Cursor for the reference marks as is, not prepared for filling,
+     * but does not need cleanFillCursorForCitationGroup either.
+     */
+    public XTextCursor getRawCursorForCitationGroup(CitationGroupID cgid,
+                                                    DocumentConnection documentConnection)
+        throws
+        NoDocumentException,
+        WrappedTargetException,
+        CreationException {
+
+        CitationGroup cg = this.getCitationGroup(cgid).orElseThrow(RuntimeException::new);
+        return backend.getRawCursorForCitationGroup(cg, documentConnection);
+    }
+
+    public XTextCursor getFillCursorForCitationGroup(DocumentConnection documentConnection,
+                                                     CitationGroupID cgid)
+        throws
+        NoDocumentException,
+        WrappedTargetException,
+        CreationException {
+
+        CitationGroup cg = this.getCitationGroup(cgid).orElseThrow(RuntimeException::new);
+        return backend.getFillCursorForCitationGroup(cg, documentConnection);
     }
 
     /**
@@ -673,72 +723,7 @@ class CitationGroups {
         CreationException {
 
         CitationGroup cg = this.getCitationGroup(cgid).orElseThrow(RuntimeException::new);
-        cg.cgRangeStorage.cleanFillCursor(documentConnection);
-    }
-
-    /**
-     * Cursor for the reference marks as is, not prepared for filling,
-     * but does not need cleanFillCursorForCitationGroup either.
-     */
-    public XTextCursor getRawCursorForCitationGroup(CitationGroupID cgid,
-                                                    DocumentConnection documentConnection)
-        throws
-        NoDocumentException,
-        WrappedTargetException,
-        CreationException {
-
-        CitationGroup cg = this.getCitationGroup(cgid).orElseThrow(RuntimeException::new);
-        return cg.cgRangeStorage.getRawCursor(documentConnection);
-    }
-
-    public XTextCursor getFillCursorForCitationGroup(DocumentConnection documentConnection,
-                                                     CitationGroupID cgid)
-        throws
-        NoDocumentException,
-        WrappedTargetException,
-        CreationException {
-
-        CitationGroup cg = this.getCitationGroup(cgid).orElseThrow(RuntimeException::new);
-        return cg.cgRangeStorage.getFillCursor(documentConnection);
-    }
-
-    /**
-     *  Given the name of a reference mark, get the corresponding
-     *  pageInfo text.
-     *
-     *  @param documentConnection Connection to a document.
-     *  @param name Name of the custom property to query.
-     *  @return "" for missing or empty pageInfo
-     */
-    private static String getPageInfoForReferenceMarkName(DocumentConnection documentConnection,
-                                                          String name)
-        throws
-        WrappedTargetException,
-        UnknownPropertyException {
-
-        Optional<String> pageInfo = documentConnection.getCustomProperty(name);
-        if (pageInfo.isEmpty() || pageInfo.get().isEmpty()) {
-            return "";
-        }
-        return pageInfo.get();
-    }
-
-    /**
-     * ranges controlled by citation groups should not overlap with each other.
-     *
-     * @param cgid : Must be known.
-     * @return Null if the reference mark is missing.
-     *
-     * TODO: getReferenceMarkRangeOrNull vs getRawCursorForCitationGroup
-     */
-    public XTextRange getReferenceMarkRangeOrNull(DocumentConnection documentConnection,
-                                                  CitationGroupID cgid)
-        throws
-        NoDocumentException,
-        WrappedTargetException {
-        String name = (this.getReferenceMarkName(cgid)
-                       .orElseThrow(RuntimeException::new));
-        return documentConnection.getReferenceMarkRangeOrNull(name);
+        backend.cleanFillCursorForCitationGroup(cg,documentConnection);
     }
 
     /**
@@ -753,16 +738,16 @@ class CitationGroups {
 
         List<RangeForOverlapCheck> xs = new ArrayList<>(numberOfCitationGroups());
 
-        List<CitationGroupID> cgids =
-            new ArrayList<>(this.getCitationGroupIDs());
+        List<CitationGroupID> cgids = new ArrayList<>(this.getCitationGroupIDs());
 
         for (CitationGroupID cgid : cgids) {
-            XTextRange r = this.getReferenceMarkRangeOrNull(documentConnection, cgid);
-            String name = this.getCitationGroup(cgid).get().referenceMarkName;
-            xs.add(new RangeForOverlapCheck(
-                       r, cgid,
-                       RangeForOverlapCheck.REFERENCE_MARK_KIND,
-                       name));
+            XTextRange r = this.getMarkRangeOrNull(documentConnection, cgid);
+            CitationGroup cg = this.getCitationGroup(cgid).orElseThrow(RuntimeException::new);
+            String name = cg.cgRangeStorage.getName();
+            xs.add(new RangeForOverlapCheck(r,
+                                            cgid,
+                                            RangeForOverlapCheck.REFERENCE_MARK_KIND,
+                                            name));
         }
         return xs;
     }
@@ -776,6 +761,10 @@ class CitationGroups {
      *  marks. Overwriting these footnote marks might kill our
      *  reference marks in the footnote.
      *
+     *  Note: Here we directly communicate to the document, not
+     *        through the backend. This is because mapping ranges to
+     *        footnote marks does not depend on how do we mark or
+     *        structure those ranges.
      */
     List<RangeForOverlapCheck> footnoteMarkRanges(DocumentConnection documentConnection)
         throws
@@ -814,10 +803,12 @@ class CitationGroups {
         return xs;
     }
 
-    public void show() {
-        System.out.printf("CitationGroupsV001%n");
+    /**
+     *  This is for debugging, can be removed.
+     */
+    public void xshow() {
+        System.out.printf("CitationGroups%n");
         System.out.printf("  citationGroups.size: %d%n", citationGroups.size());
-        System.out.printf("  pageInfoThrash.size: %d%n", pageInfoThrash.size());
         System.out.printf("  globalOrder: %s%n",
                           (globalOrder.isEmpty()
                            ? "isEmpty"

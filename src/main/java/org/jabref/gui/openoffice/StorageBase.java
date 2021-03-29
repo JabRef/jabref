@@ -45,6 +45,15 @@ class StorageBase {
     }
 
     interface HasTextRange {
+
+        /**
+         * @return Null if the mark is missing from the document.
+         */
+        public XTextRange getMarkRangeOrNull(DocumentConnection documentConnection)
+            throws
+            NoDocumentException,
+            WrappedTargetException;
+
         /**
          * Cursor for the reference marks as is, not prepared for filling,
          * but does not need cleanFillCursorForCitationGroup either.
@@ -79,6 +88,9 @@ class StorageBase {
             WrappedTargetException,
             CreationException ;
 
+        /**
+         *  Note: create is in NamedRangeManager
+         */
         public void removeFromDocument(DocumentConnection documentConnection)
             throws
             WrappedTargetException,

@@ -1149,7 +1149,6 @@ class OOBibBase {
         // when creating.
 
         String citText;
-        // String pageInfo = getPageInfoForReferenceMarkName(documentConnection, name);
         Optional<String> pageInfo = cgs.getPageInfo(cgid);
         citText = ((pageInfo.isEmpty() || pageInfo.get().equals(""))
                    ? citationText
@@ -2226,7 +2225,7 @@ class OOBibBase {
                 for (CitationGroupID cgid : referenceMarkNames) {
                     CitationGroup cg = cgs.getCitationGroupOrThrow(cgid);
 
-                    XTextRange currentRange = cgs.getReferenceMarkRangeOrNull(documentConnection, cgid);
+                    XTextRange currentRange = cgs.getMarkRangeOrNull(documentConnection, cgid);
                     Objects.requireNonNull(currentRange);
 
                     boolean addToGroup = true;
@@ -2580,7 +2579,7 @@ class OOBibBase {
                 while (pivot < (names.size())) {
                     CitationGroupID cgid = names.get(pivot);
                     CitationGroup cg = cgs.getCitationGroupOrThrow(cgid);
-                    XTextRange range1 = cgs.getReferenceMarkRangeOrNull(documentConnection,cgid);
+                    XTextRange range1 = cgs.getMarkRangeOrNull(documentConnection,cgid);
                     XTextCursor textCursor = range1.getText().createTextCursorByRange(range1);
 
                     // If we are supposed to set character format for
@@ -2895,8 +2894,25 @@ class OOBibBase {
 
             boolean requireSeparation = false;
             CitationGroups cgs = new CitationGroups(documentConnection);
+
+            if (false) {
+                // Check unused Custom Properties.
+                // Problem: annoying and not helpful.
+                // We could offer cleanup, or do it silently,
+                // but that would destroy potentially recoverable data.
+                //
+                // What we would prefer is to keep pageInfo with the range,
+                // preferably in a copy-pastable form.
+                String healthReport = cgs.healthReport(documentConnection);
+                if (healthReport != null){
+                    dialogService.showInformationDialogAndWait( "Note", healthReport );
+                }
+            }
+
+            // Check Range overlaps
             int maxReportedOverlaps = 10;
             checkRangeOverlaps(cgs, this.xDocumentConnection, requireSeparation, maxReportedOverlaps);
+
             final boolean useLockControllers = true;
             ProduceCitationMarkersResult x = produceCitationMarkers(documentConnection,
                                                                     databases,

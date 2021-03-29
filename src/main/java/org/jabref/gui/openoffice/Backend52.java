@@ -64,8 +64,15 @@ class Backend52 {
         return Codec52.filterIsJabRefReferenceMarkName(allNames);
     }
 
-    List<String> findUnusedJabrefPropertyNames(DocumentConnection documentConnection,
-                                               List<String> citationGroupNames) {
+    /**
+     * Names of custom properties belonging to us, but without a
+     * corresponding reference mark.  These can be deleted.
+     *
+     * @param citationGroupNames These are the names that are used.
+     *
+     */
+    private List<String> findUnusedJabrefPropertyNames(DocumentConnection documentConnection,
+                                                       List<String> citationGroupNames) {
         // Collect unused jabrefPropertyNames
         Set<String> citationGroupNamesSet =
             citationGroupNames.stream().collect(Collectors.toSet());
@@ -82,6 +89,26 @@ class Backend52 {
             }
         }
         return pageInfoThrash;
+    }
+
+    /**
+     *  @return null if all is OK, message text otherwise.
+     */
+    public String healthReport(DocumentConnection documentConnection)
+        throws
+        NoDocumentException {
+        List<String> pageInfoThrash =
+            this.findUnusedJabrefPropertyNames(documentConnection,
+                                               this.getJabRefReferenceMarkNames(documentConnection));
+        if ( pageInfoThrash.isEmpty() ){
+            return null; //"Backend52: found no unused pageInfo data";
+        }
+        String msg = (
+            "Backend52: found unused pageInfo data, with names listed below.\n"
+            + "In LibreOffice you may remove these in [File]/[Properties]/[Custom Properties]\n"
+            );
+        msg += "" + String.join( "\n",  pageInfoThrash ) + "";
+        return msg;
     }
 
     /**
@@ -246,6 +273,56 @@ class Backend52 {
         String refMarkName = cg.cgRangeStorage.getName();
         cg.cgRangeStorage.removeFromDocument(documentConnection);
         documentConnection.removeCustomProperty(refMarkName);
+    }
+
+    /**
+     *
+     * @return Null if the reference mark is missing.
+     *
+     */
+    public XTextRange getMarkRangeOrNull(CitationGroup cg,
+                                         DocumentConnection documentConnection)
+        throws
+        NoDocumentException,
+        WrappedTargetException {
+
+        return cg.cgRangeStorage.getMarkRangeOrNull(documentConnection);
+    }
+
+    /**
+     * Cursor for the reference marks as is, not prepared for filling,
+     * but does not need cleanFillCursorForCitationGroup either.
+     */
+    public XTextCursor getRawCursorForCitationGroup(CitationGroup cg,
+                                                    DocumentConnection documentConnection)
+        throws
+        NoDocumentException,
+        WrappedTargetException,
+        CreationException {
+        return cg.cgRangeStorage.getRawCursor(documentConnection);
+    }
+
+    /**
+     * Must be followed by call to cleanFillCursorForCitationGroup
+     */
+    public XTextCursor getFillCursorForCitationGroup(CitationGroup cg,
+                                                     DocumentConnection documentConnection)
+        throws
+        NoDocumentException,
+        WrappedTargetException,
+        CreationException {
+
+        return cg.cgRangeStorage.getFillCursor(documentConnection);
+    }
+
+    /** To be called after getFillCursorForCitationGroup */
+    public void cleanFillCursorForCitationGroup(CitationGroup cg,
+                                                DocumentConnection documentConnection)
+        throws
+        NoDocumentException,
+        WrappedTargetException,
+        CreationException {
+        cg.cgRangeStorage.cleanFillCursor(documentConnection);
     }
 
 } // end Backend52

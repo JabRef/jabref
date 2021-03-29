@@ -196,7 +196,8 @@ class StorageBaseRefMark implements StorageBase.NamedRange {
      *
      * See: getReferenceMarkRangeOrNull
      */
-    public XTextRange getRangeOrNull(DocumentConnection documentConnection)
+    @Override
+    public XTextRange getMarkRangeOrNull(DocumentConnection documentConnection)
         throws
         NoDocumentException,
         WrappedTargetException {
@@ -207,6 +208,9 @@ class StorageBaseRefMark implements StorageBase.NamedRange {
     /**
      * Cursor for the reference marks as is, not prepared for filling,
      * but does not need cleanFillCursorForCitationGroup either.
+     *
+     * @return null if reference mark is missing from the document,
+     *         otherwise an XTextCursor for getMarkRangeOrNull
      *
      * See: getRawCursorForCitationGroup
      */
