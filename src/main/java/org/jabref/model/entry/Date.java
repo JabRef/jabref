@@ -16,11 +16,8 @@ import java.util.Optional;
 
 public class Date {
 
-    private final TemporalAccessor date;
-
     private static final DateTimeFormatter NORMALIZED_DATE_FORMATTER = DateTimeFormatter.ofPattern("uuuu[-MM][-dd]");
     private static final DateTimeFormatter SIMPLE_DATE_FORMATS;
-
     static {
         List<String> formatStrings = Arrays.asList(
                 "uuuu-M-d", // covers 2009-1-15
@@ -43,6 +40,8 @@ public class Date {
                                                    (builder, formatterBuilder) -> builder.append(formatterBuilder.toFormatter()))
                                            .toFormatter(Locale.US);
     }
+
+    private final TemporalAccessor date;
 
     public Date(int year, int month, int dayOfMonth) {
         this(LocalDate.of(year, month, dayOfMonth));
