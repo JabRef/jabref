@@ -775,11 +775,13 @@ class OOBibBase {
         entries.put( ce, ck.db.get().database );
         // We need "normalized" (in parenthesis) markers
         // for uniqueness checking purposes:
+        String pageInfoForCitationGroup = null;
         return style.getCitationMarker(Collections.singletonList(ce),
                                        entries,
                                        true,
                                        null,
-                                       new int[] {-1} /* no limit on authors */);
+                                       new int[] {-1}, /* no limit on authors */
+                                       pageInfoForCitationGroup);
     }
 
     /**
@@ -952,8 +954,12 @@ class OOBibBase {
         for (CitationGroupID cgid : cgs.getSortedCitationGroupIDs()) {
             CitationGroup cg = cgs.getCitationGroupOrThrow(cgid);
             List<Integer> numbers = cg.getSortedNumbers();
+            String pageInfoForCitationGroup = cg.pageInfo.orElse(null);
             citMarkers.put(cgid,
-                           style.getNumCitationMarker(numbers, minGroupingCount, false));
+                           style.getNumCitationMarker(numbers,
+                                                      minGroupingCount,
+                                                      false,
+                                                      pageInfoForCitationGroup));
         }
 
         return citMarkers;
@@ -979,8 +985,12 @@ class OOBibBase {
         for (CitationGroupID cgid : cgs.getSortedCitationGroupIDs()) {
             CitationGroup cg = cgs.getCitationGroupOrThrow(cgid);
             List<Integer> numbers = cg.getSortedNumbers();
+            String pageInfoForCitationGroup = cg.pageInfo.orElse(null);
             citMarkers.put(cgid,
-                           style.getNumCitationMarker(numbers, minGroupingCount, false));
+                           style.getNumCitationMarker(numbers,
+                                                      minGroupingCount,
+                                                      false, /*inList*/
+                                                      pageInfoForCitationGroup));
         }
         return citMarkers;
     }
@@ -1081,13 +1091,18 @@ class OOBibBase {
                         entries.put(e,d);
                         firstLimAuthors2[0] = firstLimAuthors[j];
                         uniqueLetterForCitedEntry2[0] = uniqueLetterForCitedEntry[j];
+                        // Attribute pageInfoForCitationGroup to the last
+                        String pageInfoForCitationGroup = (j == (nCitedEntries-1)
+                                                           ? cg.pageInfo.orElse(null)
+                                                           : null);
                         s = (s
                              + style.getCitationMarker(
                                  cEntries,
                                  entries,
                                  cg.itcType == OOBibBase.AUTHORYEAR_PAR,
                                  uniqueLetterForCitedEntry2,
-                                 firstLimAuthors2
+                                 firstLimAuthors2,
+                                 pageInfoForCitationGroup
                                  ));
                     } else {
                         s = s + String.format("(Unresolved(%s))", currentKey);
@@ -1108,13 +1123,15 @@ class OOBibBase {
                     entries.put(e,d);
                 }
 
+                String pageInfoForCitationGroup = cg.pageInfo.orElse(null);
                 citMarkers.put( cgid,
                                 style.getCitationMarker(
                                     cEntries,
                                     entries,
                                     cg.itcType == OOBibBase.AUTHORYEAR_PAR,
                                     uniqueLetterForCitedEntry,
-                                    firstLimAuthors
+                                    firstLimAuthors,
+                                    pageInfoForCitationGroup
                                     )
                     );
             }
@@ -1515,6 +1532,7 @@ class OOBibBase {
                     databaseMap.put(entry, database);
                 }
 
+                String pageInfoForCitationGroup = null;
                 // The text we insert
                 String citeText =
                     style.isNumberEntries()
@@ -1524,7 +1542,8 @@ class OOBibBase {
                         databaseMap,
                         inParenthesis,
                         null,
-                        null);
+                        null,
+                        pageInfoForCitationGroup);
 
                 if (citeText.equals("")) {
                     citeText = "[?]";
@@ -1944,9 +1963,11 @@ class OOBibBase {
                 // int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
                 int minGroupingCount = 2;
                 List<Integer> numbers = Collections.singletonList(ck.number.get());
+                String pageInfoForCitationGroup = null; // no pageInfo for the bibliography
                 String marker = style.getNumCitationMarker(numbers,
                                                            minGroupingCount,
-                                                           true);
+                                                           true,
+                                                           pageInfoForCitationGroup);
 
                 OOUtil.insertTextAtCurrentLocation(documentConnection.xText,
                                                    cursor,
