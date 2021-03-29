@@ -3,7 +3,7 @@ name: Fetcher Tests
 on:
   push:
     branches:
-      - master
+      - main
     paths:
       - 'src/main/java/org/jabref/logic/importer/fetcher/**'
       - 'src/test/java/org/jabref/logic/importer/fetcher/**'
