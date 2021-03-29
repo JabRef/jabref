@@ -11,12 +11,10 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.JabRefDesktop;
-import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.identifier.DOI;
 import org.jabref.preferences.PreferencesService;
 
 public class OpenUrlAction extends SimpleCommand {
@@ -68,7 +66,7 @@ public class OpenUrlAction extends SimpleCommand {
             if (link.isPresent()) {
                 try {
                     if (field.equals(StandardField.DOI) && preferences.getDOIPreferences().isUseCustom()) {
-                        openCustomDOI(link.get());
+                        JabRefDesktop.openCustomDoi(link.get(), preferences, dialogService);
                     } else {
                         JabRefDesktop.openExternalViewer(databaseContext, link.get(), field);
                     }
@@ -77,18 +75,5 @@ public class OpenUrlAction extends SimpleCommand {
                 }
             }
         });
-    }
-
-    private void openCustomDOI(String link) {
-        IdentifierParser.parse(StandardField.DOI, link)
-                        .map(identifier -> (DOI) identifier)
-                        .flatMap(doi -> doi.getExternalURIWithCustomBase(preferences.getDOIPreferences().getDefaultBaseURI()))
-                        .ifPresent(uri -> {
-                            try {
-                                JabRefDesktop.openBrowser(uri);
-                            } catch (IOException e) {
-                                dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
-                            }
-                        });
     }
 }
