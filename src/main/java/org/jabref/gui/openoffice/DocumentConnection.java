@@ -787,12 +787,9 @@ class DocumentConnection {
      * @param range    Cursor marking the location or range for
      *                 the reference mark.
      */
-    public XNamed
-    insertReferenceMark(
-        String name,
-        XTextRange range,
-        boolean absorb
-        )
+    public XNamed insertReferenceMark(String name,
+                                      XTextRange range,
+                                      boolean absorb)
         throws
         CreationException {
 
