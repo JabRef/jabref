@@ -24,6 +24,6 @@ jobs:
         uses: pascalgn/automerge-action@v0.13.1
         if: steps.waitforstatuschecks.outputs.status == 'success'
         env:
-          MERGE_METHOD: "squash"
+          MERGE_METHOD: "merge"
           MERGE_LABELS: ""
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
