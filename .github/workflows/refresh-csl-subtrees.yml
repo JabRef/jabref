@@ -38,7 +38,6 @@ jobs:
       - name: Update csl-locales
         run: |
           git subtree pull --prefix buildres/csl/csl-locales csl-locales master --squash || true
-          git subtree pull --prefix buildres/csl/csl-locales csl-locales master --squash
           cp buildres/csl/csl-locales/locales.json src/main/resources/csl-locales/
           cp buildres/csl/csl-locales/locales-en-US.xml src/main/resources/csl-locales/
           git add .
