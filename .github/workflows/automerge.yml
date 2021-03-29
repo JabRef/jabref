@@ -5,7 +5,7 @@ jobs:
   automerge:
     name: Automerge Dependabot
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]' || github.event.label.name == 'dependencies'
+    if: github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]' || contains(github.event.pull_request.labels.*.name, 'dependencies')
     steps:
       - name: 'Wait for status checks'
         id: waitforstatuschecks
