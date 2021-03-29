@@ -36,6 +36,7 @@ jobs:
             displayName: windows
             archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
           - os: macOS-latest
+            if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
             displayName: macOS
             archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
     runs-on: ${{ matrix.os }}
@@ -74,14 +75,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Setup OSX key chain on OSX
-        if: matrix.os == 'macos-latest' && ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+        if: matrix.os == 'macos-latest'
         uses: apple-actions/import-codesign-certs@v1
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           keychain-password: jabref
       - name: Setup OSX key chain on OSX for app id cert
-        if: matrix.os == 'macos-latest' && ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+        if: matrix.os == 'macos-latest'
         uses: apple-actions/import-codesign-certs@v1
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT_APPLICATION }}
@@ -94,7 +95,7 @@ jobs:
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
         shell: bash
       - name: Resign app image for OSX and build dmg
-        if: matrix.os == 'macos-latest' && ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+        if: matrix.os == 'macos-latest'
         shell: bash
         run: |
           codesign --entitlements buildres/mac/jabref.entitlements --options runtime -vvv -f --sign "Developer ID Application: Tobias Diez (W2PU6LW5U5)" build/distribution/JabRef.app/Contents/runtime/Contents/MacOS/libjli.dylib
