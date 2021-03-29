@@ -1153,7 +1153,7 @@ public class JabRefPreferences implements PreferencesService {
         List<MainTableColumnModel> sortOrder = createMainTableColumnSortOrder();
 
         for (var column : sortOrder) {
-            boolean descending = column.getSortType() == SortType.DESCENDING ? true : false;
+            boolean descending = (column.getSortType() == SortType.DESCENDING);
             config.getSortCriteria().add(new SaveOrderConfig.SortCriterion(
                                                                            FieldFactory.parseField(column.getQualifier()),
                                                                            descending));
