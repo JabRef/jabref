@@ -33,10 +33,10 @@ public class FileFieldWriterTest {
 
     @Test
     public void testEncodeStringArray() {
-        assertEquals("a:b;c:d", FileFieldWriter.encodeStringArray(new String[][] {{"a", "b"}, {"c", "d"}}));
-        assertEquals("a:;c:d", FileFieldWriter.encodeStringArray(new String[][] {{"a", ""}, {"c", "d"}}));
-        assertEquals("a:" + null + ";c:d", FileFieldWriter.encodeStringArray(new String[][] {{"a", null}, {"c", "d"}}));
-        assertEquals("a:\\:b;c\\;:d", FileFieldWriter.encodeStringArray(new String[][] {{"a", ":b"}, {"c;", "d"}}));
+        assertEquals("a:b;c:d", FileFieldWriter.encodeStringArray(new String[][] {{"a", "b"}, {"c", "d"}}), "Encoding of stringArray failed.");
+        assertEquals("a:;c:d", FileFieldWriter.encodeStringArray(new String[][] {{"a", ""}, {"c", "d"}}), "Encoding of stringArray failed. Check empty string case.");
+        assertEquals("a:" + null + ";c:d", FileFieldWriter.encodeStringArray(new String[][] {{"a", null}, {"c", "d"}}), "Encoding of stringArray failed. Check null case.");
+        assertEquals("a:\\:b;c\\;:d", FileFieldWriter.encodeStringArray(new String[][] {{"a", ":b"}, {"c;", "d"}}), "Encoding of stringArray failed. Check escaped character case.");
     }
 
     @Test
