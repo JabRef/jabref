@@ -40,12 +40,12 @@ class GroupTreeViewModelTest {
     @Test
     void rootGroupIsAllEntriesByDefault() throws Exception {
         AllEntriesGroup allEntriesGroup = new AllEntriesGroup("All entries");
-        assertEquals(new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, allEntriesGroup, new CustomLocalDragboard(), mock(PreferencesService.class)), groupTree.rootGroupProperty().getValue());
+        assertEquals(new GroupNodeViewModel(databaseContext, stateManager, taskExecutor, allEntriesGroup, new CustomLocalDragboard(), mock(PreferencesService.class)), groupTree.rootGroupProperty().getValue()"New group view model is not set to all entries by default.");
     }
 
     @Test
     void rootGroupIsSelectedByDefault() {
-        assertEquals(groupTree.rootGroupProperty().get().getGroupNode(), stateManager.getSelectedGroup(databaseContext).get(0));
+        assertEquals(groupTree.rootGroupProperty().get().getGroupNode(), stateManager.getSelectedGroup(databaseContext).get(0),"Root group not selected by default.");
     }
 
     @Test
@@ -58,7 +58,7 @@ class GroupTreeViewModelTest {
         model.addEntriesToGroup(databaseContext.getEntries());
         groupTree.removeGroupsAndSubGroupsFromEntries(model);
 
-        assertEquals(Optional.empty(), entry.getField(StandardField.GROUPS));
+        assertEquals(Optional.empty(), entry.getField(StandardField.GROUPS),"Explicit group was not removed from BibEntry.");
     }
 
     @Test
@@ -72,6 +72,6 @@ class GroupTreeViewModelTest {
         model.addEntriesToGroup(databaseContext.getEntries());
         groupTree.removeGroupsAndSubGroupsFromEntries(model);
 
-        assertEquals(groupName, entry.getField(StandardField.KEYWORDS).get());
+        assertEquals(groupName, entry.getField(StandardField.KEYWORDS).get(),"Keyword group was not removed from Bibentry.");
     }
 }
