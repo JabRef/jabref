@@ -27,13 +27,7 @@ class SpecialFieldsToSeparateFieldsTest {
       entry = new BibEntry();
       expectedEntry = new BibEntry();
     }
-
-    @AfterEach
-    void tearDown(){
-      entry = null;
-      expectedEntry = null;
-    }
-
+    
     @ParameterizedTest
     @MethodSource("provideKeywordFieldPairs")
     public void migrateToCorrectField(SpecialField field, String fieldInKeyword, BibEntry expected) {

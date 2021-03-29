@@ -27,13 +27,6 @@ class MergeReviewIntoCommentActionMigrationTest {
         expectedEntry = createMinimalBibEntry();
     }
 
-    @AfterEach
-    public void tearDown(){
-        action = null;
-        entry = null;
-        expectedEntry = null;
-    }
-
     @Test
     public void noFields() {
         ParserResult actualParserResult = new ParserResult(Collections.singletonList(entry));
