@@ -18,8 +18,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -36,14 +36,14 @@ class OpenDatabaseTest {
     private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
 
     OpenDatabaseTest() {
-      try{
+      try {
         bibNoHeader = Path.of(OpenDatabaseTest.class.getResource("headerless.bib").toURI());
         bibWrongHeader = Path.of(OpenDatabaseTest.class.getResource("wrong-header.bib").toURI());
         bibHeader = Path.of(OpenDatabaseTest.class.getResource("encoding-header.bib").toURI());
         bibHeaderAndSignature = Path.of(OpenDatabaseTest.class.getResource("jabref-header.bib").toURI());
         bibEncodingWithoutNewline = Path.of(OpenDatabaseTest.class.getResource("encodingWithoutNewline.bib").toURI());
-      } catch (Exception e){
-        //Ignore Tests if utility files could not be located
+      } catch (Exception e) {
+        // Ignore Tests if utility files could not be located
         assumeTrue(false);
       }
     }

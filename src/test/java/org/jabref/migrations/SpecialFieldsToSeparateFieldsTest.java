@@ -8,7 +8,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,11 +22,11 @@ class SpecialFieldsToSeparateFieldsTest {
     private BibEntry expectedEntry;
 
     @BeforeEach
-    void setUp(){
-      entry = new BibEntry();
-      expectedEntry = new BibEntry();
+    void setUp() {
+        entry = new BibEntry();
+        expectedEntry = new BibEntry();
     }
-    
+
     @ParameterizedTest
     @MethodSource("provideKeywordFieldPairs")
     public void migrateToCorrectField(SpecialField field, String fieldInKeyword, BibEntry expected) {
@@ -42,7 +41,7 @@ class SpecialFieldsToSeparateFieldsTest {
     public void noKewordToMigrate() {
         entry.setField(StandardField.AUTHOR, "JabRef");
         entry.setField(StandardField.KEYWORDS, "tdd");
-        expectedEntry.setField(StandardField.AUTHOR,"JabRef");
+        expectedEntry.setField(StandardField.AUTHOR, "JabRef");
         expectedEntry.setField(StandardField.KEYWORDS, "tdd");
 
         new SpecialFieldsToSeparateFields(',').performMigration(new ParserResult(List.of(entry)));

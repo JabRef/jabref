@@ -70,7 +70,7 @@ class JournalAbbreviationsViewModelMixedAbbreviationsTabTest {
     @Test
     void testInitialHasNoFilesAndNoAbbreviations() {
         assertEquals(0, viewModel.journalFilesProperty().size(), "Incorrect setup of test. Journal files not set to 0 at setup.");
-        assertEquals(0, viewModel.abbreviationsProperty().size(),"Incorrect setup of test. Abbreviations not set to 0 at setup");
+        assertEquals(0, viewModel.abbreviationsProperty().size(), "Incorrect setup of test. Abbreviations not set to 0 at setup");
     }
 
     @Test
