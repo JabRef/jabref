@@ -333,7 +333,6 @@ class BracketedPatternTest {
         assertEquals("2325967120921344", BracketedPattern.expandBrackets("[firstpage]", null, bibEntry, null));
     }
 
-
     @Test
     void expandBracketsUnmodifiedStringFromLongLastPageNumber() {
         BibEntry bibEntry = new BibEntry()
