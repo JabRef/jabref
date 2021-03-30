@@ -3,9 +3,9 @@ on: [pull_request]
 
 jobs:
   automerge:
-    name: Automerge Dependabot
+    name: Automerge Dependency Updates
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]' || github.event.label.name == 'dependencies'
+    if: github.actor == 'dependabot[bot]' || github.actor == 'dependabot-preview[bot]' || contains(github.event.pull_request.labels.*.name, 'dependencies')
     steps:
       - name: 'Wait for status checks'
         id: waitforstatuschecks
@@ -24,6 +24,6 @@ jobs:
         uses: pascalgn/automerge-action@v0.13.1
         if: steps.waitforstatuschecks.outputs.status == 'success'
         env:
-          MERGE_METHOD: "squash"
+          MERGE_METHOD: "merge"
           MERGE_LABELS: ""
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
