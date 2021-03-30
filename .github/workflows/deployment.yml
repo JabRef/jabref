@@ -74,7 +74,7 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 15
-        if: ${{ matrix.os == "ubuntu-latest" || (matrix.os == "macOS-latest" && steps.checksecrets.outputs.certpresent) }}
+        if: ${{ matrix.os == 'ubuntu-latest' || (matrix.os == 'macOS-latest' && steps.checksecrets.outputs.certpresent) }}
       - name: Set up JDK 14 for windows
         uses: actions/setup-java@v1
         with:
