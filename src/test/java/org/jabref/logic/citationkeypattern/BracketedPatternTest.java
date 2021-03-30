@@ -326,6 +326,14 @@ class BracketedPatternTest {
     }
 
     @Test
+    void expandBracketsUnmodifiedStringFromLongPageNumber() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.PAGES, "2325967120921344");
+
+        assertEquals("2325967120921344", BracketedPattern.expandBrackets("[firstpage]", null, bibEntry, null));
+    }
+
+    @Test
     void expandBracketsWithTestCasesFromRegExpBasedFileFinder() {
         BibEntry entry = new BibEntry(StandardEntryType.Article).withCitationKey("HipKro03");
         entry.setField(StandardField.AUTHOR, "Eric von Hippel and Georg von Krogh");
