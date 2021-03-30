@@ -39,35 +39,49 @@ jobs:
             displayName: macOS
             archivePortable: brew install pigz && tar -c -C build/distribution JabRef.app | pigz --rsyncable > build/distribution/JabRef-portable_macos.tar.gz && rm -R build/distribution/JabRef.app
     runs-on: ${{ matrix.os }}
-    if: ${{ matrix.os != 'macOS-latest' || (matrix.os == 'macOS-latest' && OSXCERT =! '') }}
     name: Create installer and portable version for ${{ matrix.displayName }}
     steps:
       - name: Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.8.0
         with:
           access_token: ${{ github.token }}
+      - name: Check secrets presence
+        id: checksecrets
+        shell: bash
+        run: |
+          if [ "$OSXCERT" == "" ]; then
+            echo ::set-output name=certpresent::false
+          else
+            echo ::set-output name=certpresent::true
+          fi
+        env:
+          OSXCERT: ${{ secrets.OSX_SIGNING_CERT }}
       - name: Fetch all history for all tags and branches
+        if: ${{ steps.checksecrets.ouputs.certpresent }}
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
       - name: Install GitVersion
+        if: ${{ steps.checksecrets.ouputs.certpresent }}
         uses: gittools/actions/gitversion/setup@v0.9.9
         with:
           versionSpec: "5.x"
       - name: Run GitVersion
+        if: ${{ steps.checksecrets.ouputs.certpresent }}
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.9.9
       - name: Set up JDK 15 for linux and mac
         uses: actions/setup-java@v1
         with:
           java-version: 15
-        if: matrix.os != 'windows-latest'
+        if: ${{ matrix.os == "ubuntu-latest" || (matrix.os == "macOS-latest" && steps.checksecrets.outputs.certpresent) }}
       - name: Set up JDK 14 for windows
         uses: actions/setup-java@v1
         with:
           java-version: 14
         if: matrix.os == 'windows-latest'
       - name: Restore gradle cache
+        if: ${{ steps.checksecrets.ouputs.certpresent }}
         uses: actions/cache@master
         with:
           path: ~/.gradle/caches
@@ -75,14 +89,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Setup OSX key chain on OSX
-        if: matrix.os == 'macos-latest'
+        if: matrix.os == 'macos-latest' && steps.checksecrets.outputs.certpresent
         uses: apple-actions/import-codesign-certs@v1
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           keychain-password: jabref
       - name: Setup OSX key chain on OSX for app id cert
-        if: matrix.os == 'macos-latest'
+        if: matrix.os == 'macos-latest' && steps.checksecrets.outputs.certpresent
         uses: apple-actions/import-codesign-certs@v1
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT_APPLICATION }}
@@ -90,12 +104,14 @@ jobs:
           create-keychain: false
           keychain-password: jabref
       - name: Build runtime image
+        if: ${{ steps.checksecrets.ouputs.certpresent }}
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jlinkZip
       - name: Build installer
+        if: ${{ steps.checksecrets.ouputs.certpresent }}
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage
         shell: bash
       - name: Resign app image for OSX and build dmg
-        if: matrix.os == 'macos-latest'
+        if: matrix.os == 'macos-latest' && steps.checksecrets.outputs.certpresent
         shell: bash
         run: |
           codesign --entitlements buildres/mac/jabref.entitlements --options runtime -vvv -f --sign "Developer ID Application: Tobias Diez (W2PU6LW5U5)" build/distribution/JabRef.app/Contents/runtime/Contents/MacOS/libjli.dylib
@@ -128,15 +144,18 @@ jobs:
       #     xcrun stapler staple "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg"
       #     rm "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg"
       - name: Package application image
+        if: ${{ steps.checksecrets.ouputs.certpresent }}
         shell: bash
         run: ${{ matrix.archivePortable }}
       - name: Rename files
+        if: ${{ steps.checksecrets.ouputs.certpresent }}
         shell: pwsh
         run: |
           get-childitem -Path build/distribution/*
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
           get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable"}
       - name: Upload to GitHub workflow artifacts store
+        if: ${{ steps.checksecrets.ouputs.certpresent }}
         uses: actions/upload-artifact@master
         with:
           name: JabRef-${{ matrix.displayName }}
