@@ -165,7 +165,11 @@ public abstract class AbstractQueryTransformer {
      * If it is not supported return an empty optional.
      */
     protected Optional<String> handleOtherField(String fieldAsString, String term) {
-        return Optional.of(String.format("%s:\"%s\"", fieldAsString, term));
+        if (term.contains(" ")) {
+            return Optional.of(String.format("%s:\"%s\"", fieldAsString, term));
+        } else {
+            return Optional.of(String.format("%s:%s", fieldAsString, term));
+        }
     }
 
     private Optional<String> transform(QueryNode query) {

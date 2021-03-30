@@ -1,14 +1,16 @@
 package org.jabref.logic.importer.fetcher.transformators;
 
+import java.util.Optional;
+
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class IEEEQueryTransformerTest implements InfixTransformerTest {
+class IEEEQueryTransformerTest extends InfixTransformerTest<IEEEQueryTransformer> {
 
     @Override
-    public AbstractQueryTransformer getTransformer() {
+    public IEEEQueryTransformer getTransformer() {
         return new IEEEQueryTransformer();
     }
 
@@ -45,11 +47,14 @@ class IEEEQueryTransformerTest implements InfixTransformerTest {
 
     @Override
     public void convertYearField() throws Exception {
+        // IEEE does not support year range
+        // Thus, a generic test does not work
+
         IEEEQueryTransformer transformer = ((IEEEQueryTransformer) getTransformer());
 
         String queryString = "year:2021";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        transformer.transformLuceneQuery(luceneQuery);
+        Optional<String> result = transformer.transformLuceneQuery(luceneQuery);
 
         assertEquals(2021, transformer.getStartYear());
         assertEquals(2021, transformer.getEndYear());

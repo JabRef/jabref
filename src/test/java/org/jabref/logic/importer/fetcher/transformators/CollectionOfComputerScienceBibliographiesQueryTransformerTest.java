@@ -7,10 +7,10 @@ import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxPars
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class CollectionOfComputerScienceBibliographiesQueryTransformerTest implements InfixTransformerTest {
+class CollectionOfComputerScienceBibliographiesQueryTransformerTest extends InfixTransformerTest<CollectionOfComputerScienceBibliographiesQueryTransformer> {
 
     @Override
-    public AbstractQueryTransformer getTransformer() {
+    public CollectionOfComputerScienceBibliographiesQueryTransformer getTransformer() {
         return new CollectionOfComputerScienceBibliographiesQueryTransformer();
     }
 
@@ -36,26 +36,18 @@ class CollectionOfComputerScienceBibliographiesQueryTransformerTest implements I
 
     @Override
     public void convertYearField() throws Exception {
-        ArXivQueryTransformer transformer = ((ArXivQueryTransformer) getTransformer());
         String queryString = "2018";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> query = transformer.transformLuceneQuery(luceneQuery);
-        Optional<String> expected = Optional.of(queryString);
-        assertEquals(expected, query);
-        assertEquals(2018, transformer.getStartYear());
-        assertEquals(2018, transformer.getEndYear());
+        Optional<String> query = getTransformer().transformLuceneQuery(luceneQuery);
+        assertEquals(Optional.of("year:2018"), query);
     }
 
     @Override
     public void convertYearRangeField() throws Exception {
-        ArXivQueryTransformer transformer = ((ArXivQueryTransformer) getTransformer());
-
         String queryString = "year-range:2018-2021";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        transformer.transformLuceneQuery(luceneQuery);
-
-        assertEquals(2018, transformer.getStartYear());
-        assertEquals(2021, transformer.getEndYear());
+        Optional<String> query = getTransformer().transformLuceneQuery(luceneQuery);
+        assertEquals(Optional.of("year:2018 OR year:2019 OR year:2020 OR year:2021"), query);
     }
 
 }

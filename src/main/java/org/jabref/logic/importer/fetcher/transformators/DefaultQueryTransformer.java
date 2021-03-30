@@ -1,5 +1,8 @@
 package org.jabref.logic.importer.fetcher.transformators;
 
+/**
+ * Default query transformer without any boolean operators
+ */
 public class DefaultQueryTransformer extends AbstractQueryTransformer {
 
     @Override

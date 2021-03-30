@@ -6,7 +6,7 @@ import java.util.Optional;
 /**
  * Needs to be instantiated for each new query
  */
-public class IEEEQueryTransformer extends AbstractQueryTransformer {
+public class IEEEQueryTransformer extends YearRangeByFilteringQueryTransformer {
     // These have to be integrated into the IEEE query URL as these are just supported as query parameters
     // Journal is wrapped in quotes by the transformer
     private String journal;
@@ -53,14 +53,6 @@ public class IEEEQueryTransformer extends AbstractQueryTransformer {
     }
 
     @Override
-    protected String handleYearRange(String yearRange) {
-        String[] split = yearRange.split("-");
-        startYear = Math.min(startYear, Integer.parseInt(split[0]));
-        endYear = Math.max(endYear, Integer.parseInt(split[1]));
-        return "";
-    }
-
-    @Override
     protected String handleUnFieldedTerm(String term) {
         return String.format("\"%s\"", term);
     }
@@ -76,14 +68,6 @@ public class IEEEQueryTransformer extends AbstractQueryTransformer {
     private Optional<String> handleArticleNumber(String term) {
         articleNumber = term;
         return Optional.empty();
-    }
-
-    public Optional<Integer> getStartYear() {
-        return startYear == Integer.MAX_VALUE ? Optional.empty() : Optional.of(startYear);
-    }
-
-    public Optional<Integer> getEndYear() {
-        return endYear == Integer.MIN_VALUE ? Optional.empty() : Optional.of(endYear);
     }
 
     public Optional<String> getJournal() {

@@ -1,7 +1,7 @@
 package org.jabref.logic.importer.fetcher.transformators;
 
-public class ScholarQueryTransformer extends AbstractQueryTransformer {
-    // These have to be integrated into the Google Scholar query URL as these are just supported as query parameters
+public class ScholarQueryTransformer extends YearAndYearRangeByFilteringQueryTransformer {
+    // Start year and end year have to be integrated into the query URL itself as these are just supported as query parameters
     private int startYear = Integer.MAX_VALUE;
     private int endYear = Integer.MIN_VALUE;
 
@@ -36,30 +36,7 @@ public class ScholarQueryTransformer extends AbstractQueryTransformer {
     }
 
     @Override
-    protected String handleYear(String year) {
-        startYear = Math.min(startYear, Integer.parseInt(year));
-        endYear = Math.max(endYear, Integer.parseInt(year));
-        return "";
-    }
-
-    @Override
-    protected String handleYearRange(String yearRange) {
-        String[] split = yearRange.split("-");
-        startYear = Math.min(startYear, Integer.parseInt(split[0]));
-        endYear = Math.max(endYear, Integer.parseInt(split[1]));
-        return "";
-    }
-
-    @Override
     protected String handleUnFieldedTerm(String term) {
         return String.format("\"%s\"", term);
-    }
-
-    public int getStartYear() {
-        return startYear == Integer.MAX_VALUE ? Integer.MIN_VALUE : startYear;
-    }
-
-    public int getEndYear() {
-        return endYear == Integer.MIN_VALUE ? Integer.MAX_VALUE : endYear;
     }
 }
