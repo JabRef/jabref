@@ -49,7 +49,7 @@ jobs:
         id: checksecrets
         shell: bash
         run: |
-          if [ "$OSXCERT" == "" ]; then
+          if [ "$matrix.os" == "macOS-latest" && "$OSXCERT" == "" ]; then
             echo ::set-output name=certpresent::false
           else
             echo ::set-output name=certpresent::true
