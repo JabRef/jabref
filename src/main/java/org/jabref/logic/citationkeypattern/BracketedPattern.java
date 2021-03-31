@@ -1,5 +1,6 @@
 package org.jabref.logic.citationkeypattern;
 
+import java.math.BigInteger;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,6 +57,10 @@ public class BracketedPattern {
      */
     private static final int MAX_ALPHA_AUTHORS = 4;
 
+    /**
+     * Matches everything that is not a unicode decimal digit.
+     */
+    private static final Pattern NOT_DECIMAL_DIGIT = Pattern.compile("\\P{Nd}");
     /**
      * Matches everything that is not an uppercase ASCII letter. The intended use is to remove all lowercase letters
      */
@@ -1019,19 +1024,12 @@ public class BracketedPattern {
         // FIXME: incorrectly exracts the first page when pages are
         // specified with ellipse, e.g. "213-6", which should stand
         // for "213-216". S.G.
-        final String[] splitPages = pages.split("\\D+");
-        int result = Integer.MAX_VALUE;
-        for (String n : splitPages) {
-            if (n.matches("\\d+")) {
-                result = Math.min(Integer.parseInt(n), result);
-            }
-        }
-
-        if (result == Integer.MAX_VALUE) {
-            return "";
-        } else {
-            return String.valueOf(result);
-        }
+        return NOT_DECIMAL_DIGIT.splitAsStream(pages)
+                                .filter(Predicate.not(String::isBlank))
+                                .map(BigInteger::new)
+                                .min(BigInteger::compareTo)
+                                .map(BigInteger::toString)
+                                .orElse("");
     }
 
     /**
@@ -1057,19 +1055,12 @@ public class BracketedPattern {
      * @throws NullPointerException if pages is null.
      */
     public static String lastPage(String pages) {
-        final String[] splitPages = pages.split("\\D+");
-        int result = Integer.MIN_VALUE;
-        for (String n : splitPages) {
-            if (n.matches("\\d+")) {
-                result = Math.max(Integer.parseInt(n), result);
-            }
-        }
-
-        if (result == Integer.MIN_VALUE) {
-            return "";
-        } else {
-            return String.valueOf(result);
-        }
+        return NOT_DECIMAL_DIGIT.splitAsStream(pages)
+                                .filter(Predicate.not(String::isBlank))
+                                .map(BigInteger::new)
+                                .max(BigInteger::compareTo)
+                                .map(BigInteger::toString)
+                                .orElse("");
     }
 
     /**
