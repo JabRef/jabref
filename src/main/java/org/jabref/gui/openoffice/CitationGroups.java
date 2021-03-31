@@ -106,6 +106,9 @@ class CitationGroups {
         this.bibliography = Optional.empty();
     }
 
+    public Compat.DataModel getDataModel() {
+        return backend.dataModel;
+    }
 
     public String healthReport(DocumentConnection documentConnection)
         throws
@@ -583,7 +586,8 @@ class CitationGroups {
      */
     public CitationGroupID createCitationGroup(DocumentConnection documentConnection,
                                                List<String> citationKeys,
-                                               Optional<String> pageInfo,
+                                               //Optional<String> pageInfo,
+                                               List<String> pageInfosForCitations,
                                                int itcType,
                                                XTextCursor position,
                                                boolean insertSpaceAfter,
@@ -598,7 +602,7 @@ class CitationGroups {
 
         CitationGroup cg = backend.createCitationGroup(documentConnection,
                                                        citationKeys,
-                                                       pageInfo,
+                                                       pageInfosForCitations,
                                                        itcType,
                                                        position,
                                                        insertSpaceAfter,

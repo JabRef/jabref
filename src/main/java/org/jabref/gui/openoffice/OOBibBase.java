@@ -775,13 +775,12 @@ class OOBibBase {
         entries.put( ce, ck.db.get().database );
         // We need "normalized" (in parenthesis) markers
         // for uniqueness checking purposes:
-        String pageInfoForCitationGroup = null;
         return style.getCitationMarker(Collections.singletonList(ce),
                                        entries,
                                        true,
                                        null,
                                        new int[] {-1}, /* no limit on authors */
-                                       pageInfoForCitationGroup);
+                                       null /*pageInfosForCitations*/);
     }
 
     /**
@@ -954,12 +953,11 @@ class OOBibBase {
         for (CitationGroupID cgid : cgs.getSortedCitationGroupIDs()) {
             CitationGroup cg = cgs.getCitationGroupOrThrow(cgid);
             List<Integer> numbers = cg.getSortedNumbers();
-            String pageInfoForCitationGroup = cg.pageInfo.orElse(null);
             citMarkers.put(cgid,
                            style.getNumCitationMarker(numbers,
                                                       minGroupingCount,
                                                       false,
-                                                      pageInfoForCitationGroup));
+                                                      cgs.backend.getPageInfosForCitations(cg)));
         }
 
         return citMarkers;
@@ -985,12 +983,11 @@ class OOBibBase {
         for (CitationGroupID cgid : cgs.getSortedCitationGroupIDs()) {
             CitationGroup cg = cgs.getCitationGroupOrThrow(cgid);
             List<Integer> numbers = cg.getSortedNumbers();
-            String pageInfoForCitationGroup = cg.pageInfo.orElse(null);
             citMarkers.put(cgid,
                            style.getNumCitationMarker(numbers,
                                                       minGroupingCount,
-                                                      false, /*inList*/
-                                                      pageInfoForCitationGroup));
+                                                      false, /* inList */
+                                                      cgs.backend.getPageInfosForCitations(cg)));
         }
         return citMarkers;
     }
@@ -1072,6 +1069,7 @@ class OOBibBase {
                 }
             }
 
+            List<String> pageInfosForCitations = cgs.backend.getPageInfosForCitations(cg);
             if ( hasUnresolved ) {
                 /*
                  * Some entries are unresolved.
@@ -1091,10 +1089,7 @@ class OOBibBase {
                         entries.put(e,d);
                         firstLimAuthors2[0] = firstLimAuthors[j];
                         uniqueLetterForCitedEntry2[0] = uniqueLetterForCitedEntry[j];
-                        // Attribute pageInfoForCitationGroup to the last
-                        String pageInfoForCitationGroup = (j == (nCitedEntries-1)
-                                                           ? cg.pageInfo.orElse(null)
-                                                           : null);
+                        List<String> pageInfo = pageInfosForCitations.subList(j,j+1);
                         s = (s
                              + style.getCitationMarker(
                                  cEntries,
@@ -1102,8 +1097,7 @@ class OOBibBase {
                                  cg.itcType == OOBibBase.AUTHORYEAR_PAR,
                                  uniqueLetterForCitedEntry2,
                                  firstLimAuthors2,
-                                 pageInfoForCitationGroup
-                                 ));
+                                 pageInfo));
                     } else {
                         s = s + String.format("(Unresolved(%s))", currentKey);
                     }
@@ -1123,7 +1117,6 @@ class OOBibBase {
                     entries.put(e,d);
                 }
 
-                String pageInfoForCitationGroup = cg.pageInfo.orElse(null);
                 citMarkers.put( cgid,
                                 style.getCitationMarker(
                                     cEntries,
@@ -1131,7 +1124,7 @@ class OOBibBase {
                                     cg.itcType == OOBibBase.AUTHORYEAR_PAR,
                                     uniqueLetterForCitedEntry,
                                     firstLimAuthors,
-                                    pageInfoForCitationGroup
+                                    pageInfosForCitations
                                     )
                     );
             }
@@ -1241,7 +1234,8 @@ class OOBibBase {
     private void insertReferenceMark(CitationGroups cgs,
                                      DocumentConnection documentConnection,
                                      List<String> citationKeys,
-                                     Optional<String> pageInfo,
+                                     // Optional<String> pageInfo,
+                                     List<String> pageInfosForCitations,
                                      int itcType,
                                      String citationText,
                                      XTextCursor position,
@@ -1263,7 +1257,7 @@ class OOBibBase {
 
         CitationGroupID cgid = cgs.createCitationGroup(documentConnection,
                                                        citationKeys,
-                                                       pageInfo,
+                                                       pageInfosForCitations,
                                                        itcType,
                                                        position,
                                                        insertSpaceAfter,
@@ -1392,6 +1386,12 @@ class OOBibBase {
      *
      * @param pageInfo      A single page-info for these entries. Stored in custom property
      *                      with the same name as the reference mark.
+     *
+     *                      This is a GUI call, and we are not ready
+     *                      to get multiple pageInfo values there.
+     *
+     *                      In case of multiple entries, pageInfo goes
+     *                      to the last citation (as apparently did in JabRef52).
      *
      *                      Related https://latex.org/forum/viewtopic.php?t=14331
      *                      """
@@ -1532,18 +1532,21 @@ class OOBibBase {
                     databaseMap.put(entry, database);
                 }
 
-                String pageInfoForCitationGroup = null;
+                // JabRef53 style pageInfo list, or null
+                List<String> pageInfosForCitations =
+                    Backend52.fakePageInfosForCitations(pageInfo,
+                                                        entries.size(),
+                                                        true /* mayReturnNull */);
+
                 // The text we insert
-                String citeText =
-                    style.isNumberEntries()
-                    ? "[-]" // A dash only. Presumably we expect a refresh later.
-                    : style.getCitationMarker(
-                        entries,
-                        databaseMap,
-                        inParenthesis,
-                        null,
-                        null,
-                        pageInfoForCitationGroup);
+                String citeText = (style.isNumberEntries()
+                                   ? "[-]" // A dash only. Only refresh later.
+                                   : style.getCitationMarker(entries,
+                                                             databaseMap,
+                                                             inParenthesis,
+                                                             null,
+                                                             null,
+                                                             pageInfosForCitations));
 
                 if (citeText.equals("")) {
                     citeText = "[?]";
@@ -1552,7 +1555,7 @@ class OOBibBase {
                 insertReferenceMark(cgs,
                                     documentConnection,
                                     citationKeys,
-                                    Optional.ofNullable(pageInfo),
+                                    pageInfosForCitations,
                                     itcType,
                                     citeText,
                                     cursor,
@@ -1963,11 +1966,11 @@ class OOBibBase {
                 // int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
                 int minGroupingCount = 2;
                 List<Integer> numbers = Collections.singletonList(ck.number.get());
-                String pageInfoForCitationGroup = null; // no pageInfo for the bibliography
+                List<String> pageInfosForCitations = null; // no pageInfo for the bibliography
                 String marker = style.getNumCitationMarker(numbers,
                                                            minGroupingCount,
                                                            true,
-                                                           pageInfoForCitationGroup);
+                                                           pageInfosForCitations);
 
                 OOUtil.insertTextAtCurrentLocation(documentConnection.xText,
                                                    cursor,
@@ -2437,6 +2440,7 @@ class OOBibBase {
              */
             for (int gi = 0; gi < joinableGroups.size(); gi++) {
 
+                List<CitationGroup> joinableGroup = joinableGroups.get(gi);
                 /*
                  * Join those in joinableGroups.get(gi)
                  */
@@ -2446,39 +2450,24 @@ class OOBibBase {
                 //       adding to newGroupCitations, then removing
                 //       the original CitationGroup values)
                 //
-                // pageInfos currently belong to the CitationGroup,
+                // cgPageInfos currently belong to the CitationGroup,
                 // but it is not clear how should handle them here.
                 //
                 List<Citation> newGroupCitations = new ArrayList<>();
-                List<Optional<String>> pageInfos = new ArrayList<>();
-                int itcType = joinableGroups.get(gi).get(0).itcType;
-
-                for (int gj = 0; gj < joinableGroups.get(gi).size(); gj++) {
-                    CitationGroup rk = joinableGroups.get(gi).get(gj);
-                    //newGroupCitations.addAll(Arrays.asList(bibtexKeys[rk]));
-                    newGroupCitations.addAll( rk.citations);
-                    pageInfos.add( rk.pageInfo );
+                for (CitationGroup rk : joinableGroup) {
+                    newGroupCitations.addAll(rk.citations);
                 }
 
-                // Try to do something of the pageInfo values.
-                //
-                String pageInfo = "";
-                pageInfos.stream()
-                    .filter(pi -> pi.isPresent())
-                    .map(pi -> pi.get())
-                    .distinct()
-                    .collect(Collectors.joining("; "));
+                int itcType = joinableGroup.get(0).itcType;
 
-                /*
-                 * joinGroups( documentConnection, oldGroups, cursor, removeOldGroups )
-                 */
+                List<String> pageInfosForCitations =
+                    cgs.backend.combinePageInfos(joinableGroup);
 
-                // Remove the old referenceMarkNames from the document.
+                // Remove the old citation groups from the document.
                 // We might want to do this via backends.
-                for (int gj = 0; gj < joinableGroups.get(gi).size(); gj++) {
-                    // int rk = joinableGroups.get(gi).get(gj);
+                for (int gj = 0; gj < joinableGroup.size(); gj++) {
                     // documentConnection.removeReferenceMark(referenceMarkNames.get(rk));
-                    cgs.removeCitationGroups( joinableGroups.get(gi), documentConnection );
+                    cgs.removeCitationGroups( joinableGroup, documentConnection );
                 }
 
                 XTextCursor textCursor = joinableGroupsCursors.get(gi);
@@ -2495,7 +2484,7 @@ class OOBibBase {
                     cgs,
                     documentConnection,
                     citationKeys,
-                    Optional.ofNullable(pageInfo == "" ? null : pageInfo),
+                    pageInfosForCitations, // Optional.ofNullable(pageInfo == "" ? null : pageInfo),
                     itcType, // OOBibBase.AUTHORYEAR_PAR, // itcType
                     "tmp",
                     textCursor,
@@ -2611,7 +2600,9 @@ class OOBibBase {
                         setCharStyleTested = true;
                     }
 
-                    Optional<String> oldPageInfo = cg.pageInfo;
+                    List<String> pageInfosForCitations = cgs.backend.getPageInfosForCitations(cg);
+                    //  Optional<String> oldPageInfo = cg.pageInfo;
+
                     List<Citation> cits=cg.citations;
                     if ( cits.size() <= 1 ) {
                         pivot++;
@@ -2622,40 +2613,43 @@ class OOBibBase {
                         cits.stream().map(cit -> cit.citationKey).collect(Collectors.toList());
 
                     cgs.removeCitationGroup( cg, documentConnection );
-                    // documentConnection.removeReferenceMark(names.get(pivot));
 
                     // Now we own the content of cits
 
-                    // Insert bookmark for each key
-                    int last = keys.size() - 1;
-                    int i = 0;
-                    for (String key : keys) {
+                    // Insert mark for each key
+                    final int last = keys.size() - 1;
+                    //for (String key : keys) {
+                    for (int i = 0; i < keys.size(); i++) {
                         // Note: by using insertReferenceMark (and not something
                         //       that accepts List<Citation>, we lose the extra
                         //       info stored in the citations.
                         //       We just reread below.
-                        List<String> citationKeys = new ArrayList<>(1);
-                        citationKeys.add( key );
+
+                        //List<String> citationKeys = new ArrayList<>(Arrays.asList(keys.get(i)));
+                        // List<String> pageInfos    = new ArrayList<>(
+                        //    Arrays.asList(pageInfosForCitations.get(i)));
+
+                        // citationKeys.add(keys.get(i));
+                        // pageInfos.add(pageInfosForCitations.get(i));
+
                         boolean insertSpaceAfter = (i != last);
                         insertReferenceMark(
                             cgs,
                             documentConnection,
-                            citationKeys,
-                            ((i==last) ? oldPageInfo : Optional.empty()), // put into the last one
+                            keys.subList(i,i+1), //citationKeys,
+                            pageInfosForCitations.subList(i,i+1), //pageInfos,
                             OOBibBase.AUTHORYEAR_PAR, // itcType,
                             //newName,
                             "tmp",
                             textCursor,
-                            /* withText should be itcType != OOBibBase.INVISIBLE_CIT */
-                            true,
+                            true, /* withText. Should be itcType != OOBibBase.INVISIBLE_CIT */
                             style,
                             insertSpaceAfter
                             );
                         textCursor.collapseToEnd();
-                        i++;
                     }
-                    madeModifications = true;
 
+                    madeModifications = true;
                     pivot++;
                 }
             } finally {

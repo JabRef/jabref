@@ -206,7 +206,8 @@ class Backend52 {
      */
     public CitationGroup createCitationGroup(DocumentConnection documentConnection,
                                              List<String> citationKeys,
-                                             Optional<String> pageInfo,
+                                             // Optional<String> pageInfo,
+                                             List<String> pageInfosForCitations,
                                              int itcType,
                                              XTextCursor position,
                                              boolean insertSpaceAfter,
@@ -232,9 +233,12 @@ class Backend52 {
 
         CitationGroupID cgid = new CitationGroupID(refMarkName);
 
-        List<Citation> citations = (citationKeys.stream()
-                                    .map(Citation::new)
-                                    .collect(Collectors.toList()));
+        List<Citation> citations = new ArrayList<>(citationKeys.size());
+        for (int i = 0; i < citationKeys.size(); i++) {
+            Citation cit = new Citation(citationKeys.get(i));
+            citations.add(cit);
+            // cit.setPageInfo(getJabRef53PageInfo(pageInfosForCitations, i));
+        }
 
         /*
          * Apply to document
@@ -245,20 +249,156 @@ class Backend52 {
                                                                        insertSpaceAfter,
                                                                        withoutBrackets);
 
-        if ( pageInfo.isPresent() && !pageInfo.get().equals("") ) {
-            documentConnection.setCustomProperty(refMarkName, pageInfo.get());
-        } else {
-            documentConnection.removeCustomProperty(refMarkName);
+        switch (dataModel){
+        case JabRef52:
+            Optional<String> pageInfo = getJabRef52PageInfoFromList( pageInfosForCitations );
+            if ( pageInfo.isPresent() && !pageInfo.get().equals("") ) {
+                documentConnection.setCustomProperty(refMarkName, pageInfo.get());
+            } else {
+                documentConnection.removeCustomProperty(refMarkName);
+            }
+            CitationGroup cg = new CitationGroup(cgid,
+                                                 sr,
+                                                 itcType,
+                                                 citations,
+                                                 pageInfo,
+                                                 refMarkName);
+            return cg;
+        default:
+            throw new RuntimeException("Backend52 requires JabRef52 dataModel");
         }
+    }
 
-        CitationGroup cg = new CitationGroup(cgid,
-                                             sr,
-                                             itcType,
-                                             citations,
-                                             pageInfo,
-                                             refMarkName);
+    Optional<String> getJabRef52PageInfoFromList(List<String> pageInfosForCitations) {
+        if (pageInfosForCitations == null) {
+            return Optional.empty();
+        }
+        int n = pageInfosForCitations.size();
+        if (n == 0) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(pageInfosForCitations.get(n-1));
+    }
 
-        return cg;
+    /**
+     * @param pageInfo Nullable.
+     */
+    static List<String> fakePageInfosForCitations(String pageInfo,
+                                                  int nCitations,
+                                                  boolean mayReturnNull) {
+        // JabRef53 style pageInfo list, or null
+        List<String> pageInfosForCitations = null;
+        if (!mayReturnNull || (pageInfo != null && !pageInfo.equals(""))) {
+            pageInfosForCitations = new ArrayList<>(nCitations);
+            for (int i = 0; i < nCitations; i++) {
+                if (i == nCitations - 1) {
+                    pageInfosForCitations.add(pageInfo);
+                } else {
+                    pageInfosForCitations.add(null);
+                }
+            }
+        }
+        return pageInfosForCitations;
+    }
+
+    /**
+     * @return List of nullable pageInfo values, one for each citation.
+     *         Result contains null for missing pageInfo values.
+     *         The list itself is not null.
+     *
+     *         For Compat.DataModel.JabRef52 the last citation gets
+     *         the CitationGroup.pageInfo
+     *
+     *         The result is passed to OOBibStyle.getCitationMarker or
+     *          OOBibStyle.getNumCitationMarker
+     *
+     *          TODO: we may want class DataModel52, DataModel53 and split this.
+     */
+    static List<String> getPageInfosForCitations(Compat.DataModel dataModel, CitationGroup cg) {
+        switch (dataModel){
+        case JabRef52:
+            // check conformance to dataModel
+            for ( int i = 0; i < cg.citations.size(); i++ ) {
+                if ( cg.citations.get(i).pageInfo.isPresent() ) {
+                    throw new RuntimeException("getPageInfosForCitations:"
+                                               + " found Citation.pageInfo under JabRef52 dataModel");
+                }
+            }
+            // A list of null values, except the last that comes from this.pageInfo
+            return Backend52.fakePageInfosForCitations(cg.pageInfo.orElse(null),
+                                                       cg.citations.size(),
+                                                       false /*mayReturnNull*/);
+
+        case JabRef53:
+            // check conformance to dataModel
+            if (cg.pageInfo.isPresent()) {
+                throw new RuntimeException("getPageInfosForCitations:"
+                                           + " found CitationGroup.pageInfo under JabRef53 dataModel");
+            }
+            // pageInfo values from citations, empty mapped to null.
+            return (cg.citations.stream()
+                    .map(cit -> cit.pageInfo.orElse(null))
+                    .collect(Collectors.toList()));
+
+        default:
+            throw new RuntimeException("getPageInfosForCitations:"
+                                       + "unhandled dataModel");
+        }
+    }
+
+    /**
+     * @return A list with one nullable pageInfo entry for each citation in
+     *         joinableGroups.
+     */
+    static List<String> combinePageInfos(Compat.DataModel dataModel,
+                                         List<CitationGroup> joinableGroup ) {
+        switch (dataModel) {
+        case JabRef52:
+            // collect to cgPageInfos
+            List<Optional<String>> cgPageInfos = (joinableGroup.stream()
+                                                  .map(cg -> cg.pageInfo)
+                                                  .collect(Collectors.toList()));
+
+            // Try to do something of the cgPageInfos.
+            String cgPageInfo = (cgPageInfos.stream()
+                                 .filter(pi -> pi.isPresent())
+                                 .map(pi -> pi.get())
+                                 .distinct()
+                                 .collect(Collectors.joining("; ")));
+
+            int nCitations = (joinableGroup.stream()
+                              .map(cg -> cg.citations.size())
+                              .mapToInt(Integer::intValue).sum());
+
+            return Backend52.fakePageInfosForCitations(cgPageInfo,
+                                                       nCitations,
+                                                       false /*mayReturnNull*/);
+
+        case JabRef53:
+            return (joinableGroup.stream()
+                    .flatMap( cg -> (cg.citations.stream()
+                                     .map(cit -> cit.pageInfo.orElse(null))))
+                    .collect(Collectors.toList()));
+        default:
+            throw new RuntimeException("unhandled dataModel here");
+        }
+    }
+
+    /**
+     * 
+     */
+    public List<String> combinePageInfos(List<CitationGroup> joinableGroup ) {
+        return combinePageInfos(this.dataModel, joinableGroup);
+    }
+
+    /*
+     * @return A list of nullable pageInfo values, one for each citation.
+     *         Result contains null for missing pageInfo values.
+     *         The list itself is not null.
+     *
+     */
+    public List<String> getPageInfosForCitations(CitationGroup cg) {
+        return getPageInfosForCitations(this.dataModel, cg);
     }
 
     public void removeCitationGroup(CitationGroup cg, DocumentConnection documentConnection)

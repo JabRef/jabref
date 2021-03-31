@@ -71,8 +71,6 @@ class CitationGroup {
         this.localOrder = makeIndices(citations.size());
     }
 
-
-
     /** Integers 0..(n-1) */
     static List<Integer> makeIndices(int n) {
         return Stream.iterate(0, i -> i + 1).limit(n).collect(Collectors.toList());

@@ -414,14 +414,15 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * Format a number-based citation marker for the given number.
      *
      * @param number The citation numbers.
-     * @param pageInfoForCitationGroup Nullable. In case of multiple entries,
-     *        attributed to the last.
+     * @param pageInfosForCitations  Null for "none", or a list with
+     *        pageInfo for each citation. These can be null as well.
+     *
      * @return The text for the citation.
      */
     public String getNumCitationMarker(List<Integer> number,
                                        int minGroupingCount,
                                        boolean inList,
-                                       String pageInfoForCitationGroup) {
+                                       List<String> pageInfosForCitations) {
         String bracketBefore = getStringCitProperty(BRACKET_BEFORE);
         if (inList && (citProperties.containsKey(BRACKET_BEFORE_IN_LIST))) {
             bracketBefore = getStringCitProperty(BRACKET_BEFORE_IN_LIST);
@@ -499,7 +500,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * @param unlimAuthors  Boolean for each entry. If true, we should not use "et al" formatting
      *                      regardless of the number of authors.
      *                       Can be null to indicate that no entries should have unlimited names.
-     * @param pageInfoForCitationGroup Nullable, attibuted to the last entry
+     * @param pageInfosForCitations  Null for "none", or a list with
+     *                      pageInfo for each citation. These can be null as well.
      * @return The formatted citation.
      */
     public String getCitationMarker(List<BibEntry> entries,
@@ -507,7 +509,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
                                     boolean inParenthesis,
                                     String[] uniquefiers,
                                     int[] unlimAuthors,
-                                    String pageInfoForCitationGroup) {
+                                    List<String> pageInfosForCitations
+        ) {
         // Look for groups of uniquefied entries that should be combined in the output.
         // E.g. (Olsen, 2005a, b) should be output instead of (Olsen, 2005a; Olsen, 2005b).
         int piv = -1;

@@ -85,7 +85,7 @@ class OOBibStyleTest {
     void testGetNumCitationMarker() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences);
-        String empty = null;
+        List<String> empty = null;
         assertEquals("[1] ", style.getNumCitationMarker(Arrays.asList(1), -1, true, empty));
         assertEquals("[1]", style.getNumCitationMarker(Arrays.asList(1), -1, false, empty));
         assertEquals("[1] ", style.getNumCitationMarker(Arrays.asList(1), 0, true, empty));
@@ -103,7 +103,7 @@ class OOBibStyleTest {
     void testGetNumCitationMarkerUndefined() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences);
-        String empty = null;
+        List<String> empty = null;
         assertEquals("[" + OOBibStyle.UNDEFINED_CITATION_MARKER + "; 2-4] ",
                      style.getNumCitationMarker(Arrays.asList(4, 2, 3, 0), 1, true, empty));
 
@@ -146,7 +146,7 @@ class OOBibStyleTest {
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         entryDBMap.put(entry, database);
 
-        String empty = null;
+        List<String> empty = null;
         assertEquals("[Boström et al., 2006]",
                      style.getCitationMarker(Collections.singletonList(entry), entryDBMap, true, null, null, empty));
         assertEquals("Boström et al. [2006]",
@@ -236,7 +236,7 @@ class OOBibStyleTest {
         database.insertEntry(entry);
         entries.add(entry);
         entryDBMap.put(entry, database);
-        String empty = null;
+        List<String> empty = null;
         assertEquals("[JabRef Development Team, 2016]",
                      style.getCitationMarker(entries, entryDBMap, true, null, null, empty));
     }
@@ -258,7 +258,7 @@ class OOBibStyleTest {
         database.insertEntry(entry);
         entries.add(entry);
         entryDBMap.put(entry, database);
-        String empty = null;
+        List<String> empty = null;
         assertEquals("[von Beta, 2016]",
                      style.getCitationMarker(entries, entryDBMap, true, null, null, empty));
     }
@@ -278,7 +278,7 @@ class OOBibStyleTest {
         database.insertEntry(entry);
         entries.add(entry);
         entryDBMap.put(entry, database);
-        String empty = null;
+        List<String> empty = null;
         assertEquals("[, 2016]", style.getCitationMarker(entries, entryDBMap, true, null, null, empty));
     }
 
@@ -297,7 +297,7 @@ class OOBibStyleTest {
         database.insertEntry(entry);
         entries.add(entry);
         entryDBMap.put(entry, database);
-        String empty = null;
+        List<String> empty = null;
         assertEquals("[von Beta, ]",
                      style.getCitationMarker(entries, entryDBMap, true, null, null, empty));
     }
@@ -316,7 +316,7 @@ class OOBibStyleTest {
         database.insertEntry(entry);
         entries.add(entry);
         entryDBMap.put(entry, database);
-        String empty = null;
+        List<String> empty = null;
         assertEquals("[, ]", style.getCitationMarker(entries, entryDBMap, true, null, null, empty));
     }
 
@@ -350,7 +350,7 @@ class OOBibStyleTest {
             entryDBMap.put(entry, database);
         }
 
-        String empty = null;
+        List<String> empty = null;
         assertEquals("[Beta, 2000; Beta, 2000; Epsilon, 2001]",
                      style.getCitationMarker(entries, entryDBMap, true, null, null, empty));
         assertEquals("[Beta, 2000a,b; Epsilon, 2001]",
@@ -392,7 +392,7 @@ class OOBibStyleTest {
             entryDBMap.put(entry, database);
         }
 
-        String empty = null;
+        List<String> empty = null;
         assertEquals("Beta [2000]; Beta [2000]; Epsilon [2001]",
                      style.getCitationMarker(entries, entryDBMap, false, null, null, empty));
         assertEquals("Beta [2000a,b]; Epsilon [2001]",
@@ -435,7 +435,7 @@ class OOBibStyleTest {
             entryDBMap.put(entry, database);
         }
 
-        String empty = null;
+        List<String> empty = null;
         assertEquals("[Beta, 2000a,b,c]",
                      style.getCitationMarker(entries,
                                              entryDBMap,
@@ -476,7 +476,7 @@ class OOBibStyleTest {
             entryDBMap.put(entry, database);
         }
 
-        String empty = null;
+        List<String> empty = null;
         assertEquals("Beta [2000a,b,c]",
                      style.getCitationMarker(entries,
                                              entryDBMap,
@@ -540,7 +540,7 @@ class OOBibStyleTest {
         database.insertEntry(entry);
         entries.add(entry);
         entryDBMap.put(entry, database);
-        String empty = null;
+        List<String> empty = null;
         assertEquals("von Beta, Epsilon, & Tau, 2016",
                      style.getCitationMarker(entries, entryDBMap, true, null, null, empty));
     }
