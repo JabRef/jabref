@@ -11,6 +11,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.function.ToIntFunction;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -410,77 +411,330 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         }
     }
 
+
     /**
-     * Format a number-based citation marker for the given number.
-     *
-     * @param number The citation numbers.
-     * @param pageInfosForCitations  Null for "none", or a list with
-     *        pageInfo for each citation. These can be null as well.
-     *
-     * @return The text for the citation.
+     *  Make sure that (1) we have exactly one entry for each
+     *  citation, (2) each entry is either null or is not empty when trimmed.
      */
-    public String getNumCitationMarker(List<Integer> number,
-                                       int minGroupingCount,
-                                       boolean inList,
-                                       List<String> pageInfosForCitations) {
-        String bracketBefore = getStringCitProperty(BRACKET_BEFORE);
-        if (inList && (citProperties.containsKey(BRACKET_BEFORE_IN_LIST))) {
-            bracketBefore = getStringCitProperty(BRACKET_BEFORE_IN_LIST);
-        }
-        String bracketAfter = getStringCitProperty(BRACKET_AFTER);
-        if (inList && (citProperties.containsKey(BRACKET_AFTER_IN_LIST))) {
-            bracketAfter = getStringCitProperty(BRACKET_AFTER_IN_LIST);
-        }
-        // Sort the numbers:
-        List<Integer> lNum = new ArrayList<>(number);
-        Collections.sort(lNum);
-        StringBuilder sb = new StringBuilder(bracketBefore);
-        int combineFrom = -1;
-        int written = 0;
-        for (int i = 0; i < lNum.size(); i++) {
-            int i1 = lNum.get(i);
-            if (combineFrom < 0) {
-                // Check if next entry is the next in the ref list:
-                if ((i < (lNum.size() - 1)) && (lNum.get(i + 1) == (i1 + 1)) && (i1 > 0)) {
-                    combineFrom = i1;
-                } else {
-                    // Add single entry:
-                    if (i > 0) {
-                        sb.append(getStringCitProperty(CITATION_SEPARATOR));
-                    }
-                    sb.append(lNum.get(i) > 0
-                              ? String.valueOf(lNum.get(i))
-                              : OOBibStyle.UNDEFINED_CITATION_MARKER);
-                    written++;
-                }
-            } else {
-                // We are building a list of combined entries.
-                // Check if it ends here:
-                if ((i == (lNum.size() - 1)) || (lNum.get(i + 1) != (i1 + 1))) {
-                    if (written > 0) {
-                        sb.append(getStringCitProperty(CITATION_SEPARATOR));
-                    }
-                    if ((minGroupingCount > 0) && (((i1 + 1) - combineFrom) >= minGroupingCount)) {
-                        sb.append(combineFrom);
-                        sb.append(getStringCitProperty(GROUPED_NUMBERS_SEPARATOR));
-                        sb.append(i1);
-                        written++;
+    public List<String> regularizePageInfosForCitations(List<String> pageInfosForCitations,
+                                                        int nCitations) {
+        if ( pageInfosForCitations == null ) {
+            List<String> res = new ArrayList<>( nCitations );
+            for (int i = 0; i < nCitations; i++) {
+                res.add(null);
+            }
+            return res;
+        } else {
+            if ( pageInfosForCitations.size() != nCitations ) {
+                throw new RuntimeException("regularizePageInfosForCitations:"
+                                           + " pageInfosForCitations.size() != nCitations");
+            }
+            List<String> res = new ArrayList<>(nCitations);
+            for (int i = 0; i < nCitations; i++) {
+                String p = pageInfosForCitations.get(i);
+                if ( p != null ) {
+                    String pt = p.trim();
+                    if (pt.equals("")) {
+                        p = null;
                     } else {
-                        // Either we should never group, or there aren't enough
-                        // entries in this case to group. Output all:
-                        for (int jj = combineFrom; jj <= i1; jj++) {
-                            sb.append(jj);
-                            if (jj < i1) {
-                                sb.append(getStringCitProperty(CITATION_SEPARATOR));
-                            }
-                            written++;
-                        }
+                        p = pt;
                     }
-                    combineFrom = -1;
                 }
-                // If it doesn't end here, just keep iterating.
+                res.add(p);
+            }
+            return res;
+        }
+    }
+
+    private class NumberWithPageInfo {
+        int num;
+        String pageInfo;
+        NumberWithPageInfo(int num, String pageInfo) {
+            this.num = num;
+            this.pageInfo = pageInfo;
+        }
+    }
+
+    /*
+     * null comes before non-null
+     */
+    private static int compareNumberWithPageInfo(NumberWithPageInfo a, NumberWithPageInfo b) {
+        int res = Integer.compare(a.num, b.num);
+        if (res == 0) {
+            if (a.pageInfo == null && b.pageInfo == null) {
+                res = 0;
+            } else if (a.pageInfo == null) {
+                res = -1;
+            } else if (b.pageInfo == null) {
+                res = +1;
+            } else {
+                res = a.pageInfo.compareTo(b.pageInfo);
             }
         }
+        return res;
+    }
+
+
+    /**
+     * Format a number-based citation marker for the given number or numbers.
+     *
+     * @param numbers The citation numbers.
+     *
+     *               A zero in the list means: could not look this up
+     *               in the databases. Positive integers are the valid numbers.
+     *
+     * @param minGroupingCount Zero and negative means never group
+     *
+     * @param purpose BIBLIOGRAPHY (was: inList==True) when creating for a bibliography entry,
+     *                CITATION (was: inList=false) when creating in-text citation.
+     *
+     *               If BIBLIOGRAPHY, prefer BRACKET_BEFORE_IN_LIST over BRACKET_BEFORE,
+     *               and BRACKET_AFTER_IN_LIST over BRACKET_AFTER.
+     *
+     *        https://docs.jabref.org/cite/openofficeintegration
+     *
+     *        BracketBeforeInList : The opening bracket for citation
+     *                              numbering in the reference list.
+     *
+     *        BracketAfterInList : The closing bracket for citation
+     *                             numbering in the reference list.
+     *
+     * @param pageInfosForCitations  Null for "none", or a list with a
+     *        pageInfo for each citation. Any or all of these can be null as well.
+     *
+     * @return The text for the citation.
+     *
+     */
+    public String getNumCitationMarker(List<Integer> numbers,
+                                       int minGroupingCount,
+                                       // boolean purpose,
+                                       CitationMarkerPurpose purpose,
+                                       List<String> pageInfosForCitations) {
+
+        final boolean joinIsDisabled = (minGroupingCount <= 0);
+        final int notFoundInDatabases = 0;
+        final int nCitations = numbers.size();
+
+        /**
+         * strictPurpose: if true, expect (nCitations == 1) when purpose==BIBLIOGRAPHY
+         *
+         *
+         */
+        final boolean strictPurpose = false;
+
+        /*
+         * purpose == BIBLIOGRAPHY means: we are formatting for the
+         *                       bibliography, (not for in-text citation).
+         *
+         *
+         */
+        String bracketBefore = getStringCitProperty(BRACKET_BEFORE);
+        String bracketAfter = getStringCitProperty(BRACKET_AFTER);
+
+        if (purpose == CitationMarkerPurpose.BIBLIOGRAPHY) {
+            // prefer BRACKET_BEFORE_IN_LIST and BRACKET_AFTER_IN_LIST
+            if (citProperties.containsKey(BRACKET_BEFORE_IN_LIST)) {
+                bracketBefore = getStringCitProperty(BRACKET_BEFORE_IN_LIST);
+            }
+            if (citProperties.containsKey(BRACKET_AFTER_IN_LIST)) {
+                bracketAfter = getStringCitProperty(BRACKET_AFTER_IN_LIST);
+            }
+
+            if (strictPurpose) {
+                // If (purpose==BIBLIOGRAPHY), then
+                // we expect exactly one number here, and can handle quickly
+                // Yet we get
+                // org.jabref.logic.openoffice.OOBibStyleTest
+                //     Test testGetNumCitationMarker() FAILED          // nCitations = 3
+                //     Test testGetNumCitationMarkerUndefined() FAILED // nCitations = 4
+                //
+                if (nCitations != 1) {
+                    throw new RuntimeException(
+                        "getNumCitationMarker:"
+                        + "nCitations != 1 for purpose==BIBLIOGRAPHY."
+                        + String.format(" nCitations = %d", nCitations));
+                }
+                //
+                StringBuilder sb = new StringBuilder(bracketBefore);
+                final int current = numbers.get(0);
+                if ( current < 0 ) {
+                    throw new RuntimeException("getNumCitationMarker: found negative value");
+                }
+                sb.append(current != notFoundInDatabases
+                          ? String.valueOf(current)
+                          : OOBibStyle.UNDEFINED_CITATION_MARKER);
+                sb.append(bracketAfter);
+                return sb.toString();
+            }
+        }
+
+        /*
+         * From here:
+         *  - formatting for in-text (not for bibliography)
+         *  - need to care about pageInfosForCitations
+         *  - In case strictPurpose allows us to get here, and purpose==BIBLIOGRAPHY,
+         *    then just use a pageInfos filled with null values.
+         */
+        List<String> pageInfos =
+            regularizePageInfosForCitations((purpose==CitationMarkerPurpose.BIBLIOGRAPHY
+                                             ? null
+                                             : pageInfosForCitations),
+                                            numbers.size());
+
+
+        // Sort the numbers, together with the corresponding pageInfo values
+        List<NumberWithPageInfo> nps = new ArrayList<>();
+        for (int i = 0; i < nCitations; i++) {
+            nps.add( new NumberWithPageInfo(numbers.get(i), pageInfos.get(i)) );
+        }
+        Collections.sort(nps, OOBibStyle::compareNumberWithPageInfo );
+
+
+        // "["
+        StringBuilder sb = new StringBuilder(bracketBefore);
+
+        ToIntFunction<List<NumberWithPageInfo>> emitBlock = (List<NumberWithPageInfo> block) -> {
+            // uses:  sb, this,
+
+            final int blockSize = block.size();
+            if (blockSize == 0) {
+                throw new RuntimeException("We should not get here");
+                // return 0;
+            }
+
+            if (blockSize == 1) {
+                // Add single entry:
+                final int num = block.get(0).num;
+                sb.append(num == notFoundInDatabases
+                          ? OOBibStyle.UNDEFINED_CITATION_MARKER
+                          : String.valueOf(num));
+                // TODO: pageInfo here
+                String  pageInfo = block.get(0).pageInfo;
+                if ( pageInfo != null ) {
+                    sb.append(getStringCitProperty(PAGE_INFO_SEPARATOR) + pageInfo);
+                }
+            } else if (blockSize >= 2) {
+                // block has at least 2 elements
+                if (blockSize < 2) {
+                    throw new RuntimeException("impossible: (blockSize < 2)");
+                }
+                // None of these elements has a pageInfo,
+                // because if it had, we would not join.
+                for (NumberWithPageInfo x : block) {
+                    if (x.pageInfo != null) {
+                        throw new RuntimeException("impossible: (x.pageInfo != null)");
+                    }
+                }
+                // None of these elements needs UNDEFINED_CITATION_MARKER,
+                // because if it did, we would not join.
+                for (NumberWithPageInfo x : block) {
+                    if (x.num == notFoundInDatabases) {
+                        throw new RuntimeException("impossible: (x.num == notFoundInDatabases)");
+                    }
+                }
+                // consecutive elements have consecutive numbers
+                for (int j = 1; j < blockSize; j++) {
+                    if (block.get(j).num != (block.get(j - 1).num + 1)) {
+                        throw new RuntimeException("impossible: consecutive elements"
+                                                   + " without consecutive numbers");
+                    }
+                }
+
+                int first = block.get(0).num;
+                int last = block.get(blockSize-1).num;
+                if (((last + 1) - first) >= minGroupingCount) {
+                    // Emit: "first-last"
+                    sb.append(first);
+                    sb.append(getStringCitProperty(GROUPED_NUMBERS_SEPARATOR));
+                    sb.append(last);
+                } else {
+                    // Emit: first,first+1,...,last
+                    for (int j = 0; j < blockSize; j++) {
+                        if (j > 0) {
+                            sb.append(getStringCitProperty(CITATION_SEPARATOR));
+                        }
+                        sb.append(block.get(j).num);
+                    }
+                }
+            }
+            return 1;
+        };
+
+        /*
+         *  Original:
+         *  [2,3,4]   -> [2-4]
+         *  [0,1,2]   -> [??,1,2]
+         *  [0,1,2,3] -> [??,1-3]
+         *
+         *  Now we have to consider: duplicate numbers and pageInfos
+         *  [1,1] -> [1]
+         *  [1,1 "pp nn"] -> keep separate if pageInfo differs
+         *  [1 "pp nn",1 "pp nn"] -> [1 "pp nn"]
+         */
+
+        int blocksEmitted = 0;
+        List<NumberWithPageInfo> currentBlock = new ArrayList<>();
+        List<NumberWithPageInfo> nextBlock = new ArrayList<>();
+
+
+        for (int i = 0; i < nCitations; i++) {
+
+            final NumberWithPageInfo current = nps.get(i);
+            if ( current.num < 0 ) {
+                throw new RuntimeException("getNumCitationMarker: found negative value");
+            }
+
+            if (currentBlock.size() == 0){
+                currentBlock.add(current);
+            } else {
+                NumberWithPageInfo prev = currentBlock.get(currentBlock.size()-1);
+                if ((notFoundInDatabases == current.num)
+                     || (notFoundInDatabases == prev.num)) {
+                    nextBlock.add(current); // do not join if not found
+                } else if (joinIsDisabled) {
+                    nextBlock.add(current); // join disabled
+                } else if ( compareNumberWithPageInfo(current, prev) == 0 ) {
+                    // Same as prev, just forget it.
+                } else if ((current.num == (prev.num + 1))
+                           && (prev.pageInfo == null)
+                           && (current.pageInfo == null)) {
+                    // Just two consecutive numbers without pageInfo: join
+                    currentBlock.add(current);
+                } else {
+                    // do not join
+                    nextBlock.add(current);
+                }
+            }
+
+            if (nextBlock.size() > 0) {
+                // emit current block
+                // We are emitting a block
+                if (blocksEmitted > 0) {
+                    sb.append(getStringCitProperty(CITATION_SEPARATOR));
+                }
+                int emittedNow = emitBlock.applyAsInt(currentBlock);
+                if ( emittedNow > 0 ) {
+                    blocksEmitted += emittedNow;
+                    currentBlock = nextBlock;
+                    nextBlock = new ArrayList<>();
+                }
+            } // blockSize != 0
+
+        } // for i
+
+        if (nextBlock.size() != 0) {
+            throw new RuntimeException("impossible: (nextBlock.size() != 0) after loop");
+        }
+
+        if (currentBlock.size() > 0) {
+            // We are emitting a block
+            if (blocksEmitted > 0) {
+                sb.append(getStringCitProperty(CITATION_SEPARATOR));
+            }
+            emitBlock.applyAsInt(currentBlock);
+        }
+
+        // Emit: "]"
         sb.append(bracketAfter);
         return sb.toString();
     }

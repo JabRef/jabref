@@ -33,6 +33,7 @@ import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.openoffice.CitationEntry;
+import org.jabref.logic.openoffice.CitationMarkerPurpose;
 import org.jabref.logic.openoffice.OOBibStyle;
 import org.jabref.logic.openoffice.OOPreFormatter;
 import org.jabref.logic.openoffice.OOUtil;
@@ -956,7 +957,7 @@ class OOBibBase {
             citMarkers.put(cgid,
                            style.getNumCitationMarker(numbers,
                                                       minGroupingCount,
-                                                      false,
+                                                      CitationMarkerPurpose.CITATION,
                                                       cgs.backend.getPageInfosForCitations(cg)));
         }
 
@@ -986,7 +987,7 @@ class OOBibBase {
             citMarkers.put(cgid,
                            style.getNumCitationMarker(numbers,
                                                       minGroupingCount,
-                                                      false, /* inList */
+                                                      CitationMarkerPurpose.CITATION, /* inList */
                                                       cgs.backend.getPageInfosForCitations(cg)));
         }
         return citMarkers;
@@ -1969,7 +1970,7 @@ class OOBibBase {
                 List<String> pageInfosForCitations = null; // no pageInfo for the bibliography
                 String marker = style.getNumCitationMarker(numbers,
                                                            minGroupingCount,
-                                                           true,
+                                                           CitationMarkerPurpose.BIBLIOGRAPHY, /*inList*/
                                                            pageInfosForCitations);
 
                 OOUtil.insertTextAtCurrentLocation(documentConnection.xText,
