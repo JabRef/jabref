@@ -349,9 +349,12 @@ class Backend52 {
     /**
      * @return A list with one nullable pageInfo entry for each citation in
      *         joinableGroups.
+     *
+     *  TODO: JabRef52 combinePageInfos is not reversible. Should warn
+     *        user to check the result. Or ask what to do.
      */
     static List<String> combinePageInfos(Compat.DataModel dataModel,
-                                         List<CitationGroup> joinableGroup ) {
+                                         List<CitationGroup> joinableGroup) {
         switch (dataModel) {
         case JabRef52:
             // collect to cgPageInfos
@@ -385,7 +388,7 @@ class Backend52 {
     }
 
     /**
-     * 
+     *
      */
     public List<String> combinePageInfos(List<CitationGroup> joinableGroup ) {
         return combinePageInfos(this.dataModel, joinableGroup);

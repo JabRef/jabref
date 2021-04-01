@@ -2466,7 +2466,6 @@ class OOBibBase {
                 // Remove the old citation groups from the document.
                 // We might want to do this via backends.
                 for (int gj = 0; gj < joinableGroup.size(); gj++) {
-                    // documentConnection.removeReferenceMark(referenceMarkNames.get(rk));
                     cgs.removeCitationGroups( joinableGroup, documentConnection );
                 }
 
@@ -2480,18 +2479,18 @@ class OOBibBase {
                     .collect(Collectors.toList());
 
                 // Insert reference mark:
-                insertReferenceMark(
-                    cgs,
-                    documentConnection,
-                    citationKeys,
-                    pageInfosForCitations, // Optional.ofNullable(pageInfo == "" ? null : pageInfo),
-                    itcType, // OOBibBase.AUTHORYEAR_PAR, // itcType
-                    "tmp",
-                    textCursor,
-                    true, // withText
-                    style,
-                    false // insertSpaceAfter: no, it is already there (or could be)
-                    );
+                insertReferenceMark(cgs,
+                                    documentConnection,
+                                    citationKeys,
+                                    pageInfosForCitations,
+                                    itcType, // OOBibBase.AUTHORYEAR_PAR
+                                    "tmp",
+                                    textCursor,
+                                    true, // withText
+                                    style,
+                                    false /* insertSpaceAfter: no, it
+                                           * is already there (or
+                                           * could be) */);
             } // for gi
 
             madeModifications = (joinableGroups.size() > 0);
@@ -2514,13 +2513,10 @@ class OOBibBase {
                 if (useLockControllers) {
                     documentConnection.lockControllers();
                 }
-                applyNewCitationMarkers(
-                    documentConnection,
-                    //x.jabRefReferenceMarkNamesSortedByPosition,
-                    x.cgs,
-                    x.citMarkers,
-                    //x.itcTypes,
-                    style);
+                applyNewCitationMarkers(documentConnection,
+                                        x.cgs,
+                                        x.citMarkers,
+                                        style);
             } finally {
                 if (useLockControllers) {
                     documentConnection.unlockControllers();
@@ -2569,10 +2565,6 @@ class OOBibBase {
             documentConnection.enterUndoContext("Separate citations");
             boolean madeModifications = false;
 
-            // boolean mapFootnotesToFootnoteMarks = true;
-            // List<CitationGroupID> names =
-            // getVisuallySortedCitationGroupIDs(cgs, documentConnection, mapFootnotesToFootnoteMarks);
-            //
             // {@code names} does not need to be sorted.
             List<CitationGroupID> names = new ArrayList<>(cgs.getCitationGroupIDs());
 
@@ -2600,8 +2592,8 @@ class OOBibBase {
                         setCharStyleTested = true;
                     }
 
+                    // Note: JabRef52 returns cg.pageInfo for the last citation.
                     List<String> pageInfosForCitations = cgs.backend.getPageInfosForCitations(cg);
-                    //  Optional<String> oldPageInfo = cg.pageInfo;
 
                     List<Citation> cits=cg.citations;
                     if ( cits.size() <= 1 ) {
@@ -2618,34 +2610,24 @@ class OOBibBase {
 
                     // Insert mark for each key
                     final int last = keys.size() - 1;
-                    //for (String key : keys) {
                     for (int i = 0; i < keys.size(); i++) {
                         // Note: by using insertReferenceMark (and not something
                         //       that accepts List<Citation>, we lose the extra
                         //       info stored in the citations.
                         //       We just reread below.
 
-                        //List<String> citationKeys = new ArrayList<>(Arrays.asList(keys.get(i)));
-                        // List<String> pageInfos    = new ArrayList<>(
-                        //    Arrays.asList(pageInfosForCitations.get(i)));
-
-                        // citationKeys.add(keys.get(i));
-                        // pageInfos.add(pageInfosForCitations.get(i));
-
                         boolean insertSpaceAfter = (i != last);
-                        insertReferenceMark(
-                            cgs,
-                            documentConnection,
-                            keys.subList(i,i+1), //citationKeys,
-                            pageInfosForCitations.subList(i,i+1), //pageInfos,
-                            OOBibBase.AUTHORYEAR_PAR, // itcType,
-                            //newName,
-                            "tmp",
-                            textCursor,
-                            true, /* withText. Should be itcType != OOBibBase.INVISIBLE_CIT */
-                            style,
-                            insertSpaceAfter
-                            );
+                        insertReferenceMark(cgs,
+                                            documentConnection,
+                                            keys.subList(i,i+1), //citationKeys,
+                                            pageInfosForCitations.subList(i,i+1), //pageInfos,
+                                            OOBibBase.AUTHORYEAR_PAR, // itcType,
+                                            "tmp",
+                                            textCursor,
+                                            true, /* withText.
+                                                   * Should be itcType != OOBibBase.INVISIBLE_CIT */
+                                            style,
+                                            insertSpaceAfter);
                         textCursor.collapseToEnd();
                     }
 

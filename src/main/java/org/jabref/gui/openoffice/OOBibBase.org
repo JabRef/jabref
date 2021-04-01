@@ -14,6 +14,41 @@
    I am hoping to localize which parts of the code depends on
    dataModel.
 
+   - collecting dataModel-dependent parts to Backend52.java
+   - pageInfo handling needs change in OOBibStyle,
+     added parameter: List<String> pageInfosForCitations
+
+** Merge/Separate citations
+
+   For JabRef52 dataModel
+
+   - unCombineCiteMarkers uses
+     cgs.backend.getPageInfosForCitations(cg); which returns
+     CitationGroup.pageInfo for the last Citation.
+     - This mimics how it was presented in JabRef 5.2.
+
+   - combineCiteMarkers uses
+     cgs.backend.combinePageInfos(joinableGroup); which collects
+     pageInfos into a single String.
+
+   - Consequence: Merge then Separate moves all pageInfos
+     to the last CitationGroup: "(Au 2000; p 10) (Bu 2001)"
+     can become "(Au 2000) (Bu 2001; p 10)" which is wrong.
+
+   - We should notify the user to check the result.
+     - When?
+       - combineCiteMarkers loses original location
+       - unCombineCiteMarkers attributes pageInfo to the last citation
+
+** NotifyUser
+
+   - info, warning related to one or more citation groups (XTextRange)
+     or citations (not necessarily separable part of an XTextRange)
+
+     - add Comment ?
+     - dialog with links ?
+     - another document with links ?
+
 ** Bug: two-column numbering                              :orderOfAppearance:
 
 Citations are numbered in top-down left-to-right order even in
