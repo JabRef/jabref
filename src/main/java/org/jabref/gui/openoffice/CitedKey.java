@@ -67,6 +67,16 @@ class CitedKey implements CitationSort.ComparableCitation {
                 : Optional.empty());
     }
 
+    /** No pageInfo is needed for sorting the bibliography,
+     *  getPageInfoOrNull always returns null. Only exists to implement ComparableCitation.
+     *
+     *  @return null
+     */
+    @Override
+    public String getPageInfoOrNull(){
+        return null;
+    }
+
     /**
      * Appends to end of {@code where}
      */

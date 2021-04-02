@@ -74,6 +74,11 @@ class Citation  implements CitationSort.ComparableCitation {
     }
 
     @Override
+    public String getPageInfoOrNull(){
+        return pageInfo.orElse(null);
+    }
+
+    @Override
     public Optional<BibEntry> getBibEntry(){
         return (db.isPresent()
                 ? Optional.of(db.get().entry)

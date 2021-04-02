@@ -94,6 +94,7 @@ class CitationGroup {
     class CitationAndIndex implements CitationSort.ComparableCitation {
         Citation c;
         int i;
+
         CitationAndIndex(Citation c, int i) {
             this.c = c;
             this.i = i;
@@ -107,6 +108,11 @@ class CitationGroup {
         @Override
         public Optional<BibEntry> getBibEntry(){
             return c.getBibEntry();
+        }
+
+        @Override
+        public String getPageInfoOrNull(){
+            return c.pageInfo.orElse(null);
         }
     }
 

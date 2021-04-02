@@ -4,12 +4,14 @@ import java.util.Comparator;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.logic.openoffice.OOBibStyle;
 
 class CitationSort {
 
     interface ComparableCitation {
         public String getCitationKey();
         public Optional<BibEntry> getBibEntry();
+        public String getPageInfoOrNull();
     }
 
     static class CitationComparator implements Comparator<ComparableCitation> {
@@ -43,8 +45,13 @@ class CitationSort {
                 return mul;
             }
             // Proper comparison of entries
-            return entryComparator.compare(abe.get(),
-                                           bbe.get());
+            int res = entryComparator.compare(abe.get(),
+                                              bbe.get());
+            // Also consider pageInfo
+            if (res == 0) {
+                OOBibStyle.comparePageInfo( a.getPageInfoOrNull(), b.getPageInfoOrNull() );
+            }
+            return res;
         }
     }
 
