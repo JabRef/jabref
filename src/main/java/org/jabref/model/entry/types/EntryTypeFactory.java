@@ -59,7 +59,7 @@ public class EntryTypeFactory {
      * @return first match or {@code new UnknownEntryType(typeName)}
      */
     public static EntryType parse(String typeName) {
-        final String lcTypeName = typeName.toLowerCase(Locale.ENGLISH)
+        final String lcTypeName = typeName.toLowerCase(Locale.ENGLISH);
 
         List<EntryType> types = new ArrayList<>(Arrays.<EntryType>asList(StandardEntryType.values()));
 
