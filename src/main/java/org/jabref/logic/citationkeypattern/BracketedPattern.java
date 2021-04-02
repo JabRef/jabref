@@ -38,10 +38,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The BracketedExpressionExpander provides methods to expand bracketed expressions, such as
- * [year]_[author]_[firstpage], using information from a provided BibEntry. The above-mentioned expression would yield
- * 2017_Kitsune_123 when expanded using the BibTeX entry "@Article{ authors = {O. Kitsune}, year = {2017},
- * pages={123-6}}".
+ * The BracketedExpressionExpander provides methods to expand
+ * bracketed expressions, such as [year]_[author]_[firstpage], using
+ * information from a provided BibEntry.
+ *
+ * The above-mentioned expression would yield
+ * "2017_Kitsune_123" when expanded using the BibTeX entry
+ * "@Article{ authors = {O. Kitsune}, year = {2017}, pages={123-6}}".
  */
 public class BracketedPattern {
     private static final Logger LOGGER = LoggerFactory.getLogger(BracketedPattern.class);
@@ -50,24 +53,49 @@ public class BracketedPattern {
      * The maximum number of characters in the first author's last name.
      */
     private static final int CHARS_OF_FIRST = 5;
+
     /**
-     * The maximum number of name abbreviations that can be used. If there are more authors, {@code MAX_ALPHA_AUTHORS -
-     * 1} name abbreviations will be displayed, and a + sign will be appended at the end.
+     * The maximum number of name abbreviations that can be used.
+     *
+     * If there are more authors, {@code MAX_ALPHA_AUTHORS - 1} name
+     * abbreviations will be displayed, and a + sign will be appended
+     * at the end.
      */
     private static final int MAX_ALPHA_AUTHORS = 4;
 
     /**
-     * Matches everything that is not an uppercase ASCII letter. The intended use is to remove all lowercase letters
+     * Matches everything that is not an uppercase ASCII letter.
+     *
+     * The intended use is to remove all lowercase letters.
      */
     private static final Pattern NOT_CAPITAL_CHARACTER = Pattern.compile("[^A-Z]");
+
     /**
-     * Matches uppercase english letters between "({" and "})", which should be used to abbreviate the name of an institution
+     * Matches uppercase english letters between "({" and "})",
+     * which should be used to abbreviate the name of an institution
      */
     private static final Pattern INLINE_ABBREVIATION = Pattern.compile("(?<=\\(\\{)[A-Z]+(?=}\\))");
+
     /**
      * Matches with "dep"/"dip", case insensitive
+     *
+     * - "^dep.*" presumably attempts to catch "Department", "Dept.",
+     *            and at least 647 other english words starting with "dep"
+     *            https://www.thefreedictionary.com/words-that-start-with-dep
+     *
+     * - "^dip.*" Assumed to catch what?
+     *            https://www.thefreedictionary.com/words-that-start-with-dip : 538 words,
+     *            including "diplomatic".
+     *            Is this targeted for english, or some another language?
+     *
+     *   These patterns probably should not be baked in. Is there a
+     *   way for the user to override, replace,  extend?
+     *
+     *   https://www.theverge.com/2020/8/6/21355674/human-genes-rename-microsoft-excel-misreading-dates
+     *
      */
     private static final Pattern DEPARTMENTS = Pattern.compile("^d[ei]p.*", Pattern.CASE_INSENSITIVE);
+
     private static final Pattern WHITESPACE = Pattern.compile("\\p{javaWhitespace}");
 
     private enum Institution {
@@ -77,13 +105,26 @@ public class BracketedPattern {
         TECHNOLOGY;
 
         /**
-         * Matches "uni" followed by "v" or "b", at the start of a string or after a space, case insensitive
+         * Matches "uni" followed by "v" or "b", at the start of a
+         * string or after a space, case insensitive
+         *
+         * - "^univ.*" as in "university". But also matches "universal".
+         * - "^unib.*" https://www.thefreedictionary.com/words-that-start-with-unib suggests only "unibody".
+         *
+         *             Presumably not english. Shall we include
+         *             "^sveu.*" for "Sveučilište", "^egy.*" for
+         *             "Egyetem", "^mbo.*" for "Mbo'ehaovusu",
+         *             "^iniv.*" for "Inivèsite", "^Унив.*" for
+         *             "Университет", "^უნი.*" for "უნივერსიტეტი" etc?
+         *
          */
         private static final Pattern UNIVERSITIES = Pattern.compile("^uni(v|b|$).*", Pattern.CASE_INSENSITIVE);
+
         /**
          * Matches with "tech", case insensitive
          */
         private static final Pattern TECHNOLOGICAL_INSTITUTES = Pattern.compile("^tech.*", Pattern.CASE_INSENSITIVE);
+
         /**
          * Matches with "dep"/"dip"/"lab", case insensitive
          */
@@ -138,7 +179,8 @@ public class BracketedPattern {
     }
 
     /**
-     * Expands the current pattern using the given bibentry and database. ";" is used as keyword delimiter.
+     * Expands the current pattern using the given bibentry and
+     * database. ";" is used as keyword delimiter.
      *
      * @param bibentry The bibentry to expand.
      * @param database The database to use for string-lookups and cross-refs. May be null.
@@ -206,8 +248,11 @@ public class BracketedPattern {
      * Expands a pattern.
      *
      * @param pattern               The pattern to expand
-     * @param bracketContentHandler A function taking the string representation of the content of a bracketed pattern
-     *                              and expanding it
+     *
+     * @param bracketContentHandler A function taking the string
+     *                              representation of the content of a
+     *                              bracketed pattern and expanding it
+     *
      * @return The expanded pattern. Not null.
      */
     public static String expandBrackets(String pattern, Function<String, String> bracketContentHandler) {
@@ -514,12 +559,17 @@ public class BracketedPattern {
      * Checks if an author is an institution which can get a citation key from {@link #generateInstitutionKey(String)}.
      *
      * @param author the checked author
-     * @return true if only the last name is present and it contains at least one whitespace character.
+     *
+     * @return true if only the last name is present and it contains
+     *              at least one whitespace character.
      */
     private static boolean isInstitution(Author author) {
-        return author.getFirst().isEmpty() && author.getFirstAbbr().isEmpty() && author.getJr().isEmpty()
-                && author.getVon().isEmpty() && author.getLast().isPresent()
-                && WHITESPACE.matcher(author.getLast().get()).find();
+        return (author.getFirst().isEmpty()
+                && author.getFirstAbbr().isEmpty()
+                && author.getJr().isEmpty()
+                && author.getVon().isEmpty()
+                && author.getLast().isPresent()
+                && WHITESPACE.matcher(author.getLast().get()).find());
     }
 
     /**
@@ -1074,7 +1124,8 @@ public class BracketedPattern {
     }
 
     /**
-     * Parse a field marker with modifiers, possibly containing a parenthesised modifier, as well as escaped colons and
+     * Parse a field marker with modifiers, possibly containing a
+     * parenthesised modifier, as well as escaped colons and
      * parentheses.
      *
      * @param arg The argument string.
@@ -1116,43 +1167,67 @@ public class BracketedPattern {
 
     /**
      * <p>
-     * An author or editor may be and institution not a person. In that case the key generator builds very long keys,
-     * e.g.: for &ldquo;The Attributed Graph Grammar System (AGG)&rdquo; -> &ldquo;TheAttributedGraphGrammarSystemAGG&rdquo;.
+     * An author or editor may be and institution not a person.
+     * In that case the key generator builds very long keys,
+     * e.g.: for &ldquo;The Attributed Graph Grammar System (AGG)&rdquo;
+     *        -> &ldquo;TheAttributedGraphGrammarSystemAGG&rdquo;.
      * </p>
      *
      * <p>
-     * An institution name should be inside <code>{}</code> brackets. If the institution name includes its abbreviation
-     * this abbreviation should be in <code>{}</code> brackets. For the previous example the value should look like:
+     * An institution name should be inside <code>{}</code> brackets.
+     *
+     * If the institution name includes its abbreviation
+     * this abbreviation should be in <code>{}</code> brackets.
+     * For the previous example the value should look like:
      * <code>{The Attributed Graph Grammar System ({AGG})}</code>.
      * </p>
      *
      * <p>
-     * If an institution includes its abbreviation, i.e. "...({XYZ})", first such abbreviation should be used as the key
+     * If an institution includes its abbreviation, i.e. "...({XYZ})",
+     * first such abbreviation should be used as the key
      * value part of such author.
      * </p>
      *
      * <p>
-     * If an institution does not include its abbreviation the key should be generated from its name in the following
-     * way:
+     * If an institution does not include its abbreviation
+     * the key should be generated from its name in the following way:
      * </p>
      *
      * <p>
-     * The institution value can contain: institution name, part of the institution, address, etc. These values should
-     * be comma separated. Institution name and possible part of the institution should be in the beginning, while
-     * address and secondary information should be in the end.
+     * The institution value can contain:
+     * institution name, part of the institution, address, etc.
+     *
+     * These values should be comma separated.
+     *
+     * Institution name and possible part of the institution should be
+     * in the beginning, while address and secondary information
+     * should be in the end.
+     *
      * </p>
      * <p>
      * Each part is examined separately:
      * <ol>
-     * <li>We remove all tokens of a part which are one of the defined ignore words (the, press), which end with a dot
-     * (ltd., co., ...) and which first character is lowercase (of, on, di, ...).</li>
-     * <li>We detect the types of the part: university, technology institute,
-     * department, school, rest
+     * <li> We remove all tokens of a part
+     *       which are one of the defined ignore words (the, press),
+     *       which end with a dot (ltd., co., ...) and
+     *       which first character is lowercase (of, on, di, ...).
+     * </li>
+     * <li>We detect the types of the part:
+     *     university,
+     *     technology institute,
+     *     department,
+     *     school,
+     *     rest
      * <ul>
-     * <li>University: <code>"Uni[NameOfTheUniversity]"</code></li>
-     * <li>Department: If the institution value contains more than one comma separated part, the department will be an
-     * abbreviation of all words beginning with the uppercase letter except of words:
-     * <code>d[ei]p.*</code>, school, faculty</li>
+     *    <li>University: <code>"Uni[NameOfTheUniversity]"</code></li>
+     *    <li>Department:
+     *
+     *          If the institution value contains more than one comma separated part,
+     *          the department will be an abbreviation of
+     *          all words beginning with the uppercase letter except of words:
+     *          <code>d[ei]p.*</code>, school, faculty
+     *    </li>
+     *
      * <li>School: same as department</li>
      * <li>Rest: If there are less than 3 tokens in such part than the result
      * is a concatenation of those tokens. Otherwise, the result will be built
