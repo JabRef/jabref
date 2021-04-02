@@ -9,10 +9,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.function.ToIntFunction;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.function.ToIntFunction;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.layout.Layout;
@@ -412,28 +411,27 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         }
     }
 
-
     /**
      *  Make sure that (1) we have exactly one entry for each
      *  citation, (2) each entry is either null or is not empty when trimmed.
      */
     public List<String> regularizePageInfosForCitations(List<String> pageInfosForCitations,
                                                         int nCitations) {
-        if ( pageInfosForCitations == null ) {
-            List<String> res = new ArrayList<>( nCitations );
+        if (pageInfosForCitations == null) {
+            List<String> res = new ArrayList<>(nCitations);
             for (int i = 0; i < nCitations; i++) {
                 res.add(null);
             }
             return res;
         } else {
-            if ( pageInfosForCitations.size() != nCitations ) {
+            if (pageInfosForCitations.size() != nCitations) {
                 throw new RuntimeException("regularizePageInfosForCitations:"
                                            + " pageInfosForCitations.size() != nCitations");
             }
             List<String> res = new ArrayList<>(nCitations);
             for (int i = 0; i < nCitations; i++) {
                 String p = pageInfosForCitations.get(i);
-                if ( p != null ) {
+                if (p != null) {
                     String pt = p.trim();
                     if (pt.equals("")) {
                         p = null;
@@ -447,7 +445,11 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         }
     }
 
-    private class NumberWithPageInfo {
+    /*
+     * Helper class for sorting citation numbers while
+     * maintaining their correspondance to pageInfos.
+     */
+    private static class NumberWithPageInfo {
         int num;
         String pageInfo;
         NumberWithPageInfo(int num, String pageInfo) {
@@ -456,7 +458,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         }
     }
 
-    /*
+    /**
+     * Defines sort order for NumberWithPageInfo entries.
+     *
      * null comes before non-null
      */
     private static int compareNumberWithPageInfo(NumberWithPageInfo a, NumberWithPageInfo b) {
@@ -493,15 +497,15 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      *  To support for example numbers in superscript without brackets for the text,
      *  but "[1]" form for the bibliogaphy, the style can provide
      *  the optional "BracketBeforeInList" and "BracketAfterInList" strings
-     *  to be used here in stead of "BracketBefore" and "BracketAfter"
+     *  to be used in the bibliography instead of "BracketBefore" and "BracketAfter"
      *
      *  @return "[${number}]" where
      *       "[" stands for BRACKET_BEFORE_IN_LIST (with fallback BRACKET_BEFORE)
      *       "]" stands for BRACKET_AFTER_IN_LIST (with fallback BRACKET_AFTER)
-     *       "${number}" stands for number formatted.
+     *       "${number}" stands for the formatted number.
      */
     public String getNumCitationMarkerForBibliography(int number) {
-        return getNumCitationMarkerCommon(Arrays.asList(number),
+        return getNumCitationMarkerCommon(Collections.singletonList(number),
                                           0,
                                           CitationMarkerPurpose.BIBLIOGRAPHY,
                                           null);
@@ -528,6 +532,17 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      *               A zero in the list means: could not look this up
      *               in the databases. Positive integers are the valid numbers.
      *
+     *               Duplicate citation numbers are allowed:
+     *
+     *                 - If their pageInfos are identical, only a
+     *                   single instance is emitted.
+     *
+     *                 - If their pageInfos differ, the number is emitted with each
+     *                    distinct pageInfo.
+     *
+     *                    For pageInfo null and "" (after
+     *                    pageInfo.trim()) are considered equal (and missing).
+     *
      * @param minGroupingCount Zero and negative means never group
      *
      * @param purpose BIBLIOGRAPHY (was: inList==True) when creating for a bibliography entry,
@@ -552,22 +567,20 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         final int notFoundInDatabases = 0;
         final int nCitations = numbers.size();
 
-        /**
-         * strictPurpose: if true, expect (nCitations == 1) when purpose==BIBLIOGRAPHY
-         *
-         *
+        /*
+         * strictPurpose: if true, require (nCitations == 1) when (purpose == BIBLIOGRAPHY),
+         *                otherwise allow multiple citation numbers and process the BIBLIOGRAPHY case
+         *                as CITATION with no pageInfo.
          */
         final boolean strictPurpose = true;
+
+        String bracketBefore = getStringCitProperty(BRACKET_BEFORE);
+        String bracketAfter = getStringCitProperty(BRACKET_AFTER);
 
         /*
          * purpose == BIBLIOGRAPHY means: we are formatting for the
          *                       bibliography, (not for in-text citation).
-         *
-         *
          */
-        String bracketBefore = getStringCitProperty(BRACKET_BEFORE);
-        String bracketAfter = getStringCitProperty(BRACKET_AFTER);
-
         if (purpose == CitationMarkerPurpose.BIBLIOGRAPHY) {
             // prefer BRACKET_BEFORE_IN_LIST and BRACKET_AFTER_IN_LIST
             if (citProperties.containsKey(BRACKET_BEFORE_IN_LIST)) {
@@ -580,11 +593,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
             if (strictPurpose) {
                 // If (purpose==BIBLIOGRAPHY), then
                 // we expect exactly one number here, and can handle quickly
-                // Yet we get
-                // org.jabref.logic.openoffice.OOBibStyleTest
-                //     Test testGetNumCitationMarker() FAILED          // nCitations = 3
-                //     Test testGetNumCitationMarkerUndefined() FAILED // nCitations = 4
-                //
                 if (nCitations != 1) {
                     throw new RuntimeException(
                         "getNumCitationMarker:"
@@ -594,7 +602,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
                 //
                 StringBuilder sb = new StringBuilder(bracketBefore);
                 final int current = numbers.get(0);
-                if ( current < 0 ) {
+                if (current < 0) {
                     throw new RuntimeException("getNumCitationMarker: found negative value");
                 }
                 sb.append(current != notFoundInDatabases
@@ -609,27 +617,60 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
          * From here:
          *  - formatting for in-text (not for bibliography)
          *  - need to care about pageInfosForCitations
-         *  - In case strictPurpose allows us to get here, and purpose==BIBLIOGRAPHY,
-         *    then just use a pageInfos filled with null values.
+         *
+         *  - In case {@code strictPurpose} above is set to false and allows us to
+         *    get here, and {@code purpose==BIBLIOGRAPHY}, then we just fill
+         *    pageInfos with null values.
          */
         List<String> pageInfos =
-            regularizePageInfosForCitations((purpose==CitationMarkerPurpose.BIBLIOGRAPHY
+            regularizePageInfosForCitations((purpose == CitationMarkerPurpose.BIBLIOGRAPHY
                                              ? null
                                              : pageInfosForCitations),
                                             numbers.size());
 
-
         // Sort the numbers, together with the corresponding pageInfo values
         List<NumberWithPageInfo> nps = new ArrayList<>();
         for (int i = 0; i < nCitations; i++) {
-            nps.add( new NumberWithPageInfo(numbers.get(i), pageInfos.get(i)) );
+            nps.add(new NumberWithPageInfo(numbers.get(i), pageInfos.get(i)));
         }
-        Collections.sort(nps, OOBibStyle::compareNumberWithPageInfo );
-
+        Collections.sort(nps, OOBibStyle::compareNumberWithPageInfo);
 
         // "["
         StringBuilder sb = new StringBuilder(bracketBefore);
 
+        /*
+         * int emitBlock(List<NumberWithPageInfo> block)
+         *
+         * Given a block containing 1 or (two or more)
+         * NumberWithPageInfo entries collected as singletons or
+         * joinable into an "i-j" form, append to {@code sb} the
+         * formatted text.
+         *
+         * Assumes:
+         *
+         * - block is not empty
+         *
+         * - For a block with a single element the element may have
+         *    pageInfo and its num part may be zero
+         *    (notFoundInDatabases).
+         *
+         * - For a block with two or more elements
+         *
+         *   - The elements do not have pageInfo and their num part is
+         *     not zero.
+         *
+         *   - The elements num parts are consecutive positive integers,
+         *     without repetition.
+         *
+         * Note: this function is long enough to move into a separate method.
+         *       On the other hand, its assumptions strongly tie it to
+         *       the loop below that collects the block.
+         *
+         * @return The number of blocks emitted. Since currently
+         *         throws if the block is empty, the returned value is
+         *         always 1.
+         *
+         */
         ToIntFunction<List<NumberWithPageInfo>> emitBlock = (List<NumberWithPageInfo> block) -> {
             // uses:  sb, this,
 
@@ -645,12 +686,17 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
                 sb.append(num == notFoundInDatabases
                           ? OOBibStyle.UNDEFINED_CITATION_MARKER
                           : String.valueOf(num));
-                // TODO: pageInfo here
-                String  pageInfo = block.get(0).pageInfo;
-                if ( pageInfo != null ) {
+                // Emit pageInfo
+                String pageInfo = block.get(0).pageInfo;
+                if (pageInfo != null) {
                     sb.append(getStringCitProperty(PAGE_INFO_SEPARATOR) + pageInfo);
                 }
-            } else if (blockSize >= 2) {
+            } else {
+
+                /*
+                 * Check assumptions
+                 */
+
                 // block has at least 2 elements
                 if (blockSize < 2) {
                     throw new RuntimeException("impossible: (blockSize < 2)");
@@ -677,9 +723,16 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
                     }
                 }
 
-                int first = block.get(0).num;
-                int last = block.get(blockSize-1).num;
-                if (((last + 1) - first) >= minGroupingCount) {
+                /*
+                 * Do the actual work
+                 */
+                if (blockSize >= minGroupingCount) {
+                    int first = block.get(0).num;
+                    int last = block.get(blockSize - 1).num;
+                    if (((last + 1) - first) != blockSize) {
+                        throw new RuntimeException("impossible:"
+                                                   + " blockSize and length of num range differ");
+                    }
                     // Emit: "first-last"
                     sb.append(first);
                     sb.append(getStringCitProperty(GROUPED_NUMBERS_SEPARATOR));
@@ -713,24 +766,23 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         List<NumberWithPageInfo> currentBlock = new ArrayList<>();
         List<NumberWithPageInfo> nextBlock = new ArrayList<>();
 
-
         for (int i = 0; i < nCitations; i++) {
 
             final NumberWithPageInfo current = nps.get(i);
-            if ( current.num < 0 ) {
+            if (current.num < 0) {
                 throw new RuntimeException("getNumCitationMarker: found negative value");
             }
 
-            if (currentBlock.size() == 0){
+            if (currentBlock.size() == 0) {
                 currentBlock.add(current);
             } else {
-                NumberWithPageInfo prev = currentBlock.get(currentBlock.size()-1);
+                NumberWithPageInfo prev = currentBlock.get(currentBlock.size() - 1);
                 if ((notFoundInDatabases == current.num)
                      || (notFoundInDatabases == prev.num)) {
                     nextBlock.add(current); // do not join if not found
                 } else if (joinIsDisabled) {
                     nextBlock.add(current); // join disabled
-                } else if ( compareNumberWithPageInfo(current, prev) == 0 ) {
+                } else if (compareNumberWithPageInfo(current, prev) == 0) {
                     // Same as prev, just forget it.
                 } else if ((current.num == (prev.num + 1))
                            && (prev.pageInfo == null)
@@ -750,7 +802,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
                     sb.append(getStringCitProperty(CITATION_SEPARATOR));
                 }
                 int emittedNow = emitBlock.applyAsInt(currentBlock);
-                if ( emittedNow > 0 ) {
+                if (emittedNow > 0) {
                     blocksEmitted += emittedNow;
                     currentBlock = nextBlock;
                     nextBlock = new ArrayList<>();
@@ -1089,9 +1141,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * Take a finished citation and insert a string at the end (but
      * inside the end bracket) separated by "PageInfoSeparator"
      *
-     * @param citation
-     * @param pageInfo
-     * @return
+     * @param citation A formatted citation probably ending with BRACKET_AFTER.
+     * @param pageInfo Text to be inserted.
+     * @return The modified citation.
      */
     public String insertPageInfo(String citation, String pageInfo) {
         String bracketAfter = getStringCitProperty(BRACKET_AFTER);
@@ -1227,7 +1279,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     public int hashCode() {
         return Objects.hash(path, name, citProperties, properties);
     }
-
 
     /**
      * @param maxAuthors The maximum number of authors to write out in
