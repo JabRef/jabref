@@ -9,7 +9,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 /**
- * Helper class to get a Layout object.
+ * Helper class to get a Layout object from a text source.
  *
  * <pre>
  * <code>
@@ -47,9 +47,11 @@ public class LayoutHelper {
         parse();
 
         for (StringInt parsedEntry : parsedEntries) {
-            if ((parsedEntry.i == LayoutHelper.IS_SIMPLE_COMMAND) || (parsedEntry.i == LayoutHelper.IS_FIELD_START)
-                    || (parsedEntry.i == LayoutHelper.IS_FIELD_END) || (parsedEntry.i == LayoutHelper.IS_GROUP_START)
-                    || (parsedEntry.i == LayoutHelper.IS_GROUP_END)) {
+            if ((parsedEntry.i == LayoutHelper.IS_SIMPLE_COMMAND)
+                || (parsedEntry.i == LayoutHelper.IS_FIELD_START)
+                || (parsedEntry.i == LayoutHelper.IS_FIELD_END)
+                || (parsedEntry.i == LayoutHelper.IS_GROUP_START)
+                || (parsedEntry.i == LayoutHelper.IS_GROUP_END)) {
                 parsedEntry.s = parsedEntry.s.trim().toLowerCase(Locale.ROOT);
             }
         }
@@ -61,6 +63,9 @@ public class LayoutHelper {
         return LayoutHelper.currentGroup;
     }
 
+    /**
+     *  Only called from LayoutEntry.handleFieldOrGroupStart()
+     */
     public static void setCurrentGroup(String newGroup) {
         LayoutHelper.currentGroup = newGroup;
     }
@@ -129,7 +134,10 @@ public class LayoutHelper {
 
                 return;
             }
-            if (!inQuotes && ((c == ']') || (c == '[') || (doneWithOptions && ((c == '{') || (c == '}'))))) {
+            if (!inQuotes
+                && ((c == ']') || (c == '[')
+                    || (doneWithOptions && ((c == '{') || (c == '}'))))) {
+
                 if ((c == ']') || (doneWithOptions && (c == '}'))) {
                     // changed section start - arudert
                     // buffer may be null for parameters
@@ -142,9 +150,10 @@ public class LayoutHelper {
                     } else if (c == '}') {
                         // changed section begin - arudert
                         // bracketed option must be followed by an (optionally empty) parameter
-                        // if empty, the parameter is set to " " (whitespace to avoid that the tokenizer that
-                        // splits the string later on ignores the empty parameter)
-                        String parameter = buffer == null ? " " : buffer.toString();
+                        // if empty, the parameter is set to " " (whitespace to avoid
+                        //        that the tokenizer that splits the string later on
+                        //        ignores the empty parameter)
+                        String parameter = (buffer == null) ? " " : buffer.toString();
                         if (option == null) {
                             tmp = parameter;
                         } else {
@@ -177,7 +186,7 @@ public class LayoutHelper {
                 if (start) {
 
                     // changed section begin - arudert
-                    // keep the backslash so we know wether this is a fieldname or an ordinary parameter
+                    // keep the backslash so we know whether this is a fieldname or an ordinary parameter
                     // if (c != '\\') {
                     buffer.append((char) c);
                     // }
@@ -259,7 +268,8 @@ public class LayoutHelper {
                         lastFive.append(entry.s);
                     }
                     throw new StringIndexOutOfBoundsException(
-                            "Backslash parsing error near \'" + lastFive.toString().replace("\n", " ") + '\'');
+                            "Backslash parsing error near "
+                            + "\'" + lastFive.toString().replace("\n", " ") + '\'');
                 }
 
                 if ("begin".equalsIgnoreCase(name)) {
