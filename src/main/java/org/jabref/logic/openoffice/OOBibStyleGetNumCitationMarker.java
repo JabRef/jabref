@@ -62,15 +62,7 @@ class OOBibStyleGetNumCitationMarker {
     private static int compareNumberWithPageInfo(NumberWithPageInfo a, NumberWithPageInfo b) {
         int res = Integer.compare(a.num, b.num);
         if (res == 0) {
-            if (a.pageInfo == null && b.pageInfo == null) {
-                res = 0;
-            } else if (a.pageInfo == null) {
-                res = -1;
-            } else if (b.pageInfo == null) {
-                res = +1;
-            } else {
-                res = a.pageInfo.compareTo(b.pageInfo);
-            }
+            res = OOBibStyle.comparePageInfo( a.pageInfo, b.pageInfo );
         }
         return res;
     }

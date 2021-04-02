@@ -42,8 +42,51 @@ import org.slf4j.LoggerFactory;
 
 class OOBibStyleGetCitationMarker {
 
-    
+    /**
+     * Modify entry and uniquefier arrays to facilitate a grouped
+     * presentation of uniquefied entries.
+     *
+     * entries[ (from+1 .. to) ]  = null
+     * uniquefiers[from] = String.join( separator, uniquefiers.subList(from,to_inclusive) )
+     *
+     * @param entries     The entry array.
+     * @param uniquefiers The uniquefier array.
+     * @param from        The first index to group (inclusive)
+     * @param to          The last index to group (inclusive)
+     */
+    private static void group(OOBibStyle style,
+                              List<BibEntry> entries,
+                              String[] uniquefiers,
+                              int from,
+                              int to) {
 
+        String separator = style.getStringCitProperty(OOBibStyle.UNIQUEFIER_SEPARATOR);
+
+        StringBuilder sb = new StringBuilder(uniquefiers[from]);
+        for (int i = from + 1; i <= to; i++) {
+            sb.append(separator);
+            sb.append(uniquefiers[i]);
+            entries.set(i, null); // kill BibEntry?
+        }
+        uniquefiers[from] = sb.toString();
+    }
+
+
+    /**
+     * @param entries
+     * @param database
+     * @param inParenthesis Emit "(Au, 2000)" if true, "Au (2000)" if false.
+     * @param uniquefiers null or of length entries.size(), with
+     *                    elements null or letter making a cited
+     *                    source unique in citations.
+     *
+     * @param unlimAuthors Can this be null?
+     *                     If not null, then its elements are ...
+     *
+     * @param pageInfosForCitations
+     *                    May be null.
+     *                    Any or of its elements can be null.
+     */
     public static String getCitationMarker(OOBibStyle style,
                                            List<BibEntry> entries,
                                            Map<BibEntry, BibDatabase> database,
@@ -52,11 +95,33 @@ class OOBibStyleGetCitationMarker {
                                            int[] unlimAuthors,
                                            List<String> pageInfosForCitations
         ) {
+
+        List<String> pageInfos =
+            OOBibStyle.regularizePageInfosForCitations(pageInfosForCitations,
+                                                       entries.size());
+        // Original:
+        //
         // Look for groups of uniquefied entries that should be combined in the output.
         // E.g. (Olsen, 2005a, b) should be output instead of (Olsen, 2005a; Olsen, 2005b).
+        //
+        // Now:
+        // - handle pageInfos
+        // - allow duplicate entries with same or different pageInfos.
+        //
+        // We assume entries are already sorted, all we need is to
+        // group consecutive entries if we can.
+        //
+        // TODO: imposeLocalOrder should consider pageInfos, to make
+        //       sure multiple citations of the same entry with the same pageInfos
+        //
+        //
+        //
         int piv = -1;
+
         String tmpMarker = null;
+
         if (uniquefiers != null) {
+
             for (int i = 0; i < uniquefiers.length; i++) {
 
                 if ((uniquefiers[i] == null) || uniquefiers[i].isEmpty()) {
@@ -116,7 +181,7 @@ class OOBibStyleGetCitationMarker {
                 // Do the grouping:
                 group(style, entries, uniquefiers, piv, uniquefiers.length - 1);
             }
-        }
+        } // if uniquefiers are not null
 
         if (inParenthesis) {
             return getAuthorYearParenthesisMarker(style, entries, database, uniquefiers, unlimAuthors);
@@ -125,31 +190,6 @@ class OOBibStyleGetCitationMarker {
         }
     }
 
-    /**
-     * Modify entry and uniquefier arrays to facilitate a grouped
-     * presentation of uniquefied entries.
-     *
-     * @param entries     The entry array.
-     * @param uniquefiers The uniquefier array.
-     * @param from        The first index to group (inclusive)
-     * @param to          The last index to group (inclusive)
-     */
-    private static void group(OOBibStyle style,
-                              List<BibEntry> entries,
-                              String[] uniquefiers,
-                              int from,
-                              int to) {
-
-        String separator = style.getStringCitProperty(OOBibStyle.UNIQUEFIER_SEPARATOR);
-
-        StringBuilder sb = new StringBuilder(uniquefiers[from]);
-        for (int i = from + 1; i <= to; i++) {
-            sb.append(separator);
-            sb.append(uniquefiers[i]);
-            entries.set(i, null); // kill BibEntry?
-        }
-        uniquefiers[from] = sb.toString();
-    }
 
     /**
      * This method produces (Author, year) style citation strings in many different forms.

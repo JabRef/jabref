@@ -311,6 +311,18 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         }
     }
 
+    public static String regularizePageInfo( String p ) {
+        if (p == null) {
+            return null;
+        }
+        String pt = p.trim();
+        if (pt.equals("")) {
+            return null;
+        } else {
+            return pt;
+        }
+    }
+
     /**
      *  Make sure that (1) we have exactly one entry for each
      *  citation, (2) each entry is either null or is not empty when trimmed.
@@ -331,20 +343,32 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
             List<String> res = new ArrayList<>(nCitations);
             for (int i = 0; i < nCitations; i++) {
                 String p = pageInfosForCitations.get(i);
-                if (p != null) {
-                    String pt = p.trim();
-                    if (pt.equals("")) {
-                        p = null;
-                    } else {
-                        p = pt;
-                    }
-                }
-                res.add(p);
+                res.add(regularizePageInfo(p));
             }
             return res;
         }
     }
 
+
+    /**
+     * Defines sort order for pageInfo strings.
+     *
+     * null comes before non-null
+     */
+    public static int comparePageInfo(String a, String b) {
+        String aa = regularizePageInfo(a);
+        String bb = regularizePageInfo(b);
+        if (aa == null && bb == null) {
+            return 0;
+        }
+        if (aa == null) {
+            return -1;
+        }
+        if (bb == null) {
+            return +1;
+        }
+        return aa.compareTo(bb);
+    }
 
     /**
      * See {@see getNumCitationMarkerCommon} for details.
