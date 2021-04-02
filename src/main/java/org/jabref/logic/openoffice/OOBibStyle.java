@@ -9,6 +9,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.function.ToIntFunction;
@@ -474,9 +475,53 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return res;
     }
 
+    /**
+     * See {@see getNumCitationMarkerCommon} for details.
+     */
+    public String getNumCitationMarkerForInText(List<Integer> numbers,
+                                                int minGroupingCount,
+                                                List<String> pageInfosForCitations) {
+        return getNumCitationMarkerCommon(numbers,
+                                          minGroupingCount,
+                                          CitationMarkerPurpose.CITATION,
+                                          pageInfosForCitations);
+    }
+
+    /**
+     *  Create a numeric marker for use in the bibliography as label for the entry.
+     *
+     *  To support for example numbers in superscript without brackets for the text,
+     *  but "[1]" form for the bibliogaphy, the style can provide
+     *  the optional "BracketBeforeInList" and "BracketAfterInList" strings
+     *  to be used here in stead of "BracketBefore" and "BracketAfter"
+     *
+     *  @return "[${number}]" where
+     *       "[" stands for BRACKET_BEFORE_IN_LIST (with fallback BRACKET_BEFORE)
+     *       "]" stands for BRACKET_AFTER_IN_LIST (with fallback BRACKET_AFTER)
+     *       "${number}" stands for number formatted.
+     */
+    public String getNumCitationMarkerForBibliography(int number) {
+        return getNumCitationMarkerCommon(Arrays.asList(number),
+                                          0,
+                                          CitationMarkerPurpose.BIBLIOGRAPHY,
+                                          null);
+    }
+
+    private enum CitationMarkerPurpose {
+        /** Creating citation marker for in-text citation. */
+        CITATION,
+        /** Creating citation marker for the bibliography. */
+        BIBLIOGRAPHY
+    }
 
     /**
      * Format a number-based citation marker for the given number or numbers.
+     *
+     * This is the common implementation behind
+     * getNumCitationMarkerForInText and
+     * getNumCitationMarkerForBibliography. The latter could be easily
+     * separated unless there is (or going to be) a need for handling
+     * multiple numbers or page info by getNumCitationMarkerForBibliography.
      *
      * @param numbers The citation numbers.
      *
@@ -488,16 +533,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * @param purpose BIBLIOGRAPHY (was: inList==True) when creating for a bibliography entry,
      *                CITATION (was: inList=false) when creating in-text citation.
      *
-     *               If BIBLIOGRAPHY, prefer BRACKET_BEFORE_IN_LIST over BRACKET_BEFORE,
-     *               and BRACKET_AFTER_IN_LIST over BRACKET_AFTER.
-     *
-     *        https://docs.jabref.org/cite/openofficeintegration
-     *
-     *        BracketBeforeInList : The opening bracket for citation
-     *                              numbering in the reference list.
-     *
-     *        BracketAfterInList : The closing bracket for citation
-     *                             numbering in the reference list.
+     *               If BIBLIOGRAPHY: Prefer BRACKET_BEFORE_IN_LIST over BRACKET_BEFORE,
+     *                                   and BRACKET_AFTER_IN_LIST over BRACKET_AFTER.
+     *                                Ignore pageInfosForCitations.
      *
      * @param pageInfosForCitations  Null for "none", or a list with a
      *        pageInfo for each citation. Any or all of these can be null as well.
@@ -505,11 +543,10 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * @return The text for the citation.
      *
      */
-    public String getNumCitationMarker(List<Integer> numbers,
-                                       int minGroupingCount,
-                                       // boolean purpose,
-                                       CitationMarkerPurpose purpose,
-                                       List<String> pageInfosForCitations) {
+    private String getNumCitationMarkerCommon(List<Integer> numbers,
+                                              int minGroupingCount,
+                                              CitationMarkerPurpose purpose,
+                                              List<String> pageInfosForCitations) {
 
         final boolean joinIsDisabled = (minGroupingCount <= 0);
         final int notFoundInDatabases = 0;
@@ -520,7 +557,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
          *
          *
          */
-        final boolean strictPurpose = false;
+        final boolean strictPurpose = true;
 
         /*
          * purpose == BIBLIOGRAPHY means: we are formatting for the

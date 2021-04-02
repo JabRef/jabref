@@ -33,7 +33,6 @@ import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.openoffice.CitationEntry;
-import org.jabref.logic.openoffice.CitationMarkerPurpose;
 import org.jabref.logic.openoffice.OOBibStyle;
 import org.jabref.logic.openoffice.OOPreFormatter;
 import org.jabref.logic.openoffice.OOUtil;
@@ -954,11 +953,11 @@ class OOBibBase {
         for (CitationGroupID cgid : cgs.getSortedCitationGroupIDs()) {
             CitationGroup cg = cgs.getCitationGroupOrThrow(cgid);
             List<Integer> numbers = cg.getSortedNumbers();
+            List<String> pageInfos = cgs.backend.getPageInfosForCitations(cg);
             citMarkers.put(cgid,
-                           style.getNumCitationMarker(numbers,
-                                                      minGroupingCount,
-                                                      CitationMarkerPurpose.CITATION,
-                                                      cgs.backend.getPageInfosForCitations(cg)));
+                           style.getNumCitationMarkerForInText(numbers,
+                                                               minGroupingCount,
+                                                               pageInfos));
         }
 
         return citMarkers;
@@ -984,11 +983,11 @@ class OOBibBase {
         for (CitationGroupID cgid : cgs.getSortedCitationGroupIDs()) {
             CitationGroup cg = cgs.getCitationGroupOrThrow(cgid);
             List<Integer> numbers = cg.getSortedNumbers();
+            List<String> pageInfos = cgs.backend.getPageInfosForCitations(cg);
             citMarkers.put(cgid,
-                           style.getNumCitationMarker(numbers,
-                                                      minGroupingCount,
-                                                      CitationMarkerPurpose.CITATION, /* inList */
-                                                      cgs.backend.getPageInfosForCitations(cg)));
+                           style.getNumCitationMarkerForInText(numbers,
+                                                               minGroupingCount,
+                                                               pageInfos));
         }
         return citMarkers;
     }
@@ -1965,13 +1964,10 @@ class OOBibBase {
                 // Note: minGroupingCount is pointless here, we are
                 // formatting a single entry.
                 // int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
-                int minGroupingCount = 2;
-                List<Integer> numbers = Collections.singletonList(ck.number.get());
-                List<String> pageInfosForCitations = null; // no pageInfo for the bibliography
-                String marker = style.getNumCitationMarker(numbers,
-                                                           minGroupingCount,
-                                                           CitationMarkerPurpose.BIBLIOGRAPHY, /*inList*/
-                                                           pageInfosForCitations);
+                // int minGroupingCount = 2;
+                int number = ck.number.get();
+                // List<String> pageInfosForCitations = null; // no pageInfo for the bibliography
+                String marker = style.getNumCitationMarkerForBibliography(number);
 
                 OOUtil.insertTextAtCurrentLocation(documentConnection.xText,
                                                    cursor,

@@ -82,7 +82,7 @@ class OOBibStyleTest {
     }
 
     @Test
-    void testGetNumCitationMarker() throws IOException {
+    void testGetNumCitationMarkerForInText() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                                           layoutFormatterPreferences);
         List<String> empty = null;
@@ -97,103 +97,109 @@ class OOBibStyleTest {
          * but "[1] " with space after "]" for the bibliography.
          */
         assertEquals("[1]",
-                     style.getNumCitationMarker(Arrays.asList(1),
-                                                -1,
-                                                CitationMarkerPurpose.CITATION,
-                                                empty));
+                     style.getNumCitationMarkerForInText(Arrays.asList(1),
+                                                         -1,
+                                                         empty));
 
         // Identical numeric entries are joined.
         assertEquals("[1; 2]",
-                     style.getNumCitationMarker(Arrays.asList(1,2,1,2),
-                                                3,
-                                                CitationMarkerPurpose.CITATION,
-                                                empty));
+                     style.getNumCitationMarkerForInText(Arrays.asList(1,2,1,2),
+                                                         3,
+                                                         empty));
         // ... unless minGroupingCount <= 0
         assertEquals("[1; 1; 2; 2]",
-                     style.getNumCitationMarker(Arrays.asList(1,2,1,2),
-                                                0,
-                                                CitationMarkerPurpose.CITATION,
-                                                empty));
+                     style.getNumCitationMarkerForInText(Arrays.asList(1,2,1,2),
+                                                         0,
+                                                         empty));
         // ... or have different pageInfos
         assertEquals("[1; p1a; 1; p1b; 2; p2; 3]",
-                     style.getNumCitationMarker(Arrays.asList(1,1,2,2,3,3),
-                                                1,
-                                                CitationMarkerPurpose.CITATION,
-                                                Arrays.asList("p1a","p1b","p2","p2",null,null)));
+                     style.getNumCitationMarkerForInText(Arrays.asList(1,1,2,2,3,3),
+                                                         1,
+                                                         Arrays.asList("p1a","p1b","p2","p2",null,null)));
 
         // Consecutive numbers can become a range ...
         assertEquals("[1-3]",
-                     style.getNumCitationMarker(Arrays.asList(1, 2, 3),
-                                                1, /* minGroupingCount */
-                                                CitationMarkerPurpose.CITATION,
-                                                empty));
+                     style.getNumCitationMarkerForInText(Arrays.asList(1, 2, 3),
+                                                         1, /* minGroupingCount */
+                                                         empty));
 
         // ... unless minGroupingCount is too high
         assertEquals("[1; 2; 3]",
-                     style.getNumCitationMarker(Arrays.asList(1, 2, 3),
-                                                4, /* minGroupingCount */
-                                                CitationMarkerPurpose.CITATION,
-                                                empty));
+                     style.getNumCitationMarkerForInText(Arrays.asList(1, 2, 3),
+                                                         4, /* minGroupingCount */
+                                                         empty));
 
         // ... or if minGroupingCount <= 0
         assertEquals("[1; 2; 3]",
-                     style.getNumCitationMarker(Arrays.asList(1, 2, 3),
-                                                0, /* minGroupingCount */
-                                                CitationMarkerPurpose.CITATION,
-                                                empty));
+                     style.getNumCitationMarkerForInText(Arrays.asList(1, 2, 3),
+                                                         0, /* minGroupingCount */
+                                                         empty));
         // ... a pageInfo needs to be emitted
         assertEquals("[1; p1; 2-3]",
-                     style.getNumCitationMarker(Arrays.asList(1, 2, 3),
-                                                1, /* minGroupingCount */
-                                                CitationMarkerPurpose.CITATION,
-                                                Arrays.asList("p1",null,null)));
+                     style.getNumCitationMarkerForInText(Arrays.asList(1, 2, 3),
+                                                         1, /* minGroupingCount */
+                                                         Arrays.asList("p1",null,null)));
 
         // null and "" pageInfos are taken as equal.
         // Due to trimming, "   " is the same as well.
         assertEquals("[1]",
-                     style.getNumCitationMarker(Arrays.asList(1, 1, 1),
-                                                1, /* minGroupingCount */
-                                                CitationMarkerPurpose.CITATION,
-                                                Arrays.asList("",null,"  ")));
+                     style.getNumCitationMarkerForInText(Arrays.asList(1, 1, 1),
+                                                         1, /* minGroupingCount */
+                                                         Arrays.asList("",null,"  ")));
         // pageInfos are trimmed
         assertEquals("[1; p1]",
-                     style.getNumCitationMarker(Arrays.asList(1, 1, 1),
-                                                1, /* minGroupingCount */
-                                                CitationMarkerPurpose.CITATION,
-                                                Arrays.asList("p1"," p1","p1 ")));
+                     style.getNumCitationMarkerForInText(Arrays.asList(1, 1, 1),
+                                                         1, /* minGroupingCount */
+                                                         Arrays.asList("p1"," p1","p1 ")));
 
         // The citation numbers come out sorted
         assertEquals("[3-5; 7; 10-12]",
-                     style.getNumCitationMarker(Arrays.asList(12, 7, 3, 4, 11, 10, 5),
-                                                1,
-                                                CitationMarkerPurpose.CITATION,
-                                                empty));
+                     style.getNumCitationMarkerForInText(Arrays.asList(12, 7, 3, 4, 11, 10, 5),
+                                                         1,
+                                                         empty));
 
         // pageInfos are sorted together with the numbers
         // (but they inhibit ranges where they are, even if they are identical,
         //  but not empty-or-null)
         assertEquals("[3; p3; 4; p4; 5; p5; 7; p7; 10; px; 11; px; 12; px]",
-                     style.getNumCitationMarker(Arrays.asList(12, 7, 3, 4, 11, 10, 5),
-                                                1,
-                                                CitationMarkerPurpose.CITATION,
-                                                Arrays.asList("px", "p7", "p3", "p4",
-                                                              "px", "px", "p5")));
+                     style.getNumCitationMarkerForInText(Arrays.asList(12, 7, 3, 4, 11, 10, 5),
+                                                         1,
+                                                         Arrays.asList("px", "p7", "p3", "p4",
+                                                                       "px", "px", "p5")));
 
 
         // pageInfo sorting (for the same number)
         assertEquals("[1; 1; a; 1; b]",
-                     style.getNumCitationMarker(Arrays.asList(1, 1, 1),
-                                                1, /* minGroupingCount */
-                                                CitationMarkerPurpose.CITATION,
-                                                Arrays.asList("","b","a ")));
+                     style.getNumCitationMarkerForInText(Arrays.asList(1, 1, 1),
+                                                         1, /* minGroupingCount */
+                                                         Arrays.asList("","b","a ")));
 
         // pageInfo sorting (for the same number) is not numeric.
         assertEquals("[1; p100; 1; p20; 1; p9]",
-                     style.getNumCitationMarker(Arrays.asList(1, 1, 1),
-                                                1, /* minGroupingCount */
-                                                CitationMarkerPurpose.CITATION,
-                                                Arrays.asList("p20","p9","p100")));
+                     style.getNumCitationMarkerForInText(Arrays.asList(1, 1, 1),
+                                                         1, /* minGroupingCount */
+                                                         Arrays.asList("p20","p9","p100")));
 
+        assertEquals("[1-3]",
+                     style.getNumCitationMarkerForInText(Arrays.asList(1, 2, 3),
+                                                         1, /* minGroupingCount */
+                                                         empty));
+        assertEquals("[1; 2; 3]",
+                     style.getNumCitationMarkerForInText(Arrays.asList(1, 2, 3),
+                                                         5,
+                                                         empty));
+        assertEquals("[1; 2; 3]",
+                     style.getNumCitationMarkerForInText(Arrays.asList(1, 2, 3),
+                                                         -1,
+                                                         empty));
+        assertEquals("[1; 3; 12]",
+                     style.getNumCitationMarkerForInText(Arrays.asList(1, 12, 3),
+                                                         1,
+                                                         empty));
+        assertEquals("[3-5; 7; 10-12]",
+                     style.getNumCitationMarkerForInText(Arrays.asList(12, 7, 3, 4, 11, 10, 5),
+                                                         1,
+                                                         empty));
         /*
          * BIBLIOGRAPHY : I think
          * style.getNumCitationMarkerForBibliography(int num);
@@ -202,51 +208,14 @@ class OOBibStyleTest {
          * Nor do we need pageInfo in the bibliography.
          */
         assertEquals("[1] ",
-                     style.getNumCitationMarker(Arrays.asList(1),
-                                                -1,
-                                                CitationMarkerPurpose.BIBLIOGRAPHY,
-                                                empty));
-        assertEquals("[1] ",
-                     style.getNumCitationMarker(Arrays.asList(1),
-                                                0,
-                                                CitationMarkerPurpose.BIBLIOGRAPHY,
-                                                empty));
+                     style.getNumCitationMarkerForBibliography(1));
 
-        // (The following CitationMarkerPurpose.BIBLIOGRAPHY tests do
-        // not correspond to actual use.)
+        /*
+         * test insertPageInfo
+         */
         if (true) {
-            assertEquals("[1-3] ",
-                         style.getNumCitationMarker(Arrays.asList(1, 2, 3),
-                                                    1, /* minGroupingCount */
-                                                    CitationMarkerPurpose.BIBLIOGRAPHY,
-                                                    empty));
-            assertEquals("[1; 2; 3] ",
-                         style.getNumCitationMarker(Arrays.asList(1, 2, 3),
-                                                    5,
-                                                    CitationMarkerPurpose.BIBLIOGRAPHY,
-                                                    empty));
-            assertEquals("[1; 2; 3] ",
-                         style.getNumCitationMarker(Arrays.asList(1, 2, 3),
-                                                    -1,
-                                                    CitationMarkerPurpose.BIBLIOGRAPHY,
-                                                    empty));
-            assertEquals("[1; 3; 12] ",
-                         style.getNumCitationMarker(Arrays.asList(1, 12, 3),
-                                                    1,
-                                                    CitationMarkerPurpose.BIBLIOGRAPHY,
-                                                    empty));
-            assertEquals("[3-5; 7; 10-12] ",
-                         style.getNumCitationMarker(Arrays.asList(12, 7, 3, 4, 11, 10, 5),
-                                                    1,
-                                                    CitationMarkerPurpose.BIBLIOGRAPHY,
-                                                    empty));
-        }
-
-        // test insertPageInfo
-        if (true) {
-            String citation = style.getNumCitationMarker(Arrays.asList(1),
+            String citation = style.getNumCitationMarkerForInText(Arrays.asList(1),
                                                          -1,
-                                                         CitationMarkerPurpose.CITATION,
                                                          empty);
             assertEquals("[1; pp. 55-56]", style.insertPageInfo(citation, "pp. 55-56"));
         }
@@ -260,56 +229,41 @@ class OOBibStyleTest {
 
         // unresolved citations look like [??]
         assertEquals("[" + OOBibStyle.UNDEFINED_CITATION_MARKER + "]",
-                     style.getNumCitationMarker(Arrays.asList(0),
-                                                1,
-                                                CitationMarkerPurpose.CITATION,
-                                                empty));
+                     style.getNumCitationMarkerForInText(Arrays.asList(0),
+                                                         1,
+                                                         empty));
 
         // pageInfo is shown for unresolved citations
         assertEquals("[" + OOBibStyle.UNDEFINED_CITATION_MARKER + "; p1]",
-                     style.getNumCitationMarker(Arrays.asList(0),
-                                                1,
-                                                CitationMarkerPurpose.CITATION,
-                                                Arrays.asList("p1")));
+                     style.getNumCitationMarkerForInText(Arrays.asList(0),
+                                                         1,
+                                                         Arrays.asList("p1")));
 
         // unresolved citations sorted to the front
         assertEquals("[" + OOBibStyle.UNDEFINED_CITATION_MARKER + "; 2-4]",
-                     style.getNumCitationMarker(Arrays.asList(4, 2, 3, 0),
-                                                1,
-                                                CitationMarkerPurpose.CITATION,
-                                                empty));
+                     style.getNumCitationMarkerForInText(Arrays.asList(4, 2, 3, 0),
+                                                         1,
+                                                         empty));
 
         assertEquals("[" + OOBibStyle.UNDEFINED_CITATION_MARKER + "; 1-3]",
-                     style.getNumCitationMarker(Arrays.asList(1, 2, 3, 0),
-                                                1,
-                                                CitationMarkerPurpose.CITATION,
-                                                empty));
+                     style.getNumCitationMarkerForInText(Arrays.asList(1, 2, 3, 0),
+                                                         1,
+                                                         empty));
 
         // multiple unresolved citations are not collapsed
         assertEquals("["
                      + OOBibStyle.UNDEFINED_CITATION_MARKER + "; "
                      + OOBibStyle.UNDEFINED_CITATION_MARKER + "; "
                      + OOBibStyle.UNDEFINED_CITATION_MARKER + "]",
-                     style.getNumCitationMarker(Arrays.asList(0, 0, 0),
-                                                1,
-                                                CitationMarkerPurpose.CITATION,
-                                                empty));
+                     style.getNumCitationMarkerForInText(Arrays.asList(0, 0, 0),
+                                                         1,
+                                                         empty));
 
         /*
          * BIBLIOGRAPHY
          */
         assertEquals("[" + OOBibStyle.UNDEFINED_CITATION_MARKER + "] ",
-                     style.getNumCitationMarker(Arrays.asList(0),
-                                                1,
-                                                CitationMarkerPurpose.BIBLIOGRAPHY,
-                                                empty));
-
-        // pageInfo is not used for the bibliography
-        assertEquals("[" + OOBibStyle.UNDEFINED_CITATION_MARKER + "] ",
-                     style.getNumCitationMarker(Arrays.asList(0),
-                                                1,
-                                                CitationMarkerPurpose.BIBLIOGRAPHY,
-                                                Arrays.asList("p1")));
+                     style.getNumCitationMarkerForBibliography(0));
 
     }
 
