@@ -189,12 +189,18 @@ class LayoutEntry {
         this.postFormatter = formatter;
     }
 
+    /**
+     * Note: there is also a
+     * {@code doLayout(BibDatabaseContext databaseContext, Charset encoding)} below.
+     */
     public String doLayout(BibEntry bibtex, BibDatabase database) {
         switch (type) {
             case LayoutHelper.IS_LAYOUT_TEXT:
                 return text;
             case LayoutHelper.IS_SIMPLE_COMMAND:
-                String value = bibtex.getResolvedFieldOrAlias(FieldFactory.parseField(text), database).orElse("");
+                String value = (bibtex.getResolvedFieldOrAlias(FieldFactory.parseField(text),
+                                                              database)
+                                .orElse(""));
 
                 // If a post formatter has been set, call it:
                 if (postFormatter != null) {
@@ -252,6 +258,7 @@ class LayoutEntry {
         return fieldEntry;
     }
 
+    /** Only called from doLayout(BibEntry bibtex, BibDatabase database) */
     private String handleFieldOrGroupStart(BibEntry bibtex, BibDatabase database) {
         Optional<String> field;
         boolean negated = false;
@@ -263,7 +270,9 @@ class LayoutEntry {
             field = Optional.empty();
             for (String part : parts) {
                 negated = part.startsWith("!");
-                field = bibtex.getResolvedFieldOrAlias(FieldFactory.parseField(negated ? part.substring(1).trim() : part), database);
+                field = bibtex.getResolvedFieldOrAlias(
+                    FieldFactory.parseField(negated ? part.substring(1).trim() : part),
+                    database);
                 if (field.isPresent() == negated) {
                     break;
                 }
@@ -274,7 +283,9 @@ class LayoutEntry {
             field = Optional.empty();
             for (String part : parts) {
                 negated = part.startsWith("!");
-                field = bibtex.getResolvedFieldOrAlias(FieldFactory.parseField(negated ? part.substring(1).trim() : part), database);
+                field = bibtex.getResolvedFieldOrAlias(
+                    FieldFactory.parseField(negated ? part.substring(1).trim() : part),
+                    database);
                 if (field.isPresent() ^ negated) {
                     break;
                 }
@@ -341,15 +352,18 @@ class LayoutEntry {
                 return text;
 
             case LayoutHelper.IS_SIMPLE_COMMAND:
-                throw new UnsupportedOperationException("bibtex entry fields not allowed in begin or end layout");
+                throw new UnsupportedOperationException(
+                    "bibtex entry fields not allowed in begin or end layout");
 
             case LayoutHelper.IS_FIELD_START:
             case LayoutHelper.IS_GROUP_START:
-                throw new UnsupportedOperationException("field and group starts not allowed in begin or end layout");
+                throw new UnsupportedOperationException(
+                    "field and group starts not allowed in begin or end layout");
 
             case LayoutHelper.IS_FIELD_END:
             case LayoutHelper.IS_GROUP_END:
-                throw new UnsupportedOperationException("field and group ends not allowed in begin or end layout");
+                throw new UnsupportedOperationException(
+                    "field and group ends not allowed in begin or end layout");
 
             case LayoutHelper.IS_OPTION_FIELD:
                 String field = BibDatabase.getText(text, databaseContext.getDatabase());
@@ -370,7 +384,10 @@ class LayoutEntry {
 
             case LayoutHelper.IS_FILENAME:
             case LayoutHelper.IS_FILEPATH:
-                return databaseContext.getDatabasePath().map(Path::toAbsolutePath).map(Path::toString).orElse("");
+                return (databaseContext.getDatabasePath()
+                        .map(Path::toAbsolutePath)
+                        .map(Path::toString)
+                        .orElse(""));
 
             default:
                 break;
@@ -479,12 +496,14 @@ class LayoutEntry {
     }
 
     /**
-     * Return an array of LayoutFormatters found in the given formatterName string (in order of appearance).
+     * Return an array of LayoutFormatters found in the given
+     *  formatterName string (in order of appearance).
      */
     private List<LayoutFormatter> getOptionalLayout(String formatterName) {
         List<List<String>> formatterStrings = parseMethodsCalls(formatterName);
         List<LayoutFormatter> results = new ArrayList<>(formatterStrings.size());
-        Map<String, String> userNameFormatter = NameFormatter.getNameFormatters(prefs.getNameFormatterPreferences());
+        Map<String, String> userNameFormatter =
+            NameFormatter.getNameFormatters(prefs.getNameFormatterPreferences());
         for (List<String> strings : formatterStrings) {
             String nameFormatterName = strings.get(0).trim();
 
@@ -561,7 +580,10 @@ class LayoutEntry {
                             i++;
                             boolean escaped = false;
                             while (((i + 1) < c.length)
-                                    && !(!escaped && (c[i] == '"') && (c[i + 1] == ')') && (bracelevel == 0))) {
+                                   && !(!escaped
+                                        && (c[i] == '"')
+                                        && (c[i + 1] == ')')
+                                        && (bracelevel == 0))) {
                                 if (c[i] == '\\') {
                                     escaped = !escaped;
                                 } else if (c[i] == '(') {
