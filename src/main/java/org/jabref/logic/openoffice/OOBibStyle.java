@@ -83,13 +83,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     public static final String TITLE = "Title";
     public static final String UNDEFINED_CITATION_MARKER = "??";
 
-    private static final Pattern NUM_PATTERN = Pattern.compile("-?\\d+");
-    private static final String LAYOUT_MRK = "LAYOUT";
-    private static final String PROPERTIES_MARK = "PROPERTIES";
-    private static final String CITATION_MARK = "CITATION";
-    private static final String NAME_MARK = "NAME";
-    private static final String JOURNALS_MARK = "JOURNALS";
-    private static final String DEFAULT_MARK = "default";
     private static final String BRACKET_AFTER_IN_LIST = "BracketAfterInList";
     private static final String BRACKET_BEFORE_IN_LIST = "BracketBeforeInList";
     private static final String UNIQUEFIER_SEPARATOR = "UniquefierSeparator";
@@ -119,31 +112,39 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
     private static final String AUTHOR_SEPARATOR = "AuthorSeparator";
 
-    private static final Pattern QUOTED = Pattern.compile("\".*\"");
-
     private static final Logger LOGGER = LoggerFactory.getLogger(OOBibStyle.class);
-    private final SortedSet<String> journals = new TreeSet<>();
 
     // Formatter to be run on fields before they are used as part of citation marker:
     private final LayoutFormatter fieldFormatter = new OOPreFormatter();
 
     // reference layout mapped from entry type:
-    private final Map<EntryType, Layout> bibLayout = new HashMap<>();
-    private final Map<String, Object> properties = new HashMap<>();
-    private final Map<String, Object> citProperties = new HashMap<>();
+    // private final Map<EntryType, Layout> bibLayout = new HashMap<>();
+    // private final Map<String, Object> properties = new HashMap<>();
+    // private final Map<String, Object> citProperties = new HashMap<>();
 
     private final boolean fromResource;
     private final String path;
     private final Charset encoding;
-    private final LayoutFormatterPreferences prefs;
-    private String name = "";
-    private Layout defaultBibLayout;
-    private boolean valid;
+
+    // used in OOBibStyleParser
+    protected String name = "";
+    protected String localCopy;
+    protected final LayoutFormatterPreferences prefs;
+    protected Layout defaultBibLayout;
+    protected boolean isDefaultLayoutPresent;
+    // reference layout mapped from entry type:
+    protected final Map<EntryType, Layout> bibLayout = new HashMap<>();
+    protected final Map<String, Object> properties = new HashMap<>();
+    protected final Map<String, Object> citProperties = new HashMap<>();
+    protected boolean valid;
+    protected final SortedSet<String> journals = new TreeSet<>();
+
     private File styleFile;
     private long styleFileModificationTime = Long.MIN_VALUE;
-    private String localCopy;
-    private boolean isDefaultLayoutPresent;
 
+    /**
+     * Construct from user-provided style file.
+     */
     public OOBibStyle(File styleFile,
                       LayoutFormatterPreferences prefs,
                       Charset encoding) throws IOException {
@@ -156,6 +157,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         path = styleFile.getPath();
     }
 
+    /**
+     * Construct from resource.
+     */
     public OOBibStyle(String resourcePath, LayoutFormatterPreferences prefs) throws IOException {
         this.prefs = Objects.requireNonNull(prefs);
         Objects.requireNonNull(resourcePath);
@@ -230,6 +234,10 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private void initialize(InputStream stream) throws IOException {
         Objects.requireNonNull(stream);
 
+        // https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html
+        //
+        // The try-with-resources Statement
+        //
         try (Reader reader = new InputStreamReader(stream, encoding)) {
             readFormatFile(reader);
         }
@@ -276,79 +284,11 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         }
     }
 
+    /**
+     *  Parse a *.jstyle file from {@code in}.
+     */
     private void readFormatFile(Reader in) throws IOException {
-
-        // First read all the contents of the file:
-        StringBuilder sb = new StringBuilder();
-        int c;
-        while ((c = in.read()) != -1) {
-            sb.append((char) c);
-        }
-
-        // Store a local copy for viewing
-        localCopy = sb.toString();
-
-        // Break into separate lines:
-        String[] lines = sb.toString().split("\n");
-        BibStyleMode mode = BibStyleMode.NONE;
-
-        for (String line1 : lines) {
-            String line = line1;
-            if (!line.isEmpty() && (line.charAt(line.length() - 1) == '\r')) {
-                line = line.substring(0, line.length() - 1);
-            }
-            // Check for empty line or comment:
-            if (line.trim().isEmpty() || (line.charAt(0) == '#')) {
-                continue;
-            }
-            // Check if we should change mode:
-            switch (line) {
-                case NAME_MARK:
-                    mode = BibStyleMode.NAME;
-                    continue;
-                case LAYOUT_MRK:
-                    mode = BibStyleMode.LAYOUT;
-                    continue;
-                case PROPERTIES_MARK:
-                    mode = BibStyleMode.PROPERTIES;
-                    continue;
-                case CITATION_MARK:
-                    mode = BibStyleMode.CITATION;
-                    continue;
-                case JOURNALS_MARK:
-                    mode = BibStyleMode.JOURNALS;
-                    continue;
-                default:
-                    break;
-            }
-
-            switch (mode) {
-                case NAME:
-                    if (!line.trim().isEmpty()) {
-                        name = line.trim();
-                    }
-                    break;
-                case LAYOUT:
-                    handleStructureLine(line);
-                    break;
-                case PROPERTIES:
-                    handlePropertiesLine(line, properties);
-                    break;
-                case CITATION:
-                    handlePropertiesLine(line, citProperties);
-                    break;
-                case JOURNALS:
-                    handleJournalsLine(line);
-                    break;
-                default:
-                    break;
-            }
-        }
-        // Set validity boolean based on whether we found anything interesting
-        // in the file:
-        if ((mode != BibStyleMode.NONE) && isDefaultLayoutPresent) {
-            valid = true;
-        }
+        OOBibStyleParser.readFormatFile(in, this);
     }
 
     /**
@@ -361,66 +301,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return valid;
     }
 
-    /**
-     * Parse a line providing bibliography structure information for an entry type.
-     *
-     * @param line The string containing the structure description.
-     */
-    private void handleStructureLine(String line) {
-        int index = line.indexOf('=');
-        if ((index > 0) && (index < (line.length() - 1))) {
 
-            try {
-                String formatString = line.substring(index + 1);
-                StringReader reader = new StringReader(formatString);
-                Layout layout = new LayoutHelper(reader, this.prefs).getLayoutFromText();
-                EntryType type = EntryTypeFactory.parse(line.substring(0, index));
-
-                if (!isDefaultLayoutPresent && line.substring(0, index).equals(OOBibStyle.DEFAULT_MARK)) {
-                    isDefaultLayoutPresent = true;
-                    defaultBibLayout = layout;
-                } else {
-                    bibLayout.put(type, layout);
-                }
-            } catch (IOException ex) {
-                LOGGER.warn("Cannot parse bibliography structure", ex);
-            }
-        }
-    }
-
-    /**
-     * Parse a line providing a property name and value.
-     *
-     * @param line The line containing the formatter names.
-     */
-    private void handlePropertiesLine(String line, Map<String, Object> map) {
-        int index = line.indexOf('=');
-        if ((index > 0) && (index <= (line.length() - 1))) {
-            String propertyName = line.substring(0, index).trim();
-            String value = line.substring(index + 1);
-            if ((value.trim().length() > 1) && QUOTED.matcher(value.trim()).matches()) {
-                value = value.trim().substring(1, value.trim().length() - 1);
-            }
-            Object toSet = value;
-            if (NUM_PATTERN.matcher(value).matches()) {
-                toSet = Integer.parseInt(value);
-            } else if ("true".equalsIgnoreCase(value.trim())) {
-                toSet = Boolean.TRUE;
-            } else if ("false".equalsIgnoreCase(value.trim())) {
-                toSet = Boolean.FALSE;
-            }
-            map.put(propertyName, toSet);
-        }
-    }
-
-    /**
-     * Parse a line providing a journal name for which this style is valid.
-     */
-    private void handleJournalsLine(String line) {
-        if (!line.trim().isEmpty()) {
-            journals.add(line.trim());
-        }
-    }
+    // --- end of parser --------
 
     public Layout getReferenceFormat(EntryType type) {
         Layout l = bibLayout.get(type);
@@ -1302,8 +1184,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
     /**
      * @param maxAuthors The maximum number of authors to write out in
-     *                   full without using etal. Set to -1 to always
-     *                   write out all authors.
+     *       full without using etal. Set to -1 to always write out
+     *       all authors.
      */
     private String createAuthorList(String author,
                                     int maxAuthors,
@@ -1360,12 +1242,4 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return sb.toString();
     }
 
-    enum BibStyleMode {
-        NONE,
-        LAYOUT,
-        PROPERTIES,
-        CITATION,
-        NAME,
-        JOURNALS
-    }
 }
