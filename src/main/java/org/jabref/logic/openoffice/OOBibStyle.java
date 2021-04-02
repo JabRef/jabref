@@ -41,19 +41,34 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class embodies a bibliography formatting for OpenOffice, which is composed
- * of the following elements:
+ *
+ * This class embodies bibliography formatting for OpenOffice, which
+ * is composed of the following elements:
+ *
  * <p>
- * 1) Each OO BIB entry type must have a formatting. A formatting is an array of elements, each
- * of which is either a piece of constant text, an entry field value, or a tab. Each element has
- * a character format associated with it.
+ * 1) For each type of {@code BibEntry} we need a formatting specification,
+ *    termed {@code Layout} here.
+ *
+ *    A formatting is an array of elements, each of which is either
+ *    - a piece of constant text,
+ *    - an entry field value,
+ *    - or a tab.
+ *    Each element has a character format associated with it.
  * <p>
- * 2) Many field values (e.g. author) need to be formatted before input to OpenOffice. The style
- * has the responsibility of formatting all field values. Formatting is handled by 0-n
- * JabRef LayoutFormatter classes.
+ * 2) Many field values (e.g. author) need to be formatted before
+ *    input to OpenOffice.
+ *
+ *    The style has the responsibility of formatting all field
+ *    values.
+ *
+ *    Formatting is handled by {@code LayoutFormatter} classes.
  * <p>
- * 3) If the entries are not numbered, a citation marker must be produced for each entry. This
- * operation is performed for each JabRef BibEntry.
+ * 3) A citation marker must be produced for each entry.
+ *
+ *    For non-numbered styles this operation is performed for each
+ *    {@code BibEntry} by {@code getCitationMarker}, for numbered styles by
+ *    {@code getNumCitationMarkerForInText}.
+ *
  */
 public class OOBibStyle implements Comparable<OOBibStyle> {
 
@@ -67,6 +82,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
     public static final String TITLE = "Title";
     public static final String UNDEFINED_CITATION_MARKER = "??";
+
     private static final Pattern NUM_PATTERN = Pattern.compile("-?\\d+");
     private static final String LAYOUT_MRK = "LAYOUT";
     private static final String PROPERTIES_MARK = "PROPERTIES";
@@ -107,12 +123,15 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OOBibStyle.class);
     private final SortedSet<String> journals = new TreeSet<>();
+
     // Formatter to be run on fields before they are used as part of citation marker:
     private final LayoutFormatter fieldFormatter = new OOPreFormatter();
+
     // reference layout mapped from entry type:
     private final Map<EntryType, Layout> bibLayout = new HashMap<>();
     private final Map<String, Object> properties = new HashMap<>();
     private final Map<String, Object> citProperties = new HashMap<>();
+
     private final boolean fromResource;
     private final String path;
     private final Charset encoding;
@@ -125,7 +144,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private String localCopy;
     private boolean isDefaultLayoutPresent;
 
-    public OOBibStyle(File styleFile, LayoutFormatterPreferences prefs,
+    public OOBibStyle(File styleFile,
+                      LayoutFormatterPreferences prefs,
                       Charset encoding) throws IOException {
         this.prefs = Objects.requireNonNull(prefs);
         this.styleFile = Objects.requireNonNull(styleFile);
