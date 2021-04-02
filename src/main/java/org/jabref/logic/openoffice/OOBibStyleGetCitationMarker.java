@@ -42,7 +42,34 @@ import org.slf4j.LoggerFactory;
 
 class OOBibStyleGetCitationMarker {
 
-    
+    /**
+     * Modify entry and uniquefier arrays to facilitate a grouped
+     * presentation of uniquefied entries.
+     *
+     * entries[ (from+1 .. to) ]  = null
+     * uniquefiers[from] = String.join( separator, uniquefiers.subList(from,to_inclusive) )
+     *
+     * @param entries     The entry array.
+     * @param uniquefiers The uniquefier array.
+     * @param from        The first index to group (inclusive)
+     * @param to          The last index to group (inclusive)
+     */
+    private static void group(OOBibStyle style,
+                              List<BibEntry> entries,
+                              String[] uniquefiers,
+                              int from,
+                              int to) {
+
+        String separator = style.getStringCitProperty(OOBibStyle.UNIQUEFIER_SEPARATOR);
+
+        StringBuilder sb = new StringBuilder(uniquefiers[from]);
+        for (int i = from + 1; i <= to; i++) {
+            sb.append(separator);
+            sb.append(uniquefiers[i]);
+            entries.set(i, null); // kill BibEntry?
+        }
+        uniquefiers[from] = sb.toString();
+    }
 
     public static String getCitationMarker(OOBibStyle style,
                                            List<BibEntry> entries,
@@ -125,31 +152,6 @@ class OOBibStyleGetCitationMarker {
         }
     }
 
-    /**
-     * Modify entry and uniquefier arrays to facilitate a grouped
-     * presentation of uniquefied entries.
-     *
-     * @param entries     The entry array.
-     * @param uniquefiers The uniquefier array.
-     * @param from        The first index to group (inclusive)
-     * @param to          The last index to group (inclusive)
-     */
-    private static void group(OOBibStyle style,
-                              List<BibEntry> entries,
-                              String[] uniquefiers,
-                              int from,
-                              int to) {
-
-        String separator = style.getStringCitProperty(OOBibStyle.UNIQUEFIER_SEPARATOR);
-
-        StringBuilder sb = new StringBuilder(uniquefiers[from]);
-        for (int i = from + 1; i <= to; i++) {
-            sb.append(separator);
-            sb.append(uniquefiers[i]);
-            entries.set(i, null); // kill BibEntry?
-        }
-        uniquefiers[from] = sb.toString();
-    }
 
     /**
      * This method produces (Author, year) style citation strings in many different forms.
