@@ -14,12 +14,14 @@ public class EntryTypeFactory {
     }
 
     /**
-     * Checks whether two EntryTypeFactory are equal or not based on the equality of the type names and on the equality of
-     * the required and optional field lists
+     * Checks whether two EntryTypeFactory are equal or not
+     * based on the equality of the type names
+     *  and on the equality of the required and optional field lists
      *
-     * @param type1 the first EntryType to compare
+     * @param type1 the first  EntryType to compare
      * @param type2 the secend EntryType to compare
-     * @return returns true if the two compared entry types have the same name and equal required and optional fields
+     * @return returns true if the two compared entry types have
+     *         the same name and equal required and optional fields
      */
     public static boolean isEqualNameAndFieldBased(BibEntryType type1, BibEntryType type2) {
         if ((type1 == null) && (type2 == null)) {
@@ -30,7 +32,8 @@ public class EntryTypeFactory {
             return Objects.equals(type1.getType(), type2.getType())
                     && Objects.equals(type1.getRequiredFields(), type2.getRequiredFields())
                     && Objects.equals(type1.getOptionalFields(), type2.getOptionalFields())
-                    && Objects.equals(type1.getSecondaryOptionalFields(), type2.getSecondaryOptionalFields());
+                    && Objects.equals(type1.getSecondaryOptionalFields(),
+                                      type2.getSecondaryOptionalFields());
         }
     }
 
@@ -39,19 +42,34 @@ public class EntryTypeFactory {
     }
 
     private static boolean isBibtex(EntryType type) {
-        return BibtexEntryTypeDefinitions.ALL.stream().anyMatch(bibEntryType -> bibEntryType.getType().equals(type));
+        return BibtexEntryTypeDefinitions.ALL.stream()
+            .anyMatch(bibEntryType -> bibEntryType.getType().equals(type));
     }
 
     private static boolean isBiblatex(EntryType type) {
-        return BiblatexEntryTypeDefinitions.ALL.stream().anyMatch(bibEntryType -> bibEntryType.getType().equals(type));
+        return BiblatexEntryTypeDefinitions.ALL.stream()
+            .anyMatch(bibEntryType -> bibEntryType.getType().equals(type));
     }
 
+    /**
+     * Look up typeName in StandardEntryType.values(),
+     * IEEETranEntryType.values() and
+     * SystematicLiteratureReviewStudyEntryType.values()
+     *
+     * @return first match or {@code new UnknownEntryType(typeName)}
+     */
     public static EntryType parse(String typeName) {
+        final String lcTypeName = typeName.toLowerCase(Locale.ENGLISH)
 
         List<EntryType> types = new ArrayList<>(Arrays.<EntryType>asList(StandardEntryType.values()));
+
+        // Adding two more types here.
         types.addAll(Arrays.<EntryType>asList(IEEETranEntryType.values()));
         types.addAll(Arrays.<EntryType>asList(SystematicLiteratureReviewStudyEntryType.values()));
 
-        return types.stream().filter(type -> type.getName().equals(typeName.toLowerCase(Locale.ENGLISH))).findFirst().orElse(new UnknownEntryType(typeName));
+        return types.stream()
+            .filter(type -> type.getName().equals(lcTypeName))
+            .findFirst()
+            .orElse(new UnknownEntryType(typeName));
     }
 }
