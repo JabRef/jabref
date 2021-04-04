@@ -138,14 +138,16 @@ class OOBibStyleGetCitationMarker {
                     BibEntry currentEntry = entries.get(i);
                     if (piv == -1) {
                         piv = i;
+                        // createNormalizedCitationMarker
                         tmpMarker =
                             getAuthorYearParenthesisMarker(style,
                                                            Collections.singletonList(currentEntry),
-                                                           database,
-                                                           null,
-                                                           unlimAuthors);
+                                                           database, // Map<BibEntry, BibDatabase>
+                                                           null, // uniqueLetters
+                                                           unlimAuthors /* from args!*/);
                     } else {
                         // See if this entry can go into a group with the previous one:
+                        // createNormalizedCitationMarker
                         String thisMarker =
                             getAuthorYearParenthesisMarker(style,
                                                            Collections.singletonList(currentEntry),

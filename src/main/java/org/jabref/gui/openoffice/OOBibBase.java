@@ -775,10 +775,15 @@ class OOBibBase {
         entries.put( ce, ck.db.get().database );
         // We need "normalized" (in parenthesis) markers
         // for uniqueness checking purposes:
-        return style.getCitationMarker(Collections.singletonList(ce),
-                                       entries,
-                                       true,
-                                       null,
+        // createNormalizedCitationMarker
+        return style.getCitationMarker(Collections.singletonList(ce), // List<BibEntry>
+                                       entries, // Map<BibEntry, BibDatabase>
+                                       true,    // inParenthesis
+                                       null,    // uniqueLetters
+                                       // No limit on authors?
+                                       // TODO: Seems wrong: the actual markers
+                                       // may be shorter, with more clashes
+                                       // than we test here.
                                        new int[] {-1}, /* no limit on authors */
                                        null /*pageInfosForCitations*/);
     }
