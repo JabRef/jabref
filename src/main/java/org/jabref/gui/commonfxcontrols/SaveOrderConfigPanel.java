@@ -71,9 +71,9 @@ public class SaveOrderConfigPanel extends VBox {
     }
 
     public void changeExportDescriptionToSave() {
-        exportInOriginalOrder.setText(Localization.lang("Save entries in their original order"));
-        exportInSpecifiedOrder.setText(Localization.lang("Save entries ordered as specified"));
-        exportInTableOrder.setText(Localization.lang("Save in current table sort order"));
+        exportInOriginalOrder.setText(Localization.lang("Keep original order"));
+        exportInSpecifiedOrder.setText(Localization.lang("Use specified order"));
+        exportInTableOrder.setText(Localization.lang("Use current table sort order"));
     }
 
     public BooleanProperty saveInOriginalProperty() {
