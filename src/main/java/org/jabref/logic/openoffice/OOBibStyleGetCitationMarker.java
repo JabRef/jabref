@@ -111,9 +111,10 @@ class OOBibStyleGetCitationMarker {
         // We assume entries are already sorted, all we need is to
         // group consecutive entries if we can.
         //
-        // TODO: imposeLocalOrder should consider pageInfos, to make
-        //       sure multiple citations of the same entry with the same pageInfos
+        // We also assume, that identical entries have the same uniquefier.
         //
+        // Possibilites for two consecutive entries:
+        //   a.entry != b.entry, 
         //
         //
         int piv = -1;
@@ -316,6 +317,7 @@ class OOBibStyleGetCitationMarker {
             }
 
             BibDatabase currentDatabase = database.get(currentEntry);
+
             int unlimA = (unlimAuthors == null) ? -1 : unlimAuthors[i];
             int maxAuthors = unlimA > 0 ? unlimA : maxA;
 
@@ -375,7 +377,11 @@ class OOBibStyleGetCitationMarker {
     }
 
     /**
-     * Look up the nth author and return the proper last name for citation markers.
+     * Look up the nth author and return the "proper" last name for
+     * citation markers.
+     *
+     * Note: "proper" in the sense that it includes the "von" part
+     *        of the name (followed by a space) if there is one.
      *
      * @param al     The author list.
      * @param number The number of the author to return.
@@ -394,10 +400,30 @@ class OOBibStyleGetCitationMarker {
 
         return sb.toString();
     }
+
     /**
-     * @param maxAuthors The maximum number of authors to write out in
-     *       full without using etal. Set to -1 to always write out
-     *       all authors.
+     * @param author Passed to {@code AuthorList.parse(author)}
+     *
+     * @param maxAuthors The maximum number of authors to write out.
+     *                   If there are more authors, then ET_AL_STRING is emitted
+     *                   to mark their omission.
+     *                   Set to -1 to write out all authors.
+     *
+     * @param andString  For "A, B[ and ]C"
+     * @param yearSep    Appended to result here.
+     *                   For example " " in default_authoryear.jstyle
+     *
+     * @return "Au[AS]Bu[AS]Cu[OXFORD_COMMA][andString]Du[yearSep]"
+     *      or "Au[AS]Bu[AS]Cu[etAlString][yearSep]"
+     *
+     *             where AS = AUTHOR_SEPARATOR
+     *                   Au, Bu, Cu, Du are last names of authors.
+     *
+     *         Note:
+     *          - The ""Au[AS]Bu[AS]Cu" part may be empty (maxAuthors==0 or nAuthors==0).
+     *          - OXFORD_COMMA is only emitted if nAuthors is at least 3.
+     *          - andString  is only emitted if nAuthors is at least 2.
+     *          - yearSep is always emitted
      */
     private static String createAuthorList(OOBibStyle style,
                                            String author,
@@ -415,7 +441,7 @@ class OOBibStyleGetCitationMarker {
         String authorSep = style.getStringCitProperty(OOBibStyle.AUTHOR_SEPARATOR);
 
         // The String to put after the second to last author in case
-        // of three or more authors
+        // of three or more authors: (A, B[,] and C)
         String oxfordComma = style.getStringCitProperty(OOBibStyle.OXFORD_COMMA);
 
         StringBuilder sb = new StringBuilder();
@@ -451,6 +477,7 @@ class OOBibStyleGetCitationMarker {
             // -1            0       ""
             sb.append(etAlString);
         }
+
         sb.append(yearSep);
         return sb.toString();
     }

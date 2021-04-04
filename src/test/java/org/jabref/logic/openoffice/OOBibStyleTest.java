@@ -42,7 +42,8 @@ class OOBibStyleTest {
 
     @Test
     void testAuthorYear() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, layoutFormatterPreferences);
+        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH,
+                                          layoutFormatterPreferences);
         assertTrue(style.isValid());
         assertTrue(style.isInternalStyle());
         assertFalse(style.isCitationKeyCiteMarkers());
@@ -55,8 +56,9 @@ class OOBibStyleTest {
 
     @Test
     void testAuthorYearAsFile() throws URISyntaxException, IOException {
-        File defFile = Path.of(OOBibStyleTest.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
-                           .toFile();
+        File defFile = Path.of(
+            OOBibStyleTest.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
+            .toFile();
         OOBibStyle style = new OOBibStyle(defFile, layoutFormatterPreferences, StandardCharsets.UTF_8);
         assertTrue(style.isValid());
         assertFalse(style.isInternalStyle());
@@ -282,16 +284,27 @@ class OOBibStyleTest {
 
     @Test
     void testGetCitationMarker() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH, layoutFormatterPreferences);
+        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                                          layoutFormatterPreferences);
         BibEntry entry = new BibEntry()
-                .withField(StandardField.AUTHOR, "Gustav Bostr\\\"{o}m and Jaana W\\\"{a}yrynen and Marine Bod\\'{e}n and Konstantin Beznosov and Philippe Kruchten")
+                .withField(StandardField.AUTHOR,
+                           "Gustav Bostr\\\"{o}m"
+                           + " and Jaana W\\\"{a}yrynen"
+                           + " and Marine Bod\\'{e}n"
+                           + " and Konstantin Beznosov"
+                           + " and Philippe Kruchten")
                 .withField(StandardField.YEAR, "2006")
-                .withField(StandardField.BOOKTITLE, "SESS '06: Proceedings of the 2006 international workshop on Software engineering for secure systems")
+                .withField(StandardField.BOOKTITLE,
+                           "SESS '06: Proceedings of the 2006 international workshop"
+                           + " on Software engineering for secure systems")
                 .withField(StandardField.PUBLISHER, "ACM")
-                .withField(StandardField.TITLE, "Extending XP practices to support security requirements engineering")
+                .withField(StandardField.TITLE,
+                           "Extending XP practices to support security requirements engineering")
                 .withField(StandardField.PAGES, "11--18");
+
         BibDatabase database = new BibDatabase();
         database.insertEntry(entry);
+
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         entryDBMap.put(entry, database);
 
@@ -301,19 +314,33 @@ class OOBibStyleTest {
         assertEquals("Boström et al. [2006]",
                 style.getCitationMarker(Collections.singletonList(entry), entryDBMap, false, null, new int[]{3}, empty));
         assertEquals("[Boström, Wäyrynen, Bodén, Beznosov & Kruchten, 2006]",
-                style.getCitationMarker(Collections.singletonList(entry), entryDBMap, true, null, new int[]{5}, empty));
+                     style.getCitationMarker(Collections.singletonList(entry),
+                                             entryDBMap,
+                                             true,
+                                             null,
+                                             new int[]{5},
+                                             empty));
     }
 
     @Test
     void testLayout() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH, layoutFormatterPreferences);
+        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                                          layoutFormatterPreferences);
 
         BibEntry entry = new BibEntry()
-                .withField(StandardField.AUTHOR, "Gustav Bostr\\\"{o}m and Jaana W\\\"{a}yrynen and Marine Bod\\'{e}n and Konstantin Beznosov and Philippe Kruchten")
-                .withField(StandardField.YEAR, "2006")
-                .withField(StandardField.BOOKTITLE, "SESS '06: Proceedings of the 2006 international workshop on Software engineering for secure systems")
-                .withField(StandardField.PUBLISHER, "ACM")
-                .withField(StandardField.TITLE, "Extending XP practices to support security requirements engineering")
+            .withField(StandardField.AUTHOR,
+                       "Gustav Bostr\\\"{o}m"
+                       + " and Jaana W\\\"{a}yrynen"
+                       + " and Marine Bod\\'{e}n"
+                       + " and Konstantin Beznosov"
+                       + " and Philippe Kruchten")
+            .withField(StandardField.YEAR, "2006")
+            .withField(StandardField.BOOKTITLE,
+                       "SESS '06: Proceedings of the 2006 international workshop"
+                       + " on Software engineering for secure systems")
+            .withField(StandardField.PUBLISHER, "ACM")
+            .withField(StandardField.TITLE,
+                       "Extending XP practices to support security requirements engineering")
                 .withField(StandardField.PAGES, "11--18");
         BibDatabase database = new BibDatabase();
         database.insertEntry(entry);
@@ -321,19 +348,26 @@ class OOBibStyleTest {
         Layout l = style.getReferenceFormat(new UnknownEntryType("default"));
         l.setPostFormatter(new OOPreFormatter());
         assertEquals(
-                "Boström, G.; Wäyrynen, J.; Bodén, M.; Beznosov, K. and Kruchten, P. (<b>2006</b>). <i>Extending XP practices to support security requirements engineering</i>,   : 11-18.",
+                "Boström, G.; Wäyrynen, J.; Bodén, M.; Beznosov, K. and Kruchten, P. (<b>2006</b>)."
+                + " <i>Extending XP practices to support security requirements engineering</i>,"
+                + "   : 11-18.",
                 l.doLayout(entry, database));
 
         l = style.getReferenceFormat(StandardEntryType.InCollection);
         l.setPostFormatter(new OOPreFormatter());
         assertEquals(
-                "Boström, G.; Wäyrynen, J.; Bodén, M.; Beznosov, K. and Kruchten, P. (<b>2006</b>). <i>Extending XP practices to support security requirements engineering</i>. In:  (Ed.), <i>SESS '06: Proceedings of the 2006 international workshop on Software engineering for secure systems</i>, ACM.",
-                l.doLayout(entry, database));
+            "Boström, G.; Wäyrynen, J.; Bodén, M.; Beznosov, K. and Kruchten, P. (<b>2006</b>)."
+            + " <i>Extending XP practices to support security requirements engineering</i>."
+            + " In:  (Ed.),"
+            + " <i>SESS '06: Proceedings of the 2006 international workshop"
+            + " on Software engineering for secure systems</i>, ACM.",
+            l.doLayout(entry, database));
     }
 
     @Test
     void testInstitutionAuthor() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH, layoutFormatterPreferences);
+        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                                          layoutFormatterPreferences);
         BibDatabase database = new BibDatabase();
 
         Layout l = style.getReferenceFormat(StandardEntryType.Article);
@@ -345,14 +379,16 @@ class OOBibStyleTest {
         entry.setField(StandardField.TITLE, "JabRef Manual");
         entry.setField(StandardField.YEAR, "2016");
         database.insertEntry(entry);
-        assertEquals("<b>JabRef Development Team</b> (<b>2016</b>). <i>JabRef Manual</i>,  .",
-                l.doLayout(entry, database));
+        assertEquals("<b>JabRef Development Team</b>"
+                     + " (<b>2016</b>)."
+                     + " <i>JabRef Manual</i>,  .",
+                     l.doLayout(entry, database));
     }
 
     @Test
     void testVonAuthor() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
+                                          layoutFormatterPreferences);
         BibDatabase database = new BibDatabase();
 
         Layout l = style.getReferenceFormat(StandardEntryType.Article);
@@ -365,13 +401,13 @@ class OOBibStyleTest {
         entry.setField(StandardField.YEAR, "2016");
         database.insertEntry(entry);
         assertEquals("<b>von Beta, A.</b> (<b>2016</b>). <i>JabRef Manual</i>,  .",
-                l.doLayout(entry, database));
+                     l.doLayout(entry, database));
     }
 
     @Test
     void testInstitutionAuthorMarker() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
+                                          layoutFormatterPreferences);
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -428,7 +464,8 @@ class OOBibStyleTest {
         entries.add(entry);
         entryDBMap.put(entry, database);
         List<String> empty = null;
-        assertEquals("[, 2016]", style.getCitationMarker(entries, entryDBMap, true, null, null, empty));
+        assertEquals("[, 2016]",
+                     style.getCitationMarker(entries, entryDBMap, true, null, null, empty));
     }
 
     @Test
@@ -696,7 +733,8 @@ class OOBibStyleTest {
 
     @Test
     void testIsValidWithDefaultSectionAtTheStart() throws Exception {
-        OOBibStyle style = new OOBibStyle("testWithDefaultAtFirstLIne.jstyle", layoutFormatterPreferences);
+        OOBibStyle style = new OOBibStyle("testWithDefaultAtFirstLIne.jstyle",
+                                          layoutFormatterPreferences);
         assertTrue(style.isValid());
     }
 }
