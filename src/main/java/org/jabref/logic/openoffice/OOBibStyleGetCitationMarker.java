@@ -248,10 +248,11 @@ class OOBibStyleGetCitationMarker {
 
             BibDatabase currentDatabase = database.get(currentEntry);
 
-            /* original: */
-            int unlimA = (unlimAuthors == null) ? -1 : unlimAuthors[j];
-            int maxAuthors = (unlimA > 0) ? unlimA : maxA;
-            /*
+            /* original:
+             *
+             * int unlimA = (unlimAuthors == null) ? -1 : unlimAuthors[j];
+             * int maxAuthors = (unlimA > 0) ? unlimA : maxA;
+             *
              * translation:
              *
              * if      ( unlimAuthors == null ) { maxAuthors = maxA; }
@@ -262,13 +263,9 @@ class OOBibStyleGetCitationMarker {
              *               ? unlimAuthors[j]
              *               : maxA )
              */
-
-            int maxAuthors2 = (( (unlimAuthors != null) && (unlimAuthors[j] > 0) )
-                               ? unlimAuthors[j]
-                               : maxA );
-            if (maxAuthors2 != maxAuthors) {
-                throw new RuntimeException( "(maxAuthors2 != maxAuthors)" );
-            }
+            int maxAuthors = (( (unlimAuthors != null) && (unlimAuthors[j] > 0) )
+                              ? unlimAuthors[j]
+                              : maxA );
 
             String author = getCitationMarkerField(style, currentEntry, currentDatabase, authorField);
             String authorString = createAuthorList(style, author, maxAuthors, andString, yearSep);
@@ -338,8 +335,14 @@ class OOBibStyleGetCitationMarker {
 
             BibDatabase currentDatabase = database.get(currentEntry);
 
-            int unlimA = (unlimAuthors == null) ? -1 : unlimAuthors[i];
-            int maxAuthors = unlimA > 0 ? unlimA : maxA;
+            /* original:
+             *
+             * int unlimA = (unlimAuthors == null) ? -1 : unlimAuthors[i];
+             * int maxAuthors = unlimA > 0 ? unlimA : maxA;
+             */
+            int maxAuthors = (( (unlimAuthors != null) && (unlimAuthors[i] > 0) )
+                              ? unlimAuthors[i]
+                              : maxA );
 
             if (i > 0) {
                 sb.append(citationSeparator);
