@@ -247,8 +247,28 @@ class OOBibStyleGetCitationMarker {
             }
 
             BibDatabase currentDatabase = database.get(currentEntry);
+
+            /* original: */
             int unlimA = (unlimAuthors == null) ? -1 : unlimAuthors[j];
-            int maxAuthors = unlimA > 0 ? unlimA : maxA;
+            int maxAuthors = (unlimA > 0) ? unlimA : maxA;
+            /*
+             * translation:
+             *
+             * if      ( unlimAuthors == null ) { maxAuthors = maxA; }
+             * else if ( unlimAuthors[j] > 0  ) { maxAuthors = unlimAuthors[j]; }
+             * else                             { maxAuthors = maxA; }
+             *
+             * maxAuthors = (( (unlimAuthors != null) && (unlimAuthors[j] > 0) )
+             *               ? unlimAuthors[j]
+             *               : maxA )
+             */
+
+            int maxAuthors2 = (( (unlimAuthors != null) && (unlimAuthors[j] > 0) )
+                               ? unlimAuthors[j]
+                               : maxA );
+            if (maxAuthors2 != maxAuthors) {
+                throw new RuntimeException( "(maxAuthors2 != maxAuthors)" );
+            }
 
             String author = getCitationMarkerField(style, currentEntry, currentDatabase, authorField);
             String authorString = createAuthorList(style, author, maxAuthors, andString, yearSep);
