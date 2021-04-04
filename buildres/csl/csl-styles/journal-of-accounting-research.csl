@@ -15,10 +15,6 @@
       <name>Xuanheng Huang</name>
       <email>huangxuanheng@gmail.com</email>
     </contributor>
-    <contributor>
-      <name>Vito Ferrulli</name>
-      <email>vitof970@gmail.com</email>
-    </contributor>
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <issn>0021-8456</issn>
@@ -161,7 +157,7 @@
         <if type="legal_case" match="none">
           <choose>
             <if variable="DOI">
-              <text variable="DOI" prefix="Available at https://doi.org/"/>
+              <text variable="DOI" prefix="https://doi.org/"/>
             </if>
             <else>
               <text variable="URL" prefix="Available at "/>
