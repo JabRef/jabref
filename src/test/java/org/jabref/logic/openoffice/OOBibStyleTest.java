@@ -308,11 +308,30 @@ class OOBibStyleTest {
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         entryDBMap.put(entry, database);
 
+        assertEquals(3, style.getIntCitProperty("MaxAuthors"));
+
         List<String> empty = null;
+
+        /*
+         * For in-text citations most (maybe all) styles prescribe a single
+         * author's name before "et al."
+         */
         assertEquals("[Boström et al., 2006]",
-                     style.getCitationMarker(Collections.singletonList(entry), entryDBMap, true, null, null, empty));
+                     style.getCitationMarker(Collections.singletonList(entry), // List<BibEntry>
+                                             entryDBMap,  // Map<BibEntry, BibDatabase>
+                                             true,        // inParenthesis
+                                             null,        // uniquefiers
+                                             null,        // unlimAuthors
+                                             empty));     // pageInfosForCitations
+
         assertEquals("Boström et al. [2006]",
-                style.getCitationMarker(Collections.singletonList(entry), entryDBMap, false, null, new int[]{3}, empty));
+                     style.getCitationMarker(Collections.singletonList(entry),
+                                             entryDBMap,
+                                             false,
+                                             null,
+                                             new int[]{3},
+                                             empty));
+
         assertEquals("[Boström, Wäyrynen, Bodén, Beznosov & Kruchten, 2006]",
                      style.getCitationMarker(Collections.singletonList(entry),
                                              entryDBMap,
