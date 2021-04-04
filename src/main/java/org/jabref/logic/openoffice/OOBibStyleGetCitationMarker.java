@@ -414,7 +414,13 @@ class OOBibStyleGetCitationMarker {
 
         if (al.getNumberOfAuthors() > number) {
             Author a = al.getAuthor(number);
-            a.getVon().filter(von -> !von.isEmpty()).ifPresent(von -> sb.append(von).append(' '));
+            // "von " if von exists
+            Optional<String> von = a.getVon();
+            if (von.isPresent() && !von.isEmpty()) {
+                sb.append(von.get());
+                sb.append(' ');
+            }
+            // last name if it exists
             sb.append(a.getLast().orElse(""));
         }
 
