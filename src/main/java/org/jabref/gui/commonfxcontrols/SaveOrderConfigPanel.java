@@ -70,12 +70,6 @@ public class SaveOrderConfigPanel extends VBox {
         saveTerDesc.selectedProperty().bindBidirectional(viewModel.saveTertiaryDescPropertySelected());
     }
 
-    public void changeExportDescriptionToSave() {
-        exportInOriginalOrder.setText(Localization.lang("Keep original order"));
-        exportInSpecifiedOrder.setText(Localization.lang("Use specified order"));
-        exportInTableOrder.setText(Localization.lang("Use current table sort order"));
-    }
-
     public BooleanProperty saveInOriginalProperty() {
         return viewModel.saveInOriginalProperty();
     }
