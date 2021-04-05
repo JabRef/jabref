@@ -17,7 +17,7 @@ plugins {
     id 'org.beryx.jlink' version '2.23.5'
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
-    id 'com.adarshr.test-logger' version '2.1.1'
+    id 'com.adarshr.test-logger' version '3.0.0'
 }
 
 gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.ALWAYS
