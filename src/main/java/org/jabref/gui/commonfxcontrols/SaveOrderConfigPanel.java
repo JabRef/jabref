@@ -11,7 +11,6 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
