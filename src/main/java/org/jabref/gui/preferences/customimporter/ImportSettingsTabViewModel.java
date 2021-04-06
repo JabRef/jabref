@@ -1,4 +1,4 @@
-package org.jabref.gui.preferences.importer;
+package org.jabref.gui.preferences.customimporter;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;

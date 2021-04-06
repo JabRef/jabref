@@ -1,4 +1,4 @@
-package org.jabref.gui.preferences.customization;
+package org.jabref.gui.preferences.importexport;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -10,7 +10,7 @@ import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.preferences.PreferencesService;
 
-public class CustomizationTabViewModel implements PreferenceTabViewModel {
+public class ImportExportTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty useCustomDOIProperty = new SimpleBooleanProperty();
     private final StringProperty useCustomDOINameProperty = new SimpleStringProperty("");
@@ -19,7 +19,7 @@ public class CustomizationTabViewModel implements PreferenceTabViewModel {
     private final PreferencesService preferencesService;
     private final DOIPreferences initialDOIPreferences;
 
-    public CustomizationTabViewModel(DialogService dialogService, PreferencesService preferencesService) {
+    public ImportExportTabViewModel(DialogService dialogService, PreferencesService preferencesService) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.initialDOIPreferences = preferencesService.getDOIPreferences();

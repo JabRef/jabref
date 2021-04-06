@@ -1,4 +1,4 @@
-package org.jabref.gui.preferences.importer;
+package org.jabref.gui.preferences.customimporter;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
