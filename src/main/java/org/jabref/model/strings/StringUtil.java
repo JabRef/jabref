@@ -529,9 +529,15 @@ public class StringUtil {
         char current; // Used to reference the current character.
 
         for (int i = 0; i < in.length(); i++) {
-            current = in.charAt(i); // NOTE: No IndexOutOfBoundsException caught here; it should not happen.
-            if ((current == 0x9) || (current == 0xA) || (current == 0xD) || ((current >= 0x20) && (current <= 0xD7FF))
-                    || ((current >= 0xE000) && (current <= 0xFFFD))) {
+            current = in.charAt(i);
+            // NOTE: No IndexOutOfBoundsException caught here; it should not happen.
+
+            // Only append to out if it is valid.
+            if ((current == 0x9)     // TAB
+                || (current == 0xA)  // LF
+                || (current == 0xD)  // CR
+                || ((current >= 0x20) && (current <= 0xD7FF))
+                || ((current >= 0xE000) && (current <= 0xFFFD))) {
                 out.append(current);
             }
         }
