@@ -422,7 +422,18 @@ public class StringUtil {
      * Strings with escaped characters in curly braces at the
      * beginning and end are respected, too.
      *
-     * Note: what it actually checks is that we 
+     * Note: what it actually checks is that we have "{...}" but not
+     *       "{ balanced } ... { ... }" where balanced contains balanced pairs of "{}".
+     *
+     *       It will accept "{{ balanced }}", and even unbalanced
+     *       strings, for example "{{}" and "{}}" as long as there is
+     *       no "{" after we closed the initial "}".
+     *
+     * Called from:
+     *    StringUtil.shaveString to test if we can shave off a "{}" pair, and from
+     *    OOBibStyleGetCitationMarker.getCitationMarkerField where an author field
+     *    is tested and if it has "{}" around the content, we add another pair of "{}"
+     *    around it before passing to style.fieldFormatter.format
      *
      * @param toCheck The string to check
      * @return True, if the check was succesful. False otherwise.
