@@ -586,15 +586,27 @@ public class StringUtil {
     }
 
     /**
-     * Replace non-English characters like umlauts etc. with a sensible letter or letter combination that bibtex can
+     * Replace non-English characters like umlauts etc. with a sensible letter
+     * or letter combination that bibtex can
      * accept. The basis for replacement is the HashMap UnicodeToReadableCharMap.
      */
     public static String replaceSpecialCharacters(String s) {
-        /* Some unicode characters can be encoded in multiple ways. This uses <a href="https://docs.oracle.com/en/java/javase/14/docs/api/java.base/java/text/Normalizer.Form.html#NFC">NFC</a>
+        /* Some unicode characters can be encoded in multiple ways. This uses
+         * <a href="https://docs.oracle.com/en/java/javase/14/docs/api/ ...
+         * ... java.base/java/text/Normalizer.Form.html#NFC">NFC</a>
          * to re-encode the characters so that these characters can be found.
-         * Most people expect Unicode to work similar to NFC, i.e., if characters looks the same, it is likely that they are equivalent.
-         * Hence, if someone debugs issues in the `UNICODE_CHAR_MAP`, they will expect NFC.
-         * A more holistic approach should likely start with the <a href="http://unicode.org/reports/tr15/#Compatibility_Equivalence_Figure">compatibility equivalence</a>. */
+         *
+         * Most people expect Unicode to work similar to NFC, i.e., if
+         * characters looks the same, it is likely that they are
+         * equivalent.
+         *
+         * Hence, if someone debugs issues in the `UNICODE_CHAR_MAP`,
+         * they will expect NFC.
+         *
+         * A more holistic approach should likely start with the
+         * <a href="http://unicode.org/reports/tr15/#Compatibility_Equivalence_Figure">
+         *  compatibility equivalence</a>.
+         */
         String result = Normalizer.normalize(s, Normalizer.Form.NFC);
         for (Map.Entry<String, String> chrAndReplace : UNICODE_CHAR_MAP.entrySet()) {
             result = result.replace(chrAndReplace.getKey(), chrAndReplace.getValue());
@@ -642,7 +654,8 @@ public class StringUtil {
     }
 
     /**
-     * Checks if a CharSequence is not empty (""), not null and not whitespace only.
+     * Checks if a CharSequence is not empty (""), not null and not
+     * whitespace only.
      */
     public static boolean isNotBlank(String string) {
         // No Guava equivalent existing
@@ -661,7 +674,8 @@ public class StringUtil {
     }
 
     /**
-     * Return string enclosed in HTML bold tags  if not null, otherwise return alternative text in HTML bold tags
+     * Return string enclosed in HTML bold tags if not null, otherwise
+     * return alternative text in HTML bold tags
      */
     public static String boldHTML(String input, String alternative) {
 
