@@ -31,10 +31,11 @@ public class StringUtil {
     }
 
     /**
-     * Quote special characters.
+     * Quote special characters by inserting a quoteChar before them, like in changing "x" to "\x".
      *
      * @param toQuote   The String which may contain special characters.
-     * @param specials  A String containing all special characters except the quoting character itself, which is automatically quoted.
+     * @param specials  A String containing all special characters except the quoting character itself,
+     *                  which is automatically quoted.
      * @param quoteChar The quoting character.
      * @return A String with every special character (including the quoting character itself) quoted.
      */
@@ -106,7 +107,6 @@ public class StringUtil {
      * @param toShave
      * @return
      */
-
     public static String shaveString(String toShave) {
         if ((toShave == null) || (toShave.isEmpty())) {
             return "";
@@ -183,8 +183,8 @@ public class StringUtil {
     }
 
     /**
-     * Formats field contents for output. Must be "symmetric" with the parse method above, so stored and reloaded fields
-     * are not mangled.
+     * Formats field contents for output. Must be "symmetric" with the parse method above,
+     * so stored and reloaded fields are not mangled.
      *
      * @param in         the string to wrap
      * @param wrapAmount the number of characters belonging to a line of text
@@ -194,7 +194,8 @@ public class StringUtil {
     public static String wrap(String in, int wrapAmount, String newline) {
         String[] lines = in.split("\n");
         StringBuilder result = new StringBuilder();
-        // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
+        // remove all whitespace at the end of the string,
+        // this especially includes \r created when the field content has \r\n as line separator
         addWrappedLine(result, CharMatcher.whitespace().trimTrailingFrom(lines[0]), wrapAmount, newline);
         for (int i = 1; i < lines.length; i++) {
 
@@ -206,7 +207,8 @@ public class StringUtil {
                 result.append('\t');
                 result.append(newline);
                 result.append('\t');
-                // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
+                // remove all whitespace at the end of the string,
+                // this especially includes \r created when the field content has \r\n as line separator
                 String line = CharMatcher.whitespace().trimTrailingFrom(lines[i]);
                 addWrappedLine(result, line, wrapAmount, newline);
             }
@@ -215,14 +217,18 @@ public class StringUtil {
     }
 
     /**
-     * Appends a text to a string builder. Wraps the text so that each line is approx wrapAmount characters long.
+     * Appends a text to a string builder.
+     * Wraps the text so that each line is approx wrapAmount characters long.
      * Wrapping is done using newline and tab character.
      *
      * @param line          the line of text to be wrapped and appended
      * @param wrapAmount    the number of characters belonging to a line of text
      * @param newlineString a string containing the newline character(s)
      */
-    private static void addWrappedLine(StringBuilder result, String line, int wrapAmount, String newlineString) {
+    private static void addWrappedLine(StringBuilder result,
+                                       String line,
+                                       int wrapAmount,
+                                       String newlineString) {
         // Set our pointer to the beginning of the new line in the StringBuffer:
         int length = result.length();
         // Add the line, unmodified:
@@ -395,7 +401,8 @@ public class StringUtil {
     /**
      * Replaces all platform-dependent line breaks by OS.NEWLINE line breaks.
      * <p>
-     * We do NOT use UNIX line breaks as the user explicitly configures its linebreaks and this method is used in bibtex field writing
+     * We do NOT use UNIX line breaks as the user explicitly configures its linebreaks
+     * and this method is used in bibtex field writing
      *
      * <example>
      * Legacy Macintosh \r -> OS.NEWLINE
@@ -409,8 +416,14 @@ public class StringUtil {
     }
 
     /**
-     * Checks if the given String has exactly one pair of surrounding curly braces <br>
-     * Strings with escaped characters in curly braces at the beginning and end are respected, too
+     * Checks if the given String has exactly one pair of surrounding
+     * curly braces <br>
+     *
+     * Strings with escaped characters in curly braces at the
+     * beginning and end are respected, too.
+     *
+     * Note: what it actually checks is that we 
+     *
      * @param toCheck The string to check
      * @return True, if the check was succesful. False otherwise.
      */
@@ -457,9 +470,12 @@ public class StringUtil {
     /**
      * Optimized method for converting a String into an Integer
      * <p>
-     * From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
+     * From http://stackoverflow.com/questions/1030479/ ...
+     *       ... most-efficient-way-of-converting-string-to-integer-in-java
      *
-     * @param str the String holding an Integer value
+     * @param str The String holding an Integer value.
+     *            An optional "-" sign is allowed, but "+" is not.
+     *
      * @return the int value of str
      * @throws NumberFormatException if str cannot be parsed to an int
      */
@@ -488,7 +504,8 @@ public class StringUtil {
     /**
      * Optimized method for converting a String into an Integer
      * <p>
-     * From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
+     * From http://stackoverflow.com/questions/1030479/ ...
+     *       ... most-efficient-way-of-converting-string-to-integer-in-java
      *
      * @param str the String holding an Integer value
      * @return the int value of str or Optional.empty() if not possible

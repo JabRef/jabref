@@ -155,27 +155,47 @@ class StringUtilTest {
     @Test
     void testWrap() {
         String newline = "newline";
+
         assertEquals("aaaaa" + newline + "\tbbbbb" + newline + "\tccccc",
-                StringUtil.wrap("aaaaa bbbbb ccccc", 5, newline));
-        assertEquals("aaaaa bbbbb" + newline + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 8, newline));
-        assertEquals("aaaaa bbbbb" + newline + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 11, newline));
-        assertEquals("aaaaa bbbbb ccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 12, newline));
-        assertEquals("aaaaa" + newline + "\t" + newline + "\tbbbbb" + newline + "\t" + newline + "\tccccc",
-                StringUtil.wrap("aaaaa\nbbbbb\nccccc", 12, newline));
+                     StringUtil.wrap("aaaaa bbbbb ccccc", 5, newline));
+
+        assertEquals("aaaaa bbbbb" + newline + "\tccccc",
+                     StringUtil.wrap("aaaaa bbbbb ccccc", 8, newline));
+
+        assertEquals("aaaaa bbbbb" + newline + "\tccccc",
+                     StringUtil.wrap("aaaaa bbbbb ccccc", 11, newline));
+
+        assertEquals("aaaaa bbbbb ccccc",
+                     StringUtil.wrap("aaaaa bbbbb ccccc", 12, newline));
+
         assertEquals(
-                "aaaaa" + newline + "\t" + newline + "\t" + newline + "\tbbbbb" + newline + "\t" + newline + "\tccccc",
-                StringUtil.wrap("aaaaa\n\nbbbbb\nccccc", 12, newline));
-        assertEquals("aaaaa" + newline + "\t" + newline + "\tbbbbb" + newline + "\t" + newline + "\tccccc",
-                StringUtil.wrap("aaaaa\r\nbbbbb\r\nccccc", 12, newline));
+            "aaaaa" + newline + "\t" + newline + "\tbbbbb" + newline + "\t" + newline + "\tccccc",
+            StringUtil.wrap("aaaaa\nbbbbb\nccccc", 12, newline));
+
+        assertEquals(
+            "aaaaa" + newline + "\t" + newline + "\t" + newline
+            + "\tbbbbb" + newline + "\t" + newline + "\tccccc",
+            StringUtil.wrap("aaaaa\n\nbbbbb\nccccc", 12, newline));
+
+        assertEquals(
+            "aaaaa" + newline + "\t" + newline + "\tbbbbb" + newline + "\t" + newline + "\tccccc",
+            StringUtil.wrap("aaaaa\r\nbbbbb\r\nccccc", 12, newline));
     }
 
     @Test
     void testDecodeStringDoubleArray() {
-        assertArrayEquals(new String[][]{{"a", "b"}, {"c", "d"}}, StringUtil.decodeStringDoubleArray("a:b;c:d"));
-        assertArrayEquals(new String[][]{{"a", ""}, {"c", "d"}}, StringUtil.decodeStringDoubleArray("a:;c:d"));
+        assertArrayEquals(new String[][]{{"a", "b"}, {"c", "d"}},
+                          StringUtil.decodeStringDoubleArray("a:b;c:d"));
+
+        assertArrayEquals(new String[][]{{"a", ""}, {"c", "d"}},
+                          StringUtil.decodeStringDoubleArray("a:;c:d"));
+
         // arrays first differed at element [0][1]; expected: null<null> but was: java.lang.String<null>
         // assertArrayEquals(stringArray2res, StringUtil.decodeStringDoubleArray(encStringArray2));
-        assertArrayEquals(new String[][]{{"a", ":b"}, {"c;", "d"}}, StringUtil.decodeStringDoubleArray("a:\\:b;c\\;:d"));
+        assertArrayEquals(
+            new String[][]{{"a", ":b"},
+                           {"c;", "d"}},
+            StringUtil.decodeStringDoubleArray("a:\\:b;c\\;:d"));
     }
 
     @Test
