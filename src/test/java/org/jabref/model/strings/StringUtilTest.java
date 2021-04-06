@@ -86,17 +86,6 @@ class StringUtilTest {
         assertEquals("&#33;&#33;&#33;", StringUtil.quoteForHTML("!!!"));
     }
 
-//    @Test
-//    void testRemoveBracesAroundCapitals() {
-//        assertEquals("ABC", StringUtil.removeBracesAroundCapitals("{ABC}"));
-//        assertEquals("ABC", StringUtil.removeBracesAroundCapitals("{{ABC}}"));
-//        assertEquals("{abc}", StringUtil.removeBracesAroundCapitals("{abc}"));
-//        assertEquals("ABCDEF", StringUtil.removeBracesAroundCapitals("{ABC}{DEF}"));
-//
-//        // Is this really what we want?:
-//        assertEquals("{ÖÜÓŐÚÁŰÉÍ}", StringUtil.removeBracesAroundCapitals("{ÖÜÓŐÚÁŰÉÍ}"));
-//    }
-
     @Test
     void testPutBracesAroundCapitals() {
         assertEquals("{ABC}", StringUtil.putBracesAroundCapitals("ABC"));
