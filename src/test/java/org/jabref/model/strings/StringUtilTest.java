@@ -249,38 +249,6 @@ class StringUtilTest {
     }
 
     @Test
-    void testIntValueOfSingleDigit() {
-        assertEquals(1, StringUtil.intValueOfStringOptimized("1"));
-        assertEquals(2, StringUtil.intValueOfStringOptimized("2"));
-        assertEquals(8, StringUtil.intValueOfStringOptimized("8"));
-    }
-
-    @Test
-    void testIntValueOfLongString() {
-        assertEquals(1234567890, StringUtil.intValueOfStringOptimized("1234567890"));
-    }
-
-    @Test
-    void testIntValueOfStartWithZeros() {
-        assertEquals(1234, StringUtil.intValueOfStringOptimized("001234"));
-    }
-
-    @Test
-    void testIntValueOfExceptionIfStringContainsLetter() {
-        assertThrows(NumberFormatException.class, () -> StringUtil.intValueOfStringOptimized("12A2"));
-    }
-
-    @Test
-    void testIntValueOfExceptionIfStringNull() {
-        assertThrows(NumberFormatException.class, () -> StringUtil.intValueOfStringOptimized(null));
-    }
-
-    @Test
-    void testIntValueOfExceptionfIfStringEmpty() {
-        assertThrows(NumberFormatException.class, () -> StringUtil.intValueOfStringOptimized(""));
-    }
-
-    @Test
     void testIntValueOfWithNullSingleDigit() {
         assertEquals(Optional.of(1), StringUtil.intValueOfOptional("1"));
         assertEquals(Optional.of(2), StringUtil.intValueOfOptional("2"));

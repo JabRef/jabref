@@ -477,46 +477,6 @@ public class StringUtil {
      * From http://stackoverflow.com/questions/1030479/ ...
      *       ... most-efficient-way-of-converting-string-to-integer-in-java
      *
-     * @param str The String holding an Integer value.
-     *            An optional "-" sign is allowed, but "+" is not.
-     *
-     * @return the int value of str
-     * @throws NumberFormatException if str cannot be parsed to an int
-     */
-    public static int intValueOfStringOptimized(String str) {
-        int idx = 0;
-        int end;
-        boolean sign = false;
-        char ch;
-
-        if ((str == null)
-            || ((end = str.length()) == 0)                    // str is empty
-            || ((((ch = str.charAt(0)) < '0') || (ch > '9'))  // ch outside [0-9]
-                && (!(sign = ch == '-')                       // str[0] != '-'
-                    || (++idx == end)
-                    || ((ch = str.charAt(idx)) < '0')
-                    || (ch > '9')))) {
-            throw new NumberFormatException(str);
-        }
-
-        int ival = 0;
-        for (; ; ival *= 10) {
-            ival += '0' - ch;
-            if (++idx == end) {
-                return sign ? ival : -ival;
-            }
-            if (((ch = str.charAt(idx)) < '0') || (ch > '9')) {
-                throw new NumberFormatException(str);
-            }
-        }
-    }
-
-    /**
-     * Optimized method for converting a String into an Integer
-     * <p>
-     * From http://stackoverflow.com/questions/1030479/ ...
-     *       ... most-efficient-way-of-converting-string-to-integer-in-java
-     *
      * @param str the String holding an Integer value
      * @return the int value of str or Optional.empty() if not possible
      */
