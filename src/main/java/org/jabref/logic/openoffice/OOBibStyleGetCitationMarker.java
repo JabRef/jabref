@@ -73,7 +73,7 @@ class OOBibStyleGetCitationMarker {
     }
 
     /**
-     * @param author Passed to {@code AuthorList.parse(author)}
+     * @param authorListAsString Passed to {@code AuthorList.parse(authorListAsString)}
      *
      * @param maxAuthors The maximum number of authors to write out.
      *                   If there are more authors, then ET_AL_STRING is emitted
@@ -102,11 +102,11 @@ class OOBibStyleGetCitationMarker {
      *          - yearSep is always emitted
      */
     private static String createAuthorList(OOBibStyle style,
-                                           String author,
+                                           String authorListAsString,
                                            int maxAuthors,
                                            String andString,
                                            String yearSep) {
-        Objects.requireNonNull(author);
+        Objects.requireNonNull(authorListAsString);
 
         // Apparently maxAuthorsBeforeEtAl is always 1 for in-text citations.
         // In reference lists can be for example 7,
@@ -135,7 +135,7 @@ class OOBibStyleGetCitationMarker {
         String oxfordComma = style.getStringCitProperty(OOBibStyle.OXFORD_COMMA);
 
         StringBuilder sb = new StringBuilder();
-        AuthorList al = AuthorList.parse(author);
+        AuthorList al = AuthorList.parse(authorListAsString);
         final int nAuthors = al.getNumberOfAuthors();
 
         // To reduce ambiguity, throw on unexpected values of maxAuthors
