@@ -362,22 +362,25 @@ public class StringUtil {
         return buf.toString();
     }
 
-    /**
-     * This method looks for occurrences of capital letters enclosed in an
-     * arbitrary number of pairs of braces, e.g. "{AB}" or "{{T}}". All of these
-     * pairs of braces are removed.
-     *
-     * @param s The String to analyze.
-     * @return A new String with braces removed.
-     */
-    public static String removeBracesAroundCapitals(String s) {
-        String current = s;
-        String previous = s;
-        while ((current = removeSingleBracesAroundCapitals(current)).length() < previous.length()) {
-            previous = current;
-        }
-        return current;
-    }
+    // UNUSED
+    //    /**
+    //     * This method looks for occurrences of capital letters enclosed in an
+    //     * arbitrary number of pairs of braces, e.g. "{AB}" or "{{T}}". All of these
+    //     * pairs of braces are removed.
+    //     *
+    //     * Does not consider accented capital letters, only A-Z.
+    //     *
+    //     * @param s The String to analyze.
+    //     * @return A new String with braces removed.
+    //     */
+    //    public static String removeBracesAroundCapitals(String s) {
+    //        String current = s;
+    //        String previous = s;
+    //        while ((current = removeSingleBracesAroundCapitals(current)).length() < previous.length()) {
+    //            previous = current;
+    //        }
+    //        return current;
+    //    }
 
     /**
      * This method looks for occurrences of capital letters enclosed in one pair
