@@ -12,6 +12,7 @@ import com.airhacks.afterburner.views.ViewLoader;
 
 public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabViewModel> implements PreferencesTab {
 
+    @FXML private CheckBox generateNewKeyOnImport;
     @FXML private CheckBox useCustomDOI;
     @FXML private TextField useCustomDOIName;
 
@@ -27,10 +28,12 @@ public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabVi
     }
 
     public void initialize() {
-        this.viewModel = new ImportExportTabViewModel(dialogService, preferencesService);
+        this.viewModel = new ImportExportTabViewModel(preferencesService);
 
         useCustomDOI.selectedProperty().bindBidirectional(viewModel.useCustomDOIProperty());
         useCustomDOIName.textProperty().bindBidirectional(viewModel.useCustomDOINameProperty());
         useCustomDOIName.disableProperty().bind(useCustomDOI.selectedProperty().not());
+
+        generateNewKeyOnImport.selectedProperty().bindBidirectional(viewModel.generateKeyOnImportProperty());
     }
 }
