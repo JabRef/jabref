@@ -250,34 +250,34 @@ class StringUtilTest {
 
     @Test
     void testIntValueOfSingleDigit() {
-        assertEquals(1, StringUtil.intValueOf("1"));
-        assertEquals(2, StringUtil.intValueOf("2"));
-        assertEquals(8, StringUtil.intValueOf("8"));
+        assertEquals(1, StringUtil.intValueOfStringOptimized("1"));
+        assertEquals(2, StringUtil.intValueOfStringOptimized("2"));
+        assertEquals(8, StringUtil.intValueOfStringOptimized("8"));
     }
 
     @Test
     void testIntValueOfLongString() {
-        assertEquals(1234567890, StringUtil.intValueOf("1234567890"));
+        assertEquals(1234567890, StringUtil.intValueOfStringOptimized("1234567890"));
     }
 
     @Test
     void testIntValueOfStartWithZeros() {
-        assertEquals(1234, StringUtil.intValueOf("001234"));
+        assertEquals(1234, StringUtil.intValueOfStringOptimized("001234"));
     }
 
     @Test
     void testIntValueOfExceptionIfStringContainsLetter() {
-        assertThrows(NumberFormatException.class, () -> StringUtil.intValueOf("12A2"));
+        assertThrows(NumberFormatException.class, () -> StringUtil.intValueOfStringOptimized("12A2"));
     }
 
     @Test
     void testIntValueOfExceptionIfStringNull() {
-        assertThrows(NumberFormatException.class, () -> StringUtil.intValueOf(null));
+        assertThrows(NumberFormatException.class, () -> StringUtil.intValueOfStringOptimized(null));
     }
 
     @Test
     void testIntValueOfExceptionfIfStringEmpty() {
-        assertThrows(NumberFormatException.class, () -> StringUtil.intValueOf(""));
+        assertThrows(NumberFormatException.class, () -> StringUtil.intValueOfStringOptimized(""));
     }
 
     @Test

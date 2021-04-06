@@ -483,13 +483,19 @@ public class StringUtil {
      * @return the int value of str
      * @throws NumberFormatException if str cannot be parsed to an int
      */
-    public static int intValueOf(String str) {
+    public static int intValueOfStringOptimized(String str) {
         int idx = 0;
         int end;
         boolean sign = false;
         char ch;
 
-        if ((str == null) || ((end = str.length()) == 0) || ((((ch = str.charAt(0)) < '0') || (ch > '9')) && (!(sign = ch == '-') || (++idx == end) || ((ch = str.charAt(idx)) < '0') || (ch > '9')))) {
+        if ((str == null)
+            || ((end = str.length()) == 0)                    // str is empty
+            || ((((ch = str.charAt(0)) < '0') || (ch > '9'))  // ch outside [0-9]
+                && (!(sign = ch == '-')                       // str[0] != '-'
+                    || (++idx == end)
+                    || ((ch = str.charAt(idx)) < '0')
+                    || (ch > '9')))) {
             throw new NumberFormatException(str);
         }
 
