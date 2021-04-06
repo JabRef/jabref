@@ -62,16 +62,18 @@ public class StringUtil {
     }
 
     /**
-     * Creates a substring from a text
+     * Creates a substring from a text.
      *
      * @param text
-     * @param startIndex
+     * @param startIndex The first character we examine is text.charAt(startIndex+1).
      * @param terminateOnEndBraceOnly
-     * @return
+     * @return substring starting at the first non-whitespace character after startIndex,
+     *         stopping before the first whitespace if terminateOnEndBraceOnly is false,
+     *         or before the first "}" we have not seen an opening brace "{" for.
      */
     public static String getPart(String text, int startIndex, boolean terminateOnEndBraceOnly) {
         char c;
-        int count = 0;
+        int braceDepth = 0;
 
         StringBuilder part = new StringBuilder();
 
@@ -84,14 +86,14 @@ public class StringUtil {
         // then grab whatever is the first token (counting braces)
         while (index < text.length()) {
             c = text.charAt(index);
-            if (!terminateOnEndBraceOnly && (count == 0) && Character.isWhitespace(c)) {
+            if (!terminateOnEndBraceOnly && (braceDepth == 0) && Character.isWhitespace(c)) {
                 // end argument and leave whitespace for further processing
                 break;
             }
-            if ((c == '}') && (--count < 0)) {
+            if ((c == '}') && (--braceDepth < 0)) {
                 break;
             } else if (c == '{') {
-                count++;
+                braceDepth++;
             }
             part.append(c);
             index++;

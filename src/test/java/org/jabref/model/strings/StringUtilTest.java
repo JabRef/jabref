@@ -136,7 +136,15 @@ class StringUtilTest {
 
     @Test
     void testGetPart() {
-        // Should be added
+        assertEquals("", StringUtil.getPart("",0,true));
+        // The character at startIndex is skipped, not looked at at all.
+        assertEquals("abc", StringUtil.getPart("{abc}",0,true));
+        assertEquals("abc", StringUtil.getPart("{abc def}",0,false));
+        assertEquals("abc def", StringUtil.getPart("{abc def}",0,true));
+        // Initial ws skipped, stop at first unpaired "}"
+        assertEquals("x {a b c} y ", StringUtil.getPart("{    x {a b c} y } ",0,true));
+        // Initial ws skipped, stop at first unpaired ws not in braces
+        assertEquals("x{a b c}", StringUtil.getPart("{    x{a b c} y } ",0,false));
     }
 
     @Test
