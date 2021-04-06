@@ -210,6 +210,21 @@ class StringUtilTest {
         assertFalse(StringUtil.isInCurlyBrackets("}"));
         assertFalse(StringUtil.isInCurlyBrackets("a{}a"));
         assertFalse(StringUtil.isInCurlyBrackets("{\\AA}sa {\\AA}Stor{\\aa}"));
+
+        // These are possibly not what we want:
+
+        // Example: surrounded by not exactly one pair of curly
+        // braces. Documentation above the method says "Checks if the
+        // given String has exactly one pair of surrounding curly
+        // braces".
+        assertTrue(StringUtil.isInCurlyBrackets("{{}}"));
+
+        // Unbalanced, but no new start when ran out of brace levels.
+        // The case of unbalanced braces is not discussed above the method
+        // or in the tests above, except for "{" and "}" which fail to match
+        // "^[{].*[}]$"
+        assertTrue(StringUtil.isInCurlyBrackets("{{}"));
+        assertTrue(StringUtil.isInCurlyBrackets("{}}"));
     }
 
     @Test

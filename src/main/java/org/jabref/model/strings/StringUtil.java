@@ -428,27 +428,31 @@ public class StringUtil {
      * @return True, if the check was succesful. False otherwise.
      */
     public static boolean isInCurlyBrackets(String toCheck) {
-        int count = 0;
-        int brackets = 0;
+
+        // require match to '^[{].*[}]$'
         if ((toCheck == null) || toCheck.isEmpty()) {
             return false;
-        } else {
-            if ((toCheck.charAt(0) == '{') && (toCheck.charAt(toCheck.length() - 1) == '}')) {
-                for (char c : toCheck.toCharArray()) {
-                    if (c == '{') {
-                        if (brackets == 0) {
-                            count++;
-                        }
-                        brackets++;
-                    } else if (c == '}') {
-                        brackets--;
-                    }
-                }
-
-                return count == 1;
-            }
+        }
+        if ((toCheck.charAt(0) != '{') || (toCheck.charAt(toCheck.length() - 1) != '}')) {
             return false;
         }
+
+        int count = 0;
+        int brackets = 0;
+        for (char c : toCheck.toCharArray()) {
+            if (c == '{') {
+                // every time we are out of brackets and see "{", count is increased.
+                if (brackets == 0) {
+                    count++;
+                }
+                brackets++;
+            } else if (c == '}') {
+                brackets--;
+            }
+        }
+        // We never saw a "{" outside brackets except at the beginning.
+        // Examples: "{{}}" "{{}"  "{}}}}"
+        return count == 1;
     }
 
     public static boolean isInSquareBrackets(String toCheck) {
