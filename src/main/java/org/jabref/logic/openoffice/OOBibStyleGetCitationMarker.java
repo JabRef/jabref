@@ -205,157 +205,43 @@ class OOBibStyleGetCitationMarker {
         return sb.toString();
     }
 
-    /**
-     * Modify entry and uniquefier arrays to facilitate a grouped
-     * presentation of uniquefied entries.
-     *
-     * entries[ (from+1 .. to) ]  = null
-     * uniquefiers[from] = String.join( separator, uniquefiers.subList(from,to_inclusive) )
-     *
-     * @param entries     The entry array.
-     * @param uniquefiers The uniquefier array.
-     * @param from        The first index to group (inclusive)
-     * @param to          The last  index to group (inclusive)
-     */
-    private static void group(OOBibStyle style,
-                              List<BibEntry> entries,
-                              String[] uniquefiers,
-                              int from,
-                              int to) {
-
-        String separator = style.getStringCitProperty(OOBibStyle.UNIQUEFIER_SEPARATOR);
-
-        StringBuilder sb = new StringBuilder(uniquefiers[from]);
-        for (int i = from + 1; i <= to; i++) {
-            sb.append(separator);
-            sb.append(uniquefiers[i]);
-            entries.set(i, null); // kill BibEntry?
-        }
-        uniquefiers[from] = sb.toString();
-    }
-
 
     /**
-     * @param entries
-     * @param database
-     * @param inParenthesis Emit "(Au, 2000)" if true, "Au (2000)" if false.
-     * @param uniquefiers null or of length entries.size(), with
-     *                    elements null or letter making a cited
-     *                    source unique in citations.
+     * This method looks up a field for an entry in a database.
+     * Any number of backup fields can be used if the primary field is
+     * empty.
      *
-     * @param unlimAuthors Can this be null?
-     *                     If not null, then its elements are ...
+     * @param entry    The entry.
+     * @param database The database the entry belongs to.
+     * @param fields   The field, or succession of fields, to look up.
+     *                 If backup fields are needed, separate
+     *                 field names by /.
      *
-     * @param pageInfosForCitations
-     *                    May be null.
-     *                    Any or of its elements can be null.
+     *                 E.g. to use "author" with "editor" as backup,
+     *                 specify StandardField.orFields(StandardField.AUTHOR, StandardField.EDITOR).
+     * @return The resolved field content, or an empty string if the field(s) were empty.
      */
-    public static String getCitationMarker(OOBibStyle style,
-                                           List<BibEntry> entries,
-                                           Map<BibEntry, BibDatabase> database,
-                                           boolean inParenthesis,
-                                           String[] uniquefiers,
-                                           int[] unlimAuthors,
-                                           List<String> pageInfosForCitations
-        ) {
+    private static String getCitationMarkerField(OOBibStyle style,
+                                                 BibEntry entry,
+                                                 BibDatabase database,
+                                                 String fields) {
+        Objects.requireNonNull(entry, "Entry cannot be null");
+        Objects.requireNonNull(database, "database cannot be null");
 
-        List<String> pageInfos =
-            OOBibStyle.regularizePageInfosForCitations(pageInfosForCitations,
-                                                       entries.size());
-        // Original:
-        //
-        // Look for groups of uniquefied entries that should be combined in the output.
-        // E.g. (Olsen, 2005a, b) should be output instead of (Olsen, 2005a; Olsen, 2005b).
-        //
-        // Now:
-        // - handle pageInfos
-        // - allow duplicate entries with same or different pageInfos.
-        //
-        // We assume entries are already sorted, all we need is to
-        // group consecutive entries if we can.
-        //
-        // We also assume, that identical entries have the same uniquefier.
-        //
-        // Possibilites for two consecutive entries:
-        //   a.entry != b.entry, 
-        //
-        //
-        int piv = -1;
+        Set<Field> authorFields =
+            FieldFactory.parseOrFields(style.getStringCitProperty(OOBibStyle.AUTHOR_FIELD));
+        for (Field field : FieldFactory.parseOrFields(fields)) {
+            Optional<String> content = entry.getResolvedFieldOrAlias(field, database);
 
-        String tmpMarker = null;
-
-        if (uniquefiers != null) {
-
-            for (int i = 0; i < uniquefiers.length; i++) {
-
-                if ((uniquefiers[i] == null) || uniquefiers[i].isEmpty()) {
-                    // This entry has no uniquefier.
-                    // Check if we just passed a group of more than one entry with uniquefier:
-                    if ((piv > -1) && (i > (piv + 1))) {
-                        // Do the grouping:
-                        group(style, entries, uniquefiers, piv, i - 1);
-                    }
-
-                    piv = -1;
-                } else {
-                    BibEntry currentEntry = entries.get(i);
-                    if (piv == -1) {
-                        piv = i;
-                        // createNormalizedCitationMarker
-                        tmpMarker =
-                            getAuthorYearParenthesisMarker(style,
-                                                           Collections.singletonList(currentEntry),
-                                                           database, // Map<BibEntry, BibDatabase>
-                                                           null, // uniqueLetters
-                                                           unlimAuthors /* from args!*/);
-                    } else {
-                        // See if this entry can go into a group with the previous one:
-                        // createNormalizedCitationMarker
-                        String thisMarker =
-                            getAuthorYearParenthesisMarker(style,
-                                                           Collections.singletonList(currentEntry),
-                                                           database,
-                                                           null,
-                                                           unlimAuthors);
-
-                        String authorField = style.getStringCitProperty(OOBibStyle.AUTHOR_FIELD);
-                        int maxAuthors = style.getIntCitProperty(OOBibStyle.MAX_AUTHORS);
-                        String author = getCitationMarkerField(style,
-                                                               currentEntry,
-                                                               database.get(currentEntry),
-                                                               authorField);
-                        AuthorList al = AuthorList.parse(author);
-
-                        // assumes (unlimAuthors != null)
-                        int prevALim = unlimAuthors[i - 1]; // i always at least 1 here
-                        if (!thisMarker.equals(tmpMarker)
-                            || ((al.getNumberOfAuthors() > maxAuthors)
-                                && (unlimAuthors[i] != prevALim))) {
-                            // No match. Update piv to exclude the previous entry. But first check if the
-                            // previous entry was part of a group:
-                            if ((piv > -1) && (i > (piv + 1))) {
-                                // Do the grouping:
-                                group(style, entries, uniquefiers, piv, i - 1);
-                            }
-                            tmpMarker = thisMarker;
-                            piv = i;
-                        }
-                    }
+            if ((content.isPresent()) && !content.get().trim().isEmpty()) {
+                if (authorFields.contains(field) && StringUtil.isInCurlyBrackets(content.get())) {
+                    return "{" + style.fieldFormatter.format(content.get()) + "}";
                 }
-
+                return style.fieldFormatter.format(content.get());
             }
-            // Finished with the loop. See if the last entries form a group:
-            if (piv >= 0) {
-                // Do the grouping:
-                group(style, entries, uniquefiers, piv, uniquefiers.length - 1);
-            }
-        } // if uniquefiers are not null
-
-        if (inParenthesis) {
-            return getAuthorYearParenthesisMarker(style, entries, database, uniquefiers, unlimAuthors);
-        } else {
-            return getAuthorYearInTextMarker(style, entries, database, uniquefiers, unlimAuthors);
         }
+        // No luck? Return an empty string:
+        return "";
     }
 
 
@@ -531,39 +417,192 @@ class OOBibStyleGetCitationMarker {
     }
 
     /**
-     * This method looks up a field for an entry in a database. Any
-     * number of backup fields can be used if the primary field is
-     * empty.
+     * Modify entry and uniquefier arrays to facilitate a grouped
+     * presentation of uniquefied entries.
      *
-     * @param entry    The entry.
-     * @param database The database the entry belongs to.
-     * @param fields   The field, or succession of fields, to look up.
-     *                 If backup fields are needed, separate
-     *                 field names by /. E.g. to use "author" with "editor" as backup,
-     *                 specify StandardField.orFields(StandardField.AUTHOR, StandardField.EDITOR).
-     * @return The resolved field content, or an empty string if the field(s) were empty.
+     * entries[ (from+1 .. to) ]  = null
+     * uniquefiers[from] = String.join( separator, uniquefiers.subList(from,to_inclusive) )
+     *
+     * @param entries     The entry array.
+     * @param uniquefiers The uniquefier array.
+     * @param from        The first index to group (inclusive)
+     * @param to          The last  index to group (inclusive)
      */
-    private static String getCitationMarkerField(OOBibStyle style,
-                                                 BibEntry entry,
-                                                 BibDatabase database,
-                                                 String fields) {
-        Objects.requireNonNull(entry, "Entry cannot be null");
-        Objects.requireNonNull(database, "database cannot be null");
+    private static void group(OOBibStyle style,
+                              List<BibEntry> entries,
+                              String[] uniquefiers,
+                              int from,
+                              int to) {
 
-        Set<Field> authorFields =
-            FieldFactory.parseOrFields(style.getStringCitProperty(OOBibStyle.AUTHOR_FIELD));
-        for (Field field : FieldFactory.parseOrFields(fields)) {
-            Optional<String> content = entry.getResolvedFieldOrAlias(field, database);
+        String separator = style.getStringCitProperty(OOBibStyle.UNIQUEFIER_SEPARATOR);
 
-            if ((content.isPresent()) && !content.get().trim().isEmpty()) {
-                if (authorFields.contains(field) && StringUtil.isInCurlyBrackets(content.get())) {
-                    return "{" + style.fieldFormatter.format(content.get()) + "}";
-                }
-                return style.fieldFormatter.format(content.get());
-            }
+        StringBuilder sb = new StringBuilder(uniquefiers[from]);
+        for (int i = from + 1; i <= to; i++) {
+            sb.append(separator);
+            sb.append(uniquefiers[i]);
+            entries.set(i, null); // kill BibEntry?
         }
-        // No luck? Return an empty string:
-        return "";
+        uniquefiers[from] = sb.toString();
+    }
+
+
+    /**
+     * @param entries
+     * @param database
+     * @param inParenthesis Emit "(Au, 2000)" if true, "Au (2000)" if false.
+     * @param uniquefiers null or of length entries.size(), with
+     *                    elements null or letter making a cited
+     *                    source unique in citations.
+     *
+     * @param unlimAuthors Can this be null?
+     *                     If not null, then its elements are ...
+     *
+     * @param pageInfosForCitations
+     *                    May be null.
+     *                    Any or of its elements can be null.
+     */
+    /*
+     * Call patterns:
+     *
+     *    // normalizedCitationMarkerForNormalStyle
+     *    return style.getCitationMarker(Collections.singletonList(ce), // List<BibEntry>
+     *                                   entries, // Map<BibEntry, BibDatabase>
+     *                                   true,    // inParenthesis
+     *                                   null,    // uniqueLetters
+     *                                   new int[] {-1}, // no limit on authors
+     *                                   null // pageInfosForCitations
+     *        );
+     *    // produceCitationMarkersForNormalStyle
+     *    // when there are unresolved entries
+     *    style.getCitationMarker(cEntries,
+     *                            entries,
+     *                            cg.itcType == OOBibBase.AUTHORYEAR_PAR,
+     *                            uniqueLetterForCitedEntry2,
+     *                            firstLimAuthors2,
+     *                            pageInfo);
+     *    // when there are no unresolved entries
+     *    String citMarker = style.getCitationMarker(cEntries,
+     *                                               entries,
+     *                                               cg.itcType == OOBibBase.AUTHORYEAR_PAR,
+     *                                               uniqueLetterForCitedEntry,
+     *                                               firstLimAuthors,
+     *                                               pageInfosForCitations);
+     *    // insertCitation
+     *    String citeText = (style.isNumberEntries()
+     *                       ? "[-]" // A dash only. Only refresh later.
+     *                       : style.getCitationMarker(entries,
+     *                                                 databaseMap,
+     *                                                 inParenthesis,
+     *                                                 null, // uniqueLetters
+     *                                                 null, // unlimAuthors
+     *                                                 pageInfosForCitations));
+     */
+    public static String getCitationMarker(OOBibStyle style,
+                                           List<BibEntry> entries,
+                                           Map<BibEntry, BibDatabase> database,
+                                           boolean inParenthesis,
+                                           String[] uniquefiers,
+                                           int[] unlimAuthors,
+                                           List<String> pageInfosForCitations
+        ) {
+
+        List<String> pageInfos =
+            OOBibStyle.regularizePageInfosForCitations(pageInfosForCitations,
+                                                       entries.size());
+        // Original:
+        //
+        // Look for groups of uniquefied entries that should be combined in the output.
+        // E.g. (Olsen, 2005a, b) should be output instead of (Olsen, 2005a; Olsen, 2005b).
+        //
+        // Now:
+        // - handle pageInfos
+        // - allow duplicate entries with same or different pageInfos.
+        //
+        // We assume entries are already sorted, all we need is to
+        // group consecutive entries if we can.
+        //
+        // We also assume, that identical entries have the same uniquefier.
+        //
+        // Possibilites for two consecutive entries:
+        //   a.entry != b.entry, 
+        //
+        //
+        int piv = -1;
+
+        String tmpMarker = null;
+
+        if (uniquefiers != null) {
+
+            for (int i = 0; i < uniquefiers.length; i++) {
+
+                if ((uniquefiers[i] == null) || uniquefiers[i].isEmpty()) {
+                    // This entry has no uniquefier.
+                    // Check if we just passed a group of more than one entry with uniquefier:
+                    if ((piv > -1) && (i > (piv + 1))) {
+                        // Do the grouping:
+                        group(style, entries, uniquefiers, piv, i - 1);
+                    }
+
+                    piv = -1;
+                } else {
+                    BibEntry currentEntry = entries.get(i);
+                    if (piv == -1) {
+                        piv = i;
+                        // createNormalizedCitationMarker
+                        tmpMarker =
+                            getAuthorYearParenthesisMarker(style,
+                                                           Collections.singletonList(currentEntry),
+                                                           database, // Map<BibEntry, BibDatabase>
+                                                           null, // uniqueLetters
+                                                           unlimAuthors /* from args!*/);
+                    } else {
+                        // See if this entry can go into a group with the previous one:
+                        // createNormalizedCitationMarker
+                        String thisMarker =
+                            getAuthorYearParenthesisMarker(style,
+                                                           Collections.singletonList(currentEntry),
+                                                           database,
+                                                           null,
+                                                           unlimAuthors);
+
+                        String authorField = style.getStringCitProperty(OOBibStyle.AUTHOR_FIELD);
+                        int maxAuthors = style.getIntCitProperty(OOBibStyle.MAX_AUTHORS);
+                        String author = getCitationMarkerField(style,
+                                                               currentEntry,
+                                                               database.get(currentEntry),
+                                                               authorField);
+                        AuthorList al = AuthorList.parse(author);
+
+                        // assumes (unlimAuthors != null)
+                        int prevALim = unlimAuthors[i - 1]; // i always at least 1 here
+                        if (!thisMarker.equals(tmpMarker)
+                            || ((al.getNumberOfAuthors() > maxAuthors)
+                                && (unlimAuthors[i] != prevALim))) {
+                            // No match. Update piv to exclude the previous entry. But first check if the
+                            // previous entry was part of a group:
+                            if ((piv > -1) && (i > (piv + 1))) {
+                                // Do the grouping:
+                                group(style, entries, uniquefiers, piv, i - 1);
+                            }
+                            tmpMarker = thisMarker;
+                            piv = i;
+                        }
+                    }
+                }
+
+            }
+            // Finished with the loop. See if the last entries form a group:
+            if (piv >= 0) {
+                // Do the grouping:
+                group(style, entries, uniquefiers, piv, uniquefiers.length - 1);
+            }
+        } // if uniquefiers are not null
+
+        if (inParenthesis) {
+            return getAuthorYearParenthesisMarker(style, entries, database, uniquefiers, unlimAuthors);
+        } else {
+            return getAuthorYearInTextMarker(style, entries, database, uniquefiers, unlimAuthors);
+        }
     }
 
 
