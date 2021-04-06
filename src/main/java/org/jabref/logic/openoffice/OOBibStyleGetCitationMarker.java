@@ -52,7 +52,7 @@ class OOBibStyleGetCitationMarker {
      * @param entries     The entry array.
      * @param uniquefiers The uniquefier array.
      * @param from        The first index to group (inclusive)
-     * @param to          The last index to group (inclusive)
+     * @param to          The last  index to group (inclusive)
      */
     private static void group(OOBibStyle style,
                               List<BibEntry> entries,
@@ -162,6 +162,8 @@ class OOBibStyleGetCitationMarker {
                                                                database.get(currentEntry),
                                                                authorField);
                         AuthorList al = AuthorList.parse(author);
+
+                        // assumes (unlimAuthors != null)
                         int prevALim = unlimAuthors[i - 1]; // i always at least 1 here
                         if (!thisMarker.equals(tmpMarker)
                             || ((al.getNumberOfAuthors() > maxAuthors)

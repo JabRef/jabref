@@ -1096,13 +1096,12 @@ class OOBibBase {
                         uniqueLetterForCitedEntry2[0] = uniqueLetterForCitedEntry[j];
                         List<String> pageInfo = pageInfosForCitations.subList(j,j+1);
                         s = (s
-                             + style.getCitationMarker(
-                                 cEntries,
-                                 entries,
-                                 cg.itcType == OOBibBase.AUTHORYEAR_PAR,
-                                 uniqueLetterForCitedEntry2,
-                                 firstLimAuthors2,
-                                 pageInfo));
+                             + style.getCitationMarker(cEntries,
+                                                       entries,
+                                                       cg.itcType == OOBibBase.AUTHORYEAR_PAR,
+                                                       uniqueLetterForCitedEntry2,
+                                                       firstLimAuthors2,
+                                                       pageInfo));
                     } else {
                         s = s + String.format("(Unresolved(%s))", currentKey);
                     }
@@ -1122,16 +1121,13 @@ class OOBibBase {
                     entries.put(e,d);
                 }
 
-                citMarkers.put( cgid,
-                                style.getCitationMarker(
-                                    cEntries,
-                                    entries,
-                                    cg.itcType == OOBibBase.AUTHORYEAR_PAR,
-                                    uniqueLetterForCitedEntry,
-                                    firstLimAuthors,
-                                    pageInfosForCitations
-                                    )
-                    );
+                String citMarker = style.getCitationMarker(cEntries,
+                                                           entries,
+                                                           cg.itcType == OOBibBase.AUTHORYEAR_PAR,
+                                                           uniqueLetterForCitedEntry,
+                                                           firstLimAuthors,
+                                                           pageInfosForCitations);
+                citMarkers.put(cgid, citMarker);
             }
         }
 
@@ -1549,8 +1545,8 @@ class OOBibBase {
                                    : style.getCitationMarker(entries,
                                                              databaseMap,
                                                              inParenthesis,
-                                                             null,
-                                                             null,
+                                                             null, // uniqueLetters
+                                                             null, // unlimAuthors
                                                              pageInfosForCitations));
 
                 if (citeText.equals("")) {
