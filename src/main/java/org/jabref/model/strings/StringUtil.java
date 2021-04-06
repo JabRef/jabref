@@ -23,7 +23,7 @@ public class StringUtil {
     public static final String SPECIAL_COMMAND_CHARS = "\"`^~'=.|";
     // contains all possible line breaks, not omitting any break such as "\\n"
     private static final Pattern LINE_BREAKS = Pattern.compile("\\r\\n|\\r|\\n");
-    private static final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");
+    // UNUSED: private static final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");
     private static final UnicodeToReadableCharMap UNICODE_CHAR_MAP = new UnicodeToReadableCharMap();
 
     public static String booleanToBinaryString(boolean expression) {
@@ -382,24 +382,26 @@ public class StringUtil {
     //        return current;
     //    }
 
-    /**
-     * This method looks for occurrences of capital letters enclosed in one pair
-     * of braces, e.g. "{AB}". All these are replaced by only the capitals in
-     * between the braces.
-     *
-     * @param s The String to analyze.
-     * @return A new String with braces removed.
-     */
-    private static String removeSingleBracesAroundCapitals(String s) {
-        Matcher mcr = BRACED_TITLE_CAPITAL_PATTERN.matcher(s);
-        StringBuilder buf = new StringBuilder();
-        while (mcr.find()) {
-            String replaceStr = mcr.group();
-            mcr.appendReplacement(buf, replaceStr.substring(1, replaceStr.length() - 1));
-        }
-        mcr.appendTail(buf);
-        return buf.toString();
-    }
+ //    /**
+ //     * This method looks for occurrences of capital letters enclosed in one pair
+ //     * of braces, e.g. "{AB}". All these are replaced by only the capitals in
+ //     * between the braces.
+ //     *
+ //     * Does not consider accented capital letters, only A-Z.
+ //     *
+ //     * @param s The String to analyze.
+ //     * @return A new String with braces removed.
+ //     */
+ //    private static String removeSingleBracesAroundCapitals(String s) {
+ //        Matcher mcr = BRACED_TITLE_CAPITAL_PATTERN.matcher(s);
+ //        StringBuilder buf = new StringBuilder();
+ //        while (mcr.find()) {
+ //            String replaceStr = mcr.group();
+ //            mcr.appendReplacement(buf, replaceStr.substring(1, replaceStr.length() - 1));
+ //        }
+ //        mcr.appendTail(buf);
+ //        return buf.toString();
+ //    }
 
     /**
      * Replaces all platform-dependent line breaks by OS.NEWLINE line breaks.
