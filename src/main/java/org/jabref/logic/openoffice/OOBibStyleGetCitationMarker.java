@@ -43,6 +43,169 @@ import org.slf4j.LoggerFactory;
 class OOBibStyleGetCitationMarker {
 
     /**
+     * Look up the nth author and return the "proper" last name for
+     * citation markers.
+     *
+     * Note: "proper" in the sense that it includes the "von" part
+     *        of the name (followed by a space) if there is one.
+     *
+     * @param al     The author list.
+     * @param number The number of the author to return.
+     * @return The author name, or an empty String if inapplicable.
+     */
+    private static String getAuthorLastName(AuthorList al,
+                                            int number) {
+        StringBuilder sb = new StringBuilder();
+
+        if (al.getNumberOfAuthors() > number) {
+            Author a = al.getAuthor(number);
+            // "von " if von exists
+            Optional<String> von = a.getVon();
+            if (von.isPresent() && !von.isEmpty()) {
+                sb.append(von.get());
+                sb.append(' ');
+            }
+            // last name if it exists
+            sb.append(a.getLast().orElse(""));
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * @param author Passed to {@code AuthorList.parse(author)}
+     *
+     * @param maxAuthors The maximum number of authors to write out.
+     *                   If there are more authors, then ET_AL_STRING is emitted
+     *                   to mark their omission.
+     *                   Set to -1 to write out all authors.
+     *
+     *                   maxAuthors=0 is pointless, now throws RuntimeException
+     *                   (Earlier it behaved as maxAuthors=1)
+     *
+     *                   maxAuthors less than -1 : throw RuntimeException
+     *
+     * @param andString  For "A, B[ and ]C"
+     * @param yearSep    Appended to result here.
+     *                   For example " " in default_authoryear.jstyle
+     *
+     * @return "Au[AS]Bu[AS]Cu[OXFORD_COMMA][andString]Du[yearSep]"
+     *      or "Au[etAlString][yearSep]"
+     *
+     *             where AS = AUTHOR_SEPARATOR
+     *                   Au, Bu, Cu, Du are last names of authors.
+     *
+     *         Note:
+     *          - The "Au[AS]Bu[AS]Cu" (or the "Au") part may be empty (maxAuthors==0 or nAuthors==0).
+     *          - OXFORD_COMMA is only emitted if nAuthors is at least 3.
+     *          - andString  is only emitted if nAuthors is at least 2.
+     *          - yearSep is always emitted
+     */
+    private static String createAuthorList(OOBibStyle style,
+                                           String author,
+                                           int maxAuthors,
+                                           String andString,
+                                           String yearSep) {
+        Objects.requireNonNull(author);
+
+        // Apparently maxAuthorsBeforeEtAl is always 1 for in-text citations.
+        // In reference lists can be for example 7,
+        // (https://www.chicagomanualofstyle.org/turabian/turabian-author-date-citation-quick-guide.html)
+        // but those are handled elsewhere.
+        //
+        // There is also
+        // https://apastyle.apa.org/style-grammar-guidelines/ ...
+        //          ... citations/basic-principles/same-year-first-author
+        // suggesting the to avoid ambiguity, we may need more than one name
+        // before "et al.". We do not currently do this kind of disambiguation,
+        // but we might, one day.
+        //
+        final int maxAuthorsBeforeEtAl = 1;
+
+        // The String to represent authors that are not mentioned,
+        // e.g. " et al."
+        String etAlString = style.getStringCitProperty(OOBibStyle.ET_AL_STRING);
+
+        // The String to add between author names except the last two,
+        // e.g. ", ".
+        String authorSep = style.getStringCitProperty(OOBibStyle.AUTHOR_SEPARATOR);
+
+        // The String to put after the second to last author in case
+        // of three or more authors: (A, B[,] and C)
+        String oxfordComma = style.getStringCitProperty(OOBibStyle.OXFORD_COMMA);
+
+        StringBuilder sb = new StringBuilder();
+        AuthorList al = AuthorList.parse(author);
+        final int nAuthors = al.getNumberOfAuthors();
+
+        // To reduce ambiguity, throw on unexpected values of maxAuthors
+        if (maxAuthors == 0) {
+            throw new RuntimeException("maxAuthors = 0 in createAuthorList");
+        }
+        if (maxAuthors < -1) {
+            throw new RuntimeException("maxAuthors < -1 in createAuthorList");
+        }
+
+        boolean emitAllAuthors = ((nAuthors <= maxAuthors) || (maxAuthors == -1));
+
+        int nAuthorsToEmit = (emitAllAuthors
+                              ? nAuthors
+                              : Math.min(maxAuthorsBeforeEtAl, nAuthors));
+
+        if (!emitAllAuthors) {
+            // If we use "et al." maxAuthorsBeforeEtAl also limits the
+            // number of authors emitted.
+            nAuthorsToEmit = Math.min(nAuthorsToEmit, maxAuthorsBeforeEtAl);
+        }
+
+        if (nAuthorsToEmit > 0) {
+            // The first author
+            sb.append(getAuthorLastName(al, 0));
+        }
+
+        if (nAuthors >= 2) {
+
+            if (emitAllAuthors) {
+                // Emit last names, except for the last author
+                int j = 1;
+                while (j < (nAuthors - 1)) {
+                    sb.append(authorSep);
+                    sb.append(getAuthorLastName(al, j));
+                    j++;
+                }
+                // oxfordComma if at least 3 authors
+                if (nAuthors >= 3) {
+                    sb.append(oxfordComma);
+                }
+                // Emit " and "+"LastAuthor"
+                sb.append(andString);
+                sb.append(getAuthorLastName(al, nAuthors - 1));
+
+            } else {
+                // Emit last names up to nAuthorsToEmit.
+                //
+                // The (maxAuthorsBeforeEtAl > 1) test may seem
+                // superfluous, and yes, it is.
+                // It is intended to make sure the compiler eliminates
+                // this block as long as maxAuthorsBeforeEtAl is fixed
+                // to 1.
+                if (maxAuthorsBeforeEtAl > 1) {
+                    int j = 1;
+                    while (j < nAuthorsToEmit) {
+                        sb.append(authorSep);
+                        sb.append(getAuthorLastName(al, j));
+                        j++;
+                    }
+                }
+                sb.append(etAlString);
+            }
+        }
+
+        sb.append(yearSep);
+        return sb.toString();
+    }
+
+    /**
      * Modify entry and uniquefier arrays to facilitate a grouped
      * presentation of uniquefied entries.
      *
@@ -403,167 +566,5 @@ class OOBibStyleGetCitationMarker {
         return "";
     }
 
-    /**
-     * Look up the nth author and return the "proper" last name for
-     * citation markers.
-     *
-     * Note: "proper" in the sense that it includes the "von" part
-     *        of the name (followed by a space) if there is one.
-     *
-     * @param al     The author list.
-     * @param number The number of the author to return.
-     * @return The author name, or an empty String if inapplicable.
-     */
-    private static String getAuthorLastName(OOBibStyle style,
-                                            AuthorList al,
-                                            int number) {
-        StringBuilder sb = new StringBuilder();
-
-        if (al.getNumberOfAuthors() > number) {
-            Author a = al.getAuthor(number);
-            // "von " if von exists
-            Optional<String> von = a.getVon();
-            if (von.isPresent() && !von.isEmpty()) {
-                sb.append(von.get());
-                sb.append(' ');
-            }
-            // last name if it exists
-            sb.append(a.getLast().orElse(""));
-        }
-
-        return sb.toString();
-    }
-
-    /**
-     * @param author Passed to {@code AuthorList.parse(author)}
-     *
-     * @param maxAuthors The maximum number of authors to write out.
-     *                   If there are more authors, then ET_AL_STRING is emitted
-     *                   to mark their omission.
-     *                   Set to -1 to write out all authors.
-     *
-     *                   maxAuthors=0 is pointless, now throws RuntimeException
-     *                   (Earlier it behaved as maxAuthors=1)
-     *
-     *                   maxAuthors less than -1 : throw RuntimeException
-     *
-     * @param andString  For "A, B[ and ]C"
-     * @param yearSep    Appended to result here.
-     *                   For example " " in default_authoryear.jstyle
-     *
-     * @return "Au[AS]Bu[AS]Cu[OXFORD_COMMA][andString]Du[yearSep]"
-     *      or "Au[etAlString][yearSep]"
-     *
-     *             where AS = AUTHOR_SEPARATOR
-     *                   Au, Bu, Cu, Du are last names of authors.
-     *
-     *         Note:
-     *          - The "Au[AS]Bu[AS]Cu" (or the "Au") part may be empty (maxAuthors==0 or nAuthors==0).
-     *          - OXFORD_COMMA is only emitted if nAuthors is at least 3.
-     *          - andString  is only emitted if nAuthors is at least 2.
-     *          - yearSep is always emitted
-     */
-    private static String createAuthorList(OOBibStyle style,
-                                           String author,
-                                           int maxAuthors,
-                                           String andString,
-                                           String yearSep) {
-        Objects.requireNonNull(author);
-
-        // Apparently maxAuthorsBeforeEtAl is always 1 for in-text citations.
-        // In reference lists can be for example 7,
-        // (https://www.chicagomanualofstyle.org/turabian/turabian-author-date-citation-quick-guide.html)
-        // but those are handled elsewhere.
-        //
-        // There is also
-        // https://apastyle.apa.org/style-grammar-guidelines/citations/basic-principles/same-year-first-author
-        // suggesting the to avoid ambiguity, we may need more than one name
-        // before "et al.". We do not currently do this kind of disambiguation,
-        // but we might, one day.
-        //
-        final int maxAuthorsBeforeEtAl = 1;
-
-        // The String to represent authors that are not mentioned,
-        // e.g. " et al."
-        String etAlString = style.getStringCitProperty(OOBibStyle.ET_AL_STRING);
-
-        // The String to add between author names except the last two,
-        // e.g. ", ".
-        String authorSep = style.getStringCitProperty(OOBibStyle.AUTHOR_SEPARATOR);
-
-        // The String to put after the second to last author in case
-        // of three or more authors: (A, B[,] and C)
-        String oxfordComma = style.getStringCitProperty(OOBibStyle.OXFORD_COMMA);
-
-        StringBuilder sb = new StringBuilder();
-        AuthorList al = AuthorList.parse(author);
-        final int nAuthors = al.getNumberOfAuthors();
-
-        // To reduce ambiguity, throw on unexpected values of maxAuthors
-        if (maxAuthors == 0) {
-            throw new RuntimeException("maxAuthors = 0 in createAuthorList");
-        }
-        if (maxAuthors < -1) {
-            throw new RuntimeException("maxAuthors < -1 in createAuthorList");
-        }
-
-        boolean emitAllAuthors = ((nAuthors <= maxAuthors) || (maxAuthors == -1));
-
-        int nAuthorsToEmit = (emitAllAuthors
-                              ? nAuthors
-                              : Math.min(maxAuthorsBeforeEtAl, nAuthors));
-
-        if (!emitAllAuthors) {
-            // If we use "et al." maxAuthorsBeforeEtAl also limits the
-            // number of authors emitted.
-            nAuthorsToEmit = Math.min(nAuthorsToEmit, maxAuthorsBeforeEtAl);
-        }
-
-        if (nAuthorsToEmit > 0) {
-            // The first author
-            sb.append(getAuthorLastName(style, al, 0));
-        }
-
-        if (nAuthors >= 2) {
-
-            if (emitAllAuthors) {
-                // Emit last names, except for the last author
-                int j = 1;
-                while (j < (nAuthors - 1)) {
-                    sb.append(authorSep);
-                    sb.append(getAuthorLastName(style, al, j));
-                    j++;
-                }
-                // oxfordComma if at least 3 authors
-                if (nAuthors >= 3) {
-                    sb.append(oxfordComma);
-                }
-                // Emit " and "+"LastAuthor"
-                sb.append(andString);
-                sb.append(getAuthorLastName(style, al, nAuthors - 1));
-
-            } else {
-                // Emit last names up to nAuthorsToEmit.
-                //
-                // The (maxAuthorsBeforeEtAl > 1) test may seem
-                // superfluous, and yes, it is.
-                // It is intended to make sure the compiler eliminates
-                // this block as long as maxAuthorsBeforeEtAl is fixed
-                // to 1.
-                if (maxAuthorsBeforeEtAl > 1) {
-                    int j = 1;
-                    while (j < nAuthorsToEmit) {
-                        sb.append(authorSep);
-                        sb.append(getAuthorLastName(style, al, j));
-                        j++;
-                    }
-                }
-                sb.append(etAlString);
-            }
-        }
-
-        sb.append(yearSep);
-        return sb.toString();
-    }
 
 }
