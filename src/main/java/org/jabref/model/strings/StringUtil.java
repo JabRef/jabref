@@ -722,8 +722,20 @@ public class StringUtil {
      * Returns a list of sentences contained in the given text.
      */
     public static List<String> getStringAsSentences(String text) {
-        // A sentence ends with a .?!;, but not in the case of "Mr.", "Ms.", "Mrs.", "Dr.", "st.", "jr.", "co.", "inc.", and "ltd."
-        Pattern splitTextPattern = Pattern.compile("(?<=[\\.!;\\?])(?<![Mm](([Rr]|[Rr][Ss])|[Ss])\\.|[Dd][Rr]\\.|[Ss][Tt]\\.|[Jj][Rr]\\.|[Cc][Oo]\\.|[Ii][Nn][Cc]\\.|[Ll][Tt][Dd]\\.)\\s+");
+        // A sentence ends with a [.?!;],
+        // but not in the case of
+        // "Mr.", "Ms.", "Mrs.", "Dr.", "st.", "jr.", "co.", "inc.", and "ltd."
+        //
+        // "(?<=X)"  X, via zero-width positive lookbehind
+        // "(?<!X)"  X, via zero-width negative lookbehind
+        Pattern splitTextPattern = Pattern.compile(
+            "(?<=[.!;?])"
+            + "(?<!"
+            + "(Mr|Ms|Mrs|Dr|st|jr|co|inc|ltd)[.]"
+            + ")"
+            + "\\s+"
+            , Pattern.CASE_INSENSITIVE
+            );
         return Arrays.asList(splitTextPattern.split(text));
     }
 

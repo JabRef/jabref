@@ -347,4 +347,11 @@ class StringUtilTest {
         assertEquals("A", StringUtil.capitalizeFirst("a"));
         assertEquals("Aa", StringUtil.capitalizeFirst("AA"));
     }
+
+    @Test
+    void testGetStringAsSentences() {
+        assertEquals("x.", StringUtil.getStringAsSentences("x. y.").get(0));
+        assertEquals("x?", StringUtil.getStringAsSentences("x? y.").get(0));
+        assertEquals("ltD. y.", StringUtil.getStringAsSentences("ltD. y.").get(0));
+    }
 }
