@@ -32,6 +32,7 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
@@ -535,6 +536,22 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
     public String getStringCitProperty(String key) {
         return (String) citProperties.get(key);
+    }
+
+    /**
+     *  @return Field containing authors, with fallback fields.
+     */
+    protected OrFields getAuthorFieldNames() {
+        String authorFieldNamesString = this.getStringCitProperty(OOBibStyle.AUTHOR_FIELD);
+        return FieldFactory.parseOrFields(authorFieldNamesString);
+    }
+
+    /**
+     *  @return Field containing year, with fallback fields.
+     */
+    protected OrFields getYearFieldNames() {
+        String yearFieldNamesString = this.getStringCitProperty(OOBibStyle.YEAR_FIELD);
+        return FieldFactory.parseOrFields(yearFieldNamesString);
     }
 
     public String getCitationCharacterFormat() {

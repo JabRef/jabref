@@ -208,9 +208,39 @@ class OOBibStyleGetCitationMarker {
         return sb.toString();
     }
 
+    private static class FieldAndContent {
+        Field field;
+        String content;
+        FieldAndContent(Field field, String content) {
+            this.field = field;
+            this.content = content;
+        }
+    }
+    /**
+     * @return the field and the content of the first nonempty (after trimming)
+     * field (or alias) from {@code fields} found in {@code entry}, or Optional.empty()
+     */
+    private static Optional<FieldAndContent> getRawCitationMarkerField(BibEntry entry,
+                                                                       BibDatabase database,
+                                                                       OrFields fields
+        ) {
+        Objects.requireNonNull(entry, "Entry cannot be null");
+        Objects.requireNonNull(database, "database cannot be null");
+
+        for (Field field : fields /*FieldFactory.parseOrFields(fields)*/) {
+            Optional<String> optionalContent = entry.getResolvedFieldOrAlias(field, database);
+            final boolean foundSomething = (optionalContent.isPresent()
+                                            && !optionalContent.get().trim().isEmpty());
+            if (foundSomething) {
+                return Optional.of(new FieldAndContent(field, optionalContent.get()));
+            }
+        }
+        return Optional.empty();
+    }
 
     /**
      * This method looks up a field for an entry in a database.
+     *
      * Any number of backup fields can be used if the primary field is
      * empty.
      *
@@ -232,43 +262,32 @@ class OOBibStyleGetCitationMarker {
     private static String getCitationMarkerField(OOBibStyle style,
                                                  BibEntry entry,
                                                  BibDatabase database,
-                                                 String fields) {
+                                                 OrFields fields) {
         Objects.requireNonNull(entry, "Entry cannot be null");
         Objects.requireNonNull(database, "database cannot be null");
 
-        for (Field field : FieldFactory.parseOrFields(fields)) {
-            Optional<String> optionalContent = entry.getResolvedFieldOrAlias(field, database);
-            final boolean foundSomething = (optionalContent.isPresent()
-                                            && !optionalContent.get().trim().isEmpty());
-
-            if (foundSomething) {
-                String content = optionalContent.get();
-                String result = style.fieldFormatter.format(content);
+        Optional<FieldAndContent> optionalFieldAndContent =
+            getRawCitationMarkerField(entry, database, fields);
 
 
-                // If the field we found is mentioned in
-                // OOBibStyle.AUTHOR_FIELD and content has a pair of
-                // braces around it, we add a pair of braces around
-                // the result.
-
-                // Note: we are packing a list of strings to a string, so that we can
-                //       store it in a style.getStringCitProperty
-                //       And here we parse it to a OrFields, repeatedly, on each call.
-                //       Could be more efficient to parse when the style is created.
-                //
-                final String authorFieldNames = style.getStringCitProperty(OOBibStyle.AUTHOR_FIELD);
-                final OrFields authorFields = FieldFactory.parseOrFields(authorFieldNames);
-
-                if (authorFields.contains(field) && StringUtil.isInCurlyBrackets(content)) {
-                    result =  "{" + result  + "}";
-                }
-                return result;
-            }
+        if (optionalFieldAndContent.isEmpty()) {
+            // No luck? Return an empty string:
+            return "";
         }
-        // No luck? Return an empty string:
-        return "";
-    }
 
+        FieldAndContent fc = optionalFieldAndContent.get();
+        String result = style.fieldFormatter.format(fc.content);
+
+        // If the field we found is mentioned in authorFieldNames and
+        // content has a pair of braces around it, we add a pair of
+        // braces around the result.
+
+        final OrFields authorFieldNames = style.getAuthorFieldNames();
+        if (authorFieldNames.contains(fc.field) && StringUtil.isInCurlyBrackets(fc.content)) {
+            result =  "{" + result  + "}";
+        }
+        return result;
+    }
 
     /**
      * Produce (Author, year) style citation strings in many different forms.
@@ -289,7 +308,9 @@ class OOBibStyleGetCitationMarker {
 
         // The bibtex field providing author names, e.g. "author" or
         // "editor".
-        String authorField = style.getStringCitProperty(OOBibStyle.AUTHOR_FIELD);
+        // String authorFieldNamesString = style.getStringCitProperty(OOBibStyle.AUTHOR_FIELD);
+        // OrFields authorFieldNames = FieldFactory.parseOrFields(authorFieldNamesString);
+        OrFields authorFieldNames = style.getAuthorFieldNames();
 
         // The maximum number of authors to write out in full without
         // using etal. Set to -1 to always write out all authors.
@@ -310,7 +331,9 @@ class OOBibStyleGetCitationMarker {
         String citationSeparator = style.getStringCitProperty(OOBibStyle.CITATION_SEPARATOR);
 
         // The bibtex field providing the year, e.g. "year".
-        String yearField = style.getStringCitProperty(OOBibStyle.YEAR_FIELD);
+        // String yearFieldNamesString /*yearField*/ = style.getStringCitProperty(OOBibStyle.YEAR_FIELD);
+        // OrFields yearFieldNames = FieldFactory.parseOrFields(yearFieldNamesString);
+        OrFields yearFieldNames = style.getYearFieldNames();
 
         // The String to add between the two last author names, e.g. " & ".
         String andString = (inParenthesis
@@ -360,7 +383,7 @@ class OOBibStyleGetCitationMarker {
                               ? unlimAuthors[j]
                               : maxA );
 
-            String author = getCitationMarkerField(style, currentEntry, currentDatabase, authorField);
+            String author = getCitationMarkerField(style, currentEntry, currentDatabase, authorFieldNames);
             String authorString = createAuthorList(style, author, maxAuthors, andString, yearSep);
             sb.append(authorString);
 
@@ -368,7 +391,7 @@ class OOBibStyleGetCitationMarker {
                 sb.append(startBrace);
             }
 
-            String year = getCitationMarkerField(style, currentEntry, currentDatabase, yearField);
+            String year = getCitationMarkerField(style, currentEntry, currentDatabase, yearFieldNames);
             if (year != null) {
                 sb.append(year);
             }
@@ -544,7 +567,7 @@ class OOBibStyleGetCitationMarker {
                         String author = getCitationMarkerField(style,
                                                                currentEntry,
                                                                database.get(currentEntry),
-                                                               authorField);
+                                                               style.getAuthorFieldNames());
                         AuthorList al = AuthorList.parse(author);
 
                         // assumes (unlimAuthors != null)
