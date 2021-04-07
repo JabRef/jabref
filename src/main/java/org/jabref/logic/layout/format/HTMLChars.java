@@ -36,9 +36,11 @@ public class HTMLChars implements LayoutFormatter {
         for (i = 0; i < field.length(); i++) {
             c = field.charAt(i);
             if (escaped && (c == '\\')) {
+                // escaped backslash
                 sb.append('\\');
                 escaped = false;
             } else if (c == '\\') {
+                // unescaped backslash
                 if (incommand) {
                     /* Close Command */
                     String command = currentCommand.toString();
@@ -50,7 +52,8 @@ public class HTMLChars implements LayoutFormatter {
                 currentCommand = new StringBuilder();
             } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
-            } else if (Character.isLetter(c) || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
+            } else if (Character.isLetter(c)
+                       || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;
 
                 if (!incommand) {
@@ -62,6 +65,8 @@ public class HTMLChars implements LayoutFormatter {
                             && StringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
+
+                        // These all require at least one more character.
                         if (i >= (field.length() - 1)) {
                             break testCharCom;
                         }
@@ -71,10 +76,13 @@ public class HTMLChars implements LayoutFormatter {
                         c = field.charAt(i);
                         String commandBody;
                         if (c == '{') {
-                            String part = StringUtil.getPart(field, i, false);
+                            String part = StringUtil.getPart(field,
+                                                             i,
+                                                             false /* terminateOnEndBraceOnly */);
                             i += part.length();
                             commandBody = part;
                         } else {
+                            // No "{}", take a single character.
                             commandBody = field.substring(i, i + 1);
                         }
                         String result = HTML_CHARS.get(command + commandBody);
@@ -95,6 +103,7 @@ public class HTMLChars implements LayoutFormatter {
                             sb.append(Objects.requireNonNullElse(result, command));
                         }
                     }
+                    // "break testCharCom;" jumps here
                 }
             } else {
                 if (!incommand) {
@@ -109,7 +118,9 @@ public class HTMLChars implements LayoutFormatter {
                     if (!tag.isEmpty()) {
                         String part = StringUtil.getPart(field, i, true);
                         i += part.length();
-                        sb.append('<').append(tag).append('>').append(part).append("</").append(tag).append('>');
+                        sb.append('<').append(tag).append('>')
+                          .append(part)
+                          .append("</").append(tag).append('>');
                     } else if (c == '{') {
                         String argument = StringUtil.getPart(field, i, true);
                         i += argument.length();
@@ -141,6 +152,8 @@ public class HTMLChars implements LayoutFormatter {
                         sb.append(Objects.requireNonNullElse(result, command));
                         sb.append(' ');
                     }
+                    // Note: OOPreFormatter.format
+                    // has an "} else if (c == '}'){ /*nop*/ }" branch here
                 } else {
                     sb.append(c);
                     /*
