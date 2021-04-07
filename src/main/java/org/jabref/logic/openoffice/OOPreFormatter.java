@@ -10,17 +10,26 @@ import org.jabref.model.strings.StringUtil;
 /**
  * This formatter preprocesses JabRef fields before they are run through the layout of the
  * bibliography style. It handles translation of LaTeX italic/bold commands into HTML tags.
+ *
+ * Escapes: \\ becomes \
+ * \ starts command
+ * '{' and '}' are dropped, unless {@code incommand}
  */
 public class OOPreFormatter implements LayoutFormatter {
 
-    private static final Map<String, String> CHARS = HTMLUnicodeConversionMaps.LATEX_UNICODE_CONVERSION_MAP;
+    private static final Map<String, String> CHARS =
+        HTMLUnicodeConversionMaps.LATEX_UNICODE_CONVERSION_MAP;
 
     @Override
     public String format(String field) {
         int i;
-        String finalResult = field.replaceAll("&|\\\\&", "&") // Replace & and \& with &
-                                  .replace("\\$", "&dollar;") // Replace \$ with &dollar;
-                                  .replaceAll("\\$([^$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
+        String finalResult = (field
+                              .replaceAll("&|\\\\&", "&") // Replace & and \& with &
+                              .replace("\\$", "&dollar;") // Replace \$ with &dollar;
+                              // Replace $...$ with {...} to simplify conversion
+                              // Question: is $$ impossible here?
+                              // Question: is the replacement {...} or \{...\} ?
+                              .replaceAll("\\$([^$]*)\\$", "\\{$1\\}"));
 
         StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;

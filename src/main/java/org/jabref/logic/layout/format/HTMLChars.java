@@ -12,16 +12,19 @@ import org.jabref.model.strings.StringUtil;
  */
 public class HTMLChars implements LayoutFormatter {
 
-    private static final Map<String, String> HTML_CHARS = HTMLUnicodeConversionMaps.LATEX_HTML_CONVERSION_MAP;
+    private static final Map<String, String> HTML_CHARS =
+        HTMLUnicodeConversionMaps.LATEX_HTML_CONVERSION_MAP;
 
     @Override
     public String format(String inField) {
         int i;
-        String field = inField.replaceAll("&|\\\\&", "&amp;") // Replace & and \& with &amp;
-                              .replaceAll("[\\n]{2,}", "<p>") // Replace double line breaks with <p>
-                              .replace("\n", "<br>") // Replace single line breaks with <br>
-                              .replace("\\$", "&dollar;") // Replace \$ with &dollar;
-                              .replaceAll("\\$([^$]*)\\$", "\\{$1\\}"); // Replace $...$ with {...} to simplify conversion
+        String field = (inField
+                        .replaceAll("&|\\\\&", "&amp;") // Replace & and \& with &amp;
+                        .replaceAll("[\\n]{2,}", "<p>") // Replace double line breaks with <p>
+                        .replace("\n", "<br>") // Replace single line breaks with <br>
+                        .replace("\\$", "&dollar;") // Replace \$ with &dollar;
+                        // Replace $...$ with {...} to simplify conversion
+                        .replaceAll("\\$([^$]*)\\$", "\\{$1\\}"));
 
         StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;

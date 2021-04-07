@@ -27,7 +27,8 @@ public class HTMLCharsTest {
                 layout.format("Réflexions sur le timing de la quantité"));
 
         assertEquals("%%%", layout.format("\\%\\%\\%"));
-        assertEquals("People remember 10%, 20%…Oh Really?", layout.format("{{People remember 10\\%, 20\\%…Oh Really?}}"));
+        assertEquals("People remember 10%, 20%…Oh Really?",
+                     layout.format("{{People remember 10\\%, 20\\%…Oh Really?}}"));
 
         assertEquals("h&aacute;llo", layout.format("h\\'allo"));
 
@@ -44,7 +45,8 @@ public class HTMLCharsTest {
 
         assertEquals("&Oogon;&imath;", layout.format("\\k{O}\\i"));
 
-        assertEquals("&ntilde; &ntilde; &iacute; &imath; &imath;", layout.format("\\~{n} \\~n \\'i \\i \\i"));
+        assertEquals("&ntilde; &ntilde; &iacute; &imath; &imath;",
+                     layout.format("\\~{n} \\~n \\'i \\i \\i"));
     }
 
     @Test
