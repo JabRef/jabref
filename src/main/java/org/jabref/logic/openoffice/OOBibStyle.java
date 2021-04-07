@@ -517,7 +517,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * @param key The property key
      * @return the value
      */
-    public boolean getBooleanCitProperty(String key) {
+    private boolean getBooleanCitProperty(String key) {
         return (Boolean) citProperties.get(key);
     }
 
