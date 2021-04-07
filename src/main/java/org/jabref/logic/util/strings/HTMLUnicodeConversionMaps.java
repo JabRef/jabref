@@ -6,9 +6,15 @@ import java.util.Map;
 public class HTMLUnicodeConversionMaps {
 
     // most of the LaTeX commands can be read at http://en.wikibooks.org/wiki/LaTeX/Accents
-    // The symbols can be seen at http://www.fileformat.info/info/unicode/char/a4/index.htm. Replace "a4" with the U+ number
-    // http://detexify.kirelabs.org/classify.html and http://www.ctan.org/tex-archive/info/symbols/comprehensive/ might help to find the right LaTeX command
-    // http://llg.cubic.org/docs/ent2latex.html and http://www.w3.org/TR/xml-entity-names/byalpha.html are also useful
+    // The symbols can be seen at http://www.fileformat.info/info/unicode/char/a4/index.htm.
+    //     Replace "a4" with the U+ number
+    //
+    // http://detexify.kirelabs.org/classify.html and
+    // http://www.ctan.org/tex-archive/info/symbols/comprehensive/
+    // might help to find the right LaTeX command
+    //
+    // http://llg.cubic.org/docs/ent2latex.html and
+    // http://www.w3.org/TR/xml-entity-names/byalpha.html are also useful
     public static final Map<String, String> HTML_LATEX_CONVERSION_MAP = new HashMap<>();
     public static final Map<Integer, String> ESCAPED_ACCENTS = new HashMap<>();
     public static final Map<String, String> UNICODE_ESCAPED_ACCENTS = new HashMap<>();
@@ -25,9 +31,12 @@ public class HTMLUnicodeConversionMaps {
 
     // as well as http://www.w3.org/Math/characters/unicode.xml
     // An array of arrays of strings in the format:
+    //
     // {"decimal number of HTML entity", "text HTML entity", "corresponding LaTeX command"}
+    //
     // Leaving a field empty is OK as it then will not be included
-    private static final String[][] CONVERSION_LIST = new String[][] {{"160", "nbsp", "{~}"}, // no-break space = non-breaking space,
+    private static final String[][] CONVERSION_LIST = new String[][] {
+        {"160", "nbsp", "{~}"}, // no-break space = non-breaking space,
             //                                 U+00A0 ISOnum
             {"161", "iexcl", "{\\textexclamdown}"}, // inverted exclamation mark, U+00A1 ISOnum
             {"162", "cent", "{\\textcent}"}, // cent sign, U+00A2 ISOnum
@@ -866,9 +875,11 @@ public class HTMLUnicodeConversionMaps {
                     LATEX_HTML_CONVERSION_MAP.put(strippedLaTeX, "&#" + aConversionList[0] + ";");
                 }
                 if (!(aConversionList[0].isEmpty())) {
-                    NUMERICAL_LATEX_CONVERSION_MAP.put(Integer.decode(aConversionList[0]), aConversionList[2]);
+                    NUMERICAL_LATEX_CONVERSION_MAP.put(Integer.decode(aConversionList[0]),
+                                                       aConversionList[2]);
                     if (Integer.decode(aConversionList[0]) > 128) {
-                        String unicodeSymbol = String.valueOf(Character.toChars(Integer.decode(aConversionList[0])));
+                        String unicodeSymbol =
+                            String.valueOf(Character.toChars(Integer.decode(aConversionList[0])));
                         UNICODE_LATEX_CONVERSION_MAP.put(unicodeSymbol, aConversionList[2]);
                         if (!strippedLaTeX.isEmpty()) {
                             LATEX_UNICODE_CONVERSION_MAP.put(strippedLaTeX, unicodeSymbol);
