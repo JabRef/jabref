@@ -524,6 +524,11 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     public boolean getCitPropertyMultiCiteChronological() {
         return this.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL);
     }
+
+    public boolean getCitPropertyItalicEtAl() {
+        return this.getBooleanCitProperty(OOBibStyle.ITALIC_ET_AL);
+    }
+
     public int getIntCitProperty(String key) {
         return (Integer) citProperties.get(key);
     }
