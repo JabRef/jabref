@@ -902,6 +902,17 @@ public class HTMLUnicodeConversionMaps {
         LATEX_UNICODE_CONVERSION_MAP.put("AA", "Å"); // Overwritten by Ångstrom symbol
         LATEX_UNICODE_CONVERSION_MAP.put("'n", "ń");
 
+        // Allow accentless i : \i
+        LATEX_UNICODE_CONVERSION_MAP.put("'\\i", "í"); // From \'{\i} to í
+        LATEX_UNICODE_CONVERSION_MAP.put("`\\i", "ì");
+        LATEX_UNICODE_CONVERSION_MAP.put("\"\\i", "ï");
+        LATEX_UNICODE_CONVERSION_MAP.put("^\\i", "î");
+
+        LATEX_HTML_CONVERSION_MAP.put("'\\i", "&iacute;");
+        LATEX_HTML_CONVERSION_MAP.put("`\\i", "&igrave;");
+        LATEX_HTML_CONVERSION_MAP.put("\"\\i", "&iuml;");
+        LATEX_HTML_CONVERSION_MAP.put("^\\i", "&icirc;");
+
         // Manual additions
         // Support relax to the extent that it is simply removed
         LATEX_HTML_CONVERSION_MAP.put("relax", "");

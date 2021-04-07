@@ -19,6 +19,12 @@ public class OOPreFormatterTest {
         assertEquals("ä", new OOPreFormatter().format("{\\\"{a}}"));
         assertEquals("Ä", new OOPreFormatter().format("{\\\"{A}}"));
         assertEquals("Ç", new OOPreFormatter().format("{\\c{C}}"));
+        assertEquals("í", new OOPreFormatter().format("{\\\'{i}}"));
+
+        assertEquals("í", new OOPreFormatter().format("{\\\'{\\i}}"));
+        assertEquals("ì", new OOPreFormatter().format("{\\`{\\i}}"));
+        assertEquals("ï", new OOPreFormatter().format("{\\\"{\\i}}"));
+        assertEquals("î", new OOPreFormatter().format("{\\^{\\i}}"));
     }
 
     @Test

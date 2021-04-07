@@ -47,6 +47,8 @@ public class HTMLCharsTest {
 
         assertEquals("&ntilde; &ntilde; &iacute; &imath; &imath;",
                      layout.format("\\~{n} \\~n \\'i \\i \\i"));
+        assertEquals("&iacute; &igrave; &iuml; &icirc;",
+                     layout.format("\\'{\\i} \\`{\\i} \\\"{\\i} \\^{\\i}"));
     }
 
     @Test
