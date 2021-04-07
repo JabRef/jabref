@@ -137,7 +137,6 @@ public class OOPreFormatter implements LayoutFormatter {
                 }
             } else {
                 // Not backslash, not (brace && !incommand), not letter, not %, not SPECIAL_COMMAND_CHAR
-                String argument;
 
                 if (!incommand) {
                     sb.append(c);
