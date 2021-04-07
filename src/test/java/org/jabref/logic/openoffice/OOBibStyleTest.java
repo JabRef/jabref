@@ -275,7 +275,8 @@ class OOBibStyleTest {
                 layoutFormatterPreferences);
         assertEquals(", ", style.getStringCitProperty("AuthorSeparator"));
         assertEquals(3, style.getIntCitProperty("MaxAuthors"));
-        assertTrue(style.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL));
+        //assertTrue(style.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL));
+        assertTrue(style.getCitPropertyMultiCiteChronological());
         assertEquals("Default", style.getCitationCharacterFormat());
         assertEquals("Default [number] style file.", style.getName());
         Set<String> journals = style.getJournals();
