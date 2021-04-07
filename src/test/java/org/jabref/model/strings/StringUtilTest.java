@@ -137,6 +137,7 @@ class StringUtilTest {
     @Test
     void testGetPart() {
         assertEquals("", StringUtil.getPart("",0,true));
+
         // The character at startIndex is skipped, not looked at at all.
         assertEquals("abc", StringUtil.getPart("{abc}",0,true));
         assertEquals("abc", StringUtil.getPart("{abc def}",0,false));
