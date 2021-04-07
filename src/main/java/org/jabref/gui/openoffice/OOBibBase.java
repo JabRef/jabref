@@ -1096,10 +1096,12 @@ class OOBibBase {
                         uniqueLetterForCitedEntry2[0] = uniqueLetterForCitedEntry[j];
                         List<String> pageInfo = pageInfosForCitations.subList(j,j+1);
                         s = (s
-                             + style.getCitationMarker(cEntries,
+                             + style.getCitationMarker(cEntries, // single entry
                                                        entries,
                                                        cg.itcType == OOBibBase.AUTHORYEAR_PAR,
                                                        uniqueLetterForCitedEntry2,
+                                                       // firstLimAuthors2: firstLimAuthors[j] ==
+                                                       // maxAuthorsFirst or (-1) to use maxAuthors
                                                        firstLimAuthors2,
                                                        pageInfo));
                     } else {
@@ -1125,7 +1127,7 @@ class OOBibBase {
                                                            entries,
                                                            cg.itcType == OOBibBase.AUTHORYEAR_PAR,
                                                            uniqueLetterForCitedEntry,
-                                                           firstLimAuthors,
+                                                           firstLimAuthors, // maxAuthorsFirst or (-1)
                                                            pageInfosForCitations);
                 citMarkers.put(cgid, citMarker);
             }

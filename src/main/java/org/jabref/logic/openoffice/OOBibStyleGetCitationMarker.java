@@ -257,7 +257,11 @@ class OOBibStyleGetCitationMarker {
      *                     FieldFactory.serializeOrFields(StandardField.AUTHOR,
      *                                                    StandardField.EDITOR)
      *
-     * @return The resolved field content, or an empty string if the field(s) were empty.
+     * @return The resolved field content, or an empty string if the
+     *         field(s) were empty.
+     *
+     *
+     *
      */
     private static String getCitationMarkerField(OOBibStyle style,
                                                  BibEntry entry,
@@ -297,7 +301,9 @@ class OOBibStyleGetCitationMarker {
      * @param database          A map of BibEntry-BibDatabase pairs.
      * @param uniquifiers       Optional parameter to separate similar citations.
      *                          Elements can be null if not needed.
+     *
      * @return The formatted citation.
+     *
      */
     private static String getAuthorYearParenthesisMarker(OOBibStyle style,
                                                          List<BibEntry> entries,
@@ -379,9 +385,9 @@ class OOBibStyleGetCitationMarker {
              *               ? unlimAuthors[j]
              *               : maxA )
              */
-            int maxAuthors = (( (unlimAuthors != null) && (unlimAuthors[j] > 0) )
+            int maxAuthors = (((unlimAuthors != null) && (unlimAuthors[j] > 0))
                               ? unlimAuthors[j]
-                              : maxA );
+                              : maxA);
 
             String author = getCitationMarkerField(style, currentEntry, currentDatabase, authorFieldNames);
             String authorString = createAuthorList(style, author, maxAuthors, andString, yearSep);
@@ -473,7 +479,7 @@ class OOBibStyleGetCitationMarker {
      *                            entries,
      *                            cg.itcType == OOBibBase.AUTHORYEAR_PAR,
      *                            uniqueLetterForCitedEntry2,
-     *                            firstLimAuthors2,
+     *                            firstLimAuthors2, // entry for a single citation
      *                            pageInfo);
      *    // when there are no unresolved entries
      *    String citMarker = style.getCitationMarker(cEntries,
