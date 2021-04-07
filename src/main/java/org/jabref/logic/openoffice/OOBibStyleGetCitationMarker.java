@@ -344,12 +344,10 @@ class OOBibStyleGetCitationMarker {
         // The String to add between the two last author names, e.g. " & ".
         String andString = (inParenthesis
                             ? style.getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR)
-                            : style.getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR_IN_TEXT));
-
-        if (!inParenthesis && andString == null) {
-            // Use the default one if no explicit separator for text is defined
-            andString = style.getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR);
-        }
+                            : Objects.requireNonNullElse(
+                                style.getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR_IN_TEXT),
+                                // Use the default one if no explicit separator for text is defined
+                                style.getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR)));
 
         StringBuilder sb = new StringBuilder();
         if (inParenthesis) {
