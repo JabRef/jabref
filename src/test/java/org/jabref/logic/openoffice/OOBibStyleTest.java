@@ -73,7 +73,7 @@ class OOBibStyleTest {
     @Test
     void testNumerical() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
+                                          layoutFormatterPreferences);
         assertTrue(style.isValid());
         assertFalse(style.isCitationKeyCiteMarkers());
         assertFalse(style.isBoldCitations());
@@ -212,21 +212,12 @@ class OOBibStyleTest {
         assertEquals("[1] ",
                      style.getNumCitationMarkerForBibliography(1));
 
-        /*
-         * test insertPageInfo
-         */
-        if (true) {
-            String citation = style.getNumCitationMarkerForInText(Arrays.asList(1),
-                                                         -1,
-                                                         empty);
-            assertEquals("[1; pp. 55-56]", style.insertPageInfo(citation, "pp. 55-56"));
-        }
     }
 
     @Test
     void testGetNumCitationMarkerUndefined() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
+                                          layoutFormatterPreferences);
         List<String> empty = null;
 
         // unresolved citations look like [??]
@@ -274,8 +265,7 @@ class OOBibStyleTest {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences);
         assertEquals(", ", style.getStringCitProperty("AuthorSeparator"));
-        assertEquals(3, style.getIntCitProperty("MaxAuthors"));
-        //assertTrue(style.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL));
+        assertEquals(3, style.getMaxAuthors());
         assertTrue(style.getCitPropertyMultiCiteChronological());
         assertEquals("Default", style.getCitationCharacterFormat());
         assertEquals("Default [number] style file.", style.getName());
@@ -306,41 +296,261 @@ class OOBibStyleTest {
         BibDatabase database = new BibDatabase();
         database.insertEntry(entry);
 
-        Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
-        entryDBMap.put(entry, database);
+        List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>();
+        CitationMarkerEntry cm =
+            new CitationMarkerEntryImpl("Bostrom2006", entry, database, null, null, false);
+        citationMarkerEntries.add(cm);
 
-        assertEquals(3, style.getIntCitProperty("MaxAuthors"));
-
-        List<String> empty = null;
+        assertEquals(3, style.getMaxAuthors());
+        assertEquals(-1, style.getMaxAuthorsFirst());
 
         /*
          * For in-text citations most (maybe all) styles prescribe a single
          * author's name before "et al."
          */
         assertEquals("[Boström et al., 2006]",
-                     style.getCitationMarker(Collections.singletonList(entry), // List<BibEntry>
-                                             entryDBMap,  // Map<BibEntry, BibDatabase>
-                                             true,        // inParenthesis
-                                             null,        // uniquefiers
-                                             null,        // unlimAuthors
-                                             empty));     // pageInfosForCitations
+                     style.getCitationMarker(citationMarkerEntries,
+                                             true,
+                                             OOBibStyle.NonUniqueCitationMarker.THROWS));
 
         assertEquals("Boström et al. [2006]",
-                     style.getCitationMarker(Collections.singletonList(entry),
-                                             entryDBMap,
+                     style.getCitationMarker(citationMarkerEntries,
                                              false,
-                                             null,
-                                             new int[]{3},
-                                             empty));
+                                             OOBibStyle.NonUniqueCitationMarker.THROWS));
+
+        /*
+         * Currently there is no override for MAX_AUTHORS, except
+         * cm.isFirstAppearanceOfSource, which asks for MAX_AUTHORS_FIRST
+         */
+        citationMarkerEntries.clear();
+        cm = new CitationMarkerEntryImpl("Bostrom2006", entry, database, null, null, true);
+        citationMarkerEntries.add(cm);
 
         assertEquals("[Boström, Wäyrynen, Bodén, Beznosov & Kruchten, 2006]",
-                     style.getCitationMarker(Collections.singletonList(entry),
-                                             entryDBMap,
+                     style.getCitationMarker(citationMarkerEntries,
                                              true,
-                                             null,
-                                             new int[]{5},
-                                             empty));
+                                             OOBibStyle.NonUniqueCitationMarker.THROWS));
     }
+
+    @Test
+    void testGetCitationMarkerJoinFirst() throws IOException {
+        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                                          layoutFormatterPreferences);
+
+        // Question: What should happen if some of the sources is
+        // marked as isFirstAppearanceOfSource?
+        // This test documents what is happening now,
+        // but it is possible this is not what should.
+
+        // Two entries with identical normalizedMarkers and many authors.
+        BibEntry entry1 = new BibEntry()
+                .withField(StandardField.AUTHOR,
+                           "Gustav Bostr\\\"{o}m"
+                           + " and Jaana W\\\"{a}yrynen"
+                           + " and Marine Bod\\'{e}n"
+                           + " and Konstantin Beznosov"
+                           + " and Philippe Kruchten")
+                .withField(StandardField.YEAR, "2006")
+                .withField(StandardField.BOOKTITLE, "A book 1")
+                .withField(StandardField.PUBLISHER, "ACM")
+                .withField(StandardField.TITLE, "Title 1")
+                .withField(StandardField.PAGES, "11--18");
+
+        BibEntry entry2 = new BibEntry()
+                .withField(StandardField.AUTHOR,
+                           "Gustav Bostr\\\"{o}m"
+                           + " and Jaana W\\\"{a}yrynen"
+                           + " and Marine Bod\\'{e}n"
+                           + " and Konstantin Beznosov"
+                           + " and Philippe Kruchten")
+                .withField(StandardField.YEAR, "2006")
+                .withField(StandardField.BOOKTITLE, "A book 2")
+                .withField(StandardField.PUBLISHER, "ACM")
+                .withField(StandardField.TITLE, "title2")
+                .withField(StandardField.PAGES, "11--18");
+
+        // Last Author differs.
+        BibEntry entry3 = new BibEntry()
+                .withField(StandardField.AUTHOR,
+                           "Gustav Bostr\\\"{o}m"
+                           + " and Jaana W\\\"{a}yrynen"
+                           + " and Marine Bod\\'{e}n"
+                           + " and Konstantin Beznosov"
+                           + " and Philippe NotKruchten")
+                .withField(StandardField.YEAR, "2006")
+                .withField(StandardField.BOOKTITLE, "A book 3")
+                .withField(StandardField.PUBLISHER, "ACM")
+                .withField(StandardField.TITLE, "title3")
+                .withField(StandardField.PAGES, "11--18");
+
+        BibDatabase database = new BibDatabase();
+        database.insertEntry(entry1);
+        database.insertEntry(entry2);
+        database.insertEntry(entry3);
+
+        // Without pageInfo, two isFirstAppearanceOfSource may be joined.
+        // The third is NotKruchten, should not be joined.
+        if (true) {
+            List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>();
+            CitationMarkerEntry cm1 =
+                new CitationMarkerEntryImpl("b1", entry1, database, "a", null, true);
+            citationMarkerEntries.add(cm1);
+            CitationMarkerEntry cm2 =
+                new CitationMarkerEntryImpl("b2", entry2, database, "b", null, true);
+            citationMarkerEntries.add(cm2);
+            CitationMarkerEntry cm3 =
+                new CitationMarkerEntryImpl("b3", entry3, database, "c", null, true);
+            citationMarkerEntries.add(cm3);
+
+            assertEquals("[Boström, Wäyrynen, Bodén, Beznosov & Kruchten, 2006a,b"
+                         +"; Boström, Wäyrynen, Bodén, Beznosov & NotKruchten, 2006c]",
+                         style.getCitationMarker(citationMarkerEntries,
+                                                 true,
+                                                 OOBibStyle.NonUniqueCitationMarker.THROWS));
+
+            assertEquals("Boström, Wäyrynen, Bodén, Beznosov & Kruchten [2006a,b]"
+                         + "; Boström, Wäyrynen, Bodén, Beznosov & NotKruchten [2006c]",
+                         style.getCitationMarker(citationMarkerEntries,
+                                                 false,
+                                                 OOBibStyle.NonUniqueCitationMarker.THROWS));
+        }
+
+        // Without pageInfo, only the first is isFirstAppearanceOfSource.
+        // The second may be joined, based on expanded normalizedMarkers.
+        // The third is NotKruchten, should not be joined.
+        if (true) {
+            List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>();
+            CitationMarkerEntry cm1 =
+                new CitationMarkerEntryImpl("b1", entry1, database, "a", null, true);
+            citationMarkerEntries.add(cm1);
+            CitationMarkerEntry cm2 =
+                new CitationMarkerEntryImpl("b2", entry2, database, "b", null, false);
+            citationMarkerEntries.add(cm2);
+            CitationMarkerEntry cm3 =
+                new CitationMarkerEntryImpl("b3", entry3, database, "c", null, false);
+            citationMarkerEntries.add(cm3);
+
+            assertEquals("[Boström, Wäyrynen, Bodén, Beznosov & Kruchten, 2006a,b"
+                         +"; Boström et al., 2006c]",
+                         style.getCitationMarker(citationMarkerEntries,
+                                                 true,
+                                                 OOBibStyle.NonUniqueCitationMarker.THROWS));
+
+        }
+        // Without pageInfo, only the second is isFirstAppearanceOfSource.
+        // The second is not joined, because it is a first appearance, thus
+        // requires more names to be shown.
+        // The third is NotKruchten, should not be joined.
+        if (true) {
+            List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>();
+            CitationMarkerEntry cm1 =
+                new CitationMarkerEntryImpl("b1", entry1, database, "a", null, false);
+            citationMarkerEntries.add(cm1);
+            CitationMarkerEntry cm2 =
+                new CitationMarkerEntryImpl("b2", entry2, database, "b", null, true);
+            citationMarkerEntries.add(cm2);
+            CitationMarkerEntry cm3 =
+                new CitationMarkerEntryImpl("b3", entry3, database, "c", null, false);
+            citationMarkerEntries.add(cm3);
+
+            assertEquals("[Boström et al., 2006a"
+                         + "; Boström, Wäyrynen, Bodén, Beznosov & Kruchten, 2006b"
+                         + "; Boström et al., 2006c]",
+                         style.getCitationMarker(citationMarkerEntries,
+                                                 true,
+                                                 OOBibStyle.NonUniqueCitationMarker.THROWS));
+        }
+
+        // Without pageInfo, only the neither is isFirstAppearanceOfSource.
+        // The second is joined.
+        // The third is NotKruchten, but is joined because NotKruchten is not among the names shown.
+        // Is this the correct behaviour?
+        if (true) {
+            List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>();
+            CitationMarkerEntry cm1 =
+                new CitationMarkerEntryImpl("b1", entry1, database, "a", null, false);
+            citationMarkerEntries.add(cm1);
+            CitationMarkerEntry cm2 =
+                new CitationMarkerEntryImpl("b2", entry2, database, "b", null, false);
+            citationMarkerEntries.add(cm2);
+            CitationMarkerEntry cm3 =
+                new CitationMarkerEntryImpl("b3", entry3, database, "c", null, false);
+            citationMarkerEntries.add(cm3);
+
+            assertEquals("[Boström et al., 2006a,b,c]",
+                         style.getCitationMarker(citationMarkerEntries,
+                                                 true,
+                                                 OOBibStyle.NonUniqueCitationMarker.THROWS));
+        }
+
+        // With pageInfo: different entries with identical non-null pageInfo: not joined.
+        // XY [2000a,b,c; p1] whould be confusing.
+        if (true) {
+            List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>();
+            CitationMarkerEntry cm1 =
+                new CitationMarkerEntryImpl("b1", entry1, database, "a", "p1", false);
+            citationMarkerEntries.add(cm1);
+            CitationMarkerEntry cm2 =
+                new CitationMarkerEntryImpl("b2", entry2, database, "b", "p1", false);
+            citationMarkerEntries.add(cm2);
+            CitationMarkerEntry cm3 =
+                new CitationMarkerEntryImpl("b3", entry3, database, "c", "p1", false);
+            citationMarkerEntries.add(cm3);
+
+            assertEquals("[Boström et al., 2006a; p1"
+                         + "; Boström et al., 2006b; p1"
+                         + "; Boström et al., 2006c; p1]",
+                         style.getCitationMarker(citationMarkerEntries,
+                                                 true,
+                                                 OOBibStyle.NonUniqueCitationMarker.THROWS));
+        }
+
+        // With pageInfo: same entries with identical non-null pageInfo: collapsed.
+        // Note: "same" here looks at the visible parts and citation key only,
+        //       but ignores the rest. Normally the citation key should distinguish.
+        if (true) {
+            List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>();
+            CitationMarkerEntry cm1 =
+                new CitationMarkerEntryImpl("b1", entry1, database, "a", "p1", false);
+            citationMarkerEntries.add(cm1);
+            CitationMarkerEntry cm2 =
+                new CitationMarkerEntryImpl("b1", entry1, database, "a", "p1", false);
+            citationMarkerEntries.add(cm2);
+            CitationMarkerEntry cm3 =
+                new CitationMarkerEntryImpl("b1", entry1, database, "a", "p1", false);
+            citationMarkerEntries.add(cm3);
+
+            assertEquals("[Boström et al., 2006a; p1]",
+                         style.getCitationMarker(citationMarkerEntries,
+                                                 true,
+                                                 OOBibStyle.NonUniqueCitationMarker.THROWS));
+        }
+        // With pageInfo: same entries with different pageInfo: kept separate.
+        // Empty ("") and null pageInfos considered equal her, collapsed.
+        if (true) {
+            List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>();
+            CitationMarkerEntry cm1 =
+                new CitationMarkerEntryImpl("b1", entry1, database, "a", "p1", false);
+            citationMarkerEntries.add(cm1);
+            CitationMarkerEntry cm2 =
+                new CitationMarkerEntryImpl("b1", entry1, database, "a", "p2", false);
+            citationMarkerEntries.add(cm2);
+            CitationMarkerEntry cm3 =
+                new CitationMarkerEntryImpl("b1", entry1, database, "a", "", false);
+            citationMarkerEntries.add(cm3);
+            CitationMarkerEntry cm4 =
+                new CitationMarkerEntryImpl("b1", entry1, database, "a", null, false);
+            citationMarkerEntries.add(cm4);
+
+            assertEquals("[Boström et al., 2006a; p1"
+                         + "; Boström et al., 2006a; p2"
+                         + "; Boström et al., 2006a]",
+                         style.getCitationMarker(citationMarkerEntries,
+                                                 true,
+                                                 OOBibStyle.NonUniqueCitationMarker.THROWS));
+        }
+    }
+
 
     @Test
     void testLayout() throws IOException {
@@ -429,8 +639,6 @@ class OOBibStyleTest {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                                           layoutFormatterPreferences);
 
-        Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
-        List<BibEntry> entries = new ArrayList<>();
         BibDatabase database = new BibDatabase();
 
         BibEntry entry = new BibEntry();
@@ -439,11 +647,15 @@ class OOBibStyleTest {
         entry.setField(StandardField.TITLE, "JabRef Manual");
         entry.setField(StandardField.YEAR, "2016");
         database.insertEntry(entry);
-        entries.add(entry);
-        entryDBMap.put(entry, database);
-        List<String> empty = null;
+
+        List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>();
+        CitationMarkerEntry cm =
+            new CitationMarkerEntryImpl("JabRef2016", entry, database, null, null, false);
+        citationMarkerEntries.add(cm);
         assertEquals("[JabRef Development Team, 2016]",
-                     style.getCitationMarker(entries, entryDBMap, true, null, null, empty));
+                     style.getCitationMarker(citationMarkerEntries,
+                                             true,
+                                             OOBibStyle.NonUniqueCitationMarker.THROWS));
     }
 
     @Test
@@ -451,8 +663,6 @@ class OOBibStyleTest {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences);
 
-        Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
-        List<BibEntry> entries = new ArrayList<>();
         BibDatabase database = new BibDatabase();
 
         BibEntry entry = new BibEntry();
@@ -461,11 +671,16 @@ class OOBibStyleTest {
         entry.setField(StandardField.TITLE, "JabRef Manual");
         entry.setField(StandardField.YEAR, "2016");
         database.insertEntry(entry);
-        entries.add(entry);
-        entryDBMap.put(entry, database);
-        List<String> empty = null;
+
+        List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>();
+        CitationMarkerEntry cm =
+            new CitationMarkerEntryImpl("vonBeta2016", entry, database, null, null, false);
+        citationMarkerEntries.add(cm);
+
         assertEquals("[von Beta, 2016]",
-                     style.getCitationMarker(entries, entryDBMap, true, null, null, empty));
+                     style.getCitationMarker(citationMarkerEntries,
+                                             true,
+                                             OOBibStyle.NonUniqueCitationMarker.THROWS));
     }
 
     @Test
@@ -473,19 +688,22 @@ class OOBibStyleTest {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences);
 
-        Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
-        List<BibEntry> entries = new ArrayList<>();
         BibDatabase database = new BibDatabase();
 
         BibEntry entry = new BibEntry();
         entry.setType(StandardEntryType.Article);
         entry.setField(StandardField.YEAR, "2016");
         database.insertEntry(entry);
-        entries.add(entry);
-        entryDBMap.put(entry, database);
-        List<String> empty = null;
+
+        List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>();
+        CitationMarkerEntry cm =
+            new CitationMarkerEntryImpl("anon2016", entry, database, null, null, false);
+        citationMarkerEntries.add(cm);
+
         assertEquals("[, 2016]",
-                     style.getCitationMarker(entries, entryDBMap, true, null, null, empty));
+                     style.getCitationMarker(citationMarkerEntries,
+                                             true,
+                                             OOBibStyle.NonUniqueCitationMarker.THROWS));
     }
 
     @Test
@@ -493,203 +711,183 @@ class OOBibStyleTest {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences);
 
-        Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
-        List<BibEntry> entries = new ArrayList<>();
         BibDatabase database = new BibDatabase();
 
         BibEntry entry = new BibEntry();
         entry.setType(StandardEntryType.Article);
         entry.setField(StandardField.AUTHOR, "Alpha von Beta");
         database.insertEntry(entry);
-        entries.add(entry);
-        entryDBMap.put(entry, database);
-        List<String> empty = null;
+
+        List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>();
+        CitationMarkerEntry cm =
+            new CitationMarkerEntryImpl("vonBetaNNNN", entry, database, null, null, false);
+        citationMarkerEntries.add(cm);
+
         assertEquals("[von Beta, ]",
-                     style.getCitationMarker(entries, entryDBMap, true, null, null, empty));
+                     style.getCitationMarker(citationMarkerEntries,
+                                             true,
+                                             OOBibStyle.NonUniqueCitationMarker.THROWS));
     }
 
     @Test
     void testEmptyEntryMarker() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
+                                          layoutFormatterPreferences);
 
-        Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
-        List<BibEntry> entries = new ArrayList<>();
         BibDatabase database = new BibDatabase();
 
         BibEntry entry = new BibEntry();
         entry.setType(StandardEntryType.Article);
         database.insertEntry(entry);
-        entries.add(entry);
-        entryDBMap.put(entry, database);
-        List<String> empty = null;
-        assertEquals("[, ]", style.getCitationMarker(entries, entryDBMap, true, null, null, empty));
+
+        List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>();
+        CitationMarkerEntry cm =
+            new CitationMarkerEntryImpl("Empty", entry, database, null, null, false);
+        citationMarkerEntries.add(cm);
+
+        assertEquals("[, ]", style.getCitationMarker(citationMarkerEntries,
+                                                     true,
+                                                     OOBibStyle.NonUniqueCitationMarker.THROWS));
     }
 
     @Test
-    void testGetCitationMarkerInParenthesisUniquefiers() throws IOException {
+    void testGetCitationMarkerUniquefiers() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
+                                          layoutFormatterPreferences);
 
-        Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
-        List<BibEntry> entries = new ArrayList<>();
         BibDatabase database = new BibDatabase();
 
+        // Three different entries, the first two having the same
+        // normalized citation marks.
         BibEntry entry1 = new BibEntry();
         entry1.setField(StandardField.AUTHOR, "Alpha Beta");
         entry1.setField(StandardField.TITLE, "Paper 1");
         entry1.setField(StandardField.YEAR, "2000");
-        entries.add(entry1);
         database.insertEntry(entry1);
+
         BibEntry entry3 = new BibEntry();
         entry3.setField(StandardField.AUTHOR, "Alpha Beta");
         entry3.setField(StandardField.TITLE, "Paper 2");
         entry3.setField(StandardField.YEAR, "2000");
-        entries.add(entry3);
         database.insertEntry(entry3);
+
         BibEntry entry2 = new BibEntry();
         entry2.setField(StandardField.AUTHOR, "Gamma Epsilon");
         entry2.setField(StandardField.YEAR, "2001");
-        entries.add(entry2);
         database.insertEntry(entry2);
-        for (BibEntry entry : database.getEntries()) {
-            entryDBMap.put(entry, database);
-        }
 
-        List<String> empty = null;
+
+        // Without uniquefiers this is a problem, getCitationMarker cannot
+        // solve, since it does not see the whole picture (citations outside its scope).
+        // It can throw a RuntimeException or forgive and provide a flawed presentation.
+        //
+        // This latter is used for providing a temporary citation mark
+        // for newly inserted citations.
+        CitationMarkerEntry cm1a =
+            new CitationMarkerEntryImpl("Beta2000a", entry1, database, null, null, false);
+        CitationMarkerEntry cm3a =
+            new CitationMarkerEntryImpl("Beta2000b", entry3, database, null, null, false);
+        CitationMarkerEntry cm2 =
+            new CitationMarkerEntryImpl("Epsilon2001", entry2, database, null, null, false);
+
+        List<CitationMarkerEntry> citationMarkerEntriesA = new ArrayList<>();
+        citationMarkerEntriesA.add(cm1a);
+        citationMarkerEntriesA.add(cm3a);
+        citationMarkerEntriesA.add(cm2);
+
+        // Consecutive, different source without distinguishing uniquefiers
+        // can throw a RuntimeException.
+        boolean doesItThrow = false;
+        try {
+            style.getCitationMarker(citationMarkerEntriesA,
+                                    false,
+                                    OOBibStyle.NonUniqueCitationMarker.THROWS);
+        } catch (RuntimeException ex) {
+            doesItThrow = true;
+        }
+        assertEquals(true, doesItThrow);
+
+        // Or can just emit a presentation with repeated marks.
         assertEquals("[Beta, 2000; Beta, 2000; Epsilon, 2001]",
-                     style.getCitationMarker(entries, entryDBMap, true, null, null, empty));
-        assertEquals("[Beta, 2000a,b; Epsilon, 2001]",
-                     style.getCitationMarker(entries,
-                                             entryDBMap,
+                     style.getCitationMarker(citationMarkerEntriesA,
                                              true,
-                                             new String[]{"a", "b", ""},
-                                             new int[]{1, 1, 1},
-                                             empty));
-    }
+                                             OOBibStyle.NonUniqueCitationMarker.FORGIVEN));
 
-    @Test
-    void testGetCitationMarkerInTextUniquefiers() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
-
-        Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
-        List<BibEntry> entries = new ArrayList<>();
-        BibDatabase database = new BibDatabase();
-
-        BibEntry entry1 = new BibEntry();
-        entry1.setField(StandardField.AUTHOR, "Alpha Beta");
-        entry1.setField(StandardField.TITLE, "Paper 1");
-        entry1.setField(StandardField.YEAR, "2000");
-        entries.add(entry1);
-        database.insertEntry(entry1);
-        BibEntry entry3 = new BibEntry();
-        entry3.setField(StandardField.AUTHOR, "Alpha Beta");
-        entry3.setField(StandardField.TITLE, "Paper 2");
-        entry3.setField(StandardField.YEAR, "2000");
-        entries.add(entry3);
-        database.insertEntry(entry3);
-        BibEntry entry2 = new BibEntry();
-        entry2.setField(StandardField.AUTHOR, "Gamma Epsilon");
-        entry2.setField(StandardField.YEAR, "2001");
-        entries.add(entry2);
-        database.insertEntry(entry2);
-        for (BibEntry entry : database.getEntries()) {
-            entryDBMap.put(entry, database);
-        }
-
-        List<String> empty = null;
         assertEquals("Beta [2000]; Beta [2000]; Epsilon [2001]",
-                     style.getCitationMarker(entries, entryDBMap, false, null, null, empty));
-        assertEquals("Beta [2000a,b]; Epsilon [2001]",
-                     style.getCitationMarker(entries,
-                                             entryDBMap,
+                     style.getCitationMarker(citationMarkerEntriesA,
                                              false,
-                                             new String[]{"a", "b", ""},
-                                             new int[]{1, 1, 1},
-                                             empty));
-    }
+                                             OOBibStyle.NonUniqueCitationMarker.FORGIVEN));
 
-    @Test
-    void testGetCitationMarkerInParenthesisUniquefiersThreeSameAuthor() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
 
-        Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
-        List<BibEntry> entries = new ArrayList<>();
-        BibDatabase database = new BibDatabase();
+        // With uniquefiers
+        CitationMarkerEntry cm1b =
+            new CitationMarkerEntryImpl("Beta2000a", entry1, database, "a", null, false);
+        CitationMarkerEntry cm3b =
+            new CitationMarkerEntryImpl("Beta2000b", entry3, database, "b", null, false);
 
-        BibEntry entry1 = new BibEntry();
-        entry1.setField(StandardField.AUTHOR, "Alpha Beta");
-        entry1.setField(StandardField.TITLE, "Paper 1");
-        entry1.setField(StandardField.YEAR, "2000");
-        entries.add(entry1);
-        database.insertEntry(entry1);
-        BibEntry entry2 = new BibEntry();
-        entry2.setField(StandardField.AUTHOR, "Alpha Beta");
-        entry2.setField(StandardField.TITLE, "Paper 2");
-        entry2.setField(StandardField.YEAR, "2000");
-        entries.add(entry2);
-        database.insertEntry(entry2);
-        BibEntry entry3 = new BibEntry();
-        entry3.setField(StandardField.AUTHOR, "Alpha Beta");
-        entry3.setField(StandardField.TITLE, "Paper 3");
-        entry3.setField(StandardField.YEAR, "2000");
-        entries.add(entry3);
-        database.insertEntry(entry3);
-        for (BibEntry entry : database.getEntries()) {
-            entryDBMap.put(entry, database);
-        }
+        List<CitationMarkerEntry> citationMarkerEntriesB = new ArrayList<>();
+        citationMarkerEntriesB.add(cm1b);
+        citationMarkerEntriesB.add(cm3b);
+        citationMarkerEntriesB.add(cm2);
 
-        List<String> empty = null;
-        assertEquals("[Beta, 2000a,b,c]",
-                     style.getCitationMarker(entries,
-                                             entryDBMap,
+        assertEquals("[Beta, 2000a,b; Epsilon, 2001]",
+                     style.getCitationMarker(citationMarkerEntriesB,
                                              true,
-                                             new String[]{"a", "b", "c"},
-                                             new int[]{1, 1, 1},
-                                             empty));
+                                             OOBibStyle.NonUniqueCitationMarker.THROWS));
+
+        assertEquals("Beta [2000a,b]; Epsilon [2001]",
+                     style.getCitationMarker(citationMarkerEntriesB,
+                                             false,
+                                             OOBibStyle.NonUniqueCitationMarker.THROWS));
     }
 
-    @Test
-    void testGetCitationMarkerInTextUniquefiersThreeSameAuthor() throws IOException {
-        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                layoutFormatterPreferences);
 
-        Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
-        List<BibEntry> entries = new ArrayList<>();
+    @Test
+    void testGetCitationMarkerUniquefiersThreeSameAuthor() throws IOException {
+        OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                                          layoutFormatterPreferences);
+
         BibDatabase database = new BibDatabase();
 
         BibEntry entry1 = new BibEntry();
         entry1.setField(StandardField.AUTHOR, "Alpha Beta");
         entry1.setField(StandardField.TITLE, "Paper 1");
         entry1.setField(StandardField.YEAR, "2000");
-        entries.add(entry1);
         database.insertEntry(entry1);
+
         BibEntry entry2 = new BibEntry();
         entry2.setField(StandardField.AUTHOR, "Alpha Beta");
         entry2.setField(StandardField.TITLE, "Paper 2");
         entry2.setField(StandardField.YEAR, "2000");
-        entries.add(entry2);
         database.insertEntry(entry2);
+
         BibEntry entry3 = new BibEntry();
         entry3.setField(StandardField.AUTHOR, "Alpha Beta");
         entry3.setField(StandardField.TITLE, "Paper 3");
         entry3.setField(StandardField.YEAR, "2000");
-        entries.add(entry3);
         database.insertEntry(entry3);
-        for (BibEntry entry : database.getEntries()) {
-            entryDBMap.put(entry, database);
-        }
 
-        List<String> empty = null;
+        CitationMarkerEntry cm1 =
+            new CitationMarkerEntryImpl("v1", entry1, database, "a", null, false);
+        CitationMarkerEntry cm2 =
+            new CitationMarkerEntryImpl("v2", entry2, database, "b", null, false);
+        CitationMarkerEntry cm3 =
+            new CitationMarkerEntryImpl("v3", entry3, database, "c", null, false);
+
+        List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>();
+        citationMarkerEntries.add(cm1);
+        citationMarkerEntries.add(cm2);
+        citationMarkerEntries.add(cm3);
+
+        assertEquals("[Beta, 2000a,b,c]",
+                     style.getCitationMarker(citationMarkerEntries,
+                                             true,
+                                             OOBibStyle.NonUniqueCitationMarker.THROWS));
+
         assertEquals("Beta [2000a,b,c]",
-                     style.getCitationMarker(entries,
-                                             entryDBMap,
+                     style.getCitationMarker(citationMarkerEntries,
                                              false,
-                                             new String[]{"a", "b", "c"},
-                                             new int[]{1, 1, 1},
-                                             empty));
+                                             OOBibStyle.NonUniqueCitationMarker.THROWS));
     }
 
     @Test
@@ -733,9 +931,9 @@ class OOBibStyleTest {
 
     @Test
     void testEmptyStringPropertyAndOxfordComma() throws Exception {
+
         OOBibStyle style = new OOBibStyle("test.jstyle", layoutFormatterPreferences);
-        Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
-        List<BibEntry> entries = new ArrayList<>();
+
         BibDatabase database = new BibDatabase();
 
         BibEntry entry = new BibEntry();
@@ -744,11 +942,15 @@ class OOBibStyleTest {
         entry.setField(StandardField.TITLE, "JabRef Manual");
         entry.setField(StandardField.YEAR, "2016");
         database.insertEntry(entry);
-        entries.add(entry);
-        entryDBMap.put(entry, database);
-        List<String> empty = null;
+
+        List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>();
+        citationMarkerEntries.add(
+            new CitationMarkerEntryImpl("Beta2016", entry, database, null, null, false));
+
         assertEquals("von Beta, Epsilon, & Tau, 2016",
-                     style.getCitationMarker(entries, entryDBMap, true, null, null, empty));
+                     style.getCitationMarker(citationMarkerEntries,
+                                             true,
+                                             OOBibStyle.NonUniqueCitationMarker.THROWS));
     }
 
     @Test

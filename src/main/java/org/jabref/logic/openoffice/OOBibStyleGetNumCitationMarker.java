@@ -167,8 +167,8 @@ class OOBibStyleGetNumCitationMarker {
          */
         final boolean strictPurpose = true;
 
-        String bracketBefore = style.getStringCitProperty(OOBibStyle.BRACKET_BEFORE);
-        String bracketAfter = style.getStringCitProperty(OOBibStyle.BRACKET_AFTER);
+        String bracketBefore = style.getBracketBefore();
+        String bracketAfter = style.getBracketAfter();
 
         /*
          * purpose == BIBLIOGRAPHY means: we are formatting for the
@@ -176,12 +176,8 @@ class OOBibStyleGetNumCitationMarker {
          */
         if (purpose == CitationMarkerPurpose.BIBLIOGRAPHY) {
             // prefer BRACKET_BEFORE_IN_LIST and BRACKET_AFTER_IN_LIST
-            if (style.citProperties.containsKey(OOBibStyle.BRACKET_BEFORE_IN_LIST)) {
-                bracketBefore = style.getStringCitProperty(OOBibStyle.BRACKET_BEFORE_IN_LIST);
-            }
-            if (style.citProperties.containsKey(OOBibStyle.BRACKET_AFTER_IN_LIST)) {
-                bracketAfter = style.getStringCitProperty(OOBibStyle.BRACKET_AFTER_IN_LIST);
-            }
+            bracketBefore = style.getBracketBeforeInListWithFallBack();
+            bracketAfter = style.getBracketAfterInListWithFallBack();
 
             if (strictPurpose) {
                 // If (purpose==BIBLIOGRAPHY), then

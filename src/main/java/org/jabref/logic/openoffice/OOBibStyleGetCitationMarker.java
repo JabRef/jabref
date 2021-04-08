@@ -76,7 +76,7 @@ class OOBibStyleGetCitationMarker {
     }
 
     /**
-     * @param authorListAsString Passed to {@code AuthorList.parse(authorListAsString)}
+     * @param authorList
      *
      * @param maxAuthors The maximum number of authors to write out.
      *                   If there are more authors, then ET_AL_STRING is emitted
@@ -102,14 +102,13 @@ class OOBibStyleGetCitationMarker {
      *          - The "Au[AS]Bu[AS]Cu" (or the "Au") part may be empty (maxAuthors==0 or nAuthors==0).
      *          - OXFORD_COMMA is only emitted if nAuthors is at least 3.
      *          - andString  is only emitted if nAuthors is at least 2.
-     *          - yearSep is always emitted
      */
-    private static String createAuthorList(OOBibStyle style,
-                                           String authorListAsString,
+    private static String formatAuthorList(OOBibStyle style,
+                                           AuthorList authorList,
                                            int maxAuthors,
-                                           String andString,
-                                           String yearSep) {
-        Objects.requireNonNull(authorListAsString);
+                                           String andString) {
+
+        Objects.requireNonNull(authorList);
 
         // Apparently maxAuthorsBeforeEtAl is always 1 for in-text citations.
         // In reference lists can be for example 7,
@@ -127,26 +126,26 @@ class OOBibStyleGetCitationMarker {
 
         // The String to represent authors that are not mentioned,
         // e.g. " et al."
-        String etAlString = style.getStringCitProperty(OOBibStyle.ET_AL_STRING);
+        String etAlString = style.getEtAlString();
 
         // The String to add between author names except the last two,
         // e.g. ", ".
-        String authorSep = style.getStringCitProperty(OOBibStyle.AUTHOR_SEPARATOR);
+        String authorSep = style.getAuthorSeparator();
 
         // The String to put after the second to last author in case
         // of three or more authors: (A, B[,] and C)
-        String oxfordComma = style.getStringCitProperty(OOBibStyle.OXFORD_COMMA);
+        String oxfordComma = style.getOxfordComma();
 
         StringBuilder sb = new StringBuilder();
-        AuthorList al = AuthorList.parse(authorListAsString);
-        final int nAuthors = al.getNumberOfAuthors();
+
+        final int nAuthors = authorList.getNumberOfAuthors();
 
         // To reduce ambiguity, throw on unexpected values of maxAuthors
-        if (maxAuthors == 0) {
-            throw new RuntimeException("maxAuthors = 0 in createAuthorList");
+        if (maxAuthors == 0 && nAuthors != 0) {
+            throw new RuntimeException("maxAuthors = 0 in formatAuthorList");
         }
         if (maxAuthors < -1) {
-            throw new RuntimeException("maxAuthors < -1 in createAuthorList");
+            throw new RuntimeException("maxAuthors < -1 in formatAuthorList");
         }
 
         boolean emitAllAuthors = ((nAuthors <= maxAuthors) || (maxAuthors == -1));
@@ -163,7 +162,7 @@ class OOBibStyleGetCitationMarker {
 
         if (nAuthorsToEmit > 0) {
             // The first author
-            sb.append(getAuthorLastName(al, 0));
+            sb.append(getAuthorLastName(authorList, 0));
         }
 
         if (nAuthors >= 2) {
@@ -173,7 +172,7 @@ class OOBibStyleGetCitationMarker {
                 int j = 1;
                 while (j < (nAuthors - 1)) {
                     sb.append(authorSep);
-                    sb.append(getAuthorLastName(al, j));
+                    sb.append(getAuthorLastName(authorList, j));
                     j++;
                 }
                 // oxfordComma if at least 3 authors
@@ -182,21 +181,19 @@ class OOBibStyleGetCitationMarker {
                 }
                 // Emit " and "+"LastAuthor"
                 sb.append(andString);
-                sb.append(getAuthorLastName(al, nAuthors - 1));
+                sb.append(getAuthorLastName(authorList, nAuthors - 1));
 
             } else {
                 // Emit last names up to nAuthorsToEmit.
                 //
-                // The (maxAuthorsBeforeEtAl > 1) test may seem
-                // superfluous, and yes, it is.
-                // It is intended to make sure the compiler eliminates
-                // this block as long as maxAuthorsBeforeEtAl is fixed
-                // to 1.
+                // The (maxAuthorsBeforeEtAl > 1) test is intended to
+                // make sure the compiler eliminates this block as
+                // long as maxAuthorsBeforeEtAl is fixed to 1.
                 if (maxAuthorsBeforeEtAl > 1) {
                     int j = 1;
                     while (j < nAuthorsToEmit) {
                         sb.append(authorSep);
-                        sb.append(getAuthorLastName(al, j));
+                        sb.append(getAuthorLastName(authorList, j));
                         j++;
                     }
                 }
@@ -204,10 +201,16 @@ class OOBibStyleGetCitationMarker {
             }
         }
 
-        sb.append(yearSep);
         return sb.toString();
     }
 
+    /**
+     * On success, getRawCitationMarkerField returns content,
+     * but we also need to know which field matched, because
+     * for some fields (actually: for author names) we need to
+     * reproduce the surrounding braces to inform AuthorList.parse
+     * not to split up teh content.
+     */
     private static class FieldAndContent {
         Field field;
         String content;
@@ -216,14 +219,15 @@ class OOBibStyleGetCitationMarker {
             this.content = content;
         }
     }
+
     /**
      * @return the field and the content of the first nonempty (after trimming)
-     * field (or alias) from {@code fields} found in {@code entry}, or Optional.empty()
+     * field (or alias) from {@code fields} found in {@code entry}.
+     * Return {@code Optional.empty()} if found nothing.
      */
     private static Optional<FieldAndContent> getRawCitationMarkerField(BibEntry entry,
                                                                        BibDatabase database,
-                                                                       OrFields fields
-        ) {
+                                                                       OrFields fields) {
         Objects.requireNonNull(entry, "Entry cannot be null");
         Objects.requireNonNull(database, "database cannot be null");
 
@@ -284,81 +288,161 @@ class OOBibStyleGetCitationMarker {
 
         // If the field we found is mentioned in authorFieldNames and
         // content has a pair of braces around it, we add a pair of
-        // braces around the result.
-
-        final OrFields authorFieldNames = style.getAuthorFieldNames();
-        if (authorFieldNames.contains(fc.field) && StringUtil.isInCurlyBrackets(fc.content)) {
+        // braces around the result, so that AuthorList.parse does not split
+        // the content.
+        final OrFields fieldsToRebrace = style.getAuthorFieldNames();
+        if (fieldsToRebrace.contains(fc.field) && StringUtil.isInCurlyBrackets(fc.content)) {
             result =  "{" + result  + "}";
         }
         return result;
     }
 
+    private static AuthorList getAuthorList(OOBibStyle style,
+                                            BibEntry entry,
+                                            BibDatabase database) {
+
+        // The bibtex fields providing author names, e.g. "author" or
+        // "editor".
+        OrFields authorFieldNames = style.getAuthorFieldNames();
+
+        String authorListAsString = getCitationMarkerField(style,
+                                                           entry,
+                                                           database,
+                                                           authorFieldNames);
+        return AuthorList.parse(authorListAsString);
+    }
+
+    private enum AuthorYearMarkerPurpose {
+        IN_PARENTHESIS,
+        IN_TEXT,
+        NORMALIZED
+    };
+
     /**
-     * Produce (Author, year) style citation strings in many different forms.
-     * If inParenthesis==false, produces "Author (year)" style citation strings.
+     * How many authors would be emitted for ce, considering
+     * style and ce.getIsFirstAppearanceOfSource()
      *
-     * @param entries           The list of BibEntry to get fields from.
-     * @param database          A map of BibEntry-BibDatabase pairs.
-     * @param uniquifiers       Optional parameter to separate similar citations.
-     *                          Elements can be null if not needed.
+     * If ce is unresolved, return 0.
+     */
+    private static int calculateNAuthorsToEmit(OOBibStyle style,
+                                               CitationMarkerEntry ce) {
+
+        int maxAuthors = (ce.getIsFirstAppearanceOfSource()
+                          ? style.getMaxAuthorsFirst()
+                          : style.getMaxAuthors());
+
+        BibEntry bibEntry = ce.getBibEntryOrNull();
+        BibDatabase database = ce.getDatabaseOrNull();
+        boolean isUnresolved = (bibEntry == null) || (database == null);
+        if (isUnresolved) {
+            return 0;
+        }
+
+        AuthorList authorList = getAuthorList(style, bibEntry, database);
+        int nAuthors = authorList.getNumberOfAuthors();
+
+        if (maxAuthors == -1) {
+            return nAuthors;
+        } else {
+            return Integer.min(nAuthors,maxAuthors);
+        }
+    }
+
+    /**
+     * Produce (Author, year) or "Author (year)" style citation strings.
+     *
+     * @param purpose IN_PARENTHESIS and NORMALIZED puts parentheses around the whole,
+     *                IN_TEXT around each (year,uniqueLetter,pageInfo) part.
+     *
+     *                NORMALIZED omits uniqueLetter and pageInfo,
+     *                ignores isFirstAppearanceOfSource (always
+     *                style.getMaxAuthors, not getMaxAuthorsFirst) and
+     *                probably assumes a single CitationMarkerEntry.
+     *
+     * @param ces   The list of CitationMarkerEntry values to process.
+     *
+     *              Here we do not check for duplicate entries: those
+     *              are handled by {@code getCitationMarker} by
+     *              omitting them from the list.
+     *
+     *              Unresolved citations recognized by
+     *              ce.getBibEntryOrNull() and/or
+     *              ce.getDatabaseOrNull() returning null, and
+     *              emitted as "Unresolved${citationKey}".
+     *
+     *              Neither uniqueLetter nor pageInfo are emitted
+     *              for unresolved citations.
+     *
+     * @param startsNewGroup Should have the same length as {@code ces}, and
+     *               contain true for entries starting a new group,
+     *               false for those that only add a uniqueLetter to
+     *               the grouped presentation.
+     *
+     * @param maxAuthorsOverride If not empty, always show this number of authors.
+     *               Added to allow NORMALIZED to use maxAuthors value that differs from
+     *               style.getMaxAuthors()
      *
      * @return The formatted citation.
      *
      */
     private static String getAuthorYearParenthesisMarker(OOBibStyle style,
-                                                         List<BibEntry> entries,
-                                                         Map<BibEntry, BibDatabase> database,
-                                                         boolean inParenthesis,
-                                                         String[] uniquifiers,
-                                                         int[] unlimAuthors) {
+                                                         AuthorYearMarkerPurpose purpose,
+                                                         List<CitationMarkerEntry> ces,
+                                                         boolean[] startsNewGroup,
+                                                         Optional<Integer> maxAuthorsOverride) {
 
-        // The bibtex field providing author names, e.g. "author" or
-        // "editor".
-        // String authorFieldNamesString = style.getStringCitProperty(OOBibStyle.AUTHOR_FIELD);
-        // OrFields authorFieldNames = FieldFactory.parseOrFields(authorFieldNamesString);
-        OrFields authorFieldNames = style.getAuthorFieldNames();
+        boolean inParenthesis = (purpose == AuthorYearMarkerPurpose.IN_PARENTHESIS
+                                 || purpose == AuthorYearMarkerPurpose.NORMALIZED);
 
-        // The maximum number of authors to write out in full without
-        // using etal. Set to -1 to always write out all authors.
-        int maxA = style.getIntCitProperty(OOBibStyle.MAX_AUTHORS);
 
         // The String to separate authors from year, e.g. "; ".
         String yearSep = (inParenthesis
-                          ? style.getStringCitProperty(OOBibStyle.YEAR_SEPARATOR)
-                          : style.getStringCitProperty(OOBibStyle.IN_TEXT_YEAR_SEPARATOR));
+                          ? style.getYearSeparator()
+                          : style.getYearSeparatorInText());
 
         // The opening parenthesis.
-        String startBrace = style.getStringCitProperty(OOBibStyle.BRACKET_BEFORE);
+        String startBrace = style.getBracketBefore();
 
         // The closing parenthesis.
-        String endBrace = style.getStringCitProperty(OOBibStyle.BRACKET_AFTER);
+        String endBrace = style.getBracketAfter();
 
         // The String to separate citations from each other.
-        String citationSeparator = style.getStringCitProperty(OOBibStyle.CITATION_SEPARATOR);
+        String citationSeparator = style.getCitationSeparator();
 
         // The bibtex field providing the year, e.g. "year".
-        // String yearFieldNamesString /*yearField*/ = style.getStringCitProperty(OOBibStyle.YEAR_FIELD);
-        // OrFields yearFieldNames = FieldFactory.parseOrFields(yearFieldNamesString);
         OrFields yearFieldNames = style.getYearFieldNames();
 
         // The String to add between the two last author names, e.g. " & ".
         String andString = (inParenthesis
-                            ? style.getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR)
-                            : Objects.requireNonNullElse(
-                                style.getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR_IN_TEXT),
-                                // Use the default one if no explicit separator for text is defined
-                                style.getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR)));
+                            ? style.getAuthorLastSeparator()
+                            : style.getAuthorLastSeparatorInText());
+
+        String pageInfoSeparator = style.getPageInfoSeparator();
+        String uniquefierSeparator = style.getUniquefierSeparator();
+
 
         StringBuilder sb = new StringBuilder();
         if (inParenthesis) {
             sb.append(startBrace);
         }
 
-        for (int j = 0; j < entries.size(); j++) {
-            BibEntry currentEntry = entries.get(j);
+        for (int j = 0; j < ces.size(); j++) {
+            CitationMarkerEntry ce = ces.get(j);
+            boolean startingNewGroup = startsNewGroup[j];
+            boolean endingAGroup = (j + 1 == ces.size()) || startsNewGroup[j+1] ;
 
-            // Check if this entry has been nulled due to grouping with the previous entry(ies):
-            if (currentEntry == null) {
+            if (!startingNewGroup) {
+                // Just add our uniqueLetter
+                String uniqueLetter = ce.getUniqueLetterOrNull();
+                if (uniqueLetter != null) {
+                    sb.append( uniquefierSeparator );
+                    sb.append( uniqueLetter );
+                }
+
+                // And close the brace, if we are the last in the group.
+                if (!inParenthesis && endingAGroup) {
+                    sb.append(endBrace);
+                }
                 continue;
             }
 
@@ -366,48 +450,60 @@ class OOBibStyleGetCitationMarker {
                 sb.append(citationSeparator);
             }
 
-            BibDatabase currentDatabase = database.get(currentEntry);
+            BibDatabase currentDatabase = ce.getDatabaseOrNull();
+            BibEntry currentEntry = ce.getBibEntryOrNull();
 
-            /* original:
-             *
-             * int unlimA = (unlimAuthors == null) ? -1 : unlimAuthors[j];
-             * int maxAuthors = (unlimA > 0) ? unlimA : maxA;
-             *
-             * translation:
-             *
-             * if      ( unlimAuthors == null ) { maxAuthors = maxA; }
-             * else if ( unlimAuthors[j] > 0  ) { maxAuthors = unlimAuthors[j]; }
-             * else                             { maxAuthors = maxA; }
-             *
-             * maxAuthors = (( (unlimAuthors != null) && (unlimAuthors[j] > 0) )
-             *               ? unlimAuthors[j]
-             *               : maxA )
-             */
-            int maxAuthors = (((unlimAuthors != null) && (unlimAuthors[j] > 0))
-                              ? unlimAuthors[j]
-                              : maxA);
+            boolean isUnresolved = (currentEntry == null) || (currentDatabase == null);
 
-            String author = getCitationMarkerField(style, currentEntry, currentDatabase, authorFieldNames);
-            String authorString = createAuthorList(style, author, maxAuthors, andString, yearSep);
-            sb.append(authorString);
+            if (isUnresolved) {
+                sb.append(String.format("Unresolved(%s)", ce.getCitationKey()));
+            } else {
 
-            if (!inParenthesis) {
-                sb.append(startBrace);
+                int maxAuthors = (purpose == AuthorYearMarkerPurpose.NORMALIZED
+                                  ? style.getMaxAuthors()
+                                  : calculateNAuthorsToEmit(style,ce));
+
+                if ( maxAuthorsOverride.isPresent() ) {
+                    maxAuthors = maxAuthorsOverride.get();
+                }
+
+                AuthorList authorList = getAuthorList(style,
+                                                      currentEntry,
+                                                      currentDatabase);
+                String authorString = formatAuthorList(style, authorList, maxAuthors, andString);
+                sb.append(authorString);
+                sb.append(yearSep);
+
+                if (!inParenthesis) {
+                    sb.append(startBrace);
+                }
+
+                String year = getCitationMarkerField(style,
+                                                     currentEntry,
+                                                     currentDatabase,
+                                                     yearFieldNames);
+                if (year != null) {
+                    sb.append(year);
+                }
+
+                if (purpose != AuthorYearMarkerPurpose.NORMALIZED) {
+                    String uniqueLetter = ce.getUniqueLetterOrNull();
+                    if (uniqueLetter != null) {
+                        sb.append(uniqueLetter);
+                    }
+
+                    String pageInfo = OOBibStyle.regularizePageInfo(ce.getPageInfoOrNull());
+                    if (pageInfo != null) {
+                        sb.append(pageInfoSeparator);
+                        sb.append(pageInfo);
+                    }
+                }
+
+                if (!inParenthesis && endingAGroup) {
+                    sb.append(endBrace);
+                }
             }
-
-            String year = getCitationMarkerField(style, currentEntry, currentDatabase, yearFieldNames);
-            if (year != null) {
-                sb.append(year);
-            }
-
-            if ((uniquifiers != null) && (uniquifiers[j] != null)) {
-                sb.append(uniquifiers[j]);
-            }
-
-            if (!inParenthesis) {
-                sb.append(endBrace);
-            }
-        }
+        } // for j
 
         if (inParenthesis) {
             sb.append(endBrace);
@@ -415,99 +511,70 @@ class OOBibStyleGetCitationMarker {
         return sb.toString();
     }
 
-    /**
-     * Modify entry and uniquefier arrays to facilitate a grouped
-     * presentation of uniquefied entries.
-     *
-     * entries[ (from+1 .. to) ]  = null
-     * uniquefiers[from] = String.join( separator, uniquefiers.subList(from,to_inclusive) )
-     *
-     * @param entries     The entry array.
-     * @param uniquefiers The uniquefier array.
-     * @param from        The first index to group (inclusive)
-     * @param to          The last  index to group (inclusive)
-     */
-    private static void group(OOBibStyle style,
-                              List<BibEntry> entries,
-                              String[] uniquefiers,
-                              int from,
-                              int to) {
-
-        String separator = style.getStringCitProperty(OOBibStyle.UNIQUEFIER_SEPARATOR);
-
-        StringBuilder sb = new StringBuilder(uniquefiers[from]);
-        for (int i = from + 1; i <= to; i++) {
-            sb.append(separator);
-            sb.append(uniquefiers[i]);
-            entries.set(i, null); // kill BibEntry?
+    // "" is more convenient to compare for equality than null-or-String
+    private static String nullToEmptyString(String s) {
+        if (s == null) {
+            return "";
         }
-        uniquefiers[from] = sb.toString();
+        return s;
     }
 
+    /**
+     * @param ce          A citation to process.
+     *
+     * @return A normalized citation marker for deciding which
+     *         citations need uniqueLetters.
+     *
+     * For details of what "normalized" means: {@see getAuthorYearParenthesisMarker}
+     */
+    public static String getNormalizedCitationMarker(OOBibStyle style,
+                                                     CitationMarkerEntry ce,
+                                                     Optional<Integer> maxAuthorsOverride) {
+        boolean[] startsNewGroup = {true};
+        return getAuthorYearParenthesisMarker(style,
+                                              AuthorYearMarkerPurpose.NORMALIZED,
+                                              Collections.singletonList(ce),
+                                              startsNewGroup,
+                                              maxAuthorsOverride);
+    }
 
     /**
-     * @param entries
-     * @param database
-     * @param inParenthesis Emit "(Au, 2000)" if true, "Au (2000)" if false.
-     * @param uniquefiers null or of length entries.size(), with
-     *                    elements null or letter making a cited
-     *                    source unique in citations.
+     * Produce citation marker for a citation group.
      *
-     * @param unlimAuthors Can this be null?
-     *                     If not null, then its elements are ...
+     * Attempts to join consecutive citations: if normalized citations
+     *    markers match and no pageInfo is present, the second entry
+     *    can be presented by appending its uniqueLetter to the
+     *    previous.
      *
-     * @param pageInfosForCitations
-     *                    May be null.
-     *                    Any or of its elements can be null.
+     *    If either entry has pageInfo, join is inhibited.
+     *    If the previous entry has more names than we need
+     *    we check with extended normalizedMarkers if they match.
+     *
+     * For consecutive identical entries, the second one is omitted.
+     *     Identical requires same pageInfo here, we do not try to merge them.
+     *     Note: notifying the user about them would be nice.
+     *
+     * @param citationMarkerEntries A group of citations to process.
+     *
+     * @param inParenthesis If true, put parenthesis around the whole group,
+     *             otherwise around each (year,uniqueLetter,pageInfo) part.
+     *
+     * @param nonUniqueCitationMarkerHandling What should happen if we
+     *             stumble upon citations with identical normalized
+     *             citation markers which cite different sources and
+     *             are not distinguished by uniqueLetters.
+     *
+     *             Note: only consecutive citations are checked.
+     *
      */
-    /*
-     * Call patterns:
-     *
-     *    // normalizedCitationMarkerForNormalStyle
-     *    return style.getCitationMarker(Collections.singletonList(ce), // List<BibEntry>
-     *                                   entries, // Map<BibEntry, BibDatabase>
-     *                                   true,    // inParenthesis
-     *                                   null,    // uniqueLetters
-     *                                   new int[] {-1}, // no limit on authors
-     *                                   null // pageInfosForCitations
-     *        );
-     *    // produceCitationMarkersForNormalStyle
-     *    // when there are unresolved entries
-     *    style.getCitationMarker(cEntries,
-     *                            entries,
-     *                            cg.itcType == OOBibBase.AUTHORYEAR_PAR,
-     *                            uniqueLetterForCitedEntry2,
-     *                            firstLimAuthors2, // entry for a single citation
-     *                            pageInfo);
-     *    // when there are no unresolved entries
-     *    String citMarker = style.getCitationMarker(cEntries,
-     *                                               entries,
-     *                                               cg.itcType == OOBibBase.AUTHORYEAR_PAR,
-     *                                               uniqueLetterForCitedEntry,
-     *                                               firstLimAuthors,
-     *                                               pageInfosForCitations);
-     *    // insertCitation
-     *    String citeText = (style.isNumberEntries()
-     *                       ? "[-]" // A dash only. Only refresh later.
-     *                       : style.getCitationMarker(entries,
-     *                                                 databaseMap,
-     *                                                 inParenthesis,
-     *                                                 null, // uniqueLetters
-     *                                                 null, // unlimAuthors
-     *                                                 pageInfosForCitations));
-     */
-    public static String getCitationMarker(OOBibStyle style,
-                                           List<BibEntry> entries,
-                                           Map<BibEntry, BibDatabase> database,
-                                           boolean inParenthesis,
-                                           String[] uniquefiers,
-                                           int[] unlimAuthors,
-                                           List<String> pageInfosForCitations
-        ) {
+    public static String getCitationMarker(
+        OOBibStyle style,
+        List<CitationMarkerEntry> citationMarkerEntries,
+        boolean inParenthesis,
+        OOBibStyle.NonUniqueCitationMarker nonUniqueCitationMarkerHandling) {
 
-        List<String> pageInfos =
-            OOBibStyle.regularizePageInfosForCitations(pageInfosForCitations,
-                                                       entries.size());
+        final int nEntries = citationMarkerEntries.size();
+
         // Original:
         //
         // Look for groups of uniquefied entries that should be combined in the output.
@@ -522,88 +589,164 @@ class OOBibStyleGetCitationMarker {
         //
         // We also assume, that identical entries have the same uniquefier.
         //
-        // Possibilites for two consecutive entries:
-        //   a.entry != b.entry, 
-        //
-        //
-        int piv = -1;
 
-        String tmpMarker = null;
+        List<String> normalizedMarkers = new ArrayList<>(nEntries);
+        for (int i = 0; i < nEntries; i++){
+            String nm = getNormalizedCitationMarker(style,
+                                                    citationMarkerEntries.get(i),
+                                                    Optional.empty());
+            normalizedMarkers.add(nm);
+        }
 
-        if (uniquefiers != null) {
+        // How many authors would be emitted without grouping.
+        // Later overwritten for group members with value for
+        // first of the group.
+        int[] nAuthorsToEmit = new int[nEntries];
+        int[] nAuthorsToEmitRevised = new int[nEntries];
+        for (int i = 0; i < nEntries; i++){
+            CitationMarkerEntry ce = citationMarkerEntries.get(i);
+            nAuthorsToEmit[i] = calculateNAuthorsToEmit(style, ce);
+            nAuthorsToEmitRevised[i] = calculateNAuthorsToEmit(style, ce);
+        }
 
-            for (int i = 0; i < uniquefiers.length; i++) {
+        boolean[] startsNewGroup = new boolean[nEntries];
+        List<CitationMarkerEntry> filteredCitationMarkerEntries =  new ArrayList<>(nEntries);
+        int i_out = 0;
 
-                if ((uniquefiers[i] == null) || uniquefiers[i].isEmpty()) {
-                    // This entry has no uniquefier.
-                    // Check if we just passed a group of more than one entry with uniquefier:
-                    if ((piv > -1) && (i > (piv + 1))) {
-                        // Do the grouping:
-                        group(style, entries, uniquefiers, piv, i - 1);
-                    }
+        if ( nEntries > 0) {
+            filteredCitationMarkerEntries.add(citationMarkerEntries.get(0));
+            startsNewGroup[i_out] = true;
+            i_out++;
+        }
 
-                    piv = -1;
+        for (int i = 1; i < nEntries; i++){
+            CitationMarkerEntry ce1 = citationMarkerEntries.get(i - 1);
+            CitationMarkerEntry ce2 = citationMarkerEntries.get(i);
+            String nm1 = normalizedMarkers.get(i - 1);
+            String nm2 = normalizedMarkers.get(i);
+
+            BibEntry bibEntry1 = ce1.getBibEntryOrNull();
+            BibEntry bibEntry2 = ce2.getBibEntryOrNull();
+
+            BibDatabase database1 = ce1.getDatabaseOrNull();
+            BibDatabase database2 = ce2.getDatabaseOrNull();
+
+            boolean isUnresolved1 = (bibEntry1 == null) || (database1 == null);
+            boolean isUnresolved2 = (bibEntry2 == null) || (database2 == null);
+
+            boolean startingNewGroup;
+            boolean sameAsPrev;
+            if (isUnresolved2) {
+                startingNewGroup = true;
+                sameAsPrev = false; // keep it visible
+            } else {
+                // Does the number of authors to be shown differ?
+                // Since we compared normalizedMarkers, the difference
+                // between maxAuthors and maxAuthorsFirst may invalidate
+                // our expectation that adding uniqueLetter is valid.
+
+                boolean firstAppearanceInhibitsJoin;
+                if ( isUnresolved1 ) {
+                    firstAppearanceInhibitsJoin = true; // no join for unresolved
                 } else {
-                    BibEntry currentEntry = entries.get(i);
-                    if (piv == -1) {
-                        piv = i;
-                        // createNormalizedCitationMarker
-                        tmpMarker =
-                            getAuthorYearParenthesisMarker(style,
-                                                           Collections.singletonList(currentEntry),
-                                                           database, // Map<BibEntry, BibDatabase>
-                                                           true, // inParenthesis
-                                                           null, // uniqueLetters
-                                                           unlimAuthors /* from args!*/);
+                    boolean isFirst1 = ce1.getIsFirstAppearanceOfSource();
+                    boolean isFirst2 = ce2.getIsFirstAppearanceOfSource();
+
+                    // nAuthorsToEmitRevised[i-1] may have been indirectly increased,
+                    // we have to check that too.
+                    if (!isFirst1 && !isFirst2 && (nAuthorsToEmitRevised[i-1] == nAuthorsToEmit[i-1])){
+                        // we can rely on normalizedMarkers
+                        firstAppearanceInhibitsJoin = false;
+                    } else if (style.getMaxAuthors() == style.getMaxAuthorsFirst()) {
+                        // we can rely on normalizedMarkers
+                        firstAppearanceInhibitsJoin = false;
                     } else {
-                        // See if this entry can go into a group with the previous one:
-                        // createNormalizedCitationMarker
-                        String thisMarker =
-                            getAuthorYearParenthesisMarker(style,
-                                                           Collections.singletonList(currentEntry),
-                                                           database,
-                                                           true, // inParenthesis
-                                                           null,
-                                                           unlimAuthors);
+                        int prevShown = nAuthorsToEmitRevised[i-1];
+                        int need      = nAuthorsToEmit[i];
 
-                        String authorField = style.getStringCitProperty(OOBibStyle.AUTHOR_FIELD);
-                        int maxAuthors = style.getIntCitProperty(OOBibStyle.MAX_AUTHORS);
-                        String author = getCitationMarkerField(style,
-                                                               currentEntry,
-                                                               database.get(currentEntry),
-                                                               style.getAuthorFieldNames());
-                        AuthorList al = AuthorList.parse(author);
-
-                        // assumes (unlimAuthors != null)
-                        int prevALim = unlimAuthors[i - 1]; // i always at least 1 here
-                        if (!thisMarker.equals(tmpMarker)
-                            || ((al.getNumberOfAuthors() > maxAuthors)
-                                && (unlimAuthors[i] != prevALim))) {
-                            // No match. Update piv to exclude the previous entry. But first check if the
-                            // previous entry was part of a group:
-                            if ((piv > -1) && (i > (piv + 1))) {
-                                // Do the grouping:
-                                group(style, entries, uniquefiers, piv, i - 1);
+                        if ( prevShown < need ) {
+                            // We do not retrospectively change the number of authors shown
+                            // at the previous entry, take that as decided.
+                            firstAppearanceInhibitsJoin = true;
+                        } else {
+                            // prevShown >= need
+                            // Check with extended normalizedMarkers.
+                            String nmx1 = getNormalizedCitationMarker(style, ce1, Optional.of(prevShown));
+                            String nmx2 = getNormalizedCitationMarker(style, ce2, Optional.of(prevShown));
+                            if (nmx2.equals(nmx1)) {
+                                firstAppearanceInhibitsJoin = false;
+                            } else {
+                                firstAppearanceInhibitsJoin = true;
                             }
-                            tmpMarker = thisMarker;
-                            piv = i;
                         }
                     }
                 }
 
+                String pi2 = nullToEmptyString(OOBibStyle.regularizePageInfo(ce2.getPageInfoOrNull()));
+                String pi1 = nullToEmptyString(OOBibStyle.regularizePageInfo(ce1.getPageInfoOrNull()));
+
+                String ul2 = ce2.getUniqueLetterOrNull();
+                String ul1 = ce1.getUniqueLetterOrNull();
+
+                boolean uniqLetterPresenceChanged = (ul2 == null) != (ul1 == null);
+
+                String xul2 = nullToEmptyString(ul2);
+                String xul1 = nullToEmptyString(ul1);
+
+                String k2 = ce2.getCitationKey();
+                String k1 = ce1.getCitationKey();
+
+                boolean uniqLetterDoesNotMakeUnique = (nm2.equals(nm1)
+                                                       && xul2.equals(xul1)
+                                                       && !k2.equals(k1));
+
+                if (uniqLetterDoesNotMakeUnique &&
+                    nonUniqueCitationMarkerHandling == OOBibStyle.NonUniqueCitationMarker.THROWS) {
+                    throw new RuntimeException("different citation keys,"
+                                               + " but same normalizedMarker and uniqueLetter");
+                }
+
+                boolean pageInfoInhibitsJoin;
+                if (pi1.equals("") && pi2.equals("")) {
+                    pageInfoInhibitsJoin = false;
+                } else if (k2.equals(k1) && pi2.equals(pi1)) {
+                    pageInfoInhibitsJoin = false;
+                } else {
+                    pageInfoInhibitsJoin = true;
+                }
+
+                boolean normalizedMarkerChanged = !nm2.equals(nm1);
+                startingNewGroup = (
+                    normalizedMarkerChanged
+                    || firstAppearanceInhibitsJoin
+                    || pageInfoInhibitsJoin
+                    || uniqLetterPresenceChanged
+                    || uniqLetterDoesNotMakeUnique);
+
+                if (!startingNewGroup) {
+                    // inherit from first of group. Used at next i.
+                    nAuthorsToEmitRevised[i] = nAuthorsToEmitRevised[i-1];
+                }
+
+                sameAsPrev = (!startingNewGroup
+                              && xul2.equals(xul1)
+                              && k2.equals(k1)
+                              && pi2.equals(pi1));
             }
-            // Finished with the loop. See if the last entries form a group:
-            if (piv >= 0) {
-                // Do the grouping:
-                group(style, entries, uniquefiers, piv, uniquefiers.length - 1);
+
+            if (!sameAsPrev) {
+                filteredCitationMarkerEntries.add(ce2);
+                startsNewGroup[i_out] = startingNewGroup;
+                i_out++;
             }
-        } // if uniquefiers are not null
+        }
 
         return getAuthorYearParenthesisMarker(style,
-                                              entries,
-                                              database,
-                                              inParenthesis,
-                                              uniquefiers,
-                                              unlimAuthors);
+                                              (inParenthesis
+                                               ? AuthorYearMarkerPurpose.IN_PARENTHESIS
+                                               : AuthorYearMarkerPurpose.IN_TEXT),
+                                              filteredCitationMarkerEntries,
+                                              startsNewGroup,
+                                              Optional.empty());
     }
 }

@@ -33,6 +33,8 @@ import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.openoffice.CitationEntry;
+import org.jabref.logic.openoffice.CitationMarkerEntry;
+import org.jabref.logic.openoffice.CitationMarkerEntryImpl;
 import org.jabref.logic.openoffice.OOBibStyle;
 import org.jabref.logic.openoffice.OOPreFormatter;
 import org.jabref.logic.openoffice.OOUtil;
@@ -77,7 +79,6 @@ import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.lang.XServiceInfo;
 import com.sun.star.text.ReferenceFieldSource;
 import com.sun.star.text.ReferenceFieldPart;
-// import com.sun.star.text.TextRanges;
 import com.sun.star.text.XBookmarksSupplier;
 import com.sun.star.text.XFootnote;
 import com.sun.star.text.XReferenceMarksSupplier;
@@ -91,8 +92,6 @@ import com.sun.star.text.XTextSection;
 import com.sun.star.text.XTextSectionsSupplier;
 import com.sun.star.text.XTextViewCursor;
 import com.sun.star.text.XTextViewCursorSupplier;
-//import com.sun.star.text.textfield.GetReference;
-//import com.sun.star.text.GetReference;
 import com.sun.star.uno.Any;
 import com.sun.star.uno.Type;
 import com.sun.star.uno.UnoRuntime;
@@ -178,25 +177,6 @@ class OOBibBase {
         CreationException {
 
         this.dialogService = dialogService;
-
-        /*
-        FieldComparator a = new FieldComparator(StandardField.AUTHOR);
-        FieldComparator y = new FieldComparator(StandardField.YEAR);
-        FieldComparator t = new FieldComparator(StandardField.TITLE);
-
-        List<Comparator<BibEntry>> ayt = new ArrayList<>(3);
-        ayt.add(a);
-        ayt.add(y);
-        ayt.add(t);
-        this.entryComparator = new FieldComparatorStack<>(ayt);
-
-        List<Comparator<BibEntry>> yat = new ArrayList<>(3);
-        yat.add(y);
-        yat.add(a);
-        yat.add(t);
-        this.yearAuthorTitleComparator = new FieldComparatorStack<>(yat);
-        */
-
         this.xDesktop = simpleBootstrap(loPath);
     }
 
@@ -770,22 +750,16 @@ class OOBibBase {
         if (ck.db.isEmpty()){
             return String.format("(Unresolved(%s))", ck.citationKey);
         }
-        BibEntry ce = ck.db.get().entry;
-        Map<BibEntry, BibDatabase> entries = new HashMap<>();
-        entries.put( ce, ck.db.get().database );
         // We need "normalized" (in parenthesis) markers
         // for uniqueness checking purposes:
         // createNormalizedCitationMarker
-        return style.getCitationMarker(Collections.singletonList(ce), // List<BibEntry>
-                                       entries, // Map<BibEntry, BibDatabase>
-                                       true,    // inParenthesis
-                                       null,    // uniqueLetters
-                                       // No limit on authors?
-                                       // TODO: Seems wrong: the actual markers
-                                       // may be shorter, with more clashes
-                                       // than we test here.
-                                       new int[] {-1}, /* no limit on authors */
-                                       null /*pageInfosForCitations*/);
+        CitationMarkerEntry ce = new CitationMarkerEntryImpl(ck.citationKey,
+                                                             ck.db.get().entry,
+                                                             ck.db.get().database,
+                                                             null, // uniqueLetter
+                                                             null, // pageInfo
+                                                             false /* isFirstAppearanceOfSource */);
+        return style.getNormalizedCitationMarker(ce);
     }
 
     /**
@@ -951,7 +925,7 @@ class OOBibBase {
 
         cgs.createNumberedBibliographySortedInOrderOfAppearance();
 
-        final int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
+        final int minGroupingCount = style.getMinimumGroupingCount();
 
         Map<CitationGroupID,String> citMarkers = new HashMap<>();
 
@@ -980,8 +954,7 @@ class OOBibBase {
 
         cgs.createNumberedBibliographySortedByComparator( entryComparator );
 
-        final int minGroupingCount =
-            style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
+        final int minGroupingCount = style.getMinimumGroupingCount();
 
         Map<CitationGroupID,String> citMarkers = new HashMap<>();
 
@@ -1026,7 +999,8 @@ class OOBibBase {
 
         // Finally, go through all citation markers, and update
         // those referring to entries in our current list:
-        final int maxAuthorsFirst = style.getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST);
+        final int maxAuthorsFirst = style.getMaxAuthorsFirst();
+
         Set<String> seenBefore = new HashSet<>();
 
         Map<CitationGroupID,String> citMarkers = new HashMap<>();
@@ -1035,100 +1009,69 @@ class OOBibBase {
             CitationGroup cg = cgs.getCitationGroupOrThrow(cgid);
             List<Citation> cits = cg.getSortedCitations();
             final int nCitedEntries = cits.size();
-            int[] firstLimAuthors = new int[nCitedEntries];
-            String[] uniqueLetterForCitedEntry = new String[nCitedEntries];
+            List<String> pageInfosForCitations = cgs.backend.getPageInfosForCitations(cg);
 
-            for (int j = 0; j < nCitedEntries; j++) {
-                String currentKey = cits.get(j).citationKey; // nullable
+            List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>(nCitedEntries);
 
-                // firstLimAuthors will be (-1) except at the first
-                // refMark it appears at, where a positive
-                // maxAuthorsFirst may override. This is why:
-                // https://discourse.jabref.org/t/
-                // number-of-authors-in-citations-style-libreoffice/747/3
-                // "Some citation styles require to list the full
-                // names of the first 4 authors for the first
-                // time. Later it is sufficient to have only maybe
-                // (Author A and Author B 2019 et al.)"
-                firstLimAuthors[j] = -1;
-                if (maxAuthorsFirst > 0) {
-                    if (!seenBefore.contains(currentKey)) {
-                        firstLimAuthors[j] = maxAuthorsFirst;
-                    }
-                    seenBefore.add(currentKey);
-                }
-
-                String uniqueLetterForKey = cits.get(j).uniqueLetter.orElse("");
-                uniqueLetterForCitedEntry[j] = uniqueLetterForKey;
-            }
-
-            // TODO: Cannot pass unresolved keys to style.getCitationMarker
-            // fall back to ungrouped citations if there is
-            // any unresolved.
             boolean hasUnresolved = false;
             for (int j = 0; j < nCitedEntries; j++) {
-                //String currentKey = cits.get(j).citationKey;
-                if (cits.get(j).db.isEmpty()) {
-                    hasUnresolved = true;
-                    break;
+                Citation cit = cits.get(j);
+                String currentKey = cit.citationKey; // nullable
+                boolean isFirst = false;
+                if (!seenBefore.contains(currentKey)) {
+                    isFirst = true;
+                    seenBefore.add(currentKey);
                 }
+                String uniqueLetterForKey = cit.uniqueLetter.orElse(null);
+                BibDatabase database = null;
+                BibEntry bibEntry = null;
+                if (cit.db.isEmpty()) {
+                    hasUnresolved = true;
+                } else {
+                    database = cit.db.get().database;
+                    bibEntry = cit.db.get().entry;
+                }
+
+                CitationMarkerEntry cm =
+                    new CitationMarkerEntryImpl(currentKey,
+                                                bibEntry,
+                                                database,
+                                                uniqueLetterForKey,
+                                                pageInfosForCitations.get(j),
+                                                isFirst);
+                citationMarkerEntries.add(cm);
             }
 
-            List<String> pageInfosForCitations = cgs.backend.getPageInfosForCitations(cg);
+            // TODO: Now we can pass CitationMarkerEntry values with unresolved
+            //       keys to style.getCitationMarker,
+            //       maybe the fall back to ungrouped citations here is
+            //       not needed anymore.
+
             if ( hasUnresolved ) {
                 /*
                  * Some entries are unresolved.
                  */
                 String s = "";
                 for (int j = 0; j < nCitedEntries; j++) {
-                    List<BibEntry> cEntries = new ArrayList<>();
-                    Map<BibEntry, BibDatabase> entries = new HashMap<>();
-                    int[] firstLimAuthors2              = new int[1];
-                    String[] uniqueLetterForCitedEntry2 = new String[1];
 
-                    String currentKey = cits.get(j).citationKey;
-                    if (!cits.get(j).db.isEmpty()) {
-                        BibEntry e = cits.get(j).db.get().entry;
-                        BibDatabase d = cits.get(j).db.get().database;
-                        cEntries.add(e);
-                        entries.put(e,d);
-                        firstLimAuthors2[0] = firstLimAuthors[j];
-                        uniqueLetterForCitedEntry2[0] = uniqueLetterForCitedEntry[j];
-                        List<String> pageInfo = pageInfosForCitations.subList(j,j+1);
+                    CitationMarkerEntry cm = citationMarkerEntries.get(j);
+                    if (cm.getBibEntryOrNull() == null) {
                         s = (s
-                             + style.getCitationMarker(cEntries, // single entry
-                                                       entries,
+                             + style.getCitationMarker(citationMarkerEntries.subList(j,j+1),
                                                        cg.itcType == OOBibBase.AUTHORYEAR_PAR,
-                                                       uniqueLetterForCitedEntry2,
-                                                       // firstLimAuthors2: firstLimAuthors[j] ==
-                                                       // maxAuthorsFirst or (-1) to use maxAuthors
-                                                       firstLimAuthors2,
-                                                       pageInfo));
+                                                       OOBibStyle.NonUniqueCitationMarker.THROWS));
                     } else {
-                        s = s + String.format("(Unresolved(%s))", currentKey);
+                        s = s + String.format("(Unresolved(%s))", cm.getCitationKey());
                     }
                 }
-                citMarkers.put( cgid, s );
+                citMarkers.put(cgid, s);
             } else {
                 /*
                  * All entries are resolved.
                  */
-                List<BibEntry> cEntries = new ArrayList<>();
-                Map<BibEntry, BibDatabase> entries = new HashMap<>();
-                for (int j = 0; j < nCitedEntries; j++) {
-                    // String currentKey = cits.get(j).citationKey
-                    BibEntry e = cits.get(j).db.get().entry;
-                    BibDatabase d = cits.get(j).db.get().database;
-                    cEntries.add(e);
-                    entries.put(e,d);
-                }
-
-                String citMarker = style.getCitationMarker(cEntries,
-                                                           entries,
+                String citMarker = style.getCitationMarker(citationMarkerEntries,
                                                            cg.itcType == OOBibBase.AUTHORYEAR_PAR,
-                                                           uniqueLetterForCitedEntry,
-                                                           firstLimAuthors, // maxAuthorsFirst or (-1)
-                                                           pageInfosForCitations);
+                                                           OOBibStyle.NonUniqueCitationMarker.THROWS);
                 citMarkers.put(cgid, citMarker);
             }
         }
@@ -1157,19 +1100,9 @@ class OOBibBase {
         Objects.requireNonNull(citationText);
         Objects.requireNonNull(style);
 
-        // TODO: Last minute editing: If there is "page info" for this
-        // citation mark, we should inject it into the citation marker
-        // when creating.
-
-        String citText;
-        Optional<String> pageInfo = cgs.getPageInfo(cgid);
-        citText = ((pageInfo.isEmpty() || pageInfo.get().equals(""))
-                   ? citationText
-                   : style.insertPageInfo(citationText, pageInfo.get()));
-
         if (withText) {
             // setString: All styles are removed when applying this method.
-            cursor.setString(citText);
+            cursor.setString(citationText);
             DocumentConnection.setCharLocaleNone(cursor);
             if (style.isFormatCitations()) {
                 String charStyle = style.getCitationCharacterFormat();
@@ -1187,10 +1120,10 @@ class OOBibBase {
         if (italicize) {
             String etAlString = style.getStringCitProperty(OOBibStyle.ET_AL_STRING);
             Objects.requireNonNull(etAlString);
-            Objects.requireNonNull(citText);
-            for (int index = citText.indexOf(etAlString);
+            Objects.requireNonNull(citationText);
+            for (int index = citationText.indexOf(etAlString);
                  index >= 0;
-                 index = citText.indexOf(etAlString, index + 1)) {
+                 index = citationText.indexOf(etAlString, index + 1)) {
                 italicizeRangeFromPosition(cursor, index, index + etAlString.length());
             }
         }
@@ -1447,6 +1380,7 @@ class OOBibBase {
                 + Localization.lang("Select some before citing.")
                 );
         }
+        final int nEntries = entries.size();
 
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
         CitationGroups cgs = new CitationGroups(documentConnection);
@@ -1485,12 +1419,6 @@ class OOBibBase {
 
             // sortBibEntryListForMulticite(entries, style);
 
-            /*
-             * String keyString =
-             *   entries.stream()
-             *   .map(entry -> entry.getCitationKey().orElse(""))
-             *   .collect(Collectors.joining(","));
-             */
             List<String> citationKeys =
                 entries.stream()
                 .map(OOBibBase::insertCitationGetCitationKey)
@@ -1502,7 +1430,7 @@ class OOBibBase {
             // If we should store metadata for page info, do that now:
             //
             // Note: the (single) pageInfo here gets associated with
-            //       the citation group. At presentation it is inject
+            //       the citation group. At presentation it is injected
             //       to before the final parenthesis, appearing to
             //       belong to the last entry added here.
             //
@@ -1525,87 +1453,87 @@ class OOBibBase {
             assertCitationCharacterFormatIsOK(cursor, style);
 
             // Insert reference mark and text
-            // {
-                // Create a BibEntry to BibDatabase map (to make
-                // style.getCitationMarker happy?)
-                Map<BibEntry, BibDatabase> databaseMap = new HashMap<>();
-                for (BibEntry entry : entries) {
-                    // Using the same database for each entry.
-                    // Probably the GUI limits selection to a single database.
-                    databaseMap.put(entry, database);
+
+            // JabRef53 style pageInfo list, or null
+            List<String> pageInfosForCitations =
+                Backend52.fakePageInfosForCitations(pageInfo,
+                                                    nEntries,
+                                                    false /* mayReturnNull */);
+            // Make it non-null, with a (possibly null) entry for each
+            // pageInfosForCitations = OOBibStyle.regularizePageInfosForCitations(pageInfosForCitations);
+
+            List<CitationMarkerEntry> citationMarkerEntries = new ArrayList<>(entries.size());
+            for (int i = 0; i < nEntries; i++) {
+                // Using the same database for each entry.
+                // Probably the GUI limits selection to a single database.
+                CitationMarkerEntry cm =
+                    new CitationMarkerEntryImpl(citationKeys.get(i),
+                                                entries.get(i),
+                                                database,
+                                                null, // uniqueLetter
+                                                pageInfosForCitations.get(i),
+                                                false /* isFirstAppearanceOfSource */);
+                citationMarkerEntries.add(cm);
+            }
+
+            // The text we insert
+            String citeText = (style.isNumberEntries()
+                               ? "[-]" // A dash only. Only refresh later.
+                               : style.getCitationMarker(citationMarkerEntries,
+                                                         inParenthesis,
+                                                         OOBibStyle.NonUniqueCitationMarker.FORGIVEN));
+
+            if (citeText.equals("")) {
+                citeText = "[?]";
+            }
+
+            insertReferenceMark(cgs,
+                                documentConnection,
+                                citationKeys,
+                                pageInfosForCitations,
+                                itcType,
+                                citeText,
+                                cursor,
+                                withText,
+                                style,
+                                true /* insertSpaceAfter */);
+
+            // Remember this position: we will come back here in the
+            // end.
+            XTextRange position = cursor.getEnd();
+
+            if (sync) {
+                // To account for numbering and for uniqueLetters, we
+                // must refresh the cite markers:
+                ProduceCitationMarkersResult x =
+                    produceCitationMarkers(documentConnection, allBases, style);
+                try {
+                    documentConnection.lockControllers();
+                    applyNewCitationMarkers(documentConnection,
+                                            x.cgs,
+                                            x.citMarkers,
+                                            style);
+                    // Insert it at the current position:
+                    rebuildBibTextSection(documentConnection,
+                                          style,
+                                          x.cgs,
+                                          x.getBibliography());
+                } finally {
+                    documentConnection.unlockControllers();
                 }
 
-                // JabRef53 style pageInfo list, or null
-                List<String> pageInfosForCitations =
-                    Backend52.fakePageInfosForCitations(pageInfo,
-                                                        entries.size(),
-                                                        true /* mayReturnNull */);
-
-                // The text we insert
-                String citeText = (style.isNumberEntries()
-                                   ? "[-]" // A dash only. Only refresh later.
-                                   : style.getCitationMarker(entries,
-                                                             databaseMap,
-                                                             inParenthesis,
-                                                             null, // uniqueLetters
-                                                             null, // unlimAuthors
-                                                             pageInfosForCitations));
-
-                if (citeText.equals("")) {
-                    citeText = "[?]";
+                /*
+                 * Problem: insertEntry in bibliography
+                 * Reference is destroyed when we want to get there.
+                 */
+                // Go back to the relevant position:
+                try {
+                    cursor.gotoRange(position, false);
+                } catch (com.sun.star.uno.RuntimeException ex) {
+                    LOGGER.warn("OOBibBase.insertEntry:"
+                                + " Could not go back to end of in-text citation", ex);
                 }
-
-                insertReferenceMark(cgs,
-                                    documentConnection,
-                                    citationKeys,
-                                    pageInfosForCitations,
-                                    itcType,
-                                    citeText,
-                                    cursor,
-                                    withText,
-                                    style,
-                                    true /* insertSpaceAfter */);
-                // } // end of scope for databaseMap, citeText
-
-                // Move to the right of the space and remember this
-                // position: we will come back here in the end.
-                // cursor.collapseToEnd();
-                // cursor.goRight((short) 1, false);
-                XTextRange position = cursor.getEnd();
-
-                if (sync) {
-                    // To account for numbering and for uniqueLetters, we
-                    // must refresh the cite markers:
-                    ProduceCitationMarkersResult x = produceCitationMarkers(documentConnection,
-                                                                            allBases,
-                                                                            style);
-                    try {
-                        documentConnection.lockControllers();
-                        applyNewCitationMarkers(documentConnection,
-                                                x.cgs,
-                                                x.citMarkers,
-                                                style);
-                        // Insert it at the current position:
-                        rebuildBibTextSection(documentConnection,
-                                              style,
-                                              x.cgs,
-                                              x.getBibliography());
-                    } finally {
-                        documentConnection.unlockControllers();
-                    }
-
-                    /*
-                     * Problem: insertEntry in bibliography
-                     * Reference is destroyed when we want to get there.
-                     */
-                    // Go back to the relevant position:
-                    try {
-                        cursor.gotoRange(position, false);
-                    } catch (com.sun.star.uno.RuntimeException ex) {
-                        LOGGER.warn("OOBibBase.insertEntry:"
-                                    + " Could not go back to end of in-text citation", ex);
-                    }
-                }
+            }
         } catch (DisposedException ex) {
             // We need to catch this one here because the OpenOfficePanel class is
             // loaded before connection, and therefore cannot directly reference
@@ -1653,13 +1581,6 @@ class OOBibBase {
         CreationException,
         WrappedTargetException,
         PropertyVetoException {
-
-        // CitationGroupsV001 cgs = new CitationGroupsV001(documentConnection);
-        // CitationGroupsV001 cgs = x.cgs;
-
-        // final int nRefMarks = referenceMarkNames.size();
-        // assert (citMarkers.length == nRefMarks);
-        // assert (types.length == nRefMarks);
 
         final boolean hadBibSection =
             (documentConnection.getBookmarkRangeOrNull(OOBibBase.BIB_SECTION_NAME) != null);
@@ -1711,9 +1632,8 @@ class OOBibBase {
                 && (documentConnection.getBookmarkRangeOrNull(OOBibBase.BIB_SECTION_NAME) == null)) {
                 // Overwriting text already there is too harsh.
                 // I am making it an error, to see if we ever get here.
-                throw new RuntimeException(
-                    "OOBibBase.applyNewCitationMarkers:"
-                    + " just overwrote the bibliography section marker. Sorry.");
+                throw new RuntimeException("OOBibBase.applyNewCitationMarkers:"
+                                           + " just overwrote the bibliography section marker. Sorry.");
             }
         }
     }
@@ -1733,16 +1653,16 @@ class OOBibBase {
             this.cgs = cgs;
             this.citMarkers = citMarkers;
             if ( cgs.getBibliography().isEmpty() ) {
-                throw new RuntimeException(
-                    "ProduceCitationMarkersResult.constructor: cgs does not have a bibliography");
+                throw new RuntimeException("ProduceCitationMarkersResult.constructor:"
+                                           + " cgs does not have a bibliography");
             }
         }
 
         public CitedKeys
         getBibliography() {
             if ( cgs.getBibliography().isEmpty() ) {
-                throw new RuntimeException(
-                    "ProduceCitationMarkersResult.getBibliography: cgs does not have a bibliography");
+                throw new RuntimeException("ProduceCitationMarkersResult.getBibliography:"
+                                           + " cgs does not have a bibliography");
             }
             return cgs.getBibliography().get();
         }
@@ -1751,7 +1671,7 @@ class OOBibBase {
             CitedKeys bib = getBibliography();
             List<String> unresolvedKeys = new ArrayList<>();
             for (CitedKey ck : bib.values()) {
-                if ( ck.db.isEmpty() ) {
+                if (ck.db.isEmpty()) {
                     unresolvedKeys.add(ck.citationKey);
                 }
             }
@@ -1801,25 +1721,21 @@ class OOBibBase {
         }
         // localOrder and globalOrder together gives us order-of-appearance of citations
 
-        // citMarkers[i] = what goes in the text at referenceMark[i]
-        // String[] citMarkers;
         Map<CitationGroupID,String> citMarkers;
 
         // fill citMarkers
         Map<String, String> uniqueLetters = new HashMap<>();
 
         if (style.isCitationKeyCiteMarkers()) {
-            citMarkers =
-                produceCitationMarkersForIsCitationKeyCiteMarkers(cgs, style);
+            citMarkers = produceCitationMarkersForIsCitationKeyCiteMarkers(cgs, style);
         } else if (style.isNumberEntries()) {
             if (style.isSortByPosition()) {
-                citMarkers =
-                    produceCitationMarkersForIsNumberEntriesIsSortByPosition(cgs, style);
+                citMarkers = produceCitationMarkersForIsNumberEntriesIsSortByPosition(cgs, style);
             } else {
-                citMarkers =
-                    produceCitationMarkersForIsNumberEntriesNotSortByPosition(cgs, style);
+                citMarkers = produceCitationMarkersForIsNumberEntriesNotSortByPosition(cgs, style);
             }
-        } else /* Normal case, (!isCitationKeyCiteMarkers && !isNumberEntries) */ {
+        } else {
+            /* Normal case, (!isCitationKeyCiteMarkers && !isNumberEntries) */
             citMarkers = produceCitationMarkersForNormalStyle(cgs, style);
         }
 
@@ -1893,7 +1809,6 @@ class OOBibBase {
                                style);
     }
 
-
     /**
      * Insert body of bibliography at `cursor`.
      *
@@ -1922,29 +1837,12 @@ class OOBibBase {
 
         final boolean debugThisFun = false;
 
-        /*
-         *  Map<BibEntry, BibDatabase> entries;
-         *
-         *  if (style.isSortByPosition()) {
-         *      // We need to sort the entries according to their order of appearance:
-         *      entries =
-         *          sortEntriesByRefMarkNames(
-         *              jabRefReferenceMarkNamesSortedByPosition,
-         *              fce.citeKeyToBibEntry,
-         *              fce.entries
-         *              );
-         *  } else {
-         *      entries = sortEntriesByComparator(fce.entries, entryComparator);
-         *  }
-         */
-
         if (debugThisFun) {
             System.out.printf("Ref isSortByPosition %s\n", style.isSortByPosition());
             System.out.printf("Ref isNumberEntries  %s\n", style.isNumberEntries());
         }
 
         for (CitedKey ck : bibliography.values()) {
-
 
             if (debugThisFun) {
                 System.out.printf("Ref cit %-20s ck.number %7s%n",
@@ -1964,12 +1862,7 @@ class OOBibBase {
                         "insertFullReferenceAtCursor: numbered style, but found unnumbered entry");
                 }
 
-                // Note: minGroupingCount is pointless here, we are
-                // formatting a single entry.
-                // int minGroupingCount = style.getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
-                // int minGroupingCount = 2;
                 int number = ck.number.get();
-                // List<String> pageInfosForCitations = null; // no pageInfo for the bibliography
                 String marker = style.getNumCitationMarkerForBibliography(number);
 
                 OOUtil.insertTextAtCurrentLocation(documentConnection.xText,
@@ -1982,7 +1875,7 @@ class OOBibBase {
             }
 
             if ( ck.db.isEmpty() ) {
-                // skip unresolved entries
+                // Unresolved entry
                 OOUtil.insertTextAtCurrentLocation(documentConnection.xText,
                                                    cursor,
                                                    String.format("Unresolved(%s)", ck.citationKey),
@@ -2020,22 +1913,21 @@ class OOBibBase {
                         ")",
                         Collections.emptyList());
                 }
-            } else {
 
+            } else {
+                // Resolved entry
                 BibEntry bibentry = ck.db.get().entry;
 
                 // insert the actual details.
                 Layout layout = style.getReferenceFormat(bibentry.getType());
                 layout.setPostFormatter(POSTFORMATTER);
-                OOUtil.insertFullReferenceAtCurrentLocation(
-                    documentConnection.xText,
-                    cursor,
-                    layout,
-                    parFormat,
-                    bibentry,
-                    ck.db.get().database,
-                    ck.uniqueLetter.orElse(null)
-                    );
+                OOUtil.insertFullReferenceAtCurrentLocation(documentConnection.xText,
+                                                            cursor,
+                                                            layout,
+                                                            parFormat,
+                                                            bibentry,
+                                                            ck.db.get().database,
+                                                            ck.uniqueLetter.orElse(null));
             }
         }
     }
@@ -2057,11 +1949,9 @@ class OOBibBase {
 
         OOUtil.insertParagraphBreak(documentConnection.xText, textCursor);
 
-        documentConnection.insertTextSection(
-            OOBibBase.BIB_SECTION_NAME,
-            textCursor,
-            false
-            );
+        documentConnection.insertTextSection(OOBibBase.BIB_SECTION_NAME,
+                                             textCursor,
+                                             false);
     }
 
     /**
@@ -2088,8 +1978,7 @@ class OOBibBase {
             XTextSection section = (XTextSection) a.getObject();
             // Clear it:
 
-            XTextCursor cursor =
-                documentConnection.xText.createTextCursorByRange(section.getAnchor());
+            XTextCursor cursor = documentConnection.xText.createTextCursorByRange(section.getAnchor());
 
             cursor.gotoRange(section.getAnchor(), false);
             cursor.setString("");
@@ -2128,35 +2017,24 @@ class OOBibBase {
         XTextSection section =
             documentConnection.getTextSectionByName(OOBibBase.BIB_SECTION_NAME);
 
-        XTextCursor cursor =
-            documentConnection.xText
-            .createTextCursorByRange(section.getAnchor());
+        XTextCursor cursor = (documentConnection.xText
+                              .createTextCursorByRange(section.getAnchor()));
 
-        OOUtil.insertTextAtCurrentLocation(
-            documentConnection.xText,
-            cursor,
-            (String) style.getProperty(OOBibStyle.TITLE),
-            (String) style.getProperty(OOBibStyle.REFERENCE_HEADER_PARAGRAPH_FORMAT)
-        );
+        OOUtil.insertTextAtCurrentLocation(documentConnection.xText,
+                                           cursor,
+                                           style.getTitle(),
+                                           style.getReferenceHeaderParagraphFormat());
 
-        String refParaFormat =
-            (String) style.getProperty(OOBibStyle.REFERENCE_PARAGRAPH_FORMAT);
+        insertFullReferenceAtCursor(documentConnection,
+                                    cursor,
+                                    cgs,
+                                    bibliography,
+                                    style,
+                                    style.getReferenceParagraphFormat());
 
-        insertFullReferenceAtCursor(
-            documentConnection,
-            cursor,
-            cgs,
-            bibliography,
-            // entries,
-            style,
-            refParaFormat
-            // uniqueLetters
-        );
-
-        documentConnection.insertBookmark(
-            OOBibBase.BIB_SECTION_END_NAME,
-            cursor,
-            true);
+        documentConnection.insertBookmark(OOBibBase.BIB_SECTION_END_NAME,
+                                          cursor,
+                                          true);
         cursor.collapseToEnd();
     }
 
@@ -2207,326 +2085,319 @@ class OOBibBase {
 
             boolean madeModifications = false;
 
-
-            List<CitationGroupID>
-                referenceMarkNames =
+            List<CitationGroupID> referenceMarkNames =
                 cgs.getCitationGroupIDsSortedWithinPartitions(documentConnection,
                                                               false /* mapFootnotesToFootnoteMarks */);
 
             final int nRefMarks = referenceMarkNames.size();
 
-        try {
-
-            if (useLockControllers) {
-                documentConnection.lockControllers();
-            }
-
-            /*
-             * joinableGroups collects lists of CitationGroup values
-             * that we think are joinable.
-             *
-             * joinableGroupsCursors provides the range for each group
-             */
-            List<List<CitationGroup>> joinableGroups = new ArrayList<>();
-            List<XTextCursor> joinableGroupsCursors = new ArrayList<>();
-
-            // Since we only join groups with identical itcTypes, we
-            // can get itcType from the first element of each
-            // joinableGroup.
-            //
-            // List<Integer> itcTypes = new ArrayList<>();
-
-            if (referenceMarkNames.size() > 0) {
-                // current group of CitationGroup values
-                List<CitationGroup> currentGroup = new ArrayList<>();
-                XTextCursor currentGroupCursor = null;
-                XTextCursor cursorBetween = null;
-                CitationGroup prev = null;
-                XTextRange prevRange = null;
-
-                for (CitationGroupID cgid : referenceMarkNames) {
-                    CitationGroup cg = cgs.getCitationGroupOrThrow(cgid);
-
-                    XTextRange currentRange = cgs.getMarkRangeOrNull(documentConnection, cgid);
-                    Objects.requireNonNull(currentRange);
-
-                    boolean addToGroup = true;
-                    /*
-                     * Decide if we add cg to the group
-                     */
-
-                    // Only combine (Author 2000) type citations
-                    if (cg.itcType != OOBibBase.AUTHORYEAR_PAR
-                        // allow "Author (2000)"
-                        // && itcTypes[i] != OOBibBase.AUTHORYEAR_INTEXT
-                        ) {
-                        addToGroup = false;
-                    }
-
-                    // Even if we combine AUTHORYEAR_INTEXT citations, we
-                    // would not mix them with AUTHORYEAR_PAR
-                    if (addToGroup && (prev != null)) {
-                        if (cg.itcType != prev.itcType) {
-                            addToGroup = false;
-                        }
-                    }
-
-                    if (addToGroup && prev != null) {
-                        Objects.requireNonNull(prevRange);
-                        Objects.requireNonNull(currentRange);
-                        if (!DocumentConnection.comparableRanges(prevRange, currentRange)) {
-                            addToGroup = false;
-                        } else {
-
-                            int textOrder =
-                                DocumentConnection.javaCompareRegionStarts(
-                                    prevRange,
-                                    currentRange);
-
-                            if (textOrder != (-1)) {
-                                String msg = String.format(
-                                    "combineCiteMarkers: \"%s\" supposed to be followed by \"%s\", but %s",
-                                    prevRange.getString(),
-                                    currentRange.getString(),
-                                    ((textOrder == 0)
-                                     ? "they start at the same position"
-                                     : "the start of the latter precedes the start of the first")
-                                    );
-                                LOGGER.warn(msg);
-                                addToGroup = false;
-                            }
-                        }
-                    }
-
-                    if (addToGroup && (cursorBetween != null)) {
-                        Objects.requireNonNull(currentGroupCursor);
-                        // assume: currentGroupCursor.getEnd() == cursorBetween.getEnd()
-                        if (DocumentConnection.javaCompareRegionEnds(
-                                cursorBetween, currentGroupCursor) != 0) {
-                            throw new RuntimeException(
-                                "combineCiteMarkers: cursorBetween.end != currentGroupCursor.end");
-                        }
-
-                        XTextRange rangeStart = currentRange.getStart();
-
-                        boolean couldExpand = true;
-                        XTextCursor thisCharCursor =
-                            currentRange.getText()
-                            .createTextCursorByRange(cursorBetween.getEnd());
-                        while (couldExpand &&
-                               (DocumentConnection.javaCompareRegionEnds(
-                                   cursorBetween, rangeStart) < 0)) {
-                            couldExpand = cursorBetween.goRight((short) 1, true);
-                            currentGroupCursor.goRight((short) 1, true);
-                            //
-                            thisCharCursor.goRight((short) 1, true);
-                            String thisChar = thisCharCursor.getString();
-                            thisCharCursor.collapseToEnd();
-                            if (thisChar.isEmpty()
-                                || thisChar.equals("\n")
-                                || !thisChar.trim().isEmpty()) {
-                                couldExpand = false;
-                            }
-                            if (DocumentConnection.javaCompareRegionEnds(
-                                    cursorBetween, currentGroupCursor) != 0) {
-                                throw new RuntimeException(
-                                    "combineCiteMarkers:"
-                                    + " cursorBetween.end != currentGroupCursor.end"
-                                    + " (during expand)");
-                            }
-                        }
-
-                        if (!couldExpand) {
-                            addToGroup = false;
-                        }
-                    }
-
-                    /*
-                     * Even if we do not add it to an existing group,
-                     * we might use it to start a new group.
-                     *
-                     * Can it start a new group?
-                     */
-                    boolean canStartGroup = (cg.itcType == OOBibBase.AUTHORYEAR_PAR);
-
-                    if (!addToGroup) {
-                        // close currentGroup
-                        if (currentGroup.size() > 1) {
-                            joinableGroups.add(currentGroup);
-                            joinableGroupsCursors.add(currentGroupCursor);
-                        }
-                        // Start a new, empty group
-                        currentGroup = new ArrayList<>();
-                        currentGroupCursor = null;
-                        cursorBetween = null;
-                        prev = null;
-                        prevRange = null;
-                    }
-
-                    if (addToGroup || canStartGroup) {
-                        // Add the current entry to a group.
-                        currentGroup.add(cg);
-                        // ... and start new cursorBetween
-                        // Set up cursorBetween
-                        //
-                        XTextRange rangeEnd = currentRange.getEnd();
-                        cursorBetween =
-                            currentRange.getText().createTextCursorByRange(rangeEnd);
-                        // If new group, create currentGroupCursor
-                        if (currentGroupCursor == null) {
-                            currentGroupCursor =
-                                currentRange.getText()
-                                .createTextCursorByRange(currentRange.getStart());
-                        }
-                        // include self in currentGroupCursor
-                        currentGroupCursor.goRight(
-                            (short) (currentRange.getString().length()), true);
-
-                        if (DocumentConnection.javaCompareRegionEnds(
-                                cursorBetween, currentGroupCursor) != 0) {
-                            /*
-                             * A problem discovered using this check:
-                             * when viewing the document in
-                             * two-pages-side-by-side mode, our visual
-                             * firstAppearanceOrder follows the visual
-                             * ordering on the screen. The problem
-                             * this caused: it sees a citation on the
-                             * 2nd line of the 1st page as appearing
-                             * after one at the 1st line of 2nd
-                             * page. Since we create cursorBetween at
-                             * the end of range1Full (on 1st page), it
-                             * is now BEFORE currentGroupCursor (on
-                             * 2nd page).
-                             */
-                            throw new RuntimeException(
-                                "combineCiteMarkers: "
-                                + "cursorBetween.end != currentGroupCursor.end"
-                                + String.format(
-                                    " (after %s)", addToGroup ? "addToGroup" : "startGroup")
-                                + (addToGroup
-                                   ? String.format(
-                                       " comparisonResult: %d\n"
-                                       + "cursorBetween: '%s'\n"
-                                       + "currentRange: '%s'\n"
-                                       + "currentGroupCursor: '%s'\n",
-                                       DocumentConnection.javaCompareRegionEnds(
-                                           cursorBetween, currentGroupCursor),
-                                       cursorBetween.getString(),
-                                       currentRange.getString(),
-                                       currentGroupCursor.getString()
-                                       )
-                                   : "")
-                                );
-                        }
-                        prev = cg;
-                        prevRange = currentRange;
-                    }
-                }
-
-                // close currentGroup
-                if (currentGroup.size() > 1) {
-                    joinableGroups.add(currentGroup);
-                    joinableGroupsCursors.add(currentGroupCursor);
-                }
-            }
-
-            if (joinableGroups.size() > 0) {
-                XTextCursor textCursor = joinableGroupsCursors.get(0);
-                assertCitationCharacterFormatIsOK(textCursor, style);
-            }
-
-            /*
-             * Now we can process the joinable groups
-             */
-            for (int gi = 0; gi < joinableGroups.size(); gi++) {
-
-                List<CitationGroup> joinableGroup = joinableGroups.get(gi);
-                /*
-                 * Join those in joinableGroups.get(gi)
-                 */
-
-                //
-                // Note: we are taking ownership of the citations (by
-                //       adding to newGroupCitations, then removing
-                //       the original CitationGroup values)
-                //
-                // cgPageInfos currently belong to the CitationGroup,
-                // but it is not clear how should handle them here.
-                //
-                List<Citation> newGroupCitations = new ArrayList<>();
-                for (CitationGroup rk : joinableGroup) {
-                    newGroupCitations.addAll(rk.citations);
-                }
-
-                int itcType = joinableGroup.get(0).itcType;
-
-                List<String> pageInfosForCitations =
-                    cgs.backend.combinePageInfos(joinableGroup);
-
-                // Remove the old citation groups from the document.
-                // We might want to do this via backends.
-                for (int gj = 0; gj < joinableGroup.size(); gj++) {
-                    cgs.removeCitationGroups( joinableGroup, documentConnection );
-                }
-
-                XTextCursor textCursor = joinableGroupsCursors.get(gi);
-                // Also remove the spaces between.
-                textCursor.setString("");
-
-                List<String> citationKeys =
-                    newGroupCitations.stream()
-                    .map(cit -> cit.citationKey)
-                    .collect(Collectors.toList());
-
-                // Insert reference mark:
-                insertReferenceMark(cgs,
-                                    documentConnection,
-                                    citationKeys,
-                                    pageInfosForCitations,
-                                    itcType, // OOBibBase.AUTHORYEAR_PAR
-                                    "tmp",
-                                    textCursor,
-                                    true, // withText
-                                    style,
-                                    false /* insertSpaceAfter: no, it
-                                           * is already there (or
-                                           * could be) */);
-            } // for gi
-
-            madeModifications = (joinableGroups.size() > 0);
-
-        } finally {
-            if (useLockControllers) {
-                documentConnection.unlockControllers();
-            }
-        }
-
-        if (madeModifications) {
-            ProduceCitationMarkersResult x =
-                produceCitationMarkers(
-                    // cgs,
-                    documentConnection,
-                    databases,
-                    style
-                    );
             try {
+
                 if (useLockControllers) {
                     documentConnection.lockControllers();
                 }
-                applyNewCitationMarkers(documentConnection,
-                                        x.cgs,
-                                        x.citMarkers,
-                                        style);
+
+                /*
+                 * joinableGroups collects lists of CitationGroup values
+                 * that we think are joinable.
+                 *
+                 * joinableGroupsCursors provides the range for each group
+                 */
+                List<List<CitationGroup>> joinableGroups = new ArrayList<>();
+                List<XTextCursor> joinableGroupsCursors = new ArrayList<>();
+
+                // Since we only join groups with identical itcTypes, we
+                // can get itcType from the first element of each
+                // joinableGroup.
+                //
+                // List<Integer> itcTypes = new ArrayList<>();
+
+                if (referenceMarkNames.size() > 0) {
+                    // current group of CitationGroup values
+                    List<CitationGroup> currentGroup = new ArrayList<>();
+                    XTextCursor currentGroupCursor = null;
+                    XTextCursor cursorBetween = null;
+                    CitationGroup prev = null;
+                    XTextRange prevRange = null;
+
+                    for (CitationGroupID cgid : referenceMarkNames) {
+                        CitationGroup cg = cgs.getCitationGroupOrThrow(cgid);
+
+                        XTextRange currentRange = cgs.getMarkRangeOrNull(documentConnection, cgid);
+                        Objects.requireNonNull(currentRange);
+
+                        boolean addToGroup = true;
+                        /*
+                         * Decide if we add cg to the group
+                         */
+
+                        // Only combine (Author 2000) type citations
+                        if (cg.itcType != OOBibBase.AUTHORYEAR_PAR
+                            // allow "Author (2000)"
+                            // && itcTypes[i] != OOBibBase.AUTHORYEAR_INTEXT
+                            ) {
+                            addToGroup = false;
+                        }
+
+                        // Even if we combine AUTHORYEAR_INTEXT citations, we
+                        // would not mix them with AUTHORYEAR_PAR
+                        if (addToGroup && (prev != null)) {
+                            if (cg.itcType != prev.itcType) {
+                            addToGroup = false;
+                            }
+                        }
+
+                        if (addToGroup && prev != null) {
+                            Objects.requireNonNull(prevRange);
+                            Objects.requireNonNull(currentRange);
+                            if (!DocumentConnection.comparableRanges(prevRange, currentRange)) {
+                                addToGroup = false;
+                            } else {
+
+                                int textOrder =
+                                    DocumentConnection.javaCompareRegionStarts(prevRange,
+                                                                               currentRange);
+
+                                if (textOrder != (-1)) {
+                                    String msg = String.format(
+                                        "combineCiteMarkers:"
+                                        + " \"%s\" supposed to be followed by \"%s\", but %s",
+                                        prevRange.getString(),
+                                        currentRange.getString(),
+                                        ((textOrder == 0)
+                                         ? "they start at the same position"
+                                         : "the start of the latter precedes the start of the first"));
+                                    LOGGER.warn(msg);
+                                    addToGroup = false;
+                                }
+                            }
+                        }
+
+                        if (addToGroup && (cursorBetween != null)) {
+                            Objects.requireNonNull(currentGroupCursor);
+                            // assume: currentGroupCursor.getEnd() == cursorBetween.getEnd()
+                            if (DocumentConnection
+                                .javaCompareRegionEnds(cursorBetween, currentGroupCursor) != 0) {
+                                throw new RuntimeException(
+                                    "combineCiteMarkers:"
+                                    + " cursorBetween.end != currentGroupCursor.end");
+                            }
+
+                            XTextRange rangeStart = currentRange.getStart();
+
+                            boolean couldExpand = true;
+
+                            XTextCursor thisCharCursor =
+                                (currentRange.getText()
+                                 .createTextCursorByRange(cursorBetween.getEnd()));
+
+                            while (couldExpand &&
+                                   (DocumentConnection
+                                    .javaCompareRegionEnds(cursorBetween, rangeStart) < 0)) {
+                                couldExpand = cursorBetween.goRight((short) 1, true);
+                                currentGroupCursor.goRight((short) 1, true);
+                                //
+                                thisCharCursor.goRight((short) 1, true);
+                                String thisChar = thisCharCursor.getString();
+                                thisCharCursor.collapseToEnd();
+                                if (thisChar.isEmpty()
+                                    || thisChar.equals("\n")
+                                    || !thisChar.trim().isEmpty()) {
+                                    couldExpand = false;
+                                }
+                                if (DocumentConnection.javaCompareRegionEnds(
+                                        cursorBetween, currentGroupCursor) != 0) {
+                                    throw new RuntimeException(
+                                        "combineCiteMarkers:"
+                                        + " cursorBetween.end != currentGroupCursor.end"
+                                        + " (during expand)");
+                                }
+                            } // while
+
+                            if (!couldExpand) {
+                                addToGroup = false;
+                            }
+                        }
+
+                        /*
+                         * Even if we do not add it to an existing group,
+                         * we might use it to start a new group.
+                         *
+                         * Can it start a new group?
+                         */
+                        boolean canStartGroup = (cg.itcType == OOBibBase.AUTHORYEAR_PAR);
+
+                        if (!addToGroup) {
+                            // close currentGroup
+                            if (currentGroup.size() > 1) {
+                                joinableGroups.add(currentGroup);
+                                joinableGroupsCursors.add(currentGroupCursor);
+                            }
+                            // Start a new, empty group
+                            currentGroup = new ArrayList<>();
+                            currentGroupCursor = null;
+                            cursorBetween = null;
+                            prev = null;
+                            prevRange = null;
+                        }
+
+                        if (addToGroup || canStartGroup) {
+                            // Add the current entry to a group.
+                            currentGroup.add(cg);
+                            // ... and start new cursorBetween
+                            // Set up cursorBetween
+                            //
+                            XTextRange rangeEnd = currentRange.getEnd();
+                            cursorBetween =
+                                currentRange.getText().createTextCursorByRange(rangeEnd);
+                            // If new group, create currentGroupCursor
+                            if (currentGroupCursor == null) {
+                                currentGroupCursor = (currentRange.getText()
+                                                      .createTextCursorByRange(currentRange.getStart()));
+                            }
+                            // include self in currentGroupCursor
+                            currentGroupCursor.goRight((short) (currentRange.getString().length()), true);
+
+                            if (DocumentConnection
+                                .javaCompareRegionEnds(cursorBetween, currentGroupCursor) != 0) {
+                                /*
+                                 * A problem discovered using this check:
+                                 * when viewing the document in
+                                 * two-pages-side-by-side mode, our visual
+                                 * firstAppearanceOrder follows the visual
+                                 * ordering on the screen. The problem
+                                 * this caused: it sees a citation on the
+                                 * 2nd line of the 1st page as appearing
+                                 * after one at the 1st line of 2nd
+                                 * page. Since we create cursorBetween at
+                                 * the end of range1Full (on 1st page), it
+                                 * is now BEFORE currentGroupCursor (on
+                                 * 2nd page).
+                                 */
+                                throw new RuntimeException(
+                                    "combineCiteMarkers: "
+                                    + "cursorBetween.end != currentGroupCursor.end"
+                                    + String.format(" (after %s)",
+                                                    addToGroup ? "addToGroup" : "startGroup")
+                                    + (addToGroup
+                                       ? String.format(" comparisonResult: %d\n"
+                                                       + "cursorBetween: '%s'\n"
+                                                       + "currentRange: '%s'\n"
+                                                       + "currentGroupCursor: '%s'\n",
+                                                       DocumentConnection
+                                                       .javaCompareRegionEnds(cursorBetween,
+                                                                              currentGroupCursor),
+                                                       cursorBetween.getString(),
+                                                       currentRange.getString(),
+                                                       currentGroupCursor.getString())
+                                       : ""));
+                            }
+                            prev = cg;
+                            prevRange = currentRange;
+                        }
+                    } // for cgid
+
+                    // close currentGroup
+                    if (currentGroup.size() > 1) {
+                        joinableGroups.add(currentGroup);
+                        joinableGroupsCursors.add(currentGroupCursor);
+                    }
+                } // if (referenceMarkNames.size() > 0)
+
+                if (joinableGroups.size() > 0) {
+                    XTextCursor textCursor = joinableGroupsCursors.get(0);
+                    assertCitationCharacterFormatIsOK(textCursor, style);
+                }
+
+                /*
+                 * Now we can process the joinable groups
+                 */
+                for (int gi = 0; gi < joinableGroups.size(); gi++) {
+
+                    List<CitationGroup> joinableGroup = joinableGroups.get(gi);
+                    /*
+                     * Join those in joinableGroups.get(gi)
+                     */
+
+                    //
+                    // Note: we are taking ownership of the citations (by
+                    //       adding to newGroupCitations, then removing
+                    //       the original CitationGroup values)
+
+                    List<Citation> newGroupCitations = new ArrayList<>();
+                    for (CitationGroup rk : joinableGroup) {
+                        newGroupCitations.addAll(rk.citations);
+                    }
+
+                    int itcType = joinableGroup.get(0).itcType;
+
+                    // cgPageInfos belong to the CitationGroup (DataModel JabRef52),
+                    // but it is not clear how should we handle them here.
+                    // We delegate the problem to the backend.
+                    List<String> pageInfosForCitations =
+                        cgs.backend.combinePageInfos(joinableGroup);
+
+                    // Remove the old citation groups from the document.
+                    for (int gj = 0; gj < joinableGroup.size(); gj++) {
+                        cgs.removeCitationGroups( joinableGroup, documentConnection );
+                    }
+
+                    XTextCursor textCursor = joinableGroupsCursors.get(gi);
+                    // Also remove the spaces between.
+                    textCursor.setString("");
+
+                    List<String> citationKeys = (newGroupCitations.stream()
+                                                 .map(cit -> cit.citationKey)
+                                                 .collect(Collectors.toList()));
+
+                    // Insert reference mark:
+
+                    /* insertSpaceAfter: no, it is already there (or could
+                     * be)
+                     */
+                    boolean insertSpaceAfter = false;
+                    insertReferenceMark(cgs,
+                                        documentConnection,
+                                        citationKeys,
+                                        pageInfosForCitations,
+                                        itcType, // OOBibBase.AUTHORYEAR_PAR
+                                        "tmp",
+                                        textCursor,
+                                        true, // withText
+                                        style,
+                                        insertSpaceAfter);
+                } // for gi
+
+                madeModifications = (joinableGroups.size() > 0);
+
             } finally {
                 if (useLockControllers) {
                     documentConnection.unlockControllers();
                 }
             }
-        }
+
+            if (madeModifications) {
+                ProduceCitationMarkersResult x = produceCitationMarkers(documentConnection,
+                                                                        databases,
+                                                                        style);
+                try {
+                    if (useLockControllers) {
+                        documentConnection.lockControllers();
+                    }
+                    applyNewCitationMarkers(documentConnection,
+                                            x.cgs,
+                                            x.citMarkers,
+                                            style);
+                } finally {
+                    if (useLockControllers) {
+                        documentConnection.unlockControllers();
+                    }
+                }
+            }
         } finally {
             documentConnection.leaveUndoContext();
         }
-    }
+    } // combineCiteMarkers
 
     /**
      * GUI action "Separate citations".
@@ -2642,17 +2513,12 @@ class OOBibBase {
 
             if (madeModifications) {
                 ProduceCitationMarkersResult x =
-                    produceCitationMarkers(documentConnection,
-                                           databases,
-                                           style);
+                    produceCitationMarkers(documentConnection, databases, style);
                 try {
                     if (useLockControllers) {
                         documentConnection.lockControllers();
                     }
-                    applyNewCitationMarkers(documentConnection,
-                                            x.cgs,
-                                            x.citMarkers,
-                                            style);
+                    applyNewCitationMarkers(documentConnection, x.cgs, x.citMarkers, style);
                 } finally {
                     if (useLockControllers) {
                         documentConnection.unlockControllers();
@@ -2778,12 +2644,10 @@ class OOBibBase {
     void styleIsRequired(OOBibStyle style)
         throws JabRefException {
         if (style == null) {
-            throw new JabRefException(
-                "This operation requires a style",
-                Localization.lang("This operation requires a style.")
-                + "\n"
-                + Localization.lang("Please select one.")
-                );
+            throw new JabRefException("This operation requires a style",
+                                      Localization.lang("This operation requires a style.")
+                                      + "\n"
+                                      + Localization.lang("Please select one."));
         }
     }
 
