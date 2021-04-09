@@ -702,14 +702,14 @@ class OOBibBase {
      *
      * Note: the sort is in-place, modifies the argument.
      */
-    private void
-    sortBibEntryListForMulticite(List<BibEntry> entries,
-                                 OOBibStyle style) {
-        if (entries.size() <= 1) {
-            return;
-        }
-        entries.sort(comparatorForMulticite(style));
-    }
+    //    private void
+    //    sortBibEntryListForMulticite(List<BibEntry> entries,
+    //                                 OOBibStyle style) {
+    //        if (entries.size() <= 1) {
+    //            return;
+    //        }
+    //        entries.sort(comparatorForMulticite(style));
+    //    }
 
     /* ***************************************
      *
