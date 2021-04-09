@@ -4,6 +4,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
@@ -230,7 +231,7 @@ public class SaveDatabaseAction {
                 saveWithDifferentEncoding(file, selectedOnly, savePrefs.getEncoding(), result.getEncodingProblems(), saveType);
             }
             return true;
-        } catch (InterruptedException | ExecutionException e ) {
+        } catch (InterruptedException | ExecutionException | CancellationException e ) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

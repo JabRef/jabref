@@ -37,7 +37,7 @@ public enum GlobalSaveManager {
 
     private SaveResult saveThrottled(BibDatabaseContext bibDatabaseContext, Path file, boolean selectedOnly, List<BibEntry> entries, SavePreferences savePrefs) throws SaveException {
 
-        try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, savePrefs.getEncoding(), savePrefs.shouldMakeBackup())) {
+        try (JabRefFileWriter fileWriter = new JabRefFileWriter(file, savePrefs.getEncoding())) {
             BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, savePrefs, Globals.entryTypesManager);
 
             if (selectedOnly) {

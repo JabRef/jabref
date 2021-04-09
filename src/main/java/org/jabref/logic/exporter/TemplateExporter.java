@@ -199,7 +199,7 @@ public class TemplateExporter extends Exporter {
             return;
         }
 
-        try (AtomicFileWriter ps = new AtomicFileWriter(file, encoding)) {
+        try (JabRefFileWriter ps = new JabRefFileWriter(file, encoding)) {
             Layout beginLayout = null;
 
             // Check if this export filter has bundled name formatters:
