@@ -69,9 +69,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      */
     private static final String TITLE = "Title";
 
-    // TODO: unused SORT_ALGORITHM
-    private static final String SORT_ALGORITHM = "SortAlgorithm";
-
     private static final String IS_SORT_BY_POSITION = "IsSortByPosition";
     private static final String IS_NUMBER_ENTRIES = "IsNumberEntries";
     private static final String REFERENCE_HEADER_PARAGRAPH_FORMAT = "ReferenceHeaderParagraphFormat";
@@ -243,8 +240,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private void setDefaultProperties() {
         // Set default property values:
         properties.put(TITLE, "Bibliography");
-
-        /* TODO: unused */ properties.put(SORT_ALGORITHM, "alphanumeric");
 
         properties.put(IS_SORT_BY_POSITION, Boolean.FALSE);
         properties.put(IS_NUMBER_ENTRIES, Boolean.FALSE);
