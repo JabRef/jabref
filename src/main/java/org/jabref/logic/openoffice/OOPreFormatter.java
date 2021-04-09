@@ -55,12 +55,11 @@ public class OOPreFormatter implements LayoutFormatter {
         StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;
 
-        char c;
         boolean escaped = false;
         boolean incommand = false;
 
         for (i = 0; i < field.length(); i++) {
-            c = field.charAt(i);
+            char c = field.charAt(i);
             if (escaped && (c == '\\')) {
                 // escaped backslash
                 sb.append('\\');
