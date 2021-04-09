@@ -41,7 +41,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 class OOBibStyleGetNumCitationMarker {
-        /*
+
+    /*
      * Helper class for sorting citation numbers while
      * maintaining their correspondance to pageInfos.
      */
