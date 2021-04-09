@@ -278,7 +278,7 @@ class OOBibStyleGetNumCitationMarker {
                 // Emit pageInfo
                 String pageInfo = block.get(0).pageInfo;
                 if (pageInfo != null) {
-                    sb.append(style.getStringCitProperty(OOBibStyle.PAGE_INFO_SEPARATOR) + pageInfo);
+                    sb.append(style.getPageInfoSeparator() + pageInfo);
                 }
             } else {
 
@@ -324,13 +324,13 @@ class OOBibStyleGetNumCitationMarker {
                     }
                     // Emit: "first-last"
                     sb.append(first);
-                    sb.append(style.getStringCitProperty(OOBibStyle.GROUPED_NUMBERS_SEPARATOR));
+                    sb.append(style.getGroupedNumbersSeparator());
                     sb.append(last);
                 } else {
                     // Emit: first,first+1,...,last
                     for (int j = 0; j < blockSize; j++) {
                         if (j > 0) {
-                            sb.append(style.getStringCitProperty(OOBibStyle.CITATION_SEPARATOR));
+                            sb.append(style.getCitationSeparator());
                         }
                         sb.append(block.get(j).num);
                     }
@@ -388,7 +388,7 @@ class OOBibStyleGetNumCitationMarker {
                 // emit current block
                 // We are emitting a block
                 if (blocksEmitted > 0) {
-                    sb.append(style.getStringCitProperty(OOBibStyle.CITATION_SEPARATOR));
+                    sb.append(style.getCitationSeparator());
                 }
                 int emittedNow = emitBlock.applyAsInt(currentBlock);
                 if (emittedNow > 0) {
@@ -407,7 +407,7 @@ class OOBibStyleGetNumCitationMarker {
         if (currentBlock.size() > 0) {
             // We are emitting a block
             if (blocksEmitted > 0) {
-                sb.append(style.getStringCitProperty(OOBibStyle.CITATION_SEPARATOR));
+                sb.append(style.getCitationSeparator());
             }
             emitBlock.applyAsInt(currentBlock);
         }

@@ -61,56 +61,140 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class OOBibStyle implements Comparable<OOBibStyle> {
+    // Variable access definition in wrong order
 
-    private static final String ITALIC_ET_AL = "ItalicEtAl";
-    private static final String MULTI_CITE_CHRONOLOGICAL = "MultiCiteChronological";
-    public static final String MINIMUM_GROUPING_COUNT = "MinimumGroupingCount";
-    public static final String ET_AL_STRING = "EtAlString";
-    public static final String MAX_AUTHORS_FIRST = "MaxAuthorsFirst";
-    public static final String REFERENCE_HEADER_PARAGRAPH_FORMAT = "ReferenceHeaderParagraphFormat";
-    public static final String REFERENCE_PARAGRAPH_FORMAT = "ReferenceParagraphFormat";
-
-    public static final String TITLE = "Title";
+    // Unlike many others beolow, UNDEFINED_CITATION_MARKER is not a
+    // key to properties or citProperties
     public static final String UNDEFINED_CITATION_MARKER = "??";
 
-    // These are used in OOBibStyleGetNumCitationMarker
-    protected static final String BRACKET_AFTER = "BracketAfter";
-    protected static final String BRACKET_BEFORE = "BracketBefore";
-    protected static final String BRACKET_AFTER_IN_LIST = "BracketAfterInList";
-    protected static final String BRACKET_BEFORE_IN_LIST = "BracketBeforeInList";
-    protected static final String GROUPED_NUMBERS_SEPARATOR = "GroupedNumbersSeparator";
-    protected static final String PAGE_INFO_SEPARATOR = "PageInfoSeparator";
-    protected static final String CITATION_SEPARATOR = "CitationSeparator";
+    /*
+     * Keys for the PROPERTIES section of a *.jstyle file.
+     */
+    private static final String TITLE = "Title";
 
-    // These are used in OOBibStyleGetCitationMarker
-    protected static final String AUTHOR_FIELD = "AuthorField";
-    protected static final String MAX_AUTHORS = "MaxAuthors";
-    protected static final String UNIQUEFIER_SEPARATOR = "UniquefierSeparator";
-    protected static final String YEAR_SEPARATOR = "YearSeparator";
-    protected static final String AUTHOR_LAST_SEPARATOR = "AuthorLastSeparator";
-    protected static final String IN_TEXT_YEAR_SEPARATOR = "InTextYearSeparator";
-    protected static final String YEAR_FIELD = "YearField";
-    protected static final String AUTHOR_LAST_SEPARATOR_IN_TEXT = "AuthorLastSeparatorInText";
-    protected static final String OXFORD_COMMA = "OxfordComma";
-    protected static final String AUTHOR_SEPARATOR = "AuthorSeparator";
+    // TODO: unused SORT_ALGORITHM
+    private static final String SORT_ALGORITHM = "SortAlgorithm";
 
+    private static final String IS_SORT_BY_POSITION = "IsSortByPosition";
+    private static final String IS_NUMBER_ENTRIES = "IsNumberEntries";
+    private static final String REFERENCE_HEADER_PARAGRAPH_FORMAT = "ReferenceHeaderParagraphFormat";
+    private static final String REFERENCE_PARAGRAPH_FORMAT = "ReferenceParagraphFormat";
 
+    /*
+     * Keys for the CITATION section of a *.jstyle file.
+     */
+
+    /*
+     * general
+     */
     private static final String CITATION_KEY_CITATIONS = "BibTeXKeyCitations";
+    private static final String MULTI_CITE_CHRONOLOGICAL = "MultiCiteChronological";
+
+    // general / formatting citations
+    private static final String FORMAT_CITATIONS = "FormatCitations";
+    private static final String CITATION_CHARACTER_FORMAT = "CitationCharacterFormat";
+
+    // TODO: unused ITALIC_CITATIONS, BOLD_CITATIONS
+    private static final String ITALIC_CITATIONS = "ItalicCitations";
+    private static final String BOLD_CITATIONS = "BoldCitations";
+
+    // TODO: unused SUBSCRIPT_CITATIONS, SUPERSCRIPT_CITATIONS
     private static final String SUBSCRIPT_CITATIONS = "SubscriptCitations";
     private static final String SUPERSCRIPT_CITATIONS = "SuperscriptCitations";
-    private static final String BOLD_CITATIONS = "BoldCitations";
-    private static final String ITALIC_CITATIONS = "ItalicCitations";
-    private static final String CITATION_CHARACTER_FORMAT = "CitationCharacterFormat";
-    private static final String FORMAT_CITATIONS = "FormatCitations";
-    private static final String IS_NUMBER_ENTRIES = "IsNumberEntries";
-    private static final String IS_SORT_BY_POSITION = "IsSortByPosition";
 
-    private static final String SORT_ALGORITHM = "SortAlgorithm";
+    /*
+     * common (numeric and authoryear)
+     */
+
+    /** "{[}Smith 2000]"  "Smith {[}2000]" "{[}1]"  */
+    private static final String BRACKET_BEFORE = "BracketBefore";
+
+    /** "[Smith 2000{]}" "Smith [2000{]}" "[1{]}" */
+    private static final String BRACKET_AFTER = "BracketAfter";
+
+    /** Entry labels in bibliography: "{[}1]" */
+    private static final String BRACKET_BEFORE_IN_LIST = "BracketBeforeInList";
+
+    /** Entry labels in bibliography: "[1{]}" */
+    private static final String BRACKET_AFTER_IN_LIST = "BracketAfterInList";
+
+    /** "[Smith 2000a{; }pp 10-13]" "Smith [2000a{; }pp 10-13]" "[1{; }pp 10-13]" */
+    private static final String PAGE_INFO_SEPARATOR = "PageInfoSeparator";
+
+    /** "[Smith 2000{; }Jones 2001]" "Smith [2000{; }Jones [2001]" "[1{; }2]" */
+    private static final String CITATION_SEPARATOR = "CitationSeparator";
+
+    /*
+     * numeric
+     */
+
+    /** How many consecutive numbers in "[1; 2; 3]" allows grouping to "[1-3]" */
+    private static final String MINIMUM_GROUPING_COUNT = "MinimumGroupingCount";
+
+    /** "[1{-}3]" */
+    private static final String GROUPED_NUMBERS_SEPARATOR = "GroupedNumbersSeparator";
+
+    /*
+     * author-year
+     */
+
+    /** Name of field that contains the authors. May be a list: "author/editor" */
+    private static final String AUTHOR_FIELD = "AuthorField";
+
+    /** How many authors to show before swithing to "et al." */
+    private static final String MAX_AUTHORS = "MaxAuthors";
+
+    /** The first appearance of a source may have a higher limit. */
+    private static final String MAX_AUTHORS_FIRST = "MaxAuthorsFirst";
+
+    /**  "[Smith{, }Jones, and Brown 2000]" */
+    private static final String AUTHOR_SEPARATOR = "AuthorSeparator";
+
+    /**  "[Smith, Jones{,} and Brown 2000]" */
+    private static final String OXFORD_COMMA = "OxfordComma";
+
+    /**  "[Smith, Jones,{ and }Brown 2000]" */
+    private static final String AUTHOR_LAST_SEPARATOR = "AuthorLastSeparator";
+
+    /**  "Smith, Jones,{ and }Brown [2000]" */
+    private static final String AUTHOR_LAST_SEPARATOR_IN_TEXT = "AuthorLastSeparatorInText";
+
+    private static final String ITALIC_ET_AL = "ItalicEtAl";
+    /**  "[Smith{ et al.} 2000]" */
+    private static final String ET_AL_STRING = "EtAlString";
+
+    /**  "[Smith et al.{ }2000]" */
+    private static final String YEAR_SEPARATOR = "YearSeparator";
+
+    /**  "Smith et al.{ }[2000]" */
+    private static final String IN_TEXT_YEAR_SEPARATOR = "InTextYearSeparator";
+
+    /** Name of field that contains the year. May be a list "year/anotherFieldWithYear" */
+    private static final String YEAR_FIELD = "YearField";
+
+    /** "[Smith et al. 2000a{,}b; pp 10-13]" */
+    private static final String UNIQUEFIER_SEPARATOR = "UniquefierSeparator";
+    // end of keys
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OOBibStyle.class);
 
     // Formatter to be run on fields before they are used as part of citation marker:
     protected final LayoutFormatter fieldFormatter = new OOPreFormatter();
+
+    /*
+     * Used or modified in OOBibStyleParser.readFormatFile()
+     */
+    String name = "";
+    String localCopy;
+    final LayoutFormatterPreferences prefs;
+    Layout defaultBibLayout;
+    boolean isDefaultLayoutPresent;
+    // reference layout mapped from entry type:
+    final Map<EntryType, Layout> bibLayout = new HashMap<>();
+    final Map<String, Object> properties = new HashMap<>();
+    final Map<String, Object> citProperties = new HashMap<>();
+    boolean valid;
+    final SortedSet<String> journals = new TreeSet<>();
 
 
     private final boolean fromResource;
@@ -119,21 +203,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
     private File styleFile;
     private long styleFileModificationTime = Long.MIN_VALUE;
-
-    /*
-     * Used or modified in OOBibStyleParser.readFormatFile()
-     */
-    protected String name = "";
-    protected String localCopy;
-    protected final LayoutFormatterPreferences prefs;
-    protected Layout defaultBibLayout;
-    protected boolean isDefaultLayoutPresent;
-    // reference layout mapped from entry type:
-    protected final Map<EntryType, Layout> bibLayout = new HashMap<>();
-    protected final Map<String, Object> properties = new HashMap<>();
-    protected final Map<String, Object> citProperties = new HashMap<>();
-    protected boolean valid;
-    protected final SortedSet<String> journals = new TreeSet<>();
 
     /**
      * Construct from user-provided style file.
@@ -539,15 +608,21 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
     /**
      * Minimal number of consecutive citation numbers needed to start
-     * replacing with an "i-j" range.
+     * replacing with an range like "10-13".
      */
     public int getMinimumGroupingCount() {
         return getIntCitProperty(OOBibStyle.MINIMUM_GROUPING_COUNT);
     }
 
     /**
-     * Convenience method for checking the property for whether we use number citations or
-     * author-year citations.
+     * Used in number ranges like "10-13" in numbered citations.
+     */
+    public String getGroupedNumbersSeparator() {
+        return getStringCitProperty(OOBibStyle.GROUPED_NUMBERS_SEPARATOR);
+    }
+
+    /**
+     * Shall we use number citations or author-year citations.
      *
      * @return true if we use numbered citations, false otherwise.
      */
@@ -566,10 +641,31 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     /**
+     * Should citation markers be formatted
+     * according to the results of the
+     *  - isItalicCitations() // no, isItalicCitations() is not used at all
+     *  - isBoldCitations()   // no, isBoldCitations() is not used at all
+     *  - getCitationCharacterFormat() // yes
+     *  methods?
+     *
+     * @return true to indicate that citations should be formatted to getCitationCharacterFormat()
+     *          in italics (or bold).
+     */
+    public boolean isFormatCitations() {
+        return (Boolean) citProperties.get(FORMAT_CITATIONS);
+    }
+
+    public String getCitationCharacterFormat() {
+        return getStringCitProperty(CITATION_CHARACTER_FORMAT);
+    }
+
+    /**
      * Should citation markers be italicized?
      * Only relevant if isFormatCitations() returns true.
      *
      * @return true to indicate that citations should be in italics.
+     *
+     * TODO: unused
      */
     public boolean isItalicCitations() {
         return getBooleanCitProperty(ITALIC_CITATIONS);
@@ -580,21 +676,13 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * Only relevant if isFormatCitations() returns true.
      *
      * @return true to indicate that citations should be in bold.
+     *
+     * TODO: unused
      */
     public boolean isBoldCitations() {
         return (Boolean) citProperties.get(BOLD_CITATIONS);
     }
 
-    /**
-     * Should citation markers be formatted
-     * according to the results of the isItalicCitations() and
-     * isBoldCitations() methods?
-     *
-     * @return true to indicate that citations should be in italics (or bold).
-     */
-    public boolean isFormatCitations() {
-        return (Boolean) citProperties.get(FORMAT_CITATIONS);
-    }
 
     public boolean isCitationKeyCiteMarkers() {
         return (Boolean) citProperties.get(CITATION_KEY_CITATIONS);
@@ -625,16 +713,12 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return FieldFactory.parseOrFields(yearFieldNamesString);
     }
 
-    public String getCitationCharacterFormat() {
-        return getStringCitProperty(CITATION_CHARACTER_FORMAT);
-    }
-
     // The String to add between the two last author names, e.g. " & ".
     protected String getAuthorLastSeparator() {
         return getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR);
     }
 
-    protected String getAuthorLastSeparatorInText() {
+    protected String getAuthorLastSeparatorInTextWithFallBack() {
         return Objects.requireNonNullElse(
             getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR_IN_TEXT),
             // Use the default one if no explicit separator for text is defined
@@ -703,12 +787,12 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
     // The String to represent authors that are not mentioned,
     // e.g. " et al."
-    protected String getEtAlString() {
+    public String getEtAlString() {
         return getStringCitProperty(OOBibStyle.ET_AL_STRING);
     }
 
     // The String to add between author names except the last two,
-    // e.g. ", ".
+    // e.g. ", " in "[Smith, Jones and Brown]"
     protected String getAuthorSeparator() {
         return getStringCitProperty(OOBibStyle.AUTHOR_SEPARATOR);
     }

@@ -415,7 +415,7 @@ class OOBibStyleGetCitationMarker {
         // The String to add between the two last author names, e.g. " & ".
         String andString = (inParenthesis
                             ? style.getAuthorLastSeparator()
-                            : style.getAuthorLastSeparatorInText());
+                            : style.getAuthorLastSeparatorInTextWithFallBack());
 
         String pageInfoSeparator = style.getPageInfoSeparator();
         String uniquefierSeparator = style.getUniquefierSeparator();

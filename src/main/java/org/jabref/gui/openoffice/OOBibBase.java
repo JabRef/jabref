@@ -1118,7 +1118,7 @@ class OOBibBase {
         // Check if we should italicize the "et al." string in citations:
         boolean italicize = style.getCitPropertyItalicEtAl();
         if (italicize) {
-            String etAlString = style.getStringCitProperty(OOBibStyle.ET_AL_STRING);
+            String etAlString = style.getEtAlString();
             Objects.requireNonNull(etAlString);
             Objects.requireNonNull(citationText);
             for (int index = citationText.indexOf(etAlString);

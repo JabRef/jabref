@@ -319,8 +319,8 @@ class OOBibStyleTest {
                                              OOBibStyle.NonUniqueCitationMarker.THROWS));
 
         /*
-         * Currently there is no override for MAX_AUTHORS, except
-         * cm.isFirstAppearanceOfSource, which asks for MAX_AUTHORS_FIRST
+         * Currently there is no way override for getMaxAuthors(), except
+         * cm.isFirstAppearanceOfSource, which asks for getMaxAuthorsFirst()
          */
         citationMarkerEntries.clear();
         cm = new CitationMarkerEntryImpl("Bostrom2006", entry, database, null, null, true);
