@@ -1,47 +1,18 @@
 package org.jabref.logic.openoffice;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.function.ToIntFunction;
-import java.util.regex.Pattern;
 
-import org.jabref.logic.layout.Layout;
-import org.jabref.logic.layout.LayoutFormatter;
-import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.layout.LayoutHelper;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.OrFields;
-import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.EntryType;
-import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.strings.StringUtil;
-
-
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 class OOBibStyleGetCitationMarker {
 
@@ -89,8 +60,6 @@ class OOBibStyleGetCitationMarker {
      *                   maxAuthors less than -1 : throw RuntimeException
      *
      * @param andString  For "A, B[ and ]C"
-     * @param yearSep    Appended to result here.
-     *                   For example " " in default_authoryear.jstyle
      *
      * @return "Au[AS]Bu[AS]Cu[OXFORD_COMMA][andString]Du[yearSep]"
      *      or "Au[etAlString][yearSep]"
@@ -231,7 +200,7 @@ class OOBibStyleGetCitationMarker {
         Objects.requireNonNull(entry, "Entry cannot be null");
         Objects.requireNonNull(database, "database cannot be null");
 
-        for (Field field : fields /*FieldFactory.parseOrFields(fields)*/) {
+        for (Field field : fields /* FieldFactory.parseOrFields(fields)*/) {
             Optional<String> optionalContent = entry.getResolvedFieldOrAlias(field, database);
             final boolean foundSomething = (optionalContent.isPresent()
                                             && !optionalContent.get().trim().isEmpty());
@@ -277,7 +246,6 @@ class OOBibStyleGetCitationMarker {
         Optional<FieldAndContent> optionalFieldAndContent =
             getRawCitationMarkerField(entry, database, fields);
 
-
         if (optionalFieldAndContent.isEmpty()) {
             // No luck? Return an empty string:
             return "";
@@ -292,7 +260,7 @@ class OOBibStyleGetCitationMarker {
         // the content.
         final OrFields fieldsToRebrace = style.getAuthorFieldNames();
         if (fieldsToRebrace.contains(fc.field) && StringUtil.isInCurlyBrackets(fc.content)) {
-            result =  "{" + result  + "}";
+            result = "{" + result + "}";
         }
         return result;
     }
@@ -316,7 +284,7 @@ class OOBibStyleGetCitationMarker {
         IN_PARENTHESIS,
         IN_TEXT,
         NORMALIZED
-    };
+    }
 
     /**
      * How many authors would be emitted for ce, considering
@@ -344,7 +312,7 @@ class OOBibStyleGetCitationMarker {
         if (maxAuthors == -1) {
             return nAuthors;
         } else {
-            return Integer.min(nAuthors,maxAuthors);
+            return Integer.min(nAuthors, maxAuthors);
         }
     }
 
@@ -394,7 +362,6 @@ class OOBibStyleGetCitationMarker {
         boolean inParenthesis = (purpose == AuthorYearMarkerPurpose.IN_PARENTHESIS
                                  || purpose == AuthorYearMarkerPurpose.NORMALIZED);
 
-
         // The String to separate authors from year, e.g. "; ".
         String yearSep = (inParenthesis
                           ? style.getYearSeparator()
@@ -420,7 +387,6 @@ class OOBibStyleGetCitationMarker {
         String pageInfoSeparator = style.getPageInfoSeparator();
         String uniquefierSeparator = style.getUniquefierSeparator();
 
-
         StringBuilder sb = new StringBuilder();
         if (inParenthesis) {
             sb.append(startBrace);
@@ -429,14 +395,14 @@ class OOBibStyleGetCitationMarker {
         for (int j = 0; j < ces.size(); j++) {
             CitationMarkerEntry ce = ces.get(j);
             boolean startingNewGroup = startsNewGroup[j];
-            boolean endingAGroup = (j + 1 == ces.size()) || startsNewGroup[j+1] ;
+            boolean endingAGroup = (j + 1 == ces.size()) || startsNewGroup[j + 1];
 
             if (!startingNewGroup) {
                 // Just add our uniqueLetter
                 String uniqueLetter = ce.getUniqueLetterOrNull();
                 if (uniqueLetter != null) {
-                    sb.append( uniquefierSeparator );
-                    sb.append( uniqueLetter );
+                    sb.append(uniquefierSeparator);
+                    sb.append(uniqueLetter);
                 }
 
                 // And close the brace, if we are the last in the group.
@@ -461,9 +427,9 @@ class OOBibStyleGetCitationMarker {
 
                 int maxAuthors = (purpose == AuthorYearMarkerPurpose.NORMALIZED
                                   ? style.getMaxAuthors()
-                                  : calculateNAuthorsToEmit(style,ce));
+                                  : calculateNAuthorsToEmit(style, ce));
 
-                if ( maxAuthorsOverride.isPresent() ) {
+                if (maxAuthorsOverride.isPresent()) {
                     maxAuthors = maxAuthorsOverride.get();
                 }
 
@@ -587,11 +553,11 @@ class OOBibStyleGetCitationMarker {
         // We assume entries are already sorted, all we need is to
         // group consecutive entries if we can.
         //
-        // We also assume, that identical entries have the same uniquefier.
+        // We also assume, that identical entries have the same uniqueLetters.
         //
 
         List<String> normalizedMarkers = new ArrayList<>(nEntries);
-        for (int i = 0; i < nEntries; i++){
+        for (int i = 0; i < nEntries; i++) {
             String nm = getNormalizedCitationMarker(style,
                                                     citationMarkerEntries.get(i),
                                                     Optional.empty());
@@ -603,23 +569,23 @@ class OOBibStyleGetCitationMarker {
         // first of the group.
         int[] nAuthorsToEmit = new int[nEntries];
         int[] nAuthorsToEmitRevised = new int[nEntries];
-        for (int i = 0; i < nEntries; i++){
+        for (int i = 0; i < nEntries; i++) {
             CitationMarkerEntry ce = citationMarkerEntries.get(i);
             nAuthorsToEmit[i] = calculateNAuthorsToEmit(style, ce);
             nAuthorsToEmitRevised[i] = calculateNAuthorsToEmit(style, ce);
         }
 
         boolean[] startsNewGroup = new boolean[nEntries];
-        List<CitationMarkerEntry> filteredCitationMarkerEntries =  new ArrayList<>(nEntries);
+        List<CitationMarkerEntry> filteredCitationMarkerEntries = new ArrayList<>(nEntries);
         int i_out = 0;
 
-        if ( nEntries > 0) {
+        if (nEntries > 0) {
             filteredCitationMarkerEntries.add(citationMarkerEntries.get(0));
             startsNewGroup[i_out] = true;
             i_out++;
         }
 
-        for (int i = 1; i < nEntries; i++){
+        for (int i = 1; i < nEntries; i++) {
             CitationMarkerEntry ce1 = citationMarkerEntries.get(i - 1);
             CitationMarkerEntry ce2 = citationMarkerEntries.get(i);
             String nm1 = normalizedMarkers.get(i - 1);
@@ -646,7 +612,7 @@ class OOBibStyleGetCitationMarker {
                 // our expectation that adding uniqueLetter is valid.
 
                 boolean firstAppearanceInhibitsJoin;
-                if ( isUnresolved1 ) {
+                if (isUnresolved1) {
                     firstAppearanceInhibitsJoin = true; // no join for unresolved
                 } else {
                     boolean isFirst1 = ce1.getIsFirstAppearanceOfSource();
@@ -654,17 +620,19 @@ class OOBibStyleGetCitationMarker {
 
                     // nAuthorsToEmitRevised[i-1] may have been indirectly increased,
                     // we have to check that too.
-                    if (!isFirst1 && !isFirst2 && (nAuthorsToEmitRevised[i-1] == nAuthorsToEmit[i-1])){
+                    if (!isFirst1 &&
+                        !isFirst2 &&
+                        (nAuthorsToEmitRevised[i - 1] == nAuthorsToEmit[i - 1])) {
                         // we can rely on normalizedMarkers
                         firstAppearanceInhibitsJoin = false;
                     } else if (style.getMaxAuthors() == style.getMaxAuthorsFirst()) {
                         // we can rely on normalizedMarkers
                         firstAppearanceInhibitsJoin = false;
                     } else {
-                        int prevShown = nAuthorsToEmitRevised[i-1];
-                        int need      = nAuthorsToEmit[i];
+                        int prevShown = nAuthorsToEmitRevised[i - 1];
+                        int need = nAuthorsToEmit[i];
 
-                        if ( prevShown < need ) {
+                        if (prevShown < need) {
                             // We do not retrospectively change the number of authors shown
                             // at the previous entry, take that as decided.
                             firstAppearanceInhibitsJoin = true;
@@ -725,7 +693,7 @@ class OOBibStyleGetCitationMarker {
 
                 if (!startingNewGroup) {
                     // inherit from first of group. Used at next i.
-                    nAuthorsToEmitRevised[i] = nAuthorsToEmitRevised[i-1];
+                    nAuthorsToEmitRevised[i] = nAuthorsToEmitRevised[i - 1];
                 }
 
                 sameAsPrev = (!startingNewGroup
