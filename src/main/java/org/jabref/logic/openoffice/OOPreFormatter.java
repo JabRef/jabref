@@ -11,17 +11,28 @@ import org.jabref.model.strings.StringUtil;
  * This formatter preprocesses JabRef fields before they are run through the layout of the
  * bibliography style. It handles translation of LaTeX italic/bold commands into HTML tags.
  *
- * This is very similar to org.jabref.logic.layout.format.HTMLChars
  *
- * Escapes: \\ becomes \
- * \ starts command
- * '{' and '}' are dropped, unless {@code incommand}
  */
 public class OOPreFormatter implements LayoutFormatter {
 
     private static final Map<String, String> CHARS =
         HTMLUnicodeConversionMaps.LATEX_UNICODE_CONVERSION_MAP;
 
+    /**
+     * This is very similar to org.jabref.logic.layout.format.HTMLChars
+     *
+     * The output is unicode text with a limited set of html formatting commands.
+     * These latter are mapped from LaTeX command names to html tags in getHTMLTag below, and are:
+     *
+     * "<i>italic</i>"
+     * "<b>bold</b>"
+     * "<smallcaps>SmallCaps</smallcaps>"
+     * "<u>underlined</u>"
+     * "<s>strikeout</s>"
+     * "<tt>monospace</tt>"
+     * "<sup>superscript</sup>"
+     * "<sub>subscript</sub>"
+     */
     @Override
     public String format(String inField) {
         int i;
