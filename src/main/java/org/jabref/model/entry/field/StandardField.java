@@ -11,7 +11,8 @@ import org.jabref.gui.fieldeditors.FieldNameLabel;
 /**
  * Standard BibTeX and BibLaTeX fields, as well as "normal" JabRef specific fields.
  *
- * See {@link FieldNameLabel#getDescription(org.jabref.model.entry.field.Field)} for a description of each field.
+ * See {@link FieldNameLabel#getDescription(org.jabref.model.entry.field.Field)}
+ *     for a description of each field.
  */
 public enum StandardField implements Field {
 
