@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master
-      - master-release
+      - main
+      - main-release
     paths-ignore:
       - 'docs/**'
       - 'src/test/**'
@@ -107,7 +107,7 @@ jobs:
           mv "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-signed.pkg" "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg"
       # DISABLED UNTIL WE HAVE A NEW APPLE DEVELOPER ACCOUNT
       # - name: Notarize dmg and pkg installer
-      #   if: matrix.os == 'macos-latest' && github.ref == 'refs/heads/master'
+      #   if: matrix.os == 'macos-latest' && github.ref == 'refs/heads/main'
       #   shell: bash
       #   run: |
       #     REQUEST_UUID_DMG=$(xcrun altool --verbose --notarize-app --primary-bundle-id "org.jabref" --username ${{ secrets.OSX_NOTARIZATION_APP_USERNAME }} --password ${{ secrets.OSX_NOTARIZATION_APP_PWD }} --asc-provider "W2PU6LW5U5" --file "build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg" | grep RequestUUID | awk '{print $3}')
