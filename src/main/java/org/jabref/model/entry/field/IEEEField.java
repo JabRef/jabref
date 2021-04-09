@@ -8,6 +8,8 @@ import java.util.Set;
 
 /**
  * IEEE BSTctl fields
+ *
+ * Maybe http://tug.ctan.org/biblio/bibtex/contrib/IEEEtran/IEEEtran_bst_HOWTO.pdf page 8 ?
  */
 public enum IEEEField implements Field {
     CTLALT_STRETCH_FACTOR("ctlalt_stretch_factor", FieldProperty.NUMERIC),
