@@ -15,18 +15,71 @@ public class HTMLUnicodeConversionMaps {
     //
     // http://llg.cubic.org/docs/ent2latex.html and
     // http://www.w3.org/TR/xml-entity-names/byalpha.html are also useful
+
+    /**
+     * Key:   html_entity = "&" + CONVERSION_LIST[i][1] + ";"
+     * Value: LaTeX = CONVERSION_LIST[i][2]
+     *
+     * Used: org/jabref/logic/formatter/bibtexfields/HtmlToLatexFormatter.java
+     */
     public static final Map<String, String> HTML_LATEX_CONVERSION_MAP = new HashMap<>();
-    public static final Map<Integer, String> ESCAPED_ACCENTS = new HashMap<>();
-    public static final Map<String, String> UNICODE_ESCAPED_ACCENTS = new HashMap<>();
-    public static final Map<Integer, String> NUMERICAL_LATEX_CONVERSION_MAP = new HashMap<>();
-    public static final Map<String, String> UNICODE_LATEX_CONVERSION_MAP = new HashMap<>();
+
+    /**
+     * Key: strippedLaTeX = cleanLaTeX(CONVERSION_LIST[i][2])
+     * Value: html_entity = "&" + CONVERSION_LIST[i][1]  + ";" or  "&#" + CONVERSION_LIST[i][0] + ";"
+     *
+     * Used: org/jabref/logic/layout/format/HTMLChars/HTML_CHARS
+     */
     public static final Map<String, String> LATEX_HTML_CONVERSION_MAP = new HashMap<>();
+
+    /**
+     * Key: unicode_integer = Integer.decode(CONVERSION_LIST[i][0])
+     * Value: LaTeX = CONVERSION_LIST[i][2]
+     *
+     * Used: org/jabref/cli/GenerateCharacterTable.java
+     *       org/jabref/logic/formatter/bibtexfields/HtmlToLatexFormatter.java
+     */
+    public static final Map<Integer, String> NUMERICAL_LATEX_CONVERSION_MAP = new HashMap<>();
+
+    /**
+     * Key: unicodeSymbol = String.valueOf(Character.toChars(Integer.decode(CONVERSION_LIST[i][0])))
+     * Value: LaTeX = CONVERSION_LIST[i][2]
+     *
+     * Used: org/jabref/logic/formatter/bibtexfields/UnicodeToLatexFormatter.java
+     */
+    public static final Map<String, String> UNICODE_LATEX_CONVERSION_MAP = new HashMap<>();
+
+    /**
+     * Key: strippedLaTeX
+     * Value: unicodeSymbol
+     *
+     * Used: org/jabref/logic/openoffice/OOPreFormatter.java
+     */
     public static final Map<String, String> LATEX_UNICODE_CONVERSION_MAP = new HashMap<>();
 
-    /*   Portions © International Organization for Standardization 1986:
-     Permission to copy in any form is granted for use with
-     conforming SGML systems and applications as defined in
-     ISO 8879, provided this notice is included in all copies.
+    /**
+     * Key: unicode_integer = Integer.decode(ACCENT_LIST[i][0]) // Unicode for combining accent
+     * Value: LaTeXAccentCommandName = ACCENT_LIST[i][1] // LaTeX command name, "`" for "\\`{}"
+     *
+     * Used: org/jabref/logic/formatter/bibtexfields/UnicodeToLatexFormatter.java
+     *       org/jabref/logic/formatter/bibtexfields/HtmlToLatexFormatter.java
+     */
+    public static final Map<Integer, String> ESCAPED_ACCENTS = new HashMap<>();
+
+    /**
+     * Key: LaTeXAccentCommandName = ACCENT_LIST[i][1]
+     * Value: unicodeSymbol = String.valueOf(Character.toChars(Integer.decode(ACCENT_LIST[i][0])))
+     *        // Unicode accent as a string of one character.
+     *
+     * Used: (apparently unused)
+     */
+    public static final Map<String, String> UNICODE_ESCAPED_ACCENTS = new HashMap<>();
+
+
+    /* Portions © International Organization for Standardization 1986:
+     * Permission to copy in any form is granted for use with
+     * conforming SGML systems and applications as defined in
+     * ISO 8879, provided this notice is included in all copies.
      */
 
     // as well as http://www.w3.org/Math/characters/unicode.xml
@@ -690,7 +743,8 @@ public class HTMLUnicodeConversionMaps {
             {"8229", "nldr", "\\.{}\\.{}"}, // Double dots - en leader
             {"8241", "", "{\\textpertenthousand}"}, // per ten thousands sign
             {"8244", "", "{$\\prime\\prime\\prime$}"}, // triple prime
-            {"8251", "", "{\\textreferencemark}"}, {"8253", "", "{\\textinterrobang}"},
+            {"8251", "", "{\\textreferencemark}"},
+            {"8253", "", "{\\textinterrobang}"},
             {"8320", "", "$_{0}$"}, // sub-script 0
             {"8321", "", "$_{1}$"}, // sub-script 1
             {"8322", "", "$_{2}$"}, // sub-script 2
@@ -775,7 +829,8 @@ public class HTMLUnicodeConversionMaps {
     };
 
     // List of combining accents
-    private static final String[][] ACCENT_LIST = new String[][] {{"768", "`"}, // Grave
+    private static final String[][] ACCENT_LIST = new String[][] {
+            {"768", "`"}, // Grave
             {"769", "'"}, // Acute
             {"770", "^"}, // Circumflex
             {"771", "~"}, // Tilde
