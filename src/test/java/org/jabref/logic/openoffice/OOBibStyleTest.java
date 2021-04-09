@@ -92,8 +92,8 @@ class OOBibStyleTest {
         // Unfortunately these two are both "; " in
         // jabref/src/main/resources/resource/openoffice/default_numerical.jstyle
         // We might want to change one of them
-        // style.getStringCitProperty(OOBibStyle.PAGE_INFO_SEPARATOR);
-        // style.getStringCitProperty(OOBibStyle.CITATION_SEPARATOR);
+        // style.getPageInfoSeparator();
+        // style.getCitationSeparator();
 
         /* The default numerical style uses "[1]", no space after "]" for in-text,
          * but "[1] " with space after "]" for the bibliography.

@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -19,24 +18,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.function.ToIntFunction;
-import java.util.regex.Pattern;
 
 import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.layout.LayoutHelper;
-import org.jabref.model.database.BibDatabase;
-import org.jabref.model.entry.Author;
-import org.jabref.model.entry.AuthorList;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
-import org.jabref.model.entry.types.EntryTypeFactory;
-import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -321,7 +310,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         }
     }
 
-    public static String regularizePageInfo( String p ) {
+    public static String regularizePageInfo(String p) {
         if (p == null) {
             return null;
         }
@@ -463,7 +452,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
                                                              nonUniqueCitationMarkerHandling);
     }
 
-
     /**
      * Indicate if it is an internal style
      *
@@ -501,7 +489,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     public int hashCode() {
         return Objects.hash(path, name, citProperties, properties);
     }
-
 
     /*
      *
@@ -569,18 +556,18 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     /**
-     * Convenience method for checking the property for whether we sort the bibliography
-     * according to their order of appearance in the text.
+     * Shall we sort the bibliography entries according to their order
+     * of first appearance in the text.
      *
-     * @return true to sort by appearance, false to sort alphabetically.
+     * @return true to sort by order of appearance, false to sort alphabetically.
      */
     public boolean isSortByPosition() {
         return getBooleanProperty(IS_SORT_BY_POSITION);
     }
 
     /**
-     * Convenience method for checking whether citation markers should be italicized.
-     * Will only be relevant if isFormatCitations() returns true.
+     * Should citation markers be italicized?
+     * Only relevant if isFormatCitations() returns true.
      *
      * @return true to indicate that citations should be in italics.
      */
@@ -589,8 +576,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     /**
-     * Convenience method for checking whether citation markers should be bold.
-     * Will only be relevant if isFormatCitations() returns true.
+     * Should citation markers be bold?
+     * Only relevant if isFormatCitations() returns true.
      *
      * @return true to indicate that citations should be in bold.
      */
@@ -599,11 +586,11 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     /**
-     * Convenience method for checking whether citation markers formatted
+     * Should citation markers be formatted
      * according to the results of the isItalicCitations() and
-     * isBoldCitations() methods.
+     * isBoldCitations() methods?
      *
-     * @return true to indicate that citations should be in italics.
+     * @return true to indicate that citations should be in italics (or bold).
      */
     public boolean isFormatCitations() {
         return (Boolean) citProperties.get(FORMAT_CITATIONS);
@@ -622,7 +609,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     /**
-     *  @return Field containing authors, with fallback fields.
+     *  @return Names of fields containing authors: the first
+     *  non-empty field is will be used.
      */
     protected OrFields getAuthorFieldNames() {
         String authorFieldNamesString = this.getStringCitProperty(OOBibStyle.AUTHOR_FIELD);
