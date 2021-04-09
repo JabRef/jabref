@@ -216,7 +216,10 @@ public class OOPreFormatter implements LayoutFormatter {
             // Italic
             case "textit":
             case "it":
-            case "emph": // Should really separate between emphasized and italic but since in later stages both are converted to italic...
+                // Should really separate between emphasized and
+                // italic but since in later stages both are converted
+                // to italic...
+            case "emph":
             case "em":
                 result = "i";
                 break;
@@ -233,7 +236,8 @@ public class OOPreFormatter implements LayoutFormatter {
             case "underline":
                 result = "u";
                 break;
-            // Strikeout, sout is the "standard" command, although it is actually based on the package ulem
+            // Strikeout, sout is the "standard" command, although it
+            // is actually based on the package ulem
             case "sout":
                 result = "s";
                 break;
