@@ -1,5 +1,6 @@
 package org.jabref.logic.openoffice;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
@@ -11,12 +12,14 @@ import org.jabref.model.strings.StringUtil;
  * This formatter preprocesses JabRef fields before they are run through the layout of the
  * bibliography style. It handles translation of LaTeX italic/bold commands into HTML tags.
  *
+ * Neither this class, nor its instances contain modifiable state.
+ * The only non-static method here is only needed to implement LayoutFormatter.
  *
  */
 public class OOPreFormatter implements LayoutFormatter {
 
     private static final Map<String, String> CHARS =
-        HTMLUnicodeConversionMaps.LATEX_UNICODE_CONVERSION_MAP;
+        Collections.unmodifiableMap(HTMLUnicodeConversionMaps.LATEX_UNICODE_CONVERSION_MAP);
 
     /**
      * This is very similar to org.jabref.logic.layout.format.HTMLChars
@@ -35,6 +38,10 @@ public class OOPreFormatter implements LayoutFormatter {
      */
     @Override
     public String format(String inField) {
+        return latexToUnicodeWithHtmlTags(inField);
+    }
+
+    public static String latexToUnicodeWithHtmlTags(String inField) {
         String field = (inField
                         .replaceAll("&|\\\\&", "&") // Replace & and \& with &
                         // Replace \$ with &dollar;
@@ -222,7 +229,7 @@ public class OOPreFormatter implements LayoutFormatter {
         return sb.toString().replace("&dollar;", "$"); // Replace &dollar; with $
     }
 
-    private String getHTMLTag(String latexCommand) {
+    private static String getHTMLTag(String latexCommand) {
         String result = "";
         switch (latexCommand) {
             // Italic
