@@ -144,8 +144,10 @@ class OOCalcDatabase {
                 addTableCell(result, row, new GetOpenOfficeType().format(e.getType().getName()));
                 addTableCell(result, row, getField(e, StandardField.ISBN));
                 addTableCell(result, row, getField(e, InternalField.KEY_FIELD));
-                addTableCell(result, row, getField(e, StandardField.AUTHOR)); // new AuthorLastFirst().format(getField(e, StandardField.AUTHOR_FIELD)));
-                addTableCell(result, row, new RemoveWhitespace().format(new RemoveBrackets().format(getField(e, StandardField.TITLE))));
+                addTableCell(result, row, getField(e, StandardField.AUTHOR));
+                addTableCell(result, row, (new RemoveWhitespace()
+                                           .format(new RemoveBrackets()
+                                                   .format(getField(e, StandardField.TITLE)))));
                 addTableCell(result, row, getField(e, StandardField.JOURNAL));
                 addTableCell(result, row, getField(e, StandardField.VOLUME));
                 addTableCell(result, row, getField(e, StandardField.NUMBER));
@@ -159,7 +161,7 @@ class OOCalcDatabase {
                 addTableCell(result, row, getField(e, StandardField.CHAPTER));
                 addTableCell(result, row, getField(e, StandardField.EDITION));
                 addTableCell(result, row, getField(e, StandardField.SERIES));
-                addTableCell(result, row, getField(e, StandardField.EDITOR)); // new AuthorLastFirst().format(getField(e, StandardField.EDITOR_FIELD)));
+                addTableCell(result, row, getField(e, StandardField.EDITOR));
                 addTableCell(result, row, getField(e, StandardField.PUBLISHER));
                 addTableCell(result, row, getField(e, new UnknownField("reporttype")));
                 addTableCell(result, row, getField(e, StandardField.HOWPUBLISHED));
