@@ -215,8 +215,8 @@ public class SaveDatabaseAction {
 
     private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType) throws SaveException {
         SavePreferences savePrefs = this.preferences.getSavePreferences()
-                                                      .withEncoding(encoding)
-                                                      .withSaveType(saveType);
+                                                    .withEncoding(encoding)
+                                                    .withSaveType(saveType);
 
         Future<SaveResult> saved = this.saveManager.save(libraryTab.getBibDatabaseContext(), file, selectedOnly, libraryTab.getSelectedEntries(), savePrefs);
         SaveResult result;
@@ -231,9 +231,8 @@ public class SaveDatabaseAction {
                 saveWithDifferentEncoding(file, selectedOnly, savePrefs.getEncoding(), result.getEncodingProblems(), saveType);
             }
             return true;
-        } catch (InterruptedException | ExecutionException | CancellationException e ) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (InterruptedException | ExecutionException | CancellationException e) {
+            // ignored
         }
 
         return false;
