@@ -35,7 +35,7 @@ class OOBibStyleGetCitationMarker {
             Author a = al.getAuthor(number);
             // "von " if von exists
             Optional<String> von = a.getVon();
-            if (von.isPresent() && !von.isEmpty()) {
+            if (von.isPresent() && !von.get().isEmpty()) {
                 sb.append(von.get());
                 sb.append(' ');
             }
@@ -47,7 +47,7 @@ class OOBibStyleGetCitationMarker {
     }
 
     /**
-     * @param authorList
+     * @param authorList Parsed list of authors.
      *
      * @param maxAuthors The maximum number of authors to write out.
      *                   If there are more authors, then ET_AL_STRING is emitted
@@ -117,17 +117,14 @@ class OOBibStyleGetCitationMarker {
             throw new RuntimeException("maxAuthors < -1 in formatAuthorList");
         }
 
+        // emitAllAuthors == false means use "et al."
         boolean emitAllAuthors = ((nAuthors <= maxAuthors) || (maxAuthors == -1));
 
         int nAuthorsToEmit = (emitAllAuthors
                               ? nAuthors
+                              // If we use "et al." maxAuthorsBeforeEtAl also limits the
+                              // number of authors emitted.
                               : Math.min(maxAuthorsBeforeEtAl, nAuthors));
-
-        if (!emitAllAuthors) {
-            // If we use "et al." maxAuthorsBeforeEtAl also limits the
-            // number of authors emitted.
-            nAuthorsToEmit = Math.min(nAuthorsToEmit, maxAuthorsBeforeEtAl);
-        }
 
         if (nAuthorsToEmit > 0) {
             // The first author
@@ -533,11 +530,11 @@ class OOBibStyleGetCitationMarker {
      *             Note: only consecutive citations are checked.
      *
      */
-    public static String getCitationMarker(
-        OOBibStyle style,
-        List<CitationMarkerEntry> citationMarkerEntries,
-        boolean inParenthesis,
-        OOBibStyle.NonUniqueCitationMarker nonUniqueCitationMarkerHandling) {
+    public static String
+    getCitationMarker(OOBibStyle style,
+                      List<CitationMarkerEntry> citationMarkerEntries,
+                      boolean inParenthesis,
+                      OOBibStyle.NonUniqueCitationMarker nonUniqueCitationMarkerHandling) {
 
         final int nEntries = citationMarkerEntries.size();
 
@@ -557,9 +554,9 @@ class OOBibStyleGetCitationMarker {
         //
 
         List<String> normalizedMarkers = new ArrayList<>(nEntries);
-        for (int i = 0; i < nEntries; i++) {
+        for (CitationMarkerEntry citationMarkerEntry : citationMarkerEntries) {
             String nm = getNormalizedCitationMarker(style,
-                                                    citationMarkerEntries.get(i),
+                                                    citationMarkerEntry,
                                                     Optional.empty());
             normalizedMarkers.add(nm);
         }
@@ -641,11 +638,7 @@ class OOBibStyleGetCitationMarker {
                             // Check with extended normalizedMarkers.
                             String nmx1 = getNormalizedCitationMarker(style, ce1, Optional.of(prevShown));
                             String nmx2 = getNormalizedCitationMarker(style, ce2, Optional.of(prevShown));
-                            if (nmx2.equals(nmx1)) {
-                                firstAppearanceInhibitsJoin = false;
-                            } else {
-                                firstAppearanceInhibitsJoin = true;
-                            }
+                            firstAppearanceInhibitsJoin = !nmx2.equals(nmx1);
                         }
                     }
                 }
@@ -656,7 +649,7 @@ class OOBibStyleGetCitationMarker {
                 String ul2 = ce2.getUniqueLetterOrNull();
                 String ul1 = ce1.getUniqueLetterOrNull();
 
-                boolean uniqLetterPresenceChanged = (ul2 == null) != (ul1 == null);
+                boolean uniqueLetterPresenceChanged = (ul2 == null) != (ul1 == null);
 
                 String xul2 = nullToEmptyString(ul2);
                 String xul1 = nullToEmptyString(ul1);
@@ -664,11 +657,11 @@ class OOBibStyleGetCitationMarker {
                 String k2 = ce2.getCitationKey();
                 String k1 = ce1.getCitationKey();
 
-                boolean uniqLetterDoesNotMakeUnique = (nm2.equals(nm1)
-                                                       && xul2.equals(xul1)
-                                                       && !k2.equals(k1));
+                boolean uniqueLetterDoesNotMakeUnique = (nm2.equals(nm1)
+                                                         && xul2.equals(xul1)
+                                                         && !k2.equals(k1));
 
-                if (uniqLetterDoesNotMakeUnique &&
+                if (uniqueLetterDoesNotMakeUnique &&
                     nonUniqueCitationMarkerHandling == OOBibStyle.NonUniqueCitationMarker.THROWS) {
                     throw new RuntimeException("different citation keys,"
                                                + " but same normalizedMarker and uniqueLetter");
@@ -677,10 +670,8 @@ class OOBibStyleGetCitationMarker {
                 boolean pageInfoInhibitsJoin;
                 if (pi1.equals("") && pi2.equals("")) {
                     pageInfoInhibitsJoin = false;
-                } else if (k2.equals(k1) && pi2.equals(pi1)) {
-                    pageInfoInhibitsJoin = false;
                 } else {
-                    pageInfoInhibitsJoin = true;
+                    pageInfoInhibitsJoin = !(k2.equals(k1) && pi2.equals(pi1));
                 }
 
                 boolean normalizedMarkerChanged = !nm2.equals(nm1);
@@ -688,8 +679,8 @@ class OOBibStyleGetCitationMarker {
                     normalizedMarkerChanged
                     || firstAppearanceInhibitsJoin
                     || pageInfoInhibitsJoin
-                    || uniqLetterPresenceChanged
-                    || uniqLetterDoesNotMakeUnique);
+                    || uniqueLetterPresenceChanged
+                    || uniqueLetterDoesNotMakeUnique);
 
                 if (!startingNewGroup) {
                     // inherit from first of group. Used at next i.
