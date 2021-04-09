@@ -1,50 +1,15 @@
 package org.jabref.logic.openoffice;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.function.ToIntFunction;
-import java.util.regex.Pattern;
-
-import org.jabref.logic.layout.Layout;
-import org.jabref.logic.layout.LayoutFormatter;
-import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.logic.layout.LayoutHelper;
-import org.jabref.model.database.BibDatabase;
-import org.jabref.model.entry.Author;
-import org.jabref.model.entry.AuthorList;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.FieldFactory;
-import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.types.EntryType;
-import org.jabref.model.entry.types.EntryTypeFactory;
-import org.jabref.model.strings.StringUtil;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 class OOBibStyleGetNumCitationMarker {
 
     /*
      * Helper class for sorting citation numbers while
-     * maintaining their correspondance to pageInfos.
+     * maintaining their correspondence to pageInfos.
      */
     private static class NumberWithPageInfo {
         int num;
@@ -63,7 +28,7 @@ class OOBibStyleGetNumCitationMarker {
     private static int compareNumberWithPageInfo(NumberWithPageInfo a, NumberWithPageInfo b) {
         int res = Integer.compare(a.num, b.num);
         if (res == 0) {
-            res = OOBibStyle.comparePageInfo( a.pageInfo, b.pageInfo );
+            res = OOBibStyle.comparePageInfo(a.pageInfo, b.pageInfo);
         }
         return res;
     }
@@ -93,7 +58,7 @@ class OOBibStyleGetNumCitationMarker {
      *  Create a numeric marker for use in the bibliography as label for the entry.
      *
      *  To support for example numbers in superscript without brackets for the text,
-     *  but "[1]" form for the bibliogaphy, the style can provide
+     *  but "[1]" form for the bibliography, the style can provide
      *  the optional "BracketBeforeInList" and "BracketAfterInList" strings
      *  to be used in the bibliography instead of "BracketBefore" and "BracketAfter"
      *
@@ -213,17 +178,18 @@ class OOBibStyleGetNumCitationMarker {
          *    pageInfos with null values.
          */
         List<String> pageInfos =
-            OOBibStyle.regularizePageInfosForCitations((purpose == CitationMarkerPurpose.BIBLIOGRAPHY
-                                                        ? null
-                                                        : pageInfosForCitations),
-                                                       numbers.size());
+            OOBibStyle.regularizePageInfosForCitations(
+                (purpose == CitationMarkerPurpose.BIBLIOGRAPHY
+                 ? null
+                 : pageInfosForCitations),
+                numbers.size());
 
         // Sort the numbers, together with the corresponding pageInfo values
         List<NumberWithPageInfo> nps = new ArrayList<>();
         for (int i = 0; i < nCitations; i++) {
             nps.add(new NumberWithPageInfo(numbers.get(i), pageInfos.get(i)));
         }
-        Collections.sort(nps, OOBibStyleGetNumCitationMarker::compareNumberWithPageInfo);
+        nps.sort(OOBibStyleGetNumCitationMarker::compareNumberWithPageInfo);
 
         // "["
         StringBuilder sb = new StringBuilder(bracketBefore);
@@ -282,15 +248,12 @@ class OOBibStyleGetNumCitationMarker {
                     sb.append(style.getPageInfoSeparator() + pageInfo);
                 }
             } else {
+                // block has at least 2 elements
 
                 /*
                  * Check assumptions
                  */
 
-                // block has at least 2 elements
-                if (blockSize < 2) {
-                    throw new RuntimeException("impossible: (blockSize < 2)");
-                }
                 // None of these elements has a pageInfo,
                 // because if it had, we would not join.
                 for (NumberWithPageInfo x : block) {
@@ -328,7 +291,7 @@ class OOBibStyleGetNumCitationMarker {
                     sb.append(style.getGroupedNumbersSeparator());
                     sb.append(last);
                 } else {
-                    // Emit: first,first+1,...,last
+                    // Emit: first, first+1,..., last
                     for (int j = 0; j < blockSize; j++) {
                         if (j > 0) {
                             sb.append(style.getCitationSeparator());
