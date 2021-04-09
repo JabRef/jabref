@@ -35,7 +35,6 @@ public class OOPreFormatter implements LayoutFormatter {
      */
     @Override
     public String format(String inField) {
-        int i;
         String field = (inField
                         .replaceAll("&|\\\\&", "&") // Replace & and \& with &
                         // Replace \$ with &dollar;
@@ -53,11 +52,14 @@ public class OOPreFormatter implements LayoutFormatter {
                         /* Is there a reason we do not change "&dollar;" to "$" here? */);
 
         StringBuilder sb = new StringBuilder();
-        StringBuilder currentCommand = null;
 
+        // currentCommand, escaped and incommand carry information
+        // between iterations.
+        StringBuilder currentCommand = null;
         boolean escaped = false;
         boolean incommand = false;
 
+        int i; // i and c may change within the loop body.
         for (i = 0; i < field.length(); i++) {
             char c = field.charAt(i);
             if (escaped && (c == '\\')) {
