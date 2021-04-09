@@ -27,9 +27,6 @@ import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  *
  * This class embodies bibliography formatting for OpenOffice, which
@@ -103,7 +100,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private static final String SUPERSCRIPT_CITATIONS = "SuperscriptCitations";
 
     /*
-     * common (numeric and authoryear)
+     * common (numeric and author-year)
      */
 
     /** "{[}Smith 2000]"  "Smith {[}2000]" "{[}1]"  */
@@ -141,7 +138,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     /** Name of field that contains the authors. May be a list: "author/editor" */
     private static final String AUTHOR_FIELD = "AuthorField";
 
-    /** How many authors to show before swithing to "et al." */
+    /** How many authors to show before switching to "et al." */
     private static final String MAX_AUTHORS = "MaxAuthors";
 
     /** The first appearance of a source may have a higher limit. */
@@ -176,7 +173,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private static final String UNIQUEFIER_SEPARATOR = "UniquefierSeparator";
     // end of keys
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OOBibStyle.class);
+    // private static final Logger LOGGER = LoggerFactory.getLogger(OOBibStyle.class);
 
     /** Formatter to be run on fields before they are used as part of citation marker.
      *
@@ -293,9 +290,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         citProperties.put(OXFORD_COMMA, "");
     }
 
-    public Layout getDefaultBibLayout() {
-        return defaultBibLayout;
-    }
+    //    public Layout getDefaultBibLayout() {
+    //        return defaultBibLayout;
+    //    }
 
     public String getName() {
         return name;
@@ -347,8 +344,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     /**
      * If this style was initialized from a file on disk, reload the style
      * if the file has been modified since it was read.
-     *
-     * @throws IOException
      */
     public void ensureUpToDate() throws IOException {
         if (!isUpToDate()) {
@@ -359,8 +354,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     /**
      * If this style was initialized from a file on disk, reload the style
      * information.
-     *
-     * @throws IOException
      */
     private void reload() throws IOException {
         if (styleFile != null) {
@@ -464,7 +457,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      *  Create a numeric marker for use in the bibliography as label for the entry.
      *
      *  To support for example numbers in superscript without brackets for the text,
-     *  but "[1]" form for the bibliogaphy, the style can provide
+     *  but "[1]" form for the bibliography, the style can provide
      *  the optional "BracketBeforeInList" and "BracketAfterInList" strings
      *  to be used in the bibliography instead of "BracketBefore" and "BracketAfter"
      *
@@ -517,7 +510,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      *
      *             FORGIVEN : is needed to allow preliminary markers
      *                        for freshly inserted citations without
-     *                        going throw the uniquification process.
+     *                        going throw the uniquefication process.
      *
      * @return The formatted citation.
      */
@@ -574,15 +567,15 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      *
      */
 
-    /**
-     * Get a style property.
-     *
-     * @param propName The property name.
-     * @return The property value, or null if it doesn't exist.
-     */
-    private Object getProperty(String propName) {
-        return properties.get(propName);
-    }
+    // /**
+    //  * Get a style property.
+    //  *
+    //  * @param propName The property name.
+    //  * @return The property value, or null if it doesn't exist.
+    //  */
+    // private Object getProperty(String propName) {
+    //     return properties.get(propName);
+    // }
 
     private boolean getBooleanProperty(String propName) {
         return (Boolean) properties.get(propName);
@@ -592,9 +585,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return (String) properties.get(propName);
     }
 
-    private int getIntProperty(String key) {
-        return (Integer) properties.get(key);
-    }
+    //    private int getIntProperty(String key) {
+    //        return (Integer) properties.get(key);
+    //    }
 
     /**
      * Get boolean property.
@@ -720,11 +713,12 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return FieldFactory.parseOrFields(yearFieldNamesString);
     }
 
-    // The String to add between the two last author names, e.g. " & ".
+    /* The String to add between the two last author names, e.g. " & ". */
     protected String getAuthorLastSeparator() {
         return getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR);
     }
 
+    /* As getAuthorLastSeparator, for in-text citation. */
     protected String getAuthorLastSeparatorInTextWithFallBack() {
         return Objects.requireNonNullElse(
             getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR_IN_TEXT),
@@ -752,8 +746,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return getStringCitProperty(OOBibStyle.IN_TEXT_YEAR_SEPARATOR);
     }
 
-    // The maximum number of authors to write out in full without
-    // using etal. Set to -1 to always write out all authors.
+    /** The maximum number of authors to write out in full without
+     *  using "et al." Set to -1 to always write out all authors.
+     */
     protected int getMaxAuthors() {
         return getIntCitProperty(OOBibStyle.MAX_AUTHORS);
     }
@@ -762,24 +757,19 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return getIntCitProperty(OOBibStyle.MAX_AUTHORS_FIRST);
     }
 
-    // Opening parenthesis before citation (or year, for in-text)
+    /** Opening parenthesis before citation (or year, for in-text) */
     protected String getBracketBefore() {
         return getStringCitProperty(OOBibStyle.BRACKET_BEFORE);
     }
 
-    // Closing parenthesis after citation
+    /** Closing parenthesis after citation */
     protected String getBracketAfter() {
         return getStringCitProperty(OOBibStyle.BRACKET_AFTER);
     }
 
-    // Opening parenthesis before citation marker in the bibliography
-    protected String getBracketBeforeInList() {
+    /** Opening parenthesis before citation marker in the bibliography. */
+    private String getBracketBeforeInList() {
         return getStringCitProperty(OOBibStyle.BRACKET_BEFORE_IN_LIST);
-    }
-
-    // Closing parenthesis after citation marker in the bibliography
-    protected String getBracketAfterInList() {
-        return getStringCitProperty(OOBibStyle.BRACKET_AFTER_IN_LIST);
     }
 
     protected String getBracketBeforeInListWithFallBack() {
@@ -787,25 +777,33 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
                                           getBracketBefore());
     }
 
+    /** Closing parenthesis after citation marker in the bibliography */
+    private String getBracketAfterInList() {
+        return getStringCitProperty(OOBibStyle.BRACKET_AFTER_IN_LIST);
+    }
+
     protected String getBracketAfterInListWithFallBack() {
         return Objects.requireNonNullElse(getBracketAfterInList(),
                                           getBracketAfter());
     }
 
-    // The String to represent authors that are not mentioned,
-    // e.g. " et al."
+    /** The String to represent authors that are not mentioned,
+     * e.g. " et al."
+     */
     public String getEtAlString() {
         return getStringCitProperty(OOBibStyle.ET_AL_STRING);
     }
 
-    // The String to add between author names except the last two,
-    // e.g. ", " in "[Smith, Jones and Brown]"
+    /** The String to add between author names except the last two:
+     *  "[Smith{, }Jones and Brown]"
+     */
     protected String getAuthorSeparator() {
         return getStringCitProperty(OOBibStyle.AUTHOR_SEPARATOR);
     }
 
-    // The String to put after the second to last author in case
-    // of three or more authors: (A, B[,] and C)
+    /** The String to put after the second to last author in case
+     *  of three or more authors: (A, B{,} and C)
+     */
     protected String getOxfordComma() {
         return getStringCitProperty(OOBibStyle.OXFORD_COMMA);
     }
