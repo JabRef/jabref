@@ -30,15 +30,18 @@ public class OOPreFormatterTest {
     @Test
     public void testSpecialCommands() {
         assertEquals("å", new OOPreFormatter().format("{\\aa}"));
-        assertEquals("bb", new OOPreFormatter().format("{\\bb}"));
+        assertEquals("åÅ", new OOPreFormatter().format("\\aa\\AA"));
+        // Command does not eat following space?
         assertEquals("å a", new OOPreFormatter().format("\\aa a"));
         assertEquals("å a", new OOPreFormatter().format("{\\aa a}"));
-        assertEquals("åÅ", new OOPreFormatter().format("\\aa\\AA"));
+        // Unknown command pass through?
+        assertEquals("bb", new OOPreFormatter().format("{\\bb}"));
         assertEquals("bb a", new OOPreFormatter().format("\\bb a"));
     }
 
     @Test
     public void testUnsupportedSpecialCommands() {
+        // Pass through command, consume no arguments?
         assertEquals("ftmch", new OOPreFormatter().format("\\ftmch"));
         assertEquals("ftmch", new OOPreFormatter().format("{\\ftmch}"));
         assertEquals("ftmchaaa", new OOPreFormatter().format("{\\ftmch\\aaa}"));
