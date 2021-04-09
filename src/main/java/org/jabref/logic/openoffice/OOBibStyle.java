@@ -61,10 +61,10 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class OOBibStyle implements Comparable<OOBibStyle> {
-    // Variable access definition in wrong order
 
-    // Unlike many others beolow, UNDEFINED_CITATION_MARKER is not a
-    // key to properties or citProperties
+    /** Unlike many others below, UNDEFINED_CITATION_MARKER is not a
+     *  key to properties or citProperties
+     */
     public static final String UNDEFINED_CITATION_MARKER = "??";
 
     /*
@@ -178,7 +178,18 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OOBibStyle.class);
 
-    // Formatter to be run on fields before they are used as part of citation marker:
+    /** Formatter to be run on fields before they are used as part of citation marker.
+     *
+     * Usage: String output = fieldFormatter.format(input);
+     *
+     * Input: LaTeX, output: unicode with a small set of HTML tags
+     * indicating character formatting.
+     *
+     * Note: OOPreFormatter is stateless, the above call is equivalent to
+     *
+     *  String output = OOPreFormatter.latexToUnicodeWithHtmlTags(input);
+     *
+     */
     protected final LayoutFormatter fieldFormatter = new OOPreFormatter();
 
     /*
@@ -417,7 +428,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         }
     }
 
-
     /**
      * Defines sort order for pageInfo strings.
      *
@@ -469,9 +479,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     public String getNormalizedCitationMarker(CitationMarkerEntry ce) {
-        return OOBibStyleGetCitationMarker.getNormalizedCitationMarker(this,ce, Optional.empty());
+        return OOBibStyleGetCitationMarker.getNormalizedCitationMarker(this, ce, Optional.empty());
     }
-
 
     /**
      * What should getCitationMarker do if it discovers that
@@ -587,7 +596,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return (Integer) properties.get(key);
     }
 
-
     /**
      * Get boolean property.
      *
@@ -683,7 +691,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return (Boolean) citProperties.get(BOLD_CITATIONS);
     }
 
-
     public boolean isCitationKeyCiteMarkers() {
         return (Boolean) citProperties.get(CITATION_KEY_CITATIONS);
     }
@@ -777,12 +784,12 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
     protected String getBracketBeforeInListWithFallBack() {
         return Objects.requireNonNullElse(getBracketBeforeInList(),
-                                          getBracketBefore() );
+                                          getBracketBefore());
     }
 
     protected String getBracketAfterInListWithFallBack() {
         return Objects.requireNonNullElse(getBracketAfterInList(),
-                                          getBracketAfter() );
+                                          getBracketAfter());
     }
 
     // The String to represent authors that are not mentioned,
