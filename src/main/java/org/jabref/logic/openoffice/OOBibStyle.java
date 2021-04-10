@@ -244,11 +244,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         properties.put(IS_SORT_BY_POSITION, Boolean.FALSE);
         properties.put(IS_NUMBER_ENTRIES, Boolean.FALSE);
 
-        // BRACKET_BEFORE and BRACKET_AFTER appears both in
-        // properties and citProperties
-        /* TODO: unused */ properties.put(BRACKET_BEFORE, "[");
-        /* TODO: unused */ properties.put(BRACKET_AFTER, "]");
-
         properties.put(REFERENCE_PARAGRAPH_FORMAT, "Default");
         properties.put(REFERENCE_HEADER_PARAGRAPH_FORMAT, "Heading 1");
 
