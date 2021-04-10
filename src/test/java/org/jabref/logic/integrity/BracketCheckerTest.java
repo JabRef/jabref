@@ -41,4 +41,23 @@ public class BracketCheckerTest {
         assertNotEquals(Optional.empty(), checker.checkValue("{"));
     }
 
+    @Test
+    void fieldAcceptsFirstCharacterNotABracket() {
+        assertEquals(Optional.empty(), checker.checkValue("test{x}"));
+    }
+
+    @Test
+    void fieldAcceptsLastCharacterNotABracket() {
+        assertEquals(Optional.empty(), checker.checkValue("{x}test"));
+    }
+
+    @Test
+    void fieldAcceptsFirstAndLastCharacterNotABracket() {
+        assertEquals(Optional.empty(), checker.checkValue("test{x}test"));
+    }
+
+    @Test
+    void fieldAcceptsEmptyInput() {
+        assertEquals(Optional.empty(), checker.checkValue(""));
+    }
 }

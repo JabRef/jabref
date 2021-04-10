@@ -16,12 +16,12 @@
         <ToggleGroup fx:id="saveOrderToggleGroup"/>
     </fx:define>
 
-    <RadioButton fx:id="exportInOriginalOrder" text="%Export entries in their original order"
+    <RadioButton fx:id="exportInOriginalOrder" text="%Keep original order"
                  toggleGroup="$saveOrderToggleGroup"/>
-    <RadioButton fx:id="exportInTableOrder" text="%Export in current table sort order"
+    <RadioButton fx:id="exportInTableOrder" text="%Use current table sort order"
                  toggleGroup="$saveOrderToggleGroup"/>
     <RadioButton fx:id="exportInSpecifiedOrder"
-                 text="%Export entries ordered as specified" toggleGroup="$saveOrderToggleGroup"/>
+                 text="%Use specified order" toggleGroup="$saveOrderToggleGroup"/>
 
     <GridPane hgap="10.0" vgap="4.0">
         <columnConstraints>

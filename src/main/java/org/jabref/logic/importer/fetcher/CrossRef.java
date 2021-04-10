@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
@@ -21,6 +22,7 @@ import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformators.DefaultQueryTransformer;
 import org.jabref.logic.importer.util.JsonReader;
 import org.jabref.logic.util.strings.StringSimilarity;
+import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -150,26 +152,17 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
         }
 
         // input: list of {"given":"A.","family":"Riel","affiliation":[]}
-        AuthorList authorsParsed = new AuthorList();
-        for (int i = 0; i < authors.length(); i++) {
-            JSONObject author = authors.getJSONObject(i);
-            authorsParsed.addAuthor(
-                    author.optString("given", ""),
-                    "",
-                    "",
-                    author.optString("family", ""),
-                    "");
-        }
-        return authorsParsed.getAsFirstLastNamesWithAnd();
+        return IntStream.range(0, authors.length())
+                        .mapToObj(authors::getJSONObject)
+                        .map((author) -> new Author(
+                                author.optString("given", ""), "", "",
+                                author.optString("family", ""), ""))
+                        .collect(AuthorList.collect())
+                        .getAsFirstLastNamesWithAnd();
     }
 
     private EntryType convertType(String type) {
-        switch (type) {
-            case "journal-article":
-                return StandardEntryType.Article;
-            default:
-                return StandardEntryType.Misc;
-        }
+        return type.equals("journal-article") ? StandardEntryType.Article : StandardEntryType.Misc;
     }
 
     @Override
