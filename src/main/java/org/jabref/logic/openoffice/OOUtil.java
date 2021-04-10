@@ -285,35 +285,6 @@ public class OOUtil {
         cursor.collapseToEnd();
     }
 
-    /**
-     * Set cursor range content to {@code string}, apply {@code
-     * parStyle} to it, {@code cursor.collapseToEnd()}.
-     *
-     * Insert {@code string} into {@code text} at {@code cursor}, while removing the content
-     * of the cursor's range. The cursor's content is {@code string} now.
-     *
-     * Set paragraph style to {@code parStyle}
-     *
-     * Finally: {@code cursor.collapseToEnd();}
-     */
-    public static void insertTextAtCurrentLocation(XText text, XTextCursor cursor, String string, String parStyle)
-            throws WrappedTargetException, PropertyVetoException, UnknownPropertyException,
-            UndefinedParagraphFormatException {
-        text.insertString(cursor, string, true);
-        XParagraphCursor parCursor = UnoRuntime.queryInterface(
-                XParagraphCursor.class, cursor);
-        // Access the property set of the cursor, and set the currently selected text
-        // (which is the string we just inserted) to be bold
-        XPropertySet props = UnoRuntime.queryInterface(
-                XPropertySet.class, parCursor);
-        try {
-            props.setPropertyValue(PARA_STYLE_NAME, parStyle);
-        } catch (IllegalArgumentException ex) {
-            throw new UndefinedParagraphFormatException(parStyle);
-        }
-        cursor.collapseToEnd();
-    }
-
     public static Object getProperty(Object o, String property)
             throws UnknownPropertyException, WrappedTargetException {
         XPropertySet props = UnoRuntime.queryInterface(
