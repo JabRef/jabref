@@ -58,20 +58,32 @@ public class OOUtil {
     }
 
     /**
-     * Insert a reference, formatted using a Layout, at the position of a given cursor.
+     * Format the reference part of a bibliography entry using a Layout.
      *
-     * @param text       The text to insert in.
-     * @param cursor     The cursor giving the insert location.
+     * The label (if any) and paragraph style are not added here.
+     *
+     * param parStyle   The name of the paragraph style to use.
+     *
+     *                  Not used here, for now we leave application of
+     *                  the paragraph style to the caller.
+     *
      * @param layout     The Layout to format the reference with.
-     * @param parStyle   The name of the paragraph style to use.
      * @param entry      The entry to insert.
      * @param database   The database the entry belongs to.
      * @param uniquefier Uniqiefier letter, if any, to append to the entry's year.
+     *
+     * @return OOFormattedText suitable for insertOOFormattedTextAtCurrentLocation()
      */
-    public static void insertFullReferenceAtCurrentLocation(XText text, XTextCursor cursor,
-                                                            Layout layout, String parStyle, BibEntry entry, BibDatabase database, String uniquefier)
-            throws UndefinedParagraphFormatException, UnknownPropertyException, PropertyVetoException,
-            WrappedTargetException, IllegalArgumentException {
+    public static String formatFullReference(Layout layout,
+                                             BibEntry entry,
+                                             BibDatabase database,
+                                             String uniquefier)
+        throws
+    // TODO: are any of these thrown?
+        UnknownPropertyException,
+        PropertyVetoException,
+        WrappedTargetException,
+        IllegalArgumentException {
 
         // Backup the value of the uniq field, just in case the entry already has it:
         Optional<String> oldUniqVal = entry.getField(UNIQUEFIER_FIELD);
@@ -92,43 +104,37 @@ public class OOUtil {
         } else {
             entry.clearField(UNIQUEFIER_FIELD);
         }
-
-        // Insert the formatted text:
-        OOUtil.insertOOFormattedTextAtCurrentLocation(text, cursor, formattedText, parStyle);
+        return formattedText;
     }
 
     /**
-     * Insert a text with formatting indicated by HTML-like tags, into
-     * a text at the position given by a cursor.
+     * Insert a text in OOFormattedText
+     * (where character formatting is indicated by HTML-like tags), into
+     * an {@code XText} at the position given by an {@code XTextCursor}.
      *
-     * Set {@code parStyle}, process {@code ltext} in chunks between
-     * HTML-tags, while updating current formatting state at HTML-tags.
+     * Process {@code ltext} in chunks between HTML-tags, while
+     * updating current formatting state at HTML-tags.
      *
      * Finally: {@code cursor.collapseToEnd()}
+     *
+     * Note: Leaves setting the paragraph style to the caller.
      *
      * @param text     The text to insert in.
      * @param cursor   The cursor giving the insert location.
      * @param lText    The marked-up text to insert.
-     * @param parStyle The name of the paragraph style to use.
      * @throws WrappedTargetException
      * @throws PropertyVetoException
      * @throws UnknownPropertyException
      * @throws IllegalArgumentException
      */
-    public static void insertOOFormattedTextAtCurrentLocation(XText text, XTextCursor cursor, String lText,
-                                                              String parStyle) throws UndefinedParagraphFormatException, UnknownPropertyException, PropertyVetoException,
-            WrappedTargetException, IllegalArgumentException {
-
-        XParagraphCursor parCursor = UnoRuntime.queryInterface(
-                XParagraphCursor.class, cursor);
-        XPropertySet props = UnoRuntime.queryInterface(
-                XPropertySet.class, parCursor);
-
-        try {
-            props.setPropertyValue(PARA_STYLE_NAME, parStyle);
-        } catch (com.sun.star.lang.IllegalArgumentException ex) {
-            throw new UndefinedParagraphFormatException(parStyle);
-        }
+    public static void insertOOFormattedTextAtCurrentLocation(XText text,
+                                                              XTextCursor cursor,
+                                                              String lText)
+        throws
+        UnknownPropertyException,
+        PropertyVetoException,
+        WrappedTargetException,
+        IllegalArgumentException {
 
         List<Formatting> formatting = new ArrayList<>();
         // We need to extract formatting. Use a simple regexp search iteration:
@@ -181,7 +187,6 @@ public class OOUtil {
         if (piv < lText.length()) {
             OOUtil.insertTextAtCurrentLocation(text, cursor, lText.substring(piv), formatting);
         }
-
         cursor.collapseToEnd();
     }
 

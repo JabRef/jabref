@@ -1816,7 +1816,6 @@ class OOBibBase {
      * @param cursor  Where to
      * @param entries Its iteration order defines order in bibliography.
      * @param style Style.
-     * @param parFormat Passed to OOUtil.insertFullReferenceAtCurrentLocation
      * @param uniqueLetters
      *
      * Only called from populateBibTextSection (and that from rebuildBibTextSection)
@@ -1825,10 +1824,8 @@ class OOBibBase {
                                              XTextCursor cursor,
                                              CitationGroups cgs,
                                              CitedKeys bibliography,
-                                             OOBibStyle style,
-                                             String parFormat)
+                                             OOBibStyle style)
         throws
-        UndefinedParagraphFormatException,
         IllegalArgumentException,
         UnknownPropertyException,
         PropertyVetoException,
@@ -1842,6 +1839,8 @@ class OOBibBase {
             System.out.printf("Ref isNumberEntries  %s\n", style.isNumberEntries());
         }
 
+        String parStyle = style.getReferenceParagraphFormat();
+
         for (CitedKey ck : bibliography.values()) {
 
             if (debugThisFun) {
@@ -1852,6 +1851,7 @@ class OOBibBase {
                                    : String.format("%02d",ck.number.get())));
             }
 
+            // this is where we create the paragraph.
             OOUtil.insertParagraphBreak(documentConnection.xText, cursor);
 
             // insert marker "[1]"
@@ -1921,13 +1921,30 @@ class OOBibBase {
                 // insert the actual details.
                 Layout layout = style.getReferenceFormat(bibentry.getType());
                 layout.setPostFormatter(POSTFORMATTER);
-                OOUtil.insertFullReferenceAtCurrentLocation(documentConnection.xText,
-                                                            cursor,
-                                                            layout,
-                                                            parFormat,
-                                                            bibentry,
-                                                            ck.db.get().database,
-                                                            ck.uniqueLetter.orElse(null));
+
+                String formattedText = OOUtil.formatFullReference(layout,
+                                                                  bibentry,
+                                                                  ck.db.get().database,
+                                                                  ck.uniqueLetter.orElse(null));
+
+                // format the paragraph
+                try {
+                    if (parStyle != null) {
+                        DocumentConnection.setParagraphStyle(cursor,
+                                                             parStyle);
+                    }
+                }  catch ( UndefinedParagraphFormatException ex ) {
+                    // TODO: precheck or remember if we already emitted this message.
+                    String message =
+                        String.format("Could not apply paragraph format '%s' to bibliography entry",
+                                      parStyle);
+                    // LOGGER.warn(message, ex);
+                    LOGGER.warn(message); // no stack trace
+                }
+                // Insert the formatted text:
+                OOUtil.insertOOFormattedTextAtCurrentLocation(documentConnection.xText,
+                                                              cursor,
+                                                              formattedText);
             }
         }
     }
@@ -2020,17 +2037,30 @@ class OOBibBase {
         XTextCursor cursor = (documentConnection.xText
                               .createTextCursorByRange(section.getAnchor()));
 
-        OOUtil.insertTextAtCurrentLocation(documentConnection.xText,
-                                           cursor,
-                                           style.getTitle(),
-                                           style.getReferenceHeaderParagraphFormat());
+        // emit header
+        documentConnection.xText.insertString(cursor,
+                                              style.getTitle(),
+                                              true);
+        String parStyle = style.getReferenceHeaderParagraphFormat();
+        try {
+            if (parStyle != null) {
+                DocumentConnection.setParagraphStyle(cursor, parStyle);
+            }
+        } catch ( UndefinedParagraphFormatException ex ) {
+            String message =
+                String.format("Could not apply paragraph format '%s' to bibliography header",
+                              parStyle);
+            // LOGGER.warn(message, ex);
+            LOGGER.warn(message); // No stack trace.
+        }
+        cursor.collapseToEnd();
 
+        // emit body
         insertFullReferenceAtCursor(documentConnection,
                                     cursor,
                                     cgs,
                                     bibliography,
-                                    style,
-                                    style.getReferenceParagraphFormat());
+                                    style);
 
         documentConnection.insertBookmark(OOBibBase.BIB_SECTION_END_NAME,
                                           cursor,
