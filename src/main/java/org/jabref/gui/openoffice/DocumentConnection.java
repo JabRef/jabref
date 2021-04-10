@@ -33,7 +33,7 @@ import java.util.Optional;
 // import org.jabref.logic.openoffice.OOPreFormatter;
 import org.jabref.logic.openoffice.OOUtil;
 // import org.jabref.logic.openoffice.UndefinedBibtexEntry;
-// import org.jabref.logic.openoffice.UndefinedParagraphFormatException;
+import org.jabref.logic.openoffice.UndefinedParagraphFormatException;
 // import org.jabref.model.database.BibDatabase;
 // import org.jabref.model.entry.BibEntry;
 // import org.jabref.model.entry.field.StandardField;
@@ -74,6 +74,7 @@ import com.sun.star.text.ReferenceFieldSource;
 import com.sun.star.text.ReferenceFieldPart;
 import com.sun.star.text.XBookmarksSupplier;
 import com.sun.star.text.XFootnote;
+import com.sun.star.text.XParagraphCursor;
 import com.sun.star.text.XReferenceMarksSupplier;
 import com.sun.star.text.XText;
 import com.sun.star.text.XTextContent;
@@ -104,8 +105,8 @@ class DocumentConnection {
      *  "CharStyleName" is an OpenOffice Property name.
      */
     private static final String CHAR_STYLE_NAME = "CharStyleName";
-    private static final Logger LOGGER =
-        LoggerFactory.getLogger(DocumentConnection.class);
+    private static final String PARA_STYLE_NAME = "ParaStyleName";
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentConnection.class);
 
 
     public XTextDocument mxDoc;
@@ -979,11 +980,10 @@ class DocumentConnection {
      * @param charStyle Name of the character style as known by Openoffice.
      */
     public static void
-    setCharStyle(
-        XTextCursor position, // TODO: maybe an XTextRange is sufficient here
-        String charStyle
-        )
-        throws UndefinedCharacterFormatException {
+    setCharStyle(XTextCursor position, // TODO: maybe an XTextRange is sufficient here
+                 String charStyle)
+        throws
+        UndefinedCharacterFormatException {
 
         XPropertySet xCursorProps = unoQI(XPropertySet.class, position);
 
@@ -996,6 +996,25 @@ class DocumentConnection {
             throw new UndefinedCharacterFormatException(charStyle);
             // Setting the character format failed, so we throw an exception that
             // will result in an error message for the user:
+        }
+    }
+
+    public static void setParagraphStyle(XTextCursor cursor,
+                      String parStyle)
+        throws
+        UndefinedParagraphFormatException {
+        XParagraphCursor parCursor = unoQI(XParagraphCursor.class, cursor);
+
+        // Access the property set of the cursor, and set the currently selected text
+        // (which is the string we just inserted) to be bold
+        XPropertySet props = unoQI(XPropertySet.class, parCursor);
+        try {
+            props.setPropertyValue(PARA_STYLE_NAME, parStyle);
+        } catch (UnknownPropertyException
+                 | PropertyVetoException
+                 | IllegalArgumentException
+                 | WrappedTargetException ex) {
+            throw new UndefinedParagraphFormatException(parStyle);
         }
     }
 
