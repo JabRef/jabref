@@ -190,7 +190,9 @@ public class OOUtil {
         cursor.collapseToEnd();
     }
 
-    public static void insertParagraphBreak(XText text, XTextCursor cursor) throws IllegalArgumentException {
+    public static void insertParagraphBreak(XText text, XTextCursor cursor)
+        throws
+        IllegalArgumentException {
         text.insertControlCharacter(cursor, ControlCharacter.PARAGRAPH_BREAK, true);
         cursor.collapseToEnd();
     }
@@ -202,8 +204,8 @@ public class OOUtil {
      * Insert {@code string} into {@code text} at {@code cursor}, while removing the content
      * of the cursor's range. The cursor's content is {@code string} now.
      *
-     * Apply character direct formatting from {@code
-     * formatting}. Features not in {@code formatting} are removed by setting to NONE.
+     * Apply character direct formatting from {@code formatting}.
+     * Features not in {@code formatting} are removed by setting to NONE.
      *
      * Finally: {@code cursor.collapseToEnd();}
      */
@@ -211,11 +213,12 @@ public class OOUtil {
                                                    List<Formatting> formatting)
             throws UnknownPropertyException, PropertyVetoException, WrappedTargetException,
             IllegalArgumentException {
+
         text.insertString(cursor, string, true);
         // Access the property set of the cursor, and set the currently selected text
         // (which is the string we just inserted) to be bold
-        XPropertySet xCursorProps = UnoRuntime.queryInterface(
-                XPropertySet.class, cursor);
+        XPropertySet xCursorProps = UnoRuntime.queryInterface(XPropertySet.class, cursor);
+
         if (formatting.contains(Formatting.BOLD)) {
             xCursorProps.setPropertyValue(CHAR_WEIGHT,
                     com.sun.star.awt.FontWeight.BOLD);
@@ -250,6 +253,7 @@ public class OOUtil {
             xCursorProps.setPropertyValue("CharFontPitch",
                             com.sun.star.awt.FontPitch.VARIABLE);
         } */
+
         if (formatting.contains(Formatting.SUBSCRIPT)) {
             xCursorProps.setPropertyValue(CHAR_ESCAPEMENT,
                     (byte) -101);

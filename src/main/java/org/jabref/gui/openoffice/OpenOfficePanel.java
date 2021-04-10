@@ -163,24 +163,31 @@ public class OpenOfficePanel {
 
         setStyleFile.setMaxWidth(Double.MAX_VALUE);
         setStyleFile.setOnAction(event -> {
-
-            dialogService.showCustomDialogAndWait(new StyleSelectDialogView(loader)).ifPresent(selectedStyle -> {
-                style = selectedStyle;
-                try {
-                    style.ensureUpToDate();
-                } catch (IOException e) {
-                    LOGGER.warn("Unable to reload style file '" + style.getPath() + "'", e);
-                }
-                dialogService.notify(Localization.lang("Current style is '%0'", style.getName()));
+                dialogService.showCustomDialogAndWait(new StyleSelectDialogView(loader))
+                    .ifPresent(selectedStyle -> {
+                            style = selectedStyle;
+                            try {
+                                style.ensureUpToDate();
+                            } catch (IOException e) {
+                                LOGGER.warn("Unable to reload style file '" + style.getPath() + "'", e);
+                            }
+                            dialogService.notify(Localization.lang("Current style is '%0'",
+                                                                   style.getName()));
+                        });
             });
-        });
 
-        pushEntries.setTooltip(new Tooltip(Localization.lang("Cite selected entries between parenthesis")));
+        pushEntries.setTooltip(
+            new Tooltip(Localization.lang("Cite selected entries between parenthesis")));
+
         pushEntries.setOnAction(e -> pushEntries(true, true, false));
         pushEntries.setMaxWidth(Double.MAX_VALUE);
-        pushEntriesInt.setTooltip(new Tooltip(Localization.lang("Cite selected entries with in-text citation")));
+
+        pushEntriesInt.setTooltip(
+            new Tooltip(Localization.lang("Cite selected entries with in-text citation")));
+
         pushEntriesInt.setOnAction(e -> pushEntries(false, true, false));
         pushEntriesInt.setMaxWidth(Double.MAX_VALUE);
+
         pushEntriesEmpty.setTooltip(new Tooltip(Localization.lang("Insert a citation without text (the entry will appear in the reference list)")));
         pushEntriesEmpty.setOnAction(e -> pushEntries(false, false, false));
         pushEntriesEmpty.setMaxWidth(Double.MAX_VALUE);
