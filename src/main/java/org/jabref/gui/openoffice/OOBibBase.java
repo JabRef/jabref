@@ -2681,6 +2681,103 @@ class OOBibBase {
         }
     }
 
+    public void checkParagraphStyleExistsInTheDocument(String styleName,
+                                                       DocumentConnection documentConnection,
+                                                       String labelInJstyleFile,
+                                                       String pathToStyleFile)
+        throws
+        JabRefException,
+        NoSuchElementException,
+        WrappedTargetException {
+
+        String internalName = documentConnection.getInternalNameOfParagraphStyleOrNull(styleName);
+        if (internalName == null) {
+            throw new JabRefException(Localization.lang(
+                                          "The %0 paragraph style '%1'"
+                                          + " is missing from the document",
+                                          labelInJstyleFile,
+                                          styleName)
+                                      + "\n"
+                                      + Localization.lang(
+                                          "Please create it in the document or change in the file:")
+                                      + "\n" + pathToStyleFile);
+        }
+        if (!internalName.equals(styleName)) {
+            throw new JabRefException(Localization.lang(
+                                          "The %0 paragraph style '%1'"
+                                          + " is a display name for '%2'.",
+                                          labelInJstyleFile,
+                                          styleName,
+                                          internalName)
+                                      + "\n"
+                                      + Localization.lang(
+                                          "Please use the latter in the style file below"
+                                          + " to avoid localization problems.")
+                                      + "\n" + pathToStyleFile);
+        }
+    }
+
+    public void checkCharacterStyleExistsInTheDocument(String styleName,
+                                                       DocumentConnection documentConnection,
+                                                       String labelInJstyleFile,
+                                                       String pathToStyleFile)
+        throws
+        JabRefException,
+        NoSuchElementException,
+        WrappedTargetException {
+
+        String internalName = documentConnection.getInternalNameOfCharacterStyleOrNull(styleName);
+        if (internalName == null) {
+            throw new JabRefException(Localization.lang(
+                                          "The %0 character style '%1'"
+                                          + " is missing from the document",
+                                          labelInJstyleFile,
+                                          styleName)
+                                      + "\n"
+                                      + Localization.lang(
+                                          "Please create it in the document or change in the file:")
+                                      + "\n" + pathToStyleFile);
+        }
+        if (!internalName.equals(styleName)) {
+            throw new JabRefException(Localization.lang(
+                                          "The %0 character style '%1'"
+                                          + " is a display name for '%2'.",
+                                          labelInJstyleFile,
+                                          styleName,
+                                          internalName)
+                                      + "\n"
+                                      + Localization.lang(
+                                          "Please use the latter in the style file below"
+                                          + " to avoid localization problems.")
+                                      + "\n" + pathToStyleFile);
+        }
+    }
+
+    public void checkStylesExistInTheDocument( OOBibStyle style, DocumentConnection documentConnection )
+        throws
+        JabRefException,
+        NoSuchElementException,
+        WrappedTargetException {
+
+        String pathToStyleFile = style.getPath();
+
+        checkParagraphStyleExistsInTheDocument(style.getReferenceHeaderParagraphFormat(),
+                                               documentConnection,
+                                               "ReferenceHeaderParagraphFormat",
+                                               pathToStyleFile);
+
+        checkParagraphStyleExistsInTheDocument(style.getReferenceParagraphFormat(),
+                                               documentConnection,
+                                               "ReferenceParagraphFormat",
+                                               pathToStyleFile);
+        if (style.isFormatCitations()) {
+            checkCharacterStyleExistsInTheDocument(style.getCitationCharacterFormat(),
+                                                   documentConnection,
+                                                   "CitationCharacterFormat",
+                                                   pathToStyleFile);
+        }
+    }
+
     /**
      * GUI action, refreshes citation markers and bibliography.
      *
@@ -2709,6 +2806,8 @@ class OOBibBase {
         styleIsRequired(style);
 
         DocumentConnection documentConnection = getDocumentConnectionOrThrow();
+        checkStylesExistInTheDocument(style, documentConnection);
+
         try {
             documentConnection.enterUndoContext("Refresh bibliography");
 
