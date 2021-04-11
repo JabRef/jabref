@@ -568,9 +568,15 @@ public class OOBibStyleParser {
 
         // Set validity boolean based on whether we found every section
         // in the file.
-        if ((mode == BibStyleMode.IN_LAYOUT_SECTION) && style.isDefaultLayoutPresent) {
-            style.valid = true;
+        if (mode != BibStyleMode.IN_LAYOUT_SECTION) {
+            logger.error(fileName, lineNumber, "Did not reach LAYOUT section at EOF");
+            return logger;
         }
+        if (!style.isDefaultLayoutPresent) {
+            logger.error(fileName, lineNumber, "File did not provide a \"default\" layout.");
+            return logger;
+        }
+        style.valid = true;
         return logger;
     }
 
