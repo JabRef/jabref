@@ -152,9 +152,11 @@ public class OOBibStyleParser {
             }
 
         case STRING:
-            ParseLogLevel res = ParseLogLevel.OK;
             boolean isQuoted = hasQuotes(value);
-            if (!isQuoted) {
+            if (isQuoted) {
+                destProperties.put(propertyName, dropQuotes(value));
+                return ParseLogLevel.OK;
+            } else {
                 String msg = String.format("String %s '%s'"
                                            + " expects double quotes around value, got '%s'",
                                            whatIsIt,
@@ -168,7 +170,6 @@ public class OOBibStyleParser {
                     return ParseLogLevel.ERROR;
                 }
             }
-            return res;
         }
         throw new RuntimeException("");
     }
