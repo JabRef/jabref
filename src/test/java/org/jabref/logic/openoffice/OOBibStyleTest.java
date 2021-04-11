@@ -734,6 +734,11 @@ class OOBibStyleTest {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                                           layoutFormatterPreferences);
 
+        OOBibStyleParser.ParseLog pl = style.getParseLog();
+        assertTrue( pl != null );
+        assertTrue( !pl.hasError() );
+        assertTrue( "[".equals(style.getBracketBefore()) );
+
         BibDatabase database = new BibDatabase();
 
         BibEntry entry = new BibEntry();
