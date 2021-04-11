@@ -1,6 +1,7 @@
 package org.jabref.logic.openoffice;
 
 import java.net.URISyntaxException;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -75,7 +76,7 @@ public class StyleLoaderTest {
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
 
         String p = StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH;
-        String u = StyleLoader.class.getResource(p).toURI();
+        URI u = StyleLoader.class.getResource(p).toURI();
         String filename = Path.of(u).toFile().getPath();
         loader.addStyleIfValid(filename);
         assertEquals(NUMBER_OF_INTERNAL_STYLES + 1, loader.getStyles().size());
@@ -93,7 +94,7 @@ public class StyleLoaderTest {
     @Test
     public void testInitalizeWithOneExternalFile() throws URISyntaxException {
         String p = StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH;
-        String u = StyleLoader.class.getResource(p).toURI();
+        URI u = StyleLoader.class.getResource(p).toURI();
         String filename = Path.of(u).toFile().getPath();
         when(preferences.getExternalStyles())
             .thenReturn(Collections.singletonList(filename));
@@ -113,7 +114,7 @@ public class StyleLoaderTest {
     @Test
     public void testInitalizeWithOneExternalFileRemoveStyle() throws URISyntaxException {
         String p = StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH;
-        String u = StyleLoader.class.getResource(p).toURI();
+        URI u = StyleLoader.class.getResource(p).toURI();
         String filename = Path.of(u).toFile().getPath();
         when(preferences.getExternalStyles())
             .thenReturn(Collections.singletonList(filename));
@@ -138,7 +139,7 @@ public class StyleLoaderTest {
         throws
         URISyntaxException {
         String p = StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH;
-        String u = StyleLoader.class.getResource(p).toURI();
+        URI u = StyleLoader.class.getResource(p).toURI();
         String filename = Path.of(u).toFile().getPath();
         when(preferences.getExternalStyles())
             .thenReturn(Collections.singletonList(filename));
@@ -164,7 +165,7 @@ public class StyleLoaderTest {
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
         int beforeAdding = loader.getStyles().size();
         String p = StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH;
-        String u = StyleLoader.class.getResource(p).toURI();
+        URI u = StyleLoader.class.getResource(p).toURI();
         String filename = Path.of(u).toFile().getPath();
         loader.addStyleIfValid(filename);
         loader.addStyleIfValid(filename);
