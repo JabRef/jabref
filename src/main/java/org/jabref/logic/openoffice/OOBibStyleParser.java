@@ -649,8 +649,9 @@ public class OOBibStyleParser {
      * The "name" part is passed to {@code EntryTypeFactory.parse(name);}
      * The "RHS"  part is passed to {@code new LayoutHelper( ..., style.prefs).getLayoutFromText();}
      *
-     * See https://docs.jabref.org/collaborative-work/export/customexports for a description of what can go
-     * into the RHS.
+     * See
+     * https://docs.jabref.org/collaborative-work/export/customexports
+     * for a description of what can go into the RHS.
      */
     private static ParseLogLevel handleLayoutLine(String line,
                                                   OOBibStyle style,
