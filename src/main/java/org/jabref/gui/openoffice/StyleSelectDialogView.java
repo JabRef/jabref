@@ -34,7 +34,10 @@ import com.tobiasdiez.easybind.EasyBind;
 public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 
     private final MenuItem edit = new MenuItem(Localization.lang("Edit"));
+
+    // Note: reload has no action, removed from createContextMenu below.
     private final MenuItem reload = new MenuItem(Localization.lang("Reload"));
+
     private final StyleLoader loader;
     @FXML private TableColumn<StyleSelectItemViewModel, String> colName;
     @FXML private TableView<StyleSelectItemViewModel> tvStyles;
