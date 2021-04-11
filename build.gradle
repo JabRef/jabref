@@ -14,10 +14,10 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.38.0'
     id 'org.javamodularity.moduleplugin' version '1.7.0'
     id 'org.openjfx.javafxplugin' version '0.0.9'
-    id 'org.beryx.jlink' version '2.23.5'
+    id 'org.beryx.jlink' version '2.23.6'
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
-    id 'com.adarshr.test-logger' version '2.1.1'
+    id 'com.adarshr.test-logger' version '3.0.0'
 }
 
 gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.ALWAYS
@@ -115,8 +115,8 @@ dependencies {
 
     implementation 'commons-cli:commons-cli:1.4'
 
-    implementation 'org.libreoffice:libreoffice:7.1.1'
-    implementation 'org.libreoffice:unoloader:7.1.1'
+    implementation 'org.libreoffice:libreoffice:7.1.2'
+    implementation 'org.libreoffice:unoloader:7.1.2'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.9'
     implementation 'info.debatty:java-string-similarity:2.0.0'
