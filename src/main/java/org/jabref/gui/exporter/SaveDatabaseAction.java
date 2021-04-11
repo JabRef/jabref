@@ -62,13 +62,13 @@ public class SaveDatabaseAction {
         SILENT, NORMAL
     }
 
-    public SaveDatabaseAction(LibraryTab libraryTab, PreferencesService preferences, BibEntryTypesManager entryTypesManager) {
+    public SaveDatabaseAction(LibraryTab libraryTab, PreferencesService preferences, BibEntryTypesManager entryTypesManager, GlobalSaveManager saveManager) {
         this.libraryTab = libraryTab;
         this.frame = libraryTab.frame();
         this.dialogService = frame.getDialogService();
         this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
-        this.saveManager = GlobalSaveManager.INSTANCE;
+        this.saveManager = saveManager;
     }
 
     public boolean save() {

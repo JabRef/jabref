@@ -5,6 +5,7 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.logic.exporter.GlobalSaveManager;
 import org.jabref.logic.l10n.Localization;
 
 public class SaveAllAction extends SimpleCommand {
@@ -22,7 +23,7 @@ public class SaveAllAction extends SimpleCommand {
         dialogService.notify(Localization.lang("Saving all libraries..."));
 
         for (LibraryTab libraryTab : frame.getLibraryTabs()) {
-            SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction(libraryTab, Globals.prefs, Globals.entryTypesManager);
+            SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction(libraryTab, Globals.prefs, Globals.entryTypesManager, GlobalSaveManager.INSTANCE);
             boolean saveResult = saveDatabaseAction.save();
             if (!saveResult) {
                 dialogService.notify(Localization.lang("Could not save file."));

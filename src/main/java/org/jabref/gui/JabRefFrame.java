@@ -119,6 +119,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
+import org.jabref.logic.exporter.GlobalSaveManager;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ParserResult;
@@ -1105,7 +1106,7 @@ public class JabRefFrame extends BorderPane {
         if (response.isPresent() && response.get().equals(saveChanges)) {
             // The user wants to save.
             try {
-                SaveDatabaseAction saveAction = new SaveDatabaseAction(libraryTab, prefs, Globals.entryTypesManager);
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(libraryTab, prefs, Globals.entryTypesManager, GlobalSaveManager.INSTANCE);
                 if (saveAction.save()) {
                     return true;
                 }
