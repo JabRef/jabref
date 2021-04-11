@@ -101,7 +101,8 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
         edit.setOnAction(e -> viewModel.editStyle());
 
         new ViewModelTableRowFactory<StyleSelectItemViewModel>()
-                .withOnMouseClickedEvent((item, event) -> {
+                .withOnMouseClickedEvent(
+                    (item, event) -> {
                     if (event.getClickCount() == 2) {
                         viewModel.viewStyle(item);
                     }
@@ -140,7 +141,9 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
 
     private ContextMenu createContextMenu() {
         ContextMenu contextMenu = new ContextMenu();
-        contextMenu.getItems().addAll(edit, reload);
+        contextMenu.getItems().addAll(edit
+                                      // , reload // needs reload.setOnAction(...)
+            );
         return contextMenu;
     }
 
