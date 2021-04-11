@@ -53,6 +53,7 @@ import com.sun.star.container.NoSuchElementException;
 // import com.sun.star.container.XEnumeration;
 // import com.sun.star.container.XEnumerationAccess;
 import com.sun.star.container.XNameAccess;
+import com.sun.star.container.XNameContainer;
 import com.sun.star.container.XNamed;
 import com.sun.star.document.XDocumentPropertiesSupplier;
 import com.sun.star.document.XUndoManager;
@@ -70,6 +71,8 @@ import com.sun.star.lang.XComponent;
 // import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.lang.XServiceInfo;
+import com.sun.star.style.XStyle;
+import com.sun.star.style.XStyleFamiliesSupplier;
 import com.sun.star.text.ReferenceFieldSource;
 import com.sun.star.text.ReferenceFieldPart;
 import com.sun.star.text.XBookmarksSupplier;
@@ -148,6 +151,68 @@ class DocumentConnection {
             supp.getDocumentProperties().getUserDefinedProperties();
 
         this.propertySet = unoQI(XPropertySet.class, userProperties);
+    }
+
+    private XStyle getStyleFromFamilyOrNull(String familyName, String styleName)
+        throws
+        NoSuchElementException,
+        WrappedTargetException {
+
+        XStyleFamiliesSupplier xFamiliesSupplier = unoQI(XStyleFamiliesSupplier.class, mxDoc);
+        XNameAccess xFamilies = (XNameAccess) unoQI(XNameAccess.class,
+                                                    xFamiliesSupplier.getStyleFamilies());
+
+        // Access the 'ParagraphStyles' Family
+        XNameContainer xFamily = (XNameContainer) unoQI(XNameContainer.class,
+                                                        xFamilies.getByName(familyName));
+
+        try {
+            Object s = xFamily.getByName(styleName);
+            XStyle xs = (XStyle) unoQI( XStyle.class, s );
+            return xs;
+        } catch (NoSuchElementException ex) {
+            return null;
+        }
+    }
+
+    private XStyle getParagraphStyleOrNull(String styleName)
+        throws
+        NoSuchElementException,
+        WrappedTargetException {
+        return getStyleFromFamilyOrNull("ParagraphStyles", styleName );
+    }
+
+    private XStyle getCharacterStyleOrNull(String styleName)
+        throws
+        NoSuchElementException,
+        WrappedTargetException {
+        return getStyleFromFamilyOrNull("CharacterStyles", styleName );
+    }
+
+    public String getInternalNameOfParagraphStyleOrNull(String name)
+        throws
+        NoSuchElementException,
+        WrappedTargetException {
+
+        XStyle xs = getParagraphStyleOrNull(name);
+        if (xs == null) {
+            return null;
+        } else {
+            return xs.getName();
+        }
+    }
+
+    public String getInternalNameOfCharacterStyleOrNull(String name)
+        throws
+        NoSuchElementException,
+        WrappedTargetException {
+
+        XStyle xs = getCharacterStyleOrNull(name);
+        if (xs == null) {
+            return null;
+        } else {
+            return xs.getName();
+        }
     }
 
     /**
