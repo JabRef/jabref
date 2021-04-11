@@ -23,6 +23,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OOBibStyle;
+import org.jabref.logic.openoffice.OOBibStyleParser;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.StyleLoader;
 import org.jabref.logic.util.StandardFileType;
@@ -35,10 +36,13 @@ public class StyleSelectDialogViewModel {
     private final StyleLoader loader;
     private final OpenOfficePreferences preferences;
     private final PreferencesService preferencesService;
-    private final ListProperty<StyleSelectItemViewModel> styles = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<StyleSelectItemViewModel> styles =
+        new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<StyleSelectItemViewModel> selectedItem = new SimpleObjectProperty<>();
 
-    public StyleSelectDialogViewModel(DialogService dialogService, StyleLoader loader, PreferencesService preferencesService) {
+    public StyleSelectDialogViewModel(DialogService dialogService,
+                                      StyleLoader loader,
+                                      PreferencesService preferencesService) {
         this.dialogService = dialogService;
         this.preferences = preferencesService.getOpenOfficePreferences();
         this.loader = loader;
@@ -51,7 +55,12 @@ public class StyleSelectDialogViewModel {
     }
 
     public StyleSelectItemViewModel fromOOBibStyle(OOBibStyle style) {
-        return new StyleSelectItemViewModel(style.getName(), String.join(", ", style.getJournals()), style.isInternalStyle() ? Localization.lang("Internal style") : style.getPath(), style);
+        return new StyleSelectItemViewModel(style.getName(),
+                                            String.join(", ", style.getJournals()),
+                                            (style.isInternalStyle()
+                                             ? Localization.lang("Internal style")
+                                             : style.getPath()),
+                                            style);
     }
 
     public OOBibStyle toOOBibStyle(StyleSelectItemViewModel item) {
@@ -66,14 +75,27 @@ public class StyleSelectDialogViewModel {
                 .build();
         Optional<Path> path = dialogService.showFileOpenDialog(fileDialogConfiguration);
         path.map(Path::toAbsolutePath).map(Path::toString).ifPresent(stylePath -> {
-            if (loader.addStyleIfValid(stylePath)) {
-                preferences.setCurrentStyle(stylePath);
-                styles.setAll(loadStyles());
-                selectedItem.setValue(getStyleOrDefault(stylePath));
-            } else {
-                dialogService.showErrorDialogAndWait(Localization.lang("Invalid style selected"), Localization.lang("You must select a valid style file. Your style is probably missing a line for the type \"default\"."));
-            }
-        });
+                OOBibStyleParser.ParseLog parseLog = loader.addStyleIfValid(stylePath);
+                if ( !parseLog.hasError() ) {
+                    preferences.setCurrentStyle(stylePath);
+                    styles.setAll(loadStyles());
+                    selectedItem.setValue(getStyleOrDefault(stylePath));
+                    if (!parseLog.isEmpty()) {
+                        // showInformationDialogAndWait shows a non-resizable window,
+                        // not wide enough.
+                        dialogService.showInformationDialogAndWait("Parse log", parseLog.format());
+                    }
+                } else {
+                    dialogService.showErrorDialogAndWait(
+                        Localization.lang("Invalid style selected"),
+                        Localization.lang(
+                            "You must select a valid style file."
+                            +" Your style is probably missing a line for the type \"default\".")
+                        + "\n"
+                        + parseLog.format()
+                        );
+                }
+            });
     }
 
     public List<StyleSelectItemViewModel> loadStyles() {
@@ -94,7 +116,9 @@ public class StyleSelectDialogViewModel {
 
     public void editStyle() {
         OOBibStyle style = selectedItem.getValue().getStyle();
-        Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("jstyle");
+        Optional<ExternalFileType> type = (ExternalFileTypes
+                                           .getInstance()
+                                           .getExternalFileTypeByExt("jstyle"));
         try {
             JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), style.getPath(), type);
         } catch (IOException e) {
@@ -118,13 +142,20 @@ public class StyleSelectDialogViewModel {
     }
 
     public void storePrefs() {
-        List<String> externalStyles = styles.stream().map(this::toOOBibStyle).filter(style -> !style.isInternalStyle()).map(OOBibStyle::getPath).collect(Collectors.toList());
+        List<String> externalStyles = (styles.stream()
+                                       .map(this::toOOBibStyle)
+                                       .filter(style -> !style.isInternalStyle())
+                                       .map(OOBibStyle::getPath)
+                                       .collect(Collectors.toList()));
         preferences.setExternalStyles(externalStyles);
         preferences.setCurrentStyle(selectedItem.getValue().getStylePath());
         preferencesService.setOpenOfficePreferences(preferences);
     }
 
     private StyleSelectItemViewModel getStyleOrDefault(String stylePath) {
-        return styles.stream().filter(style -> style.getStylePath().equals(stylePath)).findFirst().orElse(styles.get(0));
+        return (styles.stream()
+                .filter(style -> style.getStylePath().equals(stylePath))
+                .findFirst()
+                .orElse(styles.get(0)));
     }
 }

@@ -88,11 +88,18 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private static final String FORMAT_CITATIONS = "FormatCitations";
     private static final String CITATION_CHARACTER_FORMAT = "CitationCharacterFormat";
 
-    // TODO: unused ITALIC_CITATIONS, BOLD_CITATIONS
+    // TODO:  ITALIC_CITATIONS ItalicCitations is not implemented
+    // status:
+    // - jstyles.jabref.org-master : 4 styles mention it, value is false in all of them.
+    // - getter: isItalicCitations() exists, but only called from tests, to assert it is false.
+    // - default: citProperties.put(ITALIC_CITATIONS, Boolean.FALSE);
+    //
     private static final String ITALIC_CITATIONS = "ItalicCitations";
+
+    // TODO: BOLD_CITATIONS is not implemented
     private static final String BOLD_CITATIONS = "BoldCitations";
 
-    // TODO: unused SUBSCRIPT_CITATIONS, SUPERSCRIPT_CITATIONS
+    // TODO: SUBSCRIPT_CITATIONS, SUPERSCRIPT_CITATIONS are not implemented
     private static final String SUBSCRIPT_CITATIONS = "SubscriptCitations";
     private static final String SUPERSCRIPT_CITATIONS = "SuperscriptCitations";
 
@@ -189,17 +196,28 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     /*
      * Used or modified in OOBibStyleParser.readFormatFile()
      */
-    String name = "";
     String localCopy;
-    final LayoutFormatterPreferences prefs;
-    Layout defaultBibLayout;
-    boolean isDefaultLayoutPresent;
+
+    String obsName = "";
+    final SortedSet<String> journals = new TreeSet<>();
+
+    final Map<String, Object> obsProperties = new HashMap<>();
+    final Map<String, Object> obsCitProperties = new HashMap<>();
+
     // reference layout mapped from entry type:
     final Map<EntryType, Layout> bibLayout = new HashMap<>();
-    final Map<String, Object> properties = new HashMap<>();
-    final Map<String, Object> citProperties = new HashMap<>();
+    Layout defaultBibLayout;
+    boolean isDefaultLayoutPresent;
+
+    final LayoutFormatterPreferences prefs;
     boolean valid;
-    final SortedSet<String> journals = new TreeSet<>();
+
+    /** Messages from that parser.
+     *
+     *  Since we are parsing from the constructor, there is no way to
+     *  return it to the caller there.
+     */
+    OOBibStyleParser.ParseLog parseLog;
 
 
     private final boolean fromResource;
@@ -218,7 +236,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         this.prefs = Objects.requireNonNull(prefs);
         this.styleFile = Objects.requireNonNull(styleFile);
         this.encoding = Objects.requireNonNull(encoding);
-        setDefaultProperties();
+        // setDefaultProperties(); // moved into initialize()
         reload();
         fromResource = false;
         path = styleFile.getPath();
@@ -231,53 +249,53 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         this.prefs = Objects.requireNonNull(prefs);
         Objects.requireNonNull(resourcePath);
         this.encoding = StandardCharsets.UTF_8;
-        setDefaultProperties();
-        initialize(OOBibStyle.class.getResourceAsStream(resourcePath));
+        // setDefaultProperties(); // moved into initialize()
+        initialize(OOBibStyle.class.getResourceAsStream(resourcePath), resourcePath);
         fromResource = true;
         path = resourcePath;
     }
 
     private void setDefaultProperties() {
         // Set default property values:
-        properties.put(TITLE, "Bibliography");
+        obsProperties.put(TITLE, "Bibliography");
 
-        properties.put(IS_SORT_BY_POSITION, Boolean.FALSE);
-        properties.put(IS_NUMBER_ENTRIES, Boolean.FALSE);
+        obsProperties.put(IS_SORT_BY_POSITION, Boolean.FALSE);
+        obsProperties.put(IS_NUMBER_ENTRIES, Boolean.FALSE);
 
-        properties.put(REFERENCE_PARAGRAPH_FORMAT, "Default");
-        properties.put(REFERENCE_HEADER_PARAGRAPH_FORMAT, "Heading 1");
+        obsProperties.put(REFERENCE_PARAGRAPH_FORMAT, "Default");
+        obsProperties.put(REFERENCE_HEADER_PARAGRAPH_FORMAT, "Heading 1");
 
-        // Set default properties for the citation marker:
-        citProperties.put(AUTHOR_FIELD,
+        // Set default obsCitProperties for the citation marker:
+        obsCitProperties.put(AUTHOR_FIELD,
                           FieldFactory.serializeOrFields(StandardField.AUTHOR,
                                                          StandardField.EDITOR));
-        citProperties.put(YEAR_FIELD, StandardField.YEAR.getName());
-        citProperties.put(MAX_AUTHORS, 3);
-        citProperties.put(MAX_AUTHORS_FIRST, -1);
-        citProperties.put(AUTHOR_SEPARATOR, ", ");
-        citProperties.put(AUTHOR_LAST_SEPARATOR, " & ");
-        citProperties.put(AUTHOR_LAST_SEPARATOR_IN_TEXT, null);
-        citProperties.put(ET_AL_STRING, " et al.");
-        citProperties.put(YEAR_SEPARATOR, ", ");
-        citProperties.put(IN_TEXT_YEAR_SEPARATOR, " ");
+        obsCitProperties.put(YEAR_FIELD, StandardField.YEAR.getName());
+        obsCitProperties.put(MAX_AUTHORS, 3);
+        obsCitProperties.put(MAX_AUTHORS_FIRST, -1);
+        obsCitProperties.put(AUTHOR_SEPARATOR, ", ");
+        obsCitProperties.put(AUTHOR_LAST_SEPARATOR, " & ");
+        obsCitProperties.put(AUTHOR_LAST_SEPARATOR_IN_TEXT, null);
+        obsCitProperties.put(ET_AL_STRING, " et al.");
+        obsCitProperties.put(YEAR_SEPARATOR, ", ");
+        obsCitProperties.put(IN_TEXT_YEAR_SEPARATOR, " ");
 
-        citProperties.put(BRACKET_BEFORE, "(");
-        citProperties.put(BRACKET_AFTER, ")");
+        obsCitProperties.put(BRACKET_BEFORE, "(");
+        obsCitProperties.put(BRACKET_AFTER, ")");
 
-        citProperties.put(CITATION_SEPARATOR, "; ");
-        citProperties.put(PAGE_INFO_SEPARATOR, "; ");
-        citProperties.put(GROUPED_NUMBERS_SEPARATOR, "-");
-        citProperties.put(MINIMUM_GROUPING_COUNT, 3);
-        citProperties.put(FORMAT_CITATIONS, Boolean.FALSE);
-        citProperties.put(CITATION_CHARACTER_FORMAT, "Default");
-        citProperties.put(ITALIC_CITATIONS, Boolean.FALSE);
-        citProperties.put(BOLD_CITATIONS, Boolean.FALSE);
-        citProperties.put(SUPERSCRIPT_CITATIONS, Boolean.FALSE);
-        citProperties.put(SUBSCRIPT_CITATIONS, Boolean.FALSE);
-        citProperties.put(MULTI_CITE_CHRONOLOGICAL, Boolean.TRUE);
-        citProperties.put(CITATION_KEY_CITATIONS, Boolean.FALSE);
-        citProperties.put(ITALIC_ET_AL, Boolean.FALSE);
-        citProperties.put(OXFORD_COMMA, "");
+        obsCitProperties.put(CITATION_SEPARATOR, "; ");
+        obsCitProperties.put(PAGE_INFO_SEPARATOR, "; ");
+        obsCitProperties.put(GROUPED_NUMBERS_SEPARATOR, "-");
+        obsCitProperties.put(MINIMUM_GROUPING_COUNT, 3);
+        obsCitProperties.put(FORMAT_CITATIONS, Boolean.FALSE);
+        obsCitProperties.put(CITATION_CHARACTER_FORMAT, "Default");
+        obsCitProperties.put(ITALIC_CITATIONS, Boolean.FALSE);
+        obsCitProperties.put(BOLD_CITATIONS, Boolean.FALSE);
+        obsCitProperties.put(SUPERSCRIPT_CITATIONS, Boolean.FALSE);
+        obsCitProperties.put(SUBSCRIPT_CITATIONS, Boolean.FALSE);
+        obsCitProperties.put(MULTI_CITE_CHRONOLOGICAL, Boolean.TRUE);
+        obsCitProperties.put(CITATION_KEY_CITATIONS, Boolean.FALSE); //"BibTeXKeyCitations"
+        obsCitProperties.put(ITALIC_ET_AL, Boolean.FALSE);
+        obsCitProperties.put(OXFORD_COMMA, "");
     }
 
     //    public Layout getDefaultBibLayout() {
@@ -285,7 +303,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     //    }
 
     public String getName() {
-        return name;
+        return obsName;
     }
 
     public String getPath() {
@@ -305,15 +323,30 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * earlier versions of the input. This may be confusing for the
      * user (modified file until it works, but next time it fails again).
      */
-    private void initialize(InputStream stream) throws IOException {
+    private void initialize(InputStream stream, String filename) throws IOException {
         Objects.requireNonNull(stream);
+
+
+        // remove data from a previous parse
+        localCopy = null;
+        obsName = "";
+        journals.clear();
+        obsProperties.clear();
+        obsCitProperties.clear();
+        bibLayout.clear();
+        defaultBibLayout = null;
+        isDefaultLayoutPresent = false;
+        valid = false;
+        setDefaultProperties();
+        this.parseLog = null;
 
         // https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html
         //
         // The try-with-resources Statement
         //
         try (Reader reader = new InputStreamReader(stream, encoding)) {
-            OOBibStyleParser.readFormatFile(reader, this);
+            this.parseLog = OOBibStyleParser.readFormatFile(reader, this, filename);
+            // System.out.print(pp.format());
         }
     }
 
@@ -349,7 +382,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         if (styleFile != null) {
             this.styleFileModificationTime = styleFile.lastModified();
             try (InputStream stream = new FileInputStream(styleFile)) {
-                initialize(stream);
+                initialize(stream, styleFile.getAbsolutePath());
             }
         }
     }
@@ -362,6 +395,13 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      */
     public boolean isValid() {
         return valid;
+    }
+
+    /**
+     * May return null.
+     */
+    public OOBibStyleParser.ParseLog getParseLog() {
+        return parseLog;
     }
 
     public Layout getReferenceFormat(EntryType type) {
@@ -531,6 +571,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return getName().compareTo(other.getName());
     }
 
+    private String nullToEmpty(String s) {
+        return ( s == null ? "" : s );
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -538,17 +581,22 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         }
         if (o instanceof OOBibStyle) {
             OOBibStyle otherStyle = (OOBibStyle) o;
-            return Objects.equals(path, otherStyle.path)
-                    && Objects.equals(name, otherStyle.name)
-                    && Objects.equals(citProperties, otherStyle.citProperties)
-                    && Objects.equals(properties, otherStyle.properties);
+            return (Objects.equals(path, otherStyle.path)
+                    && (nullToEmpty(localCopy)
+                        .equals(nullToEmpty(otherStyle.localCopy))));
+            //            return (Objects.equals(path, otherStyle.path)
+            //                    && Objects.equals(obsName, otherStyle.obsName)
+            //                    && Objects.equals(obsCitProperties, otherStyle.obsCitProperties)
+            //                    && Objects.equals(obsProperties, otherStyle.obsProperties)
+            //                    // bibLayout does no count?
+            //                );
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(path, name, citProperties, properties);
+        return Objects.hash(path, obsName, obsCitProperties, obsProperties);
     }
 
     /*
@@ -564,19 +612,19 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     //  * @return The property value, or null if it doesn't exist.
     //  */
     // private Object getProperty(String propName) {
-    //     return properties.get(propName);
+    //     return obsProperties.get(propName);
     // }
 
     private boolean getBooleanProperty(String propName) {
-        return (Boolean) properties.get(propName);
+        return (Boolean) obsProperties.get(propName);
     }
 
     private String getStringProperty(String propName) {
-        return (String) properties.get(propName);
+        return (String) obsProperties.get(propName);
     }
 
     //    private int getIntProperty(String key) {
-    //        return (Integer) properties.get(key);
+    //        return (Integer) obsProperties.get(key);
     //    }
 
     /**
@@ -586,15 +634,15 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * @return the value
      */
     private boolean getBooleanCitProperty(String key) {
-        return (Boolean) citProperties.get(key);
+        return (Boolean) obsCitProperties.get(key);
     }
 
     private int getIntCitProperty(String key) {
-        return (Integer) citProperties.get(key);
+        return (Integer) obsCitProperties.get(key);
     }
 
     public String getStringCitProperty(String key) {
-        return (String) citProperties.get(key);
+        return (String) obsCitProperties.get(key);
     }
 
     /**
@@ -634,16 +682,18 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     /**
      * Should citation markers be formatted
      * according to the results of the
-     *  - isItalicCitations() // no, isItalicCitations() is not used at all
-     *  - isBoldCitations()   // no, isBoldCitations() is not used at all
+     *  - isItalicCitations() // not implemented
+     *  - isBoldCitations()   // not implemented
      *  - getCitationCharacterFormat() // yes
      *  methods?
+     *
+     * There is also SUPERSCRIPT_CITATIONS, SUBSCRIPT_CITATIONS
      *
      * @return true to indicate that citations should be formatted to getCitationCharacterFormat()
      *          in italics (or bold).
      */
     public boolean isFormatCitations() {
-        return (Boolean) citProperties.get(FORMAT_CITATIONS);
+        return (Boolean) obsCitProperties.get(FORMAT_CITATIONS);
     }
 
     public String getCitationCharacterFormat() {
@@ -671,11 +721,13 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * TODO: unused
      */
     public boolean isBoldCitations() {
-        return (Boolean) citProperties.get(BOLD_CITATIONS);
+        return (Boolean) obsCitProperties.get(BOLD_CITATIONS);
     }
 
+    
+
     public boolean isCitationKeyCiteMarkers() {
-        return (Boolean) citProperties.get(CITATION_KEY_CITATIONS);
+        return (Boolean) obsCitProperties.get(CITATION_KEY_CITATIONS);
     }
 
     public boolean getCitPropertyMultiCiteChronological() {

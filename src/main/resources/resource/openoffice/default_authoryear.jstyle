@@ -9,36 +9,36 @@ Journal name 2
 
 PROPERTIES
 Title="References"
-IsSortByPosition="false"
-IsNumberEntries="false"
+IsSortByPosition = false
+IsNumberEntries = false
 ReferenceParagraphFormat="Text body"
 ReferenceHeaderParagraphFormat="Heading 2"
 
 CITATION
-BibtexKeyCitations=false
+BibTeXKeyCitations=false
 AuthorField="author/editor"
 YearField="year"
-MaxAuthors="2"
-MaxAuthorsFirst="6"
+MaxAuthors=2
+MaxAuthorsFirst=6
 AuthorSeparator=","
-AuthorLastSeparator=" & "
-AuthorLastSeparatorInText=" and "
+AuthorLastSeparator = " & "
+AuthorLastSeparatorInText = " and "
 EtAlString=" et al."
-ItalicEtAl="false"
+ItalicEtAl=false
 YearSeparator=" "
 InTextYearSeparator=" "
 BracketBefore="["
 BracketAfter="]"
-BracketBeforeInList="["
-BracketAfterInList="] "
-CitationSeparator="; "
-UniquefierSeparator=","
+BracketBeforeInList = "["
+BracketAfterInList = "] "
+CitationSeparator = "; "
+UniquefierSeparator = ","
 GroupedNumbersSeparator="-"
-MinimumGroupingCount="3"
-FormatCitations="false"
-CitationCharacterFormat="Default"
-MultiCiteChronological="true"
-PageInfoSeparator="; "
+MinimumGroupingCount=3
+FormatCitations = false
+CitationCharacterFormat = "Default"
+MultiCiteChronological = true
+PageInfoSeparator = "; "
 
 LAYOUT
 article=<b>\format[Authors(LastFirst,Semicolon)]{\author}</b> (<b>\year\uniq</b>). <i>\title</i>, \journal \volume\begin{pages} : \format[FormatPagesForHTML]{\pages}\end{pages}.

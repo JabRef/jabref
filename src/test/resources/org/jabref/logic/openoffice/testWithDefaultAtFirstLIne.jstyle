@@ -9,8 +9,8 @@ Journal name 2
 
 PROPERTIES
 Title="References"
-IsSortByPosition="true"
-IsNumberEntries="true"
+IsSortByPosition=true
+IsNumberEntries=true
 ReferenceParagraphFormat="Text body"
 ReferenceHeaderParagraphFormat="Heading 2"
 
@@ -22,8 +22,8 @@ BracketAfterInList="] "
 CitationSeparator="; "
 UniquefierSeparator=","
 GroupedNumbersSeparator="-"
-MinimumGroupingCount="3"
-FormatCitations="false"
+MinimumGroupingCount=3
+FormatCitations=false
 CitationCharacterFormat="Default"
 PageInfoSeparator="; "
 OxfordComma=","

@@ -8,24 +8,24 @@ Journal name 1
 Journal name 2
 
 PROPERTIES
-Title="References"
-IsSortByPosition="true"
-IsNumberEntries="true"
-ReferenceParagraphFormat="Text body"
-ReferenceHeaderParagraphFormat="Heading 2"
+Title = "References"
+IsSortByPosition = true
+IsNumberEntries  = true
+ReferenceParagraphFormat = "Text body"
+ReferenceHeaderParagraphFormat = "Heading 2"
 
 CITATION
-BracketBefore="["
-BracketAfter="]"
-BracketBeforeInList="["
-BracketAfterInList="] "
-CitationSeparator="; "
-UniquefierSeparator=","
-GroupedNumbersSeparator="-"
-MinimumGroupingCount="3"
-FormatCitations="false"
-CitationCharacterFormat="Default"
-PageInfoSeparator="; "
+BracketBefore = "["
+BracketAfter  = "]"
+BracketBeforeInList = "["
+BracketAfterInList  = "] "
+CitationSeparator   = "; "
+UniquefierSeparator = ","
+GroupedNumbersSeparator = "-"
+MinimumGroupingCount = 3
+FormatCitations = false
+CitationCharacterFormat = "Default"
+PageInfoSeparator = "; "
 
 LAYOUT
 article=<b>\format[Authors(LastFirst,Semicolon)]{\author}</b> (<b>\year\uniq</b>). <i>\title</i>, \journal \volume\begin{pages} : \format[FormatPagesForHTML]{\pages}\end{pages}.
