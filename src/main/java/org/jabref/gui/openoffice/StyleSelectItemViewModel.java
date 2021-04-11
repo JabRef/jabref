@@ -16,7 +16,8 @@ public class StyleSelectItemViewModel {
     private final StringProperty name = new SimpleStringProperty("");
     private final StringProperty journals = new SimpleStringProperty("");
     private final StringProperty file = new SimpleStringProperty("");
-    private final ObjectProperty<Node> icon = new SimpleObjectProperty<>(IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode());
+    private final ObjectProperty<Node> icon =
+        new SimpleObjectProperty<>(IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode());
     private final OOBibStyle style;
     private final BooleanProperty internalStyle = new SimpleBooleanProperty();
 
