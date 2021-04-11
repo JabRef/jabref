@@ -24,7 +24,6 @@ public enum GlobalSaveManager {
     INSTANCE;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalSaveManager.class);
-
     private static DelayTaskThrottler<SaveResult> throttler = new DelayTaskThrottler<>(1000);
 
     public static void shutdown() {

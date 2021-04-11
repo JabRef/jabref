@@ -26,11 +26,8 @@ import org.slf4j.LoggerFactory;
 public class DelayTaskThrottler<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DelayTaskThrottler.class);
-
     private final ScheduledThreadPoolExecutor executor;
-
     private int delay;
-
     private ScheduledFuture<T> scheduledTask;
 
     /**
@@ -49,7 +46,6 @@ public class DelayTaskThrottler<T> {
         }
         try {
             scheduledTask = executor.schedule(command, delay, TimeUnit.MILLISECONDS);
-
         } catch (RejectedExecutionException e) {
             LOGGER.debug("Rejecting while another process is already running.");
         }

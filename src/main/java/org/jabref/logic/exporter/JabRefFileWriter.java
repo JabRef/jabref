@@ -10,16 +10,15 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class JabRefFileWriter extends OutputStreamWriter{
+public class JabRefFileWriter extends OutputStreamWriter {
+
+    private final CharsetEncoder encoder;
+    private final Set<Character> problemCharacters = new TreeSet<>();
 
     public JabRefFileWriter(Path file, Charset encoding) throws IOException {
         super(Files.newOutputStream(file));
         encoder = encoding.newEncoder();
     }
-
-    private final CharsetEncoder encoder;
-    private final Set<Character> problemCharacters = new TreeSet<>();
-
 
 
     @Override
