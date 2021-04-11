@@ -39,17 +39,26 @@ public class StyleLoaderTest {
 
     @Test
     public void throwNPEWithNullPreferences() {
-        assertThrows(NullPointerException.class, () -> loader = new StyleLoader(null, layoutPreferences, mock(Charset.class)));
+        assertThrows(NullPointerException.class,
+                     () -> loader = new StyleLoader(null,
+                                                    layoutPreferences,
+                                                    mock(Charset.class)));
     }
 
     @Test
     public void throwNPEWithNullLayoutPreferences() {
-        assertThrows(NullPointerException.class, () -> loader = new StyleLoader(mock(OpenOfficePreferences.class), null, mock(Charset.class)));
+        assertThrows(NullPointerException.class,
+                     () -> loader = new StyleLoader(mock(OpenOfficePreferences.class),
+                                                    null,
+                                                    mock(Charset.class)));
     }
 
     @Test
     public void throwNPEWithNullCharset() {
-        assertThrows(NullPointerException.class, () -> loader = new StyleLoader(mock(OpenOfficePreferences.class), layoutPreferences, null));
+        assertThrows(NullPointerException.class,
+                     () -> loader = new StyleLoader(mock(OpenOfficePreferences.class),
+                                                    layoutPreferences,
+                                                    null));
     }
 
     @Test
@@ -65,8 +74,9 @@ public class StyleLoaderTest {
         preferences.setExternalStyles(Collections.emptyList());
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
 
-        String filename = Path.of(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
-                              .toFile().getPath();
+        String p = StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH;
+        String u = StyleLoader.class.getResource(p).toURI();
+        String filename = Path.of(u).toFile().getPath();
         loader.addStyleIfValid(filename);
         assertEquals(NUMBER_OF_INTERNAL_STYLES + 1, loader.getStyles().size());
     }
@@ -82,16 +92,19 @@ public class StyleLoaderTest {
 
     @Test
     public void testInitalizeWithOneExternalFile() throws URISyntaxException {
-        String filename = Path.of(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
-                               .toFile().getPath();
-        when(preferences.getExternalStyles()).thenReturn(Collections.singletonList(filename));
+        String p = StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH;
+        String u = StyleLoader.class.getResource(p).toURI();
+        String filename = Path.of(u).toFile().getPath();
+        when(preferences.getExternalStyles())
+            .thenReturn(Collections.singletonList(filename));
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
         assertEquals(NUMBER_OF_INTERNAL_STYLES + 1, loader.getStyles().size());
     }
 
     @Test
     public void testInitalizeWithIncorrectExternalFile() {
-        preferences.setExternalStyles(Collections.singletonList("DefinitelyNotAValidFileNameOrWeAreExtremelyUnlucky"));
+        String s = "DefinitelyNotAValidFileNameOrWeAreExtremelyUnlucky";
+        preferences.setExternalStyles(Collections.singletonList(s));
 
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
         assertEquals(NUMBER_OF_INTERNAL_STYLES, loader.getStyles().size());
@@ -99,9 +112,11 @@ public class StyleLoaderTest {
 
     @Test
     public void testInitalizeWithOneExternalFileRemoveStyle() throws URISyntaxException {
-        String filename = Path.of(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
-                               .toFile().getPath();
-        when(preferences.getExternalStyles()).thenReturn(Collections.singletonList(filename));
+        String p = StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH;
+        String u = StyleLoader.class.getResource(p).toURI();
+        String filename = Path.of(u).toFile().getPath();
+        when(preferences.getExternalStyles())
+            .thenReturn(Collections.singletonList(filename));
 
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
         List<OOBibStyle> toremove = new ArrayList<>();
@@ -119,10 +134,14 @@ public class StyleLoaderTest {
     }
 
     @Test
-    public void testInitalizeWithOneExternalFileRemoveStyleUpdatesPreferences() throws URISyntaxException {
-        String filename = Path.of(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
-                               .toFile().getPath();
-        when(preferences.getExternalStyles()).thenReturn(Collections.singletonList(filename));
+    public void testInitalizeWithOneExternalFileRemoveStyleUpdatesPreferences()
+        throws
+        URISyntaxException {
+        String p = StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH;
+        String u = StyleLoader.class.getResource(p).toURI();
+        String filename = Path.of(u).toFile().getPath();
+        when(preferences.getExternalStyles())
+            .thenReturn(Collections.singletonList(filename));
 
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
         List<OOBibStyle> toremove = new ArrayList<>();
@@ -144,8 +163,9 @@ public class StyleLoaderTest {
         preferences.setExternalStyles(Collections.emptyList());
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
         int beforeAdding = loader.getStyles().size();
-        String filename = Path.of(StyleLoader.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
-                               .toFile().getPath();
+        String p = StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH;
+        String u = StyleLoader.class.getResource(p).toURI();
+        String filename = Path.of(u).toFile().getPath();
         loader.addStyleIfValid(filename);
         loader.addStyleIfValid(filename);
         assertEquals(beforeAdding + 1, loader.getStyles().size());
@@ -159,7 +179,8 @@ public class StyleLoaderTest {
 
     @Test
     public void testGetDefaultUsedStyleWhenEmpty() {
-        when(preferences.getCurrentStyle()).thenReturn(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
+        when(preferences.getCurrentStyle())
+            .thenReturn(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
         preferences.clearCurrentStyle();
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
         OOBibStyle style = loader.getUsedStyle();
@@ -170,7 +191,8 @@ public class StyleLoaderTest {
 
     @Test
     public void testGetStoredUsedStyle() {
-        when(preferences.getCurrentStyle()).thenReturn(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH);
+        when(preferences.getCurrentStyle())
+            .thenReturn(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH);
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
         OOBibStyle style = loader.getUsedStyle();
         assertTrue(style.isValid());
@@ -180,7 +202,8 @@ public class StyleLoaderTest {
 
     @Test
     public void testGetDefaultUsedStyleWhenIncorrect() {
-        when(preferences.getCurrentStyle()).thenReturn("ljlkjlkjnljnvdlsjniuhwelfhuewfhlkuewhfuwhelu");
+        when(preferences.getCurrentStyle())
+            .thenReturn("ljlkjlkjnljnvdlsjniuhwelfhuewfhlkuewhfuwhelu");
         loader = new StyleLoader(preferences, layoutPreferences, encoding);
         OOBibStyle style = loader.getUsedStyle();
         assertTrue(style.isValid());
