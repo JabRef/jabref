@@ -19,6 +19,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.layout.Layout;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.openoffice.OOBibStyle;
 import org.jabref.logic.openoffice.StyleLoader;
@@ -108,23 +109,33 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
                 .withContextMenu(item -> createContextMenu())
                 .install(tvStyles);
 
-        tvStyles.getSelectionModel().selectedItemProperty().addListener((observable, oldvalue, newvalue) -> {
-            if (newvalue == null) {
-                viewModel.selectedItemProperty().setValue(oldvalue);
-            } else {
-                viewModel.selectedItemProperty().setValue(newvalue);
-            }
-        });
+        tvStyles
+            .getSelectionModel()
+            .selectedItemProperty()
+            .addListener((observable, oldvalue, newvalue) -> {
+                    if (newvalue == null) {
+                        viewModel.selectedItemProperty().setValue(oldvalue);
+                    } else {
+                        viewModel.selectedItemProperty().setValue(newvalue);
+                    }
+                });
 
         tvStyles.setItems(viewModel.stylesProperty());
 
         add.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
 
-        EasyBind.subscribe(viewModel.selectedItemProperty(), style -> {
-            tvStyles.getSelectionModel().select(style);
-            previewArticle.setLayout(new TextBasedPreviewLayout(style.getStyle().getReferenceFormat(StandardEntryType.Article)));
-            previewBook.setLayout(new TextBasedPreviewLayout(style.getStyle().getReferenceFormat(StandardEntryType.Book)));
-        });
+        EasyBind.subscribe(viewModel.selectedItemProperty(),
+                           style -> {
+                               tvStyles.getSelectionModel().select(style);
+                               OOBibStyle obsStyle = style.getStyle();
+                               StandardEntryType a = StandardEntryType.Article;
+                               Layout al = obsStyle.getReferenceFormat(a);
+                               previewArticle.setLayout(new TextBasedPreviewLayout(al));
+
+                               StandardEntryType b = StandardEntryType.Book;
+                               Layout bl = obsStyle.getReferenceFormat(b);
+                               previewBook.setLayout(new TextBasedPreviewLayout(bl));
+                           });
     }
 
     private ContextMenu createContextMenu() {
