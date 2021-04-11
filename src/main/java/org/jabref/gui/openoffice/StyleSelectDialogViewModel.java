@@ -81,18 +81,15 @@ public class StyleSelectDialogViewModel {
                     styles.setAll(loadStyles());
                     selectedItem.setValue(getStyleOrDefault(stylePath));
                     if (!parseLog.isEmpty()) {
-                        // showInformationDialogAndWait shows a non-resizable window,
-                        // not wide enough.
-                        dialogService.showInformationDialogAndWait("Parse log", parseLog.format());
+                        dialogService.showInformationDialogAndWait("Parse log",
+                                                                   parseLog.formatShort());
                     }
                 } else {
                     dialogService.showErrorDialogAndWait(
                         Localization.lang("Invalid style selected"),
-                        Localization.lang(
-                            "You must select a valid style file."
-                            +" Your style is probably missing a line for the type \"default\".")
+                        Localization.lang("You must select a valid style file.")
                         + "\n"
-                        + parseLog.format()
+                        + parseLog.formatShort()
                         );
                 }
             });

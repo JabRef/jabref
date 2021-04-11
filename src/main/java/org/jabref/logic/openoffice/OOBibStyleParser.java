@@ -296,6 +296,32 @@ public class OOBibStyleParser {
             sb.append("\n");
             return sb.toString();
         }
+
+        public String formatShort() {
+            StringBuilder sb = new StringBuilder();
+            ParseLogEntry e = this;
+            sb.append("line");
+            sb.append(":");
+            sb.append(e.lineNumber);
+            sb.append(":");
+            switch (e.level) {
+            case ERROR:
+                sb.append("error:");
+                break;
+            case WARN:
+                sb.append("warning:");
+                break;
+            case INFO:
+                sb.append("info:");
+                break;
+            case OK:
+                sb.append("unexpected 'OK'");
+                break;
+            }
+            sb.append(e.message);
+            sb.append("\n");
+            return sb.toString();
+        }
     }
 
     public static class ParseLog {
@@ -325,6 +351,15 @@ public class OOBibStyleParser {
             StringBuilder sb = new StringBuilder();
             for (ParseLogEntry e : entries) {
                 sb.append(e.format());
+            }
+            return sb.toString();
+        }
+
+        // omits file path
+        public String formatShort(){
+            StringBuilder sb = new StringBuilder();
+            for (ParseLogEntry e : entries) {
+                sb.append(e.formatShort());
             }
             return sb.toString();
         }
