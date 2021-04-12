@@ -745,7 +745,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return this.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL);
     }
 
-    public boolean getCitPropertyItalicEtAl() {
+    public boolean getItalicEtAl() {
+        // "ItalicEtAl"
         return this.getBooleanCitProperty(OOBibStyle.ITALIC_ET_AL);
     }
 
