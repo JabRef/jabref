@@ -146,6 +146,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     /** Name of field that contains the authors. May be a list: "author/editor" */
     private static final String AUTHOR_FIELD = "AuthorField";
 
+    /** Name of field that contains the year. May be a list "year/anotherFieldWithYear" */
+    private static final String YEAR_FIELD = "YearField";
+
     /** How many authors to show before switching to "et al." */
     private static final String MAX_AUTHORS = "MaxAuthors";
 
@@ -174,8 +177,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     /**  "Smith et al.{ }[2000]" */
     private static final String IN_TEXT_YEAR_SEPARATOR = "InTextYearSeparator";
 
-    /** Name of field that contains the year. May be a list "year/anotherFieldWithYear" */
-    private static final String YEAR_FIELD = "YearField";
 
     /** "[Smith et al. 2000a{,}b; pp 10-13]" */
     private static final String UNIQUEFIER_SEPARATOR = "UniquefierSeparator";
@@ -272,9 +273,21 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
 
         // Set default obsCitProperties for the citation marker:
+
+        /*
+         * Character formatting.
+         */
+        obsCitProperties.put(FORMAT_CITATIONS, Boolean.FALSE);
+        // was "Default", but that is not knowm to LO
+        obsCitProperties.put(CITATION_CHARACTER_FORMAT, "Standard");
+        obsCitProperties.put(ITALIC_CITATIONS, Boolean.FALSE);
+        obsCitProperties.put(BOLD_CITATIONS, Boolean.FALSE);
+        obsCitProperties.put(SUPERSCRIPT_CITATIONS, Boolean.FALSE);
+        obsCitProperties.put(SUBSCRIPT_CITATIONS, Boolean.FALSE);
+
         obsCitProperties.put(AUTHOR_FIELD,
-                          FieldFactory.serializeOrFields(StandardField.AUTHOR,
-                                                         StandardField.EDITOR));
+                             FieldFactory.serializeOrFields(StandardField.AUTHOR,
+                                                            StandardField.EDITOR));
         obsCitProperties.put(YEAR_FIELD, StandardField.YEAR.getName());
         obsCitProperties.put(MAX_AUTHORS, 3);
         obsCitProperties.put(MAX_AUTHORS_FIRST, -1);
@@ -292,14 +305,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         obsCitProperties.put(PAGE_INFO_SEPARATOR, "; ");
         obsCitProperties.put(GROUPED_NUMBERS_SEPARATOR, "-");
         obsCitProperties.put(MINIMUM_GROUPING_COUNT, 3);
-        obsCitProperties.put(FORMAT_CITATIONS, Boolean.FALSE);
 
-        // was "Default", but that is not knowm to LO
-        obsCitProperties.put(CITATION_CHARACTER_FORMAT, "Standard");
-        obsCitProperties.put(ITALIC_CITATIONS, Boolean.FALSE);
-        obsCitProperties.put(BOLD_CITATIONS, Boolean.FALSE);
-        obsCitProperties.put(SUPERSCRIPT_CITATIONS, Boolean.FALSE);
-        obsCitProperties.put(SUBSCRIPT_CITATIONS, Boolean.FALSE);
         obsCitProperties.put(MULTI_CITE_CHRONOLOGICAL, Boolean.TRUE);
         obsCitProperties.put(BIBTEX_KEY_CITATIONS, Boolean.FALSE); //"BibTeXKeyCitations"
         obsCitProperties.put(ITALIC_ET_AL, Boolean.FALSE);
@@ -713,24 +719,36 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
     /**
      * Should citation markers be italicized?
-     * Only relevant if getFormatCitations() returns true.
      *
      * @return true to indicate that citations should be in italics.
      *
-     * TODO: unused
+     * TODO: unused getItalicCitations, getBoldCitations,
+     *       getSuperscriptCitations, getSubscriptCitations
+     *
+     * May be worth implementing, because only getItalicCitations has
+     *   a corresponding predefined character style in LibreOffice
+     *   (Emphasis), and asking the user to create a style complicates
+     *   usage.
+     *
+     * (a)  Alternatively, we could have a character style, for example
+     *      JR_citation that we always apply, and modify according to the
+     *      current style. But that might interact with other uses of
+     *      styles: I think a character can only have a single character
+     *      style applied: if we are doing that, then a style applied by the
+     *      user, for example a change in the font-size is going to be
+     *      overwritten. Is it possible to create partial styles, that
+     *      only override some, but not all character properties? Probably not.
+     *
+     * (b) Considering ItalicEtAl, we may want to switch to citation
+     *     marks generated as OOFormattedText instead of plain
+     *     text. If we do so, getItalicCitations et al could be
+     *     replaced by BracketBefore="<i>[" BracketAfter="]</i>".
+     *
+     *     Probably this is the way to go.
      */
     public boolean getItalicCitations() {
         return getBooleanCitProperty(ITALIC_CITATIONS);
     }
-
-    /**
-     * Should citation markers be bold?
-     * Only relevant if getFormatCitations() returns true.
-     *
-     * @return true to indicate that citations should be in bold.
-     *
-     * TODO: unused
-     */
     public boolean getBoldCitations() {
         return (Boolean) obsCitProperties.get(BOLD_CITATIONS);
     }
