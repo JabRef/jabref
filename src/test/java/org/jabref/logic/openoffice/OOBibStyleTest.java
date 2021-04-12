@@ -964,4 +964,41 @@ class OOBibStyleTest {
                                           layoutFormatterPreferences);
         assertTrue(style.isValid());
     }
+
+    @Test
+    void testParseError() throws Exception {
+        OOBibStyle style = new OOBibStyle("parseError.jstyle",
+                                          layoutFormatterPreferences);
+        assertFalse(style.isValid());
+        OOBibStyleParser.ParseLog pl = style.getParseLog();
+        assertTrue(pl.hasError());
+    }
+
+    @Test
+    void testParserWarning() throws Exception {
+        OOBibStyle style = new OOBibStyle("parserWarning.jstyle",
+                                          layoutFormatterPreferences);
+        assertTrue(style.isValid());
+        OOBibStyleParser.ParseLog pl = style.getParseLog();
+        assertFalse(pl.hasError());
+    }
+
+    @Test
+    void testParseMultilineRules() throws Exception {
+        OOBibStyle style = new OOBibStyle("multilineLayoutRule.jstyle",
+                                          layoutFormatterPreferences);
+        assertTrue(style.isValid());
+        OOBibStyleParser.ParseLog pl = style.getParseLog();
+        assertFalse(pl.hasError());
+    }
+
+    @Test
+    void testParseExample() throws Exception {
+        OOBibStyle style = new OOBibStyle("example_style_file.jstyle",
+                                          layoutFormatterPreferences);
+        assertTrue(style.isValid());
+        OOBibStyleParser.ParseLog pl = style.getParseLog();
+        assertFalse(pl.hasError());
+    }
 }
+

@@ -1,0 +1,377 @@
+#
+# This is an example style file for the OpenOffice integration part of
+# JabRef.
+#
+# The format of *.jstyle files are describe here:
+# https://docs.jabref.org/cite/openofficeintegration#the-style-file
+#
+# The format of the rules in teh LAYOUT section is detailed here:
+# https://docs.jabref.org/collaborative-work/export/customexports
+#
+#
+# This is a comment, due to # at the beginning of the line.
+# Comments and empty lines are ignored.
+#
+# Definitions:
+#    "citation" : reference to a source in the text
+#
+#    "citation group" : one or more citations grouped together,
+#                       typically in a pair or parentheses.
+#
+#                       Technically each citation is in a group,
+#                       single citations are in their own
+#                       single-element groups.
+#
+#    in-text in-parenthesis and hidden citations:
+#
+#         JabRef allows to mark individual citation groups as
+#
+#           in-parenthesis: "[Smith et al. 2000]" (this is the default form), or
+#           in-text: "Smith et al. [2000]" form.
+#                These two are only relevant for author-year citation styles.
+#
+#           hidden citations are not shown in the text, but appear in
+#                  the bibliography. They can be used to type your own
+#                  citations in the text, but still get help in
+#                  building the bibliography.
+#
+#           Some settings below allow a different value to be set for
+#           in-text citations.
+#
+#           Implementation note:
+#
+#                The "Merge" button in the GUI only merges
+#                in-parenthesis citation groups.
+#
+#                However selecting multiple sources and clicking "Cite in-text"
+#                will create a group of multiple in-text citations.
+#
+#                Even a group of multiple hidden citations can be created by
+#                "Insert empty citation".
+#
+# Note on paragraph and character styles in LibreOffice:
+#
+#  This concerns ReferenceHeaderParagraphFormat,
+#  ReferenceParagraphFormat and, if FormatCitations is true,
+#  CitationCharacterFormat below.
+#
+#  (1) JabRef does not manipulate named styles in LibreOffice.
+#
+#      If the jstyle file refers to a style that does not exist in the
+#      document, the user has to create the style in LibreOffice or
+#      edit the the name in jstyle file.
+#
+#  (2) Styles in LibreOffice have two names. One is the "Display name"
+#      shown to users, the other is the "internal name".
+#
+#      Locally one could use either, but the "Display name" depends on
+#      the locale, thus would fail for other users.
+#
+#      The "Refresh bibliography" now checks if the jstyle asks to
+#      apply a style by display name, and asks to change it. It will
+#      show the corresponding internal name, which otherwise I
+#      do not know how to get.
+#
+#
+NAME
+# The NAME section provides a name for the style.
+# It consists of a single (non-empty, non-comment) line.
+
+Example style file for JabRef-oo plugin.
+
+JOURNALS
+# The JOURNALS section lists journal names, one per line.
+Journal name 1
+Journal name 2
+
+PROPERTIES
+
+## The PROPERTIES and CITATION sections provide name=value pairs.
+## The names are fixed, also the type of the corresponding values.
+
+## There are three value types:
+## boolean: true or false
+## integer: like -1 or 113
+## string:  like "Hello there"
+
+## Title: string, the title of the bibliography.
+## default: "Bibliography"
+Title = "References"
+
+## ReferenceHeaderParagraphFormat : string.
+## The paragraph style for the title of the bibliography.
+## Should name a paragraph style known by OpenOffice/LibreOffice
+## default: "Heading 1"
+## example: ReferenceHeaderParagraphFormat = "Heading 2"
+
+## ReferenceParagraphFormat : string.
+## The paragraph style for the bibliography entries.
+## default: "Standard"
+## example: ReferenceParagraphFormat="Text body"
+ReferenceParagraphFormat="Text body"
+
+## IsNumberEntries : boolean, default: false
+## If true, than this style uses numbered citations.
+## If false, author-year style.
+##
+## Since numbered citations have different parts than
+## author-year citations, the value of IsNumberEntries
+## affects which properties are relevant.
+##
+## Note: if BibTeXKeyCitations is true (below, in the CITATION
+## section), then IsNumberEntries is irrelevant.
+##
+IsNumberEntries = false
+
+## IsSortByPosition : boolean, default: false.
+##
+## Determines how the bibliography is sorted.
+##
+## If true, the entries will be sorted according to the order in which
+## they are cited. Note: within a citation group 
+##
+## If false, the entries will be sorted alphabetically by authors.
+##
+## Only relevant for numbered citations.
+##
+IsSortByPosition = false
+
+CITATION
+
+## This section contains settings related to individual citations and
+## citation groups.
+
+## BibTeXKeyCitations : boolean, default: false
+## If true, citations are represented by their BibTex keys.
+## In this case IsNumberEntries is irrelevant.
+# BibTeXKeyCitations=false
+
+## MultiCiteChronological: boolean, default: true
+## If true, citations in a citation group are
+## sorted by (year,author,title), otherwise by (author,year,title).
+##
+## Relevant with author-year and BibTeXKeyCitations.
+##
+## Its relevance for numbered citations is less obviuous, because just
+## before we emit a citaion group, we sort the numbers appearing in
+## the group.
+##
+## For IsNumberEntries + IsSortByPosition, it affects the citations
+## position within citation groups, which may be observable in the
+## numbering.
+##
+## For IsNumberEntries + !IsSortByPosition, the numbering comes from
+## sorting the bibliography, thus MultiCiteChronological does not have
+## an effect.
+##
+MultiCiteChronological=true
+
+## Character formatting of citation groups.
+
+## FormatCitations: boolean, default: false
+## Decides if CitationCharacterFormat below should be applied.
+##
+## Note: when switching from a style with FormatCitations==true to one
+##       with FormatCitations==false, the character style established
+##       by the first is not removed from the citations. Applying a
+##       style with CitationCharacterFormat = "Standard" might help to
+##       avoid doing by hand.
+##
+FormatCitations = false
+
+## CitationCharacterFormat : string.
+## default: "Standard"
+##
+## A character format to apply to citation groups, as known to
+## LibreOffice.
+##
+## example: CitationCharacterFormat = "Standard"
+## example: CitationCharacterFormat = "Emphasis"
+## example: CitationCharacterFormat = "Example"
+# CitationCharacterFormat = "Standard"
+# CitationCharacterFormat="JR_citation"
+
+##
+## The following correspond to direct character formatting.
+## They are not controlled by FormatCitations.
+##
+
+## ItalicCitations  : boolean, default: false.
+## Not implemented.
+# ItalicCitations = false
+
+## BoldCitations  : boolean, default: false.
+## Not implemented.
+# BoldCitations = false
+
+## SuperscriptCitations : boolean, default: false.
+## Not implemented.
+# SuperscriptCitations = false
+
+## SubscriptCitations : boolean, default: false.
+## Not implemented.
+# SubscriptCitations = false
+
+##
+## For text fragments below, examples show the location
+## by bracketing the relevant part with "{}"
+##
+
+## BracketBefore : string, default: "("
+## Location: "{[}Smith 2000]"  "Smith {[}2000]" "{[}1]" "{[}bibtextkey]"
+BracketBefore="["
+
+## BracketAfter : string, default: ")"
+## Location: "[Smith 2000{]}" "Smith [2000{]}" "[1{]}" "[bibtextkey{]}"
+BracketAfter="]"
+
+## BracketBeforeInList : string, default: not set.
+## If not set, BracketBefore is used instead.
+## Purpose: for numbered styles, used in the entry labels in the bibliography.
+## Location: "{[}1]"
+## Not relevant for BibTeXKeyCitations and author-year.
+BracketBeforeInList="["
+
+## BracketAfterInList : string, default: not set.
+## If not set, BracketAfter is used instead.
+## Purpose: for numbered styles, used in the entry labels in the bibliography.
+## Location: "[1{]}"
+## Not relevant for BibTeXKeyCitations and author-year.
+BracketAfterInList="] "
+
+## PageInfoSeparator : string, default: "; "
+## Location: "[Smith 2000a{; }pp 10-13]" "Smith [2000a{; }pp 10-13]" "[1{; }pp 10-13]"
+## Not used for BibTeXKeyCitations (maybe it should be)
+PageInfoSeparator = "; "
+
+## CitationSeparator : string, default: "; "
+## Location: between citations in the same citation group.
+##           "[Smith 2000{; }Jones 2001]" "Smith [2000{; }Jones [2001]" "[1{; }2]"
+CitationSeparator="; "
+
+##
+## Settings that only apply to numeric citation style.
+##
+
+## MinimumGroupingCount : int, default: 3
+## Purpose: How many consecutive numbers in "[1; 2; 3]" allows grouping to "[1-3]"
+MinimumGroupingCount=3
+
+## GroupedNumbersSeparator : string, default: "-"
+## Purpose: for numeric style, when consecutive numbers collapsed to a
+##          range, this is used as the separator between range start
+##          and range end.
+## Location: "[1{-}3]"
+GroupedNumbersSeparator="-"
+
+##
+## Settings that only apply to author-year style.
+##
+
+## AuthorField : string, default: "author/editor"
+##
+## Purpose: When looking for authors, which bibtex fields to look in?
+##
+##          The field names are separated by "/", the first field that
+##          exists and is not empty applies.
+AuthorField="author/editor"
+
+## YearField : string, default: "year"
+##
+## Purpose: When looking for the year, which bibtex fields to look in?
+##
+##          The field names are separated by "/", the first field that
+##          exists and is not empty applies.
+##
+YearField="year"
+
+## MaxAuthors : int, default: 3
+## Purpose: How many author names to show in citations?
+##          If there are more, "FirstAuthor et al." will be used instead.
+## Special value: -1 encodes "unlimited"
+MaxAuthors=2
+
+## MaxAuthorsFirst : int, default: -1
+## Purpose: some styles require a different value of MaxAuthors for
+##          the first appearance of a source.
+## Special value: -1 encodes "unlimited"
+##
+MaxAuthorsFirst=6
+
+## AuthorSeparator : string, default: ", "
+## Location: "[Smith{, }Jones, and Brown 2000]"
+AuthorSeparator=", "
+
+## OxfordComma : string, default: ""
+## Location: "[Smith, Jones{,} and Brown 2000]"
+# example: OxfordComma = ","
+
+## AuthorLastSeparator : string default: " & "
+## Location: "[Smith, Jones,{ and }Brown 2000]" */
+AuthorLastSeparator=" & "
+
+## AuthorLastSeparatorInText : string, default: not set.
+## If not set, AuthorLastSeparator is used instead.
+## Purpose: for in-text "Author (year)" citations,
+##          allows alternative value for AuthorLastSeparator.
+## Location:  "Smith, Jones,{ and }Brown [2000]"
+AuthorLastSeparatorInText=" and "
+
+## EtAlString : string, default: "et al."
+## Location: "[Smith{ et al.} 2000]" "Smith{ et al.} [2000]"
+## Purpose: if there are more authors than allowed by MaxAuthors,
+##          only the first author name is shown. EtAlString indicates
+##          the omission of the other names.
+EtAlString=" et al."
+
+## YearSeparator : string, default: ", "
+## Location: just after the authors, for in-parenthesis citations: "[Smith et al.{ }2000]"
+YearSeparator=" "
+
+## InTextYearSeparator : string, default: " "
+## Location: "Smith et al.{ }[2000]"
+InTextYearSeparator=" "
+
+## UniquefierSeparator : string, default: ","
+## Location: "[Smith et al. 2000a{,}b; pp 10-13]"
+UniquefierSeparator=","
+
+LAYOUT
+##
+## The LAYOUT section provides formatting rules for the bibliography entries.
+##
+## In the name=value pairs below, "name" is either a bibtex entry type (article, ...)
+## or "default" (fallback in case there is no formatting provided for a bibtex entry type.
+##
+## The default entry is required.
+##
+## Note:
+##  (1) White spaces are significant in the rules.
+##
+##  (2) You can split the value to multiple lines.
+##      Each part must be between two "|" characters.
+##      Each part (except the first) has its own line.
+##      An empty line terminates the rule.
+##      See below at the book and incollection rules.
+##
+article=<b>\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}</b> (<b>\year\uniq</b>). <i>\title</i>, \journal \volume\begin{pages} : \format[FormatPagesForHTML]{\pages}\end{pages}.
+
+book = |\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}|
+       |\begin{editor}|
+       |\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\editor} (Ed.)|
+       |\end{editor},|
+       | <b>\year\uniq</b>. <i>\title</i>. \publisher, \address.|
+
+incollection = ||
+|\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author}|
+# We can add comments between the lines (still has to start at the first column).
+| (<b>\year\uniq</b>). <i>\title</i>.|
+| In: \format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\editor} (Ed.),|
+| <i>\booktitle</i>, \publisher.|
+
+inbook=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author} (<b>\year\uniq</b>). <i>\chapter</i>. In: \format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\editor} (Ed.), <i>\title</i>, \publisher.
+
+phdthesis=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author} (<b>\year\uniq</b>). <i>\title</i>, \school.
+
+default=\format[AuthorLastFirst,AuthorAbbreviator,AuthorAndsReplacer]{\author} (<b>\year\uniq</b>). <i>\title</i>, \journal \volume\begin{pages} : \format[FormatPagesForHTML]{\pages}\end{pages}.
+

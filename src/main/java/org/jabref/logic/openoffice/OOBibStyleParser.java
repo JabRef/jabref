@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.layout.Layout;
@@ -41,6 +42,9 @@ public class OOBibStyleParser {
 
     private static final Pattern QUOTED = Pattern.compile("\".*\"");
     private static final Pattern NUM_PATTERN = Pattern.compile("-?\\d+");
+    private static final Pattern LAYOUT_MULTILINE_STARTER =
+        Pattern.compile("^\\s*([^\\s=]+)\\s*[=]\\s*[|](.*)[|]\\s*$");
+    private static final Pattern LAYOUT_MULTILINE_CONTINUATION = Pattern.compile("^\\s*[|](.*)[|]\\s*$");
 
     private static final Set<String> SECTION_NAMES =
         Set.of(NAME_MARK, JOURNALS_MARK, PROPERTIES_MARK, CITATION_MARK, LAYOUT_MARK);
@@ -248,7 +252,8 @@ public class OOBibStyleParser {
         IN_JOURNALS_SECTION,
         IN_PROPERTIES_SECTION,
         IN_CITATION_SECTION,
-        IN_LAYOUT_SECTION
+        IN_LAYOUT_SECTION,
+        IN_LAYOUT_SECTION_MULTILINE
     }
 
 
@@ -338,6 +343,9 @@ public class OOBibStyleParser {
         void warn(String fileName, int lineNumber, String message) {
             this.entries.add(new ParseLogEntry(ParseLogLevel.WARN, fileName, lineNumber, message));
         }
+        void info(String fileName, int lineNumber, String message) {
+            this.entries.add(new ParseLogEntry(ParseLogLevel.INFO, fileName, lineNumber, message));
+        }
 
         public int size() {
             return entries.size();
@@ -389,6 +397,14 @@ public class OOBibStyleParser {
      * - To reduce friction, (OOBibStyleParser.patient == true) turns
      *   "unparsable lines", "extra quotes", "missing quotes", "unknown property"
      *   into a warning (instead of error).
+     *
+     * - To avoid the necessity of long lines in the LAYOUT section,
+     *   if the RHS matches "|.*|", than we switch to multiline LAYOUT mode
+     *   for the given entry, and collect lines matching to "|.*|" into the value.
+     *   We expect an empty line to terminate the multiline rule.
+     *   The "|" characters are stripped and the rest are concatenated before
+     *   using the value.
+     *
      */
     public static ParseLog readFormatFile(Reader in, OOBibStyle style, String fileName)
         throws
@@ -406,11 +422,21 @@ public class OOBibStyleParser {
         // Store a local copy for viewing
         style.localCopy = sb.toString();
 
+        // Add EOL and a fake an empty line at the end. In case
+        // IN_LAYOUT_SECTION_MULTILINE is terminated by EOF,
+        // this will trigger closing.
         // Break into separate lines:
+        sb.append("\n \n ");
         String[] lines = sb.toString().split("\n");
-        BibStyleMode mode = BibStyleMode.BEFORE_NAME_SECTION;
 
+        BibStyleMode mode = BibStyleMode.BEFORE_NAME_SECTION;
         int lineNumber = 0;
+
+        // For multiline LAYOUT rules
+        int layoutLineCollectorStartLine = -1;
+        String layoutLineCollectorName = "***";
+        List<String> layoutLineCollectorValue = new ArrayList<>();
+
         for (String line1 : lines) {
             String line = line1;
             lineNumber++;
@@ -422,13 +448,13 @@ public class OOBibStyleParser {
 
             final String trimmedLine = line.trim();
 
-            // Skip empty lines:
-            if (trimmedLine.isEmpty()) {
+            // Skip empty lines, unless we are in IN_LAYOUT_SECTION_MULTILINE
+            if (trimmedLine.isEmpty() && (mode != BibStyleMode.IN_LAYOUT_SECTION_MULTILINE) ) {
                 continue;
             }
 
             // Skip comment:
-            if (line.charAt(0) == '#') {
+            if (line.length() > 0 && line.charAt(0) == '#') {
                 continue;
             }
 
@@ -554,11 +580,52 @@ public class OOBibStyleParser {
                 }
 
             case IN_LAYOUT_SECTION:
-                ParseLogLevel res = handleLayoutLine(line, style, fileName, lineNumber, logger);
-                if (res == ParseLogLevel.ERROR) {
-                    return logger;
-                } else {
+                Matcher ms = LAYOUT_MULTILINE_STARTER.matcher(line);
+                if (ms.find()) {
+                    layoutLineCollectorStartLine = lineNumber;
+                    layoutLineCollectorName = ms.group(1);
+                    layoutLineCollectorValue = new ArrayList<>();
+                    layoutLineCollectorValue.add(ms.group(2));
+                    mode = BibStyleMode.IN_LAYOUT_SECTION_MULTILINE;
                     continue;
+                } else {
+                    ParseLogLevel res = handleLayoutLine(line, style, fileName, lineNumber, logger);
+                    if (res == ParseLogLevel.ERROR) {
+                        return logger;
+                    } else {
+                        continue;
+                    }
+                }
+            case IN_LAYOUT_SECTION_MULTILINE:
+                Matcher mc = LAYOUT_MULTILINE_CONTINUATION.matcher(line);
+                if (mc.find()) {
+                    layoutLineCollectorValue.add(mc.group(1));
+                    continue;
+                } else if (trimmedLine.equals("")) {
+                    ParseLogLevel res = handleLayoutLineParts(layoutLineCollectorName,
+                                                              String.join("", layoutLineCollectorValue),
+                                                              style,
+                                                              fileName,
+                                                              layoutLineCollectorStartLine,
+                                                              logger );
+
+                    layoutLineCollectorName = "***";
+                    layoutLineCollectorValue = new ArrayList<>();
+                    layoutLineCollectorStartLine = -1;
+
+                    mode = BibStyleMode.IN_LAYOUT_SECTION;
+
+                    if (res == ParseLogLevel.ERROR) {
+                        return logger;
+                    } else {
+                        continue;
+                    }
+                } else {
+                    logger.error(fileName,
+                                 lineNumber,
+                                 "line is neither empty, nor |.*|"
+                                 + " while expecting multiline LAYOUT rule continuation.");
+                    return logger;
                 }
 
             default:
@@ -568,7 +635,11 @@ public class OOBibStyleParser {
 
         // Set validity boolean based on whether we found every section
         // in the file.
-        if (mode != BibStyleMode.IN_LAYOUT_SECTION) {
+        if (mode == BibStyleMode.IN_LAYOUT_SECTION_MULTILINE) {
+            logger.error(fileName, lineNumber, "Reached end of file inside a multiline LAYOUT rule.");
+            return logger;
+        }
+        if (mode != BibStyleMode.IN_LAYOUT_SECTION && mode != BibStyleMode.IN_LAYOUT_SECTION_MULTILINE) {
             logger.error(fileName, lineNumber, "Did not reach LAYOUT section at EOF");
             return logger;
         }
@@ -699,6 +770,20 @@ public class OOBibStyleParser {
 
         String name = line.substring(0, index);
         String formatString = line.substring(index + 1);
+        return handleLayoutLineParts(name,
+                                     formatString,
+                                     style,
+                                     fileName,
+                                     lineNumber,
+                                     logger );
+    }
+
+    private static ParseLogLevel handleLayoutLineParts(String name,
+                                                       String formatString,
+                                                       OOBibStyle style,
+                                                       String fileName,
+                                                       int lineNumber,
+                                                       ParseLog logger) {
 
         // Parse name: actually look up in a closed list, or
         // return {@code new UnknownEntryType(typeName)}
