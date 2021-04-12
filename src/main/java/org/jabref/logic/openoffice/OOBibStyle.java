@@ -101,9 +101,11 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     // TODO: BOLD_CITATIONS is not implemented
     private static final String BOLD_CITATIONS = "BoldCitations";
 
-    // TODO: SUBSCRIPT_CITATIONS, SUPERSCRIPT_CITATIONS are not implemented
-    private static final String SUBSCRIPT_CITATIONS = "SubscriptCitations";
+    // TODO: SUPERSCRIPT_CITATIONS is not implemented
     private static final String SUPERSCRIPT_CITATIONS = "SuperscriptCitations";
+
+    // TODO: SUBSCRIPT_CITATIONS is not implemented
+    private static final String SUBSCRIPT_CITATIONS = "SubscriptCitations";
 
     /*
      * common (numeric and author-year)
@@ -690,18 +692,16 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return getBooleanProperty(IS_SORT_BY_POSITION);
     }
 
+    /*
+     * Character formatting
+     */
+
     /**
      * Should citation markers be formatted
-     * according to the results of the
-     *  - getItalicCitations() // not implemented
-     *  - isBoldCitations()   // not implemented
-     *  - getCitationCharacterFormat() // yes
-     *  methods?
+     * according to getCitationCharacterFormat()?
      *
-     * There is also SUPERSCRIPT_CITATIONS, SUBSCRIPT_CITATIONS
-     *
-     * @return true to indicate that citations should be formatted to getCitationCharacterFormat()
-     *          in italics (or bold).
+     * @return true to indicate that citations should be formatted to
+     *              getCitationCharacterFormat().
      */
     public boolean getFormatCitations() {
         return (Boolean) obsCitProperties.get(FORMAT_CITATIONS);
@@ -731,9 +731,19 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      *
      * TODO: unused
      */
-    public boolean isBoldCitations() {
+    public boolean getBoldCitations() {
         return (Boolean) obsCitProperties.get(BOLD_CITATIONS);
     }
+    public boolean getSuperscriptCitations() {
+        return (Boolean) obsCitProperties.get(SUPERSCRIPT_CITATIONS);
+    }
+    public boolean getSubscriptCitations() {
+        return (Boolean) obsCitProperties.get(SUBSCRIPT_CITATIONS);
+    }
+
+    /*
+     *
+     */
 
     public boolean getBibTeXKeyCitations() {
         // "BibTeXKeyCitations"
