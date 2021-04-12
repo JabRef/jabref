@@ -46,7 +46,7 @@ class OOBibStyleTest {
                                           layoutFormatterPreferences);
         assertTrue(style.isValid());
         assertTrue(style.isInternalStyle());
-        assertFalse(style.isCitationKeyCiteMarkers());
+        assertFalse(style.getBibTeXKeyCitations());
         assertFalse(style.isBoldCitations());
         assertFalse(style.getFormatCitations());
         assertFalse(style.isItalicCitations());
@@ -62,7 +62,7 @@ class OOBibStyleTest {
         OOBibStyle style = new OOBibStyle(defFile, layoutFormatterPreferences, StandardCharsets.UTF_8);
         assertTrue(style.isValid());
         assertFalse(style.isInternalStyle());
-        assertFalse(style.isCitationKeyCiteMarkers());
+        assertFalse(style.getBibTeXKeyCitations());
         assertFalse(style.isBoldCitations());
         assertFalse(style.getFormatCitations());
         assertFalse(style.isItalicCitations());
@@ -75,7 +75,7 @@ class OOBibStyleTest {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                                           layoutFormatterPreferences);
         assertTrue(style.isValid());
-        assertFalse(style.isCitationKeyCiteMarkers());
+        assertFalse(style.getBibTeXKeyCitations());
         assertFalse(style.isBoldCitations());
         assertFalse(style.getFormatCitations());
         assertFalse(style.isItalicCitations());

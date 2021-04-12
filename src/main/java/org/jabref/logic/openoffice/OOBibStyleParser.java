@@ -224,7 +224,7 @@ public class OOBibStyleParser {
         res.put("SuperscriptCitations", PropertyType.BOOL);
         res.put("SubscriptCitations", PropertyType.BOOL);
         res.put("MultiCiteChronological", PropertyType.BOOL);
-        res.put("BibTeXKeyCitations", PropertyType.BOOL); // CITATION_KEY_CITATIONS
+        res.put("BibTeXKeyCitations", PropertyType.BOOL); // BIBTEX_KEY_CITATIONS
         res.put("ItalicEtAl", PropertyType.BOOL);
         res.put("OxfordComma", PropertyType.STRING);
         res.put("UniquefierSeparator", PropertyType.STRING);

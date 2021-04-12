@@ -83,7 +83,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     /*
      * general
      */
-    private static final String CITATION_KEY_CITATIONS = "BibTeXKeyCitations";
+    private static final String BIBTEX_KEY_CITATIONS = "BibTeXKeyCitations";
     private static final String MULTI_CITE_CHRONOLOGICAL = "MultiCiteChronological";
 
     // general / formatting citations
@@ -299,7 +299,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         obsCitProperties.put(SUPERSCRIPT_CITATIONS, Boolean.FALSE);
         obsCitProperties.put(SUBSCRIPT_CITATIONS, Boolean.FALSE);
         obsCitProperties.put(MULTI_CITE_CHRONOLOGICAL, Boolean.TRUE);
-        obsCitProperties.put(CITATION_KEY_CITATIONS, Boolean.FALSE); //"BibTeXKeyCitations"
+        obsCitProperties.put(BIBTEX_KEY_CITATIONS, Boolean.FALSE); //"BibTeXKeyCitations"
         obsCitProperties.put(ITALIC_ET_AL, Boolean.FALSE);
         obsCitProperties.put(OXFORD_COMMA, "");
     }
@@ -735,9 +735,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return (Boolean) obsCitProperties.get(BOLD_CITATIONS);
     }
 
-    public boolean isCitationKeyCiteMarkers() {
+    public boolean getBibTeXKeyCitations() {
         // "BibTeXKeyCitations"
-        return (Boolean) obsCitProperties.get(CITATION_KEY_CITATIONS);
+        return (Boolean) obsCitProperties.get(BIBTEX_KEY_CITATIONS);
     }
 
     public boolean getCitPropertyMultiCiteChronological() {

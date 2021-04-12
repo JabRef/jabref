@@ -880,7 +880,7 @@ class OOBibBase {
         throws
         BibEntryNotFoundException {
 
-        assert style.isCitationKeyCiteMarkers();
+        assert style.getBibTeXKeyCitations();
 
         cgs.createPlainBibliographySortedByComparator(OOBibBase.entryComparator);
 
@@ -972,7 +972,7 @@ class OOBibBase {
 
     /**
      * Produce citMarkers for normal
-     * (!isCitationKeyCiteMarkers &amp;&amp; !IsNumberEntries) styles.
+     * (!getBibTeXKeyCitations &amp;&amp; !getIsNumberEntries) styles.
      *
      * @param referenceMarkNames Names of reference marks.
      * @param bibtexKeysIn       Bibtex citation keys.
@@ -987,7 +987,7 @@ class OOBibBase {
         throws
         BibEntryNotFoundException {
 
-        assert !style.isCitationKeyCiteMarkers();
+        assert !style.getBibTeXKeyCitations();
         assert !style.getIsNumberEntries();
         // Citations in (Au1, Au2 2000) form
 
@@ -1707,7 +1707,7 @@ class OOBibBase {
         //
         // Question: is there a case when we do not need order-of-appearance?
         //
-        // style.isCitationKeyCiteMarkers() : ???
+        // style.getBibTeXKeyCitations() : ???
         // style.getIsNumberEntries() && style.getIsSortByPosition() :
         //             needs order-of-appearance for numbering
         // style.getIsNumberEntries() && !style.getIsSortByPosition() : ???
@@ -1727,7 +1727,7 @@ class OOBibBase {
         // fill citMarkers
         Map<String, String> uniqueLetters = new HashMap<>();
 
-        if (style.isCitationKeyCiteMarkers()) {
+        if (style.getBibTeXKeyCitations()) {
             citMarkers = produceCitationMarkersForIsCitationKeyCiteMarkers(cgs, style);
         } else if (style.getIsNumberEntries()) {
             if (style.getIsSortByPosition()) {
@@ -1736,7 +1736,7 @@ class OOBibBase {
                 citMarkers = produceCitationMarkersForIsNumberEntriesNotSortByPosition(cgs, style);
             }
         } else {
-            /* Normal case, (!isCitationKeyCiteMarkers && !IsNumberEntries) */
+            /* Normal case, (!getBibTeXKeyCitations && !getIsNumberEntries) */
             citMarkers = produceCitationMarkersForNormalStyle(cgs, style);
         }
 
@@ -1872,7 +1872,7 @@ class OOBibBase {
                                                    Collections.emptyList());
             } else {
                 // !style.getIsNumberEntries() : emit no prefix
-                // TODO: We might want [citationKey] prefix for style.isCitationKeyCiteMarkers();
+                // TODO: We might want [citationKey] prefix for style.getBibTeXKeyCitations();
             }
 
             if ( ck.db.isEmpty() ) {
