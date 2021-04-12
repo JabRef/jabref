@@ -93,7 +93,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     // TODO:  ITALIC_CITATIONS ItalicCitations is not implemented
     // status:
     // - jstyles.jabref.org-master : 4 styles mention it, value is false in all of them.
-    // - getter: isItalicCitations() exists, but only called from tests, to assert it is false.
+    // - getter: getItalicCitations() exists, but only called from tests, to assert it is false.
     // - default: citProperties.put(ITALIC_CITATIONS, Boolean.FALSE);
     //
     private static final String ITALIC_CITATIONS = "ItalicCitations";
@@ -693,7 +693,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     /**
      * Should citation markers be formatted
      * according to the results of the
-     *  - isItalicCitations() // not implemented
+     *  - getItalicCitations() // not implemented
      *  - isBoldCitations()   // not implemented
      *  - getCitationCharacterFormat() // yes
      *  methods?
@@ -719,7 +719,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      *
      * TODO: unused
      */
-    public boolean isItalicCitations() {
+    public boolean getItalicCitations() {
         return getBooleanCitProperty(ITALIC_CITATIONS);
     }
 
