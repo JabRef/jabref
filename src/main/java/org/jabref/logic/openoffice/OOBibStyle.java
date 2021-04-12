@@ -68,11 +68,11 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * Keys for the PROPERTIES section of a *.jstyle file.
      */
     private static final String TITLE = "Title";
-
-    private static final String IS_SORT_BY_POSITION = "IsSortByPosition";
-    private static final String IS_NUMBER_ENTRIES = "IsNumberEntries";
     private static final String REFERENCE_HEADER_PARAGRAPH_FORMAT = "ReferenceHeaderParagraphFormat";
     private static final String REFERENCE_PARAGRAPH_FORMAT = "ReferenceParagraphFormat";
+
+    private static final String IS_NUMBER_ENTRIES = "IsNumberEntries";
+    private static final String IS_SORT_BY_POSITION = "IsSortByPosition";
 
     /*
      * Keys for the CITATION section of a *.jstyle file.
@@ -728,9 +728,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return (Boolean) obsCitProperties.get(BOLD_CITATIONS);
     }
 
-    
-
     public boolean isCitationKeyCiteMarkers() {
+        // "BibTeXKeyCitations"
         return (Boolean) obsCitProperties.get(CITATION_KEY_CITATIONS);
     }
 
