@@ -289,7 +289,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         obsCitProperties.put(GROUPED_NUMBERS_SEPARATOR, "-");
         obsCitProperties.put(MINIMUM_GROUPING_COUNT, 3);
         obsCitProperties.put(FORMAT_CITATIONS, Boolean.FALSE);
-        obsCitProperties.put(CITATION_CHARACTER_FORMAT, "Default");
+
+        // was "Default", but that is not knowm to LO
+        obsCitProperties.put(CITATION_CHARACTER_FORMAT, "Standard");
         obsCitProperties.put(ITALIC_CITATIONS, Boolean.FALSE);
         obsCitProperties.put(BOLD_CITATIONS, Boolean.FALSE);
         obsCitProperties.put(SUPERSCRIPT_CITATIONS, Boolean.FALSE);
