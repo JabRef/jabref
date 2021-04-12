@@ -67,7 +67,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     /*
      * Keys for the PROPERTIES section of a *.jstyle file.
      */
-    private static final String REFERENCE_HEADER_TEXT = "Title"; // getReferenceHeaderText
+
+    // getReferenceHeaderText
+    private static final String REFERENCE_HEADER_TEXT = "Title";
     private static final String REFERENCE_HEADER_PARAGRAPH_FORMAT = "ReferenceHeaderParagraphFormat";
     private static final String REFERENCE_PARAGRAPH_FORMAT = "ReferenceParagraphFormat";
 
@@ -674,7 +676,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      *
      * @return true if we use numbered citations, false otherwise.
      */
-    public boolean isNumberEntries() {
+    public boolean getIsNumberEntries() {
         return getBooleanProperty(IS_NUMBER_ENTRIES);
     }
 
@@ -684,7 +686,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      *
      * @return true to sort by order of appearance, false to sort alphabetically.
      */
-    public boolean isSortByPosition() {
+    public boolean getIsSortByPosition() {
         return getBooleanProperty(IS_SORT_BY_POSITION);
     }
 

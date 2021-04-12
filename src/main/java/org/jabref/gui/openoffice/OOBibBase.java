@@ -920,8 +920,8 @@ class OOBibBase {
         throws
         BibEntryNotFoundException {
 
-        assert style.isNumberEntries();
-        assert style.isSortByPosition();
+        assert style.getIsNumberEntries();
+        assert style.getIsSortByPosition();
 
         cgs.createNumberedBibliographySortedInOrderOfAppearance();
 
@@ -949,8 +949,8 @@ class OOBibBase {
     private Map<CitationGroupID,String>
     produceCitationMarkersForIsNumberEntriesNotSortByPosition(CitationGroups cgs,
                                                               OOBibStyle style) {
-        assert style.isNumberEntries();
-        assert !style.isSortByPosition();
+        assert style.getIsNumberEntries();
+        assert !style.getIsSortByPosition();
 
         cgs.createNumberedBibliographySortedByComparator( entryComparator );
 
@@ -972,7 +972,7 @@ class OOBibBase {
 
     /**
      * Produce citMarkers for normal
-     * (!isCitationKeyCiteMarkers &amp;&amp; !isNumberEntries) styles.
+     * (!isCitationKeyCiteMarkers &amp;&amp; !IsNumberEntries) styles.
      *
      * @param referenceMarkNames Names of reference marks.
      * @param bibtexKeysIn       Bibtex citation keys.
@@ -988,7 +988,7 @@ class OOBibBase {
         BibEntryNotFoundException {
 
         assert !style.isCitationKeyCiteMarkers();
-        assert !style.isNumberEntries();
+        assert !style.getIsNumberEntries();
         // Citations in (Au1, Au2 2000) form
 
         CitedKeys sortedCitedKeys = cgs.getCitedKeysSortedInOrderOfAppearance();
@@ -1477,7 +1477,7 @@ class OOBibBase {
             }
 
             // The text we insert
-            String citeText = (style.isNumberEntries()
+            String citeText = (style.getIsNumberEntries()
                                ? "[-]" // A dash only. Only refresh later.
                                : style.getCitationMarker(citationMarkerEntries,
                                                          inParenthesis,
@@ -1708,8 +1708,9 @@ class OOBibBase {
         // Question: is there a case when we do not need order-of-appearance?
         //
         // style.isCitationKeyCiteMarkers() : ???
-        // style.isNumberEntries() && style.isSortByPosition() : needs order-of-appearance for numbering
-        // style.isNumberEntries() && !style.isSortByPosition() : ???
+        // style.getIsNumberEntries() && style.getIsSortByPosition() :
+        //             needs order-of-appearance for numbering
+        // style.getIsNumberEntries() && !style.getIsSortByPosition() : ???
         // produceCitationMarkersForNormalStyle : needs order-of-appearance for uniqueLetters
         //
         {
@@ -1728,14 +1729,14 @@ class OOBibBase {
 
         if (style.isCitationKeyCiteMarkers()) {
             citMarkers = produceCitationMarkersForIsCitationKeyCiteMarkers(cgs, style);
-        } else if (style.isNumberEntries()) {
-            if (style.isSortByPosition()) {
+        } else if (style.getIsNumberEntries()) {
+            if (style.getIsSortByPosition()) {
                 citMarkers = produceCitationMarkersForIsNumberEntriesIsSortByPosition(cgs, style);
             } else {
                 citMarkers = produceCitationMarkersForIsNumberEntriesNotSortByPosition(cgs, style);
             }
         } else {
-            /* Normal case, (!isCitationKeyCiteMarkers && !isNumberEntries) */
+            /* Normal case, (!isCitationKeyCiteMarkers && !IsNumberEntries) */
             citMarkers = produceCitationMarkersForNormalStyle(cgs, style);
         }
 
@@ -1786,7 +1787,7 @@ class OOBibBase {
      * Rebuilds the bibliography.
      *
      *  Note: assumes fresh `jabRefReferenceMarkNamesSortedByPosition`
-     *  if `style.isSortByPosition()`
+     *  if `style.getIsSortByPosition()`
      */
     private void rebuildBibTextSection(DocumentConnection documentConnection,
                                        OOBibStyle style,
@@ -1835,8 +1836,8 @@ class OOBibBase {
         final boolean debugThisFun = false;
 
         if (debugThisFun) {
-            System.out.printf("Ref isSortByPosition %s\n", style.isSortByPosition());
-            System.out.printf("Ref isNumberEntries  %s\n", style.isNumberEntries());
+            System.out.printf("Ref IsSortByPosition %s\n", style.getIsSortByPosition());
+            System.out.printf("Ref IsNumberEntries  %s\n", style.getIsNumberEntries());
         }
 
         String parStyle = style.getReferenceParagraphFormat();
@@ -1855,7 +1856,7 @@ class OOBibBase {
             OOUtil.insertParagraphBreak(documentConnection.xText, cursor);
 
             // insert marker "[1]"
-            if (style.isNumberEntries()) {
+            if (style.getIsNumberEntries()) {
 
                 if ( ck.number.isEmpty() ) {
                     throw new RuntimeException(
@@ -1870,7 +1871,7 @@ class OOBibBase {
                                                    marker,
                                                    Collections.emptyList());
             } else {
-                // !style.isNumberEntries() : emit no prefix
+                // !style.getIsNumberEntries() : emit no prefix
                 // TODO: We might want [citationKey] prefix for style.isCitationKeyCiteMarkers();
             }
 
