@@ -258,12 +258,14 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private void setDefaultProperties() {
         // Set default property values:
         obsProperties.put(TITLE, "Bibliography");
-
-        obsProperties.put(IS_SORT_BY_POSITION, Boolean.FALSE);
-        obsProperties.put(IS_NUMBER_ENTRIES, Boolean.FALSE);
-
-        obsProperties.put(REFERENCE_PARAGRAPH_FORMAT, "Default");
         obsProperties.put(REFERENCE_HEADER_PARAGRAPH_FORMAT, "Heading 1");
+
+        // Note: was default, but that is not known to LO
+        obsProperties.put(REFERENCE_PARAGRAPH_FORMAT, "Standard");
+
+        obsProperties.put(IS_NUMBER_ENTRIES, Boolean.FALSE);
+        obsProperties.put(IS_SORT_BY_POSITION, Boolean.FALSE);
+
 
         // Set default obsCitProperties for the citation marker:
         obsCitProperties.put(AUTHOR_FIELD,
