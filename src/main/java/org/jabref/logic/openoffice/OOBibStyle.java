@@ -237,7 +237,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         this.styleFile = Objects.requireNonNull(styleFile);
         this.encoding = Objects.requireNonNull(encoding);
         // setDefaultProperties(); // moved into initialize()
-        reload();
+        obsReload();
         fromResource = false;
         path = styleFile.getPath();
     }
@@ -374,20 +374,25 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      */
     public void ensureUpToDate() throws IOException {
         if (!isUpToDate()) {
-            reload();
+            obsReload();
         }
     }
 
     /**
      * If this style was initialized from a file on disk, reload the style
      * information.
+     *
+     * @return true if reloaded
      */
-    private void reload() throws IOException {
+    private boolean obsReload() throws IOException {
         if (styleFile != null) {
             this.styleFileModificationTime = styleFile.lastModified();
             try (InputStream stream = new FileInputStream(styleFile)) {
                 initialize(stream, styleFile.getAbsolutePath());
             }
+            return true;
+        } else {
+            return false;
         }
     }
 
