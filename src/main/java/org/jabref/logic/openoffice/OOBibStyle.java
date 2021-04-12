@@ -692,7 +692,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * @return true to indicate that citations should be formatted to getCitationCharacterFormat()
      *          in italics (or bold).
      */
-    public boolean isFormatCitations() {
+    public boolean getFormatCitations() {
         return (Boolean) obsCitProperties.get(FORMAT_CITATIONS);
     }
 
@@ -702,7 +702,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
     /**
      * Should citation markers be italicized?
-     * Only relevant if isFormatCitations() returns true.
+     * Only relevant if getFormatCitations() returns true.
      *
      * @return true to indicate that citations should be in italics.
      *
@@ -714,7 +714,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
     /**
      * Should citation markers be bold?
-     * Only relevant if isFormatCitations() returns true.
+     * Only relevant if getFormatCitations() returns true.
      *
      * @return true to indicate that citations should be in bold.
      *

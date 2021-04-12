@@ -1104,7 +1104,7 @@ class OOBibBase {
             // setString: All styles are removed when applying this method.
             cursor.setString(citationText);
             DocumentConnection.setCharLocaleNone(cursor);
-            if (style.isFormatCitations()) {
+            if (style.getFormatCitations()) {
                 String charStyle = style.getCitationCharacterFormat();
                 DocumentConnection.setCharStyle(cursor, charStyle);
             }
@@ -1234,7 +1234,7 @@ class OOBibBase {
         OOBibStyle style
         )
         throws UndefinedCharacterFormatException {
-        if (!style.isFormatCitations()) {
+        if (!style.getFormatCitations()) {
             return;
         }
 
@@ -1591,7 +1591,7 @@ class OOBibBase {
         // doesn't exist, we end up deleting the markers before the
         // process crashes due to a the missing format, with
         // catastrophic consequences for the user.
-        boolean mustTestCharFormat = style.isFormatCitations();
+        boolean mustTestCharFormat = style.getFormatCitations();
 
         for (Map.Entry<CitationGroupID,String> kv : citMarkers.entrySet() ) {
 
@@ -2770,7 +2770,7 @@ class OOBibBase {
                                                documentConnection,
                                                "ReferenceParagraphFormat",
                                                pathToStyleFile);
-        if (style.isFormatCitations()) {
+        if (style.getFormatCitations()) {
             checkCharacterStyleExistsInTheDocument(style.getCitationCharacterFormat(),
                                                    documentConnection,
                                                    "CitationCharacterFormat",
