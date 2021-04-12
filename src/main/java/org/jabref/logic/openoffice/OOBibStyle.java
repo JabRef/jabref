@@ -740,7 +740,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return (Boolean) obsCitProperties.get(BIBTEX_KEY_CITATIONS);
     }
 
-    public boolean getCitPropertyMultiCiteChronological() {
+    public boolean getMultiCiteChronological() {
+        // "MultiCiteChronological"
         return this.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL);
     }
 

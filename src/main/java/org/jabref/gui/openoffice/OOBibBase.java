@@ -690,7 +690,7 @@ class OOBibBase {
      */
     private Comparator<BibEntry>
     comparatorForMulticite(OOBibStyle style) {
-        if (style.getCitPropertyMultiCiteChronological()) {
+        if (style.getMultiCiteChronological()) {
             return this.yearAuthorTitleComparator;
         } else {
             return this.entryComparator;
