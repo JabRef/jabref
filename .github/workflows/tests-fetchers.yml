@@ -34,11 +34,12 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v2
       - name: Set up JDK
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
           java-version: 14
-      - name: Restore gradle cache
-        uses: actions/cache@v2
+          distribution: 'adopt'
+      - uses: actions/cache@v2
+        name: Restore gradle cache
         with:
           path: |
             ~/.gradle/caches
