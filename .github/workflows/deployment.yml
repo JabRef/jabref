@@ -60,11 +60,13 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: 15
+          distribution: 'adopt'
         if: matrix.os != 'windows-latest'
       - name: Set up JDK 14 for windows
         uses: actions/setup-java@v2
         with:
           java-version: 14
+          distribution: 'adopt'
         if: matrix.os == 'windows-latest'
       - name: Restore gradle cache
         uses: actions/cache@master

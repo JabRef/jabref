@@ -15,6 +15,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: 14
+          distribution: 'adopt'
       - name: Look for outdated dependencies
         run: ./gradlew -q checkOutdatedDependencies
       - name: Report issues
