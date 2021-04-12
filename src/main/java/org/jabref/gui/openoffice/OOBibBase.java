@@ -2039,7 +2039,7 @@ class OOBibBase {
 
         // emit header
         documentConnection.xText.insertString(cursor,
-                                              style.getTitle(),
+                                              style.getReferenceHeaderText(),
                                               true);
         String parStyle = style.getReferenceHeaderParagraphFormat();
         try {

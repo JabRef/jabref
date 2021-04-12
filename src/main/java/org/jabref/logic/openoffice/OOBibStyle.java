@@ -67,7 +67,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     /*
      * Keys for the PROPERTIES section of a *.jstyle file.
      */
-    private static final String TITLE = "Title";
+    private static final String REFERENCE_HEADER_TEXT = "Title"; // getReferenceHeaderText
     private static final String REFERENCE_HEADER_PARAGRAPH_FORMAT = "ReferenceHeaderParagraphFormat";
     private static final String REFERENCE_PARAGRAPH_FORMAT = "ReferenceParagraphFormat";
 
@@ -257,7 +257,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
     private void setDefaultProperties() {
         // Set default property values:
-        obsProperties.put(TITLE, "Bibliography");
+        obsProperties.put(REFERENCE_HEADER_TEXT, "Bibliography");
         obsProperties.put(REFERENCE_HEADER_PARAGRAPH_FORMAT, "Heading 1");
 
         // Note: was default, but that is not known to LO
@@ -861,8 +861,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     /**
      * Title for the bibliography.
      */
-    public String getTitle() {
-        return getStringProperty(OOBibStyle.TITLE);
+    public String getReferenceHeaderText() {
+        return getStringProperty(OOBibStyle.REFERENCE_HEADER_TEXT);
     }
 
     /**
