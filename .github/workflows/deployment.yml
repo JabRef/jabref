@@ -21,6 +21,7 @@ env:
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
   OSXCERT: ${{ secrets.OSX_SIGNING_CERT }}
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false
 
 jobs:
   build:
