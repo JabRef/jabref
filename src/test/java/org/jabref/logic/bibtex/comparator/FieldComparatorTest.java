@@ -1,5 +1,7 @@
 package org.jabref.logic.bibtex.comparator;
 
+import java.util.stream.Stream;
+
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.OrFields;
@@ -7,6 +9,9 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -175,37 +180,6 @@ public class FieldComparatorTest {
     }
 
     @Test
-    public void compareNumericFieldsIdentity() throws Exception {
-        FieldComparator comparator = new FieldComparator(StandardField.PMID);
-        BibEntry equal = new BibEntry()
-                .withField(StandardField.PMID, "123456");
-
-        assertEquals(0, comparator.compare(equal, equal));
-    }
-
-    @Test
-    public void compareNumericFieldsEquality() throws Exception {
-        FieldComparator comparator = new FieldComparator(StandardField.PMID);
-        BibEntry equal = new BibEntry()
-                .withField(StandardField.PMID, "123456");
-        BibEntry equal2 = new BibEntry()
-                .withField(StandardField.PMID, "123456");
-
-        assertEquals(0, comparator.compare(equal, equal2));
-    }
-
-    @Test
-    public void compareNumericFieldsBiggerAscending() throws Exception {
-        FieldComparator comparator = new FieldComparator(StandardField.PMID);
-        BibEntry bigger = new BibEntry()
-                .withField(StandardField.PMID, "234567");
-        BibEntry smaller = new BibEntry()
-                .withField(StandardField.PMID, "123456");
-
-        assertEquals(1, comparator.compare(bigger, smaller));
-    }
-
-    @Test
     public void compareNumericFieldsBiggerDescending() throws Exception {
         FieldComparator comparator = new FieldComparator(new OrFields(StandardField.PMID), true);
         BibEntry smaller = new BibEntry()
@@ -227,42 +201,26 @@ public class FieldComparatorTest {
         assertEquals(1, comparator.compare(parsable, unparsable));
     }
 
-    @Test
-    public void compareNonParsableWithParsableFieldAscending() throws Exception {
+    @ParameterizedTest
+    @MethodSource("provideArgumentsForNumericalComparison")
+    public void compareNumericalValues(int comparisonResult, String id1, String id2, String errorMessage) {
         FieldComparator comparator = new FieldComparator(StandardField.PMID);
-        BibEntry nonparsable = new BibEntry()
-                .withField(StandardField.PMID, "abc##z");
-        BibEntry parsable = new BibEntry()
-                .withField(StandardField.PMID, "123456");
+        BibEntry entry1 = new BibEntry()
+                .withField(StandardField.PMID, id1);
+        BibEntry entry2 = new BibEntry()
+                .withField(StandardField.PMID, id2);
 
-        assertEquals(1, comparator.compare(nonparsable, parsable));
+        assertEquals(comparisonResult, comparator.compare(entry1, entry2), errorMessage);
     }
 
-    @Test
-    public void compareEmptyFieldsAscending() throws Exception {
-        FieldComparator comparator = new FieldComparator(StandardField.PMID);
-        BibEntry empty1 = new BibEntry();
-        BibEntry empty2 = new BibEntry();
-
-        assertEquals(0, comparator.compare(empty1, empty2));
-    }
-
-    @Test
-    public void compareEmptyWithAssignedFieldAscending() throws Exception {
-        FieldComparator comparator = new FieldComparator(StandardField.PMID);
-        BibEntry empty1 = new BibEntry();
-        BibEntry assigned = new BibEntry().withField(StandardField.PMID, "123456");
-
-        assertEquals(1, comparator.compare(empty1, assigned));
-    }
-
-    @Test
-    public void compareAssignedWithEmptyFieldAscending() throws Exception {
-        FieldComparator comparator = new FieldComparator(StandardField.PMID);
-        BibEntry assigned = new BibEntry()
-                .withField(StandardField.PMID, "123456");
-        BibEntry empty = new BibEntry();
-
-        assertEquals(-1, comparator.compare(assigned, empty));
+    private static Stream<Arguments> provideArgumentsForNumericalComparison() {
+        return Stream.of(
+                Arguments.of(0, "123456", "123456", "IDs are lexicographically not equal [1]"),
+                Arguments.of(1, "234567", "123456", "234567 is lexicographically smaller than 123456"),
+                Arguments.of(1, "abc##z", "123456", "abc##z is lexicographically smaller than 123456 "),
+                Arguments.of(0, "", "", "IDs are lexicographically not equal [2]"),
+                Arguments.of(1, "", "123456", "No ID is lexicographically smaller than 123456"),
+                Arguments.of(-1, "123456", "", "123456 is lexicographically greater than no ID")
+        );
     }
 }

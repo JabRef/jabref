@@ -1,9 +1,14 @@
 package org.jabref.logic.layout.format;
 
+import java.util.stream.Stream;
+
 import org.jabref.logic.layout.LayoutFormatter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -17,37 +22,24 @@ public class ShortMonthFormatterTest {
     }
 
     @Test
-    public void formatShortName() {
-        assertEquals("jan", formatter.format("jan"));
-    }
-
-    @Test
-    public void formatFullName() {
-        assertEquals("jan", formatter.format("January"));
-    }
-
-    @Test
-    public void formatGermanFullName() {
-        assertEquals("jan", formatter.format("Januar"));
-    }
-
-    @Test
-    public void formatMonthNumber() {
-        assertEquals("jan", formatter.format("01"));
-    }
-
-    @Test
-    public void formatRandomInput() {
-        assertEquals("", formatter.format("Invented Month"));
-    }
-
-    @Test
     public void formatNullInput() {
         assertEquals("", formatter.format(null));
     }
 
-    @Test
-    public void formatEmptyInput() {
-        assertEquals("", formatter.format(""));
+    @ParameterizedTest
+    @MethodSource("provideArguments")
+    public void formatDifferentInputs(String formattedString, String originalString) {
+        assertEquals(formattedString, formatter.format(originalString));
+    }
+
+    private static Stream<Arguments> provideArguments() {
+        return Stream.of(
+                Arguments.of("jan", "jan"),
+                Arguments.of("jan", "January"),
+                Arguments.of("jan", "Januar"),
+                Arguments.of("jan", "01"),
+                Arguments.of("", "Invented Month"),
+                Arguments.of("", "")
+        );
     }
 }
