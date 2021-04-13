@@ -4,6 +4,8 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.bst.BibtexCaseChanger.FORMAT_MODE;
 
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -20,7 +22,6 @@ public class BibtexCaseChangersTest {
 
     private static Stream<Arguments> provideStringsForTitleLowers() {
         return Stream.of(
-                // part1
                 Arguments.of("i", "i"),
                 Arguments.of("0i~ ", "0I~ "),
                 Arguments.of("Hi hi ", "Hi Hi "),
@@ -32,7 +33,6 @@ public class BibtexCaseChangersTest {
                 Arguments.of("An {$O(n \\log n / \\! \\log\\log n)$} sorting algorithm", "An {$O(n \\log n / \\! \\log\\log n)$} Sorting Algorithm"),
                 Arguments.of("On notions of information transfer in {VLSI} circuits", "On Notions of Information Transfer in {VLSI} Circuits"),
 
-                // part2
                 Arguments.of("hallo", "hallo"),
                 Arguments.of("Hallo", "HAllo"),
                 Arguments.of("Hallo world", "HAllo World"),
@@ -47,7 +47,12 @@ public class BibtexCaseChangersTest {
                 Arguments.of("Hallo world. how", "HAllo WORLD. HOW"),
                 Arguments.of("Hallo world, how", "HAllo WORLD, HOW"),
                 Arguments.of("Hallo world; how", "HAllo WORLD; HOW"),
-                Arguments.of("Hallo world- how", "HAllo WORLD- HOW")
+                Arguments.of("Hallo world- how", "HAllo WORLD- HOW"),
+
+                // testSpecialBracketPlacement
+                Arguments.of("this i{S REALLY CraZy ST}uff", "tHIS I{S REALLY CraZy ST}UfF"),
+                Arguments.of("this i{S R{\\'E}ALLY CraZy ST}uff", "tHIS I{S R{\\'E}ALLY CraZy ST}UfF"),
+                Arguments.of("this is r{\\'e}ally crazy stuff", "tHIS IS R{\\'E}ALLY CraZy STUfF")
         );
     }
 
@@ -59,7 +64,6 @@ public class BibtexCaseChangersTest {
 
     private static Stream<Arguments> provideStringsForAllLowers() {
         return Stream.of(
-                // part1
                 Arguments.of("i", "i"),
                 Arguments.of("0i~ ", "0I~ "),
                 Arguments.of("hi hi ", "Hi Hi "),
@@ -71,7 +75,6 @@ public class BibtexCaseChangersTest {
                 Arguments.of("ulrich {\\\"{u}}nderwood and ned {\\~n}et and paul {\\={p}}ot", "Ulrich {\\\"{U}}nderwood and Ned {\\~N}et and Paul {\\={P}}ot"),
                 Arguments.of("an {$O(n \\log n / \\! \\log\\log n)$} sorting algorithm", "An {$O(n \\log n / \\! \\log\\log n)$} Sorting Algorithm"),
 
-                // part2
                 Arguments.of("hallo", "hallo"),
                 Arguments.of("hallo", "HAllo"),
                 Arguments.of("hallo world", "HAllo World"),
@@ -80,9 +83,7 @@ public class BibtexCaseChangersTest {
                 Arguments.of("hallo {\\world}. how", "HAllo {\\WORLD}. HOW"),
 
                 // testSpecialBracketPlacement
-                Arguments.of("this i{S REALLY CraZy ST}uff", "tHIS I{S REALLY CraZy ST}UfF"),
-                Arguments.of("this i{S R{\\'E}ALLY CraZy ST}uff", "tHIS I{S R{\\'E}ALLY CraZy ST}UfF"),
-                Arguments.of("this is r{\\'e}ally crazy stuff", "tHIS IS R{\\'E}ALLY CraZy STUfF")
+                Arguments.of("an {$O(n \\log n)$} sorting algorithm", "An {$O(n \\log n)$} Sorting Algorithm")
         );
     }
 
@@ -94,7 +95,6 @@ public class BibtexCaseChangersTest {
 
     private static Stream<Arguments> provideStringsForAllUppers() {
         return Stream.of(
-                // part1
                 Arguments.of("I", "i"),
                 Arguments.of("0I~ ", "0I~ "),
                 Arguments.of("HI HI ", "Hi Hi "),
@@ -106,7 +106,6 @@ public class BibtexCaseChangersTest {
                 Arguments.of("ULRICH {\\\"{U}}NDERWOOD AND NED {\\~N}ET AND PAUL {\\={P}}OT", "Ulrich {\\\"{U}}nderwood and Ned {\\~N}et and Paul {\\={P}}ot"),
                 Arguments.of("AN {$O(n \\log n / \\! \\log\\log n)$} SORTING ALGORITHM", "An {$O(n \\log n / \\! \\log\\log n)$} Sorting Algorithm"),
 
-                // part2
                 Arguments.of("HALLO", "hallo"),
                 Arguments.of("HALLO", "HAllo"),
                 Arguments.of("HALLO WORLD", "HAllo World"),
@@ -137,20 +136,13 @@ public class BibtexCaseChangersTest {
         );
     }
 
-    /* the real test would look like as follows. Also from the comment of issue 176, order reversed as the "should be" comes first
-    @ParameterizedTest
-    @MethodSource("provideTitleCaseTitleUppers")
-    public void testTitleCaseTitleUppers(String expected, String toBeFormatted) {
-        assertEquals(expected, BibtexCaseChanger.changeCase(toBeFormatted, FORMAT_MODE.TITLE_UPPERS));
+    @Disabled
+    @Test
+    public void testTitleCaseAllUppers() {
+        /* the real test would look like as follows. Also from the comment of issue 176, order reversed as the "should be" comes first */
+        // assertCaseChangerTitleUppers("This is a Simple Example {TITLE}", "This is a simple example {TITLE}");
+        // assertCaseChangerTitleUppers("This {IS} Another Simple Example Tit{LE}", "This {IS} another simple example tit{LE}");
+        // assertCaseChangerTitleUppers("{What ABOUT thIS} one?", "{What ABOUT thIS} one?");
+        // assertCaseChangerTitleUppers("{And {thIS} might {a{lso}} be possible}", "{And {thIS} might {a{lso}} be possible}")
     }
-
-    private static Stream<Arguments> provideTitleCaseTitleUppers() {
-        return Stream.of(
-                Arguments.of("This is a Simple Example {TITLE}", "This is a simple example {TITLE}"),
-                Arguments.of("This {IS} Another Simple Example Tit{LE}", "This {IS} another simple example tit{LE}"),
-                Arguments.of("{What ABOUT thIS} one?", "{What ABOUT thIS} one?"),
-                Arguments.of("{And {thIS} might {a{lso}} be possible}", "{And {thIS} might {a{lso}} be possible}")
-        );
-    }
-    */
 }

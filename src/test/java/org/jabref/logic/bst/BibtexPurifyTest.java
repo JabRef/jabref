@@ -14,7 +14,7 @@ public class BibtexPurifyTest {
     @ParameterizedTest
     @MethodSource("provideTestStrings")
     public void testPurify(String expected, String toBePurified) {
-        assertPurify(expected, toBePurified);
+        assertEquals(expected, BibtexPurify.purify(toBePurified, s -> fail("Should not Warn (" + s + ")! purify should be " + expected + " for " + toBePurified)));
     }
 
     private static Stream<Arguments> provideTestStrings() {
@@ -29,9 +29,5 @@ public class BibtexPurifyTest {
                 Arguments.of("Edouard Masterly", "{\\'{E}}douard Masterly"),
                 Arguments.of("Ulrich Underwood and Ned Net and Paul Pot", "Ulrich {\\\"{U}}nderwood and Ned {\\~N}et and Paul {\\={P}}ot")
         );
-    }
-
-    private void assertPurify(final String string, final String string2) {
-        assertEquals(string, BibtexPurify.purify(string2, s -> fail("Should not Warn (" + s + ")! purify should be " + string + " for " + string2)));
     }
 }
