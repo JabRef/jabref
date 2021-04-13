@@ -34,7 +34,7 @@
                 <TabPane
                         tabClosingPolicy="UNAVAILABLE"
                         BorderPane.alignment="CENTER">
-                    <Tab text="%Author and Title">
+                    <Tab text="%Authors and Title">
                         <AnchorPane>
                             <VBox spacing="20.0"
                                   AnchorPane.bottomAnchor="0.0"
@@ -50,9 +50,9 @@
                                 </HBox>
                                 <HBox alignment="CENTER_LEFT"
                                       spacing="20.0">
-                                    <Label text="%New Author:"/>
+                                    <Label text="%Add Author:"/>
                                     <TextField
-                                            fx:id="newAuthor"
+                                            fx:id="addAuthor"
                                             HBox.hgrow="ALWAYS"/>
                                     <Button fx:id="addAuthorButton"
                                             onAction="#addAuthor"/>
@@ -80,9 +80,9 @@
                                   AnchorPane.topAnchor="0.0">
                                 <HBox alignment="CENTER_LEFT"
                                       spacing="20.0">
-                                    <Label text="%New Research Question:"/>
+                                    <Label text="%Add Research Question:"/>
                                     <TextField
-                                            fx:id="newResearchQuestion"
+                                            fx:id="addResearchQuestion"
                                             HBox.hgrow="ALWAYS"/>
                                     <Button fx:id="addResearchQuestionButton"
                                             onAction="#addResearchQuestion"/>
@@ -110,10 +110,10 @@
                                   AnchorPane.topAnchor="0.0">
                                 <HBox alignment="CENTER_LEFT"
                                       spacing="20.0">
-                                    <Label text="%New Query:"/>
+                                    <Label text="%Add Query:"/>
                                     <Label fx:id="helpIcon"/>
                                     <TextField
-                                            fx:id="newQuery"
+                                            fx:id="addQuery"
                                             HBox.hgrow="ALWAYS"/>
                                     <Button fx:id="addQueryButton"
                                             onAction="#addQuery"/>
@@ -141,7 +141,7 @@
                                   AnchorPane.topAnchor="0.0">
                                 <HBox alignment="CENTER_LEFT"
                                       spacing="20.0">
-                                    <Label text="%New Database:"/>
+                                    <Label text="%Add Database:"/>
                                     <ComboBox
                                             fx:id="databaseSelectorComboBox"
                                             HBox.hgrow="ALWAYS"/>

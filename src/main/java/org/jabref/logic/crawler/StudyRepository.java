@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.jabref.gui.Globals;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.exporter.AtomicFileWriter;
@@ -421,7 +420,7 @@ class StudyRepository {
             databaseWriter.saveDatabase(new BibDatabaseContext(entries));
         }
         try (AtomicFileWriter fileWriter = new AtomicFileWriter(pathToFile, savePreferences.getEncoding(), savePreferences.shouldMakeBackup())) {
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, savePreferences, Globals.entryTypesManager);
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, savePreferences, bibEntryTypesManager);
             databaseWriter.saveDatabase(new BibDatabaseContext(entries));
         } catch (UnsupportedCharsetException ex) {
             throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", savePreferences.getEncoding().displayName()), ex);

@@ -48,9 +48,9 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     private final ManageStudyDefinitionViewModel viewModel;
 
     @FXML private TextField studyTitle;
-    @FXML private TextField newAuthor;
-    @FXML private TextField newResearchQuestion;
-    @FXML private TextField newQuery;
+    @FXML private TextField addAuthor;
+    @FXML private TextField addResearchQuestion;
+    @FXML private TextField addQuery;
     @FXML private ComboBox<StudyDatabase> databaseSelectorComboBox;
     @FXML private TextField studyDirectory;
 
@@ -137,17 +137,17 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     }
 
     private void setKeyPressListenersForInputFields() {
-        newAuthor.setOnKeyPressed(event -> {
+        addAuthor.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 addAuthor();
             }
         });
-        newResearchQuestion.setOnKeyPressed(event -> {
+        addResearchQuestion.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 addResearchQuestion();
             }
         });
-        newQuery.setOnKeyPressed(event -> {
+        addQuery.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 addQuery();
             }
@@ -239,20 +239,20 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
 
     @FXML
     private void addAuthor() {
-        viewModel.addAuthor(newAuthor.getText());
-        newAuthor.setText("");
+        viewModel.addAuthor(addAuthor.getText());
+        addAuthor.setText("");
     }
 
     @FXML
     private void addResearchQuestion() {
-        viewModel.addResearchQuestion(newResearchQuestion.getText());
-        newResearchQuestion.setText("");
+        viewModel.addResearchQuestion(addResearchQuestion.getText());
+        addResearchQuestion.setText("");
     }
 
     @FXML
     private void addQuery() {
-        viewModel.addQuery(newQuery.getText());
-        newQuery.setText("");
+        viewModel.addQuery(addQuery.getText());
+        addQuery.setText("");
     }
 
     /**
