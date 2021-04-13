@@ -1,5 +1,6 @@
 package org.jabref.logic.formatter.bibtexfields;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -9,7 +10,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class NormalizeEnDashesFormatterTest {
 
-    private static final NormalizeEnDashesFormatter formatter = new NormalizeEnDashesFormatter();
+    private NormalizeEnDashesFormatter formatter;
+
+    @BeforeEach
+    public void setUp() {
+        formatter = new NormalizeEnDashesFormatter();
+    }
 
     @Test
     public void formatExample() {

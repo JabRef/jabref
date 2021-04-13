@@ -1,12 +1,18 @@
 package org.jabref.logic.formatter.bibtexfields;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class EscapeAmpersandsFormatterTest {
 
-    private static final EscapeAmpersandsFormatter formatter = new EscapeAmpersandsFormatter();
+    private EscapeAmpersandsFormatter formatter;
+
+    @BeforeEach
+    void setUp() {
+        formatter = new EscapeAmpersandsFormatter();
+    }
 
     @Test
     void formatReturnsSameTextIfNoAmpersandsPresent() throws Exception {

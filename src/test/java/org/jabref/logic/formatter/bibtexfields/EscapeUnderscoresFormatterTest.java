@@ -1,12 +1,18 @@
 package org.jabref.logic.formatter.bibtexfields;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class EscapeUnderscoresFormatterTest {
 
-    private static final EscapeUnderscoresFormatter formatter = new EscapeUnderscoresFormatter();
+    private EscapeUnderscoresFormatter formatter;
+
+    @BeforeEach
+    void setUp() {
+        formatter = new EscapeUnderscoresFormatter();
+    }
 
     @Test
     void formatReturnsSameTextIfNoUnderscoresPresent() throws Exception {

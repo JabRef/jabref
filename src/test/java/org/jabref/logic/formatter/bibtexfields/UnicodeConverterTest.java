@@ -1,5 +1,6 @@
 package org.jabref.logic.formatter.bibtexfields;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -7,9 +8,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
  */
-public class UnicodeConverterFormatterTest {
+public class UnicodeConverterTest {
 
-    private static final UnicodeToLatexFormatter formatter = new UnicodeToLatexFormatter();
+    private UnicodeToLatexFormatter formatter;
+
+    @BeforeEach
+    public void setUp() {
+        formatter = new UnicodeToLatexFormatter();
+    }
 
     @Test
     public void testBasic() {

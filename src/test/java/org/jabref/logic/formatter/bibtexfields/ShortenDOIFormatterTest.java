@@ -2,6 +2,7 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import org.jabref.testutils.category.FetcherTest;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -9,7 +10,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @FetcherTest
 class ShortenDOIFormatterTest {
 
-    private static final ShortenDOIFormatter formatter = new ShortenDOIFormatter();
+    private ShortenDOIFormatter formatter;
+
+    @BeforeEach
+    public void setUp() {
+        formatter = new ShortenDOIFormatter();
+    }
 
     @Test
     public void formatDoi() {

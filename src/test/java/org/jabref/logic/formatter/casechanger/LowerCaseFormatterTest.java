@@ -1,5 +1,6 @@
 package org.jabref.logic.formatter.casechanger;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -9,7 +10,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class LowerCaseFormatterTest {
 
-    private static final LowerCaseFormatter formatter = new LowerCaseFormatter();
+    private LowerCaseFormatter formatter;
+
+    @BeforeEach
+    public void setUp() {
+        formatter = new LowerCaseFormatter();
+    }
 
     @Test
     public void test() {

@@ -1,5 +1,6 @@
 package org.jabref.logic.formatter.bibtexfields;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -9,7 +10,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class ClearFormatterTest {
 
-    private static final ClearFormatter formatter = new ClearFormatter();
+    private ClearFormatter formatter;
+
+    @BeforeEach
+    public void setUp() {
+        formatter = new ClearFormatter();
+    }
 
     /**
      * Check whether the clear formatter really returns the empty string for the empty string
