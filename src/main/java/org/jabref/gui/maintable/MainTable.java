@@ -94,13 +94,17 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         localDragboard = stateManager.getLocalDragboard();
 
+        this.setOnDragOver(this::handleOnDragOverTableView);
+        this.setOnDragDropped(this::handleOnDragDroppedTableView);
+
         this.getColumns().addAll(
                 new MainTableColumnFactory(
                         database,
                         preferencesService,
                         externalFileTypes,
                         libraryTab.getUndoManager(),
-                        dialogService).createColumns());
+                        dialogService,
+                        stateManager).createColumns());
 
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
                 .withOnMouseClickedEvent((entry, event) -> {
@@ -174,8 +178,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     /**
-     * This is called, if a user starts typing some characters into the keyboard with focus on main table. The {@link
-     * MainTable} will scroll to the cell with the same starting column value and typed string
+     * This is called, if a user starts typing some characters into the keyboard with focus on main table. The {@link MainTable} will scroll to the cell with the same starting column value and typed string
      *
      * @param sortedColumn The sorted column in {@link MainTable}
      * @param keyEvent     The pressed character
@@ -311,6 +314,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         event.consume();
     }
 
+    private void handleOnDragOverTableView(DragEvent event) {
+        if (event.getDragboard().hasFiles()) {
+            event.acceptTransferModes(TransferMode.ANY);
+        }
+        event.consume();
+    }
+
     private void handleOnDragEntered(TableRow<BibEntryTableViewModel> row, BibEntryTableViewModel entry, MouseDragEvent event) {
         // Support the following gesture to select entries: click on one row -> hold mouse button -> move over other rows
         // We need to select all items between the starting row and the row where the user currently hovers the mouse over
@@ -374,6 +384,20 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     }
                 }
             }
+
+            success = true;
+        }
+
+        event.setDropCompleted(success);
+        event.consume();
+    }
+
+    private void handleOnDragDroppedTableView(DragEvent event) {
+        boolean success = false;
+
+        if (event.getDragboard().hasFiles()) {
+            List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
+            importHandler.importFilesInBackground(files).executeWith(Globals.TASK_EXECUTOR);
 
             success = true;
         }

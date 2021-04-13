@@ -12,13 +12,12 @@ import org.jabref.model.strings.StringUtil;
  * Current usage: only methods <code>getLastOnly</code>, <code>getFirstLast</code>, and <code>getLastFirst</code> are used; all other methods are provided for completeness.
  */
 public class Author {
-
     private final String firstPart;
     private final String firstAbbr;
     private final String vonPart;
     private final String lastPart;
     private final String jrPart;
-    private String latexFreeLastPart;
+    private Author latexFreeAuthor;
 
     /**
      * Creates the Author object. If any part of the name is absent, <CODE>null</CODE> must be passed; otherwise other methods may return erroneous results.
@@ -274,18 +273,6 @@ public class Author {
     }
 
     /**
-     * Returns the last name of the author stored in this object with resolved latex.
-     *
-     * @return last name of the author (may consist of several tokens)
-     */
-    public Optional<String> getLastLatexFree() {
-        if (latexFreeLastPart == null && lastPart != null) {
-            latexFreeLastPart = LatexToUnicodeAdapter.format(lastPart);
-        }
-        return Optional.ofNullable(latexFreeLastPart);
-    }
-
-    /**
      * Returns the junior part of the author's name stored in this object ("Jr").
      *
      * @return junior part of the author's name (may consist of several tokens) or null if the author does not have a Jr. Part
@@ -368,5 +355,21 @@ public class Author {
             res.deleteCharAt(0);
         }
         return res.toString();
+    }
+
+    /**
+     * Returns a LaTeX-free version of this `Author`.
+     */
+    public Author latexFree() {
+        if (latexFreeAuthor == null) {
+            String first = getFirst().map(LatexToUnicodeAdapter::format).orElse(null);
+            String firstabbr = getFirstAbbr().map(LatexToUnicodeAdapter::format).orElse(null);
+            String von = getVon().map(LatexToUnicodeAdapter::format).orElse(null);
+            String last = getLast().map(LatexToUnicodeAdapter::format).orElse(null);
+            String jr = getJr().map(LatexToUnicodeAdapter::format).orElse(null);
+            latexFreeAuthor = new Author(first, firstabbr, von, last, jr);
+            latexFreeAuthor.latexFreeAuthor = latexFreeAuthor;
+        }
+        return latexFreeAuthor;
     }
 }

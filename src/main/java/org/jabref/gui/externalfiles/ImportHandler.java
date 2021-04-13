@@ -173,7 +173,9 @@ public class ImportHandler {
                 preferencesService.getTimestampPreferences());
 
         // Generate citation keys
-        generateKeys(entries);
+        if (preferencesService.getImportSettingsPreferences().generateNewKeyOnImport()) {
+            generateKeys(entries);
+        }
 
         // Add to group
         addToGroups(entries, stateManager.getSelectedGroup(bibdatabase));

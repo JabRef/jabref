@@ -149,7 +149,11 @@ public class GroupDialogViewModel {
                     }
                     return true;
                 },
-                ValidationMessage.error(Localization.lang("There exists already a group with the same name.")));
+                ValidationMessage.warning(
+                    Localization.lang("There exists already a group with the same name.") + "\n" +
+                    Localization.lang("If you use it, it will inherit all entries from this other group.")
+                )
+        );
 
         keywordRegexValidator = new FunctionBasedValidator<>(
                 keywordGroupSearchTermProperty,
@@ -233,8 +237,6 @@ public class GroupDialogViewModel {
                     }
                 },
                 ValidationMessage.error(Localization.lang("Please provide a valid aux file.")));
-
-        validator.addValidators(nameValidator, sameNameValidator);
 
         typeSearchProperty.addListener((obs, _oldValue, isSelected) -> {
             if (isSelected) {

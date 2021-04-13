@@ -10,13 +10,12 @@
     <link href="https://www.pakjas.com.pk/Author%20instructions.pdf" rel="documentation"/>
     <author>
       <name>Patrick O'Brien</name>
-      <email>obrienpat86@gmail.com</email>
     </author>
     <category citation-format="author-date"/>
     <category field="science"/>
     <issn>0552-9034</issn>
     <eissn>2076-0906</eissn>
-    <updated>2020-01-28T15:06:11+00:00</updated>
+    <updated>2021-03-23T21:11:01+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor-translator">
@@ -163,7 +162,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography hanging-indent="true" subsequent-author-substitute="---" subsequent-author-substitute-rule="partial-each">
+  <bibliography subsequent-author-substitute-rule="partial-each" hanging-indent="true">
     <sort>
       <key macro="author"/>
       <key macro="year-date"/>
