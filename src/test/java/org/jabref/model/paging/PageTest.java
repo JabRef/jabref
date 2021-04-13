@@ -30,7 +30,7 @@ public class PageTest {
 
     @Test
     public void getContentTest() {
-        //make sure the collections have the same elements
+        // make sure the collections have the same elements
         List<String> differences = new ArrayList<>(testContent);
         differences.removeAll(page1.getContent());
         assertTrue(differences.isEmpty());
