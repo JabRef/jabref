@@ -12,7 +12,9 @@ import javafx.scene.layout.StackPane;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.gui.preferences.PreferencesDialogView;
+import org.jabref.logic.l10n.Localization;
 
 public class MainTableHeaderRightClickMenu extends ContextMenu {
 
@@ -31,7 +33,7 @@ public class MainTableHeaderRightClickMenu extends ContextMenu {
         mainTable.getColumns().forEach(tableColumn -> radioMenuItems.add(createRadioMenuItem(tableColumn)));
 
         SeparatorMenuItem line = new SeparatorMenuItem();
-        MenuItem columnsPreferences = new MenuItem("Columns preferences");
+        MenuItem columnsPreferences = new MenuItem(Localization.lang("Show preferences"));
         columnsPreferences.setOnAction(event -> {
             PreferencesDialogView preferencesDialogView = new PreferencesDialogView(libraryTab.frame());
             preferencesDialogView.getPreferenceTabList().getSelectionModel().select(3);
@@ -44,7 +46,8 @@ public class MainTableHeaderRightClickMenu extends ContextMenu {
     }
 
     private RadioMenuItem createRadioMenuItem(TableColumn<BibEntryTableViewModel, ?> tableColumn) {
-        RadioMenuItem radioMenuItem = new RadioMenuItem(tableColumn.getText());
+        RadioMenuItem radioMenuItem = new RadioMenuItem(((MainTableColumn) tableColumn).getDisplayName());
+        radioMenuItem.setSelected(true);
         return radioMenuItem;
     }
 }
