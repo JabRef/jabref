@@ -102,19 +102,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         libraryTab.getUndoManager(),
                         dialogService).createColumns());
 
-//        ContextMenu contextMenu = new ContextMenu(new MenuItem("My contextMenu"));
-//        ActionFactory factory = new ActionFactory(keyBindingRepository);
-//        contextMenu.getItems().add(factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, libraryTab.frame(), stateManager)));
-//        contextMenu.getItems().add(factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, libraryTab.frame(), stateManager)));
-//        contextMenu.getItems().add(factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, libraryTab.frame(), stateManager)));
-//        contextMenu.getItems().add(factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, libraryTab.frame(), stateManager)));
-//        this.setOnContextMenuRequested(event -> {
-//            if (!(event.getTarget() instanceof StackPane)) {
-//                contextMenu.show(this, event.getScreenX(), event.getScreenY());
-//            }
-//            event.consume();
-//        });
-
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
                 .withOnMouseClickedEvent((entry, event) -> {
                     if (event.getClickCount() == 2) {
@@ -137,6 +124,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 .install(this);
 
         this.getSortOrder().clear();
+
+        new MainTableHeaderRightClickMenu().show(this);
 
         /* KEEP for debugging purposes
         for (var colModel : mainTablePreferences.getColumnPreferences().getColumnSortOrder()) {
