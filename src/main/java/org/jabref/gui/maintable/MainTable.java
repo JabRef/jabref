@@ -11,7 +11,10 @@ import java.util.stream.Collectors;
 import javax.swing.undo.UndoManager;
 
 import javafx.collections.ListChangeListener;
-import javafx.scene.control.*;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -142,10 +145,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         mainTablePreferences.getColumnPreferences().getColumnSortOrder().forEach(columnModel ->
                 this.getColumns().stream()
-                        .map(column -> (MainTableColumn<?>) column)
-                        .filter(column -> column.getModel().equals(columnModel))
-                        .findFirst()
-                        .ifPresent(column -> this.getSortOrder().add(column)));
+                    .map(column -> (MainTableColumn<?>) column)
+                    .filter(column -> column.getModel().equals(columnModel))
+                    .findFirst()
+                    .ifPresent(column -> this.getSortOrder().add(column)));
 
         if (mainTablePreferences.getResizeColumnsToFit()) {
             this.setColumnResizePolicy(new SmartConstrainedResizePolicy());
@@ -196,16 +199,16 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         lastKeyPressTime = System.currentTimeMillis();
 
         this.getItems().stream()
-                .filter(item -> Optional.ofNullable(sortedColumn.getCellObservableValue(item).getValue())
-                        .map(Object::toString)
-                        .orElse("")
-                        .toLowerCase()
-                        .startsWith(columnSearchTerm))
-                .findFirst()
-                .ifPresent(item -> {
-                    this.scrollTo(item);
-                    this.clearAndSelect(item.getEntry());
-                });
+            .filter(item -> Optional.ofNullable(sortedColumn.getCellObservableValue(item).getValue())
+                                    .map(Object::toString)
+                                    .orElse("")
+                                    .toLowerCase()
+                                    .startsWith(columnSearchTerm))
+            .findFirst()
+            .ifPresent(item -> {
+                this.scrollTo(item);
+                this.clearAndSelect(item.getEntry());
+            });
     }
 
     @Subscribe
@@ -243,8 +246,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 getSelectedEntries().stream()
-                        .findFirst()
-                        .ifPresent(libraryTab::showAndEdit);
+                                    .findFirst()
+                                    .ifPresent(libraryTab::showAndEdit);
                 event.consume();
                 return;
             }
@@ -426,8 +429,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private Optional<BibEntryTableViewModel> findEntry(BibEntry entry) {
         return model.getEntriesFilteredAndSorted()
-                .stream()
-                .filter(viewModel -> viewModel.getEntry().equals(entry))
-                .findFirst();
+                    .stream()
+                    .filter(viewModel -> viewModel.getEntry().equals(entry))
+                    .findFirst();
     }
 }
