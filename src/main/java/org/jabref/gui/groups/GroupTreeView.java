@@ -336,12 +336,12 @@ public class GroupTreeView {
             menu.hide();
             viewModel.addNewSubgroup(group);
         });
-        MenuItem removeGroupAndSubgroups = new MenuItem(Localization.lang("Remove group and subgroups"));
-        removeGroupAndSubgroups.setOnAction(event -> viewModel.removeGroupAndSubgroups(group));
-        MenuItem removeGroupKeepSubgroups = new MenuItem(Localization.lang("Remove group, keep subgroups"));
-        removeGroupKeepSubgroups.setOnAction(event -> viewModel.removeGroupKeepSubgroups(group));
-        MenuItem removeSubgroups = new MenuItem(Localization.lang("Remove subgroups"));
-        removeSubgroups.setOnAction(event -> viewModel.removeSubgroups(group));
+//        MenuItem removeGroupAndSubgroups = new MenuItem(Localization.lang("Remove group and subgroups"));
+//        removeGroupAndSubgroups.setOnAction(event -> viewModel.removeGroupAndSubgroups(group));
+//        MenuItem removeGroupKeepSubgroups = new MenuItem(Localization.lang("Remove group, keep subgroups"));
+//        removeGroupKeepSubgroups.setOnAction(event -> viewModel.removeGroupKeepSubgroups(group));
+//        MenuItem removeSubgroups = new MenuItem(Localization.lang("Remove subgroups"));
+//        removeSubgroups.setOnAction(event -> viewModel.removeSubgroups(group));
 
         MenuItem addEntries = new MenuItem(Localization.lang("Add selected entries to this group"));
         addEntries.setOnAction(event -> viewModel.addSelectedEntries(group));
@@ -353,7 +353,9 @@ public class GroupTreeView {
 
         menu.getItems().add(editGroup);
         menu.getItems().add(new SeparatorMenuItem());
-        menu.getItems().addAll(addSubgroup, removeSubgroups, removeGroupAndSubgroups, removeGroupKeepSubgroups);
+//        menu.getItems().addAll(addSubgroup, removeSubgroups, removeGroupAndSubgroups, removeGroupKeepSubgroups);
+//        Line above replaced with:
+        menu.getItems().addAll(addSubgroup);
         menu.getItems().add(new SeparatorMenuItem());
         menu.getItems().addAll(addEntries, removeEntries);
         menu.getItems().add(new SeparatorMenuItem());

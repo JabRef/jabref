@@ -228,60 +228,63 @@ public class GroupTreeViewModel extends AbstractViewModel {
         });
     }
 
-    public void removeSubgroups(GroupNodeViewModel group) {
-        boolean confirmation = dialogService.showConfirmationDialogAndWait(
-                Localization.lang("Remove subgroups"),
-                Localization.lang("Remove all subgroups of \"%0\"?", group.getDisplayName()));
-        if (confirmation) {
-            /// TODO: Add undo
-            // final UndoableModifySubtree undo = new UndoableModifySubtree(getGroupTreeRoot(), node, "Remove subgroups");
-            // panel.getUndoManager().addEdit(undo);
-            group.getGroupNode().removeAllChildren();
-            dialogService.notify(Localization.lang("Removed all subgroups of group \"%0\".", group.getDisplayName()));
-            writeGroupChangesToMetaData();
-        }
-    }
+//    Comment out following:
+//    public void removeSubgroups(GroupNodeViewModel group) {
+//        boolean confirmation = dialogService.showConfirmationDialogAndWait(
+//                Localization.lang("Remove subgroups"),
+//                Localization.lang("Remove all subgroups of \"%0\"?", group.getDisplayName()));
+//        if (confirmation) {
+//            /// TODO: Add undo
+//            // final UndoableModifySubtree undo = new UndoableModifySubtree(getGroupTreeRoot(), node, "Remove subgroups");
+//            // panel.getUndoManager().addEdit(undo);
+//            group.getGroupNode().removeAllChildren();
+//            dialogService.notify(Localization.lang("Removed all subgroups of group \"%0\".", group.getDisplayName()));
+//            writeGroupChangesToMetaData();
+//        }
+//    }
 
-    public void removeGroupKeepSubgroups(GroupNodeViewModel group) {
-        boolean confirmation = dialogService.showConfirmationDialogAndWait(
-                Localization.lang("Remove group"),
-                Localization.lang("Remove group \"%0\"?", group.getDisplayName()));
-
-        if (confirmation) {
-            // TODO: Add undo
-            // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN);
-            // panel.getUndoManager().addEdit(undo);
-            GroupTreeNode groupNode = group.getGroupNode();
-            groupNode.getParent()
-                     .ifPresent(parent -> groupNode.moveAllChildrenTo(parent, parent.getIndexOfChild(groupNode).get()));
-            groupNode.removeFromParent();
-
-            dialogService.notify(Localization.lang("Removed group \"%0\".", group.getDisplayName()));
-            writeGroupChangesToMetaData();
-        }
-    }
+//    Comment out following:
+//    public void removeGroupKeepSubgroups(GroupNodeViewModel group) {
+//        boolean confirmation = dialogService.showConfirmationDialogAndWait(
+//                Localization.lang("Remove group"),
+//                Localization.lang("Remove group \"%0\"?", group.getDisplayName()));
+//
+//        if (confirmation) {
+//            // TODO: Add undo
+//            // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN);
+//            // panel.getUndoManager().addEdit(undo);
+//            GroupTreeNode groupNode = group.getGroupNode();
+//            groupNode.getParent()
+//                     .ifPresent(parent -> groupNode.moveAllChildrenTo(parent, parent.getIndexOfChild(groupNode).get()));
+//            groupNode.removeFromParent();
+//
+//            dialogService.notify(Localization.lang("Removed group \"%0\".", group.getDisplayName()));
+//            writeGroupChangesToMetaData();
+//        }
+//    }
 
     /**
      * Removes the specified group and its subgroups (after asking for confirmation).
      */
-    public void removeGroupAndSubgroups(GroupNodeViewModel group) {
-        boolean confirmed = dialogService.showConfirmationDialogAndWait(
-                Localization.lang("Remove group and subgroups"),
-                Localization.lang("Remove group \"%0\" and its subgroups?", group.getDisplayName()),
-                Localization.lang("Remove"));
-        if (confirmed) {
-            // TODO: Add undo
-            // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_AND_CHILDREN);
-            // panel.getUndoManager().addEdit(undo);
-
-            removeGroupsAndSubGroupsFromEntries(group);
-
-            group.getGroupNode().removeFromParent();
-
-            dialogService.notify(Localization.lang("Removed group \"%0\" and its subgroups.", group.getDisplayName()));
-            writeGroupChangesToMetaData();
-        }
-    }
+//    Comment out following:
+//    public void removeGroupAndSubgroups(GroupNodeViewModel group) {
+//        boolean confirmed = dialogService.showConfirmationDialogAndWait(
+//                Localization.lang("Remove group and subgroups"),
+//                Localization.lang("Remove group \"%0\" and its subgroups?", group.getDisplayName()),
+//                Localization.lang("Remove"));
+//        if (confirmed) {
+//            // TODO: Add undo
+//            // final UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot, node, UndoableAddOrRemoveGroup.REMOVE_NODE_AND_CHILDREN);
+//            // panel.getUndoManager().addEdit(undo);
+//
+//            removeGroupsAndSubGroupsFromEntries(group);
+//
+//            group.getGroupNode().removeFromParent();
+//
+//            dialogService.notify(Localization.lang("Removed group \"%0\" and its subgroups.", group.getDisplayName()));
+//            writeGroupChangesToMetaData();
+//        }
+//    }
 
     void removeGroupsAndSubGroupsFromEntries(GroupNodeViewModel group) {
         for (GroupNodeViewModel child : group.getChildren()) {
