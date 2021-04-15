@@ -1,5 +1,9 @@
 package org.jabref.gui.exporter;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
@@ -20,10 +24,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import org.mockito.Answers;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import static org.mockito.Mockito.*;
 
