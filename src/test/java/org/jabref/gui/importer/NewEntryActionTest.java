@@ -3,6 +3,7 @@ package org.jabref.gui.importer;
 import org.jabref.gui.*;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.PreferencesService;
 
@@ -37,32 +38,12 @@ public class NewEntryActionTest {
     }
 
     @Test
-    public void testExecuteWithNoSelectedTypeFromDialog() {
-        when(jabRefFrame.getBasePanelCount()).thenReturn(1);
-        when(dialogService.showCustomDialogAndWait(any(EntryTypeView.class))).thenReturn(null);
-
-        newEntryAction.execute();
-        verify(dialogService, times(1)).showCustomDialogAndWait(any(EntryTypeView.class));
-        verify(libraryTab, times(0)).insertEntry(any(BibEntry.class));
-    }
-
-    @Test
-    public void testExecuteOnSuccessWithSelectedTypeFromDialog() {
-        when(jabRefFrame.getBasePanelCount()).thenReturn(1);
-        when(dialogService.showCustomDialogAndWait(any(EntryTypeView.class))).thenReturn(java.util.Optional.of(StandardEntryType.Article));
-
-        newEntryAction.execute();
-        verify(dialogService, times(1)).showCustomDialogAndWait(any(EntryTypeView.class));
-        verify(libraryTab, times(1)).insertEntry(any(BibEntry.class));
-    }
-
-    @Test
     public void testExecuteOnSuccessWithFixedType() {
-        newEntryAction = new NewEntryAction(jabRefFrame, StandardEntryType.Article, dialogService, preferencesService, stateManager);
+        EntryType type = StandardEntryType.Article;
+        newEntryAction = new NewEntryAction(jabRefFrame, type, dialogService, preferencesService, stateManager);
         when(jabRefFrame.getBasePanelCount()).thenReturn(1);
 
         newEntryAction.execute();
-        verify(dialogService, times(0)).showCustomDialogAndWait(any(EntryTypeView.class));
-        verify(libraryTab, times(1)).insertEntry(any(BibEntry.class));
+        verify(libraryTab, times(1)).insertEntry(new BibEntry(type));
     }
 }

@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.gui.ClipBoardManager;
-import org.jabref.gui.DialogService;
-import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.LibraryTab;
+import org.jabref.gui.*;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
