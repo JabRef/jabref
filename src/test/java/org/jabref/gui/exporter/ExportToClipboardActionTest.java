@@ -1,6 +1,7 @@
 package org.jabref.gui.exporter;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +34,7 @@ import org.jabref.preferences.PreferencesService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
@@ -53,12 +55,11 @@ public class ExportToClipboardActionTest {
     private TaskExecutor taskExecutor;
     private List<BibEntry> selectedEntries;
     private final BibDatabaseContext databaseContext = mock(BibDatabaseContext.class);
-    private final PreferencesService preferences = mock(PreferencesService.class, Answers.RETURNS_MOCKS);
+    private final PreferencesService preferences = spy(PreferencesService.class);
     private final ImportExportPreferences importExportPrefs = mock(ImportExportPreferences.class);
 
     @BeforeEach
     public void setUp() {
-
         taskExecutor = new CurrentThreadTaskExecutor();
 
         List<TemplateExporter> customFormats = new ArrayList<>();
@@ -96,7 +97,9 @@ public class ExportToClipboardActionTest {
             }
         };
 
-        when(importExportPrefs.getLastExportExtension()).thenReturn("html");
+        when(importExportPrefs.getLastExportExtension()).thenReturn("HTML");
+        when(preferences.getImportExportPreferences()).thenReturn(importExportPrefs);
+        when(preferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
         when(libraryTab.getSelectedEntries()).thenReturn(selectedEntries);
         when(libraryTab.getBibDatabaseContext()).thenReturn(databaseContext);
         when(databaseContext.getFileDirectories(preferences.getFilePreferences())).thenReturn(new ArrayList<>(Arrays.asList(Path.of("path"))));
@@ -110,6 +113,5 @@ public class ExportToClipboardActionTest {
                eq(Localization.lang("Export")), eq(Localization.lang("Select export format")),
                 eq(Localization.lang("Export")), any(Exporter.class), anyCollection());
         verify(dialogService, times(1)).notify(Localization.lang("Entries exported to clipboard") + ": " + selectedEntries.size());
-
         }
 }
