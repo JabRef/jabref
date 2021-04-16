@@ -1056,7 +1056,6 @@ public class JabRefPreferences implements PreferencesService {
                 fileDirForDatabase);
     }
 
-
     @Override
     public void storeFileDirforDatabase(List<Path> dirs) {
         this.fileDirForDatabase = dirs;

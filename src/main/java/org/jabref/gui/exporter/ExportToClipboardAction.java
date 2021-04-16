@@ -46,9 +46,7 @@ public class ExportToClipboardAction extends SimpleCommand {
     private final ExporterFactory exporterFactory;
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
-
     private final PreferencesService preferences;
-
 
     public ExportToClipboardAction(JabRefFrame frame, DialogService dialogService, ExporterFactory exporterFactory, ClipBoardManager clipBoardManager, TaskExecutor taskExecutor, PreferencesService prefs) {
         this.frame = frame;
