@@ -1,5 +1,6 @@
 import groovy.json.JsonSlurper
 import org.gradle.internal.os.OperatingSystem
+import org.gradle.work.DisableCachingByDefault
 import org.jabref.build.JournalAbbreviationConverter
 import org.jabref.build.xjc.XjcPlugin
 import org.jabref.build.xjc.XjcTask
@@ -300,8 +301,7 @@ task generateSource(dependsOn: ["generateBstGrammarSource",
     group = 'JabRef'
     description 'Generates all necessary (Java) source files.'
 }
-
-task generateBstGrammarSource(type: JavaExec) {
+tasks.register("generateBstGrammarSource", JavaExec) {
     main = "org.antlr.Tool"
     classpath = configurations.antlr3
     group = "JabRef"
@@ -311,7 +311,7 @@ task generateBstGrammarSource(type: JavaExec) {
     args = ["-o", "$projectDir/src/main/generated/org/jabref/logic/bst/" , "$projectDir/src/main/antlr3/org/jabref/bst/Bst.g" ]
 }
 
-task generateSearchGrammarSource(type: JavaExec) {
+tasks.register("generateSearchGrammarSource", JavaExec) {
     main = "org.antlr.v4.Tool"
     classpath = configurations.antlr4
     group = 'JabRef'
