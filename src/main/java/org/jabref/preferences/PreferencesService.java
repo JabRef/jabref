@@ -382,6 +382,4 @@ public interface PreferencesService {
     ProtectedTermsPreferences getProtectedTermsPreferences();
 
     void storeProtectedTermsPreferences(ProtectedTermsPreferences preferences);
-
-
 }
