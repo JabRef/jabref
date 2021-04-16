@@ -57,9 +57,9 @@ public class ExportToClipboardActionTest {
 
     @BeforeEach
     public void setUp() {
-        if(Globals.prefs == null){
-            Globals.prefs = JabRefPreferences.getInstance();
-        }
+//        if (Globals.prefs == null) {
+//            Globals.prefs = JabRefPreferences.getInstance();
+//        }
         taskExecutor = new CurrentThreadTaskExecutor();
 
         List<TemplateExporter> customFormats = new ArrayList<>();
