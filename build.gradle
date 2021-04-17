@@ -109,6 +109,7 @@ dependencies {
     implementation 'com.h2database:h2-mvstore:1.4.200'
 
     implementation group: 'org.apache.tika', name: 'tika-core', version: '1.26'
+
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     implementation 'org.bouncycastle:bcprov-jdk15on:1.68'
 
