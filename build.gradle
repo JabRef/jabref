@@ -109,7 +109,6 @@ dependencies {
     implementation 'com.h2database:h2-mvstore:1.4.200'
 
     implementation group: 'org.apache.tika', name: 'tika-core', version: '1.26'
-
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
     implementation 'org.bouncycastle:bcprov-jdk15on:1.68'
 
@@ -274,7 +273,7 @@ processResources {
     filesMatching("build.properties") {
         expand(version: project.findProperty('projVersionInfo') ?: '100.0.0',
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
-                "maintainers": new File('MAINTAINERS').readLines().findAll { !it.startsWith("#") }.join(", "),
+                "maintainers": new File('/Volumes/Data/Document/2021-Spring/Code/Java/jabref/MAINTAINERS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "azureInstrumentationKey": System.getenv('AzureInstrumentationKey') ? System.getenv('AzureInstrumentationKey') : '',
                 "springerNatureAPIKey": System.getenv('SpringerNatureAPIKey') ? System.getenv('SpringerNatureAPIKey') : '',
                 "astrophysicsDataSystemAPIKey": System.getenv('AstrophysicsDataSystemAPIKey') ? System.getenv('AstrophysicsDataSystemAPIKey') : '',

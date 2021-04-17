@@ -44,7 +44,7 @@ public class IntegrityCheck {
         } else {
             entryCheckers.addAll(List.of(
                     new JournalInAbbreviationListChecker(StandardField.JOURNAL, journalAbbreviationRepository),
-                    new ASCIICharacterChecker(),
+                    new UTF8Checker(),
                     new NoBibtexFieldChecker(),
                     new BibTeXEntryTypeChecker())
             );
@@ -59,7 +59,6 @@ public class IntegrityCheck {
         for (BibEntry entry : database.getEntries()) {
             result.addAll(checkEntry(entry));
         }
-
         result.addAll(checkDatabase(database));
 
         return result;
