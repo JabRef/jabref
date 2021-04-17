@@ -9,7 +9,7 @@ public class PreambleDiff {
     private final String originalPreamble;
     private final String newPreamble;
 
-    private PreambleDiff(String originalPreamble, String newPreamble) {
+    PreambleDiff(String originalPreamble, String newPreamble) {
         this.originalPreamble = originalPreamble;
         this.newPreamble = newPreamble;
     }

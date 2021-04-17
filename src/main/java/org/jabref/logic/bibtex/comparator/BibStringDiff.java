@@ -17,7 +17,7 @@ public class BibStringDiff {
     private final BibtexString originalString;
     private final BibtexString newString;
 
-    private BibStringDiff(BibtexString originalString, BibtexString newString) {
+    BibStringDiff(BibtexString originalString, BibtexString newString) {
         this.originalString = originalString;
         this.newString = newString;
     }
