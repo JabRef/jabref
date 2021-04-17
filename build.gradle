@@ -274,7 +274,7 @@ processResources {
     filesMatching("build.properties") {
         expand(version: project.findProperty('projVersionInfo') ?: '100.0.0',
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
-                "maintainers": new File('/Volumes/Data/Document/2021-Spring/Code/Java/jabref/MAINTAINERS').readLines().findAll { !it.startsWith("#") }.join(", "),
+                "maintainers": new File('MAINTAINERS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "azureInstrumentationKey": System.getenv('AzureInstrumentationKey') ? System.getenv('AzureInstrumentationKey') : '',
                 "springerNatureAPIKey": System.getenv('SpringerNatureAPIKey') ? System.getenv('SpringerNatureAPIKey') : '',
                 "astrophysicsDataSystemAPIKey": System.getenv('AstrophysicsDataSystemAPIKey') ? System.getenv('AstrophysicsDataSystemAPIKey') : '',
@@ -427,9 +427,9 @@ javadoc {
         encoding = 'UTF-8'
         version = true
         author = true
-         addMultilineStringsOption("-add-exports").setValue([
-            'javafx.controls/com.sun.javafx.scene.control=org.jabref',
-            'org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref'
+        addMultilineStringsOption("-add-exports").setValue([
+                'javafx.controls/com.sun.javafx.scene.control=org.jabref',
+                'org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref'
         ])
     }
 }
@@ -757,5 +757,4 @@ task downloadDependencies {
         }
     }
 }
-
 
