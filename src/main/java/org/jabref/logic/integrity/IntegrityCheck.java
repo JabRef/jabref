@@ -38,13 +38,15 @@ public class IntegrityCheck {
                 new CitationKeyDeviationChecker(bibDatabaseContext, citationKeyPatternPreferences),
                 new CitationKeyDuplicationChecker(bibDatabaseContext.getDatabase())
         ));
-
         if (bibDatabaseContext.isBiblatexMode()) {
-            entryCheckers.add(new JournalInAbbreviationListChecker(StandardField.JOURNALTITLE, journalAbbreviationRepository));
+            entryCheckers.addAll(List.of(
+                    new JournalInAbbreviationListChecker(StandardField.JOURNALTITLE, journalAbbreviationRepository),
+                    new UTF8Checker())
+            );
         } else {
             entryCheckers.addAll(List.of(
                     new JournalInAbbreviationListChecker(StandardField.JOURNAL, journalAbbreviationRepository),
-                    new UTF8Checker(),
+                    new ASCIICharacterChecker(),
                     new NoBibtexFieldChecker(),
                     new BibTeXEntryTypeChecker())
             );
