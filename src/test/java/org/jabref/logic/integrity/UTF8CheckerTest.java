@@ -28,12 +28,11 @@ public class UTF8CheckerTest {
         String NonUTF8 = "";
         try {
             NonUTF8 = new String("你好，这条语句使用GBK字符集".getBytes(), "GBK");
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         entry.setField(StandardField.MONTH, NonUTF8);
         assertEquals(List.of(new IntegrityMessage("Non-UTF-8 encoded found", entry, StandardField.MONTH)), checker.check(entry));
     }
-
 
 }
