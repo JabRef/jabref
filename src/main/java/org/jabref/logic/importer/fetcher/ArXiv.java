@@ -136,7 +136,7 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
             query = "doi:" + doi.get();
         } else {
             Optional<String> authorQuery = entry.getField(StandardField.AUTHOR).map(author -> "au:" + author);
-            Optional<String> titleQuery = entry.getField(StandardField.TITLE).map(title -> "ti:" + title);
+            Optional<String> titleQuery = entry.getField(StandardField.TITLE).map(title -> "ti:" + removeCurlyBracesInTitle(title));
             query = OptionalUtil.toList(authorQuery, titleQuery).stream().collect(Collectors.joining("+AND+"));
         }
 
@@ -146,7 +146,7 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
             // Check if entry is a match
             StringSimilarity match = new StringSimilarity();
             String arxivTitle = arxivEntry.get().title.orElse("");
-            String entryTitle = entry.getField(StandardField.TITLE).orElse("");
+            String entryTitle = removeCurlyBracesInTitle(entry.getField(StandardField.TITLE).orElse(""));
 
             if (match.isSimilar(arxivTitle, entryTitle)) {
                 return OptionalUtil.toList(arxivEntry);
@@ -154,6 +154,10 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
         }
 
         return Collections.emptyList();
+    }
+
+    private String removeCurlyBracesInTitle(String title) {
+        return StringUtil.isNotBlank(title) ? title.replace("{", "").replace("}", "") : title;
     }
 
     private List<ArXivEntry> searchForEntries(String searchQuery, int pageNumber) throws FetcherException {
@@ -271,8 +275,8 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
         return searchResult.stream()
                            .filter(entry -> entry.getField(StandardField.DATE).isPresent())
                            // Filter the date field for year only
-                           .filter(entry -> transformer.getEndYear().isEmpty() || Integer.parseInt(entry.getField(StandardField.DATE).get().substring(0, 4)) <= transformer.getEndYear().get())
-                           .filter(entry -> transformer.getStartYear().isEmpty() || Integer.parseInt(entry.getField(StandardField.DATE).get().substring(0, 4)) >= transformer.getStartYear().get())
+                           .filter(entry -> transformer.getEndYear().isEmpty() || (Integer.parseInt(entry.getField(StandardField.DATE).get().substring(0, 4)) <= transformer.getEndYear().get()))
+                           .filter(entry -> transformer.getStartYear().isEmpty() || (Integer.parseInt(entry.getField(StandardField.DATE).get().substring(0, 4)) >= transformer.getStartYear().get()))
                            .collect(Collectors.toList());
     }
 
@@ -284,11 +288,14 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
 
     @Override
     public Optional<ArXivIdentifier> findIdentifier(BibEntry entry) throws FetcherException {
-        return searchForEntries(entry).stream()
-                                      .map(ArXivEntry::getId)
-                                      .filter(Optional::isPresent)
-                                      .map(Optional::get)
-                                      .findFirst();
+        LOGGER.info("Trying to find identifier");
+        Optional<ArXivIdentifier> result = searchForEntries(entry).stream()
+            .map(ArXivEntry::getId)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .findFirst();
+        LOGGER.info("identifier : {}", result.isPresent() ? result.get() : "null");
+        return result;
     }
 
     @Override
