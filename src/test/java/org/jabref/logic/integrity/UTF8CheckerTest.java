@@ -35,7 +35,6 @@ public class UTF8CheckerTest {
         entry.setField(StandardField.MONTH, NonUTF8);
         assertEquals(List.of(new IntegrityMessage("Non-UTF-8 encoded field found", entry, StandardField.MONTH)), checker.check(entry));
         System.getProperties().put("file.encoding", defaultCharset);
-        System.out.println(System.getProperty("file.encoding"));
     }
 
 }
