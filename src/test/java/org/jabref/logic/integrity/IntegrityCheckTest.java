@@ -3,9 +3,12 @@ package org.jabref.logic.integrity;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -34,6 +37,7 @@ import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -87,9 +91,9 @@ class IntegrityCheckTest {
 
     private static Stream<String> provideIncorrectFormat() {
         return Stream.of("   Knuth, Donald E. ",
-                         "Knuth, Donald E. and Kurt Cobain and A. Einstein",
-                         ", and Kurt Cobain and A. Einstein", "Donald E. Knuth and Kurt Cobain and ,",
-                         "and Kurt Cobain and A. Einstein", "Donald E. Knuth and Kurt Cobain and");
+                "Knuth, Donald E. and Kurt Cobain and A. Einstein",
+                ", and Kurt Cobain and A. Einstein", "Donald E. Knuth and Kurt Cobain and ,",
+                "and Kurt Cobain and A. Einstein", "Donald E. Knuth and Kurt Cobain and");
     }
 
     @Test
@@ -145,6 +149,94 @@ class IntegrityCheckTest {
         assertEquals(clonedEntry, entry);
     }
 
+    /**
+     * testCheckersForBibTex use injection to test the checkers in integrity check of BibTex
+     *
+     * @throws NoSuchFieldException   when using getDeclaredField in integrityCheck.getClass().getDeclaredField("entryCheckers")
+     * @throws IllegalAccessException when using Get method in entryCheckersField.get(integrityCheck)
+     */
+    @Test
+    void testCheckersForBibTex() throws NoSuchFieldException, IllegalAccessException {
+        BibEntry entry = new BibEntry();
+
+        for (Field field : FieldFactory.getCommonFields()) {
+            entry.setField(field, UUID.randomUUID().toString());
+        }
+        entry.setField(StandardField.EPRINT, UUID.randomUUID().toString());
+        BibDatabase bibDatabase = new BibDatabase();
+        bibDatabase.insertEntry(entry);
+        BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
+        context.setMode(BibDatabaseMode.BIBTEX);
+
+        IntegrityCheck integrityCheck = new IntegrityCheck(context,
+                mock(FilePreferences.class),
+                createCitationKeyPatternPreferences(),
+                JournalAbbreviationLoader.loadBuiltInRepository(), false);
+        java.lang.reflect.Field entryCheckersField = integrityCheck.getClass().getDeclaredField("entryCheckers");
+        entryCheckersField.setAccessible(true);
+        Object list = entryCheckersField.get(integrityCheck);
+        Set<Class<?>> entryCheckersSet = new HashSet<>();
+        if (list instanceof ArrayList<?>) {
+            for (Object o : (List<?>) list) {
+                entryCheckersSet.add(o.getClass());
+            }
+        }
+        assertTrue(entryCheckersSet.contains(CitationKeyChecker.class));
+        assertTrue(entryCheckersSet.contains(TypeChecker.class));
+        assertTrue(entryCheckersSet.contains(BibStringChecker.class));
+        assertTrue(entryCheckersSet.contains(HTMLCharacterChecker.class));
+        assertTrue(entryCheckersSet.contains(EntryLinkChecker.class));
+        assertTrue(entryCheckersSet.contains(CitationKeyDeviationChecker.class));
+        assertTrue(entryCheckersSet.contains(CitationKeyDuplicationChecker.class));
+        assertTrue(entryCheckersSet.contains(JournalInAbbreviationListChecker.class));
+        assertTrue(entryCheckersSet.contains(ASCIICharacterChecker.class));
+        assertTrue(entryCheckersSet.contains(NoBibtexFieldChecker.class));
+        assertTrue(entryCheckersSet.contains(BibTeXEntryTypeChecker.class));
+    }
+
+    /**
+     * testCheckersForBibLatex use injection to test the checkers in integrity check of BibTex
+     *
+     * @throws NoSuchFieldException   when using getDeclaredField in integrityCheck.getClass().getDeclaredField("entryCheckers")
+     * @throws IllegalAccessException when using Get method in entryCheckersField.get(integrityCheck)
+     */
+    @Test
+    void testCheckersForBibLatex() throws NoSuchFieldException, IllegalAccessException {
+        BibEntry entry = new BibEntry();
+
+        for (Field field : FieldFactory.getCommonFields()) {
+            entry.setField(field, UUID.randomUUID().toString());
+        }
+        entry.setField(StandardField.EPRINT, UUID.randomUUID().toString());
+        BibDatabase bibDatabase = new BibDatabase();
+        bibDatabase.insertEntry(entry);
+        BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
+        context.setMode(BibDatabaseMode.BIBLATEX);
+
+        IntegrityCheck integrityCheck = new IntegrityCheck(context,
+                mock(FilePreferences.class),
+                createCitationKeyPatternPreferences(),
+                JournalAbbreviationLoader.loadBuiltInRepository(), false);
+        java.lang.reflect.Field entryCheckersField = integrityCheck.getClass().getDeclaredField("entryCheckers");
+        entryCheckersField.setAccessible(true);
+        Object list = entryCheckersField.get(integrityCheck);
+        Set<Class<?>> entryCheckersSet = new HashSet<>();
+        if (list instanceof ArrayList<?>) {
+            for (Object o : (List<?>) list) {
+                entryCheckersSet.add(o.getClass());
+            }
+        }
+        assertTrue(entryCheckersSet.contains(CitationKeyChecker.class));
+        assertTrue(entryCheckersSet.contains(TypeChecker.class));
+        assertTrue(entryCheckersSet.contains(BibStringChecker.class));
+        assertTrue(entryCheckersSet.contains(HTMLCharacterChecker.class));
+        assertTrue(entryCheckersSet.contains(EntryLinkChecker.class));
+        assertTrue(entryCheckersSet.contains(CitationKeyDeviationChecker.class));
+        assertTrue(entryCheckersSet.contains(CitationKeyDuplicationChecker.class));
+        assertTrue(entryCheckersSet.contains(JournalInAbbreviationListChecker.class));
+        assertTrue(entryCheckersSet.contains(UTF8Checker.class));
+    }
+
     private BibDatabaseContext createContext(Field field, String value, EntryType type) {
         BibEntry entry = new BibEntry();
         entry.setField(field, value);
@@ -190,10 +282,10 @@ class IntegrityCheckTest {
 
     private void assertCorrect(BibDatabaseContext context, boolean allowIntegerEdition) {
         List<IntegrityMessage> messages = new IntegrityCheck(context,
-                                                             mock(FilePreferences.class),
-                                                             createCitationKeyPatternPreferences(),
-                                                             JournalAbbreviationLoader.loadBuiltInRepository(),
-                                                             allowIntegerEdition).check();
+                mock(FilePreferences.class),
+                createCitationKeyPatternPreferences(),
+                JournalAbbreviationLoader.loadBuiltInRepository(),
+                allowIntegerEdition).check();
         assertEquals(Collections.emptyList(), messages);
     }
 

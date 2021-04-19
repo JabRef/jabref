@@ -17,7 +17,7 @@ public class UTF8Checker implements EntryChecker {
 
     /**
      * Detect any non UTF-8 encoded field
-     * @param entry the BibEntry of BibLatex or Bibtex.
+     * @param entry the BibEntry of BibLatex.
      * @return return the warning of UTF-8 check for BibLatex.
      */
     @Override
