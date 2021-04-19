@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
@@ -15,6 +13,8 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.JabRefPreferences;
+
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -22,7 +22,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.testutils.category.GUITest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -35,14 +34,13 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mockito.Answers;
 
 @GUITest
 @ExtendWith(ApplicationExtension.class)
 public class DuplicateSearchTest {
 
     private final DialogService dialogService = spy(DialogService.class);
-    private final StateManager stateManager = mock(StateManager.class, Answers.RETURNS_DEEP_STUBS);
+    private final StateManager stateManager = mock(StateManager.class);
     private final JabRefFrame jabRefFrame = mock(JabRefFrame.class);
     private final LibraryTab libraryTab = mock(LibraryTab.class);
     private final BibDatabaseContext bibDatabaseContext = mock(BibDatabaseContext.class);
