@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -161,6 +162,13 @@ public class SaveDatabaseAction {
                 .build();
         Optional<Path> selectedPath = dialogService.showFileSaveDialog(fileDialogConfiguration);
         selectedPath.ifPresent(path -> preferences.setWorkingDirectory(path.getParent()));
+        if(!selectedPath.isEmpty()){
+            Path savePath = selectedPath.get();
+            if(!savePath.endsWith(".bib")){
+                String newPath = savePath.toString() + ".bib";
+                selectedPath = Optional.of(Paths.get(newPath));
+            }
+        }
         return selectedPath;
     }
 
