@@ -737,6 +737,6 @@ public class StringUtil {
     }
 
     public static String ignoreCurlyBracket(String title){
-        return isNotBlank(title) ? title.replace("{","").replace("}","") : title;
+        return isNotBlank(title) ? title.replace("{", "").replace("}", "") : title;
     }
 }
