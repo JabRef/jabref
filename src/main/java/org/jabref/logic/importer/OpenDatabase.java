@@ -73,7 +73,6 @@ public class OpenDatabase {
         List<PostOpenMigration> postOpenMigrations = Arrays.asList(
                 new ConvertLegacyExplicitGroups(),
                 new ConvertMarkingToGroups(),
-                new TimeStampToDateAddAndModify(timestampPreferences),
                 new SpecialFieldsToSeparateFields(keywordDelimited)
         );
 
