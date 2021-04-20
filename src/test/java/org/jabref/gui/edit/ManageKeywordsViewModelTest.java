@@ -76,10 +76,4 @@ public class ManageKeywordsViewModelTest {
         keywordsViewModel.removeKeyword(keywordToBeRemoved);
         assertFalse(addedKeywords.contains(keywordToBeRemoved));
     }
-/*
-    @Test
-    void savingNoChangesDoesNothing() {
-        keywordsViewModel.saveChanges();
-        assertEquals(13, keywordsViewModel.getKeywords().size());
-    }*/
 }
