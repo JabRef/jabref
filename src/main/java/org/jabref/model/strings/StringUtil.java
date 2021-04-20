@@ -736,7 +736,7 @@ public class StringUtil {
         return StringUtils.substringBetween(str, open, close);
     }
 
-    public static String ignoreCurlyBraces(String title){
+    public static String ignoreCurlyBracket(String title){
         return isNotBlank(title) ? title.replace("{","").replace("}","") : title;
     }
 }
