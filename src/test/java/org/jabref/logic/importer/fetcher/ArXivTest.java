@@ -96,9 +96,24 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherT
     }
 
     @Test
+    void findFullTextByTitleWithCurlyBrace() throws IOException {
+        entry.setField(StandardField.TITLE, "Machine versus {Human} {Attention} in {Deep} {Reinforcement} {Learning} {Tasks}");
+
+        assertEquals(Optional.of(new URL("https://arxiv.org/pdf/2010.15942v2")), fetcher.findFullText(entry));
+    }
+
+    @Test
     void findFullTextByTitleAndPartOfAuthor() throws IOException {
         entry.setField(StandardField.TITLE, "Pause Point Spectra in DNA Constant-Force Unzipping");
         entry.setField(StandardField.AUTHOR, "Weeks and Lucks");
+
+        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/cond-mat/0406246v1")), fetcher.findFullText(entry));
+    }
+
+    @Test
+    void findFullTextByTitleWithCurlyBraceAndPartOfAuthor() throws IOException {
+        entry.setField(StandardField.TITLE, "Machine versus {Human} {Attention} in {Deep} {Reinforcement} {Learning} {Tasks}");
+        entry.setField(StandardField.AUTHOR, "Zhang, Ruohan and Guo");
 
         assertEquals(Optional.of(new URL("http://arxiv.org/pdf/cond-mat/0406246v1")), fetcher.findFullText(entry));
     }

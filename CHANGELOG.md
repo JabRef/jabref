@@ -76,6 +76,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where opening BibTex file (doubleclick) from Folder with spaces not working. [#6487](https://github.com/JabRef/jabref/issues/6487)
 - We fixed an issue with saving large `.bib` files [#7265](https://github.com/JabRef/jabref/issues/7265)
 - We fixed an issue with very large page numbers [#7590](https://github.com/JabRef/jabref/issues/7590)
+- we fixed an issue where download article title with curly braces fail to download arXiv links (pdf files).  [#7633](https://github.com/JabRef/jabref/issues/7633)
 
 ### Removed
 
