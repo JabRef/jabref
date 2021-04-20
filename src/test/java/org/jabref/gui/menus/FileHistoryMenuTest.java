@@ -1,22 +1,20 @@
 package org.jabref.gui.menus;
 
-import javafx.scene.input.KeyEvent;
-import org.jabref.gui.DialogService;
-import org.jabref.gui.importer.actions.OpenDatabaseAction;
-import org.jabref.logic.util.io.FileHistory;
-import org.jabref.preferences.PreferencesService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import org.mockito.Mockito;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.LinkedList;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import javafx.scene.input.KeyEvent;
+
+import org.jabref.gui.DialogService;
+import org.jabref.gui.importer.actions.OpenDatabaseAction;
+import org.jabref.logic.util.io.FileHistory;
+import org.jabref.preferences.PreferencesService;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -28,10 +26,6 @@ class FileHistoryMenuTest {
   private final PreferencesService preferences = mock(PreferencesService.class);
   private final DialogService dialogService = mock(DialogService.class);
   private final OpenDatabaseAction openDatabaseAction = mock(OpenDatabaseAction.class);
-
-  @BeforeEach
-  void setUp() {
-  }
 
   @Test
   void openCorrectFileInMenuAfterKeystroke() {
@@ -47,11 +41,11 @@ class FileHistoryMenuTest {
     KeyEvent pressOne = mock(KeyEvent.class);
     when(pressOne.getCharacter()).thenReturn(String.valueOf('1'));
 
-    FileHistoryMenu historyMenu = new FileHistoryMenu(preferences,dialogService,openDatabaseAction);
+    FileHistoryMenu historyMenu = new FileHistoryMenu(preferences, dialogService, openDatabaseAction);
     FileHistoryMenu spyHistory = Mockito.spy(historyMenu);
 
     spyHistory.openFileByKey(pressOne);
 
-    verify(spyHistory,times(1)).openFile(history.getFileAt(0)); // First element in the file history should be opened, when pressing 1
+    verify(spyHistory, times(1)).openFile(history.getFileAt(0)); // First element in the file history should be opened, when pressing 1
   }
 }

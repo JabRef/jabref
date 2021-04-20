@@ -1,21 +1,22 @@
 package org.jabref.gui.importer;
 
 import javafx.beans.binding.BooleanExpression;
-import javafx.beans.value.ObservableBooleanValue;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.types.EntryType;
 import org.jabref.preferences.PreferencesService;
+
 import org.junit.jupiter.api.Test;
 
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class NewEntryActionTest {
 
