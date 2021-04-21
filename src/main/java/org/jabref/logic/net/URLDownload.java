@@ -36,9 +36,9 @@ import java.util.Map.Entry;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import javax.net.ssl.SSLSocketFactory;
 
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.util.FileHelper;
@@ -138,7 +138,7 @@ public class URLDownload {
      * @param sf trust manager
      * @param v host verifier
      */
-    public static void setSSLVerification(SSLSocketFactory sf, HostnameVerifier v){
+    public static void setSSLVerification(SSLSocketFactory sf, HostnameVerifier v) {
         try {
             HttpsURLConnection.setDefaultSSLSocketFactory(sf);
             HttpsURLConnection.setDefaultHostnameVerifier(v);
