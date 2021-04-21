@@ -20,9 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -309,5 +307,25 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherT
 
         // There is only one paper authored by Tobias Büscher with that phrase in the title
         assertEquals(Collections.singletonList(expected), result);
+    }
+
+
+    @Test
+    public void findByTitleWithCurlyBracket() throws Exception {
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Zhang, Ruohan and Guo, Sihang and Liu, Bo and Zhu, Yifeng and Hayhoe, Mary and Ballard, Dana and Stone, Peter")
+                .withField(StandardField.TITLE, "Machine versus {Human} {Attention} in {Deep} {Reinforcement} {Learning} {Tasks}")
+                .withField(StandardField.TITLE, "Machine versus Human Attention in Deep Reinforcement Learning Tasks")
+                .withField(StandardField.DATE, "2021-02")
+                // .withField(StandardField.FILE, ":http\\://arxiv.org/abs/2010.15942v2:PDF")
+                .withField(StandardField.FILE, ":http\\://arxiv.org/abs/2010.15942v2")
+                .withField(StandardField.JOURNAL, "arXiv");
+
+        Optional<URL> result = fetcher.findFullText(expected);
+
+        System.err.println(result);
+
+        // There is only one paper authored by Tobias Büscher with that phrase in the title
+        assertFalse(true);
     }
 }
