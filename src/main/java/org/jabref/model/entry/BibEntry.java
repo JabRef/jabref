@@ -19,6 +19,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
+import javafx.application.Platform;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.bibtex.FileFieldWriter;
@@ -560,7 +561,9 @@ public class BibEntry implements Cloneable {
         changed = true;
 
         invalidateFieldCache(field);
-        fields.put(field, value.intern());
+        Platform.runLater(() -> {
+            fields.put(field, value.intern());
+        });
 
         FieldChange change = new FieldChange(this, field, oldValue, value);
         if (isNewField) {
@@ -606,7 +609,9 @@ public class BibEntry implements Cloneable {
         changed = true;
 
         invalidateFieldCache(field);
-        fields.remove(field);
+        Platform.runLater(() -> {
+            fields.remove(field);
+        });
 
         FieldChange change = new FieldChange(this, field, oldValue.get(), null);
         eventBus.post(new FieldAddedOrRemovedEvent(change, eventSource));
