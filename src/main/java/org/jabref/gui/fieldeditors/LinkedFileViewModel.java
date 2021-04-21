@@ -481,8 +481,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     URLDownload.bypassSSLVerification();
                     return true;
                 } else {
-                    dialogService.showInformationDialogAndWait(Localization.lang("Download file"),
-                            Localization.lang("Operation canceled."));
+                    dialogService.notify(Localization.lang("Download operation canceled."));
                 }
             }
             return false;
