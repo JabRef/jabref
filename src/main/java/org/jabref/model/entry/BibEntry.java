@@ -14,12 +14,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 
+import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
-import javafx.application.Platform;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.bibtex.FileFieldWriter;
