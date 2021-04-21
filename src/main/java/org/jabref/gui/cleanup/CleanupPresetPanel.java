@@ -36,6 +36,8 @@ public class CleanupPresetPanel extends VBox {
     @FXML private CheckBox cleanUpUpgradeExternalLinks;
     @FXML private CheckBox cleanUpBiblatex;
     @FXML private CheckBox cleanUpBibtex;
+    @FXML private CheckBox cleanUpTimestampToCreationDate;
+    @FXML private CheckBox cleanUpTimestampToModificationDate;
     @FXML private FieldFormatterCleanupsPanel formatterCleanupsPanel;
 
     public CleanupPresetPanel(BibDatabaseContext databaseContext, CleanupPreset cleanupPreset, FilePreferences filePreferences) {
@@ -85,6 +87,8 @@ public class CleanupPresetPanel extends VBox {
         cleanUpUpgradeExternalLinks.setSelected(preset.isActive(CleanupPreset.CleanupStep.CLEAN_UP_UPGRADE_EXTERNAL_LINKS));
         cleanUpBiblatex.setSelected(preset.isActive(CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX));
         cleanUpBibtex.setSelected(preset.isActive(CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX));
+        cleanUpTimestampToCreationDate.setSelected(preset.isActive(CleanupPreset.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE));
+        cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreset.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE));
         cleanUpISSN.setSelected(preset.isActive(CleanupPreset.CleanupStep.CLEAN_UP_ISSN));
         formatterCleanupsPanel.cleanupsDisableProperty().setValue(!preset.getFormatterCleanups().isEnabled());
         formatterCleanupsPanel.cleanupsProperty().setValue(FXCollections.observableArrayList(preset.getFormatterCleanups().getConfiguredActions()));
@@ -123,6 +127,12 @@ public class CleanupPresetPanel extends VBox {
         }
         if (cleanUpBibtex.isSelected()) {
             activeJobs.add(CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX);
+        }
+        if (cleanUpTimestampToCreationDate.isSelected()) {
+            activeJobs.add(CleanupPreset.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE);
+        }
+        if (cleanUpTimestampToModificationDate.isSelected()) {
+            activeJobs.add(CleanupPreset.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE);
         }
 
         activeJobs.add(CleanupPreset.CleanupStep.FIX_FILE_LINKS);

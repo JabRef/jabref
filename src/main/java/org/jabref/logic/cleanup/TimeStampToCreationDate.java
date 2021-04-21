@@ -1,4 +1,4 @@
-package org.jabref.migrations;
+package org.jabref.logic.cleanup;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -22,14 +22,12 @@ import org.jabref.model.entry.field.StandardField;
  * If the old updateTimestamp setting is enabled, the timestamp field for each entry are migrated to the date-modified field.
  * Otherwise it is migrated to the date-added field.
  */
-public class TimeStampToDateAddAndModify implements CleanupJob {
+public class TimeStampToCreationDate implements CleanupJob {
 
     private final boolean interpretTimeStampAsModificationDate;
     private final Field timeStampField;
-    private final TimestampPreferences timestampPreferences;
 
-    public TimeStampToDateAddAndModify(TimestampPreferences timestampPreferences) {
-        this.timestampPreferences = timestampPreferences;
+    public TimeStampToCreationDate(TimestampPreferences timestampPreferences) {
         interpretTimeStampAsModificationDate = timestampPreferences.shouldUpdateTimestamp();
         timeStampField = timestampPreferences.getTimestampField();
     }
@@ -81,13 +79,8 @@ public class TimeStampToDateAddAndModify implements CleanupJob {
             FieldChange changeTo;
             // Add removal of timestamp field
             changeList.add(new FieldChange(entry, StandardField.TIMESTAMP, formattedTimeStamp.get(), ""));
-            if (interpretTimeStampAsModificationDate) {
-                entry.setField(StandardField.MODIFICATIONDATE, formattedTimeStamp.get());
-                changeTo = new FieldChange(entry, StandardField.MODIFICATIONDATE, entry.getField(StandardField.MODIFICATIONDATE).orElse(""), formattedTimeStamp.get());
-            } else {
-                entry.setField(StandardField.CREATIONDATE, formattedTimeStamp.get());
-                changeTo = new FieldChange(entry, StandardField.CREATIONDATE, entry.getField(StandardField.CREATIONDATE).orElse(""), formattedTimeStamp.get());
-            }
+            entry.setField(StandardField.CREATIONDATE, formattedTimeStamp.get());
+            changeTo = new FieldChange(entry, StandardField.CREATIONDATE, entry.getField(StandardField.CREATIONDATE).orElse(""), formattedTimeStamp.get());
             changeList.add(changeTo);
             return changeList;
         }

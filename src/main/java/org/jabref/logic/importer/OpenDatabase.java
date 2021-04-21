@@ -13,7 +13,6 @@ import org.jabref.migrations.ConvertLegacyExplicitGroups;
 import org.jabref.migrations.ConvertMarkingToGroups;
 import org.jabref.migrations.PostOpenMigration;
 import org.jabref.migrations.SpecialFieldsToSeparateFields;
-import org.jabref.migrations.TimeStampToDateAddAndModify;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
