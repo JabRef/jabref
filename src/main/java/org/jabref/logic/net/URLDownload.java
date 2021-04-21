@@ -38,6 +38,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.SSLSocketFactory;
 
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.util.FileHelper;
@@ -129,6 +130,20 @@ public class URLDownload {
             HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
         } catch (Exception e) {
             LOGGER.error("A problem occurred when bypassing SSL verification", e);
+        }
+    }
+
+    /**
+     *
+     * @param sf trust manager
+     * @param v host verifier
+     */
+    public static void setSSLVerification(SSLSocketFactory sf, HostnameVerifier v){
+        try {
+            HttpsURLConnection.setDefaultSSLSocketFactory(sf);
+            HttpsURLConnection.setDefaultHostnameVerifier(v);
+        } catch (Exception e) {
+            LOGGER.error("A problem occurred when reset SSL verification", e);
         }
     }
 
