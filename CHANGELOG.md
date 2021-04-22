@@ -81,6 +81,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where journal abbreviations in UTF-8 were not recognized [#5850](https://github.com/JabRef/jabref/issues/5850)
 - We fixed an issue where the article title with curly brackets fails to download the arXiv link (pdf file). [#7633](https://github.com/JabRef/jabref/issues/7633)
 - We fixed an issue where the article title with colon fails to download the arXiv link (pdf file). [#7660](https://github.com/JabRef/issues/7660)
+- We fixed an issue when throw an exception if you put ISBN or DOI in web search [#7575](https://github.com/JabRef/jabref/issues/7575)
 
 ### Removed
 
