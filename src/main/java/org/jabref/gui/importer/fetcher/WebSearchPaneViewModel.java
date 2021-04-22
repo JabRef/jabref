@@ -1,5 +1,7 @@
 package org.jabref.gui.importer.fetcher;
 
+import java.util.Collections;
+import java.util.Optional;
 import java.util.SortedSet;
 
 import javafx.beans.property.ListProperty;
@@ -15,10 +17,16 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.importer.fetcher.DoiFetcher;
+import org.jabref.logic.importer.fetcher.IsbnFetcher;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 
@@ -31,6 +39,8 @@ public class WebSearchPaneViewModel {
     private final StringProperty query = new SimpleStringProperty();
     private final DialogService dialogService;
     private final StateManager stateManager;
+    private final DoiFetcher doiFetcher;
+    private final IsbnFetcher isbnFetcher;
 
     public WebSearchPaneViewModel(PreferencesService preferencesService, DialogService dialogService, StateManager stateManager) {
         this.dialogService = dialogService;
@@ -50,6 +60,9 @@ public class WebSearchPaneViewModel {
             int newIndex = fetchers.indexOf(newFetcher);
             preferencesService.storeSidePanePreferences(preferencesService.getSidePanePreferences().withWebSearchFetcherSelected(newIndex));
         });
+
+        this.doiFetcher = new DoiFetcher(preferencesService.getImportFormatPreferences());
+        this.isbnFetcher = new IsbnFetcher(preferencesService.getImportFormatPreferences());
     }
 
     public ObservableList<SearchBasedFetcher> getFetchers() {
@@ -90,8 +103,32 @@ public class WebSearchPaneViewModel {
         SearchBasedFetcher activeFetcher = getSelectedFetcher();
 
         BackgroundTask<ParserResult> task;
-        task = BackgroundTask.wrap(() -> new ParserResult(activeFetcher.performSearch(getQuery().trim())))
-                             .withInitialMessage(Localization.lang("Processing %0", getQuery().trim()));
+        task = BackgroundTask.wrap(() -> {
+            Optional<DOI> doi = DOI.parse(getQuery());
+            if (doi.isPresent()) {
+                try {
+                    Optional<BibEntry> bibEntry = doiFetcher.performSearchById(doi.get().getDOI());
+                    if (bibEntry.isPresent()) {
+                        return new ParserResult(Collections.singletonList(bibEntry.get()));
+                    }
+                } catch (FetcherException ignore) {
+                }
+            }
+
+            Optional<ISBN> isbn = ISBN.parse(getQuery());
+            if (isbn.isPresent()) {
+                try {
+                    Optional<BibEntry> bibEntry = isbnFetcher.performSearchById(isbn.get().getNormalized());
+                    if (bibEntry.isPresent()) {
+                        return new ParserResult(Collections.singletonList(bibEntry.get()));
+                    }
+                } catch (FetcherException ignore) {
+                }
+            }
+
+            return new ParserResult(activeFetcher.performSearch(getQuery().trim()));
+        }).withInitialMessage(Localization.lang("Processing %0", getQuery().trim()));
+        
         task.onFailure(dialogService::showErrorDialogAndWait);
 
         ImportEntriesDialog dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task);
