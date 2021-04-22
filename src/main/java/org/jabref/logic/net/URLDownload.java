@@ -138,7 +138,7 @@ public class URLDownload {
      * @param sf trust manager
      * @param v host verifier
      */
-    public static void setSSLVerification(SSLSocketFactory sf, HostnameVerifier v) {
+    public static void setSSLVerification(SSLSocketFactory socketFactory, HostnameVerifier verifier) {
         try {
             HttpsURLConnection.setDefaultSSLSocketFactory(sf);
             HttpsURLConnection.setDefaultHostnameVerifier(v);
