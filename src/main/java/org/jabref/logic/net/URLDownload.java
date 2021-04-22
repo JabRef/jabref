@@ -135,13 +135,13 @@ public class URLDownload {
 
     /**
      *
-     * @param sf trust manager
-     * @param v host verifier
+     * @param socketFactory trust manager
+     * @param verifier host verifier
      */
     public static void setSSLVerification(SSLSocketFactory socketFactory, HostnameVerifier verifier) {
         try {
-            HttpsURLConnection.setDefaultSSLSocketFactory(sf);
-            HttpsURLConnection.setDefaultHostnameVerifier(v);
+            HttpsURLConnection.setDefaultSSLSocketFactory(socketFactory);
+            HttpsURLConnection.setDefaultHostnameVerifier(verifier);
         } catch (Exception e) {
             LOGGER.error("A problem occurred when reset SSL verification", e);
         }
