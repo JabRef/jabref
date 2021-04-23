@@ -13,15 +13,13 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.JabRefPreferences;
-
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.testutils.category.GUITest;
 
 import org.junit.jupiter.api.BeforeEach;
