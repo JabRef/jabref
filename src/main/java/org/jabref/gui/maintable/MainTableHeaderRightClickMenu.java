@@ -1,5 +1,7 @@
 package org.jabref.gui.maintable;
 
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +28,21 @@ public class MainTableHeaderRightClickMenu extends ContextMenu {
             }
             event.consume();
         });
-        mainTable.setOnMouseClicked(event -> this.hide());
+
+        mainTable.setOnMouseClicked(event -> {
+            if (!event.isControlDown() && (!event.isSecondaryButtonDown()) ) {
+                this.hide();
+            }
+        });
+
+        /*
+        mainTable.setOnMouseClicked(event -> {
+            if (event.isPrimaryButtonDown()) {
+                this.hide();
+            }
+        });
+
+         */
     }
 
     private void updateContextMenu(MainTable mainTable, LibraryTab libraryTab, DialogService dialogService) {
