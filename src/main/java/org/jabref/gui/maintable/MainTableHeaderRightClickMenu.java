@@ -26,6 +26,12 @@ public class MainTableHeaderRightClickMenu extends ContextMenu {
             }
             event.consume();
         });
+
+        mainTable.setOnMouseClicked(event -> {
+            if (!event.isControlDown() && (!event.isSecondaryButtonDown()) ) {
+                this.hide();
+            }
+        });
     }
 
     private void updateContextMenu(MainTable mainTable, LibraryTab libraryTab, DialogService dialogService) {
@@ -46,8 +52,9 @@ public class MainTableHeaderRightClickMenu extends ContextMenu {
     }
 
     private RadioMenuItem createRadioMenuItem(TableColumn<BibEntryTableViewModel, ?> tableColumn) {
-        RadioMenuItem radioMenuItem = new RadioMenuItem(((MainTableColumn) tableColumn).getDisplayName());
-        radioMenuItem.setSelected(true);
+        RadioMenuItem radioMenuItem = new RadioMenuItem(((MainTableColumn<?>) tableColumn).getDisplayName());
+        radioMenuItem.setSelected(tableColumn.isVisible());
+        radioMenuItem.setOnAction(event -> tableColumn.setVisible(!tableColumn.isVisible()));
         return radioMenuItem;
     }
 }
