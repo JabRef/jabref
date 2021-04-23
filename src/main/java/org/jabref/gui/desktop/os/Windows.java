@@ -27,13 +27,36 @@ public class Windows implements NativeDesktop {
     @Override
     public String detectProgramPath(String programName, String directoryName) {
         String progFiles = System.getenv("ProgramFiles(x86)");
-        if (progFiles == null) {
-            progFiles = System.getenv("ProgramFiles");
+        String programPath;
+        if (progFiles != null) {
+            programPath = getProgramPath(programName, directoryName, progFiles);
+            if (programPath != null) {
+                return programPath;
+            }
         }
+
+        progFiles = System.getenv("ProgramFiles");
+        System.out.println(progFiles);
+        programPath = getProgramPath(programName, directoryName, progFiles);
+        if (programPath != null) {
+            return programPath;
+        }
+
+        return "";
+    }
+
+    private String getProgramPath(String programName, String directoryName, String progFiles) {
+        String programPath;
         if ((directoryName != null) && !directoryName.isEmpty()) {
-            return Path.of(progFiles, directoryName, programName + DEFAULT_EXECUTABLE_EXTENSION).toString();
+            programPath = Path.of(progFiles, directoryName, programName + DEFAULT_EXECUTABLE_EXTENSION).toString();
+        } else {
+            programPath = Path.of(progFiles, programName + DEFAULT_EXECUTABLE_EXTENSION).toString();
         }
-        return Path.of(progFiles, programName + DEFAULT_EXECUTABLE_EXTENSION).toString();
+        File program = new File(programPath);
+        if (program.exists()) {
+            return programPath;
+        }
+        return null;
     }
 
     @Override
