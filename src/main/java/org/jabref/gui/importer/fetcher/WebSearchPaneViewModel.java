@@ -124,7 +124,7 @@ public class WebSearchPaneViewModel {
                         return new ParserResult(Collections.singletonList(bibEntry.get()));
                     }
                 } catch (FetcherException ignore) {
-                    // Ignored, because it can be something els
+                    // Ignored, because it can be something else
                 }
             }
 
