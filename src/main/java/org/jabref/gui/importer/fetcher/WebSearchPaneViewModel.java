@@ -130,7 +130,7 @@ public class WebSearchPaneViewModel {
 
             return new ParserResult(activeFetcher.performSearch(getQuery().trim()));
         }).withInitialMessage(Localization.lang("Processing %0", getQuery().trim()));
-        
+
         task.onFailure(dialogService::showErrorDialogAndWait);
 
         ImportEntriesDialog dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task);
