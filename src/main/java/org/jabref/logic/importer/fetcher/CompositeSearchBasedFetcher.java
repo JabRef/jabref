@@ -17,7 +17,9 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
+    public static volatile Boolean onPerformSucceed = false;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeSearchBasedFetcher.class);
 
@@ -36,6 +38,11 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
         this.maximumNumberOfReturnedResults = maximumNumberOfReturnedResults;
     }
 
+
+    public static void PerformSucceed(){
+        onPerformSucceed = true;
+    }
+
     @Override
     public String getName() {
         return "SearchAll";
@@ -50,9 +57,10 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
     public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
         ImportCleanup cleanup = new ImportCleanup(BibDatabaseMode.BIBTEX);
         // All entries have to be converted into one format, this is necessary for the format conversion
-        return fetchers.parallelStream()
+        return fetchers.stream()
                        .flatMap(searchBasedFetcher -> {
                            try {
+                               onPerformSucceed  = false;
                                return searchBasedFetcher.performSearch(luceneQuery).stream();
                            } catch (FetcherException e) {
                                LOGGER.warn(String.format("%s API request failed", searchBasedFetcher.getName()), e);
@@ -60,7 +68,12 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
                            }
                        })
                        .limit(maximumNumberOfReturnedResults)
-                       .map(cleanup::doPostCleanup)
+                       .map(x->{
+                           while (!onPerformSucceed) {
+                               Thread.onSpinWait();
+                           }
+                           return cleanup.doPostCleanup(x);
+                            })
                        .collect(Collectors.toList());
     }
 }

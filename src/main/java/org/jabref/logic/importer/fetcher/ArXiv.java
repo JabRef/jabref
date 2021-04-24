@@ -264,6 +264,7 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
         List<BibEntry> searchResult = searchForEntries(transformedQuery, pageNumber).stream()
                                                                                     .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
                                                                                     .collect(Collectors.toList());
+        CompositeSearchBasedFetcher.PerformSucceed();
         return new Page<>(transformedQuery, pageNumber, filterYears(searchResult, transformer));
     }
 
