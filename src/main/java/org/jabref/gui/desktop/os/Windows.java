@@ -2,6 +2,7 @@ package org.jabref.gui.desktop.os;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -36,7 +37,6 @@ public class Windows implements NativeDesktop {
         }
 
         progFiles = System.getenv("ProgramFiles");
-        System.out.println(progFiles);
         programPath = getProgramPath(programName, directoryName, progFiles);
         if (programPath != null) {
             return programPath;
@@ -46,15 +46,14 @@ public class Windows implements NativeDesktop {
     }
 
     private String getProgramPath(String programName, String directoryName, String progFiles) {
-        String programPath;
+        Path programPath;
         if ((directoryName != null) && !directoryName.isEmpty()) {
-            programPath = Path.of(progFiles, directoryName, programName + DEFAULT_EXECUTABLE_EXTENSION).toString();
+            programPath = Path.of(progFiles, directoryName, programName + DEFAULT_EXECUTABLE_EXTENSION);
         } else {
-            programPath = Path.of(progFiles, programName + DEFAULT_EXECUTABLE_EXTENSION).toString();
+            programPath = Path.of(progFiles, programName + DEFAULT_EXECUTABLE_EXTENSION);
         }
-        File program = new File(programPath);
-        if (program.exists()) {
-            return programPath;
+        if (Files.exists(programPath)) {
+            return programPath.toString();
         }
         return null;
     }
