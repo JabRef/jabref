@@ -14,7 +14,7 @@
     <category field="biology"/>
     <issn>0144-686X</issn>
     <eissn>1469-1779</eissn>
-    <updated>2017-06-04T17:19:24+00:00</updated>
+    <updated>2021-04-10T17:19:24+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -107,7 +107,7 @@
   <macro name="pages">
     <text variable="page"/>
   </macro>
-  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true">
+  <citation et-al-min="4" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true">
     <sort>
       <key variable="author"/>
       <key macro="year-date"/>
