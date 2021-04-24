@@ -14,7 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 
-import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -561,9 +560,7 @@ public class BibEntry implements Cloneable {
         changed = true;
 
         invalidateFieldCache(field);
-        Platform.runLater(() -> {
-            fields.put(field, value.intern());
-        });
+        fields.put(field, value.intern());
 
         FieldChange change = new FieldChange(this, field, oldValue, value);
         if (isNewField) {
@@ -609,9 +606,7 @@ public class BibEntry implements Cloneable {
         changed = true;
 
         invalidateFieldCache(field);
-        Platform.runLater(() -> {
-            fields.remove(field);
-        });
+        fields.remove(field);
 
         FieldChange change = new FieldChange(this, field, oldValue.get(), null);
         eventBus.post(new FieldAddedOrRemovedEvent(change, eventSource));
