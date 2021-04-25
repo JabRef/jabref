@@ -38,7 +38,11 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
         this.maximumNumberOfReturnedResults = maximumNumberOfReturnedResults;
     }
 
-
+    /**
+     * CS304 Issue Link: https://github.com/JabRef/jabref/issues/7606
+     *
+     * Set onPerformSucceed to true at performSearchPaged method in ArXiv
+     */
     public static void PerformSucceed(){
         onPerformSucceed = true;
     }
@@ -53,6 +57,15 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
         return Optional.empty();
     }
 
+    /**
+     * CS304 Issue Link: https://github.com/JabRef/jabref/issues/7606
+     *
+     * @param luceneQuery the root node of the lucene query
+     *
+     * @return return the fetchers stream
+     *
+     * @throws FetcherException when API request failed at searchBasedFetcher.getName()
+     */
     @Override
     public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
         ImportCleanup cleanup = new ImportCleanup(BibDatabaseMode.BIBTEX);

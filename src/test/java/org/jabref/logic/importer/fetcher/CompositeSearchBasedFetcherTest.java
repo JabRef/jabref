@@ -41,6 +41,12 @@ public class CompositeSearchBasedFetcherTest {
     }
 
     @Test
+    public void setPerformSucceed() {
+        CompositeSearchBasedFetcher.PerformSucceed();
+        Assertions.assertEquals(true, CompositeSearchBasedFetcher.onPerformSucceed);
+    }
+
+    @Test
     public void performSearchWithoutFetchers() throws Exception {
         Set<SearchBasedFetcher> empty = new HashSet<>();
         CompositeSearchBasedFetcher fetcher = new CompositeSearchBasedFetcher(empty, Integer.MAX_VALUE);

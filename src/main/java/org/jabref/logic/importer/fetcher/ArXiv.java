@@ -254,6 +254,10 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
     /**
      * Constructs a complex query string using the field prefixes specified at https://arxiv.org/help/api/user-manual
      *
+     * CS304 Issue Link: https://github.com/JabRef/jabref/issues/7606
+     *
+     * Set the onPerformSucceed to true after performedPage
+     *
      * @param luceneQuery the root node of the lucene query
      * @return A list of entries matching the complex query
      */
