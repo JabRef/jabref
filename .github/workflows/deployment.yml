@@ -75,9 +75,9 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle7-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-gradle7x-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
-            ${{ runner.os }}-gradle7-
+            ${{ runner.os }}-gradle7x-
       - name: Setup OSX key chain on OSX
         if: matrix.os == 'macos-latest'
         uses: apple-actions/import-codesign-certs@v1
