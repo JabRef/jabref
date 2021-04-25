@@ -38,9 +38,11 @@ public class IntegrityCheck {
                 new CitationKeyDeviationChecker(bibDatabaseContext, citationKeyPatternPreferences),
                 new CitationKeyDuplicationChecker(bibDatabaseContext.getDatabase())
         ));
-
         if (bibDatabaseContext.isBiblatexMode()) {
-            entryCheckers.add(new JournalInAbbreviationListChecker(StandardField.JOURNALTITLE, journalAbbreviationRepository));
+            entryCheckers.addAll(List.of(
+                    new JournalInAbbreviationListChecker(StandardField.JOURNALTITLE, journalAbbreviationRepository),
+                    new UTF8Checker())
+            );
         } else {
             entryCheckers.addAll(List.of(
                     new JournalInAbbreviationListChecker(StandardField.JOURNAL, journalAbbreviationRepository),
@@ -59,7 +61,6 @@ public class IntegrityCheck {
         for (BibEntry entry : database.getEntries()) {
             result.addAll(checkEntry(entry));
         }
-
         result.addAll(checkDatabase(database));
 
         return result;
