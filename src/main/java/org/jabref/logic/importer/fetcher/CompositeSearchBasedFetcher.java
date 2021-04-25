@@ -45,7 +45,7 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
     public static void PerformSucceed(){
         onPerformSucceed = true;
     }
-
+    // keep a status of perform search to make sure the execute order
     @Override
     public String getName() {
         return "SearchAll";
@@ -89,3 +89,4 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
                        .collect(Collectors.toList());
     }
 }
+//clear only after the perform search
