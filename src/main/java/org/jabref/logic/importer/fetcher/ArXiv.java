@@ -268,10 +268,10 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
         List<BibEntry> searchResult = searchForEntries(transformedQuery, pageNumber).stream()
                                                                                     .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
                                                                                     .collect(Collectors.toList());
-        CompositeSearchBasedFetcher.PerformSucceed();
+        CompositeSearchBasedFetcher.performSucceed();
         return new Page<>(transformedQuery, pageNumber, filterYears(searchResult, transformer));
     }
-    //when perform pages set onPerformSearch to true
+    // when perform pages set onPerformSearch to true
 
     private List<BibEntry> filterYears(List<BibEntry> searchResult, ArXivQueryTransformer transformer) {
         return searchResult.stream()

@@ -40,9 +40,12 @@ public class CompositeSearchBasedFetcherTest {
                 () -> new CompositeSearchBasedFetcher(null, 0));
     }
 
+    /***
+     * CS304 Issue Link: https://github.com/JabRef/jabref/issues/7606
+     */
     @Test
     public void setPerformSucceed() {
-        CompositeSearchBasedFetcher.PerformSucceed();
+        CompositeSearchBasedFetcher.performSucceed();
         Assertions.assertEquals(true, CompositeSearchBasedFetcher.onPerformSucceed);
     }
 
