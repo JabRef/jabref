@@ -9,7 +9,7 @@ import org.jabref.model.pdf.FileAnnotationType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FileAnnotationViewModelTest {
 
@@ -30,26 +30,22 @@ public class FileAnnotationViewModelTest {
 
     @Test
     public void sameAuthor() {
-        String expectedAuthor = "Jaroslav Kucha ˇr";
-        assertTrue(annotationViewModel.getAuthor().equals(expectedAuthor));
+        assertEquals("Jaroslav Kucha ˇr", annotationViewModel.getAuthor());
     }
 
     @Test
     public void retrieveCorrectPageNumberAsString() {
-        String expectedPage = "1";
-        assertTrue(annotationViewModel.getPage().equals(expectedPage));
+        assertEquals("1", annotationViewModel.getPage());
     }
 
     @Test
     public void retrieveCorrectDateAsString() {
-        String expectedDate = "2017-07-20 10:11:30";
-        assertTrue(annotationViewModel.getDate().equals(expectedDate));
+        assertEquals("2017-07-20 10:11:30", annotationViewModel.getDate());
     }
 
     @Test
     public void retrieveCorrectContent() {
-        String expectedContent = "This is content";
-        assertTrue(annotationViewModel.getContent().equals(expectedContent));
+        assertEquals("This is content", annotationViewModel.getContent());
     }
 
     @Test
@@ -58,6 +54,6 @@ public class FileAnnotationViewModelTest {
                 "This is paragraph 2, and it crosses several lines, now you can see next paragraph:%n"
                 + "This is paragraph 3.");
 
-        assertTrue(annotationViewModel.getMarking().equals(expectedMarking));
+        assertEquals(expectedMarking, annotationViewModel.getMarking());
     }
 }
