@@ -10,6 +10,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
@@ -36,8 +37,9 @@ public class CleanupPresetPanel extends VBox {
     @FXML private CheckBox cleanUpUpgradeExternalLinks;
     @FXML private CheckBox cleanUpBiblatex;
     @FXML private CheckBox cleanUpBibtex;
-    @FXML private CheckBox cleanUpTimestampToCreationDate;
-    @FXML private CheckBox cleanUpTimestampToModificationDate;
+    @FXML private RadioButton cleanUpTimestampToCreationDate;
+    @FXML private RadioButton cleanUpTimestampToModificationDate;
+    @FXML private RadioButton noTimestampCleanup;
     @FXML private FieldFormatterCleanupsPanel formatterCleanupsPanel;
 
     public CleanupPresetPanel(BibDatabaseContext databaseContext, CleanupPreset cleanupPreset, FilePreferences filePreferences) {
@@ -89,6 +91,7 @@ public class CleanupPresetPanel extends VBox {
         cleanUpBibtex.setSelected(preset.isActive(CleanupPreset.CleanupStep.CONVERT_TO_BIBTEX));
         cleanUpTimestampToCreationDate.setSelected(preset.isActive(CleanupPreset.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE));
         cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreset.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE));
+        cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreset.CleanupStep.DO_NOT_CONVERT_TIMESTAMP));
         cleanUpISSN.setSelected(preset.isActive(CleanupPreset.CleanupStep.CLEAN_UP_ISSN));
         formatterCleanupsPanel.cleanupsDisableProperty().setValue(!preset.getFormatterCleanups().isEnabled());
         formatterCleanupsPanel.cleanupsProperty().setValue(FXCollections.observableArrayList(preset.getFormatterCleanups().getConfiguredActions()));
