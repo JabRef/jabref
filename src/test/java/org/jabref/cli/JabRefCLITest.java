@@ -68,6 +68,27 @@ class JabRefCLITest {
     }
 
     @Test
+    void emptyPreferencesLeftOver() throws Exception {
+        JabRefCLI cli = new JabRefCLI(new String[]{"-n", "-x=some/file"});
+
+        assertEquals(Collections.emptyList(), cli.getLeftOver());
+    }
+
+    @Test
+    void successfulExportOfPreferences() throws Exception {
+        JabRefCLI cli = new JabRefCLI(new String[]{"-n", "-x=some/file"});
+
+        assertEquals("some/file", cli.getPreferencesExport());
+    }
+
+    @Test
+    void guiDisabledForPreferencesExport() throws Exception {
+        JabRefCLI cli = new JabRefCLI(new String[]{"-n", "-x=some/file"});
+
+        assertTrue(cli.isDisableGui());
+    }
+
+    @Test
     void emptyLeftOversCLIShortImportingBibtex() throws Exception {
         JabRefCLI cli = new JabRefCLI(new String[]{"-ib", bibtex});
 
