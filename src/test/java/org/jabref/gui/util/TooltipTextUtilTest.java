@@ -21,14 +21,14 @@ public class TooltipTextUtilTest {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.NORMAL);
         String textStyle = "Regular";
 
-        assertTrue(text.getFont().getStyle().equals(textStyle));
+        assertEquals(textStyle, text.getFont().getStyle());
     }
 
     @Test
     public void stringRemainsTheSameAfterTransformationToNormal() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.NORMAL);
 
-        assertTrue(text.getText().equals(testText));
+        assertEquals(testText, text.getText());
     }
 
     @Test
@@ -36,14 +36,14 @@ public class TooltipTextUtilTest {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.BOLD);
         String textStyle = "tooltip-text-bold";
 
-        assertTrue(text.getStyleClass().toString().equals(textStyle));
+        assertEquals(textStyle, text.getStyleClass().toString());
     }
 
     @Test
     public void stringRemainsTheSameAfterTransformationToBold() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.BOLD);
 
-        assertTrue(text.getText().equals(testText));
+        assertEquals(testText, text.getText());
     }
 
     @Test
@@ -51,14 +51,14 @@ public class TooltipTextUtilTest {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.ITALIC);
         String textStyle = "tooltip-text-italic";
 
-        assertTrue(text.getStyleClass().toString().equals(textStyle));
+        assertEquals(textStyle, text.getStyleClass().toString());
     }
 
     @Test
     public void stringRemainsTheSameAfterTransformationToItalic() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.ITALIC);
 
-        assertTrue(text.getText().equals(testText));
+        assertEquals(testText, text.getText());
     }
 
     @Test
@@ -73,14 +73,14 @@ public class TooltipTextUtilTest {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.MONOSPACED);
         String textStyle = "tooltip-text-monospaced";
 
-        assertTrue(text.getStyleClass().toString().equals(textStyle));
+        assertEquals(textStyle, text.getStyleClass().toString());
     }
 
     @Test
     public void stringRemainsTheSameAfterTransformationToMonospaced() {
         Text text = TooltipTextUtil.createText(testText, TooltipTextUtil.TextType.MONOSPACED);
 
-        assertTrue(text.getText().equals(testText));
+        assertEquals(testText, text.getText());
     }
 
     @Test
@@ -89,7 +89,7 @@ public class TooltipTextUtilTest {
         String htmlString = TooltipTextUtil.textToHTMLString(text);
         String expectedString = "<b>" + testText + "</b>";
 
-        assertTrue(htmlString.equals(expectedString));
+        assertEquals(expectedString, htmlString);
     }
 
     @Test
@@ -98,7 +98,7 @@ public class TooltipTextUtilTest {
         String htmlString = TooltipTextUtil.textToHTMLString(text);
         String expectedString = "<i>" + testText + "</i>";
 
-        assertTrue(htmlString.equals(expectedString));
+        assertEquals(expectedString, htmlString);
     }
 
     @Test
@@ -107,7 +107,7 @@ public class TooltipTextUtilTest {
         String htmlString = TooltipTextUtil.textToHTMLString(text);
         String expectedString = "<kbd>" + testText + "</kbd>";
 
-        assertTrue(htmlString.equals(expectedString));
+        assertEquals(expectedString, htmlString);
     }
 
     @Test
@@ -117,7 +117,7 @@ public class TooltipTextUtilTest {
         String htmlString = TooltipTextUtil.textToHTMLString(text);
         String expectedString = "<b><kbd>" + testText + "</kbd></b>";
 
-        assertTrue(htmlString.equals(expectedString));
+        assertEquals(expectedString, htmlString);
     }
 
     @Test
@@ -127,7 +127,7 @@ public class TooltipTextUtilTest {
         String htmlString = TooltipTextUtil.textToHTMLString(text);
         String expectedString = "this<br>is a<br>test text";
 
-        assertTrue(htmlString.equals(expectedString));
+        assertEquals(expectedString, htmlString);
     }
 
     @Test
