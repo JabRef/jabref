@@ -1,8 +1,10 @@
 package org.jabref.gui.edit;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.model.entry.BibEntry;
@@ -14,8 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -60,20 +61,26 @@ public class ManageKeywordsViewModelTest {
     }
 
     @Test
-    void checkAmountOfKeywordsInList() {
+    void keywordsFilledInCorrectly() {
         ObservableList<String> addedKeywords = keywordsViewModel.getKeywords();
+        List<String> expectedKeywordsList = Arrays.asList("Human-machine interaction", "Chatbot", "Medical Chatbot",
+                "Natural Language Processing", "Machine Learning", "Bot", "Chatbot", "Medical services", "Internet",
+                "Data collection", "Medical diagnostic imaging", "Automation", "Vocabulary");
 
-        assertEquals(13, addedKeywords.size());
+        assertEquals(FXCollections.observableList(expectedKeywordsList), addedKeywords);
     }
 
     @Test
     void removedKeywordNotIncludedInKeywordsList() {
-        ObservableList<String> addedKeywords = keywordsViewModel.getKeywords();
-        String keywordToBeRemoved = "Human-machine interaction";
+        ObservableList<String> modifiedKeywords = keywordsViewModel.getKeywords();
+        List<String> originalKeywordsList = Arrays.asList("Human-machine interaction", "Chatbot", "Medical Chatbot",
+                "Natural Language Processing", "Machine Learning", "Bot", "Chatbot", "Medical services", "Internet",
+                "Data collection", "Medical diagnostic imaging", "Automation", "Vocabulary");
 
-        assertTrue(addedKeywords.contains(keywordToBeRemoved));
+        assertEquals(FXCollections.observableList(originalKeywordsList), modifiedKeywords, "compared lists are not identical");
 
-        keywordsViewModel.removeKeyword(keywordToBeRemoved);
-        assertFalse(addedKeywords.contains(keywordToBeRemoved));
+        keywordsViewModel.removeKeyword("Human-machine interaction");
+
+        assertNotEquals(FXCollections.observableList(originalKeywordsList), modifiedKeywords, "compared lists are identical");
     }
 }
