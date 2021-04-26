@@ -3,6 +3,7 @@ package org.jabref.gui.importer;
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -23,9 +24,11 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.database.DuplicateCheck;
+import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
@@ -52,6 +55,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private final PreferencesService preferences;
     private final BibEntryTypesManager entryTypesManager;
 
+    private final ImportCleanup cleanup = new ImportCleanup(BibDatabaseMode.BIBTEX);
     /**
      * @param databaseContext the database to import into
      * @param task            the task executed for parsing the selected files(s).
@@ -78,10 +82,13 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         this.message.bind(task.messageProperty());
 
         task.onSuccess(parserResult -> {
+
             // store the complete parser result (to import groups, ... later on)
             this.parserResult = parserResult;
+
+            List<BibEntry> entries = parserResult.getDatabase().getEntries().stream().map(cleanup::doPostCleanup).collect(Collectors.toList());
             // fill in the list for the user, where one can select the entries to import
-            entries.addAll(parserResult.getDatabase().getEntries());
+            entries.addAll(entries);
         }).onFailure(ex -> {
             LOGGER.error("Error importing", ex);
             dialogService.showErrorDialogAndWait(ex);

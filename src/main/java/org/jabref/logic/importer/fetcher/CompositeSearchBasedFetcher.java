@@ -60,7 +60,6 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
                            }
                        })
                        .limit(maximumNumberOfReturnedResults)
-                       .map(cleanup::doPostCleanup)
                        .collect(Collectors.toList());
     }
 }
