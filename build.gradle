@@ -14,7 +14,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.38.0'
     id 'org.javamodularity.moduleplugin' version '1.7.0'
     id 'org.openjfx.javafxplugin' version '0.0.9'
-    id 'org.beryx.jlink' version '2.23.6'
+    id 'org.beryx.jlink' version '2.23.7'
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
     id 'com.adarshr.test-logger' version '3.0.0'
@@ -138,7 +138,7 @@ dependencies {
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.2'
 
-    implementation 'org.postgresql:postgresql:42.2.19'
+    implementation 'org.postgresql:postgresql:42.2.20'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
@@ -213,7 +213,7 @@ dependencies {
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.41.1'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.42'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.3'
 }
 

@@ -16,6 +16,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.jabref.logic.cleanup.CleanupJob;
+import org.jabref.logic.cleanup.EprintCleanup;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
@@ -116,6 +118,9 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
     }
 
     private List<ArXivEntry> searchForEntries(BibEntry entry) throws FetcherException {
+        entry = (BibEntry) entry.clone();
+        CleanupJob cleanupJob = new EprintCleanup();
+        cleanupJob.cleanup(entry);
         // 1. Eprint
         Optional<String> identifier = entry.getField(StandardField.EPRINT);
         if (StringUtil.isNotBlank(identifier)) {
