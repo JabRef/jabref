@@ -73,16 +73,16 @@ public class EditionCheckerTest {
         assertNotEquals(Optional.empty(), createBiblatexEditionChecker(true).checkValue("2nd"));
     }
 
-    private EditionChecker createBibtexEditionChecker(Boolean bool) {
+    private EditionChecker createBibtexEditionChecker(Boolean allowIntegerEdition) {
         BibDatabaseContext bibtex = new BibDatabaseContext();
         bibtex.setMode(BibDatabaseMode.BIBTEX);
-        return new EditionChecker(bibtex, bool);
+        return new EditionChecker(bibtex, allowIntegerEdition);
     }
 
-    private EditionChecker createBiblatexEditionChecker(Boolean bool) {
+    private EditionChecker createBiblatexEditionChecker(Boolean allowIntegerEdition) {
         BibDatabaseContext biblatex = new BibDatabaseContext();
         biblatex.setMode(BibDatabaseMode.BIBLATEX);
-        return new EditionChecker(biblatex, bool);
+        return new EditionChecker(biblatex, allowIntegerEdition);
     }
 
     private EditionChecker createSimpleEditionChecker(BibDatabaseContext bibDatabaseContextEdition, boolean allowIntegerEdition) {
