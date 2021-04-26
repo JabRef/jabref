@@ -83,11 +83,11 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         fontSizeProperty.setValue(String.valueOf(initialAppearancePreferences.getMainFontSize()));
 
         Theme currentTheme = initialAppearancePreferences.getTheme();
-        if (currentTheme.getType() == Theme.Type.LIGHT) {
+        if (currentTheme.getType() == Theme.Type.DEFAULT) {
             themeLightProperty.setValue(true);
             themeDarkProperty.setValue(false);
             themeCustomProperty.setValue(false);
-        } else if (currentTheme.getType() == Theme.Type.DARK) {
+        } else if (currentTheme.getType() == Theme.Type.EMBEDDED) {
             themeLightProperty.setValue(false);
             themeDarkProperty.setValue(true);
             themeCustomProperty.setValue(false);

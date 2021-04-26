@@ -6,11 +6,11 @@ import java.util.Optional;
 public class Theme {
 
     public enum Type {
-        LIGHT, DARK, CUSTOM
+        DEFAULT, EMBEDDED, CUSTOM
     }
 
     public static final String BASE_CSS = "Base.css";
-    public static final String EMBEDDED_DARK_THEME_CSS = "Dark.css";
+    public static final String EMBEDDED_DARK_CSS = "Dark.css";
 
     private final Type type;
     private final String name;
@@ -21,19 +21,25 @@ public class Theme {
 
         if (themeName.equals("") || BASE_CSS.equalsIgnoreCase(themeName)) {
             this.additionalStylesheet = Optional.empty();
-            this.type = Type.LIGHT;
+            this.type = Type.DEFAULT;
             themeName = "";
-        } else if (EMBEDDED_DARK_THEME_CSS.equalsIgnoreCase(themeName)) {
-            this.additionalStylesheet = StyleSheet.create(EMBEDDED_DARK_THEME_CSS);
-            this.type = this.additionalStylesheet.isPresent() ? Type.DARK : Type.LIGHT;
-            themeName = EMBEDDED_DARK_THEME_CSS;
+        } else if (EMBEDDED_DARK_CSS.equalsIgnoreCase(themeName)) {
+            this.additionalStylesheet = StyleSheet.create(EMBEDDED_DARK_CSS);
+
+            if (this.additionalStylesheet.isPresent()) {
+                this.type = Type.EMBEDDED;
+                themeName = EMBEDDED_DARK_CSS;
+            } else {
+                this.type = Type.DEFAULT;
+                themeName = "";
+            }
         } else {
             this.additionalStylesheet = StyleSheet.create(name);
             if (this.additionalStylesheet.isPresent()) {
                 this.type = Type.CUSTOM;
                 themeName = name;
             } else {
-                this.type = Type.LIGHT;
+                this.type = Type.DEFAULT;
                 themeName = "";
             }
         }
@@ -46,7 +52,7 @@ public class Theme {
     }
 
     public static Theme dark() {
-        return new Theme(EMBEDDED_DARK_THEME_CSS);
+        return new Theme(EMBEDDED_DARK_CSS);
     }
 
     public static Theme custom(String name) {
