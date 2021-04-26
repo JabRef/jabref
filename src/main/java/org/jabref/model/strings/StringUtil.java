@@ -735,4 +735,8 @@ public class StringUtil {
     public static String substringBetween(String str, String open, String close) {
         return StringUtils.substringBetween(str, open, close);
     }
+
+    public static String ignoreCurlyBracket(String title) {
+        return isNotBlank(title) ? title.replace("{", "").replace("}", "") : title;
+    }
 }
