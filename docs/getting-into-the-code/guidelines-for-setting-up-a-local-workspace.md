@@ -5,7 +5,7 @@ This guide explains how to set up your environment for development of JabRef. It
 ```text
 The most important step is to configure your IDE.
 In case you know how to install JDK15 with JavaFX support and to fork JabRef's code,
-        please scroll down to the IDE setup.
+please scroll down to the IDE setup.
 ```
 
 For a complete step-by-step guide for Linux using IntelliJ IDEA as the IDE, have a look at the following video instructions:
@@ -20,7 +20,7 @@ This section list the prerequisites you need to get started to develop JabRef. A
 
 A working Java \(Develoment Kit\) 15 installation with Java FX support is required. In the command line \(terminal in Linux, cmd in Windows\) run `javac -version` and make sure that the reported version is Java 15 \(e.g `javac 15`\). If `javac` is not found or a wrong version is reported, check your `PATH` environment variable, your `JAVA_HOME` environment variable or install the most recent JDK.
 
-[JavaFX is not part of the default JDK any more](https://www.reddit.com/r/java/comments/82qm9x/javafx_will_be_removed_from_the_java_jdk_in_jdk_11/), it needs to be installed separately if not using a special JDK. ~~We recommend to setup the full Liberica JDK including JavaFX. You can get it from~~ [~~https://bell-sw.com/pages/downloads/?version=java-15&package=jdk-full~~](https://bell-sw.com/pages/downloads/?version=java-15&package=jdk-full)~~. On Windows, you can execute `choco install libericajdkfull` \(requires~~ [~~installation of chocolatey - a package manager for Windows~~](https://chocolatey.org/install)~~\).~~ \(Liberica JDK 15 does not include the Java compiler properly any more\)
+[JavaFX is not part of the default JDK any more](https://www.reddit.com/r/java/comments/82qm9x/javafx_will_be_removed_from_the_java_jdk_in_jdk_11/), it needs to be installed separately if not using a special JDK.
 
 Download and install the JDK from [https://jdk.java.net/](https://jdk.java.net/). Afterwards, download the "jmods" JavaFX 15 zip archive from [https://gluonhq.com/products/javafx/](https://gluonhq.com/products/javafx/) and put the `.jmod` files into `C:\Program Files\OpenJDK\jdk-15\jmods`.
 
@@ -92,7 +92,7 @@ This section explains how you get the JabRef code onto your machine in a form al
 
 ## Configure your IDE
 
-These steps are very important. They allow you to focus on the content and ensure that the code formatting always goes well. Did you know that [IntelliJ allows for reformatting selected code](https://www.jetbrains.com/help/idea/reformat-and-rearrange-code.html#reformat_code) if you press Ctrl+Alt+L?
+These steps are very important. They allow you to focus on the content and ensure that the code formatting always goes well. Did you know that [IntelliJ allows for reformatting selected code](https://www.jetbrains.com/help/idea/reformat-and-rearrange-code.html#reformat_code) if you press <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>L</kbd>?
 
 ### Configuration of IntelliJ IDEA
 

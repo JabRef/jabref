@@ -36,6 +36,7 @@ import java.util.Map.Entry;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
@@ -129,6 +130,20 @@ public class URLDownload {
             HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
         } catch (Exception e) {
             LOGGER.error("A problem occurred when bypassing SSL verification", e);
+        }
+    }
+
+    /**
+     *
+     * @param socketFactory trust manager
+     * @param verifier host verifier
+     */
+    public static void setSSLVerification(SSLSocketFactory socketFactory, HostnameVerifier verifier) {
+        try {
+            HttpsURLConnection.setDefaultSSLSocketFactory(socketFactory);
+            HttpsURLConnection.setDefaultHostnameVerifier(verifier);
+        } catch (Exception e) {
+            LOGGER.error("A problem occurred when reset SSL verification", e);
         }
     }
 
