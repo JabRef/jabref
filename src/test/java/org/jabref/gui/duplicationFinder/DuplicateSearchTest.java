@@ -105,6 +105,5 @@ public class DuplicateSearchTest {
         verify(dialogService, times(1)).notify(Localization.lang("Searching for duplicates..."));
         verify(dialogService, times(1)).notify(Localization.lang("Duplicates found") + ": " + String.valueOf(0) + ' '
                 + Localization.lang("pairs processed") + ": " + String.valueOf(0));
-        // verify(dialogService, times(2)).notify(any());
     }
 }
