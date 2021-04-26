@@ -13,6 +13,7 @@ import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
+import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 
@@ -74,12 +75,13 @@ public class TimeStampToCreationDate implements CleanupJob {
                 // In case the timestamp could not be parsed, do nothing to not lose data
                 return Collections.emptyList();
             }
-            entry.clearField(timeStampField);
+            // Setting the EventSource is necessary to circumvent the update of the modification date during timestamp migration
+            entry.clearField(timeStampField, EntriesEventSource.CLEANUP_TIMESTAMP);
             List<FieldChange> changeList = new ArrayList<>();
             FieldChange changeTo;
             // Add removal of timestamp field
             changeList.add(new FieldChange(entry, StandardField.TIMESTAMP, formattedTimeStamp.get(), ""));
-            entry.setField(StandardField.CREATIONDATE, formattedTimeStamp.get());
+            entry.setField(StandardField.CREATIONDATE, formattedTimeStamp.get(), EntriesEventSource.CLEANUP_TIMESTAMP);
             changeTo = new FieldChange(entry, StandardField.CREATIONDATE, entry.getField(StandardField.CREATIONDATE).orElse(""), formattedTimeStamp.get());
             changeList.add(changeTo);
             return changeList;
