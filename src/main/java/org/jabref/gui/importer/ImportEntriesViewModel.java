@@ -86,9 +86,9 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             // store the complete parser result (to import groups, ... later on)
             this.parserResult = parserResult;
 
-            List<BibEntry> entries = parserResult.getDatabase().getEntries().stream().map(cleanup::doPostCleanup).collect(Collectors.toList());
+            List<BibEntry> resultEntries = parserResult.getDatabase().getEntries().stream().map(cleanup::doPostCleanup).collect(Collectors.toList());
             // fill in the list for the user, where one can select the entries to import
-            entries.addAll(entries);
+            entries.addAll(resultEntries);
         }).onFailure(ex -> {
             LOGGER.error("Error importing", ex);
             dialogService.showErrorDialogAndWait(ex);
