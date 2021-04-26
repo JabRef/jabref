@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.AppearancePreferences;
 
@@ -152,7 +153,9 @@ public class ThemeManager {
     private void baseCssLiveUpdate() {
         baseStyleSheet.reload();
         LOGGER.debug("Updating base CSS for {} scenes", scenes.size());
-        updateRunner.accept(() -> scenes.forEach(this::updateBaseCss));
+        DefaultTaskExecutor.runInJavaFXThread(() ->
+                updateRunner.accept(() -> scenes.forEach(this::updateBaseCss))
+        );
     }
 
     private void additionalCssLiveUpdate() {
@@ -166,17 +169,19 @@ public class ThemeManager {
         LOGGER.debug("Updating additional CSS for {} scenes and {} web engines", scenes.size(), webEngines.size());
 
         final String finalNewStyleSheetLocation = newStyleSheetLocation;
-        updateRunner.accept(() -> {
-            scenes.forEach(this::updateAdditionalCss);
+        DefaultTaskExecutor.runInJavaFXThread(() ->
+                updateRunner.accept(() -> {
+                    scenes.forEach(this::updateAdditionalCss);
 
-            webEngines.forEach(webEngine -> {
-                // force refresh by unloading style sheet, if the location hasn't changed
-                if (webEngine.getUserStyleSheetLocation().equals(finalNewStyleSheetLocation)) {
-                    webEngine.setUserStyleSheetLocation(null);
-                }
-                webEngine.setUserStyleSheetLocation(finalNewStyleSheetLocation);
-            });
-        });
+                    webEngines.forEach(webEngine -> {
+                        // force refresh by unloading style sheet, if the location hasn't changed
+                        if (webEngine.getUserStyleSheetLocation().equals(finalNewStyleSheetLocation)) {
+                            webEngine.setUserStyleSheetLocation(null);
+                        }
+                        webEngine.setUserStyleSheetLocation(finalNewStyleSheetLocation);
+                    });
+                })
+        );
     }
 
     private void updateBaseCss(Scene scene) {
