@@ -78,6 +78,10 @@ public class Theme {
         return name;
     }
 
+    public Optional<StyleSheet> getAdditionalStylesheet() {
+        return additionalStylesheet;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -93,10 +97,6 @@ public class Theme {
     @Override
     public int hashCode() {
         return Objects.hash(type, name);
-    }
-
-    public Optional<StyleSheet> getAdditionalStylesheet() {
-        return additionalStylesheet;
     }
 
     @Override
