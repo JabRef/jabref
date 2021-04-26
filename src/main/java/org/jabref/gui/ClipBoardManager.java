@@ -27,10 +27,12 @@ import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.ImportFormatReader.UnknownFormatImport;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.fetcher.ArXiv;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.util.OptionalUtil;
 import org.jabref.preferences.PreferencesService;
@@ -194,6 +196,10 @@ public class ClipBoardManager {
         if (doi.isPresent()) {
             return fetchByDOI(doi.get());
         }
+        Optional<ArXivIdentifier> arXiv = ArXivIdentifier.parse(data);
+        if (arXiv.isPresent()) {
+            return fetchByArXiv(arXiv.get());
+        }
 
         return tryImportFormats(data);
     }
@@ -211,6 +217,17 @@ public class ClipBoardManager {
         LOGGER.info("Found DOI in clipboard");
         try {
             Optional<BibEntry> entry = new DoiFetcher(preferencesService.getImportFormatPreferences()).performSearchById(doi.getDOI());
+            return OptionalUtil.toList(entry);
+        } catch (FetcherException ex) {
+            LOGGER.error("Error while fetching", ex);
+            return Collections.emptyList();
+        }
+    }
+
+    private List<BibEntry> fetchByArXiv(ArXivIdentifier arXivIdentifier) {
+        LOGGER.info("Found arxiv identifier in clipboard");
+        try {
+            Optional<BibEntry> entry = new ArXiv(preferencesService.getImportFormatPreferences()).performSearchById(arXivIdentifier.getNormalizedWithoutVersion());
             return OptionalUtil.toList(entry);
         } catch (FetcherException ex) {
             LOGGER.error("Error while fetching", ex);

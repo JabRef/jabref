@@ -36,7 +36,7 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
     private final Field field;
-    private PreferencesService preferences;
+    private final PreferencesService preferences;
 
     public IdentifierEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, TaskExecutor taskExecutor, DialogService dialogService, FieldCheckers fieldCheckers, PreferencesService preferences) {
         super(field, suggestionProvider, fieldCheckers);
@@ -75,8 +75,8 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
 
     public void openExternalLink() {
         if (field.equals(StandardField.DOI) && preferences.getDOIPreferences().isUseCustom()) {
-            String baseURI = preferences.getDOIPreferences().getDefaultBaseURI();
-            openDOIWithCustomBase(baseURI);
+            identifier.get().map(identifier -> (DOI) identifier).map(DOI::getDOI)
+                      .ifPresent(s -> JabRefDesktop.openCustomDoi(s, preferences, dialogService));
         } else {
             openExternalLinkDefault();
         }
@@ -87,18 +87,6 @@ public class IdentifierEditorViewModel extends AbstractEditorViewModel {
                 url -> {
                     try {
                         JabRefDesktop.openBrowser(url);
-                    } catch (IOException ex) {
-                        dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), ex);
-                    }
-                }
-        );
-    }
-
-    public void openDOIWithCustomBase(String baseURI) {
-        identifier.get().map(identifier -> (DOI) identifier).flatMap(doi -> doi.getExternalURIWithCustomBase(baseURI)).ifPresent(
-                uri -> {
-                    try {
-                        JabRefDesktop.openBrowser(uri);
                     } catch (IOException ex) {
                         dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), ex);
                     }

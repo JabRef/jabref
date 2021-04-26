@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="note" default-locale="fr-FR" version="1.0" page-range-format="expanded" demote-non-dropping-particle="display-and-sort">
   <info>
-    <title>Presses universitaires de Paris Nanterre (note, French)</title>
+    <title>Presses universitaires de Paris Nanterre (note, Français)</title>
     <title-short>PU Paris Nanterre</title-short>
     <id>http://www.zotero.org/styles/presses-universitaires-de-paris-nanterre</id>
     <link href="http://www.zotero.org/styles/presses-universitaires-de-paris-nanterre" rel="self"/>
@@ -197,6 +197,12 @@
       </else-if>
     </choose>
   </macro>
+  <macro name="locators">
+    <group delimiter=".&#160;">
+      <label variable="locator" form="short"/>
+      <text variable="locator"/>
+    </group>
+  </macro>
   <macro name="yearpage-bib">
     <choose>
       <if type="bill book graphic legal_case motion_picture paper-conference report song speech thesis" match="any">
@@ -212,10 +218,7 @@
             </group>
             <text variable="number-of-pages" suffix="&#160;p"/>
           </group>
-          <group>
-            <label variable="locator" form="short"/>
-            <text variable="locator"/>
-          </group>
+          <text macro="locators"/>
         </group>
       </if>
       <else-if type="chapter entry-dictionary entry-encyclopedia" match="any">
@@ -349,7 +352,7 @@
         <if position="ibid-with-locator">
           <group delimiter=", ">
             <text term="ibid" text-case="capitalize-first" font-style="italic" suffix="."/>
-            <text variable="locator" prefix="p. "/>
+            <text macro="locators"/>
           </group>
         </if>
         <else-if position="ibid">
@@ -368,7 +371,7 @@
                 <text value="art cit"/>
               </else>
             </choose>
-            <text variable="locator" prefix="p.&#160;"/>
+            <text macro="locators"/>
           </group>
         </else-if>
         <else>

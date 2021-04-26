@@ -195,6 +195,16 @@ public class GroupTreeViewModel extends AbstractViewModel {
                 boolean removePreviousAssignments = (oldGroup.getGroupNode().getGroup() instanceof ExplicitGroup)
                         && (group instanceof ExplicitGroup);
 
+                int groupsWithSameName = 0;
+                Optional<GroupTreeNode> databaseRootGroup = currentDatabase.get().getMetaData().getGroups();
+                if (databaseRootGroup.isPresent()) {
+                    String name = oldGroup.getGroupNode().getGroup().getName();
+                    groupsWithSameName = databaseRootGroup.get().findChildrenSatisfying(g -> g.getName().equals(name)).size();
+                }
+                if (groupsWithSameName >= 2) {
+                    removePreviousAssignments = false;
+                }
+
                 oldGroup.getGroupNode().setGroup(
                         group,
                         keepPreviousAssignments,
@@ -236,6 +246,9 @@ public class GroupTreeViewModel extends AbstractViewModel {
             /// TODO: Add undo
             // final UndoableModifySubtree undo = new UndoableModifySubtree(getGroupTreeRoot(), node, "Remove subgroups");
             // panel.getUndoManager().addEdit(undo);
+            for (GroupNodeViewModel child : group.getChildren()) {
+                removeGroupsAndSubGroupsFromEntries(child);
+            }
             group.getGroupNode().removeAllChildren();
             dialogService.notify(Localization.lang("Removed all subgroups of group \"%0\".", group.getDisplayName()));
             writeGroupChangesToMetaData();
@@ -290,8 +303,16 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
         // only remove explicit groups from the entries, keyword groups should not be deleted
         if (group.getGroupNode().getGroup() instanceof ExplicitGroup) {
-            List<BibEntry> entriesInGroup = group.getGroupNode().getEntriesInGroup(this.currentDatabase.get().getEntries());
-            group.getGroupNode().removeEntriesFromGroup(entriesInGroup);
+            int groupsWithSameName = 0;
+            String name = group.getGroupNode().getGroup().getName();
+            Optional<GroupTreeNode> rootGroup = currentDatabase.get().getMetaData().getGroups();
+            if (rootGroup.isPresent()) {
+                groupsWithSameName = rootGroup.get().findChildrenSatisfying(g -> g.getName().equals(name)).size();
+            }
+            if (groupsWithSameName < 2) {
+                List<BibEntry> entriesInGroup = group.getGroupNode().getEntriesInGroup(this.currentDatabase.get().getEntries());
+                group.getGroupNode().removeEntriesFromGroup(entriesInGroup);
+            }
         }
     }
 
