@@ -3,21 +3,14 @@ package org.jabref.logic.bibtex.comparator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class EntryComparatorTest {
 
-    private BibEntry entry1;
-    private BibEntry entry2;
-
-    @BeforeEach
-    void setup() {
-        entry1 = new BibEntry();
-        entry2 = new BibEntry();
-    }
+    private BibEntry entry1 = new BibEntry();
+    private BibEntry entry2 = new BibEntry();
 
     @Test
     void recognizeIdenticObjectsAsEqual() {
@@ -27,7 +20,6 @@ class EntryComparatorTest {
 
     @Test
     void compareAuthorFieldBiggerAscending() throws Exception {
-
         entry1.setField(StandardField.AUTHOR, "Stephen King");
         entry2.setField(StandardField.AUTHOR, "Henning Mankell");
 
