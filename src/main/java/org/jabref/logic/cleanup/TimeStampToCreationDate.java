@@ -24,11 +24,9 @@ import org.jabref.model.entry.field.StandardField;
  */
 public class TimeStampToCreationDate implements CleanupJob {
 
-    private final boolean interpretTimeStampAsModificationDate;
     private final Field timeStampField;
 
     public TimeStampToCreationDate(TimestampPreferences timestampPreferences) {
-        interpretTimeStampAsModificationDate = timestampPreferences.shouldUpdateTimestamp();
         timeStampField = timestampPreferences.getTimestampField();
     }
 
