@@ -33,12 +33,10 @@
               text="%Convert to biblatex format (for example, move the value of the 'journal' field to 'journaltitle')"/>
     <CheckBox fx:id="cleanUpBibtex"
               text="%Convert to BibTeX format (for example, move the value of the 'journaltitle' field to 'journal')"/>
-    <RadioButton fx:id="cleanUpTimestampToCreationDate" toggleGroup="$timestampCleanup"
+    <CheckBox fx:id="cleanUpTimestampToCreationDate"
               text="%Convert timestamp field to creationdate field"/>
-    <RadioButton fx:id="cleanUpTimestampToModificationDate" toggleGroup="$timestampCleanup"
+    <CheckBox fx:id="cleanUpTimestampToModificationDate"
               text="%Convert timestamp field to modificationdate field"/>
-    <RadioButton fx:id="noTimestampCleanup" toggleGroup="$timestampCleanup" selected="true"
-                 text="%Do not convert timestamp field"/>
 
     <FieldFormatterCleanupsPanel fx:id="formatterCleanupsPanel"/>
 </fx:root>

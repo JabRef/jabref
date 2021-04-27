@@ -10,7 +10,6 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
@@ -37,9 +36,8 @@ public class CleanupPresetPanel extends VBox {
     @FXML private CheckBox cleanUpUpgradeExternalLinks;
     @FXML private CheckBox cleanUpBiblatex;
     @FXML private CheckBox cleanUpBibtex;
-    @FXML private RadioButton cleanUpTimestampToCreationDate;
-    @FXML private RadioButton cleanUpTimestampToModificationDate;
-    @FXML private RadioButton noTimestampCleanup;
+    @FXML private CheckBox cleanUpTimestampToCreationDate;
+    @FXML private CheckBox cleanUpTimestampToModificationDate;
     @FXML private FieldFormatterCleanupsPanel formatterCleanupsPanel;
 
     public CleanupPresetPanel(BibDatabaseContext databaseContext, CleanupPreset cleanupPreset, FilePreferences filePreferences) {
@@ -73,7 +71,30 @@ public class CleanupPresetPanel extends VBox {
                                             .concat(": ")
                                             .concat(filePreferences.getFileNamePattern());
         cleanupRenamePDFLabel.setText(currentPattern);
-
+        cleanUpBibtex.selectedProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    if (newValue) {
+                        cleanUpBiblatex.selectedProperty().setValue(false);
+                    }
+                });
+        cleanUpBiblatex.selectedProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    if (newValue) {
+                        cleanUpBibtex.selectedProperty().setValue(false);
+                    }
+                });
+        cleanUpTimestampToCreationDate.selectedProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    if (newValue) {
+                        cleanUpTimestampToModificationDate.selectedProperty().setValue(false);
+                    }
+                });
+        cleanUpTimestampToModificationDate.selectedProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    if (newValue) {
+                        cleanUpTimestampToCreationDate.selectedProperty().setValue(false);
+                    }
+                });
         updateDisplay(cleanupPreset);
     }
 
