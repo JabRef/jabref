@@ -3,7 +3,6 @@ package org.jabref.gui.importer;
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -81,12 +80,10 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         this.message.bind(task.messageProperty());
 
         task.onSuccess(parserResult -> {
-            cleanup = new ImportCleanup(databaseContext.getMode());
             // store the complete parser result (to import groups, ... later on)
             this.parserResult = parserResult;
-            List<BibEntry> cleanedEntries = parserResult.getDatabase().getEntries().stream().map(cleanup::doPostCleanup).collect(Collectors.toList());
             // fill in the list for the user, where one can select the entries to import
-            entries.addAll(cleanedEntries);
+            entries.addAll(parserResult.getDatabase().getEntries());
         }).onFailure(ex -> {
             LOGGER.error("Error importing", ex);
             dialogService.showErrorDialogAndWait(ex);
