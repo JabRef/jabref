@@ -15,8 +15,6 @@ import org.slf4j.LoggerFactory;
 
 abstract class StyleSheet {
 
-    protected static final String DATA_URL_PREFIX = "data:text/css;charset=utf-8;base64,";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(StyleSheet.class);
 
     abstract URL getSceneStylesheet();
@@ -33,33 +31,19 @@ abstract class StyleSheet {
         Optional<URL> styleSheetUrl = Optional.ofNullable(JabRefFrame.class.getResource(name));
 
         if (styleSheetUrl.isEmpty()) {
-            styleSheetUrl = getExternalUrl(name);
-        }
-
-        if (styleSheetUrl.isEmpty()) {
-            return Optional.empty();
-        } else if ("file".equals(styleSheetUrl.get().getProtocol())) {
-            return Optional.of(new StyleSheetFile(styleSheetUrl.get()));
-        } else {
-            return Optional.of(new StyleSheetResource(styleSheetUrl.get()));
-        }
-    }
-
-    private static Optional<URL> getExternalUrl(String name) {
-        Optional<URL> url;
-
-        try {
-            url = Optional.of(Path.of(name).toUri().toURL());
-        } catch (InvalidPathException e) {
-            LOGGER.warn("Cannot load additional css {} because it is an invalid path: {}", name, e.getLocalizedMessage());
-            return Optional.empty();
-        } catch (MalformedURLException e) {
-            LOGGER.warn("Cannot load additional css url {} because it is a malformed url: {}", name, e.getLocalizedMessage());
-            return Optional.empty();
+            try {
+                styleSheetUrl = Optional.of(Path.of(name).toUri().toURL());
+            } catch (InvalidPathException e) {
+                LOGGER.warn("Cannot load additional css {} because it is an invalid path: {}", name, e.getLocalizedMessage());
+                return Optional.empty();
+            } catch (MalformedURLException e) {
+                LOGGER.warn("Cannot load additional css url {} because it is a malformed url: {}", name, e.getLocalizedMessage());
+                return Optional.empty();
+            }
         }
 
         try {
-            Path path = Path.of(url.get().toURI());
+            Path path = Path.of(styleSheetUrl.get().toURI());
             if (Files.isDirectory(path)) {
                 LOGGER.warn("Cannot load additional css {} because it is a directory.", name);
                 return Optional.empty();
@@ -68,10 +52,14 @@ abstract class StyleSheet {
                 return Optional.empty();
             }
         } catch (URISyntaxException ignored) {
-            // JVM is reformatting a url its validity already checked above
+            // JVM is reformatting a url its validity already is checked above
         }
 
-        return url;
+        if ("file".equals(styleSheetUrl.get().getProtocol())) {
+            return Optional.of(new StyleSheetFile(styleSheetUrl.get()));
+        } else {
+            return Optional.of(new StyleSheetResource(styleSheetUrl.get()));
+        }
     }
 
     @Override

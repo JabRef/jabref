@@ -44,6 +44,8 @@ final class StyleSheetFile extends StyleSheet {
      */
     static final int MAX_IN_MEMORY_CSS_LENGTH = 48000;
 
+    private static final String DATA_URL_PREFIX = "data:text/css;charset=utf-8;base64,";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(StyleSheetFile.class);
 
     private final URL url;
