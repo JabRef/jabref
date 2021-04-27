@@ -7,10 +7,10 @@ import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxPars
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class JstorQueryTransformerTest implements InfixTransformerTest {
+class JstorQueryTransformerTest extends InfixTransformerTest<JstorQueryTransformer> {
 
     @Override
-    public AbstractQueryTransformer getTransformer() {
+    public JstorQueryTransformer getTransformer() {
         return new JstorQueryTransformer();
     }
 

@@ -3,7 +3,7 @@ package org.jabref.logic.importer.fetcher.transformators;
 /**
  * Default query transformer without any boolean operators
  */
-public class DefaultQueryTransformer extends AbstractQueryTransformer {
+public class DefaultQueryTransformer extends YearAndYearRangeByFilteringQueryTransformer {
 
     @Override
     protected String getLogicalAndOperator() {
@@ -33,11 +33,6 @@ public class DefaultQueryTransformer extends AbstractQueryTransformer {
     @Override
     protected String handleJournal(String journalTitle) {
         return journalTitle;
-    }
-
-    @Override
-    protected String handleYear(String year) {
-        return year;
     }
 
     @Override

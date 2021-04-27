@@ -7,7 +7,7 @@ import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxPars
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class SpringerQueryTransformerTest implements InfixTransformerTest {
+class SpringerQueryTransformerTest extends InfixTransformerTest<SpringerQueryTransformer> {
 
     @Override
     public String getAuthorPrefix() {
@@ -15,7 +15,7 @@ class SpringerQueryTransformerTest implements InfixTransformerTest {
     }
 
     @Override
-    public AbstractQueryTransformer getTransformer() {
+    public SpringerQueryTransformer getTransformer() {
         return new SpringerQueryTransformer();
     }
 
