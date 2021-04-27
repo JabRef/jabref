@@ -164,6 +164,7 @@ public class SaveDatabaseAction {
         selectedPath.ifPresent(path -> preferences.setWorkingDirectory(path.getParent()));
         if(!selectedPath.isEmpty()){
             Path savePath = selectedPath.get();
+            // Workaround for linux systems not adding file extension
             if(!savePath.endsWith(".bib")){
                 String newPath = savePath.toString() + ".bib";
                 selectedPath = Optional.of(Paths.get(newPath));
