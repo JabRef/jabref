@@ -67,7 +67,7 @@ public abstract class InfixTransformerTest<T extends AbstractQueryTransformer> {
     public abstract void convertYearField() throws Exception;
 
     @Test
-    public abstract void  convertYearRangeField() throws Exception;
+    public abstract void convertYearRangeField() throws Exception;
 
     @Test
     public void convertMultipleValuesWithTheSameField() throws Exception {

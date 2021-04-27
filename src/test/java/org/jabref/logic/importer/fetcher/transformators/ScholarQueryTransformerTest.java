@@ -1,7 +1,5 @@
 package org.jabref.logic.importer.fetcher.transformators;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 class ScholarQueryTransformerTest extends YearAndYearRangeByFilteringQueryTransformerTest<ScholarQueryTransformer> {
 
     @Override
