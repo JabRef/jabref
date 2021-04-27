@@ -11,7 +11,7 @@ public abstract class YearRangeByFilteringQueryTransformerTest<T extends YearRan
 
     @Override
     public void convertYearRangeField() throws Exception {
-        YearRangeByFilteringQueryTransformer transformer = getTransformer());
+        YearRangeByFilteringQueryTransformer transformer = getTransformer();
 
         String queryString = "year-range:2018-2021";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
