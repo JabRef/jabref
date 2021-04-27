@@ -28,7 +28,6 @@ import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
@@ -54,8 +53,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private final ObservableList<BibEntry> entries;
     private final PreferencesService preferences;
     private final BibEntryTypesManager entryTypesManager;
+    private ImportCleanup cleanup;
 
-    private final ImportCleanup cleanup = new ImportCleanup(BibDatabaseMode.BIBTEX);
     /**
      * @param databaseContext the database to import into
      * @param task            the task executed for parsing the selected files(s).
@@ -82,13 +81,12 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         this.message.bind(task.messageProperty());
 
         task.onSuccess(parserResult -> {
-
+            cleanup = new ImportCleanup(databaseContext.getMode());
             // store the complete parser result (to import groups, ... later on)
             this.parserResult = parserResult;
-
-            List<BibEntry> resultEntries = parserResult.getDatabase().getEntries().stream().map(cleanup::doPostCleanup).collect(Collectors.toList());
+            List<BibEntry> cleanedEntries = parserResult.getDatabase().getEntries().stream().map(cleanup::doPostCleanup).collect(Collectors.toList());
             // fill in the list for the user, where one can select the entries to import
-            entries.addAll(resultEntries);
+            entries.addAll(cleanedEntries);
         }).onFailure(ex -> {
             LOGGER.error("Error importing", ex);
             dialogService.showErrorDialogAndWait(ex);
