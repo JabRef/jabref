@@ -23,7 +23,6 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.database.DuplicateCheck;
-import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -52,7 +51,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private final ObservableList<BibEntry> entries;
     private final PreferencesService preferences;
     private final BibEntryTypesManager entryTypesManager;
-    private ImportCleanup cleanup;
 
     /**
      * @param databaseContext the database to import into
