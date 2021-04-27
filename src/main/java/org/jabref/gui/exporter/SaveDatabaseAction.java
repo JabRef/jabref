@@ -162,10 +162,10 @@ public class SaveDatabaseAction {
                 .build();
         Optional<Path> selectedPath = dialogService.showFileSaveDialog(fileDialogConfiguration);
         selectedPath.ifPresent(path -> preferences.setWorkingDirectory(path.getParent()));
-        if(!selectedPath.isEmpty()){
+        if(selectedPath.isPresent()){
             Path savePath = selectedPath.get();
             // Workaround for linux systems not adding file extension
-            if(!savePath.endsWith(".bib")){
+            if(!(savePath.getFileName().toString().toLowerCase().endsWith(".bib"))){
                 String newPath = savePath.toString() + ".bib";
                 selectedPath = Optional.of(Paths.get(newPath));
             }
