@@ -12,9 +12,10 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v2
       - name: Set up JDK
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
           java-version: 14
+          distribution: 'adopt'
       - name: Look for outdated dependencies
         run: ./gradlew -q checkOutdatedDependencies
       - name: Report issues

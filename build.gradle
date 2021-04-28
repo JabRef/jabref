@@ -14,10 +14,10 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.38.0'
     id 'org.javamodularity.moduleplugin' version '1.7.0'
     id 'org.openjfx.javafxplugin' version '0.0.9'
-    id 'org.beryx.jlink' version '2.23.5'
+    id 'org.beryx.jlink' version '2.23.7'
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
-    id 'com.adarshr.test-logger' version '2.1.1'
+    id 'com.adarshr.test-logger' version '3.0.0'
 }
 
 gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.ALWAYS
@@ -115,8 +115,8 @@ dependencies {
 
     implementation 'commons-cli:commons-cli:1.4'
 
-    implementation 'org.libreoffice:libreoffice:7.1.1'
-    implementation 'org.libreoffice:unoloader:7.1.1'
+    implementation 'org.libreoffice:libreoffice:7.1.2'
+    implementation 'org.libreoffice:unoloader:7.1.2'
 
     implementation 'io.github.java-diff-utils:java-diff-utils:4.9'
     implementation 'info.debatty:java-string-similarity:2.0.0'
@@ -127,18 +127,18 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.9.2'
     implementation 'org.antlr:antlr4-runtime:4.9.2'
 
-    implementation (group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.8.1') {
+    implementation (group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.8.2') {
         exclude group: 'org.apache.lucene', module: 'lucene-sandbox'
     }
 
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.11.0.202103091610-r'
 
-    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.12.2'
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.2'
+    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.12.3'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.12.3'
 
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.2'
 
-    implementation 'org.postgresql:postgresql:42.2.19'
+    implementation 'org.postgresql:postgresql:42.2.20'
 
     implementation ('com.oracle.ojdbc:ojdbc10:19.3.0.0') {
         // causing module issues
@@ -201,19 +201,19 @@ dependencies {
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.7.1'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.7.1'
 
-    testImplementation 'net.bytebuddy:byte-buddy-parent:1.10.22'
+    testImplementation 'net.bytebuddy:byte-buddy-parent:1.11.0'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:3.8.0'
+    testImplementation 'org.mockito:mockito-core:3.9.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.8.2'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.8.2'
-    testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.17.0'
+    testRuntime 'com.tngtech.archunit:archunit-junit5-engine:0.18.0'
     testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.17.0'
     testImplementation "org.testfx:testfx-core:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.41.1'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.42'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.3'
 }
 
