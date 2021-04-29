@@ -309,23 +309,31 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherT
         assertEquals(Collections.singletonList(expected), result);
     }
 
+    @Test
+    public void findByTitleWithoutCurlyBracket() throws Exception {
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Zhang, Ruohan and Guo, Sihang and Liu, Bo and Zhu, Yifeng and Hayhoe, Mary and Ballard, Dana and Stone, Peter")
+                .withField(StandardField.TITLE, "Machine versus Human Attention in Deep Reinforcement Learning Tasks")
+                .withField(StandardField.JOURNAL, "arXiv");
+
+        final Optional<URL> result = fetcher.findFullText(expected);
+        final Optional<URL> expectedResult = Optional
+                .of(new URL("http://arxiv.org/pdf/2010.15942v2"));
+
+        assertEquals(expectedResult, result);
+    }
 
     @Test
     public void findByTitleWithCurlyBracket() throws Exception {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Zhang, Ruohan and Guo, Sihang and Liu, Bo and Zhu, Yifeng and Hayhoe, Mary and Ballard, Dana and Stone, Peter")
                 .withField(StandardField.TITLE, "Machine versus {Human} {Attention} in {Deep} {Reinforcement} {Learning} {Tasks}")
-                .withField(StandardField.TITLE, "Machine versus Human Attention in Deep Reinforcement Learning Tasks")
-                .withField(StandardField.DATE, "2021-02")
-                // .withField(StandardField.FILE, ":http\\://arxiv.org/abs/2010.15942v2:PDF")
-                .withField(StandardField.FILE, ":http\\://arxiv.org/abs/2010.15942v2")
                 .withField(StandardField.JOURNAL, "arXiv");
 
-        Optional<URL> result = fetcher.findFullText(expected);
+        final Optional<URL> result = fetcher.findFullText(expected);
+        final Optional<URL> expectedResult = Optional
+                .of(new URL("http://arxiv.org/pdf/2010.15942v2"));
 
-        System.err.println(result);
-
-        // There is only one paper authored by Tobias Büscher with that phrase in the title
-        assertFalse(true);
+        assertEquals(expectedResult, result);
     }
 }

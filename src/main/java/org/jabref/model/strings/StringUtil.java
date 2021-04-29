@@ -735,4 +735,56 @@ public class StringUtil {
     public static String substringBetween(String str, String open, String close) {
         return StringUtils.substringBetween(str, open, close);
     }
+
+
+
+
+    /**
+     * This method removes all occurrences of braces in a string
+     *
+     * @param s The String to analyze.
+     * @return A new String with braces removed.
+     */
+    public static String removeAllBraces(String s) {
+        return s.replaceAll("\\{", "")
+                .replaceAll("}", "");
+    }
+
+    private static final Pattern BRACED_TITLE_CAPITAL_WORD_PATTERN = Pattern.compile("\\{[A-Z][a-z]*\\}");
+
+    /**
+     * This method looks for occurrences of capital letters enclosed in an
+     * arbitrary number of pairs of braces, e.g. "{Word}" or "{{Word}}". All of these
+     * pairs of braces are removed.
+     *
+     * @param s The String to analyze.
+     * @return A new String with braces removed.
+     */
+    public static String removeBracesAroundCapitalizedWords(String s) {
+        String current = s;
+        String previous = s;
+        while ((current = removeSingleBracesAroundCapitalizedWords(current)).length() < previous.length()) {
+            previous = current;
+        }
+        return current;
+    }
+
+    /**
+     * This method looks for occurrences of capital words enclosed in one pair
+     * of braces, e.g. "{Word}". All these are replaced by only the word in
+     * between the braces.
+     *
+     * @param s The String to analyze.
+     * @return A new String with braces removed.
+     */
+    private static String removeSingleBracesAroundCapitalizedWords(String s) {
+        Matcher mcr = BRACED_TITLE_CAPITAL_WORD_PATTERN.matcher(s);
+        StringBuilder buf = new StringBuilder();
+        while (mcr.find()) {
+            String replaceStr = mcr.group();
+            mcr.appendReplacement(buf, replaceStr.substring(1, replaceStr.length() - 1));
+        }
+        mcr.appendTail(buf);
+        return buf.toString();
+    }
 }

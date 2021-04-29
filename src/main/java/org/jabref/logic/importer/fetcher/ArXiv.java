@@ -136,17 +136,22 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
             query = "doi:" + doi.get();
         } else {
             Optional<String> authorQuery = entry.getField(StandardField.AUTHOR).map(author -> "au:" + author);
-            Optional<String> titleQuery = entry.getField(StandardField.TITLE).map(title -> "ti:" + title);
+            Optional<String> titleQuery = entry.getField(StandardField.TITLE)
+                    .map(title -> StringUtil.removeBracesAroundCapitalizedWords(title))
+                    .map(title -> "ti:" + title);
             query = OptionalUtil.toList(authorQuery, titleQuery).stream().collect(Collectors.joining("+AND+"));
         }
 
+        System.err.println(query);
         Optional<ArXivEntry> arxivEntry = searchForEntry(query);
 
         if (arxivEntry.isPresent()) {
             // Check if entry is a match
             StringSimilarity match = new StringSimilarity();
             String arxivTitle = arxivEntry.get().title.orElse("");
-            String entryTitle = entry.getField(StandardField.TITLE).orElse("");
+            String entryTitle = entry.getField(StandardField.TITLE)
+                    .map(title -> StringUtil.removeBracesAroundCapitalizedWords(title))
+                    .orElse("");
 
             if (match.isSimilar(arxivTitle, entryTitle)) {
                 return OptionalUtil.toList(arxivEntry);
