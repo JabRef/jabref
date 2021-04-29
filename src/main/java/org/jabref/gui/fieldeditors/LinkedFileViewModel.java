@@ -1,6 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
 import java.io.IOException;
+import java.io.File;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -427,6 +428,28 @@ public class LinkedFileViewModel extends AbstractViewModel {
             URLDownload urlDownload = new URLDownload(linkedFile.getLink());
             BackgroundTask<Path> downloadTask = prepareDownloadTask(targetDirectory.get(), urlDownload);
             downloadTask.onSuccess(destination -> {
+				File newFile =  new File (destination.toString());
+				String oldFilename = destination.toString();
+				
+				if  (oldFilename.contains(".")) {
+					oldFilename = oldFilename.substring(0, oldFilename.lastIndexOf('.')-4) + oldFilename.substring(oldFilename.lastIndexOf('.'));
+				}
+				
+				File oldFile =  new File (oldFilename);
+				
+				if (oldFile.exists()) {
+					try {
+						if (com.google.common.io.Files.equal(oldFile, newFile)) {
+							newFile.delete();
+							dialogService.notify(Localization.lang("The file is already linked"));
+						}	
+					}
+					catch(IOException e) {
+						System.err
+                    		.println(Localization.lang("Error comparing files '%0' and '%1'.", newFile, oldFile));
+					}
+				}
+				
                 LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectories(filePreferences), externalFileTypes);
 
                 List<LinkedFile> linkedFiles = entry.getFiles();
