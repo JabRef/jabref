@@ -50,7 +50,7 @@ public class RfcFetcher implements IdBasedParserFetcher {
 
         String prefixedIdentifier = identifier;
         // if not a "draft" version
-        if (!identifier.toLowerCase().startsWith(DRAFT_PREFIX)){
+        if (!identifier.toLowerCase().startsWith(DRAFT_PREFIX)) {
             // Add "rfc" prefix if user's search entry was numerical
             prefixedIdentifier = (!identifier.toLowerCase().startsWith("rfc")) ? "rfc" + prefixedIdentifier : prefixedIdentifier;
         }
