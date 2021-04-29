@@ -38,7 +38,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 
 ### Fixed
 
-- we fixed an issue where importing entries would not respect the library mode (BibTeX/biblatex)[#1018](https://github.com/JabRef/jabref/issues/1018)
+- We fixed an issue where getting bibliograhpic data from DOI or another identifer did not respect the library mode (BibTeX/biblatex)[#1018](https://github.com/JabRef/jabref/issues/6267)
+- We fixed an issue where importing entries would not respect the library mode (BibTeX/biblatex)[#1018](https://github.com/JabRef/jabref/issues/1018)
 - We fixed an issue where an exception occured when importing entries from a web search [#7606](https://github.com/JabRef/jabref/issues/7606)
 - We fixed an issue where the table column sort order was not properly stored and resulted in unsorted eports [#7524](https://github.com/JabRef/jabref/issues/7524)
 - We fixed an issue where the value of the field `school` or `institution` would be printed twice in the HTML Export [forum#2634](https://discourse.jabref.org/t/problem-with-exporting-techreport-phdthesis-mastersthesis-to-html/2634)
