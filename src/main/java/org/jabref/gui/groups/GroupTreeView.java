@@ -322,34 +322,12 @@ public class GroupTreeView {
 
         return node;
     }
-    // JJ - Remove group submenu
-
-    private ContextMenu createContextMenuForRemoveGroup() {
-
-        ContextMenu removeGroupMenu = new ContextMenu();
-
-        // JJ - Keep subgroups
-        MenuItem keepSubmenu = new MenuItem(Localization.lang("Keep subgroups"));
-        // JJ - Implement Event Handler
-
-        // JJ - Also remove subgroups
-        MenuItem alsoRemoveSubgroups = new MenuItem(Localization.lang("Also remove subgroups"));
-
-        // JJ - Add items to submenu
-        removeGroupMenu.getItems().add(keepSubmenu);
-        removeGroupMenu.getItems().add(new SeparatorMenuItem());
-        removeGroupMenu.getItems().add(alsoRemoveSubgroups);
-
-        return removeGroupMenu;
-    }
-
     // JJ - Edit here
     private ContextMenu createContextMenuForGroup(GroupNodeViewModel group) {
 
         ContextMenu menu = new ContextMenu();
         Menu removeGroup = new Menu(Localization.lang("Remove group"));
 
-        // JJ - Edit Group
         MenuItem editGroup = new MenuItem(Localization.lang("Edit group"));
         editGroup.setOnAction(event -> {
             menu.hide();
@@ -357,16 +335,23 @@ public class GroupTreeView {
             groupTree.refresh();
         });
 
-        // JJ - Remove group - implement submenu
         MenuItem keepSubmenu = new MenuItem(Localization.lang("Keep subgroups"));
-        MenuItem removeSubgroups = new MenuItem(Localization.lang("Remove subgroups"));
-        // JJ - Set on action
+        // Specify action
+        MenuItem alsoRemoveSubgroups = new MenuItem(Localization.lang("Also remove subgroups"));
+        // Specify action
 
         MenuItem addSubgroup = new MenuItem(Localization.lang("Add subgroup"));
         addSubgroup.setOnAction(event -> {
             menu.hide();
             viewModel.addNewSubgroup(group);
         });
+
+        MenuItem removeSubgroups = new MenuItem(Localization.lang("Remove subgroups"));
+        // Specify action
+
+        MenuItem sortSubgroups = new MenuItem(Localization.lang("Sort subgroups"));
+        // Specify action
+
 //        MenuItem removeGroupAndSubgroups = new MenuItem(Localization.lang("Remove group and subgroups"));
 //        removeGroupAndSubgroups.setOnAction(event -> viewModel.removeGroupAndSubgroups(group));
 //        MenuItem removeGroupKeepSubgroups = new MenuItem(Localization.lang("Remove group, keep subgroups"));
@@ -374,29 +359,29 @@ public class GroupTreeView {
 //        MenuItem removeSubgroups = new MenuItem(Localization.lang("Remove subgroups"));
 //        removeSubgroups.setOnAction(event -> viewModel.removeSubgroups(group));
 
-        MenuItem addEntries = new MenuItem(Localization.lang("Add selected entries to this group"));
-        addEntries.setOnAction(event -> viewModel.addSelectedEntries(group));
+//        MenuItem addEntries = new MenuItem(Localization.lang("Add selected entries to this group"));
+//        addEntries.setOnAction(event -> viewModel.addSelectedEntries(group));
 //        MenuItem removeEntries = new MenuItem(Localization.lang("Remove selected entries from this group"));
 //        removeEntries.setOnAction(event -> viewModel.removeSelectedEntries(group));
 
-        MenuItem sortAlphabetically = new MenuItem(Localization.lang("Sort all subgroups (recursively)"));
-        sortAlphabetically.setOnAction(event -> viewModel.sortAlphabeticallyRecursive(group));
+//        MenuItem sortAlphabetically = new MenuItem(Localization.lang("Sort all subgroups (recursively)"));
+//        sortAlphabetically.setOnAction(event -> viewModel.sortAlphabeticallyRecursive(group));
 
         menu.getItems().add(editGroup);
-        menu.getItems().add(new SeparatorMenuItem());
 
-//        menu.getItems().addAll(addSubgroup, removeSubgroups, removeGroupAndSubgroups, removeGroupKeepSubgroups);
-//        Line above replaced with:
         removeGroup.getItems().add(keepSubmenu);
-        removeGroup.getItems().add(new SeparatorMenuItem());
-        removeGroup.getItems().add(removeSubgroups);
+        removeGroup.getItems().add(alsoRemoveSubgroups);
         menu.getItems().add(removeGroup);
 
-
         menu.getItems().add(addSubgroup);
-        menu.getItems().add(new SeparatorMenuItem());
-//        menu.getItems().addAll(addEntries, removeEntries);
-        menu.getItems().add(sortAlphabetically);
+
+        menu.getItems().add(removeSubgroups);
+
+        menu.getItems().add(sortSubgroups);
+
+
+
+//        menu.getItems().add(sortAlphabetically);
 
         // TODO: Disable some actions under certain conditions
         // if (group.canBeEdited()) {
