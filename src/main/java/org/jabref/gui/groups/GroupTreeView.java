@@ -17,6 +17,7 @@ import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SeparatorMenuItem;
@@ -322,29 +323,31 @@ public class GroupTreeView {
         return node;
     }
     // JJ - Remove group submenu
-//    private ContextMenu createContextMenuForRemoveGroup(GroupNodeViewModel group) {
-//
-//        ContextMenu removeGroupSubMenu = new ContextMenu();
-//
-//        // JJ - Keep subgroups
-//        MenuItem keepSubmenu = new MenuItem(Localization.lang("Keep subgroups"));
-//        // JJ - Implement Event Handler
-//
-//        // JJ - Also remove subgroups
-//        MenuItem alsoRemoveSubgroups = new MenuItem(Localization.lang("Also remove subgroups"));
-//
-//        // JJ - Add items to submenu
-//        removeGroupSubMenu.getItems().add(keepSubmenu);
-//        removeGroupSubMenu.getItems().add(new SeparatorMenuItem());
-//        removeGroupSubMenu.getItems().add(alsoRemoveSubgroups);
-//
-//        return removeGroupSubMenu;
-//    }
+
+    private ContextMenu createContextMenuForRemoveGroup() {
+
+        ContextMenu removeGroupMenu = new ContextMenu();
+
+        // JJ - Keep subgroups
+        MenuItem keepSubmenu = new MenuItem(Localization.lang("Keep subgroups"));
+        // JJ - Implement Event Handler
+
+        // JJ - Also remove subgroups
+        MenuItem alsoRemoveSubgroups = new MenuItem(Localization.lang("Also remove subgroups"));
+
+        // JJ - Add items to submenu
+        removeGroupMenu.getItems().add(keepSubmenu);
+        removeGroupMenu.getItems().add(new SeparatorMenuItem());
+        removeGroupMenu.getItems().add(alsoRemoveSubgroups);
+
+        return removeGroupMenu;
+    }
 
     // JJ - Edit here
     private ContextMenu createContextMenuForGroup(GroupNodeViewModel group) {
 
         ContextMenu menu = new ContextMenu();
+        Menu removeGroup = new Menu(Localization.lang("Remove group"));
 
         // JJ - Edit Group
         MenuItem editGroup = new MenuItem(Localization.lang("Edit group"));
@@ -355,7 +358,8 @@ public class GroupTreeView {
         });
 
         // JJ - Remove group - implement submenu
-        MenuItem removeGroup = new MenuItem(Localization.lang("Remove group"));
+        MenuItem keepSubmenu = new MenuItem(Localization.lang("Keep subgroups"));
+        MenuItem removeSubgroups = new MenuItem(Localization.lang("Remove subgroups"));
         // JJ - Set on action
 
         MenuItem addSubgroup = new MenuItem(Localization.lang("Add subgroup"));
@@ -380,12 +384,18 @@ public class GroupTreeView {
 
         menu.getItems().add(editGroup);
         menu.getItems().add(new SeparatorMenuItem());
+
 //        menu.getItems().addAll(addSubgroup, removeSubgroups, removeGroupAndSubgroups, removeGroupKeepSubgroups);
 //        Line above replaced with:
-        menu.getItems().addAll(addSubgroup);
+        removeGroup.getItems().add(keepSubmenu);
+        removeGroup.getItems().add(new SeparatorMenuItem());
+        removeGroup.getItems().add(removeSubgroups);
+        menu.getItems().add(removeGroup);
+
+
+        menu.getItems().add(addSubgroup);
         menu.getItems().add(new SeparatorMenuItem());
 //        menu.getItems().addAll(addEntries, removeEntries);
-        menu.getItems().add(new SeparatorMenuItem());
         menu.getItems().add(sortAlphabetically);
 
         // TODO: Disable some actions under certain conditions
