@@ -1,5 +1,6 @@
 package org.jabref.gui.specialfields;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -69,7 +70,8 @@ public class SpecialFieldAction extends SimpleCommand {
                 return;
             }
             NamedCompound ce = new NamedCompound(undoText);
-            for (BibEntry bibEntry : bes) {
+            List<BibEntry> besCopy = new ArrayList<>(bes);
+            for (BibEntry bibEntry : besCopy) {
                 // if (value==null) and then call nullField has been omitted as updatefield also handles value==null
                 Optional<FieldChange> change = UpdateField.updateField(bibEntry, specialField, value, nullFieldIfValueIsTheSame);
 
