@@ -48,6 +48,7 @@ import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
+import de.saxsys.mvvmfx.Context;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.reactfx.util.FxTimer;
@@ -320,16 +321,42 @@ public class GroupTreeView {
 
         return node;
     }
+    // JJ - Remove group submenu
+//    private ContextMenu createContextMenuForRemoveGroup(GroupNodeViewModel group) {
+//
+//        ContextMenu removeGroupSubMenu = new ContextMenu();
+//
+//        // JJ - Keep subgroups
+//        MenuItem keepSubmenu = new MenuItem(Localization.lang("Keep subgroups"));
+//        // JJ - Implement Event Handler
+//
+//        // JJ - Also remove subgroups
+//        MenuItem alsoRemoveSubgroups = new MenuItem(Localization.lang("Also remove subgroups"));
+//
+//        // JJ - Add items to submenu
+//        removeGroupSubMenu.getItems().add(keepSubmenu);
+//        removeGroupSubMenu.getItems().add(new SeparatorMenuItem());
+//        removeGroupSubMenu.getItems().add(alsoRemoveSubgroups);
+//
+//        return removeGroupSubMenu;
+//    }
 
+    // JJ - Edit here
     private ContextMenu createContextMenuForGroup(GroupNodeViewModel group) {
+
         ContextMenu menu = new ContextMenu();
 
+        // JJ - Edit Group
         MenuItem editGroup = new MenuItem(Localization.lang("Edit group"));
         editGroup.setOnAction(event -> {
             menu.hide();
             viewModel.editGroup(group);
             groupTree.refresh();
         });
+
+        // JJ - Remove group - implement submenu
+        MenuItem removeGroup = new MenuItem(Localization.lang("Remove group"));
+        // JJ - Set on action
 
         MenuItem addSubgroup = new MenuItem(Localization.lang("Add subgroup"));
         addSubgroup.setOnAction(event -> {
@@ -345,8 +372,8 @@ public class GroupTreeView {
 
         MenuItem addEntries = new MenuItem(Localization.lang("Add selected entries to this group"));
         addEntries.setOnAction(event -> viewModel.addSelectedEntries(group));
-        MenuItem removeEntries = new MenuItem(Localization.lang("Remove selected entries from this group"));
-        removeEntries.setOnAction(event -> viewModel.removeSelectedEntries(group));
+//        MenuItem removeEntries = new MenuItem(Localization.lang("Remove selected entries from this group"));
+//        removeEntries.setOnAction(event -> viewModel.removeSelectedEntries(group));
 
         MenuItem sortAlphabetically = new MenuItem(Localization.lang("Sort all subgroups (recursively)"));
         sortAlphabetically.setOnAction(event -> viewModel.sortAlphabeticallyRecursive(group));
@@ -357,7 +384,7 @@ public class GroupTreeView {
 //        Line above replaced with:
         menu.getItems().addAll(addSubgroup);
         menu.getItems().add(new SeparatorMenuItem());
-        menu.getItems().addAll(addEntries, removeEntries);
+//        menu.getItems().addAll(addEntries, removeEntries);
         menu.getItems().add(new SeparatorMenuItem());
         menu.getItems().add(sortAlphabetically);
 

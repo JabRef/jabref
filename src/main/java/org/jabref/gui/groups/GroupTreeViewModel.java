@@ -286,17 +286,17 @@ public class GroupTreeViewModel extends AbstractViewModel {
 //        }
 //    }
 
-    void removeGroupsAndSubGroupsFromEntries(GroupNodeViewModel group) {
-        for (GroupNodeViewModel child : group.getChildren()) {
-            removeGroupsAndSubGroupsFromEntries(child);
-        }
-
-        // only remove explicit groups from the entries, keyword groups should not be deleted
-        if (group.getGroupNode().getGroup() instanceof ExplicitGroup) {
-            List<BibEntry> entriesInGroup = group.getGroupNode().getEntriesInGroup(this.currentDatabase.get().getEntries());
-            group.getGroupNode().removeEntriesFromGroup(entriesInGroup);
-        }
-    }
+//    void removeGroupsAndSubGroupsFromEntries(GroupNodeViewModel group) {
+//        for (GroupNodeViewModel child : group.getChildren()) {
+//            removeGroupsAndSubGroupsFromEntries(child);
+//        }
+//
+//        // only remove explicit groups from the entries, keyword groups should not be deleted
+//        if (group.getGroupNode().getGroup() instanceof ExplicitGroup) {
+//            List<BibEntry> entriesInGroup = group.getGroupNode().getEntriesInGroup(this.currentDatabase.get().getEntries());
+//            group.getGroupNode().removeEntriesFromGroup(entriesInGroup);
+//        }
+//    }
 
     public void addSelectedEntries(GroupNodeViewModel group) {
         // TODO: Warn
@@ -326,17 +326,17 @@ public class GroupTreeViewModel extends AbstractViewModel {
         // }
     }
 
-    public void removeSelectedEntries(GroupNodeViewModel group) {
-        // TODO: warn if assignment has undesired side effects (modifies a field != keywords)
-        // if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(mNode.getNode().getGroup(), mPanel.frame())) {
-        //    return; // user aborted operation
-
-        group.getGroupNode().removeEntriesFromGroup(stateManager.getSelectedEntries());
-
-        // TODO: Add undo
-        // if (!undo.isEmpty()) {
-        //    mPanel.getUndoManager().addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(mNode, undo));
-    }
+//    public void removeSelectedEntries(GroupNodeViewModel group) {
+//        // TODO: warn if assignment has undesired side effects (modifies a field != keywords)
+//        // if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(mNode.getNode().getGroup(), mPanel.frame())) {
+//        //    return; // user aborted operation
+//
+//        group.getGroupNode().removeEntriesFromGroup(stateManager.getSelectedEntries());
+//
+//        // TODO: Add undo
+//        // if (!undo.isEmpty()) {
+//        //    mPanel.getUndoManager().addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(mNode, undo));
+//    }
 
     public void sortAlphabeticallyRecursive(GroupNodeViewModel group) {
         group.getGroupNode().sortChildren(compAlphabetIgnoreCase, true);
