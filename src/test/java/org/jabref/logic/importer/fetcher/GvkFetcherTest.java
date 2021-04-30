@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
+import org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransformer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;

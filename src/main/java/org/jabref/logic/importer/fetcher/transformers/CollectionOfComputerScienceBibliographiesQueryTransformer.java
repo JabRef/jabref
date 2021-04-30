@@ -1,20 +1,20 @@
-package org.jabref.logic.importer.fetcher.transformators;
+package org.jabref.logic.importer.fetcher.transformers;
 
-public class ZbMathQueryTransformer extends AbstractQueryTransformer {
+public class CollectionOfComputerScienceBibliographiesQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String getLogicalAndOperator() {
-        return " & ";
+        return " ";
     }
 
     @Override
     protected String getLogicalOrOperator() {
-        return " | ";
+        return " OR ";
     }
 
     @Override
     protected String getLogicalNotOperator() {
-        return "!";
+        return "-";
     }
 
     @Override
@@ -29,21 +29,20 @@ public class ZbMathQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return String.format("so:\"%s\"", journalTitle);
+        return String.format("\"%s\"", journalTitle);
     }
 
     @Override
     protected String handleYear(String year) {
-        return "py:" + year;
-    }
-
-    @Override
-    protected String handleYearRange(String yearRange) {
-        return "py:" + yearRange;
+        return String.format("year:%s", year);
     }
 
     @Override
     protected String handleUnFieldedTerm(String term) {
-        return String.format("any:\"%s\"", term);
+        if (term.contains(" ")) {
+            return String.format("\"%s\"", term);
+        } else {
+            return term;
+        }
     }
 }

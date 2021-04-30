@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fetcher.transformators;
+package org.jabref.logic.importer.fetcher.transformers;
 
 /**
  * Default query transformer without any boolean operators

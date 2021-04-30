@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fetcher.transformators;
+package org.jabref.logic.importer.fetcher.transformers;
 
 public class ArXivQueryTransformer extends YearRangeByFilteringQueryTransformer {
     @Override

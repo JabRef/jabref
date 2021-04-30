@@ -1,47 +1,49 @@
-package org.jabref.logic.importer.fetcher.transformators;
+package org.jabref.logic.importer.fetcher.transformers;
 
-/**
- * Transforms the query to a lucene query string
- */
-public class DefaultLuceneQueryTransformer extends AbstractQueryTransformer {
+public class ZbMathQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String getLogicalAndOperator() {
-        return " AND ";
+        return " & ";
     }
 
     @Override
     protected String getLogicalOrOperator() {
-        return " OR ";
+        return " | ";
     }
 
     @Override
     protected String getLogicalNotOperator() {
-        return "NOT ";
+        return "!";
     }
 
     @Override
     protected String handleAuthor(String author) {
-        return handleOtherField("author", author).get();
+        return String.format("au:\"%s\"", author);
     }
 
     @Override
     protected String handleTitle(String title) {
-        return handleOtherField("title", title).get();
+        return String.format("ti:\"%s\"", title);
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return handleOtherField("journal", journalTitle).get();
+        return String.format("so:\"%s\"", journalTitle);
     }
 
     @Override
     protected String handleYear(String year) {
-        return handleOtherField("year", year).get();
+        return "py:" + year;
+    }
+
+    @Override
+    protected String handleYearRange(String yearRange) {
+        return "py:" + yearRange;
     }
 
     @Override
     protected String handleUnFieldedTerm(String term) {
-        return "\"" + term + "\"";
+        return String.format("any:\"%s\"", term);
     }
 }

@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fetcher.transformators;
+package org.jabref.logic.importer.fetcher.transformers;
 
 import java.util.Optional;
 
@@ -7,16 +7,16 @@ import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxPars
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class SpringerQueryTransformerTest extends InfixTransformerTest<SpringerQueryTransformer> {
+class DBLPQueryTransformerTest extends InfixTransformerTest<DBLPQueryTransformer> {
 
     @Override
-    public String getAuthorPrefix() {
-        return "name:";
+    public DBLPQueryTransformer getTransformer() {
+        return new DBLPQueryTransformer();
     }
 
     @Override
-    public SpringerQueryTransformer getTransformer() {
-        return new SpringerQueryTransformer();
+    public String getAuthorPrefix() {
+        return "";
     }
 
     @Override
@@ -26,12 +26,12 @@ class SpringerQueryTransformerTest extends InfixTransformerTest<SpringerQueryTra
 
     @Override
     public String getJournalPrefix() {
-        return "journal:";
+        return "";
     }
 
     @Override
     public String getTitlePrefix() {
-        return "title:";
+        return "";
     }
 
     @Override
@@ -39,8 +39,7 @@ class SpringerQueryTransformerTest extends InfixTransformerTest<SpringerQueryTra
         String queryString = "year:2015";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
-
-        Optional<String> expected = Optional.of("date:2015*");
+        Optional<String> expected = Optional.of("2015");
         assertEquals(expected, searchQuery);
     }
 
@@ -49,8 +48,7 @@ class SpringerQueryTransformerTest extends InfixTransformerTest<SpringerQueryTra
         String queryString = "year-range:2012-2015";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         Optional<String> searchQuery = getTransformer().transformLuceneQuery(luceneQuery);
-
-        Optional<String> expected = Optional.of("date:2012* OR date:2013* OR date:2014* OR date:2015*");
+        Optional<String> expected = Optional.of("2012|2013|2014|2015");
         assertEquals(expected, searchQuery);
     }
 }

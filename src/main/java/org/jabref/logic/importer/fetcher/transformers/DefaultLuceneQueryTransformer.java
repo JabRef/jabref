@@ -1,10 +1,13 @@
-package org.jabref.logic.importer.fetcher.transformators;
+package org.jabref.logic.importer.fetcher.transformers;
 
-public class CollectionOfComputerScienceBibliographiesQueryTransformer extends AbstractQueryTransformer {
+/**
+ * Transforms the query to a lucene query string
+ */
+public class DefaultLuceneQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String getLogicalAndOperator() {
-        return " ";
+        return " AND ";
     }
 
     @Override
@@ -14,35 +17,31 @@ public class CollectionOfComputerScienceBibliographiesQueryTransformer extends A
 
     @Override
     protected String getLogicalNotOperator() {
-        return "-";
+        return "NOT ";
     }
 
     @Override
     protected String handleAuthor(String author) {
-        return String.format("au:\"%s\"", author);
+        return handleOtherField("author", author).get();
     }
 
     @Override
     protected String handleTitle(String title) {
-        return String.format("ti:\"%s\"", title);
+        return handleOtherField("title", title).get();
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return String.format("\"%s\"", journalTitle);
+        return handleOtherField("journal", journalTitle).get();
     }
 
     @Override
     protected String handleYear(String year) {
-        return String.format("year:%s", year);
+        return handleOtherField("year", year).get();
     }
 
     @Override
     protected String handleUnFieldedTerm(String term) {
-        if (term.contains(" ")) {
-            return String.format("\"%s\"", term);
-        } else {
-            return term;
-        }
+        return "\"" + term + "\"";
     }
 }
