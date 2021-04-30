@@ -67,15 +67,19 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
     private final GroupDialogViewModel viewModel;
 
-    public GroupDialogView(DialogService dialogService, BibDatabaseContext currentDatabase, PreferencesService preferencesService, AbstractGroup editedGroup) {
-        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup);
+    public GroupDialogView(DialogService dialogService, BibDatabaseContext currentDatabase, PreferencesService preferencesService, AbstractGroup editedGroup, boolean isGroup) {
+        viewModel = new GroupDialogViewModel(dialogService, currentDatabase, preferencesService, editedGroup, isGroup);
 
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
 
         if (editedGroup == null) {
-            this.setTitle(Localization.lang("Add subgroup"));
+            if (isGroup == true) {
+                this.setTitle(Localization.lang("Add group")); // header title
+            } else {
+                this.setTitle(Localization.lang("Add subgroup")); // header title\
+            }
         } else {
             this.setTitle(Localization.lang("Edit group") + " " + editedGroup.getName());
         }
