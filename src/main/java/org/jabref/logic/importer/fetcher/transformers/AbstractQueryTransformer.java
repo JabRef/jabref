@@ -161,15 +161,32 @@ public abstract class AbstractQueryTransformer {
     protected abstract String handleUnFieldedTerm(String term);
 
     /**
+     * Encloses the given string with " if there is a space contained
+     *
+     * @return Returns a string
+     */
+    protected String quoteStringIfSpaceIsContained(String string) {
+        if (string.contains(" ")) {
+            return "\"" + string + "\"";
+        } else {
+            return string;
+        }
+    }
+
+    protected String createKeyValuePair(String fieldAsString, String term) {
+        return createKeyValuePair(fieldAsString, term, ":");
+    }
+
+    protected String createKeyValuePair(String fieldAsString, String term, String separator) {
+        return String.format("%s%s%s", fieldAsString, separator, quoteStringIfSpaceIsContained(term));
+    }
+
+    /**
      * Return a string representation of the provided field
      * If it is not supported return an empty optional.
      */
     protected Optional<String> handleOtherField(String fieldAsString, String term) {
-        if (term.contains(" ")) {
-            return Optional.of(String.format("%s:\"%s\"", fieldAsString, term));
-        } else {
-            return Optional.of(String.format("%s:%s", fieldAsString, term));
-        }
+        return Optional.of(createKeyValuePair(fieldAsString, term));
     }
 
     private Optional<String> transform(QueryNode query) {

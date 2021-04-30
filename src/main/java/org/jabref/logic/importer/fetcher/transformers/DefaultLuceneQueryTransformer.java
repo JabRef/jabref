@@ -22,26 +22,26 @@ public class DefaultLuceneQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleAuthor(String author) {
-        return handleOtherField("author", author).get();
+        return createKeyValuePair("author", author);
     }
 
     @Override
     protected String handleTitle(String title) {
-        return handleOtherField("title", title).get();
+        return createKeyValuePair("title", title);
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return handleOtherField("journal", journalTitle).get();
+        return createKeyValuePair("journal", journalTitle);
     }
 
     @Override
     protected String handleYear(String year) {
-        return handleOtherField("year", year).get();
+        return createKeyValuePair("year", year);
     }
 
     @Override
     protected String handleUnFieldedTerm(String term) {
-        return "\"" + term + "\"";
+        return quoteStringIfSpaceIsContained(term);
     }
 }

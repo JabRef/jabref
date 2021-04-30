@@ -18,17 +18,17 @@ public class ArXivQueryTransformer extends YearRangeByFilteringQueryTransformer 
 
     @Override
     protected String handleAuthor(String author) {
-        return String.format("au:\"%s\"", author);
+        return createKeyValuePair("au", author);
     }
 
     @Override
     protected String handleTitle(String title) {
-        return String.format("ti:\"%s\"", title);
+        return createKeyValuePair("ti", title);
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return String.format("jr:\"%s\"", journalTitle);
+        return createKeyValuePair("jr", journalTitle);
     }
 
     /**
@@ -43,7 +43,7 @@ public class ArXivQueryTransformer extends YearRangeByFilteringQueryTransformer 
 
     @Override
     protected String handleUnFieldedTerm(String term) {
-        return String.format("all:\"%s\"", term);
+        return createKeyValuePair("all", term);
     }
 
 }

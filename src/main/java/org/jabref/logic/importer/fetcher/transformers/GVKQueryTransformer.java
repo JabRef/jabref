@@ -27,18 +27,18 @@ public class GVKQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleAuthor(String author) {
-        return String.format("pica.per=\"%s\"", author);
+        return createKeyValuePair("pica.per", author, "=");
     }
 
     @Override
     protected String handleTitle(String title) {
-        return String.format("pica.tit=\"%s\"", title);
+        return createKeyValuePair("pica.tit", title, "=");
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
         // zti means "Zeitschrift", does not search for conferences (kon:)
-        return String.format("pica.zti=\"%s\"", journalTitle);
+        return createKeyValuePair("pica.zti", journalTitle, "=");
     }
 
     @Override
@@ -57,11 +57,11 @@ public class GVKQueryTransformer extends AbstractQueryTransformer {
     protected String handleUnFieldedTerm(String term) {
         // all does not search in full-text
         // Other option is txt: but this does not search in meta data
-        return String.format("pica.all=\"%s\"", term);
+        return createKeyValuePair("pica.all", term, "=");
     }
 
     @Override
     protected Optional<String> handleOtherField(String fieldAsString, String term) {
-        return Optional.of("pica." + fieldAsString + "=\"" + term + "\"");
+        return Optional.of(createKeyValuePair("pica." + fieldAsString, term, "=");
     }
 }

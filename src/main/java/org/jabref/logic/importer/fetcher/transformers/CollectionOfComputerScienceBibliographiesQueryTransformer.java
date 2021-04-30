@@ -19,17 +19,17 @@ public class CollectionOfComputerScienceBibliographiesQueryTransformer extends A
 
     @Override
     protected String handleAuthor(String author) {
-        return String.format("au:\"%s\"", author);
+        return createKeyValuePair("au", author);
     }
 
     @Override
     protected String handleTitle(String title) {
-        return String.format("ti:\"%s\"", title);
+        return createKeyValuePair("ti", title);
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return String.format("\"%s\"", journalTitle);
+        return quoteStringIfSpaceIsContained(journalTitle);
     }
 
     @Override
@@ -39,10 +39,6 @@ public class CollectionOfComputerScienceBibliographiesQueryTransformer extends A
 
     @Override
     protected String handleUnFieldedTerm(String term) {
-        if (term.contains(" ")) {
-            return String.format("\"%s\"", term);
-        } else {
-            return term;
-        }
+        return quoteStringIfSpaceIsContained(term);
     }
 }

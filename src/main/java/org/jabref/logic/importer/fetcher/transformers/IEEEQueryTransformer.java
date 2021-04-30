@@ -31,18 +31,17 @@ public class IEEEQueryTransformer extends YearRangeByFilteringQueryTransformer {
 
     @Override
     protected String handleAuthor(String author) {
-        return String.format("author:\"%s\"", author);
+        return createKeyValuePair("author", author);
     }
 
     @Override
     protected String handleTitle(String title) {
-        return String.format("article_title:\"%s\"", title);
+        return createKeyValuePair("article_title", title);
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
-        journal = String.format("\"%s\"", journalTitle);
-        return "";
+        return handleUnFieldedTerm(journalTitle);
     }
 
     @Override
@@ -54,7 +53,7 @@ public class IEEEQueryTransformer extends YearRangeByFilteringQueryTransformer {
 
     @Override
     protected String handleUnFieldedTerm(String term) {
-        return String.format("\"%s\"", term);
+        return quoteStringIfSpaceIsContained(term);
     }
 
     @Override

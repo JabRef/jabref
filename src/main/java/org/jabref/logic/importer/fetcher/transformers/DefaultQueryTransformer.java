@@ -22,21 +22,21 @@ public class DefaultQueryTransformer extends YearAndYearRangeByFilteringQueryTra
 
     @Override
     protected String handleAuthor(String author) {
-        return author;
+        return quoteStringIfSpaceIsContained(author);
     }
 
     @Override
     protected String handleTitle(String title) {
-        return title;
+        return quoteStringIfSpaceIsContained(title);
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return journalTitle;
+        return quoteStringIfSpaceIsContained(journalTitle);
     }
 
     @Override
     protected String handleUnFieldedTerm(String term) {
-        return term;
+        return quoteStringIfSpaceIsContained(term);
     }
 }

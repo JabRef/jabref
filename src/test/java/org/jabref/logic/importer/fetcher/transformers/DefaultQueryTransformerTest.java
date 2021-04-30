@@ -1,6 +1,6 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
-class DefaultLuceneQueryTransformerTest extends YearAndYearRangeByFilteringQueryTransformerTest<DefaultQueryTransformer> {
+class DefaultQueryTransformerTest extends YearAndYearRangeByFilteringQueryTransformerTest<DefaultQueryTransformer> {
 
     @Override
     protected DefaultQueryTransformer getTransformer() {
@@ -9,7 +9,7 @@ class DefaultLuceneQueryTransformerTest extends YearAndYearRangeByFilteringQuery
 
     @Override
     public String getAuthorPrefix() {
-        return "author:";
+        return "";
     }
 
     @Override
@@ -19,11 +19,11 @@ class DefaultLuceneQueryTransformerTest extends YearAndYearRangeByFilteringQuery
 
     @Override
     public String getJournalPrefix() {
-        return "journal:";
+        return "";
     }
 
     @Override
     public String getTitlePrefix() {
-        return "title:";
+        return "";
     }
 }
