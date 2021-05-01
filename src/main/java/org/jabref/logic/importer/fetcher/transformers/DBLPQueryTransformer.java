@@ -49,17 +49,6 @@ public class DBLPQueryTransformer extends AbstractQueryTransformer {
     }
 
     @Override
-    protected String handleYearRange(String yearRange) {
-        // DBLP does not support explicit year range search
-        String[] split = yearRange.split("-");
-        StringJoiner resultBuilder = new StringJoiner(getLogicalOrOperator());
-        for (int i = Integer.parseInt(split[0]); i <= Integer.parseInt(split[1]); i++) {
-            resultBuilder.add(String.valueOf(i));
-        }
-        return resultBuilder.toString();
-    }
-
-    @Override
     protected String handleUnFieldedTerm(String term) {
         return String.format("\"%s\"", term);
     }

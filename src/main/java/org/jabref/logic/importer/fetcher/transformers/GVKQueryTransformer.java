@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GVKQueryTransformer extends AbstractQueryTransformer {
+public class GVKQueryTransformer extends YearRangeByFilteringQueryTransformer {
     private static final Logger LOGGER = LoggerFactory.getLogger(GVKQueryTransformer.class);
 
     @Override
@@ -48,12 +48,6 @@ public class GVKQueryTransformer extends AbstractQueryTransformer {
     }
 
     @Override
-    protected String handleYearRange(String yearRange) {
-        // Returns empty string as otherwise leads to no results
-        return "";
-    }
-
-    @Override
     protected String handleUnFieldedTerm(String term) {
         // all does not search in full-text
         // Other option is txt: but this does not search in meta data
@@ -62,6 +56,6 @@ public class GVKQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected Optional<String> handleOtherField(String fieldAsString, String term) {
-        return Optional.of(createKeyValuePair("pica." + fieldAsString, term, "=");
+        return Optional.of(createKeyValuePair("pica." + fieldAsString, term, "="));
     }
 }

@@ -21,6 +21,10 @@ public abstract class AbstractQueryTransformer {
     public static final String NO_EXPLICIT_FIELD = "default";
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractQueryTransformer.class);
 
+    // These can be used for filtering in post processing
+    protected int startYear = Integer.MAX_VALUE;
+    protected int endYear = Integer.MIN_VALUE;
+
     /**
      * Transforms a and b and c to (a AND b AND c), where
      * a, b, and c can be complex expressions.
@@ -138,18 +142,38 @@ public abstract class AbstractQueryTransformer {
     protected abstract String handleYear(String year);
 
     /**
+     * Parses the year range and fills startYear and endYear.
+     * Ensures that startYear <= endYear
+     */
+    protected void parseYearRange(String yearRange) {
+        String[] split = yearRange.split("-");
+        int parsedStartYear = Integer.parseInt(split[0]);
+        startYear = parsedStartYear;
+        if (split.length >= 1) {
+            int parsedEndYear = Integer.parseInt(split[1]);
+            if (parsedEndYear >= parsedStartYear) {
+                endYear = parsedEndYear;
+            } else {
+                startYear = parsedEndYear;
+                endYear = parsedStartYear;
+            }
+        }
+    }
+
+    /**
      * Return a string representation of the year-range fielded term
      * Should follow the structure yyyy-yyyy
      *
      * Example: <code>2015-2021</code>
      */
     protected String handleYearRange(String yearRange) {
-        String[] split = yearRange.split("-");
-        if (split.length != 2) {
+        parseYearRange(yearRange);
+        if (endYear == Integer.MAX_VALUE) {
+            // invalid year range
             return yearRange;
         }
         StringJoiner resultBuilder = new StringJoiner(getLogicalOrOperator());
-        for (int i = Integer.parseInt(split[0]); i <= Integer.parseInt(split[1]); i++) {
+        for (int i = startYear; i <= endYear; i++) {
             resultBuilder.add(handleYear(String.valueOf(i)));
         }
         return resultBuilder.toString();
