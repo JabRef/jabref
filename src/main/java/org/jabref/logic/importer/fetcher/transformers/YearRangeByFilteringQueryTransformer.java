@@ -2,6 +2,10 @@ package org.jabref.logic.importer.fetcher.transformers;
 
 import java.util.Optional;
 
+/**
+ * This is a query transformer for a fetcher, which does not support server-side filtering by year-range (e.g., only publications between 1999 and 2002).
+ * Thus, JabRef (as client) filters for year ranges on client-side.
+ */
 public abstract class YearRangeByFilteringQueryTransformer extends AbstractQueryTransformer {
 
     public Optional<Integer> getStartYear() {
@@ -24,5 +28,4 @@ public abstract class YearRangeByFilteringQueryTransformer extends AbstractQuery
         parseYearRange(yearRange);
         return "";
     }
-
 }
