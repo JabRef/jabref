@@ -19,17 +19,17 @@ public class ZbMathQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleAuthor(String author) {
-        return String.format("au:\"%s\"", author);
+        return createKeyValuePair("au", author);
     }
 
     @Override
     protected String handleTitle(String title) {
-        return String.format("ti:\"%s\"", title);
+        return createKeyValuePair("ti", title);
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return String.format("so:\"%s\"", journalTitle);
+        return createKeyValuePair("so", journalTitle);
     }
 
     @Override

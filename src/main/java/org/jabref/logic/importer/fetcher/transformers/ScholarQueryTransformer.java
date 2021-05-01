@@ -22,16 +22,16 @@ public class ScholarQueryTransformer extends YearAndYearRangeByFilteringQueryTra
 
     @Override
     protected String handleAuthor(String author) {
-        return String.format("author:\"%s\"", author);
+        return createKeyValuePair("author", author);
     }
 
     @Override
     protected String handleTitle(String title) {
-        return String.format("allintitle:\"%s\"", title);
+        return createKeyValuePair("allintitle", title);
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return String.format("source:\"%s\"", journalTitle);
+        return createKeyValuePair("source", journalTitle);
     }
 }

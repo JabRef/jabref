@@ -24,17 +24,17 @@ public class SpringerQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleAuthor(String author) {
-        return String.format("name:\"%s\"", author);
+        return createKeyValuePair("name", author);
     }
 
     @Override
     protected String handleTitle(String title) {
-        return String.format("title:\"%s\"", title);
+        return createKeyValuePair("title", title);
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return String.format("journal:\"%s\"", journalTitle);
+        return createKeyValuePair("journal", journalTitle);
 
     }
 
