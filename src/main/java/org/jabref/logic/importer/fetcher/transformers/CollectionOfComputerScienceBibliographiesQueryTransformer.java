@@ -36,9 +36,4 @@ public class CollectionOfComputerScienceBibliographiesQueryTransformer extends A
     protected String handleYear(String year) {
         return String.format("year:%s", year);
     }
-
-    @Override
-    protected String handleUnFieldedTerm(String term) {
-        return quoteStringIfSpaceIsContained(term);
-    }
 }

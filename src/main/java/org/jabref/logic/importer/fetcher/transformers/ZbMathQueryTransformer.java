@@ -44,6 +44,6 @@ public class ZbMathQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleUnFieldedTerm(String term) {
-        return String.format("any:\"%s\"", term);
+        return createKeyValuePair("any", term);
     }
 }

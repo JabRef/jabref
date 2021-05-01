@@ -34,9 +34,4 @@ public class DefaultQueryTransformer extends YearAndYearRangeByFilteringQueryTra
     protected String handleJournal(String journalTitle) {
         return quoteStringIfSpaceIsContained(journalTitle);
     }
-
-    @Override
-    protected String handleUnFieldedTerm(String term) {
-        return quoteStringIfSpaceIsContained(term);
-    }
 }

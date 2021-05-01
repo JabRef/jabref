@@ -34,9 +34,4 @@ public class ScholarQueryTransformer extends YearAndYearRangeByFilteringQueryTra
     protected String handleJournal(String journalTitle) {
         return String.format("source:\"%s\"", journalTitle);
     }
-
-    @Override
-    protected String handleUnFieldedTerm(String term) {
-        return String.format("\"%s\"", term);
-    }
 }

@@ -44,9 +44,4 @@ public class JstorQueryTransformer extends AbstractQueryTransformer {
         }
         return "sd:" + Integer.toString(startYear) + getLogicalAndOperator() + "ed:" + Integer.toString(endYear);
     }
-
-    @Override
-    protected String handleUnFieldedTerm(String term) {
-        return String.format("\"%s\"", term);
-    }
 }

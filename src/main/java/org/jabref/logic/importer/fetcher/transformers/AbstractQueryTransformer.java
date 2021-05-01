@@ -181,8 +181,12 @@ public abstract class AbstractQueryTransformer {
 
     /**
      * Return a string representation of the un-fielded (default fielded) term
+     *
+     * Default implementation: just return the term (in quotes if a space is contained)
      */
-    protected abstract String handleUnFieldedTerm(String term);
+    protected String handleUnFieldedTerm(String term) {
+        return quoteStringIfSpaceIsContained(term);
+    }
 
     /**
      * Encloses the given string with " if there is a space contained

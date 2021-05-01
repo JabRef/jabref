@@ -39,9 +39,4 @@ public class DefaultLuceneQueryTransformer extends AbstractQueryTransformer {
     protected String handleYear(String year) {
         return createKeyValuePair("year", year);
     }
-
-    @Override
-    protected String handleUnFieldedTerm(String term) {
-        return quoteStringIfSpaceIsContained(term);
-    }
 }

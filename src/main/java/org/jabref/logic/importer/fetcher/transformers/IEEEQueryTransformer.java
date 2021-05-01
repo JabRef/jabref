@@ -52,11 +52,6 @@ public class IEEEQueryTransformer extends YearRangeByFilteringQueryTransformer {
     }
 
     @Override
-    protected String handleUnFieldedTerm(String term) {
-        return quoteStringIfSpaceIsContained(term);
-    }
-
-    @Override
     protected Optional<String> handleOtherField(String fieldAsString, String term) {
         return switch (fieldAsString) {
             case "article_number" -> handleArticleNumber(term);
