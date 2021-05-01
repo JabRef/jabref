@@ -33,8 +33,25 @@ class TimeStampToModificationDateTest {
         Mockito.when(timestampPreferences.getTimestampField()).then(invocation -> StandardField.TIMESTAMP);
     }
 
+    public static Stream<Arguments> standardFieldToModificationDate() {
+        return Stream.of(
+                Arguments.of(
+                        new BibEntry().withField(StandardField.MODIFICATIONDATE, "2018-09-10T00:00:00"),
+                        new BibEntry().withField(StandardField.TIMESTAMP, "2018-09-10")
+                ),
+                Arguments.of(
+                        new BibEntry().withField(StandardField.MODIFICATIONDATE, "2020-12-24T00:00:00"),
+                        new BibEntry().withField(StandardField.TIMESTAMP, "2020-12-24")
+                ),
+                Arguments.of(
+                        new BibEntry().withField(StandardField.MODIFICATIONDATE, "2020-12-31T00:00:00"),
+                        new BibEntry().withField(StandardField.TIMESTAMP, "2020-12-31")
+                )
+        );
+    }
+
     /**
-     * Tests migration to modificationdate if the users uses the default ISO yyyy-mm-dd format and the standard timestamp field
+     * Tests migration to field "modificationdate" if the users uses the default ISO yyyy-mm-dd format and the standard timestamp field
      */
     @ParameterizedTest
     @MethodSource("standardFieldToModificationDate")
@@ -63,7 +80,7 @@ class TimeStampToModificationDateTest {
     }
 
     /**
-     * Tests migration to modificationdate if the users uses the default ISO yyyy-mm-dd format and a custom timestamp field
+     * Tests migration to field "modificationdate" if the users uses the default ISO yyyy-mm-dd format and a custom timestamp field
      */
     @ParameterizedTest
     @MethodSource("customFieldToModificationDate")
@@ -73,22 +90,5 @@ class TimeStampToModificationDateTest {
         ParserResult entries = new ParserResult(List.of(input));
         migrator.cleanup(input);
         assertEquals(expected, input);
-    }
-
-    public static Stream<Arguments> standardFieldToModificationDate() {
-        return Stream.of(
-                Arguments.of(
-                        new BibEntry().withField(StandardField.MODIFICATIONDATE, "2018-09-10T00:00:00"),
-                        new BibEntry().withField(StandardField.TIMESTAMP, "2018-09-10")
-                ),
-                Arguments.of(
-                        new BibEntry().withField(StandardField.MODIFICATIONDATE, "2020-12-24T00:00:00"),
-                        new BibEntry().withField(StandardField.TIMESTAMP, "2020-12-24")
-                ),
-                Arguments.of(
-                        new BibEntry().withField(StandardField.MODIFICATIONDATE, "2020-12-31T00:00:00"),
-                        new BibEntry().withField(StandardField.TIMESTAMP, "2020-12-31")
-                )
-        );
     }
 }
