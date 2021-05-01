@@ -19,6 +19,8 @@ class UpdateTimestampListener {
 
     @Subscribe
     public void listen(EntryChangedEvent event) {
+        // The event source needs to be checked, since the timestamp is always updated on every change. The cleanup formatter is an exception to that behaviour,
+        // since it just should move the contents from the timestamp field to modificationdate or creationdate.
         if (preferencesService.getTimestampPreferences().shouldAddModificationDate() && event.getEntriesEventSource() != EntriesEventSource.CLEANUP_TIMESTAMP) {
             event.getBibEntry().setField(StandardField.MODIFICATIONDATE,
                     preferencesService.getTimestampPreferences().now());
