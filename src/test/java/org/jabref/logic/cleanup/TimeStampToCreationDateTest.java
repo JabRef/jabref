@@ -3,7 +3,6 @@ package org.jabref.logic.cleanup;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.jabref.logic.cleanup.TimeStampToCreationDate;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.entry.BibEntry;
@@ -20,12 +19,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TimeStampToCreationDateTest {
 
-    private static final Field customTimeStampField = new UnknownField("dateOfCreation");
+    private static final Field CUSTOM_TIME_STAMP_FIELD = new UnknownField("dateOfCreation");
 
     private final TimestampPreferences timestampPreferences = Mockito.mock(TimestampPreferences.class);
 
     public void makeMockReturnCustomField() {
-        Mockito.when(timestampPreferences.getTimestampField()).then(invocation -> customTimeStampField);
+        Mockito.when(timestampPreferences.getTimestampField()).then(invocation -> CUSTOM_TIME_STAMP_FIELD);
     }
 
     public void makeMockReturnStandardField() {
@@ -65,15 +64,15 @@ class TimeStampToCreationDateTest {
         return Stream.of(
                 Arguments.of(
                         new BibEntry().withField(StandardField.CREATIONDATE, "2018-09-10T00:00:00"),
-                        new BibEntry().withField(customTimeStampField, "2018-09-10")
+                        new BibEntry().withField(CUSTOM_TIME_STAMP_FIELD, "2018-09-10")
                 ),
                 Arguments.of(
                         new BibEntry().withField(StandardField.CREATIONDATE, "2020-12-24T00:00:00"),
-                        new BibEntry().withField(customTimeStampField, "2020-12-24")
+                        new BibEntry().withField(CUSTOM_TIME_STAMP_FIELD, "2020-12-24")
                 ),
                 Arguments.of(
                         new BibEntry().withField(StandardField.CREATIONDATE, "2020-12-31T00:00:00"),
-                        new BibEntry().withField(customTimeStampField, "2020-12-31")
+                        new BibEntry().withField(CUSTOM_TIME_STAMP_FIELD, "2020-12-31")
                 )
         );
     }
