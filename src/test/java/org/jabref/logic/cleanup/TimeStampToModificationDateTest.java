@@ -87,7 +87,6 @@ class TimeStampToModificationDateTest {
     public void withCustomFieldToModificationDate(BibEntry expected, BibEntry input) {
         makeMockReturnCustomField();
         TimeStampToModificationDate migrator = new TimeStampToModificationDate(timestampPreferences);
-        ParserResult entries = new ParserResult(List.of(input));
         migrator.cleanup(input);
         assertEquals(expected, input);
     }
