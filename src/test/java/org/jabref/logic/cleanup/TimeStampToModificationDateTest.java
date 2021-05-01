@@ -1,11 +1,7 @@
 package org.jabref.logic.cleanup;
 
-import java.util.List;
 import java.util.stream.Stream;
 
-import org.jabref.logic.cleanup.TimeStampToCreationDate;
-import org.jabref.logic.cleanup.TimeStampToModificationDate;
-import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
