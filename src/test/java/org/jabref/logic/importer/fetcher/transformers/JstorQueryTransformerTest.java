@@ -36,20 +36,17 @@ class JstorQueryTransformerTest extends InfixTransformerTest<JstorQueryTransform
 
     @Override
     public void convertYearField() throws Exception {
-        JstorQueryTransformer transformer = (JstorQueryTransformer) getTransformer();
         String queryString = "year:2018";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> query = transformer.transformLuceneQuery(luceneQuery);
+        Optional<String> query = getTransformer().transformLuceneQuery(luceneQuery);
         assertEquals(Optional.of("sd:2018 AND ed:2018"), query);
     }
 
     @Override
     public void convertYearRangeField() throws Exception {
-        JstorQueryTransformer transformer = ((JstorQueryTransformer) getTransformer());
-
         String queryString = "year-range:2018-2021";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> query = transformer.transformLuceneQuery(luceneQuery);
+        Optional<String> query = getTransformer().transformLuceneQuery(luceneQuery);
         assertEquals(Optional.of("sd:2018 AND ed:2021"), query);
     }
 }
