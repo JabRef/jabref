@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fetcher.transformators;
+package org.jabref.logic.importer.fetcher.transformers;
 
 public class JstorQueryTransformer extends AbstractQueryTransformer {
     @Override
@@ -18,17 +18,17 @@ public class JstorQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleAuthor(String author) {
-        return String.format("au:\"%s\"", author);
+        return createKeyValuePair("au", author);
     }
 
     @Override
     protected String handleTitle(String title) {
-        return String.format("ti:\"%s\"", title);
+        return createKeyValuePair("ti", title);
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return String.format("pt:\"%s\"", journalTitle);
+        return createKeyValuePair("pt", journalTitle);
     }
 
     @Override
@@ -38,12 +38,10 @@ public class JstorQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleYearRange(String yearRange) {
-        String[] split = yearRange.split("-");
-        return "sd:" + split[0] + getLogicalAndOperator() + "ed:" + split[1];
-    }
-
-    @Override
-    protected String handleUnFieldedTerm(String term) {
-        return String.format("\"%s\"", term);
+        parseYearRange(yearRange);
+        if (endYear == Integer.MAX_VALUE) {
+            return yearRange;
+        }
+        return "sd:" + Integer.toString(startYear) + getLogicalAndOperator() + "ed:" + Integer.toString(endYear);
     }
 }

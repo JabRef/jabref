@@ -1,6 +1,4 @@
-package org.jabref.logic.importer.fetcher.transformators;
-
-import java.util.StringJoiner;
+package org.jabref.logic.importer.fetcher.transformers;
 
 /**
  * This class converts a query string written in lucene syntax into a complex  query.
@@ -26,37 +24,22 @@ public class SpringerQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String handleAuthor(String author) {
-        return String.format("name:\"%s\"", author);
+        return createKeyValuePair("name", author);
     }
 
     @Override
     protected String handleTitle(String title) {
-        return String.format("title:\"%s\"", title);
+        return createKeyValuePair("title", title);
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return String.format("journal:\"%s\"", journalTitle);
+        return createKeyValuePair("journal", journalTitle);
 
     }
 
     @Override
     protected String handleYear(String year) {
         return String.format("date:%s*", year);
-    }
-
-    @Override
-    protected String handleYearRange(String yearRange) {
-        String[] split = yearRange.split("-");
-        StringJoiner resultBuilder = new StringJoiner("*" + getLogicalOrOperator() + "date:", "(date:", "*)");
-        for (int i = Integer.parseInt(split[0]); i <= Integer.parseInt(split[1]); i++) {
-            resultBuilder.add(String.valueOf(i));
-        }
-        return resultBuilder.toString();
-    }
-
-    @Override
-    protected String handleUnFieldedTerm(String term) {
-        return "\"" + term + "\"";
     }
 }

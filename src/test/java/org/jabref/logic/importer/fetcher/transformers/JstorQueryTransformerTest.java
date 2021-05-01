@@ -1,20 +1,22 @@
-package org.jabref.logic.importer.fetcher.transformators;
+package org.jabref.logic.importer.fetcher.transformers;
+
+import java.util.Optional;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class ScholarQueryTransformerTest implements InfixTransformerTest {
+class JstorQueryTransformerTest extends InfixTransformerTest<JstorQueryTransformer> {
 
     @Override
-    public AbstractQueryTransformer getTransformator() {
-        return new ScholarQueryTransformer();
+    public JstorQueryTransformer getTransformer() {
+        return new JstorQueryTransformer();
     }
 
     @Override
     public String getAuthorPrefix() {
-        return "author:";
+        return "au:";
     }
 
     @Override
@@ -24,36 +26,27 @@ class ScholarQueryTransformerTest implements InfixTransformerTest {
 
     @Override
     public String getJournalPrefix() {
-        return "source:";
+        return "pt:";
     }
 
     @Override
     public String getTitlePrefix() {
-        return "allintitle:";
+        return "ti:";
     }
 
     @Override
     public void convertYearField() throws Exception {
-        ScholarQueryTransformer transformer = ((ScholarQueryTransformer) getTransformator());
-
-        String queryString = "year:2021";
+        String queryString = "year:2018";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        transformer.transformLuceneQuery(luceneQuery);
-
-        assertEquals(2021, transformer.getStartYear());
-        assertEquals(2021, transformer.getEndYear());
+        Optional<String> query = getTransformer().transformLuceneQuery(luceneQuery);
+        assertEquals(Optional.of("sd:2018 AND ed:2018"), query);
     }
 
     @Override
     public void convertYearRangeField() throws Exception {
-
-        ScholarQueryTransformer transformer = ((ScholarQueryTransformer) getTransformator());
-
         String queryString = "year-range:2018-2021";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        transformer.transformLuceneQuery(luceneQuery);
-
-        assertEquals(2018, transformer.getStartYear());
-        assertEquals(2021, transformer.getEndYear());
+        Optional<String> query = getTransformer().transformLuceneQuery(luceneQuery);
+        assertEquals(Optional.of("sd:2018 AND ed:2021"), query);
     }
 }

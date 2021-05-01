@@ -1,6 +1,7 @@
-package org.jabref.logic.importer.fetcher.transformators;
+package org.jabref.logic.importer.fetcher.transformers;
 
 import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.BooleanQueryNode;
@@ -13,12 +14,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * In case the transformator contains state for a query transformation (such as the {@link IEEEQueryTransformer}), it has to be noted at the JavaDoc.
+ * In case the transformer contains state for a query transformation (such as the {@link IEEEQueryTransformer}), it has to be noted at the JavaDoc.
  * Otherwise, a single instance QueryTransformer can be used.
  */
 public abstract class AbstractQueryTransformer {
     public static final String NO_EXPLICIT_FIELD = "default";
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractQueryTransformer.class);
+
+    // These can be used for filtering in post processing
+    protected int startYear = Integer.MAX_VALUE;
+    protected int endYear = Integer.MIN_VALUE;
 
     /**
      * Transforms a and b and c to (a AND b AND c), where
@@ -137,24 +142,79 @@ public abstract class AbstractQueryTransformer {
     protected abstract String handleYear(String year);
 
     /**
+     * Parses the year range and fills startYear and endYear.
+     * Ensures that startYear <= endYear
+     */
+    protected void parseYearRange(String yearRange) {
+        String[] split = yearRange.split("-");
+        int parsedStartYear = Integer.parseInt(split[0]);
+        startYear = parsedStartYear;
+        if (split.length >= 1) {
+            int parsedEndYear = Integer.parseInt(split[1]);
+            if (parsedEndYear >= parsedStartYear) {
+                endYear = parsedEndYear;
+            } else {
+                startYear = parsedEndYear;
+                endYear = parsedStartYear;
+            }
+        }
+    }
+
+    /**
      * Return a string representation of the year-range fielded term
      * Should follow the structure yyyy-yyyy
      *
      * Example: <code>2015-2021</code>
      */
-    protected abstract String handleYearRange(String yearRange);
+    protected String handleYearRange(String yearRange) {
+        parseYearRange(yearRange);
+        if (endYear == Integer.MAX_VALUE) {
+            // invalid year range
+            return yearRange;
+        }
+        StringJoiner resultBuilder = new StringJoiner(getLogicalOrOperator());
+        for (int i = startYear; i <= endYear; i++) {
+            resultBuilder.add(handleYear(String.valueOf(i)));
+        }
+        return resultBuilder.toString();
+    }
 
     /**
      * Return a string representation of the un-fielded (default fielded) term
+     *
+     * Default implementation: just return the term (in quotes if a space is contained)
      */
-    protected abstract String handleUnFieldedTerm(String term);
+    protected String handleUnFieldedTerm(String term) {
+        return quoteStringIfSpaceIsContained(term);
+    }
+
+    /**
+     * Encloses the given string with " if there is a space contained
+     *
+     * @return Returns a string
+     */
+    protected String quoteStringIfSpaceIsContained(String string) {
+        if (string.contains(" ")) {
+            return "\"" + string + "\"";
+        } else {
+            return string;
+        }
+    }
+
+    protected String createKeyValuePair(String fieldAsString, String term) {
+        return createKeyValuePair(fieldAsString, term, ":");
+    }
+
+    protected String createKeyValuePair(String fieldAsString, String term, String separator) {
+        return String.format("%s%s%s", fieldAsString, separator, quoteStringIfSpaceIsContained(term));
+    }
 
     /**
      * Return a string representation of the provided field
      * If it is not supported return an empty optional.
      */
     protected Optional<String> handleOtherField(String fieldAsString, String term) {
-        return Optional.of(String.format("%s:\"%s\"", fieldAsString, term));
+        return Optional.of(createKeyValuePair(fieldAsString, term));
     }
 
     private Optional<String> transform(QueryNode query) {

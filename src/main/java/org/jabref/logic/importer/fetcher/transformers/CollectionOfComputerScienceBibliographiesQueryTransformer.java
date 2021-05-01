@@ -1,6 +1,6 @@
-package org.jabref.logic.importer.fetcher.transformators;
+package org.jabref.logic.importer.fetcher.transformers;
 
-public class DefaultQueryTransformer extends AbstractQueryTransformer {
+public class CollectionOfComputerScienceBibliographiesQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String getLogicalAndOperator() {
@@ -9,41 +9,31 @@ public class DefaultQueryTransformer extends AbstractQueryTransformer {
 
     @Override
     protected String getLogicalOrOperator() {
-        return " ";
+        return " OR ";
     }
 
     @Override
     protected String getLogicalNotOperator() {
-        return "";
+        return "-";
     }
 
     @Override
     protected String handleAuthor(String author) {
-        return author;
+        return createKeyValuePair("au", author);
     }
 
     @Override
     protected String handleTitle(String title) {
-        return title;
+        return createKeyValuePair("ti", title);
     }
 
     @Override
     protected String handleJournal(String journalTitle) {
-        return journalTitle;
+        return quoteStringIfSpaceIsContained(journalTitle);
     }
 
     @Override
     protected String handleYear(String year) {
-        return year;
-    }
-
-    @Override
-    protected String handleYearRange(String yearRange) {
-        return yearRange;
-    }
-
-    @Override
-    protected String handleUnFieldedTerm(String term) {
-        return term;
+        return String.format("year:%s", year);
     }
 }

@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fetcher.transformators;
+package org.jabref.logic.importer.fetcher.transformers;
 
 import java.util.Optional;
 
@@ -7,16 +7,16 @@ import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxPars
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class DBLPQueryTransformerTest implements InfixTransformerTest {
+class CollectionOfComputerScienceBibliographiesQueryTransformerTest extends InfixTransformerTest<CollectionOfComputerScienceBibliographiesQueryTransformer> {
 
     @Override
-    public AbstractQueryTransformer getTransformator() {
-        return new DBLPQueryTransformer();
+    public CollectionOfComputerScienceBibliographiesQueryTransformer getTransformer() {
+        return new CollectionOfComputerScienceBibliographiesQueryTransformer();
     }
 
     @Override
     public String getAuthorPrefix() {
-        return "";
+        return "au:";
     }
 
     @Override
@@ -31,24 +31,23 @@ class DBLPQueryTransformerTest implements InfixTransformerTest {
 
     @Override
     public String getTitlePrefix() {
-        return "";
+        return "ti:";
     }
 
     @Override
     public void convertYearField() throws Exception {
-        String queryString = "year:2015";
+        String queryString = "2018";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformator().transformLuceneQuery(luceneQuery);
-        Optional<String> expected = Optional.of("2015");
-        assertEquals(expected, searchQuery);
+        Optional<String> query = getTransformer().transformLuceneQuery(luceneQuery);
+        assertEquals(Optional.of("year:2018"), query);
     }
 
     @Override
     public void convertYearRangeField() throws Exception {
-        String queryString = "year-range:2012-2015";
+        String queryString = "year-range:2018-2021";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
-        Optional<String> searchQuery = getTransformator().transformLuceneQuery(luceneQuery);
-        Optional<String> expected = Optional.of("2012|2013|2014|2015");
-        assertEquals(expected, searchQuery);
+        Optional<String> query = getTransformer().transformLuceneQuery(luceneQuery);
+        assertEquals(Optional.of("year:2018 OR year:2019 OR year:2020 OR year:2021"), query);
     }
+
 }
