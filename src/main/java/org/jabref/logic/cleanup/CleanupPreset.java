@@ -65,6 +65,9 @@ public class CleanupPreset {
          * Converts to bibtex format
          */
         CONVERT_TO_BIBTEX,
+        CONVERT_TIMESTAMP_TO_CREATIONDATE,
+        CONVERT_TIMESTAMP_TO_MODIFICATIONDATE,
+        DO_NOT_CONVERT_TIMESTAMP,
         MOVE_PDF,
         FIX_FILE_LINKS,
         CLEAN_UP_ISSN

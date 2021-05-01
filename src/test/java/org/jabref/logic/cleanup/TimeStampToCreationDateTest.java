@@ -1,4 +1,4 @@
-package org.jabref.migrations;
+package org.jabref.logic.cleanup;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -17,26 +17,18 @@ import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TimeStampToDateAddAndModifyTest {
+class TimeStampToCreationDateTest {
 
-    private static Field customTimeStampField = new UnknownField("dateOfCreation");
+    private static final Field CUSTOM_TIME_STAMP_FIELD = new UnknownField("dateOfCreation");
 
-    private TimestampPreferences timestampPreferences = Mockito.mock(TimestampPreferences.class);
+    private final TimestampPreferences timestampPreferences = Mockito.mock(TimestampPreferences.class);
 
     public void makeMockReturnCustomField() {
-        Mockito.when(timestampPreferences.getTimestampField()).then(invocation -> customTimeStampField);
+        Mockito.when(timestampPreferences.getTimestampField()).then(invocation -> CUSTOM_TIME_STAMP_FIELD);
     }
 
     public void makeMockReturnStandardField() {
         Mockito.when(timestampPreferences.getTimestampField()).then(invocation -> StandardField.TIMESTAMP);
-    }
-
-    public void makeMockToMigrateToCreationDate() {
-        Mockito.when(timestampPreferences.shouldUpdateTimestamp()).then(invocation -> Boolean.FALSE);
-    }
-
-    public void makeMockToMigrateToModificationDate() {
-        Mockito.when(timestampPreferences.shouldUpdateTimestamp()).then(invocation -> Boolean.TRUE);
     }
 
     public static Stream<Arguments> standardFieldToCreationDate() {
@@ -62,27 +54,25 @@ class TimeStampToDateAddAndModifyTest {
     @ParameterizedTest
     @MethodSource("standardFieldToCreationDate")
     public void withStandardFieldToCreationDate(BibEntry expected, BibEntry input) {
-        makeMockToMigrateToCreationDate();
         makeMockReturnStandardField();
-        TimeStampToDateAddAndModify migrator = new TimeStampToDateAddAndModify(timestampPreferences);
-        ParserResult entries = new ParserResult(List.of(input));
-        migrator.performMigration(entries);
-        assertEquals(List.of(expected), entries.getDatabase().getEntries());
+        TimeStampToCreationDate migrator = new TimeStampToCreationDate(timestampPreferences);
+        migrator.cleanup(input);
+        assertEquals(expected, input);
     }
 
     public static Stream<Arguments> customFieldToCreationDate() {
         return Stream.of(
                 Arguments.of(
                         new BibEntry().withField(StandardField.CREATIONDATE, "2018-09-10T00:00:00"),
-                        new BibEntry().withField(customTimeStampField, "2018-09-10")
+                        new BibEntry().withField(CUSTOM_TIME_STAMP_FIELD, "2018-09-10")
                 ),
                 Arguments.of(
                         new BibEntry().withField(StandardField.CREATIONDATE, "2020-12-24T00:00:00"),
-                        new BibEntry().withField(customTimeStampField, "2020-12-24")
+                        new BibEntry().withField(CUSTOM_TIME_STAMP_FIELD, "2020-12-24")
                 ),
                 Arguments.of(
                         new BibEntry().withField(StandardField.CREATIONDATE, "2020-12-31T00:00:00"),
-                        new BibEntry().withField(customTimeStampField, "2020-12-31")
+                        new BibEntry().withField(CUSTOM_TIME_STAMP_FIELD, "2020-12-31")
                 )
         );
     }
@@ -93,74 +83,10 @@ class TimeStampToDateAddAndModifyTest {
     @ParameterizedTest
     @MethodSource("customFieldToCreationDate")
     public void withCustomFieldToCreationDate(BibEntry expected, BibEntry input) {
-        makeMockToMigrateToCreationDate();
         makeMockReturnCustomField();
-        TimeStampToDateAddAndModify migrator = new TimeStampToDateAddAndModify(timestampPreferences);
-        ParserResult entries = new ParserResult(List.of(input));
-        migrator.performMigration(entries);
-        assertEquals(List.of(expected), entries.getDatabase().getEntries());
-    }
-
-    public static Stream<Arguments> standardFieldToModificationDate() {
-        return Stream.of(
-                Arguments.of(
-                        new BibEntry().withField(StandardField.MODIFICATIONDATE, "2018-09-10T00:00:00"),
-                        new BibEntry().withField(StandardField.TIMESTAMP, "2018-09-10")
-                ),
-                Arguments.of(
-                        new BibEntry().withField(StandardField.MODIFICATIONDATE, "2020-12-24T00:00:00"),
-                        new BibEntry().withField(StandardField.TIMESTAMP, "2020-12-24")
-                ),
-                Arguments.of(
-                        new BibEntry().withField(StandardField.MODIFICATIONDATE, "2020-12-31T00:00:00"),
-                        new BibEntry().withField(StandardField.TIMESTAMP, "2020-12-31")
-                )
-        );
-    }
-
-    /**
-     * Tests migration to modificationdate if the users uses the default ISO yyyy-mm-dd format and the standard timestamp field
-     */
-    @ParameterizedTest
-    @MethodSource("standardFieldToModificationDate")
-    public void withStandardFieldToModificationDate(BibEntry expected, BibEntry input) {
-        makeMockToMigrateToModificationDate();
-        makeMockReturnStandardField();
-        TimeStampToDateAddAndModify migrator = new TimeStampToDateAddAndModify(timestampPreferences);
-        ParserResult entries = new ParserResult(List.of(input));
-        migrator.performMigration(entries);
-        assertEquals(List.of(expected), entries.getDatabase().getEntries());
-    }
-
-    public static Stream<Arguments> customFieldToModificationDate() {
-        return Stream.of(
-                Arguments.of(
-                        new BibEntry().withField(StandardField.MODIFICATIONDATE, "2018-09-10T00:00:00"),
-                        new BibEntry().withField(customTimeStampField, "2018-09-10")
-                ),
-                Arguments.of(
-                        new BibEntry().withField(StandardField.MODIFICATIONDATE, "2020-12-24T00:00:00"),
-                        new BibEntry().withField(customTimeStampField, "2020-12-24")
-                ),
-                Arguments.of(
-                        new BibEntry().withField(StandardField.MODIFICATIONDATE, "2020-12-31T00:00:00"),
-                        new BibEntry().withField(customTimeStampField, "2020-12-31")
-                )
-        );
-    }
-
-    /**
-     * Tests migration to modificationdate if the users uses the default ISO yyyy-mm-dd format and a custom timestamp field
-     */
-    @ParameterizedTest
-    @MethodSource("customFieldToModificationDate")
-    public void withCustomFieldToModificationDate(BibEntry expected, BibEntry input) {
-        makeMockToMigrateToModificationDate();
-        makeMockReturnCustomField();
-        TimeStampToDateAddAndModify migrator = new TimeStampToDateAddAndModify(timestampPreferences);
-        ParserResult entries = new ParserResult(List.of(input));
-        migrator.performMigration(entries);
-        assertEquals(List.of(expected), entries.getDatabase().getEntries());
+        TimeStampToCreationDate migrator = new TimeStampToCreationDate(timestampPreferences);
+        migrator.cleanup(input);
+        assertEquals(expected, input);
     }
 
     public static Stream<Arguments> entriesMigratedToCreationDateFromDifferentFormats() {
@@ -244,12 +170,11 @@ class TimeStampToDateAddAndModifyTest {
     @ParameterizedTest
     @MethodSource("entriesMigratedToCreationDateFromDifferentFormats")
     public void withDifferentFormats(BibEntry expected, BibEntry input) {
-        makeMockToMigrateToCreationDate();
         makeMockReturnStandardField();
-        TimeStampToDateAddAndModify migrator = new TimeStampToDateAddAndModify(timestampPreferences);
+        TimeStampToCreationDate migrator = new TimeStampToCreationDate(timestampPreferences);
         ParserResult parserResult = new ParserResult(List.of(input));
-        migrator.performMigration(parserResult);
-        assertEquals(List.of(expected), parserResult.getDatabase().getEntries());
+        migrator.cleanup(input);
+        assertEquals(expected, input);
     }
 
 }
