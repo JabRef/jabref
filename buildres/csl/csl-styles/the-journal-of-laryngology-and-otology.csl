@@ -1,29 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="minimal" default-locale="en-US">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="minimal" default-locale="en-GB">
   <info>
-    <title>Journal of Nutrition</title>
-    <id>http://www.zotero.org/styles/journal-of-nutrition</id>
-    <link href="http://www.zotero.org/styles/journal-of-nutrition" rel="self"/>
-    <link href="http://www.zotero.org/styles/vancouver" rel="template"/>
-    <link href="https://academic.oup.com/jn/pages/General_Instructions" rel="documentation"/>
-    <link href="http://www.nlm.nih.gov/bsd/uniform_requirements.html" rel="documentation"/>
-    <author>
-      <name>Sebastian Karcher</name>
-    </author>
+    <title>The Journal of Laryngology &amp; Otology</title>
+    <title-short>JLO</title-short>
+    <id>http://www.zotero.org/styles/the-journal-of-laryngology-and-otology</id>
+    <link href="http://www.zotero.org/styles/the-journal-of-laryngology-and-otology" rel="self"/>
+    <link href="http://www.zotero.org/styles/vancouver-superscript" rel="template"/>
+    <link href="https://www.jlo.co.uk/submitting-articles/instructions-for-authors/" rel="documentation"/>
+    <link href="https://www.cambridge.org/core/journals/journal-of-laryngology-and-otology/information/instructions-contributors" rel="documentation"/>
     <category citation-format="numeric"/>
     <category field="medicine"/>
-    <issn>0022-3166</issn>
-    <eissn>1541-6100</eissn>
-    <summary>Vancouver style with only year/volume and et al after 11 authors</summary>
-    <updated>2021-04-19T12:19:55+00:00</updated>
+    <issn>0022-2151</issn>
+    <eissn>1748-5460</eissn>
+    <summary>The Journal of Laryngology and Otology</summary>
+    <updated>2021-04-22T12:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
-    <date form="text" delimiter=" ">
-      <date-part name="year"/>
-      <date-part name="month" form="short" strip-periods="true"/>
-      <date-part name="day"/>
-    </date>
     <terms>
       <term name="retrieved">available</term>
       <term name="section" form="short">sect.</term>
@@ -41,7 +34,7 @@
   <macro name="editor">
     <group delimiter=": ">
       <choose>
-        <if type="chapter paper-conference" match="any">
+        <if type="chapter paper-conference">
           <text term="in" text-case="capitalize-first"/>
         </if>
       </choose>
@@ -52,37 +45,32 @@
     </group>
   </macro>
   <macro name="publisher">
-    <group delimiter=": " suffix=";">
+    <group delimiter=": " suffix=":">
       <choose>
-        <if type="thesis">
-          <text variable="publisher-place" prefix="[" suffix="]"/>
+        <if type="article" match="none">
+          <text variable="publisher"/>
+          <choose>
+            <if type="thesis">
+              <text variable="publisher-place" prefix="[" suffix="]"/>
+            </if>
+            <else>
+              <text variable="publisher-place"/>
+            </else>
+          </choose>
         </if>
-        <else>
-          <text variable="publisher-place"/>
-        </else>
       </choose>
-      <text variable="publisher"/>
     </group>
-  </macro>
-  <macro name="access">
-    <choose>
-      <if variable="URL">
-        <group delimiter=": ">
-          <group delimiter=" ">
-            <text term="retrieved" text-case="capitalize-first"/>
-            <text term="from"/>
-          </group>
-          <text variable="URL"/>
-        </group>
-      </if>
-    </choose>
   </macro>
   <macro name="accessed-date">
     <choose>
       <if variable="URL">
         <group prefix="[" suffix="]" delimiter=" ">
-          <text term="cited" text-case="lowercase"/>
-          <date variable="accessed" form="text"/>
+          <text term="accessed" text-case="lowercase"/>
+          <date variable="accessed" suffix="">
+            <date-part name="year"/>
+            <date-part name="month" prefix=" " form="short" strip-periods="true"/>
+            <date-part name="day" prefix=" "/>
+          </date>
         </group>
       </if>
     </choose>
@@ -91,26 +79,14 @@
     <choose>
       <if type="article-journal article-magazine chapter paper-conference article-newspaper" match="any">
         <group delimiter=" ">
-          <choose>
-            <if type="article-journal">
-              <text variable="container-title" form="short" strip-periods="true"/>
-            </if>
-            <else>
-              <text variable="container-title" strip-periods="true" suffix="."/>
-            </else>
-          </choose>
-          <choose>
-            <if variable="URL">
-              <text term="internet" prefix="[" suffix="]" text-case="capitalize-first"/>
-            </if>
-          </choose>
+          <text variable="container-title" form="short" strip-periods="true" font-style="italic"/>
         </group>
         <text macro="edition" prefix=" "/>
       </if>
-      <else-if type="bill legislation" match="any">
+      <else-if type="bill legislation">
         <group delimiter=", ">
           <group delimiter=". ">
-            <text variable="container-title"/>
+            <text variable="container-title" form="short"/>
             <group delimiter=" ">
               <text term="section" form="short" text-case="capitalize-first"/>
               <text variable="section"/>
@@ -120,14 +96,28 @@
         </group>
       </else-if>
       <else>
-        <text variable="container-title" suffix="."/>
+        <text variable="container-title" suffix="." form="short"/>
+        <choose>
+          <if type="webpage" match="any">
+            <text variable="URL" prefix=" "/>
+          </if>
+        </choose>
       </else>
     </choose>
   </macro>
   <macro name="title">
-    <text variable="title"/>
     <choose>
-      <if type="article-journal article-magazine chapter paper-conference article-newspaper" match="none">
+      <if type="book" match="any">
+        <text variable="title" strip-periods="true" font-style="italic"/>
+      </if>
+    </choose>
+    <choose>
+      <if type="book" match="none">
+        <text variable="title"/>
+      </if>
+    </choose>
+    <choose>
+      <if type="article-journal article-magazine chapter paper-conference article-newspaper book" match="none">
         <choose>
           <if variable="URL">
             <text term="internet" prefix=" [" suffix="]" text-case="capitalize-first"/>
@@ -151,7 +141,7 @@
         </group>
       </if>
       <else>
-        <text variable="edition" suffix="."/>
+        <text variable="edition"/>
       </else>
     </choose>
   </macro>
@@ -159,11 +149,12 @@
     <choose>
       <if type="article-journal article-magazine article-newspaper" match="any">
         <group suffix=";" delimiter=" ">
-          <date variable="issued" form="text" date-parts="year"/>
-          <text macro="accessed-date"/>
+          <date variable="issued" delimiter=" ">
+            <date-part name="year"/>
+          </date>
         </group>
       </if>
-      <else-if type="bill legislation" match="any">
+      <else-if type="bill legislation">
         <group delimiter=", ">
           <date variable="issued" delimiter=" ">
             <date-part name="month" form="short" strip-periods="true"/>
@@ -180,16 +171,8 @@
           <date-part name="month" form="short" strip-periods="true"/>
         </date>
       </else-if>
-      <else-if type="patent">
-        <group suffix=".">
-          <group delimiter=", ">
-            <text variable="number"/>
-            <date variable="issued">
-              <date-part name="year"/>
-            </date>
-          </group>
-          <text macro="accessed-date" prefix=" "/>
-        </group>
+      <else-if type="book" match="any">
+        <date date-parts="year" form="numeric" variable="issued"/>
       </else-if>
       <else>
         <group suffix=".">
@@ -206,12 +189,9 @@
       <if type="article-journal article-magazine article-newspaper" match="any">
         <text variable="page" prefix=":"/>
       </if>
-      <else-if type="book" match="any">
-        <text variable="number-of-pages" prefix=" " suffix=" p"/>
-      </else-if>
       <else>
         <group prefix=" " delimiter=" ">
-          <label variable="page" form="short" plural="never"/>
+          <label variable="page" plural="never"/>
           <text variable="page"/>
         </group>
       </else>
@@ -220,14 +200,7 @@
   <macro name="journal-location">
     <choose>
       <if type="article-journal article-magazine" match="any">
-        <text variable="volume"/>
-      </if>
-    </choose>
-  </macro>
-  <macro name="report-details">
-    <choose>
-      <if type="report">
-        <text variable="number" prefix="Report No.: "/>
+        <text variable="volume" font-weight="bold"/>
       </if>
     </choose>
   </macro>
@@ -235,18 +208,18 @@
     <sort>
       <key variable="citation-number"/>
     </sort>
-    <layout prefix="(" suffix=")" delimiter=",">
+    <layout delimiter="," vertical-align="sup">
       <text variable="citation-number"/>
     </layout>
   </citation>
-  <bibliography et-al-min="11" et-al-use-first="10" second-field-align="flush">
+  <bibliography et-al-min="7" et-al-use-first="6" second-field-align="flush">
     <layout>
       <text variable="citation-number" suffix=". "/>
       <group delimiter=". " suffix=". ">
         <text macro="author"/>
         <text macro="title"/>
       </group>
-      <group delimiter=" " suffix=". ">
+      <group delimiter=" ">
         <text macro="editor"/>
         <text macro="container-title"/>
         <text macro="publisher"/>
@@ -256,8 +229,6 @@
           <text macro="pages"/>
         </group>
       </group>
-      <text macro="report-details" suffix=". "/>
-      <text macro="access"/>
     </layout>
   </bibliography>
 </style>
