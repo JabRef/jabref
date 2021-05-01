@@ -34,9 +34,9 @@
     <CheckBox fx:id="cleanUpBibtex"
               text="%Convert to BibTeX format (for example, move the value of the 'journaltitle' field to 'journal')"/>
     <CheckBox fx:id="cleanUpTimestampToCreationDate"
-              text="%Convert timestamp field to creationdate field"/>
+              text="%Convert timestamp field to field 'creationdate'"/>
     <CheckBox fx:id="cleanUpTimestampToModificationDate"
-              text="%Convert timestamp field to modificationdate field"/>
+              text="%Convert timestamp field to field 'modificationdate'"/>
 
     <FieldFormatterCleanupsPanel fx:id="formatterCleanupsPanel"/>
 </fx:root>
