@@ -87,6 +87,7 @@ sourceSets {
 }
 
 repositories {
+    mavenCentral()
     mavenLocal()
     maven { url 'https://oss.sonatype.org/content/groups/public' }
     maven { url 'https://repository.apache.org/snapshots' }
