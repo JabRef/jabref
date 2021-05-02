@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer;
+import org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransformer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -31,32 +31,30 @@ public class GvkFetcherTest {
     public void setUp() {
         fetcher = new GvkFetcher();
 
-        bibEntryPPN591166003 = new BibEntry();
-        bibEntryPPN591166003.setType(StandardEntryType.Book);
-        bibEntryPPN591166003.setField(StandardField.TITLE, "Effective Java");
-        bibEntryPPN591166003.setField(StandardField.PUBLISHER, "Addison-Wesley");
-        bibEntryPPN591166003.setField(StandardField.YEAR, "2008");
-        bibEntryPPN591166003.setField(StandardField.AUTHOR, "Joshua Bloch");
-        bibEntryPPN591166003.setField(StandardField.SERIES, "The @Java series");
-        bibEntryPPN591166003.setField(StandardField.ADDRESS, "Upper Saddle River, NJ [u.a.]");
-        bibEntryPPN591166003.setField(StandardField.EDITION, "2. ed., 5. print.");
-        bibEntryPPN591166003.setField(StandardField.NOTE, "Literaturverz. S. 321 - 325");
-        bibEntryPPN591166003.setField(StandardField.ISBN, "9780321356680");
-        bibEntryPPN591166003.setField(StandardField.PAGETOTAL, "XXI, 346");
-        bibEntryPPN591166003.setField(new UnknownField("ppn_gvk"), "591166003");
-        bibEntryPPN591166003.setField(StandardField.SUBTITLE, "[revised and updated for JAVA SE 6]");
+        bibEntryPPN591166003 = new BibEntry(StandardEntryType.Book)
+                .withField(StandardField.TITLE, "Effective Java")
+                .withField(StandardField.PUBLISHER, "Addison-Wesley")
+                .withField(StandardField.YEAR, "2008")
+                .withField(StandardField.AUTHOR, "Joshua Bloch")
+                .withField(StandardField.SERIES, "The @Java series")
+                .withField(StandardField.ADDRESS, "Upper Saddle River, NJ [u.a.]")
+                .withField(StandardField.EDITION, "2. ed., 5. print.")
+                .withField(StandardField.NOTE, "Literaturverz. S. 321 - 325")
+                .withField(StandardField.ISBN, "9780321356680")
+                .withField(StandardField.PAGETOTAL, "XXI, 346")
+                .withField(new UnknownField("ppn_gvk"), "591166003")
+                .withField(StandardField.SUBTITLE, "[revised and updated for JAVA SE 6]");
 
-        bibEntryPPN66391437X = new BibEntry();
-        bibEntryPPN66391437X.setType(StandardEntryType.Book);
-        bibEntryPPN66391437X.setField(StandardField.TITLE, "Effective unit testing");
-        bibEntryPPN66391437X.setField(StandardField.PUBLISHER, "Manning");
-        bibEntryPPN66391437X.setField(StandardField.YEAR, "2013");
-        bibEntryPPN66391437X.setField(StandardField.AUTHOR, "Lasse Koskela");
-        bibEntryPPN66391437X.setField(StandardField.ADDRESS, "Shelter Island, NY");
-        bibEntryPPN66391437X.setField(StandardField.ISBN, "9781935182573");
-        bibEntryPPN66391437X.setField(StandardField.PAGETOTAL, "XXIV, 223");
-        bibEntryPPN66391437X.setField(new UnknownField("ppn_gvk"), "66391437X");
-        bibEntryPPN66391437X.setField(StandardField.SUBTITLE, "A guide for Java developers");
+        bibEntryPPN66391437X = new BibEntry(StandardEntryType.Book)
+                .withField(StandardField.TITLE, "Effective unit testing")
+                .withField(StandardField.PUBLISHER, "Manning")
+                .withField(StandardField.YEAR, "2013")
+                .withField(StandardField.AUTHOR, "Lasse Koskela")
+                .withField(StandardField.ADDRESS, "Shelter Island, NY")
+                .withField(StandardField.ISBN, "9781935182573")
+                .withField(StandardField.PAGETOTAL, "XXIV, 223")
+                .withField(new UnknownField("ppn_gvk"), "66391437X")
+                .withField(StandardField.SUBTITLE, "A guide for Java developers");
     }
 
     @Test
@@ -69,7 +67,7 @@ public class GvkFetcherTest {
         String query = "java jdk";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(query, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         URL url = fetcher.getURLForQuery(luceneQuery);
-        assertEquals("http://sru.gbv.de/gvk?version=1.1&operation=searchRetrieve&query=pica.all%3D%22java%22+and+pica.all%3D%22jdk%22&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1", url.toString());
+        assertEquals("http://sru.gbv.de/gvk?version=1.1&operation=searchRetrieve&query=pica.all%3Djava+and+pica.all%3Djdk&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1", url.toString());
     }
 
     @Test
@@ -77,7 +75,7 @@ public class GvkFetcherTest {
         String query = "kon:java tit:jdk";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(query, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         URL url = fetcher.getURLForQuery(luceneQuery);
-        assertEquals("http://sru.gbv.de/gvk?version=1.1&operation=searchRetrieve&query=pica.kon%3D%22java%22+and+pica.tit%3D%22jdk%22&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1", url.toString());
+        assertEquals("http://sru.gbv.de/gvk?version=1.1&operation=searchRetrieve&query=pica.kon%3Djava+and+pica.tit%3Djdk&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1", url.toString());
     }
 
     @Test
