@@ -2,64 +2,64 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.ParamLayoutFormatter;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class WrapContentTest {
 
-    @Test
-    public void testSimpleText() {
-        ParamLayoutFormatter a = new WrapContent();
-        a.setArgument("<,>");
-        assertEquals("<Bob>", a.format("Bob"));
+    private ParamLayoutFormatter wrapContentParamLayoutFormatter;
+
+    @BeforeEach
+    void setup() {
+        wrapContentParamLayoutFormatter = new WrapContent();
     }
 
     @Test
-    public void testEmptyStart() {
-        ParamLayoutFormatter a = new WrapContent();
-        a.setArgument(",:");
-        assertEquals("Bob:", a.format("Bob"));
+    public void formatSimpleText() {
+        wrapContentParamLayoutFormatter.setArgument("<,>");
+        assertEquals("<Bob>", wrapContentParamLayoutFormatter.format("Bob"));
     }
 
     @Test
-    public void testEmptyEnd() {
-        ParamLayoutFormatter a = new WrapContent();
-        a.setArgument("Content: ,");
-        assertEquals("Content: Bob", a.format("Bob"));
+    public void formatEmptyStart() {
+        wrapContentParamLayoutFormatter.setArgument(",:");
+        assertEquals("Bob:", wrapContentParamLayoutFormatter.format("Bob"));
     }
 
     @Test
-    public void testEscaping() {
-        ParamLayoutFormatter a = new WrapContent();
-        a.setArgument("Name\\,Field\\,,\\,Author");
-        assertEquals("Name,Field,Bob,Author", a.format("Bob"));
+    public void formatEmptyEnd() {
+        wrapContentParamLayoutFormatter.setArgument("Content: ,");
+        assertEquals("Content: Bob", wrapContentParamLayoutFormatter.format("Bob"));
     }
 
     @Test
-    public void testFormatNullExpectNothingAdded() {
-        ParamLayoutFormatter a = new WrapContent();
-        a.setArgument("Eds.,Ed.");
-        assertEquals(null, a.format(null));
+    public void formatEscaping() {
+        wrapContentParamLayoutFormatter.setArgument("Name\\,Field\\,,\\,Author");
+        assertEquals("Name,Field,Bob,Author", wrapContentParamLayoutFormatter.format("Bob"));
     }
 
     @Test
-    public void testFormatEmptyExpectNothingAdded() {
-        ParamLayoutFormatter a = new WrapContent();
-        a.setArgument("Eds.,Ed.");
-        assertEquals("", a.format(""));
+    public void formatNull() {
+        wrapContentParamLayoutFormatter.setArgument("Eds.,Ed.");
+        assertEquals(null, wrapContentParamLayoutFormatter.format(null));
     }
 
     @Test
-    public void testNoArgumentSetExpectNothingAdded() {
-        ParamLayoutFormatter a = new WrapContent();
-        assertEquals("Bob Bruce and Jolly Jumper", a.format("Bob Bruce and Jolly Jumper"));
+    public void formatEmptyString() {
+        wrapContentParamLayoutFormatter.setArgument("Eds.,Ed.");
+        assertEquals("", wrapContentParamLayoutFormatter.format(""));
     }
 
     @Test
-    public void testNoProperArgumentExpectNothingAdded() {
-        ParamLayoutFormatter a = new WrapContent();
-        a.setArgument("Eds.");
-        assertEquals("Bob Bruce and Jolly Jumper", a.format("Bob Bruce and Jolly Jumper"));
+    public void noArgumentSetInFormatter() {
+        assertEquals("Bob Bruce and Jolly Jumper", wrapContentParamLayoutFormatter.format("Bob Bruce and Jolly Jumper"));
+    }
+
+    @Test
+    public void formatNoProperArgumentSet() {
+        wrapContentParamLayoutFormatter.setArgument("Eds.");
+        assertEquals("Bob Bruce and Jolly Jumper", wrapContentParamLayoutFormatter.format("Bob Bruce and Jolly Jumper"));
     }
 }
