@@ -11,53 +11,48 @@ import static org.mockito.Mockito.mock;
 public class FileLinkTest {
 
     private FileLinkPreferences prefs;
+    private ParamLayoutFormatter fileLinkLayoutFormatter;
 
     @BeforeEach
     public void setUp() throws Exception {
         prefs = mock(FileLinkPreferences.class);
+        fileLinkLayoutFormatter = new FileLink(prefs);
     }
 
     @Test
-    public void testEmpty() {
-        assertEquals("", new FileLink(prefs).format(""));
+    public void formatEmpty() {
+        assertEquals("", fileLinkLayoutFormatter.format(""));
     }
 
     @Test
-    public void testNull() {
-        assertEquals("",
-                new FileLink(prefs).format(null));
+    public void formatNull() {
+        assertEquals("", fileLinkLayoutFormatter.format(null));
     }
 
     @Test
-    public void testOnlyFilename() {
-        assertEquals("test.pdf",
-                new FileLink(prefs).format("test.pdf"));
+    public void formatOnlyFilename() {
+        assertEquals("test.pdf", fileLinkLayoutFormatter.format("test.pdf"));
     }
 
     @Test
-    public void testCompleteRecord() {
-        assertEquals("test.pdf",
-                new FileLink(prefs)
-                        .format("paper:test.pdf:PDF"));
+    public void formatCompleteRecord() {
+        assertEquals("test.pdf", fileLinkLayoutFormatter.format("paper:test.pdf:PDF"));
     }
 
     @Test
-    public void testMultipleFiles() {
-        ParamLayoutFormatter a = new FileLink(prefs);
-        assertEquals("test.pdf", a.format("paper:test.pdf:PDF;presentation:pres.ppt:PPT"));
+    public void formatMultipleFiles() {
+        assertEquals("test.pdf", fileLinkLayoutFormatter.format("paper:test.pdf:PDF;presentation:pres.ppt:PPT"));
     }
 
     @Test
-    public void testMultipleFilesPick() {
-        ParamLayoutFormatter a = new FileLink(prefs);
-        a.setArgument("ppt");
-        assertEquals("pres.ppt", a.format("paper:test.pdf:PDF;presentation:pres.ppt:PPT"));
+    public void formatMultipleFilesPick() {
+        fileLinkLayoutFormatter.setArgument("ppt");
+        assertEquals("pres.ppt", fileLinkLayoutFormatter.format("paper:test.pdf:PDF;presentation:pres.ppt:PPT"));
     }
 
     @Test
-    public void testMultipleFilesPickNonExistant() {
-        ParamLayoutFormatter a = new FileLink(prefs);
-        a.setArgument("doc");
-        assertEquals("", a.format("paper:test.pdf:PDF;presentation:pres.ppt:PPT"));
+    public void formatMultipleFilesPickNonExistant() {
+        fileLinkLayoutFormatter.setArgument("doc");
+        assertEquals("", fileLinkLayoutFormatter.format("paper:test.pdf:PDF;presentation:pres.ppt:PPT"));
     }
 }

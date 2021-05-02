@@ -2,39 +2,42 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FirstPageTest {
 
-    @Test
-    public void testFormatEmpty() {
-        LayoutFormatter a = new FirstPage();
-        assertEquals("", a.format(""));
+    private LayoutFormatter firstPageLayoutFormatter;
+
+    @BeforeEach
+    void setup() {
+        firstPageLayoutFormatter = new FirstPage();
     }
 
     @Test
-    public void testFormatNull() {
-        LayoutFormatter a = new FirstPage();
-        assertEquals("", a.format(null));
+    public void formatEmpty() {
+        assertEquals("", firstPageLayoutFormatter.format(""));
     }
 
     @Test
-    public void testFormatSinglePage() {
-        LayoutFormatter a = new FirstPage();
-        assertEquals("345", a.format("345"));
+    public void formatNull() {
+        assertEquals("", firstPageLayoutFormatter.format(null));
     }
 
     @Test
-    public void testFormatSingleDash() {
-        LayoutFormatter a = new FirstPage();
-        assertEquals("345", a.format("345-350"));
+    public void formatSinglePage() {
+        assertEquals("345", firstPageLayoutFormatter.format("345"));
     }
 
     @Test
-    public void testFormatDoubleDash() {
-        LayoutFormatter a = new FirstPage();
-        assertEquals("345", a.format("345--350"));
+    public void formatSingleDash() {
+        assertEquals("345", firstPageLayoutFormatter.format("345-350"));
+    }
+
+    @Test
+    public void formatDoubleDash() {
+        assertEquals("345", firstPageLayoutFormatter.format("345--350"));
     }
 }
