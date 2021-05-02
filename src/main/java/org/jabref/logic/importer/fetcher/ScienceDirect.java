@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
@@ -31,7 +32,7 @@ public class ScienceDirect implements FulltextFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScienceDirect.class);
 
     private static final String API_URL = "http://api.elsevier.com/content/article/doi/";
-    private static final String API_KEY = "fb82f2e692b3c72dafe5f4f1fa0ac00b";
+    private static final String API_KEY = new BuildInfo().scienceDirectApiKey;
 
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
