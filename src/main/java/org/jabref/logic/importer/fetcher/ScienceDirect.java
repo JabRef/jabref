@@ -55,7 +55,8 @@ public class ScienceDirect implements FulltextFetcher {
         Document html = Jsoup.connect(urlFromDoi)
                              .userAgent(URLDownload.USER_AGENT)
                              .referrer("https://www.google.com")
-                             .ignoreHttpErrors(true).get();
+                             .ignoreHttpErrors(true)
+                             .get();
 
         // Retrieve PDF link from meta data (most recent)
         Elements metaLinks = html.getElementsByAttributeValue("name", "citation_pdf_url");
@@ -83,7 +84,7 @@ public class ScienceDirect implements FulltextFetcher {
                 .findAny();
 
         if (pdfDownloadOptional.isEmpty()) {
-            LOGGER.debug("No pdfDownload key found in JSON information");
+            LOGGER.debug("No 'pdfDownload' key found in JSON information");
             return Optional.empty();
         }
 
@@ -106,7 +107,7 @@ public class ScienceDirect implements FulltextFetcher {
                     urlMetadata.getString("pdfExtension"),
                     queryParameters);
         } else {
-            LOGGER.debug("No suitable meta data information in JSON information");
+            LOGGER.debug("No suitable data in JSON information");
             return Optional.empty();
         }
 
