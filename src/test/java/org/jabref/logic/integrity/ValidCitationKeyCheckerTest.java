@@ -22,7 +22,8 @@ public class ValidCitationKeyCheckerTest {
     }
 
     private static Stream<Arguments> provideCitationKeys() {
-        return Stream.of(Arguments.of(Optional.of(Localization.lang("empty citation key")), "", "Citation key not empty"),
+        return Stream.of(
+                Arguments.of(Optional.of(Localization.lang("empty citation key")), "", "Citation key not empty"),
                 Arguments.of(Optional.empty(), "Seaver2019", "Invalid citation key"),
                 Arguments.of(Optional.of(Localization.lang("Invalid citation key")), "Seaver_2019}", "Valid citation key"));
     }

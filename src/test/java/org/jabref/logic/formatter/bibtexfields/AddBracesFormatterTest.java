@@ -74,7 +74,7 @@ class AddBracesFormatterTest {
     }
 
     @Test
-    public void formatBoundaryCase() {
+    public void formatStringWithMinimalRequiredLength() {
         assertEquals("AB", formatter.format("AB"));
     }
 }
