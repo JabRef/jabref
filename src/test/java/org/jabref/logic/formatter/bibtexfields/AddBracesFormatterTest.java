@@ -75,6 +75,6 @@ class AddBracesFormatterTest {
 
     @Test
     public void formatStringWithMinimalRequiredLength() {
-        assertEquals("AB", formatter.format("AB"));
+        assertEquals("{AB}", formatter.format("AB"));
     }
 }
