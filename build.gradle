@@ -27,17 +27,17 @@ plugins {
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
     id 'com.adarshr.test-logger' version '3.0.0'
+
+    id 'jacoco'
+
+    id 'checkstyle'
+
+    id 'project-report'
 }
 
 // Enable following for debugging
 // gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.
 
-apply plugin: 'java'
-apply plugin: 'application'
-apply plugin: 'project-report'
-apply plugin: 'jacoco'
-apply plugin: 'me.champeau.gradle.jmh'
-apply plugin: 'checkstyle'
 apply plugin: XjcPlugin
 
 apply from: 'eclipse.gradle'
@@ -48,7 +48,10 @@ version = project.findProperty('projVersion') ?: '100.0.0'
 java {
     sourceCompatibility = JavaVersion.VERSION_14
     targetCompatibility = JavaVersion.VERSION_14
-    modularity.inferModulePath.set(false) //workaround needed for Eclipse, probably because of https://github.com/gradle/gradle/issues/16922
+
+    // Workaround needed for Eclipse, probably because of https://github.com/gradle/gradle/issues/16922
+    // Should be removed as soon as Gradle 7.0.1 is released ( https://github.com/gradle/gradle/issues/16922#issuecomment-828217060 )
+    modularity.inferModulePath.set(false)
 }
 
 application {
@@ -376,7 +379,10 @@ task generateJournalAbbreviationList(type: JournalAbbreviationConverter) {
     group = 'JabRef'
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore."
 
+    // This directory is filled by "refresh-journal-lists.yml"
+    // It takes the contents of https://github.com/JabRef/abbrv.jabref.org.git
     inputDir = file("build/journals")
+
     outputDir = file("src/main/resources/journals")
 }
 
@@ -770,5 +776,3 @@ task downloadDependencies {
         }
     }
 }
-
-
