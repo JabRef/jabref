@@ -19,6 +19,7 @@ public class LowerCaseFormatterTest {
 
     @Test
     public void test() {
+        assertEquals("lower", formatter.format("lower"));
         assertEquals("lower", formatter.format("LOWER"));
         assertEquals("lower {UPPER}", formatter.format("LOWER {UPPER}"));
         assertEquals("lower {U}pper", formatter.format("LOWER {U}PPER"));

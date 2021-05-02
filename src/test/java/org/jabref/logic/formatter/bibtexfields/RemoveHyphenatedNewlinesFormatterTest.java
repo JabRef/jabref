@@ -21,6 +21,11 @@ public class RemoveHyphenatedNewlinesFormatterTest {
     }
 
     @Test
+    public void withoutHyphensUnmodified() {
+        assertEquals("water", formatter.format("water"));
+    }
+
+    @Test
     public void removeHyphensBeforePlatformSpecificNewlines() {
         String newLine = String.format("%n");
         assertEquals("water", formatter.format("wa-" + newLine + "ter"));
