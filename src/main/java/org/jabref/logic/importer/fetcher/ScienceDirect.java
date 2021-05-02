@@ -23,6 +23,7 @@ import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +34,7 @@ import org.slf4j.LoggerFactory;
 public class ScienceDirect implements FulltextFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScienceDirect.class);
 
-    private static final String API_URL = "http://api.elsevier.com/content/article/doi/";
+    private static final String API_URL = "https://api.elsevier.com/content/article/doi/";
     private static final String API_KEY = new BuildInfo().scienceDirectApiKey;
 
     @Override
@@ -41,8 +42,8 @@ public class ScienceDirect implements FulltextFetcher {
         Objects.requireNonNull(entry);
 
         Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
-        if (!doi.isPresent()) {
-            // full text fetching works only if a DOI is present
+        if (doi.isEmpty()) {
+            // Full text fetching works only if a DOI is present
             return Optional.empty();
         }
 
@@ -50,12 +51,10 @@ public class ScienceDirect implements FulltextFetcher {
         if (urlFromDoi.isEmpty()) {
             return Optional.empty();
         }
-        URL url = new URL(urlFromDoi);
-
-        // scrape the web page not as mobile client!
+        // Scrape the web page as desktop client (not as mobile client!)
         Document html = Jsoup.connect(urlFromDoi)
                              .userAgent(URLDownload.USER_AGENT)
-                             .referrer("https://www.jabref.org")
+                             .referrer("https://www.google.com")
                              .ignoreHttpErrors(true).get();
 
         // Retrieve PDF link from meta data (most recent)
@@ -65,27 +64,25 @@ public class ScienceDirect implements FulltextFetcher {
             return Optional.of(new URL(link));
         }
 
-        // We now have the ScienceDirect page with the article - and the link to the PDF
+        // We use the ScienceDirect web page which contains the article (presented using HTML).
+        // This page contains the link to the PDF in some JavaScript code embedded in the web page.
         // Example page: https://www.sciencedirect.com/science/article/pii/S1674775515001079
-
-        String protocol = url.getProtocol();
-        String authority = url.getAuthority();
 
         Optional<JSONObject> pdfDownloadOptional = html
                 .getElementsByAttributeValue("type", "application/json")
                 .stream()
                 .flatMap(element -> element.getElementsByTag("script").stream())
-                // get the text element
+                // The first DOM child of the script element is the script itself (represented as HTML text)
                 .map(element -> element.childNode(0))
-                .map(element -> element.toString())
-                .map(text -> new JSONObject(text))
+                .map(Node::toString)
+                .map(JSONObject::new)
                 .filter(json -> json.has("article"))
                 .map(json -> json.getJSONObject("article"))
                 .filter(json -> json.has("pdfDownload"))
                 .map(json -> json.getJSONObject("pdfDownload"))
                 .findAny();
 
-        if (!pdfDownloadOptional.isPresent()) {
+        if (pdfDownloadOptional.isEmpty()) {
             LOGGER.debug("No pdfDownload key found in JSON information");
             return Optional.empty();
         }
@@ -95,7 +92,8 @@ public class ScienceDirect implements FulltextFetcher {
         String fullLinkToPdf;
         if (pdfDownload.has("linkToPdf")) {
             String linkToPdf = pdfDownload.getString("linkToPdf");
-            fullLinkToPdf = String.format("%s://%s%s", protocol, authority, linkToPdf);
+            URL url = new URL(urlFromDoi);
+            fullLinkToPdf = String.format("%s://%s%s", url.getProtocol(), url.getAuthority(), linkToPdf);
         } else if (pdfDownload.has("urlMetadata")) {
             JSONObject urlMetadata = pdfDownload.getJSONObject("urlMetadata");
             JSONObject queryParamsObject = urlMetadata.getJSONObject("queryParams");
