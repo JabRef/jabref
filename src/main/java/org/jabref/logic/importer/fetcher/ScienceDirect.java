@@ -2,11 +2,9 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FulltextFetcher;
