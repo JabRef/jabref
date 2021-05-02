@@ -21,7 +21,8 @@ plugins {
     id 'com.adarshr.test-logger' version '3.0.0'
 }
 
-gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.ALWAYS
+// Enable following for debugging
+// gradle.startParameter.showStacktrace = org.gradle.api.logging.configuration.ShowStacktrace.
 
 apply plugin: 'java'
 apply plugin: 'application'
