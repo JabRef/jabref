@@ -268,6 +268,7 @@ processResources {
         if (gradle.taskGraph.hasTask(":jpackage")) {
             logger.info('Adding buildres/csl to resources')
             from("buildres/csl")
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         }
     }
 
@@ -641,8 +642,6 @@ jlink {
     }
 
     jpackage {
-        // In order for this to work, you need to dowload jpackage from https://jdk.java.net/jpackage/
-        // and put the path to the jdk-14 folder in the environment variable BADASS_JLINK_JPACKAGE_HOME
         outputDir = "distribution"
 
         if (OperatingSystem.current().isWindows()) {
