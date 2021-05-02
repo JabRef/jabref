@@ -99,7 +99,7 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherT
     void findFullTextByTitleWithCurlyBracket() throws IOException {
         entry.setField(StandardField.TITLE, "Machine versus {Human} {Attention} in {Deep} {Reinforcement} {Learning} {Tasks}");
 
-        assertEquals(Optional.of(new URL("https://arxiv.org/pdf/2010.15942v2")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/2010.15942v2")), fetcher.findFullText(entry));
     }
 
     @Test
