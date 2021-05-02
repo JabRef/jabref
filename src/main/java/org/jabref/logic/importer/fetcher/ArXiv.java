@@ -80,7 +80,6 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
                                                           .map(Optional::get)
                                                           .findFirst();
             pdfUrl.ifPresent(url -> LOGGER.info("Fulltext PDF found @ arXiv."));
-
             return pdfUrl;
         } catch (FetcherException e) {
             LOGGER.warn("arXiv API request failed", e);
@@ -118,10 +117,11 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
     }
 
     private List<ArXivEntry> searchForEntries(BibEntry entry) throws FetcherException {
+        // We need to clone the entry, because we modify it by a cleanup job.
         entry = (BibEntry) entry.clone();
-        CleanupJob cleanupJob = new EprintCleanup();
-        cleanupJob.cleanup(entry);
-        // 1. Eprint
+
+        // 1. Check for Eprint
+        new EprintCleanup().cleanup(entry);
         Optional<String> identifier = entry.getField(StandardField.EPRINT);
         if (StringUtil.isNotBlank(identifier)) {
             try {
@@ -133,9 +133,8 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
         }
 
         // 2. DOI and other fields
-        String query;
-
         Optional<String> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse).map(DOI::getNormalized);
+        String query;
         if (doi.isPresent()) {
             // Search for an entry in the ArXiv which is linked to the doi
             query = "doi:" + doi.get();
@@ -144,15 +143,12 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
             Optional<String> titleQuery = entry.getField(StandardField.TITLE).map(title -> "ti:" + StringUtil.ignoreCurlyBracket(title));
             query = OptionalUtil.toList(authorQuery, titleQuery).stream().collect(Collectors.joining("+AND+"));
         }
-
         Optional<ArXivEntry> arxivEntry = searchForEntry(query);
-
         if (arxivEntry.isPresent()) {
             // Check if entry is a match
             StringSimilarity match = new StringSimilarity();
             String arxivTitle = arxivEntry.get().title.orElse("");
             String entryTitle = StringUtil.ignoreCurlyBracket(entry.getField(StandardField.TITLE).orElse(""));
-
             if (match.isSimilar(arxivTitle, entryTitle)) {
                 return OptionalUtil.toList(arxivEntry);
             }
