@@ -13,7 +13,7 @@ plugins {
     id "com.simonharrer.modernizer" version '2.1.0-1'
     id 'me.champeau.gradle.jmh' version '0.5.3'
     id 'com.github.ben-manes.versions' version '0.38.0'
-    id 'org.javamodularity.moduleplugin' version '1.8.1'
+    id 'org.javamodularity.moduleplugin' version '1.8.2'
     id 'org.openjfx.javafxplugin' version '0.0.9'
     id 'org.beryx.jlink' version '2.23.7'
     // nicer test outputs during running and completion
@@ -306,6 +306,7 @@ tasks.register("generateBstGrammarSource", JavaExec) {
     description = 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr3.'
 
     inputs.dir('src/main/antlr3/org/jabref/bst/')
+    outputs.dir("src/main/generated/org/jabref/logic/bst/")
     args = ["-o", "$projectDir/src/main/generated/org/jabref/logic/bst/" , "$projectDir/src/main/antlr3/org/jabref/bst/Bst.g" ]
 }
 
@@ -316,6 +317,7 @@ tasks.register("generateSearchGrammarSource", JavaExec) {
     description = "Generates java files for Search.g antlr4."
 
     inputs.dir("src/main/antlr4/org/jabref/search/")
+    outputs.dir("src/main/generated/org/jabref/search/")
     args  = ["-o","$projectDir/src/main/generated/org/jabref/search" , "-visitor", "-no-listener", "-package", "org.jabref.search", "$projectDir/src/main/antlr4/org/jabref/search/Search.g4"]
 }
 
