@@ -40,7 +40,6 @@ java {
     sourceCompatibility = JavaVersion.VERSION_14
     targetCompatibility = JavaVersion.VERSION_14
     modularity.inferModulePath.set(false) //workaround needed for Eclipse, probably because of https://github.com/gradle/gradle/issues/16922
-
 }
 
 application {
