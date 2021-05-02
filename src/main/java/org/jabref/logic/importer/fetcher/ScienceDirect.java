@@ -29,7 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * FulltextFetcher implementation that attempts to find a PDF URL at <a href="https://www.sciencedirect.com/">ScienceDirect</a>. See <a href="https://dev.elsevier.com/">https://dev.elsevier.com/</a>
+ * FulltextFetcher implementation that attempts to find a PDF URL at <a href="https://www.sciencedirect.com/">ScienceDirect</a>.
+ * See <a href="https://dev.elsevier.com/">https://dev.elsevier.com/</a>.
  */
 public class ScienceDirect implements FulltextFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScienceDirect.class);
@@ -135,7 +136,9 @@ public class ScienceDirect implements FulltextFetcher {
                                                          .asJson();
 
             JSONObject json = jsonResponse.getBody().getObject();
-            JSONArray links = json.getJSONObject("full-text-retrieval-response").getJSONObject("coredata").getJSONArray("link");
+            JSONArray links = json.getJSONObject("full-text-retrieval-response")
+                                  .getJSONObject("coredata")
+                                  .getJSONArray("link");
 
             for (int i = 0; i < links.length(); i++) {
                 JSONObject link = links.getJSONObject(i);
