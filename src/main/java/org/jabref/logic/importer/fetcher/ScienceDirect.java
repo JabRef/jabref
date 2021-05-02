@@ -6,6 +6,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.net.URLDownload;
@@ -64,11 +66,14 @@ public class ScienceDirect implements FulltextFetcher {
             return Optional.of(new URL(link));
         }
 
+        // We now have the ScienceDirect page with the article - and the link to the PDF
+        // Example page: https://www.sciencedirect.com/science/article/pii/S1674775515001079
+
         URL scienceDirectUrl = new URL(sciLink);
         String protocol = scienceDirectUrl.getProtocol();
         String authority = scienceDirectUrl.getAuthority();
 
-        return html
+        Optional<JSONObject> pdfDownloadOptional = html
                 .getElementsByAttributeValue("type", "application/json")
                 .stream()
                 .flatMap(element -> element.getElementsByTag("script").stream())
@@ -80,21 +85,42 @@ public class ScienceDirect implements FulltextFetcher {
                 .map(json -> json.getJSONObject("article"))
                 .filter(json -> json.has("pdfDownload"))
                 .map(json -> json.getJSONObject("pdfDownload"))
-                .filter(json -> json.has("linkToPdf"))
-                .map(json -> json.getString("linkToPdf"))
-                .map(linkToPdf -> String.format("%s://%s%s", protocol, authority, linkToPdf))
-                .findAny()
-                .map(fullLinkToPdf -> {
-                    LOGGER.info("Fulltext PDF found at ScienceDirect.");
-                    try {
-                        return new URL(fullLinkToPdf);
-                    } catch (MalformedURLException e) {
-                        LOGGER.error("malformed URL", e);
-                        return null;
-                    }
-                })
-                //
-                .filter(url -> url != null);
+                .findAny();
+
+        if (!pdfDownloadOptional.isPresent()) {
+            LOGGER.debug("No pdfDownload key found in JSON information");
+            return Optional.empty();
+        }
+
+        JSONObject pdfDownload = pdfDownloadOptional.get();
+
+        String fullLinkToPdf;
+        if (pdfDownload.has("linkToPdf")) {
+            String linkToPdf = pdfDownload.getString("linkToPdf");
+            fullLinkToPdf = String.format("%s://%s%s", protocol, authority, linkToPdf);
+        } else if (pdfDownload.has("urlMetadata")) {
+            JSONObject urlMetadata = pdfDownload.getJSONObject("urlMetadata");
+            JSONObject queryParamsObject = urlMetadata.getJSONObject("queryParams");
+            String queryParameters = queryParamsObject.keySet().stream()
+                                                      .map(key -> String.format("%s=%s", key, queryParamsObject.getString(key)))
+                                                      .collect(Collectors.joining("&"));
+            fullLinkToPdf = String.format("https://www.sciencedirect.com/%s/%s%s?%s",
+                    urlMetadata.getString("path"),
+                    urlMetadata.getString("pii"),
+                    urlMetadata.getString("pdfExtension"),
+                    queryParameters);
+        } else {
+            LOGGER.debug("No suitable meta data information in JSON information");
+            return Optional.empty();
+        }
+
+        LOGGER.info("Fulltext PDF found at ScienceDirect at {}.", fullLinkToPdf);
+        try {
+            return Optional.of(new URL(fullLinkToPdf));
+        } catch (MalformedURLException e) {
+            LOGGER.error("malformed URL", e);
+            return Optional.empty();
+        }
     }
 
     @Override
