@@ -46,13 +46,14 @@ public class ScienceDirect implements FulltextFetcher {
             return Optional.empty();
         }
 
-        String sciLink = getUrlByDoi(doi.get().getDOI());
-        if (sciLink.isEmpty()) {
+        String urlFromDoi = getUrlByDoi(doi.get().getDOI());
+        if (urlFromDoi.isEmpty()) {
             return Optional.empty();
         }
+        URL url = new URL(urlFromDoi);
 
         // scrape the web page not as mobile client!
-        Document html = Jsoup.connect(sciLink)
+        Document html = Jsoup.connect(urlFromDoi)
                              .userAgent(URLDownload.USER_AGENT)
                              .referrer("https://www.jabref.org")
                              .ignoreHttpErrors(true).get();
@@ -67,9 +68,8 @@ public class ScienceDirect implements FulltextFetcher {
         // We now have the ScienceDirect page with the article - and the link to the PDF
         // Example page: https://www.sciencedirect.com/science/article/pii/S1674775515001079
 
-        URL scienceDirectUrl = new URL(sciLink);
-        String protocol = scienceDirectUrl.getProtocol();
-        String authority = scienceDirectUrl.getAuthority();
+        String protocol = url.getProtocol();
+        String authority = url.getAuthority();
 
         Optional<JSONObject> pdfDownloadOptional = html
                 .getElementsByAttributeValue("type", "application/json")
