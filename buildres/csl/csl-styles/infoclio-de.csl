@@ -292,7 +292,7 @@
   </macro>
   <macro name="alt-publisher">
     <choose>
-      <if type="book chapter paper-conference entry-dictionary entry-encyclopedia" match="none">
+      <if type="thesis report song motion_picture broadcast" match="any">
         <!-- university for theses,
              institution for reports,
              label for songs,
