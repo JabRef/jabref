@@ -16,7 +16,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.jabref.logic.cleanup.CleanupJob;
 import org.jabref.logic.cleanup.EprintCleanup;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
@@ -116,9 +115,9 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
         }
     }
 
-    private List<ArXivEntry> searchForEntries(BibEntry entry) throws FetcherException {
+    private List<ArXivEntry> searchForEntries(BibEntry originalEntry) throws FetcherException {
         // We need to clone the entry, because we modify it by a cleanup job.
-        entry = (BibEntry) entry.clone();
+        final BibEntry entry = (BibEntry) originalEntry.clone();
 
         // 1. Check for Eprint
         new EprintCleanup().cleanup(entry);
@@ -133,16 +132,15 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
         }
 
         // 2. DOI and other fields
-        Optional<String> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse).map(DOI::getNormalized);
-        String query;
-        if (doi.isPresent()) {
-            // Search for an entry in the ArXiv which is linked to the doi
-            query = "doi:" + doi.get();
-        } else {
-            Optional<String> authorQuery = entry.getField(StandardField.AUTHOR).map(author -> "au:" + author);
-            Optional<String> titleQuery = entry.getField(StandardField.TITLE).map(title -> "ti:" + StringUtil.ignoreCurlyBracket(title));
-            query = OptionalUtil.toList(authorQuery, titleQuery).stream().collect(Collectors.joining("+AND+"));
-        }
+        String query = entry.getField(StandardField.DOI)
+             .flatMap(DOI::parse)
+             .map(DOI::getNormalized)
+             .map(doiString -> "doi:" + doiString)
+             .orElseGet(() -> {
+                 Optional<String> authorQuery = entry.getField(StandardField.AUTHOR).map(author -> "au:" + author);
+                 Optional<String> titleQuery = entry.getField(StandardField.TITLE).map(title -> "ti:" + StringUtil.ignoreCurlyBracket(title));
+                 return String.join("+AND+", OptionalUtil.toList(authorQuery, titleQuery));
+             });
         Optional<ArXivEntry> arxivEntry = searchForEntry(query);
         if (arxivEntry.isPresent()) {
             // Check if entry is a match
@@ -171,7 +169,7 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
 
     /**
      * Queries the API.
-     *
+     * <p>
      * If only {@code searchQuery} is given, then the API will return results for each article that matches the query.
      * If only {@code ids} is given, then the API will return results for each article in the list.
      * If both {@code searchQuery} and {@code ids} are given, then the API will return each article in
