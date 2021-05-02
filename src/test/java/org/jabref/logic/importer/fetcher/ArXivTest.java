@@ -131,7 +131,7 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherT
         entry.setField(StandardField.TITLE, "Machine versus {Human} {Attention} in {Deep} {Reinforcement} {Learning} {Tasks}");
         entry.setField(StandardField.AUTHOR, "Zhang, Ruohan and Guo");
 
-        assertEquals(Optional.of(new URL("https://arxiv.org/pdf/2010.15942v2")), fetcher.findFullText(entry));
+        assertEquals(Optional.of(new URL("http://arxiv.org/pdf/2010.15942v2")), fetcher.findFullText(entry));
     }
 
     @Test
