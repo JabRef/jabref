@@ -63,7 +63,7 @@ public class MSBibConverter {
         }
 
         result.day = entry.getFieldOrAliasLatexFree(StandardField.DAY).orElse(null);
-        result.month = entry.getMonth().map(Month::getNumber).map(Object::toString).orElse(null);
+        result.month = entry.getMonth().map(Month::getFullName).orElse(null);
 
         if (!entry.getLatexFreeField(StandardField.YEAR).isPresent()) {
             result.year = entry.getFieldOrAliasLatexFree(StandardField.YEAR).orElse(null);
