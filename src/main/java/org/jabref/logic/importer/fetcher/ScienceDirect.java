@@ -1,6 +1,8 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
@@ -26,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * FulltextFetcher implementation that attempts to find a PDF URL at ScienceDirect. See <a href="https://dev.elsevier.com/">https://dev.elsevier.com/</a>
+ * FulltextFetcher implementation that attempts to find a PDF URL at <a href="https://www.sciencedirect.com/">ScienceDirect</a>. See <a href="https://dev.elsevier.com/">https://dev.elsevier.com/</a>
  */
 public class ScienceDirect implements FulltextFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScienceDirect.class);
@@ -38,61 +40,61 @@ public class ScienceDirect implements FulltextFetcher {
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
 
-        // Try unique DOI first
         Optional<DOI> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse);
-
-        if (doi.isPresent()) {
-            // Available in catalog?
-            try {
-                String sciLink = getUrlByDoi(doi.get().getDOI());
-
-                // scrape the web page not as mobile client!
-                if (!sciLink.isEmpty()) {
-                    Document html = Jsoup.connect(sciLink)
-                                         .userAgent(URLDownload.USER_AGENT)
-                                         .referrer("http://www.google.com")
-                                         .ignoreHttpErrors(true).get();
-
-                    // Retrieve PDF link from meta data (most recent)
-                    Elements metaLinks = html.getElementsByAttributeValue("name", "citation_pdf_url");
-
-                    if (!metaLinks.isEmpty()) {
-                        String link = metaLinks.first().attr("content");
-                        return Optional.of(new URL(link));
-                    }
-
-                    URL url = new URL(sciLink);
-                    String protocol = url.getProtocol();
-                    String authority = url.getAuthority();
-
-                    Optional<String> fullLinkToPdf = html
-                            .getElementsByAttributeValue("type", "application/json")
-                            .stream()
-                            .flatMap(element -> element.getElementsByTag("script").stream())
-                            // get the text element
-                            .map(element -> element.childNode(0))
-                            .map(element -> element.toString())
-                            .map(text -> new JSONObject(text))
-                            .filter(json -> json.has("article"))
-                            .map(json -> json.getJSONObject("article"))
-                            .filter(json -> json.has("pdfDownload"))
-                            .map(json -> json.getJSONObject("pdfDownload"))
-                            .filter(json -> json.has("linkToPdf"))
-                            .map(json -> json.getString("linkToPdf"))
-                            .map(linkToPdf -> String.format("%s://%s%s", protocol, authority, linkToPdf))
-                            .findAny();
-                    if (fullLinkToPdf.isPresent()) {
-                        LOGGER.info("Fulltext PDF found at ScienceDirect.");
-                        // new URL may through "MalformedURLException", thus using "isPresent()" above and ".get()"
-                        Optional<URL> pdfLink = Optional.of(new URL(fullLinkToPdf.get()));
-                        return pdfLink;
-                    }
-                }
-            } catch (UnirestException e) {
-                LOGGER.warn("ScienceDirect API request failed", e);
-            }
+        if (!doi.isPresent()) {
+            // full text fetching works only if a DOI is present
+            return Optional.empty();
         }
-        return Optional.empty();
+
+        String sciLink = getUrlByDoi(doi.get().getDOI());
+        if (sciLink.isEmpty()) {
+            return Optional.empty();
+        }
+
+        // scrape the web page not as mobile client!
+        Document html = Jsoup.connect(sciLink)
+                             .userAgent(URLDownload.USER_AGENT)
+                             .referrer("https://www.jabref.org")
+                             .ignoreHttpErrors(true).get();
+
+        // Retrieve PDF link from meta data (most recent)
+        Elements metaLinks = html.getElementsByAttributeValue("name", "citation_pdf_url");
+        if (!metaLinks.isEmpty()) {
+            String link = metaLinks.first().attr("content");
+            return Optional.of(new URL(link));
+        }
+
+        URL scienceDirectUrl = new URL(sciLink);
+        String protocol = scienceDirectUrl.getProtocol();
+        String authority = scienceDirectUrl.getAuthority();
+
+        return html
+                .getElementsByAttributeValue("type", "application/json")
+                .stream()
+                .flatMap(element -> element.getElementsByTag("script").stream())
+                // get the text element
+                .map(element -> element.childNode(0))
+                .map(element -> element.toString())
+                .map(text -> new JSONObject(text))
+                .filter(json -> json.has("article"))
+                .map(json -> json.getJSONObject("article"))
+                .filter(json -> json.has("pdfDownload"))
+                .map(json -> json.getJSONObject("pdfDownload"))
+                .filter(json -> json.has("linkToPdf"))
+                .map(json -> json.getString("linkToPdf"))
+                .map(linkToPdf -> String.format("%s://%s%s", protocol, authority, linkToPdf))
+                .findAny()
+                .map(fullLinkToPdf -> {
+                    LOGGER.info("Fulltext PDF found at ScienceDirect.");
+                    try {
+                        return new URL(fullLinkToPdf);
+                    } catch (MalformedURLException e) {
+                        LOGGER.error("malformed URL", e);
+                        return null;
+                    }
+                })
+                //
+                .filter(url -> url != null);
     }
 
     @Override
