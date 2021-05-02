@@ -39,6 +39,8 @@ version = project.findProperty('projVersion') ?: '100.0.0'
 java {
     sourceCompatibility = JavaVersion.VERSION_14
     targetCompatibility = JavaVersion.VERSION_14
+    modularity.inferModulePath.set(false) //workaround needed for Eclipse, probably because of https://github.com/gradle/gradle/issues/16922
+
 }
 
 application {
@@ -55,6 +57,7 @@ modularity.patchModule("test3", "sourcecode_2.12-0.1.4.jar")
 // Workaround for https://github.com/openjfx/javafx-gradle-plugin/issues/89
 // See also https://github.com/java9-modularity/gradle-modules-plugin/issues/165
 modularity.disableEffectiveArgumentsAdjustment()
+
 
 sourceSets {
     main {
