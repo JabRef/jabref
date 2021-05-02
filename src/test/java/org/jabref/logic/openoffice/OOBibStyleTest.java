@@ -42,14 +42,14 @@ class OOBibStyleTest {
     @Test
     void testAuthorYear() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, layoutFormatterPreferences);
-        assertTrue(style.isValid());
-        assertTrue(style.isInternalStyle());
-        assertFalse(style.isCitationKeyCiteMarkers());
-        assertFalse(style.isBoldCitations());
-        assertFalse(style.isFormatCitations());
-        assertFalse(style.isItalicCitations());
-        assertFalse(style.isNumberEntries());
-        assertFalse(style.isSortByPosition());
+        assertTrue(style.isValid(), "isValid, Expected: true, but was: false");
+        assertTrue(style.isInternalStyle(), "isInternalStyle, Expected: true, but was: false");
+        assertFalse(style.isCitationKeyCiteMarkers(), "isCitationKeyCiteMarkers, Expected: false, but was: true");
+        assertFalse(style.isBoldCitations(), "isBoldCitations, Expected: false, but was: true");
+        assertFalse(style.isFormatCitations(), "isFormatCitations, Expected: false, but was: true");
+        assertFalse(style.isItalicCitations(), "isItalicCitations, Expected: false, but was: true");
+        assertFalse(style.isNumberEntries(), "isNumberEntries, Expected: false, but was: true");
+        assertFalse(style.isSortByPosition(), "isSortByPosition, Expected: false, but was: true");
     }
 
     @Test
@@ -57,27 +57,27 @@ class OOBibStyleTest {
         File defFile = Path.of(OOBibStyleTest.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                            .toFile();
         OOBibStyle style = new OOBibStyle(defFile, layoutFormatterPreferences, StandardCharsets.UTF_8);
-        assertTrue(style.isValid());
-        assertFalse(style.isInternalStyle());
-        assertFalse(style.isCitationKeyCiteMarkers());
-        assertFalse(style.isBoldCitations());
-        assertFalse(style.isFormatCitations());
-        assertFalse(style.isItalicCitations());
-        assertFalse(style.isNumberEntries());
-        assertFalse(style.isSortByPosition());
+        assertTrue(style.isValid(), "isValid, Expected: true, but was: false");
+        assertFalse(style.isInternalStyle(), "isInternalStyle, Expected: false, but was: true");
+        assertFalse(style.isCitationKeyCiteMarkers(), "isCitationKeyCiteMarkers, Expected: false, but was: true");
+        assertFalse(style.isBoldCitations(), "isBoldCitations, Expected: false, but was: true");
+        assertFalse(style.isFormatCitations(), "isFormatCitations, Expected: false, but was: true");
+        assertFalse(style.isItalicCitations(), "isItalicCitations, Expected: false, but was: true");
+        assertFalse(style.isNumberEntries(), "isNumberEntries, Expected: false, but was: true");
+        assertFalse(style.isSortByPosition(), "isSortByPosition, Expected: false, but was: true");
     }
 
     @Test
     void testNumerical() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences);
-        assertTrue(style.isValid());
-        assertFalse(style.isCitationKeyCiteMarkers());
-        assertFalse(style.isBoldCitations());
-        assertFalse(style.isFormatCitations());
-        assertFalse(style.isItalicCitations());
-        assertTrue(style.isNumberEntries());
-        assertTrue(style.isSortByPosition());
+        assertTrue(style.isValid(), "isValid, Expected: true, but was: false");
+        assertFalse(style.isCitationKeyCiteMarkers(), "isCitationKeyCiteMarkers, Expected: false, but was: true");
+        assertFalse(style.isBoldCitations(), "isBoldCitations, Expected: false, but was: true");
+        assertFalse(style.isFormatCitations(), "isFormatCitations, Expected: false, but was: true");
+        assertFalse(style.isItalicCitations(), "isItalicCitations, Expected: false, but was: true");
+        assertTrue(style.isNumberEntries(), "isNumberEntries, Expected: true, but was: false");
+        assertTrue(style.isSortByPosition(), "isSortByPosition, Expected: true, but was: false");
     }
 
     @Test

@@ -51,11 +51,17 @@ public class TestVM {
 
         vm.run(v);
 
-        assertEquals(2, vm.getStrings().size());
-        assertEquals(7, vm.getIntegers().size());
-        assertEquals(1, vm.getEntries().size());
-        assertEquals(5, vm.getEntries().get(0).fields.size());
-        assertEquals(38, vm.getFunctions().size());
+        int expectedNumberOfStrings = 2;
+        int expectedNumberOfIntegers = 7;
+        int expectedNumberOfEntries = 1;
+        int expectedNumberOfFieldsOfFirstEntry = 5;
+        int expectedNumberOfFunctions = 38;
+
+        assertEquals(expectedNumberOfStrings, vm.getStrings().size(), "Expected getStrings() to return a map of size " + expectedNumberOfStrings);
+        assertEquals(expectedNumberOfIntegers, vm.getIntegers().size(), "Expected getIntegers() to return a map of size " + expectedNumberOfIntegers);
+        assertEquals(expectedNumberOfEntries, vm.getEntries().size(), "Expected getEntries() to return a list of size " + expectedNumberOfEntries);
+        assertEquals(expectedNumberOfFieldsOfFirstEntry, vm.getEntries().get(0).fields.size(), "Expected first entry to have " + expectedNumberOfFieldsOfFirstEntry + " fields");
+        assertEquals(expectedNumberOfFunctions, vm.getFunctions().size(), "Expected getFunctions() to return a map of size " + expectedNumberOfFunctions);
     }
 
     @Test

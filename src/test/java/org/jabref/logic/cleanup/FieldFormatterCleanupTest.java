@@ -42,13 +42,13 @@ public class FieldFormatterCleanupTest {
         FieldFormatterCleanup cleanup = new FieldFormatterCleanup(InternalField.INTERNAL_ALL_FIELD, new UpperCaseFormatter());
         cleanup.cleanup(entry);
 
-        assertEquals(fieldMap.get(StandardField.TITLE).toUpperCase(), entry.getField(StandardField.TITLE).get());
-        assertEquals(fieldMap.get(StandardField.BOOKTITLE).toUpperCase(), entry.getField(StandardField.BOOKTITLE).get());
-        assertEquals(fieldMap.get(StandardField.YEAR).toUpperCase(), entry.getField(StandardField.YEAR).get());
-        assertEquals(fieldMap.get(StandardField.MONTH).toUpperCase(), entry.getField(StandardField.MONTH).get());
-        assertEquals(fieldMap.get(StandardField.ABSTRACT).toUpperCase(), entry.getField(StandardField.ABSTRACT).get());
-        assertEquals(fieldMap.get(StandardField.DOI).toUpperCase(), entry.getField(StandardField.DOI).get());
-        assertEquals(fieldMap.get(StandardField.ISSN).toUpperCase(), entry.getField(StandardField.ISSN).get());
+        assertEquals(fieldMap.get(StandardField.TITLE).toUpperCase(), entry.getField(StandardField.TITLE).get(), "Title was not cleaned up correctly. Expected: " + fieldMap.get(StandardField.TITLE).toUpperCase() + " But was: " + entry.getField(StandardField.TITLE).get());
+        assertEquals(fieldMap.get(StandardField.BOOKTITLE).toUpperCase(), entry.getField(StandardField.BOOKTITLE).get(), "Booktitle was not cleaned up correctly. Expected: " + fieldMap.get(StandardField.BOOKTITLE).toUpperCase() + " But was: " + entry.getField(StandardField.BOOKTITLE).get());
+        assertEquals(fieldMap.get(StandardField.YEAR).toUpperCase(), entry.getField(StandardField.YEAR).get(), "Year was not cleaned up correctly. Expected: " + fieldMap.get(StandardField.YEAR).toUpperCase() + " But was: " + entry.getField(StandardField.YEAR).get());
+        assertEquals(fieldMap.get(StandardField.MONTH).toUpperCase(), entry.getField(StandardField.MONTH).get(), "Month was not cleaned up correctly. Expected: " + fieldMap.get(StandardField.MONTH).toUpperCase() + " But was: " + entry.getField(StandardField.MONTH).get());
+        assertEquals(fieldMap.get(StandardField.ABSTRACT).toUpperCase(), entry.getField(StandardField.ABSTRACT).get(), "Abstract was not cleaned up correctly. Expected: " + fieldMap.get(StandardField.ABSTRACT).toUpperCase() + " But was: " + entry.getField(StandardField.ABSTRACT).get());
+        assertEquals(fieldMap.get(StandardField.DOI).toUpperCase(), entry.getField(StandardField.DOI).get(), "DOI was not cleaned up correctly. Expected: " + fieldMap.get(StandardField.DOI).toUpperCase() + " But was: " + entry.getField(StandardField.DOI).get());
+        assertEquals(fieldMap.get(StandardField.ISSN).toUpperCase(), entry.getField(StandardField.ISSN).get(), "ISSN was not cleaned up correctly. Expected: " + fieldMap.get(StandardField.ISSN).toUpperCase() + " But was: " + entry.getField(StandardField.ISSN).get());
     }
 
     @Test
@@ -56,13 +56,13 @@ public class FieldFormatterCleanupTest {
         FieldFormatterCleanup cleanup = new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new UpperCaseFormatter());
         cleanup.cleanup(entry);
 
-        assertEquals(fieldMap.get(StandardField.TITLE).toUpperCase(), entry.getField(StandardField.TITLE).get());
-        assertEquals(fieldMap.get(StandardField.BOOKTITLE).toUpperCase(), entry.getField(StandardField.BOOKTITLE).get());
-        assertEquals(fieldMap.get(StandardField.YEAR), entry.getField(StandardField.YEAR).get());
-        assertEquals(fieldMap.get(StandardField.MONTH), entry.getField(StandardField.MONTH).get());
-        assertEquals(fieldMap.get(StandardField.ABSTRACT).toUpperCase(), entry.getField(StandardField.ABSTRACT).get());
-        assertEquals(fieldMap.get(StandardField.DOI), entry.getField(StandardField.DOI).get());
-        assertEquals(fieldMap.get(StandardField.ISSN), entry.getField(StandardField.ISSN).get());
+        assertEquals(fieldMap.get(StandardField.TITLE).toUpperCase(), entry.getField(StandardField.TITLE).get(), "Title was not cleaned up correctly. Expected: " + fieldMap.get(StandardField.TITLE).toUpperCase() + " But was: " + entry.getField(StandardField.TITLE).get());
+        assertEquals(fieldMap.get(StandardField.BOOKTITLE).toUpperCase(), entry.getField(StandardField.BOOKTITLE).get(), "Booktitle was not cleaned up correctly. Expected: " + fieldMap.get(StandardField.BOOKTITLE).toUpperCase() + " But was: " + entry.getField(StandardField.BOOKTITLE).get());
+        assertEquals(fieldMap.get(StandardField.YEAR), entry.getField(StandardField.YEAR).get(), "Year was not cleaned up correctly. Expected: " + fieldMap.get(StandardField.YEAR).toUpperCase() + " But was: " + entry.getField(StandardField.YEAR).get());
+        assertEquals(fieldMap.get(StandardField.MONTH), entry.getField(StandardField.MONTH).get(), "Month was not cleaned up correctly. Expected: " + fieldMap.get(StandardField.MONTH).toUpperCase() + " But was: " + entry.getField(StandardField.MONTH).get());
+        assertEquals(fieldMap.get(StandardField.ABSTRACT).toUpperCase(), entry.getField(StandardField.ABSTRACT).get(), "Abstract was not cleaned up correctly. Expected: " + fieldMap.get(StandardField.ABSTRACT).toUpperCase() + " But was: " + entry.getField(StandardField.ABSTRACT).get());
+        assertEquals(fieldMap.get(StandardField.DOI), entry.getField(StandardField.DOI).get(), "DOI was not cleaned up correctly. Expected: " + fieldMap.get(StandardField.DOI).toUpperCase() + " But was: " + entry.getField(StandardField.DOI).get());
+        assertEquals(fieldMap.get(StandardField.ISSN), entry.getField(StandardField.ISSN).get(), "ISSN was not cleaned up correctly. Expected: " + fieldMap.get(StandardField.ISSN).toUpperCase() + " But was: " + entry.getField(StandardField.ISSN).get());
     }
 
     @Test

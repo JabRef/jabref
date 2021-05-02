@@ -18,10 +18,10 @@ class BibDatabaseDiffTest {
     void compareOfEmptyDatabasesReportsNoDifferences() throws Exception {
         BibDatabaseDiff diff = BibDatabaseDiff.compare(new BibDatabaseContext(), new BibDatabaseContext());
 
-        assertEquals(Optional.empty(), diff.getPreambleDifferences());
-        assertEquals(Optional.empty(), diff.getMetaDataDifferences());
-        assertEquals(Collections.emptyList(), diff.getBibStringDifferences());
-        assertEquals(Collections.emptyList(), diff.getEntryDifferences());
+        assertEquals(Optional.empty(), diff.getPreambleDifferences(), "Expected preamble differences to be Optional.empty()");
+        assertEquals(Optional.empty(), diff.getMetaDataDifferences(), "Expected metadata differences to be Optional.empty()");
+        assertEquals(Collections.emptyList(), diff.getBibStringDifferences(), "Expected bibstring differences to be Collections.emptyList()");
+        assertEquals(Collections.emptyList(), diff.getEntryDifferences(), "Expected entry differences to be Collections.emptyList()");
     }
 
     @Test
