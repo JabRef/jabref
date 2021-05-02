@@ -303,6 +303,7 @@ task generateSource(dependsOn: ["generateBstGrammarSource",
     group = 'JabRef'
     description 'Generates all necessary (Java) source files.'
 }
+
 tasks.register("generateBstGrammarSource", JavaExec) {
     main = "org.antlr.Tool"
     classpath = configurations.antlr3
@@ -440,7 +441,6 @@ javadoc {
         ])
     }
 }
-
 
 test {
     useJUnitPlatform {
