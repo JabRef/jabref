@@ -89,6 +89,7 @@ sourceSets {
 repositories {
     mavenCentral()
     mavenLocal()
+    mavenCentral()
     maven { url 'https://oss.sonatype.org/content/groups/public' }
     maven { url 'https://repository.apache.org/snapshots' }
 }
@@ -563,7 +564,7 @@ task deleteInstallerTemp(type: Delete) {
 
 jpackage.dependsOn deleteInstallerTemp
 jlink {
-    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+    addOptions('--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages')
     launcher {
         name = 'JabRef'
     }
