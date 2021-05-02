@@ -18,6 +18,7 @@ public class UnprotectTermsFormatterTest {
 
     private static Stream<Arguments> terms() throws IOException {
         return Stream.of(
+                Arguments.of("", ""),
                 Arguments.of("VLSI", "{VLSI}"),
                 Arguments.of("VLsI", "VLsI"),
                 Arguments.of("VLSI", "VLSI"),
