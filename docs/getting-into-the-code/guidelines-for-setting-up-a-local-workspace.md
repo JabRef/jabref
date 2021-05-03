@@ -104,10 +104,10 @@ To configure IntelliJ IDEA for developing JabRef, you should first ensure that y
 
 After that, you can open `jabref/build.gradle` as a project. It is crucial that Java 15 is used consistently for the JabRef project which includes ensuring the right settings for your project structure, Gradle build, and run configurations.
 
-Ensure you have a Java 15 SDK configured by navigating to **File \| Project Structure \| Platform Settings \| SDKs**. If you don't have one, add a new Java JDK and point it to the location of a JDK 15.  
+Ensure you have a Java 15 SDK configured by navigating to **File \| Project Structure \| Platform Settings \| SDKs**. If you don't have one, add a new Java JDK and point it to the location of a JDK 15.
 ![Project Settings](../.gitbook/assets/intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
 
-Navigate to **File \| Project Structure \| Project** and ensure that the projects' SDK is Java 15  
+Navigate to **File \| Project Structure \| Project** and ensure that the projects' SDK is Java 15
 ![Use JDK 15 as project SDK](../.gitbook/assets/intellij-choose-jdk15-project-default.png)
 
 Navigate to **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** and select the "Project SDK" as the Gradle JVM at the bottom.
@@ -275,6 +275,7 @@ java.lang.UnsupportedClassVersionError: org/javamodularity/moduleplugin/ModuleSy
 
 In rare cases you might encounter problems due to out-dated automatically generated source files. Running `./gradlew clean` deletes these old copies. Do not forget to run at least `./gradlew eclipse` or `./gradlew build` afterwards to regenerate the source files.
 ``
+
 ### Issues with `buildSrc`
 
 1. Open the context menu of `buildSrc`.
