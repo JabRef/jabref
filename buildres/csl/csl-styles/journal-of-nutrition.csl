@@ -5,7 +5,7 @@
     <id>http://www.zotero.org/styles/journal-of-nutrition</id>
     <link href="http://www.zotero.org/styles/journal-of-nutrition" rel="self"/>
     <link href="http://www.zotero.org/styles/vancouver" rel="template"/>
-    <link href="http://jn.nutrition.org/site/misc/ifora-full.pdf" rel="documentation"/>
+    <link href="https://academic.oup.com/jn/pages/General_Instructions" rel="documentation"/>
     <link href="http://www.nlm.nih.gov/bsd/uniform_requirements.html" rel="documentation"/>
     <author>
       <name>Sebastian Karcher</name>
@@ -15,7 +15,7 @@
     <issn>0022-3166</issn>
     <eissn>1541-6100</eissn>
     <summary>Vancouver style with only year/volume and et al after 11 authors</summary>
-    <updated>2013-12-15T07:14:53+00:00</updated>
+    <updated>2021-04-19T12:19:55+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -90,13 +90,13 @@
   <macro name="container-title">
     <choose>
       <if type="article-journal article-magazine chapter paper-conference article-newspaper" match="any">
-        <group suffix="." delimiter=" ">
+        <group delimiter=" ">
           <choose>
             <if type="article-journal">
               <text variable="container-title" form="short" strip-periods="true"/>
             </if>
             <else>
-              <text variable="container-title" strip-periods="true"/>
+              <text variable="container-title" strip-periods="true" suffix="."/>
             </else>
           </choose>
           <choose>
@@ -107,7 +107,6 @@
         </group>
         <text macro="edition" prefix=" "/>
       </if>
-      <!--add event-name and event-place once they become available-->
       <else-if type="bill legislation" match="any">
         <group delimiter=", ">
           <group delimiter=". ">

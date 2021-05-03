@@ -2,6 +2,8 @@ require 'csl'
 require 'json'
 
 LOCALE_ROOT = File.expand_path('../..', __FILE__)
+PULL_REQUEST = File.join(LOCALE_ROOT, 'pull-request')
+LOCALE_ROOT = PULL_REQUEST if File.directory?(PULL_REQUEST)
 
 NO_REGIONS = %w{
   eu ar la
