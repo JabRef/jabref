@@ -20,31 +20,29 @@ class NoBibTexFieldCheckerTest {
 
     private final NoBibtexFieldChecker checker = new NoBibtexFieldChecker();
 
-    private static Stream<Arguments> nonBiblatexOnlyFields() {
+    private static Stream<Field> nonBiblatexOnlyFields() {
         return Stream.of(
                 // arbitrary field
-                Arguments.of(new UnknownField("fieldNameNotDefinedInThebiblatexManual"), Collections.emptyList()),
-
-                // these fields are displayed by JabRef as default
-                Arguments.of(StandardField.ABSTRACT, Collections.emptyList()),
-                Arguments.of(StandardField.COMMENT, Collections.emptyList()),
-                Arguments.of(StandardField.DOI, Collections.emptyList()),
-                Arguments.of(StandardField.URL, Collections.emptyList()),
+                new UnknownField("fieldNameNotDefinedInThebiblatexManual"),
+                StandardField.ABSTRACT,
+                StandardField.COMMENT,
+                StandardField.DOI,
+                StandardField.URL,
 
                 // these fields are not recognized as biblatex only fields
-                Arguments.of(StandardField.ADDRESS, Collections.emptyList()),
-                Arguments.of(StandardField.INSTITUTION, Collections.emptyList()),
-                Arguments.of(StandardField.JOURNAL, Collections.emptyList()),
-                Arguments.of(StandardField.KEYWORDS, Collections.emptyList()),
-                Arguments.of(StandardField.REVIEW, Collections.emptyList())
+                StandardField.ADDRESS,
+                StandardField.INSTITUTION,
+                StandardField.JOURNAL,
+                StandardField.KEYWORDS,
+                StandardField.REVIEW
         );
     }
 
     @ParameterizedTest()
     @MethodSource("nonBiblatexOnlyFields")
-    void nonBiblatexOnlyField(Field field, List<IntegrityMessage> expectedResult) {
+    void nonBiblatexOnlyField(Field field) {
         BibEntry entry = new BibEntry().withField(field, "test");
-        assertEquals(expectedResult, checker.check(entry));
+        assertEquals(Collections.emptyList(), checker.check(entry));
     }
 
     @ParameterizedTest(name = "field={0}")
