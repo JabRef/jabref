@@ -322,7 +322,7 @@ public class GroupTreeView {
 
         return node;
     }
-    // JJ - Edit here
+
     private ContextMenu createContextMenuForGroup(GroupNodeViewModel group) {
 
         ContextMenu menu = new ContextMenu();
@@ -335,10 +335,11 @@ public class GroupTreeView {
             groupTree.refresh();
         });
 
-        MenuItem keepSubmenu = new MenuItem(Localization.lang("Keep subgroups"));
-        // Specify action
-        MenuItem alsoRemoveSubgroups = new MenuItem(Localization.lang("Also remove subgroups"));
-        // Specify action
+        MenuItem removeGroupKeepSubgroups = new MenuItem(Localization.lang("Keep subgroups"));
+        removeGroupKeepSubgroups.setOnAction(event -> viewModel.removeGroupKeepSubgroups(group));
+
+        MenuItem removeGroupAndSubgroups = new MenuItem(Localization.lang("Also remove subgroups"));
+        removeGroupAndSubgroups.setOnAction(event -> viewModel.removeGroupAndSubgroups(group));
 
         MenuItem addSubgroup = new MenuItem(Localization.lang("Add subgroup"));
         addSubgroup.setOnAction(event -> {
@@ -347,10 +348,10 @@ public class GroupTreeView {
         });
 
         MenuItem removeSubgroups = new MenuItem(Localization.lang("Remove subgroups"));
-        // Specify action
+        removeSubgroups.setOnAction(event -> viewModel.removeSubgroups(group));
 
         MenuItem sortSubgroups = new MenuItem(Localization.lang("Sort subgroups"));
-        // Specify action
+        sortSubgroups.setOnAction(event -> viewModel.sortAlphabeticallyRecursive(group));
 
 //        MenuItem removeGroupAndSubgroups = new MenuItem(Localization.lang("Remove group and subgroups"));
 //        removeGroupAndSubgroups.setOnAction(event -> viewModel.removeGroupAndSubgroups(group));
@@ -369,8 +370,8 @@ public class GroupTreeView {
 
         menu.getItems().add(editGroup);
 
-        removeGroup.getItems().add(keepSubmenu);
-        removeGroup.getItems().add(alsoRemoveSubgroups);
+        removeGroup.getItems().add(removeGroupKeepSubgroups);
+        removeGroup.getItems().add(removeGroupAndSubgroups);
         menu.getItems().add(removeGroup);
 
         menu.getItems().add(addSubgroup);
