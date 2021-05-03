@@ -118,7 +118,7 @@ dependencies {
     implementation 'org.libreoffice:libreoffice:7.1.2'
     implementation 'org.libreoffice:unoloader:7.1.2'
 
-    implementation 'io.github.java-diff-utils:java-diff-utils:4.9'
+    implementation 'io.github.java-diff-utils:java-diff-utils:4.10'
     implementation 'info.debatty:java-string-similarity:2.0.0'
 
     antlr3 'org.antlr:antlr:3.5.2'
@@ -196,7 +196,7 @@ dependencies {
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.62.2'
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.62.2'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.104'
+    testImplementation 'io.github.classgraph:classgraph:4.8.105'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.7.1'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.7.1'
