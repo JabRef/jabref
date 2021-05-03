@@ -15,6 +15,7 @@ import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
 import javafx.scene.control.Menu;
@@ -66,6 +67,7 @@ public class GroupTreeView {
     @FXML private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> numberColumn;
     @FXML private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> expansionNodeColumn;
     @FXML private CustomTextField searchField;
+    @FXML private Button addNewGroup;
 
     @Inject private StateManager stateManager;
     @Inject private DialogService dialogService;
@@ -102,6 +104,8 @@ public class GroupTreeView {
             viewModel.filterTextProperty().setValue(searchField.textProperty().getValue());
         });
         searchField.textProperty().addListener((observable, oldValue, newValue) -> searchTask.restart());
+
+        setNewGroupButtonStyle(groupTree);
 
         groupTree.rootProperty().bind(
                 EasyBind.map(viewModel.rootGroupProperty(),
@@ -173,6 +177,7 @@ public class GroupTreeView {
         groupTree.setRowFactory(treeTable -> {
             TreeTableRow<GroupNodeViewModel> row = new TreeTableRow<>();
             row.treeItemProperty().addListener((ov, oldTreeItem, newTreeItem) -> {
+                setNewGroupButtonStyle(treeTable);
                 boolean isRoot = newTreeItem == treeTable.getRoot();
                 row.pseudoClassStateChanged(rootPseudoClass, isRoot);
 
@@ -344,7 +349,7 @@ public class GroupTreeView {
         MenuItem addSubgroup = new MenuItem(Localization.lang("Add subgroup"));
         addSubgroup.setOnAction(event -> {
             menu.hide();
-            viewModel.addNewSubgroup(group);
+            viewModel.addNewSubgroup(group, false);
         });
 
         MenuItem removeSubgroups = new MenuItem(Localization.lang("Remove subgroups"));
@@ -419,6 +424,21 @@ public class GroupTreeView {
             m.invoke(null, customTextField, customTextField.rightProperty());
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
             LOGGER.error("Failed to decorate text field with clear button", ex);
+        }
+    }
+
+    private void setNewGroupButtonStyle(TreeTableView<GroupNodeViewModel> groupTree) {
+        if (groupTree.getRoot() != null) {
+            if (groupTree.getExpandedItemCount() <= 10) {
+                addNewGroup.setStyle("-fx-border-width: 0px; -fx-background-color: -jr-theme;" +
+                        " -fx-padding: 0.5em; -fx-text-fill: -jr-white;");
+            } else {
+                addNewGroup.setStyle("-fx-border-width: 0px; -fx-background-color: -jr-icon-background-active;" +
+                        " -fx-padding: 0.5em; -fx-text-fill: -jr-black;");
+            }
+        } else {
+            addNewGroup.setStyle("-fx-border-width: 0px; -fx-background-color: -jr-theme;" +
+                    " -fx-padding: 0.5em; -fx-text-fill: -jr-white;");
         }
     }
 
