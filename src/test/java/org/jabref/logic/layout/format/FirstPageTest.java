@@ -9,12 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FirstPageTest {
 
-    private LayoutFormatter firstPageLayoutFormatter;
-
-    @BeforeEach
-    void setup() {
-        firstPageLayoutFormatter = new FirstPage();
-    }
+    private LayoutFormatter firstPageLayoutFormatter = new FirstPage();
 
     @Test
     public void formatEmpty() {
