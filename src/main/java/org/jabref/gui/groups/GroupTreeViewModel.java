@@ -147,7 +147,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
     /**
      * Opens "New Group Dialog" and add the resulting group to the specified group
      */
-    public void  addNewSubgroup(GroupNodeViewModel parent, boolean isGroup) {
+
+    public void addNewSubgroup(GroupNodeViewModel parent, boolean isGroup) {
         currentDatabase.ifPresent(database -> {
             Optional<AbstractGroup> newGroup = dialogService.showCustomDialogAndWait(new GroupDialogView(
                     dialogService,
@@ -325,17 +326,17 @@ public class GroupTreeViewModel extends AbstractViewModel {
         // }
     }
 
-//    public void removeSelectedEntries(GroupNodeViewModel group) {
-//        // TODO: warn if assignment has undesired side effects (modifies a field != keywords)
-//        // if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(mNode.getNode().getGroup(), mPanel.frame())) {
-//        //    return; // user aborted operation
-//
-//        group.getGroupNode().removeEntriesFromGroup(stateManager.getSelectedEntries());
-//
-//        // TODO: Add undo
-//        // if (!undo.isEmpty()) {
-//        //    mPanel.getUndoManager().addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(mNode, undo));
-//    }
+    public void removeSelectedEntries(GroupNodeViewModel group) {
+        // TODO: warn if assignment has undesired side effects (modifies a field != keywords)
+        // if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(mNode.getNode().getGroup(), mPanel.frame())) {
+        //    return; // user aborted operation
+
+        group.getGroupNode().removeEntriesFromGroup(stateManager.getSelectedEntries());
+
+        // TODO: Add undo
+        // if (!undo.isEmpty()) {
+        //    mPanel.getUndoManager().addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(mNode, undo));
+    }
 
     public void sortAlphabeticallyRecursive(GroupNodeViewModel group) {
         group.getGroupNode().sortChildren(compAlphabetIgnoreCase, true);

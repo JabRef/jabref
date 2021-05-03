@@ -50,7 +50,6 @@ import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
-import de.saxsys.mvvmfx.Context;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.reactfx.util.FxTimer;
@@ -349,45 +348,34 @@ public class GroupTreeView {
         MenuItem addSubgroup = new MenuItem(Localization.lang("Add subgroup"));
         addSubgroup.setOnAction(event -> {
             menu.hide();
-            viewModel.addNewSubgroup(group, false);
+            viewModel.addNewSubgroup(group, true);
         });
 
         MenuItem removeSubgroups = new MenuItem(Localization.lang("Remove subgroups"));
-        removeSubgroups.setOnAction(event -> viewModel.removeSubgroups(group));
+        removeSubgroups.setOnAction(event -> {
+            viewModel.removeSubgroups(group);
+        });
 
         MenuItem sortSubgroups = new MenuItem(Localization.lang("Sort subgroups"));
         sortSubgroups.setOnAction(event -> viewModel.sortAlphabeticallyRecursive(group));
 
-//        MenuItem removeGroupAndSubgroups = new MenuItem(Localization.lang("Remove group and subgroups"));
-//        removeGroupAndSubgroups.setOnAction(event -> viewModel.removeGroupAndSubgroups(group));
-//        MenuItem removeGroupKeepSubgroups = new MenuItem(Localization.lang("Remove group, keep subgroups"));
-//        removeGroupKeepSubgroups.setOnAction(event -> viewModel.removeGroupKeepSubgroups(group));
-//        MenuItem removeSubgroups = new MenuItem(Localization.lang("Remove subgroups"));
-//        removeSubgroups.setOnAction(event -> viewModel.removeSubgroups(group));
+        MenuItem addEntries = new MenuItem(Localization.lang("Add Selected Entries to this Group"));
+        addEntries.setOnAction(event -> viewModel.addSelectedEntries(group));
 
-//        MenuItem addEntries = new MenuItem(Localization.lang("Add selected entries to this group"));
-//        addEntries.setOnAction(event -> viewModel.addSelectedEntries(group));
-//        MenuItem removeEntries = new MenuItem(Localization.lang("Remove selected entries from this group"));
-//        removeEntries.setOnAction(event -> viewModel.removeSelectedEntries(group));
-
-//        MenuItem sortAlphabetically = new MenuItem(Localization.lang("Sort all subgroups (recursively)"));
-//        sortAlphabetically.setOnAction(event -> viewModel.sortAlphabeticallyRecursive(group));
+        MenuItem removeEntries = new MenuItem(Localization.lang("Remove Selected Entries from this Group"));
+        removeEntries.setOnAction(event -> viewModel.removeSelectedEntries(group));
 
         menu.getItems().add(editGroup);
-
         removeGroup.getItems().add(removeGroupKeepSubgroups);
         removeGroup.getItems().add(removeGroupAndSubgroups);
         menu.getItems().add(removeGroup);
-
+        menu.getItems().add(new SeparatorMenuItem());
         menu.getItems().add(addSubgroup);
-
         menu.getItems().add(removeSubgroups);
-
         menu.getItems().add(sortSubgroups);
-
-
-
-//        menu.getItems().add(sortAlphabetically);
+        menu.getItems().add(new SeparatorMenuItem());
+        menu.getItems().add(addEntries);
+        menu.getItems().add(removeEntries);
 
         // TODO: Disable some actions under certain conditions
         // if (group.canBeEdited()) {
