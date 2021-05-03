@@ -11,12 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AuthorsTest {
 
-    private ParamLayoutFormatter authorsLayoutFormatter;
-
-    @BeforeEach
-    void setup() {
-        authorsLayoutFormatter = new Authors();
-    }
+    private ParamLayoutFormatter authorsLayoutFormatter = new Authors();
 
     @Test
     public void testStandardUsage() {
