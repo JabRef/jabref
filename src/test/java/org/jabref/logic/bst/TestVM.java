@@ -51,17 +51,17 @@ public class TestVM {
 
         vm.run(v);
 
-        int expectedNumberOfStrings = 2;
-        int expectedNumberOfIntegers = 7;
-        int expectedNumberOfEntries = 1;
-        int expectedNumberOfFieldsOfFirstEntry = 5;
-        int expectedNumberOfFunctions = 38;
+        final int EXPECTED_NUMBER_OF_STRINGS = 2;
+        final int EXPECTED_NUMBER_OF_INTEGERS = 7;
+        final int EXPECTED_NUMBER_OF_ENTRIES = 1;
+        final int EXPECTED_NUMBER_OF_FIELDS = 5;
+        final int EXPECTED_NUMBER_OF_FUNCTIONS = 38;
 
-        assertEquals(expectedNumberOfStrings, vm.getStrings().size(), "Expected getStrings() to return a map of size " + expectedNumberOfStrings);
-        assertEquals(expectedNumberOfIntegers, vm.getIntegers().size(), "Expected getIntegers() to return a map of size " + expectedNumberOfIntegers);
-        assertEquals(expectedNumberOfEntries, vm.getEntries().size(), "Expected getEntries() to return a list of size " + expectedNumberOfEntries);
-        assertEquals(expectedNumberOfFieldsOfFirstEntry, vm.getEntries().get(0).fields.size(), "Expected first entry to have " + expectedNumberOfFieldsOfFirstEntry + " fields");
-        assertEquals(expectedNumberOfFunctions, vm.getFunctions().size(), "Expected getFunctions() to return a map of size " + expectedNumberOfFunctions);
+        assertEquals(EXPECTED_NUMBER_OF_STRINGS, vm.getStrings().size(), "Expected getStrings() to return a map of size " + EXPECTED_NUMBER_OF_STRINGS);
+        assertEquals(EXPECTED_NUMBER_OF_INTEGERS, vm.getIntegers().size(), "Expected getIntegers() to return a map of size " + EXPECTED_NUMBER_OF_INTEGERS);
+        assertEquals(EXPECTED_NUMBER_OF_ENTRIES, vm.getEntries().size(), "Expected getEntries() to return a list of size " + EXPECTED_NUMBER_OF_ENTRIES);
+        assertEquals(EXPECTED_NUMBER_OF_FIELDS, vm.getEntries().get(0).fields.size(), "Expected entry to have " + EXPECTED_NUMBER_OF_FIELDS + " fields");
+        assertEquals(EXPECTED_NUMBER_OF_FUNCTIONS, vm.getFunctions().size(), "Expected getFunctions() to return a map of size " + EXPECTED_NUMBER_OF_FUNCTIONS);
     }
 
     @Test
