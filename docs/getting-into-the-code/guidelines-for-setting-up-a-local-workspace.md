@@ -114,7 +114,7 @@ Navigate to **File \| Settings \| Build, Execution, Deployment \| Build Tools \|
 
 To prepare IntelliJ's build system two additional steps are required:
 
-* Navigate to **File \| Settings \| Build, Execution, Deployment \| Compiler \| Java Compiler**, and under "Override compiler parameters per-module" add \(\[+\]\) the following compiler arguments for the `JabRef.main` module:
+* Navigate to **File \| Settings \| Build, Execution, Deployment \| Compiler \| Java Compiler**, and under "Override compiler parameters per-module" add \(\[+\]\) the following compiler arguments for the `JabRef.main` module. Otherwise, you will get: `java: package com.sun.javafx.scene.control is not visible (package com.sun.javafx.scene.control is declared in module javafx.controls, which does not export it to module org.jabref)`
 
   ```text
    --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref
@@ -171,7 +171,7 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 
 Essentially, you now have the best of both worlds: You can run Gradle tasks using the Gradle Tool Window and unless you haven't made changes to input files that generate sources, you can compile and run with IntelliJ's faster internal build system.
 
-In case all steps are followed, and there are still issues with `SearchBaseVisitor` \(e.g., `Error:(16, 25) java: package org.jabref.search does not exist`\), you have to delete `generated\org\jabref\gui\logging\plugins\Log4jPlugins.java`. This is independent of having enabled or disabled Annotation Processing \(see above at "Enable Annotation Processing"\).
+In case all steps are followed, and there are still issues with `SearchBaseVisitor` \(e.g., `Error:(16, 25) java: package org.jabref.search does not exist`\), you have to delete `src\main\generated\org\jabref\gui\logging\plugins\Log4jPlugins.java`. This is independent of having enabled or disabled Annotation Processing \(see above at "Enable Annotation Processing"\).
 
 #### Using JabRef's code style
 
@@ -271,11 +271,17 @@ Another indication is following output
 java.lang.UnsupportedClassVersionError: org/javamodularity/moduleplugin/ModuleSystemPlugin has been compiled by a more recent version of the Java Runtime (class file version 55.0), this version of the Java Runtime only recognizes class file versions up to 52.0
 ```
 
-### Problems with generated source files
+### Issues with generated source files
 
 In rare cases you might encounter problems due to out-dated automatically generated source files. Running `./gradlew clean` deletes these old copies. Do not forget to run at least `./gradlew eclipse` or `./gradlew build` afterwards to regenerate the source files.
+``
+### Issues with `buildSrc`
 
-### Problems with openjfx libraries in local maven repository
+1. Open the context menu of `buildSrc`.
+1. Select "Load/Unload modules".
+1. Unload `jabRef.buildSrc`.
+
+### Issues with openjfx libraries in local maven repository
 
 There might be problems with building if you have openjfx libraries in local maven repository, resulting in errors like this:
 
