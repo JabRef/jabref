@@ -779,11 +779,3 @@ task downloadDependencies {
         }
     }
 }
-
-idea {
-    module {
-        // documentation: https://docs.gradle.org/current/dsl/org.gradle.plugins.ide.idea.model.IdeaModule.html
-        generatedSourceDirs += file('src-gen/main/java')
-        downloadJavadoc = true
-    }
-}
