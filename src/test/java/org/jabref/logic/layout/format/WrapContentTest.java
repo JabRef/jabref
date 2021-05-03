@@ -17,7 +17,7 @@ public class WrapContentTest {
     @ParameterizedTest
     @MethodSource("provideContent")
     void formatContent(String formattedContent, String originalContent, String desiredFormat) {
-        if(!desiredFormat.isEmpty()) {
+        if (!desiredFormat.isEmpty()) {
             wrapContentParamLayoutFormatter.setArgument(desiredFormat);
         }
 
