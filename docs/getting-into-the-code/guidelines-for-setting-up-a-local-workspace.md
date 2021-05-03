@@ -146,8 +146,6 @@ After that a new entry called "jabref \[run\]" will appear in the run configurat
 
 #### Using IntelliJ's internal build system
 
-**Note that these steps do not work on IntelliJ 2020.x.**. You have to keep using gradle for executing tasks. See [IDEA-249391](https://youtrack.jetbrains.com/issue/IDEA-249391) for details.
-
 You should use IntelliJ IDEA's internal build system for compiling and running JabRef during development, because it is usually more responsive. Thereby, **it's important** that you understand that JabRef relies on generated sources which are only build through Gradle. Therefore, to build or update these dependencies you need to run the `assemble` Gradle task at least once.
 
 To use IntelliJ IDEA's internal build system when you build JabRef through **Build \| Build Project** or use the provided "JabRef Main" run configuration, ensure that
@@ -157,7 +155,19 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 
   ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc%20%282%29%20%282%29%20%282%29%20%283%29.png)
 
-* Delete `org.jabref.gui.logging.plugins.Log4jPlugins` \(location: `generated\org\jabref\gui\logging\plugins\Log4jPlugins.java`\). Otherwise, you will see following error:
+* Add `src-gen` as root:
+
+    1. Right click on the project "jabref".
+    1. Select "Open Module Settings"
+    1. Expand "JabRef"
+    1. Select "main"
+    1. Select tab "Sources"
+    1. Click "+ Add Content Root"
+    1. Select the `src-gen` directory
+    1. Click "OK". When expanding "main", "java" should have been selected as source
+    1. Click "OK" to save the changes
+
+* Delete `org.jabref.gui.logging.plugins.Log4jPlugins` \(location: `src-gen/main/java/org/jabref/gui/logging/plugins/Log4jPlugins.java`\). Otherwise, you will see following error:
 
   ```text
   Error:java: Unable to create Plugin Service Class org.jabref.gui.logging.plugins.Log4jPlugins
@@ -172,6 +182,8 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 Essentially, you now have the best of both worlds: You can run Gradle tasks using the Gradle Tool Window and unless you haven't made changes to input files that generate sources, you can compile and run with IntelliJ's faster internal build system.
 
 In case all steps are followed, and there are still issues with `SearchBaseVisitor` \(e.g., `Error:(16, 25) java: package org.jabref.search does not exist`\), you have to delete `src\main\generated\org\jabref\gui\logging\plugins\Log4jPlugins.java`. This is independent of having enabled or disabled Annotation Processing \(see above at "Enable Annotation Processing"\).
+
+~~Note that the above steps might not work on IntelliJ 2020.x.**. You have to keep using gradle for executing tasks. See [IDEA-249391](https://youtrack.jetbrains.com/issue/IDEA-249391) for details.~~
 
 #### Using JabRef's code style
 
