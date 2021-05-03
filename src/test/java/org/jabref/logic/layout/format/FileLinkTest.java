@@ -1,9 +1,13 @@
 package org.jabref.logic.layout.format;
 
+import java.util.stream.Stream;
+
 import org.jabref.logic.layout.ParamLayoutFormatter;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -19,40 +23,24 @@ public class FileLinkTest {
         fileLinkLayoutFormatter = new FileLink(prefs);
     }
 
-    @Test
-    public void formatEmpty() {
-        assertEquals("", fileLinkLayoutFormatter.format(""));
+    @ParameterizedTest
+    @MethodSource("provideFileLinks")
+    void formatFileLinks(String formattedFileLink, String originalFileLink, String desiredDocType) {
+        if (!desiredDocType.isEmpty()) {
+            fileLinkLayoutFormatter.setArgument(desiredDocType);
+        }
+        assertEquals(formattedFileLink, fileLinkLayoutFormatter.format(originalFileLink));
     }
 
-    @Test
-    public void formatNull() {
-        assertEquals("", fileLinkLayoutFormatter.format(null));
-    }
-
-    @Test
-    public void formatOnlyFilename() {
-        assertEquals("test.pdf", fileLinkLayoutFormatter.format("test.pdf"));
-    }
-
-    @Test
-    public void formatCompleteRecord() {
-        assertEquals("test.pdf", fileLinkLayoutFormatter.format("paper:test.pdf:PDF"));
-    }
-
-    @Test
-    public void formatMultipleFiles() {
-        assertEquals("test.pdf", fileLinkLayoutFormatter.format("paper:test.pdf:PDF;presentation:pres.ppt:PPT"));
-    }
-
-    @Test
-    public void formatMultipleFilesPick() {
-        fileLinkLayoutFormatter.setArgument("ppt");
-        assertEquals("pres.ppt", fileLinkLayoutFormatter.format("paper:test.pdf:PDF;presentation:pres.ppt:PPT"));
-    }
-
-    @Test
-    public void formatMultipleFilesPickNonExistant() {
-        fileLinkLayoutFormatter.setArgument("doc");
-        assertEquals("", fileLinkLayoutFormatter.format("paper:test.pdf:PDF;presentation:pres.ppt:PPT"));
+    private static Stream<Arguments> provideFileLinks() {
+        return Stream.of(
+                Arguments.of("", "", ""),
+                Arguments.of("", null, ""),
+                Arguments.of("test.pdf", "test.pdf", ""),
+                Arguments.of("test.pdf", "paper:test.pdf:PDF", ""),
+                Arguments.of("test.pdf", "paper:test.pdf:PDF;presentation:pres.ppt:PPT", ""),
+                Arguments.of("pres.ppt", "paper:test.pdf:PDF;presentation:pres.ppt:PPT", "ppt"),
+                Arguments.of("", "paper:test.pdf:PDF;presentation:pres.ppt:PPT", "doc")
+        );
     }
 }
