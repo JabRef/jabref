@@ -118,7 +118,7 @@ dependencies {
     implementation 'org.libreoffice:libreoffice:7.1.2'
     implementation 'org.libreoffice:unoloader:7.1.2'
 
-    implementation 'io.github.java-diff-utils:java-diff-utils:4.9'
+    implementation 'io.github.java-diff-utils:java-diff-utils:4.10'
     implementation 'info.debatty:java-string-similarity:2.0.0'
 
     antlr3 'org.antlr:antlr:3.5.2'
