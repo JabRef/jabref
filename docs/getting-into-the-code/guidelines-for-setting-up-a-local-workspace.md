@@ -167,6 +167,8 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
     1. Click "OK". When expanding "main", "java" should have been selected as source
     1. Click "OK" to save the changes
 
+* In case the above step does not work, run with gradle, import gradle project again, and try again.
+
 * Delete `org.jabref.gui.logging.plugins.Log4jPlugins` \(location: `src-gen/main/java/org/jabref/gui/logging/plugins/Log4jPlugins.java`\). Otherwise, you will see following error:
 
   ```text
