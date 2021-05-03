@@ -14,7 +14,7 @@ dependencies {
 sourceSets{
     main {
         java {
-            srcDir "${project.rootDir}/../src/main/java/org/jabref/logic/journals"
+            srcDir "src/copied"
         }
     }
 }
