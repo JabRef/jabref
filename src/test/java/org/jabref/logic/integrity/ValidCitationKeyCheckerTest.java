@@ -18,13 +18,13 @@ public class ValidCitationKeyCheckerTest {
     @ParameterizedTest
     @MethodSource("provideCitationKeys")
     void citationKeyValidity(Optional optionalArgument, String citationKey, String errorMessage) {
-        assertEquals(optionalArgument, checker.checkValue(citationKey), errorMessage);
+        assertEquals(optionalArgument, checker.checkValue(citationKey));
     }
 
     private static Stream<Arguments> provideCitationKeys() {
         return Stream.of(
-                Arguments.of(Optional.of(Localization.lang("empty citation key")), "", "Citation key not empty"),
-                Arguments.of(Optional.empty(), "Seaver2019", "Invalid citation key"),
-                Arguments.of(Optional.of(Localization.lang("Invalid citation key")), "Seaver_2019}", "Valid citation key"));
+                Arguments.of(Optional.of(Localization.lang("empty citation key")), ""),
+                Arguments.of(Optional.empty(), "Seaver2019"),
+                Arguments.of(Optional.of(Localization.lang("Invalid citation key"))}", "Valid citation key"));
     }
 }
