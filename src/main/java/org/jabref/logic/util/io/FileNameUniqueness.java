@@ -112,7 +112,7 @@ public class FileNameUniqueness {
     }
 
     /**
-     * recover the file name to origin if it has duplicate mark such as " (1)", this function can handle
+     * recover the file name to origin if it has duplicate mark such as " (1)"
      * It will change the String whose format is "xxxxxx (number)" into "xxxxxx", while return the same String when it does not match the format
      *
      * @param fileName Suggested name for the file without extensionSuffix, if it has duplicate file name with other file, it will end with something like " (1)"
