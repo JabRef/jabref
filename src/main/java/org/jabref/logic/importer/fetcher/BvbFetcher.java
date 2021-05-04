@@ -8,7 +8,7 @@ import java.util.Optional;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
-import org.jabref.logic.importer.fetcher.transformators.BVBQueryTransformer;
+import org.jabref.logic.importer.fetcher.transformers.BVBQueryTransformer;
 import org.jabref.logic.importer.fileformat.MarcXmlParser;
 
 import org.apache.http.client.utils.URIBuilder;

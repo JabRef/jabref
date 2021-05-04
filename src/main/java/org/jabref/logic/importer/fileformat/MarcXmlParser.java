@@ -33,10 +33,17 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
- * A parser for the bavarian flavor (Bibliotheksverbund Bayern) of the marc xml standard
+ * A parser for the bavarian flavour (Bibliotheksverbund Bayern) of the marc xml standard
  * <p>
  * See <a href="https://www.dnb.de/DE/Professionell/Metadatendienste/Exportformate/MARC21/marc21_node.html">Feldbeschreibung
  * der Titeldaten bei der Deutschen Nationalbibliothek</a>
+ *
+ * For further information see
+ * https://www.loc.gov/marc/bibliographic/ for detailed documentation
+ * for modifications in B3Kat https://www.bib-bvb.de/documents/10792/9f51a033-5ca1-42e2-b2d3-a75e7f1512d4
+ * https://www.dnb.de/DE/Professionell/Metadatendienste/Exportformate/MARC21/marc21_node.html
+ * https://www.dnb.de/SharedDocs/Downloads/DE/Professionell/Standardisierung/AGV/marc21VereinbarungDatentauschTeil1.pdf?__blob=publicationFile&v=2
+ * about multiple books in a series https://www.dnb.de/SharedDocs/Downloads/DE/Professionell/Standardisierung/marc21FormatumstiegAbbildungBegrenzterWerke2008.pdf?__blob=publicationFile&v=2
  */
 public class MarcXmlParser implements Parser {
     private static final Logger LOGGER = LoggerFactory.getLogger(MarcXmlParser.class);
@@ -81,12 +88,6 @@ public class MarcXmlParser implements Parser {
         for (Element datafield : datafields) {
             String tag = datafield.getAttribute("tag");
             LOGGER.debug("tag: " + tag);
-
-            // see https://www.loc.gov/marc/bibliographic/ for detailed documentation
-            // for modifications in B3Kat https://www.bib-bvb.de/documents/10792/9f51a033-5ca1-42e2-b2d3-a75e7f1512d4
-            // https://www.dnb.de/DE/Professionell/Metadatendienste/Exportformate/MARC21/marc21_node.html
-            // https://www.dnb.de/SharedDocs/Downloads/DE/Professionell/Standardisierung/AGV/marc21VereinbarungDatentauschTeil1.pdf?__blob=publicationFile&v=2
-            // multiple books in a series https://www.dnb.de/SharedDocs/Downloads/DE/Professionell/Standardisierung/marc21FormatumstiegAbbildungBegrenzterWerke2008.pdf?__blob=publicationFile&v=2
 
             switch (tag) {
                 case "020" -> { // ISBN
