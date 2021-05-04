@@ -16,9 +16,7 @@ plugins {
 
     id 'com.github.ben-manes.versions' version '0.38.0'
 
-    // 1.8.2 does not work in our case (tends to be buggy)
-    // See https://github.com/java9-modularity/gradle-modules-plugin/issues/188 for details
-    id 'org.javamodularity.moduleplugin' version '1.8.1'
+    id 'org.javamodularity.moduleplugin' version '1.8.3'
 
     id 'org.openjfx.javafxplugin' version '0.0.9'
 
