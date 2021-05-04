@@ -71,13 +71,11 @@ public class FileNameUniqueness {
         }
 
         String originalFileName = fileNameWithoutDuplicated + extensionSuffix;
-
         if (fileName.equals(originalFileName)) {
             return false;
         }
 
         File originalFile = new File(directory, originalFileName);
-
         // deal with a very special case, when duplication does not happen, but the file name is end with something like " (1)" as it originally is
         if (!originalFile.exists()) {
             return false;
@@ -90,11 +88,10 @@ public class FileNameUniqueness {
             if (com.google.common.io.Files.equal(originalFile, duplicateFile)) {
                 if (duplicateFile.delete()) {
                     dialogService.notify(Localization.lang("Dupilcate file with '%0', succesfully delete the file '%1'", originalFileName, fileName));
-                    return true;
                 } else {
                     dialogService.notify(Localization.lang("Dupilcate file with '%0', fail to delete the file '%1'", originalFileName, fileName));
-                    return false;
                 }
+                return true;
             }
 
             originalFileName = fileNameWithoutDuplicated +
@@ -130,12 +127,10 @@ public class FileNameUniqueness {
                 return fileName;
             }
         }
-
         int dotPosition = fileName.lastIndexOf('(');
         if ((dotPosition > 0) && (dotPosition < (fileName.length() - 1))) {
             fileName = fileName.substring(0, dotPosition - 1);
         }
         return fileName;
     }
-
 }
