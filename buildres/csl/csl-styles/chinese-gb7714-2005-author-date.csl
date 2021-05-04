@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="zh-CN">
   <info>
-    <title>China National Standard GB/T 7714-2005 (author-date, Chinese)</title>
+    <title>China National Standard GB/T 7714-2005 (author-date, 中文)</title>
     <id>http://www.zotero.org/styles/chinese-gb7714-2005-author-date</id>
     <link href="http://www.zotero.org/styles/chinese-gb7714-2005-author-date" rel="self"/>
     <link href="http://www.zotero.org/styles/chinese-gb7714-2005-numeric" rel="template"/>

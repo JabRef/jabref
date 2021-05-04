@@ -57,7 +57,6 @@ public class JabRefGUI {
     }
 
     private void openWindow(Stage mainStage) {
-        IconTheme.loadFonts();
 
         LOGGER.debug("Initializing frame");
         mainFrame.init();

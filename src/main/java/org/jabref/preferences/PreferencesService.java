@@ -29,13 +29,16 @@ import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.CustomImporter;
+import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
@@ -143,6 +146,10 @@ public interface PreferencesService {
     TelemetryPreferences getTelemetryPreferences();
 
     void storeTelemetryPreferences(TelemetryPreferences preferences);
+
+    DOIPreferences getDOIPreferences();
+
+    void storeDOIPreferences(DOIPreferences preferences);
 
     OwnerPreferences getOwnerPreferences();
 
@@ -272,6 +279,10 @@ public interface PreferencesService {
 
     void storeShouldAutosave(boolean shouldAutosave);
 
+    FileLinkPreferences getFileLinkPreferences();
+
+    void storeFileDirforDatabase(List<Path> dirs);
+
     //*************************************************************************************************************
     // Import/Export preferences
     //*************************************************************************************************************
@@ -287,6 +298,10 @@ public interface PreferencesService {
     Set<CustomImporter> getCustomImportFormats();
 
     void storeCustomImportFormats(Set<CustomImporter> customImporters);
+
+    ImportSettingsPreferences getImportSettingsPreferences();
+
+    void storeImportSettingsPreferences(ImportSettingsPreferences preferences);
 
     //*************************************************************************************************************
     // Preview preferences

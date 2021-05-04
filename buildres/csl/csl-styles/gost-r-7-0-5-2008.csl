@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" default-locale="ru-RU">
   <info>
-    <title>Russian GOST R 7.0.5-2008 (Russian)</title>
+    <title>Russian GOST R 7.0.5-2008 (Ру́сский)</title>
     <id>http://www.zotero.org/styles/gost-r-7-0-5-2008</id>
     <link href="http://www.zotero.org/styles/gost-r-7-0-5-2008" rel="self"/>
     <link href="http://chetvericov.ru/stil-oformleniya-dlya-mendeley-i-zotero-csl-po-gost-r-705-2008/" rel="documentation"/>
@@ -14,7 +14,7 @@
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>Russian GOST-2008 style.</summary>
-    <updated>2012-09-27T22:06:38+00:00</updated>
+    <updated>2021-04-23T08:29:37+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor">
@@ -134,11 +134,11 @@
             <text prefix="С. " variable="page"/>
           </group>
         </else-if>
-        <else-if type="webpage post-weblog">
+        <else-if type="webpage post-weblog" match="any">
           <text macro="title" prefix=" "/>
           <text prefix=" " macro="access"/>
         </else-if>
-        <else-if type="article-journal article-magazine article-newspaper broadcast interview manuscript map patent personal_communication post-weblog song speech thesis webpage" match="any">
+        <else-if type="article-journal article-magazine article-newspaper broadcast interview manuscript map patent personal_communication speech thesis" match="any">
           <text macro="title" prefix=" "/>
           <group delimiter=". " prefix=" " suffix=".">
             <group prefix="// " delimiter=". ">

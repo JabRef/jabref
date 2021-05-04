@@ -3,7 +3,6 @@
   <info>
     <title>American Psychological Association 7th edition (numeric, superscript)</title>
     <title-short>APA (numeric)</title-short>
-    <summary>APA style, with superscript numeric in-text citations</summary>
     <id>http://www.zotero.org/styles/apa-numeric-superscript</id>
     <link href="http://www.zotero.org/styles/apa-numeric-superscript" rel="self"/>
     <link href="http://www.zotero.org/styles/apa" rel="template"/>
@@ -15,6 +14,7 @@
     <category citation-format="numeric"/>
     <category field="psychology"/>
     <category field="generic-base"/>
+    <summary>APA style, with superscript numeric in-text citations</summary>
     <updated>2019-12-04T13:09:49+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>

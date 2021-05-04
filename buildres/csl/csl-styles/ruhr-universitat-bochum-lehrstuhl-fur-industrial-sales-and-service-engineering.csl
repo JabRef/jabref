@@ -12,7 +12,7 @@
       <email>sebastian.knop@rub.de</email>
     </author>
     <category citation-format="author-date"/>
-    <updated>2019-12-18T15:42:00+01:00</updated>
+    <updated>2021-02-25T04:41:09+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="de">
@@ -20,11 +20,13 @@
       <term name="et-al">et&#160;al.</term>
       <term name="retrieved">abgerufen am</term>
       <term name="and"> und </term>
+      <term name="number">Nr.</term>
     </terms>
   </locale>
   <locale xml:lang="en">
     <terms>
       <term name="et-al">et&#160;al.</term>
+      <term name="number">No.</term>
       <term name="ordinal">ᵗʰ</term>
       <term name="ordinal-01">ˢᵗ</term>
       <term name="ordinal-02">ⁿᵈ</term>
@@ -46,14 +48,14 @@
   </locale>
   <locale xml:lang="en-GB">
     <date form="text">
-      <date-part name="day" form="ordinal" suffix=" "/>
+      <date-part name="day" form="numeric" suffix=" "/>
       <date-part name="month" suffix=" "/>
       <date-part name="year"/>
     </date>
   </locale>
   <macro name="container-contributors">
     <choose>
-      <if type="chapter paper-conference" match="any">
+      <if type="chapter" match="any">
         <names variable="editor translator">
           <name and="text" sort-separator=", " initialize-with=". " delimiter=", " delimiter-precedes-last="contextual"/>
           <label form="short" prefix=" (" suffix=")"/>
@@ -63,7 +65,7 @@
   </macro>
   <macro name="secondary-contributors">
     <choose>
-      <if type="chapter paper-conference" match="none">
+      <if type="chapter paper-conference article-journal" match="none">
         <names variable="editor translator" delimiter=", " prefix=" (" suffix=")">
           <name and="text" initialize-with=". " delimiter=", " delimiter-precedes-last="contextual"/>
           <label form="short" prefix=", "/>
@@ -129,14 +131,15 @@
   </macro>
   <macro name="title">
     <choose>
-      <if type="report thesis article-journal paper-conference" match="any">
+      <if type="report article-journal paper-conference" match="any">
         <text variable="title" quotes="true" suffix=","/>
-        <group prefix=" " suffix=", ">
+        <group prefix=" ">
           <text variable="genre"/>
-          <text variable="number" prefix=" No. "/>
+          <text term="number" prefix=" " suffix=" "/>
+          <text variable="number"/>
         </group>
       </if>
-      <else-if type="bill book graphic legal_case legislation manuscript motion_picture report song" match="any">
+      <else-if type="bill book graphic legal_case legislation manuscript motion_picture report song thesis" match="any">
         <text variable="title" font-style="italic"/>
       </else-if>
       <else>
@@ -146,13 +149,17 @@
   </macro>
   <macro name="publisher">
     <choose>
-      <if type="report thesis" match="any">
+      <if type="report">
         <group delimiter=": ">
           <text variable="publisher-place"/>
           <text variable="publisher"/>
         </group>
       </if>
-      <else>
+      <else-if type="thesis">
+        <text variable="publisher" prefix="Dissertation, "/>
+        <text variable="publisher-place" prefix=" "/>
+      </else-if>
+      <else-if type="article-journal paper-conference" match="none">
         <choose>
           <if variable="event" match="none">
             <text variable="genre" suffix=", "/>
@@ -162,7 +169,7 @@
           <text variable="publisher-place"/>
           <text variable="publisher"/>
         </group>
-      </else>
+      </else-if>
     </choose>
   </macro>
   <macro name="event">
@@ -227,16 +234,21 @@
         </group>
       </if>
       <else-if type="bill book chapter graphic legal_case legislation motion_picture paper-conference report song" match="any">
-        <group delimiter=", " prefix=" ">
+        <group delimiter=" " prefix=" ">
           <text macro="edition"/>
-          <group>
-            <text term="volume" form="short" plural="true" text-case="capitalize-first" suffix=" "/>
-            <number variable="number-of-volumes" form="numeric" prefix="1-"/>
-          </group>
-          <group>
-            <text term="volume" form="short" text-case="capitalize-first" suffix=" "/>
-            <number variable="volume" form="numeric"/>
-          </group>
+          <choose>
+            <if variable="number-of-volumes" match="any">
+              <group delimiter="">
+                <text term="volume" form="short" text-case="capitalize-first" prefix="(" suffix=" "/>
+                <number variable="volume" form="numeric"/>
+                <number variable="number-of-volumes" form="numeric" prefix="/" suffix=")"/>
+              </group>
+            </if>
+            <else-if variable="volume" match="any">
+              <text term="volume" form="short" text-case="capitalize-first" prefix="(" suffix=""/>
+              <number variable="volume" form="numeric" suffix=")"/>
+            </else-if>
+          </choose>
         </group>
       </else-if>
     </choose>
@@ -250,9 +262,10 @@
   <macro name="container-phrase">
     <group>
       <choose>
-        <if type="chapter paper-conference speech" match="any">
+        <if type="paper-conference speech" match="any">
           <choose>
             <if variable="container-title" match="none">
+              <text term="presented at" suffix=" "/>
               <text variable="event" font-style="italic"/>
             </if>
             <else>
@@ -260,6 +273,9 @@
             </else>
           </choose>
         </if>
+        <else-if type="chapter">
+          <text term="in" suffix=" "/>
+        </else-if>
       </choose>
       <text variable="container-title" font-style="italic"/>
     </group>

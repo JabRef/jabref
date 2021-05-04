@@ -94,13 +94,17 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         localDragboard = stateManager.getLocalDragboard();
 
+        this.setOnDragOver(this::handleOnDragOverTableView);
+        this.setOnDragDropped(this::handleOnDragDroppedTableView);
+
         this.getColumns().addAll(
                 new MainTableColumnFactory(
                         database,
                         preferencesService,
                         externalFileTypes,
                         libraryTab.getUndoManager(),
-                        dialogService).createColumns());
+                        dialogService,
+                        stateManager).createColumns());
 
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
                 .withOnMouseClickedEvent((entry, event) -> {
@@ -174,8 +178,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     /**
-     * This is called, if a user starts typing some characters into the keyboard with focus on main table. The {@link
-     * MainTable} will scroll to the cell with the same starting column value and typed string
+     * This is called, if a user starts typing some characters into the keyboard with focus on main table. The {@link MainTable} will scroll to the cell with the same starting column value and typed string
      *
      * @param sortedColumn The sorted column in {@link MainTable}
      * @param keyEvent     The pressed character
@@ -273,6 +276,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         new EditAction(StandardActions.CUT, libraryTab.frame(), Globals.stateManager).execute();
                         event.consume();
                         break;
+                    case DELETE_ENTRY:
+                        new EditAction(StandardActions.DELETE_ENTRY, libraryTab.frame(), Globals.stateManager).execute();
+                        event.consume();
+                        break;
                     default:
                         // Pass other keys to parent
                 }
@@ -307,6 +314,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         if (event.getDragboard().hasFiles()) {
             event.acceptTransferModes(TransferMode.ANY);
             ControlHelper.setDroppingPseudoClasses(row, event);
+        }
+        event.consume();
+    }
+
+    private void handleOnDragOverTableView(DragEvent event) {
+        if (event.getDragboard().hasFiles()) {
+            event.acceptTransferModes(TransferMode.ANY);
         }
         event.consume();
     }
@@ -374,6 +388,20 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     }
                 }
             }
+
+            success = true;
+        }
+
+        event.setDropCompleted(success);
+        event.consume();
+    }
+
+    private void handleOnDragDroppedTableView(DragEvent event) {
+        boolean success = false;
+
+        if (event.getDragboard().hasFiles()) {
+            List<Path> files = event.getDragboard().getFiles().stream().map(File::toPath).collect(Collectors.toList());
+            importHandler.importFilesInBackground(files).executeWith(Globals.TASK_EXECUTOR);
 
             success = true;
         }

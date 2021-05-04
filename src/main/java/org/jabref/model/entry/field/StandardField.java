@@ -135,6 +135,7 @@ public enum StandardField implements Field {
     YEAR("year", FieldProperty.NUMERIC),
     YEARFILED("yearfiled"),
     MR_NUMBER("mrnumber"),
+    ZBL_NUMBER("zbl"),
     XDATA("xdata", FieldProperty.MULTIPLE_ENTRY_LINK),
     XREF("xref", FieldProperty.SINGLE_ENTRY_LINK),
 

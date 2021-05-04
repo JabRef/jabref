@@ -14,6 +14,7 @@ import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.preferences.appearance.AppearanceTab;
 import org.jabref.gui.preferences.citationkeypattern.CitationKeyPatternTab;
+import org.jabref.gui.preferences.customization.CustomizationTab;
 import org.jabref.gui.preferences.entryeditor.EntryEditorTab;
 import org.jabref.gui.preferences.entryeditortabs.CustomEditorFieldsTab;
 import org.jabref.gui.preferences.exporter.ExportCustomizationTab;
@@ -22,6 +23,7 @@ import org.jabref.gui.preferences.file.FileTab;
 import org.jabref.gui.preferences.general.GeneralTab;
 import org.jabref.gui.preferences.groups.GroupsTab;
 import org.jabref.gui.preferences.importer.ImportCustomizationTab;
+import org.jabref.gui.preferences.importer.ImportSettingsTab;
 import org.jabref.gui.preferences.journals.JournalAbbreviationsTab;
 import org.jabref.gui.preferences.keybindings.KeyBindingsTab;
 import org.jabref.gui.preferences.linkedfiles.LinkedFilesTab;
@@ -74,10 +76,12 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new JournalAbbreviationsTab(),
                 new GroupsTab(),
                 new EntryEditorTab(),
+                new CustomizationTab(),
                 new CustomEditorFieldsTab(),
                 new CitationKeyPatternTab(),
                 new LinkedFilesTab(),
                 new NameFormatterTab(),
+                new ImportSettingsTab(),
                 new ImportCustomizationTab(),
                 new ExportCustomizationTab(),
                 new XmpPrivacyTab(),

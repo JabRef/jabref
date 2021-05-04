@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="note" default-locale="fr-FR" version="1.0" delimiter-precedes-last="never" delimiter-precedes-et-al="never" and="text">
   <info>
-    <title>Université de Lausanne - Histoire (French)</title>
+    <title>Université de Lausanne - Histoire (Français)</title>
     <id>http://www.zotero.org/styles/universite-de-lausanne-histoire</id>
     <link href="http://www.zotero.org/styles/universite-de-lausanne-histoire" rel="self"/>
     <link href="http://www.zotero.org/styles/infoclio-fr-smallcaps" rel="template"/>
@@ -469,13 +469,13 @@
       <else-if variable="volume">
         <group delimiter="&#160;">
           <number variable="number-of-pages"/>
-          <label variable="page" form="short"/>
+          <label variable="number-of-pages" form="short"/>
         </group>
       </else-if>
       <else-if variable="number-of-volumes" match="none">
         <group delimiter="&#160;">
           <number variable="number-of-pages"/>
-          <label variable="page" form="short"/>
+          <label variable="number-of-pages" form="short"/>
         </group>
       </else-if>
     </choose>
