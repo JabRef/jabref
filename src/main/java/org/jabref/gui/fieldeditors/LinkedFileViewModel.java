@@ -434,29 +434,34 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
             BackgroundTask<Path> downloadTask = prepareDownloadTask(targetDirectory.get(), urlDownload);
             downloadTask.onSuccess(destination -> {
-                LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectories(filePreferences), externalFileTypes);
-
-                List<LinkedFile> linkedFiles = entry.getFiles();
-                int oldFileIndex = -1;
-                int i = 0;
-                while ((i < linkedFiles.size()) && (oldFileIndex == -1)) {
-                    LinkedFile file = linkedFiles.get(i);
-                    // The file type changes as part of download process (see prepareDownloadTask), thus we only compare by link
-                    if (file.getLink().equalsIgnoreCase(linkedFile.getLink())) {
-                        oldFileIndex = i;
+                try {
+                    if (!FileNameUniqueness.isDuplicatedFile(targetDirectory.get().toString(), destination.getFileName().toString(), dialogService)) {
+                        LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectories(filePreferences), externalFileTypes);
+                        List<LinkedFile> linkedFiles = entry.getFiles();
+                        int oldFileIndex = -1;
+                        int i = 0;
+                        while ((i < linkedFiles.size()) && (oldFileIndex == -1)) {
+                            LinkedFile file = linkedFiles.get(i);
+                            // The file type changes as part of download process (see prepareDownloadTask), thus we only compare by link
+                            if (file.getLink().equalsIgnoreCase(linkedFile.getLink())) {
+                                oldFileIndex = i;
+                            }
+                            i++;
+                        }
+                        if (oldFileIndex == -1) {
+                            linkedFiles.add(0, newLinkedFile);
+                        } else {
+                            linkedFiles.set(oldFileIndex, newLinkedFile);
+                        }
+                        entry.setFiles(linkedFiles);
+                        // Notify in bar when the file type is HTML.
+                        if (newLinkedFile.getFileType().equals(StandardExternalFileType.URL.getName())) {
+                            dialogService.notify(Localization.lang("Downloaded website as an HTML file."));
+                            LOGGER.debug("Downloaded website {} as an HTML file at {}", linkedFile.getLink(), destination);
+                        }
                     }
-                    i++;
-                }
-                if (oldFileIndex == -1) {
-                    linkedFiles.add(0, newLinkedFile);
-                } else {
-                    linkedFiles.set(oldFileIndex, newLinkedFile);
-                }
-                entry.setFiles(linkedFiles);
-                // Notify in bar when the file type is HTML.
-                if (newLinkedFile.getFileType().equals(StandardExternalFileType.URL.getName())) {
-                    dialogService.notify(Localization.lang("Downloaded website as an HTML file."));
-                    LOGGER.debug("Downloaded website {} as an HTML file at {}", linkedFile.getLink(), destination);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             });
             downloadProgress.bind(downloadTask.workDonePercentageProperty());

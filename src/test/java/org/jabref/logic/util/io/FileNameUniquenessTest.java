@@ -44,4 +44,32 @@ public class FileNameUniquenessTest {
         String outputFileName = FileNameUniqueness.getNonOverWritingFileName(tempDir, "manyfiles.txt");
         assertEquals("manyfiles (2).txt", outputFileName);
     }
+
+    @Test
+    public void testTaseDuplicateMarksReturnsOrignalFileName1() throws IOException {
+        String fileName1 = "abc def (1)";
+        String fileName2 = FileNameUniqueness.eraseDuplicateMarks(fileName1);
+        assertEquals("abc def", fileName2);
+    }
+
+    @Test
+    public void testTaseDuplicateMarksReturnsOrignalFileName2() throws IOException {
+        String fileName1 = "abc (def) gh (1)";
+        String fileName2 = FileNameUniqueness.eraseDuplicateMarks(fileName1);
+        assertEquals("abc (def) gh", fileName2);
+    }
+
+    @Test
+    public void testTaseDuplicateMarksReturnsSameName1() throws IOException {
+        String fileName1 = "abc def (g)";
+        String fileName2 = FileNameUniqueness.eraseDuplicateMarks(fileName1);
+        assertEquals("abc def (g)", fileName2);
+    }
+
+    @Test
+    public void testTaseDuplicateMarksReturnsSameName2() throws IOException {
+        String fileName1 = "abc def";
+        String fileName2 = FileNameUniqueness.eraseDuplicateMarks(fileName1);
+        assertEquals("abc def", fileName2);
+    }
 }
