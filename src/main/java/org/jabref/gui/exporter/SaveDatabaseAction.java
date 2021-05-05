@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -166,8 +165,7 @@ public class SaveDatabaseAction {
             Path savePath = selectedPath.get();
             // Workaround for linux systems not adding file extension
             if(!(savePath.getFileName().toString().toLowerCase().endsWith(".bib"))){
-                String newPath = savePath.toString() + ".bib";
-                selectedPath = Optional.of(Paths.get(newPath));
+                selectedPath = Optional.of(Path.of(savePath.toString(),".bib"));
             }
         }
         return selectedPath;
