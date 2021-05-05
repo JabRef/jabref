@@ -1,10 +1,18 @@
 package org.jabref.gui.util;
 
 import java.nio.file.Path;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.FileTime;
 
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+
 
 import org.jabref.logic.l10n.Localization;
 
@@ -36,6 +44,17 @@ public class FileNodeViewModel {
         this.fileCount = fileCount;
     }
 
+
+    public static String formatDateTime(FileTime fileTime) {
+
+        LocalDateTime localDateTime = fileTime
+                .toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+
+        return localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+    }
+
     /**
      * Return a string for displaying a node name (and its number of children if it is a directory).
      */
@@ -44,7 +63,13 @@ public class FileNodeViewModel {
             return String.format("%s (%s %s)", path.getFileName(), fileCount,
                     fileCount == 1 ? Localization.lang("file") : Localization.lang("files"));
         }
-        return path.getFileName().toString();
+        FileTime lastEditedTime = null;
+        try {
+            lastEditedTime = Files.getLastModifiedTime(path);
+        } catch (IOException e) {
+            System.err.println("Exception Caught");
+        }
+        return String.format("%s (%s: %s)", path.getFileName().toString(), Localization.lang("last edited"), formatDateTime(lastEditedTime));
     }
 
     @Override
