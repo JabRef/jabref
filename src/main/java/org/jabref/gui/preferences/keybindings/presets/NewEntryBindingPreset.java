@@ -12,6 +12,7 @@ public class NewEntryBindingPreset implements KeyBindingPreset {
     static {
         // Clear conflicting default presets
         KEY_BINDINGS.put(KeyBinding.PULL_CHANGES_FROM_SHARED_DATABASE, "");
+        KEY_BINDINGS.put(KeyBinding.COPY_PREVIEW, "");
 
         // Add new entry presets
         KEY_BINDINGS.put(KeyBinding.NEW_ARTICLE,"Ctrl+shift+A");
