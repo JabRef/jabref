@@ -52,7 +52,24 @@ public class MergeEntriesAction extends SimpleCommand {
         BibEntry one = selectedEntries.get(0);
         BibEntry two = selectedEntries.get(1);
 
-        MergeEntriesDialog dlg = new MergeEntriesDialog(one, two);
+        // Compare the citation key
+        BibEntry first = one;
+        BibEntry second = two;
+
+        Optional<String> keyOne = one.getCitationKey();
+        Optional<String> keyTwo = two.getCitationKey();
+        if (keyOne.isPresent() && keyTwo.isPresent() && keyOne.get().compareTo(keyTwo.get()) > 0) {
+            first = two;
+            second = one;
+        }
+        else {
+            if (keyTwo.isPresent()) {
+                first = two;
+                second = one;
+            }
+        }
+
+        MergeEntriesDialog dlg = new MergeEntriesDialog(first, second);
         dlg.setTitle(Localization.lang("Merge entries"));
         Optional<BibEntry> mergedEntry = dialogService.showCustomDialogAndWait(dlg);
         if (mergedEntry.isPresent()) {
