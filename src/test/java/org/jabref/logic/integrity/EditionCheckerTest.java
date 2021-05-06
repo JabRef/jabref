@@ -2,6 +2,7 @@ package org.jabref.logic.integrity;
 
 import java.util.Optional;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 
@@ -78,6 +79,28 @@ public class EditionCheckerTest {
     @Test
     void bibTexAcceptsOrdinalNumberInNumbers() {
         assertEquals(Optional.empty(), checker.checkValue("2nd"));
+    }
+
+    @Test
+    void bibTexEmptyValueAsInput() {
+        assertEquals(Optional.empty(), checker.checkValue(""));
+    }
+
+    @Test
+    void bibTexNullValueAsInput() {
+        assertEquals(Optional.empty(), checker.checkValue(null));
+    }
+
+    @Test
+    void bibTexDoesNotAcceptIntegerOnly() {
+        var editionChecker = new EditionChecker(bibtex, false);
+        assertEquals(Optional.of(Localization.lang("no integer as values for edition allowed")), editionChecker.checkValue("3"));
+    }
+
+    @Test
+    void bibTexAcceptsFirstEditionAlsoIfIntegerEditionDisallowed() {
+        var editionChecker = new EditionChecker(bibtex, false);
+        assertEquals(Optional.of(Localization.lang("edition of book reported as just 1")), editionChecker.checkValue("1"));
     }
 
     @Test
