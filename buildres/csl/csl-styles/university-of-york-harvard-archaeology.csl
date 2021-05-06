@@ -38,7 +38,7 @@
   </macro>
   <macro name="author-short">
     <names variable="author">
-      <name form="short" font-style="normal" delimiter=","/>
+      <name form="short" font-style="normal"/>
       <et-al font-style="normal"/>
       <substitute>
         <names variable="translator"/>

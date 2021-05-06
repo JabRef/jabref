@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 import javax.xml.transform.TransformerException;
 
 import javafx.beans.Observable;
@@ -426,6 +429,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
             }
 
             URLDownload urlDownload = new URLDownload(linkedFile.getLink());
+            if (!checkSSLHandshake(urlDownload)) {
+                return;
+            }
+
             BackgroundTask<Path> downloadTask = prepareDownloadTask(targetDirectory.get(), urlDownload);
             downloadTask.onSuccess(destination -> {
 				File newFile =  new File (destination.toString());
@@ -486,7 +493,28 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
     }
 
+    public boolean checkSSLHandshake(URLDownload urlDownload) {
+        try {
+            urlDownload.canBeReached();
+        } catch (kong.unirest.UnirestException ex) {
+            if (ex.getCause() instanceof javax.net.ssl.SSLHandshakeException) {
+                if (dialogService.showConfirmationDialogAndWait(Localization.lang("Download file"),
+                        Localization.lang("Unable to find valid certification path to requested target(%0), download anyway?",
+                                urlDownload.getSource().toString()))) {
+                    URLDownload.bypassSSLVerification();
+                    return true;
+                } else {
+                    dialogService.notify(Localization.lang("Download operation canceled."));
+                }
+            }
+            return false;
+        }
+        return true;
+    }
+
     public BackgroundTask<Path> prepareDownloadTask(Path targetDirectory, URLDownload urlDownload) {
+        SSLSocketFactory defaultSSLSocketFactory = HttpsURLConnection.getDefaultSSLSocketFactory();
+        HostnameVerifier defaultHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
         BackgroundTask<Path> downloadTask = BackgroundTask
                 .wrap(() -> {
                     Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
@@ -499,6 +527,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     return targetDirectory.resolve(fulltextDir).resolve(suggestedName);
                 })
                 .then(destination -> new FileDownloadTask(urlDownload.getSource(), destination))
+                .onFinished(() -> URLDownload.setSSLVerification(defaultSSLSocketFactory, defaultHostnameVerifier))
                 .onFailure(exception -> dialogService.showErrorDialogAndWait("Download failed", exception));
         return downloadTask;
     }
