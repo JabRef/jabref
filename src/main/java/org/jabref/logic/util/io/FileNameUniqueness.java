@@ -1,6 +1,5 @@
 package org.jabref.logic.util.io;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -56,7 +55,7 @@ public class FileNameUniqueness {
      *         false when it is not a duplicate file or fail to delete the duplicate file
      * @throws IOException Fail when the file is not exist or something wrong when reading the file
      */
-    public static boolean isDuplicatedFile(String directory, String fileName, DialogService dialogService) throws IOException {
+    public static boolean isDuplicatedFile(Path directory, String fileName, DialogService dialogService) throws IOException {
 
         Optional<String> extensionOptional = FileUtil.getFileExtension(fileName);
         String extensionSuffix;
@@ -75,19 +74,18 @@ public class FileNameUniqueness {
             return false;
         }
 
-        File originalFile = new File(directory, originalFileName);
+        Path originalFile = Path.of(directory.toString(), originalFileName);
         // deal with a very special case, when duplication does not happen, but the file name is end with something like " (1)" as it originally is
-        if (!originalFile.exists()) {
+        if (!Files.exists(directory.resolve(originalFileName))) {
             return false;
         }
 
-        File duplicateFile = new File(directory, fileName);
-        assert (duplicateFile.exists());
+        Path duplicateFile = Path.of(directory.toString(), fileName);
         int counter = 1;
         while (true) {
-            if (com.google.common.io.Files.equal(originalFile, duplicateFile)) {
-                if (duplicateFile.delete()) {
-                    dialogService.notify(Localization.lang("Dupilcate file with '%0', succesfully delete the file '%1'", originalFileName, fileName));
+            if (com.google.common.io.Files.equal(originalFile.toFile(), duplicateFile.toFile())) {
+                if (duplicateFile.toFile().delete()) {
+                    dialogService.notify(Localization.lang("Dupilcate file with '%0', successfully delete the file '%1'", originalFileName, fileName));
                 } else {
                     dialogService.notify(Localization.lang("Dupilcate file with '%0', fail to delete the file '%1'", originalFileName, fileName));
                 }
@@ -104,8 +102,8 @@ public class FileNameUniqueness {
                 return false;
             }
 
-            originalFile = new File(directory, originalFileName);
-            if (!originalFile.exists()) {
+            originalFile = Path.of(directory.toString(), originalFileName);
+            if (!Files.exists(directory.resolve(originalFileName))) {
                 return false;
             }
         }
@@ -118,7 +116,7 @@ public class FileNameUniqueness {
      * @param fileName Suggested name for the file without extensionSuffix, if it has duplicate file name with other file, it will end with something like " (1)"
      * @return Suggested name for the file without extensionSuffix and duplicate marks such as " (1)"
      */
-    public static String eraseDuplicateMarks(String fileName) {
+    private static String eraseDuplicateMarks(String fileName) {
         int dotPosition1 = fileName.lastIndexOf(')');
         if (dotPosition1 != fileName.length() - 1 || dotPosition1 <= 2) {
             return fileName;

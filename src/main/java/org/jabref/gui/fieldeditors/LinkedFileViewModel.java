@@ -435,7 +435,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             BackgroundTask<Path> downloadTask = prepareDownloadTask(targetDirectory.get(), urlDownload);
             downloadTask.onSuccess(destination -> {
                 try {
-                    if (!FileNameUniqueness.isDuplicatedFile(targetDirectory.get().toString(), destination.getFileName().toString(), dialogService)) {
+                    if (!FileNameUniqueness.isDuplicatedFile(targetDirectory.get(), destination.getFileName().toString(), dialogService)) {
                         LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectories(filePreferences), externalFileTypes);
                         List<LinkedFile> linkedFiles = entry.getFiles();
                         int oldFileIndex = -1;
