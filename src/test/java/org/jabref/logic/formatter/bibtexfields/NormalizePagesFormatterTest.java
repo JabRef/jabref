@@ -62,6 +62,7 @@ public class NormalizePagesFormatterTest {
                 // special case, where -- is also put into
                 Arguments.of("some--text", "some-text"),
                 Arguments.of("pages 1--50", "pages 1-50"),
+                Arguments.of("--43", "-43"),
 
                 // keep arbitrary text
                 Arguments.of("some-text-with-dashes", "some-text-with-dashes"),
