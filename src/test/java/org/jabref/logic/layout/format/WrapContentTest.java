@@ -1,65 +1,39 @@
 package org.jabref.logic.layout.format;
 
+import java.util.stream.Stream;
+
 import org.jabref.logic.layout.ParamLayoutFormatter;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class WrapContentTest {
 
-    @Test
-    public void testSimpleText() {
-        ParamLayoutFormatter a = new WrapContent();
-        a.setArgument("<,>");
-        assertEquals("<Bob>", a.format("Bob"));
+    private ParamLayoutFormatter wrapContentParamLayoutFormatter = new WrapContent();
+
+    @ParameterizedTest
+    @MethodSource("provideContent")
+    void formatContent(String formattedContent, String originalContent, String desiredFormat) {
+        if (!desiredFormat.isEmpty()) {
+            wrapContentParamLayoutFormatter.setArgument(desiredFormat);
+        }
+
+        assertEquals(formattedContent, wrapContentParamLayoutFormatter.format(originalContent));
     }
 
-    @Test
-    public void testEmptyStart() {
-        ParamLayoutFormatter a = new WrapContent();
-        a.setArgument(",:");
-        assertEquals("Bob:", a.format("Bob"));
-    }
-
-    @Test
-    public void testEmptyEnd() {
-        ParamLayoutFormatter a = new WrapContent();
-        a.setArgument("Content: ,");
-        assertEquals("Content: Bob", a.format("Bob"));
-    }
-
-    @Test
-    public void testEscaping() {
-        ParamLayoutFormatter a = new WrapContent();
-        a.setArgument("Name\\,Field\\,,\\,Author");
-        assertEquals("Name,Field,Bob,Author", a.format("Bob"));
-    }
-
-    @Test
-    public void testFormatNullExpectNothingAdded() {
-        ParamLayoutFormatter a = new WrapContent();
-        a.setArgument("Eds.,Ed.");
-        assertEquals(null, a.format(null));
-    }
-
-    @Test
-    public void testFormatEmptyExpectNothingAdded() {
-        ParamLayoutFormatter a = new WrapContent();
-        a.setArgument("Eds.,Ed.");
-        assertEquals("", a.format(""));
-    }
-
-    @Test
-    public void testNoArgumentSetExpectNothingAdded() {
-        ParamLayoutFormatter a = new WrapContent();
-        assertEquals("Bob Bruce and Jolly Jumper", a.format("Bob Bruce and Jolly Jumper"));
-    }
-
-    @Test
-    public void testNoProperArgumentExpectNothingAdded() {
-        ParamLayoutFormatter a = new WrapContent();
-        a.setArgument("Eds.");
-        assertEquals("Bob Bruce and Jolly Jumper", a.format("Bob Bruce and Jolly Jumper"));
+    private static Stream<Arguments> provideContent() {
+        return Stream.of(
+                Arguments.of("<Bob>", "Bob", "<,>"),
+                Arguments.of("Bob:", "Bob", ",:"),
+                Arguments.of("Content: Bob", "Bob", "Content: ,"),
+                Arguments.of("Name,Field,Bob,Author", "Bob", "Name\\,Field\\,,\\,Author"),
+                Arguments.of(null, null, "Eds.,Ed."),
+                Arguments.of("", "", "Eds.,Ed."),
+                Arguments.of("Bob Bruce and Jolly Jumper", "Bob Bruce and Jolly Jumper", ""),
+                Arguments.of("Bob Bruce and Jolly Jumper", "Bob Bruce and Jolly Jumper", "Eds.")
+        );
     }
 }

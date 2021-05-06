@@ -120,7 +120,6 @@ public class CitationKeyGenerator extends BracketedPattern {
         String newKey = createCitationKeyFromPattern(entry);
         newKey = replaceWithRegex(newKey);
         newKey = appendLettersToKey(newKey, currentKey);
-
         return cleanKey(newKey, unwantedCharacters);
     }
 
