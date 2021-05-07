@@ -56,22 +56,22 @@ public class FieldFactory {
 
     public static Set<OrFields> parseOrFieldsList(String fieldNames) {
         return Arrays.stream(fieldNames.split(FieldFactory.DELIMITER))
-                    .filter(StringUtil::isNotBlank)
-                    .map(FieldFactory::parseOrFields)
-                    .collect(Collectors.toCollection(LinkedHashSet::new));
+                     .filter(StringUtil::isNotBlank)
+                     .map(FieldFactory::parseOrFields)
+                     .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public static Set<Field> parseFieldList(String fieldNames) {
         return Arrays.stream(fieldNames.split(FieldFactory.DELIMITER))
-                    .filter(StringUtil::isNotBlank)
-                    .map(FieldFactory::parseField)
-                    .collect(Collectors.toCollection(LinkedHashSet::new));
+                     .filter(StringUtil::isNotBlank)
+                     .map(FieldFactory::parseField)
+                     .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public static String serializeFieldsList(Collection<Field> fields) {
         return fields.stream()
-                    .map(Field::getName)
-                    .collect(Collectors.joining(DELIMITER));
+                     .map(Field::getName)
+                     .collect(Collectors.joining(DELIMITER));
     }
 
     public static Field parseField(String fieldName) {
@@ -138,8 +138,8 @@ public class FieldFactory {
 
     private static Set<Field> getFieldsFiltered(Predicate<Field> selector) {
         return getAllFields().stream()
-                    .filter(selector)
-                    .collect(Collectors.toSet());
+                             .filter(selector)
+                             .collect(Collectors.toSet());
     }
 
     private static Set<Field> getAllFields() {
