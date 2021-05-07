@@ -592,7 +592,6 @@ jlink {
         requires 'java.xml';
         requires 'com.sun.xml.txw2';
         requires 'java.desktop';
-        requires 'jdk.jfr';
         requires 'jdk.unsupported';
         requires 'com.google.gson';
         requires 'java.management';
@@ -620,7 +619,6 @@ jlink {
         uses 'org.apache.logging.log4j.plugins.processor.PluginService';
         uses 'org.controlsfx.glyphfont.GlyphFont';
         uses 'com.airhacks.afterburner.views.ResourceLocator';
-        uses 'com.sun.webkit.plugin.PluginHandler';
         uses 'org.apache.logging.log4j.message.ThreadDumpMessage.ThreadInfoFactory';
         uses 'com.airhacks.afterburner.injection.PresenterFactory';
         uses 'org.eclipse.jgit.transport.SshSessionFactory';
@@ -638,7 +636,6 @@ jlink {
         provides 'org.apache.tika.metadata.filter.MetadataFilter' with 'org.apache.tika.metadata.filter.NoOpFilter';
         provides 'org.mariadb.jdbc.tls.TlsSocketPlugin' with 'org.mariadb.jdbc.internal.protocol.tls.DefaultTlsSocketPlugin';
         provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.ServerProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.netty.shaded.io.grpc.netty.NettyServerProvider';
-        provides 'javax.xml.bind.JAXBContext' with 'com.sun.xml.bind.v2.ContextFactory';
         provides 'org.apache.lucene.codecs.DocValuesFormat' with 'org.apache.lucene.codecs.lucene80.Lucene80DocValuesFormat';
         provides 'com.microsoft.applicationinsights.core.dependencies.io.grpc.NameResolverProvider' with 'com.microsoft.applicationinsights.core.dependencies.io.grpc.internal.DnsNameResolverProvider';
         provides 'org.apache.logging.log4j.util.PropertySource' with 'org.apache.logging.log4j.util.EnvironmentPropertySource',
@@ -656,7 +653,6 @@ jlink {
                 'org.mariadb.jdbc.credential.env.EnvCredentialPlugin',
                 'org.mariadb.jdbc.credential.system.PropertiesCredentialPlugin';
         provides 'org.apache.commons.logging.LogFactory' with 'org.apache.logging.log4j.jcl.LogFactoryImpl';
-        provides 'org.slf4j.spi.SLF4JServiceProvider' with 'org.apache.logging.slf4j.SLF4JServiceProvider';
         provides 'org.apache.logging.log4j.plugins.processor.PluginService' with 'org.apache.logging.log4j.core.plugins.Log4jPlugins',
                 'org.apache.logging.log4j.plugins.convert.plugins.Log4jPlugins';
         provides 'org.apache.lucene.codecs.Codec' with 'org.apache.lucene.codecs.lucene87.Lucene87Codec';
