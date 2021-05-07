@@ -1,5 +1,7 @@
 package org.jabref.gui.commonfxcontrols;
 
+import java.util.Comparator;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -16,8 +18,6 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
-
-import java.util.Comparator;
 
 public class FieldFormatterCleanupsPanelViewModel {
 
