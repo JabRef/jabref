@@ -30,8 +30,8 @@ public class FieldFactory {
 
     public static String serializeOrFields(OrFields fields) {
         return fields.stream()
-                    .map(Field::getName)
-                    .collect(Collectors.joining(FIELD_OR_SEPARATOR));
+                     .map(Field::getName)
+                     .collect(Collectors.joining(FIELD_OR_SEPARATOR));
     }
 
     public static String serializeOrFieldsList(Set<OrFields> fields) {
@@ -48,9 +48,9 @@ public class FieldFactory {
 
     public static OrFields parseOrFields(String fieldNames) {
         Set<Field> fields = Arrays.stream(fieldNames.split(FieldFactory.FIELD_OR_SEPARATOR))
-                    .filter(StringUtil::isNotBlank)
-                    .map(FieldFactory::parseField)
-                    .collect(Collectors.toCollection(LinkedHashSet::new));
+                     .filter(StringUtil::isNotBlank)
+                     .map(FieldFactory::parseField)
+                     .collect(Collectors.toCollection(LinkedHashSet::new));
         return new OrFields(fields);
     }
 
