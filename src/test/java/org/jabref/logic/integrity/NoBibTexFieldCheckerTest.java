@@ -56,5 +56,4 @@ class NoBibTexFieldCheckerTest {
         List<IntegrityMessage> messages = checker.check(entry);
         assertEquals(Collections.singletonList(message), messages);
     }
-
 }
