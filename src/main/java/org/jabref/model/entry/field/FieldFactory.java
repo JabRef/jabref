@@ -6,9 +6,9 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.TreeSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -153,7 +153,7 @@ public class FieldFactory {
 
     /**
      * These are the fields JabRef always displays as default {@link org.jabref.preferences.JabRefPreferences#setLanguageDependentDefaultValues()}
-     * <p>
+     *
      * A user can change them. The change is currently stored in the preferences only and not explicitly exposed as
      * separate preferences object
      */
