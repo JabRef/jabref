@@ -19,7 +19,7 @@ import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fetcher.transformators.ScholarQueryTransformer;
+import org.jabref.logic.importer.fetcher.transformers.ScholarQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;

@@ -1049,10 +1049,16 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    private FileLinkPreferences getFileLinkPreferences() {
+    @Override
+    public FileLinkPreferences getFileLinkPreferences() {
         return new FileLinkPreferences(
                 get(MAIN_FILE_DIRECTORY), // REALLY HERE?
                 fileDirForDatabase);
+    }
+
+    @Override
+    public void storeFileDirforDatabase(List<Path> dirs) {
+        this.fileDirForDatabase = dirs;
     }
 
     @Override

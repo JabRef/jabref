@@ -23,6 +23,11 @@ public class BracesCorrectorTest {
     }
 
     @Test
+    public void inputAlreadyCorrect() {
+        assertEquals("{banana}", BracesCorrector.apply("{banana}"));
+    }
+
+    @Test
     public void inputMissingClosing() {
         assertEquals("{banana}", BracesCorrector.apply("{banana"));
     }

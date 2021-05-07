@@ -38,20 +38,15 @@ jobs:
         with:
           java-version: 14
           distribution: 'adopt'
-      - uses: actions/cache@v1
+      - uses: actions/cache@v2
         name: Restore gradle cache
         with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
-            ${{ runner.OS }}-gradle-${{ env.cache-name }}-
-            ${{ runner.OS }}-gradle-
-            ${{ runner.OS }}-
-      - uses: actions/cache@v1
-        name: Restore gradle wrapper
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+            ${{ runner.os }}-gradle-
       - name: Run fetcher tests
         run: ./gradlew fetcherTest
         env:
