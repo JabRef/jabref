@@ -10,7 +10,7 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.core.parser.SyntaxParser;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 
-import static org.jabref.logic.importer.fetcher.transformators.AbstractQueryTransformer.NO_EXPLICIT_FIELD;
+import static org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransformer.NO_EXPLICIT_FIELD;
 
 /**
  * Searches web resources for bibliographic information based on a free-text query.
