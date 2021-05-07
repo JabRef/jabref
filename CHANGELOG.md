@@ -476,6 +476,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added an option in preferences to allow for integers in field "edition" when running database in bibtex mode. [#4680](https://github.com/JabRef/jabref/issues/4680)
 - We added the ability to use negation in export filter layouts. [#5138](https://github.com/JabRef/jabref/pull/5138)
 - Focus on Name Area instead of 'OK' button whenever user presses 'Add subgroup'. [#6307](https://github.com/JabRef/jabref/issues/6307)
+- We sorted the standard fields by alphabetical order. [#7710](https://github.com/JabRef/jabref/issues/7710)
 
 ### Fixed
 

@@ -1,13 +1,6 @@
 package org.jabref.model.entry.field;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -99,12 +92,13 @@ public class FieldFactory {
      */
     public static Set<Field> getCommonFields() {
         EnumSet<StandardField> allFields = EnumSet.allOf(StandardField.class);
+        List<StandardField> sortedAllFields = allFields.stream().sorted(Comparator.comparing(StandardField::getName)).collect(Collectors.toList());
 
         LinkedHashSet<Field> publicAndInternalFields = new LinkedHashSet<>(allFields.size() + 3);
         publicAndInternalFields.add(InternalField.INTERNAL_ALL_FIELD);
         publicAndInternalFields.add(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD);
         publicAndInternalFields.add(InternalField.KEY_FIELD);
-        publicAndInternalFields.addAll(allFields);
+        publicAndInternalFields.addAll(sortedAllFields);
 
         return publicAndInternalFields;
     }
