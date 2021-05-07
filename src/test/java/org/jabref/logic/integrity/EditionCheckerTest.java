@@ -56,24 +56,22 @@ public class EditionCheckerTest {
 
     @Test
     void bibTexEmptyValueAsInput() {
-        assertEquals(Optional.empty(), checker.checkValue(""));
+        assertEquals(Optional.empty(), createBibtexEditionChecker(false).checkValue(""));
     }
 
     @Test
     void bibTexNullValueAsInput() {
-        assertEquals(Optional.empty(), checker.checkValue(null));
+        assertEquals(Optional.empty(), createBibtexEditionChecker(false).checkValue(null));
     }
 
     @Test
     void bibTexDoesNotAcceptIntegerOnly() {
-        var editionChecker = new EditionChecker(bibtex, false);
-        assertEquals(Optional.of(Localization.lang("no integer as values for edition allowed")), editionChecker.checkValue("3"));
+        assertEquals(Optional.of(Localization.lang("no integer as values for edition allowed")), createBibtexEditionChecker(false).checkValue("3"));
     }
 
     @Test
     void bibTexAcceptsFirstEditionAlsoIfIntegerEditionDisallowed() {
-        var editionChecker = new EditionChecker(bibtex, false);
-        assertEquals(Optional.of(Localization.lang("edition of book reported as just 1")), editionChecker.checkValue("1"));
+        assertEquals(Optional.of(Localization.lang("edition of book reported as just 1")), createBibtexEditionChecker(false).checkValue("1"));
     }
 
     @Test
