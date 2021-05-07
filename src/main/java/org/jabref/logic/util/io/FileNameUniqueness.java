@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
@@ -57,37 +59,25 @@ public class FileNameUniqueness {
      */
     public static boolean isDuplicatedFile(Path directory, String fileName, DialogService dialogService) throws IOException {
 
-        Optional<String> extensionOptional = FileUtil.getFileExtension(fileName);
-        String extensionSuffix;
-        String fileNameWithoutDuplicated;
-
-        if (extensionOptional.isPresent()) {
-            extensionSuffix = '.' + extensionOptional.get();
-            fileNameWithoutDuplicated = eraseDuplicateMarks(fileName.substring(0, fileName.lastIndexOf('.')));
-        } else {
-            extensionSuffix = "";
-            fileNameWithoutDuplicated = eraseDuplicateMarks(fileName);
-        }
+        String fileNameWithoutDuplicated = eraseDuplicateMarks(FileUtil.getBaseName(fileName));
+        String extensionSuffix = FileUtil.getFileExtension(fileName).orElse("");
+        extensionSuffix = extensionSuffix.equals("") ? extensionSuffix : "." + extensionSuffix;
 
         String originalFileName = fileNameWithoutDuplicated + extensionSuffix;
         if (fileName.equals(originalFileName)) {
             return false;
         }
 
-        Path originalFile = Path.of(directory.toString(), originalFileName);
-        // deal with a very special case, when duplication does not happen, but the file name is end with something like " (1)" as it originally is
-        if (!Files.exists(directory.resolve(originalFileName))) {
-            return false;
-        }
-
-        Path duplicateFile = Path.of(directory.toString(), fileName);
+        Path originalFile = directory.resolve(originalFileName);
+        Path duplicateFile = directory.resolve(fileName);
         int counter = 1;
-        while (true) {
+
+        while (Files.exists(originalFile)) {
             if (com.google.common.io.Files.equal(originalFile.toFile(), duplicateFile.toFile())) {
                 if (duplicateFile.toFile().delete()) {
-                    dialogService.notify(Localization.lang("Dupilcate file with '%0', successfully delete the file '%1'", originalFileName, fileName));
+                    dialogService.notify(Localization.lang("File '%1' is a duplicate of '%0'. Keeping '%0'", originalFileName, fileName));
                 } else {
-                    dialogService.notify(Localization.lang("Dupilcate file with '%0', fail to delete the file '%1'", originalFileName, fileName));
+                    dialogService.notify(Localization.lang("File '%1' is a duplicate of '%0'. Keeping both due to deletion error", originalFileName, fileName));
                 }
                 return true;
             }
@@ -98,37 +88,24 @@ public class FileNameUniqueness {
             counter++;
 
             if (originalFileName.equals(fileName)) {
-                dialogService.notify(Localization.lang("Duplicate file name but different content, keep the new file '%0'", fileName));
                 return false;
             }
-
-            originalFile = Path.of(directory.toString(), originalFileName);
-            if (!Files.exists(directory.resolve(originalFileName))) {
-                return false;
-            }
+            originalFile = directory.resolve(originalFileName);
         }
+        return false;
     }
 
     /**
-     * recover the file name to origin if it has duplicate mark such as " (1)"
-     * It will change the String whose format is "xxxxxx (number)" into "xxxxxx", while return the same String when it does not match the format
+     * This is the opposite function of getNonOverWritingFileName
+     * It will recover the file name to origin if it has duplicate mark such as " (1)"
+     * change the String whose format is "xxxxxx (number)" into "xxxxxx", while return the same String when it does not match the format
      *
      * @param fileName Suggested name for the file without extensionSuffix, if it has duplicate file name with other file, it will end with something like " (1)"
      * @return Suggested name for the file without extensionSuffix and duplicate marks such as " (1)"
      */
-    private static String eraseDuplicateMarks(String fileName) {
-        int dotPosition1 = fileName.lastIndexOf(')');
-        if (dotPosition1 != fileName.length() - 1 || dotPosition1 <= 2) {
-            return fileName;
-        } else {
-            if (!Character.isDigit(fileName.charAt(dotPosition1 - 1))) {
-                return fileName;
-            }
-        }
-        int dotPosition = fileName.lastIndexOf('(');
-        if ((dotPosition > 0) && (dotPosition < (fileName.length() - 1))) {
-            fileName = fileName.substring(0, dotPosition - 1);
-        }
-        return fileName;
+    public static String eraseDuplicateMarks(String fileName) {
+        Pattern p = Pattern.compile("(.*) \\(\\d+\\)");
+        Matcher m = p.matcher(fileName);
+        return m.find() ? fileName.substring(0, fileName.lastIndexOf('(') - 1) : fileName;
     }
 }
