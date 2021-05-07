@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -29,8 +30,8 @@ public class FieldFactory {
 
     public static String serializeOrFields(OrFields fields) {
         return fields.stream()
-                     .map(Field::getName)
-                     .collect(Collectors.joining(FIELD_OR_SEPARATOR));
+                .map(Field::getName)
+                .collect(Collectors.joining(FIELD_OR_SEPARATOR));
     }
 
     public static String serializeOrFieldsList(Set<OrFields> fields) {
@@ -47,30 +48,30 @@ public class FieldFactory {
 
     public static OrFields parseOrFields(String fieldNames) {
         Set<Field> fields = Arrays.stream(fieldNames.split(FieldFactory.FIELD_OR_SEPARATOR))
-                     .filter(StringUtil::isNotBlank)
-                     .map(FieldFactory::parseField)
-                     .collect(Collectors.toCollection(LinkedHashSet::new));
+                .filter(StringUtil::isNotBlank)
+                .map(FieldFactory::parseField)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
         return new OrFields(fields);
     }
 
     public static Set<OrFields> parseOrFieldsList(String fieldNames) {
         return Arrays.stream(fieldNames.split(FieldFactory.DELIMITER))
-                     .filter(StringUtil::isNotBlank)
-                     .map(FieldFactory::parseOrFields)
-                     .collect(Collectors.toCollection(LinkedHashSet::new));
+                .filter(StringUtil::isNotBlank)
+                .map(FieldFactory::parseOrFields)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public static Set<Field> parseFieldList(String fieldNames) {
         return Arrays.stream(fieldNames.split(FieldFactory.DELIMITER))
-                     .filter(StringUtil::isNotBlank)
-                     .map(FieldFactory::parseField)
-                     .collect(Collectors.toCollection(LinkedHashSet::new));
+                .filter(StringUtil::isNotBlank)
+                .map(FieldFactory::parseField)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public static String serializeFieldsList(Collection<Field> fields) {
         return fields.stream()
-                     .map(Field::getName)
-                     .collect(Collectors.joining(DELIMITER));
+                .map(Field::getName)
+                .collect(Collectors.joining(DELIMITER));
     }
 
     public static Field parseField(String fieldName) {
@@ -100,7 +101,12 @@ public class FieldFactory {
     public static Set<Field> getCommonFields() {
         EnumSet<StandardField> allFields = EnumSet.allOf(StandardField.class);
 
-        LinkedHashSet<Field> publicAndInternalFields = new LinkedHashSet<>(allFields.size() + 3);
+        TreeSet<Field> publicAndInternalFields = new TreeSet<>((field1, field2) -> {
+            if (field1.getDisplayName().equals(field2.getDisplayName()))
+                return 0;
+            return field1.getDisplayName().compareTo(field2.getDisplayName()) > 0 ? 1 : -1;
+        }
+        );
         publicAndInternalFields.add(InternalField.INTERNAL_ALL_FIELD);
         publicAndInternalFields.add(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD);
         publicAndInternalFields.add(InternalField.KEY_FIELD);
@@ -132,8 +138,8 @@ public class FieldFactory {
 
     private static Set<Field> getFieldsFiltered(Predicate<Field> selector) {
         return getAllFields().stream()
-                             .filter(selector)
-                             .collect(Collectors.toSet());
+                .filter(selector)
+                .collect(Collectors.toSet());
     }
 
     private static Set<Field> getAllFields() {
@@ -147,7 +153,7 @@ public class FieldFactory {
 
     /**
      * These are the fields JabRef always displays as default {@link org.jabref.preferences.JabRefPreferences#setLanguageDependentDefaultValues()}
-     *
+     * <p>
      * A user can change them. The change is currently stored in the preferences only and not explicitly exposed as
      * separate preferences object
      */
