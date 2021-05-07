@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.TreeSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -101,12 +100,7 @@ public class FieldFactory {
     public static Set<Field> getCommonFields() {
         EnumSet<StandardField> allFields = EnumSet.allOf(StandardField.class);
 
-        TreeSet<Field> publicAndInternalFields = new TreeSet<>((field1, field2) -> {
-            if (field1.getDisplayName().equals(field2.getDisplayName()))
-                return 0;
-            return field1.getDisplayName().compareTo(field2.getDisplayName()) > 0 ? 1 : -1;
-        }
-        );
+        LinkedHashSet<Field> publicAndInternalFields = new LinkedHashSet<>(allFields.size() + 3);
         publicAndInternalFields.add(InternalField.INTERNAL_ALL_FIELD);
         publicAndInternalFields.add(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD);
         publicAndInternalFields.add(InternalField.KEY_FIELD);

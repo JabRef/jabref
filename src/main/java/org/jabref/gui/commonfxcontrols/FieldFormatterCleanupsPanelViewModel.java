@@ -28,6 +28,12 @@ public class FieldFormatterCleanupsPanelViewModel {
     private final ObjectProperty<Formatter> selectedFormatterProperty = new SimpleObjectProperty<>();
 
     public FieldFormatterCleanupsPanelViewModel() {
+        availableFieldsProperty.sort((field1, field2) -> {
+            if (field1.getDisplayName().equals(field2.getDisplayName())) {
+                return 0;
+            }
+            return field1.getDisplayName().compareTo(field2.getDisplayName()) > 0 ? 1 : -1;
+        });
     }
 
     public void resetToRecommended() {
