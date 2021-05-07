@@ -228,10 +228,10 @@ dependencies {
     testImplementation 'org.xmlunit:xmlunit-core:2.8.2'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.8.2'
     testRuntimeOnly ('com.tngtech.archunit:archunit-junit5-engine:0.18.0') {
-        exclude group: "javax.annotation", module: "javax.annotation-api"
+        exclude group: "javax.annotation", module: "javax.annotation"
     }
     testImplementation ('com.tngtech.archunit:archunit-junit5-api:0.18.0') {
-        exclude group: "javax.annotation", module: "javax.annotation-api"
+        exclude group: "javax.annotation", module: "javax.annotation"
     }
     testImplementation "org.testfx:testfx-core:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
