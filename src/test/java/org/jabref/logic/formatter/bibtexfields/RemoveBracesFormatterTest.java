@@ -38,6 +38,11 @@ public class RemoveBracesFormatterTest {
     }
 
     @Test
+    public void formatRemovesBracesOnly() {
+        assertEquals("", formatter.format("{}"));
+    }
+
+    @Test
     public void formatKeepsEmptyString() {
         assertEquals("", formatter.format(""));
     }

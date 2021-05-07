@@ -46,7 +46,7 @@ It supports you in every step of your research work.
 
 ## Installation
 
-Fresh development builds are available at [builds.jabref.org](https://builds.jabref.org/master/).
+Fresh development builds are available at [builds.jabref.org](https://builds.jabref.org/main/).
 The [latest stable release is available at FossHub](https://downloads.jabref.org/).
 
 Please see our [Installation Guide](https://docs.jabref.org/installation).
