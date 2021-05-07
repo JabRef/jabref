@@ -42,11 +42,6 @@ public class ActionHelper {
                                              stateManager.getSelectedEntries());
     }
 
-    public static BooleanExpression needsMultipleEntriesSelected(StateManager stateManager) {
-        return Bindings.createBooleanBinding(() -> stateManager.getSelectedEntries().size() > 1,
-                stateManager.getSelectedEntries());
-    }
-
     public static BooleanExpression isFieldSetForSelectedEntry(Field field, StateManager stateManager) {
         return isAnyFieldSetForSelectedEntry(Collections.singletonList(field), stateManager);
     }
@@ -84,6 +79,39 @@ public class ActionHelper {
         }).orElse(false);
 
         return BooleanExpression.booleanExpression(fileIsPresent);
+    }
+
+    /**
+     * Check if at least one of the selected entries has linked files
+     * <br>
+     * Used in {@link org.jabref.gui.maintable.OpenExternalFileAction} when multiple entries selected
+     * @param stateManager manager for the state of the GUI
+     * @param preferencesService services of preferences
+     * @return a boolean binding
+     */
+    public static BooleanExpression hasPresentFileForSelectedEntries(StateManager stateManager, PreferencesService preferencesService) {
+        return Bindings.createBooleanBinding(() -> {
+            ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
+            List<LinkedFile> files;
+            for (BibEntry entry:selectedEntries) {
+                files = entry.getFiles();
+
+                if ((entry.getFiles().size() > 0) && stateManager.getActiveDatabase().isPresent()) {
+                    if (files.get(0).isOnlineLink()) {
+                        return true;
+                    }
+
+                    Optional<Path> filename = FileHelper.find(
+                            stateManager.getActiveDatabase().get(),
+                            files.get(0).getLink(),
+                            preferencesService.getFilePreferences());
+                    if (filename.isPresent()) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        });
     }
 
     public static BooleanExpression isOpenMultiDatabase(TabPane tabbedPane) {

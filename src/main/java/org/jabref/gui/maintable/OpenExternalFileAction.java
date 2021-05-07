@@ -1,5 +1,6 @@
 package org.jabref.gui.maintable;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
@@ -24,32 +25,53 @@ public class OpenExternalFileAction extends SimpleCommand {
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
 
-        this.executable.bind(ActionHelper.isFilePresentForSelectedEntry(stateManager, preferencesService)
-                                         .and(ActionHelper.needsEntriesSelected(1, stateManager)));
+        this.executable.bind(ActionHelper.hasPresentFileForSelectedEntries(stateManager, preferencesService)
+                .and(ActionHelper.needsEntriesSelected(stateManager))
+        );
     }
 
+    /**
+     * Open all linked files of the selected entries.
+     * <br>
+     * If some selected entries have linked file and others does not, pop out a dialog to ask user whether to skip them and continue or cancel the whole action.
+     */
     @Override
     public void execute() {
         stateManager.getActiveDatabase().ifPresent(databaseContext -> {
             final List<BibEntry> selectedEntries = stateManager.getSelectedEntries();
 
-            if (selectedEntries.size() != 1) {
-                dialogService.notify(Localization.lang("This operation requires exactly one item to be selected."));
-                return;
+            List<LinkedFileViewModel> linkedFileViewModelList = new LinkedList<>();
+            LinkedFileViewModel linkedFileViewModel;
+
+            boolean asked = false;
+
+            for (BibEntry entry:selectedEntries) {
+                if (entry.getFiles().isEmpty()) {
+                    if (!asked) {
+                        boolean continu = dialogService.showConfirmationDialogAndWait(Localization.lang("Missing file"),
+                                Localization.lang("Some entries you selected are not linked to any file. They will be skipped. Continue?"),
+                                Localization.lang("Continue"), Localization.lang("Cancel"));
+                        asked = true;
+                        if (!continu) {
+                            return;
+                        }
+                    }
+                } else {
+                    linkedFileViewModel = new LinkedFileViewModel(
+                            entry.getFiles().get(0),
+                            entry,
+                            databaseContext,
+                            Globals.TASK_EXECUTOR,
+                            dialogService,
+                            preferencesService.getXmpPreferences(),
+                            preferencesService.getFilePreferences(),
+                            ExternalFileTypes.getInstance());
+
+                    linkedFileViewModelList.add(linkedFileViewModel);
+                }
             }
 
-            final BibEntry entry = selectedEntries.get(0);
-
-            LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(
-                    entry.getFiles().get(0),
-                    entry,
-                    databaseContext,
-                    Globals.TASK_EXECUTOR,
-                    dialogService,
-                    preferencesService.getXmpPreferences(),
-                    preferencesService.getFilePreferences(),
-                    ExternalFileTypes.getInstance());
-            linkedFileViewModel.open();
+            linkedFileViewModelList.forEach(LinkedFileViewModel::open);
         });
     }
 }
