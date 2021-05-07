@@ -42,6 +42,11 @@ public class ActionHelper {
                                              stateManager.getSelectedEntries());
     }
 
+    public static BooleanExpression needsMultipleEntriesSelected(StateManager stateManager) {
+        return Bindings.createBooleanBinding(() -> stateManager.getSelectedEntries().size() > 1,
+                stateManager.getSelectedEntries());
+    }
+
     public static BooleanExpression isFieldSetForSelectedEntry(Field field, StateManager stateManager) {
         return isAnyFieldSetForSelectedEntry(Collections.singletonList(field), stateManager);
     }
