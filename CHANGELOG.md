@@ -550,7 +550,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the XMP Importer would incorrectly return an empty default entry when importing pdfs [#6577](https://github.com/JabRef/jabref/issues/6577)
 - We fixed an issue where opening the menu 'Library properties' marked the library as modified [#6451](https://github.com/JabRef/jabref/issues/6451)
 - We fixed an issue when importing resulted in an exception [#7343](https://github.com/JabRef/jabref/issues/7343)
-
+- We fixed an issue Some fields are in random order [#7710](https://github.com/JabRef/jabref/issues/7710)
 ### Removed
 
 - The feature to "mark entries" was removed and merged with the groups functionality.  For migration, a group is created for every value of the `__markedentry` field and the entry is added to this group.
