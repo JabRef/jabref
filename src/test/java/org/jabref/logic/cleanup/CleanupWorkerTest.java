@@ -19,6 +19,7 @@ import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.model.FieldChange;
@@ -65,7 +66,7 @@ class CleanupWorkerTest {
         when(fileDirPrefs.shouldStoreFilesRelativeToBib()).thenReturn(true);
 
         worker = new CleanupWorker(context,
-                new CleanupPreferences(mock(LayoutFormatterPreferences.class), fileDirPrefs));
+                new CleanupPreferences(mock(LayoutFormatterPreferences.class), fileDirPrefs), mock(TimestampPreferences.class));
     }
 
     @Test
