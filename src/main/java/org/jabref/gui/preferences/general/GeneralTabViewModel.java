@@ -14,11 +14,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-
 import javafx.collections.transformation.SortedList;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
-import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
