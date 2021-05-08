@@ -3,6 +3,7 @@ package org.jabref.logic.util.io;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,22 +50,30 @@ public class FileNameUniqueness {
     }
 
     /**
+     * This function decide whether the newly downloaded file has the same content with other files
+     * If returns ture when the content is duplicate, while returns false if it is not
      *
      * @param directory The directory which saves the files (.pdf, for example)
      * @param fileName Suggest name for the newly downloaded file
      * @param dialogService To display the error and success message
-     * @return true when the content of files is duplicate and successfully delete the newly downloaded file ,
-     *         false when it is not a duplicate file or fail to delete the duplicate file
+     * @return true when the content of the newly downloaded file is same as the file with "similar" name,
+     *         false when there is no "similar" file name or the content is different from that of files with "similar" name
      * @throws IOException Fail when the file is not exist or something wrong when reading the file
      */
-    public static boolean isDuplicatedFile(Path directory, String fileName, DialogService dialogService) throws IOException {
+    public static boolean isDuplicatedFile(Path directory, Path fileName, DialogService dialogService) throws IOException {
 
-        String fileNameWithoutDuplicated = eraseDuplicateMarks(FileUtil.getBaseName(fileName));
+        Objects.requireNonNull(directory);
+        Objects.requireNonNull(fileName);
+        Objects.requireNonNull(dialogService);
+
         String extensionSuffix = FileUtil.getFileExtension(fileName).orElse("");
         extensionSuffix = extensionSuffix.equals("") ? extensionSuffix : "." + extensionSuffix;
+        String newFilename = FileUtil.getBaseName(fileName) + extensionSuffix;
 
+        String fileNameWithoutDuplicated = eraseDuplicateMarks(FileUtil.getBaseName(fileName));
         String originalFileName = fileNameWithoutDuplicated + extensionSuffix;
-        if (fileName.equals(originalFileName)) {
+
+        if (newFilename.equals(originalFileName)) {
             return false;
         }
 
@@ -87,7 +96,7 @@ public class FileNameUniqueness {
                     + extensionSuffix;
             counter++;
 
-            if (originalFileName.equals(fileName)) {
+            if (newFilename.equals(originalFileName)) {
                 return false;
             }
             originalFile = directory.resolve(originalFileName);

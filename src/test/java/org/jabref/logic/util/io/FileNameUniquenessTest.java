@@ -56,7 +56,7 @@ public class FileNameUniquenessTest {
         Path filePath1 = tempDir.resolve(filename1);
         Files.createFile(filePath1);
 
-        boolean isDuplicate = FileNameUniqueness.isDuplicatedFile(tempDir, filename1, dialogService);
+        boolean isDuplicate = FileNameUniqueness.isDuplicatedFile(tempDir, filePath1, dialogService);
         assertFalse(isDuplicate);
     }
 
@@ -70,7 +70,7 @@ public class FileNameUniquenessTest {
         Files.createFile(filePath1);
         Files.createFile(filePath2);
 
-        boolean isDuplicate = FileNameUniqueness.isDuplicatedFile(tempDir, filename2, dialogService);
+        boolean isDuplicate = FileNameUniqueness.isDuplicatedFile(tempDir, filePath2, dialogService);
         assertTrue(isDuplicate);
     }
 
