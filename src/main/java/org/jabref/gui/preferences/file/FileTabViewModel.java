@@ -1,7 +1,8 @@
 package org.jabref.gui.preferences.file;
 
+import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Set;
+import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -80,14 +81,11 @@ public class FileTabViewModel implements PreferenceTabViewModel {
             saveInTableOrderProperty.setValue(true);
         }
 
-        Set<Field> fieldNames = FieldFactory.getCommonFields();
+        List<Field> fieldNames = new ArrayList<>(FieldFactory.getCommonFields());
+        fieldNames.sort(Comparator.comparing(Field::getDisplayName));
         primarySortFieldsProperty.addAll(fieldNames);
         secondarySortFieldsProperty.addAll(fieldNames);
         tertiarySortFieldsProperty.addAll(fieldNames);
-
-        primarySortFieldsProperty.sort(Comparator.comparing(Field::getDisplayName));
-        secondarySortFieldsProperty.sort(Comparator.comparing(Field::getDisplayName));
-        tertiarySortFieldsProperty.sort(Comparator.comparing(Field::getDisplayName));
 
         savePrimarySortSelectedValueProperty.setValue(initialExportOrder.getSortCriteria().get(0).field);
         saveSecondarySortSelectedValueProperty.setValue(initialExportOrder.getSortCriteria().get(1).field);
