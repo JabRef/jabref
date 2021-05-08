@@ -1049,10 +1049,16 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    private FileLinkPreferences getFileLinkPreferences() {
+    @Override
+    public FileLinkPreferences getFileLinkPreferences() {
         return new FileLinkPreferences(
                 get(MAIN_FILE_DIRECTORY), // REALLY HERE?
                 fileDirForDatabase);
+    }
+
+    @Override
+    public void storeFileDirforDatabase(List<Path> dirs) {
+        this.fileDirForDatabase = dirs;
     }
 
     @Override
@@ -1152,9 +1158,12 @@ public class JabRefPreferences implements PreferencesService {
         updateMainTableColumns();
         List<MainTableColumnModel> sortOrder = createMainTableColumnSortOrder();
 
-        sortOrder.forEach(column -> config.getSortCriteria().add(new SaveOrderConfig.SortCriterion(
-                FieldFactory.parseField(column.getQualifier()),
-                column.getSortType().toString())));
+        for (var column : sortOrder) {
+            boolean descending = (column.getSortType() == SortType.DESCENDING);
+            config.getSortCriteria().add(new SaveOrderConfig.SortCriterion(
+                                                                           FieldFactory.parseField(column.getQualifier()),
+                                                                           descending));
+        }
 
         return config;
     }
