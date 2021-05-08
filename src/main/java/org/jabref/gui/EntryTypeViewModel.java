@@ -1,5 +1,6 @@
 package org.jabref.gui;
 
+import java.util.Comparator;
 import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
@@ -60,6 +61,7 @@ public class EntryTypeViewModel {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         fetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences()));
+        fetchers.sort(Comparator.comparing(IdBasedFetcher::getName));
         selectedItemProperty.setValue(getLastSelectedFetcher());
         idFieldValidator = new FunctionBasedValidator<>(idText, StringUtil::isNotBlank, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("ID"))));
     }

@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences.file;
 
+import java.util.Comparator;
 import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
@@ -83,6 +84,10 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         primarySortFieldsProperty.addAll(fieldNames);
         secondarySortFieldsProperty.addAll(fieldNames);
         tertiarySortFieldsProperty.addAll(fieldNames);
+
+        primarySortFieldsProperty.sort(Comparator.comparing(Field::getDisplayName));
+        secondarySortFieldsProperty.sort(Comparator.comparing(Field::getDisplayName));
+        tertiarySortFieldsProperty.sort(Comparator.comparing(Field::getDisplayName));
 
         savePrimarySortSelectedValueProperty.setValue(initialExportOrder.getSortCriteria().get(0).field);
         saveSecondarySortSelectedValueProperty.setValue(initialExportOrder.getSortCriteria().get(1).field);

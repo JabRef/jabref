@@ -2,6 +2,7 @@ package org.jabref.gui.libraryproperties;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.Set;
 
@@ -112,6 +113,10 @@ public class LibraryPropertiesDialogViewModel {
         primarySortFieldsProperty.addAll(fieldNames);
         secondarySortFieldsProperty.addAll(fieldNames);
         tertiarySortFieldsProperty.addAll(fieldNames);
+
+        primarySortFieldsProperty.sort(Comparator.comparing(Field::getDisplayName));
+        secondarySortFieldsProperty.sort(Comparator.comparing(Field::getDisplayName));
+        tertiarySortFieldsProperty.sort(Comparator.comparing(Field::getDisplayName));
 
         savePrimarySortSelectedValueProperty.setValue(initialSaveOrderConfig.getSortCriteria().get(0).field);
         saveSecondarySortSelectedValueProperty.setValue(initialSaveOrderConfig.getSortCriteria().get(1).field);
