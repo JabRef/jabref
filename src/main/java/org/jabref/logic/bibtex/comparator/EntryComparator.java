@@ -72,6 +72,9 @@ public class EntryComparator implements Comparator<BibEntry> {
             // Sort by type.
             f1 = e1.getType();
             f2 = e2.getType();
+        } else if (sortField.equals(InternalField.KEY_FIELD)) {
+            f1 = e1.hasCitationKey() ? e1.getCitationKey().get() : null;
+            f2 = e2.hasCitationKey() ? e2.getCitationKey().get() : null;
         } else if (sortField.isNumeric()) {
             try {
                 Integer i1 = Integer.parseInt((String) f1);

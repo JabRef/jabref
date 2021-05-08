@@ -89,6 +89,16 @@ class EntryComparatorTest {
         assertEquals(-1, new EntryComparator(false, false, InternalField.KEY_FIELD).compare(e1, e2));
         assertEquals(1, new EntryComparator(false, false, InternalField.KEY_FIELD).compare(e2, e1));
     }
+
+    @Test
+    void compareObjectsByKeyWithBlank() {
+        BibEntry e1 = new BibEntry();
+        BibEntry e2 = new BibEntry();
+        e1.setCitationKey("Mayer2019b");
+        e2.setCitationKey(" ");
+        assertEquals(-1, new EntryComparator(false, false, InternalField.KEY_FIELD).compare(e1, e2));
+        assertEquals(1, new EntryComparator(false, false, InternalField.KEY_FIELD).compare(e2, e1));
+    }
 }
 
 
