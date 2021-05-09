@@ -57,7 +57,7 @@ jobs:
       - name: Run GitVersion
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.9.9
-      - name: Set up JDK 16 for linux and mac
+      - name: Set up JDK
         uses: actions/setup-java@v2
         with:
           java-version: 16
