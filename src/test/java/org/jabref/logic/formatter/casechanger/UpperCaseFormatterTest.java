@@ -21,7 +21,7 @@ public class UpperCaseFormatterTest {
         assertEquals(expectedFormat, formatter.format(inputFormat));
     }
 
-    private static Stream<Arguments> upperCaseTests(){
+    private static Stream<Arguments> upperCaseTests() {
         return Stream.of(
         Arguments.of("LOWER", "LOWER"),
         Arguments.of("UPPER", "upper"),
