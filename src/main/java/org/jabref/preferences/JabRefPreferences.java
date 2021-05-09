@@ -90,6 +90,7 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.StyleLoader;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
+import org.jabref.logic.preferences.SpringerApiKeyPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
@@ -205,6 +206,8 @@ public class JabRefPreferences implements PreferencesService {
 
     public static final String BASE_DOI_URI = "baseDOIURI";
     public static final String USE_CUSTOM_DOI_URI = "useCustomDOIURI";
+    public static final String SPRINGER_API_KEY = "SpringerApiKey";
+    public static final String USE_CUSTOM_SPRINGER_API_KEY = "useCustomSpringerApiKey";
 
     public static final String USE_OWNER = "useOwner";
     public static final String DEFAULT_OWNER = "defaultOwner";
@@ -456,6 +459,9 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(USE_CUSTOM_DOI_URI, Boolean.FALSE);
         defaults.put(BASE_DOI_URI, "https://doi.org");
+
+        defaults.put(USE_CUSTOM_SPRINGER_API_KEY, Boolean.FALSE);
+        defaults.put(SPRINGER_API_KEY, "");
 
         if (OS.OS_X) {
             defaults.put(FONT_FAMILY, "SansSerif");
@@ -1389,10 +1395,31 @@ public class JabRefPreferences implements PreferencesService {
                 get(BASE_DOI_URI));
     }
 
+    /**
+     * Gets the SpringerAPIKeyPreferences that contains information: the custom Springer API key and whether to use it
+     * @return SpringerAPIKeyPreferences
+     */
+    @Override
+    public SpringerApiKeyPreferences getSpringerAPIKeyPreferences() {
+        return new SpringerApiKeyPreferences(
+                getBoolean(USE_CUSTOM_SPRINGER_API_KEY),
+                get(SPRINGER_API_KEY));
+    }
+
     @Override
     public void storeDOIPreferences(DOIPreferences preferences) {
         putBoolean(USE_CUSTOM_DOI_URI, preferences.isUseCustom());
         put(BASE_DOI_URI, preferences.getDefaultBaseURI());
+    }
+
+    /**
+     * Saves SpringerAPIKeyPreferences information: the custom Springer API key and whether to use it
+     * @param preferences SpringerAPIKeyPreferences
+     */
+    @Override
+    public void storeCustomSpringerKeyPreferences(SpringerApiKeyPreferences preferences) {
+        putBoolean(USE_CUSTOM_SPRINGER_API_KEY, preferences.isUseCustom());
+        put(SPRINGER_API_KEY, preferences.getDefaultApiKey());
     }
 
     @Override

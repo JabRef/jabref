@@ -22,6 +22,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added a feature that allows the user to copy highlighted text in the preview window. [#6962](https://github.com/JabRef/jabref/issues/6962)
 - We added a feature that allows you to create new BibEntry via paste arxivId [#2292](https://github.com/JabRef/jabref/issues/2292)
 - We added a feature that allows the user to choose whether to trust the target site when unable to find a valid certification path from the file download site. [#7616](https://github.com/JabRef/jabref/issues/7616)
+- We added a feature that allows the user to customize the Springer API Key in the customization tab of the preferences and check this key [#6877](https://github.com/JabRef/jabref/issues/6877)
 
 ### Changed
 
