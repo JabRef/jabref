@@ -17,5 +17,4 @@ public class SpringerApiKeyPreferences {
         return defaultApiKey;
     }
 
-
 }

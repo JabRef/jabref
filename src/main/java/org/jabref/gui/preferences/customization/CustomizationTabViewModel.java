@@ -98,7 +98,7 @@ public class CustomizationTabViewModel implements PreferenceTabViewModel {
         boolean valid = true;
 
         if (useCustomSpringerKeyProperty.getValue()) {
-            if(!springerApiKey.isEmpty()){
+            if (!springerApiKey.isEmpty()) {
                 final String testUrl = "https://api.springernature.com/meta/v1/json?q=doi:10.1007/s11276-008-0131-4s=1&p=1&api_key="
                         + springerApiKey;
                 URLDownload urlDownload;
@@ -110,14 +110,14 @@ public class CustomizationTabViewModel implements PreferenceTabViewModel {
                 } catch (IOException | kong.unirest.UnirestException e) {
                     valid = false;
                 }
-            }else{
+            } else {
                 valid = false;
             }
         }
 
-        if(valid){
+        if (valid) {
             dialogService.showInformationDialogAndWait(dialogTitle, connectionSuccessText);
-        }else{
+        } else {
             dialogService.showErrorDialogAndWait(dialogTitle, connectionFailedText);
         }
     }

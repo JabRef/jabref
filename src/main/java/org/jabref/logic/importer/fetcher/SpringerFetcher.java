@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.jabref.gui.Globals;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
@@ -25,6 +24,7 @@ import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.preferences.PreferencesService;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
@@ -44,6 +44,15 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
 
     private static final String API_URL = "https://api.springernature.com/meta/v1/json";
     private static final String API_KEY = new BuildInfo().springerNatureAPIKey;
+
+    private PreferencesService preferences;
+
+    public SpringerFetcher() {
+    }
+
+    public SpringerFetcher(PreferencesService preferences) {
+        this.preferences = preferences;
+    }
 
     /**
      * Convert a JSONObject obtained from http://api.springer.com/metadata/json to a BibEntry
@@ -164,14 +173,20 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
 
     /**
      * Gets the query URL
+     *
      * @param luceneQuery the search query
-     * @param pageNumber the number of the page indexed from 0
+     * @param pageNumber  the number of the page indexed from 0
      * @return URL
      */
     @Override
     public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
-        SpringerApiKeyPreferences apiKeyPreferences = Globals.prefs.getSpringerAPIKeyPreferences();
-        String apiKey = apiKeyPreferences.isUseCustom() ? apiKeyPreferences.getDefaultApiKey() : API_KEY;
+        String apiKey = API_KEY;
+        if (preferences != null) {
+            SpringerApiKeyPreferences apiKeyPreferences = preferences.getSpringerAPIKeyPreferences();
+            if (apiKeyPreferences.isUseCustom()) {
+                apiKey = apiKeyPreferences.getDefaultApiKey();
+            }
+        }
 
         URIBuilder uriBuilder = new URIBuilder(API_URL);
         uriBuilder.addParameter("q", new SpringerQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // Search query
