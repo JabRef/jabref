@@ -10,6 +10,7 @@ import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
 
@@ -36,14 +37,20 @@ class SuggestionProvidersTest {
       entry.setField(journalEntryField, "Journal");
       entry.setField(publisherEntryField, "Publisher");
       entry.setField(specialEntryField, "2000");
-      database.insertEntry(entry);
 
-      assertSame("org.jabref.gui.autocompleter.EmptySuggestionProvider", empty.getForField(personEntryField).getClass().getName());
-      assertSame("org.jabref.gui.autocompleter.PersonNameSuggestionProvider", sp.getForField(personEntryField).getClass().getName());
-      assertSame("org.jabref.gui.autocompleter.BibEntrySuggestionProvider", sp.getForField(singleEntryField).getClass().getName());
-      assertSame("org.jabref.gui.autocompleter.BibEntrySuggestionProvider", sp.getForField(multipleEntryField).getClass().getName());
-      assertSame("org.jabref.gui.autocompleter.JournalsSuggestionProvider", sp.getForField(journalEntryField).getClass().getName());
-      assertSame("org.jabref.gui.autocompleter.JournalsSuggestionProvider", sp.getForField(publisherEntryField).getClass().getName());
-      assertSame("org.jabref.gui.autocompleter.WordSuggestionProvider", sp.getForField(specialEntryField).getClass().getName());
+      assertEquals(org.jabref.gui.autocompleter.EmptySuggestionProvider.class
+              , empty.getForField(personEntryField).getClass());
+      assertEquals(org.jabref.gui.autocompleter.PersonNameSuggestionProvider.class
+              , sp.getForField(personEntryField).getClass());
+      assertEquals(org.jabref.gui.autocompleter.BibEntrySuggestionProvider.class
+              , sp.getForField(singleEntryField).getClass());
+      assertEquals(org.jabref.gui.autocompleter.BibEntrySuggestionProvider.class
+              , sp.getForField(multipleEntryField).getClass());
+      assertEquals(org.jabref.gui.autocompleter.JournalsSuggestionProvider.class
+              , sp.getForField(journalEntryField).getClass());
+      assertEquals(org.jabref.gui.autocompleter.JournalsSuggestionProvider.class
+              , sp.getForField(publisherEntryField).getClass());
+      assertEquals(org.jabref.gui.autocompleter.WordSuggestionProvider.class
+              , sp.getForField(specialEntryField).getClass());
   }
 }

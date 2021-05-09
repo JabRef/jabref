@@ -31,7 +31,6 @@ public class EntryLinkListTest {
         link = links.get(0);
         source = create("source");
         target = create("target");
-        entry = create("entry");
     }
 
     private BibEntry create(String citeKey) {
@@ -64,8 +63,9 @@ public class EntryLinkListTest {
 
     @Test
     public void givenBibEntryWhenParsingThenExpectLink() {
-      ParsedEntryLink expected = new ParsedEntryLink(entry);
-      assertFalse(expected.getLinkedEntry().isEmpty());
+        entry = create("entry");
+        ParsedEntryLink expected = new ParsedEntryLink(entry);
+        assertFalse(expected.getLinkedEntry().isEmpty());
     }
 
     @Test
