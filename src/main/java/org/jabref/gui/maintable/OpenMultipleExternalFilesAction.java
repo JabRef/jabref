@@ -37,7 +37,9 @@ public class OpenMultipleExternalFilesAction extends SimpleCommand {
         {
             final List<BibEntry> selectedEntries = stateManager.getSelectedEntries();
 
-            if (selectedEntries.size() != maxNumberOfFiles) {
+            if (selectedEntries.stream()
+                    .mapToInt(entry -> entry.getFiles().size())
+                    .sum() > maxNumberOfFiles) {
                 dialogService.notify(Localization.lang("This operation cannot exceed the max number of files to be opened at the same time, max is " + maxNumberOfFiles));
                 return;
             }
