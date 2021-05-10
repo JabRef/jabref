@@ -4,12 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jabref.gui.keyboard.KeyBinding;
+import org.jabref.logic.l10n.Localization;
 
 public class NewEntryBindingPreset implements KeyBindingPreset {
 
     @Override
     public String getName() {
-        return "New Entries";
+        return Localization.lang("New entry by type");
     }
 
     @Override
