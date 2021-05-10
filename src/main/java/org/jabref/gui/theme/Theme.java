@@ -3,6 +3,8 @@ package org.jabref.gui.theme;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.model.strings.StringUtil;
+
 public class Theme {
 
     public enum Type {
@@ -17,7 +19,7 @@ public class Theme {
     private final Optional<StyleSheet> additionalStylesheet;
 
     public Theme(String name) {
-        String themeName = name != null ? name : "";
+        /* String themeName = name != null ? name : "";
 
         if (themeName.equals("") || BASE_CSS.equalsIgnoreCase(themeName)) {
             this.additionalStylesheet = Optional.empty();
@@ -44,7 +46,21 @@ public class Theme {
             }
         }
 
-        this.name = themeName;
+        this.name = themeName; */
+
+        this.name = name != null ? name : "";
+        if (StringUtil.isBlank(this.name) || BASE_CSS.equalsIgnoreCase(this.name)) {
+            this.type = Type.DEFAULT;
+        } else if (EMBEDDED_DARK_CSS.equalsIgnoreCase(this.name)) {
+            this.type = Type.EMBEDDED;
+        } else {
+            this.type = Type.CUSTOM;
+        }
+        this.additionalStylesheet = switch (type) {
+            case DEFAULT -> StyleSheet.create("Light.css");
+            case EMBEDDED -> StyleSheet.create("Dark.css");
+            case CUSTOM -> StyleSheet.create(name);
+        };
     }
 
     public static Theme light() {

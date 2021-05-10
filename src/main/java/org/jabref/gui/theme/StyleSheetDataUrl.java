@@ -2,12 +2,15 @@ package org.jabref.gui.theme;
 
 import java.net.URL;
 
-final class StyleSheetResource extends StyleSheet {
+public class StyleSheetDataUrl extends StyleSheet {
 
     private final URL url;
 
-    StyleSheetResource(URL url) {
+    private volatile String dataUrl;
+
+    StyleSheetDataUrl(URL url) {
         this.url = url;
+        reload();
     }
 
     @Override
@@ -17,16 +20,16 @@ final class StyleSheetResource extends StyleSheet {
 
     @Override
     public String getWebEngineStylesheet() {
-        return url.toExternalForm();
+        return dataUrl;
     }
 
     @Override
     void reload() {
-        // nothing to do
+        StyleSheetFile.embedDataUrl(url, embedded -> dataUrl = embedded.orElse(EMPTY_WEBENGINE_CSS));
     }
 
     @Override
     public String toString() {
-        return "StyleSheetResource{" + getSceneStylesheet() + "}";
+        return "StyleSheetDataUrl{" + getSceneStylesheet() + "}";
     }
 }

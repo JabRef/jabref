@@ -43,7 +43,7 @@ public class ThemeManager {
     private final Consumer<Runnable> updateRunner;
 
     private final StyleSheet baseStyleSheet;
-    private final AtomicReference<AppearancePreferences> appearancePreferences = new AtomicReference<>();
+    private final AtomicReference<AppearancePreferences> currentAppearancePreferences = new AtomicReference<>();
 
     private final Set<Scene> scenes = Collections.newSetFromMap(new WeakHashMap<>());
     private final Set<WebEngine> webEngines = Collections.newSetFromMap(new WeakHashMap<>());
@@ -79,13 +79,13 @@ public class ThemeManager {
      * large themes it can be {@code 'file:'}.
      */
     Optional<StyleSheet> getAdditionalStylesheet() {
-        return appearancePreferences.get().getTheme().getAdditionalStylesheet();
+        return currentAppearancePreferences.get().getTheme().getAdditionalStylesheet();
     }
 
     public void updatePreferences(AppearancePreferences newPreferences) {
         Objects.requireNonNull(newPreferences);
 
-        AppearancePreferences oldPreferences = this.appearancePreferences.get();
+        AppearancePreferences oldPreferences = this.currentAppearancePreferences.get();
         if (oldPreferences != null) {
             if (!newPreferences.equals(oldPreferences)) {
                 LOGGER.info("Not updating appearance preferences because it hasn't changed");
@@ -100,7 +100,7 @@ public class ThemeManager {
             }
         }
 
-        this.appearancePreferences.set(newPreferences);
+        this.currentAppearancePreferences.set(newPreferences);
         LOGGER.info("Theme set to {} with base css {}", newPreferences.getTheme(), baseStyleSheet);
 
         newPreferences.getTheme().getAdditionalStylesheet().ifPresent(styleSheet -> {
@@ -194,7 +194,7 @@ public class ThemeManager {
     }
 
     private void updateAdditionalCss(Scene scene) {
-        AppearancePreferences appearance = this.appearancePreferences.get();
+        AppearancePreferences appearance = this.currentAppearancePreferences.get();
         List<String> stylesheets = scene.getStylesheets();
         if (stylesheets.size() == 2) {
             stylesheets.remove(1);
@@ -211,6 +211,6 @@ public class ThemeManager {
     }
 
     public AppearancePreferences getCurrentAppearancePreferences() {
-        return appearancePreferences.get();
+        return currentAppearancePreferences.get();
     }
 }

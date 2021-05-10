@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Base64;
 import java.util.Optional;
@@ -44,8 +45,6 @@ final class StyleSheetFile extends StyleSheet {
      */
     static final int MAX_IN_MEMORY_CSS_LENGTH = 48000;
 
-    private static final String DATA_URL_PREFIX = "data:text/css;charset=utf-8;base64,";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(StyleSheetFile.class);
 
     private final URL url;
@@ -71,6 +70,16 @@ final class StyleSheetFile extends StyleSheet {
 
     @Override
     public URL getSceneStylesheet() {
+        if (!Files.exists(path)) {
+            LOGGER.warn("Cannot load additional css {} because the file does not exist.", path);
+            return null;
+        }
+
+        if (Files.isDirectory(path)) {
+            LOGGER.warn("Failed to loadCannot load additional css {} because it is a directory.", path);
+            return null;
+        }
+
         return url;
     }
 
@@ -86,7 +95,11 @@ final class StyleSheetFile extends StyleSheet {
         if (dataUrl.get().isEmpty()) {
             reload();
         }
-        return dataUrl.get().orElseGet(() -> getSceneStylesheet().toExternalForm());
+
+        return dataUrl.get().orElseGet(() -> {
+            URL stylesheet = getSceneStylesheet();
+            return stylesheet == null ? "" : stylesheet.toExternalForm();
+        });
     }
 
     static void embedDataUrl(URL url, Consumer<Optional<String>> embedded) {
@@ -108,5 +121,10 @@ final class StyleSheetFile extends StyleSheet {
         } catch (IOException e) {
             LOGGER.warn("Could not load css url {}", url, e);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "StyleSheetFile{" + getSceneStylesheet() + "}";
     }
 }

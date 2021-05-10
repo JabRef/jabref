@@ -18,7 +18,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
+import org.testfx.framework.junit5.ApplicationExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -26,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(ApplicationExtension.class)
 class ThemeManagerTest {
     private Path tempFolder;
 
@@ -49,7 +52,7 @@ class ThemeManagerTest {
         ThemeManager themeManager = new ThemeManager(new AppearancePreferences(false, 0, new Theme(testCss.toString())), new DummyFileUpdateMonitor(), Runnable::run);
         assertEquals(Theme.Type.CUSTOM, themeManager.getCurrentAppearancePreferences().getTheme().getType());
         assertEquals(testCss.toString(), themeManager.getCurrentAppearancePreferences().getTheme().getName());
-        assertTrue(themeManager.getAdditionalStylesheet().isPresent());
+        assertTrue(themeManager.getCurrentAppearancePreferences().getTheme().getAdditionalStylesheet().isPresent());
 
         String testCssLocation1 = themeManager.getAdditionalStylesheet().get().getWebEngineStylesheet();
         assertTrue(StringUtil.isNotBlank(testCssLocation1), "expected custom theme location to be available");
@@ -87,7 +90,7 @@ class ThemeManagerTest {
                 "data:text/css;charset=utf-8;base64,LyogQmlibGF0ZXggU291cmNlIENvZGUgKi8KLmNvZGUtYXJlYSAudGV4dCB7CiAgICAtZngtZm9udC1mYW1pbHk6IG1vbm9zcGFjZTsKfQ==",
                 testCssLocation3);
 
-        String testCssLocation4 = themeManager.getAdditionalStylesheet().get().getWebEngineStylesheet();
+        String testCssLocation4 = themeManagerCreatedWhenAlreadyMissing.getAdditionalStylesheet().get().getWebEngineStylesheet();
         assertTrue(StringUtil.isNotBlank(testCssLocation4), "expected custom theme location to be available");
         assertEquals(
                 "data:text/css;charset=utf-8;base64,LyogQmlibGF0ZXggU291cmNlIENvZGUgKi8KLmNvZGUtYXJlYSAudGV4dCB7CiAgICAtZngtZm9udC1mYW1pbHk6IG1vbm9zcGFjZTsKfQ==",

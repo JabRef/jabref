@@ -1,7 +1,6 @@
 package org.jabref.gui.theme;
 
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -14,6 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 abstract class StyleSheet {
+
+    static final String DATA_URL_PREFIX = "data:text/css;charset=utf-8;base64,";
+    static final String EMPTY_WEBENGINE_CSS = DATA_URL_PREFIX;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StyleSheet.class);
 
@@ -35,27 +37,30 @@ abstract class StyleSheet {
                 styleSheetUrl = Optional.of(Path.of(name).toUri().toURL());
             } catch (InvalidPathException e) {
                 LOGGER.warn("Cannot load additional css {} because it is an invalid path: {}", name, e.getLocalizedMessage());
-                return Optional.empty();
             } catch (MalformedURLException e) {
                 LOGGER.warn("Cannot load additional css url {} because it is a malformed url: {}", name, e.getLocalizedMessage());
-                return Optional.empty();
             }
         }
 
-        try {
-            Path path = Path.of(styleSheetUrl.get().toURI());
-            if (Files.isDirectory(path)) {
-                LOGGER.warn("Cannot load additional css {} because it is a directory.", name);
-                return Optional.empty();
-            } else if (!Files.exists(path)) {
-                LOGGER.warn("Cannot load additional css {} because the file does not exist.", name);
+        if (styleSheetUrl.isEmpty()) {
+            try {
+                return Optional.of(new StyleSheetDataUrl(new URL(EMPTY_WEBENGINE_CSS)));
+            } catch (MalformedURLException e) {
                 return Optional.empty();
             }
-        } catch (URISyntaxException ignored) {
-            // JVM is reformatting a url its validity already is checked above
-        }
+        } else if ("file".equals(styleSheetUrl.get().getProtocol())) {
+            StyleSheet styleSheet = new StyleSheetFile(styleSheetUrl.get());
 
-        if ("file".equals(styleSheetUrl.get().getProtocol())) {
+            if (!Files.exists(styleSheet.getWatchPath())) {
+                LOGGER.warn("Cannot load additional css {} because the file does not exist.", styleSheet.getWatchPath());
+                return Optional.empty();
+            }
+
+            if (Files.isDirectory(styleSheet.getWatchPath())) {
+                LOGGER.warn("Failed to loadCannot load additional css {} because it is a directory.", styleSheet.getWatchPath());
+                return Optional.empty();
+            }
+
             return Optional.of(new StyleSheetFile(styleSheetUrl.get()));
         } else {
             return Optional.of(new StyleSheetResource(styleSheetUrl.get()));
