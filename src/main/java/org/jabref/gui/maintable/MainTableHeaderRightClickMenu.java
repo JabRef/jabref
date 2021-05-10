@@ -29,15 +29,15 @@ public class MainTableHeaderRightClickMenu extends ContextMenu {
         });
 
         mainTable.setOnMouseClicked(event -> {
-            if(event.getButton() != MouseButton.SECONDARY && !event.isControlDown())
+            if (event.getButton() != MouseButton.SECONDARY && !event.isControlDown()) {
                 this.hide();
         });
     }
 
     private void updateContextMenu(MainTable mainTable, LibraryTab libraryTab, DialogService dialogService) {
         List<RadioMenuItem> radioMenuItems = new ArrayList<>();
-        mainTable.getColumns().forEach(tableColumn -> radioMenuItems.add(createRadioMenuItem(tableColumn)));
 
+        mainTable.getColumns().forEach(tableColumn -> radioMenuItems.add(createRadioMenuItem(tableColumn)));
         SeparatorMenuItem line = new SeparatorMenuItem();
         MenuItem columnsPreferences = new MenuItem(Localization.lang("Show preferences"));
         columnsPreferences.setOnAction(event -> {
@@ -53,8 +53,11 @@ public class MainTableHeaderRightClickMenu extends ContextMenu {
 
     private RadioMenuItem createRadioMenuItem(TableColumn<BibEntryTableViewModel, ?> tableColumn) {
         RadioMenuItem radioMenuItem = new RadioMenuItem(((MainTableColumn<?>) tableColumn).getDisplayName());
-        radioMenuItem.setSelected(tableColumn.isVisible());
-        radioMenuItem.setOnAction(event -> tableColumn.setVisible(!tableColumn.isVisible()));
+        radioMenuItem.setSelected(((MainTableColumn) tableColumn).getModel().getVisibleStatus());
+        radioMenuItem.setOnAction(event -> {
+            ((MainTableColumn) tableColumn).getModel().setVisibleStatus(!((MainTableColumn) tableColumn).getModel().getVisibleStatus());
+            tableColumn.setVisible(((MainTableColumn) tableColumn).getModel().getVisibleStatus());
+        });
         return radioMenuItem;
     }
 }

@@ -25,6 +25,8 @@ public class MainTableColumn<T> extends TableColumn<BibEntryTableViewModel, T> {
                 (ObservableValue<SortType>) model.sortTypeProperty(),
                 value -> this.setSortType(model.sortTypeProperty().getValue()),
                 value -> model.sortTypeProperty().setValue(this.getSortType()));
+
+        this.setVisible(this.model.getVisibleStatus());
     }
 
     public MainTableColumnModel getModel() {
