@@ -1,24 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-US">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="chicago" default-locale="en-US">
   <info>
     <title>Catholic Biblical Association (full note)</title>
     <id>http://www.zotero.org/styles/catholic-biblical-association</id>
     <link href="http://www.zotero.org/styles/catholic-biblical-association" rel="self"/>
     <link href="http://www.zotero.org/styles/society-of-biblical-literature-fullnote-bibliography" rel="template"/>
-    <link href="http://cba.cua.edu/instruct2%5Ccbqinstr%5Cinstrcbq.pdf" rel="documentation"/>
+    <link href="https://assets.noviams.com/novi-file-uploads/cba/PDFs/CBQ-Instructions-for-Contributors-2020.pdf" rel="documentation"/>
+    <link href="https://www.catholicbiblical.org/cbq-instructions-for-contributors" rel="documentation"/>
     <author>
       <name>Nathan LaMontagne</name>
       <email>nathan.lamontagne@gmail.com</email>
     </author>
+    <contributor>
+      <name>J. David Stark</name>
+      <email>david@jdavidstark.com</email>
+      <uri>https://www.jdavidstark.com</uri>
+    </contributor>
     <category citation-format="note"/>
     <category field="theology"/>
-    <updated>2019-11-05T09:18:20+00:00</updated>
+    <updated>2021-03-31T17:57:09+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
     <terms>
       <term name="editor" form="verb-short">ed.</term>
       <term name="translator" form="verb-short">trans.</term>
+      <!-- Overrides the defaulte en dash delimiter with the hyphen delimiter required by CBA sec. 23. -->
+      <term name="page-range-delimiter">-</term>
+      <!-- Allow for section-based citations per CBA's fallback to CMS. -->
+      <term name="section" form="short">
+        <single>§</single>
+        <multiple>§§</multiple>
+      </term>
     </terms>
   </locale>
   <!--
@@ -152,11 +165,12 @@
           </else-if>
         </choose>
       </if>
+      <!-- Enforces use of title case per CBA sec. 24. -->
       <else-if type="book">
-        <text variable="title" form="short" font-style="italic"/>
+        <text variable="title" form="short" font-style="italic" text-case="title"/>
       </else-if>
       <else>
-        <text variable="title" form="short" quotes="true"/>
+        <text variable="title" form="short" quotes="true" text-case="title"/>
       </else>
     </choose>
   </macro>
@@ -178,11 +192,12 @@
           </if>
         </choose>
       </if>
+      <!-- Enforces use of title case per CBA sec. 24. -->
       <else-if type="book">
-        <text variable="title" font-style="italic"/>
+        <text variable="title" font-style="italic" text-case="title"/>
       </else-if>
       <else>
-        <text variable="title" quotes="true"/>
+        <text variable="title" quotes="true" text-case="title"/>
       </else>
     </choose>
   </macro>
@@ -208,9 +223,10 @@
     </names>
   </macro>
   <macro name="editor">
+    <!-- Outputs citation of a work with only editors per CMS with "[name], ed." or "[names], eds." -->
     <names variable="editor">
-      <label form="verb-short" prefix=", " suffix="."/>
       <name and="text" sort-separator=", " delimiter=", "/>
+      <label form="short" prefix=", " suffix="."/>
     </names>
   </macro>
   <macro name="volumes">
@@ -246,7 +262,15 @@
     </group>
   </macro>
   <macro name="collection">
-    <text variable="collection-title"/>
+    <!-- CBQ uses a series abbreviation scheme that resembles but is not identical to that of the SBL Handbook of Style. See CBQ's guidelines, sec. 43, https://assets.noviams.com/novi-file-uploads/cba/PDFs/CBQ-Instructions-for-Contributors-2020.pdf. The macro below allows for a collection-title-short form to be stored and used if it is available. If it does not exist, the style uses the full series name. -->
+    <choose>
+      <if variable="collection-title">
+        <text variable="collection-title" form="short"/>
+      </if>
+      <else>
+        <text variable="collection-title"/>
+      </else>
+    </choose>
     <text variable="collection-number" prefix=" "/>
   </macro>
   <macro name="edition">
@@ -260,7 +284,8 @@
             </group>
           </if>
           <else>
-            <text variable="edition" text-case="capitalize-first" suffix="."/>
+            <!-- Removes an initial capital on text-based editions like rev. ed. -->
+            <text variable="edition" suffix="."/>
           </else>
         </choose>
       </if>
@@ -346,18 +371,29 @@
       <if variable="locator" match="none">
         <text macro="pages" prefix=" "/>
       </if>
-      <else-if type="article-journal chapter" match="any">
-        <text macro="pages"/>
+      <!-- Adds support for section-based citations. -->
+      <else-if locator="section">
+        <text term="section" form="short" prefix=" "/>
+        <text variable="locator"/>
+      </else-if>
+      <else-if type="article-journal chapter" locator="page">
+        <text macro="pages" prefix=" "/>
         <text variable="locator" prefix=", here "/>
       </else-if>
-      <else-if type="entry-dictionary entry-encyclopedia" match="any">
+      <else-if type="entry-dictionary entry-encyclopedia" locator="page">
         <text macro="pages"/>
         <text variable="locator" prefix=", esp. "/>
       </else-if>
+      <!-- Corrects improper spacing and delimitation with volume-page citations. See CBA sec. 24. -->
+      <else-if variable="volume">
+        <number variable="volume" form="numeric" prefix=" " suffix=":"/>
+        <text variable="locator"/>
+      </else-if>
       <else>
+        <!-- Adds sub verbo to an initial citation where it had previously been left out. -->
         <choose>
-          <if variable="volume">
-            <number variable="volume" form="numeric" prefix=" " suffix="."/>
+          <if locator="sub-verbo" match="any">
+            <text term="sub verbo" form="short" prefix=" "/>
           </if>
         </choose>
         <text variable="locator" prefix=" "/>
@@ -369,13 +405,14 @@
       <if type="article-journal">
         <text variable="page" prefix=" "/>
       </if>
+      <!-- Corrects the dictionary entry total page range output when a volume is cited. -->
       <else-if type="chapter entry-dictionary entry-encyclopedia" match="any">
         <choose>
           <if variable="volume">
-            <number variable="volume" form="numeric" suffix="."/>
+            <number variable="volume" form="numeric" suffix=":"/>
           </if>
         </choose>
-        <text variable="page" prefix=" "/>
+        <text variable="page"/>
       </else-if>
     </choose>
   </macro>
@@ -404,59 +441,91 @@
       </date>
     </group>
   </macro>
-  <citation et-al-min="4" et-al-use-first="1" disambiguate-add-names="true">
-    <layout delimiter="; ">
+  <macro name="custom">
+    <!-- Add support for custom citations specified via annote. -->
+    <group>
+      <text variable="annote"/>
       <choose>
+        <if locator="sub-verbo" match="any">
+          <text term="sub verbo" form="short" prefix=" "/>
+          <text variable="locator" prefix=" "/>
+        </if>
+        <else>
+          <text variable="locator" prefix=" "/>
+        </else>
+      </choose>
+    </group>
+  </macro>
+  <citation et-al-min="4" et-al-use-first="1" disambiguate-add-names="true">
+    <!-- Adds a period at the end of a citation per current CBA guidelines (deference to CMS, examples in sec. 24). -->
+    <layout delimiter="; " suffix=".">
+      <choose>
+        <!-- Eliminates the spurious uppercasing of ibid. if it appears mid-note. -->
         <if position="ibid-with-locator">
           <group delimiter=", ">
-            <text term="ibid" text-case="capitalize-first" suffix="."/>
+            <text term="ibid"/>
             <text macro="point-locators-subsequent"/>
           </group>
         </if>
         <else-if position="ibid">
-          <text term="ibid" text-case="capitalize-first" suffix="."/>
+          <text term="ibid"/>
         </else-if>
         <else-if position="subsequent">
-          <group delimiter=", ">
-            <text macro="contributors-short"/>
-            <text macro="title-short"/>
-            <text macro="point-locators-subsequent"/>
-          </group>
+          <choose>
+            <!-- Add support for custom citations specified via annote. -->
+            <if variable="annote">
+              <text macro="custom"/>
+            </if>
+            <else>
+              <group delimiter=", ">
+                <text macro="contributors-short"/>
+                <text macro="title-short"/>
+                <text macro="point-locators-subsequent"/>
+              </group>
+            </else>
+          </choose>
         </else-if>
         <else>
           <choose>
-            <if type="book chapter article-journal thesis paper-conference speech" match="any">
-              <group delimiter=", " suffix=" ">
-                <text macro="contributors"/>
-                <text macro="title"/>
-                <text macro="container-title"/>
-              </group>
-              <group delimiter="; " prefix="(" suffix=")">
-                <text macro="translator"/>
-                <text macro="volumes"/>
-                <text macro="secondary-contributors"/>
-                <text macro="collection"/>
-                <text macro="edition"/>
-                <text macro="issue-note"/>
-              </group>
-              <text macro="point-locators"/>
+            <if variable="annote">
+              <text macro="custom"/>
             </if>
-            <else-if type="entry-encyclopedia entry-dictionary" match="any">
-              <group delimiter=", ">
-                <text macro="contributors"/>
-                <text macro="title"/>
-                <text macro="container-title"/>
-                <text macro="point-locators"/>
-              </group>
-            </else-if>
-            <else-if type="webpage post" match="any">
-              <group delimiter=", ">
-                <text macro="contributors"/>
-                <text macro="title"/>
-                <text macro="webpage-title"/>
-                <text macro="webpage-information"/>
-              </group>
-            </else-if>
+            <else>
+              <choose>
+                <if type="book chapter article-journal thesis paper-conference speech" match="any">
+                  <group delimiter=", " suffix=" ">
+                    <text macro="contributors"/>
+                    <text macro="title"/>
+                    <text macro="container-title"/>
+                  </group>
+                  <group delimiter="; " prefix="(" suffix=")">
+                    <text macro="translator"/>
+                    <text macro="volumes"/>
+                    <text macro="secondary-contributors"/>
+                    <text macro="collection"/>
+                    <text macro="edition"/>
+                    <text macro="issue-note"/>
+                  </group>
+                  <text macro="point-locators"/>
+                </if>
+                <else-if type="entry-encyclopedia entry-dictionary" match="any">
+                  <group delimiter=", ">
+                    <text macro="contributors"/>
+                    <text macro="title"/>
+                    <text macro="container-title"/>
+                    <text macro="point-locators"/>
+                  </group>
+                </else-if>
+                <else-if type="webpage post" match="any">
+                  <group delimiter=", ">
+                    <text macro="contributors"/>
+                    <text macro="title"/>
+                    <text macro="webpage-title"/>
+                    <text macro="webpage-information"/>
+                  </group>
+                </else-if>
+              </choose>
+            </else>
           </choose>
         </else>
       </choose>

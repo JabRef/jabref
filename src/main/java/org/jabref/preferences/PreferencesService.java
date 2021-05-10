@@ -34,6 +34,7 @@ import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
@@ -277,6 +278,10 @@ public interface PreferencesService {
     boolean shouldAutosave();
 
     void storeShouldAutosave(boolean shouldAutosave);
+
+    FileLinkPreferences getFileLinkPreferences();
+
+    void storeFileDirforDatabase(List<Path> dirs);
 
     //*************************************************************************************************************
     // Import/Export preferences

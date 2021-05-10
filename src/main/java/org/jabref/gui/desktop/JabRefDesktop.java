@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.desktop.os.DefaultDesktop;
@@ -19,6 +20,7 @@ import org.jabref.gui.desktop.os.OSX;
 import org.jabref.gui.desktop.os.Windows;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
@@ -27,6 +29,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Eprint;
 import org.jabref.model.util.FileHelper;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,6 +108,19 @@ public class JabRefDesktop {
     private static void openDoi(String doi) throws IOException {
         String link = DOI.parse(doi).map(DOI::getURIAsASCIIString).orElse(doi);
         openBrowser(link);
+    }
+
+    public static void openCustomDoi(String link, PreferencesService preferences, DialogService dialogService) {
+        IdentifierParser.parse(StandardField.DOI, link)
+                        .map(identifier -> (DOI) identifier)
+                        .flatMap(doi -> doi.getExternalURIWithCustomBase(preferences.getDOIPreferences().getDefaultBaseURI()))
+                        .ifPresent(uri -> {
+                            try {
+                                JabRefDesktop.openBrowser(uri);
+                            } catch (IOException e) {
+                                dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
+                            }
+                        });
     }
 
     /**
@@ -203,9 +219,8 @@ public class JabRefDesktop {
     }
 
     /**
-     * Opens the url with the users standard Browser.
-     * If that fails a popup will be shown to instruct the user to open the link manually
-     * and the link gets copied to the clipboard
+     * Opens the url with the users standard Browser. If that fails a popup will be shown to instruct the user to open the link manually and the link gets copied to the clipboard
+     *
      * @param url the URL to open
      */
     public static void openBrowserShowPopup(String url) {

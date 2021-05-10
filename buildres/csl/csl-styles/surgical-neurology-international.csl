@@ -5,7 +5,7 @@
     <title-short>SNI</title-short>
     <id>http://www.zotero.org/styles/surgical-neurology-international</id>
     <link href="http://www.zotero.org/styles/surgical-neurology-international" rel="self"/>
-    <link href="http://www.zotero.org/styles/journal-of-neurosurgery" rel="template"/>
+    <link href="http://www.zotero.org/styles/american-medical-association" rel="template"/>
     <link href="https://surgicalneurologyint.com/submit-article/" rel="documentation"/>
     <link href="http://surgicalneurologyint.com/wp-content/uploads/2018/12/Author_Instructions.pdf" rel="documentation"/>
     <author>
@@ -18,7 +18,7 @@
     <issn>2229-5097</issn>
     <eissn>2152-7806</eissn>
     <summary>Style for Surgical Neurology International, the open-acccess journal for neurosurgery and clinical neuroscience.</summary>
-    <updated>2019-12-23T14:40:52+00:00</updated>
+    <updated>2021-04-14T12:00:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor">
