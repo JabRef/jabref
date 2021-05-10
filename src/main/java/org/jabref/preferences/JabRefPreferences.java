@@ -1888,6 +1888,7 @@ public class JabRefPreferences implements PreferencesService {
             columns.add(columnModel);
         }
 
+        // Set VisibleStatus form oldColumns
         if (mainTableColumns != null) {
             mainTableColumns.forEach(oldColumn -> {
                 columns.forEach(newColumn -> {

@@ -41,6 +41,7 @@ public class MainTableHeaderRightClickMenu extends ContextMenu {
                     dialogService.showCustomDialog(preferencesDialogView);
                 });
 
+                // Clean items and add newItems
                 this.getItems().clear();
                 this.getItems().addAll(radioMenuItems);
                 this.getItems().addAll(line, columnsPreferences);
@@ -51,6 +52,7 @@ public class MainTableHeaderRightClickMenu extends ContextMenu {
             clickEvent.consume();
         });
 
+        // Cancel ContextMenu
         mainTable.setOnMouseClicked(event -> {
             if (event.getButton() != MouseButton.SECONDARY && !event.isControlDown()) {
                 this.hide();
@@ -71,6 +73,7 @@ public class MainTableHeaderRightClickMenu extends ContextMenu {
             ((MainTableColumn) tableColumn).getModel().setVisibleStatus(!((MainTableColumn) tableColumn).getModel().getVisibleStatus());
             tableColumn.setVisible(((MainTableColumn) tableColumn).getModel().getVisibleStatus());
         });
+
         return radioMenuItem;
     }
 }

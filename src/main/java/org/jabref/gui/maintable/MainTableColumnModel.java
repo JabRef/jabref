@@ -76,8 +76,7 @@ public class MainTableColumnModel {
     private final StringProperty qualifierProperty = new SimpleStringProperty();
     private final DoubleProperty widthProperty = new SimpleDoubleProperty();
     private final ObjectProperty<TableColumn.SortType> sortTypeProperty = new SimpleObjectProperty<>();
-    private boolean visible = true;
-
+    private boolean visible;
 
     /**
      * This is used by the preferences dialog, to initialize available columns the user can add to the table.
