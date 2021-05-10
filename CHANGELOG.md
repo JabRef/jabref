@@ -409,6 +409,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed a bug where the selection of groups was lost after drag and drop. [#2868](https://github.com/JabRef/jabref/issues/2868)
 - We fixed an issue where the custom entry types didn't show the correct display name [#5651](https://github.com/JabRef/jabref/issues/5651)
 - We fixed an issue where full change only takes effect after restart of program of entry preview as tab by giving a restart warning. [#5464](https://github.com/JabRef/jabref/issues/5464)
+
 ### Removed
 
 - We removed some obsolete notifications. [#5555](https://github.com/JabRef/jabref/issues/5555)
