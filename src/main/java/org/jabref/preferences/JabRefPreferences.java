@@ -1161,8 +1161,8 @@ public class JabRefPreferences implements PreferencesService {
         for (var column : sortOrder) {
             boolean descending = (column.getSortType() == SortType.DESCENDING);
             config.getSortCriteria().add(new SaveOrderConfig.SortCriterion(
-                                                                           FieldFactory.parseField(column.getQualifier()),
-                                                                           descending));
+                    FieldFactory.parseField(column.getQualifier()),
+                    descending));
         }
 
         return config;
@@ -1891,7 +1891,7 @@ public class JabRefPreferences implements PreferencesService {
         if (mainTableColumns != null) {
             mainTableColumns.forEach(oldColumn -> {
                 columns.forEach(newColumn -> {
-                    if (oldColumn.getName() == newColumn.getName()) {
+                    if (oldColumn.getName().equals(newColumn.getName())) {
                         newColumn.setVisibleStatus(oldColumn.getVisibleStatus());
                     }
                 });

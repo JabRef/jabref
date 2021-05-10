@@ -20,41 +20,54 @@ import org.jabref.logic.l10n.Localization;
 public class MainTableHeaderRightClickMenu extends ContextMenu {
 
     public void show(MainTable mainTable, LibraryTab libraryTab, DialogService dialogService) {
-        mainTable.setOnContextMenuRequested(event -> {
-            if (!(event.getTarget() instanceof StackPane)) {
-                updateContextMenu(mainTable, libraryTab, dialogService);
-                this.show(mainTable, event.getScreenX(), event.getScreenY());
+        mainTable.setOnContextMenuRequested(clickEvent -> {
+
+            // Click on the tableColumns
+            if (!(clickEvent.getTarget() instanceof StackPane)) {
+
+                // Create radioMenuItemList from tableColumnList
+                List<RadioMenuItem> radioMenuItems = new ArrayList<>();
+                mainTable.getColumns().forEach(tableColumn -> radioMenuItems.add(createRadioMenuItem(tableColumn)));
+
+                SeparatorMenuItem line = new SeparatorMenuItem();
+
+                // Show preferences Button
+                MenuItem columnsPreferences = new MenuItem(Localization.lang("Show preferences"));
+                columnsPreferences.setOnAction(event -> {
+
+                    // Show Entry table
+                    PreferencesDialogView preferencesDialogView = new PreferencesDialogView(libraryTab.frame());
+                    preferencesDialogView.getPreferenceTabList().getSelectionModel().select(3);
+                    dialogService.showCustomDialog(preferencesDialogView);
+                });
+
+                this.getItems().clear();
+                this.getItems().addAll(radioMenuItems);
+                this.getItems().addAll(line, columnsPreferences);
+
+                // Show ContextMenu
+                this.show(mainTable, clickEvent.getScreenX(), clickEvent.getScreenY());
             }
-            event.consume();
+            clickEvent.consume();
         });
 
         mainTable.setOnMouseClicked(event -> {
             if (event.getButton() != MouseButton.SECONDARY && !event.isControlDown()) {
                 this.hide();
+            }
         });
-    }
-
-    private void updateContextMenu(MainTable mainTable, LibraryTab libraryTab, DialogService dialogService) {
-        List<RadioMenuItem> radioMenuItems = new ArrayList<>();
-
-        mainTable.getColumns().forEach(tableColumn -> radioMenuItems.add(createRadioMenuItem(tableColumn)));
-        SeparatorMenuItem line = new SeparatorMenuItem();
-        MenuItem columnsPreferences = new MenuItem(Localization.lang("Show preferences"));
-        columnsPreferences.setOnAction(event -> {
-            PreferencesDialogView preferencesDialogView = new PreferencesDialogView(libraryTab.frame());
-            preferencesDialogView.getPreferenceTabList().getSelectionModel().select(3);
-            dialogService.showCustomDialog(preferencesDialogView);
-        });
-
-        this.getItems().clear();
-        this.getItems().addAll(radioMenuItems);
-        this.getItems().addAll(line, columnsPreferences);
     }
 
     private RadioMenuItem createRadioMenuItem(TableColumn<BibEntryTableViewModel, ?> tableColumn) {
+
+        // Get DisplayName
         RadioMenuItem radioMenuItem = new RadioMenuItem(((MainTableColumn<?>) tableColumn).getDisplayName());
+
+        // Get VisibleStatus
         radioMenuItem.setSelected(((MainTableColumn) tableColumn).getModel().getVisibleStatus());
         radioMenuItem.setOnAction(event -> {
+
+            // Store VisibleStatus and setVisible
             ((MainTableColumn) tableColumn).getModel().setVisibleStatus(!((MainTableColumn) tableColumn).getModel().getVisibleStatus());
             tableColumn.setVisible(((MainTableColumn) tableColumn).getModel().getVisibleStatus());
         });
