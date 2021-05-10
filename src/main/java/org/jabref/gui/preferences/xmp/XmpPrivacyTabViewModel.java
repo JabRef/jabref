@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences.xmp;
 
+import java.util.Comparator;
 import java.util.HashSet;
 
 import javafx.beans.property.BooleanProperty;
@@ -59,6 +60,7 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
 
         availableFieldsProperty.clear();
         availableFieldsProperty.addAll(FieldFactory.getCommonFields());
+        availableFieldsProperty.sort((Comparator.comparing(Field::getDisplayName)));
     }
 
     @Override
