@@ -227,8 +227,9 @@ public class GroupDialogViewModel {
                     if (StringUtil.isBlank(input)) {
                         return false;
                     } else {
-                        Path texFilePath = preferencesService.getWorkingDir().resolve(input);
-                        if (!Files.isRegularFile(texFilePath)) {
+                        // we don't need to add the working dir before checking, let user input absolute path
+                        Path inputPath = Path.of(input);
+                        if (!Files.isRegularFile(inputPath)) {
                             return false;
                         }
                         return FileUtil.getFileExtension(input)
@@ -335,6 +336,7 @@ public class GroupDialogViewModel {
                             FieldFactory.parseField(autoGroupPersonsFieldProperty.getValue().trim()));
                 }
             } else if (typeTexProperty.getValue()) {
+                // issue 7719: if texGroupFilePath is not absolute, path to Jabref will be added, which is wrong
                 resultingGroup = TexGroup.create(
                         groupName,
                         groupHierarchySelectedProperty.getValue(),
