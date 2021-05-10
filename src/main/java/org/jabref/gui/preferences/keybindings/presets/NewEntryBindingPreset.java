@@ -22,17 +22,17 @@ public class NewEntryBindingPreset implements KeyBindingPreset {
         keyBindings.put(KeyBinding.COPY_PREVIEW, "");
 
         // Add new entry presets
-        keyBindings.put(KeyBinding.NEW_ARTICLE, "Ctrl+shift+A");
-        keyBindings.put(KeyBinding.NEW_BOOK, "Ctrl+shift+B");
-        keyBindings.put(KeyBinding.NEW_ENTRY, "Ctrl+N");
-        keyBindings.put(KeyBinding.NEW_ENTRY_FROM_PLAIN_TEXT, "Ctrl+shift+N");
-        keyBindings.put(KeyBinding.NEW_INBOOK, "Ctrl+shift+I");
-        keyBindings.put(KeyBinding.NEW_INPROCEEDINGS, "Ctrl+shift+C");
-        keyBindings.put(KeyBinding.NEW_MASTERSTHESIS, "Ctrl+shift+M");
-        keyBindings.put(KeyBinding.NEW_PHDTHESIS, "Ctrl+shift+T");
-        keyBindings.put(KeyBinding.NEW_PROCEEDINGS, "Ctrl+shift+P");
-        keyBindings.put(KeyBinding.NEW_TECHREPORT, "Ctrl+shift+R");
-        keyBindings.put(KeyBinding.NEW_UNPUBLISHED, "Ctrl+shift+U");
+        keyBindings.put(KeyBinding.NEW_ARTICLE, "ctrl+shift+A");
+        keyBindings.put(KeyBinding.NEW_BOOK, "ctrl+shift+B");
+        keyBindings.put(KeyBinding.NEW_ENTRY, "ctrl+N");
+        keyBindings.put(KeyBinding.NEW_ENTRY_FROM_PLAIN_TEXT, "ctrl+shift+N");
+        keyBindings.put(KeyBinding.NEW_INBOOK, "ctrl+shift+I");
+        keyBindings.put(KeyBinding.NEW_INPROCEEDINGS, "ctrl+shift+C");
+        keyBindings.put(KeyBinding.NEW_MASTERSTHESIS, "ctrl+shift+M");
+        keyBindings.put(KeyBinding.NEW_PHDTHESIS, "ctrl+shift+T");
+        keyBindings.put(KeyBinding.NEW_PROCEEDINGS, "ctrl+shift+P");
+        keyBindings.put(KeyBinding.NEW_TECHREPORT, "ctrl+shift+R");
+        keyBindings.put(KeyBinding.NEW_UNPUBLISHED, "ctrl+shift+U");
 
         return keyBindings;
     }
