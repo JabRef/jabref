@@ -8,6 +8,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.StackPane;
 
 import org.jabref.gui.DialogService;
@@ -28,9 +29,8 @@ public class MainTableHeaderRightClickMenu extends ContextMenu {
         });
 
         mainTable.setOnMouseClicked(event -> {
-            if (!event.isControlDown() && (!event.isSecondaryButtonDown()) ) {
+            if(event.getButton() != MouseButton.SECONDARY && !event.isControlDown())
                 this.hide();
-            }
         });
     }
 
