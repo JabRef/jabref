@@ -2,6 +2,7 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -13,7 +14,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class NormalizePagesFormatterTest {
 
-    private final NormalizePagesFormatter formatter = new NormalizePagesFormatter();
+    private NormalizePagesFormatter formatter;
+
+    @BeforeEach
+    public void setUp() {
+        formatter = new NormalizePagesFormatter();
+    }
 
     private static Stream<Arguments> tests() {
         return Stream.of(
@@ -62,6 +68,7 @@ public class NormalizePagesFormatterTest {
                 // special case, where -- is also put into
                 Arguments.of("some--text", "some-text"),
                 Arguments.of("pages 1--50", "pages 1-50"),
+                Arguments.of("--43", "-43"),
 
                 // keep arbitrary text
                 Arguments.of("some-text-with-dashes", "some-text-with-dashes"),
