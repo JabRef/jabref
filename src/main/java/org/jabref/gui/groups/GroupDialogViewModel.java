@@ -335,10 +335,12 @@ public class GroupDialogViewModel {
                             FieldFactory.parseField(autoGroupPersonsFieldProperty.getValue().trim()));
                 }
             } else if (typeTexProperty.getValue()) {
+                // issue 7719: add workingDir to filepath if it is relative
+                Path inputPath = preferencesService.getWorkingDir().resolve(Path.of(texGroupFilePathProperty.getValue().trim()));
                 resultingGroup = TexGroup.create(
                         groupName,
                         groupHierarchySelectedProperty.getValue(),
-                        Path.of(texGroupFilePathProperty.getValue().trim()),
+                        inputPath,
                         new DefaultAuxParser(new BibDatabase()),
                         Globals.getFileUpdateMonitor(),
                         currentDatabase.getMetaData());
