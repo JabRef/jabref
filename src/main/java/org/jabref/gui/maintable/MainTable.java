@@ -129,6 +129,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         this.getSortOrder().clear();
 
+        // Create Right Click ContextMenu
         new MainTableHeaderRightClickMenu().show(this, libraryTab, dialogService);
 
         /* KEEP for debugging purposes
