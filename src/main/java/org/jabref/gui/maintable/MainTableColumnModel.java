@@ -29,6 +29,8 @@ public class MainTableColumnModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnModel.class);
 
+    public boolean isVisible = true;
+
     public enum Type {
         INDEX("index", Localization.lang("Index")),
         EXTRAFILE("extrafile", Localization.lang("File type")),

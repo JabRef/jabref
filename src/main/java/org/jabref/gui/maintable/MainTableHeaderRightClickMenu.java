@@ -8,6 +8,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.StackPane;
 
 import org.jabref.gui.DialogService;
@@ -28,7 +29,7 @@ public class MainTableHeaderRightClickMenu extends ContextMenu {
         });
 
         mainTable.setOnMouseClicked(event -> {
-            if (!event.isControlDown() && (!event.isSecondaryButtonDown()) ) {
+            if(event.getButton() != MouseButton.SECONDARY && !event.isControlDown()){
                 this.hide();
             }
         });
@@ -36,8 +37,8 @@ public class MainTableHeaderRightClickMenu extends ContextMenu {
 
     private void updateContextMenu(MainTable mainTable, LibraryTab libraryTab, DialogService dialogService) {
         List<RadioMenuItem> radioMenuItems = new ArrayList<>();
-        mainTable.getColumns().forEach(tableColumn -> radioMenuItems.add(createRadioMenuItem(tableColumn)));
 
+        mainTable.getColumns().forEach(tableColumn -> radioMenuItems.add(createRadioMenuItem(tableColumn)));
         SeparatorMenuItem line = new SeparatorMenuItem();
         MenuItem columnsPreferences = new MenuItem(Localization.lang("Show preferences"));
         columnsPreferences.setOnAction(event -> {
@@ -53,8 +54,11 @@ public class MainTableHeaderRightClickMenu extends ContextMenu {
 
     private RadioMenuItem createRadioMenuItem(TableColumn<BibEntryTableViewModel, ?> tableColumn) {
         RadioMenuItem radioMenuItem = new RadioMenuItem(((MainTableColumn<?>) tableColumn).getDisplayName());
-        radioMenuItem.setSelected(tableColumn.isVisible());
-        radioMenuItem.setOnAction(event -> tableColumn.setVisible(!tableColumn.isVisible()));
+        radioMenuItem.setSelected(((MainTableColumn) tableColumn).getModel().isVisible);
+        radioMenuItem.setOnAction(event -> {
+            ((MainTableColumn) tableColumn).getModel().isVisible = !((MainTableColumn) tableColumn).getModel().isVisible;
+            tableColumn.setVisible(((MainTableColumn) tableColumn).getModel().isVisible);
+        });
         return radioMenuItem;
     }
 }
