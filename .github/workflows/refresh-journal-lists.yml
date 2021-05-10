@@ -43,10 +43,12 @@ jobs:
           mkdir -p $GITHUB_WORKSPACE/build/journals
           cp * $GITHUB_WORKSPACE/build/journals/
 
+          # ensure that the .java classes are the most recent ones
+          cp $GITHUB_WORKSPACE/src/main/java/org/jabref/logic/journals/* $GITHUB_WORKSPACE/buildSrc/src/copied/java/org/jabref/logic/journals
+
           # create .mv file
           cd $GITHUB_WORKSPACE
           ./gradlew generateJournalAbbreviationList
-
       - uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

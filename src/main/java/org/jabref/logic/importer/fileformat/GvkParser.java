@@ -48,7 +48,7 @@ public class GvkParser implements Parser {
 
         // Namespace srwNamespace = Namespace.getNamespace("srw","http://www.loc.gov/zing/srw/");
 
-        // Schleife ueber allen Teilergebnissen
+        // Schleife ueber alle Teilergebnisse
         // Element root = content.getDocumentElement();
         Element root = (Element) content.getElementsByTagName("zs:searchRetrieveResponse").item(0);
         Element srwrecords = getChild("zs:records", root);
@@ -62,7 +62,9 @@ public class GvkParser implements Parser {
             if (e != null) {
                 e = getChild("record", e);
                 if (e != null) {
-                    result.add(parseEntry(e));
+                    BibEntry bibEntry = parseEntry(e);
+                    // TODO: Add filtering on years (based on org.jabref.logic.importer.fetcher.transformers.YearRangeByFilteringQueryTransformer.getStartYear)
+                    result.add(bibEntry);
                 }
             }
         }
