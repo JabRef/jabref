@@ -83,6 +83,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final CustomLocalDragboard localDragboard;
     private ListProperty<PreviewLayout> dragSourceList = null;
     private ObjectProperty<MultipleSelectionModel<PreviewLayout>> dragSourceSelectionModel = null;
+    private List<String> restartWarning = new ArrayList<>();
 
     public PreviewTabViewModel(DialogService dialogService, PreferencesService preferences, TaskExecutor taskExecutor, StateManager stateManager) {
         this.dialogService = dialogService;
@@ -192,6 +193,18 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         return layout;
     }
 
+    /**
+     * Get warning info of change the settings of preview.
+     * @return list of string with warning information.
+     */
+    @Override
+    public List<String> getRestartWarnings() {
+        return restartWarning;
+    }
+
+    /**
+     * Store the changes in preview settings of preference.
+     */
     @Override
     public void storeSettings() {
         PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
@@ -203,6 +216,9 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         PreviewLayout previewStyle = findLayoutByName(TextBasedPreviewLayout.NAME);
         if (previewStyle == null) {
             previewStyle = previewPreferences.getTextBasedPreviewLayout();
+        }
+        if (showAsExtraTab.getValue() != initialPreviewPreferences.showPreviewAsExtraTab()) {
+            restartWarning.add(Localization.lang("Preview settings changed."));
         }
 
         PreviewPreferences newPreviewPreferences = preferences.getPreviewPreferences()
@@ -223,7 +239,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         for (LibraryTab libraryTab : JabRefGUI.getMainFrame().getLibraryTabs()) {
             // TODO: Find a better way to update preview
             libraryTab.closeBottomPane();
-            // basePanel.getPreviewPanel().updateLayout(preferences.getPreviewPreferences());
+//          basePanel.getPreviewPanel().updateLayout(preferences.getPreviewPreferences());
         }
     }
 
