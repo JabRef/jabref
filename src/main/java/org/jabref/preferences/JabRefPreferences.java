@@ -1879,11 +1879,11 @@ public class JabRefPreferences implements PreferencesService {
             columns.add(columnModel);
         }
 
-        if(mainTableColumns != null){
-            mainTableColumns.forEach(oldColumn->{
-                columns.forEach(newColumn ->{
-                    if(oldColumn.getName() == newColumn.getName()){
-                        newColumn.isVisible = oldColumn.isVisible;
+        if (mainTableColumns != null) {
+            mainTableColumns.forEach(oldColumn -> {
+                columns.forEach(newColumn -> {
+                    if (oldColumn.getName() == newColumn.getName()) {
+                        newColumn.setVisibleStatus(oldColumn.getVisibleStatus());
                     }
                 });
             });

@@ -29,8 +29,6 @@ public class MainTableColumnModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MainTableColumnModel.class);
 
-    public boolean isVisible = true;
-
     public enum Type {
         INDEX("index", Localization.lang("Index")),
         EXTRAFILE("extrafile", Localization.lang("File type")),
@@ -78,6 +76,8 @@ public class MainTableColumnModel {
     private final StringProperty qualifierProperty = new SimpleStringProperty();
     private final DoubleProperty widthProperty = new SimpleDoubleProperty();
     private final ObjectProperty<TableColumn.SortType> sortTypeProperty = new SimpleObjectProperty<>();
+    private boolean visible = true;
+
 
     /**
      * This is used by the preferences dialog, to initialize available columns the user can add to the table.
@@ -92,6 +92,7 @@ public class MainTableColumnModel {
         this.typeProperty.setValue(type);
         this.qualifierProperty.setValue(qualifier);
         this.sortTypeProperty.setValue(TableColumn.SortType.ASCENDING);
+        this.visible = true;
 
         if (Type.ICON_COLUMNS.contains(type)) {
             this.widthProperty.setValue(ColumnPreferences.ICON_COLUMN_WIDTH);
@@ -161,6 +162,14 @@ public class MainTableColumnModel {
 
     public TableColumn.SortType getSortType() {
         return sortTypeProperty.getValue();
+    }
+
+    public boolean getVisibleStatus(){
+        return visible;
+    }
+
+    public void setVisibleStatus(boolean visible){
+        this.visible = visible;
     }
 
     public ObjectProperty<TableColumn.SortType> sortTypeProperty() {

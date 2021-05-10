@@ -29,7 +29,7 @@ public class MainTableHeaderRightClickMenu extends ContextMenu {
         });
 
         mainTable.setOnMouseClicked(event -> {
-            if(event.getButton() != MouseButton.SECONDARY && !event.isControlDown()){
+            if (event.getButton() != MouseButton.SECONDARY && !event.isControlDown()) {
                 this.hide();
             }
         });
@@ -54,10 +54,10 @@ public class MainTableHeaderRightClickMenu extends ContextMenu {
 
     private RadioMenuItem createRadioMenuItem(TableColumn<BibEntryTableViewModel, ?> tableColumn) {
         RadioMenuItem radioMenuItem = new RadioMenuItem(((MainTableColumn<?>) tableColumn).getDisplayName());
-        radioMenuItem.setSelected(((MainTableColumn) tableColumn).getModel().isVisible);
+        radioMenuItem.setSelected(((MainTableColumn) tableColumn).getModel().getVisibleStatus());
         radioMenuItem.setOnAction(event -> {
-            ((MainTableColumn) tableColumn).getModel().isVisible = !((MainTableColumn) tableColumn).getModel().isVisible;
-            tableColumn.setVisible(((MainTableColumn) tableColumn).getModel().isVisible);
+            ((MainTableColumn) tableColumn).getModel().setVisibleStatus(!((MainTableColumn) tableColumn).getModel().getVisibleStatus());
+            tableColumn.setVisible(((MainTableColumn) tableColumn).getModel().getVisibleStatus());
         });
         return radioMenuItem;
     }
