@@ -80,7 +80,7 @@
                 <CheckBox fx:id="protect"
                           text="%Refuse to save the library before external changes have been reviewed."/>
 
-                <Label styleClass="sectionHeader" text="%Export sort order"/>
+                <Label styleClass="sectionHeader" text="%Save sort order"/>
                 <SaveOrderConfigPanel fx:id="saveOrderConfigPanel"/>
 
                 <Label styleClass="sectionHeader" text="%Save actions"/>

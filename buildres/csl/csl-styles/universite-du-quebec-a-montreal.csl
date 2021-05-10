@@ -953,7 +953,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography et-al-min="8" et-al-use-first="6" et-al-use-last="true" entry-spacing="0" hanging-indent="true">
+  <bibliography et-al-min="8" et-al-use-first="6" et-al-use-last="true" entry-spacing="1" hanging-indent="true">
     <sort>
       <key macro="author"/>
       <key macro="issued-sort" sort="ascending"/>

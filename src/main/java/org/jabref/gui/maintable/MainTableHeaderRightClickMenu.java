@@ -31,7 +31,6 @@ public class MainTableHeaderRightClickMenu extends ContextMenu {
         mainTable.setOnMouseClicked(event -> {
             if (event.getButton() != MouseButton.SECONDARY && !event.isControlDown()) {
                 this.hide();
-            }
         });
     }
 

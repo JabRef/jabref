@@ -16,7 +16,7 @@
     <issn>1492-9058</issn>
     <eissn>1492-9066</eissn>
     <summary>Style for online journal Canadian Biosystems Engineering</summary>
-    <updated>2020-09-26T15:27:23+00:00</updated>
+    <updated>2020-12-05T19:18:31+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en-US">
@@ -274,6 +274,15 @@
       </else-if>
       <else-if type="webpage chapter paper-conference article-journal article-magazine article-newspaper" match="any">
         <text variable="title"/>
+      </else-if>
+      <else-if type="patent">
+        <group delimiter=". ">
+          <text variable="title"/>
+          <group delimiter=", ">
+            <text variable="authority"/>
+            <text variable="number"/>
+          </group>
+        </group>
       </else-if>
       <else-if type="motion_picture broadcast" match="any"/>
       <else>

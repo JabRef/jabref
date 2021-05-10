@@ -20,7 +20,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
-import org.jabref.logic.importer.fetcher.transformators.DefaultQueryTransformer;
+import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.CoinsParser;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
