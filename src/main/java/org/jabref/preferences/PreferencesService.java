@@ -38,9 +38,9 @@ import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
+import org.jabref.logic.preferences.CustomApiKeyPreferences;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
-import org.jabref.logic.preferences.SpringerApiKeyPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.remote.RemotePreferences;
@@ -150,11 +150,11 @@ public interface PreferencesService {
 
     DOIPreferences getDOIPreferences();
 
-    SpringerApiKeyPreferences getSpringerAPIKeyPreferences();
+    CustomApiKeyPreferences getCustomApiKeyPreferences(String name);
 
     void storeDOIPreferences(DOIPreferences preferences);
 
-    void storeCustomSpringerKeyPreferences(SpringerApiKeyPreferences preferences);
+    void storeCustomApiKeyPreferences(CustomApiKeyPreferences preferences);
 
     OwnerPreferences getOwnerPreferences();
 

@@ -15,7 +15,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.SpringerQueryTransformer;
-import org.jabref.logic.preferences.SpringerApiKeyPreferences;
+import org.jabref.logic.preferences.CustomApiKeyPreferences;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
@@ -172,6 +172,22 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
     }
 
     /**
+     * Gets springer api key, use key if it customized it in the preferences, otherwise use the default
+     *
+     * @return Springer API Key
+     */
+    private String getApiKey() {
+        String apiKey = API_KEY;
+        if (preferences != null) {
+            CustomApiKeyPreferences apiKeyPreferences = preferences.getCustomApiKeyPreferences(getName());
+            if (apiKeyPreferences.isUseCustom()) {
+                apiKey = apiKeyPreferences.getDefaultApiKey();
+            }
+        }
+        return apiKey;
+    }
+
+    /**
      * Gets the query URL
      *
      * @param luceneQuery the search query
@@ -180,17 +196,10 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
      */
     @Override
     public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
-        String apiKey = API_KEY;
-        if (preferences != null) {
-            SpringerApiKeyPreferences apiKeyPreferences = preferences.getSpringerAPIKeyPreferences();
-            if (apiKeyPreferences.isUseCustom()) {
-                apiKey = apiKeyPreferences.getDefaultApiKey();
-            }
-        }
 
         URIBuilder uriBuilder = new URIBuilder(API_URL);
         uriBuilder.addParameter("q", new SpringerQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // Search query
-        uriBuilder.addParameter("api_key", apiKey); // API key
+        uriBuilder.addParameter("api_key", getApiKey()); // API key
         uriBuilder.addParameter("s", String.valueOf(getPageSize() * pageNumber + 1)); // Start entry, starts indexing at 1
         uriBuilder.addParameter("p", String.valueOf(getPageSize())); // Page size
         return uriBuilder.build().toURL();

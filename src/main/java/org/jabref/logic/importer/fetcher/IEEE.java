@@ -22,6 +22,7 @@ import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.IEEEQueryTransformer;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.preferences.CustomApiKeyPreferences;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
@@ -29,6 +30,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.preferences.JabRefPreferences;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
@@ -56,10 +58,10 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
     private static final String BASE_URL = "https://ieeexplore.ieee.org";
     private static final String API_KEY = new BuildInfo().ieeeAPIKey;
 
-    private final ImportFormatPreferences preferences;
+    private final ImportFormatPreferences importFormatPreferences;
 
-    public IEEE(ImportFormatPreferences preferences) {
-        this.preferences = Objects.requireNonNull(preferences);
+    public IEEE(ImportFormatPreferences importFormatPreferences) {
+        this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
     }
 
     /**
@@ -205,7 +207,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
                 JSONArray results = jsonObject.getJSONArray("articles");
                 for (int i = 0; i < results.length(); i++) {
                     JSONObject jsonEntry = results.getJSONObject(i);
-                    BibEntry entry = parseJsonRespone(jsonEntry, preferences.getKeywordSeparator());
+                    BibEntry entry = parseJsonRespone(jsonEntry, importFormatPreferences.getKeywordSeparator());
                     entries.add(entry);
                 }
             }
@@ -224,12 +226,30 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
         return Optional.of(HelpFile.FETCHER_IEEEXPLORE);
     }
 
+    /**
+     * Gets IEEE api key, use key if it customized it in the preferences, otherwise use the default
+     *
+     * @return IEEE API Key
+     */
+    private String getApiKey() {
+        // TODO: Construct CustomPreferences as a global variable, and may modify ImportFormatPreferences
+        JabRefPreferences preferences = null;
+        String apiKey = API_KEY;
+        if (preferences != null) {
+            CustomApiKeyPreferences apiKeyPreferences = preferences.getCustomApiKeyPreferences(getName());
+            if (apiKeyPreferences.isUseCustom()) {
+                apiKey = apiKeyPreferences.getDefaultApiKey();
+            }
+        }
+        return apiKey;
+    }
+
     @Override
     public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
         IEEEQueryTransformer transformer = new IEEEQueryTransformer();
         String transformedQuery = transformer.transformLuceneQuery(luceneQuery).orElse("");
         URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
-        uriBuilder.addParameter("apikey", API_KEY);
+        uriBuilder.addParameter("apikey", getApiKey());
         if (!transformedQuery.isBlank()) {
             uriBuilder.addParameter("querytext", transformedQuery);
         }

@@ -88,9 +88,9 @@ import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.StyleLoader;
+import org.jabref.logic.preferences.CustomApiKeyPreferences;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
-import org.jabref.logic.preferences.SpringerApiKeyPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
@@ -206,8 +206,8 @@ public class JabRefPreferences implements PreferencesService {
 
     public static final String BASE_DOI_URI = "baseDOIURI";
     public static final String USE_CUSTOM_DOI_URI = "useCustomDOIURI";
-    public static final String SPRINGER_API_KEY = "SpringerApiKey";
-    public static final String USE_CUSTOM_SPRINGER_API_KEY = "useCustomSpringerApiKey";
+    public static final String CUSTOM_API_KEY = "customApiKey";
+    public static final String USE_CUSTOM_API_KEY = "useCustomApiKey";
 
     public static final String USE_OWNER = "useOwner";
     public static final String DEFAULT_OWNER = "defaultOwner";
@@ -459,9 +459,6 @@ public class JabRefPreferences implements PreferencesService {
 
         defaults.put(USE_CUSTOM_DOI_URI, Boolean.FALSE);
         defaults.put(BASE_DOI_URI, "https://doi.org");
-
-        defaults.put(USE_CUSTOM_SPRINGER_API_KEY, Boolean.FALSE);
-        defaults.put(SPRINGER_API_KEY, "");
 
         if (OS.OS_X) {
             defaults.put(FONT_FAMILY, "SansSerif");
@@ -1396,14 +1393,16 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     /**
-     * Gets the SpringerAPIKeyPreferences that contains information: the custom Springer API key and whether to use it
-     * @return SpringerAPIKeyPreferences
+     * Gets the CustomAPIKeyPreferences that contains information: the custom API key and whether to use it
+     *
+     * @param name the key name of API key
+     * @return CustomAPIKeyPreferences
      */
     @Override
-    public SpringerApiKeyPreferences getSpringerAPIKeyPreferences() {
-        return new SpringerApiKeyPreferences(
-                getBoolean(USE_CUSTOM_SPRINGER_API_KEY),
-                get(SPRINGER_API_KEY));
+    public CustomApiKeyPreferences getCustomApiKeyPreferences(String name) {
+        return new CustomApiKeyPreferences(name,
+                getBoolean(USE_CUSTOM_API_KEY + name, false),
+                get(CUSTOM_API_KEY + name, ""));
     }
 
     @Override
@@ -1413,13 +1412,15 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     /**
-     * Saves SpringerAPIKeyPreferences information: the custom Springer API key and whether to use it
-     * @param preferences SpringerAPIKeyPreferences
+     * Saves CustomAPIKeyPreferences information: the custom custom API key and whether to use it
+     *
+     * @param preferences CustomApiKeyPreferences
      */
     @Override
-    public void storeCustomSpringerKeyPreferences(SpringerApiKeyPreferences preferences) {
-        putBoolean(USE_CUSTOM_SPRINGER_API_KEY, preferences.isUseCustom());
-        put(SPRINGER_API_KEY, preferences.getDefaultApiKey());
+    public void storeCustomApiKeyPreferences(CustomApiKeyPreferences preferences) {
+        String keyName = preferences.getName();
+        putBoolean(USE_CUSTOM_API_KEY + keyName, preferences.isUseCustom());
+        put(CUSTOM_API_KEY + keyName, preferences.getDefaultApiKey());
     }
 
     @Override
