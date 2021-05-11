@@ -121,6 +121,10 @@
     -fx-font-size: 2em;
 }
 
+.add-group-button {
+    -fx-max-width: Infinity;
+}
+
 .add-group-button:hover {
     -fx-background-color: -jr-icon-background-active;
     -fx-text-fill: -jr-black;
