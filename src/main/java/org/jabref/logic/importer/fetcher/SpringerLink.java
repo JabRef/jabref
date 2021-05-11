@@ -13,14 +13,13 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.preferences.PreferencesService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
 import kong.unirest.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * FulltextFetcher implementation that attempts to find a PDF URL at SpringerLink.
