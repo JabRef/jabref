@@ -1,5 +1,7 @@
 package org.jabref.gui.commonfxcontrols;
 
+import java.util.Comparator;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -7,6 +9,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.transformation.SortedList;
 import javafx.scene.control.SelectionModel;
 
 import org.jabref.gui.Globals;
@@ -22,9 +25,9 @@ public class FieldFormatterCleanupsPanelViewModel {
     private final BooleanProperty cleanupsDisableProperty = new SimpleBooleanProperty();
     private final ListProperty<FieldFormatterCleanup> cleanupsListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<SelectionModel<FieldFormatterCleanup>> selectedCleanupProperty = new SimpleObjectProperty<>(new NoSelectionModel<>());
-    private final ListProperty<Field> availableFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList(FieldFactory.getCommonFields()));
+    private final ListProperty<Field> availableFieldsProperty = new SimpleListProperty<>(new SortedList<>(FXCollections.observableArrayList(FieldFactory.getCommonFields()), Comparator.comparing(Field::getDisplayName)));
     private final ObjectProperty<Field> selectedFieldProperty = new SimpleObjectProperty<>();
-    private final ListProperty<Formatter> availableFormattersProperty = new SimpleListProperty<>(FXCollections.observableArrayList(Cleanups.getBuiltInFormatters()));
+    private final ListProperty<Formatter> availableFormattersProperty = new SimpleListProperty<>(new SortedList<>(FXCollections.observableArrayList(Cleanups.getBuiltInFormatters()), Comparator.comparing(Formatter::getName)));
     private final ObjectProperty<Formatter> selectedFormatterProperty = new SimpleObjectProperty<>();
 
     public FieldFormatterCleanupsPanelViewModel() {
