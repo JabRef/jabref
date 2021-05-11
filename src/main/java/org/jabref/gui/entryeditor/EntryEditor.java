@@ -189,7 +189,7 @@ public class EntryEditor extends BorderPane {
                         event.consume();
                         break;
                     case CLOSE:
-                    case CLOSE_ENTRY:
+                    case EDIT_ENTRY:
                         close();
                         event.consume();
                         break;

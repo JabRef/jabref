@@ -14,7 +14,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
-import org.jabref.logic.importer.fetcher.transformators.SpringerQueryTransformer;
+import org.jabref.logic.importer.fetcher.transformers.SpringerQueryTransformer;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;

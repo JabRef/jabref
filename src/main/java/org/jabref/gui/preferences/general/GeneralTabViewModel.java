@@ -2,6 +2,7 @@ package org.jabref.gui.preferences.general;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
@@ -13,6 +14,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.transformation.SortedList;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
@@ -66,7 +68,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     }
 
     public void setValues() {
-        languagesListProperty.setValue(FXCollections.observableArrayList(Language.values()));
+        languagesListProperty.setValue(new SortedList<>(FXCollections.observableArrayList(Language.values()), Comparator.comparing(Language::getDisplayName)));
         selectedLanguageProperty.setValue(preferencesService.getLanguage());
 
         encodingsListProperty.setValue(FXCollections.observableArrayList(Encodings.getCharsets()));

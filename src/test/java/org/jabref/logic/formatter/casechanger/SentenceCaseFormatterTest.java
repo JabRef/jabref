@@ -2,6 +2,7 @@ package org.jabref.logic.formatter.casechanger;
 
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -13,7 +14,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class SentenceCaseFormatterTest {
 
-    private final SentenceCaseFormatter formatter = new SentenceCaseFormatter();
+    private SentenceCaseFormatter formatter;
+
+    @BeforeEach
+    public void setUp() {
+        formatter = new SentenceCaseFormatter();
+    }
 
     private static Stream<Arguments> testData() {
         return Stream.of(
@@ -22,15 +28,15 @@ public class SentenceCaseFormatterTest {
                 Arguments.of("Upper {NOT} first", "upper {NOT} FIRST"),
                 Arguments.of("Upper {N}ot first", "upper {N}OT FIRST"),
                 Arguments.of("Whose music? A sociology of musical language",
-                    "Whose music? a sociology of musical language"),
+                        "Whose music? a sociology of musical language"),
                 Arguments.of("Bibliographic software. A comparison.",
-                    "bibliographic software. a comparison."),
+                        "bibliographic software. a comparison."),
                 Arguments.of("England’s monitor; The history of the separation",
-                    "England’s Monitor; the History of the Separation"),
+                        "England’s Monitor; the History of the Separation"),
                 Arguments.of("Dr. schultz: a dentist turned bounty hunter.",
-                    "Dr. schultz: a dentist turned bounty hunter."),
+                        "Dr. schultz: a dentist turned bounty hunter."),
                 Arguments.of("Example case. {EXCLUDED SENTENCE.}",
-                    "Example case. {EXCLUDED SENTENCE.}"),
+                        "Example case. {EXCLUDED SENTENCE.}"),
                 Arguments.of("I have {Aa} dream", new SentenceCaseFormatter().getExampleInput()));
     }
 
