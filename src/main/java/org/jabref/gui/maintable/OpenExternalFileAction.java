@@ -10,7 +10,6 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.preferences.PreferencesService;
 
@@ -33,7 +32,7 @@ public class OpenExternalFileAction extends SimpleCommand {
     /**
      * Open all linked files of the selected entries.
      * <br>
-     * If some selected entries have linked file and others does not, pop out a dialog to ask user whether to skip them and continue or cancel the whole action.
+     * If some selected entries have linked file and others do not, ignore the latter.
      */
     @Override
     public void execute() {
@@ -43,20 +42,8 @@ public class OpenExternalFileAction extends SimpleCommand {
             List<LinkedFileViewModel> linkedFileViewModelList = new LinkedList<>();
             LinkedFileViewModel linkedFileViewModel;
 
-            boolean asked = false;
-
             for (BibEntry entry:selectedEntries) {
-                if (entry.getFiles().isEmpty()) {
-                    if (!asked) {
-                        boolean continu = dialogService.showConfirmationDialogAndWait(Localization.lang("Missing file"),
-                                Localization.lang("Some entries you selected are not linked to any file. They will be skipped. Continue?"),
-                                Localization.lang("Continue"), Localization.lang("Cancel"));
-                        asked = true;
-                        if (!continu) {
-                            return;
-                        }
-                    }
-                } else {
+                if (!entry.getFiles().isEmpty()) {
                     linkedFileViewModel = new LinkedFileViewModel(
                             entry.getFiles().get(0),
                             entry,
