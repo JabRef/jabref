@@ -12,6 +12,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.logic.l10n.Localization;
 
 public class FileNameUniqueness {
+    private static final Pattern DUPLICATE_MARK_PATTERN = Pattern.compile("(.*) \\(\\d+\\)");
 
     /**
      * Returns a file name such that it does not match any existing files in targetDirectory
@@ -114,8 +115,7 @@ public class FileNameUniqueness {
      * @return Suggested name for the file without extensionSuffix and duplicate marks such as " (1)"
      */
     public static String eraseDuplicateMarks(String fileName) {
-        Pattern p = Pattern.compile("(.*) \\(\\d+\\)");
-        Matcher m = p.matcher(fileName);
+        Matcher m = DUPLICATE_MARK_PATTERN.matcher(fileName);
         return m.find() ? fileName.substring(0, fileName.lastIndexOf('(') - 1) : fileName;
     }
 }
