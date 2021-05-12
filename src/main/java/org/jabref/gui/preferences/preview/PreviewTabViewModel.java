@@ -194,7 +194,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     /**
-     * Get warning info of change the settings of preview.
+     * Getter method for warning list.
      * @return list of string with warning information.
      */
     @Override
@@ -203,7 +203,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     /**
-     * Store the changes in preview settings of preference.
+     * Store the changes of preference-preview settings.
      */
     @Override
     public void storeSettings() {
@@ -239,7 +239,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         for (LibraryTab libraryTab : JabRefGUI.getMainFrame().getLibraryTabs()) {
             // TODO: Find a better way to update preview
             libraryTab.closeBottomPane();
-//          basePanel.getPreviewPanel().updateLayout(preferences.getPreviewPreferences());
+            //  basePanel.getPreviewPanel().updateLayout(preferences.getPreviewPreferences());
         }
     }
 
