@@ -107,14 +107,14 @@ public class GroupDialogViewModel {
     private final PreferencesService preferencesService;
     private final BibDatabaseContext currentDatabase;
     private final AbstractGroup editedGroup;
-    private final boolean isGroup;
+    private final GroupDialogHeader isgroup;
 
-    public GroupDialogViewModel(DialogService dialogService, BibDatabaseContext currentDatabase, PreferencesService preferencesService, AbstractGroup editedGroup, boolean isGroup) {
+    public GroupDialogViewModel(DialogService dialogService, BibDatabaseContext currentDatabase, PreferencesService preferencesService, AbstractGroup editedGroup, GroupDialogHeader isgroup) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.currentDatabase = currentDatabase;
         this.editedGroup = editedGroup;
-        this.isGroup = isGroup;
+        this.isgroup = isgroup;
 
         setupValidation();
         setValues();
