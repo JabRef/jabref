@@ -1,6 +1,5 @@
 package org.jabref.logic.bibtex.comparator;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.model.database.BibDatabase;

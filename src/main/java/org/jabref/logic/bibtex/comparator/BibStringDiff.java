@@ -97,4 +97,9 @@ public class BibStringDiff {
         return this.getOriginalString().toString().equals(((BibStringDiff) other).getOriginalString().toString())
                 && this.getNewString().toString().equals(((BibStringDiff) other).getNewString().toString());
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(originalString, newString);
+    }
 }

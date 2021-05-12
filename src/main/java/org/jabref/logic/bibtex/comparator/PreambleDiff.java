@@ -1,5 +1,6 @@
 package org.jabref.logic.bibtex.comparator;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.model.database.BibDatabaseContext;
@@ -39,5 +40,10 @@ public class PreambleDiff {
         }
         return this.getOriginalPreamble().equals(((PreambleDiff) other).getOriginalPreamble())
                 && this.getNewPreamble().equals(((PreambleDiff) other).getNewPreamble());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(originalPreamble, newPreamble);
     }
 }
