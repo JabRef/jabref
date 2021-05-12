@@ -30,8 +30,7 @@ class CleanupUrlFormatterTest {
     }
 
     @Test
-    void validURLUnmodified() {
-        // the caller has to pay attention that this does not happen
+    void validUrlUnmodified() {
         assertEquals("http://wikipedia.org", formatter.format("http://wikipedia.org"));
     }
 
