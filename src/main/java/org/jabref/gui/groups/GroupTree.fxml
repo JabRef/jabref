@@ -31,8 +31,8 @@
     </center>
     <bottom>
         <HBox fx:id="groupBar" alignment="CENTER" spacing="8">
-            <Button fx:id="addNewGroup" onAction="#addNewGroup" styleClass="add-group-button"
-                    text="%Add group" HBox.hgrow="ALWAYS">
+            <Button fx:id="addNewGroup" onAction="#addNewGroup"
+                    text="%Add group" maxWidth="Infinity" HBox.hgrow="ALWAYS">
                 <tooltip>
                     <Tooltip text="%New group"/>
                 </tooltip>
