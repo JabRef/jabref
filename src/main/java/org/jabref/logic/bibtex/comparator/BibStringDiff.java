@@ -88,4 +88,13 @@ public class BibStringDiff {
     public BibtexString getNewString() {
         return newString;
     }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == null) {
+            return false;
+        }
+        return this.getOriginalString().toString().equals(((BibStringDiff) other).getOriginalString().toString())
+                && this.getNewString().toString().equals(((BibStringDiff) other).getNewString().toString());
+    }
 }

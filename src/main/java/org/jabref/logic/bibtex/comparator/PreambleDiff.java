@@ -31,4 +31,13 @@ public class PreambleDiff {
     public String getOriginalPreamble() {
         return originalPreamble;
     }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == null) {
+            return false;
+        }
+        return this.getOriginalPreamble().equals(((PreambleDiff) other).getOriginalPreamble())
+                && this.getNewPreamble().equals(((PreambleDiff) other).getNewPreamble());
+    }
 }
