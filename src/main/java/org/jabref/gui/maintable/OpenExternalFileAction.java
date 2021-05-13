@@ -10,11 +10,14 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.PreferencesService;
 
 public class OpenExternalFileAction extends SimpleCommand {
+
+    private final int FILES_LIMIT = 10;
 
     private final DialogService dialogService;
     private final StateManager stateManager;
@@ -31,7 +34,7 @@ public class OpenExternalFileAction extends SimpleCommand {
     }
 
     /**
-     * Open all linked files of the selected entries.
+     * Open all linked files of the selected entries. If opening too many files, pop out a dialog to ask the user if to continue.
      * <br>
      * If some selected entries have linked file and others do not, ignore the latter.
      */
@@ -41,8 +44,9 @@ public class OpenExternalFileAction extends SimpleCommand {
             final List<BibEntry> selectedEntries = stateManager.getSelectedEntries();
 
             List<LinkedFileViewModel> linkedFileViewModelList = new LinkedList<>();
-            LinkedFileViewModel linkedFileViewModel;
 
+            boolean asked = false;
+            LinkedFileViewModel linkedFileViewModel;
             for (BibEntry entry:selectedEntries) {
                 for (LinkedFile linkedFile:entry.getFiles()) {
                     linkedFileViewModel = new LinkedFileViewModel(
@@ -56,6 +60,17 @@ public class OpenExternalFileAction extends SimpleCommand {
                             ExternalFileTypes.getInstance());
 
                     linkedFileViewModelList.add(linkedFileViewModel);
+                }
+
+                // ask the user when detecting # of files > FILES_LIMIT
+                if (!asked && linkedFileViewModelList.size() > FILES_LIMIT) {
+                    asked = true;
+                    boolean continu = dialogService.showConfirmationDialogAndWait(Localization.lang("Opening large number of files"),
+                            Localization.lang("You are about to open %0 files. Continue?", Integer.toString(linkedFileViewModelList.size())),
+                            Localization.lang("Continue"), Localization.lang("Cancel"));
+                    if (!continu) {
+                        return;
+                    }
                 }
             }
 

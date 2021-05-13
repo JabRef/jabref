@@ -93,11 +93,6 @@ public class ActionHelper {
         return Bindings.createBooleanBinding(() -> {
             ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
             for (BibEntry entry:selectedEntries) {
-//                for (LinkedFile linkedFile:entry.getFiles()) {
-//                    if (!linkedFile.isOnlineLink()) {
-//                        return true;
-//                    }
-//                }
                 if (!entry.getFiles().isEmpty()) {
                     return true;
                 }
