@@ -86,19 +86,11 @@ public class ActionHelper {
      * <br>
      * Used in {@link org.jabref.gui.maintable.OpenExternalFileAction} when multiple entries selected
      * @param stateManager manager for the state of the GUI
-     * @param preferencesService services of preferences
      * @return a boolean binding
      */
-    public static BooleanExpression hasLinkedFileForSelectedEntries(StateManager stateManager, PreferencesService preferencesService) {
-        return Bindings.createBooleanBinding(() -> {
-            ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
-            for (BibEntry entry:selectedEntries) {
-                if (!entry.getFiles().isEmpty()) {
-                    return true;
-                }
-            }
-            return false;
-        });
+    public static BooleanExpression hasLinkedFileForSelectedEntries(StateManager stateManager) {
+        return BooleanExpression.booleanExpression(EasyBind.reduce(stateManager.getSelectedEntries(),
+                entries -> entries.anyMatch(entry -> !entry.getFiles().isEmpty())));
     }
 
     public static BooleanExpression isOpenMultiDatabase(TabPane tabbedPane) {

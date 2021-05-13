@@ -28,7 +28,7 @@ public class OpenExternalFileAction extends SimpleCommand {
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
 
-        this.executable.bind(ActionHelper.hasLinkedFileForSelectedEntries(stateManager, preferencesService)
+        this.executable.bind(ActionHelper.hasLinkedFileForSelectedEntries(stateManager)
                 .and(ActionHelper.needsEntriesSelected(stateManager))
         );
     }
@@ -64,10 +64,10 @@ public class OpenExternalFileAction extends SimpleCommand {
 
             // ask the user when detecting # of files > FILES_LIMIT
             if (linkedFileViewModelList.size() > FILES_LIMIT) {
-                boolean continu = dialogService.showConfirmationDialogAndWait(Localization.lang("Opening large number of files"),
+                boolean continueOpening = dialogService.showConfirmationDialogAndWait(Localization.lang("Opening large number of files"),
                         Localization.lang("You are about to open %0 files. Continue?", Integer.toString(linkedFileViewModelList.size())),
                         Localization.lang("Continue"), Localization.lang("Cancel"));
-                if (!continu) {
+                if (!continueOpening) {
                     return;
                 }
             }
