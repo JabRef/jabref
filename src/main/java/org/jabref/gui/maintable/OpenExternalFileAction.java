@@ -44,9 +44,8 @@ public class OpenExternalFileAction extends SimpleCommand {
             final List<BibEntry> selectedEntries = stateManager.getSelectedEntries();
 
             List<LinkedFileViewModel> linkedFileViewModelList = new LinkedList<>();
-
-            boolean asked = false;
             LinkedFileViewModel linkedFileViewModel;
+
             for (BibEntry entry:selectedEntries) {
                 for (LinkedFile linkedFile:entry.getFiles()) {
                     linkedFileViewModel = new LinkedFileViewModel(
@@ -61,16 +60,15 @@ public class OpenExternalFileAction extends SimpleCommand {
 
                     linkedFileViewModelList.add(linkedFileViewModel);
                 }
+            }
 
-                // ask the user when detecting # of files > FILES_LIMIT
-                if (!asked && linkedFileViewModelList.size() > FILES_LIMIT) {
-                    asked = true;
-                    boolean continu = dialogService.showConfirmationDialogAndWait(Localization.lang("Opening large number of files"),
-                            Localization.lang("You are about to open %0 files. Continue?", Integer.toString(linkedFileViewModelList.size())),
-                            Localization.lang("Continue"), Localization.lang("Cancel"));
-                    if (!continu) {
-                        return;
-                    }
+            // ask the user when detecting # of files > FILES_LIMIT
+            if (linkedFileViewModelList.size() > FILES_LIMIT) {
+                boolean continu = dialogService.showConfirmationDialogAndWait(Localization.lang("Opening large number of files"),
+                        Localization.lang("You are about to open %0 files. Continue?", Integer.toString(linkedFileViewModelList.size())),
+                        Localization.lang("Continue"), Localization.lang("Cancel"));
+                if (!continu) {
+                    return;
                 }
             }
 
