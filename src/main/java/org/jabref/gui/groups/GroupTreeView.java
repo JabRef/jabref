@@ -348,7 +348,7 @@ public class GroupTreeView {
         MenuItem addSubgroup = new MenuItem(Localization.lang("Add subgroup"));
         addSubgroup.setOnAction(event -> {
             menu.hide();
-            viewModel.addNewSubgroup(group, false);
+            viewModel.addNewSubgroup(group, GroupDialogHeader.SUBGROUP);
         });
 
         MenuItem removeSubgroups = new MenuItem(Localization.lang("Remove subgroups"));
