@@ -89,25 +89,17 @@ public class ActionHelper {
      * @param preferencesService services of preferences
      * @return a boolean binding
      */
-    public static BooleanExpression hasPresentFileForSelectedEntries(StateManager stateManager, PreferencesService preferencesService) {
+    public static BooleanExpression hasLinkedFileForSelectedEntries(StateManager stateManager, PreferencesService preferencesService) {
         return Bindings.createBooleanBinding(() -> {
             ObservableList<BibEntry> selectedEntries = stateManager.getSelectedEntries();
-            List<LinkedFile> files;
             for (BibEntry entry:selectedEntries) {
-                files = entry.getFiles();
-
-                if ((entry.getFiles().size() > 0) && stateManager.getActiveDatabase().isPresent()) {
-                    if (files.get(0).isOnlineLink()) {
-                        return true;
-                    }
-
-                    Optional<Path> filename = FileHelper.find(
-                            stateManager.getActiveDatabase().get(),
-                            files.get(0).getLink(),
-                            preferencesService.getFilePreferences());
-                    if (filename.isPresent()) {
-                        return true;
-                    }
+//                for (LinkedFile linkedFile:entry.getFiles()) {
+//                    if (!linkedFile.isOnlineLink()) {
+//                        return true;
+//                    }
+//                }
+                if (!entry.getFiles().isEmpty()) {
+                    return true;
                 }
             }
             return false;

@@ -11,6 +11,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.preferences.PreferencesService;
 
 public class OpenExternalFileAction extends SimpleCommand {
@@ -24,7 +25,7 @@ public class OpenExternalFileAction extends SimpleCommand {
         this.stateManager = stateManager;
         this.preferencesService = preferencesService;
 
-        this.executable.bind(ActionHelper.hasPresentFileForSelectedEntries(stateManager, preferencesService)
+        this.executable.bind(ActionHelper.hasLinkedFileForSelectedEntries(stateManager, preferencesService)
                 .and(ActionHelper.needsEntriesSelected(stateManager))
         );
     }
@@ -43,9 +44,9 @@ public class OpenExternalFileAction extends SimpleCommand {
             LinkedFileViewModel linkedFileViewModel;
 
             for (BibEntry entry:selectedEntries) {
-                if (!entry.getFiles().isEmpty()) {
+                for (LinkedFile linkedFile:entry.getFiles()) {
                     linkedFileViewModel = new LinkedFileViewModel(
-                            entry.getFiles().get(0),
+                            linkedFile,
                             entry,
                             databaseContext,
                             Globals.TASK_EXECUTOR,
