@@ -1127,4 +1127,16 @@ class CitationKeyGeneratorTest {
         assertEquals("WickednessManaging",
                 new CitationKeyGenerator(keyPattern, new BibDatabase(), patternPreferences).generateKey(bibEntry));
     }
+
+    @Test
+    void generateKeyNotFallBackField() {
+        BibEntry bibEntry1 = new BibEntry().withField(StandardField.TITLE, "Title").withField(StandardField.EPRINT, "2105.02891").withField(StandardField.YEAR, "2021");
+        assertEquals("Title_2105.02891", generateKey(bibEntry1, "[title]_[eprint:([year])]"));
+    }
+
+    @Test
+    void generateKeyWithFallBackField() {
+        BibEntry bibEntry2 = new BibEntry().withField(StandardField.TITLE, "Title").withField(StandardField.YEAR, "2021");
+        assertEquals("Title_2021", generateKey(bibEntry2, "[title]_[eprint:([year])]"));
+    }
 }

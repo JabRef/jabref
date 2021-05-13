@@ -207,6 +207,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added native support for biblatex-software [#6574](https://github.com/JabRef/jabref/issues/6574)
 - We added a missing restart warning for AutoComplete in the preferences dialog. [#6351](https://github.com/JabRef/jabref/issues/6351)
 - We added a note to the citation key pattern preferences dialog as a temporary workaround for a JavaFX bug, about committing changes in a table cell, if the focus is lost. [#5825](https://github.com/JabRef/jabref/issues/5825)
+- We added support for customized fall back fields in citation key generation. [#7111](https://github.com/JabRef/jabref/issues/7111)
 
 ### Changed
 
