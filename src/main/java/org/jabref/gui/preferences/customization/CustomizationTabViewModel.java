@@ -33,7 +33,7 @@ public class CustomizationTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty useCustomDOIProperty = new SimpleBooleanProperty();
     private final StringProperty useCustomDOINameProperty = new SimpleStringProperty("");
 
-    private final Map<String, String> apiKeyNameUrl = new TreeMap<>();
+    private final static Map<String, String> API_KEY_NAME_URL = new TreeMap<>();
     private final ListProperty<CustomApiKeyPreferences> customApiKeyPrefsListProperty = new SimpleListProperty<>();
     private final ObjectProperty<CustomApiKeyPreferences> selectedCustomApiKeyPrefProperty = new SimpleObjectProperty<>();
     private final BooleanProperty useCustomApiKeyProperty = new SimpleBooleanProperty();
@@ -52,8 +52,17 @@ public class CustomizationTabViewModel implements PreferenceTabViewModel {
 
     private void initApiKeyNameUrl() {
         // Springer query using the parameter 'q=doi:10.1007/s11276-008-0131-4s=1' will respond faster
-        apiKeyNameUrl.put("Springer", "https://api.springernature.com/meta/v1/json?q=doi:10.1007/s11276-008-0131-4s=1&p=1&api_key=");
-        apiKeyNameUrl.put("IEEEXplore", "https://ieeexploreapi.ieee.org/api/v1/search/articles?max_records=0&apikey=");
+        API_KEY_NAME_URL.put("Springer", "https://api.springernature.com/meta/v1/json?q=doi:10.1007/s11276-008-0131-4s=1&p=1&api_key=");
+        API_KEY_NAME_URL.put("IEEEXplore", "https://ieeexploreapi.ieee.org/api/v1/search/articles?max_records=0&apikey=");
+    }
+
+    /**
+     * Gets a list of Fetcher names which in the custom Tab
+     *
+     * @return ArrayList containing Fetcher names
+     */
+    public ArrayList<String> getCustomApiKeyFetchers(){
+        return new ArrayList<>(API_KEY_NAME_URL.keySet());
     }
 
     /**
@@ -66,7 +75,7 @@ public class CustomizationTabViewModel implements PreferenceTabViewModel {
 
         // Initialize API KEY preferences and property
         ArrayList<CustomApiKeyPreferences> customApiKeyPreferencesList = new ArrayList<>();
-        for (String name : apiKeyNameUrl.keySet()) {
+        for (String name : API_KEY_NAME_URL.keySet()) {
             customApiKeyPreferencesList.add(preferencesService.getCustomApiKeyPreferences(name));
         }
         customApiKeyPrefsListProperty.setValue(FXCollections.observableArrayList(customApiKeyPreferencesList));
@@ -114,7 +123,7 @@ public class CustomizationTabViewModel implements PreferenceTabViewModel {
 
     public void checkCustomApiKey() {
         final String apiKeyName = selectedCustomApiKeyPrefProperty.get().getName();
-        final String testUrlWithoutApiKey = apiKeyNameUrl.get(apiKeyName);
+        final String testUrlWithoutApiKey = API_KEY_NAME_URL.get(apiKeyName);
         final String apiKey = customApiKeyTextProperty.get();
 
         final String connectionSuccessText = Localization.lang("Connection successful!");
