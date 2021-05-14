@@ -265,8 +265,7 @@ public class BracketedPattern {
                 case "]" -> {
                     if (subBrackets == 0) {
                         foundClosingBracket = true;
-                    }
-                    else {
+                    } else {
                         subBrackets--;
                         bracketContent.append(token);
                     }
