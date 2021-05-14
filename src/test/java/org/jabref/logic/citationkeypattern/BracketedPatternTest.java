@@ -380,4 +380,51 @@ class BracketedPatternTest {
                 "Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
                 BracketedPattern.expandBrackets("[author] have published [title] in [journal].", ',', entry, database));
     }
+
+    @Test
+    void expandBracketsWithFallBackToString() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.TITLE, "Title");
+
+        assertEquals("Title_eprint", BracketedPattern.expandBrackets("[title]_[EPRINT:(eprint)]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsWithTWOFallBack() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.YEAR, "2021");
+
+        assertEquals("2021", BracketedPattern.expandBrackets("[title:([EPRINT:([YEAR])])]", null, bibEntry, null));
+    }
+
+    @Test
+    void unbalancedBracketsExpandBracketsWithFallBack() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.YEAR, "2021");
+
+        assertEquals("", BracketedPattern.expandBrackets("[title:([Year)]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsWithFallBackFieldAndString() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.YEAR, "2021");
+
+        assertEquals("not2021", BracketedPattern.expandBrackets("[title:(not[Year])]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsWithFallBackFieldAndSpecialString() {
+        BibEntry bibEntry = new BibEntry()
+                .withField(StandardField.YEAR, "2021");
+
+        assertEquals("auth2021", BracketedPattern.expandBrackets("[title:(auth[Year])]", null, bibEntry, null));
+    }
+
+    @Test
+    void expandBracketsWithFallBackSpecialString() {
+        BibEntry bibEntry = new BibEntry();
+
+        assertEquals("auth", BracketedPattern.expandBrackets("[title:(auth)]", null, bibEntry, null));
+    }
 }
