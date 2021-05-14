@@ -218,7 +218,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
             previewStyle = previewPreferences.getTextBasedPreviewLayout();
         }
         if (showAsExtraTab.getValue() != initialPreviewPreferences.showPreviewAsExtraTab()) {
-            restartWarning.add(Localization.lang("Preview settings changed."));
+            restartWarning.add(Localization.lang("Show preview as extra tab."));
         }
 
         PreviewPreferences newPreviewPreferences = preferences.getPreviewPreferences()
