@@ -201,7 +201,7 @@ public class BracketedPattern {
             expandedPattern = getFieldValue(entry, fieldParts.get(0), keywordDelimiter, database);
             if (fieldParts.size() > 1) {
                 // apply modifiers:
-                expandedPattern = applyModifiers(expandedPattern, fieldParts, 1, entry, database, keywordDelimiter);
+                expandedPattern = applyModifiers(expandedPattern, fieldParts, 1, expandBracketContent(keywordDelimiter, entry, database));
             }
             return expandedPattern;
         };
@@ -263,8 +263,9 @@ public class BracketedPattern {
             switch (token) {
                 case "\"" -> appendQuote(bracketContent, tokenizer);
                 case "]" -> {
-                    if (subBrackets == 0)
+                    if (subBrackets == 0) {
                         foundClosingBracket = true;
+                    }
                     else {
                         subBrackets--;
                         bracketContent.append(token);
@@ -439,7 +440,7 @@ public class BracketedPattern {
             } else if ("shorttitleINI".equals(pattern)) {
                 return keepLettersAndDigitsOnly(
                         applyModifiers(getTitleWordsWithSpaces(3, entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")),
-                                Collections.singletonList("abbr"), 0, entry, database, keywordDelimiter));
+                                Collections.singletonList("abbr"), 0, Function.identity()));
             } else if ("veryshorttitle".equals(pattern)) {
                 return getTitleWords(1,
                         removeSmallWords(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")));
@@ -547,7 +548,7 @@ public class BracketedPattern {
      * @param offset The number of initial items in the modifiers array to skip.
      * @return The modified label.
      */
-    static String applyModifiers(final String label, final List<String> parts, final int offset, BibEntry entry, BibDatabase database, Character keywordDelimiter) {
+    static String applyModifiers(final String label, final List<String> parts, final int offset, Function<String, String> expandBracketContent) {
         String resultingLabel = label;
         for (int j = offset; j < parts.size(); j++) {
             String modifier = parts.get(j);
@@ -570,7 +571,7 @@ public class BracketedPattern {
                 } else if (!modifier.isEmpty() && (modifier.length() >= 2) && (modifier.charAt(0) == '(') && modifier.endsWith(")")) {
                     // Alternate text modifier in parentheses. Should be inserted if the label is empty
                     if (label.isEmpty() && (modifier.length() > 2)) {
-                        resultingLabel = expandBrackets(modifier.substring(1, modifier.length() - 1), keywordDelimiter, entry, database);
+                        resultingLabel = expandBrackets(modifier.substring(1, modifier.length() - 1), expandBracketContent);
                     }
                 } else {
                     LOGGER.warn("Key generator warning: unknown modifier '{}'.", modifier);
