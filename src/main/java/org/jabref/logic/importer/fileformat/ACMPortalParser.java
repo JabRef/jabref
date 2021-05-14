@@ -38,7 +38,7 @@ import org.apache.http.client.utils.URIBuilder;
 public class ACMPortalParser implements Parser {
 
     private static final String DOI_URL = "https://dl.acm.org/action/exportCiteProcCitation";
-    private static final Pattern DIO_HTML_PATTERN = Pattern.compile("<input name=\"(.*?)\"");
+    private static final Pattern DOI_HTML_PATTERN = Pattern.compile("<input name=\"(.*?)\"");
     private static final String ITEM_HTML = "<li class=\"search__item issue-item-container\">";
     private static final int MAX_ITEM_CNT_PER_PAGE = 20;
     private static HashMap<String, StandardEntryType> ENTRY_TYPE_MAP;
@@ -80,12 +80,15 @@ public class ACMPortalParser implements Parser {
         String htmlLine;
         try (BufferedReader in = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
             int cnt = 0;
-            while ((htmlLine = in.readLine()) != null && cnt < MAX_ITEM_CNT_PER_PAGE) {
+            while ((htmlLine = in.readLine()) != null) {
                 if (ITEM_HTML.equals(htmlLine)) {
-                    Matcher matcher = DIO_HTML_PATTERN.matcher(in.readLine());
+                    Matcher matcher = DOI_HTML_PATTERN.matcher(in.readLine());
                     if (matcher.find()) {
                         doiList.add(matcher.group(1));
                         ++cnt;
+                        if (cnt >= MAX_ITEM_CNT_PER_PAGE) {
+                            break;
+                        }
                     }
                 }
             }
