@@ -94,7 +94,8 @@ public class CleanupAction extends SimpleCommand {
         // Create and run cleaner
         CleanupWorker cleaner = new CleanupWorker(
                 databaseContext,
-                preferences.getCleanupPreferences(Globals.journalAbbreviationRepository));
+                preferences.getCleanupPreferences(Globals.journalAbbreviationRepository),
+                preferences.getTimestampPreferences());
 
         List<FieldChange> changes = cleaner.cleanup(preset, entry);
 
