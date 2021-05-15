@@ -50,9 +50,7 @@ public class ManageKeywordsViewModelTest {
                 .withField(StandardField.TITLE, "Chatbots as conversational healthcare services")
                 .withField(StandardField.KEYWORDS, "Chatbot, Medical services, Internet, Data collection, Medical diagnostic imaging, Automation, Vocabulary");
 
-        List<BibEntry> entries = new ArrayList<>();
-        entries.add(entryOne);
-        entries.add(entryTwo);
+        List<BibEntry> entries = List.of(entryOne, entryTwo);
 
         char delimiter = ',';
         when(preferences.getKeywordDelimiter()).thenReturn(delimiter);
