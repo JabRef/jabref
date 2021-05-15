@@ -276,6 +276,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         new EditAction(StandardActions.CUT, libraryTab.frame(), Globals.stateManager).execute();
                         event.consume();
                         break;
+                    case DELETE_ENTRY:
+                        new EditAction(StandardActions.DELETE_ENTRY, libraryTab.frame(), Globals.stateManager).execute();
+                        event.consume();
+                        break;
                     default:
                         // Pass other keys to parent
                 }
