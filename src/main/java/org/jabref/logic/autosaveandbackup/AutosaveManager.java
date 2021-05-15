@@ -30,11 +30,11 @@ public class AutosaveManager {
 
     private final EventBus eventBus;
     private final CoarseChangeFilter changeFilter;
-    private final DelayTaskThrottler throttler;
+    private final DelayTaskThrottler<?> throttler;
 
     private AutosaveManager(BibDatabaseContext bibDatabaseContext) {
         this.bibDatabaseContext = bibDatabaseContext;
-        this.throttler = new DelayTaskThrottler(2000);
+        this.throttler = new DelayTaskThrottler<>(2000);
         this.eventBus = new EventBus();
         this.changeFilter = new CoarseChangeFilter(bibDatabaseContext);
         changeFilter.registerListener(this);

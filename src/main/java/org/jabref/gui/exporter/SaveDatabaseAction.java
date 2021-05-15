@@ -1,11 +1,12 @@
 package org.jabref.gui.exporter;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import javafx.scene.control.ButtonBar;
@@ -22,8 +23,8 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.autosaveandbackup.AutosaveManager;
 import org.jabref.logic.autosaveandbackup.BackupManager;
-import org.jabref.logic.exporter.AtomicFileWriter;
-import org.jabref.logic.exporter.BibtexDatabaseWriter;
+import org.jabref.logic.exporter.GlobalSaveManager;
+import org.jabref.logic.exporter.GlobalSaveManager.SaveResult;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.l10n.Encodings;
@@ -55,16 +56,19 @@ public class SaveDatabaseAction {
     private final PreferencesService preferences;
     private final BibEntryTypesManager entryTypesManager;
 
+    private final GlobalSaveManager saveManager;
+
     public enum SaveDatabaseMode {
         SILENT, NORMAL
     }
 
-    public SaveDatabaseAction(LibraryTab libraryTab, PreferencesService preferences, BibEntryTypesManager entryTypesManager) {
+    public SaveDatabaseAction(LibraryTab libraryTab, PreferencesService preferences, BibEntryTypesManager entryTypesManager, GlobalSaveManager saveManager) {
         this.libraryTab = libraryTab;
         this.frame = libraryTab.frame();
         this.dialogService = frame.getDialogService();
         this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
+        this.saveManager = saveManager;
     }
 
     public boolean save() {
@@ -210,30 +214,28 @@ public class SaveDatabaseAction {
     }
 
     private boolean saveDatabase(Path file, boolean selectedOnly, Charset encoding, SavePreferences.DatabaseSaveType saveType) throws SaveException {
-        SavePreferences preferences = this.preferences.getSavePreferences()
-                                                      .withEncoding(encoding)
-                                                      .withSaveType(saveType);
-        try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, preferences.getEncoding(), preferences.shouldMakeBackup())) {
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, preferences, entryTypesManager);
+        SavePreferences savePrefs = this.preferences.getSavePreferences()
+                                                    .withEncoding(encoding)
+                                                    .withSaveType(saveType);
 
-            if (selectedOnly) {
-                databaseWriter.savePartOfDatabase(libraryTab.getBibDatabaseContext(), libraryTab.getSelectedEntries());
-            } else {
-                databaseWriter.saveDatabase(libraryTab.getBibDatabaseContext());
+        Future<SaveResult> saved = this.saveManager.save(libraryTab.getBibDatabaseContext(), file, selectedOnly, libraryTab.getSelectedEntries(), savePrefs);
+        SaveResult result;
+        try {
+            if (saved.isCancelled()) {
+                return false;
             }
+            result = saved.get();
+            libraryTab.registerUndoableChanges(result.getFieldChanges());
 
-            libraryTab.registerUndoableChanges(databaseWriter.getSaveActionsFieldChanges());
-
-            if (fileWriter.hasEncodingProblems()) {
-                saveWithDifferentEncoding(file, selectedOnly, preferences.getEncoding(), fileWriter.getEncodingProblems(), saveType);
+            if (!result.getEncodingProblems().isEmpty()) {
+                saveWithDifferentEncoding(file, selectedOnly, savePrefs.getEncoding(), result.getEncodingProblems(), saveType);
             }
-        } catch (UnsupportedCharsetException ex) {
-            throw new SaveException(Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()), ex);
-        } catch (IOException ex) {
-            throw new SaveException("Problems saving: " + ex, ex);
+            return true;
+        } catch (InterruptedException | ExecutionException | CancellationException e) {
+            // ignored
         }
 
-        return true;
+        return false;
     }
 
     private void saveWithDifferentEncoding(Path file, boolean selectedOnly, Charset encoding, Set<Character> encodingProblems, SavePreferences.DatabaseSaveType saveType) throws SaveException {

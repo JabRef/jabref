@@ -17,11 +17,11 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
-import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
+import org.jabref.logic.exporter.JabRefFileWriter;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.FetcherException;
@@ -389,7 +389,7 @@ public class ArgumentProcessor {
         try {
             System.out.println(Localization.lang("Saving") + ": " + subName);
             SavePreferences prefs = Globals.prefs.getSavePreferences();
-            AtomicFileWriter fileWriter = new AtomicFileWriter(Path.of(subName), prefs.getEncoding());
+            JabRefFileWriter fileWriter = new JabRefFileWriter(Path.of(subName), prefs.getEncoding());
             BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, prefs, Globals.entryTypesManager);
             databaseWriter.saveDatabase(new BibDatabaseContext(newBase));
 

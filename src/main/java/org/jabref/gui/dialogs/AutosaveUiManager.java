@@ -3,6 +3,7 @@ package org.jabref.gui.dialogs;
 import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.exporter.SaveDatabaseAction;
+import org.jabref.logic.exporter.GlobalSaveManager;
 import org.jabref.model.database.event.AutosaveEvent;
 
 import com.google.common.eventbus.Subscribe;
@@ -25,7 +26,7 @@ public class AutosaveUiManager {
     @Subscribe
     public void listen(AutosaveEvent event) {
         try {
-            new SaveDatabaseAction(libraryTab, Globals.prefs, Globals.entryTypesManager).save(SaveDatabaseAction.SaveDatabaseMode.SILENT);
+            new SaveDatabaseAction(libraryTab, Globals.prefs, Globals.entryTypesManager, GlobalSaveManager.INSTANCE).save(SaveDatabaseAction.SaveDatabaseMode.SILENT);
         } catch (Throwable e) {
             LOGGER.error("Problem occurred while saving.", e);
         }

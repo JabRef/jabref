@@ -12,8 +12,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 
 import org.jabref.logic.bibtex.InvalidFieldValueException;
-import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
+import org.jabref.logic.exporter.JabRefFileWriter;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.logic.util.DelayTaskThrottler;
@@ -134,7 +134,7 @@ public class BackupManager {
             SavePreferences savePreferences = preferences.getSavePreferences()
                                                          .withEncoding(charset)
                                                          .withMakeBackup(false);
-            new BibtexDatabaseWriter(new AtomicFileWriter(backupPath, savePreferences.getEncoding()), savePreferences, entryTypesManager)
+            new BibtexDatabaseWriter(new JabRefFileWriter(backupPath, savePreferences.getEncoding()), savePreferences, entryTypesManager)
                     .saveDatabase(bibDatabaseContext);
         } catch (IOException e) {
             logIfCritical(backupPath, e);

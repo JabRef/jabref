@@ -28,6 +28,7 @@ import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
+import org.jabref.logic.exporter.GlobalSaveManager;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DBMSConnectionProperties;
@@ -162,7 +163,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
 
             if (!folder.getValue().isEmpty()) {
                 try {
-                    new SaveDatabaseAction(libraryTab, Globals.prefs, Globals.entryTypesManager).saveAs(Path.of(folder.getValue()));
+                    new SaveDatabaseAction(libraryTab, Globals.prefs, Globals.entryTypesManager, GlobalSaveManager.INSTANCE).saveAs(Path.of(folder.getValue()));
                 } catch (Throwable e) {
                     LOGGER.error("Error while saving the database", e);
                 }

@@ -5,6 +5,7 @@ import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.logic.exporter.GlobalSaveManager;
 
 /**
  * This class is just a simple wrapper for the soon to be refactored SaveDatabaseAction.
@@ -32,7 +33,8 @@ public class SaveAction extends SimpleCommand {
         SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction(
                 frame.getCurrentLibraryTab(),
                 Globals.prefs,
-                Globals.entryTypesManager);
+                Globals.entryTypesManager,
+                GlobalSaveManager.INSTANCE);
 
         switch (saveMethod) {
             case SAVE -> saveDatabaseAction.save();

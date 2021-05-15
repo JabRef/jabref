@@ -19,6 +19,7 @@ import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.exporter.GlobalSaveManager;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.database.BibDatabase;
@@ -46,10 +47,10 @@ class SaveDatabaseActionTest {
 
     private static final String TEST_BIBTEX_LIBRARY_LOCATION = "C:\\Users\\John_Doe\\Jabref\\literature.bib";
     private Path file = Path.of(TEST_BIBTEX_LIBRARY_LOCATION);
-    private DialogService dialogService = mock(DialogService.class);
-    private JabRefPreferences preferences = mock(JabRefPreferences.class);
+    private final DialogService dialogService = mock(DialogService.class);
+    private final JabRefPreferences preferences = mock(JabRefPreferences.class);
     private LibraryTab libraryTab = mock(LibraryTab.class);
-    private JabRefFrame jabRefFrame = mock(JabRefFrame.class);
+    private final JabRefFrame jabRefFrame = mock(JabRefFrame.class);
     private BibDatabaseContext dbContext = spy(BibDatabaseContext.class);
     private SaveDatabaseAction saveDatabaseAction;
 
@@ -59,7 +60,7 @@ class SaveDatabaseActionTest {
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
         when(jabRefFrame.getDialogService()).thenReturn(dialogService);
 
-        saveDatabaseAction = spy(new SaveDatabaseAction(libraryTab, preferences, mock(BibEntryTypesManager.class)));
+        saveDatabaseAction = spy(new SaveDatabaseAction(libraryTab, preferences, mock(BibEntryTypesManager.class), GlobalSaveManager.INSTANCE));
     }
 
     @Test
@@ -129,7 +130,7 @@ class SaveDatabaseActionTest {
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
         when(libraryTab.getUndoManager()).thenReturn(mock(CountingUndoManager.class));
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);
-        saveDatabaseAction = new SaveDatabaseAction(libraryTab, preferences, mock(BibEntryTypesManager.class));
+        saveDatabaseAction = new SaveDatabaseAction(libraryTab, preferences, mock(BibEntryTypesManager.class), GlobalSaveManager.INSTANCE);
         return saveDatabaseAction;
     }
 
