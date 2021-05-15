@@ -22,6 +22,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.testutils.category.GUITest;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,12 +48,13 @@ public class DuplicateSearchTest {
     private DuplicateSearch duplicateSearch;
     private BibEntry entry1;
 
-    @BeforeEach
-    void setup() {
-        if (Globals.prefs == null) {
-            Globals.prefs = JabRefPreferences.getInstance();
-        }
+    @BeforeAll
+    public static void setupGlobals() {
+        Globals.prefs = mock(JabRefPreferences.class);
+    }
 
+    @BeforeEach
+    void setupDuplicateSearchInstance() {
         entry1 = new BibEntry(StandardEntryType.InProceedings)
                 .withField(StandardField.AUTHOR, "Souti Chattopadhyay and Nicholas Nelson and Audrey Au and Natalia Morales and Christopher Sanchez and Rahul Pandita and Anita Sarma")
                 .withField(StandardField.TITLE, "A tale from the trenches")
