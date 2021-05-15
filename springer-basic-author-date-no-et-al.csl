@@ -142,16 +142,14 @@
                    in long author lists will also be accepted:
                    Smith J, Jones M Jr, Houghton L et al (1999)
                    Future of health insurance. N Engl J Med 965:325-329   -->
-              <group prefix=". ">
-                <group delimiter=" ">
-                  <text variable="container-title" form="short" strip-periods="true"/>
-                  <group delimiter=":">
-                    <text variable="volume" suffix=":"/>
-                    <text variable="page"/>
-                  </group>
-                  <text prefix=". https://doi.org/" variable="DOI"/>
+              <group delimiter=" " prefix=". ">
+                <text variable="container-title" form="short" strip-periods="true"/>
+                <group delimiter=":">
+                  <text variable="volume"/>
+                  <text variable="page"/>
                 </group>
               </group>
+              <text prefix=". https://doi.org/" variable="DOI"/>
             </if>
             <else>
               <!--    Article by DOI
