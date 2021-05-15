@@ -167,13 +167,12 @@ public class SaveDatabaseAction {
             // Workaround for linux systems not adding file extension
             if (!(savePath.getFileName().toString().toLowerCase().endsWith(".bib"))) {
                 savePath = Path.of(savePath.toString() + ".bib");
-                if (Files.notExists(savePath)) {
-                  selectedPath = Optional.of(savePath);
-                } else if (dialogService.showConfirmationDialogAndWait(Localization.lang("Overwrite file"), Localization.lang("'%0' exists. Overwrite file?",savePath.getFileName()))) {
-                  selectedPath = Optional.of(savePath);
-                } else {
-                  selectedPath = Optional.empty();
+                if (!Files.notExists(savePath)) {
+                    if (!dialogService.showConfirmationDialogAndWait(Localization.lang("Overwrite file"), Localization.lang("'%0' exists. Overwrite file?", savePath.getFileName()))) {
+                        return Optional.empty();
+                    }
                 }
+                selectedPath = Optional.of(savePath);
             }
         }
         return selectedPath;
