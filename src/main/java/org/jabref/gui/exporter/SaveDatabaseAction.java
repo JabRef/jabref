@@ -3,8 +3,8 @@ package org.jabref.gui.exporter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
-import java.nio.file.Path;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -162,16 +162,17 @@ public class SaveDatabaseAction {
                 .build();
         Optional<Path> selectedPath = dialogService.showFileSaveDialog(fileDialogConfiguration);
         selectedPath.ifPresent(path -> preferences.setWorkingDirectory(path.getParent()));
-        if(selectedPath.isPresent()){
+        if (selectedPath.isPresent()) {
             Path savePath = selectedPath.get();
             // Workaround for linux systems not adding file extension
-            if(!(savePath.getFileName().toString().toLowerCase().endsWith(".bib"))){
-                savePath = Path.of(savePath.toString()+".bib");
-                if(Files.notExists(savePath)){
+            if (!(savePath.getFileName().toString().toLowerCase().endsWith(".bib"))) {
+                savePath = Path.of(savePath.toString() + ".bib");
+                if (Files.notExists(savePath)) {
+                  selectedPath = Optional.of(savePath);
+                } else if (dialogService.showConfirmationDialogAndWait(Localization.lang("Overwrite file"), Localization.lang("'%0' exists. Overwrite file?",savePath.getFileName()))) {
                   selectedPath = Optional.of(savePath);
                 } else {
                   selectedPath = Optional.empty();
-                  dialogService.notify(Localization.lang("Could not save file."));
                 }
             }
         }
