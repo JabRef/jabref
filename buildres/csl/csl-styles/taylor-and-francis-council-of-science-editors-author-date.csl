@@ -46,7 +46,14 @@
     </names>
   </macro>
   <macro name="access">
-    <text variable="URL"/>
+    <choose>
+      <if match="any" variable="DOI">
+        <text variable="DOI" prefix="https://doi.org/"/>
+      </if>
+      <else>
+        <text variable="URL"/>
+      </else>
+    </choose>
   </macro>
   <macro name="title">
     <group delimiter=" ">
