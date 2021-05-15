@@ -12,9 +12,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,7 +26,9 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import com.google.common.base.CaseFormat;
 import com.google.common.base.Charsets;
+import com.google.common.base.Enums;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -41,16 +41,6 @@ public class ACMPortalParser implements Parser {
     private static final Pattern DOI_HTML_PATTERN = Pattern.compile("<input name=\"(.*?)\"");
     private static final String ITEM_HTML = "<li class=\"search__item issue-item-container\">";
     private static final int MAX_ITEM_CNT_PER_PAGE = 20;
-    private static HashMap<String, StandardEntryType> ENTRY_TYPE_MAP;
-
-    public ACMPortalParser() {
-        // Gets the lowercase StandardEntryType keys and corresponding StandardEntryType
-        StandardEntryType[] standardEntryTypes = StandardEntryType.values();
-        ENTRY_TYPE_MAP = new HashMap<>(standardEntryTypes.length);
-        for (StandardEntryType standardEntryType : standardEntryTypes) {
-            ENTRY_TYPE_MAP.put(standardEntryType.getName(), standardEntryType);
-        }
-    }
 
     /**
      * Parse the DOI of the ACM Portal search result page and obtain the corresponding BibEntry
@@ -142,18 +132,11 @@ public class ACMPortalParser implements Parser {
 
     private StandardEntryType typeStrToEnum(String typeStr) {
         StandardEntryType type;
-        typeStr = typeStr.toLowerCase(Locale.ENGLISH).replace("_", "");
-        if (ENTRY_TYPE_MAP.containsKey(typeStr)) {
-            type = ENTRY_TYPE_MAP.get(typeStr);
+        if ("PAPER_CONFERENCE".equals(typeStr)) {
+            type = StandardEntryType.Conference;
         } else {
-            // There may be other types that do not exactly match
-            switch (typeStr) {
-                case "PAPER_CONFERENCE":
-                    type = StandardEntryType.Conference;
-                    break;
-                default:
-                    type = StandardEntryType.Article;
-            }
+            String upperUnderscoreTyeStr = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, typeStr);
+            type = Enums.getIfPresent(StandardEntryType.class, upperUnderscoreTyeStr).or(StandardEntryType.Article);
         }
         return type;
     }
@@ -166,10 +149,7 @@ public class ACMPortalParser implements Parser {
      */
     public BibEntry parseBibEntry(String jsonStr) {
         JsonObject jsonObject = JsonParser.parseString(jsonStr).getAsJsonObject();
-        BibEntry bibEntry;
-
-        bibEntry = new BibEntry();
-
+        BibEntry bibEntry = new BibEntry();
         if (jsonObject.has("type")) {
             bibEntry.setType(typeStrToEnum(jsonObject.get("type").getAsString()));
         }

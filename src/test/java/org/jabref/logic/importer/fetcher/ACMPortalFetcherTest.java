@@ -33,7 +33,7 @@ class ACMPortalFetcherTest {
 
     @Test
     void searchByQueryFindsEntry() throws Exception {
-        BibEntry expected = new BibEntry(StandardEntryType.Article);
+        BibEntry expected = new BibEntry(StandardEntryType.Conference);
 
         expected.setField(StandardField.AUTHOR, "Tobias Olsson and Morgan Ericsson and Anna Wingkvist");
         expected.setField(StandardField.YEAR, "2017");

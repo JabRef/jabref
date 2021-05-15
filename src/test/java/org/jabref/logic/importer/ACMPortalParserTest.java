@@ -37,7 +37,7 @@ public class ACMPortalParserTest {
         searchUrl = new URIBuilder("https://dl.acm.org/action/doSearch?AllField=" + searchDoi).build().toURL();
         searchEntryList = new ArrayList<>();
 
-        BibEntry expected = new BibEntry(StandardEntryType.Article);
+        BibEntry expected = new BibEntry(StandardEntryType.Conference);
 
         expected.setField(StandardField.AUTHOR, "Tobias Olsson and Morgan Ericsson and Anna Wingkvist");
         expected.setField(StandardField.YEAR, "2017");
