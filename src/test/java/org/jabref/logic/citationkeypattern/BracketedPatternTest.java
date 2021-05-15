@@ -382,7 +382,7 @@ class BracketedPatternTest {
     }
 
     @Test
-    void expandBracketsWithFallBackToString() {
+    void expandBracketsWithFallbackToString() {
         BibEntry bibEntry = new BibEntry()
                 .withField(StandardField.TITLE, "Title");
 
@@ -390,7 +390,7 @@ class BracketedPatternTest {
     }
 
     @Test
-    void expandBracketsWithTWOFallBack() {
+    void expandBracketsWithTwoFallbacks() {
         BibEntry bibEntry = new BibEntry()
                 .withField(StandardField.YEAR, "2021");
 
@@ -398,31 +398,32 @@ class BracketedPatternTest {
     }
 
     @Test
-    void unbalancedBracketsExpandBracketsWithFallBack() {
+    void unbalancedBracketsExpandWithFallback() {
         BibEntry bibEntry = new BibEntry()
                 .withField(StandardField.YEAR, "2021");
 
-        assertEquals("", BracketedPattern.expandBrackets("[title:([Year)]", null, bibEntry, null));
+        assertEquals("", BracketedPattern.expandBrackets("[title:([YEAR)]", null, bibEntry, null));
+        assertEquals(")]", BracketedPattern.expandBrackets("[title:(YEAR])]", null, bibEntry, null));
     }
 
     @Test
-    void expandBracketsWithFallBackFieldAndString() {
+    void expandBracketsWithFallbackFieldAndString() {
         BibEntry bibEntry = new BibEntry()
                 .withField(StandardField.YEAR, "2021");
 
-        assertEquals("not2021", BracketedPattern.expandBrackets("[title:(not[Year])]", null, bibEntry, null));
+        assertEquals("not2021", BracketedPattern.expandBrackets("[title:(not[YEAR])]", null, bibEntry, null));
     }
 
     @Test
-    void expandBracketsWithFallBackFieldAndSpecialString() {
+    void expandBracketsWithFallbackFieldAndSpecialString() {
         BibEntry bibEntry = new BibEntry()
                 .withField(StandardField.YEAR, "2021");
 
-        assertEquals("auth2021", BracketedPattern.expandBrackets("[title:(auth[Year])]", null, bibEntry, null));
+        assertEquals("auth2021", BracketedPattern.expandBrackets("[title:(auth[YEAR])]", null, bibEntry, null));
     }
 
     @Test
-    void expandBracketsWithFallBackSpecialString() {
+    void expandBracketsWithFallbackSpecialString() {
         BibEntry bibEntry = new BibEntry();
 
         assertEquals("auth", BracketedPattern.expandBrackets("[title:(auth)]", null, bibEntry, null));
