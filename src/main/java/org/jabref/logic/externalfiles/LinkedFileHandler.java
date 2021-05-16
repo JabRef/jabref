@@ -59,7 +59,7 @@ public class LinkedFileHandler {
                     filePreferences.getFileDirectoryPattern());
         }
 
-        if(filePreferences.getFileDirectory().isPresent()){
+        if (filePreferences.getFileDirectory().isPresent()) {
             targetDirectoryName = filePreferences.getFileDirectory().get().toString() + "\\" + targetDirectoryName;
         }
 
