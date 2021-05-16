@@ -59,6 +59,10 @@ public class LinkedFileHandler {
                     filePreferences.getFileDirectoryPattern());
         }
 
+        if(filePreferences.getFileDirectory().isPresent()){
+            targetDirectoryName = filePreferences.getFileDirectory().get().toString() + "\\" + targetDirectoryName;
+        }
+
         Path targetPath = targetDirectory.get().resolve(targetDirectoryName).resolve(oldFile.get().getFileName());
         if (Files.exists(targetPath)) {
             // We do not overwrite already existing files
