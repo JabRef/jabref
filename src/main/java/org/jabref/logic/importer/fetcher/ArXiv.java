@@ -16,6 +16,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.jabref.logic.cleanup.EprintCleanup;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
@@ -23,7 +24,7 @@ import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
-import org.jabref.logic.importer.fetcher.transformators.ArXivQueryTransformer;
+import org.jabref.logic.importer.fetcher.transformers.ArXivQueryTransformer;
 import org.jabref.logic.util.io.XMLUtil;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.entry.BibEntry;
@@ -78,7 +79,6 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
                                                           .map(Optional::get)
                                                           .findFirst();
             pdfUrl.ifPresent(url -> LOGGER.info("Fulltext PDF found @ arXiv."));
-
             return pdfUrl;
         } catch (FetcherException e) {
             LOGGER.warn("arXiv API request failed", e);
@@ -115,8 +115,12 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
         }
     }
 
-    private List<ArXivEntry> searchForEntries(BibEntry entry) throws FetcherException {
-        // 1. Eprint
+    private List<ArXivEntry> searchForEntries(BibEntry originalEntry) throws FetcherException {
+        // We need to clone the entry, because we modify it by a cleanup job.
+        final BibEntry entry = (BibEntry) originalEntry.clone();
+
+        // 1. Check for Eprint
+        new EprintCleanup().cleanup(entry);
         Optional<String> identifier = entry.getField(StandardField.EPRINT);
         if (StringUtil.isNotBlank(identifier)) {
             try {
@@ -128,26 +132,21 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
         }
 
         // 2. DOI and other fields
-        String query;
-
-        Optional<String> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse).map(DOI::getNormalized);
-        if (doi.isPresent()) {
-            // Search for an entry in the ArXiv which is linked to the doi
-            query = "doi:" + doi.get();
-        } else {
-            Optional<String> authorQuery = entry.getField(StandardField.AUTHOR).map(author -> "au:" + author);
-            Optional<String> titleQuery = entry.getField(StandardField.TITLE).map(title -> "ti:" + StringUtil.ignoreCurlyBracket(title));
-            query = OptionalUtil.toList(authorQuery, titleQuery).stream().collect(Collectors.joining("+AND+"));
-        }
-
+        String query = entry.getField(StandardField.DOI)
+             .flatMap(DOI::parse)
+             .map(DOI::getNormalized)
+             .map(doiString -> "doi:" + doiString)
+             .orElseGet(() -> {
+                 Optional<String> authorQuery = entry.getField(StandardField.AUTHOR).map(author -> "au:" + author);
+                 Optional<String> titleQuery = entry.getField(StandardField.TITLE).map(title -> "ti:" + StringUtil.ignoreCurlyBracket(title));
+                 return String.join("+AND+", OptionalUtil.toList(authorQuery, titleQuery));
+             });
         Optional<ArXivEntry> arxivEntry = searchForEntry(query);
-
         if (arxivEntry.isPresent()) {
             // Check if entry is a match
             StringSimilarity match = new StringSimilarity();
             String arxivTitle = arxivEntry.get().title.orElse("");
             String entryTitle = StringUtil.ignoreCurlyBracket(entry.getField(StandardField.TITLE).orElse(""));
-
             if (match.isSimilar(arxivTitle, entryTitle)) {
                 return OptionalUtil.toList(arxivEntry);
             }
@@ -170,7 +169,7 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
 
     /**
      * Queries the API.
-     *
+     * <p>
      * If only {@code searchQuery} is given, then the API will return results for each article that matches the query.
      * If only {@code ids} is given, then the API will return results for each article in the list.
      * If both {@code searchQuery} and {@code ids} are given, then the API will return each article in

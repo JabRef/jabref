@@ -8,9 +8,7 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.SearchBasedFetcher;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -48,7 +46,6 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
-        ImportCleanup cleanup = new ImportCleanup(BibDatabaseMode.BIBTEX);
         // All entries have to be converted into one format, this is necessary for the format conversion
         return fetchers.parallelStream()
                        .flatMap(searchBasedFetcher -> {
@@ -60,7 +57,6 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
                            }
                        })
                        .limit(maximumNumberOfReturnedResults)
-                       .map(cleanup::doPostCleanup)
                        .collect(Collectors.toList());
     }
 }

@@ -1,7 +1,11 @@
 package org.jabref.logic.util.strings;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -14,32 +18,32 @@ public class StringLengthComparatorTest {
         slc = new StringLengthComparator();
     }
 
-    @Test
-    public void test() {
-        assertEquals(-1, slc.compare("AAA", "AA"));
-        assertEquals(0, slc.compare("AA", "AA"));
-        assertEquals(1, slc.compare("AA", "AAA"));
+    @ParameterizedTest
+    @MethodSource("tests")
+    void compareStringLength(int comparisonResult, String firstString, String secondString) {
+        assertEquals(comparisonResult, slc.compare(firstString, secondString));
     }
 
-    @Test
-    public void emptyStringTest() {
-        assertEquals(-1, slc.compare("A", ""));
-        assertEquals(0, slc.compare("", ""));
-        assertEquals(1, slc.compare("", "A"));
-    }
+    private static Stream<Arguments> tests() {
+        return Stream.of(
+                Arguments.of(-1, "AAA", "AA"),
+                Arguments.of(0, "AA", "AA"),
+                Arguments.of(1, "AA", "AAA"),
 
-    @Test
-    public void backslashTest() {
-        assertEquals(-1, slc.compare("\\\\", "A"));
-        assertEquals(0, slc.compare("\\", "A"));
-        assertEquals(0, slc.compare("\\", "\\"));
-        assertEquals(0, slc.compare("A", "\\"));
-        assertEquals(1, slc.compare("A", "\\\\"));
-    }
+                // empty strings
+                Arguments.of(-1, "A", ""),
+                Arguments.of(0, "", ""),
+                Arguments.of(1, "", "A"),
 
-    @Test
-    public void emptyStringAndBackslashTest() {
-        assertEquals(-1, slc.compare("\\", ""));
-        assertEquals(1, slc.compare("", "\\"));
+                // backslash
+                Arguments.of(-1, "\\\\", "A"),
+                Arguments.of(0, "\\", "A"),
+                Arguments.of(0, "\\", "\\"),
+                Arguments.of(0, "A", "\\"),
+                Arguments.of(1, "A", "\\\\"),
+
+                // empty string + backslash
+                Arguments.of(-1, "\\", ""),
+                Arguments.of(1, "", "\\"));
     }
 }
