@@ -20,18 +20,17 @@ class UnicodeToLatexFormatterTest {
 
     private static Stream<Arguments> testCases() {
         return Stream.of(
-                Arguments.of("", ""), // empty string input
-                Arguments.of("abc", "abc"), // non unicode input
-                Arguments.of("{{\\aa}}{\\\"{a}}{\\\"{o}}", "\u00E5\u00E4\u00F6"), // multiple unicodes input
-                Arguments.of("", "\u0081"), // high code point unicode, boundary case: cp = 129
-                Arguments.of("", "\u0080"), // high code point unicode, boundary case: cp = 128 < 129
-                Arguments.of("M{\\\"{o}}nch", new UnicodeToLatexFormatter().getExampleInput())
-        );
+                         Arguments.of("", ""), // empty string input
+                         Arguments.of("abc", "abc"), // non unicode input
+                         Arguments.of("{{\\aa}}{\\\"{a}}{\\\"{o}}", "\u00E5\u00E4\u00F6"), // multiple unicodes input
+                         Arguments.of("", "\u0081"), // high code point unicode, boundary case: cp = 129
+                         Arguments.of("", "\u0080"), // high code point unicode, boundary case: cp = 128 < 129
+                         Arguments.of("M{\\\"{o}}nch", new UnicodeToLatexFormatter().getExampleInput()));
     }
 
     @ParameterizedTest()
     @MethodSource("testCases")
-    void testFormat(String expectedResult, String input){
+    void testFormat(String expectedResult, String input) {
         assertEquals(expectedResult, formatter.format(input));
     }
 
