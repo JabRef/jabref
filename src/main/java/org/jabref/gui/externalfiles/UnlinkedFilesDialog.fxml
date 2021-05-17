@@ -71,8 +71,8 @@
                             <TableView fx:id="importResultTable" >
                                 <columns>
                                     <TableColumn fx:id="colStatus" prefWidth="40.0" text="%Status"/>
-                                    <TableColumn fx:id="colFile" prefWidth="200.0"  text="%File"/>
-                                    <TableColumn fx:id="colMessage" prefWidth="320.0"  text="%Message"/>
+                                    <TableColumn fx:id="colFile" prefWidth="200.0" text="%File"/>
+                                    <TableColumn fx:id="colMessage" prefWidth="320.0" text="%Message"/>
                                 </columns>
                                 <columnResizePolicy>
                                     <TableView fx:constant="UNCONSTRAINED_RESIZE_POLICY"/>
