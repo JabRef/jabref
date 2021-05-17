@@ -118,6 +118,10 @@ public enum StandardActions implements Action {
     NEXT_PREVIEW_STYLE(Localization.lang("Next preview style"), KeyBinding.NEXT_PREVIEW_LAYOUT),
     PREVIOUS_PREVIEW_STYLE(Localization.lang("Previous preview style"), KeyBinding.PREVIOUS_PREVIEW_LAYOUT),
     SELECT_ALL(Localization.lang("Select all"), KeyBinding.SELECT_ALL),
+    UNSELECT_ALL(Localization.lang("Unselect all")),
+
+    EXPAND_ALL(Localization.lang("Expand all")),
+    COLLAPSE_ALL(Localization.lang("Collapse all")),
 
     NEW_ENTRY(Localization.lang("New entry"), IconTheme.JabRefIcons.ADD_ENTRY, KeyBinding.NEW_ENTRY),
     NEW_ARTICLE(Localization.lang("New article"), IconTheme.JabRefIcons.ADD_ARTICLE),
