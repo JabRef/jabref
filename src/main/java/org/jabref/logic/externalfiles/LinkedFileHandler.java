@@ -1,5 +1,6 @@
 package org.jabref.logic.externalfiles;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -60,7 +61,7 @@ public class LinkedFileHandler {
         }
 
         if (filePreferences.getFileDirectory().isPresent()) {
-            targetDirectoryName = filePreferences.getFileDirectory().get().toString() + "\\" + targetDirectoryName;
+            targetDirectoryName = filePreferences.getFileDirectory().get().toString() + File.separator + targetDirectoryName;
         }
 
         Path targetPath = targetDirectory.get().resolve(targetDirectoryName).resolve(oldFile.get().getFileName());
