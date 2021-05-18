@@ -35,11 +35,15 @@ public class PreambleDiff {
 
     @Override
     public boolean equals(Object other) {
-        if (other == null) {
+        if (this == other) {
+            return true;
+        }
+        if ((other == null) || (getClass() != other.getClass())) {
             return false;
         }
-        return this.getOriginalPreamble().equals(((PreambleDiff) other).getOriginalPreamble())
-                && this.getNewPreamble().equals(((PreambleDiff) other).getNewPreamble());
+
+        PreambleDiff that = (PreambleDiff) other;
+        return Objects.equals(newPreamble, that.newPreamble) && Objects.equals(originalPreamble, that.originalPreamble);
     }
 
     @Override

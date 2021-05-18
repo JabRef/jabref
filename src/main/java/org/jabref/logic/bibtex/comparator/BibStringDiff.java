@@ -91,11 +91,15 @@ public class BibStringDiff {
 
     @Override
     public boolean equals(Object other) {
-        if (other == null) {
+        if (this == other) {
+            return true;
+        }
+        if ((other == null) || (getClass() != other.getClass())) {
             return false;
         }
-        return this.getOriginalString().toString().equals(((BibStringDiff) other).getOriginalString().toString())
-                && this.getNewString().toString().equals(((BibStringDiff) other).getNewString().toString());
+
+        BibStringDiff that = (BibStringDiff) other;
+        return Objects.equals(newString, that.newString) && Objects.equals(originalString, that.originalString);
     }
 
     @Override
