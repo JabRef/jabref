@@ -75,7 +75,7 @@ public class ACMPortalParser implements Parser {
                     Matcher matcher = DOI_HTML_PATTERN.matcher(in.readLine());
                     if (matcher.find()) {
                         doiList.add(matcher.group(1));
-                        ++cnt;
+                        cnt++;
                         if (cnt >= MAX_ITEM_CNT_PER_PAGE) {
                             break;
                         }
@@ -145,7 +145,7 @@ public class ACMPortalParser implements Parser {
      * Parse BibEntry from query result xml
      *
      * @param jsonStr query result in JSON format
-     * @return BibEntry
+     * @return BibEntry parsed from query result
      */
     public BibEntry parseBibEntry(String jsonStr) {
         JsonObject jsonObject = JsonParser.parseString(jsonStr).getAsJsonObject();
@@ -171,10 +171,14 @@ public class ACMPortalParser implements Parser {
         }
 
         if (jsonObject.has("issued")) {
-            JsonArray dateArray = jsonObject.get("issued").getAsJsonObject().get("date-parts").getAsJsonArray().get(0).getAsJsonArray();
-            bibEntry.setField(StandardField.YEAR, dateArray.get(0).getAsString());
-            bibEntry.setField(StandardField.MONTH, dateArray.get(1).getAsString());
-            bibEntry.setField(StandardField.DAY, dateArray.get(2).getAsString());
+            JsonObject issued = jsonObject.get("issued").getAsJsonObject();
+            if (issued.has("date-parts")) {
+                JsonArray dateArray = issued.get("date-parts").getAsJsonArray().get(0).getAsJsonArray();
+                StandardField[] dateField = {StandardField.YEAR, StandardField.MONTH, StandardField.DAY};
+                for (int i = 0; i < dateArray.size(); i++) {
+                    bibEntry.setField(dateField[i], dateArray.get(i).getAsString());
+                }
+            }
         }
 
         if (jsonObject.has("abstract")) {

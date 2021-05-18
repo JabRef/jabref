@@ -37,8 +37,7 @@ public class ACMPortalFetcher implements SearchBasedParserFetcher {
     }
 
     private static String createQueryString(QueryNode query) {
-        String queryString = new DefaultQueryTransformer().transformLuceneQuery(query).orElse("");
-        return queryString.trim().replaceAll("\\s+", "+");
+        return new DefaultQueryTransformer().transformLuceneQuery(query).orElse("");
     }
 
     /**
@@ -57,7 +56,7 @@ public class ACMPortalFetcher implements SearchBasedParserFetcher {
     /**
      * Gets an instance of ACMPortalParser.
      *
-     * @return ACMPortalParser
+     * @return the parser which can process the results returned from the ACM Portal search page
      */
     @Override
     public Parser getParser() {

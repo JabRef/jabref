@@ -93,7 +93,6 @@ public class WebFetchers {
         set.add(new AstrophysicsDataSystem(importFormatPreferences));
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new ZbMATH(importFormatPreferences));
-        // see https://github.com/JabRef/jabref/issues/5804
         set.add(new ACMPortalFetcher());
         // set.add(new GoogleScholar(importFormatPreferences));
         set.add(new DBLPFetcher(importFormatPreferences));
