@@ -58,6 +58,7 @@ import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
+import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.preferences.PreferencesService;
@@ -126,6 +127,7 @@ public class LibraryTab extends Tab {
 
         this.getDatabase().registerListener(new SearchListener());
         this.getDatabase().registerListener(new EntriesRemovedListener());
+        this.getDatabase().registerListener(new FieldKeywordChangeListener());
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
         this.bibDatabaseContext.getDatabase().registerListener(new GroupTreeListener());
@@ -813,6 +815,19 @@ public class LibraryTab extends Tab {
             if (preferencesService.getGroupsPreferences().shouldAutoAssignGroup()) {
                 Globals.stateManager.getSelectedGroup(bibDatabaseContext).forEach(
                         selectedGroup -> selectedGroup.addEntriesToGroup(addedEntriesEvent.getBibEntries()));
+            }
+        }
+    }
+
+    /**
+     * Listen whether field of "keywords" changed.
+     */
+    private class FieldKeywordChangeListener {
+
+        @Subscribe
+        public void listen(FieldChangedEvent fieldChangedEvent) {
+            if (fieldChangedEvent.getField().getName().equals("keywords")) {
+                Globals.stateManager.fieldKeywordChangedProperty().set(Optional.of(fieldChangedEvent));
             }
         }
     }

@@ -216,6 +216,21 @@ public class GroupNodeViewModel {
         return children;
     }
 
+    /**
+     * Reset the chird node based on newDatabase.
+     *
+     * @param newDatabase The database after entries changed.
+     */
+    public void setChildren(BibDatabaseContext newDatabase) {
+        AutomaticGroup automaticGroup = (AutomaticGroup) groupNode.getGroup();
+
+        this.children.setAll(automaticGroup.createSubgroups(newDatabase.getDatabase().getEntries())
+                                           .stream()
+                                           .map(this::toViewModel)
+                                           .sorted((group1, group2) -> group1.getDisplayName().compareToIgnoreCase(group2.getDisplayName()))
+                                           .collect(Collectors.toCollection(FXCollections::observableArrayList)));
+    }
+
     public GroupTreeNode getGroupNode() {
         return groupNode;
     }

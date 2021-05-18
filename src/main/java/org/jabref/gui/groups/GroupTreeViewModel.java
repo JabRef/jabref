@@ -26,6 +26,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AbstractGroup;
+import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.MetaData;
@@ -59,6 +60,8 @@ public class GroupTreeViewModel extends AbstractViewModel {
         // Register listener
         EasyBind.subscribe(stateManager.activeDatabaseProperty(), this::onActiveDatabaseChanged);
         EasyBind.subscribe(selectedGroups, this::onSelectedGroupChanged);
+        // EasyBind.subscribe(stateManager.fieldKeywordChangedProperty(), changeEvent -> onActiveDatabaseChanged(stateManager.getActiveDatabase()));
+        EasyBind.subscribe(stateManager.fieldKeywordChangedProperty(), changeEvent -> onFieldKeywordChanged(stateManager.getActiveDatabase()));
 
         // Set-up bindings
         filterPredicate.bind(EasyBind.map(filterText, text -> group -> group.isMatchedBy(text)));
@@ -137,6 +140,29 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     stateManager.getSelectedGroup(newDatabase.get()).stream()
                                 .map(selectedGroup -> new GroupNodeViewModel(newDatabase.get(), stateManager, taskExecutor, selectedGroup, localDragboard, preferences))
                                 .collect(Collectors.toList()));
+        } else {
+            rootGroup.setValue(null);
+        }
+
+        currentDatabase = newDatabase;
+    }
+
+    /**
+     * Gets invoked when the user is trying to change the value of keywords of any entries.
+     * To ensure the performance for large scale, only group node defined in AutomaticKeywordGroup should be updated.
+     *
+     * @param newDatabase The database after entries changed.
+     */
+    private void onFieldKeywordChanged(Optional<BibDatabaseContext> newDatabase) {
+        if (newDatabase.isPresent()) {
+            if (selectedGroups.size() > 0) {
+                for (GroupNodeViewModel iter:rootGroup.get().getChildren()) {
+                    AbstractGroup keywordGroup = iter.getGroupNode().getGroup();
+                    if (keywordGroup.getClass() == AutomaticKeywordGroup.class && ((AutomaticKeywordGroup) keywordGroup).getField().getName().equals("keywords")) {
+                        iter.setChildren(newDatabase.get());
+                    }
+                }
+            }
         } else {
             rootGroup.setValue(null);
         }
