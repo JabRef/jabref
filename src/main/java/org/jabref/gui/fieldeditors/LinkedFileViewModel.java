@@ -434,29 +434,25 @@ public class LinkedFileViewModel extends AbstractViewModel {
 
             BackgroundTask<Path> downloadTask = prepareDownloadTask(targetDirectory.get(), urlDownload);
             downloadTask.onSuccess(destination -> {
-                LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectories(filePreferences), externalFileTypes);
+                boolean isDuplicate = false;
+                try {
+                    isDuplicate = FileNameUniqueness.isDuplicatedFile(targetDirectory.get(), destination.getFileName(), dialogService);
+                } catch (IOException e) {
+                    LOGGER.error("FileNameUniqueness.isDuplicatedFile failed", e);
+                    return;
+                }
 
-                List<LinkedFile> linkedFiles = entry.getFiles();
-                int oldFileIndex = -1;
-                int i = 0;
-                while ((i < linkedFiles.size()) && (oldFileIndex == -1)) {
-                    LinkedFile file = linkedFiles.get(i);
-                    // The file type changes as part of download process (see prepareDownloadTask), thus we only compare by link
-                    if (file.getLink().equalsIgnoreCase(linkedFile.getLink())) {
-                        oldFileIndex = i;
+                if (!isDuplicate) {
+                    LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectories(filePreferences), externalFileTypes);
+                    List<LinkedFile> linkedFiles = entry.getFiles();
+
+                    entry.addLinkedFile(entry, linkedFile, newLinkedFile, linkedFiles);
+
+                    // Notify in bar when the file type is HTML.
+                    if (newLinkedFile.getFileType().equals(StandardExternalFileType.URL.getName())) {
+                        dialogService.notify(Localization.lang("Downloaded website as an HTML file."));
+                        LOGGER.debug("Downloaded website {} as an HTML file at {}", linkedFile.getLink(), destination);
                     }
-                    i++;
-                }
-                if (oldFileIndex == -1) {
-                    linkedFiles.add(0, newLinkedFile);
-                } else {
-                    linkedFiles.set(oldFileIndex, newLinkedFile);
-                }
-                entry.setFiles(linkedFiles);
-                // Notify in bar when the file type is HTML.
-                if (newLinkedFile.getFileType().equals(StandardExternalFileType.URL.getName())) {
-                    dialogService.notify(Localization.lang("Downloaded website as an HTML file."));
-                    LOGGER.debug("Downloaded website {} as an HTML file at {}", linkedFile.getLink(), destination);
                 }
             });
             downloadProgress.bind(downloadTask.workDonePercentageProperty());
