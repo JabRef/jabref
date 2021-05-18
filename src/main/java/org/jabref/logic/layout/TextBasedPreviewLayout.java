@@ -37,6 +37,8 @@ public class TextBasedPreviewLayout implements PreviewLayout {
         StringReader sr = new StringReader(text.replace("__NEWLINE__", "\n"));
         try {
             layout = new LayoutHelper(sr, layoutFormatterPreferences).getLayoutFromText();
+        } catch (StringIndexOutOfBoundsException e) {
+            LOGGER.error("Could not generate layout", e);
         } catch (IOException e) {
             LOGGER.error("Could not generate layout", e);
         }
