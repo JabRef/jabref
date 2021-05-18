@@ -78,7 +78,7 @@ public class LinkedFileHandler {
         Files.move(oldFile.get(), targetPath);
 
         // Update path
-        fileEntry.setLink(relativize(targetPath));
+        fileEntry.setLink(targetPath.toString());
         return true;
     }
 
@@ -116,14 +116,9 @@ public class LinkedFileHandler {
         }
 
         // Update path
-        fileEntry.setLink(relativize(newPath));
+        fileEntry.setLink(newPath.toString());
 
         return true;
-    }
-
-    private String relativize(Path path) {
-        List<Path> fileDirectories = databaseContext.getFileDirectories(filePreferences);
-        return FileUtil.relativize(path, fileDirectories).toString();
     }
 
     public String getSuggestedFileName() {
