@@ -545,6 +545,7 @@ public class BracketedPattern {
      * @param label  The generated label.
      * @param parts  String array containing the modifiers.
      * @param offset The number of initial items in the modifiers array to skip.
+     * @param expandBracketContent a function to expand the content in the parentheses.
      * @return The modified label.
      */
     static String applyModifiers(final String label, final List<String> parts, final int offset, Function<String, String> expandBracketContent) {

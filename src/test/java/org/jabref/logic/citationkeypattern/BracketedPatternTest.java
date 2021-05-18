@@ -385,47 +385,54 @@ class BracketedPatternTest {
     void expandBracketsWithFallbackToString() {
         BibEntry bibEntry = new BibEntry()
                 .withField(StandardField.TITLE, "Title");
+        BracketedPattern pattern = new BracketedPattern("[title]_[EPRINT:(eprint)]");
 
-        assertEquals("Title_eprint", BracketedPattern.expandBrackets("[title]_[EPRINT:(eprint)]", null, bibEntry, null));
+        assertEquals("Title_eprint", pattern.expand(bibEntry));
     }
 
     @Test
     void expandBracketsWithTwoFallbacks() {
         BibEntry bibEntry = new BibEntry()
                 .withField(StandardField.YEAR, "2021");
+        BracketedPattern pattern = new BracketedPattern("[title:([EPRINT:([YEAR])])]");
 
-        assertEquals("2021", BracketedPattern.expandBrackets("[title:([EPRINT:([YEAR])])]", null, bibEntry, null));
+        assertEquals("2021", pattern.expand(bibEntry));
     }
 
     @Test
     void unbalancedBracketsExpandWithFallback() {
         BibEntry bibEntry = new BibEntry()
                 .withField(StandardField.YEAR, "2021");
+        BracketedPattern pattern = new BracketedPattern("[title:([YEAR)]");
+        BracketedPattern pattern1 = new BracketedPattern("[title:(YEAR])]");
 
-        assertEquals("", BracketedPattern.expandBrackets("[title:([YEAR)]", null, bibEntry, null));
-        assertEquals(")]", BracketedPattern.expandBrackets("[title:(YEAR])]", null, bibEntry, null));
+        assertEquals("", pattern.expand(bibEntry));
+        assertEquals(")]", pattern1.expand(bibEntry));
     }
 
     @Test
     void expandBracketsWithFallbackFieldAndString() {
         BibEntry bibEntry = new BibEntry()
                 .withField(StandardField.YEAR, "2021");
+        BracketedPattern pattern = new BracketedPattern("[title:(not[YEAR])]");
 
-        assertEquals("not2021", BracketedPattern.expandBrackets("[title:(not[YEAR])]", null, bibEntry, null));
+        assertEquals("not2021", pattern.expand(bibEntry));
     }
 
     @Test
     void expandBracketsWithFallbackFieldAndSpecialString() {
         BibEntry bibEntry = new BibEntry()
                 .withField(StandardField.YEAR, "2021");
+        BracketedPattern pattern = new BracketedPattern("[title:(auth[YEAR])]");
 
-        assertEquals("auth2021", BracketedPattern.expandBrackets("[title:(auth[YEAR])]", null, bibEntry, null));
+        assertEquals("auth2021", pattern.expand(bibEntry));
     }
 
     @Test
     void expandBracketsWithFallbackSpecialString() {
         BibEntry bibEntry = new BibEntry();
+        BracketedPattern pattern = new BracketedPattern("[title:(auth)]");
 
-        assertEquals("auth", BracketedPattern.expandBrackets("[title:(auth)]", null, bibEntry, null));
+        assertEquals("auth", pattern.expand(bibEntry));
     }
 }
