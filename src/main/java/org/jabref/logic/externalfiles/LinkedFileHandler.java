@@ -1,6 +1,5 @@
 package org.jabref.logic.externalfiles;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -61,7 +60,7 @@ public class LinkedFileHandler {
         }
 
         if (filePreferences.getFileDirectory().isPresent()) {
-            targetDirectoryName = filePreferences.getFileDirectory().get().toString() + File.separator + targetDirectoryName;
+            targetDirectoryName = filePreferences.getFileDirectory().get().resolve(targetDirectoryName).toString();
         }
 
         Path targetPath = targetDirectory.get().resolve(targetDirectoryName).resolve(oldFile.get().getFileName());
@@ -78,7 +77,7 @@ public class LinkedFileHandler {
         Files.move(oldFile.get(), targetPath);
 
         // Update path
-        fileEntry.setLink(targetPath.toString());
+        fileEntry.setLink(relativize(targetPath));
         return true;
     }
 
@@ -116,9 +115,14 @@ public class LinkedFileHandler {
         }
 
         // Update path
-        fileEntry.setLink(newPath.toString());
+        fileEntry.setLink(relativize(newPath));
 
         return true;
+    }
+
+    private String relativize(Path path) {
+        List<Path> fileDirectories = databaseContext.getFileDirectories(filePreferences);
+        return FileUtil.relativize(path, fileDirectories).toString();
     }
 
     public String getSuggestedFileName() {
@@ -146,14 +150,14 @@ public class LinkedFileHandler {
     public Optional<Path> findExistingFile(LinkedFile flEntry, BibEntry entry, String targetFileName) {
         // The .get() is legal without check because the method will always return a value.
         Path targetFilePath = flEntry.findIn(databaseContext, filePreferences)
-                                     .get().getParent().resolve(targetFileName);
+                .get().getParent().resolve(targetFileName);
         Path oldFilePath = flEntry.findIn(databaseContext, filePreferences).get();
         // Check if file already exists in directory with different case.
         // This is necessary because other entries may have such a file.
         Optional<Path> matchedByDiffCase = Optional.empty();
         try (Stream<Path> stream = Files.list(oldFilePath.getParent())) {
             matchedByDiffCase = stream.filter(name -> name.toString().equalsIgnoreCase(targetFilePath.toString()))
-                                      .findFirst();
+                    .findFirst();
         } catch (IOException e) {
             LOGGER.error("Could not get the list of files in target directory", e);
         }
