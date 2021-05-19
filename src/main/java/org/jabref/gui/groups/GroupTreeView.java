@@ -359,10 +359,10 @@ public class GroupTreeView {
         MenuItem sortSubgroups = new MenuItem(Localization.lang("Sort subgroups"));
         sortSubgroups.setOnAction(event -> viewModel.sortAlphabeticallyRecursive(group));
 
-        MenuItem addEntries = new MenuItem(Localization.lang("Add Selected Entries to this Group"));
+        MenuItem addEntries = new MenuItem(Localization.lang("Add selected entries to this group"));
         addEntries.setOnAction(event -> viewModel.addSelectedEntries(group));
 
-        MenuItem removeEntries = new MenuItem(Localization.lang("Remove Selected Entries from this Group"));
+        MenuItem removeEntries = new MenuItem(Localization.lang("Remove selected entries from this group"));
         removeEntries.setOnAction(event -> viewModel.removeSelectedEntries(group));
 
         menu.getItems().add(editGroup);
