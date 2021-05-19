@@ -61,7 +61,7 @@ public class LinkedFileHandler {
         }
 
         if (filePreferences.getFileDirectory().isPresent()) {
-            targetDirectoryName = filePreferences.getFileDirectory().get().toString() + File.separator + targetDirectoryName;
+            targetDirectoryName = filePreferences.getFileDirectory().get().resolve(targetDirectoryName).toString();
         }
 
         Path targetPath = targetDirectory.get().resolve(targetDirectoryName).resolve(oldFile.get().getFileName());
