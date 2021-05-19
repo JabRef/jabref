@@ -163,11 +163,11 @@ public class MainTableColumnModel {
         return sortTypeProperty.getValue();
     }
 
-    public boolean getVisibleStatus(){
+    public boolean getVisibleStatus() {
         return visible;
     }
 
-    public void setVisibleStatus(boolean visible){
+    public void setVisibleStatus(boolean visible) {
         this.visible = visible;
     }
 
