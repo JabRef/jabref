@@ -28,7 +28,7 @@ public class BibStringDiffTest {
 
     @Test
     void compareTest() {
-        BibStringDiff result = BibStringDiff.compare(originalDataBase, newDataBase).get(0);
-        assertEquals(diff, result);
+        List<BibStringDiff> result = BibStringDiff.compare(originalDataBase, newDataBase);
+        assertEquals(List.of(diff), result);
     }
 }

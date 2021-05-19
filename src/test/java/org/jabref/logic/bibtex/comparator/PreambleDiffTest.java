@@ -38,8 +38,8 @@ public class PreambleDiffTest {
         when(originalDataBase.getPreamble()).thenReturn(Optional.of("preamble"));
         when(newDataBase.getPreamble()).thenReturn(Optional.of("otherPreamble"));
 
-        PreambleDiff expected = new PreambleDiff("preamble", "otherPreamble");
-        PreambleDiff result = PreambleDiff.compare(originalDataBaseContext, newDataBaseContext).orElse(null);
+        Optional<PreambleDiff> expected = Optional.of(new PreambleDiff("preamble", "otherPreamble"));
+        Optional<PreambleDiff> result = PreambleDiff.compare(originalDataBaseContext, newDataBaseContext);
         assertEquals(expected, result);
     }
 }
