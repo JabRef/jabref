@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -156,18 +157,14 @@ public class ACMPortalParser implements Parser {
 
         if (jsonObject.has("author")) {
             JsonArray authors = jsonObject.getAsJsonArray("author");
-            StringBuilder authorStrBuilder = new StringBuilder();
-            int size = authors.size();
+            StringJoiner authorsJoiner = new StringJoiner(" and ");
             for (JsonElement author : authors) {
                 JsonObject authorJsonObject = author.getAsJsonObject();
-                authorStrBuilder.append(authorJsonObject.get("given").getAsString()).append(" ")
-                        .append(authorJsonObject.get("family").getAsString());
-                --size;
-                if (size > 0) {
-                    authorStrBuilder.append(" and ");
-                }
+                authorsJoiner.add(
+                        authorJsonObject.get("given").getAsString() + " " + authorJsonObject.get("family").getAsString()
+                );
             }
-            bibEntry.setField(StandardField.AUTHOR, authorStrBuilder.toString());
+            bibEntry.setField(StandardField.AUTHOR, authorsJoiner.toString());
         }
 
         if (jsonObject.has("issued")) {
