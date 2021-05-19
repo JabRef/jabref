@@ -30,10 +30,10 @@ import org.jabref.preferences.PreferencesService;
 
 public class CustomizationTabViewModel implements PreferenceTabViewModel {
 
+    private final static Map<String, String> API_KEY_NAME_URL = new TreeMap<>();
     private final BooleanProperty useCustomDOIProperty = new SimpleBooleanProperty();
     private final StringProperty useCustomDOINameProperty = new SimpleStringProperty("");
 
-    private final static Map<String, String> API_KEY_NAME_URL = new TreeMap<>();
     private final ListProperty<CustomApiKeyPreferences> customApiKeyPrefsListProperty = new SimpleListProperty<>();
     private final ObjectProperty<CustomApiKeyPreferences> selectedCustomApiKeyPrefProperty = new SimpleObjectProperty<>();
     private final BooleanProperty useCustomApiKeyProperty = new SimpleBooleanProperty();
@@ -61,7 +61,7 @@ public class CustomizationTabViewModel implements PreferenceTabViewModel {
      *
      * @return ArrayList containing Fetcher names
      */
-    public ArrayList<String> getCustomApiKeyFetchers(){
+    public ArrayList<String> getCustomApiKeyFetchers() {
         return new ArrayList<>(API_KEY_NAME_URL.keySet());
     }
 
@@ -91,9 +91,13 @@ public class CustomizationTabViewModel implements PreferenceTabViewModel {
                 useCustomDOIProperty.getValue(),
                 useCustomDOINameProperty.getValue().trim()));
         selectedCustomApiKeyPrefProperty.get().useCustom(useCustomApiKeyProperty.get());
-        selectedCustomApiKeyPrefProperty.get().setDefaultApiKey(customApiKeyTextProperty.get());
+        selectedCustomApiKeyPrefProperty.get().setCustomApiKey(customApiKeyTextProperty.get());
         for (CustomApiKeyPreferences apiKeyPreferences : customApiKeyPrefsListProperty.get()) {
-            preferencesService.storeCustomApiKeyPreferences(apiKeyPreferences);
+            if (apiKeyPreferences.getCustomApiKey().isEmpty()) {
+                preferencesService.clearCustomApiKeyPreferences(apiKeyPreferences.getName());
+            } else {
+                preferencesService.storeCustomApiKeyPreferences(apiKeyPreferences);
+            }
         }
     }
 

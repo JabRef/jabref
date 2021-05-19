@@ -40,6 +40,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Identifier;
+import org.jabref.preferences.PreferencesService;
 
 import static org.jabref.model.entry.field.StandardField.EPRINT;
 import static org.jabref.model.entry.field.StandardField.ISBN;
@@ -83,7 +84,8 @@ public class WebFetchers {
     /**
      * @return sorted set containing search based fetchers
      */
-    public static SortedSet<SearchBasedFetcher> getSearchBasedFetchers(ImportFormatPreferences importFormatPreferences) {
+    public static SortedSet<SearchBasedFetcher> getSearchBasedFetchers(PreferencesService preferencesService) {
+        ImportFormatPreferences importFormatPreferences = preferencesService.getImportFormatPreferences();
         SortedSet<SearchBasedFetcher> set = new TreeSet<>(Comparator.comparing(WebFetcher::getName));
         set.add(new ArXiv(importFormatPreferences));
         set.add(new INSPIREFetcher(importFormatPreferences));
@@ -96,11 +98,11 @@ public class WebFetchers {
         // set.add(new ACMPortalFetcher(importFormatPreferences));
         // set.add(new GoogleScholar(importFormatPreferences));
         set.add(new DBLPFetcher(importFormatPreferences));
-        set.add(new SpringerFetcher());
+        set.add(new SpringerFetcher(preferencesService));
         set.add(new CrossRef());
         set.add(new CiteSeer());
         set.add(new DOAJFetcher(importFormatPreferences));
-        set.add(new IEEE(importFormatPreferences));
+        set.add(new IEEE(preferencesService));
         set.add(new CompositeSearchBasedFetcher(set, 30));
         set.add(new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences));
         // set.add(new JstorFetcher(importFormatPreferences));
@@ -157,16 +159,16 @@ public class WebFetchers {
     /**
      * @return set containing fulltext fetchers
      */
-    public static Set<FulltextFetcher> getFullTextFetchers(ImportFormatPreferences importFormatPreferences) {
+    public static Set<FulltextFetcher> getFullTextFetchers(PreferencesService preferencesService) {
         Set<FulltextFetcher> fetchers = new HashSet<>();
         // Original
         fetchers.add(new DoiResolution());
         // Publishers
         fetchers.add(new ScienceDirect());
-        fetchers.add(new SpringerLink());
+        fetchers.add(new SpringerLink(preferencesService));
         fetchers.add(new ACS());
-        fetchers.add(new ArXiv(importFormatPreferences));
-        fetchers.add(new IEEE(importFormatPreferences));
+        fetchers.add(new ArXiv(preferencesService.getImportFormatPreferences()));
+        fetchers.add(new IEEE(preferencesService));
         fetchers.add(new ApsFetcher());
         // Meta search
         // fetchers.add(new JstorFetcher(importFormatPreferences));

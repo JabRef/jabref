@@ -30,7 +30,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
@@ -59,9 +59,15 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
     private static final String API_KEY = new BuildInfo().ieeeAPIKey;
 
     private final ImportFormatPreferences importFormatPreferences;
+    private PreferencesService preferencesService;
 
     public IEEE(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
+    }
+
+    public IEEE(PreferencesService preferencesService) {
+        this.preferencesService = Objects.requireNonNull(preferencesService);
+        this.importFormatPreferences = preferencesService.getImportFormatPreferences();
     }
 
     /**
@@ -232,13 +238,11 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
      * @return IEEE API Key
      */
     private String getApiKey() {
-        // TODO: Construct CustomPreferences as a global variable, and may modify ImportFormatPreferences
-        JabRefPreferences preferences = null;
         String apiKey = API_KEY;
-        if (preferences != null) {
-            CustomApiKeyPreferences apiKeyPreferences = preferences.getCustomApiKeyPreferences(getName());
+        if (preferencesService != null) {
+            CustomApiKeyPreferences apiKeyPreferences = preferencesService.getCustomApiKeyPreferences(getName());
             if (apiKeyPreferences.isUseCustom()) {
-                apiKey = apiKeyPreferences.getDefaultApiKey();
+                apiKey = apiKeyPreferences.getCustomApiKey();
             }
         }
         return apiKey;

@@ -181,7 +181,7 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
         if (preferences != null) {
             CustomApiKeyPreferences apiKeyPreferences = preferences.getCustomApiKeyPreferences(getName());
             if (apiKeyPreferences.isUseCustom()) {
-                apiKey = apiKeyPreferences.getDefaultApiKey();
+                apiKey = apiKeyPreferences.getCustomApiKey();
             }
         }
         return apiKey;

@@ -59,11 +59,11 @@ public class CustomizationTab extends AbstractPreferenceTabView<CustomizationTab
         customApiKeyNameComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue != null) {
                 oldValue.useCustom(useCustomApiKeyCheckBox.isSelected());
-                oldValue.setDefaultApiKey(useCustomApiKeyText.getText().trim());
+                oldValue.setCustomApiKey(useCustomApiKeyText.getText().trim());
             }
             if (newValue != null) {
                 useCustomApiKeyCheckBox.setSelected(newValue.isUseCustom());
-                useCustomApiKeyText.setText(newValue.getDefaultApiKey());
+                useCustomApiKeyText.setText(newValue.getCustomApiKey());
             }
         });
 

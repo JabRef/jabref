@@ -53,7 +53,7 @@ public class SpringerLink implements FulltextFetcher {
         if (preferences != null) {
             CustomApiKeyPreferences apiKeyPreferences = preferences.getCustomApiKeyPreferences(NAME);
             if (apiKeyPreferences.isUseCustom()) {
-                apiKey = apiKeyPreferences.getDefaultApiKey();
+                apiKey = apiKeyPreferences.getCustomApiKey();
             }
         }
         return apiKey;

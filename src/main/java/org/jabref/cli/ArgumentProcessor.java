@@ -535,7 +535,7 @@ public class ArgumentProcessor {
         String engine = split[0];
         String query = split[1];
 
-        Set<SearchBasedFetcher> fetchers = WebFetchers.getSearchBasedFetchers(Globals.prefs.getImportFormatPreferences());
+        Set<SearchBasedFetcher> fetchers = WebFetchers.getSearchBasedFetchers(Globals.prefs);
         Optional<SearchBasedFetcher> selectedFetcher = fetchers.stream()
                                                                .filter(fetcher -> fetcher.getName().equalsIgnoreCase(engine))
                                                                .findFirst();

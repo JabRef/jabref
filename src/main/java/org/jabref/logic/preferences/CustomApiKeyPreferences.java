@@ -3,12 +3,12 @@ package org.jabref.logic.preferences;
 public class CustomApiKeyPreferences {
     private final String name;
     private boolean useCustom;
-    private String defaultApiKey;
+    private String customApiKey;
 
-    public CustomApiKeyPreferences(String name, boolean useCustom, String defaultApiKey) {
+    public CustomApiKeyPreferences(String name, boolean useCustom, String customApiKey) {
         this.name = name;
         this.useCustom = useCustom;
-        this.defaultApiKey = defaultApiKey;
+        this.customApiKey = customApiKey;
     }
 
     public String getName() {
@@ -19,16 +19,16 @@ public class CustomApiKeyPreferences {
         return useCustom;
     }
 
-    public String getDefaultApiKey() {
-        return defaultApiKey;
+    public String getCustomApiKey() {
+        return customApiKey;
     }
 
     public void useCustom(boolean useCustom) {
         this.useCustom = useCustom;
     }
 
-    public void setDefaultApiKey(String defaultApiKey) {
-        this.defaultApiKey = defaultApiKey;
+    public void setCustomApiKey(String customApiKey) {
+        this.customApiKey = customApiKey;
     }
 
 }

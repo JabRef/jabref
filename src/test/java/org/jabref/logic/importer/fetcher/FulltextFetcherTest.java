@@ -7,6 +7,7 @@ import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -14,12 +15,15 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class FulltextFetcherTest {
 
     @SuppressWarnings("unused")
     private static Set<FulltextFetcher> fetcherProvider() {
-        return WebFetchers.getFullTextFetchers(mock(ImportFormatPreferences.class));
+        PreferencesService preferencesService = mock(PreferencesService.class);
+        when(preferencesService.getImportFormatPreferences()).thenReturn(mock(ImportFormatPreferences.class));
+        return WebFetchers.getFullTextFetchers(preferencesService);
     }
 
     @ParameterizedTest

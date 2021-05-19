@@ -150,11 +150,13 @@ public interface PreferencesService {
 
     DOIPreferences getDOIPreferences();
 
-    CustomApiKeyPreferences getCustomApiKeyPreferences(String name);
-
     void storeDOIPreferences(DOIPreferences preferences);
 
+    CustomApiKeyPreferences getCustomApiKeyPreferences(String name);
+
     void storeCustomApiKeyPreferences(CustomApiKeyPreferences preferences);
+
+    void clearCustomApiKeyPreferences(String name);
 
     OwnerPreferences getOwnerPreferences();
 

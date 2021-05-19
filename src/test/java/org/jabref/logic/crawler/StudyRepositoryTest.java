@@ -30,6 +30,7 @@ import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.study.FetchResult;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,6 +47,7 @@ import static org.mockito.Mockito.when;
 class StudyRepositoryTest {
     private static final String NON_EXISTING_DIRECTORY = "nonExistingTestRepositoryDirectory";
     CitationKeyPatternPreferences citationKeyPatternPreferences;
+    PreferencesService preferencesService;
     ImportFormatPreferences importFormatPreferences;
     SavePreferences savePreferences;
     TimestampPreferences timestampPreferences;
@@ -63,6 +65,7 @@ class StudyRepositoryTest {
      */
     @BeforeEach
     public void setUpMocks() throws Exception {
+        preferencesService = mock(PreferencesService.class);
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         timestampPreferences = mock(TimestampPreferences.class);
@@ -76,6 +79,7 @@ class StudyRepositoryTest {
                 DEFAULT_UNWANTED_CHARACTERS,
                 GlobalCitationKeyPattern.fromPattern("[auth][year]"),
                 ',');
+        when(preferencesService.getImportFormatPreferences()).thenReturn(importFormatPreferences);
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
         when(savePreferences.getEncoding()).thenReturn(null);
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
@@ -93,7 +97,7 @@ class StudyRepositoryTest {
     void providePathToNonExistentRepositoryThrowsException() {
         Path nonExistingRepositoryDirectory = tempRepositoryDirectory.resolve(NON_EXISTING_DIRECTORY);
 
-        assertThrows(IOException.class, () -> new StudyRepository(nonExistingRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, timestampPreferences, entryTypesManager));
+        assertThrows(IOException.class, () -> new StudyRepository(nonExistingRepositoryDirectory, gitHandler, preferencesService, new DummyFileUpdateMonitor(), savePreferences, timestampPreferences, entryTypesManager));
     }
 
     /**
@@ -173,7 +177,7 @@ class StudyRepositoryTest {
 
     private StudyRepository getTestStudyRepository() throws Exception {
         setUpTestStudyDefinitionFile();
-        studyRepository = new StudyRepository(tempRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, timestampPreferences, entryTypesManager);
+        studyRepository = new StudyRepository(tempRepositoryDirectory, gitHandler, preferencesService, new DummyFileUpdateMonitor(), savePreferences, timestampPreferences, entryTypesManager);
         return studyRepository;
     }
 

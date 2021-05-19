@@ -1392,6 +1392,12 @@ public class JabRefPreferences implements PreferencesService {
                 get(BASE_DOI_URI));
     }
 
+    @Override
+    public void storeDOIPreferences(DOIPreferences preferences) {
+        putBoolean(USE_CUSTOM_DOI_URI, preferences.isUseCustom());
+        put(BASE_DOI_URI, preferences.getDefaultBaseURI());
+    }
+
     /**
      * Gets the CustomAPIKeyPreferences that contains information: the custom API key and whether to use it
      *
@@ -1405,12 +1411,6 @@ public class JabRefPreferences implements PreferencesService {
                 get(CUSTOM_API_KEY + name, ""));
     }
 
-    @Override
-    public void storeDOIPreferences(DOIPreferences preferences) {
-        putBoolean(USE_CUSTOM_DOI_URI, preferences.isUseCustom());
-        put(BASE_DOI_URI, preferences.getDefaultBaseURI());
-    }
-
     /**
      * Saves CustomAPIKeyPreferences information: the custom custom API key and whether to use it
      *
@@ -1420,7 +1420,18 @@ public class JabRefPreferences implements PreferencesService {
     public void storeCustomApiKeyPreferences(CustomApiKeyPreferences preferences) {
         String keyName = preferences.getName();
         putBoolean(USE_CUSTOM_API_KEY + keyName, preferences.isUseCustom());
-        put(CUSTOM_API_KEY + keyName, preferences.getDefaultApiKey());
+        put(CUSTOM_API_KEY + keyName, preferences.getCustomApiKey());
+    }
+
+    /**
+     * Removes the value associated with the specified custom api key in this preference node, if any.
+     *
+     * @param name the name of custom api key
+     */
+    @Override
+    public void clearCustomApiKeyPreferences(String name) {
+        prefs.remove(USE_CUSTOM_API_KEY + name);
+        prefs.remove(CUSTOM_API_KEY + name);
     }
 
     @Override
