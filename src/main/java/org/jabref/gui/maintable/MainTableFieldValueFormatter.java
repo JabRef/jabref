@@ -84,4 +84,13 @@ public class MainTableFieldValueFormatter {
             case NATBIB -> authors.latexFree().getAsNatbib();
         };
     }
+
+    /***
+     * Finds the entry in the crossref field
+     * @param entry the entry to be searched
+     * @return The referenced entry
+     */
+    public Optional<BibEntry> getReferencedEntry(BibEntry entry) {
+        return bibDatabase.getReferencedEntry(entry);
+    }
 }
