@@ -8,6 +8,11 @@ import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -381,58 +386,25 @@ class BracketedPatternTest {
                 BracketedPattern.expandBrackets("[author] have published [title] in [journal].", ',', entry, database));
     }
 
-    @Test
-    void expandBracketsWithFallbackToString() {
+    @ParameterizedTest
+    @MethodSource("provideArgumentsForFallback")
+    void expandBracketsWithFallback(String expandResult, String pattern) {
         BibEntry bibEntry = new BibEntry()
-                .withField(StandardField.TITLE, "Title");
-        BracketedPattern pattern = new BracketedPattern("[title]_[EPRINT:(eprint)]");
+                .withField(StandardField.YEAR, "2021").withField(StandardField.EPRINT, "2105.02891");
+        BracketedPattern bracketedPattern = new BracketedPattern(pattern);
 
-        assertEquals("Title_eprint", pattern.expand(bibEntry));
+        assertEquals(expandResult, bracketedPattern.expand(bibEntry));
     }
 
-    @Test
-    void expandBracketsWithTwoFallbacks() {
-        BibEntry bibEntry = new BibEntry()
-                .withField(StandardField.YEAR, "2021");
-        BracketedPattern pattern = new BracketedPattern("[title:([EPRINT:([YEAR])])]");
-
-        assertEquals("2021", pattern.expand(bibEntry));
-    }
-
-    @Test
-    void unbalancedBracketsExpandWithFallback() {
-        BibEntry bibEntry = new BibEntry()
-                .withField(StandardField.YEAR, "2021");
-        BracketedPattern pattern = new BracketedPattern("[title:([YEAR)]");
-        BracketedPattern pattern1 = new BracketedPattern("[title:(YEAR])]");
-
-        assertEquals("", pattern.expand(bibEntry));
-        assertEquals(")]", pattern1.expand(bibEntry));
-    }
-
-    @Test
-    void expandBracketsWithFallbackFieldAndString() {
-        BibEntry bibEntry = new BibEntry()
-                .withField(StandardField.YEAR, "2021");
-        BracketedPattern pattern = new BracketedPattern("[title:(not[YEAR])]");
-
-        assertEquals("not2021", pattern.expand(bibEntry));
-    }
-
-    @Test
-    void expandBracketsWithFallbackFieldAndSpecialString() {
-        BibEntry bibEntry = new BibEntry()
-                .withField(StandardField.YEAR, "2021");
-        BracketedPattern pattern = new BracketedPattern("[title:(auth[YEAR])]");
-
-        assertEquals("auth2021", pattern.expand(bibEntry));
-    }
-
-    @Test
-    void expandBracketsWithFallbackSpecialString() {
-        BibEntry bibEntry = new BibEntry();
-        BracketedPattern pattern = new BracketedPattern("[title:(auth)]");
-
-        assertEquals("auth", pattern.expand(bibEntry));
+    private static Stream<Arguments> provideArgumentsForFallback() {
+        return Stream.of(
+                Arguments.of("auth", "[title:(auth)]"),
+                Arguments.of("auth2021", "[title:(auth[YEAR])]"),
+                Arguments.arguments("not2021", "[title:(not[YEAR])]"),
+                Arguments.arguments("", "[title:([YEAR)]"),
+                Arguments.arguments(")]", "[title:(YEAR])]"),
+                Arguments.arguments("2105.02891", "[title:([EPRINT:([YEAR])])]"),
+                Arguments.arguments("2021", "[title:([auth:([YEAR])])]")
+        );
     }
 }
