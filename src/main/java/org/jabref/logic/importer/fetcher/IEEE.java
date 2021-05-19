@@ -241,7 +241,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
         String apiKey = API_KEY;
         if (preferencesService != null) {
             CustomApiKeyPreferences apiKeyPreferences = preferencesService.getCustomApiKeyPreferences(getName());
-            if (apiKeyPreferences.isUseCustom()) {
+            if (apiKeyPreferences != null && apiKeyPreferences.isUseCustom()) {
                 apiKey = apiKeyPreferences.getCustomApiKey();
             }
         }
