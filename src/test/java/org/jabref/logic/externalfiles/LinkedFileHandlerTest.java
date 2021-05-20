@@ -1,5 +1,12 @@
 package org.jabref.logic.externalfiles;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Optional;
+
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -13,14 +20,6 @@ import org.junit.jupiter.api.io.TempDir;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Optional;
 
 class LinkedFileHandlerTest {
     private LinkedFileHandler linkedFileHandler;
