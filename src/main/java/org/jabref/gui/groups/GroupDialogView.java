@@ -12,7 +12,6 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -31,6 +30,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     // Basic Settings
     @FXML private TextField nameField;
     @FXML private TextField descriptionField;
+    @FXML private Button iconButton;
     @FXML private TextField iconField;
     @FXML private ColorPicker colorField;
     @FXML private ComboBox<GroupHierarchyType> hierarchicalContextCombo;
@@ -164,5 +164,10 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML
     private void openHelp() {
         viewModel.openHelpPage();
+    }
+
+    @FXML
+    private void openIconPicker() {
+        viewModel.openIconPickerPage();
     }
 }

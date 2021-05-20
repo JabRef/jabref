@@ -434,6 +434,12 @@ public class GroupDialogViewModel {
         HelpAction.openHelpPage(HelpFile.GROUPS);
     }
 
+    public void openIconPickerPage(){
+        GroupIconPicker groupIconPicker= new GroupIconPicker();
+        dialogService.showCustomDialogAndWait(groupIconPicker);
+        iconProperty.setValue(groupIconPicker.selected_icon_name);
+    }
+
     private List<Path> getFileDirectoriesAsPaths() {
         List<Path> fileDirs = new ArrayList<>();
         MetaData metaData = currentDatabase.getMetaData();

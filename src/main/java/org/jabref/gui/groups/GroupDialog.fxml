@@ -16,6 +16,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
+<?import javafx.scene.text.Font?>
 <DialogPane prefHeight="300.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.groups.GroupDialogView">
     <content>
@@ -38,8 +39,16 @@
             </VBox>
             <HBox spacing="10.0">
                 <VBox HBox.hgrow="ALWAYS">
-                    <Label text="%Icon"/>
-                    <TextField fx:id="iconField"/>
+                    <Label text="%Icon" />
+                    <Button fx:id="iconButton" onAction="#openIconPicker" text="IconPicker" minHeight="23.5" maxHeight="23.5" prefHeight="23.5">
+                        <font>
+                            <Font size="10.5" />
+                        </font>
+                    </Button>
+                </VBox>
+                <VBox HBox.hgrow="ALWAYS">
+                    <Label text="IconField"/>
+                    <TextField fx:id="iconField" />
                 </VBox>
                 <VBox layoutX="10.0" layoutY="10.0" minWidth="130.0" maxWidth="130.0" prefWidth="130.0">
                     <Label text="%Color"/>
