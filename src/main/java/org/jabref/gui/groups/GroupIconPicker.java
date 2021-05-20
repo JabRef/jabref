@@ -27,7 +27,8 @@ public class GroupIconPicker extends BaseDialog<AbstractGroup> {
     private static int iconInOnePage = 504;
     private static int iconInOneRow = 6;
 
-    public ScrollPane createPage(int PageIndex) {
+
+    private ScrollPane createPage(int PageIndex) {
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setMaxWidth(Double.MAX_VALUE);
