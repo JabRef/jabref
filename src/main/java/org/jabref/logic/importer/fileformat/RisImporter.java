@@ -32,6 +32,11 @@ public class RisImporter extends Importer {
 
     private static final Pattern RECOGNIZED_FORMAT_PATTERN = Pattern.compile("TY  - .*");
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy");
+    /**
+     * CS304 issue link :https://github.com/JabRef/jabref/issues/7737
+     * use for check the result of split
+     */
+    private static String[] entries;
 
     @Override
     public String getName() {
@@ -54,6 +59,13 @@ public class RisImporter extends Importer {
         return reader.lines().anyMatch(line -> RECOGNIZED_FORMAT_PATTERN.matcher(line).find());
     }
 
+    /**
+     * use for check the result of split
+     */
+    public String[] getEntries() {
+        return entries;
+    }
+
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
@@ -61,7 +73,8 @@ public class RisImporter extends Importer {
         // use optional here, so that no exception will be thrown if the file is empty
         String linesAsString = reader.lines().reduce((line, nextline) -> line + "\n" + nextline).orElse("");
 
-        String[] entries = linesAsString.replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
+        // use split(ER  -.*(\\n)*) to instead of split(ER  -.\\n) to solve the problem of hangs of ris file import
+        entries = linesAsString.replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
                                         .split("ER  -.*(\\n)*");
 
         // stores all the date tags from highest to lowest priority
