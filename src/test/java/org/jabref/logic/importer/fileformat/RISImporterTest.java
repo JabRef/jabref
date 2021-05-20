@@ -48,10 +48,6 @@ public class RISImporterTest {
         assertFalse(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
     }
 
-    /**
-     * CS304 (manually written) issue link: https://github.com/JabRef/jabref/issues/7737
-     * Test if split the lines remove "ER  -" correctly
-     */
     @Test
     public void testIfSplitCorrect(){
         String[] entries = importer.gerEntries;
