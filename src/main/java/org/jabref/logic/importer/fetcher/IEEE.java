@@ -58,6 +58,8 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
 
     private final ImportFormatPreferences preferences;
 
+    private IEEEQueryTransformer transformer;
+
     public IEEE(ImportFormatPreferences preferences) {
         this.preferences = Objects.requireNonNull(preferences);
     }
@@ -206,7 +208,11 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
                 for (int i = 0; i < results.length(); i++) {
                     JSONObject jsonEntry = results.getJSONObject(i);
                     BibEntry entry = parseJsonResponse(jsonEntry, preferences.getKeywordSeparator());
-                    entries.add(entry);
+                    if (entry.getField(StandardField.YEAR).filter(year -> Integer.valueOf(year) >= minYear && Integer.valueOf(year) <= maxYear)
+                             .ifPresentOrElse(e -> entries.add(e),
+                                     ()-> {
+                        entries.add(entry);
+                    });
                 }
             }
 
@@ -226,7 +232,9 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
 
     @Override
     public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
-        IEEEQueryTransformer transformer = new IEEEQueryTransformer();
+        // transfomer is stored globally, because we need to filter out the bib entries by the year manually
+        // the transformer stores the min and max year
+        transformer = new IEEEQueryTransformer();
         String transformedQuery = transformer.transformLuceneQuery(luceneQuery).orElse("");
         URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
         uriBuilder.addParameter("apikey", API_KEY);
