@@ -227,7 +227,7 @@ public class GroupDialogViewModel {
                     if (StringUtil.isBlank(input)) {
                         return false;
                     } else {
-                        Path texFilePath = preferencesService.getWorkingDir().resolve(input);
+                        Path texFilePath = getAbsoluteTexGroupPath(input);
                         if (!Files.isRegularFile(texFilePath)) {
                             return false;
                         }
@@ -261,6 +261,16 @@ public class GroupDialogViewModel {
                 validator.removeValidators(texGroupFilePathValidator);
             }
         });
+    }
+
+    /**
+     * gets the absolute path relative to getLatexFileDirectory, if given a relative path
+     * @param input the user input path
+     * @return an absolute path
+     */
+    private Path getAbsoluteTexGroupPath(String input) {
+        Optional<Path> latexFileDirectory = currentDatabase.getMetaData().getLatexFileDirectory(preferencesService.getUser());
+        return latexFileDirectory.map(path -> path.resolve(input)).orElse(Path.of(input));
     }
 
     public void validationHandler(Event event) {
@@ -335,12 +345,10 @@ public class GroupDialogViewModel {
                             FieldFactory.parseField(autoGroupPersonsFieldProperty.getValue().trim()));
                 }
             } else if (typeTexProperty.getValue()) {
-                // issue 7719: add workingDir to filepath if it is relative
-                Path inputPath = preferencesService.getWorkingDir().resolve(Path.of(texGroupFilePathProperty.getValue().trim()));
                 resultingGroup = TexGroup.create(
                         groupName,
                         groupHierarchySelectedProperty.getValue(),
-                        inputPath,
+                        Path.of(texGroupFilePathProperty.getValue().trim()),
                         new DefaultAuxParser(new BibDatabase()),
                         Globals.getFileUpdateMonitor(),
                         currentDatabase.getMetaData());
