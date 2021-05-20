@@ -65,7 +65,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
     /**
      * @implNote <a href="https://developer.ieee.org/docs/read/Metadata_API_responses">documentation</a>
      */
-    private static BibEntry parseJsonRespone(JSONObject jsonEntry, Character keywordSeparator) {
+    private static BibEntry parseJsonResponse(JSONObject jsonEntry, Character keywordSeparator) {
         BibEntry entry = new BibEntry();
 
         switch (jsonEntry.optString("content_type")) {
@@ -205,7 +205,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
                 JSONArray results = jsonObject.getJSONArray("articles");
                 for (int i = 0; i < results.length(); i++) {
                     JSONObject jsonEntry = results.getJSONObject(i);
-                    BibEntry entry = parseJsonRespone(jsonEntry, preferences.getKeywordSeparator());
+                    BibEntry entry = parseJsonResponse(jsonEntry, preferences.getKeywordSeparator());
                     entries.add(entry);
                 }
             }
