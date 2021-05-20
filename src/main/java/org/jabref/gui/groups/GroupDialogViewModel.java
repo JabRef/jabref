@@ -437,7 +437,7 @@ public class GroupDialogViewModel {
     public void openIconPickerPage(){
         GroupIconPicker groupIconPicker= new GroupIconPicker();
         dialogService.showCustomDialogAndWait(groupIconPicker);
-        iconProperty.setValue(groupIconPicker.selected_icon_name);
+        iconProperty.setValue(groupIconPicker.selectedIconName);
     }
 
     private List<Path> getFileDirectoriesAsPaths() {
