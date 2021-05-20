@@ -95,6 +95,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the RFC fetcher is not compatible with the draft [7305](https://github.com/JabRef/jabref/issues/7305)
 
 ### Removed
+
 - We removed add group button beside the filter group tab. [#4682](https://github.com/JabRef/jabref/issues/4682)
 
 ## [5.2] – 2020-12-24
