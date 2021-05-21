@@ -1,6 +1,5 @@
 package org.jabref.logic.externalfiles;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -54,8 +54,7 @@ class LinkedFileHandlerTest {
         when(filePreferences.getFileDirectoryPattern()).thenReturn("papers");
         when(filePreferences.getFileDirectory()).thenReturn(Optional.of(testFolder.resolve("main")));
         linkedFileHandler.moveToDefaultDirectory();
-        File file = testFolder.resolve("main/papers/pdf_test.pdf").toFile();
-        assert file.exists();
+        assertTrue(Files.exists(testFolder.resolve("main/papers/pdf_test.pdf")));
     }
 
     @Test
@@ -63,7 +62,6 @@ class LinkedFileHandlerTest {
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
         when(filePreferences.getFileDirectory()).thenReturn(Optional.empty());
         linkedFileHandler.moveToDefaultDirectory();
-        File file = testFolder.resolve("pdf_test.pdf").toFile();
-        assert file.exists();
+        assertTrue(Files.exists(testFolder.resolve("pdf_test.pdf")));
     }
 }
