@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -53,7 +54,7 @@ class LinkedFileHandlerTest {
         when(filePreferences.getFileDirectoryPattern()).thenReturn("papers");
         when(filePreferences.getFileDirectory()).thenReturn(Optional.of(testFolder.resolve("main")));
         linkedFileHandler.moveToDefaultDirectory();
-        assertTrue(Files.exists(estFolder.resolve("main/papers/pdf_test.pdf")));
+        assertTrue(Files.exists(testFolder.resolve("main/papers/pdf_test.pdf")));
     }
 
     @Test
