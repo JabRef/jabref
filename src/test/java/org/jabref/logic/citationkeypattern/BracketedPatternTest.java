@@ -400,11 +400,11 @@ class BracketedPatternTest {
         return Stream.of(
                 Arguments.of("auth", "[title:(auth)]"),
                 Arguments.of("auth2021", "[title:(auth[YEAR])]"),
-                Arguments.arguments("not2021", "[title:(not[YEAR])]"),
-                Arguments.arguments("", "[title:([YEAR)]"),
-                Arguments.arguments(")]", "[title:(YEAR])]"),
-                Arguments.arguments("2105.02891", "[title:([EPRINT:([YEAR])])]"),
-                Arguments.arguments("2021", "[title:([auth:([YEAR])])]")
+                Arguments.of("not2021", "[title:(not[YEAR])]"),
+                Arguments.of("", "[title:([YEAR)]"),
+                Arguments.of(")]", "[title:(YEAR])]"),
+                Arguments.of("2105.02891", "[title:([EPRINT:([YEAR])])]"),
+                Arguments.of("2021", "[title:([auth:([YEAR])])]")
         );
     }
 }
