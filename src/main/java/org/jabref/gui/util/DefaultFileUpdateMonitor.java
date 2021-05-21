@@ -87,7 +87,6 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
     public void addListenerForFile(Path file, FileUpdateListener listener) throws IOException {
         if (isActive()) {
             // We can't watch files directly, so monitor their parent directory for updates
-            // toAbsolutePath() will add the path to Jabref as home directory to file, if file is not a absolute path
             Path directory = file.toAbsolutePath().getParent();
             directory.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY);
             listeners.put(file, listener);
