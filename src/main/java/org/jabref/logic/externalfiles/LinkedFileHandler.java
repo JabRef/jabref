@@ -38,7 +38,7 @@ public class LinkedFileHandler {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.filePreferences = Objects.requireNonNull(filePreferences);
     }
-    
+
     public boolean moveToDefaultDirectory() throws IOException {
         Optional<Path> targetDirectory = databaseContext.getFirstExistingFileDir(filePreferences);
         if (targetDirectory.isEmpty()) {
