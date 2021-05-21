@@ -227,8 +227,8 @@ public class GroupDialogViewModel {
                     if (StringUtil.isBlank(input)) {
                         return false;
                     } else {
-                        Path inputPath = Path.of(input);
-                        if (!Files.isRegularFile(inputPath)) {
+                        Path inputPath = getAbsoluteTexGroupPath(input);
+                        if (!inputPath.isAbsolute() || !Files.isRegularFile(inputPath)) {
                             return false;
                         }
                         return FileUtil.getFileExtension(input)
@@ -266,7 +266,7 @@ public class GroupDialogViewModel {
     /**
      * Gets the absolute path relative to the LatexFileDirectory, if given a relative path
      * @param input the user input path
-     * @return an absolute path
+     * @return an absolute path if LatexFileDirectory exists; otherwise, returns input
      */
     private Path getAbsoluteTexGroupPath(String input) {
         Optional<Path> latexFileDirectory = currentDatabase.getMetaData().getLatexFileDirectory(preferencesService.getUser());
