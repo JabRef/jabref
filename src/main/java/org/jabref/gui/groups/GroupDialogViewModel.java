@@ -227,7 +227,6 @@ public class GroupDialogViewModel {
                     if (StringUtil.isBlank(input)) {
                         return false;
                     } else {
-                        // we don't need to add the working dir before checking, let user input absolute path
                         Path inputPath = Path.of(input);
                         if (!Files.isRegularFile(inputPath)) {
                             return false;
@@ -262,6 +261,16 @@ public class GroupDialogViewModel {
                 validator.removeValidators(texGroupFilePathValidator);
             }
         });
+    }
+
+    /**
+     * Gets the absolute path relative to the LatexFileDirectory, if given a relative path
+     * @param input the user input path
+     * @return an absolute path
+     */
+    private Path getAbsoluteTexGroupPath(String input) {
+        Optional<Path> latexFileDirectory = currentDatabase.getMetaData().getLatexFileDirectory(preferencesService.getUser());
+        return latexFileDirectory.map(path -> path.resolve(input)).orElse(Path.of(input));
     }
 
     public void validationHandler(Event event) {
@@ -336,7 +345,6 @@ public class GroupDialogViewModel {
                             FieldFactory.parseField(autoGroupPersonsFieldProperty.getValue().trim()));
                 }
             } else if (typeTexProperty.getValue()) {
-                // issue 7719: if texGroupFilePath is not absolute, path to Jabref will be added, which is wrong
                 resultingGroup = TexGroup.create(
                         groupName,
                         groupHierarchySelectedProperty.getValue(),

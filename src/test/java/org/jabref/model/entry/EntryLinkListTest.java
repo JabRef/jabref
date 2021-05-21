@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EntryLinkListTest {
@@ -21,6 +22,7 @@ public class EntryLinkListTest {
     private ParsedEntryLink link;
     private BibEntry source;
     private BibEntry target;
+    private BibEntry entry;
 
     @BeforeEach
     public void before() {
@@ -57,6 +59,13 @@ public class EntryLinkListTest {
     public void givenFieldValueAndDatabaseWhenParsingThenExpectLink() {
         ParsedEntryLink expected = new ParsedEntryLink(KEY, database);
         assertEquals(expected, link);
+    }
+
+    @Test
+    public void givenBibEntryWhenParsingThenExpectLink() {
+        entry = create("entry");
+        ParsedEntryLink expected = new ParsedEntryLink(entry);
+        assertFalse(expected.getLinkedEntry().isEmpty());
     }
 
     @Test
