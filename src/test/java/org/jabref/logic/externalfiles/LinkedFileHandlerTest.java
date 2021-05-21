@@ -53,7 +53,7 @@ class LinkedFileHandlerTest {
         when(filePreferences.getFileDirectoryPattern()).thenReturn("papers");
         when(filePreferences.getFileDirectory()).thenReturn(Optional.of(testFolder.resolve("main")));
         linkedFileHandler.moveToDefaultDirectory();
-        assertTrue(Files.exists(estFolder.resolve("main/papers/pdf_test.pdf")))
+        assertTrue(Files.exists(estFolder.resolve("main/papers/pdf_test.pdf")));
     }
 
     @Test
@@ -61,6 +61,6 @@ class LinkedFileHandlerTest {
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
         when(filePreferences.getFileDirectory()).thenReturn(Optional.empty());
         linkedFileHandler.moveToDefaultDirectory();
-        assertTrue(Files.exists(testFolder.resolve("pdf_test.pdf")))
+        assertTrue(Files.exists(testFolder.resolve("pdf_test.pdf")));
     }
 }
