@@ -67,7 +67,6 @@ class LinkedFileHandlerTest {
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
         when(filePreferences.getFileDirectory()).thenReturn(Optional.empty());
         linkedFileHandler.moveToDefaultDirectory();
-        File file = testFolder.resolve("pdf_test.pdf").toFile();
-        assert file.exists();
+        assertTrue(Files.exists(testFolder.resolve("pdf_test.pdf")))
     }
 }
