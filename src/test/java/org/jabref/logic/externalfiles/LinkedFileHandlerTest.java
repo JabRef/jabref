@@ -1,5 +1,6 @@
 package org.jabref.logic.externalfiles;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,13 +31,15 @@ class LinkedFileHandlerTest {
         Path pdfPath = testFolder.resolve("pdf_test.pdf");
         Files.createFile(bibPath);
         Files.createFile(pdfPath);
-        Files.writeString(bibPath, "% Encoding: UTF-8\n" +
+        FileWriter fw = new FileWriter(bibPath.toFile());
+        fw.write("% Encoding: UTF-8\n" +
                 "\n" +
                 "@Article{,\n" +
                 "  file = {:" + pdfPath.toAbsolutePath() + "},\n" +
                 "}\n" +
                 "\n" +
                 "@Comment{jabref-meta: databaseType:bibtex;}\n");
+        fw.close();
         MetaData metaData = new MetaData();
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData);
         context.setDatabasePath(bibPath);
