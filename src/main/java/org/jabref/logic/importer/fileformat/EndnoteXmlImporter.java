@@ -271,7 +271,6 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                            .findFirst();
     }
 
-
     private String mergeStyleContents(List<Style> styles) {
         return styles.stream().map(Style::getContent).collect(Collectors.joining());
     }
