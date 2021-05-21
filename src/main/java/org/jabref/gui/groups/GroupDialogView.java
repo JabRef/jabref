@@ -165,4 +165,9 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     private void openHelp() {
         viewModel.openHelpPage();
     }
+
+    @FXML
+    private void openIconPicker(){
+        viewModel.openIconPicker();
+    }
 }
