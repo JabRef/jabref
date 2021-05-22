@@ -4,13 +4,13 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -34,9 +34,9 @@ public class ManageStudyDefinitionViewModel {
     private final ObservableList<String> authors = FXCollections.observableArrayList();
     private final ObservableList<String> researchQuestions = FXCollections.observableArrayList();
     private final ObservableList<String> queries = FXCollections.observableArrayList();
-    private final ObservableList<StudyDatabase> databases = FXCollections.observableArrayList();
+    private final ObservableList<StudyDatabaseItem> databases = FXCollections.observableArrayList();
     // Hold the complement of databases for the selector
-    private final ObservableList<StudyDatabase> nonSelectedDatabases = FXCollections.observableArrayList();
+    private final ObservableList<StudyDatabaseItem> nonSelectedDatabases = FXCollections.observableArrayList();
     private final SimpleStringProperty directory = new SimpleStringProperty();
     private Study study;
 
@@ -50,7 +50,10 @@ public class ManageStudyDefinitionViewModel {
         authors.addAll(study.getAuthors());
         researchQuestions.addAll(study.getResearchQuestions());
         queries.addAll(study.getQueries().stream().map(StudyQuery::getQuery).collect(Collectors.toList()));
-        databases.addAll(study.getDatabases());
+        databases.addAll(study.getDatabases()
+                              .stream()
+                              .map(studyDatabase -> new StudyDatabaseItem(studyDatabase.getName(), studyDatabase.isEnabled()))
+                              .collect(Collectors.toList()));
         computeNonSelectedDatabases(importFormatPreferences);
         if (!Objects.isNull(studyDirectory)) {
             this.directory.set(studyDirectory.toString());
@@ -61,7 +64,7 @@ public class ManageStudyDefinitionViewModel {
         nonSelectedDatabases.addAll(WebFetchers.getSearchBasedFetchers(importFormatPreferences)
                                                .stream()
                                                .map(SearchBasedFetcher::getName)
-                                               .map(s -> new StudyDatabase(s, true))
+                                               .map(s -> new StudyDatabaseItem(s, true))
                                                .filter(studyDatabase -> !databases.contains(studyDatabase))
                                                .collect(Collectors.toList()));
     }
@@ -86,11 +89,11 @@ public class ManageStudyDefinitionViewModel {
         return queries;
     }
 
-    public ObservableList<StudyDatabase> getDatabases() {
+    public ObservableList<StudyDatabaseItem> getDatabases() {
         return databases;
     }
 
-    public ObservableList<StudyDatabase> getNonSelectedDatabases() {
+    public ObservableList<StudyDatabaseItem> getNonSelectedDatabases() {
         return nonSelectedDatabases;
     }
 
@@ -115,7 +118,7 @@ public class ManageStudyDefinitionViewModel {
         queries.add(query);
     }
 
-    public void addDatabase(StudyDatabase database) {
+    public void addDatabase(StudyDatabaseItem database) {
         if (Objects.isNull(database)) {
             return;
         }
@@ -133,7 +136,7 @@ public class ManageStudyDefinitionViewModel {
         study.setAuthors(authors);
         study.setResearchQuestions(researchQuestions);
         study.setQueries(queries.stream().map(StudyQuery::new).collect(Collectors.toList()));
-        study.setDatabases(databases);
+        study.setDatabases(databases.stream().map(studyDatabaseItem -> new StudyDatabase(studyDatabaseItem.getName(), studyDatabaseItem.isEnabled())).collect(Collectors.toList()));
         Path studyDirectory = null;
         try {
             studyDirectory = Path.of(directory.getValueSafe());
@@ -143,24 +146,37 @@ public class ManageStudyDefinitionViewModel {
         return new SlrStudyAndDirectory(study, studyDirectory);
     }
 
-    /**
-     * If any items are removed from the selected databases list they have to be added back to the combobox
-     *
-     * @param c the change to the databases list
-     */
-    public void handleChangeToDatabases(ListChangeListener.Change<? extends StudyDatabase> c) {
-        while (c.next()) {
-            if (c.wasRemoved()) {
-                // If a database is added from the combo box it should be enabled by default
-                c.getRemoved().forEach(database -> database.setEnabled(true));
-                nonSelectedDatabases.addAll(c.getRemoved());
-                // Resort list
-                nonSelectedDatabases.sort(Comparator.comparing(StudyDatabase::getName));
-            }
-        }
-    }
-
     public Property<String> titleProperty() {
         return title;
+    }
+
+    public void removeDatabase(String database) {
+        // If a database is added from the combo box it should be enabled by default
+        Optional<StudyDatabaseItem> correspondingDatabase = databases.stream().filter(studyDatabaseItem -> studyDatabaseItem.getName().equals(database)).findFirst();
+        if (correspondingDatabase.isEmpty()) {
+            return;
+        }
+        StudyDatabaseItem databaseToRemove = correspondingDatabase.get();
+        databases.remove(databaseToRemove);
+        databaseToRemove.setEnabled(true);
+        nonSelectedDatabases.add(databaseToRemove);
+        // Resort list
+        nonSelectedDatabases.sort(Comparator.comparing(StudyDatabaseItem::getName));
+    }
+
+    public void setStudyDirectory(Optional<Path> studyRepositoryRoot) {
+        getDirectory().setValue(studyRepositoryRoot.isPresent() ? studyRepositoryRoot.get().toString() : getDirectory().getValueSafe());
+    }
+
+    public void deleteAuthor(String item) {
+        authors.remove(item);
+    }
+
+    public void deleteQuestion(String item) {
+        researchQuestions.remove(item);
+    }
+
+    public void deleteQuery(String item) {
+        queries.remove(item);
     }
 }

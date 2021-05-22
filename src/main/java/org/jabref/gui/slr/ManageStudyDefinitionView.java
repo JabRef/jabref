@@ -2,27 +2,24 @@ package org.jabref.gui.slr;
 
 import java.nio.file.Path;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.StringJoiner;
 
 import javax.inject.Inject;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -32,6 +29,8 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
+import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
@@ -56,7 +55,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @FXML private TextField addAuthor;
     @FXML private TextField addResearchQuestion;
     @FXML private TextField addQuery;
-    @FXML private ComboBox<StudyDatabase> databaseSelectorComboBox;
+    @FXML private ComboBox<StudyDatabaseItem> databaseSelectorComboBox;
     @FXML private TextField studyDirectory;
 
     private Button saveButton;
@@ -69,14 +68,22 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @FXML private ButtonType saveButtonType;
     @FXML private Label helpIcon;
 
-    @FXML private ListView<String> authorListView;
-    @FXML private ListView<String> questionListView;
-    @FXML private ListView<String> queryListView;
-    @FXML private TableView<StudyDatabase> databaseTableView;
+    @FXML private TableView<String> authorTableView;
+    @FXML private TableColumn<String, String> authorsColumn;
+    @FXML private TableColumn<String, String> authorsActionColumn;
 
-    @FXML private TableColumn<StudyDatabase, String> databaseTableEntry;
-    @FXML private TableColumn<StudyDatabase, StudyDatabase> enabledTableEntry;
-    @FXML private TableColumn<StudyDatabase, StudyDatabase> removeTableEntry;
+    @FXML private TableView<String> questionTableView;
+    @FXML private TableColumn<String, String> questionsColumn;
+    @FXML private TableColumn<String, String> questionsActionColumn;
+
+    @FXML private TableView<String> queryTableView;
+    @FXML private TableColumn<String, String> queriesColumn;
+    @FXML private TableColumn<String, String> queriesActionColumn;
+
+    @FXML private TableView<StudyDatabaseItem> databaseTableView;
+    @FXML private TableColumn<StudyDatabaseItem, String> databaseTableEntry;
+    @FXML private TableColumn<StudyDatabaseItem, Boolean> databaseEnabledTableEntry;
+    @FXML private TableColumn<StudyDatabaseItem, String> removeDatabaseTableEntry;
 
     /**
      * This can be used to either create new study objects or edit existing ones.
@@ -93,7 +100,19 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
-        saveButton = ((Button) this.getDialogPane().lookupButton(saveButtonType));
+
+        setupSaveButton();
+        setupTable();
+    }
+
+    private void setupSaveButton() {
+        Button saveButton = ((Button) this.getDialogPane().lookupButton(saveButtonType));
+
+        saveButton.disableProperty().bind(Bindings.or(Bindings.or(
+                Bindings.or(
+                        Bindings.or(Bindings.isEmpty(viewModel.getQueries()), Bindings.isEmpty(viewModel.getDatabases())),
+                        Bindings.isEmpty(viewModel.getAuthors())),
+                viewModel.getTitle().isEmpty()), viewModel.getDirectory().isEmpty()));
 
         setResultConverter(button -> {
             if (button == saveButtonType) {
@@ -102,39 +121,21 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
             // Cancel button will return null
             return null;
         });
-        registerListenersAndBindings();
     }
 
     @FXML
     private void initialize() {
         viewModel = new ManageStudyDefinitionViewModel(study, workingDirectory, prefs.getImportFormatPreferences());
-        setButtonIcons();
-        setButtonToolTips();
+        setHelpTooltip();
         setKeyPressListenersForInputFields();
         setDataForListViews();
         setCellFactories();
         configureLayout();
+        registerBindings();
     }
 
-    /**
-     * Configures all the buttons used directly in the study management GUI
-     */
-    private void setButtonIcons() {
-        addAuthorButton.setGraphic(IconTheme.JabRefIcons.ADD_ARTICLE.getGraphicNode());
-        addResearchQuestionButton.setGraphic(IconTheme.JabRefIcons.ADD_ARTICLE.getGraphicNode());
-        addQueryButton.setGraphic(IconTheme.JabRefIcons.ADD_ARTICLE.getGraphicNode());
-        addDatabaseButton.setGraphic(IconTheme.JabRefIcons.ADD_ARTICLE.getGraphicNode());
-        addQueryButton.setGraphic(IconTheme.JabRefIcons.ADD_ARTICLE.getGraphicNode());
-        selectStudyDirectory.setGraphic(IconTheme.JabRefIcons.FILE.getGraphicNode());
-        helpIcon.setGraphic(IconTheme.JabRefIcons.HELP.getGraphicNode());
-    }
-
-    private void setButtonToolTips() {
-        addAuthorButton.setTooltip(new Tooltip(Localization.lang("Add")));
-        addResearchQuestionButton.setTooltip(new Tooltip(Localization.lang("Add")));
-        addQueryButton.setTooltip(new Tooltip(Localization.lang("Add")));
-        addDatabaseButton.setTooltip(new Tooltip(Localization.lang("Add")));
-        addQueryButton.setTooltip(new Tooltip(Localization.lang("Add")));
+    private void setHelpTooltip() {
+        // TODO: Keep until PR #7279 is merged
         helpIcon.setTooltip(new Tooltip(new StringJoiner("\n")
                 .add(Localization.lang("Query terms are separated by spaces."))
                 .add(Localization.lang("All query terms are joined using the logical AND, and OR operators") + ".")
@@ -167,81 +168,91 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     }
 
     private void setDataForListViews() {
-        authorListView.setItems(viewModel.getAuthors());
-        questionListView.setItems(viewModel.getResearchQuestions());
-        queryListView.setItems(viewModel.getQueries());
-
+        authorTableView.setItems(viewModel.getAuthors());
+        questionTableView.setItems(viewModel.getResearchQuestions());
+        queryTableView.setItems(viewModel.getQueries());
         databaseTableView.setItems(viewModel.getDatabases());
-
         databaseSelectorComboBox.setItems(viewModel.getNonSelectedDatabases());
+    }
+
+    private void setupTable() {
+        authorsColumn.setReorderable(false);
+        authorsActionColumn.setReorderable(false);
+        authorsActionColumn.setResizable(false);
+        questionsColumn.setReorderable(false);
+        questionsActionColumn.setReorderable(false);
+        questionsActionColumn.setResizable(false);
+        queriesColumn.setReorderable(false);
+        queriesActionColumn.setReorderable(false);
+        queriesActionColumn.setResizable(false);
+        databaseTableEntry.setReorderable(false);
+        databaseEnabledTableEntry.setResizable(false);
+        databaseEnabledTableEntry.setReorderable(false);
+        removeDatabaseTableEntry.setResizable(false);
+        removeDatabaseTableEntry.setReorderable(false);
     }
 
     /**
      * Configures which cells are used for the different List-/TableViews
      */
     private void setCellFactories() {
-        authorListView.setCellFactory(param -> new StringCellWithDelete());
-        questionListView.setCellFactory(param -> new StringCellWithDelete());
-        queryListView.setCellFactory(param -> new StringCellWithDelete());
+        // TODO: Make this like TableTab (Controls as columns on the right), use sizes from KeyBindingsTab
+        authorsColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        authorsColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue()));
+        authorsActionColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue()));
+        new ValueTableCellFactory<String, String>()
+                .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withTooltip(name -> Localization.lang("Remove"))
+                .withOnMouseClickedEvent(item -> evt ->
+                        viewModel.deleteAuthor(item))
+                .install(authorsActionColumn);
 
-        databaseSelectorComboBox.setCellFactory(param -> new StudyDatabaseComboBoxCell());
-        databaseSelectorComboBox.setButtonCell(new StudyDatabaseComboBoxCell());
-        databaseTableEntry.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getName()));
-        enabledTableEntry.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
-        removeTableEntry.setCellValueFactory(param -> new ReadOnlyObjectWrapper<>(param.getValue()));
+        questionsColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        questionsColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue()));
+        questionsActionColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue()));
+        new ValueTableCellFactory<String, String>()
+                .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withTooltip(name -> Localization.lang("Remove"))
+                .withOnMouseClickedEvent(item -> evt ->
+                        viewModel.deleteQuestion(item))
+                .install(questionsActionColumn);
 
-        enabledTableEntry.setCellFactory(param -> new TableCell<>() {
-            final CheckBox checkBox = new CheckBox();
+        queriesColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        queriesColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue()));
+        queriesActionColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue()));
+        new ValueTableCellFactory<String, String>()
+                .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withTooltip(name -> Localization.lang("Remove"))
+                .withOnMouseClickedEvent(item -> evt ->
+                        viewModel.deleteQuery(item))
+                .install(queriesActionColumn);
 
-            @Override
-            protected void updateItem(StudyDatabase database, boolean empty) {
-                super.updateItem(database, empty);
+        new ViewModelListCellFactory<StudyDatabaseItem>().withText(StudyDatabaseItem::getName)
+                                      .install(databaseSelectorComboBox);
 
-                if (database == null) {
-                    setGraphic(null);
-                    return;
-                }
-                checkBox.selectedProperty().setValue(database.isEnabled());
-                checkBox.setPrefWidth(20);
-                setGraphic(checkBox);
-                checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> database.setEnabled(newValue));
-            }
-        });
-        removeTableEntry.setCellFactory(param -> new TableCell<>() {
-            final Button deleteButton = new Button();
+        // databaseTableEntry.setCellFactory(TextFieldTableCell.forTableColumn());
+        databaseTableEntry.setCellValueFactory(param -> param.getValue().nameProperty());
 
-            @Override
-            protected void updateItem(StudyDatabase database, boolean empty) {
-                super.updateItem(database, empty);
+        databaseEnabledTableEntry.setCellValueFactory(param -> param.getValue().enabledProperty());
+        databaseEnabledTableEntry.setCellFactory(CheckBoxTableCell.forTableColumn(databaseEnabledTableEntry));
 
-                if (database == null) {
-                    setGraphic(null);
-                    return;
-                }
-                deleteButton.setGraphic(IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode());
-                deleteButton.setPrefWidth(20);
-                setGraphic(deleteButton);
-                deleteButton.setOnAction(
-                        event -> getTableView().getItems().remove(database)
-                );
-            }
-        });
+        removeDatabaseTableEntry.setCellValueFactory(param -> param.getValue().nameProperty());
+        new ValueTableCellFactory<org.jabref.gui.slr.StudyDatabaseItem, String>()
+                .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withTooltip(name -> Localization.lang("Remove"))
+                .withOnMouseClickedEvent(item -> evt ->
+                        viewModel.removeDatabase(item))
+                .install(removeDatabaseTableEntry);
     }
 
     private void configureLayout() {
         databaseTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
-    private void registerListenersAndBindings() {
+    private void registerBindings() {
         // Listen whether any databases are removed from selection -> Add back to the database selector
-        databaseTableView.getItems().addListener(viewModel::handleChangeToDatabases);
         studyTitle.textProperty().bindBidirectional(viewModel.titleProperty());
         studyDirectory.textProperty().bindBidirectional(viewModel.getDirectory());
-        saveButton.disableProperty().bind(Bindings.or(Bindings.or(
-                Bindings.or(
-                        Bindings.or(Bindings.isEmpty(viewModel.getQueries()), Bindings.isEmpty(viewModel.getDatabases())),
-                        Bindings.isEmpty(viewModel.getAuthors())),
-                viewModel.getTitle().isEmpty()), viewModel.getDirectory().isEmpty()));
     }
 
     @FXML
@@ -263,7 +274,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     }
 
     /**
-     * Add seleted entry from combobox, push onto database pop from nonselecteddatabase (combobox)
+     * Add selected entry from combobox, push onto database pop from nonselecteddatabase (combobox)
      */
     @FXML
     private void addDatabase() {
@@ -276,8 +287,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                 .withInitialDirectory(workingDirectory)
                 .build();
 
-        Optional<Path> studyRepositoryRoot = dialogService.showDirectorySelectionDialog(directoryDialogConfiguration);
-        viewModel.getDirectory().setValue(studyRepositoryRoot.isPresent() ? studyRepositoryRoot.get().toString() : viewModel.getDirectory().getValueSafe());
+        viewModel.setStudyDirectory(dialogService.showDirectorySelectionDialog(directoryDialogConfiguration));
     }
 
     private static class StringCellWithDelete extends ListCell<String> {
