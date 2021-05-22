@@ -5,6 +5,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 
+import javax.inject.Inject;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -30,10 +32,10 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
@@ -43,9 +45,12 @@ import com.airhacks.afterburner.views.ViewLoader;
  */
 public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> {
     Path workingDirectory;
-    DialogService dialogService;
 
-    private final ManageStudyDefinitionViewModel viewModel;
+    @Inject DialogService dialogService;
+    @Inject PreferencesService prefs;
+
+    private ManageStudyDefinitionViewModel viewModel;
+    private final Study study;
 
     @FXML private TextField studyTitle;
     @FXML private TextField addAuthor;
@@ -54,7 +59,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @FXML private ComboBox<StudyDatabase> databaseSelectorComboBox;
     @FXML private TextField studyDirectory;
 
-    private final Button saveButton;
+    private Button saveButton;
 
     @FXML private Button addAuthorButton;
     @FXML private Button addResearchQuestionButton;
@@ -79,14 +84,15 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
      * @param study          null if a new study is created. Otherwise the study object to edit.
      * @param studyDirectory the directory where the study to edit is located (null if a new study is created)
      */
-    public ManageStudyDefinitionView(Study study, Path studyDirectory, ImportFormatPreferences importFormatPreferences, DialogService dialogService, Path workingDirectory) {
+    public ManageStudyDefinitionView(Study study, Path studyDirectory, Path workingDirectory) {
         // If an existing study is edited, open the directory dialog at the directory the study is stored
         this.workingDirectory = Objects.isNull(studyDirectory) ? workingDirectory : studyDirectory;
         this.setTitle(Objects.isNull(studyDirectory) ? Localization.lang("Define study parameters") : Localization.lang("Manage study definition"));
-        this.dialogService = dialogService;
-        viewModel = new ManageStudyDefinitionViewModel(study, studyDirectory, importFormatPreferences);
-        ViewLoader.view(this).load().setAsDialogPane(this);
+        this.study = study;
 
+        ViewLoader.view(this)
+                  .load()
+                  .setAsDialogPane(this);
         saveButton = ((Button) this.getDialogPane().lookupButton(saveButtonType));
 
         setResultConverter(button -> {
@@ -101,6 +107,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
 
     @FXML
     private void initialize() {
+        viewModel = new ManageStudyDefinitionViewModel(study, workingDirectory, prefs.getImportFormatPreferences());
         setButtonIcons();
         setButtonToolTips();
         setKeyPressListenersForInputFields();

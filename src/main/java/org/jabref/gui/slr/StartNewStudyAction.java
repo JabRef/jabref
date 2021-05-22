@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.crawler.StudyYamlParser;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.study.Study;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.PreferencesService;
@@ -15,12 +14,10 @@ import org.jabref.preferences.PreferencesService;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 public class StartNewStudyAction extends ExistingStudySearchAction {
-    ImportFormatPreferences importFormatPreferences;
     Study newStudy;
 
     public StartNewStudyAction(JabRefFrame frame, FileUpdateMonitor fileUpdateMonitor, TaskExecutor taskExecutor, PreferencesService prefs) {
         super(frame, fileUpdateMonitor, taskExecutor, prefs);
-        this.importFormatPreferences = prefs.getImportFormatPreferences();
     }
 
     @Override
@@ -31,7 +28,7 @@ public class StartNewStudyAction extends ExistingStudySearchAction {
 
     @Override
     public void execute() {
-        Optional<SlrStudyAndDirectory> studyAndDirectory = dialogService.showCustomDialogAndWait(new ManageStudyDefinitionView(null, null, importFormatPreferences, dialogService, workingDirectory));
+        Optional<SlrStudyAndDirectory> studyAndDirectory = dialogService.showCustomDialogAndWait(new ManageStudyDefinitionView(null, null, workingDirectory));
         if (studyAndDirectory.isEmpty()) {
             return;
         }
