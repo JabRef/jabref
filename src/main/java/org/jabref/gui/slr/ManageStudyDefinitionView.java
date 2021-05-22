@@ -13,7 +13,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -21,9 +20,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.icon.IconTheme;
@@ -33,7 +29,6 @@ import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.study.Study;
-import org.jabref.model.study.StudyDatabase;
 import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -196,7 +191,6 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
      * Configures which cells are used for the different List-/TableViews
      */
     private void setCellFactories() {
-        // TODO: Make this like TableTab (Controls as columns on the right), use sizes from KeyBindingsTab
         authorsColumn.setCellFactory(TextFieldTableCell.forTableColumn());
         authorsColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue()));
         authorsActionColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue()));
@@ -288,56 +282,5 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                 .build();
 
         viewModel.setStudyDirectory(dialogService.showDirectorySelectionDialog(directoryDialogConfiguration));
-    }
-
-    private static class StringCellWithDelete extends ListCell<String> {
-        HBox hbox = new HBox();
-        Label text = new Label();
-        Button deleteButton = new Button();
-
-        public StringCellWithDelete() {
-            super();
-            hbox.setSpacing(20);
-            Region spacer = new Region();
-            deleteButton.setGraphic(IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode());
-            deleteButton.setOnAction(event -> getListView().getItems().remove(getItem()));
-            hbox.getChildren().addAll(text, spacer, deleteButton);
-            HBox.setHgrow(spacer, Priority.ALWAYS);
-        }
-
-        @Override
-        protected void updateItem(String item, boolean empty) {
-            super.updateItem(item, empty);
-            setText(null);
-            setGraphic(null);
-
-            if (item != null && !empty) {
-                text.setText(item);
-                setGraphic(hbox);
-            }
-        }
-    }
-
-    private static class StudyDatabaseComboBoxCell extends ListCell<StudyDatabase> {
-        HBox hbox = new HBox();
-        Label database = new Label();
-
-        public StudyDatabaseComboBoxCell() {
-            super();
-            hbox.setSpacing(20);
-            hbox.getChildren().add(database);
-        }
-
-        @Override
-        protected void updateItem(StudyDatabase item, boolean empty) {
-            super.updateItem(item, empty);
-            setText(null);
-            setGraphic(null);
-
-            if (item != null && !empty) {
-                database.setText(item.getName());
-                setGraphic(hbox);
-            }
-        }
     }
 }
