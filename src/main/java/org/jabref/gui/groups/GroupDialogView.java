@@ -1,10 +1,15 @@
 package org.jabref.gui.groups;
 
+import java.io.IOException;
 import java.util.EnumMap;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
+import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -12,6 +17,9 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.BaseDialog;
@@ -32,6 +40,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     @FXML private TextField nameField;
     @FXML private TextField descriptionField;
     @FXML private TextField iconField;
+    @FXML private Button openIconPicker;
     @FXML private ColorPicker colorField;
     @FXML private ComboBox<GroupHierarchyType> hierarchicalContextCombo;
 
@@ -167,7 +176,39 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     }
 
     @FXML
-    private void openIconPicker(){
-        viewModel.openIconPicker();
+    void openIconPicker(ActionEvent event) throws IOException {
+        System.out.println("clicking the icon picker button");
+        Stage s = new Stage();
+        s.initModality(Modality.APPLICATION_MODAL);
+        s.initStyle(StageStyle.UNDECORATED);
+        s.setHeight(150);
+        s.setWidth(250);
+        s.setX(700);
+        s.setY(550);
+        s.setTitle("Icon Picker");
+
+        //create buttion
+        Button button = new Button();
+        button.setCursor(Cursor.MOVE);//设置鼠标移动到button按钮上的样式
+        button.setText("Close");
+        button.setPrefHeight(60);
+        button.setPrefWidth(150);
+        button.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                s.close();
+            }
+        });
+
+        //create Group
+        Group group = new Group();
+        group.getChildren().add(button);
+        //create Scene
+        Scene scene = new Scene(group);
+        scene.setCursor(Cursor.CLOSED_HAND);//设置鼠标移动到scene场景里面的样式
+
+
+        s.setScene(scene);
+        s.show();
     }
 }

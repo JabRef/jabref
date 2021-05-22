@@ -42,7 +42,7 @@
                     <TextField fx:id="iconField"/>
                 </VBox>
                 <VBox>
-                    <Button onAction="#openIconPicker">
+                    <Button fx:id="openIconPicker" onAction="#openIconPicker">
                         <graphic>
                                 <JabRefIconView glyph="SELECT_ICONS" glyphSize="25"/>
                         </graphic>
