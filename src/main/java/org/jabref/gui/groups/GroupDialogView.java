@@ -16,7 +16,11 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -179,34 +183,39 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
     void openIconPicker(ActionEvent event) throws IOException {
         System.out.println("clicking the icon picker button");
         Stage s = new Stage();
-        s.initModality(Modality.APPLICATION_MODAL);
+//        s.initModality(Modality.APPLICATION_MODAL);
         s.initStyle(StageStyle.UNDECORATED);
-        s.setHeight(150);
-        s.setWidth(250);
+//        s.setHeight(150);
+//        s.setWidth(250);
         s.setX(700);
         s.setY(550);
         s.setTitle("Icon Picker");
 
-        //create buttion
-        Button button = new Button();
-        button.setCursor(Cursor.MOVE);//设置鼠标移动到button按钮上的样式
-        button.setText("Close");
-        button.setPrefHeight(60);
-        button.setPrefWidth(150);
-        button.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                s.close();
-            }
-        });
+        //create FlowPane
+        FlowPane flowPane = new FlowPane();
+        flowPane.setHgap(20);// 设置水平间隙
+        flowPane.setVgap(20);// 设置竖直间隙
 
-        //create Group
-        Group group = new Group();
-        group.getChildren().add(button);
+        //create ScrollPane
+        ScrollPane scroll = new ScrollPane();
+        scroll.setContent(flowPane);
+        scroll.setPrefSize(300,200);
+
+        //create AnchorPane
+        AnchorPane anchorPane = new AnchorPane();
+        anchorPane.setPrefSize(300, 200);
+        anchorPane.getChildren().add(scroll);
+
+        //create a number of icon buttons on the flowPane
+        for(int i = 0; i < 60; i++){
+            Button tmpbutton = new Button("icon");
+            tmpbutton.setCursor(Cursor.MOVE);
+            flowPane.getChildren().add(tmpbutton);
+        }
+
         //create Scene
-        Scene scene = new Scene(group);
-        scene.setCursor(Cursor.CLOSED_HAND);//设置鼠标移动到scene场景里面的样式
-
+        Scene scene = new Scene(anchorPane);
+        scene.setCursor(Cursor.CLOSED_HAND);
 
         s.setScene(scene);
         s.show();
