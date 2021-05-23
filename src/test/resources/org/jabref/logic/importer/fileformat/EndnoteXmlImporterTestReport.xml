@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xml>
-	<records>
-		  <record>
+  <records>
+    <record>
       <database name="birdsurvival-Converted.enl" path="/Users/Seb/Downloads/birdsurvival-Converted.enl">birdsurvival-Converted.enl</database>
       <source-app name="EndNote" version="20.0">EndNote</source-app>
       <rec-number>1289</rec-number>
@@ -35,7 +35,7 @@
       <label>
         <style face="normal" font="default" size="100%">B1040</style>
       </label>
-      <urls/>
+      <urls />
     </record>
-	</records>
+  </records>
 </xml>

@@ -1,11 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xml>
     <records>
         <record>
-            <database name="EndNote Ecology.enl"
-                      path="/Users/LowDecarie/Dropbox/Meta presentation of stats/Data/EndNote Ecology.enl">EndNote
-                Ecology.enl
-            </database>
+            <database name="EndNote Ecology.enl" path="/Users/LowDecarie/Dropbox/Meta presentation of stats/Data/EndNote Ecology.enl">EndNote
+                Ecology.enl</database>
             <source-app name="EndNote" version="15.0">EndNote</source-app>
             <rec-number>13264</rec-number>
             <foreign-keys>
@@ -24,9 +22,7 @@
             </auth-address>
             <titles>
                 <title>
-                    <style face="normal" font="default" size="100%">An ecological basis for reforestation of
-                        submariginal lands in the Central Hardwood Region
-                    </style>
+                    <style face="normal" font="default" size="100%">An ecological basis for reforestation of submariginal lands in the Central Hardwood Region</style>
                 </title>
                 <secondary-title>
                     <style face="normal" font="default" size="100%">Ecology</style>
@@ -77,8 +73,7 @@
                 <style face="normal" font="default" size="100%">ISI:000200148800007</style>
             </accession-num>
             <notes>
-                <style face="normal" font="default" size="100%">some notes
-                </style>
+                <style face="normal" font="default" size="100%">some notes</style>
             </notes>
             <urls>
                 <related-urls>
@@ -92,10 +87,8 @@
             </language>
         </record>
         <record>
-            <database name="EndNote Ecology.enl"
-                      path="/Users/LowDecarie/Dropbox/Meta presentation of stats/Data/EndNote Ecology.enl">EndNote
-                Ecology.enl
-            </database>
+            <database name="EndNote Ecology.enl" path="/Users/LowDecarie/Dropbox/Meta presentation of stats/Data/EndNote Ecology.enl">EndNote
+                Ecology.enl</database>
             <source-app name="EndNote" version="15.0">EndNote</source-app>
             <rec-number>13265</rec-number>
             <foreign-keys>
@@ -114,8 +107,7 @@
             </auth-address>
             <titles>
                 <title>
-                    <style face="normal" font="default" size="100%">A survey of soil temperatures in the Chicago area
-                    </style>
+                    <style face="normal" font="default" size="100%">A survey of soil temperatures in the Chicago area</style>
                 </title>
                 <secondary-title>
                     <style face="normal" font="default" size="100%">Ecology</style>
@@ -166,8 +158,7 @@
                 <style face="normal" font="default" size="100%">ISI:000200148800014</style>
             </accession-num>
             <notes>
-                <style face="normal" font="default" size="100%">some other notes
-                </style>
+                <style face="normal" font="default" size="100%">some other notes</style>
             </notes>
             <urls>
                 <related-urls>
@@ -180,57 +171,57 @@
                 <style face="normal" font="default" size="100%">English</style>
             </language>
         </record>
-      <record>
-      <database name="birdsurvival-Converted.enl" path="/Users/Downloads/test.enl">test.enl</database>
-      <source-app name="EndNote" version="20.0">EndNote</source-app>
-      <rec-number>650</rec-number>
-      <foreign-keys>
-        <key app="EN" db-id="edzwwfxp95ffssewwsx5s95lrpzvz90at5x2">650</key>
-      </foreign-keys>
-      <ref-type name="Journal Article">17</ref-type>
-      <contributors>
-        <authors>
-          <author>
-            <style face="normal" font="default" size="100%">Ainley, D.G.</style>
-          </author>
-          <author>
-            <style face="normal" font="default" size="100%">Ribic, C.A.</style>
-          </author>
-          <author>
-            <style face="normal" font="default" size="100%">Wodd, R.C.</style>
-          </author>
-        </authors>
-      </contributors>
-      <titles>
-        <title>
-          <style face="normal" font="default" size="100%">A demographic study of the south polar skua </style>
-          <style face="italic" font="default" size="100%">Catharacta maccormicki</style>
-          <style face="normal" font="default" size="100%"> at Cape Crozier</style>
-        </title>
-        <secondary-title>
-          <style face="normal" font="default" size="100%">Journal of Animal Ecology</style>
-        </secondary-title>
-      </titles>
-      <periodical>
-        <full-title>
-          <style face="normal" font="default" size="100%">Journal of Animal Ecology</style>
-        </full-title>
-      </periodical>
-      <pages>
-        <style face="normal" font="default" size="100%">1-20</style>
-      </pages>
-      <volume>
-        <style face="normal" font="default" size="100%">59</style>
-      </volume>
-      <dates>
-        <year>
-          <style face="normal" font="default" size="100%">1990</style>
-        </year>
-      </dates>
-      <label>
-        <style face="normal" font="default" size="100%">B4</style>
-      </label>
-      <urls/>
-    </record>
+        <record>
+            <database name="birdsurvival-Converted.enl" path="/Users/Downloads/test.enl">test.enl</database>
+            <source-app name="EndNote" version="20.0">EndNote</source-app>
+            <rec-number>650</rec-number>
+            <foreign-keys>
+                <key app="EN" db-id="edzwwfxp95ffssewwsx5s95lrpzvz90at5x2">650</key>
+            </foreign-keys>
+            <ref-type name="Journal Article">17</ref-type>
+            <contributors>
+                <authors>
+                    <author>
+                        <style face="normal" font="default" size="100%">Ainley, D.G.</style>
+                    </author>
+                    <author>
+                        <style face="normal" font="default" size="100%">Ribic, C.A.</style>
+                    </author>
+                    <author>
+                        <style face="normal" font="default" size="100%">Wodd, R.C.</style>
+                    </author>
+                </authors>
+            </contributors>
+            <titles>
+                <title>
+                    <style face="normal" font="default" size="100%">A demographic study of the south polar skua</style>
+                    <style face="italic" font="default" size="100%">Catharacta maccormicki</style>
+                    <style face="normal" font="default" size="100%"> at Cape Crozier</style>
+                </title>
+                <secondary-title>
+                    <style face="normal" font="default" size="100%">Journal of Animal Ecology</style>
+                </secondary-title>
+            </titles>
+            <periodical>
+                <full-title>
+                    <style face="normal" font="default" size="100%">Journal of Animal Ecology</style>
+                </full-title>
+            </periodical>
+            <pages>
+                <style face="normal" font="default" size="100%">1-20</style>
+            </pages>
+            <volume>
+                <style face="normal" font="default" size="100%">59</style>
+            </volume>
+            <dates>
+                <year>
+                    <style face="normal" font="default" size="100%">1990</style>
+                </year>
+            </dates>
+            <label>
+                <style face="normal" font="default" size="100%">B4</style>
+            </label>
+            <urls />
+        </record>
     </records>
 </xml>
