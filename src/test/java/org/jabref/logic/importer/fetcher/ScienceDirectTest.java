@@ -28,7 +28,7 @@ class ScienceDirectTest {
 
     @Test
     @DisabledOnCIServer("CI server is blocked")
-    void findByDOIOldPage() throws IOException {
+    void findByDoiOldPage() throws IOException {
         entry.setField(StandardField.DOI, "10.1016/j.jrmge.2015.08.004");
 
         assertEquals(
@@ -39,7 +39,7 @@ class ScienceDirectTest {
 
     @Test
     @DisabledOnCIServer("CI server is blocked")
-    void findByDOINewPage() throws IOException {
+    void findByDoiNewPage() throws IOException {
         entry.setField(StandardField.DOI, "10.1016/j.aasri.2014.09.002");
 
         assertEquals(
@@ -62,7 +62,7 @@ class ScienceDirectTest {
 
     @Test
     @DisabledOnCIServer("CI server is blocked")
-    void notFoundByDOI() throws IOException {
+    void notFoundByDoi() throws IOException {
         entry.setField(StandardField.DOI, "10.1016/j.aasri.2014.0559.002");
 
         assertEquals(Optional.empty(), finder.findFullText(entry));

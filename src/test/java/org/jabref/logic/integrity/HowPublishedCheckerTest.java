@@ -32,7 +32,7 @@ public class HowPublishedCheckerTest {
     }
 
     @Test
-    void bibTexDoesNotCareAboutSpecialChracters() {
+    void bibTexDoesNotCareAboutSpecialCharacters() {
         assertEquals(Optional.empty(), checker.checkValue("Lorem ipsum? 10"));
     }
 

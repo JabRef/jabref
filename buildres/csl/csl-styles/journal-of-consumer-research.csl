@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-US" page-range-format="chicago">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="chicago" default-locale="en-US">
   <info>
     <title>Journal of Consumer Research</title>
+    <title-short>JCR</title-short>
     <id>http://www.zotero.org/styles/journal-of-consumer-research</id>
     <link href="http://www.zotero.org/styles/journal-of-consumer-research" rel="self"/>
     <link href="http://www.zotero.org/styles/international-studies-association" rel="template"/>
-    <link href="http://www.ejcr.org/newstylesheet.pdf" rel="documentation"/>
+    <link href="https://consumerresearcher.com/manuscript-preparation" rel="documentation"/>
+    <link href="https://consumerresearcher.com/wp-content/uploads/2021/01/stylesheet.pdf" rel="documentation"/>
     <author>
       <name>Sebastian Karcher</name>
     </author>
     <category citation-format="author-date"/>
     <category field="social_science"/>
     <issn>0093-5301</issn>
-    <updated>2012-09-27T22:06:38+00:00</updated>
+    <eissn>1537-5277</eissn>
+    <updated>2021-04-01T06:57:26+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor">
@@ -33,7 +36,7 @@
   </macro>
   <macro name="author-short">
     <names variable="author">
-      <name form="short" and="text" delimiter=", " initialize-with=". " sort-separator=", "/>
+      <name form="short" and="text" delimiter-precedes-last="never" initialize-with=". "/>
       <substitute>
         <names variable="editor"/>
         <names variable="translator"/>
@@ -148,6 +151,7 @@
   <bibliography hanging-indent="true" subsequent-author-substitute="&#8212;&#8212;&#8212;">
     <sort>
       <key macro="author"/>
+      <key macro="year-date"/>
       <key variable="title"/>
     </sort>
     <layout suffix=".">
