@@ -21,6 +21,7 @@ env:
   AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
   IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
   OSXCERT: ${{ secrets.OSX_SIGNING_CERT }}
+  GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false
 
 jobs:
   build:
@@ -56,25 +57,20 @@ jobs:
       - name: Run GitVersion
         id: gitversion
         uses: gittools/actions/gitversion/execute@v0.9.9
-      - name: Set up JDK 15 for linux and mac
+      - name: Set up JDK
         uses: actions/setup-java@v2
         with:
-          java-version: 15
+          java-version: 16
           distribution: 'adopt'
-        if: matrix.os != 'windows-latest'
-      - name: Set up JDK 14 for windows
-        uses: actions/setup-java@v2
-        with:
-          java-version: 14
-          distribution: 'adopt'
-        if: matrix.os == 'windows-latest'
       - name: Restore gradle cache
-        uses: actions/cache@master
+        uses: actions/cache@v2
         with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle7x-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
-            ${{ runner.os }}-gradle-
+            ${{ runner.os }}-gradle7x-
       - name: Setup OSX key chain on OSX
         if: matrix.os == 'macos-latest'
         uses: apple-actions/import-codesign-certs@v1
