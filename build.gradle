@@ -16,11 +16,11 @@ plugins {
 
     id 'com.github.ben-manes.versions' version '0.38.0'
 
-    id 'org.javamodularity.moduleplugin' version '1.8.3'
+    id 'org.javamodularity.moduleplugin' version '1.8.4'
 
     id 'org.openjfx.javafxplugin' version '0.0.10'
 
-    id 'org.beryx.jlink' version '2.23.8'
+    id 'org.beryx.jlink' version '2.24.0'
 
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
@@ -172,7 +172,7 @@ dependencies {
     implementation 'org.kordamp.ikonli:ikonli-materialdesign2-pack:12.2.0'
     implementation 'de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT'
     implementation 'de.saxsys:mvvmfx:1.8.0'
-    implementation 'com.tobiasdiez:easybind:2.1.0'
+    implementation 'com.tobiasdiez:easybind:2.2'
     implementation 'org.fxmisc.flowless:flowless:0.6.3'
     implementation 'org.fxmisc.richtext:richtextfx:0.10.6'
     implementation group: 'org.glassfish.hk2.external', name: 'jakarta.inject', version: '2.6.1'
