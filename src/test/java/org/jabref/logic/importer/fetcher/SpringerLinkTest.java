@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 
 @FetcherTest
 public class SpringerLinkTest {
@@ -23,7 +25,8 @@ public class SpringerLinkTest {
 
     @BeforeEach
     public void setUp() {
-        finder = new SpringerLink();
+        PreferencesService preferencesService = mock(PreferencesService.class);
+        finder = new SpringerLink(preferencesService);
         entry = new BibEntry();
     }
 

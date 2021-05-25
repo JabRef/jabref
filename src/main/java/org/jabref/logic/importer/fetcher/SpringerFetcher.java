@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -45,13 +46,10 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
     private static final String API_URL = "https://api.springernature.com/meta/v1/json";
     private static final String API_KEY = new BuildInfo().springerNatureAPIKey;
 
-    private PreferencesService preferences;
-
-    public SpringerFetcher() {
-    }
+    private final PreferencesService preferences;
 
     public SpringerFetcher(PreferencesService preferences) {
-        this.preferences = preferences;
+        this.preferences = Objects.requireNonNull(preferences);
     }
 
     /**
@@ -178,11 +176,9 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
      */
     private String getApiKey() {
         String apiKey = API_KEY;
-        if (preferences != null) {
-            CustomApiKeyPreferences apiKeyPreferences = preferences.getCustomApiKeyPreferences(getName());
-            if (apiKeyPreferences != null && apiKeyPreferences.isUseCustom()) {
-                apiKey = apiKeyPreferences.getCustomApiKey();
-            }
+        CustomApiKeyPreferences apiKeyPreferences = preferences.getCustomApiKeyPreferences(getName());
+        if (apiKeyPreferences != null && apiKeyPreferences.isUseCustom()) {
+            apiKey = apiKeyPreferences.getCustomApiKey();
         }
         return apiKey;
     }

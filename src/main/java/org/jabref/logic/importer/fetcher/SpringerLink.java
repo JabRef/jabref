@@ -34,13 +34,10 @@ public class SpringerLink implements FulltextFetcher {
     private static final String CONTENT_HOST = "link.springer.com";
     private static final String NAME = "Springer";
 
-    private PreferencesService preferences;
-
-    public SpringerLink() {
-    }
+    private final PreferencesService preferences;
 
     public SpringerLink(PreferencesService preferences) {
-        this.preferences = preferences;
+        this.preferences = Objects.requireNonNull(preferences);
     }
 
     /**
@@ -50,11 +47,9 @@ public class SpringerLink implements FulltextFetcher {
      */
     private String getApiKey() {
         String apiKey = API_KEY;
-        if (preferences != null) {
-            CustomApiKeyPreferences apiKeyPreferences = preferences.getCustomApiKeyPreferences(NAME);
-            if (apiKeyPreferences != null && apiKeyPreferences.isUseCustom()) {
-                apiKey = apiKeyPreferences.getCustomApiKey();
-            }
+        CustomApiKeyPreferences apiKeyPreferences = preferences.getCustomApiKeyPreferences(NAME);
+        if (apiKeyPreferences != null && apiKeyPreferences.isUseCustom()) {
+            apiKey = apiKeyPreferences.getCustomApiKey();
         }
         return apiKey;
     }

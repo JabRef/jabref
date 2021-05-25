@@ -59,11 +59,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
     private static final String API_KEY = new BuildInfo().ieeeAPIKey;
 
     private final ImportFormatPreferences importFormatPreferences;
-    private PreferencesService preferencesService;
-
-    public IEEE(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
-    }
+    private final PreferencesService preferencesService;
 
     public IEEE(PreferencesService preferencesService) {
         this.preferencesService = Objects.requireNonNull(preferencesService);
@@ -239,11 +235,9 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
      */
     private String getApiKey() {
         String apiKey = API_KEY;
-        if (preferencesService != null) {
-            CustomApiKeyPreferences apiKeyPreferences = preferencesService.getCustomApiKeyPreferences(getName());
-            if (apiKeyPreferences != null && apiKeyPreferences.isUseCustom()) {
-                apiKey = apiKeyPreferences.getCustomApiKey();
-            }
+        CustomApiKeyPreferences apiKeyPreferences = preferencesService.getCustomApiKeyPreferences(getName());
+        if (apiKeyPreferences != null && apiKeyPreferences.isUseCustom()) {
+            apiKey = apiKeyPreferences.getCustomApiKey();
         }
         return apiKey;
     }
