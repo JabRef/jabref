@@ -858,6 +858,15 @@ class BibtexParserTest {
     }
 
     @Test
+    void parseRecognizesPreambleWithArbitraryBracketPairAndSpace() throws IOException {
+        ParserResult result = parser
+                .parse(new StringReader("@preamble{some (  {text    )}) and \\latex}"));
+        //                                                               |> the rest got cut-off
+
+        assertEquals(Optional.of("some ( {text )}"), result.getDatabase().getPreamble());
+    }
+
+    @Test
     void parseRecognizesString() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("@string{bourdieu = {Bourdieu, Pierre}}"));
