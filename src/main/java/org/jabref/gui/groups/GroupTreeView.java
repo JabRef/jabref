@@ -416,17 +416,15 @@ public class GroupTreeView {
     }
 
     private void setNewGroupButtonStyle(TreeTableView<GroupNodeViewModel> groupTree) {
+        PseudoClass active = PseudoClass.getPseudoClass("active");
+        PseudoClass inactive = PseudoClass.getPseudoClass("inactive");
+
         if (groupTree.getRoot() != null) {
-            if (groupTree.getExpandedItemCount() <= 10) {
-                addNewGroup.setStyle("-fx-border-width: 0px; -fx-background-color: -jr-theme;" +
-                        " -fx-padding: 0.5em; -fx-text-fill: -jr-white;");
-            } else {
-                addNewGroup.setStyle("-fx-border-width: 0px; -fx-background-color: -jr-icon-background-active;" +
-                        " -fx-padding: 0.5em; -fx-text-fill: -jr-black;");
-            }
+            boolean isActive = groupTree.getExpandedItemCount() <= 10;
+            addNewGroup.pseudoClassStateChanged(active, isActive);
+            addNewGroup.pseudoClassStateChanged(inactive, !isActive);
         } else {
-            addNewGroup.setStyle("-fx-border-width: 0px; -fx-background-color: -jr-theme;" +
-                    " -fx-padding: 0.5em; -fx-text-fill: -jr-white;");
+            addNewGroup.pseudoClassStateChanged(active, true);
         }
     }
 
