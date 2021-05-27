@@ -218,9 +218,8 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         viewModel.openHelpPage();
     }
 
-//    private static int fieldsNum;
     @FXML
-    void openIconPicker(ActionEvent event) throws Exception {
+    private void openIconPicker(ActionEvent event) throws Exception {
         System.out.println("clicking the icon picker button");
 
         TabPane tabPane = new TabPane();
@@ -257,7 +256,6 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         scene.setCursor(Cursor.CLOSED_HAND);
 
         Stage stage = new Stage();
-//        s.initModality(Modality.APPLICATION_MODAL);
         stage.initStyle(StageStyle.UNDECORATED);
         stage.setX(700);
         stage.setY(550);
@@ -268,7 +266,7 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
         stage.show();
     }
 
-    private static class IconTab extends Tab {
+    private class IconTab extends Tab {
         private IconTab(Class<? extends Ikon> iconFontClass, EnumSet<? extends Ikon> enumSet) throws Exception {
             super(iconFontClass.getSimpleName());
             setClosable(false);
@@ -282,6 +280,14 @@ public class GroupDialogView extends BaseDialog<AbstractGroup> {
                 icon.getStyleClass().setAll("font-icon");
                 Button button = new Button();
                 button.setGraphic(icon);
+                button.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        iconField.textProperty().setValue(String.valueOf(icon.getIconCode()));
+                        Stage stage = (Stage) button.getScene().getWindow();
+                        stage.close();
+                    }
+                });
                 pane.add(button, column++, row);
                 GridPane.setMargin(button, new Insets(10, 10, 10, 10));
                 if (++index % 10 == 0) {
