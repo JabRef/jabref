@@ -5,10 +5,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
@@ -660,7 +658,6 @@ class BibEntryWriterTest {
 
         String output = writer.serializeAll(List.of(entry1, entry2), BibDatabaseMode.BIBLATEX);
 
-
         // @formatter:off
         String expected1 = OS.NEWLINE + "@Article{," + OS.NEWLINE +
                 "  author       = {Journal Author}," + OS.NEWLINE +
@@ -686,7 +683,6 @@ class BibEntryWriterTest {
                 "  year      = {2020}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
         // @formatter:on
-
 
         assertEquals(expected1 + expected2, output);
 
