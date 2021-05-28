@@ -15,11 +15,11 @@ public class OOVoidResult<E> {
     }
 
     public static <E> OOVoidResult<E> ok() {
-        return new OOVoidResult(Optional.empty());
+        return new OOVoidResult<>(Optional.empty());
     }
 
     public static <E> OOVoidResult<E> error(E error) {
-        return new OOVoidResult(Optional.of(error));
+        return new OOVoidResult<>(Optional.of(error));
     }
 
     public boolean isError() {

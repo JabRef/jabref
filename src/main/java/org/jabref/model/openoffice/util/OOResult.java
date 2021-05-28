@@ -31,14 +31,14 @@ public class OOResult<R, E> {
      * @param result Null is not allowed.
      */
     public static <R, E> OOResult<R, E> ok(R result) {
-        return new OOResult(Optional.of(result), Optional.empty());
+        return new OOResult<>(Optional.of(result), Optional.empty());
     }
 
     /**
      * @param error Null is not allowed.
      */
     public static <R, E> OOResult<R, E> error(E error) {
-        return new OOResult(Optional.empty(), Optional.of(error));
+        return new OOResult<>(Optional.empty(), Optional.of(error));
     }
 
     /*
