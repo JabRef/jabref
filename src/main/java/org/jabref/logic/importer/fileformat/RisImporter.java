@@ -32,7 +32,6 @@ public class RisImporter extends Importer {
 
     private static final Pattern RECOGNIZED_FORMAT_PATTERN = Pattern.compile("TY  - .*");
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy");
-    private static String[] entries;
 
     @Override
     public String getName() {
