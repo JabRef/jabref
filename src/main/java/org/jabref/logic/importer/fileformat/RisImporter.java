@@ -32,6 +32,7 @@ public class RisImporter extends Importer {
 
     private static final Pattern RECOGNIZED_FORMAT_PATTERN = Pattern.compile("TY  - .*");
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy");
+    private static String[] entries;
 
     @Override
     public String getName() {
@@ -54,6 +55,10 @@ public class RisImporter extends Importer {
         return reader.lines().anyMatch(line -> RECOGNIZED_FORMAT_PATTERN.matcher(line).find());
     }
 
+    public String[] getEntries() {
+        return entries;
+    }
+
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
@@ -61,8 +66,8 @@ public class RisImporter extends Importer {
         // use optional here, so that no exception will be thrown if the file is empty
         String linesAsString = reader.lines().reduce((line, nextline) -> line + "\n" + nextline).orElse("");
 
-        String[] entries = linesAsString.replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
-                                        .split("ER  -.*\\n");
+        entries = linesAsString.replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
+                                        .split("ER  -.*(\\n)*");
 
         // stores all the date tags from highest to lowest priority
         List<String> dateTags = Arrays.asList("Y1", "PY", "DA", "Y2");
