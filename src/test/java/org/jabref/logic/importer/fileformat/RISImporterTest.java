@@ -47,14 +47,4 @@ public class RISImporterTest {
         Path file = Path.of(RISImporterTest.class.getResource("RisImporterCorrupted.ris").toURI());
         assertFalse(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
     }
-
-    @Test
-    public void testIfSplitCorrect(){
-        String[] entries = importer.gerEntries;
-        for (String entry : entries) {
-            assertFalse(entry.equals("ER  - "));
-        }
-    }
-
-
 }
