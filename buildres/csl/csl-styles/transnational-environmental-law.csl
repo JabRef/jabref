@@ -7,6 +7,7 @@
     <link href="http://www.zotero.org/styles/transnational-environmental-law" rel="self"/>
     <link href="http://www.zotero.org/styles/elsevier-with-titles" rel="template"/>
     <link href="https://www.cambridge.org/core/journals/transnational-environmental-law/information/instructions-contributors" rel="documentation"/>
+    <link href="https://www.cambridge.org/core/services/aop-file-manager/file/5f8435072aae1a2bdc987dac/TEL-IFC.pdf" rel="documentation"/>
     <author>
       <name>Patrick O'Brien</name>
       <email>obrienpat86@gmail.com</email>
@@ -15,7 +16,7 @@
     <category field="law"/>
     <issn>2047-1025</issn>
     <eissn>2047-1033</eissn>
-    <updated>2017-09-06T13:20:13+00:00</updated>
+    <updated>2021-05-07T11:59:01+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="author">
@@ -67,18 +68,28 @@
     <choose>
       <if variable="locator">
         <choose>
-          <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
-            <group delimiter=" " prefix=", ">
-              <text term="at"/>
-              <label variable="page" form="short"/>
+          <if match="any" position="subsequent">
+            <group delimiter=" ">
+              <label variable="locator" form="short"/>
               <text variable="locator"/>
             </group>
           </if>
           <else>
-            <group delimiter=" " prefix=", ">
-              <text term="at"/>
-              <text variable="locator"/>
-            </group>
+            <choose>
+              <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
+                <group delimiter=" " prefix=", ">
+                  <text term="at"/>
+                  <label variable="page" form="short"/>
+                  <text variable="locator"/>
+                </group>
+              </if>
+              <else>
+                <group delimiter=" " prefix=", ">
+                  <text term="at"/>
+                  <text variable="locator"/>
+                </group>
+              </else>
+            </choose>
           </else>
         </choose>
       </if>
@@ -90,6 +101,16 @@
         <if position="ibid">
           <text term="ibid"/>
         </if>
+        <else-if match="any" position="subsequent">
+          <group delimiter=", ">
+            <text macro="author"/>
+            <group delimiter=" ">
+              <text value="n."/>
+              <text variable="first-reference-note-number"/>
+              <text value="above"/>
+            </group>
+          </group>
+        </else-if>
         <else>
           <text macro="author" suffix=", "/>
           <choose>
