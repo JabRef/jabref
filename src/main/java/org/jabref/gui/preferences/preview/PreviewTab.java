@@ -147,11 +147,10 @@ public class PreviewTab extends AbstractPreferenceTabView<PreviewTabViewModel> i
         sortUpButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
         sortDownButton.disableProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNull());
 
-        previewTab.setContent(new PreviewViewer(new BibDatabaseContext(), dialogService, stateManager));
+        previewTab.setContent(new PreviewViewer(new BibDatabaseContext(), dialogService, stateManager, themeManager));
         ((PreviewViewer) previewTab.getContent()).setEntry(TestEntry.getTestEntry());
         EasyBind.subscribe(viewModel.layoutProperty(), value -> ((PreviewViewer) previewTab.getContent()).setLayout(value));
         previewTab.getContent().visibleProperty().bind(viewModel.chosenSelectionModelProperty().getValue().selectedItemProperty().isNotNull());
-        ((PreviewViewer) previewTab.getContent()).setThemeManager(themeManager);
 
         editArea.clear();
         editArea.setParagraphGraphicFactory(LineNumberFactory.get(editArea));

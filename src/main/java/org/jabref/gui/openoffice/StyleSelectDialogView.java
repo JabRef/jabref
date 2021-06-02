@@ -75,16 +75,13 @@ public class StyleSelectDialogView extends BaseDialog<OOBibStyle> {
     private void initialize() {
         viewModel = new StyleSelectDialogViewModel(dialogService, loader, preferencesService);
 
-        previewArticle = new PreviewViewer(new BibDatabaseContext(), dialogService, stateManager);
+        previewArticle = new PreviewViewer(new BibDatabaseContext(), dialogService, stateManager, themeManager);
         previewArticle.setEntry(TestEntry.getTestEntry());
         vbox.getChildren().add(previewArticle);
 
-        previewBook = new PreviewViewer(new BibDatabaseContext(), dialogService, stateManager);
+        previewBook = new PreviewViewer(new BibDatabaseContext(), dialogService, stateManager, themeManager);
         previewBook.setEntry(TestEntry.getTestEntryBook());
         vbox.getChildren().add(previewBook);
-
-        previewArticle.setThemeManager(themeManager);
-        previewBook.setThemeManager(themeManager);
 
         colName.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         colJournals.setCellValueFactory(cellData -> cellData.getValue().journalsProperty());

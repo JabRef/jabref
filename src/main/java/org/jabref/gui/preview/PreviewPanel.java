@@ -60,10 +60,9 @@ public class PreviewPanel extends VBox {
         fileLinker = new ExternalFilesEntryLinker(externalFileTypes, preferences.getFilePreferences(), database);
 
         PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
-        previewView = new PreviewViewer(database, dialogService, stateManager);
+        previewView = new PreviewViewer(database, dialogService, stateManager, themeManager);
         previewView.setLayout(previewPreferences.getCurrentPreviewStyle());
         previewView.setContextMenu(createPopupMenu());
-        previewView.setThemeManager(themeManager);
         previewView.setOnDragDetected(event -> {
             previewView.startFullDrag();
 

@@ -116,7 +116,10 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     /**
      * @param database Used for resolving strings and pdf directories for links.
      */
-    public PreviewViewer(BibDatabaseContext database, DialogService dialogService, StateManager stateManager) {
+    public PreviewViewer(BibDatabaseContext database,
+                         DialogService dialogService,
+                         StateManager stateManager,
+                         ThemeManager themeManager) {
         this.database = Objects.requireNonNull(database);
         this.dialogService = dialogService;
         this.clipBoardManager = Globals.getClipboardManager();
@@ -138,9 +141,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             }
             highlightSearchPattern();
         });
-    }
 
-    public void setThemeManager(ThemeManager themeManager) {
         themeManager.installCss(previewView.getEngine());
     }
 
