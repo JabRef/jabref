@@ -3,8 +3,14 @@ package org.jabref.gui.theme;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.model.strings.StringUtil;
-
+/**
+ * Represents one of three types of a css based Theme for JabRef:
+ * <p>
+ * The Default type of theme is the light theme, the dark theme is currently the only embedded theme and the custom
+ * themes, that can be created by loading a proper css file. If a css file cannot be found, the Theme package will
+ * nevertheless create a stylesheet representation for the missing file and report a file watch path so the user can
+ * provide the file later, but will not provide the additional stylesheet.
+ */
 public class Theme {
 
     public enum Type {
@@ -19,48 +25,31 @@ public class Theme {
     private final Optional<StyleSheet> additionalStylesheet;
 
     public Theme(String name) {
-        /* String themeName = name != null ? name : "";
+        Objects.requireNonNull(name);
 
-        if (themeName.equals("") || BASE_CSS.equalsIgnoreCase(themeName)) {
+        if (name.equals("") || BASE_CSS.equalsIgnoreCase(name)) {
             this.additionalStylesheet = Optional.empty();
             this.type = Type.DEFAULT;
-            themeName = "";
-        } else if (EMBEDDED_DARK_CSS.equalsIgnoreCase(themeName)) {
+            this.name = "";
+        } else if (EMBEDDED_DARK_CSS.equalsIgnoreCase(name)) {
             this.additionalStylesheet = StyleSheet.create(EMBEDDED_DARK_CSS);
-
             if (this.additionalStylesheet.isPresent()) {
                 this.type = Type.EMBEDDED;
-                themeName = EMBEDDED_DARK_CSS;
+                this.name = EMBEDDED_DARK_CSS;
             } else {
                 this.type = Type.DEFAULT;
-                themeName = "";
+                this.name = "";
             }
         } else {
             this.additionalStylesheet = StyleSheet.create(name);
-            if (this.additionalStylesheet.isPresent()) {
+             if (this.additionalStylesheet.isPresent()) {
                 this.type = Type.CUSTOM;
-                themeName = name;
+                this.name = name;
             } else {
                 this.type = Type.DEFAULT;
-                themeName = "";
+                this.name = "";
             }
         }
-
-        this.name = themeName; */
-
-        this.name = name != null ? name : "";
-        if (StringUtil.isBlank(this.name) || BASE_CSS.equalsIgnoreCase(this.name)) {
-            this.type = Type.DEFAULT;
-        } else if (EMBEDDED_DARK_CSS.equalsIgnoreCase(this.name)) {
-            this.type = Type.EMBEDDED;
-        } else {
-            this.type = Type.CUSTOM;
-        }
-        this.additionalStylesheet = switch (type) {
-            case DEFAULT -> StyleSheet.create("Light.css");
-            case EMBEDDED -> StyleSheet.create("Dark.css");
-            case CUSTOM -> StyleSheet.create(name);
-        };
     }
 
     public static Theme light() {
@@ -94,6 +83,13 @@ public class Theme {
         return name;
     }
 
+    /**
+     * This method allows callers to obtain the theme's additional stylesheet.
+     *
+     * @return called with the stylesheet location if there is an additional stylesheet present and available. The
+     * location will be a local URL. Typically it will be a {@code 'data:'} URL where the CSS is embedded. However for
+     * large themes it can be {@code 'file:'}.
+     */
     public Optional<StyleSheet> getAdditionalStylesheet() {
         return additionalStylesheet;
     }

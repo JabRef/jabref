@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ThemeTest {
     @Test
@@ -30,6 +31,7 @@ public class ThemeTest {
         Theme theme = new Theme("Dark.css");
 
         assertEquals(Theme.Type.EMBEDDED, theme.getType());
+        assertTrue(theme.getAdditionalStylesheet().isPresent());
         assertEquals("Dark.css", theme.getAdditionalStylesheet().get().getWatchPath().getFileName().toString(),
                 "expected dark theme stylesheet to be available");
     }
@@ -50,5 +52,14 @@ public class ThemeTest {
         assertEquals(Theme.Type.DEFAULT, theme.getType());
         assertEquals(Optional.empty(), theme.getAdditionalStylesheet(),
                 "didn't expect additional stylesheet when CSS location is just some null terminators!");
+    }
+
+    @Test
+    public void customThemeIfFileNotFound() {
+        Theme theme = new Theme("Idonotexist.css");
+
+        assertEquals(Theme.Type.CUSTOM, theme.getType());
+        assertTrue(theme.getAdditionalStylesheet().isPresent());
+        assertEquals("Idonotexist.css", theme.getAdditionalStylesheet().get().getWatchPath().getFileName().toString());
     }
 }

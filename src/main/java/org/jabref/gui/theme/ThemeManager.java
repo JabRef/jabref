@@ -1,23 +1,22 @@
 package org.jabref.gui.theme;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.WeakHashMap;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.preferences.AppearancePreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +28,9 @@ import org.slf4j.LoggerFactory;
  * <p>
  * For type Custom, Theme will protect against removal of the CSS file, degrading as gracefully as possible. If the file
  * becomes unavailable while the application is running, some Scenes that have not yet had the CSS installed may not be
- * themed. The PreviewViewer, which uses WebEngine, supports data URLs and so generally are not affected by removal of
- * the file; however Theme will not attempt to URL-encode large style sheets so as to protect memory usage (see {@link
- * StyleSheetFile#MAX_IN_MEMORY_CSS_LENGTH}.
+ * themed. The PreviewViewer, which uses WebEngine, supports data URLs and so generally is not affected by removal of
+ * the file; however Theme package will not attempt to URL-encode large style sheets so as to protect memory usage (see
+ * {@link StyleSheetFile#MAX_IN_MEMORY_CSS_LENGTH}).
  *
  * @see <a href="https://docs.jabref.org/advanced/custom-themes">Custom themes</a> in the Jabref documentation.
  */
@@ -39,85 +38,70 @@ public class ThemeManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeManager.class);
 
+    private final PreferencesService preferencesService;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final Consumer<Runnable> updateRunner;
 
     private final StyleSheet baseStyleSheet;
-    private final AtomicReference<AppearancePreferences> currentAppearancePreferences = new AtomicReference<>();
+    private Theme theme;
 
     private final Set<Scene> scenes = Collections.newSetFromMap(new WeakHashMap<>());
     private final Set<WebEngine> webEngines = Collections.newSetFromMap(new WeakHashMap<>());
 
-    public ThemeManager(AppearancePreferences initialPreferences,
+    public ThemeManager(PreferencesService preferencesService,
                         FileUpdateMonitor fileUpdateMonitor,
                         Consumer<Runnable> updateRunner) {
+        this.preferencesService = Objects.requireNonNull(preferencesService);
         this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
         this.updateRunner = Objects.requireNonNull(updateRunner);
 
         this.baseStyleSheet = StyleSheet.create(Theme.BASE_CSS).get();
+        this.theme = preferencesService.getAppearancePreferences().getTheme();
 
-        /* Watching base CSS only works in development and test scenarios, where the build system exposes the CSS as a
-        file (e.g. for Gradle run task it will be in build/resources/main/org/jabref/gui/Base.css) */
-        Path baseCssPath = this.baseStyleSheet.getWatchPath();
-        if (baseCssPath != null) {
-            try {
-                fileUpdateMonitor.addListenerForFile(baseCssPath, this::baseCssLiveUpdate);
-                LOGGER.info("Watching base css {} for live updates", baseCssPath);
-            } catch (IOException e) {
-                LOGGER.warn("Cannot watch base css path {} for live updates", baseCssPath, e);
-            }
-        }
+        // Watching base CSS only works in development and test scenarios, where the build system exposes the CSS as a
+        // file (e.g. for Gradle run task it will be in build/resources/main/org/jabref/gui/Base.css)
+        addStylesheetToWatchlist(this.baseStyleSheet, this::baseCssLiveUpdate);
+        baseCssLiveUpdate();
 
-        updatePreferences(Objects.requireNonNull(initialPreferences));
+        updateTheme();
     }
 
-    /**
-     * This method allows callers to obtain the theme's additional stylesheet.
-     *
-     * @return called with the stylesheet location if there is an additional stylesheet present and available. The
-     * location will be a local URL. Typically it will be a {@code 'data:'} URL where the CSS is embedded. However for
-     * large themes it can be {@code 'file:'}.
-     */
-    Optional<StyleSheet> getAdditionalStylesheet() {
-        return currentAppearancePreferences.get().getTheme().getAdditionalStylesheet();
-    }
+    public void updateTheme() {
+        Theme newTheme = Objects.requireNonNull(preferencesService.getAppearancePreferences().getTheme());
 
-    public void updatePreferences(AppearancePreferences newPreferences) {
-        Objects.requireNonNull(newPreferences);
-
-        AppearancePreferences oldPreferences = this.currentAppearancePreferences.get();
-        if (oldPreferences != null) {
-            if (!newPreferences.equals(oldPreferences)) {
-                LOGGER.info("Not updating appearance preferences because it hasn't changed");
-
-                oldPreferences.getTheme().getAdditionalStylesheet().ifPresent(styleSheet -> {
-                    Path oldPath = styleSheet.getWatchPath();
-                    if (oldPath != null) {
-                        fileUpdateMonitor.removeListener(oldPath, this::additionalCssLiveUpdate);
-                        LOGGER.info("No longer watch css {} for live updates", oldPath);
-                    }
-                });
-            }
+        if (newTheme.equals(theme)) {
+            LOGGER.info("Not updating theme because it hasn't changed");
+        } else {
+            theme.getAdditionalStylesheet().ifPresent(this::removeStylesheetFromWatchList);
         }
 
-        this.currentAppearancePreferences.set(newPreferences);
-        LOGGER.info("Theme set to {} with base css {}", newPreferences.getTheme(), baseStyleSheet);
+        this.theme = newTheme;
+        LOGGER.info("Theme set to {} with base css {}", newTheme, baseStyleSheet);
 
-        newPreferences.getTheme().getAdditionalStylesheet().ifPresent(styleSheet -> {
-            Path newPath = styleSheet.getWatchPath();
-            if (newPath != null && !Files.isDirectory(newPath) && Files.exists(newPath)) {
-                try {
-                    fileUpdateMonitor.addListenerForFile(newPath, this::additionalCssLiveUpdate);
-                    LOGGER.info("Watching additional css {} for live updates", newPath);
-                } catch (IOException e) {
-                    LOGGER.warn("Cannot watch additional css path {} for live updates", newPath, e);
-                }
-            } else {
-                LOGGER.warn("Cannot watch additional css path {} for live updates, since this is no valid file", newPath);
-            }
-        });
+        this.theme.getAdditionalStylesheet().ifPresent(
+                styleSheet -> addStylesheetToWatchlist(styleSheet, this::additionalCssLiveUpdate));
 
         additionalCssLiveUpdate();
+    }
+
+    private void removeStylesheetFromWatchList(StyleSheet styleSheet) {
+        Path oldPath = styleSheet.getWatchPath();
+        if (oldPath != null) {
+            fileUpdateMonitor.removeListener(oldPath, this::additionalCssLiveUpdate);
+            LOGGER.info("No longer watch css {} for live updates", oldPath);
+        }
+    }
+
+    private void addStylesheetToWatchlist(StyleSheet styleSheet, FileUpdateListener updateMethod) {
+        Path watchPath = styleSheet.getWatchPath();
+        if (watchPath != null) {
+            try {
+                fileUpdateMonitor.addListenerForFile(watchPath, updateMethod);
+                LOGGER.info("Watching css {} for live updates", watchPath);
+            } catch (IOException e) {
+                LOGGER.warn("Cannot watch css path {} for live updates", watchPath, e);
+            }
+        }
     }
 
     /**
@@ -144,8 +128,8 @@ public class ThemeManager {
     public void installCss(WebEngine webEngine) {
         updateRunner.accept(() -> {
             if (this.webEngines.add(webEngine)) {
-                webEngine.setUserStyleSheetLocation(getAdditionalStylesheet().isPresent() ?
-                        getAdditionalStylesheet().get().getWebEngineStylesheet() : "");
+                webEngine.setUserStyleSheetLocation(this.theme.getAdditionalStylesheet().isPresent() ?
+                        this.theme.getAdditionalStylesheet().get().getWebEngineStylesheet() : "");
             }
         });
     }
@@ -160,8 +144,8 @@ public class ThemeManager {
 
     private void additionalCssLiveUpdate() {
         String newStyleSheetLocation = "";
-        if (getAdditionalStylesheet().isPresent()) {
-            StyleSheet styleSheet = getAdditionalStylesheet().get();
+        if (this.theme.getAdditionalStylesheet().isPresent()) {
+            StyleSheet styleSheet = this.theme.getAdditionalStylesheet().get();
             styleSheet.reload();
             newStyleSheetLocation = styleSheet.getWebEngineStylesheet();
         }
@@ -194,9 +178,10 @@ public class ThemeManager {
     }
 
     private void updateAdditionalCss(Scene scene) {
-        AppearancePreferences appearance = this.currentAppearancePreferences.get();
+        AppearancePreferences appearance = preferencesService.getAppearancePreferences();
+
         List<String> stylesheets = scene.getStylesheets();
-        if (stylesheets.size() == 2) {
+        if (stylesheets.size() > 1) {
             stylesheets.remove(1);
         }
 
@@ -210,7 +195,7 @@ public class ThemeManager {
         }
     }
 
-    public AppearancePreferences getCurrentAppearancePreferences() {
-        return currentAppearancePreferences.get();
+    public Theme getActiveTheme() {
+        return this.theme;
     }
 }

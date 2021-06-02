@@ -51,14 +51,14 @@ abstract class StyleSheet {
         } else if ("file".equals(styleSheetUrl.get().getProtocol())) {
             StyleSheet styleSheet = new StyleSheetFile(styleSheetUrl.get());
 
-            if (!Files.exists(styleSheet.getWatchPath())) {
-                LOGGER.warn("Cannot load additional css {} because the file does not exist.", styleSheet.getWatchPath());
-                return Optional.empty();
-            }
-
             if (Files.isDirectory(styleSheet.getWatchPath())) {
                 LOGGER.warn("Failed to loadCannot load additional css {} because it is a directory.", styleSheet.getWatchPath());
                 return Optional.empty();
+            }
+
+            if (!Files.exists(styleSheet.getWatchPath())) {
+                LOGGER.warn("Cannot load additional css {} because the file does not exist.", styleSheet.getWatchPath());
+                // Should not return empty, since the user can create the file later.
             }
 
             return Optional.of(new StyleSheetFile(styleSheetUrl.get()));

@@ -118,7 +118,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
                 newTheme);
 
         preferences.storeAppearancePreference(newAppearancePreferences);
-        themeManager.updatePreferences(newAppearancePreferences);
+        themeManager.updateTheme();
     }
 
     public ValidationStatus fontSizeValidationStatus() {
