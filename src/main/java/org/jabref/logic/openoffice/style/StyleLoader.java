@@ -92,7 +92,7 @@ public class StyleLoader {
                 }
             } catch (FileNotFoundException e) {
                 // The file couldn't be found... should we tell anyone?
-                LOGGER.info("Cannot find external style file " + filename, e);
+                LOGGER.info("Cannot find external style file " + filename);
             } catch (IOException e) {
                 LOGGER.info("Problem reading external style file " + filename, e);
             }
