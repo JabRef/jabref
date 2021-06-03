@@ -1,4 +1,7 @@
-package org.jabref.logic.remote.online;
+package org.jabref.logic.remote.online.dto;
+
+import org.jabref.logic.remote.online.dto.EntryDto;
+import org.jabref.logic.remote.online.dto.GraphQLQuery;
 
 public class SaveEntryGraphQLQuery extends GraphQLQuery {
     private static final String SAVE_ENTRY_QUERY = "mutation addUserDocumentRaw($doc: DocumentRawInput!) {" +

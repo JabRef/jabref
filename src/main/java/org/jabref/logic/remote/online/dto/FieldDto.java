@@ -1,9 +1,12 @@
-package org.jabref.logic.remote.online;
+package org.jabref.logic.remote.online.dto;
 
 public class FieldDto {
 
     private String field;
     private String value;
+
+    public FieldDto() {
+    }
 
     public FieldDto(String field, String value) {
         this.field = field;

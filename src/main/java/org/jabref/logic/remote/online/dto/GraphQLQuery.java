@@ -1,4 +1,4 @@
-package org.jabref.logic.remote.online;
+package org.jabref.logic.remote.online.dto;
 
 import java.util.Map;
 

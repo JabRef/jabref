@@ -10,11 +10,19 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.remote.online.dto.EntryDto;
+import org.jabref.logic.remote.online.dto.FieldDto;
+import org.jabref.logic.remote.online.dto.GetByIdGraphQLQuery;
+import org.jabref.logic.remote.online.dto.GraphQLGetByIdResponseData;
+import org.jabref.logic.remote.online.dto.GraphQLResponseDto;
+import org.jabref.logic.remote.online.dto.GraphQLSaveResponseData;
+import org.jabref.logic.remote.online.dto.SaveEntryGraphQLQuery;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.UnknownField;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JabrefOnlineService {
@@ -40,15 +48,19 @@ public class JabrefOnlineService {
                 os.write(input, 0, input.length);
             }
 
+            EntryDto entryDto;
             try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"))) {
                 StringBuilder response = new StringBuilder();
                 String responseLine;
                 while ((responseLine = br.readLine()) != null) {
                     response.append(responseLine.trim());
                 }
+
+                GraphQLResponseDto<GraphQLGetByIdResponseData> graphQLResponseDto = MAPPER.readValue(response.toString(), new TypeReference<>() {
+                });
+                entryDto = graphQLResponseDto.getData().getEntryDto();
             }
 
-            EntryDto entryDto = null;
             BibEntry bibEntry = new BibEntry();
             for (FieldDto field : entryDto.getFields()) {
                 Field fieldFromDto = new UnknownField(field.getField());
@@ -90,8 +102,9 @@ public class JabrefOnlineService {
                     response.append(responseLine.trim());
                 }
 
-                GraphQLResponseDto<AddEntryResponse> graphQLResponseDto = MAPPER.readValue(response.toString(), GraphQLResponseDto.class);
-                return graphQLResponseDto.getData().getResponse().getId();
+                GraphQLResponseDto<GraphQLSaveResponseData> graphQLResponseDto = MAPPER.readValue(response.toString(), new TypeReference<>() {
+                });
+                return graphQLResponseDto.getData().getAddUserDocumentRaw().getId();
             }
         } catch (IOException e) {
             throw new JabrefOnlineException();
