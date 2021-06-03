@@ -604,7 +604,7 @@ public class OOTextIntoOO {
                 }
                 // namesArray must be alphabetically sorted.
                 String[] namesArray = names.toArray(new String[names.size()]);
-                String[] delNamesArray = delNames.toArray(new String[names.size()]);
+                String[] delNamesArray = delNames.toArray(new String[delNames.size()]);
                 mpss.setPropertiesToDefault(delNamesArray);
                 mps.setPropertyValues(namesArray, values.toArray());
             } catch (UnknownPropertyException ex) {
