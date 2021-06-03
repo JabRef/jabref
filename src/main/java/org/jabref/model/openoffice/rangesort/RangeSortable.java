@@ -5,7 +5,7 @@ import com.sun.star.text.XTextRange;
 /**
  * This is what {@code visualSort} needs in its input.
  */
-public interface RangeSortable<T> {
+public interface RangeSortable<T> extends RangeHolder {
 
     /** The XTextRange
      *

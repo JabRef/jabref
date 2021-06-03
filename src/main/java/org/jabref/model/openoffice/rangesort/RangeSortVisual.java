@@ -1,10 +1,9 @@
 package org.jabref.model.openoffice.rangesort;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.jabref.model.openoffice.uno.NoDocumentException;
 import org.jabref.model.openoffice.uno.UnoScreenRefresh;
@@ -53,18 +52,19 @@ public class RangeSortVisual {
             LOGGER.warn("visualSort:"
                         + " with ControllersLocked, viewCursor.gotoRange"
                         + " is probably useless");
+            throw new RuntimeException("visualSort:"
+                                       + " with ControllersLocked, viewCursor.gotoRange"
+                                       + " is probably useless");
         }
 
         XTextViewCursor viewCursor = fcursor.getViewCursor();
 
         // find coordinates
         List<Point> positions = new ArrayList<>(inputSize);
-
         for (RangeSortable<T> v : inputs) {
             positions.add(findPositionOfTextRange(v.getRange(),
                                                   viewCursor));
         }
-
         fcursor.restore(doc);
 
         if (positions.size() != inputSize) {
@@ -72,12 +72,14 @@ public class RangeSortVisual {
         }
 
         // order by position
-        Set<ComparableMark<RangeSortable<T>>> set = new TreeSet<>();
+        ArrayList<ComparableMark<RangeSortable<T>>> set = new ArrayList<>(inputSize);
         for (int i = 0; i < inputSize; i++) {
+            RangeSortable<T> input = inputs.get(i);
             set.add(new ComparableMark<>(positions.get(i),
-                                         inputs.get(i).getIndexInPosition(),
-                                         inputs.get(i)));
+                                         input.getIndexInPosition(),
+                                         input));
         }
+        Collections.sort(set);
 
         if (set.size() != inputSize) {
             throw new RuntimeException("visualSort: set.size() != inputSize");
