@@ -1,4 +1,4 @@
-package org.jabref.logic.openoffice;
+package org.jabref.logic.openoffice.style;
 
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
+import org.jabref.logic.openoffice.OpenOfficePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
