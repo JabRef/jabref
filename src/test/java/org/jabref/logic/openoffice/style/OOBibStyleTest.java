@@ -157,23 +157,7 @@ class OOBibStyleTest {
                                                         inParenthesis,
                                                         uniquefiers,
                                                         isFirstAppearanceOfSource,
-                                                        pageInfo );
-    }
-
-    static String getCitationMarker2b(OOBibStyle style,
-                                      List<BibEntry> entries,
-                                      Map<BibEntry, BibDatabase> entryDBMap,
-                                      boolean inParenthesis,
-                                      String[] uniquefiers,
-                                      Boolean[] isFirstAppearanceOfSource,
-                                      String[] pageInfo) {
-        return OOBibStyleTestHelper.getCitationMarker2b(style,
-                                                        entries,
-                                                        entryDBMap,
-                                                        inParenthesis,
-                                                        uniquefiers,
-                                                        isFirstAppearanceOfSource,
-                                                        pageInfo );
+                                                        pageInfo);
     }
 
     /*
