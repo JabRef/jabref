@@ -8,14 +8,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.UnknownField;
-import org.jabref.model.entry.types.UnknownEntryType;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -31,7 +29,7 @@ public class JabrefOnlineService {
         try {
             URL url = new URL(JABREF_ONLINE);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("content-type", "application/json");
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
 
@@ -42,7 +40,7 @@ public class JabrefOnlineService {
                 os.write(input, 0, input.length);
             }
 
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf-8"))) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"))) {
                 StringBuilder response = new StringBuilder();
                 String responseLine;
                 while ((responseLine = br.readLine()) != null) {
@@ -58,7 +56,6 @@ public class JabrefOnlineService {
             }
 
             bibEntry.setCitationKey(entryDto.getCitationKey());
-            bibEntry.setType(new UnknownEntryType("asd"));
             return bibEntry;
         } catch (IOException e) {
             throw new JabrefOnlineException();
@@ -69,7 +66,7 @@ public class JabrefOnlineService {
         try {
             URL url = new URL(JABREF_ONLINE);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("content-Type", "application/json");
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
 
@@ -79,7 +76,6 @@ public class JabrefOnlineService {
                                             .map(field -> new FieldDto(field.getName(), entry.getField(field).orElse("")))
                                             .collect(Collectors.toList());
             EntryDto entryDto = new EntryDto(entry.getType().getName(), entry.getCitationKey().orElse(""), fieldDtos);
-
             SaveEntryGraphQLQuery saveEntryGraphQLQuery = new SaveEntryGraphQLQuery(entryDto);
 
             try (OutputStream os = connection.getOutputStream()) {
@@ -87,15 +83,16 @@ public class JabrefOnlineService {
                 os.write(input, 0, input.length);
             }
 
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf-8"))) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"))) {
                 StringBuilder response = new StringBuilder();
                 String responseLine;
                 while ((responseLine = br.readLine()) != null) {
                     response.append(responseLine.trim());
                 }
-            }
 
-            return null;
+                GraphQLResponseDto<AddEntryResponse> graphQLResponseDto = MAPPER.readValue(response.toString(), GraphQLResponseDto.class);
+                return graphQLResponseDto.getData().getResponse().getId();
+            }
         } catch (IOException e) {
             throw new JabrefOnlineException();
         }

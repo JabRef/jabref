@@ -7,6 +7,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 
 import static org.jabref.model.entry.field.InternalField.TYPE_HEADER;
@@ -27,7 +29,6 @@ public class JabrefOnlineServiceTest {
         entry.setType(StandardEntryType.Article);
         entry.setCitationKey("asdsdad");
         entry.setField(fieldStringMap);
-
 
         service.save(entry);
     }
