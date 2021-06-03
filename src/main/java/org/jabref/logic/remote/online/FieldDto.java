@@ -2,20 +2,20 @@ package org.jabref.logic.remote.online;
 
 public class FieldDto {
 
-    private String name;
+    private String field;
     private String value;
 
-    public FieldDto(String name, String value) {
-        this.name = name;
+    public FieldDto(String field, String value) {
+        this.field = field;
         this.value = value;
     }
 
-    public String getName() {
-        return name;
+    public String getField() {
+        return field;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setField(String field) {
+        this.field = field;
     }
 
     public String getValue() {

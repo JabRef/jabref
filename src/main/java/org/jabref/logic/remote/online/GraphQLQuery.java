@@ -24,13 +24,4 @@ public abstract class GraphQLQuery {
     public String getQuery() {
         return query;
     }
-
-    public String asJson() {
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        try {
-            return mapper.writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            return "";
-        }
-    }
 }

@@ -7,34 +7,38 @@ public class SaveEntryGraphQLQuery extends GraphQLQuery {
             "  }" +
             "}";
 
-    private final Variable variable;
+    private Variable variables;
 
     public SaveEntryGraphQLQuery(EntryDto entryDto) {
         super("addUserDocumentRaw", SAVE_ENTRY_QUERY);
-        this.variable = new Variable(entryDto);
+        this.variables = new Variable(entryDto);
     }
 
-    public EntryDto getEntryDto() {
-        return variable.getEntryDto();
+    public static String getSaveEntryQuery() {
+        return SAVE_ENTRY_QUERY;
     }
 
-    public void setEntryDto(EntryDto entryDto) {
-        variable.setEntryDto(entryDto);
+    public void setVariables(Variable variables) {
+        this.variables = variables;
+    }
+
+    public Variable getVariables() {
+        return variables;
     }
 
     public static class Variable {
-        private EntryDto entryDto;
+        private EntryDto doc;
 
-        public Variable(EntryDto entryDto) {
-            this.entryDto = entryDto;
+        public Variable(EntryDto doc) {
+            this.doc = doc;
         }
 
-        public EntryDto getEntryDto() {
-            return entryDto;
+        public EntryDto getDoc() {
+            return doc;
         }
 
-        public void setEntryDto(EntryDto entryDto) {
-            this.entryDto = entryDto;
+        public void setDoc(EntryDto doc) {
+            this.doc = doc;
         }
     }
 }

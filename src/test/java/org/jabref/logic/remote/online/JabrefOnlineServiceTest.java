@@ -10,6 +10,9 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.junit.Test;
 
 import static org.jabref.model.entry.field.InternalField.TYPE_HEADER;
+import static org.jabref.model.entry.field.StandardField.ADDRESS;
+import static org.jabref.model.entry.field.StandardField.AFTERWORD;
+import static org.jabref.model.entry.field.StandardField.AUTHOR;
 
 public class JabrefOnlineServiceTest {
 
@@ -18,12 +21,13 @@ public class JabrefOnlineServiceTest {
         JabrefOnlineService service = new JabrefOnlineService();
 
         Map<Field, String> fieldStringMap = new HashMap<>();
-        fieldStringMap.put(TYPE_HEADER, "book");
+        fieldStringMap.put(AUTHOR, "JabRef devs");
 
         BibEntry entry = new BibEntry();
         entry.setType(StandardEntryType.Article);
         entry.setCitationKey("asdsdad");
         entry.setField(fieldStringMap);
+
 
         service.save(entry);
     }
