@@ -185,13 +185,14 @@ class OOBibStyleTestHelper {
      * Similar to old API. pageInfo is new, and unlimAuthors is
      * replaced with isFirstAppearanceOfSource
      */
-    static String getCitationMarker2(OOBibStyle style,
-                                     List<BibEntry> entries,
-                                     Map<BibEntry, BibDatabase> entryDBMap,
-                                     boolean inParenthesis,
-                                     String[] uniquefiers,
-                                     Boolean[] isFirstAppearanceOfSource,
-                                     String[] pageInfo) {
+    static String getCitationMarker2ab(OOBibStyle style,
+                                       List<BibEntry> entries,
+                                       Map<BibEntry, BibDatabase> entryDBMap,
+                                       boolean inParenthesis,
+                                       String[] uniquefiers,
+                                       Boolean[] isFirstAppearanceOfSource,
+                                       String[] pageInfo,
+                                       NonUniqueCitationMarker nonunique) {
         if (uniquefiers == null) {
             uniquefiers = new String[entries.size()];
             Arrays.fill(uniquefiers, null);
@@ -216,7 +217,41 @@ class OOBibStyleTestHelper {
         }
         return style.createCitationMarker(citationMarkerEntries,
                                           inParenthesis,
-                                          NonUniqueCitationMarker.THROWS).asString();
+                                          nonunique).asString();
+    }
+
+    static String getCitationMarker2(OOBibStyle style,
+                                     List<BibEntry> entries,
+                                     Map<BibEntry, BibDatabase> entryDBMap,
+                                     boolean inParenthesis,
+                                     String[] uniquefiers,
+                                     Boolean[] isFirstAppearanceOfSource,
+                                     String[] pageInfo) {
+        return getCitationMarker2ab(style,
+                                    entries,
+                                    entryDBMap,
+                                    inParenthesis,
+                                    uniquefiers,
+                                    isFirstAppearanceOfSource,
+                                    pageInfo,
+                                    NonUniqueCitationMarker.THROWS);
+    }
+
+    static String getCitationMarker2b(OOBibStyle style,
+                                      List<BibEntry> entries,
+                                      Map<BibEntry, BibDatabase> entryDBMap,
+                                      boolean inParenthesis,
+                                      String[] uniquefiers,
+                                      Boolean[] isFirstAppearanceOfSource,
+                                      String[] pageInfo) {
+        return getCitationMarker2ab(style,
+                                    entries,
+                                    entryDBMap,
+                                    inParenthesis,
+                                    uniquefiers,
+                                    isFirstAppearanceOfSource,
+                                    pageInfo,
+                                    NonUniqueCitationMarker.FORGIVEN);
     }
 
     /*
