@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,13 +24,10 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.model.openoffice.ootext.OOText;
-import org.jabref.model.openoffice.style.Citation;
-import org.jabref.model.openoffice.style.CitationLookupResult;
 import org.jabref.model.openoffice.style.CitationMarkerEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNumericBibEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNumericEntry;
 import org.jabref.model.openoffice.style.NonUniqueCitationMarker;
-import org.jabref.model.openoffice.style.PageInfo;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -96,7 +92,7 @@ class OOBibStyleTest {
      * begin helpers
      */
     static String runGetNumCitationMarker2a(OOBibStyle style,
-                                            List<Integer> num, int  minGroupingCount, boolean inList ) {
+                                            List<Integer> num, int minGroupingCount, boolean inList) {
         return OOBibStyleTestHelper.runGetNumCitationMarker2a(style, num, minGroupingCount, inList);
     }
 
@@ -125,7 +121,7 @@ class OOBibStyleTest {
                                                             database,
                                                             uniqueLetterQ,
                                                             pageInfoQ,
-                                                            isFirstAppearanceOfSource );
+                                                            isFirstAppearanceOfSource);
     }
 
     /*
@@ -145,13 +141,12 @@ class OOBibStyleTest {
                                                        inParenthesis,
                                                        uniquefiers,
                                                        isFirstAppearanceOfSource,
-                                                       pageInfo );
+                                                       pageInfo);
     }
 
     /*
      * end helpers
      */
-
 
     @Test
     void testGetNumCitationMarker() throws IOException {
@@ -218,27 +213,27 @@ class OOBibStyleTest {
         // unresolved citations look like [??key]
         assertEquals("[" + OOBibStyle.UNDEFINED_CITATION_MARKER + "key" + "]",
                      runGetNumCitationMarker2b(style, 1,
-                                               numEntry("key",0,null)));
+                                               numEntry("key", 0, null)));
 
         // pageInfo is shown for unresolved citations
         assertEquals("[" + OOBibStyle.UNDEFINED_CITATION_MARKER + "key" + "; p1]",
                      runGetNumCitationMarker2b(style, 1,
-                                               numEntry("key",0,"p1")));
+                                               numEntry("key", 0, "p1")));
 
         // unresolved citations sorted to the front
         assertEquals("[" + OOBibStyle.UNDEFINED_CITATION_MARKER + "key" + "; 2-4]",
                      runGetNumCitationMarker2b(style, 1,
-                                               numEntry("x4",4,""),
-                                               numEntry("x2",2,""),
-                                               numEntry("x3",3,""),
-                                               numEntry("key",0,"")));
+                                               numEntry("x4", 4, ""),
+                                               numEntry("x2", 2, ""),
+                                               numEntry("x3", 3, ""),
+                                               numEntry("key", 0, "")));
 
         assertEquals("[" + OOBibStyle.UNDEFINED_CITATION_MARKER + "key" + "; 1-3]",
                      runGetNumCitationMarker2b(style, 1,
-                                               numEntry("x1",1,""),
-                                               numEntry("x2",2,""),
-                                               numEntry("y3",3,""),
-                                               numEntry("key",0,"")));
+                                               numEntry("x1", 1, ""),
+                                               numEntry("x2", 2, ""),
+                                               numEntry("y3", 3, ""),
+                                               numEntry("key", 0, "")));
 
         // multiple unresolved citations are not collapsed
         assertEquals("["
@@ -246,19 +241,16 @@ class OOBibStyleTest {
                      + OOBibStyle.UNDEFINED_CITATION_MARKER + "x2" + "; "
                      + OOBibStyle.UNDEFINED_CITATION_MARKER + "x3" + "]",
                      runGetNumCitationMarker2b(style, 1,
-                                               numEntry("x1",0,""),
-                                               numEntry("x2",0,""),
-                                               numEntry("x3",0,"")));
+                                               numEntry("x1", 0, ""),
+                                               numEntry("x2", 0, ""),
+                                               numEntry("x3", 0, "")));
 
         /*
          * BIBLIOGRAPHY
          */
-        {
-            CitationMarkerNumericBibEntry x = numBibEntry("key", Optional.empty());
-            assertEquals("[" + OOBibStyle.UNDEFINED_CITATION_MARKER + "key" + "] ",
-                         style.getNumCitationMarkerForBibliography(x).asString());
-        }
-
+        CitationMarkerNumericBibEntry x = numBibEntry("key", Optional.empty());
+        assertEquals("[" + OOBibStyle.UNDEFINED_CITATION_MARKER + "key" + "] ",
+                     style.getNumCitationMarkerForBibliography(x).asString());
     }
 
     @Test
@@ -279,7 +271,6 @@ class OOBibStyleTest {
         Set<String> journals = style.getJournals();
         assertTrue(journals.contains("Journal name 1"));
     }
-
 
     @Test
     void testGetCitationMarker() throws IOException {
@@ -767,7 +758,7 @@ class OOBibStyleTest {
             citationMarkerEntries.add(cm3);
 
             assertEquals("[Boström, Wäyrynen, Bodén, Beznosov & Kruchten, 2006a,b"
-                         +"; Boström, Wäyrynen, Bodén, Beznosov & NotKruchten, 2006c]",
+                         + "; Boström, Wäyrynen, Bodén, Beznosov & NotKruchten, 2006c]",
                          style.createCitationMarker(citationMarkerEntries,
                                                     true,
                                                     NonUniqueCitationMarker.THROWS).asString());
@@ -795,7 +786,7 @@ class OOBibStyleTest {
             citationMarkerEntries.add(cm3);
 
             assertEquals("[Boström, Wäyrynen, Bodén, Beznosov & Kruchten, 2006a,b"
-                         +"; Boström et al., 2006c]",
+                         + "; Boström et al., 2006c]",
                          style.createCitationMarker(citationMarkerEntries,
                                                     true,
                                                     NonUniqueCitationMarker.THROWS).asString());
