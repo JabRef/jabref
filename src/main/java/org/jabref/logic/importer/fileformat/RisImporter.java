@@ -62,7 +62,7 @@ public class RisImporter extends Importer {
         String linesAsString = reader.lines().reduce((line, nextline) -> line + "\n" + nextline).orElse("");
 
         String[] entries = linesAsString.replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
-                                        .split("ER  -.*\\n");
+                                        .split("ER  -.*(\\n)*");
 
         // stores all the date tags from highest to lowest priority
         List<String> dateTags = Arrays.asList("Y1", "PY", "DA", "Y2");
