@@ -15,7 +15,7 @@ public class CustomApiKeyPreferences {
         return name;
     }
 
-    public boolean isUseCustom() {
+    public boolean shouldUseCustom() {
         return useCustom;
     }
 
@@ -23,7 +23,7 @@ public class CustomApiKeyPreferences {
         return customApiKey;
     }
 
-    public void useCustom(boolean useCustom) {
+    public void shouldUseCustomKey(boolean useCustom) {
         this.useCustom = useCustom;
     }
 

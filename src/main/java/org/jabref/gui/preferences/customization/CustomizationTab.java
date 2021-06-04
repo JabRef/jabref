@@ -35,9 +35,6 @@ public class CustomizationTab extends AbstractPreferenceTabView<CustomizationTab
         return Localization.lang("Customization");
     }
 
-    /**
-     * Initialize CustomizationTab
-     */
     public void initialize() {
         this.viewModel = new CustomizationTabViewModel(dialogService, preferencesService);
 
@@ -55,14 +52,14 @@ public class CustomizationTab extends AbstractPreferenceTabView<CustomizationTab
                 .install(customApiKeyNameComboBox);
 
         customApiKeyNameComboBox.itemsProperty().bind(viewModel.customApiKeyPrefsProperty());
-        customApiKeyNameComboBox.valueProperty().bindBidirectional(viewModel.selectedCustomApiKeyPrefProperty());
+        customApiKeyNameComboBox.valueProperty().bindBidirectional(viewModel.selectedCustomApiKeyPreferencesProperty());
         customApiKeyNameComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue != null) {
-                oldValue.useCustom(useCustomApiKeyCheckBox.isSelected());
+                oldValue.shouldUseCustomKey(useCustomApiKeyCheckBox.isSelected());
                 oldValue.setCustomApiKey(useCustomApiKeyText.getText().trim());
             }
             if (newValue != null) {
-                useCustomApiKeyCheckBox.setSelected(newValue.isUseCustom());
+                useCustomApiKeyCheckBox.setSelected(newValue.shouldUseCustom());
                 useCustomApiKeyText.setText(newValue.getCustomApiKey());
             }
         });

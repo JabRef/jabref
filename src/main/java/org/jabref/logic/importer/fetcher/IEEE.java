@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.gui.preferences.customization.CustomizationTabViewModel;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
@@ -57,6 +58,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
     private static final String IEEE_DOI = "10.1109";
     private static final String BASE_URL = "https://ieeexplore.ieee.org";
     private static final String API_KEY = new BuildInfo().ieeeAPIKey;
+    private static final String TEST_URL_WITHOUT_API_KEY = "https://ieeexploreapi.ieee.org/api/v1/search/articles?max_records=0&apikey=";
 
     private final ImportFormatPreferences importFormatPreferences;
     private final PreferencesService preferencesService;
@@ -64,6 +66,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
     public IEEE(PreferencesService preferencesService) {
         this.preferencesService = Objects.requireNonNull(preferencesService);
         this.importFormatPreferences = preferencesService.getImportFormatPreferences();
+        CustomizationTabViewModel.registerApiKeyCustom(this.getName(), TEST_URL_WITHOUT_API_KEY);
     }
 
     /**
@@ -236,7 +239,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
     private String getApiKey() {
         String apiKey = API_KEY;
         CustomApiKeyPreferences apiKeyPreferences = preferencesService.getCustomApiKeyPreferences(getName());
-        if (apiKeyPreferences != null && apiKeyPreferences.isUseCustom()) {
+        if (apiKeyPreferences != null && apiKeyPreferences.shouldUseCustom()) {
             apiKey = apiKeyPreferences.getCustomApiKey();
         }
         return apiKey;

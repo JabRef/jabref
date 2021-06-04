@@ -34,8 +34,8 @@ public class CustomizationTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty useCustomDOIProperty = new SimpleBooleanProperty();
     private final StringProperty useCustomDOINameProperty = new SimpleStringProperty("");
 
-    private final ListProperty<CustomApiKeyPreferences> customApiKeyPrefsListProperty = new SimpleListProperty<>();
-    private final ObjectProperty<CustomApiKeyPreferences> selectedCustomApiKeyPrefProperty = new SimpleObjectProperty<>();
+    private final ListProperty<CustomApiKeyPreferences> customApiKeyPreferencesListProperty = new SimpleListProperty<>();
+    private final ObjectProperty<CustomApiKeyPreferences> selectedCustomApiKeyPreferencesProperty = new SimpleObjectProperty<>();
     private final BooleanProperty useCustomApiKeyProperty = new SimpleBooleanProperty();
     private final StringProperty customApiKeyTextProperty = new SimpleStringProperty();
 
@@ -47,13 +47,10 @@ public class CustomizationTabViewModel implements PreferenceTabViewModel {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.initialDOIPreferences = preferencesService.getDOIPreferences();
-        initApiKeyNameUrl();
     }
 
-    private void initApiKeyNameUrl() {
-        // Springer query using the parameter 'q=doi:10.1007/s11276-008-0131-4s=1' will respond faster
-        API_KEY_NAME_URL.put("Springer", "https://api.springernature.com/meta/v1/json?q=doi:10.1007/s11276-008-0131-4s=1&p=1&api_key=");
-        API_KEY_NAME_URL.put("IEEEXplore", "https://ieeexploreapi.ieee.org/api/v1/search/articles?max_records=0&apikey=");
+    public static void registerApiKeyCustom(String key, String testUrlWithoutApiKey) {
+        API_KEY_NAME_URL.put(key, testUrlWithoutApiKey);
     }
 
     /**
@@ -65,9 +62,6 @@ public class CustomizationTabViewModel implements PreferenceTabViewModel {
         return new ArrayList<>(API_KEY_NAME_URL.keySet());
     }
 
-    /**
-     * Reads user settings when the dialog is opened.
-     */
     @Override
     public void setValues() {
         useCustomDOIProperty.setValue(initialDOIPreferences.isUseCustom());
@@ -78,21 +72,18 @@ public class CustomizationTabViewModel implements PreferenceTabViewModel {
         for (String name : API_KEY_NAME_URL.keySet()) {
             customApiKeyPreferencesList.add(preferencesService.getCustomApiKeyPreferences(name));
         }
-        customApiKeyPrefsListProperty.setValue(FXCollections.observableArrayList(customApiKeyPreferencesList));
-        selectedCustomApiKeyPrefProperty.setValue(customApiKeyPreferencesList.get(0));
+        customApiKeyPreferencesListProperty.setValue(FXCollections.observableArrayList(customApiKeyPreferencesList));
+        selectedCustomApiKeyPreferencesProperty.setValue(customApiKeyPreferencesList.get(0));
     }
 
-    /**
-     * Stores user settings when the user presses OK in the Preferences dialog.
-     */
     @Override
     public void storeSettings() {
         preferencesService.storeDOIPreferences(new DOIPreferences(
                 useCustomDOIProperty.getValue(),
                 useCustomDOINameProperty.getValue().trim()));
-        selectedCustomApiKeyPrefProperty.get().useCustom(useCustomApiKeyProperty.get());
-        selectedCustomApiKeyPrefProperty.get().setCustomApiKey(customApiKeyTextProperty.get());
-        for (CustomApiKeyPreferences apiKeyPreferences : customApiKeyPrefsListProperty.get()) {
+        selectedCustomApiKeyPreferencesProperty.get().shouldUseCustomKey(useCustomApiKeyProperty.get());
+        selectedCustomApiKeyPreferencesProperty.get().setCustomApiKey(customApiKeyTextProperty.get());
+        for (CustomApiKeyPreferences apiKeyPreferences : customApiKeyPreferencesListProperty.get()) {
             if (apiKeyPreferences.getCustomApiKey().isEmpty()) {
                 preferencesService.clearCustomApiKeyPreferences(apiKeyPreferences.getName());
             } else {
@@ -110,11 +101,11 @@ public class CustomizationTabViewModel implements PreferenceTabViewModel {
     }
 
     public ListProperty<CustomApiKeyPreferences> customApiKeyPrefsProperty() {
-        return this.customApiKeyPrefsListProperty;
+        return this.customApiKeyPreferencesListProperty;
     }
 
-    public ObjectProperty<CustomApiKeyPreferences> selectedCustomApiKeyPrefProperty() {
-        return this.selectedCustomApiKeyPrefProperty;
+    public ObjectProperty<CustomApiKeyPreferences> selectedCustomApiKeyPreferencesProperty() {
+        return this.selectedCustomApiKeyPreferencesProperty;
     }
 
     public BooleanProperty useCustomApiKeyProperty() {
@@ -126,13 +117,9 @@ public class CustomizationTabViewModel implements PreferenceTabViewModel {
     }
 
     public void checkCustomApiKey() {
-        final String apiKeyName = selectedCustomApiKeyPrefProperty.get().getName();
+        final String apiKeyName = selectedCustomApiKeyPreferencesProperty.get().getName();
         final String testUrlWithoutApiKey = API_KEY_NAME_URL.get(apiKeyName);
         final String apiKey = customApiKeyTextProperty.get();
-
-        final String connectionSuccessText = Localization.lang("Connection successful!");
-        final String connectionFailedText = Localization.lang("Connection failed!");
-        final String dialogTitle = Localization.lang("Check %0 API Key Setting", apiKeyName);
 
         boolean valid;
         if (!apiKey.isEmpty()) {
@@ -156,9 +143,9 @@ public class CustomizationTabViewModel implements PreferenceTabViewModel {
         }
 
         if (valid) {
-            dialogService.showInformationDialogAndWait(dialogTitle, connectionSuccessText);
+            dialogService.showInformationDialogAndWait(Localization.lang("Check %0 API Key Setting", apiKeyName), Localization.lang("Connection successful!"));
         } else {
-            dialogService.showErrorDialogAndWait(dialogTitle, connectionFailedText);
+            dialogService.showErrorDialogAndWait(Localization.lang("Check %0 API Key Setting", apiKeyName), Localization.lang("Connection failed!"));
         }
     }
 

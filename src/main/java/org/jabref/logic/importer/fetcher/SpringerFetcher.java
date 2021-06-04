@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.gui.preferences.customization.CustomizationTabViewModel;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
@@ -45,11 +46,14 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
 
     private static final String API_URL = "https://api.springernature.com/meta/v1/json";
     private static final String API_KEY = new BuildInfo().springerNatureAPIKey;
+    // Springer query using the parameter 'q=doi:10.1007/s11276-008-0131-4s=1' will respond faster
+    private static final String TEST_URL_WITHOUT_API_KEY = "https://api.springernature.com/meta/v1/json?q=doi:10.1007/s11276-008-0131-4s=1&p=1&api_key=";
 
     private final PreferencesService preferences;
 
     public SpringerFetcher(PreferencesService preferences) {
         this.preferences = Objects.requireNonNull(preferences);
+        CustomizationTabViewModel.registerApiKeyCustom(this.getName(), TEST_URL_WITHOUT_API_KEY);
     }
 
     /**
@@ -177,7 +181,7 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
     private String getApiKey() {
         String apiKey = API_KEY;
         CustomApiKeyPreferences apiKeyPreferences = preferences.getCustomApiKeyPreferences(getName());
-        if (apiKeyPreferences != null && apiKeyPreferences.isUseCustom()) {
+        if (apiKeyPreferences != null && apiKeyPreferences.shouldUseCustom()) {
             apiKey = apiKeyPreferences.getCustomApiKey();
         }
         return apiKey;

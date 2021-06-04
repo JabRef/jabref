@@ -87,9 +87,8 @@ import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.openoffice.StyleLoader;
-import org.jabref.logic.preferences.CustomApiKeyPreferences;
 import org.jabref.logic.openoffice.style.StyleLoader;
+import org.jabref.logic.preferences.CustomApiKeyPreferences;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
@@ -1420,7 +1419,7 @@ public class JabRefPreferences implements PreferencesService {
     @Override
     public void storeCustomApiKeyPreferences(CustomApiKeyPreferences preferences) {
         String keyName = preferences.getName();
-        putBoolean(USE_CUSTOM_API_KEY + keyName, preferences.isUseCustom());
+        putBoolean(USE_CUSTOM_API_KEY + keyName, preferences.shouldUseCustom());
         put(CUSTOM_API_KEY + keyName, preferences.getCustomApiKey());
     }
 
