@@ -102,8 +102,7 @@ public class JabrefOnlineService {
                     response.append(responseLine.trim());
                 }
 
-                GraphQLResponseDto<GraphQLSaveResponseData> graphQLResponseDto = MAPPER.readValue(response.toString(), new TypeReference<>() {
-                });
+                GraphQLResponseDto<GraphQLSaveResponseData> graphQLResponseDto = MAPPER.readValue(response.toString(), new TypeReference<>() {});
                 return graphQLResponseDto.getData().getAddUserDocumentRaw().getId();
             }
         } catch (IOException e) {
