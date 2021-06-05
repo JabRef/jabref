@@ -14,6 +14,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -107,7 +108,10 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                 keyGenerator.generateAndSetKey(entry)
                             .ifPresent(fieldChange -> compound.addEdit(new UndoableKeyChange(fieldChange)));
                 entriesDone++;
-                backgroundProgressProperty.setValue(new BackgroundTask.BackgroundProgress(entriesDone, entries.size()));
+                int finalEntriesDone = entriesDone;
+                DefaultTaskExecutor.runInJavaFXThread(() -> {
+                    backgroundProgressProperty.setValue(new BackgroundTask.BackgroundProgress(finalEntriesDone, entries.size()));
+                });
             }
             compound.end();
 
