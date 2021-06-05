@@ -261,7 +261,7 @@ public abstract class BackgroundTask<V> {
         return BackgroundTask.iconMap.getOrDefault(task.getTitle(), null);
     }
 
-    static class BackgroundProgress {
+    public static class BackgroundProgress {
 
         private final double workDone;
         private final double max;

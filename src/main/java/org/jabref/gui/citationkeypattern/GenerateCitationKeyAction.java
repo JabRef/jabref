@@ -2,6 +2,9 @@ package org.jabref.gui.citationkeypattern;
 
 import java.util.List;
 
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
@@ -45,8 +48,17 @@ public class GenerateCitationKeyAction extends SimpleCommand {
 
         checkOverwriteKeysChosen();
 
-        BackgroundTask.wrap(this::generateKeys)
-                      .executeWith(Globals.TASK_EXECUTOR);
+        if (!this.isCanceled) {
+            Property<BackgroundTask.BackgroundProgress> backgroundProgressProperty = new SimpleObjectProperty<>(new BackgroundTask.BackgroundProgress(0, entries.size()));
+            BackgroundTask backgroundTask = BackgroundTask.wrap(() -> {
+                this.generateKeys(backgroundProgressProperty);
+            });
+            backgroundTask.showToUser(true);
+            backgroundTask.titleProperty().set(Localization.lang("Autogenerate citation keys"));
+            backgroundTask.messageProperty().set(entries.size() + " " + Localization.lang("entries"));
+            backgroundTask.progressProperty().bindBidirectional(backgroundProgressProperty);
+            backgroundTask.executeWith(Globals.TASK_EXECUTOR);
+        }
     }
 
     public static boolean confirmOverwriteKeys(DialogService dialogService) {
@@ -80,7 +92,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
         }
     }
 
-    private void generateKeys() {
+    private void generateKeys(Property<BackgroundTask.BackgroundProgress> backgroundProgressProperty) {
         if (isCanceled) {
             return;
         }
@@ -90,9 +102,12 @@ public class GenerateCitationKeyAction extends SimpleCommand {
             final NamedCompound compound = new NamedCompound(Localization.lang("Autogenerate citation keys"));
             CitationKeyGenerator keyGenerator =
                     new CitationKeyGenerator(databaseContext, Globals.prefs.getCitationKeyPatternPreferences());
+            int entriesDone = 0;
             for (BibEntry entry : entries) {
                 keyGenerator.generateAndSetKey(entry)
                             .ifPresent(fieldChange -> compound.addEdit(new UndoableKeyChange(fieldChange)));
+                entriesDone++;
+                backgroundProgressProperty.setValue(new BackgroundTask.BackgroundProgress(entriesDone, entries.size()));
             }
             compound.end();
 
