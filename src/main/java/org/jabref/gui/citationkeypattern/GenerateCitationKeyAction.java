@@ -2,9 +2,6 @@ package org.jabref.gui.citationkeypattern;
 
 import java.util.List;
 
-import javafx.beans.property.Property;
-import javafx.beans.property.SimpleObjectProperty;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
