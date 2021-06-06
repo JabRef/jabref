@@ -179,14 +179,7 @@ public class GlobalSearchBar extends HBox {
     private void initSearchModifierButtons() {
         regularExpressionButton.setSelected(searchPreferences.isRegularExpression());
         regularExpressionButton.setTooltip(new Tooltip(Localization.lang("regular expression")));
-        regularExpressionButton.setCursor(Cursor.DEFAULT);
-        regularExpressionButton.setMinHeight(28);
-        regularExpressionButton.setMaxHeight(28);
-        regularExpressionButton.setMinWidth(28);
-        regularExpressionButton.setMaxWidth(28);
-        regularExpressionButton.setPadding(new Insets(1.0));
-        regularExpressionButton.managedProperty().bind(searchField.editableProperty());
-        regularExpressionButton.visibleProperty().bind(searchField.editableProperty());
+        initSearchModifierButton(regularExpressionButton);
         regularExpressionButton.setOnAction(event -> {
             searchPreferences = searchPreferences.withRegularExpression(regularExpressionButton.isSelected());
             preferencesService.storeSearchPreferences(searchPreferences);
@@ -195,14 +188,7 @@ public class GlobalSearchBar extends HBox {
 
         caseSensitiveButton.setSelected(searchPreferences.isCaseSensitive());
         caseSensitiveButton.setTooltip(new Tooltip(Localization.lang("Case sensitive")));
-        caseSensitiveButton.setCursor(Cursor.DEFAULT);
-        caseSensitiveButton.setMinHeight(28);
-        caseSensitiveButton.setMaxHeight(28);
-        caseSensitiveButton.setMinWidth(28);
-        caseSensitiveButton.setMaxWidth(28);
-        caseSensitiveButton.setPadding(new Insets(1.0));
-        caseSensitiveButton.managedProperty().bind(searchField.editableProperty());
-        caseSensitiveButton.visibleProperty().bind(searchField.editableProperty());
+        initSearchModifierButton(caseSensitiveButton);
         caseSensitiveButton.setOnAction(event -> {
             searchPreferences = searchPreferences.withCaseSensitive(caseSensitiveButton.isSelected());
             preferencesService.storeSearchPreferences(searchPreferences);
@@ -225,6 +211,17 @@ public class GlobalSearchBar extends HBox {
 
             performSearch();
         }); */
+    }
+
+    private void initSearchModifierButton(ToggleButton searchButton) {
+        searchButton.setCursor(Cursor.DEFAULT);
+        searchButton.setMinHeight(28);
+        searchButton.setMaxHeight(28);
+        searchButton.setMinWidth(28);
+        searchButton.setMaxWidth(28);
+        searchButton.setPadding(new Insets(1.0));
+        searchButton.managedProperty().bind(searchField.editableProperty());
+        searchButton.visibleProperty().bind(searchField.editableProperty());
     }
 
     /**
