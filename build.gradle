@@ -406,9 +406,10 @@ apollo {
   customTypeMapping = [
     "DateTime" : "java.time.LocalDateTime"
   ]
-    generateKotlinModels.set(false)
-    nullableValueType.set("javaOptional")
-    useJavaBeansSemanticNaming.set(true)
+  generateKotlinModels.set(false)
+  nullableValueType.set("javaOptional")
+  useJavaBeansSemanticNaming.set(true)
+  rootPackageName.set("org.jabref.jabrefonline")
 
 }
 
