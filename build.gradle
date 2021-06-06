@@ -33,6 +33,8 @@ plugins {
     id 'project-report'
 
     id 'idea'
+
+    id "com.apollographql.apollo" version '2.5.8'
 }
 
 // Enable following for debugging
@@ -64,6 +66,7 @@ application {
 modularity.patchModule("test", "fastparse_2.12-1.0.0.jar")
 modularity.patchModule("test2", "fastparse-utils_2.12-1.0.0.jar")
 modularity.patchModule("test3", "sourcecode_2.12-0.1.4.jar")
+modularity.patchModule("apollo.runtime", "apollo-api-2.5.8.jar")
 
 // Workaround for https://github.com/openjfx/javafx-gradle-plugin/issues/89
 // See also https://github.com/java9-modularity/gradle-modules-plugin/issues/165
@@ -210,6 +213,11 @@ dependencies {
     implementation 'com.vladsch.flexmark:flexmark:0.62.2'
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.62.2'
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.62.2'
+
+    implementation ("com.apollographql.apollo:apollo-runtime:2.5.8"){
+        exclude module: "apollo-api"
+        exclude module: "apollo-normalized-cache"
+    }
 
     testImplementation 'io.github.classgraph:classgraph:4.8.106'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
@@ -385,6 +393,19 @@ task generateJournalAbbreviationList(type: JournalAbbreviationConverter) {
     inputDir = file("build/journals")
 
     outputDir = file("src/main/resources/journals")
+}
+
+apollo {
+
+  schemaFile.set(file("src/main/java/org/jabref/jabrefonline/graphql/schema.json"))
+//graphqlSourceDirectorySet.srcDirs += "src/main/java/org/jabref/jabrefonline/graphql/"
+  customTypeMapping = [
+    "DateTime" : "java.time.LocalDateTime"
+  ]
+    generateKotlinModels.set(false)
+    nullableValueType.set("javaOptional")
+    useJavaBeansSemanticNaming.set(true)
+
 }
 
 tasks.withType(JavaCompile) {

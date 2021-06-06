@@ -1,0 +1,7 @@
+query getDocumentById($id: ID!) {
+	getUserDocumentRaw(id: $id) {
+	type
+    citationKey
+    fields { field, value }
+  }
+}
