@@ -50,14 +50,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
         checkOverwriteKeysChosen();
 
         if (!this.isCanceled) {
-            Property<BackgroundTask.BackgroundProgress> backgroundProgressProperty = new SimpleObjectProperty<>(new BackgroundTask.BackgroundProgress(0, entries.size()));
-            BackgroundTask backgroundTask = BackgroundTask.wrap(() -> {
-                this.generateKeys(backgroundProgressProperty);
-            });
-            backgroundTask.showToUser(true);
-            backgroundTask.titleProperty().set(Localization.lang("Autogenerate citation keys"));
-            backgroundTask.messageProperty().set(entries.size() + " " + Localization.lang("entries"));
-            backgroundTask.progressProperty().bindBidirectional(backgroundProgressProperty);
+            BackgroundTask backgroundTask = this.generateKeysInBackground();
             backgroundTask.executeWith(Globals.TASK_EXECUTOR);
         }
     }
@@ -93,36 +86,51 @@ public class GenerateCitationKeyAction extends SimpleCommand {
         }
     }
 
-    private void generateKeys(Property<BackgroundTask.BackgroundProgress> backgroundProgressProperty) {
-        if (isCanceled) {
-            return;
-        }
+    private BackgroundTask generateKeysInBackground() {
+        return new BackgroundTask<Void>() {
 
-        stateManager.getActiveDatabase().ifPresent(databaseContext -> {
-            // generate the new citation keys for each entry
-            final NamedCompound compound = new NamedCompound(Localization.lang("Autogenerate citation keys"));
-            CitationKeyGenerator keyGenerator =
-                    new CitationKeyGenerator(databaseContext, Globals.prefs.getCitationKeyPatternPreferences());
-            int entriesDone = 0;
-            for (BibEntry entry : entries) {
-                keyGenerator.generateAndSetKey(entry)
-                            .ifPresent(fieldChange -> compound.addEdit(new UndoableKeyChange(fieldChange)));
-                entriesDone++;
-                int finalEntriesDone = entriesDone;
-                DefaultTaskExecutor.runInJavaFXThread(() -> {
-                    backgroundProgressProperty.setValue(new BackgroundTask.BackgroundProgress(finalEntriesDone, entries.size()));
-                });
+            @Override
+            protected Void call() {
+
+                    if (isCanceled) {
+                        return null;
+                    }
+                    showToUser(true);
+                    titleProperty().set(Localization.lang("Autogenerate citation keys"));
+                    messageProperty().set(entries.size() + " " + Localization.lang("entries"));
+
+                    DefaultTaskExecutor.runInJavaFXThread(() -> {
+                        updateProgress(0, entries.size());
+                    });
+                    stateManager.getActiveDatabase().ifPresent(databaseContext -> {
+                        // generate the new citation keys for each entry
+                        final NamedCompound compound = new NamedCompound(Localization.lang("Autogenerate citation keys"));
+                        CitationKeyGenerator keyGenerator =
+                                new CitationKeyGenerator(databaseContext, Globals.prefs.getCitationKeyPatternPreferences());
+                        int entriesDone = 0;
+                        for (BibEntry entry : entries) {
+                            keyGenerator.generateAndSetKey(entry)
+                                        .ifPresent(fieldChange -> compound.addEdit(new UndoableKeyChange(fieldChange)));
+                            entriesDone++;
+                            int finalEntriesDone = entriesDone;
+                            DefaultTaskExecutor.runInJavaFXThread(() -> {
+                                updateProgress(finalEntriesDone, entries.size());
+                            });
+                        }
+                        compound.end();
+
+                        // register the undo event only if new citation keys were generated
+                        if (compound.hasEdits()) {
+                            frame.getUndoManager().addEdit(compound);
+                        }
+
+                        frame.getCurrentLibraryTab().markBaseChanged();
+                        dialogService.notify(formatOutputMessage(Localization.lang("Generated citation key for"), entries.size()));
+                    });
+                    return null;
             }
-            compound.end();
+        };
 
-            // register the undo event only if new citation keys were generated
-            if (compound.hasEdits()) {
-                frame.getUndoManager().addEdit(compound);
-            }
-
-            frame.getCurrentLibraryTab().markBaseChanged();
-            dialogService.notify(formatOutputMessage(Localization.lang("Generated citation key for"), entries.size()));
-        });
     }
 
     private String formatOutputMessage(String start, int count) {
