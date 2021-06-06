@@ -1,6 +1,7 @@
 package org.jabref.gui.citationkeypattern;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
@@ -48,6 +49,10 @@ public class GenerateCitationKeyAction extends SimpleCommand {
 
         if (!this.isCanceled) {
             BackgroundTask backgroundTask = this.generateKeysInBackground();
+            backgroundTask.showToUser(true);
+            backgroundTask.titleProperty().set(Localization.lang("Autogenerate citation keys"));
+            backgroundTask.messageProperty().set(entries.size() + " " + Localization.lang("entries"));
+
             backgroundTask.executeWith(Globals.TASK_EXECUTOR);
         }
     }
@@ -86,22 +91,19 @@ public class GenerateCitationKeyAction extends SimpleCommand {
     private BackgroundTask generateKeysInBackground() {
         return new BackgroundTask<Void>() {
 
+            private NamedCompound compound;
+
             @Override
             protected Void call() {
-
                     if (isCanceled) {
                         return null;
                     }
-                    showToUser(true);
-                    titleProperty().set(Localization.lang("Autogenerate citation keys"));
-                    messageProperty().set(entries.size() + " " + Localization.lang("entries"));
-
                     DefaultTaskExecutor.runInJavaFXThread(() -> {
                         updateProgress(0, entries.size());
                     });
                     stateManager.getActiveDatabase().ifPresent(databaseContext -> {
                         // generate the new citation keys for each entry
-                        final NamedCompound compound = new NamedCompound(Localization.lang("Autogenerate citation keys"));
+                        compound = new NamedCompound(Localization.lang("Autogenerate citation keys"));
                         CitationKeyGenerator keyGenerator =
                                 new CitationKeyGenerator(databaseContext, Globals.prefs.getCitationKeyPatternPreferences());
                         int entriesDone = 0;
@@ -115,16 +117,20 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                             });
                         }
                         compound.end();
-
-                        // register the undo event only if new citation keys were generated
-                        if (compound.hasEdits()) {
-                            frame.getUndoManager().addEdit(compound);
-                        }
-
-                        frame.getCurrentLibraryTab().markBaseChanged();
-                        dialogService.notify(formatOutputMessage(Localization.lang("Generated citation key for"), entries.size()));
                     });
                     return null;
+            }
+
+            @Override
+            public BackgroundTask<Void> onSuccess(Consumer<Void> onSuccess) {
+                // register the undo event only if new citation keys were generated
+                if (compound.hasEdits()) {
+                    frame.getUndoManager().addEdit(compound);
+                }
+
+                frame.getCurrentLibraryTab().markBaseChanged();
+                dialogService.notify(formatOutputMessage(Localization.lang("Generated citation key for"), entries.size()));
+                return super.onSuccess(onSuccess);
             }
         };
 
