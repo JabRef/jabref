@@ -3,6 +3,8 @@ package org.jabref.gui.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javafx.scene.text.Text;
 
@@ -10,6 +12,12 @@ import javafx.scene.text.Text;
  * Utility class with static methods for javafx {@link Text} objects
  */
 public class TooltipTextUtil {
+
+    // (?s) tells Java that "." also matches the newline character
+    // (?<...>...) are named groups in Java regular expressions: https://stackoverflow.com/a/415635/873282
+    private static final Pattern TT_TEXT = Pattern.compile("(?s)(?<before>.*)<tt>(?<in>.*)</tt>");
+
+    private static final Pattern B_TEXT = Pattern.compile("(?s)(?<before>.*)<b>(?<in>.*)</b>");
 
     public enum TextType {
         NORMAL, BOLD, ITALIC, MONOSPACED
@@ -35,6 +43,54 @@ public class TooltipTextUtil {
 
     public static Text createText(String textString) {
         return createText(textString, TextType.NORMAL);
+    }
+
+    /**
+     * Creates a list of Text elements respecting <code>tt</code> and <code>b</code> markers.
+     * Nesting of these markers is not possible.
+     */
+    public static List<Text> createTextsFromHtml(String htmlString) {
+        List<Text> result = new ArrayList<>();
+
+        Matcher matcher = TT_TEXT.matcher(htmlString);
+        int lastMatchPos = 0;
+        while (matcher.find()) {
+            lastMatchPos = matcher.end();
+            String before = matcher.group("before");
+            if (!before.isBlank()) {
+                result.addAll(convertHtmlBold(before));
+            }
+            String in = matcher.group("in");
+            result.add(TooltipTextUtil.createText(in, TooltipTextUtil.TextType.MONOSPACED));
+        }
+        if (lastMatchPos < htmlString.length()) {
+            String remaining = htmlString.substring(lastMatchPos);
+            result.addAll(convertHtmlBold(remaining));
+        }
+
+        return result;
+    }
+
+    private static List<Text> convertHtmlBold(String htmlString) {
+        List<Text> result = new ArrayList<>();
+
+        Matcher matcher = B_TEXT.matcher(htmlString);
+        int lastMatchPos = 0;
+        while (matcher.find()) {
+            lastMatchPos = matcher.end();
+            String before = matcher.group("before");
+            if (!before.isBlank()) {
+                result.add(TooltipTextUtil.createText(before));
+            }
+            String in = matcher.group("in");
+            result.add(TooltipTextUtil.createText(in, TextType.BOLD));
+        }
+        if (lastMatchPos < htmlString.length()) {
+            String remaining = htmlString.substring(lastMatchPos);
+            result.add(TooltipTextUtil.createText(remaining));
+        }
+
+        return result;
     }
 
     /**
