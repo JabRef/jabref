@@ -104,4 +104,5 @@ open module org.jabref {
     requires okio;
     requires annotations;
     requires apollo.runtime;
+    requires kotlin.stdlib;
 }
