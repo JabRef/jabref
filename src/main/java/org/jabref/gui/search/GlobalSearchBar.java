@@ -239,7 +239,7 @@ public class GlobalSearchBar extends HBox {
         // An empty search field should cause the search to be cleared.
         if (searchField.getText().isEmpty()) {
             currentResults.setText("");
-            setHintTooltip(null);
+            setSearchFieldHintTooltip(null);
             stateManager.clearSearchQuery();
             return;
         }
@@ -320,22 +320,22 @@ public class GlobalSearchBar extends HBox {
             // searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
         }
 
-        setHintTooltip(description);
+        setSearchFieldHintTooltip(description);
     }
 
-    private void setHintTooltip(TextFlow description) {
+    private void setSearchFieldHintTooltip(TextFlow description) {
         if (preferencesService.getGeneralPreferences().shouldShowAdvancedHints()) {
             String genericDescription = Localization.lang("Hint: To search specific fields only, enter for example:\n<tt>author=smith and title=electrical</tt>");
             List<Text> genericDescriptionTexts = TooltipTextUtil.formatToTexts(genericDescription, new TooltipTextUtil.TextReplacement("<tt>author=smith and title=electrical</tt>", "author=smith and title=electrical", TooltipTextUtil.TextType.MONOSPACED));
 
-            if (description != null) {
-                description.getChildren().add(new Text("\n\n"));
-                description.getChildren().addAll(genericDescriptionTexts);
-                searchFieldTooltip.setGraphic(description);
-            } else {
+            if (description == null) {
                 TextFlow emptyHintTooltip = new TextFlow();
                 emptyHintTooltip.getChildren().setAll(genericDescriptionTexts);
                 searchFieldTooltip.setGraphic(emptyHintTooltip);
+            } else {
+                description.getChildren().add(new Text("\n\n"));
+                description.getChildren().addAll(genericDescriptionTexts);
+                searchFieldTooltip.setGraphic(description);
             }
         }
     }
@@ -346,7 +346,7 @@ public class GlobalSearchBar extends HBox {
         } else {
             searchField.setTooltip(null);
         }
-        setHintTooltip(null);
+        setSearchFieldHintTooltip(null);
     }
 
     public void setSearchTerm(String searchTerm) {
