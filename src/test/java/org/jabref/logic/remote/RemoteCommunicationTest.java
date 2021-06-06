@@ -73,4 +73,14 @@ class RemoteCommunicationTest {
 
         verify(server).handleCommandLineArguments(message);
     }
+
+    @Test
+    void commandLineArgumentEncodingAndDecoding() {
+        final String[] message = new String[]{"D:\\T EST\\测试te st.bib"};
+
+        // will be encoded as "D%3A%5CT+EST%5C%E6%B5%8B%E8%AF%95te+st.bib"
+        client.sendCommandLineArguments(message);
+
+        verify(server).handleCommandLineArguments(message);
+    }
 }

@@ -76,6 +76,7 @@ import org.jabref.logic.exporter.TemplateExporter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fileformat.CustomImporter;
+import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
@@ -86,7 +87,7 @@ import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.openoffice.StyleLoader;
+import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
@@ -235,6 +236,8 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SEARCH_DISPLAY_MODE = "searchDisplayMode";
     public static final String SEARCH_CASE_SENSITIVE = "caseSensitiveSearch";
     public static final String SEARCH_REG_EXP = "regExpSearch";
+
+    public static final String GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
 
     // Currently, it is not possible to specify defaults for specific entry types
     // When this should be made possible, the code to inspect is org.jabref.gui.preferences.CitationKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getCiteKeyPattern(); etc
@@ -435,6 +438,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SEARCH_DISPLAY_MODE, SearchDisplayMode.FILTER.toString());
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
+
+        defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
 
         defaults.put(PUSH_TEXMAKER_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texmaker", "Texmaker"));
         defaults.put(PUSH_WINEDT_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
@@ -1044,10 +1049,16 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    private FileLinkPreferences getFileLinkPreferences() {
+    @Override
+    public FileLinkPreferences getFileLinkPreferences() {
         return new FileLinkPreferences(
                 get(MAIN_FILE_DIRECTORY), // REALLY HERE?
                 fileDirForDatabase);
+    }
+
+    @Override
+    public void storeFileDirforDatabase(List<Path> dirs) {
+        this.fileDirForDatabase = dirs;
     }
 
     @Override
@@ -1147,9 +1158,12 @@ public class JabRefPreferences implements PreferencesService {
         updateMainTableColumns();
         List<MainTableColumnModel> sortOrder = createMainTableColumnSortOrder();
 
-        sortOrder.forEach(column -> config.getSortCriteria().add(new SaveOrderConfig.SortCriterion(
-                FieldFactory.parseField(column.getQualifier()),
-                column.getSortType().toString())));
+        for (var column : sortOrder) {
+            boolean descending = (column.getSortType() == SortType.DESCENDING);
+            config.getSortCriteria().add(new SaveOrderConfig.SortCriterion(
+                                                                           FieldFactory.parseField(column.getQualifier()),
+                                                                           descending));
+        }
 
         return config;
     }
@@ -2681,5 +2695,21 @@ public class JabRefPreferences implements PreferencesService {
         putStringList(PROTECTED_TERMS_DISABLED_EXTERNAL, preferences.getDisabledExternalTermLists());
         putStringList(PROTECTED_TERMS_ENABLED_INTERNAL, preferences.getEnabledInternalTermLists());
         putStringList(PROTECTED_TERMS_DISABLED_INTERNAL, preferences.getDisabledInternalTermLists());
+    }
+
+    //*************************************************************************************************************
+    // Import preferences
+    //*************************************************************************************************************
+
+    @Override
+    public void storeImportSettingsPreferences(ImportSettingsPreferences preferences) {
+        putBoolean(GENERATE_KEY_ON_IMPORT, preferences.generateNewKeyOnImport());
+    }
+
+    @Override
+    public ImportSettingsPreferences getImportSettingsPreferences() {
+        return new ImportSettingsPreferences(
+                getBoolean(GENERATE_KEY_ON_IMPORT)
+        );
     }
 }

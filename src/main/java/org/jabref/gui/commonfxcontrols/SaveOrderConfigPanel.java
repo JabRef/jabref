@@ -11,7 +11,6 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.util.FieldsUtil;
 import org.jabref.gui.util.ViewModelListCellFactory;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.field.Field;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -68,12 +67,6 @@ public class SaveOrderConfigPanel extends VBox {
         savePriDesc.selectedProperty().bindBidirectional(viewModel.savePrimaryDescPropertySelected());
         saveSecDesc.selectedProperty().bindBidirectional(viewModel.saveSecondaryDescPropertySelected());
         saveTerDesc.selectedProperty().bindBidirectional(viewModel.saveTertiaryDescPropertySelected());
-    }
-
-    public void changeExportDescriptionToSave() {
-        exportInOriginalOrder.setText(Localization.lang("Save entries in their original order"));
-        exportInSpecifiedOrder.setText(Localization.lang("Save entries ordered as specified"));
-        exportInTableOrder.setText(Localization.lang("Save in current table sort order"));
     }
 
     public BooleanProperty saveInOriginalProperty() {
