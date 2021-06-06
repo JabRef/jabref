@@ -66,7 +66,7 @@ application {
 modularity.patchModule("test", "fastparse_2.12-1.0.0.jar")
 modularity.patchModule("test2", "fastparse-utils_2.12-1.0.0.jar")
 modularity.patchModule("test3", "sourcecode_2.12-0.1.4.jar")
-modularity.patchModule("apollo.runtime", "apollo-api-2.5.8.jar")
+modularity.patchModule("apollo.runtime", "apollo-api-jvm-2.5.8.jar")
 
 // Workaround for https://github.com/openjfx/javafx-gradle-plugin/issues/89
 // See also https://github.com/java9-modularity/gradle-modules-plugin/issues/165
@@ -218,6 +218,7 @@ dependencies {
         exclude module: "apollo-api"
         exclude module: "apollo-normalized-cache"
     }
+
 
     testImplementation 'io.github.classgraph:classgraph:4.8.106'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
