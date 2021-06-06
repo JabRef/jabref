@@ -220,6 +220,7 @@ dependencies {
 
         exclude module: "apollo-normalized-cache"
     }
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.5.10'
 
 
     testImplementation 'io.github.classgraph:classgraph:4.8.106'
