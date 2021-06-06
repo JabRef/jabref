@@ -81,8 +81,8 @@ public class GlobalSearchBar extends HBox {
     private final ToggleButton caseSensitiveButton;
     private final ToggleButton regularExpressionButton;
     // private final Button searchModeButton;
+    private final Tooltip searchFieldTooltip = new Tooltip();
     private final Label currentResults = new Label("");
-    private final Tooltip tooltip = new Tooltip();
 
     private final StateManager stateManager;
     private final PreferencesService preferencesService;
@@ -101,9 +101,8 @@ public class GlobalSearchBar extends HBox {
         // fits the standard "found x entries"-message thus hinders the searchbar to jump around while searching if the frame width is too small
         currentResults.setPrefWidth(150);
 
-        tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        tooltip.setMaxHeight(10);
-        searchField.setTooltip(null);
+        searchFieldTooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        searchFieldTooltip.setMaxHeight(10);
         updateHintVisibility();
 
         KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
@@ -332,18 +331,18 @@ public class GlobalSearchBar extends HBox {
             if (description != null) {
                 description.getChildren().add(new Text("\n\n"));
                 description.getChildren().addAll(genericDescriptionTexts);
-                tooltip.setGraphic(description);
+                searchFieldTooltip.setGraphic(description);
             } else {
                 TextFlow emptyHintTooltip = new TextFlow();
                 emptyHintTooltip.getChildren().setAll(genericDescriptionTexts);
-                tooltip.setGraphic(emptyHintTooltip);
+                searchFieldTooltip.setGraphic(emptyHintTooltip);
             }
         }
     }
 
     public void updateHintVisibility() {
         if (preferencesService.getGeneralPreferences().shouldShowAdvancedHints()) {
-            searchField.setTooltip(tooltip);
+            searchField.setTooltip(searchFieldTooltip);
         } else {
             searchField.setTooltip(null);
         }
