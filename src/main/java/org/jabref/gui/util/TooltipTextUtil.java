@@ -37,21 +37,6 @@ public class TooltipTextUtil {
         return createText(textString, TextType.NORMAL);
     }
 
-    public static String textToHTMLString(Text text) {
-        String textString = text.getText();
-        textString = textString.replace("\n", "<br>");
-        if (text.getStyleClass().toString().contains("tooltip-text-monospaced")) {
-            textString = String.format("<kbd>%s</kbd>", textString);
-        }
-        if (text.getStyleClass().toString().contains("tooltip-text-bold")) {
-            textString = String.format("<b>%s</b>", textString);
-        }
-        if (text.getStyleClass().toString().contains("tooltip-text-italic")) {
-            textString = String.format("<i>%s</i>", textString);
-        }
-        return textString;
-    }
-
     /**
      * Formats a String to multiple Texts by replacing some parts and adding font characteristics.
      */
@@ -104,5 +89,20 @@ public class TooltipTextUtil {
             this.replacement = replacement;
             this.textType = textType;
         }
+    }
+
+    public static String textToHTMLString(Text text) {
+        String textString = text.getText();
+        textString = textString.replace("\n", "<br>");
+        if (text.getStyleClass().toString().contains("tooltip-text-monospaced")) {
+            textString = String.format("<kbd>%s</kbd>", textString);
+        }
+        if (text.getStyleClass().toString().contains("tooltip-text-bold")) {
+            textString = String.format("<b>%s</b>", textString);
+        }
+        if (text.getStyleClass().toString().contains("tooltip-text-italic")) {
+            textString = String.format("<i>%s</i>", textString);
+        }
+        return textString;
     }
 }
