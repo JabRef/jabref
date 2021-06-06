@@ -398,7 +398,8 @@ task generateJournalAbbreviationList(type: JournalAbbreviationConverter) {
 apollo {
 
   schemaFile.set(file("src/main/java/org/jabref/jabrefonline/graphql/schema.json"))
-//graphqlSourceDirectorySet.srcDirs += "src/main/java/org/jabref/jabrefonline/graphql/"
+  graphqlSourceDirectorySet.srcDir("src/main/java/org/jabref/jabrefonline/graphql/")
+  graphqlSourceDirectorySet.exclude("schema.json")
   customTypeMapping = [
     "DateTime" : "java.time.LocalDateTime"
   ]
