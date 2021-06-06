@@ -216,6 +216,8 @@ dependencies {
 
     implementation ("com.apollographql.apollo:apollo-runtime:2.5.8"){
         exclude module: "apollo-api"
+        exclude module: "apollo-api-jvm"
+
         exclude module: "apollo-normalized-cache"
     }
 
@@ -424,7 +426,9 @@ compileJava {
         // TODO: Remove access to internal api
         addExports = [
                 'javafx.controls/com.sun.javafx.scene.control' : 'org.jabref',
-                'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref'
+                'org.controlsfx.controls/impl.org.controlsfx.skin' : 'org.jabref',
+                'apollo.runtime/com.apollographql.apollo.api': 'org.jabref',
+                'apollo.runtime/com.apollographql.apollo.api.internal': 'org.jabref'
         ]
     }
 }

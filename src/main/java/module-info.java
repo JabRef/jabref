@@ -103,4 +103,5 @@ open module org.jabref {
     requires com.fasterxml.jackson.datatype.jsr310;
     requires okio;
     requires annotations;
+    requires apollo.runtime;
 }
