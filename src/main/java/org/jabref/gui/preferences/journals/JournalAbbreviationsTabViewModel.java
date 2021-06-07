@@ -40,6 +40,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     private final Logger logger = LoggerFactory.getLogger(JournalAbbreviationsTabViewModel.class);
     private final SimpleListProperty<AbbreviationsFileViewModel> journalFiles = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final SimpleListProperty<AbbreviationViewModel> abbreviations = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final SimpleListProperty<AbbreviationViewModel> filteredAbbreviations = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final SimpleIntegerProperty abbreviationsCount = new SimpleIntegerProperty();
     private final SimpleObjectProperty<AbbreviationsFileViewModel> currentFile = new SimpleObjectProperty<>();
     private final SimpleObjectProperty<AbbreviationViewModel> currentAbbreviation = new SimpleObjectProperty<>();
@@ -101,6 +102,8 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                 }
             }
         });
+        filteredAbbreviations.setAll(abbreviations);
+        filteredAbbreviations.bindBidirectional(abbreviations);
     }
 
     @Override
@@ -373,6 +376,10 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         return abbreviations;
     }
 
+    public SimpleListProperty<AbbreviationViewModel> filteredAbbreviationsProperty() {
+        return filteredAbbreviations;
+    }
+
     public SimpleIntegerProperty abbreviationsCountProperty() {
         return abbreviationsCount;
     }
@@ -395,5 +402,25 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
 
     public SimpleBooleanProperty isFileRemovableProperty() {
         return isFileRemovable;
+    }
+
+    public void filterAbbreviations(String text) {
+        if (text.isEmpty()) {
+            clearSearch();
+            return;
+        }
+
+        this.filteredAbbreviations.unbindBidirectional(this.abbreviations);
+        this.filteredAbbreviations.clear();
+        for (AbbreviationViewModel abbreviation : abbreviations) {
+            if (abbreviation.contains(text)) {
+                filteredAbbreviations.add(abbreviation);
+            }
+        }
+    }
+
+    private void clearSearch() {
+        filteredAbbreviations.setAll(this.abbreviations);
+        filteredAbbreviations.bindBidirectional(this.abbreviations);
     }
 }

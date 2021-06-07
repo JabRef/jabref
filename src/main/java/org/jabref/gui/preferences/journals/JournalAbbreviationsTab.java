@@ -1,5 +1,7 @@
 package org.jabref.gui.preferences.journals;
 
+import java.util.Locale;
+
 import javax.inject.Inject;
 
 import javafx.fxml.FXML;
@@ -20,6 +22,7 @@ import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import org.controlsfx.control.textfield.CustomTextField;
 
 /**
  * This class controls the user interface of the journal abbreviations dialog. The UI elements and their layout are
@@ -40,6 +43,8 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     @FXML private Button addAbbreviationListButton;
     @FXML private Button removeAbbreviationListButton;
 
+    @FXML private CustomTextField searchBox;
+
     @Inject private TaskExecutor taskExecutor;
     @Inject private JournalAbbreviationRepository abbreviationRepository;
 
@@ -56,6 +61,14 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         setButtonStyles();
         setUpTable();
         setBindings();
+
+        searchBox.textProperty().addListener((observable, previousText, newText) -> {
+            viewModel.filterAbbreviations(newText.toLowerCase(Locale.ROOT));
+            journalAbbreviationsTable.getSelectionModel().clearSelection();
+            journalAbbreviationsTable.getSelectionModel().selectFirst();
+        });
+        searchBox.setPromptText(Localization.lang("Search") + "...");
+        searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
     }
 
     private void setButtonStyles() {
@@ -78,7 +91,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     }
 
     private void setBindings() {
-        journalAbbreviationsTable.itemsProperty().bindBidirectional(viewModel.abbreviationsProperty());
+        journalAbbreviationsTable.itemsProperty().bindBidirectional(viewModel.filteredAbbreviationsProperty());
 
         EasyBind.subscribe(journalAbbreviationsTable.getSelectionModel().selectedItemProperty(), newValue ->
                 viewModel.currentAbbreviationProperty().set(newValue));

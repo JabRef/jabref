@@ -94,4 +94,17 @@ public class AbbreviationViewModel {
     public int hashCode() {
         return Objects.hash(getName(), isPseudoAbbreviation());
     }
+
+    public boolean contains(String s) {
+        if (this.abbreviation.get().toLowerCase().contains(s)) {
+            return true;
+        }
+        if (this.name.get().toLowerCase().contains(s)) {
+            return true;
+        }
+        if (this.shortestUniqueAbbreviation.get().toLowerCase().contains(s)) {
+            return true;
+        }
+        return false;
+    }
 }
