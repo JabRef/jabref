@@ -2,7 +2,6 @@ package org.jabref.gui.preferences.journals;
 
 import javax.inject.Inject;
 
-import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -71,7 +70,6 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
             } else {
                 filteredAbbreviations.setPredicate(s -> s.contains(newText.toLowerCase()));
             }
-            journalAbbreviationsTable.setItems(filteredAbbreviations);
             journalAbbreviationsTable.getSelectionModel().clearSelection();
             journalAbbreviationsTable.getSelectionModel().selectFirst();
         });
@@ -100,9 +98,6 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
     private void setBindings() {
         journalAbbreviationsTable.setItems(filteredAbbreviations);
-        filteredAbbreviations.addListener(
-                (ListChangeListener<AbbreviationViewModel>) c -> journalAbbreviationsTable.setItems(filteredAbbreviations)
-        );
 
         EasyBind.subscribe(journalAbbreviationsTable.getSelectionModel().selectedItemProperty(), newValue ->
                 viewModel.currentAbbreviationProperty().set(newValue));
