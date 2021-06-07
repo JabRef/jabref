@@ -24,7 +24,6 @@ public class CompositeFormatTest {
 
     @Test
     public void testDoubleComposite() {
-
         LayoutFormatter f = new CompositeFormat(new AuthorOrgSci(), new NoSpaceBetweenAbbreviations());
         LayoutFormatter first = new AuthorOrgSci();
         LayoutFormatter second = new NoSpaceBetweenAbbreviations();
