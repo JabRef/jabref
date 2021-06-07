@@ -326,7 +326,7 @@ public class GlobalSearchBar extends HBox {
     private void setSearchFieldHintTooltip(TextFlow description) {
         if (preferencesService.getGeneralPreferences().shouldShowAdvancedHints()) {
             // String hint = Localization.lang("Hint: To search specific fields only, enter for example:\n<tt>author=smith and title=electrical</tt>");
-            String genericDescription = Localization.lang("Please enter a search term. For example, to search all fields for <b>Smith</b>, enter:<p><tt>smith</tt><p>To search the field <b>author</b> for <b>Smith</b> and the field <b>title</b> for <b>electrical</b>, enter:<p><tt>author=smith and title=electrical</tt>");
+            String genericDescription = Localization.lang("Hint:\n\nTo search all fields for <b>Smith</b>, enter:\n<tt>smith</tt>\n\nTo search the field <b>author</b> for <b>Smith</b> and the field <b>title</b> for <b>electrical</b>, enter:\n<tt>author=Smith and title=electrical</tt>");
             List<Text> genericDescriptionTexts = TooltipTextUtil.createTextsFromHtml(genericDescription);
 
             if (description == null) {

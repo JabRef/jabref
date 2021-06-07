@@ -15,9 +15,10 @@ public class TooltipTextUtil {
 
     // (?s) tells Java that "." also matches the newline character
     // (?<...>...) are named groups in Java regular expressions: https://stackoverflow.com/a/415635/873282
-    private static final Pattern TT_TEXT = Pattern.compile("(?s)(?<before>.*)<tt>(?<in>.*)</tt>");
+    // .*? tells to match non-greedy (see https://stackoverflow.com/q/7124778/873282 for details)
+    private static final Pattern TT_TEXT = Pattern.compile("(?s)(?<before>.*?)<tt>(?<in>.*?)</tt>");
 
-    private static final Pattern B_TEXT = Pattern.compile("(?s)(?<before>.*)<b>(?<in>.*)</b>");
+    private static final Pattern B_TEXT = Pattern.compile("(?s)(?<before>.*?)<b>(?<in>.*?)</b>");
 
     public enum TextType {
         NORMAL, BOLD, ITALIC, MONOSPACED
