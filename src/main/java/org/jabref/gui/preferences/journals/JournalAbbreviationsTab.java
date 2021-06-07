@@ -1,12 +1,8 @@
 package org.jabref.gui.preferences.journals;
 
-import java.util.Locale;
-
 import javax.inject.Inject;
 
-import javafx.beans.property.SimpleListProperty;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -103,7 +99,6 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     }
 
     private void setBindings() {
-        //journalAbbreviationsTable.itemsProperty().bindBidirectional(filteredAbbreviations.predicateProperty());
         journalAbbreviationsTable.setItems(filteredAbbreviations);
         filteredAbbreviations.addListener(
                 (ListChangeListener<AbbreviationViewModel>) c -> journalAbbreviationsTable.setItems(filteredAbbreviations)
