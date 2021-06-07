@@ -4,6 +4,10 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -36,6 +40,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     @FXML private TableColumn<AbbreviationViewModel, String> journalTableNameColumn;
     @FXML private TableColumn<AbbreviationViewModel, String> journalTableAbbreviationColumn;
     @FXML private TableColumn<AbbreviationViewModel, String> journalTableShortestUniqueAbbreviationColumn;
+    private FilteredList<AbbreviationViewModel> filteredAbbreviations;
     @FXML private ComboBox<AbbreviationsFileViewModel> journalFilesBox;
     @FXML private Button addAbbreviationButton;
     @FXML private Button removeAbbreviationButton;
@@ -58,12 +63,19 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     private void initialize() {
         viewModel = new JournalAbbreviationsTabViewModel(preferencesService, dialogService, taskExecutor, abbreviationRepository);
 
+        filteredAbbreviations = new FilteredList<>(viewModel.abbreviationsProperty(), s -> true);
+
         setButtonStyles();
         setUpTable();
         setBindings();
 
         searchBox.textProperty().addListener((observable, previousText, newText) -> {
-            viewModel.filterAbbreviations(newText.toLowerCase(Locale.ROOT));
+            if (newText.isEmpty()) {
+                filteredAbbreviations.setPredicate(s -> true);
+            } else {
+                filteredAbbreviations.setPredicate(s -> s.contains(newText.toLowerCase()));
+            }
+            journalAbbreviationsTable.setItems(filteredAbbreviations);
             journalAbbreviationsTable.getSelectionModel().clearSelection();
             journalAbbreviationsTable.getSelectionModel().selectFirst();
         });
@@ -91,7 +103,11 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     }
 
     private void setBindings() {
-        journalAbbreviationsTable.itemsProperty().bindBidirectional(viewModel.filteredAbbreviationsProperty());
+        //journalAbbreviationsTable.itemsProperty().bindBidirectional(filteredAbbreviations.predicateProperty());
+        journalAbbreviationsTable.setItems(filteredAbbreviations);
+        filteredAbbreviations.addListener(
+                (ListChangeListener<AbbreviationViewModel>) c -> journalAbbreviationsTable.setItems(filteredAbbreviations)
+        );
 
         EasyBind.subscribe(journalAbbreviationsTable.getSelectionModel().selectedItemProperty(), newValue ->
                 viewModel.currentAbbreviationProperty().set(newValue));
