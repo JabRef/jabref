@@ -30,6 +30,11 @@ class CleanupUrlFormatterTest {
     }
 
     @Test
+    void validUrlUnmodified() {
+        assertEquals("http://wikipedia.org", formatter.format("http://wikipedia.org"));
+    }
+
+    @Test
     void latexCommandsNotRemoved() {
         assertEquals("http://pi.informatik.uni-siegen.de/stt/36\\_2/./03\\_Technische\\_Beitraege/ZEUS2016/beitrag\\_2.pdf", formatter.format("http://pi.informatik.uni-siegen.de/stt/36\\_2/./03\\_Technische\\_Beitraege/ZEUS2016/beitrag\\_2.pdf"));
     }
