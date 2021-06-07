@@ -148,7 +148,7 @@ public class TooltipTextUtil {
         }
     }
 
-    public static String textToHTMLString(Text text) {
+    public static String textToHtmlString(Text text) {
         String textString = text.getText();
         textString = textString.replace("\n", "<br>");
         if (text.getStyleClass().toString().contains("tooltip-text-monospaced")) {
