@@ -14,7 +14,7 @@ Read on about our automated quality checks at [Code Quality](../advanced-reading
 
 ## Continuous integration
 
-Since end of 2019, we just use GitHub actions to execute our tests and to creates binaries. The binaries are create using [gradle](https://gradle.org/) and are uploaded to to [https://builds.jabref.org](https://builds.jabref.org). These binaries are created without any checks to have them available as quickly as possible, even if the localization or some fetchers are broken. Deep link: [https://github.com/JabRef/jabref/actions?workflow=Deployment](https://github.com/JabRef/jabref/actions?workflow=Deployment).
+Since end of 2019, we just use GitHub actions to execute our tests and to creates binaries. The binaries are created using [gradle](https://gradle.org/) and are uploaded to [https://builds.jabref.org](https://builds.jabref.org). These binaries are created without any checks to have them available as quickly as possible, even if the localization or some fetchers are broken. Deep link: [https://github.com/JabRef/jabref/actions?workflow=Deployment](https://github.com/JabRef/jabref/actions?workflow=Deployment).
 
 ## Branches
 
