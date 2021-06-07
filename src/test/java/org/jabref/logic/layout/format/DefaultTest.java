@@ -16,8 +16,8 @@ public class DefaultTest {
 
     @ParameterizedTest
     @MethodSource("formatTests")
-    void paramLayoutFormatTest(String expectedString, String inputString, String formatterArgument){
-        if (!formatterArgument.isEmpty()){
+    void paramLayoutFormatTest(String expectedString, String inputString, String formatterArgument) {
+        if (!formatterArgument.isEmpty()) {
             paramLayoutFormatter.setArgument(formatterArgument);
         }
         assertEquals(expectedString, paramLayoutFormatter.format(inputString));

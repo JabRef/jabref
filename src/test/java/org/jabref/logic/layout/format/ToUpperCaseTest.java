@@ -14,7 +14,7 @@ public class ToUpperCaseTest {
 
     @ParameterizedTest
     @MethodSource("toUpperCaseTests")
-    void toUpperCaseTests(String expectedString, String inputString){
+    void toUpperCaseTests(String expectedString, String inputString) {
         assertEquals(expectedString, upperCase.format(inputString));
     }
 

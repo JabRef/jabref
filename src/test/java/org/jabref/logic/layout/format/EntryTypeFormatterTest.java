@@ -1,7 +1,5 @@
 package org.jabref.logic.layout.format;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -16,7 +14,7 @@ public class EntryTypeFormatterTest {
 
     @ParameterizedTest
     @MethodSource("formatTests")
-    void testCorrectFormat(String expectedString, String inputString){
+    void testCorrectFormat(String expectedString, String inputString) {
         assertEquals(expectedString, formatter.format(inputString));
     }
 
