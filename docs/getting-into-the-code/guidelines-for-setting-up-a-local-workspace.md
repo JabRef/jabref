@@ -151,7 +151,7 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 * In **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** the setting "Build and run using" and "Test using" is set to "IntelliJ IDEA".
 * Ignore the Gradle project "buildSrc" by clicking the button **Select Project Data To Import** in the Gradle Tool Window and unchecking the folder "buildSrc".
 
-  ![Ignore the Gradle project &quot;buildSrc&quot;](https://github.com/JabRef/jabref/tree/e6288bdbf0cf5e913dfbea5e5e206929a6dc9b04/docs/.gitbook/assets/intellij-gradle-config-ignore-buildSrc%20%282%29%20%282%29%20%282%29%20%283%29.png)
+  ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc%20%282%29%20%282%29%20%282%29%20%283%29%20%283%29%20%286%29%20%284%29.png)
 
 * Add `src-gen` as root:
   1. Right click on the project "jabref".
