@@ -101,6 +101,7 @@ public class GlobalSearchBar extends HBox {
         // fits the standard "found x entries"-message thus hinders the searchbar to jump around while searching if the frame width is too small
         currentResults.setPrefWidth(150);
 
+        searchField.setTooltip(searchFieldTooltip);
         searchFieldTooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         searchFieldTooltip.setMaxHeight(10);
         updateHintVisibility();
@@ -342,11 +343,6 @@ public class GlobalSearchBar extends HBox {
     }
 
     public void updateHintVisibility() {
-        if (preferencesService.getGeneralPreferences().shouldShowAdvancedHints()) {
-            searchField.setTooltip(searchFieldTooltip);
-        } else {
-            searchField.setTooltip(null);
-        }
         setSearchFieldHintTooltip(null);
     }
 
