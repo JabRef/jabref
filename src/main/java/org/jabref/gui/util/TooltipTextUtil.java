@@ -152,7 +152,7 @@ public class TooltipTextUtil {
         String textString = text.getText();
         textString = textString.replace("\n", "<br>");
         if (text.getStyleClass().toString().contains("tooltip-text-monospaced")) {
-            textString = String.format("<kbd>%s</kbd>", textString);
+            textString = String.format("<tt>%s</tt>", textString);
         }
         if (text.getStyleClass().toString().contains("tooltip-text-bold")) {
             textString = String.format("<b>%s</b>", textString);

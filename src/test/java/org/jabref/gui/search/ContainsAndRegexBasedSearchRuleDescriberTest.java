@@ -1,6 +1,5 @@
 package org.jabref.gui.search;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javafx.scene.text.Text;

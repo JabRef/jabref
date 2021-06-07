@@ -2,7 +2,6 @@ package org.jabref.logic.l10n;
 
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -10,15 +9,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class LocalizationKeyTest {
-
-    @Test
-    void testConversionToPropertiesKey() {
-        /*
-        LocalizationKey localizationKey = LocalizationKey.fr("#test! : =");
-        assertEquals("\\#test\\!\\ \\:\\ \\=", localizationKey.getPropertiesKey());
-        assertEquals("#test! : =", localizationKey.getJavaCodeKey());
-        assertEquals("#test! : =", localizationKey.getTranslationValue());*/
-    }
 
     private static Stream<Arguments> propertiesKeyTestCases() {
         return Stream.of(
