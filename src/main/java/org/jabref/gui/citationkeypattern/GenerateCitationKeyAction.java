@@ -51,7 +51,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
             BackgroundTask backgroundTask = this.generateKeysInBackground();
             backgroundTask.showToUser(true);
             backgroundTask.titleProperty().set(Localization.lang("Autogenerate citation keys"));
-            backgroundTask.messageProperty().set(entries.size() + " " + Localization.lang("entries"));
+            backgroundTask.messageProperty().set(Localization.lang("0/%0 entries", entries.size()));
 
             backgroundTask.executeWith(Globals.TASK_EXECUTOR);
         }
@@ -100,6 +100,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                     }
                     DefaultTaskExecutor.runInJavaFXThread(() -> {
                         updateProgress(0, entries.size());
+                        messageProperty().set(Localization.lang("0/%0 entries", entries.size()));
                     });
                     stateManager.getActiveDatabase().ifPresent(databaseContext -> {
                         // generate the new citation keys for each entry
@@ -114,6 +115,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                             int finalEntriesDone = entriesDone;
                             DefaultTaskExecutor.runInJavaFXThread(() -> {
                                 updateProgress(finalEntriesDone, entries.size());
+                                messageProperty().set(Localization.lang("%0/%1 entries", finalEntriesDone, entries.size()));
                             });
                         }
                         compound.end();
