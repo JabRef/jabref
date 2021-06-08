@@ -2,6 +2,7 @@ package org.jabref.gui.importer.fetcher;
 
 import java.util.Map;
 import java.util.SortedSet;
+import java.util.function.Predicate;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -13,6 +14,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.importer.ImportEntriesDialog;
 import org.jabref.gui.util.BackgroundTask;
@@ -24,6 +26,15 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 
 import com.tobiasdiez.easybind.EasyBind;
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
+import org.apache.lucene.queryparser.flexible.core.parser.SyntaxParser;
+import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
+
+import static org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransformer.NO_EXPLICIT_FIELD;
 
 public class WebSearchPaneViewModel {
 
@@ -32,6 +43,9 @@ public class WebSearchPaneViewModel {
     private final StringProperty query = new SimpleStringProperty();
     private final DialogService dialogService;
     private final StateManager stateManager;
+
+    private final Validator searchQueryValidator;
+    private final SyntaxParser parser = new StandardSyntaxParser();
 
     public WebSearchPaneViewModel(PreferencesService preferencesService, DialogService dialogService, StateManager stateManager) {
         this.dialogService = dialogService;
@@ -51,6 +65,21 @@ public class WebSearchPaneViewModel {
             int newIndex = fetchers.indexOf(newFetcher);
             preferencesService.storeSidePanePreferences(preferencesService.getSidePanePreferences().withWebSearchFetcherSelected(newIndex));
         });
+
+        Predicate<String> queryValid = queryText -> {
+            if (StringUtil.isBlank(queryText)) {
+                // in case user did not enter something, it is treated as valid (to avoid UI WTFs)
+                return true;
+            }
+            try {
+                parser.parse(queryText, NO_EXPLICIT_FIELD);
+                return true;
+            } catch (QueryNodeParseException e) {
+                return false;
+            }
+        };
+        searchQueryValidator = new FunctionBasedValidator<>(
+                query, queryValid.negate(), ValidationMessage.error(Localization.lang("Search query unparseable")));
     }
 
     public ObservableList<SearchBasedFetcher> getFetchers() {
@@ -78,11 +107,11 @@ public class WebSearchPaneViewModel {
     }
 
     public void search() {
-        if (StringUtil.isBlank(getQuery())) {
+        String query = getQuery().trim();
+        if (StringUtil.isBlank(query)) {
             dialogService.notify(Localization.lang("Please enter a search string"));
             return;
         }
-
         if (stateManager.getActiveDatabase().isEmpty()) {
             dialogService.notify(Localization.lang("Please open or start a new library before searching"));
             return;
@@ -92,12 +121,16 @@ public class WebSearchPaneViewModel {
         Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("search", Map.of("fetcher", activeFetcher.getName()), Map.of()));
 
         BackgroundTask<ParserResult> task;
-        task = BackgroundTask.wrap(() -> new ParserResult(activeFetcher.performSearch(getQuery().trim())))
-                             .withInitialMessage(Localization.lang("Processing %0", getQuery().trim()));
+        task = BackgroundTask.wrap(() -> new ParserResult(activeFetcher.performSearch(query)))
+                             .withInitialMessage(Localization.lang("Processing %0", query));
         task.onFailure(dialogService::showErrorDialogAndWait);
 
         ImportEntriesDialog dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task);
         dialog.setTitle(activeFetcher.getName());
         dialogService.showCustomDialogAndWait(dialog);
+    }
+
+    public ValidationStatus queryInvalidationStatus() {
+        return searchQueryValidator.getValidationStatus();
     }
 }

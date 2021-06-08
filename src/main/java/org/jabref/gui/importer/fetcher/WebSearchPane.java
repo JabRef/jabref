@@ -1,5 +1,6 @@
 package org.jabref.gui.importer.fetcher;
 
+import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -22,6 +23,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.search.SearchTextField;
+import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
@@ -30,6 +32,8 @@ import org.jabref.preferences.PreferencesService;
 import com.tobiasdiez.easybind.EasyBind;
 
 public class WebSearchPane extends SidePaneComponent {
+
+    private static final PseudoClass QUERY_INVALID = PseudoClass.getPseudoClass("invalid");
 
     private final PreferencesService preferences;
     private final WebSearchPaneViewModel viewModel;
@@ -73,6 +77,7 @@ public class WebSearchPane extends SidePaneComponent {
         // Create text field for query input
         TextField query = SearchTextField.create();
         query.getStyleClass().add("searchBar");
+        BindingsHelper.includePseudoClassWhen(query, QUERY_INVALID, viewModel.queryInvalidationStatus().validProperty());
 
         viewModel.queryProperty().bind(query.textProperty());
 
