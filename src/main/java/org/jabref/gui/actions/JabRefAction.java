@@ -80,6 +80,6 @@ class JabRefAction extends org.controlsfx.control.action.Action {
         Globals.getTelemetryClient().ifPresent(telemetryClient -> telemetryClient.trackEvent(
                 actionName,
                 Map.of("Source", source.toString()),
-                Map.of());
+                Map.of()));
     }
 }
