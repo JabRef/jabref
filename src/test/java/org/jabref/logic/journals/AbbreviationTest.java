@@ -1,8 +1,12 @@
 package org.jabref.logic.journals;
 
+import org.jabref.gui.preferences.journals.AbbreviationViewModel;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AbbreviationTest {
 
@@ -100,5 +104,14 @@ class AbbreviationTest {
     void testDefaultAndShortestUniqueAbbreviationsAreSame() {
         Abbreviation abbreviation = new Abbreviation("Long Name", "L N");
         assertEquals(abbreviation.getAbbreviation(), abbreviation.getShortestUniqueAbbreviation());
+    }
+
+    @Test
+    void testStringIsFoundInAllAbbreviationFields() {
+        AbbreviationViewModel abbreviationViewModel = new AbbreviationViewModel(new Abbreviation("Long Name", "abbr", "unique"));
+        assertTrue(abbreviationViewModel.containsCaseIndependent("name"));
+        assertTrue(abbreviationViewModel.containsCaseIndependent("bBr"));
+        assertTrue(abbreviationViewModel.containsCaseIndependent("Uniq"));
+        assertFalse(abbreviationViewModel.containsCaseIndependent("Something else"));
     }
 }
