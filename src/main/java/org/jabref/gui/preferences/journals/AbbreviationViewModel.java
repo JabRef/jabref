@@ -95,7 +95,8 @@ public class AbbreviationViewModel {
         return Objects.hash(getName(), isPseudoAbbreviation());
     }
 
-    public boolean contains(String s) {
+    public boolean containsCaseIndependent(String s) {
+        s = s.toLowerCase();
         if (this.abbreviation.get().toLowerCase().contains(s)) {
             return true;
         }

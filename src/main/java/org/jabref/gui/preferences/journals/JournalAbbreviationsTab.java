@@ -68,7 +68,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
             if (newText.isEmpty()) {
                 filteredAbbreviations.setPredicate(s -> true);
             } else {
-                filteredAbbreviations.setPredicate(s -> s.contains(newText.toLowerCase()));
+                filteredAbbreviations.setPredicate(s -> s.containsCaseIndependent(newText));
             }
             journalAbbreviationsTable.getSelectionModel().clearSelection();
             journalAbbreviationsTable.getSelectionModel().selectFirst();
