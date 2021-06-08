@@ -1040,11 +1040,10 @@ public class JabRefFrame extends BorderPane {
     }
 
     private void trackOpenNewDatabase(LibraryTab libraryTab) {
-        Map<String, String> properties = new HashMap<>();
-        Map<String, Double> measurements = new HashMap<>();
-        measurements.put("NumberOfEntries", (double) libraryTab.getBibDatabaseContext().getDatabase().getEntryCount());
-
-        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("OpenNewDatabase", properties, measurements));
+        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent(
+                "OpenNewDatabase",
+                Map.of(),
+                Map.of("NumberOfEntries", (double) libraryTab.getBibDatabaseContext().getDatabase().getEntryCount())));
     }
 
     public LibraryTab addTab(BibDatabaseContext databaseContext, boolean raisePanel) {

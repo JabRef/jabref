@@ -1,5 +1,6 @@
 package org.jabref.gui.importer.fetcher;
 
+import java.util.Map;
 import java.util.SortedSet;
 
 import javafx.beans.property.ListProperty;
@@ -88,6 +89,7 @@ public class WebSearchPaneViewModel {
         }
 
         SearchBasedFetcher activeFetcher = getSelectedFetcher();
+        Globals.getTelemetryClient().ifPresent(client -> client.trackEvent("search", Map.of("fetcher", activeFetcher.getName()), Map.of()));
 
         BackgroundTask<ParserResult> task;
         task = BackgroundTask.wrap(() -> new ParserResult(activeFetcher.performSearch(getQuery().trim())))
