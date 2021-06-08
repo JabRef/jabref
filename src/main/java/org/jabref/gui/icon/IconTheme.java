@@ -331,7 +331,8 @@ public class IconTheme {
         HOME(MaterialDesignH.HOME),
         LINK(MaterialDesignL.LINK),
         LINK_VARIANT(MaterialDesignL.LINK_VARIANT),
-        PROTECT_STRING(MaterialDesignC.CODE_BRACES);
+        PROTECT_STRING(MaterialDesignC.CODE_BRACES),
+        SELECT_ICONS(MaterialDesignA.ALPHA_I_CIRCLE);
 
         private final JabRefIcon icon;
 
