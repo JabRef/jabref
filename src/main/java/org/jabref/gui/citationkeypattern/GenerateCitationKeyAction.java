@@ -13,6 +13,7 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -26,10 +27,13 @@ public class GenerateCitationKeyAction extends SimpleCommand {
     private List<BibEntry> entries;
     private boolean isCanceled;
 
-    public GenerateCitationKeyAction(JabRefFrame frame, DialogService dialogService, StateManager stateManager) {
+    private TaskExecutor taskExecutor;
+
+    public GenerateCitationKeyAction(JabRefFrame frame, DialogService dialogService, StateManager stateManager, TaskExecutor taskExecutor) {
         this.frame = frame;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
+        this.taskExecutor = taskExecutor;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
@@ -53,7 +57,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
             backgroundTask.titleProperty().set(Localization.lang("Autogenerate citation keys"));
             backgroundTask.messageProperty().set(Localization.lang("%0/%1 entries", 0, entries.size()));
 
-            backgroundTask.executeWith(Globals.TASK_EXECUTOR);
+            backgroundTask.executeWith(this.taskExecutor);
         }
     }
 
