@@ -132,6 +132,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     @FXML
     private void addAbbreviation() {
         viewModel.addAbbreviation();
+        searchBox.textProperty().set("");
         selectNewAbbreviation();
         editAbbreviation();
     }
