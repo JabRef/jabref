@@ -2,13 +2,16 @@ package org.jabref.cli;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Vector;
 import java.util.prefs.BackingStoreException;
 
 import org.jabref.gui.Globals;
@@ -24,6 +27,7 @@ import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
+import org.jabref.logic.exporter.XmpPdfExporter;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
@@ -47,8 +51,11 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.model.util.FileHelper;
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.SearchPreferences;
 
 import com.google.common.base.Throwables;
@@ -215,6 +222,13 @@ public class ArgumentProcessor {
             automaticallySetFileLinks(loaded);
         }
 
+        if (cli.isWriteXMPtoPdf()) {
+            System.out.println("writing for " + cli.getWriteXMPtoPdf());
+            if (!loaded.isEmpty()) {
+                writeXMPtoPdf(loaded, cli.getWriteXMPtoPdf(), Globals.prefs);
+            }
+        }
+
         if (cli.isFileExport()) {
             if (!loaded.isEmpty()) {
                 exportFile(loaded, cli.getFileExport().split(","));
@@ -237,6 +251,114 @@ public class ArgumentProcessor {
         }
 
         return loaded;
+    }
+
+    private void writeXMPtoPdf(List<ParserResult> loaded, String filesAndCitekeys, JabRefPreferences preferences) {
+
+        ParserResult pr = loaded.get(loaded.size() - 1);
+        BibDatabaseContext databaseContext = pr.getDatabaseContext();
+        BibDatabase dataBase = pr.getDatabase();
+
+        XmpPdfExporter xmpPdfExporter = new XmpPdfExporter(preferences.getXmpPreferences());
+
+        if (filesAndCitekeys.equals("all")) {
+            for (BibEntry entry : dataBase.getEntries()) {
+                writeXMPtoPDFsOfEntry(databaseContext, dataBase, entry, preferences, xmpPdfExporter);
+            }
+            return;
+        }
+
+        Vector<String> citeKeys = new Vector<>();
+        Vector<String> pdfs = new Vector<>();
+        for (String fileOrCiteKey : filesAndCitekeys.split(",")) {
+            if (fileOrCiteKey.toLowerCase(Locale.ROOT).endsWith(".pdf")) {
+                pdfs.add(fileOrCiteKey);
+            } else {
+                citeKeys.add(fileOrCiteKey);
+            }
+        }
+
+        writeXMPtoPdfByCitekey(databaseContext, dataBase, citeKeys, preferences, xmpPdfExporter);
+        writeXMPtoPdfByFileNames(databaseContext, dataBase, pdfs, preferences, xmpPdfExporter);
+
+    }
+
+    private void writeXMPtoPDFsOfEntry(BibDatabaseContext databaseContext, BibDatabase dataBase, BibEntry entry, JabRefPreferences preferences, XmpPdfExporter xmpPdfExporter) {
+        boolean writtenToAFile = false;
+
+        for (LinkedFile file : entry.getFiles()) {
+            if (file.getFileType().toLowerCase(Locale.ROOT).equals("pdf")) {
+                Optional<Path> filePath = file.findIn(databaseContext, preferences.getFilePreferences());
+                if (filePath.isEmpty()) {
+                    System.err.println(Localization.lang("Skipped - PDF %0 does not exist", filePath.get()));
+                } else {
+                    try {
+                        xmpPdfExporter.export(databaseContext, filePath.get(), preferences.getDefaultEncoding(), Arrays.asList(entry));
+                        writtenToAFile = true;
+                    } catch (Exception e) {
+                        System.err.println(Localization.lang("Error writing XMP content: %0", filePath.get()));
+                    }
+                }
+            }
+        }
+
+        if (!writtenToAFile) {
+            System.err.println(Localization.lang("Skipped - No PDF linked to entry %0", entry.getCitationKey()));
+        }
+    }
+
+    private void writeXMPtoPdfByCitekey(BibDatabaseContext databaseContext, BibDatabase dataBase, Vector<String> citeKeys, JabRefPreferences preferences, XmpPdfExporter xmpPdfExporter) {
+        for (String citeKey : citeKeys) {
+            Optional<BibEntry> entry = dataBase.getEntryByCitationKey(citeKey);
+            if (entry.isEmpty()) {
+                System.err.println(Localization.lang("Cannot find %0 in library.", citeKey));
+                return;
+            }
+            writeXMPtoPDFsOfEntry(databaseContext, dataBase, entry.get(), preferences, xmpPdfExporter);
+        }
+    }
+
+    private void writeXMPtoPdfByFileNames(BibDatabaseContext databaseContext, BibDatabase dataBase, Vector<String> fileNames, JabRefPreferences preferences, XmpPdfExporter xmpPdfExporter) {
+        List<Path> dirs = databaseContext.getFileDirectories(preferences.getFilePreferences());
+        dirs.add(Path.of("").toAbsolutePath());
+
+        for (String fileName : fileNames) {
+            Path filePath = Path.of(fileName);
+            if (!filePath.isAbsolute()) {
+                Optional<Path> optionalFilePath = FileHelper.find(fileName, dirs);
+                if (!optionalFilePath.isEmpty()) {
+                    filePath = optionalFilePath.get();
+                }
+            }
+            System.out.println(filePath);
+            if (Files.exists(filePath)) {
+                boolean writtenToAFile = false;
+                for (BibEntry entry : dataBase.getEntries()) {
+                    for (LinkedFile linkedFile : entry.getFiles()) {
+                        if (linkedFile.getFileType().toLowerCase(Locale.ROOT).equals("pdf")) {
+                            Optional<Path> linkedFilePath = linkedFile.findIn(dirs);
+                            try {
+                                if (!linkedFilePath.isEmpty() && Files.isSameFile(linkedFilePath.get(), filePath)) {
+                                    try {
+                                        xmpPdfExporter.export(databaseContext, filePath, preferences.getDefaultEncoding(), Arrays.asList(entry));
+                                        writtenToAFile = true;
+                                    } catch (Exception e) {
+                                        System.err.println(Localization.lang("Error writing XMP content: %0", filePath));
+                                    }
+                                }
+                            } catch (IOException e) {
+                                System.err.println(Localization.lang("Error opening %0 and %1 for comparison", linkedFile.getLink(), fileName));
+                            }
+                        }
+                    }
+                }
+                if (!writtenToAFile) {
+                    System.err.println(Localization.lang("Skipped - PDF %0 not found in library", fileName));
+                }
+            } else {
+                System.err.println(Localization.lang("Skipped - PDF %0 does not exist", fileName));
+            }
+        }
     }
 
     private boolean exportMatches(List<ParserResult> loaded) {
