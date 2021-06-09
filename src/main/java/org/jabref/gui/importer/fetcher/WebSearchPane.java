@@ -79,7 +79,7 @@ public class WebSearchPane extends SidePaneComponent {
         query.getStyleClass().add("searchBar");
 
         // Weird issue: viewModel.queryValidationStatus().not() does not work...
-        BindingsHelper.includePseudoClassWhen(query, QUERY_INVALID, viewModel.queryInvalidationStatus().validProperty());
+        BindingsHelper.includePseudoClassWhen(query, QUERY_INVALID, viewModel.queryValidationStatus().validProperty().not());
 
         viewModel.queryProperty().bind(query.textProperty());
 

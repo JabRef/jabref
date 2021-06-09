@@ -32,6 +32,7 @@ import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
 import org.apache.lucene.queryparser.flexible.core.parser.SyntaxParser;
+import org.apache.lucene.queryparser.flexible.standard.parser.ParseException;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 
 import static org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransformer.NO_EXPLICIT_FIELD;
@@ -66,20 +67,24 @@ public class WebSearchPaneViewModel {
             preferencesService.storeSidePanePreferences(preferencesService.getSidePanePreferences().withWebSearchFetcherSelected(newIndex));
         });
 
-        Predicate<String> queryValid = queryText -> {
-            if (StringUtil.isBlank(queryText)) {
-                // in case user did not enter something, it is treated as valid (to avoid UI WTFs)
-                return true;
-            }
-            try {
-                parser.parse(queryText, NO_EXPLICIT_FIELD);
-                return true;
-            } catch (QueryNodeParseException e) {
-                return false;
-            }
-        };
         searchQueryValidator = new FunctionBasedValidator<>(
-                query, queryValid.negate(), ValidationMessage.error(Localization.lang("Search query unparseable")));
+                query,
+                queryText -> {
+                    if (StringUtil.isBlank(queryText)) {
+                        // in case user did not enter something, it is treated as valid (to avoid UI WTFs)
+                        return null;
+                    }
+                    try {
+                        parser.parse(queryText, NO_EXPLICIT_FIELD);
+                        return null;
+                    } catch (ParseException e) {
+                        String element = e.currentToken.image;
+                        int position = e.currentToken.beginColumn;
+                        return ValidationMessage.error(Localization.lang("Invalid query element '%0' at position %1", element, position));
+                    } catch (QueryNodeParseException e) {
+                        return ValidationMessage.error("");
+                    }
+                });
     }
 
     public ObservableList<SearchBasedFetcher> getFetchers() {
@@ -130,7 +135,7 @@ public class WebSearchPaneViewModel {
         dialogService.showCustomDialogAndWait(dialog);
     }
 
-    public ValidationStatus queryInvalidationStatus() {
+    public ValidationStatus queryValidationStatus() {
         return searchQueryValidator.getValidationStatus();
     }
 }
