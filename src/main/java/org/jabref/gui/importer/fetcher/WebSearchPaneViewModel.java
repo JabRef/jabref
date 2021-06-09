@@ -2,7 +2,6 @@ package org.jabref.gui.importer.fetcher;
 
 import java.util.Map;
 import java.util.SortedSet;
-import java.util.function.Predicate;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
