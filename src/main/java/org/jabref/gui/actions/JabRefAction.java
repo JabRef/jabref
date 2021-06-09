@@ -1,6 +1,5 @@
 package org.jabref.gui.actions;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javafx.beans.binding.Bindings;
