@@ -98,15 +98,8 @@ public class AbbreviationViewModel {
 
     public boolean containsCaseIndependent(String searchTerm) {
         searchTerm = searchTerm.toLowerCase(Locale.ROOT);
-        if (this.abbreviation.get().toLowerCase(Locale.ROOT).contains(searchTerm)) {
-            return true;
-        }
-        if (this.name.get().toLowerCase(Locale.ROOT).contains(searchTerm)) {
-            return true;
-        }
-        if (this.shortestUniqueAbbreviation.get().toLowerCase(Locale.ROOT).contains(searchTerm)) {
-            return true;
-        }
-        return false;
+        return this.abbreviation.get().toLowerCase(Locale.ROOT).contains(searchTerm) ||
+                this.name.get().toLowerCase(Locale.ROOT).contains(searchTerm) ||
+                this.shortestUniqueAbbreviation.get().toLowerCase(Locale.ROOT).contains(searchTerm);
     }
 }
