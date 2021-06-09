@@ -58,7 +58,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     private void initialize() {
         viewModel = new JournalAbbreviationsTabViewModel(preferencesService, dialogService, taskExecutor, abbreviationRepository);
 
-        filteredAbbreviations = new FilteredList<>(viewModel.abbreviationsProperty(), s -> true);
+        filteredAbbreviations = new FilteredList<>(viewModel.abbreviationsProperty(), abbreviation -> true);
 
         setButtonStyles();
         setUpTable();
@@ -66,9 +66,9 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
         searchBox.textProperty().addListener((observable, previousText, newText) -> {
             if (newText.isEmpty()) {
-                filteredAbbreviations.setPredicate(s -> true);
+                filteredAbbreviations.setPredicate(abbreviation -> true);
             } else {
-                filteredAbbreviations.setPredicate(s -> s.containsCaseIndependent(newText));
+                filteredAbbreviations.setPredicate(abbreviation -> abbreviation.containsCaseIndependent(newText));
             }
             journalAbbreviationsTable.getSelectionModel().clearSelection();
             journalAbbreviationsTable.getSelectionModel().selectFirst();
