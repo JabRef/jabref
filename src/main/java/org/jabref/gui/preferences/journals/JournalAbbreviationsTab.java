@@ -58,21 +58,12 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     private void initialize() {
         viewModel = new JournalAbbreviationsTabViewModel(preferencesService, dialogService, taskExecutor, abbreviationRepository);
 
-        filteredAbbreviations = new FilteredList<>(viewModel.abbreviationsProperty(), abbreviation -> true);
+        filteredAbbreviations = new FilteredList<>(viewModel.abbreviationsProperty());
 
         setButtonStyles();
         setUpTable();
         setBindings();
 
-        searchBox.textProperty().addListener((observable, previousText, newText) -> {
-            if (newText.isEmpty()) {
-                filteredAbbreviations.setPredicate(abbreviation -> true);
-            } else {
-                filteredAbbreviations.setPredicate(abbreviation -> abbreviation.containsCaseIndependent(newText));
-            }
-            journalAbbreviationsTable.getSelectionModel().clearSelection();
-            journalAbbreviationsTable.getSelectionModel().selectFirst();
-        });
         searchBox.setPromptText(Localization.lang("Search") + "...");
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
     }
@@ -117,6 +108,10 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
         loadingLabel.visibleProperty().bind(viewModel.isLoadingProperty());
         progressIndicator.visibleProperty().bind(viewModel.isLoadingProperty());
+
+        searchBox.textProperty().addListener((observable, previousText, searchTerm) -> {
+            filteredAbbreviations.setPredicate(abbreviation -> searchTerm.isEmpty() ? true : abbreviation.containsCaseIndependent(searchTerm));
+        });
     }
 
     @FXML
