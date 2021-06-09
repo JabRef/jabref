@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
@@ -17,6 +16,7 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.PreferencesService;
 
 public class GenerateCitationKeyAction extends SimpleCommand {
 
@@ -27,13 +27,15 @@ public class GenerateCitationKeyAction extends SimpleCommand {
     private List<BibEntry> entries;
     private boolean isCanceled;
 
-    private TaskExecutor taskExecutor;
+    private final TaskExecutor taskExecutor;
+    private final PreferencesService preferencesService;
 
-    public GenerateCitationKeyAction(JabRefFrame frame, DialogService dialogService, StateManager stateManager, TaskExecutor taskExecutor) {
+    public GenerateCitationKeyAction(JabRefFrame frame, DialogService dialogService, StateManager stateManager, TaskExecutor taskExecutor, PreferencesService preferencesService) {
         this.frame = frame;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
+        this.preferencesService = preferencesService;
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
@@ -61,16 +63,16 @@ public class GenerateCitationKeyAction extends SimpleCommand {
         }
     }
 
-    public static boolean confirmOverwriteKeys(DialogService dialogService) {
-        if (Globals.prefs.getCitationKeyPatternPreferences().shouldWarnBeforeOverwriteCiteKey()) {
+    public static boolean confirmOverwriteKeys(DialogService dialogService, PreferencesService preferencesService) {
+        if (preferencesService.getCitationKeyPatternPreferences().shouldWarnBeforeOverwriteCiteKey()) {
             return dialogService.showConfirmationDialogWithOptOutAndWait(
                     Localization.lang("Overwrite keys"),
                     Localization.lang("One or more keys will be overwritten. Continue?"),
                     Localization.lang("Overwrite keys"),
                     Localization.lang("Cancel"),
                     Localization.lang("Do not ask again"),
-                    optOut -> Globals.prefs.storeCitationKeyPatternPreferences(
-                            Globals.prefs.getCitationKeyPatternPreferences().withWarnBeforeOverwriteCiteKey(!optOut)));
+                    optOut -> preferencesService.storeCitationKeyPatternPreferences(
+                            preferencesService.getCitationKeyPatternPreferences().withWarnBeforeOverwriteCiteKey(!optOut)));
         } else {
             // Always overwrite keys by default
             return true;
@@ -79,11 +81,11 @@ public class GenerateCitationKeyAction extends SimpleCommand {
 
     private void checkOverwriteKeysChosen() {
         // We don't want to generate keys for entries which already have one thus remove the entries
-        if (Globals.prefs.getCitationKeyPatternPreferences().shouldAvoidOverwriteCiteKey()) {
+        if (this.preferencesService.getCitationKeyPatternPreferences().shouldAvoidOverwriteCiteKey()) {
             entries.removeIf(BibEntry::hasCitationKey);
             // if we're going to override some citation keys warn the user about it
         } else if (entries.parallelStream().anyMatch(BibEntry::hasCitationKey)) {
-            boolean overwriteKeys = confirmOverwriteKeys(dialogService);
+            boolean overwriteKeys = confirmOverwriteKeys(dialogService, this.preferencesService);
 
             // The user doesn't want to override citation keys
             if (!overwriteKeys) {
@@ -110,7 +112,7 @@ public class GenerateCitationKeyAction extends SimpleCommand {
                         // generate the new citation keys for each entry
                         compound = new NamedCompound(Localization.lang("Autogenerate citation keys"));
                         CitationKeyGenerator keyGenerator =
-                                new CitationKeyGenerator(databaseContext, Globals.prefs.getCitationKeyPatternPreferences());
+                                new CitationKeyGenerator(databaseContext, preferencesService.getCitationKeyPatternPreferences());
                         int entriesDone = 0;
                         for (BibEntry entry : entries) {
                             keyGenerator.generateAndSetKey(entry)
