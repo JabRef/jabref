@@ -32,7 +32,7 @@ public class GenerateCitationKeySingleAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        if (!entry.hasCitationKey() || GenerateCitationKeyAction.confirmOverwriteKeys(dialogService)) {
+        if (!entry.hasCitationKey() || GenerateCitationKeyAction.confirmOverwriteKeys(dialogService, preferencesService)) {
             new CitationKeyGenerator(databaseContext, preferencesService.getCitationKeyPatternPreferences())
                     .generateAndSetKey(entry)
                     .ifPresent(change -> undoManager.addEdit(new UndoableKeyChange(change)));
