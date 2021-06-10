@@ -320,19 +320,18 @@ To test that a preferences migration works successfully, use the mockito method 
 
 ### Background on Java testing
 
-In JabRef, we mainly rely to basic JUnit tests to increase code coverage.
-There are other ways to test:
+In JabRef, we mainly rely to basic JUnit tests to increase code coverage. There are other ways to test:
 
-| Type | Techniques | Tool (Java) | Kind of tests | Used In JabRef |
-| -- | -- | -- | -- | -- |
+| Type | Techniques | Tool \(Java\) | Kind of tests | Used In JabRef |
+| :--- | :--- | :--- | :--- | :--- |
 | Functional | Dynamics, black box, positive and negative | [JUnit-QuickCheck](https://github.com/pholser/junit-quickcheck) | Random data generation | No, not intended, because other test kinds seem more helpful. |
 | Functional | Dynamics, black box, positive and negative | [GraphWalker](https://graphwalker.github.io/) | Model-based | No, because the BibDatabase doesn't need to be tests |
 | Functional | Dynamics, black box, positive and negative | [TestFX](https://github.com/TestFX/TestFX) | GUI Tests | Yes |
 | Functional | Dynamics, white box, negative | [PIT](https://pitest.org/) | Mutation | No |
 | Functional | Dynamics, white box, positive and negative | [Mockito](https://site.mockito.org/) | Mocking | Yes |
-| Non-functional | Dynamics, black box, positive and negative | [JETM](http://jetm.void.fm/), [Apache JMeter](https://jmeter.apache.org/) | Performance (performance testing vs load testing respectively) | No |
+| Non-functional | Dynamics, black box, positive and negative | [JETM](http://jetm.void.fm/), [Apache JMeter](https://jmeter.apache.org/) | Performance \(performance testing vs load testing respectively\) | No |
 | Structural | Static, white box | [CheckStyle](https://checkstyle.sourceforge.io/) | Constient formatting of the source code | Yes |
-| Structural | Dynamics, white box | [SpotBugs](https://spotbugs.github.io/) | Reocurreing bugs (based on experience of other projects) | No |
+| Structural | Dynamics, white box | [SpotBugs](https://spotbugs.github.io/) | Reocurreing bugs \(based on experience of other projects\) | No |
 
 ## UI
 
