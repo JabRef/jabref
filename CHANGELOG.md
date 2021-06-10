@@ -26,6 +26,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added a feature that allows the user to open all linked files of multiple selected entries by "Open file" option. [#6966](https://github.com/JabRef/jabref/issues/6966)
 - We added a keybinding preset for new entries. [#7705](https://github.com/JabRef/jabref/issues/7705)
 - We added a select all button for the library import function. [#7786](https://github.com/JabRef/jabref/issues/7786)
+- We added auto-key-generation progress to the background task list. [#7267](https://github.com/JabRef/jabref/issues/7267)
 
 ### Changed
 
