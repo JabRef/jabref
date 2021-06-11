@@ -25,6 +25,7 @@ import javafx.util.Duration;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
+import org.jabref.gui.util.ColorUtil;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -176,14 +177,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     }
 
     private static void setColorStringFromColor(StringProperty colorStringProperty, ObjectProperty<Color> color) {
-        colorStringProperty.set(
-                "rgba(" +
-                        ((int) (color.get().getRed() * 255)) + "," +
-                        ((int) (color.get().getGreen() * 255)) + "," +
-                        ((int) (color.get().getBlue() * 255)) + "," +
-                        color.get().getOpacity() +
-                ")"
-        );
+        colorStringProperty.set(ColorUtil.toRGBACode(color.get()));
     }
 
     @FXML
