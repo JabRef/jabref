@@ -35,8 +35,11 @@ eclipse {
                 javafxfxml.entryAttributes['add-opens'] = 'javafx.fxml/javafx.fxml=org.jabref';
 
                 def apollo = entries.find { isApollo(it) };
+                apollo.entryAttributes['patch-module']= 'apollo.runtime=/Users/christophs/workspace/jabref/lib/apollo-api-jvm-2.5.8.jar'
                 apollo.entryAttributes['add-exports'] = 'apollo.runtime/com.apollographql.apollo.api=org.jabref:apollo.runtime/com.apollographql.apollo.api.internal=org.jabref'
 
+                //def apolloUnderlib = entries.find { isApolloUnderLib(it) };
+                entries.removeAll { entry -> isApolloUnderLib(entry) }
 
                 entries.findAll { isLibrary(it) && isTestScope(it) }.each { //mark test source files
                     it.entryAttributes['test'] = 'true'
@@ -68,6 +71,8 @@ boolean isJavafxGraphics(entry) { return entry.properties.path.contains('javafx-
 boolean isJavafxFXML(entry) { return entry.properties.path.contains('javafx-fxml'); }
 
 boolean isApollo(entry) { return entry.properties.path.contains('apollo-runtime'); }
+
+boolean isApolloUnderLib(entry) { return entry.properties.path.contains('lib/apollo-api-jvm'); }
 
 // add formatter and cleanup settings to Eclipse settings
 // see http://stackoverflow.com/a/27461890/873282
