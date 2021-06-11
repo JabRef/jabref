@@ -17,7 +17,7 @@ For users documentation, please head to [https://docs.jabref.org](https://docs.j
 
 ## Teaching Exercises
 
-We are very happy that JabRef is part of [Software Engineering](https://en.wikipedia.org/wiki/Software_engineering) trainings. Please head to [Teaching](teaching.md) for more information on using JabRef as teaching object and on previous courses where JabRef was used.
+We are very happy that JabRef is part of [Software Engineering](https://en.wikipedia.org/wiki/Software_engineering) trainings. Please head to [Teaching](teaching.md) for more information on using JabRef as a teaching object and on previous courses where JabRef was used.
 
 ## Miscellaneous Hints
 

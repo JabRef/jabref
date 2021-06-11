@@ -7,22 +7,12 @@
 <?import javafx.scene.control.TreeTableView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import org.jabref.gui.icon.JabRefIconView?>
 <?import org.controlsfx.control.textfield.CustomTextField?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="150.0"
             xmlns="http://javafx.com/javafx/8.0.112" fx:controller="org.jabref.gui.groups.GroupTreeView">
     <top>
         <HBox fx:id="groupFilterBar" alignment="CENTER" spacing="8">
             <CustomTextField fx:id="searchField" promptText="%Filter groups" HBox.hgrow="ALWAYS"/>
-            <Button fx:id="newGroupButton" onAction="#addNewGroup" styleClass="icon-button"
-                    ButtonBar.buttonData="RIGHT">
-                <graphic>
-                    <JabRefIconView glyph="NEW_GROUP" glyphSize="18"/>
-                </graphic>
-                <tooltip>
-                    <Tooltip text="%New group"/>
-                </tooltip>
-            </Button>
         </HBox>
     </top>
     <center>
@@ -39,4 +29,15 @@
             </columnResizePolicy>
         </TreeTableView>
     </center>
+    <bottom>
+        <HBox fx:id="groupBar" alignment="CENTER" spacing="8">
+            <Button fx:id="addNewGroup" onAction="#addNewGroup"
+                    text="%Add group" maxWidth="Infinity" HBox.hgrow="ALWAYS">
+                <tooltip>
+                    <Tooltip text="%New group"/>
+                </tooltip>
+            </Button>
+        </HBox>
+
+    </bottom>
 </BorderPane>
