@@ -20,9 +20,7 @@ public class UnoStyle {
 
     private UnoStyle() { }
 
-    private static Optional<XStyle> getStyleFromFamily(XTextDocument doc,
-                                                       String familyName,
-                                                       String styleName)
+    private static Optional<XStyle> getStyleFromFamily(XTextDocument doc, String familyName, String styleName)
         throws
         WrappedTargetException {
 
@@ -33,7 +31,7 @@ public class UnoStyle {
             xFamily = UnoCast.cast(XNameContainer.class, fs.getByName(familyName)).get();
         } catch (NoSuchElementException ex) {
             String msg = String.format("Style family name '%s' is not recognized", familyName);
-            throw new RuntimeException(msg, ex);
+            throw new java.lang.IllegalArgumentException(msg, ex);
         }
 
         try {

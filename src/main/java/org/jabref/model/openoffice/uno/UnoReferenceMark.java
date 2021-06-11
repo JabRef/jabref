@@ -59,11 +59,10 @@ public class UnoReferenceMark {
      *
      * Removes both the text and the mark itself.
      */
-    public static void remove(XTextDocument doc, String name)
+    public static void removeIfExists(XTextDocument doc, String name)
         throws
         WrappedTargetException,
-        NoDocumentException,
-        NoSuchElementException {
+        NoDocumentException {
 
         XNameAccess xReferenceMarks = UnoReferenceMark.getNameAccess(doc);
 
@@ -72,7 +71,11 @@ public class UnoReferenceMark {
             if (mark.isEmpty()) {
                 return;
             }
-            doc.getText().removeTextContent(mark.get());
+            try {
+                doc.getText().removeTextContent(mark.get());
+            } catch (NoSuchElementException ex) {
+                // The caller gets what it expects.
+            }
         }
     }
 
@@ -114,10 +117,7 @@ public class UnoReferenceMark {
      * @param name     For the reference mark.
      * @param range Cursor marking the location or range for the reference mark.
      */
-    public static XNamed create(XTextDocument doc,
-                                String name,
-                                XTextRange range,
-                                boolean absorb)
+    public static XNamed create(XTextDocument doc, String name, XTextRange range, boolean absorb)
         throws
         CreationException {
         return UnoNamed.insertNamedTextContent(doc, "com.sun.star.text.ReferenceMark", name, range, absorb);

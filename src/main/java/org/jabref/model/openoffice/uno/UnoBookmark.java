@@ -6,7 +6,6 @@ import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.container.XNamed;
 import com.sun.star.lang.DisposedException;
-import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XBookmarksSupplier;
 import com.sun.star.text.XTextContent;
@@ -64,7 +63,6 @@ public class UnoBookmark {
      */
     public static XNamed create(XTextDocument doc, String name, XTextRange range, boolean absorb)
         throws
-        IllegalArgumentException,
         CreationException {
         return UnoNamed.insertNamedTextContent(doc, "com.sun.star.text.Bookmark", name, range, absorb);
     }
@@ -72,10 +70,9 @@ public class UnoBookmark {
     /**
      * Remove the named bookmark if it exists.
      */
-    public static void remove(XTextDocument doc, String name)
+    public static void removeIfExists(XTextDocument doc, String name)
         throws
         NoDocumentException,
-        NoSuchElementException,
         WrappedTargetException {
 
         XNameAccess marks = UnoBookmark.getNameAccess(doc);
@@ -85,7 +82,11 @@ public class UnoBookmark {
             if (mark.isEmpty()) {
                 return;
             }
-            doc.getText().removeTextContent(mark.get());
+            try {
+                doc.getText().removeTextContent(mark.get());
+            } catch (NoSuchElementException ex) {
+                // The caller gets what it expects.
+            }
         }
     }
 }

@@ -37,7 +37,7 @@ public class UnoUndo {
             try {
                 um.get().leaveUndoContext();
             } catch (InvalidStateException ex) {
-                throw new RuntimeException("leaveUndoContext reported InvalidStateException");
+                throw new IllegalStateException("leaveUndoContext reported InvalidStateException");
             }
         }
     }

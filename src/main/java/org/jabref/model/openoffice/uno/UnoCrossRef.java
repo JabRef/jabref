@@ -36,8 +36,6 @@ public class UnoCrossRef {
                                                                   XTextRange cursor)
         throws
         CreationException,
-        UnknownPropertyException,
-        PropertyVetoException,
         WrappedTargetException {
 
         // based on: https://wiki.openoffice.org/wiki/Documentation/DevGuide/Text/Reference_Marks
@@ -52,15 +50,35 @@ public class UnoCrossRef {
             throw new CreationException(e.getMessage());
         }
 
-        // Set the SourceName of the GetReference text field to the referenceMarkName
-        xFieldProps.setPropertyValue("SourceName", referenceMarkName);
+        try {
+            // Set the SourceName of the GetReference text field to the referenceMarkName
+            xFieldProps.setPropertyValue("SourceName", referenceMarkName);
+        } catch (UnknownPropertyException ex) {
+            throw new java.lang.IllegalStateException("The created GetReference does not have property 'SourceName'");
+        } catch (PropertyVetoException ex) {
+            throw new java.lang.IllegalStateException("Caught PropertyVetoException on 'SourceName'");
+        }
 
-        // specify that the source is a reference mark (could also be a footnote,
-        // bookmark or sequence field)
-        xFieldProps.setPropertyValue("ReferenceFieldSource", Short.valueOf​(ReferenceFieldSource.REFERENCE_MARK));
+        try {
+            // specify that the source is a reference mark (could also be a footnote,
+            // bookmark or sequence field)
+            xFieldProps.setPropertyValue("ReferenceFieldSource", Short.valueOf​(ReferenceFieldSource.REFERENCE_MARK));
+        } catch (UnknownPropertyException ex) {
+            throw new java.lang.IllegalStateException("The created GetReference does not have property"
+                                                      + " 'ReferenceFieldSource'");
+        } catch (PropertyVetoException ex) {
+            throw new java.lang.IllegalStateException("Caught PropertyVetoException on 'ReferenceFieldSource'");
+        }
 
-        // We want the reference displayed as page number
-        xFieldProps.setPropertyValue("ReferenceFieldPart", Short.valueOf​(ReferenceFieldPart.PAGE));
+        try {
+            // We want the reference displayed as page number
+            xFieldProps.setPropertyValue("ReferenceFieldPart", Short.valueOf​(ReferenceFieldPart.PAGE));
+        } catch (UnknownPropertyException ex) {
+            throw new java.lang.IllegalStateException("The created GetReference does not have property"
+                                                      + " 'ReferenceFieldPart'");
+        } catch (PropertyVetoException ex) {
+            throw new java.lang.IllegalStateException("Caught PropertyVetoException on 'ReferenceFieldPart'");
+        }
 
         // Get the XTextContent interface of the GetReference text field
         XTextContent xRefContent = UnoCast.cast(XTextContent.class, xFieldProps).get();

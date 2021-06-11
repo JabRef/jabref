@@ -70,8 +70,7 @@ public class UnoTextDocument {
         }
 
         try {
-            Optional<Object> frameTitleObj =
-                UnoProperties.getValueAsObject(propertySet.get(), "Title");
+            Optional<Object> frameTitleObj = UnoProperties.getValueAsObject(propertySet.get(), "Title");
             if (frameTitleObj.isEmpty()) {
                 return Optional.empty();
             }

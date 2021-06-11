@@ -6,7 +6,6 @@ import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.container.XNamed;
 import com.sun.star.lang.DisposedException;
-import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextContent;
 import com.sun.star.text.XTextDocument;
@@ -73,7 +72,6 @@ public class UnoTextSection {
      */
     public static XNamed create(XTextDocument doc, String name, XTextRange range, boolean absorb)
         throws
-        IllegalArgumentException,
         CreationException {
 
         return UnoNamed.insertNamedTextContent(doc, "com.sun.star.text.TextSection", name, range, absorb);

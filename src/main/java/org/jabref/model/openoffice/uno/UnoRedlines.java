@@ -18,7 +18,6 @@ public class UnoRedlines {
 
     public static boolean getRecordChanges(XTextDocument doc)
         throws
-        UnknownPropertyException,
         WrappedTargetException {
 
         // https://wiki.openoffice.org/wiki/Documentation/DevGuide/Text/Settings
@@ -26,7 +25,11 @@ public class UnoRedlines {
 
         XPropertySet propertySet = UnoCast.cast(XPropertySet.class, doc).get();
 
-        return (boolean) propertySet.getPropertyValue("RecordChanges");
+        try {
+            return (boolean) propertySet.getPropertyValue("RecordChanges");
+        } catch (UnknownPropertyException ex) {
+            throw new java.lang.IllegalStateException("Caught UnknownPropertyException on 'RecordChanges'");
+        }
     }
 
     private static Optional<XRedlinesSupplier> getRedlinesSupplier(XTextDocument doc) {
