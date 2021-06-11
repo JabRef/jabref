@@ -2,6 +2,14 @@ package org.jabref.gui.preferences.journals;
 
 import javax.inject.Inject;
 
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -11,6 +19,8 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.paint.Color;
+import javafx.util.Duration;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
@@ -48,6 +58,10 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     @Inject private TaskExecutor taskExecutor;
     @Inject private JournalAbbreviationRepository abbreviationRepository;
 
+    private Timeline invalidateSearch;
+    private ObjectProperty<Color> flashingColor;
+    private StringProperty flashingColorStringProperty;
+
     public JournalAbbreviationsTab() {
         ViewLoader.view(this)
                   .root(this)
@@ -63,6 +77,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         setButtonStyles();
         setUpTable();
         setBindings();
+        setAnimations();
 
         searchBox.setPromptText(Localization.lang("Search") + "...");
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
@@ -114,6 +129,20 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         });
     }
 
+    private void setAnimations() {
+        flashingColor = new SimpleObjectProperty<>(Color.TRANSPARENT);
+        flashingColorStringProperty = createFlashingColorStringProperty(flashingColor);
+        searchBox.styleProperty().bind(
+                new SimpleStringProperty("-fx-background-color: ").concat(flashingColorStringProperty).concat(";")
+        );
+        invalidateSearch = new Timeline(
+                new KeyFrame(Duration.seconds(0), new KeyValue(flashingColor, Color.TRANSPARENT, Interpolator.LINEAR)),
+                new KeyFrame(Duration.seconds(0.25), new KeyValue(flashingColor, Color.RED, Interpolator.LINEAR)),
+                new KeyFrame(Duration.seconds(0.25), new KeyValue(searchBox.textProperty(), "", Interpolator.DISCRETE)),
+                new KeyFrame(Duration.seconds(0.5), new KeyValue(flashingColor, Color.TRANSPARENT, Interpolator.LINEAR))
+        );
+    }
+
     @FXML
     private void addList() {
         viewModel.addNewFile();
@@ -132,9 +161,29 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     @FXML
     private void addAbbreviation() {
         viewModel.addAbbreviation();
-        searchBox.textProperty().set("");
+        if (!searchBox.getText().isEmpty()) {
+            invalidateSearch.play();
+        }
         selectNewAbbreviation();
         editAbbreviation();
+    }
+
+    private static StringProperty createFlashingColorStringProperty(final ObjectProperty<Color> flashingColor) {
+        final StringProperty flashingColorStringProperty = new SimpleStringProperty();
+        setColorStringFromColor(flashingColorStringProperty, flashingColor);
+        flashingColor.addListener((observable, oldValue, newValue) -> setColorStringFromColor(flashingColorStringProperty, flashingColor));
+        return flashingColorStringProperty;
+    }
+
+    private static void setColorStringFromColor(StringProperty colorStringProperty, ObjectProperty<Color> color) {
+        colorStringProperty.set(
+                "rgba(" +
+                        ((int) (color.get().getRed() * 255)) + "," +
+                        ((int) (color.get().getGreen() * 255)) + "," +
+                        ((int) (color.get().getBlue() * 255)) + "," +
+                        color.get().getOpacity() +
+                ")"
+        );
     }
 
     @FXML
