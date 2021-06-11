@@ -1,7 +1,5 @@
 package org.jabref.model.openoffice.uno;
 
-import java.lang.IllegalArgumentException;
-
 import com.sun.star.container.XNamed;
 import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.text.XTextContent;
