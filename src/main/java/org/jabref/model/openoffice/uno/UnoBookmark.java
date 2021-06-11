@@ -24,7 +24,7 @@ public class UnoBookmark {
         throws
         NoDocumentException {
 
-        XBookmarksSupplier supplier = UnoCast.unoQI(XBookmarksSupplier.class, doc);
+        XBookmarksSupplier supplier = UnoCast.cast(XBookmarksSupplier.class, doc).get();
         try {
             return supplier.getBookmarks();
         } catch (DisposedException ex) {
@@ -44,36 +44,29 @@ public class UnoBookmark {
         NoDocumentException {
 
         XNameAccess nameAccess = getNameAccess(doc);
-        return (UnoNameAccess.getTextContentByName(nameAccess, name)
-                .map(e -> e.getAnchor()));
+        return (UnoNameAccess.getTextContentByName(nameAccess, name).map(XTextContent::getAnchor));
     }
 
     /**
-     * Insert a bookmark with the given name at the cursor provided,
-     * or with another name if the one we asked for is already in use.
+     * Insert a bookmark with the given name at the cursor provided, or with another name if the one
+     * we asked for is already in use.
      *
      * In LibreOffice the another name is in "{name}{number}" format.
      *
      * @param name     For the bookmark.
-     * @param range    Cursor marking the location or range for
-     *                 the bookmark.
+     * @param range    Cursor marking the location or range for the bookmark.
      * @param absorb   Shall we incorporate range?
      *
      * @return The XNamed interface of the bookmark.
      *
-     *         result.getName() should be checked by the
-     *         caller, because its name may differ from the one
-     *         requested.
+     *         result.getName() should be checked by the caller, because its name may differ from
+     *         the one requested.
      */
     public static XNamed create(XTextDocument doc, String name, XTextRange range, boolean absorb)
         throws
         IllegalArgumentException,
         CreationException {
-        return UnoNamed.insertNamedTextContent(doc,
-                                               "com.sun.star.text.Bookmark",
-                                               name,
-                                               range,
-                                               absorb);
+        return UnoNamed.insertNamedTextContent(doc, "com.sun.star.text.Bookmark", name, range, absorb);
     }
 
     /**

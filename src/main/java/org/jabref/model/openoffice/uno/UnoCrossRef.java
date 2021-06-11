@@ -21,16 +21,15 @@ public class UnoCrossRef {
      */
     public static void refresh(XTextDocument doc) {
         // Refresh the document
-        XRefreshable xRefresh = UnoCast.unoQI(XRefreshable.class, doc);
+        XRefreshable xRefresh = UnoCast.cast(XRefreshable.class, doc).get();
         xRefresh.refresh();
     }
 
     /**
-     * Insert a clickable cross-reference to a reference mark,
-     * with a label containing the target's page number.
+     * Insert a clickable cross-reference to a reference mark, with a label containing the target's
+     * page number.
      *
-     * May need a documentConnection.refresh() after, to update
-     * the text shown.
+     * May need a documentConnection.refresh() after, to update the text shown.
      */
     public static void insertReferenceToPageNumberOfReferenceMark(XTextDocument doc,
                                                                   String referenceMarkName,
@@ -42,15 +41,14 @@ public class UnoCrossRef {
         WrappedTargetException {
 
         // based on: https://wiki.openoffice.org/wiki/Documentation/DevGuide/Text/Reference_Marks
-        XMultiServiceFactory msf = UnoCast.unoQI(XMultiServiceFactory.class, doc);
+        XMultiServiceFactory msf = UnoCast.cast(XMultiServiceFactory.class, doc).get();
         // Create a 'GetReference' text field to refer to the reference mark we just inserted,
         // and get it's XPropertySet interface
         XPropertySet xFieldProps;
         try {
             String name = "com.sun.star.text.textfield.GetReference";
-            xFieldProps = (XPropertySet) UnoCast.unoQI(XPropertySet.class,
-                                                       msf.createInstance(name));
-        } catch (Exception e) {
+            xFieldProps = UnoCast.cast(XPropertySet.class, msf.createInstance(name)).get();
+        } catch (com.sun.star.uno.Exception e) {
             throw new CreationException(e.getMessage());
         }
 
@@ -59,15 +57,13 @@ public class UnoCrossRef {
 
         // specify that the source is a reference mark (could also be a footnote,
         // bookmark or sequence field)
-        xFieldProps.setPropertyValue("ReferenceFieldSource",
-                                     new Short(ReferenceFieldSource.REFERENCE_MARK));
+        xFieldProps.setPropertyValue("ReferenceFieldSource", Short.valueOf​(ReferenceFieldSource.REFERENCE_MARK));
 
         // We want the reference displayed as page number
-        xFieldProps.setPropertyValue("ReferenceFieldPart",
-                                     new Short(ReferenceFieldPart.PAGE));
+        xFieldProps.setPropertyValue("ReferenceFieldPart", Short.valueOf​(ReferenceFieldPart.PAGE));
 
         // Get the XTextContent interface of the GetReference text field
-        XTextContent xRefContent = (XTextContent) UnoCast.unoQI(XTextContent.class, xFieldProps);
+        XTextContent xRefContent = UnoCast.cast(XTextContent.class, xFieldProps).get();
 
         // Insert the text field
         cursor.getText().insertTextContent(cursor.getEnd(), xRefContent, false);

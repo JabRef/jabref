@@ -16,14 +16,13 @@ public class UnoUndo {
 
     public static Optional<XUndoManager> getXUndoManager(XTextDocument doc) {
         // https://www.openoffice.org/api/docs/common/ref/com/sun/star/document/XUndoManager.html
-        return (UnoCast.optUnoQI(XUndoManagerSupplier.class, doc)
-                .map(e -> e.getUndoManager()));
+        return (UnoCast.cast(XUndoManagerSupplier.class, doc)
+                .map(XUndoManagerSupplier::getUndoManager));
     }
 
     /**
-     * Each call to enterUndoContext must be paired by a call to
-     * leaveUndoContext, otherwise, the document's undo stack is
-     * left in an inconsistent state.
+     * Each call to enterUndoContext must be paired by a call to leaveUndoContext, otherwise, the
+     * document's undo stack is left in an inconsistent state.
      */
     public static void enterUndoContext(XTextDocument doc, String title) {
         Optional<XUndoManager> um = getXUndoManager(doc);

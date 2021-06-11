@@ -7,12 +7,14 @@ import java.util.Optional;
 
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
+import com.sun.star.beans.PropertyAttribute;
 import com.sun.star.beans.PropertyExistException;
 import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.beans.XPropertyContainer;
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.beans.XPropertySetInfo;
+import com.sun.star.document.XDocumentProperties;
 import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
@@ -33,7 +35,7 @@ public class UnoUserDefinedProperty {
     private UnoUserDefinedProperty() { }
 
     public static Optional<XPropertyContainer> getPropertyContainer(XTextDocument doc) {
-        return UnoTextDocument.getDocumentProperties(doc).map(e -> e.getUserDefinedProperties());
+        return UnoTextDocument.getDocumentProperties(doc).map(XDocumentProperties::getUserDefinedProperties);
     }
 
     public static List<String> getListOfNames(XTextDocument doc) {
@@ -43,13 +45,12 @@ public class UnoUserDefinedProperty {
     }
 
     /**
-     * @param property Name of a custom document property in the
-     *        current document.
+     * @param property Name of a custom document property in the current document.
      *
      * @return The value of the property or Optional.empty()
      *
-     * These properties are used to store extra data about
-     * individual citation. In particular, the `pageInfo` part.
+     * These properties are used to store extra data about individual citation.
+     * In particular, the `pageInfo` part.
      *
      */
     public static Optional<String> getStringValue(XTextDocument doc, String property)
@@ -69,8 +70,8 @@ public class UnoUserDefinedProperty {
     }
 
     /**
-     * @param property Name of a custom document property in the
-     *        current document. Created if does not exist yet.
+     * @param property Name of a custom document property in the current document.
+     *                 Created if does not exist yet.
      *
      * @param value The value to be stored.
      */
@@ -108,14 +109,11 @@ public class UnoUserDefinedProperty {
             }
         }
 
-        container.get().addProperty(property,
-                                    com.sun.star.beans.PropertyAttribute.REMOVEABLE,
-                                    new Any(Type.STRING, value));
+        container.get().addProperty(property, PropertyAttribute.REMOVEABLE, new Any(Type.STRING, value));
     }
 
     /**
-     * @param property Name of a custom document property in the
-     *                 current document.
+     * @param property Name of a custom document property in the current document.
      *
      *  Logs warning if does not exist.
      */
@@ -137,15 +135,13 @@ public class UnoUserDefinedProperty {
         try {
             container.get().removeProperty(property);
         } catch (UnknownPropertyException ex) {
-            LOGGER.warn(String.format("UnoUserDefinedProperty.remove(%s)"
-                                      + " This property was not there to remove",
+            LOGGER.warn(String.format("UnoUserDefinedProperty.remove(%s) This property was not there to remove",
                                       property));
         }
     }
 
     /**
-     * @param property Name of a custom document property in the
-     *        current document.
+     * @param property Name of a custom document property in the current document.
      *
      * Keep silent if property did not exist.
      */
