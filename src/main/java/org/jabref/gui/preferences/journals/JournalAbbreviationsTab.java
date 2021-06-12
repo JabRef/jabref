@@ -134,7 +134,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         flashingColor = new SimpleObjectProperty<>(Color.TRANSPARENT);
         flashingColorStringProperty = createFlashingColorStringProperty(flashingColor);
         searchBox.styleProperty().bind(
-                new SimpleStringProperty("-fx-background-color: ").concat(flashingColorStringProperty).concat(";")
+                new SimpleStringProperty("-fx-control-inner-background: ").concat(flashingColorStringProperty).concat(";")
         );
         invalidateSearch = new Timeline(
                 new KeyFrame(Duration.seconds(0), new KeyValue(flashingColor, Color.TRANSPARENT, Interpolator.LINEAR)),
