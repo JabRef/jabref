@@ -196,7 +196,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         int lastRow = viewModel.abbreviationsCountProperty().get() - 1;
         journalAbbreviationsTable.scrollTo(lastRow);
         journalAbbreviationsTable.getSelectionModel().select(lastRow);
-        journalAbbreviationsTable.getFocusModel().focus(lastRow);
+        journalAbbreviationsTable.getFocusModel().focus(lastRow, journalTableNameColumn);
     }
 
     @Override
