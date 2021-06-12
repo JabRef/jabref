@@ -11,6 +11,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.transformation.FilteredList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -140,6 +141,9 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
                 new KeyFrame(Duration.seconds(0), new KeyValue(flashingColor, Color.TRANSPARENT, Interpolator.LINEAR)),
                 new KeyFrame(Duration.seconds(0.25), new KeyValue(flashingColor, Color.RED, Interpolator.LINEAR)),
                 new KeyFrame(Duration.seconds(0.25), new KeyValue(searchBox.textProperty(), "", Interpolator.DISCRETE)),
+                new KeyFrame(Duration.seconds(0.25), (ActionEvent event) -> {
+                    addAbbreviationActions();
+                }),
                 new KeyFrame(Duration.seconds(0.5), new KeyValue(flashingColor, Color.TRANSPARENT, Interpolator.LINEAR))
         );
     }
@@ -161,10 +165,15 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
     @FXML
     private void addAbbreviation() {
-        viewModel.addAbbreviation();
         if (!searchBox.getText().isEmpty()) {
             invalidateSearch.play();
+        } else {
+            addAbbreviationActions();
         }
+    }
+
+    private void addAbbreviationActions() {
+        viewModel.addAbbreviation();
         selectNewAbbreviation();
         editAbbreviation();
     }
