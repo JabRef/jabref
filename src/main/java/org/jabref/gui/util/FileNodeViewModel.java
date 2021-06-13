@@ -44,7 +44,9 @@ public class FileNodeViewModel {
         this.fileCount = fileCount;
     }
 
-
+    /**
+     * Return a string of a FileTime in a yyyy-MM-dd HH:mm format.
+     */
     public static String formatDateTime(FileTime fileTime) {
 
         LocalDateTime localDateTime = fileTime
@@ -59,6 +61,19 @@ public class FileNodeViewModel {
      * Return a string for displaying a node name (and its number of children if it is a directory).
      */
     public String getDisplayText() {
+        if (path.toFile().isDirectory()) {
+            return String.format("%s (%s %s)", path.getFileName(), fileCount,
+                    fileCount == 1 ? Localization.lang("file") : Localization.lang("files"));
+        }
+        FileTime lastEditedTime = null;
+        return String.format("%s", path.getFileName().toString());
+    }
+
+    /**
+     * Return a string for displaying a node name (and its number of children if it is a directory).
+     * along with the last edited time
+     */
+    public String getDisplayTextWithEditDate() {
         if (path.toFile().isDirectory()) {
             return String.format("%s (%s %s)", path.getFileName(), fileCount,
                     fileCount == 1 ? Localization.lang("file") : Localization.lang("files"));
