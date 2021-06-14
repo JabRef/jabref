@@ -263,7 +263,7 @@ public class ArgumentProcessor {
 
         if (filesAndCitekeys.equals("all")) {
             for (BibEntry entry : dataBase.getEntries()) {
-                writeXMPtoPDFsOfEntry(databaseContext, dataBase, entry, preferences, xmpPdfExporter);
+                writeXMPtoPDFsOfEntry(databaseContext, entry, preferences, xmpPdfExporter);
             }
             return;
         }
@@ -283,7 +283,7 @@ public class ArgumentProcessor {
 
     }
 
-    private void writeXMPtoPDFsOfEntry(BibDatabaseContext databaseContext, BibDatabase dataBase, BibEntry entry, JabRefPreferences preferences, XmpPdfExporter xmpPdfExporter) {
+    private void writeXMPtoPDFsOfEntry(BibDatabaseContext databaseContext, BibEntry entry, JabRefPreferences preferences, XmpPdfExporter xmpPdfExporter) {
         boolean writtenToAFile = false;
 
         for (LinkedFile file : entry.getFiles()) {
@@ -314,7 +314,7 @@ public class ArgumentProcessor {
                 System.err.println(Localization.lang("Cannot find %0 in library.", citeKey));
                 return;
             }
-            writeXMPtoPDFsOfEntry(databaseContext, dataBase, entry.get(), preferences, xmpPdfExporter);
+            writeXMPtoPDFsOfEntry(databaseContext, entry.get(), preferences, xmpPdfExporter);
         }
     }
 
@@ -330,7 +330,6 @@ public class ArgumentProcessor {
                     filePath = optionalFilePath.get();
                 }
             }
-            System.out.println(filePath);
             if (Files.exists(filePath)) {
                 boolean writtenToAFile = false;
                 for (BibEntry entry : dataBase.getEntries()) {
