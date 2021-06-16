@@ -308,12 +308,14 @@ public class ArgumentProcessor {
 
     private void writeXMPtoPdfByCitekey(BibDatabaseContext databaseContext, BibDatabase dataBase, Vector<String> citeKeys, JabRefPreferences preferences, XmpPdfExporter xmpPdfExporter) {
         for (String citeKey : citeKeys) {
-            Optional<BibEntry> entry = dataBase.getEntryByCitationKey(citeKey);
-            if (entry.isEmpty()) {
+            List<BibEntry> bibEntryList = dataBase.getEntriesByCitationKey(citeKey)
+            if (bibEntryList.isEmpty()) {
                 LOGGER.error(Localization.lang("Cannot find %0 in library.", citeKey));
                 return;
             }
-            writeXMPtoPDFsOfEntry(databaseContext, entry.get(), preferences, xmpPdfExporter);
+            for (BibEntry entry : bibEntryList) {
+                writeXMPtoPDFsOfEntry(databaseContext, entry.get(), preferences, xmpPdfExporter);
+            }
         }
     }
 
