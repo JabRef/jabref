@@ -223,7 +223,6 @@ public class ArgumentProcessor {
         }
 
         if (cli.isWriteXMPtoPdf()) {
-            System.out.println("writing for " + cli.getWriteXMPtoPdf());
             if (!loaded.isEmpty()) {
                 writeXMPtoPdf(loaded, cli.getWriteXMPtoPdf(), Globals.prefs);
             }
@@ -290,20 +289,20 @@ public class ArgumentProcessor {
             if (file.getFileType().toLowerCase(Locale.ROOT).equals("pdf")) {
                 Optional<Path> filePath = file.findIn(databaseContext, preferences.getFilePreferences());
                 if (filePath.isEmpty()) {
-                    System.err.println(Localization.lang("Skipped - PDF %0 does not exist", filePath.get()));
+                    LOGGER.error(Localization.lang("Skipped - PDF %0 does not exist", filePath.get()));
                 } else {
                     try {
                         xmpPdfExporter.export(databaseContext, filePath.get(), preferences.getDefaultEncoding(), Arrays.asList(entry));
                         writtenToAFile = true;
                     } catch (Exception e) {
-                        System.err.println(Localization.lang("Error writing XMP content: %0", filePath.get()));
+                        LOGGER.error(Localization.lang("Error writing XMP content: %0", filePath.get()));
                     }
                 }
             }
         }
 
         if (!writtenToAFile) {
-            System.err.println(Localization.lang("Skipped - No PDF linked to entry %0", entry.getCitationKey()));
+            LOGGER.error(Localization.lang("Skipped - No PDF linked to entry %0", entry.getCitationKey()));
         }
     }
 
@@ -311,7 +310,7 @@ public class ArgumentProcessor {
         for (String citeKey : citeKeys) {
             Optional<BibEntry> entry = dataBase.getEntryByCitationKey(citeKey);
             if (entry.isEmpty()) {
-                System.err.println(Localization.lang("Cannot find %0 in library.", citeKey));
+                LOGGER.error(Localization.lang("Cannot find %0 in library.", citeKey));
                 return;
             }
             writeXMPtoPDFsOfEntry(databaseContext, entry.get(), preferences, xmpPdfExporter);
@@ -342,20 +341,20 @@ public class ArgumentProcessor {
                                         xmpPdfExporter.export(databaseContext, filePath, preferences.getDefaultEncoding(), Arrays.asList(entry));
                                         writtenToAFile = true;
                                     } catch (Exception e) {
-                                        System.err.println(Localization.lang("Error writing XMP content: %0", filePath));
+                                        LOGGER.error(Localization.lang("Error writing XMP content: %0", filePath));
                                     }
                                 }
                             } catch (IOException e) {
-                                System.err.println(Localization.lang("Error opening %0 and %1 for comparison", linkedFile.getLink(), fileName));
+                                LOGGER.error(Localization.lang("Error opening %0 and %1 for comparison", linkedFile.getLink(), fileName));
                             }
                         }
                     }
                 }
                 if (!writtenToAFile) {
-                    System.err.println(Localization.lang("Skipped - PDF %0 not found in library", fileName));
+                    LOGGER.error(Localization.lang("Skipped - PDF %0 not found in library", fileName));
                 }
             } else {
-                System.err.println(Localization.lang("Skipped - PDF %0 does not exist", fileName));
+                LOGGER.error(Localization.lang("Skipped - PDF %0 does not exist", fileName));
             }
         }
     }
