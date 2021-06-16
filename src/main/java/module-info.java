@@ -95,6 +95,9 @@ open module org.jabref {
     requires flexmark.util.ast;
     requires flexmark.util.data;
     requires com.h2database.mvstore;
+	requires lucene.queries;
+	requires lucene.analyzers.common;
+	requires lucene.backward.codecs;
     requires lucene.queryparser;
     requires lucene.core;
     requires org.eclipse.jgit;
