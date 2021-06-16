@@ -33,6 +33,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We improved the linking of the `python3` interpreter via the shebang to dynamically use the systems default Python. Related to [JabRef-Browser-Extension #177](https://github.com/JabRef/JabRef-Browser-Extension/issues/177)
 - Automatically found pdf files now have the linking button to the far left and uses a link icon with a plus instead of a briefcase. The file name also has lowered opacity(70%) until added. [#3607](https://github.com/JabRef/jabref/issues/3607)
 - We simplified the select entry type form by splitting it into two parts ("Recommended" and "Others") based on internal usage data. [#6730](https://github.com/JabRef/jabref/issues/6730)
+- We changed the Jabref app icon 32 to a more visible one with a lighter color (40% lighter) [#7771](https://github.com/JabRef/jabref/issues/7771)
 
 ### Fixed
 
