@@ -213,7 +213,7 @@
             <else-if type="entry-dictionary entry-encyclopedia" match="any">
               <group delimiter=", ">
                 <text macro="title" quotes="true"/>
-                <text variable="title" form="short" font-style="italic"/>
+                <text variable="container-title" form="short" font-style="italic"/>
                 <group delimiter="&#160;">
                   <label variable="volume" form="short"/>
                   <text variable="volume"/>

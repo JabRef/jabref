@@ -13,7 +13,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
-import org.jabref.logic.importer.fetcher.transformators.DefaultQueryTransformer;
+import org.jabref.logic.importer.fetcher.transformers.DefaultLuceneQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.util.MediaTypes;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
@@ -52,7 +52,7 @@ public class INSPIREFetcher implements SearchBasedParserFetcher {
     @Override
     public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(INSPIRE_HOST);
-        uriBuilder.addParameter("q", new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // Query
+        uriBuilder.addParameter("q", new DefaultLuceneQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
         return uriBuilder.build().toURL();
     }
 

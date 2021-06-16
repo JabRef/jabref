@@ -1,40 +1,32 @@
 package org.jabref.logic.layout.format;
 
+import java.util.stream.Stream;
+
 import org.jabref.logic.layout.LayoutFormatter;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FirstPageTest {
 
-    @Test
-    public void testFormatEmpty() {
-        LayoutFormatter a = new FirstPage();
-        assertEquals("", a.format(""));
+    private LayoutFormatter firstPageLayoutFormatter = new FirstPage();
+
+    @ParameterizedTest
+    @MethodSource("providePages")
+    void formatPages(String formattedFirstPage, String originalPages) {
+        assertEquals(formattedFirstPage, firstPageLayoutFormatter.format(originalPages));
     }
 
-    @Test
-    public void testFormatNull() {
-        LayoutFormatter a = new FirstPage();
-        assertEquals("", a.format(null));
-    }
-
-    @Test
-    public void testFormatSinglePage() {
-        LayoutFormatter a = new FirstPage();
-        assertEquals("345", a.format("345"));
-    }
-
-    @Test
-    public void testFormatSingleDash() {
-        LayoutFormatter a = new FirstPage();
-        assertEquals("345", a.format("345-350"));
-    }
-
-    @Test
-    public void testFormatDoubleDash() {
-        LayoutFormatter a = new FirstPage();
-        assertEquals("345", a.format("345--350"));
+    private static Stream<Arguments> providePages() {
+        return Stream.of(
+                Arguments.of("", ""),
+                Arguments.of("", null),
+                Arguments.of("345", "345"),
+                Arguments.of("345", "345-350"),
+                Arguments.of("345", "345--350")
+        );
     }
 }
