@@ -311,7 +311,7 @@ public class ArgumentProcessor {
             List<BibEntry> bibEntryList = dataBase.getEntriesByCitationKey(citeKey)
             if (bibEntryList.isEmpty()) {
                 LOGGER.error(Localization.lang("Cannot find %0 in library.", citeKey));
-                return;
+                continue;
             }
             for (BibEntry entry : bibEntryList) {
                 writeXMPtoPDFsOfEntry(databaseContext, entry.get(), preferences, xmpPdfExporter);
