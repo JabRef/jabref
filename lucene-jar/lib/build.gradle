@@ -1,0 +1,18 @@
+plugins {
+    id 'java-library'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.apache.lucene:lucene-core:8.8.2'
+    implementation ('org.apache.lucene:lucene-queryparser:8.8.2') {
+        exclude module: "lucene-sandbox"
+    }
+    implementation 'org.apache.lucene:lucene-queries:8.8.2'
+    implementation 'org.apache.lucene:lucene-analyzers-common:8.8.2'
+    implementation 'org.apache.lucene:lucene-backward-codecs:8.8.2'
+}
