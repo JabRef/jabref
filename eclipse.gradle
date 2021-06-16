@@ -35,11 +35,11 @@ eclipse {
                 javafxfxml.entryAttributes['add-opens'] = 'javafx.fxml/javafx.fxml=org.jabref';
 
                 def apollo = entries.find { isApollo(it) };
-                apollo.entryAttributes['patch-module']= 'apollo.runtime=/Users/christophs/workspace/jabref/lib/apollo-api-jvm-2.5.8.jar'
-                apollo.entryAttributes['add-exports'] = 'apollo.runtime/com.apollographql.apollo.api=org.jabref:apollo.runtime/com.apollographql.apollo.api.internal=org.jabref'
+                apollo.entryAttributes['patch-module']= 'apollo.runtime=apollo-api-jvm-2.5.8.jar'
+                apollo.entryAttributes['add-exports'] = 'apollo.runtime/com.apollographql.apollo.api=ALL-UNNAMED:apollo.runtime/com.apollographql.apollo.api.internal=ALL-UNNAMED'
 
                 //def apolloUnderlib = entries.find { isApolloUnderLib(it) };
-                entries.removeAll { entry -> isApolloUnderLib(entry) }
+                //entries.removeAll { entry -> isApolloUnderLib(entry) }
 
                 entries.findAll { isLibrary(it) && isTestScope(it) }.each { //mark test source files
                     it.entryAttributes['test'] = 'true'
