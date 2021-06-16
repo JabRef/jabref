@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.Date;
+import org.jabref.model.entry.Month;
 import org.jabref.model.strings.StringUtil;
 
 import org.w3c.dom.Document;
@@ -77,11 +78,12 @@ class MSBibEntry {
     private final Pattern ADDRESS_PATTERN = Pattern.compile("\\b(\\w+)\\s?[,]?\\s?(\\w*)\\s?[,]?\\s?(\\w*)\\b");
 
     public MSBibEntry() {
-        //empty
+        // empty
     }
 
     /**
      * Createa new {@link MsBibEntry} to import from an xml element
+     *
      * @param entry
      */
     public MSBibEntry(Element entry) {
@@ -235,6 +237,7 @@ class MSBibEntry {
 
     /**
      * Gets the dom representation for one entry, used for export
+     *
      * @param document XmlDocument
      * @return XmlElement represenation of one entry
      */
@@ -303,7 +306,7 @@ class MSBibEntry {
         parent.appendChild(elem);
     }
 
-    //Add authors for export
+    // Add authors for export
     private void addAuthor(Document document, Element allAuthors, String entryName, List<MsBibAuthor> authorsLst) {
         if (authorsLst == null) {
             return;
@@ -311,7 +314,7 @@ class MSBibEntry {
         Element authorTop = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + entryName);
 
         Optional<MsBibAuthor> personName = authorsLst.stream().filter(MsBibAuthor::isCorporate)
-                .findFirst();
+                                                     .findFirst();
         if (personName.isPresent()) {
             MsBibAuthor person = personName.get();
 
@@ -328,29 +331,25 @@ class MSBibEntry {
                 addField(document, person, "Middle", name.getMiddleName());
                 addField(document, person, "First", name.getFirstName());
                 nameList.appendChild(person);
-
             }
             authorTop.appendChild(nameList);
         }
         allAuthors.appendChild(authorTop);
-
     }
 
     private void addDateAcessedFields(Document document, Element rootNode) {
         Optional<Date> parsedDateAcesseField = Date.parse(dateAccessed);
-        parsedDateAcesseField.flatMap(Date::getYear).map(accYear -> accYear.toString()).ifPresent(yearAccessed -> {
+        parsedDateAcesseField.flatMap(Date::getYear).map(Object::toString).ifPresent(yearAccessed -> {
             addField(document, rootNode, "Year" + "Accessed", yearAccessed);
         });
 
         parsedDateAcesseField.flatMap(Date::getMonth)
-                .map(accMonth -> accMonth.getTwoDigitNumber()).ifPresent(monthAcessed -> {
-                    addField(document, rootNode, "Month" + "Accessed", monthAcessed);
-
-                });
-        parsedDateAcesseField.flatMap(Date::getDay).map(accDay -> accDay.toString()).ifPresent(dayAccessed -> {
+                             .map(Month::getFullName).ifPresent(monthAcessed -> {
+            addField(document, rootNode, "Month" + "Accessed", monthAcessed);
+        });
+        parsedDateAcesseField.flatMap(Date::getDay).map(Object::toString).ifPresent(dayAccessed -> {
             addField(document, rootNode, "Day" + "Accessed", dayAccessed);
         });
-
     }
 
     private void addAddress(Document document, Element parent, String addressToSplit) {

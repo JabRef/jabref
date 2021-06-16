@@ -1,29 +1,33 @@
 package org.jabref.model.entry;
 
-import org.jabref.model.database.BibDatabase;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.util.List;
 import java.util.Optional;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.field.StandardField;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EntryLinkListTest {
 
-    private static final String key = "test";
+    private static final String KEY = "test";
 
     private BibDatabase database;
     private List<ParsedEntryLink> links;
     private ParsedEntryLink link;
     private BibEntry source;
     private BibEntry target;
+    private BibEntry entry;
 
-    @Before
+    @BeforeEach
     public void before() {
         database = new BibDatabase();
-        links = EntryLinkList.parse(key, database);
+        links = EntryLinkList.parse(KEY, database);
         link = links.get(0);
         source = create("source");
         target = create("target");
@@ -31,19 +35,19 @@ public class EntryLinkListTest {
 
     private BibEntry create(String citeKey) {
         BibEntry entry = new BibEntry();
-        entry.setCiteKey(citeKey);
+        entry.setCitationKey(citeKey);
         database.insertEntry(entry);
         return entry;
     }
 
     @Test
     public void givenFieldValueAndDatabaseWhenParsingThenExpectKey() {
-        assertEquals(key, link.getKey());
+        assertEquals(KEY, link.getKey());
     }
 
     @Test
     public void givenFieldValueAndDatabaseWhenParsingThenExpectDataBase() {
-        assertEquals(database, link.getDataBase());
+        assertEquals(database, link.getDatabase());
     }
 
     @Test
@@ -53,8 +57,15 @@ public class EntryLinkListTest {
 
     @Test
     public void givenFieldValueAndDatabaseWhenParsingThenExpectLink() {
-        ParsedEntryLink expected = new ParsedEntryLink(key, database);
+        ParsedEntryLink expected = new ParsedEntryLink(KEY, database);
         assertEquals(expected, link);
+    }
+
+    @Test
+    public void givenBibEntryWhenParsingThenExpectLink() {
+        entry = create("entry");
+        ParsedEntryLink expected = new ParsedEntryLink(entry);
+        assertFalse(expected.getLinkedEntry().isEmpty());
     }
 
     @Test
@@ -65,13 +76,13 @@ public class EntryLinkListTest {
 
     @Test
     public void givenTargetAndSourceWhenSourceCrossrefTargetThenSourceCrossrefsTarget() {
-        source.setField(FieldName.CROSSREF, "target");
+        source.setField(StandardField.CROSSREF, "target");
         assertSourceCrossrefsTarget(target, source);
     }
 
     private void assertSourceCrossrefsTarget(BibEntry target, BibEntry source) {
-        Optional<String> sourceCrossref = source.getField(FieldName.CROSSREF);
-        Optional<String> targetCiteKey = target.getCiteKeyOptional();
+        Optional<String> sourceCrossref = source.getField(StandardField.CROSSREF);
+        Optional<String> targetCiteKey = target.getCitationKey();
         assertEquals(sourceCrossref, targetCiteKey);
     }
 }

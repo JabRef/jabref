@@ -7,18 +7,11 @@ import java.io.Reader;
 import java.util.regex.Pattern;
 
 /**
- *
  * Warning -- it is not a generic filter, only read is implemented!
- *
+ * <p>
  * Note: this is just a quick port of the original SPIRESBibtexFilterReader.
- *
- * @author Fedor Bezrukov
- * @author Sheer El-Showk
- *
- * @version $Id$
- *
- * TODO: Fix grammar in bibtex entries -- it ma return invalid bibkeys (with space)
- *
+ * <p>
+ * TODO: Fix grammar in bibtex entries -- it may return invalid bibkeys (with space)
  */
 public class INSPIREBibtexFilterReader extends FilterReader {
 
@@ -29,7 +22,6 @@ public class INSPIREBibtexFilterReader extends FilterReader {
     private int pos;
 
     private boolean pre;
-
 
     public INSPIREBibtexFilterReader(final Reader initialReader) {
         super(initialReader);
@@ -85,5 +77,4 @@ public class INSPIREBibtexFilterReader extends FilterReader {
         }
         return line.charAt(pos++);
     }
-
 }

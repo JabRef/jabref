@@ -1,0 +1,22 @@
+# Table of contents
+
+* [Overview on Developing](README.md)
+* [Contributing](contributing.md)
+* [Architectural Decisions](adr.md)
+* [Getting into the code](getting-into-the-code/README.md)
+  * [Set up a local workspace](getting-into-the-code/guidelines-for-setting-up-a-local-workspace.md)
+  * [High-level documentation](getting-into-the-code/high-level-documentation.md)
+  * [How to test](getting-into-the-code/testing.md)
+  * [Code Howtos](getting-into-the-code/code-howtos.md)
+  * [JabRef's development strategy](getting-into-the-code/development-strategy.md)
+* [Advanced reading](advanced-reading/README.md)
+  * [Code Quality](advanced-reading/code-quality.md)
+  * [Recommendations for UI design](advanced-reading/ui-recommendations.md)
+  * [Custom SVG icons](advanced-reading/custom-svg-icons.md)
+  * [Working on fetchers](advanced-reading/fetchers.md)
+  * [Creating a binary and debug it](advanced-reading/jpackage.md)
+* [JabRef and Software Engineering Training](teaching.md)
+* [Readings on Coding](readings-on-coding/README.md)
+  * [Readings on JavaFX](readings-on-coding/javafx.md)
+  * [Useful development tooling](readings-on-coding/tools.md)
+

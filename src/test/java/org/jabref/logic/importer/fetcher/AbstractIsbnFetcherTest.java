@@ -4,20 +4,20 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@FetcherTest
 public abstract class AbstractIsbnFetcherTest {
 
     protected AbstractIsbnFetcher fetcher;
     protected BibEntry bibEntry;
 
     public abstract void testName();
-
-    public abstract void testHelpPage();
 
     public abstract void authorsAreCorrectlyFormatted() throws Exception;
 
@@ -49,5 +49,4 @@ public abstract class AbstractIsbnFetcherTest {
     public void searchByIdThrowsExceptionForInvalidISBN() {
         assertThrows(FetcherException.class, () -> fetcher.performSearchById("jabref-4-ever"));
     }
-
 }

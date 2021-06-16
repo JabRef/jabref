@@ -10,10 +10,14 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.EntryTypeFactory;
+import org.jabref.model.entry.types.StandardEntryType;
 
 /**
  * INSPEC format importer.
@@ -28,8 +32,8 @@ public class InspecImporter extends Importer {
     }
 
     @Override
-    public FileType getFileType() {
-        return FileType.INSPEC;
+    public StandardFileType getFileType() {
+        return StandardFileType.TXT;
     }
 
     @Override
@@ -65,8 +69,8 @@ public class InspecImporter extends Importer {
             }
         }
         String[] entries = sb.toString().split("__::__");
-        String type = "";
-        Map<String, String> h = new HashMap<>();
+        EntryType type = BibEntry.DEFAULT_TYPE;
+        Map<Field, String> h = new HashMap<>();
         for (String entry : entries) {
             if (entry.indexOf("Record") != 0) {
                 continue;
@@ -78,45 +82,44 @@ public class InspecImporter extends Importer {
                 String f3 = s.substring(0, 2);
                 String frest = s.substring(5);
                 if ("TI".equals(f3)) {
-                    h.put(FieldName.TITLE, frest);
+                    h.put(StandardField.TITLE, frest);
                 } else if ("PY".equals(f3)) {
-                    h.put(FieldName.YEAR, frest);
+                    h.put(StandardField.YEAR, frest);
                 } else if ("AU".equals(f3)) {
-                    h.put(FieldName.AUTHOR,
+                    h.put(StandardField.AUTHOR,
                             AuthorList.fixAuthorLastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
                 } else if ("AB".equals(f3)) {
-                    h.put(FieldName.ABSTRACT, frest);
+                    h.put(StandardField.ABSTRACT, frest);
                 } else if ("ID".equals(f3)) {
-                    h.put(FieldName.KEYWORDS, frest);
+                    h.put(StandardField.KEYWORDS, frest);
                 } else if ("SO".equals(f3)) {
                     int m = frest.indexOf('.');
                     if (m >= 0) {
                         String jr = frest.substring(0, m);
-                        h.put(FieldName.JOURNAL, jr.replace("-", " "));
+                        h.put(StandardField.JOURNAL, jr.replace("-", " "));
                         frest = frest.substring(m);
                         m = frest.indexOf(';');
                         if (m >= 5) {
                             String yr = frest.substring(m - 5, m).trim();
-                            h.put(FieldName.YEAR, yr);
+                            h.put(StandardField.YEAR, yr);
                             frest = frest.substring(m);
                             m = frest.indexOf(':');
                             if (m >= 0) {
                                 String pg = frest.substring(m + 1).trim();
-                                h.put(FieldName.PAGES, pg);
+                                h.put(StandardField.PAGES, pg);
                                 String vol = frest.substring(1, m).trim();
-                                h.put(FieldName.VOLUME, vol);
+                                h.put(StandardField.VOLUME, vol);
                             }
                         }
                     }
-
                 } else if ("RT".equals(f3)) {
                     frest = frest.trim();
                     if ("Journal-Paper".equals(frest)) {
-                        type = "article";
+                        type = StandardEntryType.Article;
                     } else if ("Conference-Paper".equals(frest) || "Conference-Paper; Journal-Paper".equals(frest)) {
-                        type = "inproceedings";
+                        type = StandardEntryType.InProceedings;
                     } else {
-                        type = frest.replace(" ", "");
+                        type = EntryTypeFactory.parse(frest.replace(" ", ""));
                     }
                 }
             }
@@ -124,7 +127,6 @@ public class InspecImporter extends Importer {
             b.setField(h);
 
             bibitems.add(b);
-
         }
 
         return new ParserResult(bibitems);

@@ -1,27 +1,21 @@
 package org.jabref.model.entry;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.WeakHashMap;
+import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.logic.importer.AuthorListParser;
+
 /**
- * This is an immutable class representing information of either <CODE>author</CODE>
- * or <CODE>editor</CODE> field in bibtex record.
+ * This is an immutable class representing information of either <CODE>author</CODE> or <CODE>editor</CODE> field in bibtex record.
  * <p>
- * Constructor performs parsing of raw field text and stores preformatted data.
- * Various accessor methods return author/editor field in different formats.
+ * Constructor performs parsing of raw field text and stores preformatted data. Various accessor methods return author/editor field in different formats.
  * <p>
- * Parsing algorithm is designed to satisfy two requirements: (a) when author's
- * name is typed correctly, the result should coincide with the one of BiBTeX;
- * (b) for erroneous names, output should be reasonable (but may differ from
- * BiBTeX output). The following rules are used:
+ * Parsing algorithm is designed to satisfy two requirements: (a) when author's name is typed correctly, the result should coincide with the one of BiBTeX; (b) for erroneous names, output should be reasonable (but may differ from BiBTeX output). The following rules are used:
  * <ol>
  * <li> 'author field' is a sequence of tokens;
  * <ul>
@@ -118,21 +112,12 @@ import java.util.stream.Collectors;
  * K."
  * </ol>
  */
+@AllowedToUseLogic("because it needs access to AuthorList parser")
 public class AuthorList {
 
     private static final WeakHashMap<String, AuthorList> AUTHOR_CACHE = new WeakHashMap<>();
-    // Avoid partition where these values are contained
-    private final static Collection<String> AVOID_TERMS_IN_LOWER_CASE = Arrays.asList("jr", "sr", "jnr", "snr", "von", "zu", "van", "der");
     private final List<Author> authors;
-    private final String[] authorsFirstFirst = new String[4];
-    private final String[] authorsLastOnly = new String[2];
-    private final String[] authorLastFirstAnds = new String[2];
-    private final String[] authorsLastFirst = new String[4];
-    private final String[] authorsLastFirstFirstLast = new String[2];
-    // Variables for storing computed strings, so they only need to be created once:
-    private String authorsNatbib;
-    private String authorsFirstFirstAnds;
-    private String authorsAlph;
+    private AuthorList latexFreeAuthors;
 
     /**
      * Creates a new list of authors.
@@ -142,16 +127,36 @@ public class AuthorList {
      *
      * @param authors the list of authors which should underlie this instance
      */
-    protected AuthorList(List<Author> authors) {
+    private AuthorList(List<Author> authors) {
         this.authors = Objects.requireNonNull(authors);
     }
 
-    protected AuthorList(Author author) {
-        this(Collections.singletonList(author));
+    public static AuthorList of(List<Author> authors) {
+        return new AuthorList(List.copyOf(authors));
     }
 
-    public AuthorList() {
-        this(new ArrayList<Author>());
+    public static AuthorList of(Author... authors) {
+        return new AuthorList(List.of(authors));
+    }
+
+    public static Collector<Author, ?, AuthorList> collect() {
+        return Collectors.collectingAndThen(Collectors.toUnmodifiableList(), AuthorList::new);
+    }
+
+    private static String andCoordinatedConjunction(List<Author> authors, Function<Author, String> style, boolean oxfordComma) {
+        var formattedAuthors = authors.stream().map(style).collect(Collectors.toUnmodifiableList());
+        return andCoordinatedConjunction(formattedAuthors, oxfordComma);
+    }
+
+    private static String andCoordinatedConjunction(List<String> authors, boolean oxfordComma) {
+        String lastDelimiter = oxfordComma ? ", and " : " and ";
+        int lastIndex = authors.size() - 1;
+        return switch (authors.size()) {
+            case 0 -> "";
+            case 1 -> authors.get(0);
+            case 2 -> authors.get(0) + " and " + authors.get(1);
+            default -> String.join(", ", authors.subList(0, lastIndex)) + lastDelimiter + authors.get(lastIndex);
+        };
     }
 
     /**
@@ -162,52 +167,8 @@ public class AuthorList {
      * @param authors The string of authors or editors in bibtex format to parse.
      * @return An AuthorList object representing the given authors.
      */
-    public static AuthorList parse(String authors) {
+    public static AuthorList parse(final String authors) {
         Objects.requireNonNull(authors);
-
-        // Handle case names in order lastname, firstname and separated by ","
-        // E.g., Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H.
-        final boolean authorsContainAND = authors.toUpperCase(Locale.ENGLISH).contains(" AND ");
-        final boolean authorsContainOpeningBrace = authors.contains("{");
-        final boolean authorsContainSemicolon = authors.contains(";");
-        final boolean authorsContainTwoOrMoreCommas = (authors.length() - authors.replace(",", "").length()) >= 2;
-        if (!authorsContainAND && !authorsContainOpeningBrace && !authorsContainSemicolon && authorsContainTwoOrMoreCommas) {
-            List<String> arrayNameList = Arrays.asList(authors.split(","));
-
-            // Delete spaces for correct case identification
-            arrayNameList.replaceAll(String::trim);
-
-            // Looking for space between pre- and lastname
-            boolean spaceInAllParts = arrayNameList.stream().filter(name -> name.contains(" ")).collect(Collectors
-                    .toList()).size() == arrayNameList.size();
-
-            // We hit the comma name separator case
-            // Usually the getAsLastFirstNamesWithAnd method would separate them if pre- and lastname are separated with "and"
-            // If not, we check if spaces separate pre- and lastname
-            if (spaceInAllParts) {
-                authors = authors.replaceAll(",", " and");
-            } else {
-                // Looking for name affixes to avoid
-                // arrayNameList needs to reduce by the count off avoiding terms
-                // valuePartsCount holds the count of name parts without the avoided terms
-
-                int valuePartsCount = arrayNameList.size();
-                // Holds the index of each term which needs to be avoided
-                Collection<Integer> avoidIndex = new HashSet<>();
-
-                for (int i = 0; i < arrayNameList.size(); i++) {
-                    if (AVOID_TERMS_IN_LOWER_CASE.contains(arrayNameList.get(i).toLowerCase(Locale.ROOT))) {
-                        avoidIndex.add(i);
-                        valuePartsCount--;
-                    }
-                }
-
-                if ((valuePartsCount % 2) == 0) {
-                    // We hit the described special case with name affix like Jr
-                    authors = buildWithAffix(avoidIndex, arrayNameList).toString();
-                }
-            }
-        }
 
         AuthorList authorList = AUTHOR_CACHE.get(authors);
         if (authorList == null) {
@@ -223,8 +184,8 @@ public class AuthorList {
      *
      * @see AuthorList#getAsFirstLastNames
      */
-    public static String fixAuthorFirstNameFirstCommas(String authors, boolean abbr, boolean oxfordComma) {
-        return AuthorList.parse(authors).getAsFirstLastNames(abbr, oxfordComma);
+    public static String fixAuthorFirstNameFirstCommas(String authors, boolean abbreviate, boolean oxfordComma) {
+        return AuthorList.parse(authors).getAsFirstLastNames(abbreviate, oxfordComma);
     }
 
     /**
@@ -241,8 +202,8 @@ public class AuthorList {
      *
      * @see AuthorList#getAsLastFirstNames
      */
-    public static String fixAuthorLastNameFirstCommas(String authors, boolean abbr, boolean oxfordComma) {
-        return AuthorList.parse(authors).getAsLastFirstNames(abbr, oxfordComma);
+    public static String fixAuthorLastNameFirstCommas(String authors, boolean abbreviate, boolean oxfordComma) {
+        return AuthorList.parse(authors).getAsLastFirstNames(abbreviate, oxfordComma);
     }
 
     /**
@@ -291,37 +252,6 @@ public class AuthorList {
     }
 
     /**
-     * Builds a new array of strings with stringbuilder.
-     * Regarding to the name affixes.
-     *
-     * @return New string with correct seperation
-     */
-    private static StringBuilder buildWithAffix(Collection<Integer> indexArray, List<String> nameList) {
-        StringBuilder stringBuilder = new StringBuilder();
-        // avoidedTimes needs to be increased by the count of avoided terms for correct odd/even calculation
-        int avoidedTimes = 0;
-        for (int i = 0; i < nameList.size(); i++) {
-            if (indexArray.contains(i)) {
-                // We hit a name affix
-                stringBuilder.append(nameList.get(i));
-                stringBuilder.append(',');
-                avoidedTimes++;
-            } else {
-                stringBuilder.append(nameList.get(i));
-                if (((i + avoidedTimes) % 2) == 0) {
-                    // Hit separation between last name and firstname --> comma has to be kept
-                    stringBuilder.append(',');
-                } else {
-                    // Hit separation between full names (e.g., Ali Babar, M. and Dingsøyr, T.) --> semicolon has to be used
-                    // Will be treated correctly by AuthorList.parse(authors);
-                    stringBuilder.append(';');
-                }
-            }
-        }
-        return stringBuilder;
-    }
-
-    /**
      * Returns the number of author names in this object.
      *
      * @return the number of author names in this object.
@@ -352,10 +282,23 @@ public class AuthorList {
     /**
      * Returns the a list of <CODE>Author</CODE> objects.
      *
-     * @return the <CODE>List<Author></CODE> object.
+     * @return the <CODE>List&lt;Author></CODE> object.
      */
     public List<Author> getAuthors() {
         return authors;
+    }
+
+    /**
+     * Returns a LaTeX-free version of this `AuthorList`.
+     */
+    public AuthorList latexFree() {
+        if (latexFreeAuthors == null) {
+            latexFreeAuthors = new AuthorList(authors.stream()
+                                                     .map(Author::latexFree)
+                                                     .collect(Collectors.toUnmodifiableList()));
+            latexFreeAuthors.latexFreeAuthors = latexFreeAuthors;
+        }
+        return latexFreeAuthors;
     }
 
     /**
@@ -371,30 +314,17 @@ public class AuthorList {
      * @return formatted list of authors.
      */
     public String getAsNatbib() {
-        // Check if we've computed this before:
-        if (authorsNatbib != null) {
-            return authorsNatbib;
-        }
-
-        StringBuilder res = new StringBuilder();
-        if (!isEmpty()) {
-            res.append(getAuthor(0).getLastOnly());
-            if (getNumberOfAuthors() == 2) {
-                res.append(" and ");
-                res.append(getAuthor(1).getLastOnly());
-            } else if (getNumberOfAuthors() > 2) {
-                res.append(" et al.");
-            }
-        }
-        authorsNatbib = res.toString();
-        return authorsNatbib;
+        var authors = getAuthors();
+        return switch (authors.size()) {
+            case 0 -> "";
+            case 1 -> authors.get(0).getLastOnly();
+            case 2 -> authors.get(0).getLastOnly() + " and " + authors.get(1).getLastOnly();
+            default -> authors.get(0).getLastOnly() + " et al.";
+        };
     }
 
     /**
-     * Returns the list of authors separated by commas with last name only; If
-     * the list consists of two or more authors, "and" is inserted before the
-     * last author's name.
-     * <p>
+     * Returns the list of authors separated by commas with last name only; If the list consists of two or more authors, "and" is inserted before the last author's name.
      * <p>
      * <ul>
      * <li> "John Smith" ==> "Smith"</li>
@@ -409,40 +339,11 @@ public class AuthorList {
      * Oxford comma.</a>
      */
     public String getAsLastNames(boolean oxfordComma) {
-        int abbrInt = oxfordComma ? 0 : 1;
-
-        // Check if we've computed this before:
-        if (authorsLastOnly[abbrInt] != null) {
-            return authorsLastOnly[abbrInt];
-        }
-
-        StringBuilder result = new StringBuilder();
-        if (!isEmpty()) {
-            result.append(getAuthor(0).getLastOnly());
-            int i = 1;
-            while (i < (getNumberOfAuthors() - 1)) {
-                result.append(", ");
-                result.append(getAuthor(i).getLastOnly());
-                i++;
-            }
-            if ((getNumberOfAuthors() > 2) && oxfordComma) {
-                result.append(',');
-            }
-            if (getNumberOfAuthors() > 1) {
-                result.append(" and ");
-                result.append(getAuthor(i).getLastOnly());
-            }
-        }
-        authorsLastOnly[abbrInt] = result.toString();
-        return authorsLastOnly[abbrInt];
+        return andCoordinatedConjunction(getAuthors(), Author::getLastOnly, oxfordComma);
     }
 
     /**
-     * Returns the list of authors separated by commas with first names after
-     * last name; first names are abbreviated or not depending on parameter. If
-     * the list consists of three or more authors, "and" is inserted before the
-     * last author's name.
-     * <p>
+     * Returns the list of authors separated by commas with first names after last name; first names are abbreviated or not depending on parameter. If the list consists of three or more authors, "and" is inserted before the last author's name.
      * <p>
      * <ul>
      * <li> "John Smith" ==> "Smith, John" or "Smith, J."</li>
@@ -460,33 +361,7 @@ public class AuthorList {
      * Oxford comma.</a>
      */
     public String getAsLastFirstNames(boolean abbreviate, boolean oxfordComma) {
-        int abbrInt = abbreviate ? 0 : 1;
-        abbrInt += oxfordComma ? 0 : 2;
-
-        // Check if we've computed this before:
-        if (authorsLastFirst[abbrInt] != null) {
-            return authorsLastFirst[abbrInt];
-        }
-
-        StringBuilder result = new StringBuilder();
-        if (!isEmpty()) {
-            result.append(getAuthor(0).getLastFirst(abbreviate));
-            int i = 1;
-            while (i < (getNumberOfAuthors() - 1)) {
-                result.append(", ");
-                result.append(getAuthor(i).getLastFirst(abbreviate));
-                i++;
-            }
-            if ((getNumberOfAuthors() > 2) && oxfordComma) {
-                result.append(',');
-            }
-            if (getNumberOfAuthors() > 1) {
-                result.append(" and ");
-                result.append(getAuthor(i).getLastFirst(abbreviate));
-            }
-        }
-        authorsLastFirst[abbrInt] = result.toString();
-        return authorsLastFirst[abbrInt];
+        return andCoordinatedConjunction(getAuthors(), (auth) -> auth.getLastFirst(abbreviate), oxfordComma);
     }
 
     @Override
@@ -495,8 +370,7 @@ public class AuthorList {
     }
 
     /**
-     * Returns the list of authors separated by "and"s with first names after
-     * last name; first names are not abbreviated.
+     * Returns the list of authors separated by "and"s with first names after last name; first names are not abbreviated.
      * <p>
      * <ul>
      * <li>"John Smith" ==> "Smith, John"</li>
@@ -509,42 +383,32 @@ public class AuthorList {
      * @return formatted list of authors.
      */
     public String getAsLastFirstNamesWithAnd(boolean abbreviate) {
-        int abbrInt = abbreviate ? 0 : 1;
-        // Check if we've computed this before:
-        if (authorLastFirstAnds[abbrInt] != null) {
-            return authorLastFirstAnds[abbrInt];
-        }
-
-        authorLastFirstAnds[abbrInt] = getAuthors().stream().map(author -> author.getLastFirst(abbreviate))
-                .collect(Collectors.joining(" and "));
-        return authorLastFirstAnds[abbrInt];
-    }
-
-    public String getAsLastFirstFirstLastNamesWithAnd(boolean abbreviate) {
-        int abbrInt = abbreviate ? 0 : 1;
-        // Check if we've computed this before:
-        if (authorsLastFirstFirstLast[abbrInt] != null) {
-            return authorsLastFirstFirstLast[abbrInt];
-        }
-
-        StringBuilder result = new StringBuilder();
-        if (!isEmpty()) {
-            result.append(getAuthor(0).getLastFirst(abbreviate));
-            for (int i = 1; i < getNumberOfAuthors(); i++) {
-                result.append(" and ");
-                result.append(getAuthor(i).getFirstLast(abbreviate));
-            }
-        }
-
-        authorsLastFirstFirstLast[abbrInt] = result.toString();
-        return authorsLastFirstFirstLast[abbrInt];
+        return getAuthors().stream()
+                           .map(author -> author.getLastFirst(abbreviate))
+                           .collect(Collectors.joining(" and "));
     }
 
     /**
-     * Returns the list of authors separated by commas with first names before
-     * last name; first names are abbreviated or not depending on parameter. If
-     * the list consists of three or more authors, "and" is inserted before the
-     * last author's name.
+     * Returns a list of authors separated with "and". The first author is formatted with {@link Author#getLastFirst(boolean)} and each subsequent author is formatted with {@link Author#getFirstLast(boolean)}.
+     *
+     * @param abbreviate first names.
+     */
+    public String getAsLastFirstFirstLastNamesWithAnd(boolean abbreviate) {
+        return switch (authors.size()) {
+            case 0 -> "";
+            case 1 -> authors.get(0).getLastFirst(abbreviate);
+            default -> authors.stream()
+                              .skip(1)
+                              .map(author -> author.getFirstLast(abbreviate))
+                              .collect(Collectors.joining(
+                                      " and ",
+                                      authors.get(0).getLastFirst(abbreviate) + " and ",
+                                      ""));
+        };
+    }
+
+    /**
+     * Returns the list of authors separated by commas with first names before last name; first names are abbreviated or not depending on parameter. If the list consists of three or more authors, "and" is inserted before the last author's name.
      * <p>
      * <ul>
      * <li>"John Smith" ==> "John Smith" or "J. Smith"</li>
@@ -555,50 +419,26 @@ public class AuthorList {
      * Smith and P. Black Brown" </li>
      * </ul>
      *
-     * @param abbr        whether to abbreivate first names.
+     * @param abbreviate  whether to abbreivate first names.
      * @param oxfordComma Whether to put a comma before the and at the end.
      * @return formatted list of authors.
      * @see <a href="http://en.wikipedia.org/wiki/Serial_comma">serial comma for an detailed explaination about the
      * Oxford comma.</a>
      */
-    public String getAsFirstLastNames(boolean abbr, boolean oxfordComma) {
-
-        int abbrInt = abbr ? 0 : 1;
-        abbrInt += oxfordComma ? 0 : 2;
-
-        // Check if we've computed this before:
-        if (authorsFirstFirst[abbrInt] != null) {
-            return authorsFirstFirst[abbrInt];
-        }
-
-        StringBuilder result = new StringBuilder();
-        if (!isEmpty()) {
-            result.append(getAuthor(0).getFirstLast(abbr));
-            int i = 1;
-            while (i < (getNumberOfAuthors() - 1)) {
-                result.append(", ");
-                result.append(getAuthor(i).getFirstLast(abbr));
-                i++;
-            }
-            if ((getNumberOfAuthors() > 2) && oxfordComma) {
-                result.append(',');
-            }
-            if (getNumberOfAuthors() > 1) {
-                result.append(" and ");
-                result.append(getAuthor(i).getFirstLast(abbr));
-            }
-        }
-        authorsFirstFirst[abbrInt] = result.toString();
-        return authorsFirstFirst[abbrInt];
+    public String getAsFirstLastNames(boolean abbreviate, boolean oxfordComma) {
+        return andCoordinatedConjunction(getAuthors(), author -> author.getFirstLast(abbreviate), oxfordComma);
     }
 
     /**
      * Compare this object with the given one.
-     * <p>
-     * Will return true iff the other object is an Author and all fields are identical on a string comparison.
+     *
+     * @return `true` iff the other object is an AuthorList, all contained authors are in the same order (and these authors' fields are `Objects.equals`)
      */
     @Override
     public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
         if (!(o instanceof AuthorList)) {
             return false;
         }
@@ -613,8 +453,7 @@ public class AuthorList {
     }
 
     /**
-     * Returns the list of authors separated by "and"s with first names before
-     * last name; first names are not abbreviated.
+     * Returns the list of authors separated by "and"s with first names before last name; first names are not abbreviated.
      * <p>
      * <ul>
      * <li>"John Smith" ==> "John Smith"</li>
@@ -622,45 +461,28 @@ public class AuthorList {
      * Brown"</li>
      * <li>"John von Neumann and John Smith and Black Brown, Peter" ==> "John
      * von Neumann and John Smith and Peter Black Brown" </li>
-     * </li>
+     * </ul>
      *
      * @return formatted list of authors.
      */
     public String getAsFirstLastNamesWithAnd() {
-        // Check if we've computed this before:
-        if (authorsFirstFirstAnds != null) {
-            return authorsFirstFirstAnds;
-        }
-
-        authorsFirstFirstAnds = getAuthors().stream().map(author -> author.getFirstLast(false))
-                .collect(Collectors.joining(" and "));
-        return authorsFirstFirstAnds;
+        return getAuthors().stream()
+                           .map(author -> author.getFirstLast(false))
+                           .collect(Collectors.joining(" and "));
     }
 
     /**
-     * Returns the list of authors in a form suitable for alphabetization. This
-     * means that last names come first, never preceded by "von" particles, and
-     * that any braces are removed. First names are abbreviated so the same name
-     * is treated similarly if abbreviated in one case and not in another. This
-     * form is not intended to be suitable for presentation, only for sorting.
-     * <p>
+     * Returns the list of authors in a form suitable for alphabetization. This means that last names come first, never preceded by "von" particles, and that any braces are removed. First names are abbreviated so the same name is treated similarly if abbreviated in one case and not in another. This form is not intended to be suitable for presentation, only for sorting.
      * <p>
      * <ul>
      * <li>"John Smith" ==> "Smith, J.";</li>
+     * </ul>
      *
      * @return formatted list of authors
      */
     public String getForAlphabetization() {
-        if (authorsAlph != null) {
-            return authorsAlph;
-        }
-
-        authorsAlph = getAuthors().stream().map(Author::getNameForAlphabetization)
-                .collect(Collectors.joining(" and "));
-        return authorsAlph;
-    }
-
-    public void addAuthor(String first, String firstabbr, String von, String last, String jr) {
-        authors.add(new Author(first, firstabbr, von, last, jr));
+        return getAuthors().stream()
+                           .map(Author::getNameForAlphabetization)
+                           .collect(Collectors.joining(" and "));
     }
 }

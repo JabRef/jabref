@@ -10,7 +10,7 @@ import org.jabref.model.strings.StringUtil;
 public class YearChecker implements ValueChecker {
 
     private static final Predicate<String> CONTAINS_FOUR_DIGIT = Pattern.compile("([^0-9]|^)[0-9]{4}([^0-9]|$)")
-            .asPredicate();
+                                                                        .asPredicate();
     private static final Predicate<String> ENDS_WITH_FOUR_DIGIT = Pattern.compile("[0-9]{4}$").asPredicate();
     private static final String PUNCTUATION_MARKS = "[(){},.;!?<>%&$]";
 

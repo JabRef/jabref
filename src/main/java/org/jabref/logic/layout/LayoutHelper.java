@@ -11,16 +11,17 @@ import java.util.Objects;
 /**
  * Helper class to get a Layout object.
  *
+ * <pre>
  * <code>
  * LayoutHelper helper = new LayoutHelper(...a reader...);
  * Layout layout = helper.getLayoutFromText();
  * </code>
- *
+ * </pre>
  */
 public class LayoutHelper {
 
     public static final int IS_LAYOUT_TEXT = 1;
-    public static final int IS_SIMPLE_FIELD = 2;
+    public static final int IS_SIMPLE_COMMAND = 2;
     public static final int IS_FIELD_START = 3;
     public static final int IS_FIELD_END = 4;
     public static final int IS_OPTION_FIELD = 5;
@@ -37,7 +38,6 @@ public class LayoutHelper {
     private final LayoutFormatterPreferences prefs;
     private boolean endOfFile;
 
-
     public LayoutHelper(Reader in, LayoutFormatterPreferences prefs) {
         this.in = new PushbackReader(Objects.requireNonNull(in));
         this.prefs = Objects.requireNonNull(prefs);
@@ -47,7 +47,7 @@ public class LayoutHelper {
         parse();
 
         for (StringInt parsedEntry : parsedEntries) {
-            if ((parsedEntry.i == LayoutHelper.IS_SIMPLE_FIELD) || (parsedEntry.i == LayoutHelper.IS_FIELD_START)
+            if ((parsedEntry.i == LayoutHelper.IS_SIMPLE_COMMAND) || (parsedEntry.i == LayoutHelper.IS_FIELD_START)
                     || (parsedEntry.i == LayoutHelper.IS_FIELD_END) || (parsedEntry.i == LayoutHelper.IS_GROUP_START)
                     || (parsedEntry.i == LayoutHelper.IS_GROUP_END)) {
                 parsedEntry.s = parsedEntry.s.trim().toLowerCase(Locale.ROOT);
@@ -67,27 +67,24 @@ public class LayoutHelper {
 
     private void doBracketedField(final int field) throws IOException {
         StringBuilder buffer = null;
-        int c;
+        int currentCharacter;
         boolean start = false;
 
         while (!endOfFile) {
-            c = read();
+            currentCharacter = read();
 
-            if (c == -1) {
+            if (currentCharacter == -1) {
                 endOfFile = true;
-
                 if (buffer != null) {
                     parsedEntries.add(new StringInt(buffer.toString(), field));
                 }
-
                 return;
             }
 
-            if ((c == '{') || (c == '}')) {
-                if (c == '}') {
+            if ((currentCharacter == '{') || (currentCharacter == '}')) {
+                if (currentCharacter == '}') {
                     if (buffer != null) {
                         parsedEntries.add(new StringInt(buffer.toString(), field));
-
                         return;
                     }
                 } else {
@@ -98,16 +95,13 @@ public class LayoutHelper {
                     buffer = new StringBuilder(100);
                 }
 
-                if (start && (c != '}')) {
-                    buffer.append((char) c);
+                if (start && (currentCharacter != '}')) {
+                    buffer.append((char) currentCharacter);
                 }
             }
         }
     }
 
-    /**
-     *
-     */
     private void doBracketedOptionField() throws IOException {
         StringBuilder buffer = null;
         int c;
@@ -184,10 +178,9 @@ public class LayoutHelper {
 
                     // changed section begin - arudert
                     // keep the backslash so we know wether this is a fieldname or an ordinary parameter
-                    //if (c != '\\')
-                    //{
+                    // if (c != '\\') {
                     buffer.append((char) c);
-                    //}
+                    // }
                     // changed section end - arudert
 
                 }
@@ -209,10 +202,7 @@ public class LayoutHelper {
             if (c == -1) {
                 endOfFile = true;
 
-                /*
-                 * CO 2006-11-11: Added check for null, otherwise a Layout that
-                 * finishes with a curly brace throws a NPE
-                 */
+                // Check for null, otherwise a Layout that finishes with a curly brace throws a NPE
                 if (buffer != null) {
                     parsedEntries.add(new StringInt(buffer.toString(), LayoutHelper.IS_LAYOUT_TEXT));
                 }
@@ -237,8 +227,7 @@ public class LayoutHelper {
                     buffer = new StringBuilder(100);
                 }
 
-                if ((c != '\\') || escaped)// (previous == '\\')))
-                {
+                if ((c != '\\') || escaped) /* (previous == '\\'))) */ {
                     buffer.append((char) c);
                 }
 
@@ -258,7 +247,7 @@ public class LayoutHelper {
                 endOfFile = true;
             }
 
-            if (!Character.isLetter((char) c) && (c != '_') && (c != '-')) {
+            if (!Character.isLetter((char) c) && (c != '_')) {
                 unread(c);
 
                 name = buffer == null ? "" : buffer.toString();
@@ -323,8 +312,8 @@ public class LayoutHelper {
                     return;
                 }
 
-                // for all other cases
-                parsedEntries.add(new StringInt(name, LayoutHelper.IS_SIMPLE_FIELD));
+                // for all other cases -> simple command
+                parsedEntries.add(new StringInt(name, LayoutHelper.IS_SIMPLE_COMMAND));
 
                 return;
             } else {

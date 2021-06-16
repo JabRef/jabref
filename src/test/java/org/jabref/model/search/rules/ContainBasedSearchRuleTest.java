@@ -1,10 +1,13 @@
 package org.jabref.model.search.rules;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.StandardEntryType;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test case for ContainBasedSearchRule.
@@ -21,33 +24,31 @@ public class ContainBasedSearchRuleTest {
 
         String query = "marine 2001 shields";
 
-        Assert.assertEquals(false, bsCaseSensitive.applyRule(query, be));
-        Assert.assertEquals(true, bsCaseInsensitive.applyRule(query, be));
-        Assert.assertEquals(false, bsCaseSensitiveRegexp.applyRule(query, be));
-        Assert.assertEquals(false, bsCaseInsensitiveRegexp.applyRule(query, be));
+        assertFalse(bsCaseSensitive.applyRule(query, be));
+        assertTrue(bsCaseInsensitive.applyRule(query, be));
+        assertFalse(bsCaseSensitiveRegexp.applyRule(query, be));
+        assertFalse(bsCaseInsensitiveRegexp.applyRule(query, be));
 
         query = "\"marine larviculture\"";
 
-        Assert.assertEquals(false, bsCaseSensitive.applyRule(query, be));
-        Assert.assertEquals(false, bsCaseInsensitive.applyRule(query, be));
-        Assert.assertEquals(false, bsCaseSensitiveRegexp.applyRule(query, be));
-        Assert.assertEquals(false, bsCaseInsensitiveRegexp.applyRule(query, be));
+        assertFalse(bsCaseSensitive.applyRule(query, be));
+        assertFalse(bsCaseInsensitive.applyRule(query, be));
+        assertFalse(bsCaseSensitiveRegexp.applyRule(query, be));
+        assertFalse(bsCaseInsensitiveRegexp.applyRule(query, be));
 
         query = "marine [A-Za-z]* larviculture";
 
-        Assert.assertEquals(false, bsCaseSensitive.applyRule(query, be));
-        Assert.assertEquals(false, bsCaseInsensitive.applyRule(query, be));
-        Assert.assertEquals(false, bsCaseSensitiveRegexp.applyRule(query, be));
-        Assert.assertEquals(true, bsCaseInsensitiveRegexp.applyRule(query, be));
-
+        assertFalse(bsCaseSensitive.applyRule(query, be));
+        assertFalse(bsCaseInsensitive.applyRule(query, be));
+        assertFalse(bsCaseSensitiveRegexp.applyRule(query, be));
+        assertTrue(bsCaseInsensitiveRegexp.applyRule(query, be));
     }
 
     public BibEntry makeBibtexEntry() {
-        BibEntry e = new BibEntry(BibtexEntryTypes.INCOLLECTION.getName());
-        e.setField("title", "Marine finfish larviculture in Europe");
-        e.setField("bibtexkey", "shields01");
-        e.setField("year", "2001");
-        e.setField("author", "Kevin Shields");
-        return e;
+        return new BibEntry(StandardEntryType.InCollection)
+                .withCitationKey("shields01")
+                .withField(StandardField.TITLE, "Marine finfish larviculture in Europe")
+                .withField(StandardField.YEAR, "2001")
+                .withField(StandardField.AUTHOR, "Kevin Shields");
     }
 }

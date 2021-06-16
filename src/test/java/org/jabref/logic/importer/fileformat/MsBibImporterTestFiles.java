@@ -1,63 +1,42 @@
 package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import org.jabref.logic.bibtex.BibEntryAssert;
-import org.jabref.model.entry.BibEntry;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
-
-@RunWith(Parameterized.class)
 public class MsBibImporterTestFiles {
 
-    @Parameter
-    public String fileName;
-    public Path resourceDir;
-    private MsBibImporter testImporter;
+    private static final String FILE_ENDING = ".xml";
 
-    @Before
-    public void setUp() throws Exception {
-        resourceDir = Paths.get(MsBibImporterTestFiles.class.getResource("").toURI());
-        testImporter = new MsBibImporter();
+    private static Stream<String> fileNames() throws IOException {
+        Predicate<String> fileName = name -> name.startsWith("MsBib")
+                && name.endsWith(FILE_ENDING);
+        return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
-    @Parameters(name = "{0}")
-    public static Collection<String> fileNames() throws IOException, URISyntaxException {
-        try (Stream<Path> stream = Files.list(Paths.get(MsBibImporterTestFiles.class.getResource("").toURI()))) {
-            return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".xml"))
-                    .filter(n -> n.startsWith("MsBib")).collect(Collectors.toList());
-        }
+    private static Stream<String> invalidFileNames() throws IOException {
+        Predicate<String> fileName = name -> !name.contains("MsBib");
+        return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
-    @Test
-    public final void testIsRecognizedFormat() throws Exception {
-        Path xmlFile = resourceDir.resolve(fileName);
-        Assert.assertTrue(testImporter.isRecognizedFormat(xmlFile, StandardCharsets.UTF_8));
+    @ParameterizedTest
+    @MethodSource("fileNames")
+    public void testIsRecognizedFormat(String fileName) throws IOException {
+        ImporterTestEngine.testIsRecognizedFormat(new MsBibImporter(), fileName);
     }
 
-    @Test
-    public void testImportEntries() throws Exception {
-
-        String bibFileName = fileName.replace(".xml", ".bib");
-        Path xmlFile = resourceDir.resolve(fileName);
-
-        List<BibEntry> result = testImporter.importDatabase(xmlFile, StandardCharsets.UTF_8).getDatabase().getEntries();
-        BibEntryAssert.assertEquals(MsBibImporterTest.class, bibFileName, result);
+    @ParameterizedTest
+    @MethodSource("invalidFileNames")
+    public void testIsNotRecognizedFormat(String fileName) throws IOException {
+        ImporterTestEngine.testIsNotRecognizedFormat(new MsBibImporter(), fileName);
     }
 
+    @ParameterizedTest
+    @MethodSource("fileNames")
+    public void testImportEntries(String fileName) throws Exception {
+        ImporterTestEngine.testImportEntries(new MsBibImporter(), fileName, FILE_ENDING);
+    }
 }

@@ -8,14 +8,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 /**
  * Importer for the Refer/Endnote format.
@@ -44,8 +48,8 @@ public class EndnoteImporter extends Importer {
     }
 
     @Override
-    public FileType getFileType() {
-        return FileType.ENDNOTE;
+    public StandardFileType getFileType() {
+        return StandardFileType.ENDNOTE;
     }
 
     @Override
@@ -92,9 +96,9 @@ public class EndnoteImporter extends Importer {
         }
 
         String[] entries = sb.toString().split(ENDOFRECORD);
-        Map<String, String> hm = new HashMap<>();
+        Map<Field, String> hm = new HashMap<>();
         String author;
-        String type;
+        EntryType type;
         String editor;
         String artnum;
         for (String entry : entries) {
@@ -142,95 +146,93 @@ public class EndnoteImporter extends Importer {
                         editor += " and " + val;
                     }
                 } else if ("T".equals(prefix)) {
-                    hm.put(FieldName.TITLE, val);
+                    hm.put(StandardField.TITLE, val);
                 } else if ("0".equals(prefix)) {
                     if (val.indexOf("Journal") == 0) {
-                        type = "article";
+                        type = StandardEntryType.Article;
                     } else if (val.indexOf("Book Section") == 0) {
-                        type = "incollection";
+                        type = StandardEntryType.InCollection;
                     } else if (val.indexOf("Book") == 0) {
-                        type = "book";
+                        type = StandardEntryType.Book;
                     } else if (val.indexOf("Edited Book") == 0) {
-                        type = "book";
+                        type = StandardEntryType.Book;
                         isEditedBook = true;
                     } else if (val.indexOf("Conference") == 0) {
-                        type = "inproceedings";
+                        type = StandardEntryType.InProceedings;
                     } else if (val.indexOf("Report") == 0) {
-                        type = "techreport";
+                        type = StandardEntryType.TechReport;
                     } else if (val.indexOf("Review") == 0) {
-                        type = "article";
+                        type = StandardEntryType.Article;
                     } else if (val.indexOf("Thesis") == 0) {
-                        type = "phdthesis";
+                        type = StandardEntryType.PhdThesis;
                     } else {
                         type = BibEntry.DEFAULT_TYPE; //
                     }
                 } else if ("7".equals(prefix)) {
-                    hm.put(FieldName.EDITION, val);
+                    hm.put(StandardField.EDITION, val);
                 } else if ("C".equals(prefix)) {
-                    hm.put(FieldName.ADDRESS, val);
+                    hm.put(StandardField.ADDRESS, val);
                 } else if ("D".equals(prefix)) {
-                    hm.put(FieldName.YEAR, val);
+                    hm.put(StandardField.YEAR, val);
                 } else if ("8".equals(prefix)) {
-                    hm.put(FieldName.DATE, val);
+                    hm.put(StandardField.DATE, val);
                 } else if ("J".equals(prefix)) {
                     // "Alternate journal. Let's set it only if no journal
                     // has been set with %B.
-                    hm.putIfAbsent(FieldName.JOURNAL, val);
+                    hm.putIfAbsent(StandardField.JOURNAL, val);
                 } else if ("B".equals(prefix)) {
                     // This prefix stands for "journal" in a journal entry, and
                     // "series" in a book entry.
-                    if ("article".equals(type)) {
-                        hm.put(FieldName.JOURNAL, val);
-                    } else if ("book".equals(type) || "inbook".equals(type)) {
-                        hm.put(FieldName.SERIES, val);
+                    if (type.equals(StandardEntryType.Article)) {
+                        hm.put(StandardField.JOURNAL, val);
+                    } else if (type.equals(StandardEntryType.Book) || type.equals(StandardEntryType.InBook)) {
+                        hm.put(StandardField.SERIES, val);
                     } else {
                         /* type = inproceedings */
-                        hm.put(FieldName.BOOKTITLE, val);
+                        hm.put(StandardField.BOOKTITLE, val);
                     }
                 } else if ("I".equals(prefix)) {
-                    if ("phdthesis".equals(type)) {
-                        hm.put(FieldName.SCHOOL, val);
+                    if (type.equals(StandardEntryType.PhdThesis)) {
+                        hm.put(StandardField.SCHOOL, val);
                     } else {
-                        hm.put(FieldName.PUBLISHER, val);
+                        hm.put(StandardField.PUBLISHER, val);
                     }
-                }
-                // replace single dash page ranges (23-45) with double dashes (23--45):
-                else if ("P".equals(prefix)) {
-                    hm.put(FieldName.PAGES, val.replaceAll("([0-9]) *- *([0-9])", "$1--$2"));
+                } else if ("P".equals(prefix)) {
+                    // replace single dash page ranges (23-45) with double dashes (23--45):
+                    hm.put(StandardField.PAGES, val.replaceAll("([0-9]) *- *([0-9])", "$1--$2"));
                 } else if ("V".equals(prefix)) {
-                    hm.put(FieldName.VOLUME, val);
+                    hm.put(StandardField.VOLUME, val);
                 } else if ("N".equals(prefix)) {
-                    hm.put(FieldName.NUMBER, val);
+                    hm.put(StandardField.NUMBER, val);
                 } else if ("U".equals(prefix)) {
-                    hm.put(FieldName.URL, val);
+                    hm.put(StandardField.URL, val);
                 } else if ("R".equals(prefix)) {
                     String doi = val;
                     if (doi.startsWith("doi:")) {
                         doi = doi.substring(4);
                     }
-                    hm.put(FieldName.DOI, doi);
+                    hm.put(StandardField.DOI, doi);
                 } else if ("O".equals(prefix)) {
                     // Notes may contain Article number
                     if (val.startsWith("Artn")) {
                         String[] tokens = val.split("\\s");
                         artnum = tokens[1];
                     } else {
-                        hm.put(FieldName.NOTE, val);
+                        hm.put(StandardField.NOTE, val);
                     }
                 } else if ("K".equals(prefix)) {
-                    hm.put(FieldName.KEYWORDS, val);
+                    hm.put(StandardField.KEYWORDS, val);
                 } else if ("X".equals(prefix)) {
-                    hm.put(FieldName.ABSTRACT, val);
+                    hm.put(StandardField.ABSTRACT, val);
                 } else if ("9".equals(prefix)) {
                     if (val.indexOf("Ph.D.") == 0) {
-                        type = "phdthesis";
+                        type = StandardEntryType.PhdThesis;
                     }
                     if (val.indexOf("Masters") == 0) {
-                        type = "mastersthesis";
+                        type = StandardEntryType.MastersThesis;
                     }
                 } else if ("F".equals(prefix)) {
-                    hm.put(BibEntry.KEY_FIELD, BibtexKeyGenerator.cleanKey(val,
-                            preferences.getBibtexKeyPatternPreferences().isEnforceLegalKey()));
+                    hm.put(InternalField.KEY_FIELD, CitationKeyGenerator.cleanKey(val, ""));
                 }
             }
 
@@ -241,28 +243,26 @@ public class EndnoteImporter extends Importer {
                 author = "";
             }
 
-            //fixauthorscomma
+            // fixauthorscomma
             if (!"".equals(author)) {
-                hm.put(FieldName.AUTHOR, fixAuthor(author));
+                hm.put(StandardField.AUTHOR, fixAuthor(author));
             }
             if (!"".equals(editor)) {
-                hm.put(FieldName.EDITOR, fixAuthor(editor));
+                hm.put(StandardField.EDITOR, fixAuthor(editor));
             }
-            //if pages missing and article number given, use the article number
-            if (((hm.get(FieldName.PAGES) == null) || "-".equals(hm.get(FieldName.PAGES))) && !"".equals(artnum)) {
-                hm.put(FieldName.PAGES, artnum);
+            // if pages missing and article number given, use the article number
+            if (((hm.get(StandardField.PAGES) == null) || "-".equals(hm.get(StandardField.PAGES))) && !"".equals(artnum)) {
+                hm.put(StandardField.PAGES, artnum);
             }
 
             BibEntry b = new BibEntry(type);
             b.setField(hm);
-            if (!b.getFieldNames().isEmpty()) {
+            if (!b.getFields().isEmpty()) {
                 bibitems.add(b);
             }
-
         }
 
         return new ParserResult(bibitems);
-
     }
 
     /**
@@ -288,5 +288,4 @@ public class EndnoteImporter extends Importer {
             return AuthorList.fixAuthorLastNameFirst(s);
         }
     }
-
 }

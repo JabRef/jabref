@@ -3,49 +3,30 @@ package org.jabref.model.entry;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.jabref.model.strings.LatexToUnicodeAdapter;
 import org.jabref.model.strings.StringUtil;
 
 /**
- * This is an immutable class that keeps information regarding single
- * author. It is just a container for the information, with very simple
- * methods to access it.
+ * This is an immutable class that keeps information regarding single author. It is just a container for the information, with very simple methods to access it.
  * <p>
- * Current usage: only methods <code>getLastOnly</code>,
- * <code>getFirstLast</code>, and <code>getLastFirst</code> are used;
- * all other methods are provided for completeness.
+ * Current usage: only methods <code>getLastOnly</code>, <code>getFirstLast</code>, and <code>getLastFirst</code> are used; all other methods are provided for completeness.
  */
 public class Author {
-
     private final String firstPart;
-
     private final String firstAbbr;
-
     private final String vonPart;
-
     private final String lastPart;
-
     private final String jrPart;
+    private Author latexFreeAuthor;
 
     /**
-     * Creates the Author object. If any part of the name is absent, <CODE>null</CODE>
-     * must be passed; otherwise other methods may return erroneous results.
+     * Creates the Author object. If any part of the name is absent, <CODE>null</CODE> must be passed; otherwise other methods may return erroneous results.
      *
-     * @param first     the first name of the author (may consist of several
-     *                  tokens, like "Charles Louis Xavier Joseph" in "Charles
-     *                  Louis Xavier Joseph de la Vall{\'e}e Poussin")
-     * @param firstabbr the abbreviated first name of the author (may consist of
-     *                  several tokens, like "C. L. X. J." in "Charles Louis
-     *                  Xavier Joseph de la Vall{\'e}e Poussin"). It is a
-     *                  responsibility of the caller to create a reasonable
-     *                  abbreviation of the first name.
-     * @param von       the von part of the author's name (may consist of several
-     *                  tokens, like "de la" in "Charles Louis Xavier Joseph de la
-     *                  Vall{\'e}e Poussin")
-     * @param last      the last name of the author (may consist of several
-     *                  tokens, like "Vall{\'e}e Poussin" in "Charles Louis Xavier
-     *                  Joseph de la Vall{\'e}e Poussin")
-     * @param jr        the junior part of the author's name (may consist of
-     *                  several tokens, like "Jr. III" in "Smith, Jr. III, John")
+     * @param first     the first name of the author (may consist of several tokens, like "Charles Louis Xavier Joseph" in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin")
+     * @param firstabbr the abbreviated first name of the author (may consist of several tokens, like "C. L. X. J." in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin"). It is a responsibility of the caller to create a reasonable abbreviation of the first name.
+     * @param von       the von part of the author's name (may consist of several tokens, like "de la" in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin")
+     * @param last      the last name of the author (may consist of several tokens, like "Vall{\'e}e Poussin" in "Charles Louis Xavier Joseph de la Vall{\'e}e Poussin")
+     * @param jr        the junior part of the author's name (may consist of several tokens, like "Jr. III" in "Smith, Jr. III, John")
      */
     public Author(String first, String firstabbr, String von, String last, String jr) {
         firstPart = addDotIfAbbreviation(removeStartAndEndBraces(first));
@@ -56,7 +37,6 @@ public class Author {
     }
 
     public static String addDotIfAbbreviation(String name) {
-        // Avoid arrayindexoutof.... :
         if ((name == null) || name.isEmpty()) {
             return name;
         }
@@ -114,23 +94,26 @@ public class Author {
             // AA -> A. A.
             // Only append ". " if the rest of the 'word' is uppercase
             boolean nextWordIsUppercase = true;
+            char furtherChar = Character.MIN_VALUE;
             for (int j = i + 1; j < name.length(); j++) {
-                char furtherChar = name.charAt(j);
-                if (Character.isWhitespace(furtherChar) || (furtherChar == '-') || (furtherChar == '~')
-                        || (furtherChar == '.')) {
+                furtherChar = name.charAt(j);
+                if (Character.isWhitespace(furtherChar) || (furtherChar == '-') || (furtherChar == '~') || (furtherChar == '.')) {
                     // end of word
                     break;
                 }
 
-                boolean furtherIsUppercaseLetter = Character.isLetter(furtherChar)
-                        && Character.isUpperCase(furtherChar);
+                boolean furtherIsUppercaseLetter = Character.isLetter(furtherChar) && Character.isUpperCase(furtherChar);
                 if (!furtherIsUppercaseLetter) {
                     nextWordIsUppercase = false;
                     break;
                 }
             }
             if (nextWordIsUppercase) {
-                sb.append(". ");
+                if (Character.isWhitespace(furtherChar)) {
+                    sb.append(".");
+                } else {
+                    sb.append(". ");
+                }
             }
         }
 
@@ -144,8 +127,8 @@ public class Author {
 
     /**
      * Compare this object with the given one.
-     * <p>
-     * Will return true iff the other object is an Author and all fields are identical on a string comparison.
+     *
+     * @return `true` iff the other object is an Author and all fields are `Objects.equals`.
      */
     @Override
     public boolean equals(Object other) {
@@ -155,16 +138,18 @@ public class Author {
 
         if (other instanceof Author) {
             Author that = (Author) other;
-            return Objects.equals(firstPart, that.firstPart) && Objects.equals(firstAbbr, that.firstAbbr)
-                    && Objects.equals(
-                            vonPart, that.vonPart)
-                    && Objects.equals(lastPart, that.lastPart) && Objects.equals(jrPart, that.jrPart);
+            return Objects.equals(firstPart, that.firstPart)
+                    && Objects.equals(firstAbbr, that.firstAbbr)
+                    && Objects.equals(vonPart, that.vonPart)
+                    && Objects.equals(lastPart, that.lastPart)
+                    && Objects.equals(jrPart, that.jrPart);
         }
+
         return false;
     }
 
     /**
-     * @return true if the brackets in s are properly paired
+     * @return true iff the brackets in s are properly paired
      */
     private boolean properBrackets(String s) {
         // nested construct is there, check for "proper" nesting
@@ -173,17 +158,17 @@ public class Author {
         while (i < s.length()) {
             char c = s.charAt(i);
             switch (c) {
-            case '{':
-                level++;
-                break;
-            case '}':
-                level--;
-                if (level == -1) { // improper nesting
-                    return false;
-                }
-                break;
-            default:
-                break;
+                case '{':
+                    level++;
+                    break;
+                case '}':
+                    level--;
+                    if (level == -1) { // improper nesting
+                        return false;
+                    }
+                    break;
+                default:
+                    break;
             }
             i++;
         }
@@ -194,9 +179,11 @@ public class Author {
      * Removes start and end brace at a string
      * <p>
      * E.g.,
-     * * {Vall{\'e}e Poussin} -> Vall{\'e}e Poussin
-     * * {Vall{\'e}e} {Poussin} -> Vall{\'e}e Poussin
-     * * Vall{\'e}e Poussin -> Vall{\'e}e Poussin
+     * <ul>
+     *     <li>{Vall{\'e}e Poussin} -> Vall{\'e}e Poussin</li>
+     *     <li>{Vall{\'e}e} {Poussin} -> Vall{\'e}e Poussin</li>
+     *     <li>Vall{\'e}e Poussin -> Vall{\'e}e Poussin</li>
+     * </ul>
      */
     private String removeStartAndEndBraces(String name) {
         if (StringUtil.isBlank(name)) {
@@ -259,19 +246,16 @@ public class Author {
     }
 
     /**
-     * Returns the abbreviated first name of the author stored in this
-     * object ("F.").
+     * Returns the abbreviated first name of the author stored in this object ("F.").
      *
-     * @return abbreviated first name of the author (may consist of several
-     * tokens)
+     * @return abbreviated first name of the author (may consist of several tokens)
      */
     public Optional<String> getFirstAbbr() {
         return Optional.ofNullable(firstAbbr);
     }
 
     /**
-     * Returns the von part of the author's name stored in this object
-     * ("von").
+     * Returns the von part of the author's name stored in this object ("von").
      *
      * @return von part of the author's name (may consist of several tokens)
      */
@@ -289,20 +273,16 @@ public class Author {
     }
 
     /**
-     * Returns the junior part of the author's name stored in this object
-     * ("Jr").
+     * Returns the junior part of the author's name stored in this object ("Jr").
      *
-     * @return junior part of the author's name (may consist of several
-     * tokens) or null if the author does not have a Jr. Part
+     * @return junior part of the author's name (may consist of several tokens) or null if the author does not have a Jr. Part
      */
     public Optional<String> getJr() {
         return Optional.ofNullable(jrPart);
     }
 
     /**
-     * Returns von-part followed by last name ("von Last"). If both fields
-     * were specified as <CODE>null</CODE>, the empty string <CODE>""</CODE>
-     * is returned.
+     * Returns von-part followed by last name ("von Last"). If both fields were specified as <CODE>null</CODE>, the empty string <CODE>""</CODE> is returned.
      *
      * @return 'von Last'
      */
@@ -315,13 +295,10 @@ public class Author {
     }
 
     /**
-     * Returns the author's name in form 'von Last, Jr., First' with the
-     * first name full or abbreviated depending on parameter.
+     * Returns the author's name in form 'von Last, Jr., First' with the first name full or abbreviated depending on parameter.
      *
-     * @param abbr <CODE>true</CODE> - abbreviate first name, <CODE>false</CODE> -
-     *             do not abbreviate
-     * @return 'von Last, Jr., First' (if <CODE>abbr==false</CODE>) or
-     * 'von Last, Jr., F.' (if <CODE>abbr==true</CODE>)
+     * @param abbr <CODE>true</CODE> - abbreviate first name, <CODE>false</CODE> - do not abbreviate
+     * @return 'von Last, Jr., First' (if <CODE>abbr==false</CODE>) or 'von Last, Jr., F.' (if <CODE>abbr==true</CODE>)
      */
     public String getLastFirst(boolean abbr) {
         StringBuilder res = new StringBuilder(getLastOnly());
@@ -335,13 +312,10 @@ public class Author {
     }
 
     /**
-     * Returns the author's name in form 'First von Last, Jr.' with the
-     * first name full or abbreviated depending on parameter.
+     * Returns the author's name in form 'First von Last, Jr.' with the first name full or abbreviated depending on parameter.
      *
-     * @param abbr <CODE>true</CODE> - abbreviate first name, <CODE>false</CODE> -
-     *             do not abbreviate
-     * @return 'First von Last, Jr.' (if <CODE>abbr==false</CODE>) or 'F.
-     * von Last, Jr.' (if <CODE>abbr==true</CODE>)
+     * @param abbr <CODE>true</CODE> - abbreviate first name, <CODE>false</CODE> - do not abbreviate
+     * @return 'First von Last, Jr.' (if <CODE>abbr==false</CODE>) or 'F. von Last, Jr.' (if <CODE>abbr==true</CODE>)
      */
     public String getFirstLast(boolean abbr) {
         StringBuilder res = new StringBuilder();
@@ -368,11 +342,9 @@ public class Author {
     }
 
     /**
-     * Returns the name as "Last, Jr, F." omitting the von-part and removing
-     * starting braces.
+     * Returns the name as "Last, Jr, F." omitting the von-part and removing starting braces.
      *
-     * @return "Last, Jr, F." as described above or "" if all these parts
-     * are empty.
+     * @return "Last, Jr, F." as described above or "" if all these parts are empty.
      */
     public String getNameForAlphabetization() {
         StringBuilder res = new StringBuilder();
@@ -383,5 +355,21 @@ public class Author {
             res.deleteCharAt(0);
         }
         return res.toString();
+    }
+
+    /**
+     * Returns a LaTeX-free version of this `Author`.
+     */
+    public Author latexFree() {
+        if (latexFreeAuthor == null) {
+            String first = getFirst().map(LatexToUnicodeAdapter::format).orElse(null);
+            String firstabbr = getFirstAbbr().map(LatexToUnicodeAdapter::format).orElse(null);
+            String von = getVon().map(LatexToUnicodeAdapter::format).orElse(null);
+            String last = getLast().map(LatexToUnicodeAdapter::format).orElse(null);
+            String jr = getJr().map(LatexToUnicodeAdapter::format).orElse(null);
+            latexFreeAuthor = new Author(first, firstabbr, von, last, jr);
+            latexFreeAuthor.latexFreeAuthor = latexFreeAuthor;
+        }
+        return latexFreeAuthor;
     }
 }

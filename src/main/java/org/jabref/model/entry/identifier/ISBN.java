@@ -2,19 +2,20 @@ package org.jabref.model.entry.identifier;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 public class ISBN implements Identifier {
 
     private static final Pattern ISBN_PATTERN = Pattern.compile("^(\\d{9}[\\dxX]|\\d{13})$");
 
     private final String isbnString;
-
 
     public ISBN(String isbnString) {
         this.isbnString = Objects.requireNonNull(isbnString).trim().replace("-", "");
@@ -31,10 +32,7 @@ public class ISBN implements Identifier {
 
     public boolean isValidFormat() {
         Matcher isbnMatcher = ISBN_PATTERN.matcher(isbnString);
-        if (isbnMatcher.matches()) {
-            return true;
-        }
-        return false;
+        return isbnMatcher.matches();
     }
 
     public boolean isValidChecksum() {
@@ -92,8 +90,8 @@ public class ISBN implements Identifier {
     }
 
     @Override
-    public String getDefaultField() {
-        return FieldName.ISBN;
+    public Field getDefaultField() {
+        return StandardField.ISBN;
     }
 
     @Override
@@ -104,9 +102,26 @@ public class ISBN implements Identifier {
     @Override
     public Optional<URI> getExternalURI() {
         try {
-            return Optional.of(new URI("http://www.worldcat.org/isbn/" + isbnString));
+            return Optional.of(new URI("https://www.worldcat.org/isbn/" + isbnString));
         } catch (URISyntaxException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if ((o == null) || (getClass() != o.getClass())) {
+            return false;
+        }
+        ISBN other = (ISBN) o;
+        return isbnString.equalsIgnoreCase(other.isbnString);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(isbnString.toLowerCase(Locale.ENGLISH));
     }
 }

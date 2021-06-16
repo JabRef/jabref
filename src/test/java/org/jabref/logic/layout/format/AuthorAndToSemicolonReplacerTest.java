@@ -1,41 +1,31 @@
 package org.jabref.logic.layout.format;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.stream.Stream;
 
 import org.jabref.logic.layout.LayoutFormatter;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 
-@RunWith(Parameterized.class)
-public class AuthorAndToSemicolonReplacerTest {
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-    @Parameter(value = 0)
-    public String input;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-    @Parameter(value = 1)
-    public String expected;
+class AuthorAndToSemicolonReplacerTest {
 
-    @Parameters(name = "{index}: format(\"{0}\")=\"{1}\"")
-    public static Collection<Object[]> data() {
-
-        return Arrays.asList(new Object[][] {
-            {"",""},
-            {"Someone, Van Something", "Someone, Van Something"},
-            {"John Smith and Black Brown, Peter", "John Smith; Black Brown, Peter"},
-            {"von Neumann, John and Smith, John and Black Brown, Peter", "von Neumann, John; Smith, John; Black Brown, Peter"},
-            {"John von Neumann and John Smith and Peter Black Brown","John von Neumann; John Smith; Peter Black Brown"},
-        });
+    private static Stream<Arguments> data() {
+        return Stream.of(
+                Arguments.of("", ""),
+                Arguments.of("Someone, Van Something", "Someone, Van Something"),
+                Arguments.of("John Smith and Black Brown, Peter", "John Smith; Black Brown, Peter"),
+                Arguments.of("von Neumann, John and Smith, John and Black Brown, Peter", "von Neumann, John; Smith, John; Black Brown, Peter"),
+                Arguments.of("John von Neumann and John Smith and Peter Black Brown", "John von Neumann; John Smith; Peter Black Brown"));
     }
 
-    @Test
-    public void testFormat() {
+    @ParameterizedTest
+    @MethodSource("data")
+    void testFormat(String input, String expected) {
         LayoutFormatter a = new AuthorAndToSemicolonReplacer();
 
-        Assert.assertEquals(expected, a.format(input));
+        assertEquals(expected, a.format(input));
     }
 }

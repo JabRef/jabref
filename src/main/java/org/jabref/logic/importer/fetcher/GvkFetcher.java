@@ -5,18 +5,17 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
+import org.jabref.logic.importer.fetcher.transformers.GVKQueryTransformer;
 import org.jabref.logic.importer.fileformat.GvkParser;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 public class GvkFetcher implements SearchBasedParserFetcher {
 
@@ -34,47 +33,16 @@ public class GvkFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
-    public HelpFile getHelpPage() {
-        return HelpFile.FETCHER_GVK;
-    }
-
-    private String getSearchQueryStringForComplexQuery(List<String> queryList) {
-        String query = "";
-        boolean lastWasNoKey = false;
-
-        for (String key : queryList) {
-            if (searchKeys.contains(key)) {
-                if (lastWasNoKey) {
-                    query = query + "and ";
-                }
-                query = query + "pica." + key + "=";
-            } else {
-                query = query + key + " ";
-                lastWasNoKey = true;
-            }
-        }
-        return query.trim();
-    }
-
-    protected String getSearchQueryString(String query) {
-        Objects.requireNonNull(query);
-        LinkedList<String> queryList = new LinkedList<>(Arrays.asList(query.split("\\s")));
-
-        if (searchKeys.contains(queryList.get(0))) {
-            return getSearchQueryStringForComplexQuery(queryList);
-        } else {
-            // query as pica.all
-            return queryList.stream().collect(Collectors.joining(" ", "pica.all=", ""));
-        }
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_GVK);
     }
 
     @Override
-    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
-        String gvkQuery = getSearchQueryString(query);
+    public URL getURLForQuery(QueryNode luceneQuery) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(URL_PATTERN);
         uriBuilder.addParameter("version", "1.1");
         uriBuilder.addParameter("operation", "searchRetrieve");
-        uriBuilder.addParameter("query", gvkQuery);
+        uriBuilder.addParameter("query", new GVKQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
         uriBuilder.addParameter("maximumRecords", "50");
         uriBuilder.addParameter("recordSchema", "picaxml");
         uriBuilder.addParameter("sortKeys", "Year,,1");
@@ -85,5 +53,4 @@ public class GvkFetcher implements SearchBasedParserFetcher {
     public Parser getParser() {
         return new GvkParser();
     }
-
 }

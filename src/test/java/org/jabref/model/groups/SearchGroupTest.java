@@ -2,12 +2,11 @@ package org.jabref.model.groups;
 
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SearchGroupTest {
-
 
     @Test
     public void containsFindsWordWithRegularExpression() {

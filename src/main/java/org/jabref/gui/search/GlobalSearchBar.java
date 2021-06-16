@@ -1,293 +1,227 @@
 package org.jabref.gui.search;
 
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.io.File;
+import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
-import javax.swing.AbstractAction;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
-import javax.swing.SwingUtilities;
-
+import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.css.PseudoClass;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
+import javafx.event.Event;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.TextField;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.Skin;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.cell.TextFieldListCell;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
-import org.jabref.Globals;
-import org.jabref.gui.AbstractView;
-import org.jabref.gui.BasePanel;
-import org.jabref.gui.GUIGlobals;
-import org.jabref.gui.IconTheme;
+import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
-import org.jabref.gui.OSXCompatibleToolbar;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.AppendPersonNamesStrategy;
 import org.jabref.gui.autocompleter.AutoCompleteFirstNameMode;
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
 import org.jabref.gui.autocompleter.PersonNameStringConverter;
-import org.jabref.gui.customjfx.CustomJFXPanel;
-import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.maintable.MainTable;
-import org.jabref.gui.maintable.MainTableDataModel;
+import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.search.rules.describer.SearchDescribers;
+import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
-import org.jabref.logic.help.HelpFile;
+import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.SearchQuery;
-import org.jabref.logic.search.SearchQueryHighlightObservable;
 import org.jabref.model.entry.Author;
-import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.SearchPreferences;
 
-import org.fxmisc.easybind.EasyBind;
+import com.tobiasdiez.easybind.EasyBind;
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.Validator;
+import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import impl.org.controlsfx.skin.AutoCompletePopup;
+import org.controlsfx.control.textfield.AutoCompletionBinding;
+import org.controlsfx.control.textfield.CustomTextField;
+import org.reactfx.util.FxTimer;
+import org.reactfx.util.Timer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class GlobalSearchBar extends JPanel {
+import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
+public class GlobalSearchBar extends HBox {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalSearchBar.class);
+
+    private static final int SEARCH_DELAY = 400;
     private static final PseudoClass CLASS_NO_RESULTS = PseudoClass.getPseudoClass("emptyResult");
     private static final PseudoClass CLASS_RESULTS_FOUND = PseudoClass.getPseudoClass("emptyResult");
 
-    private final JabRefFrame frame;
+    private final CustomTextField searchField = SearchTextField.create();
+    private final ToggleButton caseSensitiveButton;
+    private final ToggleButton regularExpressionButton;
+    // private final Button searchModeButton;
+    private final Tooltip searchFieldTooltip = new Tooltip();
+    private final Label currentResults = new Label("");
 
-    private final TextField searchField = SearchTextField.create();
-    private final JToggleButton caseSensitive;
-    private final JToggleButton regularExp;
-    private final JButton searchModeButton = new JButton();
-    private final JLabel currentResults = new JLabel("");
-    private final SearchQueryHighlightObservable searchQueryHighlightObservable = new SearchQueryHighlightObservable();
-    private final JButton openCurrentResultsInDialog = new JButton(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon());
-    private final JFXPanel container;
-    private SearchWorker searchWorker;
-    private GlobalSearchWorker globalSearchWorker;
+    private final StateManager stateManager;
+    private final PreferencesService preferencesService;
+    private final Validator regexValidator;
 
-    private SearchResultFrame searchResultFrame;
+    private SearchPreferences searchPreferences;
 
-    private SearchDisplayMode searchDisplayMode;
-
-    /**
-     * if this flag is set the searchbar won't be selected after the next search
-     */
-    private boolean dontSelectSearchBar;
-
-    public GlobalSearchBar(JabRefFrame frame) {
+    public GlobalSearchBar(JabRefFrame frame, StateManager stateManager, PreferencesService preferencesService) {
         super();
-        this.frame = Objects.requireNonNull(frame);
-        SearchPreferences searchPreferences = new SearchPreferences(Globals.prefs);
-        searchDisplayMode = searchPreferences.getSearchMode();
+        this.stateManager = stateManager;
+        this.preferencesService = preferencesService;
+        this.searchPreferences = preferencesService.getSearchPreferences();
+
+        this.searchField.disableProperty().bind(needsDatabase(stateManager).not());
 
         // fits the standard "found x entries"-message thus hinders the searchbar to jump around while searching if the frame width is too small
-        currentResults.setPreferredSize(new Dimension(150, 5));
-        currentResults.setFont(currentResults.getFont().deriveFont(Font.BOLD));
+        currentResults.setPrefWidth(150);
 
-        JToggleButton globalSearch = new JToggleButton(IconTheme.JabRefIcon.GLOBAL_SEARCH.getSmallIcon(), searchPreferences.isGlobalSearch());
-        globalSearch.setToolTipText(Localization.lang("Search in all open libraries"));
+        searchField.setTooltip(searchFieldTooltip);
+        searchFieldTooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        searchFieldTooltip.setMaxHeight(10);
+        updateHintVisibility();
 
-        // default action to be performed for toggling globalSearch
-        AbstractAction globalSearchStandardAction = new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                searchPreferences.setGlobalSearch(globalSearch.isSelected());
-                updateOpenCurrentResultsTooltip(globalSearch.isSelected());
-            }
-        };
-
-        // additional action for global search shortcut
-        AbstractAction globalSearchShortCutAction = new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                globalSearch.setSelected(true);
-                globalSearchStandardAction.actionPerformed(new ActionEvent(this, 0, "fire standard action"));
-                focus();
-            }
-        };
-        //TODO: These have to be somehow converted
-        /*
-        String endSearch = "endSearch";
-        searchField.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.CLEAR_SEARCH), endSearch);
-        searchField.getActionMap().put(endSearch, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                if (autoCompleteSupport.isVisible()) {
-                    autoCompleteSupport.setVisible(false);
-                } else {
-                    endSearch();
+        KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
+        searchField.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
+            if (keyBinding.isPresent()) {
+                if (keyBinding.get().equals(KeyBinding.CLOSE)) {
+                    // Clear search and select first entry, if available
+                    searchField.setText("");
+                    frame.getCurrentLibraryTab().getMainTable().getSelectionModel().selectFirst();
+                    event.consume();
                 }
             }
         });
-        */
 
-        /*
-        String acceptSearch = "acceptSearch";
-        searchField.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.ACCEPT), acceptSearch);
-        searchField.getActionMap().put(acceptSearch, new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                autoCompleteSupport.setVisible(false);
-                BasePanel currentBasePanel = frame.getCurrentBasePanel();
-                Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
-                currentBasePanel.getMainTable().requestFocus();
-            }
+        ClipBoardManager.addX11Support(searchField);
+
+        regularExpressionButton = IconTheme.JabRefIcons.REG_EX.asToggleButton();
+        caseSensitiveButton = IconTheme.JabRefIcons.CASE_SENSITIVE.asToggleButton();
+        // searchModeButton = new Button();
+        initSearchModifierButtons();
+
+        BooleanBinding focusedOrActive = searchField.focusedProperty()
+                                                    .or(regularExpressionButton.focusedProperty())
+                                                    .or(caseSensitiveButton.focusedProperty())
+                                                    .or(searchField.textProperty()
+                                                                   .isNotEmpty());
+
+        regularExpressionButton.visibleProperty().unbind();
+        regularExpressionButton.visibleProperty().bind(focusedOrActive);
+        caseSensitiveButton.visibleProperty().unbind();
+        caseSensitiveButton.visibleProperty().bind(focusedOrActive);
+
+        StackPane modifierButtons = new StackPane(new HBox(regularExpressionButton, caseSensitiveButton));
+        modifierButtons.setAlignment(Pos.CENTER);
+        searchField.setRight(new HBox(searchField.getRight(), modifierButtons));
+        searchField.getStyleClass().add("search-field");
+        searchField.setMinWidth(100);
+        HBox.setHgrow(searchField, Priority.ALWAYS);
+
+        regexValidator = new FunctionBasedValidator<>(
+                searchField.textProperty(),
+                query -> !(regularExpressionButton.isSelected() && !validRegex()),
+                ValidationMessage.error(Localization.lang("Invalid regular expression"))
+        );
+        ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
+        visualizer.setDecoration(new IconValidationDecorator(Pos.CENTER_LEFT));
+        Platform.runLater(() -> visualizer.initVisualization(regexValidator.getValidationStatus(), searchField));
+
+        this.getChildren().addAll(searchField, currentResults);
+        this.setSpacing(4.0);
+        this.setAlignment(Pos.CENTER_LEFT);
+
+        Timer searchTask = FxTimer.create(java.time.Duration.ofMillis(SEARCH_DELAY), this::performSearch);
+        BindingsHelper.bindBidirectional(
+                stateManager.activeSearchQueryProperty(),
+                searchField.textProperty(),
+                searchTerm -> {
+                    // Async update
+                    searchTask.restart();
+                },
+                query -> setSearchTerm(query.map(SearchQuery::getQuery).orElse(""))
+        );
+
+        EasyBind.subscribe(this.stateManager.activeSearchQueryProperty(), searchQuery -> {
+            searchQuery.ifPresent(query -> {
+                updateResults(this.stateManager.getSearchResultSize().intValue(), SearchDescribers.getSearchDescriberFor(query).getDescription(),
+                        query.isGrammarBasedSearch());
+            });
         });
-        */
+    }
 
-        String searchGlobalByKey = "searchGlobalByKey";
-        globalSearch.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(Globals.getKeyPrefs().getKey(KeyBinding.GLOBAL_SEARCH), searchGlobalByKey);
-        globalSearch.getActionMap().put(searchGlobalByKey, globalSearchShortCutAction);
-
-        globalSearch.addActionListener(globalSearchStandardAction);
-
-        openCurrentResultsInDialog.setDisabledIcon(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon().createDisabledIcon());
-        openCurrentResultsInDialog.addActionListener(event -> {
-            if (globalSearch.isSelected()) {
-                performGlobalSearch();
-            } else {
-                openLocalFindingsInExternalPanel();
-            }
-        });
-        openCurrentResultsInDialog.setEnabled(false);
-        updateOpenCurrentResultsTooltip(globalSearch.isSelected());
-
-        regularExp = new JToggleButton(IconTheme.JabRefIcon.REG_EX.getSmallIcon(),
-                searchPreferences.isRegularExpression());
-        regularExp.setToolTipText(Localization.lang("regular expression"));
-        regularExp.addActionListener(event -> {
-            searchPreferences.setRegularExpression(regularExp.isSelected());
+    private void initSearchModifierButtons() {
+        regularExpressionButton.setSelected(searchPreferences.isRegularExpression());
+        regularExpressionButton.setTooltip(new Tooltip(Localization.lang("regular expression")));
+        initSearchModifierButton(regularExpressionButton);
+        regularExpressionButton.setOnAction(event -> {
+            searchPreferences = searchPreferences.withRegularExpression(regularExpressionButton.isSelected());
+            preferencesService.storeSearchPreferences(searchPreferences);
             performSearch();
         });
 
-        caseSensitive = new JToggleButton(IconTheme.JabRefIcon.CASE_SENSITIVE.getSmallIcon(),
-                searchPreferences.isCaseSensitive());
-        caseSensitive.setToolTipText(Localization.lang("Case sensitive"));
-        caseSensitive.addActionListener(event -> {
-            searchPreferences.setCaseSensitive(caseSensitive.isSelected());
+        caseSensitiveButton.setSelected(searchPreferences.isCaseSensitive());
+        caseSensitiveButton.setTooltip(new Tooltip(Localization.lang("Case sensitive")));
+        initSearchModifierButton(caseSensitiveButton);
+        caseSensitiveButton.setOnAction(event -> {
+            searchPreferences = searchPreferences.withCaseSensitive(caseSensitiveButton.isSelected());
+            preferencesService.storeSearchPreferences(searchPreferences);
             performSearch();
         });
 
-        updateSearchModeButtonText();
-        searchModeButton.addActionListener(event -> toggleSearchModeAndSearch());
+        // ToDo: Reimplement searchMode (searchModeButton)
+        /* searchModeButton.setText(searchPreferences.getSearchDisplayMode().getDisplayName());
+        searchModeButton.setTooltip(new Tooltip(searchPreferences.getSearchDisplayMode().getToolTipText()));
+        searchModeButton.setOnAction(event -> {
+            SearchDisplayMode searchDisplayMode = searchPreferences.getSearchDisplayMode();
+            int nextSearchMode = (searchDisplayMode.ordinal() + 1) % SearchDisplayMode.values().length;
+            searchDisplayMode = SearchDisplayMode.values()[nextSearchMode];
 
-        EasyBind.subscribe(searchField.textProperty(), searchText -> performSearch());
+            searchPreferences = searchPreferences..withSearchDisplayMode(searchDisplayMode);
+            preferencesService.storeSearchPreferences(searchPreferences);
 
-        container = CustomJFXPanel.create();
-        DefaultTaskExecutor.runInJavaFXThread(() -> {
-            Scene scene = new Scene(searchField);
-            scene.getStylesheets().add(AbstractView.class.getResource("Main.css").toExternalForm());
-            container.setScene(scene);
-            container.addKeyListener(new SearchKeyAdapter());
-        });
+            searchModeButton.setText(searchDisplayMode.getDisplayName());
+            searchModeButton.setTooltip(new Tooltip(searchDisplayMode.getToolTipText()));
 
-        setLayout(new FlowLayout(FlowLayout.RIGHT));
-        JToolBar toolBar = new OSXCompatibleToolbar();
-        toolBar.setFloatable(false);
-        toolBar.add(container);
-        toolBar.add(openCurrentResultsInDialog);
-        toolBar.addSeparator();
-        toolBar.add(globalSearch);
-        toolBar.add(regularExp);
-        toolBar.add(caseSensitive);
-        toolBar.add(searchModeButton);
-        toolBar.addSeparator();
-        toolBar.add(new HelpAction(HelpFile.SEARCH));
-        toolBar.addSeparator();
-        toolBar.add(currentResults);
-        this.add(toolBar);
+            performSearch();
+        }); */
     }
 
-    public void performGlobalSearch() {
-        BasePanel currentBasePanel = frame.getCurrentBasePanel();
-        if ((currentBasePanel == null) || validateSearchResultFrame(true)) {
-            return;
-        }
-
-        if (globalSearchWorker != null) {
-            globalSearchWorker.cancel(true);
-        }
-
-        if (searchField.getText().isEmpty()) {
-            focus();
-            return;
-        }
-
-        globalSearchWorker = new GlobalSearchWorker(currentBasePanel.frame(), getSearchQuery());
-        globalSearchWorker.execute();
-    }
-
-    private void openLocalFindingsInExternalPanel() {
-        BasePanel currentBasePanel = frame.getCurrentBasePanel();
-        if ((currentBasePanel == null) || validateSearchResultFrame(false)) {
-            return;
-        }
-
-        if (searchField.getText().isEmpty()) {
-            focus();
-            return;
-        }
-
-        SearchResultFrame searchDialog = new SearchResultFrame(currentBasePanel.frame(),
-                Localization.lang("Search results in library %0 for %1", currentBasePanel.getBibDatabaseContext()
-                                .getDatabaseFile().map(File::getName).orElse(GUIGlobals.UNTITLED_TITLE),
-                        this.getSearchQuery().localize()),
-                getSearchQuery(), false);
-        List<BibEntry> entries = currentBasePanel.getDatabase().getEntries().stream()
-                .filter(BibEntry::isSearchHit)
-                .collect(Collectors.toList());
-        searchDialog.addEntries(entries, currentBasePanel);
-        searchDialog.selectFirstEntry();
-        searchDialog.setVisible(true);
-    }
-
-    private boolean validateSearchResultFrame(boolean globalSearch) {
-        if (searchResultFrame != null) {
-            if ((searchResultFrame.isGlobalSearch() == globalSearch) && isStillValidQuery(searchResultFrame.getSearchQuery())) {
-                searchResultFrame.focus();
-                return true;
-            } else {
-                searchResultFrame.dispose();
-                return false;
-            }
-        }
-
-        return false;
-    }
-
-    private void toggleSearchModeAndSearch() {
-        int nextSearchMode = (searchDisplayMode.ordinal() + 1) % SearchDisplayMode.values().length;
-        searchDisplayMode = SearchDisplayMode.values()[nextSearchMode];
-        new SearchPreferences(Globals.prefs).setSearchMode(searchDisplayMode);
-        updateSearchModeButtonText();
-        performSearch();
-    }
-
-    private void updateSearchModeButtonText() {
-        searchModeButton.setText(searchDisplayMode.getDisplayName());
-        searchModeButton.setToolTipText(searchDisplayMode.getToolTipText());
-    }
-
-    public void endSearch() {
-        BasePanel currentBasePanel = frame.getCurrentBasePanel();
-        if (currentBasePanel != null) {
-            clearSearch(currentBasePanel);
-            MainTable mainTable = frame.getCurrentBasePanel().getMainTable();
-            Globals.getFocusListener().setFocused(mainTable);
-            mainTable.requestFocus();
-            SwingUtilities.invokeLater(() -> mainTable.ensureVisible(mainTable.getSelectedRow()));
-        }
+    private void initSearchModifierButton(ToggleButton searchButton) {
+        searchButton.setCursor(Cursor.DEFAULT);
+        searchButton.setMinHeight(28);
+        searchButton.setMaxHeight(28);
+        searchButton.setMinWidth(28);
+        searchButton.setMaxWidth(28);
+        searchButton.setPadding(new Insets(1.0));
+        searchButton.managedProperty().bind(searchField.editableProperty());
+        searchButton.visibleProperty().bind(searchField.editableProperty());
     }
 
     /**
@@ -295,95 +229,83 @@ public class GlobalSearchBar extends JPanel {
      */
     public void focus() {
         if (!searchField.isFocused()) {
-            container.requestFocus();
             searchField.requestFocus();
         }
         searchField.selectAll();
     }
 
-    private void clearSearch(BasePanel currentBasePanel) {
-        currentResults.setText("");
-        searchField.setText("");
-        searchQueryHighlightObservable.reset();
-        openCurrentResultsInDialog.setEnabled(false);
-
-        if (currentBasePanel != null) {
-            currentBasePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
-            currentBasePanel.setCurrentSearchQuery(null);
-        }
-
-        if (dontSelectSearchBar) {
-            dontSelectSearchBar = false;
-            return;
-        }
-        focus();
-    }
-
     public void performSearch() {
-        BasePanel currentBasePanel = frame.getCurrentBasePanel();
-        if (currentBasePanel == null) {
-            return;
-        }
-
-        if (searchWorker != null) {
-            searchWorker.cancel(true);
-        }
+        LOGGER.debug("Run search " + searchField.getText());
 
         // An empty search field should cause the search to be cleared.
         if (searchField.getText().isEmpty()) {
-            clearSearch(currentBasePanel);
+            currentResults.setText("");
+            setSearchFieldHintTooltip(null);
+            stateManager.clearSearchQuery();
             return;
         }
 
-        SearchQuery searchQuery = getSearchQuery();
+        // Invalid regular expression
+        if (!regexValidator.getValidationStatus().isValid()) {
+            currentResults.setText(Localization.lang("Invalid regular expression"));
+            return;
+        }
+
+        SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), searchPreferences.isCaseSensitive(), searchPreferences.isRegularExpression());
         if (!searchQuery.isValid()) {
             informUserAboutInvalidSearchQuery();
             return;
         }
+        stateManager.setSearchQuery(searchQuery);
+    }
 
-        searchWorker = new SearchWorker(currentBasePanel, searchQuery, searchDisplayMode);
-        searchWorker.execute();
+    private boolean validRegex() {
+        try {
+            Pattern.compile(searchField.getText());
+        } catch (PatternSyntaxException e) {
+            LOGGER.debug(e.getMessage());
+            return false;
+        }
+        return true;
     }
 
     private void informUserAboutInvalidSearchQuery() {
         searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
 
-        searchQueryHighlightObservable.reset();
-
-        BasePanel currentBasePanel = frame.getCurrentBasePanel();
-        currentBasePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
+        stateManager.clearSearchQuery();
 
         String illegalSearch = Localization.lang("Search failed: illegal search expression");
         currentResults.setText(illegalSearch);
-        openCurrentResultsInDialog.setEnabled(false);
     }
 
-    public void setAutoCompleter(AutoCompleteSuggestionProvider<Author> searchCompleter) {
-        if (Globals.prefs.getAutoCompletePreferences().shouldAutoComplete()) {
-            AutoCompletionTextInputBinding.autoComplete(searchField,
-                    searchCompleter,
+    public void setAutoCompleter(SuggestionProvider<Author> searchCompleter) {
+        if (preferencesService.getAutoCompletePreferences().shouldAutoComplete()) {
+            AutoCompletionTextInputBinding<Author> autoComplete = AutoCompletionTextInputBinding.autoComplete(searchField,
+                    searchCompleter::provideSuggestions,
                     new PersonNameStringConverter(false, false, AutoCompleteFirstNameMode.BOTH),
                     new AppendPersonNamesStrategy());
+            AutoCompletePopup<Author> popup = getPopup(autoComplete);
+            popup.setSkin(new SearchPopupSkin<>(popup));
         }
     }
 
-    public SearchQueryHighlightObservable getSearchQueryHighlightObservable() {
-        return searchQueryHighlightObservable;
+    /**
+     * The popup has private access in {@link AutoCompletionBinding}, so we use reflection to access it.
+     */
+    @SuppressWarnings("unchecked")
+    private <T> AutoCompletePopup<T> getPopup(AutoCompletionBinding<T> autoCompletionBinding) {
+        try {
+            // TODO: reflective access, should be removed
+            Field privatePopup = AutoCompletionBinding.class.getDeclaredField("autoCompletionPopup");
+            privatePopup.setAccessible(true);
+            return (AutoCompletePopup<T>) privatePopup.get(autoCompletionBinding);
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            LOGGER.error("Could not get access to auto completion popup", e);
+            return new AutoCompletePopup<>();
+        }
     }
 
-    public boolean isStillValidQuery(SearchQuery query) {
-        return query.getQuery().equals(this.searchField.getText())
-                && (query.isRegularExpression() == regularExp.isSelected())
-                && (query.isCaseSensitive() == caseSensitive.isSelected());
-    }
-
-    private SearchQuery getSearchQuery() {
-        SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), this.caseSensitive.isSelected(), this.regularExp.isSelected());
-        this.frame.getCurrentBasePanel().setCurrentSearchQuery(searchQuery);
-        return searchQuery;
-    }
-
-    public void updateResults(int matched, TextFlow description, boolean grammarBasedSearch) {
+    private void updateResults(int matched, TextFlow description, boolean grammarBasedSearch) {
         if (matched == 0) {
             currentResults.setText(Localization.lang("No results found."));
             searchField.pseudoClassStateChanged(CLASS_NO_RESULTS, true);
@@ -391,16 +313,36 @@ public class GlobalSearchBar extends JPanel {
             currentResults.setText(Localization.lang("Found %0 results.", String.valueOf(matched)));
             searchField.pseudoClassStateChanged(CLASS_RESULTS_FOUND, true);
         }
-        Tooltip tooltip = new Tooltip();
-        tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        tooltip.setGraphic(description);
-        tooltip.setMaxHeight(10);
-        DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setTooltip(tooltip));
-        openCurrentResultsInDialog.setEnabled(true);
+        if (grammarBasedSearch) {
+            // TODO: switch Icon color
+            // searchIcon.setIcon(IconTheme.JabRefIcon.ADVANCED_SEARCH.getIcon());
+        } else {
+            // TODO: switch Icon color
+            // searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
+        }
+
+        setSearchFieldHintTooltip(description);
     }
 
-    public void setSearchResultFrame(SearchResultFrame searchResultFrame) {
-        this.searchResultFrame = searchResultFrame;
+    private void setSearchFieldHintTooltip(TextFlow description) {
+        if (preferencesService.getGeneralPreferences().shouldShowAdvancedHints()) {
+            String genericDescription = Localization.lang("Hint:\n\nTo search all fields for <b>Smith</b>, enter:\n<tt>smith</tt>\n\nTo search the field <b>author</b> for <b>Smith</b> and the field <b>title</b> for <b>electrical</b>, enter:\n<tt>author=Smith and title=electrical</tt>");
+            List<Text> genericDescriptionTexts = TooltipTextUtil.createTextsFromHtml(genericDescription);
+
+            if (description == null) {
+                TextFlow emptyHintTooltip = new TextFlow();
+                emptyHintTooltip.getChildren().setAll(genericDescriptionTexts);
+                searchFieldTooltip.setGraphic(emptyHintTooltip);
+            } else {
+                description.getChildren().add(new Text("\n\n"));
+                description.getChildren().addAll(genericDescriptionTexts);
+                searchFieldTooltip.setGraphic(description);
+            }
+        }
+    }
+
+    public void updateHintVisibility() {
+        setSearchFieldHintTooltip(null);
     }
 
     public void setSearchTerm(String searchTerm) {
@@ -408,53 +350,74 @@ public class GlobalSearchBar extends JPanel {
             return;
         }
 
-        setDontSelectSearchBar();
         DefaultTaskExecutor.runInJavaFXThread(() -> searchField.setText(searchTerm));
     }
 
-    public void setDontSelectSearchBar() {
-        this.dontSelectSearchBar = true;
-    }
+    private class SearchPopupSkin<T> implements Skin<AutoCompletePopup<T>> {
 
-    private void updateOpenCurrentResultsTooltip(boolean globalSearchEnabled) {
-        if (globalSearchEnabled) {
-            openCurrentResultsInDialog.setToolTipText(Localization.lang("Show global search results in a window"));
-        } else {
-            openCurrentResultsInDialog.setToolTipText(Localization.lang("Show search results in a window"));
+        private final AutoCompletePopup<T> control;
+        private final ListView<T> suggestionList;
+        private final BorderPane container;
+
+        public SearchPopupSkin(AutoCompletePopup<T> control) {
+            this.control = control;
+            this.suggestionList = new ListView<>(control.getSuggestions());
+            this.suggestionList.getStyleClass().add("auto-complete-popup");
+            this.suggestionList.getStylesheets().add(AutoCompletionBinding.class.getResource("autocompletion.css").toExternalForm());
+            this.suggestionList.prefHeightProperty().bind(Bindings.min(control.visibleRowCountProperty(), Bindings.size(this.suggestionList.getItems())).multiply(24).add(18));
+            this.suggestionList.setCellFactory(TextFieldListCell.forListView(control.getConverter()));
+            this.suggestionList.prefWidthProperty().bind(control.prefWidthProperty());
+            this.suggestionList.maxWidthProperty().bind(control.maxWidthProperty());
+            this.suggestionList.minWidthProperty().bind(control.minWidthProperty());
+
+            this.container = new BorderPane();
+            this.container.setCenter(suggestionList);
+
+            this.registerEventListener();
         }
-    }
 
-    private class SearchKeyAdapter extends KeyAdapter {
-
-        @Override
-        public void keyPressed(java.awt.event.KeyEvent e) {
-            switch (e.getKeyCode()) {
-                //This "hack" prevents that the focus moves out of the field
-                case java.awt.event.KeyEvent.VK_RIGHT:
-                case java.awt.event.KeyEvent.VK_LEFT:
-                case java.awt.event.KeyEvent.VK_UP:
-                case java.awt.event.KeyEvent.VK_DOWN:
-                    e.consume();
-                    break;
-                default:
-                    //do nothing
-            }
-
-            //We need to consume this event here to prevent the propgation of keybinding events back to the JFrame
-            Optional<KeyBinding> keyBinding = Globals.getKeyPrefs().mapToKeyBinding(e);
-            if (keyBinding.isPresent()) {
-                switch (keyBinding.get()) {
-                    case CUT:
-                    case COPY:
-                    case PASTE:
-                    case DELETE_ENTRY:
-                    case SELECT_ALL:
-                        e.consume();
+        private void registerEventListener() {
+            this.suggestionList.setOnMouseClicked((me) -> {
+                if (me.getButton() == MouseButton.PRIMARY) {
+                    this.onSuggestionChosen(this.suggestionList.getSelectionModel().getSelectedItem());
+                }
+            });
+            this.suggestionList.setOnKeyPressed((ke) -> {
+                switch (ke.getCode()) {
+                    case TAB:
+                    case ENTER:
+                        this.onSuggestionChosen(this.suggestionList.getSelectionModel().getSelectedItem());
+                        break;
+                    case ESCAPE:
+                        if (this.control.isHideOnEscape()) {
+                            this.control.hide();
+                        }
                         break;
                     default:
-                        //do nothing
+                        break;
                 }
+            });
+        }
+
+        private void onSuggestionChosen(T suggestion) {
+            if (suggestion != null) {
+                Event.fireEvent(this.control, new AutoCompletePopup.SuggestionEvent<>(suggestion));
             }
+        }
+
+        @Override
+        public Node getNode() {
+            return this.container;
+        }
+
+        @Override
+        public AutoCompletePopup<T> getSkinnable() {
+            return this.control;
+        }
+
+        @Override
+        public void dispose() {
+            // empty
         }
     }
 }

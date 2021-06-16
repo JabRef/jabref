@@ -6,7 +6,6 @@ public class VersionPreferences {
 
     private final Version ignoredVersion;
 
-
     public VersionPreferences(Version ignoredVersion) {
         this.ignoredVersion = ignoredVersion;
     }
@@ -14,5 +13,4 @@ public class VersionPreferences {
     public Version getIgnoredVersion() {
         return ignoredVersion;
     }
-
 }

@@ -1,42 +1,67 @@
-# *[short title of solved problem and solution]*
+# MADR Template
 
-**User Story:** *[ticket/issue-number]* <!-- optional -->
+The template of [MADR](https://adr.github.io/madr/) is available at <https://github.com/adr/madr#the-template>.
+You can omit the `<-- optional -->` parts, which lead to a very minimal ADR:
 
-*[context and problem statement]*
-*[decision drivers | forces]* <!-- optional -->
+```markdown
+# [short title of solved problem and solution]
 
-## Considered Alternatives
+## Context and Problem Statement
 
-* *[alternative 1]*
-* *[alternative 2]*
-* *[alternative 3]*
-* *[...]* <!-- numbers of alternatives can vary -->
+[Describe the context and problem statement, e.g., in free form using two to three sentences. You may want to articulate the problem in form of a question.]
+
+## Considered Options
+
+* [option 1]
+* [option 2]
+* [option 3]
+* … <!-- numbers of options can vary -->
 
 ## Decision Outcome
 
-* Chosen Alternative: *[alternative 1]*
-* *[justification. e.g., only alternative, which meets k.o. criterion decision driver | which resolves force force | ... | comes out best (see below)]*
-* *[consequences. e.g., negative impact on quality attribute, follow-up decisions required, ...]* <!-- optional -->
+Chosen option: "[option 1]", because [justification. e.g., only option, which meets k.o. criterion decision driver | which resolves force force | … ].
+```
 
-## Pros and Cons of the Alternatives <!-- optional -->
+In case you want to include the pros and cons of the options, the template is as follows:
 
-### *[alternative 1]*
+```markdown
+# [short title of solved problem and solution]
 
-* `+` *[argument 1 pro]*
-* `+` *[argument 2 pro]*
-* `-` *[argument 1 con]*
-* *[...]* <!-- numbers of pros and cons can vary -->
+## Context and Problem Statement
 
-### *[alternative 2]*
+[Describe the context and problem statement, e.g., in free form using two to three sentences. You may want to articulate the problem in form of a question.]
 
-* `+` *[argument 1 pro]*
-* `+` *[argument 2 pro]*
-* `-` *[argument 1 con]*
-* *[...]* <!-- numbers of pros and cons can vary -->
+## Considered Options
 
-### *[alternative 3]*
+* [option 1]
+* [option 2]
+* [option 3]
+* … <!-- numbers of options can vary -->
 
-* `+` *[argument 1 pro]*
-* `+` *[argument 2 pro]*
-* `-` *[argument 1 con]*
-* *[...]* <!-- numbers of pros and cons can vary -->
+## Decision Outcome
+
+Chosen option: "[option 1]", because comes out best (see below).
+
+## Pros and Cons of the Options
+
+### [option 1]
+
+* Good, because [argument a]
+* Good, because [argument b]
+* Bad, because [argument c]
+* … <!-- numbers of pros and cons can vary -->
+
+### [option 2]
+
+* Good, because [argument a]
+* Good, because [argument b]
+* Bad, because [argument c]
+* … <!-- numbers of pros and cons can vary -->
+
+### [option 3]
+
+* Good, because [argument a]
+* Good, because [argument b]
+* Bad, because [argument c]
+* … <!-- numbers of pros and cons can vary -->
+```

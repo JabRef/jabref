@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <b:Sources xmlns:b="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" xmlns="http://schemas.openxmlformats.org/officeDocument/2006/bibliography" SelectedStyle="">
-<b:Source>
-<b:BIBTEX_Key>MyStandardKey</b:BIBTEX_Key>
-<b:Year>2012</b:Year>
-<b:BIBTEX_Entry>mycustomentrytype</b:BIBTEX_Entry>
-<b:SourceType>Misc</b:SourceType>
-<b:Tag>SampleAuthor2012</b:Tag>
-<b:Author>
-<b:Author>
-<b:NameList>
-<b:Person>
-<b:Last>SampleAuthor</b:Last>
-</b:Person>
-</b:NameList>
-</b:Author>
-</b:Author>
-</b:Source>
+    <b:Source>
+        <b:BIBTEX_Key>MyStandardKey</b:BIBTEX_Key>
+        <b:Year>2012</b:Year>
+        <b:BIBTEX_Entry>mycustomentrytype</b:BIBTEX_Entry>
+        <b:SourceType>Misc</b:SourceType>
+        <b:Tag>SampleAuthor2012</b:Tag>
+        <b:Author>
+            <b:Author>
+                <b:NameList>
+                    <b:Person>
+                        <b:Last>SampleAuthor</b:Last>
+                    </b:Person>
+                </b:NameList>
+            </b:Author>
+        </b:Author>
+    </b:Source>
 </b:Sources>

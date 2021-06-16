@@ -6,28 +6,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
+import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.util.OS;
-import org.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
-import org.jabref.model.cleanup.FieldFormatterCleanup;
-import org.jabref.model.cleanup.FieldFormatterCleanups;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MetaDataSerializerTest {
 
     private MetaData metaData;
-    private GlobalBibtexKeyPattern pattern;
+    private GlobalCitationKeyPattern pattern;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         metaData = new MetaData();
-        pattern = GlobalBibtexKeyPattern.fromPattern("[auth][year]");
+        pattern = GlobalCitationKeyPattern.fromPattern("[auth][year]");
     }
 
     @Test
@@ -38,7 +39,7 @@ public class MetaDataSerializerTest {
     @Test
     public void serializeSingleSaveAction() {
         FieldFormatterCleanups saveActions = new FieldFormatterCleanups(true,
-                Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseFormatter())));
+                Collections.singletonList(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())));
         metaData.setSaveActions(saveActions);
 
         Map<String, String> expectedSerialization = new TreeMap<>();
@@ -49,17 +50,16 @@ public class MetaDataSerializerTest {
 
     @Test
     public void serializeSingleContentSelectors() {
-        List<String> values = new ArrayList(4);
+        List<String> values = new ArrayList<>(4);
         values.add("approved");
         values.add("captured");
         values.add("received");
         values.add("status");
 
-        metaData.addContentSelector(new ContentSelector("status", values));
+        metaData.addContentSelector(new ContentSelector(StandardField.PUBSTATE, values));
 
         Map<String, String> expectedSerialization = new TreeMap<>();
-        expectedSerialization.put("selector_status",
-                "approved;captured;received;status;");
+        expectedSerialization.put("selector_pubstate", "approved;captured;received;status;");
         assertEquals(expectedSerialization, MetaDataSerializer.getSerializedStringMap(metaData, pattern));
     }
 }

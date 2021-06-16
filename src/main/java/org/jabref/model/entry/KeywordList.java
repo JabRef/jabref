@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
@@ -48,6 +47,9 @@ public class KeywordList implements Iterable<Keyword> {
             return new KeywordList();
         }
 
+        Objects.requireNonNull(delimiter);
+        Objects.requireNonNull(hierarchicalDelimiter);
+
         KeywordList keywordList = new KeywordList();
 
         StringTokenizer tok = new StringTokenizer(keywordString, delimiter.toString());
@@ -60,21 +62,14 @@ public class KeywordList implements Iterable<Keyword> {
     }
 
     /**
+     * Parses the keyword list and uses {@link Keyword#DEFAULT_HIERARCHICAL_DELIMITER} as hierarchical delimiter.
+     *
      * @param keywordString a String of keywordChains
+     * @param delimiter     The delimiter used for separating the keywords
      * @return an parsed list containing the keywordChains
      */
     public static KeywordList parse(String keywordString, Character delimiter) {
         return parse(keywordString, delimiter, Keyword.DEFAULT_HIERARCHICAL_DELIMITER);
-    }
-
-    /**
-     * parses a KeywordList from an optional String of keywordChains
-     *
-     * @param keywordString a optional String of keywordChains
-     * @return an parsed list containing the keywordChains
-     */
-    public static KeywordList parse(Optional<String> keywordString, Character delimiter) {
-        return keywordString.map(keyword -> KeywordList.parse(keyword, delimiter)).orElse(new KeywordList());
     }
 
     public KeywordList createClone() {
@@ -139,6 +134,10 @@ public class KeywordList implements Iterable<Keyword> {
 
     public boolean contains(Keyword o) {
         return keywordChains.contains(o);
+    }
+
+    public boolean contains(String keywordString) {
+        return contains(new Keyword(keywordString));
     }
 
     public boolean remove(Keyword o) {

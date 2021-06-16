@@ -1,15 +1,14 @@
 package org.jabref.logic.util;
 
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class VersionTest {
 
@@ -284,4 +283,15 @@ public class VersionTest {
         assertEquals(Optional.of(stable), alpha.shouldBeUpdatedTo(availableVersions));
     }
 
+    @Test
+    public void ciSuffixShouldBeRemoved() {
+        Version v50ci = Version.parse("5.0-ci.1");
+        assertEquals("5.0", v50ci.getFullVersion());
+    }
+
+    @Test
+    public void ciSuffixShouldBeRemovedIfDateIsPresent() {
+        Version v50ci = Version.parse("5.0-ci.1--2020-03-06--289142f");
+        assertEquals("5.0--2020-03-06--289142f", v50ci.getFullVersion());
+    }
 }

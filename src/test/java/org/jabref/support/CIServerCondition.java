@@ -8,7 +8,7 @@ import org.jabref.model.strings.StringUtil;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.platform.commons.util.AnnotationUtils;
+import org.junit.platform.commons.support.AnnotationSupport;
 
 public class CIServerCondition implements ExecutionCondition {
 
@@ -21,7 +21,7 @@ public class CIServerCondition implements ExecutionCondition {
     }
 
     /**
-     * Containers and tests are disabled if they are annotated with {@link DisabledOnCIServer} and they tests are run on
+     * Containers and tests are disabled if they are annotated with {@link DisabledOnCIServer} and the tests are run on
      * the CI server.
      */
     @Override
@@ -31,11 +31,11 @@ public class CIServerCondition implements ExecutionCondition {
         }
 
         Optional<AnnotatedElement> element = context.getElement();
-        Optional<DisabledOnCIServer> disabled = AnnotationUtils.findAnnotation(element, DisabledOnCIServer.class);
+        Optional<DisabledOnCIServer> disabled = AnnotationSupport.findAnnotation(element, DisabledOnCIServer.class);
         if (disabled.isPresent()) {
             String reason = disabled.map(DisabledOnCIServer::value)
-                    .filter(StringUtil::isNotBlank)
-                    .orElseGet(() -> element.get() + " is disabled on CI server");
+                                    .filter(StringUtil::isNotBlank)
+                                    .orElseGet(() -> element.get() + " is disabled on CI server");
             return ConditionEvaluationResult.disabled(reason);
         }
 

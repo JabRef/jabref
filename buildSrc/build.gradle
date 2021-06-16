@@ -1,0 +1,20 @@
+apply plugin: 'java'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.h2database:h2-mvstore:1.4.200'
+    implementation 'org.apache.commons:commons-csv:1.8'
+    implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
+}
+
+sourceSets{
+    main {
+        java {
+            srcDir "src/copied"
+        }
+    }
+}

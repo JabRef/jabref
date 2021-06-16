@@ -1,7 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -17,7 +17,8 @@ import static org.mockito.Mockito.mock;
 
 class FulltextFetcherTest {
 
-    private static List<FulltextFetcher> fetcherProvider() {
+    @SuppressWarnings("unused")
+    private static Set<FulltextFetcher> fetcherProvider() {
         return WebFetchers.getFullTextFetchers(mock(ImportFormatPreferences.class));
     }
 

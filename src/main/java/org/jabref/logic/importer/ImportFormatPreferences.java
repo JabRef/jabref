@@ -3,27 +3,30 @@ package org.jabref.logic.importer;
 import java.nio.charset.Charset;
 import java.util.Set;
 
-import org.jabref.logic.bibtex.FieldContentParserPreferences;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
+import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
+import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.fileformat.CustomImporter;
+import org.jabref.logic.xmp.XmpPreferences;
 
 public class ImportFormatPreferences {
 
     private final Set<CustomImporter> customImportList;
     private final Charset encoding;
     private final Character keywordSeparator;
-    private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
-    private final FieldContentParserPreferences fieldContentParserPreferences;
+    private final CitationKeyPatternPreferences citationKeyPatternPreferences;
+    private final FieldContentFormatterPreferences fieldContentFormatterPreferences;
+    private final XmpPreferences xmpPreferences;
     private final boolean keywordSyncEnabled;
 
     public ImportFormatPreferences(Set<CustomImporter> customImportList, Charset encoding, Character keywordSeparator,
-            BibtexKeyPatternPreferences bibtexKeyPatternPreferences,
-            FieldContentParserPreferences fieldContentParserPreferences, boolean keywordSyncEnabled) {
+                                   CitationKeyPatternPreferences citationKeyPatternPreferences,
+                                   FieldContentFormatterPreferences fieldContentFormatterPreferences, XmpPreferences xmpPreferences, boolean keywordSyncEnabled) {
         this.customImportList = customImportList;
         this.encoding = encoding;
         this.keywordSeparator = keywordSeparator;
-        this.bibtexKeyPatternPreferences = bibtexKeyPatternPreferences;
-        this.fieldContentParserPreferences = fieldContentParserPreferences;
+        this.citationKeyPatternPreferences = citationKeyPatternPreferences;
+        this.fieldContentFormatterPreferences = fieldContentFormatterPreferences;
+        this.xmpPreferences = xmpPreferences;
         this.keywordSyncEnabled = keywordSyncEnabled;
     }
 
@@ -43,17 +46,17 @@ public class ImportFormatPreferences {
         return keywordSeparator;
     }
 
-    public BibtexKeyPatternPreferences getBibtexKeyPatternPreferences() {
-        return bibtexKeyPatternPreferences;
+    public CitationKeyPatternPreferences getCitationKeyPatternPreferences() {
+        return citationKeyPatternPreferences;
     }
 
-    public FieldContentParserPreferences getFieldContentParserPreferences() {
-        return fieldContentParserPreferences;
+    public FieldContentFormatterPreferences getFieldContentFormatterPreferences() {
+        return fieldContentFormatterPreferences;
     }
 
     public ImportFormatPreferences withEncoding(Charset newEncoding) {
-        return new ImportFormatPreferences(customImportList, newEncoding, keywordSeparator, bibtexKeyPatternPreferences,
-                fieldContentParserPreferences, keywordSyncEnabled);
+        return new ImportFormatPreferences(customImportList, newEncoding, keywordSeparator, citationKeyPatternPreferences,
+                fieldContentFormatterPreferences, xmpPreferences, keywordSyncEnabled);
     }
 
     /**
@@ -62,5 +65,9 @@ public class ImportFormatPreferences {
     @Deprecated
     public boolean isKeywordSyncEnabled() {
         return keywordSyncEnabled;
+    }
+
+    public XmpPreferences getXmpPreferences() {
+        return xmpPreferences;
     }
 }

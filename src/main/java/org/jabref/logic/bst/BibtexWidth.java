@@ -167,13 +167,6 @@ public class BibtexWidth {
         }
     }
 
-    /**
-     *
-     * @param toMeasure
-     * @param warn
-     *            may-be-null
-     * @return
-     */
     public static int width(String toMeasure) {
 
         /*

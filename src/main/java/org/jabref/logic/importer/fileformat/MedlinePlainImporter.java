@@ -7,24 +7,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.OS;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 /**
  * Importer for the MEDLINE Plain format.
- *
- * check here for details on the format
- * http://www.nlm.nih.gov/bsd/mms/medlineelements.html
- *
- * @author vegeziel
+ * <p>
+ * check here for details on the format http://www.nlm.nih.gov/bsd/mms/medlineelements.html
  */
 public class MedlinePlainImporter extends Importer {
 
@@ -40,8 +40,8 @@ public class MedlinePlainImporter extends Importer {
     }
 
     @Override
-    public FileType getFileType() {
-        return FileType.MEDLINE_PLAIN;
+    public StandardFileType getFileType() {
+        return StandardFileType.MEDLINE_PLAIN;
     }
 
     @Override
@@ -73,12 +73,11 @@ public class MedlinePlainImporter extends Importer {
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
 
-        //use optional here, so that no exception will be thrown if the file is empty
-        Optional<String> OptionalLines = reader.lines().reduce((line, nextline) -> line + "\n" + nextline);
-        String linesAsString = OptionalLines.isPresent() ? OptionalLines.get() : "";
+        // use optional here, so that no exception will be thrown if the file is empty
+        String linesAsString = reader.lines().reduce((line, nextline) -> line + "\n" + nextline).orElse("");
 
         String[] entries = linesAsString.replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
-                .split("\\n\\n");
+                                        .split("\\n\\n");
 
         for (String entry1 : entries) {
 
@@ -86,11 +85,11 @@ public class MedlinePlainImporter extends Importer {
                 continue;
             }
 
-            String type = BibEntry.DEFAULT_TYPE;
+            EntryType type = BibEntry.DEFAULT_TYPE;
             String author = "";
             String editor = "";
             String comment = "";
-            Map<String, String> fields = new HashMap<>();
+            Map<Field, String> fieldConversionMap = new HashMap<>();
 
             String[] lines = entry1.split("\n");
 
@@ -125,11 +124,11 @@ public class MedlinePlainImporter extends Importer {
                 if ("PT".equals(label)) {
                     type = addSourceType(value, type);
                 }
-                addDates(fields, label, value);
-                addAbstract(fields, label, value);
-                addTitles(fields, label, value, type);
-                addIDs(fields, label, value);
-                addStandardNumber(fields, label, value);
+                addDates(fieldConversionMap, label, value);
+                addAbstract(fieldConversionMap, label, value);
+                addTitles(fieldConversionMap, label, value, type);
+                addIDs(fieldConversionMap, label, value);
+                addStandardNumber(fieldConversionMap, label, value);
 
                 if ("FAU".equals(label)) {
                     if ("".equals(author)) {
@@ -145,54 +144,54 @@ public class MedlinePlainImporter extends Importer {
                     }
                 }
 
-                //store the fields in a map
-                Map<String, String> hashMap = new HashMap<>();
-                hashMap.put("PG", FieldName.PAGES);
-                hashMap.put("PL", FieldName.ADDRESS);
-                hashMap.put("PHST", "history");
-                hashMap.put("PST", "publication-status");
-                hashMap.put("VI", FieldName.VOLUME);
-                hashMap.put("LA", FieldName.LANGUAGE);
-                hashMap.put("PUBM", "model");
-                hashMap.put("RN", "registry-number");
-                hashMap.put("NM", "substance-name");
-                hashMap.put("OCI", "copyright-owner");
-                hashMap.put("CN", "corporate");
-                hashMap.put("IP", FieldName.ISSUE);
-                hashMap.put("EN", FieldName.EDITION);
-                hashMap.put("GS", "gene-symbol");
-                hashMap.put("GN", FieldName.NOTE);
-                hashMap.put("GR", "grantno");
-                hashMap.put("SO", "source");
-                hashMap.put("NR", "number-of-references");
-                hashMap.put("SFM", "space-flight-mission");
-                hashMap.put("STAT", "status");
-                hashMap.put("SB", "subset");
-                hashMap.put("OTO", "termowner");
-                hashMap.put("OWN", FieldName.OWNER);
+                // store the fields in a map
+                Map<String, Field> hashMap = new HashMap<>();
+                hashMap.put("PG", StandardField.PAGES);
+                hashMap.put("PL", StandardField.ADDRESS);
+                hashMap.put("PHST", new UnknownField("history"));
+                hashMap.put("PST", new UnknownField("publication-status"));
+                hashMap.put("VI", StandardField.VOLUME);
+                hashMap.put("LA", StandardField.LANGUAGE);
+                hashMap.put("PUBM", new UnknownField("model"));
+                hashMap.put("RN", new UnknownField("registry-number"));
+                hashMap.put("NM", new UnknownField("substance-name"));
+                hashMap.put("OCI", new UnknownField("copyright-owner"));
+                hashMap.put("CN", new UnknownField("corporate"));
+                hashMap.put("IP", StandardField.ISSUE);
+                hashMap.put("EN", StandardField.EDITION);
+                hashMap.put("GS", new UnknownField("gene-symbol"));
+                hashMap.put("GN", StandardField.NOTE);
+                hashMap.put("GR", new UnknownField("grantno"));
+                hashMap.put("SO", new UnknownField("source"));
+                hashMap.put("NR", new UnknownField("number-of-references"));
+                hashMap.put("SFM", new UnknownField("space-flight-mission"));
+                hashMap.put("STAT", new UnknownField("status"));
+                hashMap.put("SB", new UnknownField("subset"));
+                hashMap.put("OTO", new UnknownField("termowner"));
+                hashMap.put("OWN", StandardField.OWNER);
 
-                //add the fields to hm
-                for (Map.Entry<String, String> mapEntry : hashMap.entrySet()) {
+                // add the fields to hm
+                for (Map.Entry<String, Field> mapEntry : hashMap.entrySet()) {
                     String medlineKey = mapEntry.getKey();
-                    String bibtexKey = mapEntry.getValue();
+                    Field bibtexKey = mapEntry.getValue();
                     if (medlineKey.equals(label)) {
-                        fields.put(bibtexKey, value);
+                        fieldConversionMap.put(bibtexKey, value);
                     }
                 }
 
                 if ("IRAD".equals(label) || "IR".equals(label) || "FIR".equals(label)) {
-                    String oldInvestigator = fields.get("investigator");
+                    String oldInvestigator = fieldConversionMap.get(new UnknownField("investigator"));
                     if (oldInvestigator == null) {
-                        fields.put("investigator", value);
+                        fieldConversionMap.put(new UnknownField("investigator"), value);
                     } else {
-                        fields.put("investigator", oldInvestigator + ", " + value);
+                        fieldConversionMap.put(new UnknownField("investigator"), oldInvestigator + ", " + value);
                     }
                 } else if ("MH".equals(label) || "OT".equals(label)) {
-                    if (!fields.containsKey(FieldName.KEYWORDS)) {
-                        fields.put(FieldName.KEYWORDS, value);
+                    if (!fieldConversionMap.containsKey(StandardField.KEYWORDS)) {
+                        fieldConversionMap.put(StandardField.KEYWORDS, value);
                     } else {
-                        String kw = fields.get(FieldName.KEYWORDS);
-                        fields.put(FieldName.KEYWORDS, kw + ", " + value);
+                        String kw = fieldConversionMap.get(StandardField.KEYWORDS);
+                        fieldConversionMap.put(StandardField.KEYWORDS, kw + ", " + value);
                     }
                 } else if ("CON".equals(label) || "CIN".equals(label) || "EIN".equals(label) || "EFR".equals(label)
                         || "CRI".equals(label) || "CRF".equals(label) || "PRIN".equals(label) || "PROF".equals(label)
@@ -204,199 +203,183 @@ public class MedlinePlainImporter extends Importer {
                     comment = comment + value;
                 }
             }
-            fixAuthors(fields, author, FieldName.AUTHOR);
-            fixAuthors(fields, editor, FieldName.EDITOR);
+            fixAuthors(fieldConversionMap, author, StandardField.AUTHOR);
+            fixAuthors(fieldConversionMap, editor, StandardField.EDITOR);
             if (!comment.isEmpty()) {
-                fields.put(FieldName.COMMENT, comment);
+                fieldConversionMap.put(StandardField.COMMENT, comment);
             }
 
             BibEntry b = new BibEntry(type);
 
-            // Remove empty fields:
-            fields.entrySet().stream().filter(n -> n.getValue().trim().isEmpty()).forEach(fields::remove);
-
             // create one here
-            b.setField(fields);
+            b.setField(fieldConversionMap);
             bibitems.add(b);
         }
 
         return new ParserResult(bibitems);
-
     }
 
     private boolean checkLineValidity(String line) {
         return (line.length() >= 5) && (line.charAt(4) == '-');
     }
 
-    private String addSourceType(String value, String type) {
+    private EntryType addSourceType(String value, EntryType type) {
         String val = value.toLowerCase(Locale.ENGLISH);
-        String theType = type;
         switch (val) {
-        case "book":
-            theType = "book";
-            break;
-        case "journal article":
-        case "classical article":
-        case "corrected and republished article":
-        case "historical article":
-        case "introductory journal article":
-        case "newspaper article":
-            theType = "article";
-            break;
-        case "clinical conference":
-        case "consensus development conference":
-        case "consensus development conference, nih":
-            theType = "conference";
-            break;
-        case "technical report":
-            theType = "techreport";
-            break;
-        case "editorial":
-            theType = "inproceedings";
-            break;
-        case "overall":
-            theType = "proceedings";
-            break;
-        default:
-            break;
+            case "book":
+                return StandardEntryType.Book;
+            case "journal article":
+            case "classical article":
+            case "corrected and republished article":
+            case "historical article":
+            case "introductory journal article":
+            case "newspaper article":
+                return StandardEntryType.Article;
+            case "clinical conference":
+            case "consensus development conference":
+            case "consensus development conference, nih":
+                return StandardEntryType.Conference;
+            case "technical report":
+                return StandardEntryType.TechReport;
+            case "editorial":
+                return StandardEntryType.InProceedings;
+            case "overall":
+                return StandardEntryType.Proceedings;
+            default:
+                return type;
         }
-        if ("".equals(theType)) {
-            theType = "other";
-        }
-        return theType;
     }
 
-    private void addStandardNumber(Map<String, String> hm, String lab, String value) {
+    private void addStandardNumber(Map<Field, String> hm, String lab, String value) {
         if ("IS".equals(lab)) {
-            String key = FieldName.ISSN;
-            //it is possible to have two issn, one for electronic and for print
-            //if there are two then it comes at the end in brackets (electronic) or (print)
-            //so search for the brackets
+            Field key = StandardField.ISSN;
+            // it is possible to have two issn, one for electronic and for print
+            // if there are two then it comes at the end in brackets (electronic) or (print)
+            // so search for the brackets
             if (value.indexOf('(') > 0) {
                 int keyStart = value.indexOf('(');
                 int keyEnd = value.indexOf(')');
-                key = value.substring(keyStart + 1, keyEnd) + "-" + key;
+                key = new UnknownField(value.substring(keyStart + 1, keyEnd) + "-" + key);
                 String numberValue = value.substring(0, keyStart - 1);
                 hm.put(key, numberValue);
             } else {
                 hm.put(key, value);
             }
         } else if ("ISBN".equals(lab)) {
-            hm.put(FieldName.ISBN, value);
+            hm.put(StandardField.ISBN, value);
         }
     }
 
-    private void fixAuthors(Map<String, String> hm, String author, String field) {
+    private void fixAuthors(Map<Field, String> hm, String author, Field field) {
         if (!author.isEmpty()) {
             String fixedAuthor = AuthorList.fixAuthorLastNameFirst(author);
             hm.put(field, fixedAuthor);
         }
     }
 
-    private void addIDs(Map<String, String> hm, String lab, String value) {
+    private void addIDs(Map<Field, String> hm, String lab, String value) {
         if ("AID".equals(lab)) {
-            String key = "article-id";
+            Field key = new UnknownField("article-id");
             String idValue = value;
             if (value.startsWith("doi:")) {
                 idValue = idValue.replaceAll("(?i)doi:", "").trim();
-                key = FieldName.DOI;
+                key = StandardField.DOI;
             } else if (value.indexOf('[') > 0) {
                 int startOfIdentifier = value.indexOf('[');
                 int endOfIdentifier = value.indexOf(']');
-                key = "article-" + value.substring(startOfIdentifier + 1, endOfIdentifier);
+                key = new UnknownField("article-" + value.substring(startOfIdentifier + 1, endOfIdentifier));
                 idValue = value.substring(0, startOfIdentifier - 1);
             }
             hm.put(key, idValue);
-
         } else if ("LID".equals(lab)) {
-            hm.put("location-id", value);
+            hm.put(new UnknownField("location-id"), value);
         } else if ("MID".equals(lab)) {
-            hm.put("manuscript-id", value);
+            hm.put(new UnknownField("manuscript-id"), value);
         } else if ("JID".equals(lab)) {
-            hm.put("nlm-unique-id", value);
+            hm.put(new UnknownField("nlm-unique-id"), value);
         } else if ("OID".equals(lab)) {
-            hm.put("other-id", value);
+            hm.put(new UnknownField("other-id"), value);
         } else if ("SI".equals(lab)) {
-            hm.put("second-id", value);
+            hm.put(new UnknownField("second-id"), value);
         }
     }
 
-    private void addTitles(Map<String, String> hm, String lab, String val, String type) {
+    private void addTitles(Map<Field, String> hm, String lab, String val, EntryType type) {
         if ("TI".equals(lab)) {
-            String oldVal = hm.get(FieldName.TITLE);
+            String oldVal = hm.get(StandardField.TITLE);
             if (oldVal == null) {
-                hm.put(FieldName.TITLE, val);
+                hm.put(StandardField.TITLE, val);
             } else {
                 if (oldVal.endsWith(":") || oldVal.endsWith(".") || oldVal.endsWith("?")) {
-                    hm.put(FieldName.TITLE, oldVal + " " + val);
+                    hm.put(StandardField.TITLE, oldVal + " " + val);
                 } else {
-                    hm.put(FieldName.TITLE, oldVal + ": " + val);
+                    hm.put(StandardField.TITLE, oldVal + ": " + val);
                 }
             }
         } else if ("BTI".equals(lab) || "CTI".equals(lab)) {
-            hm.put(FieldName.BOOKTITLE, val);
+            hm.put(StandardField.BOOKTITLE, val);
         } else if ("JT".equals(lab)) {
-            if ("inproceedings".equals(type)) {
-                hm.put(FieldName.BOOKTITLE, val);
+            if (type.equals(StandardEntryType.InProceedings)) {
+                hm.put(StandardField.BOOKTITLE, val);
             } else {
-                hm.put(FieldName.JOURNAL, val);
+                hm.put(StandardField.JOURNAL, val);
             }
         } else if ("CTI".equals(lab)) {
-            hm.put("collection-title", val);
+            hm.put(new UnknownField("collection-title"), val);
         } else if ("TA".equals(lab)) {
-            hm.put("title-abbreviation", val);
+            hm.put(new UnknownField("title-abbreviation"), val);
         } else if ("TT".equals(lab)) {
-            hm.put("transliterated-title", val);
+            hm.put(new UnknownField("transliterated-title"), val);
         } else if ("VTI".equals(lab)) {
-            hm.put("volume-title", val);
+            hm.put(new UnknownField("volume-title"), val);
         }
     }
 
-    private void addAbstract(Map<String, String> hm, String lab, String value) {
+    private void addAbstract(Map<Field, String> hm, String lab, String value) {
         String abstractValue = "";
         if ("AB".equals(lab)) {
-            //adds copyright information that comes at the end of an abstract
+            // adds copyright information that comes at the end of an abstract
             if (value.contains("Copyright")) {
                 int copyrightIndex = value.lastIndexOf("Copyright");
-                //remove the copyright from the field since the name of the field is copyright
-                String copyrightInfo = value.substring(copyrightIndex, value.length()).replaceAll("Copyright ", "");
-                hm.put("copyright", copyrightInfo);
+                // remove the copyright from the field since the name of the field is copyright
+                String copyrightInfo = value.substring(copyrightIndex).replaceAll("Copyright ", "");
+                hm.put(new UnknownField("copyright"), copyrightInfo);
                 abstractValue = value.substring(0, copyrightIndex);
             } else {
                 abstractValue = value;
             }
-            String oldAb = hm.get(FieldName.ABSTRACT);
+            String oldAb = hm.get(StandardField.ABSTRACT);
             if (oldAb == null) {
-                hm.put(FieldName.ABSTRACT, abstractValue);
+                hm.put(StandardField.ABSTRACT, abstractValue);
             } else {
-                hm.put(FieldName.ABSTRACT, oldAb + OS.NEWLINE + abstractValue);
+                hm.put(StandardField.ABSTRACT, oldAb + OS.NEWLINE + abstractValue);
             }
         } else if ("OAB".equals(lab) || "OABL".equals(lab)) {
-            hm.put("other-abstract", value);
+            hm.put(new UnknownField("other-abstract"), value);
         }
     }
 
-    private void addDates(Map<String, String> hm, String lab, String val) {
+    private void addDates(Map<Field, String> hm, String lab, String val) {
         if ("CRDT".equals(lab) && isCreateDateFormat(val)) {
-            hm.put("create-date", val);
+            hm.put(new UnknownField("create-date"), val);
         } else if ("DEP".equals(lab) && isDateFormat(val)) {
-            hm.put("electronic-publication", val);
+            hm.put(new UnknownField("electronic-publication"), val);
         } else if ("DA".equals(lab) && isDateFormat(val)) {
-            hm.put("date-created", val);
+            hm.put(new UnknownField("date-created"), val);
         } else if ("DCOM".equals(lab) && isDateFormat(val)) {
-            hm.put("completed", val);
+            hm.put(new UnknownField("completed"), val);
         } else if ("LR".equals(lab) && isDateFormat(val)) {
-            hm.put("revised", val);
+            hm.put(new UnknownField("revised"), val);
         } else if ("DP".equals(lab)) {
             String[] parts = val.split(" ");
-            hm.put(FieldName.YEAR, parts[0]);
+            hm.put(StandardField.YEAR, parts[0]);
             if ((parts.length > 1) && !parts[1].isEmpty()) {
-                hm.put(FieldName.MONTH, parts[1]);
+                hm.put(StandardField.MONTH, parts[1]);
             }
         } else if ("EDAT".equals(lab) && isCreateDateFormat(val)) {
-            hm.put("publication", val);
+            hm.put(new UnknownField("publication"), val);
         } else if ("MHDA".equals(lab) && isCreateDateFormat(val)) {
-            hm.put("mesh-date", val);
+            hm.put(new UnknownField("mesh-date"), val);
         }
     }
 

@@ -6,24 +6,24 @@
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
-<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
-<fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112">
+<?import org.jabref.gui.icon.JabRefIconView?>
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="HBox" xmlns="http://javafx.com/javafx/8.0.112"
+         fx:controller="org.jabref.gui.fieldeditors.LinkedFilesEditor">
     <ListView fx:id="listView" prefHeight="0" HBox.hgrow="ALWAYS" maxHeight="100"/>
     <Button onAction="#addNewFile"
-            styleClass="flatButton">
+            styleClass="icon-button">
         <graphic>
-            <MaterialDesignIconView glyphName="PLUS"/>
+            <JabRefIconView glyph="NEW_FILE"/>
         </graphic>
         <tooltip>
             <Tooltip text="%Open"/>
         </tooltip>
     </Button>
-    <Button onAction="#fetchFulltext" styleClass="flatButton">
+    <Button onAction="#fetchFulltext" styleClass="icon-button">
         <graphic>
             <StackPane>
-                <!-- TODO: use WEB_SEARCH instead as soon as it is available -->
-                <MaterialDesignIconView glyphName="MAGNIFY"
-                                        visible="${controller.viewModel.fulltextLookupInProgress == false}"/>
+                <JabRefIconView glyph="FETCH_FULLTEXT"
+                                visible="${controller.viewModel.fulltextLookupInProgress == false}"/>
                 <ProgressIndicator maxHeight="12.0" maxWidth="12.0"
                                    visible="${controller.viewModel.fulltextLookupInProgress}"/>
             </StackPane>
@@ -34,9 +34,9 @@
     </Button>
     <Button
             onAction="#addFromURL"
-            styleClass="flatButton">
+            styleClass="icon-button">
         <graphic>
-            <MaterialDesignIconView glyphName="DOWNLOAD"/>
+            <JabRefIconView glyph="DOWNLOAD"/>
         </graphic>
         <tooltip>
             <Tooltip text="%Download from URL"/>

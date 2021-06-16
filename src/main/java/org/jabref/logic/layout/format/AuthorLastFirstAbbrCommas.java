@@ -10,10 +10,6 @@ import org.jabref.model.entry.AuthorList;
  * <li>Individual authors are separated by commas.</li>
  * <li>There is no comma before the 'and' at the end of a list of three or more authors</li>
  * </ul>
- *
- * @author mkovtun
- * @author Christopher Oezbek <oezi@oezi.de>
- *
  */
 public class AuthorLastFirstAbbrCommas implements LayoutFormatter {
 
@@ -21,5 +17,4 @@ public class AuthorLastFirstAbbrCommas implements LayoutFormatter {
     public String format(String fieldText) {
         return AuthorList.fixAuthorLastNameFirstCommas(fieldText, true, false);
     }
-
 }

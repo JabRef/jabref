@@ -1,15 +1,21 @@
 package org.jabref.gui;
 
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import javafx.concurrent.Task;
 import javafx.print.PrinterJob;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.TextInputDialog;
 
+import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
@@ -21,7 +27,29 @@ import org.controlsfx.dialog.ProgressDialog;
  */
 public interface DialogService {
 
+    /**
+     * This will create and display new {@link ChoiceDialog} of type T with a default choice and a collection of possible choices
+     *
+     * @implNote The implementation should accept {@code null} for {@code defaultChoice}, but callers should use {@link #showChoiceDialogAndWait(String, String, String, Collection)}.
+     */
+    <T> Optional<T> showChoiceDialogAndWait(String title, String content, String okButtonLabel, T defaultChoice, Collection<T> choices);
+
+    /**
+     * This will create and display new {@link ChoiceDialog} of type T with a collection of possible choices
+     */
+    default <T> Optional<T> showChoiceDialogAndWait(String title, String content, String okButtonLabel, Collection<T> choices) {
+        return showChoiceDialogAndWait(title, content, okButtonLabel, null, choices);
+    }
+
+    /**
+     * This will create and display new {@link TextInputDialog} with a text fields to enter data
+     */
     Optional<String> showInputDialogAndWait(String title, String content);
+
+    /**
+     * This will create and display new {@link TextInputDialog} with a text field with a default value to enter data
+     */
+    Optional<String> showInputDialogWithDefaultAndWait(String title, String content, String defaultValue);
 
     /**
      * This will create and display a new information dialog.
@@ -65,6 +93,13 @@ public interface DialogService {
     }
 
     /**
+     * Create and display error dialog displaying the given exception.
+     *
+     * @param exception the exception causing the error
+     */
+    void showErrorDialogAndWait(String title, String content, Throwable exception);
+
+    /**
      * Create and display error dialog displaying the given message.
      *
      * @param message the error message
@@ -85,7 +120,7 @@ public interface DialogService {
      * Create and display a new confirmation dialog.
      * It will include a blue question icon on the left and
      * a OK (with given label) and Cancel button. To create a confirmation dialog with custom
-     * buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}
+     * buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}.
      *
      * @return true if the use clicked "OK" otherwise false
      */
@@ -95,11 +130,43 @@ public interface DialogService {
      * Create and display a new confirmation dialog.
      * It will include a blue question icon on the left and
      * a OK (with given label) and Cancel (also with given label) button. To create a confirmation dialog with custom
-     * buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}
+     * buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}.
      *
      * @return true if the use clicked "OK" otherwise false
      */
     boolean showConfirmationDialogAndWait(String title, String content, String okButtonLabel, String cancelButtonLabel);
+
+    /**
+     * Create and display a new confirmation dialog.
+     * It will include a blue question icon on the left and
+     * a YES (with given label) and Cancel (also with given label) button. To create a confirmation dialog with custom
+     * buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}.
+     * Moreover, the dialog contains a opt-out checkbox with the given text to support "Do not ask again"-behaviour.
+     *
+     * @return true if the use clicked "YES" otherwise false
+     */
+    boolean showConfirmationDialogWithOptOutAndWait(String title, String content,
+                                                    String optOutMessage, Consumer<Boolean> optOutAction);
+
+    /**
+     * Create and display a new confirmation dialog.
+     * It will include a blue question icon on the left and
+     * a YES (with given label) and Cancel (also with given label) button. To create a confirmation dialog with custom
+     * buttons see also {@link #showCustomButtonDialogAndWait(Alert.AlertType, String, String, ButtonType...)}.
+     * Moreover, the dialog contains a opt-out checkbox with the given text to support "Do not ask again"-behaviour.
+     *
+     * @return true if the use clicked "YES" otherwise false
+     */
+    boolean showConfirmationDialogWithOptOutAndWait(String title, String content,
+                                                    String okButtonLabel, String cancelButtonLabel,
+                                                    String optOutMessage, Consumer<Boolean> optOutAction);
+
+    /**
+     * Shows a custom dialog without returning any results.
+     *
+     * @param dialog dialog to show
+     */
+    void showCustomDialog(BaseDialog<?> dialog);
 
     /**
      * This will create and display a new dialog of the specified
@@ -125,17 +192,30 @@ public interface DialogService {
      * @param dialog dialog to show
      * @param <R>    type of result
      */
-    <R> Optional<R> showCustomDialogAndWait(Dialog<R> dialog);
+    <R> Optional<R> showCustomDialogAndWait(javafx.scene.control.Dialog<R> dialog);
 
     /**
      * Constructs and shows a canceable {@link ProgressDialog}. Clicking cancel will cancel the underlying service and close the dialog
      *
-     * @param task The {@link Task} which executes the work and for which to show the dialog
+     * @param title   title of the dialog
+     * @param content message to show above the progress bar
+     * @param task    The {@link Task} which executes the work and for which to show the dialog
      */
-    <V> void showCanceableProgressDialogAndWait(Task<V> task);
+    <V> void showProgressDialog(String title, String content, Task<V> task);
 
     /**
-     * Notify the user in an non-blocking way (i.e., update status message instead of showing a dialog).
+     * Constructs and shows a dialog showing the progress of running background tasks.
+     * Clicking cancel will cancel the underlying service and close the dialog.
+     * The dialog will exit as soon as none of the background tasks are running
+     *
+     * @param title        title of the dialog
+     * @param content      message to show below the list of background tasks
+     * @param stateManager The {@link StateManager} which contains the background tasks
+     */
+    <V> Optional<ButtonType> showBackgroundProgressDialogAndWait(String title, String content, StateManager stateManager);
+
+    /**
+     * Notify the user in an non-blocking way (i.e., in form of toast in a snackbar).
      *
      * @param message the message to show.
      */
@@ -191,4 +271,13 @@ public interface DialogService {
      * @return false if the user opts to cancel printing
      */
     boolean showPrintDialog(PrinterJob job);
+
+    /**
+     * Shows a new dialog that list all files contained in the given archive and which lets the user select one of these
+     * files. The method doesn't return until the displayed open dialog is dismissed. The return value specifies the
+     * file chosen by the user or an empty {@link Optional} if no selection has been made.
+     *
+     * @return the selected file or an empty {@link Optional} if no file has been selected
+     */
+    Optional<Path> showFileOpenFromArchiveDialog(Path archivePath) throws IOException;
 }

@@ -3,8 +3,8 @@ package org.jabref.logic.util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -12,14 +12,13 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import kong.unirest.json.JSONArray;
+import kong.unirest.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Represents the Application Version with the major and minor number, the full Version String and if it's a developer
- * version
+ * Represents the Application Version with the major and minor number, the full Version String and if it's a developer version
  */
 public class Version {
 
@@ -29,8 +28,9 @@ public class Version {
     private static final Version UNKNOWN_VERSION = new Version();
 
     private final static Pattern VERSION_PATTERN = Pattern.compile("(?<major>\\d+)(\\.(?<minor>\\d+))?(\\.(?<patch>\\d+))?(?<stage>-alpha|-beta)?(?<dev>-?dev)?.*");
-    private static final String JABREF_GITHUB_RELEASES = "https://api.github.com/repos/JabRef/JabRef/releases";
+    private final static Pattern CI_SUFFIX_PATTERN = Pattern.compile("-ci\\.\\d+");
 
+    private static final String JABREF_GITHUB_RELEASES = "https://api.github.com/repos/JabRef/JabRef/releases";
 
     private String fullVersion = BuildInfo.UNKNOWN_VERSION;
     private int major = -1;
@@ -46,8 +46,7 @@ public class Version {
     }
 
     /**
-     * @param version must be in form of following pattern: {@code (\d+)(\.(\d+))?(\.(\d+))?(-alpha|-beta)?(-?dev)?}
-     *                (e.g., 3.3; 3.4-dev)
+     * @param version must be in form of following pattern: {@code (\d+)(\.(\d+))?(\.(\d+))?(-alpha|-beta)?(-?dev)?} (e.g., 3.3; 3.4-dev)
      * @return the parsed version or {@link Version#UNKNOWN_VERSION} if an error occurred
      */
     public static Version parse(String version) {
@@ -57,6 +56,10 @@ public class Version {
         }
 
         Version parsedVersion = new Version();
+
+        // remove "-ci.1" suffix
+        Matcher ciSuffixMatcher = CI_SUFFIX_PATTERN.matcher(version);
+        version = ciSuffixMatcher.replaceAll("");
 
         parsedVersion.fullVersion = version;
         Matcher matcher = VERSION_PATTERN.matcher(version);
@@ -91,7 +94,7 @@ public class Version {
      * Grabs all the available releases from the GitHub repository
      */
     public static List<Version> getAllAvailableVersions() throws IOException {
-        URLConnection connection = new URL(JABREF_GITHUB_RELEASES).openConnection();
+        HttpURLConnection connection = (HttpURLConnection) new URL(JABREF_GITHUB_RELEASES).openConnection();
         connection.setRequestProperty("Accept-Charset", "UTF-8");
         try (BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
 
@@ -102,6 +105,7 @@ public class Version {
                 Version version = Version.parse(jsonObject.getString("tag_name").replaceFirst("v", ""));
                 versions.add(version);
             }
+            connection.disconnect();
             return versions;
         }
     }
@@ -143,7 +147,6 @@ public class Version {
         }
         return false;
     }
-
 
     /**
      * Checks if this version should be updated to one of the given ones.
@@ -277,7 +280,7 @@ public class Version {
             } else if (stage.equals(BETA.stage)) {
                 return BETA;
             }
-            LOGGER.warn("Unknown development stage: " + stage);
+            LOGGER.warn("Unknown development stage: {}", stage);
             return UNKNOWN;
         }
 

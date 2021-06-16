@@ -7,16 +7,16 @@ import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 
 public class UndoableAbbreviator {
 
     private final JournalAbbreviationRepository journalAbbreviationRepository;
-    private final boolean isoAbbreviationStyle;
+    private final AbbreviationType abbreviationType;
 
-
-    public UndoableAbbreviator(JournalAbbreviationRepository journalAbbreviationRepository, boolean isoAbbreviationStyle) {
+    public UndoableAbbreviator(JournalAbbreviationRepository journalAbbreviationRepository, AbbreviationType abbreviationType) {
         this.journalAbbreviationRepository = journalAbbreviationRepository;
-        this.isoAbbreviationStyle = isoAbbreviationStyle;
+        this.abbreviationType = abbreviationType;
     }
 
     /**
@@ -28,10 +28,11 @@ public class UndoableAbbreviator {
      * @param ce        If the entry is changed, add an edit to this compound.
      * @return true if the entry was changed, false otherwise.
      */
-    public boolean abbreviate(BibDatabase database, BibEntry entry, String fieldName, CompoundEdit ce) {
+    public boolean abbreviate(BibDatabase database, BibEntry entry, Field fieldName, CompoundEdit ce) {
         if (!entry.hasField(fieldName)) {
             return false;
         }
+
         String text = entry.getField(fieldName).get();
         String origText = text;
         if (database != null) {
@@ -39,10 +40,10 @@ public class UndoableAbbreviator {
         }
 
         if (!journalAbbreviationRepository.isKnownName(text)) {
-            return false; // unknown, cannot un/abbreviate anything
+            return false; // Unknown, cannot abbreviate anything.
         }
 
-        String newText = getAbbreviatedName(journalAbbreviationRepository.getAbbreviation(text).get());
+        String newText = getAbbreviatedName(journalAbbreviationRepository.get(text).get());
 
         if (newText.equals(origText)) {
             return false;
@@ -54,11 +55,15 @@ public class UndoableAbbreviator {
     }
 
     private String getAbbreviatedName(Abbreviation text) {
-        if (isoAbbreviationStyle) {
-            return text.getIsoAbbreviation();
-        } else {
-            return text.getMedlineAbbreviation();
+        switch (abbreviationType) {
+            case DEFAULT:
+                return text.getAbbreviation();
+            case MEDLINE:
+                return text.getMedlineAbbreviation();
+            case SHORTEST_UNIQUE:
+                return text.getShortestUniqueAbbreviation();
+            default:
+                throw new IllegalStateException(String.format("Unexpected value: %s", abbreviationType));
         }
     }
-
 }

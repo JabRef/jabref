@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?xml-model href="http://docbook.org/xml/5.1/rng/docbook.rng" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://docbook.org/xml/5.1/sch/docbook.sch" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<bibliography version="5.1" xml:lang="en"
+    xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:ns="http://docbook.org/ns/docbook">
+<biblioentry xreflabel="Kolb and Diez (2018)" xml:id="mykey">
+   <authorgroup>
+<!--AUTHORS-->
+       <author><personname><firstname>Stefan</firstname><surname>Kolb</surname></personname></author>
+       <author><personname><firstname>Tobias</firstname><surname>Diez</surname></personname></author> 
+<!--EDITORS-->
+
+   </authorgroup>
+   <!--TITLE-->
+           <citetitle pubwork="book">my paper title</citetitle> 
+    
+<!--BOOK booktitle, edition, (pages), publisher-->
+    <biblioset relation="book">
+        
+		
+        <pubdate>2018</pubdate>
+        
+        
+		<publishername></publishername>
+        <address></address>
+        
+	</biblioset>
+    
+    
+<!-- IDENTIFIERS-->
+    
+    
+    
+        <biblioid class="isbn">1&#45;2&#45;34</biblioid>
+    
+<!--ABSTRACT-->
+    
+</biblioentry></bibliography>

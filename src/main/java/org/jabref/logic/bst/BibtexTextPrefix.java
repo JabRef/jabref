@@ -20,14 +20,9 @@ public class BibtexTextPrefix {
     }
 
     /**
-     *
-     * @param numOfChars
-     * @param toPrefix
      * @param warn may-be-null
-     * @return
      */
     public static String textPrefix(int inNumOfChars, String toPrefix, Warn warn) {
-
         int numOfChars = inNumOfChars;
         StringBuilder sb = new StringBuilder();
 
@@ -65,7 +60,6 @@ public class BibtexTextPrefix {
             } else {
                 numOfChars--;
             }
-
         }
         sb.append(toPrefix.substring(0, i));
         while (braceLevel > 0) {

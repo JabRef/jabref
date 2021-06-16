@@ -1,0 +1,57 @@
+name: Refresh Journal Lists
+
+on:
+  workflow_dispatch:
+    # Allow to run manually
+
+jobs:
+  publish:
+    name: Refresh Journal List Files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch all history for all tags and branches
+        uses: actions/checkout@v2
+        with:
+          ref: main
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: 14
+      - uses: actions/cache@v1
+        name: Restore gradle wrapper
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+      - name: Update journal lists
+        run: |
+          set +o pipefail
+
+          # prepare journal lists
+          cd /tmp
+          git clone --depth=1 https://github.com/JabRef/abbrv.jabref.org.git
+          cd abbrv.jabref.org/journals
+
+          # remove all lists without dot in them
+          # we use abbrevatiation lists containing dots in them only (to be consistent)
+          rm journal_abbreviations_entrez.csv
+          rm journal_abbreviations_medicus.csv
+          rm journal_abbreviations_webofscience-dots.csv
+
+          # prepare building
+          mkdir -p $GITHUB_WORKSPACE/build/journals
+          cp * $GITHUB_WORKSPACE/build/journals/
+
+          # ensure that the .java classes are the most recent ones
+          cp $GITHUB_WORKSPACE/src/main/java/org/jabref/logic/journals/* $GITHUB_WORKSPACE/buildSrc/src/copied/java/org/jabref/logic/journals
+
+          # create .mv file
+          cd $GITHUB_WORKSPACE
+          ./gradlew generateJournalAbbreviationList
+      - uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: update-journallist
+          title: "[Bot] Update Journal abbrev list"
+          commit-message: Update journal abbrev list

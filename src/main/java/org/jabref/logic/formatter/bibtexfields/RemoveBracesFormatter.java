@@ -2,13 +2,10 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.Objects;
 
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.cleanup.Formatter;
 
-/**
- * Removes all matching braces around the string.
- */
-public class RemoveBracesFormatter implements Formatter {
+public class RemoveBracesFormatter extends Formatter {
 
     @Override
     public String getName() {

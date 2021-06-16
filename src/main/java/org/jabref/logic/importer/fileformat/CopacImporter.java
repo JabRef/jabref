@@ -9,16 +9,18 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.StandardEntryType;
 
 /**
  * Importer for COPAC format.
- *
- * Documentation can be found online at:
- *
- * http://copac.ac.uk/faq/#format
+ * <p>
+ * Documentation can be found online at: <a href="http://copac.ac.uk/faq/#format">http://copac.ac.uk/faq/#format</a>
  */
 public class CopacImporter extends Importer {
 
@@ -30,8 +32,8 @@ public class CopacImporter extends Importer {
     }
 
     @Override
-    public FileType getFileType() {
-        return FileType.COPAC;
+    public StandardFileType getFileType() {
+        return StandardFileType.TXT;
     }
 
     @Override
@@ -53,6 +55,14 @@ public class CopacImporter extends Importer {
             }
         }
         return false;
+    }
+
+    private static void setOrAppend(BibEntry b, Field field, String value, String separator) {
+        if (b.hasField(field)) {
+            b.setField(field, b.getField(field).get() + separator + value);
+        } else {
+            b.setField(field, value);
+        }
     }
 
     @Override
@@ -98,7 +108,7 @@ public class CopacImporter extends Importer {
 
             // Copac does not contain enough information on the type of the
             // document. A book is assumed.
-            BibEntry b = new BibEntry("book");
+            BibEntry b = new BibEntry(StandardEntryType.Book);
 
             String[] lines = entry.split("\n");
 
@@ -110,40 +120,32 @@ public class CopacImporter extends Importer {
                 String code = line.substring(0, 4);
 
                 if ("TI- ".equals(code)) {
-                    setOrAppend(b, FieldName.TITLE, line.substring(4).trim(), ", ");
+                    setOrAppend(b, StandardField.TITLE, line.substring(4).trim(), ", ");
                 } else if ("AU- ".equals(code)) {
-                    setOrAppend(b, FieldName.AUTHOR, line.substring(4).trim(), " and ");
+                    setOrAppend(b, StandardField.AUTHOR, line.substring(4).trim(), " and ");
                 } else if ("PY- ".equals(code)) {
-                    setOrAppend(b, FieldName.YEAR, line.substring(4).trim(), ", ");
+                    setOrAppend(b, StandardField.YEAR, line.substring(4).trim(), ", ");
                 } else if ("PU- ".equals(code)) {
-                    setOrAppend(b, FieldName.PUBLISHER, line.substring(4).trim(), ", ");
+                    setOrAppend(b, StandardField.PUBLISHER, line.substring(4).trim(), ", ");
                 } else if ("SE- ".equals(code)) {
-                    setOrAppend(b, FieldName.SERIES, line.substring(4).trim(), ", ");
+                    setOrAppend(b, StandardField.SERIES, line.substring(4).trim(), ", ");
                 } else if ("IS- ".equals(code)) {
-                    setOrAppend(b, FieldName.ISBN, line.substring(4).trim(), ", ");
+                    setOrAppend(b, StandardField.ISBN, line.substring(4).trim(), ", ");
                 } else if ("KW- ".equals(code)) {
-                    setOrAppend(b, FieldName.KEYWORDS, line.substring(4).trim(), ", ");
+                    setOrAppend(b, StandardField.KEYWORDS, line.substring(4).trim(), ", ");
                 } else if ("NT- ".equals(code)) {
-                    setOrAppend(b, FieldName.NOTE, line.substring(4).trim(), ", ");
+                    setOrAppend(b, StandardField.NOTE, line.substring(4).trim(), ", ");
                 } else if ("PD- ".equals(code)) {
-                    setOrAppend(b, "physicaldimensions", line.substring(4).trim(), ", ");
+                    setOrAppend(b, new UnknownField("physicaldimensions"), line.substring(4).trim(), ", ");
                 } else if ("DT- ".equals(code)) {
-                    setOrAppend(b, "documenttype", line.substring(4).trim(), ", ");
+                    setOrAppend(b, new UnknownField("documenttype"), line.substring(4).trim(), ", ");
                 } else {
-                    setOrAppend(b, code.substring(0, 2), line.substring(4).trim(), ", ");
+                    setOrAppend(b, FieldFactory.parseField(code.substring(0, 2)), line.substring(4).trim(), ", ");
                 }
             }
             results.add(b);
         }
 
         return new ParserResult(results);
-    }
-
-    private static void setOrAppend(BibEntry b, String field, String value, String separator) {
-        if (b.hasField(field)) {
-            b.setField(field, b.getField(field).get() + separator + value);
-        } else {
-            b.setField(field, value);
-        }
     }
 }

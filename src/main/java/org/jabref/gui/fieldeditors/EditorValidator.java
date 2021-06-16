@@ -1,24 +1,26 @@
 package org.jabref.gui.fieldeditors;
 
+import javafx.scene.control.TextInputControl;
+
 import org.jabref.gui.util.IconValidationDecorator;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class EditorValidator {
 
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
 
-    public EditorValidator(JabRefPreferences preferences) {
+    public EditorValidator(PreferencesService preferences) {
         this.preferences = preferences;
     }
 
-    public void configureValidation(ValidationStatus status, EditorTextArea area) {
-        if (preferences.getBoolean(JabRefPreferences.VALIDATE_IN_ENTRY_EDITOR)) {
+    public void configureValidation(final ValidationStatus status, final TextInputControl textInput) {
+        if (preferences.getEntryEditorPreferences().shouldEnableValidation()) {
             ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
             validationVisualizer.setDecoration(new IconValidationDecorator());
-            validationVisualizer.initVisualization(status, area);
+            validationVisualizer.initVisualization(status, textInput);
         }
     }
 }

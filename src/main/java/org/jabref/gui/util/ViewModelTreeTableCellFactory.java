@@ -6,73 +6,63 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Paint;
-import javafx.scene.text.Text;
 import javafx.util.Callback;
 
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.model.strings.StringUtil;
-
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
-import de.jensd.fx.glyphs.materialdesignicons.utils.MaterialDesignIconFactory;
 
 /**
  * Constructs a {@link TreeTableCell} based on the view model of the row and a bunch of specified converter methods.
  *
  * @param <S> view model
- * @param <T> cell value
  */
-public class ViewModelTreeTableCellFactory<S, T> implements Callback<TreeTableColumn<S, T>, TreeTableCell<S, T>> {
+public class ViewModelTreeTableCellFactory<S> implements Callback<TreeTableColumn<S, S>, TreeTableCell<S, S>> {
 
     private Callback<S, String> toText;
     private Callback<S, Node> toGraphic;
     private Callback<S, EventHandler<? super MouseEvent>> toOnMouseClickedEvent;
     private Callback<S, String> toTooltip;
 
-    public ViewModelTreeTableCellFactory<S, T> withText(Callback<S, String> toText) {
+    public ViewModelTreeTableCellFactory<S> withText(Callback<S, String> toText) {
         this.toText = toText;
         return this;
     }
 
-    public ViewModelTreeTableCellFactory<S, T> withGraphic(Callback<S, Node> toGraphic) {
+    public ViewModelTreeTableCellFactory<S> withGraphic(Callback<S, Node> toGraphic) {
         this.toGraphic = toGraphic;
         return this;
     }
 
-    public ViewModelTreeTableCellFactory<S, T> withIcon(Callback<S, MaterialDesignIcon> toIcon, Callback<S, Paint> toColor) {
-        this.toGraphic = viewModel -> {
-            Text graphic = MaterialDesignIconFactory.get().createIcon(toIcon.call(viewModel));
-            graphic.setFill(toColor.call(viewModel));
-            return graphic;
-        };
+    public ViewModelTreeTableCellFactory<S> withIcon(Callback<S, JabRefIcon> toIcon) {
+        this.toGraphic = viewModel -> toIcon.call(viewModel).getGraphicNode();
         return this;
     }
 
-    public ViewModelTreeTableCellFactory<S, T> withTooltip(Callback<S, String> toTooltip) {
+    public ViewModelTreeTableCellFactory<S> withTooltip(Callback<S, String> toTooltip) {
         this.toTooltip = toTooltip;
         return this;
     }
 
-    public ViewModelTreeTableCellFactory<S, T> withOnMouseClickedEvent(
+    public ViewModelTreeTableCellFactory<S> withOnMouseClickedEvent(
             Callback<S, EventHandler<? super MouseEvent>> toOnMouseClickedEvent) {
         this.toOnMouseClickedEvent = toOnMouseClickedEvent;
         return this;
     }
 
     @Override
-    public TreeTableCell<S, T> call(TreeTableColumn<S, T> param) {
+    public TreeTableCell<S, S> call(TreeTableColumn<S, S> param) {
 
-        return new TreeTableCell<S, T>() {
+        return new TreeTableCell<S, S>() {
 
             @Override
-            protected void updateItem(T item, boolean empty) {
-                super.updateItem(item, empty);
+            protected void updateItem(S viewModel, boolean empty) {
+                super.updateItem(viewModel, empty);
 
-                if (empty || getTreeTableRow() == null || getTreeTableRow().getItem() == null) {
+                if (empty || viewModel == null) {
                     setText(null);
                     setGraphic(null);
                     setOnMouseClicked(null);
                 } else {
-                    S viewModel = getTreeTableRow().getItem();
                     if (toText != null) {
                         setText(toText.call(viewModel));
                     }
@@ -91,5 +81,10 @@ public class ViewModelTreeTableCellFactory<S, T> implements Callback<TreeTableCo
                 }
             }
         };
+    }
+
+    public void install(TreeTableColumn<S, S> column) {
+        column.setCellValueFactory(cellData -> cellData.getValue().valueProperty());
+        column.setCellFactory(this);
     }
 }

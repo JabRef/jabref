@@ -7,19 +7,22 @@
 <?import javafx.scene.control.TreeTableView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIconView?>
 <?import org.controlsfx.control.textfield.CustomTextField?>
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="150.0" styleClass="groupsPane"
-            xmlns="http://javafx.com/javafx/8.0.112" fx:controller="org.jabref.gui.groups.GroupTreeController">
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="150.0"
+            xmlns="http://javafx.com/javafx/8.0.112" fx:controller="org.jabref.gui.groups.GroupTreeView">
+    <top>
+        <HBox fx:id="groupFilterBar" alignment="CENTER" spacing="8">
+            <CustomTextField fx:id="searchField" promptText="%Filter groups" HBox.hgrow="ALWAYS"/>
+        </HBox>
+    </top>
     <center>
-        <TreeTableView fx:id="groupTree" layoutY="-7.0" prefHeight="600.0" prefWidth="250.0" styleClass="groupsPane">
+        <TreeTableView fx:id="groupTree" layoutY="-7.0" prefHeight="600.0" prefWidth="250.0">
             <columns>
                 <TreeTableColumn fx:id="mainColumn"/>
-                <TreeTableColumn fx:id="numberColumn" minWidth="43.0" maxWidth="55.0"
+                <TreeTableColumn fx:id="numberColumn" minWidth="50.0" maxWidth="70.0" prefWidth="60.0"
                                  styleClass="numberColumn"/>
-                <TreeTableColumn fx:id="disclosureNodeColumn" maxWidth="14.0" minWidth="14.0"
-                                 styleClass="disclosureNodeColumn" text="Column X"/>
+                <TreeTableColumn fx:id="expansionNodeColumn" maxWidth="25.0" minWidth="25.0"
+                                 styleClass="expansionNodeColumn"/>
             </columns>
             <columnResizePolicy>
                 <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
@@ -27,22 +30,14 @@
         </TreeTableView>
     </center>
     <bottom>
-        <HBox fx:id="barBottom" alignment="CENTER">
-            <ButtonBar fx:id="buttonBarBottom">
-                <buttons>
-                    <Button fx:id="newGroupButton" onAction="#addNewGroup" styleClass="flatButton"
-                            ButtonBar.buttonData="LEFT">
-                        <graphic>
-                            <MaterialDesignIconView glyphName="PLUS"/>
-                        </graphic>
-                        <tooltip>
-                            <Tooltip text="%New group"/>
-                        </tooltip>
-                    </Button>
-                </buttons>
-            </ButtonBar>
-            <Region prefWidth="20.0" HBox.hgrow="ALWAYS"/>
-            <CustomTextField fx:id="searchField" promptText="Filter groups"/>
+        <HBox fx:id="groupBar" alignment="CENTER" spacing="8">
+            <Button fx:id="addNewGroup" onAction="#addNewGroup"
+                    text="%Add group" maxWidth="Infinity" HBox.hgrow="ALWAYS">
+                <tooltip>
+                    <Tooltip text="%New group"/>
+                </tooltip>
+            </Button>
         </HBox>
+
     </bottom>
 </BorderPane>

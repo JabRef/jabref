@@ -26,7 +26,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -34,19 +34,15 @@ import org.jabref.model.entry.BibEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author alver
- */
 public class OpenOfficeDocumentCreator extends Exporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenOfficeDocumentCreator.class);
-
 
     /**
      * Creates a new instance of OpenOfficeDocumentCreator
      */
     public OpenOfficeDocumentCreator() {
-        super("oocalc", FileType.SXC.getDescription(), FileType.SXC);
+        super("oocalc", "Old OpenOffice/LibreOffice Calc format", StandardFileType.SXC);
     }
 
     private static void storeOpenOfficeFile(Path file, InputStream source) throws Exception {
@@ -65,7 +61,6 @@ public class OpenOfficeDocumentCreator extends Exporter {
             OpenOfficeDocumentCreator.addResourceFile("mimetype", "/resource/openoffice/mimetype", out);
             OpenOfficeDocumentCreator.addResourceFile("META-INF/manifest.xml", "/resource/openoffice/manifest.xml",
                     out);
-
         }
     }
 
@@ -107,7 +102,6 @@ public class OpenOfficeDocumentCreator extends Exporter {
         } catch (Exception e) {
             throw new Error(e);
         }
-
     }
 
     private static void addResourceFile(String name, String resource, ZipOutputStream out) throws IOException {

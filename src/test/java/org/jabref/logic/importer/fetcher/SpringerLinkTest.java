@@ -5,50 +5,62 @@ import java.net.URL;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-@Category(FetcherTest.class)
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+@FetcherTest
 public class SpringerLinkTest {
 
     private SpringerLink finder;
     private BibEntry entry;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         finder = new SpringerLink();
         entry = new BibEntry();
     }
 
-    @Test(expected = NullPointerException.class)
-    public void rejectNullParameter() throws IOException {
-        finder.findFullText(null);
-        Assert.fail();
+    @Test
+    public void rejectNullParameter() {
+        assertThrows(NullPointerException.class, () -> finder.findFullText(null));
     }
 
     @Test
     public void doiNotPresent() throws IOException {
-        Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
+        assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
+    @DisabledOnCIServer("Disable on CI Server to not hit the API call limit")
     @Test
     public void findByDOI() throws IOException {
-        entry.setField("doi", "10.1186/s13677-015-0042-8");
-
-        Assert.assertEquals(
+        entry.setField(StandardField.DOI, "10.1186/s13677-015-0042-8");
+        assertEquals(
                 Optional.of(new URL("http://link.springer.com/content/pdf/10.1186/s13677-015-0042-8.pdf")),
-                finder.findFullText(entry)
-        );
+                finder.findFullText(entry));
+    }
+
+    @DisabledOnCIServer("Disable on CI Server to not hit the API call limit")
+    @Test
+    public void notFoundByDOI() throws IOException {
+        entry.setField(StandardField.DOI, "10.1186/unknown-doi");
+
+        assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
     @Test
-    public void notFoundByDOI() throws IOException {
-        entry.setField("doi", "10.1186/unknown-doi");
+    void entityWithoutDoi() throws IOException {
+        assertEquals(Optional.empty(), finder.findFullText(entry));
+    }
 
-        Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
+    @Test
+    void trustLevel() {
+        assertEquals(TrustLevel.PUBLISHER, finder.getTrustLevel());
     }
 }

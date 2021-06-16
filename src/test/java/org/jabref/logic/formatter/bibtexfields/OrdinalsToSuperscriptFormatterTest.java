@@ -1,9 +1,9 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
@@ -12,7 +12,7 @@ public class OrdinalsToSuperscriptFormatterTest {
 
     private OrdinalsToSuperscriptFormatter formatter;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         formatter = new OrdinalsToSuperscriptFormatter();
     }

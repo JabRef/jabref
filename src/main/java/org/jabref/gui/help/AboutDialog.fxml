@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.effect.Reflection?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+<DialogPane prefWidth="530.0" prefHeight="510.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.help.AboutDialogView">
+    <content>
+        <VBox alignment="CENTER_LEFT" BorderPane.alignment="CENTER">
+            <HBox alignment="CENTER_LEFT">
+                <VBox alignment="CENTER_LEFT" spacing="1.0" styleClass="about-top" HBox.hgrow="NEVER">
+                    <Label alignment="CENTER" contentDisplay="CENTER" onMouseClicked="#copyVersionToClipboard" styleClass="about-heading" text="${controller.viewModel.heading}" textFill="#2c3e50" wrapText="true">
+                        <cursor>
+                            <Cursor fx:constant="HAND"/>
+                        </cursor>
+                        <tooltip>
+                            <Tooltip text="%Copy Version"/>
+                        </tooltip>
+                    </Label>
+                    <Label managed="${controller.viewModel.isDevelopmentVersion}" styleClass="dev-heading"
+                           text="${controller.viewModel.developmentVersion}"
+                           visible="${controller.viewModel.isDevelopmentVersion}"/>
+                    <Hyperlink onAction="#openChangeLog" styleClass="top-padding" text="%What's new in this version?"/>
+                    <Label styleClass="filler"/>
+                    <HBox alignment="CENTER_LEFT">
+                        <Label styleClass="space-after" text="${controller.viewModel.license}" wrapText="true"/>
+                        <Hyperlink onAction="#openLicense" text="MIT"/>
+                    </HBox>
+                    <Hyperlink onAction="#openExternalLibrariesWebsite" text="%Used libraries"/>
+                    <HBox alignment="CENTER_LEFT">
+                        <Label styleClass="space-after" text="%Want to help?" wrapText="true"/>
+                        <Hyperlink onAction="#openDonation" text="%Make a donation"/>
+                        <Label styleClass="space" text="%or" wrapText="true"/>
+                        <Hyperlink onAction="#openGithub" text="%get involved"/>
+                        <Label text="."/>
+                    </HBox>
+                </VBox>
+                <BorderPane BorderPane.alignment="CENTER" HBox.hgrow="ALWAYS">
+                    <center>
+                        <StackPane onMouseClicked="#openJabrefWebsite" prefHeight="140" prefWidth="140" scaleX="0.6"
+                                   scaleY="0.6" BorderPane.alignment="CENTER">
+                            <!-- SVGPaths need to be wrapped in a Pane to get them to the same size -->
+                            <Pane prefHeight="350" prefWidth="350" styleClass="logo-pane">
+                                <SVGPath content="M97.2 87.1C93.2 33.8 18.4 14.6 18.2 15.6c-0.1 6.7-0.3 13.3-0.4 20 17.8 3.6 61.7 20.1 79.4 51.5"/>
+                            </Pane>
+                            <Pane prefHeight="350" prefWidth="350" styleClass="logo-pane">
+                                <SVGPath content="M96.2 61.2C92.8 19.2 35.1 0.4 35 1c0 3.5-0.1 7-0.1 10.6 18.1 7.5 47.7 24.7 61.3 49.6"/>
+                            </Pane>
+                            <Pane prefHeight="350" prefWidth="350" styleClass="logo-pane">
+                                <SVGPath content="M67.1 65.2c-25.9-17.6-58.5-22.1-58.6-21.4-0.3 12.4-0.6 24.8-0.9 37.2 37.9 2.2 40.2 25.7 37.9 40.8l-39.1 12.6-1.9 69.5 68.7-26.6c8-3.3 16-6.4 24.1-9.3v-47.9c0-21.4-10.9-41.8-30.1-54.9"/>
+                            </Pane>
+
+                            <Pane prefHeight="350" prefWidth="350" styleClass="logo-pane">
+                                <SVGPath content="M107.8 87.1c3.9-53.2 78.8-72.5 78.9-71.5 0.1 6.7 0.3 13.3 0.4 20-17.8 3.6-61.7 20.1-79.4 51.5"/>
+                            </Pane>
+                            <Pane prefHeight="350" prefWidth="350" styleClass="logo-pane">
+                                <SVGPath content="M108.8 61.2c3.4-42.1 61.1-60.8 61.2-60.2 0 3.5 0.1 7 0.1 10.6-18.1 7.5-47.7 24.7-61.3 49.6"/>
+                            </Pane>
+                            <Pane prefHeight="350" prefWidth="350" styleClass="logo-pane">
+                                <SVGPath content="M137.9 65.2c25.9-17.6 58.5-22.1 58.6-21.4 0.3 12.4 0.6 24.8 0.9 37.2-37.9 2.2-40.2 25.7-37.9 40.8l39.1 12.6 1.9 69.5-68.7-26.6c-8-3.3-16-6.4-24.1-9.3v-47.9c0-21.4 10.9-41.8 30.1-54.9"/>
+                            </Pane>
+
+                            <cursor>
+                                <Cursor fx:constant="HAND"/>
+                            </cursor>
+                            <effect>
+                                <Reflection fraction="0.15"/>
+                            </effect>
+                        </StackPane>
+                    </center>
+                    <bottom>
+                    </bottom>
+                </BorderPane>
+            </HBox>
+            <Label styleClass="sub-heading" text="%Maintainers"/>
+            <Label alignment="CENTER" styleClass="info-sections" text="${controller.viewModel.maintainers}" textAlignment="JUSTIFY" wrapText="true"/>
+            <Label styleClass="sub-heading" text="%Contributors"/>
+            <HBox alignment="CENTER_LEFT">
+                <Hyperlink styleClass="contrib-section" onAction="#openContributors" text="%JabRef would not have been possible without the help of our contributors." wrapText="true"/>
+            </HBox>
+            <TextArea fx:id="textAreaVersions" editable="false" prefHeight="100.0" prefWidth="200.0" styleClass="info-sections"/>
+        </VBox>
+    </content>
+    <header>
+    </header>
+    <ButtonType fx:id="copyVersionButton" text="%Copy Version" buttonData="LEFT"/>
+    <ButtonType fx:constant="CLOSE"/>
+</DialogPane>

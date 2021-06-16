@@ -1,38 +1,42 @@
 package org.jabref.gui.fieldeditors;
 
-import java.util.Optional;
-
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.layout.HBox;
 
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
-import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
-import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
 import org.jabref.logic.integrity.FieldCheckers;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.model.entry.field.Field;
+import org.jabref.preferences.PreferencesService;
+
+import com.airhacks.afterburner.views.ViewLoader;
 
 public class JournalEditor extends HBox implements FieldEditorFX {
 
     @FXML private JournalEditorViewModel viewModel;
-    @FXML private EditorTextArea textArea;
-    private Optional<BibEntry> entry;
+    @FXML private EditorTextField textField;
 
-    public JournalEditor(String fieldName, JournalAbbreviationLoader journalAbbreviationLoader, JabRefPreferences preferences, AutoCompleteSuggestionProvider<?> suggestionProvider, FieldCheckers fieldCheckers) {
-        this.viewModel = new JournalEditorViewModel(fieldName, suggestionProvider, journalAbbreviationLoader, preferences.getJournalAbbreviationPreferences(), fieldCheckers);
+    public JournalEditor(Field field,
+                         JournalAbbreviationRepository journalAbbreviationRepository,
+                         PreferencesService preferences,
+                         SuggestionProvider<?> suggestionProvider,
+                         FieldCheckers fieldCheckers) {
+        this.viewModel = new JournalEditorViewModel(field, suggestionProvider, journalAbbreviationRepository, fieldCheckers);
 
-        ControlHelper.loadFXMLForControl(this);
+        ViewLoader.view(this)
+                  .root(this)
+                  .load();
 
-        textArea.textProperty().bindBidirectional(viewModel.textProperty());
-        textArea.addToContextMenu(EditorMenus.getDefaultMenu(textArea));
+        textField.textProperty().bindBidirectional(viewModel.textProperty());
+        textField.initContextMenu(new DefaultMenu(textField));
 
-        AutoCompletionTextInputBinding.autoComplete(textArea, viewModel::complete);
+        AutoCompletionTextInputBinding.autoComplete(textField, viewModel::complete);
 
-        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }
 
     public JournalEditorViewModel getViewModel() {
@@ -41,7 +45,6 @@ public class JournalEditor extends HBox implements FieldEditorFX {
 
     @Override
     public void bindToEntry(BibEntry entry) {
-        this.entry = Optional.of(entry);
         viewModel.bindToEntry(entry);
     }
 
@@ -51,7 +54,7 @@ public class JournalEditor extends HBox implements FieldEditorFX {
     }
 
     @FXML
-    private void toggleAbbreviation(ActionEvent event) {
+    private void toggleAbbreviation() {
         viewModel.toggleAbbreviation();
     }
 }

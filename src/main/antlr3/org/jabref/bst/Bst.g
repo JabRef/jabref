@@ -73,7 +73,7 @@ QUOTED
 	: '\'' IDENTIFIER;
 
 IDENTIFIER
-	: LETTER (LETTER|NUMERAL)* ;
+	: LETTER (LETTER|NUMERAL|'_')* ;
 
 fragment LETTER
 	: ('a'..'z'|'A'..'Z'|'.'|'$');

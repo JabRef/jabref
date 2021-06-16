@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="JabRef Main" type="Application" factoryName="Application" singleton="true">
+    <option name="MAIN_CLASS_NAME" value="org.jabref.gui.JabRefMain" />
+    <module name="JabRef.main" />
+    <option name="VM_PARAMETERS" value="--patch-module test=fastparse_2.12-1.0.0.jar --patch-module test2=fastparse-utils_2.12-1.0.0.jar --patch-module test3=sourcecode_2.12-0.1.4.jar --patch-module org.jabref=build/resources/main --add-exports javafx.controls/com.sun.javafx.scene.control=org.jabref --add-exports org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref --add-opens javafx.controls/javafx.scene.control=org.jabref --add-opens org.controlsfx.controls/org.controlsfx.control.textfield=org.jabref --add-exports javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls --add-exports javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls --add-exports javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls --add-exports javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls --add-exports javafx.base/com.sun.javafx.collections=org.controlsfx.controls --add-exports javafx.base/com.sun.javafx.runtime=org.controlsfx.controls --add-exports javafx.web/com.sun.webkit=org.controlsfx.controls --add-exports javafx.graphics/com.sun.javafx.css=org.controlsfx.controls --add-opens javafx.controls/javafx.scene.control.skin=org.controlsfx.controls --add-opens javafx.graphics/javafx.scene=org.controlsfx.controls --add-exports com.oracle.truffle.regex/com.oracle.truffle.regex=org.graalvm.truffle --add-exports javafx.graphics/com.sun.javafx.stage=com.jfoenix --add-exports javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix" />
+    <option name="WORKING_DIRECTORY" value="$MODULE_WORKING_DIR$" />
+    <RunnerSettings RunnerId="Profile ">
+      <option name="myExternalizedOptions" value="additional-options2=onexit\=snapshot,_no_java_version_check&#13;&#10;startup=12" />
+    </RunnerSettings>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

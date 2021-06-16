@@ -1,8 +1,13 @@
 package org.jabref.logic.formatter.minifier;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
@@ -11,26 +16,25 @@ public class MinifyNameListFormatterTest {
 
     private MinifyNameListFormatter formatter;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         formatter = new MinifyNameListFormatter();
     }
 
-    @Test
-    public void minifyAuthorNames() {
-        expectCorrect("Simon Harrer", "Simon Harrer");
-        expectCorrect("Simon Harrer and others", "Simon Harrer and others");
-        expectCorrect("Simon Harrer and Jörg Lenhard", "Simon Harrer and Jörg Lenhard");
-        expectCorrect("Simon Harrer and Jörg Lenhard and Guido Wirtz", "Simon Harrer and others");
-        expectCorrect("Simon Harrer and Jörg Lenhard and Guido Wirtz and others", "Simon Harrer and others");
+    @ParameterizedTest
+    @MethodSource("provideAuthorNames")
+    void minifyAuthorNames(String expectedAuthorNames, String originalAuthorNames) {
+        assertEquals(expectedAuthorNames, formatter.format(originalAuthorNames));
     }
 
-    @Test
-    public void formatExample() {
-        expectCorrect(formatter.getExampleInput(), "Stefan Kolb and others");
-    }
-
-    private void expectCorrect(String input, String expected) {
-        Assert.assertEquals(expected, formatter.format(input));
+    private static Stream<Arguments> provideAuthorNames() {
+        return Stream.of(
+                Arguments.of("Simon Harrer", "Simon Harrer"),
+                Arguments.of("Simon Harrer and others", "Simon Harrer and others"),
+                Arguments.of("Simon Harrer and Jörg Lenhard", "Simon Harrer and Jörg Lenhard"),
+                Arguments.of("Simon Harrer and others", "Simon Harrer and Jörg Lenhard and Guido Wirtz"),
+                Arguments.of("Simon Harrer and others", "Simon Harrer and Jörg Lenhard and Guido Wirtz and others"),
+                Arguments.of("Stefan Kolb and others", new MinifyNameListFormatter().getExampleInput())
+                );
     }
 }

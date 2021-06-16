@@ -1,0 +1,1486 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--  Editor:  Ray Denenberg, Library of Congress; rden@loc.gov -->
+<!-- -->
+<xs:schema xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.loc.gov/mods/v3" targetNamespace="http://www.loc.gov/mods/v3" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<!-- -->
+	<xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
+	<xs:import namespace="http://www.w3.org/1999/xlink" schemaLocation="xlink.xsd"/>
+	<!-- 
+MODS: Metadata Object Description Schema. See http://www.loc.gov/standards/mods/
+
+          ****************************************************************
+         *                                                                                
+         *                            MODS 3.7
+         *         
+         *                           January 4, 2018                 
+         *                    
+          *****************************************************************w
+
+***************************************************
+
+Changes in version 3.7
+1.	Capability added to supply an authority for a publisher. 
+2.	Controlled-list restriction removed from typeOfResource so that any value may be supplied. 
+3.	Capability added to supply  a calendar name for a date. 
+4.	Capability added to supply an alternative name for a name.
+
+***************************************************
+***************************************************
+
+
+
+     *************************************
+     Organization of this schema
+     *************************************
+
+The schema has three parts:
+
+1.   Structural declarations and definitions 
+2.    Elements (top level elements  and their subelements)
+3.   Auxiliary Definitions 
+
+         ***********************************************************************
+         ***********************************************************************
+         Part 1:    Structural Declarations and Definitions 
+         ***********************************************************************
+         ***********************************************************************
+- Definition of a single MODS record  and a MODS collection   
+- modsGroup, listing the top level MODS elements
+
+***********************************************************************
+**      Definition of a single MODS record                           **
+**********************************************************************
+-->
+	<xs:element name="mods" type="modsDefinition"/>
+	<!--  -->
+	<xs:complexType name="modsDefinition">
+		<xs:group ref="modsGroup" maxOccurs="unbounded"/>
+		<xs:attribute name="ID" type="xs:ID"/>
+		<xs:attribute name="version">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="3.7"/>
+					<xs:enumeration value="3.6"/>
+					<xs:enumeration value="3.5"/>
+					<xs:enumeration value="3.4"/>
+					<xs:enumeration value="3.3"/>
+					<xs:enumeration value="3.2"/>
+					<xs:enumeration value="3.1"/>
+					<xs:enumeration value="3.0"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<!-- 
+***********************************************************************
+**      Definition of a MODS collection                                **
+**********************************************************************
+-->
+	<xs:element name="modsCollection" type="modsCollectionDefinition"/>
+	<!-- -->
+	<xs:complexType name="modsCollectionDefinition">
+		<xs:sequence>
+			<xs:element ref="mods" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!--  
+
+************************************************
+**      Group Definition 
+***********************************************
+This forms the basis of the mods record definition, and also relatedItem. 
+The difference between a MODS record and a relatedItem 
+(as they pertain to their usage of the group definition) 
+is that mods requires at least one element and relatedItem does not. 
+The group definition is used by both, where relatedItem says 
+minOccurs="0" and for the mods record definition minOccurs="1" (default).
+
+-->
+	<xs:group name="modsGroup">
+		<xs:choice>
+			<!-- 
+***********************************************************************
+**        These are the "top level" MODS elements               **
+**********************************************************************
+-->
+			<xs:element ref="abstract"/>
+			<xs:element ref="accessCondition"/>
+			<xs:element ref="classification"/>
+			<xs:element ref="extension"/>
+			<xs:element ref="genre"/>
+			<xs:element ref="identifier"/>
+			<xs:element ref="language"/>
+			<xs:element ref="location"/>
+			<xs:element ref="name"/>
+			<xs:element ref="note"/>
+			<xs:element ref="originInfo"/>
+			<xs:element ref="part"/>
+			<xs:element ref="physicalDescription"/>
+			<xs:element ref="recordInfo"/>
+			<xs:element ref="relatedItem"/>
+			<xs:element ref="subject"/>
+			<xs:element ref="tableOfContents"/>
+			<xs:element ref="targetAudience"/>
+			<xs:element ref="titleInfo"/>
+			<xs:element ref="typeOfResource"/>
+			<!-- 
+End list of "top level" MODS elements 
+-->
+		</xs:choice>
+	</xs:group>
+	<!--	
+        ***********************************************************************
+        ***********************************************************************
+       Part 2:   Elements (top level elements and their subelements)                               
+       ************************************************************************
+        ***********************************************************************                              
+-->
+	<!--   
+*********************************************
+*   Top Level Element <abstract>       *
+*********************************************
+ -->
+	<xs:element name="abstract" type="abstractDefinition"/>
+	<!-- -->
+	<xs:complexType name="abstractDefinition">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguage">
+				<xs:attribute name="displayLabel" type="xs:string"/>
+				<xs:attribute name="type" type="xs:string"/>
+				<xs:attributeGroup ref="xlink:simpleLink"/>
+				<xs:attribute name="shareable" fixed="no"/>
+				<xs:attribute name="altRepGroup" type="xs:string"/>
+				<xs:attributeGroup ref="altFormatAttributeGroup"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!--
+
+****************************************************
+*   Top Level Element <accessCondition>       *
+*****************************************************
+ -->
+	<xs:element name="accessCondition" type="accessConditionDefinition"/>
+	<!-- -->
+	<xs:complexType name="accessConditionDefinition" mixed="true">
+		<xs:complexContent mixed="true">
+			<xs:extension base="extensionDefinition">
+				<xs:attributeGroup ref="xlink:simpleLink"/>
+				<xs:attributeGroup ref="languageAttributeGroup"/>
+				<xs:attribute name="type" type="xs:string"/>
+				<xs:attribute name="altRepGroup" type="xs:string"/>
+				<xs:attributeGroup ref="altFormatAttributeGroup"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--
+****************************************************
+*   Top Level Element <classification>          *
+*****************************************************
+-->
+	<xs:element name="classification" type="classificationDefinition"/>
+	<!-- -->
+	<xs:complexType name="classificationDefinition">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguagePlusAuthority">
+				<xs:attribute name="edition" type="xs:string"/>
+				<xs:attribute name="displayLabel" type="xs:string"/>
+				<xs:attribute name="altRepGroup" type="xs:string"/>
+				<xs:attribute name="usage" fixed="primary"/>
+				<xs:attribute name="generator" type="xs:string"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!--
+****************************************************
+*   Top Level Element <extension>              *
+*****************************************************
+ -->
+	<xs:element name="extension" type="extensionDefinition"/>
+	<!-- -->
+	<xs:complexType name="extensionDefinition" mixed="true">
+		<xs:sequence>
+			<xs:any processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="displayLabel" type="xs:string"/>
+	</xs:complexType>
+	<!--  
+****************************************************
+*   Top Level Element <genre>                    *
+*****************************************************
+-->
+	<xs:element name="genre" type="genreDefinition"/>
+	<!-- -->
+	<xs:complexType name="genreDefinition">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguagePlusAuthority">
+				<xs:attribute name="type" type="xs:string"/>
+				<xs:attribute name="displayLabel" type="xs:string"/>
+				<xs:attribute name="altRepGroup" type="xs:string"/>
+				<xs:attribute name="usage" fixed="primary"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!--
+****************************************************
+*   Top Level Element <identifier>                  *
+*****************************************************
+-->
+	<xs:element name="identifier" type="identifierDefinition"/>
+	<!-- -->
+	<xs:complexType name="identifierDefinition">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguage">
+				<xs:attribute name="displayLabel" type="xs:string"/>
+				<xs:attribute name="type" type="xs:string"/>
+				<xs:attribute name="typeURI" type="xs:anyURI"/>
+				<xs:attribute name="invalid" fixed="yes"/>
+				<xs:attribute name="altRepGroup" type="xs:string"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!--  
+****************************************************
+*   Top Level Element <language>                *
+*****************************************************
+-->
+	<xs:element name="language" type="languageDefinition"/>
+	<!-- -->
+	<xs:complexType name="languageDefinition">
+		<xs:sequence>
+			<xs:element ref="languageTerm" maxOccurs="unbounded"/>
+			<xs:element ref="scriptTerm" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="objectPart" type="xs:string"/>
+		<xs:attributeGroup ref="languageAttributeGroup"/>
+		<xs:attribute name="displayLabel" type="xs:string"/>
+		<xs:attribute name="altRepGroup" type="xs:string"/>
+		<xs:attribute name="usage" fixed="primary"/>
+	</xs:complexType>
+	<!--
+
+********   Subordinate Elements for <language>                
+ -->
+	<xs:element name="languageTerm" type="languageTermDefinition"/>
+	<!-- -->
+	<xs:complexType name="languageTermDefinition">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguage">
+				<xs:attribute name="authorityURI" type="xs:anyURI"/>
+				<xs:attribute name="valueURI" type="xs:anyURI"/>
+				<xs:attribute name="authority">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="rfc3066"/>
+							<xs:enumeration value="iso639-2b"/>
+							<xs:enumeration value="iso639-3"/>
+							<xs:enumeration value="rfc4646"/>
+							<xs:enumeration value="rfc5646"/>
+							<!-- -->
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="type" type="codeOrText"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!-- 
+*****************scriptTerm ************************
+-->
+	<xs:element name="scriptTerm" type="scriptTermDefinition"/>
+	<!-- -->
+	<xs:complexType name="scriptTermDefinition">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguagePlusAuthority">
+				<xs:attribute name="type" type="codeOrText"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!--
+
+****************************************************
+*   Top Level Element <location>                 *
+*****************************************************         
+ -->
+	<xs:element name="location" type="locationDefinition"/>
+	<!-- -->
+	<xs:complexType name="locationDefinition">
+		<xs:sequence>
+			<xs:element ref="physicalLocation" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="shelfLocator" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="url" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="holdingSimple" minOccurs="0"/>
+			<xs:element ref="holdingExternal" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attributeGroup ref="languageAttributeGroup"/>
+		<xs:attribute name="displayLabel" type="xs:string"/>
+		<xs:attribute name="altRepGroup" type="xs:string"/>
+	</xs:complexType>
+	<!--
+
+********   Subordinate Elements for <location>                
+ -->
+	<!--	  
+********** physicalLocation **********         
+-->
+	<xs:element name="physicalLocation" type="physicalLocationDefinition"/>
+	<!-- -->
+	<xs:complexType name="physicalLocationDefinition">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguagePlusAuthority">
+				<xs:attributeGroup ref="xlink:simpleLink"/>
+				<xs:attribute name="displayLabel" type="xs:string"/>
+				<xs:attribute name="type" type="xs:string"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!-- -->
+	<xs:element name="shelfLocator" type="stringPlusLanguage"/>
+	<!--  
+********** holdingSimple **********      
+ -->
+	<xs:element name="holdingSimple" type="holdingSimpleDefinition"/>
+	<!-- -->
+	<xs:complexType name="holdingSimpleDefinition">
+		<xs:sequence>
+			<xs:element ref="copyInformation" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!--
+**********copyInformation **********     
+ -->
+	<xs:element name="copyInformation" type="copyInformationDefinition"/>
+	<!-- -->
+	<xs:complexType name="copyInformationDefinition">
+		<xs:sequence>
+			<xs:element ref="form" minOccurs="0"/>
+			<xs:element ref="subLocation" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="shelfLocator" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="electronicLocator" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="note" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="stringPlusLanguage">
+							<xs:attribute name="displayLabel" type="xs:string"/>
+							<xs:attribute name="type" type="xs:string"/>
+							<xs:attributeGroup ref="xlink:simpleLink"/>
+							<xs:attribute name="ID" type="xs:ID"/>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element ref="enumerationAndChronology" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="itemIdentifier" minOccurs="0" maxOccurs="unbounded"/>
+			<!--	-->
+		</xs:sequence>
+	</xs:complexType>
+	<!--
+**********itemIdentifier **********     
+ -->
+		<xs:element name="itemIdentifier" type="itemIdentifierDefinition"/>
+			<xs:complexType name="itemIdentifierDefinition">
+				<xs:simpleContent>
+					<xs:extension base="stringPlusLanguage">
+						<xs:attribute name="type" type="xs:string"/>
+					</xs:extension>
+				</xs:simpleContent>
+			</xs:complexType>
+	<!--
+**********form**********     
+ -->
+	<xs:element name="form" type="formDefinition"/>
+	<!-- -->
+	<xs:complexType name="formDefinition">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguagePlusAuthority">
+				<xs:attribute name="type" type="xs:string"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!-- -->
+	<xs:element name="subLocation" type="stringPlusLanguage"/>
+	<xs:element name="electronicLocator" type="stringPlusLanguage"/>
+	<!--  
+**********enumerationAndChronology  **********     
+     -->
+	<xs:element name="enumerationAndChronology" type="enumerationAndChronologyDefinition"/>
+	<!-- -->
+	<xs:complexType name="enumerationAndChronologyDefinition">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguage">
+				<xs:attribute name="unitType">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="1"/>
+							<xs:enumeration value="2"/>
+							<xs:enumeration value="3"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!--
+ ********** url  **********        
+     -->
+	<xs:element name="url" type="urlDefinition"/>
+	<!-- -->
+	<xs:complexType name="urlDefinition">
+		<xs:simpleContent>
+			<xs:extension base="xs:anyURI">
+				<xs:attribute name="dateLastAccessed" type="xs:string"/>
+				<xs:attribute name="displayLabel" type="xs:string"/>
+				<xs:attribute name="note" type="xs:string"/>
+				<xs:attribute name="access">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="preview"/>
+							<xs:enumeration value="raw object"/>
+							<xs:enumeration value="object in context"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="usage">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="primary display"/>
+							<xs:enumeration value="primary"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!-- -->
+	<xs:element name="holdingExternal" type="extensionDefinition"/>
+	<!-- 
+****************************************************
+*   Top Level Element <name>                 *
+*****************************************************         
+-->
+	<xs:element name="name" type="nameDefinition"/>
+	<!-- -->
+	<xs:complexType name="nameDefinition">
+		<xs:choice>
+			
+			<!-- this choice gives two ways to do this.  
+				The second way allows the element <etal>,  to express "et. al."
+
+Choice one. WITHOUT <etal>.
+-->
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="namePart"/>
+				<xs:element ref="displayForm"/>
+				<xs:element ref="affiliation"/>
+				<xs:element ref="role"/>
+				<xs:element ref="description"/>
+				<xs:element ref="nameIdentifier"/>
+				<!-- 
+				The following,alternativeName, is new in 3.7-->
+				<xs:element ref="alternativeName"/>				
+		<!--   -->		
+			</xs:choice>
+			<!-- 
+Choice two.	With <etal>.
+               The presence of <etal> indicates that there are names that cannot 
+               be explicitily included. It may be empty, or it may have simple content
+               - e.g. <etal>et al.</etal>.  In the latter case the content is what is 
+               suggested for display. 
+               When <etal> occurs:
+                  - <namePart>, <displayForm>, and <identifier> MAY NOT occur;
+                  - <affiliation>, <role>, <description>   MAY occur (but are NOT repeatable).
+              <etal> is not repeatable within a given <name>, however there may be 
+              mutilple <etal> elements, each within in a separate <name> element.
+-->
+			<xs:sequence>
+				<!--   
+             <etal> is mandatory, nonrepeatable, and must occur first. 
+            After that <affiliation>, <role>, and <description> may occur, in any order or number. 
+            <nameIdentifier> is not used with <etal>
+-->
+				<xs:element ref="etal"/>
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element ref="affiliation"/>
+					<xs:element ref="role"/>
+					<xs:element ref="description"/>
+				</xs:choice>
+			</xs:sequence>
+			<!-- -->
+		</xs:choice>
+		<xs:attribute name="ID" type="xs:ID"/>
+		<xs:attributeGroup ref="authorityAttributeGroup"/>
+		<xs:attributeGroup ref="xlink:simpleLink"/>
+		<xs:attributeGroup ref="languageAttributeGroup"/>
+		<xs:attribute name="displayLabel" type="xs:string"/>
+		<xs:attribute name="altRepGroup" type="xs:string"/>
+		<xs:attribute name="nameTitleGroup" type="xs:string"/>
+		<xs:attribute name="usage" fixed="primary"/>
+		<xs:attribute name="type">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="personal"/>
+					<xs:enumeration value="corporate"/>
+					<xs:enumeration value="conference"/>
+					<xs:enumeration value="family"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<!--
+
+********   Subordinate Elements for <name>                
+ -->
+	<!-- namePart-->
+	<xs:element name="namePart" type="namePartDefinition"/>
+	<!-- -->
+	<xs:complexType name="namePartDefinition">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguage">
+				<xs:attribute name="type">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="date"/>
+							<xs:enumeration value="family"/>
+							<xs:enumeration value="given"/>
+							<xs:enumeration value="termsOfAddress"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!-- displayForm, affiliation, description, alternativeName -->
+	<xs:element name="displayForm" type="stringPlusLanguage"/>
+	<xs:element name="affiliation" type="stringPlusLanguage"/>
+	<xs:element name="description" type="stringPlusLanguage"/>
+	<xs:element name="nameIdentifier" type="identifierDefinition"/>
+	<!-- the following element, alternativeName, is new in 3.7 -->
+	<xs:element name="alternativeName" type="alternativeNameDefinition"/>
+
+	<!--  
+******** role *********************
+    -->
+	<xs:element name="role" type="roleDefinition"/>
+	<!-- -->
+	<xs:complexType name="roleDefinition">
+		<xs:sequence maxOccurs="unbounded">
+			<xs:element ref="roleTerm"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!--  
+***************roleTerm *********************** 
+    -->
+	<xs:element name="roleTerm" type="roleTermDefinition"/>
+	<!-- -->
+	<xs:complexType name="roleTermDefinition">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguagePlusAuthority">
+				<xs:attribute name="type" type="codeOrText"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!-- 
+********  etal  ********
+-->
+	<xs:element name="etal" type="stringPlusLanguage"/>
+	<!--   
+********  alternativeName  ********
+******************** new in 3.7 ****************************
+-->
+<xs:complexType name="alternativeNameDefinition">
+
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="namePart"/>
+				<xs:element ref="displayForm"/>
+				<xs:element ref="affiliation"/>
+				<xs:element ref="role"/>
+				<xs:element ref="description"/>
+				<xs:element ref="nameIdentifier"/>				
+		</xs:choice>
+			<!-- -->
+		<xs:attributeGroup ref="xlink:simpleLink"/>
+		<xs:attributeGroup ref="languageAttributeGroup"/>
+		<xs:attribute name="displayLabel" type="xs:string"/>
+		<xs:attribute name="altType" type="xs:string"/>
+</xs:complexType>
+	
+	<!--
+
+****************************************************
+*   Top Level Element <note>                      *
+*****************************************************         
+-->
+	<xs:element name="note" type="noteDefinition"/>
+	<!-- -->
+	<xs:complexType name="noteDefinition">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguage">
+				<xs:attribute name="displayLabel" type="xs:string"/>
+				<xs:attribute name="type" type="xs:string"/>
+				<xs:attribute name="typeURI" type="xs:anyURI"/>
+				<xs:attributeGroup ref="xlink:simpleLink"/>
+				<xs:attribute name="ID" type="xs:ID"/>
+				<xs:attribute name="altRepGroup" type="xs:string"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!--  
+
+****************************************************
+*   Top Level Element <originInfo>                 *
+*****************************************************         
+-->
+	<xs:element name="originInfo" type="originInfoDefinition"/>
+	<!-- -->
+	<xs:complexType name="originInfoDefinition">
+		<xs:choice maxOccurs="unbounded">
+			<xs:element ref="place"/>
+			<xs:element ref="publisher"/>
+			<xs:element ref="dateIssued"/>
+			<xs:element ref="dateCreated"/>
+			<xs:element ref="dateCaptured"/>
+			<xs:element ref="dateValid"/>
+			<xs:element ref="dateModified"/>
+			<xs:element ref="copyrightDate"/>
+			<xs:element ref="dateOther"/>
+			<xs:element ref="edition"/>
+			<xs:element ref="issuance"/>
+			<xs:element ref="frequency"/>
+		</xs:choice>
+		<xs:attributeGroup ref="languageAttributeGroup"/>
+		<xs:attribute name="displayLabel" type="xs:string"/>
+		<xs:attribute name="altRepGroup" type="xs:string"/>
+		<xs:attribute name="eventType" type="xs:string"/>
+	</xs:complexType>
+	<!--
+
+********   Subordinate Elements for <originInfo>                
+ -->
+	<!-- 
+*** place ***
+-->
+	<xs:element name="place" type="placeDefinition"/>
+	<!-- -->
+	<xs:complexType name="placeDefinition">
+		<xs:sequence>
+			<xs:element ref="placeTerm" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="supplied" fixed="yes"/>
+	</xs:complexType>
+	<!-- 
+*** placeTerm ***
+-->
+	<xs:element name="placeTerm" type="placeTermDefinition"/>
+	<!-- -->
+	<xs:complexType name="placeTermDefinition">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguage">
+				<xs:attribute name="authorityURI" type="xs:anyURI"/>
+				<xs:attribute name="valueURI" type="xs:anyURI"/>
+				<xs:attribute name="authority">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="marcgac"/>
+							<xs:enumeration value="marccountry"/>
+							<xs:enumeration value="iso3166"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="type" type="codeOrText"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!-- 
+*** publisher ***
+-->
+	<xs:element name="publisher" type="publisherDefinition"/> 
+<!--     ******************* definition changed in 3.7 *******************
+		****** in 3.6, publisher was defined as stringPlusLanguagePlusSupplied
+		****** in 3.7, the authority attributes are added
+-->		
+	<xs:complexType  name="publisherDefinition">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguagePlusSupplied">
+				<xs:attributeGroup ref="authorityAttributeGroup"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	
+	
+	
+	
+	<!--  
+********** dates  **********  
+-->
+	<xs:element name="dateIssued" type="dateDefinition"/>
+	<xs:element name="dateCreated" type="dateDefinition"/>
+	<xs:element name="dateCaptured" type="dateDefinition"/>
+	<xs:element name="dateValid" type="dateDefinition"/>
+	<xs:element name="dateModified" type="dateDefinition"/>
+	<xs:element name="copyrightDate" type="dateDefinition"/>
+	<xs:element name="dateOther" type="dateOtherDefinition"/>
+	<!--  -->
+	<xs:complexType name="dateDefinition">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguage">
+				<xs:attribute name="encoding">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="w3cdtf"/>
+							<xs:enumeration value="iso8601"/>
+							<xs:enumeration value="marc"/>
+							<xs:enumeration value="temper"/>
+							<xs:enumeration value="edtf"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="qualifier">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="approximate"/>
+							<xs:enumeration value="inferred"/>
+							<xs:enumeration value="questionable"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="point">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="start"/>
+							<xs:enumeration value="end"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="keyDate" fixed="yes"/>
+				<!-- 
+				***********  Following attribute, @calendar, added in 3.7
+				-->
+				<xs:attribute name="calendar" type="xs:string"/>
+<!-- -->				
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!--
+	********** dateOther  **********  
+-->
+	<xs:complexType name="dateOtherDefinition">
+		<xs:simpleContent>
+			<xs:extension base="dateDefinition">
+				<xs:attribute name="type" type="xs:string"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!--
+	********** edition **********  
+-->
+	<xs:element name="edition" type="stringPlusLanguagePlusSupplied"/>
+	<!--  
+********** issuance **********  	
+       -->
+	<xs:element name="issuance" type="issuanceDefinition"/>
+	<!-- -->
+	<xs:simpleType name="issuanceDefinition">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="continuing"/>
+			<xs:enumeration value="monographic"/>
+			<xs:enumeration value="single unit"/>
+			<xs:enumeration value="multipart monograph"/>
+			<xs:enumeration value="serial"/>
+			<xs:enumeration value="integrating resource"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--
+	********** frequency**********  
+-->
+	<xs:element name="frequency" type="stringPlusLanguagePlusAuthority"/>
+	<!--  
+
+****************************************************
+*   Top Level Element <part>                       *
+*****************************************************         
+-->
+	<xs:element name="part" type="partDefinition"/>
+	<!-- -->
+	<xs:complexType name="partDefinition">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="detail"/>
+			<xs:element name="extent" type="extentDefinition"/>
+			<xs:element ref="date"/>
+			<xs:element ref="text"/>
+		</xs:choice>
+		<xs:attribute name="ID" type="xs:ID"/>
+		<xs:attribute name="type" type="xs:string"/>
+		<xs:attribute name="order" type="xs:integer"/>
+		<xs:attributeGroup ref="languageAttributeGroup"/>
+		<xs:attribute name="displayLabel" type="xs:string"/>
+		<xs:attribute name="altRepGroup" type="xs:string"/>
+	</xs:complexType>
+	<!--
+
+********   Subordinate Elements for <part>                
+ -->
+	<!-- 
+********** detail **********  
+-->
+	<xs:element name="detail" type="detailDefinition"/>
+	<!-- -->
+	<xs:complexType name="detailDefinition">
+		<xs:choice maxOccurs="unbounded">
+			<xs:element ref="number"/>
+			<xs:element ref="caption"/>
+			<xs:element ref="title"/>
+		</xs:choice>
+		<xs:attribute name="type" type="xs:string"/>
+		<xs:attribute name="level" type="xs:positiveInteger"/>
+	</xs:complexType>
+	<!-- -->
+	<xs:element name="number" type="stringPlusLanguage"/>
+	<xs:element name="caption" type="stringPlusLanguage"/>
+	<!-- 
+********** extent **********  
+-->
+	<xs:complexType name="extentDefinition">
+		<xs:sequence>
+			<xs:element ref="start" minOccurs="0"/>
+			<xs:element ref="end" minOccurs="0"/>
+			<xs:element ref="total" minOccurs="0"/>
+			<xs:element ref="list" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="unit" type="xs:string"/>
+	</xs:complexType>
+	<!-- -->
+	<xs:element name="start" type="stringPlusLanguage"/>
+	<xs:element name="end" type="stringPlusLanguage"/>
+	<xs:element name="total" type="xs:positiveInteger"/>
+	<xs:element name="list" type="stringPlusLanguage"/>
+	<!--
+***************** date *** 
+-->
+	<xs:element name="date" type="dateDefinition"/>
+	<!--
+***************** text *** 
+-->
+	<xs:element name="text">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="stringPlusLanguage">
+					<xs:attribute name="displayLabel" type="xs:string"/>
+					<xs:attribute name="type" type="xs:string"/>
+					<xs:attributeGroup ref="xlink:simpleLink"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<!--
+
+****************************************************
+*   Top Level Element <physicalDescription> *
+*****************************************************         
+ -->
+	<xs:element name="physicalDescription" type="physicalDescriptionDefinition"/>
+	<!-- -->
+	<xs:complexType name="physicalDescriptionDefinition">
+		<xs:choice maxOccurs="unbounded">
+			<xs:element ref="form"/>
+			<!-- same definition as is used in copyInformation -->
+			<xs:element ref="reformattingQuality"/>
+			<xs:element ref="internetMediaType"/>
+			<xs:element ref="extent"/>
+			<xs:element ref="digitalOrigin"/>
+			<xs:element name="note" type="physicalDescriptionNote"/>
+		</xs:choice>
+		<xs:attributeGroup ref="languageAttributeGroup"/>
+		<xs:attribute name="displayLabel" type="xs:string"/>
+		<xs:attribute name="altRepGroup" type="xs:string"/>
+	</xs:complexType>
+	<!--
+
+********   Subordinate Elements for <physicalDescription>                
+ -->
+	<!-- 
+**********reformattingQuality **********  		 
+ -->
+	<xs:element name="reformattingQuality" type="reformattingQualityDefinition"/>
+	<!-- -->
+	<xs:simpleType name="reformattingQualityDefinition">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="access"/>
+			<xs:enumeration value="preservation"/>
+			<xs:enumeration value="replacement"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- 
+**********internetMediaType **********  		 
+ -->
+	<xs:element name="internetMediaType" type="stringPlusLanguage"/>
+	<!--
+********** extent **********  	
+ -->
+	<xs:element name="extent">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="stringPlusLanguagePlusSupplied">
+					<xs:attribute name="unit"/>
+				</xs:extension>
+				</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<!--
+********** digitalOrigin **********  	
+ -->
+	<xs:element name="digitalOrigin" type="digitalOriginDefinition"/>
+	<!-- -->
+	<xs:simpleType name="digitalOriginDefinition">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="born digital"/>
+			<xs:enumeration value="reformatted digital"/>
+			<xs:enumeration value="digitized microfilm"/>
+			<xs:enumeration value="digitized other analog"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--
+********** note **********  	
+ -->
+	<xs:complexType name="physicalDescriptionNote">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguage">
+				<xs:attribute name="displayLabel" type="xs:string"/>
+				<xs:attribute name="type" type="xs:string"/>
+				<xs:attribute name="typeURI" type="xs:anyURI"/>
+				<xs:attributeGroup ref="xlink:simpleLink"/>
+				<xs:attribute name="ID" type="xs:ID"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!--
+****************************************************
+*   Top Level Element <recordInfo>              *
+*****************************************************         
+
+**********  recordInfo  **********   
+-->
+	<xs:element name="recordInfo" type="recordInfoDefinition"/>
+	<!-- -->
+	<xs:complexType name="recordInfoDefinition">
+		<xs:choice maxOccurs="unbounded">
+			<xs:element ref="recordContentSource"/>
+			<xs:element ref="recordCreationDate"/>
+			<xs:element ref="recordChangeDate"/>
+			<xs:element ref="recordIdentifier"/>
+			<xs:element ref="languageOfCataloging"/>
+			<xs:element ref="recordOrigin"/>
+			<xs:element ref="descriptionStandard"/>
+			<xs:element ref="recordInfoNote"/>
+<!-- -->			
+		</xs:choice>
+		<xs:attributeGroup ref="languageAttributeGroup"/>
+		<xs:attribute name="displayLabel" type="xs:string"/>
+		<xs:attribute name="altRepGroup" type="xs:string"/>
+	</xs:complexType>
+	<!--
+
+********   Subordinate Elements for <recordInfo>                
+ -->
+	<xs:element name="recordContentSource" type="stringPlusLanguagePlusAuthority"/>
+	<xs:element name="recordCreationDate" type="dateDefinition"/>
+	<xs:element name="recordChangeDate" type="dateDefinition"/>
+	<xs:element name="recordInfoNote" type="noteDefinition"/>
+	<!--
+********** recordIdentifier 
+-->
+	<xs:element name="recordIdentifier" type="recordIdentifierDefinition"/>
+	<!-- -->
+	<xs:complexType name="recordIdentifierDefinition">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguage">
+				<xs:attribute name="source" type="xs:string"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!-- -->
+	<xs:element name="languageOfCataloging" type="languageDefinition"/>
+	<xs:element name="recordOrigin" type="stringPlusLanguage"/>
+	<xs:element name="descriptionStandard" type="stringPlusLanguagePlusAuthority"/>
+	<!-- 
+
+****************************************************
+*   Top Level Element <relatedItem>             *
+*****************************************************         
+
+**********   relatedItem  **********  
+-->
+	<xs:element name="relatedItem" type="relatedItemDefinition"/>
+	<!-- -->
+	<xs:complexType name="relatedItemDefinition">
+		<xs:group ref="modsGroup" minOccurs="0" maxOccurs="unbounded"/>
+		<xs:attribute name="type">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="preceding"/>
+					<xs:enumeration value="succeeding"/>
+					<xs:enumeration value="original"/>
+					<xs:enumeration value="host"/>
+					<xs:enumeration value="constituent"/>
+					<xs:enumeration value="series"/>
+					<xs:enumeration value="otherVersion"/>
+					<xs:enumeration value="otherFormat"/>
+					<xs:enumeration value="isReferencedBy"/>
+					<xs:enumeration value="references"/>
+					<xs:enumeration value="reviewOf"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<!-- -->	
+		<xs:attribute name="otherType" type="xs:string"/>
+		<xs:attribute name="otherTypeAuth" type="xs:string"/>
+		<xs:attribute name="otherTypeAuthURI" type="xs:string"/>
+		<xs:attribute name="otherTypeURI" type="xs:string"/>
+		<xs:attribute name="displayLabel" type="xs:string"/>
+		<xs:attribute name="ID" type="xs:ID"/>
+		<xs:attributeGroup ref="xlink:simpleLink"/>
+		
+	</xs:complexType>
+	<!--  
+
+****************************************************
+*   Top Level Element <subject>                  *
+*****************************************************         
+-->
+	<xs:element name="subject" type="subjectDefinition"/>
+	<!-- -->
+	<xs:complexType name="subjectDefinition">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="topic"/>
+			<xs:element ref="geographic"/>
+			<xs:element ref="temporal"/>
+			<xs:element name="titleInfo" type="subjectTitleInfoDefinition"/>
+			<xs:element name="name" type="subjectNameDefinition"/>
+			<xs:element ref="geographicCode"/>
+			<xs:element ref="hierarchicalGeographic"/>
+			<xs:element ref="cartographics"/>
+			<xs:element ref="occupation"/>
+			<xs:element ref="genre"/>
+			<!-- uses top-level genre definition -->
+		</xs:choice>
+		<xs:attribute name="ID" type="xs:ID"/>
+		<xs:attributeGroup ref="authorityAttributeGroup"/>
+		<xs:attributeGroup ref="languageAttributeGroup"/>
+		<xs:attributeGroup ref="xlink:simpleLink"/>
+		<xs:attribute name="displayLabel" type="xs:string"/>
+		<xs:attribute name="altRepGroup" type="xs:string"/>
+		<xs:attribute name="usage" fixed="primary"/>
+	</xs:complexType>
+	<!--
+
+********   Subordinate Elements for <subject>                
+ -->
+	<!-- topic, geographic -->
+	<xs:element name="topic" type="stringPlusLanguagePlusAuthority"/>
+	<xs:element name="geographic" type="stringPlusLanguagePlusAuthority"/>
+	<!-- 
+*****************temporal  ************************
+ -->
+	<xs:element name="temporal" type="temporalDefinition"/>
+	<!-- -->
+	<xs:complexType name="temporalDefinition">
+		<xs:simpleContent>
+			<xs:extension base="dateDefinition">
+				<xs:attributeGroup ref="authorityAttributeGroup"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!-- 
+*****************subjectTitleInfo ************************
+-->
+	<xs:complexType name="subjectTitleInfoDefinition">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="title"/>
+			<xs:element ref="subTitle"/>
+			<xs:element ref="partNumber"/>
+			<xs:element ref="partName"/>
+			<xs:element ref="nonSort"/>
+		</xs:choice>
+		<xs:attribute name="ID" type="xs:ID"/>
+		<xs:attributeGroup ref="authorityAttributeGroup"/>
+		<xs:attributeGroup ref="xlink:simpleLink"/>
+		<xs:attributeGroup ref="languageAttributeGroup"/>
+		<xs:attribute name="displayLabel" type="xs:string"/>
+		<xs:attribute name="type">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="abbreviated"/>
+					<xs:enumeration value="translated"/>
+					<xs:enumeration value="alternative"/>
+					<xs:enumeration value="uniform"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<!-- 
+*****************subjectName ************************
+-->
+	<xs:complexType name="subjectNameDefinition">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="namePart"/>
+			<xs:element ref="displayForm"/>
+			<xs:element ref="affiliation"/>
+			<xs:element ref="role"/>
+			<xs:element ref="description"/>
+			<xs:element ref="nameIdentifier"/>
+			<!-- -->
+		</xs:choice>
+		<xs:attribute name="type">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="personal"/>
+					<xs:enumeration value="corporate"/>
+					<xs:enumeration value="conference"/>
+					<xs:enumeration value="family"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="ID" type="xs:ID"/>
+		<xs:attributeGroup ref="authorityAttributeGroup"/>
+		<xs:attributeGroup ref="xlink:simpleLink"/>
+		<xs:attributeGroup ref="languageAttributeGroup"/>
+		<xs:attribute name="displayLabel" type="xs:string"/>
+	</xs:complexType>
+	<!--
+ ********** geographicCode **********  	 	
+-->
+	<xs:element name="geographicCode" type="geographicCodeDefinition"/>
+	<!-- -->
+	<xs:complexType name="geographicCodeDefinition">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguage">
+				<xs:attribute name="authorityURI" type="xs:anyURI"/>
+				<xs:attribute name="valueURI" type="xs:anyURI"/>
+				<xs:attribute name="authority">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="marcgac"/>
+							<xs:enumeration value="marccountry"/>
+							<xs:enumeration value="iso3166"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!--  
+********** hierarchicalGeographic **********  	 
+-->
+	<xs:element name="hierarchicalGeographic" type="hierarchicalGeographicDefinition"/>
+	<!-- -->
+	<xs:complexType name="hierarchicalGeographicDefinition">
+		<xs:choice maxOccurs="unbounded">
+			<xs:element ref="extraTerrestrialArea"/>
+			<xs:element ref="continent"/>
+			<xs:element ref="country"/>
+			<xs:element ref="province"/>
+			<!-- province is deprecated.  Use <state> instead.  -->
+			<xs:element ref="region"/>
+			<xs:element ref="state"/>
+			<xs:element ref="territory"/>
+			<xs:element ref="county"/>
+			<xs:element ref="city"/>
+			<xs:element ref="citySection"/>
+			<xs:element ref="island"/>
+			<xs:element ref="area"/>
+		</xs:choice>
+		<xs:attributeGroup ref="authorityAttributeGroup"/>
+	</xs:complexType>
+	<!-- -->
+		<!-- 		********** hierarchicalPart   *** auxiliary definition 	-->
+	<xs:complexType name="hierarchicalPart">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguage">
+				<xs:attribute name="level"/>
+				<xs:attribute name="period"/>
+				<xs:attributeGroup ref="authorityAttributeGroup"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+		<!-- 
+		Next, definitions for the place elements, starting with area, region, and citySection
+		-->
+
+		<xs:element name="area" type="areaDefinition"/>
+	<!-- -->
+	<xs:complexType name="areaDefinition">
+		<xs:simpleContent>
+			<xs:extension base="hierarchicalPart">
+				<xs:attribute name="areaType"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+		<!-- -->
+	
+	<xs:element name="region" type="regionDefinition"/>
+	<!-- -->
+	<xs:complexType name="regionDefinition">
+		<xs:simpleContent>
+			<xs:extension base="hierarchicalPart">
+				<xs:attribute name="regionType"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	
+		<xs:element name="citySection" type="citySectionDefinition"/>
+	<!-- -->
+	<xs:complexType name="citySectionDefinition">
+		<xs:simpleContent>
+			<xs:extension base="hierarchicalPart">
+				<xs:attribute name="citySectionType"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+		<!--  
+	The rest are all of type "hierarchicalPart"   ......
+		-->
+	<xs:element name="extraTerrestrialArea" type="hierarchicalPart"/>
+		<xs:element name="city" type="hierarchicalPart"/>
+	<xs:element name="continent" type="hierarchicalPart"/>
+	<xs:element name="country" type="hierarchicalPart"/>
+	<xs:element name="county" type="hierarchicalPart"/>
+	<xs:element name="island" type="hierarchicalPart"/>
+	<xs:element name="state" type="hierarchicalPart"/>
+	<xs:element name="territory" type="hierarchicalPart"/>
+	<!--  
+		..... except for province
+	-->
+	<xs:element name="province" type="stringPlusLanguage"/>
+	<!--  
+ ********** cartographics **********  
+-->
+	<xs:element name="cartographics" type="cartographicsDefinition"/>
+	<!-- -->
+	<xs:complexType name="cartographicsDefinition">
+		
+		<xs:sequence>
+			<xs:element ref="scale" minOccurs="0"/>
+			<xs:element ref="projection" minOccurs="0"/>
+			<xs:element ref="coordinates" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="cartographicExtension" minOccurs="0" maxOccurs="unbounded"/>
+<!--  -->   
+		</xs:sequence>
+		
+		<xs:attributeGroup ref="authorityAttributeGroup"/>
+	</xs:complexType>
+	<!-- -->
+	<xs:element name="scale" type="stringPlusLanguage"/>
+	<xs:element name="projection" type="stringPlusLanguage"/>
+	<xs:element name="coordinates" type="stringPlusLanguage"/>
+	<xs:element name="cartographicExtension" type="extensionDefinition"/>
+	<!-- 
+ ********** occupation **********  
+-->
+	<xs:element name="occupation" type="stringPlusLanguagePlusAuthority"/>
+	<!--
+****************************************************
+*   Top Level Element <tableOfContents>     *
+*****************************************************           
+ -->
+	<xs:element name="tableOfContents" type="tableOfContentsDefinition"/>
+	<!-- -->
+	<xs:complexType name="tableOfContentsDefinition">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguage">
+				<xs:attribute name="displayLabel" type="xs:string"/>
+				<xs:attribute name="type" type="xs:string"/>
+				<xs:attributeGroup ref="xlink:simpleLink"/>
+				<xs:attribute name="shareable" fixed="no"/>
+				<xs:attribute name="altRepGroup" type="xs:string"/>
+				<xs:attributeGroup ref="altFormatAttributeGroup"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!-- 
+
+****************************************************
+*   Top Level Element <targetAudience>       *
+*****************************************************           
+ -->
+	<xs:element name="targetAudience" type="targetAudienceDefinition"/>
+	<!-- -->
+	<xs:complexType name="targetAudienceDefinition">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguagePlusAuthority">
+				<xs:attribute name="displayLabel" type="xs:string"/>
+				<xs:attribute name="altRepGroup" type="xs:string"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!--
+****************************************************
+*   Top Level Element <titleInfo>                   *
+*****************************************************
+          -->
+	<xs:element name="titleInfo" type="titleInfoDefinition"/>
+	<!-- -->
+	<xs:complexType name="titleInfoDefinition">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<xs:element ref="title"/>
+			<xs:element ref="subTitle"/>
+			<xs:element ref="partNumber"/>
+			<xs:element ref="partName"/>
+			<xs:element ref="nonSort"/>
+		</xs:choice>
+		<xs:attribute name="type">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="abbreviated"/>
+					<xs:enumeration value="translated"/>
+					<xs:enumeration value="alternative"/>
+					<xs:enumeration value="uniform"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="otherType"/>
+		<xs:attribute name="supplied" fixed="yes"/>
+		<xs:attribute name="altRepGroup" type="xs:string"/>
+		<xs:attributeGroup ref="altFormatAttributeGroup"/>
+		<xs:attribute name="nameTitleGroup" type="xs:string"/>
+		<xs:attribute name="usage" fixed="primary"/>
+		<xs:attribute name="ID" type="xs:ID"/>
+		<xs:attributeGroup ref="authorityAttributeGroup"/>
+		<xs:attributeGroup ref="xlink:simpleLink"/>
+		<xs:attributeGroup ref="languageAttributeGroup"/>
+		<xs:attribute name="displayLabel" type="xs:string"/>
+	</xs:complexType>
+	<!--
+
+********   Subordinate Elements for <titleInfo>                
+ -->
+	<xs:element name="title" type="stringPlusLanguage"/>
+	<xs:element name="subTitle" type="stringPlusLanguage"/>
+	<xs:element name="partNumber" type="stringPlusLanguage"/>
+	<xs:element name="partName" type="stringPlusLanguage"/>
+	<!-- 
+*********  nonSort
+		-->
+	<xs:element name="nonSort">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="stringPlusLanguage">
+					<xs:attribute ref="xml:space"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element> 
+	<!--
+****************************************************
+*   Top Level Element <typeOfResource>     *
+*****************************************************         
+ -->
+	<xs:element name="typeOfResource" type="typeOfResourceDefinition"/>
+	<!-- -->
+	<xs:complexType name="typeOfResourceDefinition">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguagePlusAuthority">
+				<!-- 
+					***************** definition changed in 3.7 *****************
+				In 3.6 the base was "resourceTypeDefinition", 
+				which was a controlled list.
+				In 3.7 resourceTypeDefinition is removed, so
+				any value may be supplied.
+				-->
+				<xs:attribute name="collection" fixed="yes"/>
+				<xs:attribute name="manuscript" fixed="yes"/>
+				<xs:attribute name="displayLabel" type="xs:string"/>
+				<xs:attribute name="altRepGroup" type="xs:string"/>
+				<xs:attribute name="usage" fixed="primary"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	
+	<!--  
+         *********************************
+         *********************************
+         Part 3:   Auxiliary definitions
+         *********************************
+         *********************************
+
+**********************************
+String Definitions 
+**********************************
+-->
+	<!--
+********** stringPlusLanguage  
+   -->
+	<xs:complexType name="stringPlusLanguage">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attributeGroup ref="languageAttributeGroup"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!--
+************************* stringPlusLanguagePlusAuthority  *************************     	
+ -->
+	<xs:complexType name="stringPlusLanguagePlusAuthority">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguage">
+				<xs:attributeGroup ref="authorityAttributeGroup"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!--                     
+************************* stringPlusLanguagePlusSupplied  *************************     	 
+ -->
+	<xs:complexType name="stringPlusLanguagePlusSupplied">
+		<xs:simpleContent>
+			<xs:extension base="stringPlusLanguage">
+				<xs:attribute name="supplied" fixed="yes"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!-- 
+**********************************
+  Attribute Group Definitions 
+**********************************
+-->
+	<!--   
+ ********** authorityAttributeGroup   **********  	                       	  
+   -->
+	<xs:attributeGroup name="authorityAttributeGroup">
+		<!-- new in 3.4 -->
+		<xs:attribute name="authority" type="xs:string"/>
+		<xs:attribute name="authorityURI" type="xs:anyURI"/>
+		<xs:attribute name="valueURI" type="xs:anyURI"/>
+	</xs:attributeGroup>
+	<!--   
+  ********** languageAttributeGroup   **********  	                       	  
+-->
+	<xs:attributeGroup name="languageAttributeGroup">
+		<xs:attribute name="lang" type="xs:string"/>
+		<xs:attribute ref="xml:lang"/>
+		<xs:attribute name="script" type="xs:string"/>
+		<xs:attribute name="transliteration" type="xs:string"/>
+	</xs:attributeGroup>
+	<!--   
+  ********** altFormatAttributeGroup   **********  	                       	  
+-->
+	<xs:attributeGroup name="altFormatAttributeGroup">
+		<xs:attribute name="altFormat" type="xs:anyURI"/>
+		<xs:attribute name="contentType" type="xs:string"/>
+	</xs:attributeGroup>
+	<!--  
+****************************************************
+  - Attribute definitions (simpleTypes)
+*****************************************************
+-->
+	<!--  
+   ********** codeOrText
+                  ******** used by type attribute  for elements that distinguish code from text:
+                  ******** <languageTerm>, <placeTerm>, <roleTerm>, <scriptTerm>
+ -->
+	<xs:simpleType name="codeOrText">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="code"/>
+			<xs:enumeration value="text"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- -->
+</xs:schema>

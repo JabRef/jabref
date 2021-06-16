@@ -1,11 +1,10 @@
 package org.jabref.gui.mergeentries;
 
-import java.awt.Font;
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,212 +12,185 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JTextArea;
-import javax.swing.JTextPane;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
+import javafx.collections.FXCollections;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
-
-import org.jabref.Globals;
-import org.jabref.gui.PreviewPanel;
-import org.jabref.gui.customjfx.CustomJFXPanel;
+import org.jabref.gui.Globals;
+import org.jabref.gui.icon.IconTheme.JabRefIcons;
+import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.component.DiffHighlightingTextPane;
-import org.jabref.logic.bibtex.BibEntryWriter;
-import org.jabref.logic.bibtex.LatexFieldFormatter;
-import org.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.strings.DiffHighlighting;
-import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.InternalBibtexFields;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.RowSpec;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.tobiasdiez.easybind.EasyBind;
 
-/**
- * @author Oscar Gustafsson
- *
- *         Class for dealing with merging entries
- */
+public class MergeEntries extends BorderPane {
 
-public class MergeEntries {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MergeEntries.class);
-
-
-    private static final String MARGIN = "10px";
-
-    private static final List<JLabel> HEADING_LABELS = new ArrayList<>(6);
-
-    private static final CellConstraints CELL_CONSTRAINTS = new CellConstraints();
-    private static final String[] DIFF_MODES = {Localization.lang("Plain text"),
-            Localization.lang("Show diff") + " - " + Localization.lang("word"),
-            Localization.lang("Show diff") + " - " + Localization.lang("character"),
-            Localization.lang("Show symmetric diff") + " - " + Localization.lang("word"),
-            Localization.lang("Show symmetric diff") + " - " + Localization.lang("character")};
+    private static final int NUMBER_OF_COLUMNS = 6;
+    private static final int LEFT_RADIOBUTTON_INDEX = 0;
+    private static final int RIGHT_RADIOBUTTON_INDEX = 2;
+    private final ComboBox<DiffMode> diffMode = new ComboBox<>();
 
     // Headings
-    private final List<String> columnHeadings = Arrays.asList(Localization.lang("Field"),
+    private final List<String> columnHeadings = Arrays.asList(
+            Localization.lang("Field"),
             Localization.lang("Left entry"),
-            Localization.lang("Left"),
+            "left icon",
             Localization.lang("None"),
-            Localization.lang("Right"),
+            "right icon",
             Localization.lang("Right entry"));
-    private final Set<String> identicalFields = new HashSet<>();
-    private final Set<String> differentFields = new HashSet<>();
+    private final Set<Field> identicalFields = new HashSet<>();
+    private final Set<Field> differentFields = new HashSet<>();
     private final BibEntry mergedEntry = new BibEntry();
     private final BibEntry leftEntry;
     private final BibEntry rightEntry;
-    private final BibDatabaseMode databaseType;
-    private JScrollPane scrollPane;
-    private JTextArea sourceView;
-    private PreviewPanel entryPreview;
-    private Boolean doneBuilding;
+    private final Map<Field, TextFlow> leftTextPanes = new HashMap<>();
+    private final Set<Field> allFields = new TreeSet<>(Comparator.comparing(Field::getName));
+    private final Map<Field, TextFlow> rightTextPanes = new HashMap<>();
+    private final Map<Field, List<RadioButton>> radioButtons = new HashMap<>();
     private Boolean identicalTypes;
-    private List<JRadioButton> typeRadioButtons;
-    private final Set<String> allFields = new TreeSet<>();
-    private final JComboBox<String> diffMode = new JComboBox<>();
-    private final Map<String, JTextPane> leftTextPanes = new HashMap<>();
-    private final Map<String, JTextPane> rightTextPanes = new HashMap<>();
-
-    private final Map<String, List<JRadioButton>> radioButtons = new HashMap<>();
-
-    private final JPanel mainPanel = new JPanel();
-
-
+    private List<RadioButton> typeRadioButtons;
+    private final DefaultRadioButtonSelectionMode defaultRadioButtonSelectionMode;
+    private final List<RadioButton> leftRadioButtons = new ArrayList<>();
+    private final List<RadioButton> rightRadioButtons = new ArrayList<>();
 
     /**
-     * Constructor taking two entries
+     * Constructor with optional column captions for the two entries
      *
-     * @param entryLeft Left entry
-     * @param entryRight Right entry
-     * @param type Bib database mode
+     * @param entryLeft                       Left entry
+     * @param entryRight                      Right entry
+     * @param headingLeft                     Heading for left entry
+     * @param headingRight                    Heading for right entry
+     * @param defaultRadioButtonSelectionMode If the left or the right side of the radio button should be preselected
      */
-    public MergeEntries(BibEntry entryLeft, BibEntry entryRight, BibDatabaseMode type) {
-        leftEntry = entryLeft;
-        rightEntry = entryRight;
-        this.databaseType = type;
+    public MergeEntries(BibEntry entryLeft, BibEntry entryRight, String headingLeft, String headingRight, DefaultRadioButtonSelectionMode defaultRadioButtonSelectionMode) {
+        this.leftEntry = entryLeft;
+        this.rightEntry = entryRight;
+        this.defaultRadioButtonSelectionMode = defaultRadioButtonSelectionMode;
+
         initialize();
+        setLeftHeaderText(headingLeft);
+        setRightHeaderText(headingRight);
     }
 
     /**
      * Constructor with optional column captions for the two entries
      *
-     * @param entryLeft Left entry
-     * @param entryRight Right entry
-     * @param headingLeft Heading for left entry
+     * @param entryLeft    Left entry
+     * @param entryRight   Right entry
+     * @param headingLeft  Heading for left entry
      * @param headingRight Heading for right entry
-     * @param type Bib database mode
      */
-    public MergeEntries(BibEntry entryLeft, BibEntry entryRight, String headingLeft, String headingRight, BibDatabaseMode type) {
-        columnHeadings.set(1, headingLeft);
-        columnHeadings.set(5, headingRight);
-        this.leftEntry = entryLeft;
-        this.rightEntry = entryRight;
+    public MergeEntries(BibEntry entryLeft, BibEntry entryRight, String headingLeft, String headingRight) {
+        this(entryLeft, entryRight, headingLeft, headingRight, DefaultRadioButtonSelectionMode.LEFT);
+    }
 
-        this.databaseType = type;
-
+    /**
+     * Constructor taking two entries
+     *
+     * @param entryLeft                       Left entry
+     * @param entryRight                      Right entry
+     * @param defaultRadioButtonSelectionMode If the left or the right side of the radio button should be preselected
+     */
+    public MergeEntries(BibEntry entryLeft, BibEntry entryRight, DefaultRadioButtonSelectionMode defaultRadioButtonSelectionMode) {
+        leftEntry = entryLeft;
+        rightEntry = entryRight;
+        this.defaultRadioButtonSelectionMode = defaultRadioButtonSelectionMode;
         initialize();
+    }
+
+    /**
+     * Constructor taking two entries
+     *
+     * @param entryLeft  Left entry
+     * @param entryRight Right entry
+     */
+    public MergeEntries(BibEntry entryLeft, BibEntry entryRight) {
+        this(entryLeft, entryRight, DefaultRadioButtonSelectionMode.LEFT);
+    }
+
+    private static String getDisplayText(DiffMode mode) {
+        switch (mode) {
+            case PLAIN:
+                return Localization.lang("Plain text");
+            case WORD:
+                return Localization.lang("Show diff") + " - " + Localization.lang("word");
+            case CHARACTER:
+                return Localization.lang("Show diff") + " - " + Localization.lang("character");
+            case WORD_SYMMETRIC:
+                return Localization.lang("Show symmetric diff") + " - " + Localization.lang("word");
+            case CHARACTER_SYMMETRIC:
+                return Localization.lang("Show symmetric diff") + " - " + Localization.lang("character");
+            default:
+                throw new UnsupportedOperationException("Not implemented: " + mode);
+        }
     }
 
     /**
      * Main function for building the merge entry JPanel
      */
     private void initialize() {
-        doneBuilding = false;
+        setPrefWidth(800);
+
         setupFields();
 
         fillDiffModes();
 
-        // Create main layout
-        String colSpecMain = "left:pref, 5px, center:3cm:grow, 5px, center:pref, 3px, center:pref, 3px, center:pref, 5px, center:3cm:grow";
-        String colSpecMerge = "left:pref, 5px, fill:3cm:grow, 5px, center:pref, 3px, center:pref, 3px, center:pref, 5px, fill:3cm:grow";
-        String rowSpec = "pref, pref, 10px, fill:5cm:grow, 10px, pref, 10px, fill:3cm:grow";
-        StringBuilder rowBuilder = new StringBuilder("");
-        for (int i = 0; i < allFields.size(); i++) {
-            rowBuilder.append("pref, 2dlu, ");
-        }
-        rowBuilder.append("pref");
+        GridPane mergePanel = new GridPane();
+        mergePanel.setVgap(10);
+        mergePanel.setHgap(15);
+        ColumnConstraints columnLabel = new ColumnConstraints();
+        columnLabel.setHgrow(Priority.ALWAYS);
+        ColumnConstraints columnValues = new ColumnConstraints();
+        columnValues.setHgrow(Priority.NEVER);
+        columnValues.setPercentWidth(40);
+        ColumnConstraints columnSelect = new ColumnConstraints();
+        columnSelect.setHgrow(Priority.NEVER);
+        columnSelect.setHalignment(HPos.CENTER);
+        // See columnHeadings variable for the headings: 1) field, 2) left content, 3) left arrow, 4) "none", 5) right arrow, 6) right content
+        mergePanel.getColumnConstraints().setAll(columnLabel, columnValues, columnSelect, columnSelect, columnSelect, columnValues);
 
-        JPanel mergePanel = new JPanel();
-        FormLayout mainLayout = new FormLayout(colSpecMain, rowSpec);
-        FormLayout mergeLayout = new FormLayout(colSpecMerge, rowBuilder.toString());
-        mainPanel.setLayout(mainLayout);
-        mergePanel.setLayout(mergeLayout);
-
-        setupHeadingRows();
-
-        mainPanel.add(new JSeparator(), CELL_CONSTRAINTS.xyw(1, 3, 11));
-
+        setupHeadingRows(mergePanel);
         setupEntryTypeRow(mergePanel);
+        setupFieldRows(mergePanel);
 
-        int maxLabelWidth = setupFieldRows(mergePanel);
+        ScrollPane scrollPane = new ScrollPane(mergePanel);
+        scrollPane.setFitToWidth(true);
+        setCenter(scrollPane);
 
-        // Create and add scrollpane
-        scrollPane = new JScrollPane(mergePanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        updateTextPanes(allFields);
-        mainPanel.add(scrollPane, CELL_CONSTRAINTS.xyw(1, 4, 11));
-        mainPanel.add(new JSeparator(), CELL_CONSTRAINTS.xyw(1, 5, 11));
+        updateFieldValues(allFields);
 
-        synchronizeColumnWidths(mainLayout, mergeLayout, maxLabelWidth);
+        updateMergedEntry();
 
-        // Setup a PreviewPanel and a Bibtex source box for the merged entry
-        mainPanel.add(boldFontLabel(Localization.lang("Merged entry")), CELL_CONSTRAINTS.xyw(1, 6, 6));
-
-        entryPreview = new PreviewPanel(null, null);
-        entryPreview.setEntry(mergedEntry);
-        JFXPanel container = CustomJFXPanel.wrap(new Scene(entryPreview));
-        mainPanel.add(container, CELL_CONSTRAINTS.xyw(1, 8, 6));
-
-        mainPanel.add(boldFontLabel(Localization.lang("Merged BibTeX source code")), CELL_CONSTRAINTS.xyw(8, 6, 4));
-
-        sourceView = new JTextArea();
-        sourceView.setLineWrap(true);
-        sourceView.setFont(new Font("Monospaced", Font.PLAIN, Globals.prefs.getInt(JabRefPreferences.FONT_SIZE)));
-        mainPanel.add(new JScrollPane(sourceView), CELL_CONSTRAINTS.xyw(8, 8, 4));
-        sourceView.setEditable(false);
-
-        // Add some margin around the layout
-        mainLayout.appendRow(RowSpec.decode(MARGIN));
-        mainLayout.appendColumn(ColumnSpec.decode(MARGIN));
-        mainLayout.insertRow(1, RowSpec.decode(MARGIN));
-        mainLayout.insertColumn(1, ColumnSpec.decode(MARGIN));
-
-        // Everything done, allow any action to actually update the merged entry
-        doneBuilding = true;
-
-        updateAll();
-
-        // Show what we've got
-        mainPanel.setVisible(true);
-        SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(0));
+        getStylesheets().add(0, MergeEntries.class.getResource("MergeEntries.css").toExternalForm());
     }
 
-    private int setupFieldRows(JPanel mergePanel) {
+    private void setupFieldRows(GridPane mergePanel) {
         // For all fields in joint add a row and possibly radio buttons
         int row = 2;
-        int maxLabelWidth = -1;
-        for (String field : allFields) {
-            JLabel label = boldFontLabel(new SentenceCaseFormatter().format(field));
-            mergePanel.add(label, CELL_CONSTRAINTS.xy(1, (2 * row) - 1, "left, top"));
+        for (Field field : allFields) {
+            Label label = new Label(field.getDisplayName());
+            label.setMinWidth(USE_PREF_SIZE);
+            mergePanel.add(label, 0, row);
             Optional<String> leftString = leftEntry.getField(field);
             Optional<String> rightString = rightEntry.getField(field);
             if (leftString.equals(rightString)) {
@@ -227,12 +199,10 @@ public class MergeEntries {
                 differentFields.add(field);
             }
 
-            maxLabelWidth = Math.max(maxLabelWidth, label.getPreferredSize().width);
-
             // Left text pane
             if (leftString.isPresent()) {
-                JTextPane tf = new DiffHighlightingTextPane();
-                mergePanel.add(tf, CELL_CONSTRAINTS.xy(3, (2 * row) - 1, "f, f"));
+                TextFlow tf = new DiffHighlightingTextPane();
+                mergePanel.add(tf, 1, row);
                 leftTextPanes.put(field, tf);
             }
 
@@ -240,166 +210,174 @@ public class MergeEntries {
             if (identicalFields.contains(field)) {
                 mergedEntry.setField(field, leftString.get()); // Will only happen if both entries have the field and the content is identical
             } else {
-                ButtonGroup group = new ButtonGroup();
-                List<JRadioButton> list = new ArrayList<>(3);
+                ToggleGroup group = new ToggleGroup();
+                List<RadioButton> list = new ArrayList<>(3);
                 for (int k = 0; k < 3; k++) {
-                    JRadioButton button = new JRadioButton();
-                    group.add(button);
-                    mergePanel.add(button, CELL_CONSTRAINTS.xy(5 + (k * 2), (2 * row) - 1));
-                    button.addChangeListener(e -> updateAll());
+                    RadioButton button = new RadioButton();
+                    EasyBind.subscribe(button.selectedProperty(), selected -> updateMergedEntry());
+                    group.getToggles().add(button);
+                    mergePanel.add(button, 2 + k, row);
                     list.add(button);
                 }
                 radioButtons.put(field, list);
                 if (leftString.isPresent()) {
-                    list.get(0).setSelected(true);
+                    leftRadioButtons.add(list.get(LEFT_RADIOBUTTON_INDEX));
+                    list.get(LEFT_RADIOBUTTON_INDEX).setSelected(true);
                     if (!rightString.isPresent()) {
-                        list.get(2).setEnabled(false);
+                        list.get(RIGHT_RADIOBUTTON_INDEX).setDisable(true);
+                    } else if (this.defaultRadioButtonSelectionMode == DefaultRadioButtonSelectionMode.RIGHT) {
+                        list.get(RIGHT_RADIOBUTTON_INDEX).setSelected(true);
+                        rightRadioButtons.add(list.get(RIGHT_RADIOBUTTON_INDEX));
+                    } else {
+                        rightRadioButtons.add(list.get(RIGHT_RADIOBUTTON_INDEX));
                     }
                 } else {
-                    list.get(0).setEnabled(false);
-                    list.get(2).setSelected(true);
+                    list.get(LEFT_RADIOBUTTON_INDEX).setDisable(true);
+                    list.get(RIGHT_RADIOBUTTON_INDEX).setSelected(true);
+                    rightRadioButtons.add(list.get(RIGHT_RADIOBUTTON_INDEX));
                 }
             }
 
             // Right text pane
             if (rightString.isPresent()) {
-                JTextPane tf = new DiffHighlightingTextPane();
-                mergePanel.add(tf, CELL_CONSTRAINTS.xy(11, (2 * row) - 1, "f, f"));
+                TextFlow tf = new DiffHighlightingTextPane();
+                mergePanel.add(tf, 5, row);
                 rightTextPanes.put(field, tf);
             }
             row++;
         }
-        return maxLabelWidth;
     }
 
-    private void setupEntryTypeRow(JPanel mergePanel) {
+    private void setupEntryTypeRow(GridPane mergePanel) {
         // Start with entry type
-        mergePanel.add(boldFontLabel(Localization.lang("Entry type")), CELL_CONSTRAINTS.xy(1, 1));
-
-        JTextPane leftTypeDisplay = new DiffHighlightingTextPane();
-        leftTypeDisplay.setText(DiffHighlighting.HTML_START + leftEntry.getType() + DiffHighlighting.HTML_END);
-        mergePanel.add(leftTypeDisplay, CELL_CONSTRAINTS.xy(3, 1));
+        int rowIndex = 1;
+        mergePanel.add(new Label(Localization.lang("Entry type")), 0, rowIndex);
         if (leftEntry.getType().equals(rightEntry.getType())) {
+            mergePanel.add(DiffHighlighting.forUnchanged(leftEntry.getType().getDisplayName()), 1, rowIndex);
+            mergePanel.add(DiffHighlighting.forUnchanged(rightEntry.getType().getDisplayName()), 5, rowIndex);
             identicalTypes = true;
         } else {
+            mergePanel.add(DiffHighlighting.forChanged(leftEntry.getType().getDisplayName()), 1, rowIndex);
+            mergePanel.add(DiffHighlighting.forChanged(rightEntry.getType().getDisplayName()), 5, rowIndex);
             identicalTypes = false;
-            ButtonGroup group = new ButtonGroup();
+            ToggleGroup group = new ToggleGroup();
             typeRadioButtons = new ArrayList<>(2);
+
             for (int k = 0; k < 3; k += 2) {
-                JRadioButton button = new JRadioButton();
+                RadioButton button = new RadioButton();
+                EasyBind.subscribe(button.selectedProperty(), selected -> updateMergedEntry());
                 typeRadioButtons.add(button);
-                group.add(button);
-                mergePanel.add(button, CELL_CONSTRAINTS.xy(5 + (k * 2), 1));
-                button.addChangeListener(e -> updateAll());
+                group.getToggles().add(button);
+                mergePanel.add(button, 2 + k, rowIndex);
             }
-            typeRadioButtons.get(0).setSelected(true);
+            if (defaultRadioButtonSelectionMode == DefaultRadioButtonSelectionMode.RIGHT) {
+                typeRadioButtons.get(1).setSelected(true); // This Radio Button list does not have a third option as compared to the fields, so do not use the constants here
+                rightRadioButtons.add(typeRadioButtons.get(1));
+            } else {
+                typeRadioButtons.get(0).setSelected(true);
+                leftRadioButtons.add(typeRadioButtons.get(0));
+            }
         }
-        JTextPane rightTypeDisplay = new DiffHighlightingTextPane();
-        rightTypeDisplay.setText(DiffHighlighting.HTML_START + rightEntry.getType() + DiffHighlighting.HTML_END);
-        mergePanel.add(rightTypeDisplay, CELL_CONSTRAINTS.xy(11, 1));
     }
 
-    private void setupHeadingRows() {
-        mainPanel.add(boldFontLabel(Localization.lang("Use")), CELL_CONSTRAINTS.xyw(4, 1, 7, "center, bottom"));
-        mainPanel.add(diffMode, CELL_CONSTRAINTS.xy(11, 1, "right, bottom"));
-
+    private void setupHeadingRows(GridPane mergePanel) {
         // Set headings
-        for (int i = 0; i < 6; i++) {
-            HEADING_LABELS.add(boldFontLabel(columnHeadings.get(i)));
-            mainPanel.add(HEADING_LABELS.get(i), CELL_CONSTRAINTS.xy(1 + (i * 2), 2));
+        for (int i = 0; i < NUMBER_OF_COLUMNS; i++) {
+            if (i == 2) {
+                Button selectAllLeft = new Button();
+                selectAllLeft.setGraphic(JabRefIcons.LEFT.getGraphicNode());
+                selectAllLeft.setOnAction(evt -> this.selectAllLeftRadioButtons());
+                selectAllLeft.setTooltip(new Tooltip(Localization.lang("Select all changes on the left")));
+                mergePanel.add(selectAllLeft, i, 0);
+            } else if (i == 4) {
+                Button selectAllRight = new Button();
+                selectAllRight.setOnAction(evt -> this.selectAllRightRadioButtons());
+                selectAllRight.setGraphic(JabRefIcons.RIGHT.getGraphicNode());
+                selectAllRight.setTooltip(new Tooltip(Localization.lang("Select all changes on the right")));
+                mergePanel.add(selectAllRight, i, 0);
+            } else {
+                Label colHeading = new Label(columnHeadings.get(i));
+                colHeading.setMinWidth(USE_PREF_SIZE);
+                mergePanel.add(colHeading, i, 0);
+            }
         }
     }
 
     private void fillDiffModes() {
-        // Fill diff mode combo box
-        for (String diffText : DIFF_MODES) {
-            diffMode.addItem(diffText);
-        }
-        diffMode.setSelectedIndex(
-                Math.min(Globals.prefs.getInt(JabRefPreferences.MERGE_ENTRIES_DIFF_MODE), diffMode.getItemCount() - 1));
-        diffMode.addActionListener(e -> {
-            updateTextPanes(differentFields);
-            storePreference();
+        diffMode.setItems(FXCollections.observableList(Arrays.asList(DiffMode.values())));
+        new ViewModelListCellFactory<DiffMode>()
+                .withText(MergeEntries::getDisplayText)
+                .install(diffMode);
+        DiffMode diffModePref = Globals.prefs.getMergeDiffMode()
+                                             .flatMap(DiffMode::parse)
+                                             .orElse(DiffMode.WORD);
+        diffMode.setValue(diffModePref);
+        EasyBind.subscribe(this.diffMode.valueProperty(), mode -> {
+            updateFieldValues(differentFields);
+            Globals.prefs.storeMergeDiffMode(mode.name());
         });
-    }
 
-    private void synchronizeColumnWidths(FormLayout mainLayout, FormLayout mergeLayout,
-            int maxLabelWidth) {
-        // Synchronize column widths
-        String[] rbAlign = {"right", "center", "left"};
-        mainLayout.setColumnSpec(1, ColumnSpec.decode(Integer.toString(maxLabelWidth) + "px"));
-        Integer maxRBWidth = -1;
-        for (int k = 2; k < 5; k++) {
-            maxRBWidth = Math.max(maxRBWidth, HEADING_LABELS.get(k).getPreferredSize().width);
-        }
-        for (int k = 0; k < 3; k++) {
-            mergeLayout.setColumnSpec(5 + (k * 2), ColumnSpec.decode(rbAlign[k] + ":" + maxRBWidth + "px"));
-        }
-    }
-
-    private JLabel boldFontLabel(String text) {
-        JLabel label = new JLabel(text);
-        Font font = label.getFont();
-        label.setFont(font.deriveFont(font.getStyle() | Font.BOLD));
-        return label;
-    }
-
-    private void storePreference() {
-        Globals.prefs.putInt(JabRefPreferences.MERGE_ENTRIES_DIFF_MODE, diffMode.getSelectedIndex());
+        HBox heading = new HBox(10);
+        heading.getChildren().setAll(this.diffMode);
+        setTop(heading);
+        BorderPane.setMargin(heading, new Insets(0, 0, 10, 0));
     }
 
     private void setupFields() {
-        allFields.addAll(leftEntry.getFieldNames());
-        allFields.addAll(rightEntry.getFieldNames());
+        allFields.addAll(leftEntry.getFields());
+        allFields.addAll(rightEntry.getFields());
 
-        // Remove internal fields
-        Set<String> toberemoved = new TreeSet<>();
-        for (String field : allFields) {
-            if (InternalBibtexFields.isInternalField(field)) {
-                toberemoved.add(field);
-            }
-        }
-        allFields.removeAll(toberemoved);
+        // Do not show internal fields
+        Set<Field> internalFields = allFields.stream().filter(FieldFactory::isInternalField).collect(Collectors.toSet());
+        allFields.removeAll(internalFields);
     }
 
-    private void updateTextPanes(Collection<String> fields) {
-        int oldScrollPaneValue = scrollPane.getVerticalScrollBar().getValue();
-        for (String field : fields) {
+    private void updateFieldValues(Collection<Field> fields) {
+        for (Field field : fields) {
             String leftString = leftEntry.getField(field).orElse("");
             String rightString = rightEntry.getField(field).orElse("");
-            switch (diffMode.getSelectedIndex()) {
-            case 0: // Plain text
-                break;
-            case 1: // Latexdiff style - word
-                rightString = DiffHighlighting.generateDiffHighlighting(leftString, rightString, " ");
-                break;
-            case 2: // Latexdiff style - character
-                rightString = DiffHighlighting.generateDiffHighlighting(leftString, rightString, "");
-                break;
-            case 3: // Symmetric style - word
-                String tmpLeftString = DiffHighlighting.generateSymmetricHighlighting(leftString, rightString, " ");
-                rightString = DiffHighlighting.generateSymmetricHighlighting(rightString, leftString, " ");
-                leftString = tmpLeftString;
-                break;
-            case 4: // Symmetric style - character
-                tmpLeftString = DiffHighlighting.generateSymmetricHighlighting(leftString, rightString, "");
-                rightString = DiffHighlighting.generateSymmetricHighlighting(rightString, leftString, "");
-                leftString = tmpLeftString;
-                break;
-            default: // Shouldn't happen
-                break;
+            List<Text> leftText = leftString.isEmpty() ? Collections.emptyList() : Collections.singletonList(DiffHighlighting.forUnchanged(leftString));
+            List<Text> rightText = rightString.isEmpty() ? Collections.emptyList() : Collections.singletonList(DiffHighlighting.forUnchanged(rightString));
+            switch (diffMode.getValue()) {
+                case PLAIN:
+                    break;
+                case WORD:
+                    rightText = DiffHighlighting.generateDiffHighlighting(leftString, rightString, " ");
+                    break;
+                case CHARACTER:
+                    rightText = DiffHighlighting.generateDiffHighlighting(leftString, rightString, "");
+                    break;
+                case WORD_SYMMETRIC:
+                    leftText = DiffHighlighting.generateSymmetricHighlighting(leftString, rightString, " ");
+                    rightText = DiffHighlighting.generateSymmetricHighlighting(rightString, leftString, " ");
+                    break;
+                case CHARACTER_SYMMETRIC:
+                    leftText = DiffHighlighting.generateSymmetricHighlighting(leftString, rightString, "");
+                    rightText = DiffHighlighting.generateSymmetricHighlighting(rightString, leftString, "");
+                    break;
+                default:
+                    throw new UnsupportedOperationException("Not implemented " + diffMode.getValue());
             }
-            if ((leftString != null) && leftTextPanes.containsKey(field)) {
-                leftTextPanes.get(field).setText(DiffHighlighting.HTML_START + leftString + DiffHighlighting.HTML_END);
+            if (!leftText.isEmpty() && leftTextPanes.containsKey(field)) {
+                leftTextPanes.get(field).getChildren().setAll(leftText);
             }
-            if ((rightString != null) && rightTextPanes.containsKey(field)) {
-                rightTextPanes.get(field).setText(DiffHighlighting.HTML_START + rightString + DiffHighlighting.HTML_END);
+            if (!rightText.isEmpty() && rightTextPanes.containsKey(field)) {
+                rightTextPanes.get(field).getChildren().setAll(rightText);
             }
         }
-        SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar()
-                .setValue(Math.min(scrollPane.getVerticalScrollBar().getMaximum(), oldScrollPaneValue)));
     }
 
+    public void selectAllRightRadioButtons() {
+        for (RadioButton radioButton : rightRadioButtons) {
+            radioButton.setSelected(true);
+        }
+    }
+
+    public void selectAllLeftRadioButtons() {
+        for (RadioButton radioButton : leftRadioButtons) {
+            radioButton.setSelected(true);
+        }
+    }
 
     /**
      * @return Merged BibEntry
@@ -409,50 +387,61 @@ public class MergeEntries {
     }
 
     /**
-     * @return The merge entry JPanel
+     * Update the merged entry
      */
-    public JPanel getMergeEntryPanel() {
-        return mainPanel;
-    }
-
-    /**
-     * Update the merged BibEntry with source and preview panel every time something is changed
-     */
-    private void updateAll() {
-        if (!doneBuilding) {
-            // If we are not done adding everything, do not do anything...
-            return;
-        }
+    private void updateMergedEntry() {
         // Check if the type has changed
-        if (!identicalTypes && typeRadioButtons.get(0).isSelected()) {
+        if (!identicalTypes && !typeRadioButtons.isEmpty() && typeRadioButtons.get(0).isSelected()) {
             mergedEntry.setType(leftEntry.getType());
         } else {
             mergedEntry.setType(rightEntry.getType());
         }
 
         // Check the potentially different fields
-        for (String field : differentFields) {
-            if (radioButtons.get(field).get(0).isSelected()) {
+        for (Field field : differentFields) {
+            if (!radioButtons.containsKey(field)) {
+                // May happen during initialization -> just ignore
+                continue;
+            }
+            if (radioButtons.get(field).get(LEFT_RADIOBUTTON_INDEX).isSelected()) {
                 mergedEntry.setField(field, leftEntry.getField(field).get()); // Will only happen if field exists
-            } else if (radioButtons.get(field).get(2).isSelected()) {
+            } else if (radioButtons.get(field).get(RIGHT_RADIOBUTTON_INDEX).isSelected()) {
                 mergedEntry.setField(field, rightEntry.getField(field).get()); // Will only happen if field exists
             } else {
                 mergedEntry.clearField(field);
             }
         }
+    }
 
-        // Update the PreviewPanel
-        entryPreview.setEntry(mergedEntry);
+    public void setLeftHeaderText(String leftHeaderText) {
+        columnHeadings.set(1, leftHeaderText);
+        initialize();
+    }
 
-        // Update the BibTeX source view
-        StringWriter writer = new StringWriter();
-        try {
-            new BibEntryWriter(new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()),
-                    false).write(mergedEntry, writer, databaseType);
-        } catch (IOException ex) {
-            LOGGER.error("Error in entry", ex);
+    public void setRightHeaderText(String rightHeaderText) {
+        columnHeadings.set(5, rightHeaderText);
+        initialize();
+    }
+
+    public enum DiffMode {
+
+        PLAIN,
+        WORD,
+        CHARACTER,
+        WORD_SYMMETRIC,
+        CHARACTER_SYMMETRIC;
+
+        public static Optional<DiffMode> parse(String name) {
+            try {
+                return Optional.of(DiffMode.valueOf(name));
+            } catch (IllegalArgumentException e) {
+                return Optional.empty();
+            }
         }
-        sourceView.setText(writer.getBuffer().toString());
-        sourceView.setCaretPosition(0);
+    }
+
+    public enum DefaultRadioButtonSelectionMode {
+        LEFT,
+        RIGHT
     }
 }

@@ -1,71 +1,46 @@
 package org.jabref.gui.autocompleter;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.Set;
 
-import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.FieldProperty;
-import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.StandardField;
 
 public class SuggestionProviders {
 
-    /**
-     * key: field name
-     */
-    private final Map<String, AutoCompleteSuggestionProvider<?>> providers = new HashMap<>();
+    private final boolean isEmpty;
+    private BibDatabase database;
+    private JournalAbbreviationRepository abbreviationRepository;
+    private AutoCompletePreferences autoCompletePreferences;
 
-    /**
-     * Empty
-     */
+    public SuggestionProviders(BibDatabase database, JournalAbbreviationRepository abbreviationRepository, AutoCompletePreferences autoCompletePreferences) {
+        this.database = database;
+        this.abbreviationRepository = abbreviationRepository;
+        this.autoCompletePreferences = autoCompletePreferences;
+        this.isEmpty = false;
+    }
+
     public SuggestionProviders() {
-
+        this.isEmpty = true;
     }
 
-    public SuggestionProviders(AutoCompletePreferences preferences,
-            JournalAbbreviationLoader abbreviationLoader) {
-        Objects.requireNonNull(preferences);
+    public SuggestionProvider<?> getForField(Field field) {
 
-        List<String> completeFields = preferences.getCompleteFields();
-        for (String field : completeFields) {
-            AutoCompleteSuggestionProvider<?> autoCompleter = initalizeSuggestionProvider(field, preferences, abbreviationLoader);
-            providers.put(field, autoCompleter);
+        if (isEmpty || !autoCompletePreferences.getCompleteFields().contains(field)) {
+            return new EmptySuggestionProvider();
         }
-    }
 
-    public AutoCompleteSuggestionProvider<?> getForField(String fieldName) {
-        return providers.get(fieldName);
-    }
-
-    public void indexDatabase(BibDatabase database) {
-        for (BibEntry entry : database.getEntries()) {
-            indexEntry(entry);
-        }
-    }
-
-    /**
-     * This methods assures all information in the given entry is included as suggestions.
-     */
-    public void indexEntry(BibEntry bibEntry) {
-        for (AutoCompleteSuggestionProvider<?> autoCompleter : providers.values()) {
-            autoCompleter.indexEntry(bibEntry);
-        }
-    }
-
-    private AutoCompleteSuggestionProvider<?> initalizeSuggestionProvider(String fieldName, AutoCompletePreferences preferences, JournalAbbreviationLoader abbreviationLoader) {
-        if (InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.PERSON_NAMES)) {
-            return new PersonNameSuggestionProvider(fieldName);
-        } else if (InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.SINGLE_ENTRY_LINK)) {
-            return new BibEntrySuggestionProvider();
-        } else if (InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.JOURNAL_NAME)
-                || FieldName.PUBLISHER.equals(fieldName)) {
-            return new JournalsSuggestionProvider(fieldName, preferences, abbreviationLoader);
+        Set<FieldProperty> fieldProperties = field.getProperties();
+        if (fieldProperties.contains(FieldProperty.PERSON_NAMES)) {
+            return new PersonNameSuggestionProvider(field, database);
+        } else if (fieldProperties.contains(FieldProperty.SINGLE_ENTRY_LINK) || fieldProperties.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
+            return new BibEntrySuggestionProvider(database);
+        } else if (fieldProperties.contains(FieldProperty.JOURNAL_NAME) || StandardField.PUBLISHER.equals(field)) {
+            return new JournalsSuggestionProvider(field, database, abbreviationRepository);
         } else {
-            return new WordSuggestionProvider(fieldName);
+            return new WordSuggestionProvider(field, database);
         }
     }
 }

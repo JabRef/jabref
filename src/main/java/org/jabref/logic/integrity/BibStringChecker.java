@@ -6,29 +6,27 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.integrity.IntegrityCheck.Checker;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldProperty;
-import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldProperty;
 
-public class BibStringChecker implements Checker {
+/**
+ * Checks, if there is an even number of unescaped #
+ */
+public class BibStringChecker implements EntryChecker {
 
     // Detect # if it doesn't have a \ in front of it or if it starts the string
     private static final Pattern UNESCAPED_HASH = Pattern.compile("(?<!\\\\)#|^#");
 
-
-    /**
-     * Checks, if there is an even number of unescaped #
-     */
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
         List<IntegrityMessage> results = new ArrayList<>();
 
-        Map<String, String> fields = entry.getFieldMap();
+        Map<Field, String> fields = entry.getFieldMap();
 
-        for (Map.Entry<String, String> field : fields.entrySet()) {
-            if (!InternalBibtexFields.getFieldProperties(field.getKey()).contains(FieldProperty.VERBATIM)) {
+        for (Map.Entry<Field, String> field : fields.entrySet()) {
+            if (!field.getKey().getProperties().contains(FieldProperty.VERBATIM)) {
                 Matcher hashMatcher = UNESCAPED_HASH.matcher(field.getValue());
                 int hashCount = 0;
                 while (hashMatcher.find()) {

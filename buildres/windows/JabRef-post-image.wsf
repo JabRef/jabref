@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<package>
+   <job id="postImage">
+    <script language="jscript">
+     <![CDATA[
+        var fileSystem = new ActiveXObject("Scripting.FileSystemObject");
+
+        // The script is invoked in the "image" folder and not in "config" for some reason
+        // DEBUG Output
+        // var shell = new ActiveXObject("WScript.Shell");
+        // shell.Popup(fileSystem.GetFolder("."));
+        var jabRefRoot = fileSystem.GetFolder(".").ParentFolder.ParentFolder.ParentFolder.ParentFolder.Path;
+        var installerConfig = jabRefRoot + "/build/installer/config/";
+
+        // Copy additional installer resources
+        fileSystem.CopyFile(jabRefRoot + "/buildres/windows/JabRefTopBanner.bmp", installerConfig);
+
+        var wxsFilePath = installerConfig + "main.wxs";
+        wxsFile = fileSystem.OpenTextFile(wxsFilePath, 1);
+        var contents = wxsFile.ReadAll();
+        wxsFile.Close();
+
+        // Add registry values for JabRef Browser Extension
+        contents = contents.replace("</Product>", "<DirectoryRef Id=\"TARGETDIR\"><Component Id=\"RegistryJabRefBrowserEntries\" Guid=\"b6bc55ad-905c-4258-89b1-8b37abbe559c\" Win64=\"yes\"><RegistryKey Root=\"HKMU\" Key=\"SOFTWARE\\Mozilla\\NativeMessagingHosts\\org.jabref.jabref\" Action=\"createAndRemoveOnUninstall\" ForceCreateOnInstall=\"yes\"><RegistryValue Type=\"string\" Value=\"[INSTALLDIR]jabref-firefox.json\"/></RegistryKey><RegistryKey Root=\"HKMU\" Key=\"Software\\Google\\Chrome\\NativeMessagingHosts\\org.jabref.jabref\" Action=\"createAndRemoveOnUninstall\" ForceCreateOnInstall=\"yes\"><RegistryValue Type=\"string\" Value=\"[INSTALLDIR]jabref-chrome.json\"/></RegistryKey><RegistryKey Root=\"HKMU\" Key=\"Software\\Microsoft\\Edge\\NativeMessagingHosts\\org.jabref.jabref\" Action=\"createAndRemoveOnUninstall\" ForceCreateOnInstall=\"yes\"><RegistryValue Type=\"string\" Value=\"[INSTALLDIR]jabref-chrome.json\"/></RegistryKey></Component></DirectoryRef><Feature Id=\"BrowserExtension\" Level=\"1\"><ComponentRef Id=\"RegistryJabRefBrowserEntries\" /></Feature></Product>");
+
+        // Specify banner
+        contents = contents.replace("</Product>", "<WixVariable Id=\"WixUIBannerBmp\" Value=\"JabRefTopBanner.bmp\" /></Product>");
+        //contents = contents.replace("</Product>", "<WixVariable Id=\"WixUIDialogBmp\" Value=\"\" /></Product>");
+
+         wxsFile = fileSystem.OpenTextFile(wxsFilePath, 2, true);
+         wxsFile.Write(contents);
+         wxsFile.Close();
+     ]]>
+    </script>
+   </job>
+</package>

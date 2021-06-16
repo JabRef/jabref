@@ -11,10 +11,6 @@ import org.jabref.model.entry.AuthorList;
  * <li>The 'and' of a list of three or more authors is preceeded by a comma
  * (Oxford comma)</li>
  * </ul>
- *
- * @author mkovtun
- * @author Christopher Oezbek <oezi@oezi.de>
- *
  */
 public class AuthorLastFirstAbbrOxfordCommas implements LayoutFormatter {
 
@@ -22,5 +18,4 @@ public class AuthorLastFirstAbbrOxfordCommas implements LayoutFormatter {
     public String format(String fieldText) {
         return AuthorList.fixAuthorLastNameFirstCommas(fieldText, true, true);
     }
-
 }

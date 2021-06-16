@@ -1,0 +1,2 @@
+# This Mockito extension allows us to mock final methods, which are very common in OpenJFX
+mock-maker-inline

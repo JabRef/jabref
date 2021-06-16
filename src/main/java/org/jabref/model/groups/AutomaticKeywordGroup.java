@@ -1,22 +1,22 @@
 package org.jabref.model.groups;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
-import org.jabref.model.util.OptionalUtil;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.strings.StringUtil;
 
 public class AutomaticKeywordGroup extends AutomaticGroup {
 
-    private Character keywordDelimiter;
-    private Character keywordHierarchicalDelimiter;
-    private String field;
+    private final Character keywordDelimiter;
+    private final Character keywordHierarchicalDelimiter;
+    private final Field field;
 
-    public AutomaticKeywordGroup(String name, GroupHierarchyType context, String field, Character keywordDelimiter, Character keywordHierarchicalDelimiter) {
+    public AutomaticKeywordGroup(String name, GroupHierarchyType context, Field field, Character keywordDelimiter, Character keywordHierarchicalDelimiter) {
         super(name, context);
         this.field = field;
         this.keywordDelimiter = keywordDelimiter;
@@ -31,19 +31,23 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
         return keywordDelimiter;
     }
 
-    public String getField() {
+    public Field getField() {
         return field;
     }
 
     @Override
     public AbstractGroup deepCopy() {
-        return new AutomaticKeywordGroup(this.name, this.context, field, this.keywordDelimiter, keywordHierarchicalDelimiter);
+        return new AutomaticKeywordGroup(this.name.getValue(), this.context, field, this.keywordDelimiter, keywordHierarchicalDelimiter);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         AutomaticKeywordGroup that = (AutomaticKeywordGroup) o;
         return Objects.equals(keywordDelimiter, that.keywordDelimiter) &&
                 Objects.equals(field, that.field);
@@ -56,12 +60,11 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
 
     @Override
     public Set<GroupTreeNode> createSubgroups(BibEntry entry) {
-        Optional<KeywordList> keywordList = entry.getLatexFreeField(field)
-                .map(fieldValue -> KeywordList.parse(fieldValue, keywordDelimiter));
-        return OptionalUtil.toStream(keywordList)
-                .flatMap(KeywordList::stream)
-                .map(this::createGroup)
-                .collect(Collectors.toSet());
+        KeywordList keywordList = entry.getFieldAsKeywords(field, keywordDelimiter);
+        return keywordList.stream()
+                          .filter(keyword -> StringUtil.isNotBlank(keyword.get()))
+                          .map(this::createGroup)
+                          .collect(Collectors.toSet());
     }
 
     private GroupTreeNode createGroup(Keyword keywordChain) {
@@ -75,8 +78,8 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
                 true);
         GroupTreeNode root = new GroupTreeNode(rootGroup);
         keywordChain.getChild()
-                .map(this::createGroup)
-                .ifPresent(root::addChild);
+                    .map(this::createGroup)
+                    .ifPresent(root::addChild);
         return root;
     }
 }

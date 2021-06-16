@@ -1,24 +1,21 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
- */
-public class LatexCleanupFormatterTest {
+class LatexCleanupFormatterTest {
 
     private LatexCleanupFormatter formatter;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         formatter = new LatexCleanupFormatter();
     }
 
     @Test
-    public void test() {
+    void test() {
         assertEquals("$\\alpha\\beta$", formatter.format("$\\alpha$$\\beta$"));
         assertEquals("{VLSI DSP}", formatter.format("{VLSI} {DSP}"));
         assertEquals("\\textbf{VLSI} {DSP}", formatter.format("\\textbf{VLSI} {DSP}"));
@@ -27,23 +24,22 @@ public class LatexCleanupFormatterTest {
     }
 
     @Test
-    public void preservePercentSign() {
+    void preservePercentSign() {
         assertEquals("\\%", formatter.format("%"));
     }
 
     @Test
-    public void escapePercentSignOnlyOnce() {
+    void escapePercentSignOnlyOnce() {
         assertEquals("\\%", formatter.format("\\%"));
     }
 
     @Test
-    public void escapePercentSignOnlnyOnceWithNumber() {
+    void escapePercentSignOnlnyOnceWithNumber() {
         assertEquals("50\\%", formatter.format("50\\%"));
     }
 
     @Test
-    public void formatExample() {
+    void formatExample() {
         assertEquals("{VLSI DSP}", formatter.format(formatter.getExampleInput()));
     }
-
 }

@@ -3,11 +3,10 @@ package org.jabref.model.search.matchers;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.rules.MockSearchMatcher;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MatcherSetsTest {
 
@@ -46,5 +45,4 @@ public class MatcherSetsTest {
         NotMatcher matcher = new NotMatcher(new MockSearchMatcher(false));
         assertTrue(matcher.isMatch(new BibEntry()));
     }
-
 }

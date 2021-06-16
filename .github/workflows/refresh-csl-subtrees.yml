@@ -1,0 +1,51 @@
+name: Refresh Citation Style Language Files
+
+on:
+  schedule:
+    # run on 1st and 15th of each month
+    - cron: '1 2 1,15 * *'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: Refresh Citation Style Language Files
+    runs-on: ubuntu-latest
+    if: github.repository == 'JabRef/jabref'
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v2
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Initialize git
+        run: |
+          git checkout main
+          git config --local core.editor /usr/bin/cat
+          git config user.name "github actions"
+          git config user.email "jabrefmail+webfeedback@gmail.com"
+      - name: Add csl-styles remote
+        run: git remote add -f csl-styles https://github.com/citation-style-language/styles.git
+      - name: Update csl-styles
+        run: |
+          git subtree pull --prefix buildres/csl/csl-styles csl-styles master --squash || true
+          cp buildres/csl/csl-styles/acm-siggraph.csl src/main/resources/csl-styles/
+          cp buildres/csl/csl-styles/ieee.csl src/main/resources/csl-styles/
+          cp buildres/csl/csl-styles/turabian-author-date.csl src/main/resources/csl-styles/
+          git add .
+          git commit -m"Refresh example styles" || true
+      - name: Add csl-locales remote
+        run: git remote add -f csl-locales https://github.com/citation-style-language/locales.git
+      - name: Update csl-locales
+        run: |
+          git subtree pull --prefix buildres/csl/csl-locales csl-locales master --squash || true
+          cp buildres/csl/csl-locales/locales.json src/main/resources/csl-locales/
+          cp buildres/csl/csl-locales/locales-en-US.xml src/main/resources/csl-locales/
+          git add .
+          git commit -m"Refresh example styles" || true
+      - uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GH_TOKEN_UPDATE_GRADLE_WRAPPER }}
+          branch: refresh-csl
+          commit-message: Update CSL styles
+          title: "[Bot] Update CSL styles"
+          labels: dependencies

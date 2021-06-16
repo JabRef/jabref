@@ -11,14 +11,17 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.EntryTypeFactory;
+import org.jabref.model.entry.types.StandardEntryType;
 
 /**
- * Imports a SilverPlatter exported file. This is a poor format to parse,
- * so it currently doesn't handle everything correctly.
+ * Imports a SilverPlatter exported file. This is a poor format to parse, so it currently doesn't handle everything correctly.
  */
 public class SilverPlatterImporter extends Importer {
 
@@ -30,8 +33,8 @@ public class SilverPlatterImporter extends Importer {
     }
 
     @Override
-    public FileType getFileType() {
-        return FileType.SILVER_PLATTER;
+    public StandardFileType getFileType() {
+        return StandardFileType.SILVER_PLATTER;
     }
 
     @Override
@@ -73,8 +76,8 @@ public class SilverPlatterImporter extends Importer {
             }
         }
         String[] entries = sb.toString().split("__::__");
-        String type = "";
-        Map<String, String> h = new HashMap<>();
+        EntryType type = StandardEntryType.Misc;
+        Map<Field, String> h = new HashMap<>();
         for (String entry : entries) {
             if (entry.trim().length() < 6) {
                 continue;
@@ -88,41 +91,41 @@ public class SilverPlatterImporter extends Importer {
                 String f3 = field.substring(0, 2);
                 String frest = field.substring(5);
                 if ("TI".equals(f3)) {
-                    h.put(FieldName.TITLE, frest);
+                    h.put(StandardField.TITLE, frest);
                 } else if ("AU".equals(f3)) {
                     if (frest.trim().endsWith("(ed)")) {
                         String ed = frest.trim();
                         ed = ed.substring(0, ed.length() - 4);
-                        h.put(FieldName.EDITOR,
+                        h.put(StandardField.EDITOR,
                                 AuthorList.fixAuthorLastNameFirst(ed.replace(",-", ", ").replace(";", " and ")));
                     } else {
-                        h.put(FieldName.AUTHOR,
+                        h.put(StandardField.AUTHOR,
                                 AuthorList.fixAuthorLastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
                     }
                 } else if ("AB".equals(f3)) {
-                    h.put(FieldName.ABSTRACT, frest);
+                    h.put(StandardField.ABSTRACT, frest);
                 } else if ("DE".equals(f3)) {
                     String kw = frest.replace("-;", ",").toLowerCase(Locale.ROOT);
-                    h.put(FieldName.KEYWORDS, kw.substring(0, kw.length() - 1));
+                    h.put(StandardField.KEYWORDS, kw.substring(0, kw.length() - 1));
                 } else if ("SO".equals(f3)) {
                     int m = frest.indexOf('.');
                     if (m >= 0) {
                         String jr = frest.substring(0, m);
-                        h.put(FieldName.JOURNAL, jr.replace("-", " "));
+                        h.put(StandardField.JOURNAL, jr.replace("-", " "));
                         frest = frest.substring(m);
                         m = frest.indexOf(';');
                         if (m >= 5) {
                             String yr = frest.substring(m - 5, m).trim();
-                            h.put(FieldName.YEAR, yr);
+                            h.put(StandardField.YEAR, yr);
                             frest = frest.substring(m);
                             m = frest.indexOf(':');
                             int issueIndex = frest.indexOf('(');
                             int endIssueIndex = frest.indexOf(')');
                             if (m >= 0) {
                                 String pg = frest.substring(m + 1).trim();
-                                h.put(FieldName.PAGES, pg);
-                                h.put(FieldName.VOLUME, frest.substring(1, issueIndex).trim());
-                                h.put(FieldName.ISSUE, frest.substring(issueIndex + 1, endIssueIndex).trim());
+                                h.put(StandardField.PAGES, pg);
+                                h.put(StandardField.VOLUME, frest.substring(1, issueIndex).trim());
+                                h.put(StandardField.ISSUE, frest.substring(issueIndex + 1, endIssueIndex).trim());
                             }
                         }
                     }
@@ -130,54 +133,50 @@ public class SilverPlatterImporter extends Importer {
                     int m = frest.indexOf(':');
                     if (m >= 0) {
                         String jr = frest.substring(0, m);
-                        h.put(FieldName.PUBLISHER, jr.replace("-", " ").trim());
+                        h.put(StandardField.PUBLISHER, jr.replace("-", " ").trim());
                         frest = frest.substring(m);
                         m = frest.indexOf(", ");
                         if ((m + 2) < frest.length()) {
                             String yr = frest.substring(m + 2).trim();
                             try {
                                 Integer.parseInt(yr);
-                                h.put(FieldName.YEAR, yr);
+                                h.put(StandardField.YEAR, yr);
                             } catch (NumberFormatException ex) {
                                 // Let's assume that this wasn't a number, since it
                                 // couldn't be parsed as an integer.
                             }
-
                         }
-
                     }
                 } else if ("AF".equals(f3)) {
-                    h.put(FieldName.SCHOOL, frest.trim());
-
+                    h.put(StandardField.SCHOOL, frest.trim());
                 } else if ("DT".equals(f3)) {
                     frest = frest.trim();
                     if ("Monograph".equals(frest)) {
-                        type = "book";
+                        type = StandardEntryType.Book;
                     } else if (frest.startsWith("Dissertation")) {
-                        type = "phdthesis";
-                    } else if (frest.toLowerCase(Locale.ROOT).contains(FieldName.JOURNAL)) {
-                        type = "article";
+                        type = StandardEntryType.PhdThesis;
+                    } else if (frest.toLowerCase(Locale.ROOT).contains(StandardField.JOURNAL.getName())) {
+                        type = StandardEntryType.Article;
                     } else if ("Contribution".equals(frest) || "Chapter".equals(frest)) {
-                        type = "incollection";
+                        type = StandardEntryType.InCollection;
                         // This entry type contains page numbers and booktitle in the
                         // title field.
                         isChapter = true;
                     } else {
-                        type = frest.replace(" ", "");
+                        type = EntryTypeFactory.parse(frest.replace(" ", ""));
                     }
                 }
             }
 
             if (isChapter) {
-                String titleO = h.get(FieldName.TITLE);
+                String titleO = h.get(StandardField.TITLE);
                 if (titleO != null) {
                     String title = titleO.trim();
                     int inPos = title.indexOf("\" in ");
                     if (inPos > 1) {
-                        h.put(FieldName.TITLE, title.substring(0, inPos));
+                        h.put(StandardField.TITLE, title.substring(0, inPos));
                     }
                 }
-
             }
 
             BibEntry b = new BibEntry(type);
@@ -185,7 +184,6 @@ public class SilverPlatterImporter extends Importer {
             b.setField(h);
 
             bibitems.add(b);
-
         }
 
         return new ParserResult(bibitems);

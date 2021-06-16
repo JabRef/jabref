@@ -3,60 +3,52 @@ package org.jabref.logic.importer.fileformat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-@RunWith(Parameterized.class)
-public class BiblioscapeImporterTestTypes {
+class BiblioscapeImporterTestTypes {
 
-    private BiblioscapeImporter bsImporter;
-
-    @Parameter(value = 0)
-    public String biblioscapeType;
-
-    @Parameter(value = 1)
-    public String expectedBibType;
-
-
-    @Parameters
-    public static Collection<String[]> types() {
-        return Arrays.asList(new String[][] {{"journal", "article"}, {"book section", "inbook"}, {"book", "book"},
-                {"conference", "inproceedings"}, {"proceedings", "inproceedings"}, {"report", "techreport"},
-                {"master thesis", "mastersthesis"}, {"thesis", "phdthesis"}, {"master", "misc"}});
+    private static Stream<Arguments> types() {
+        return Stream.of(
+                Arguments.of("journal", StandardEntryType.Article),
+                Arguments.of("book section", StandardEntryType.InBook),
+                Arguments.of("book", StandardEntryType.Book),
+                Arguments.of("conference", StandardEntryType.InProceedings),
+                Arguments.of("proceedings", StandardEntryType.InProceedings),
+                Arguments.of("report", StandardEntryType.TechReport),
+                Arguments.of("master thesis", StandardEntryType.MastersThesis),
+                Arguments.of("thesis", StandardEntryType.PhdThesis),
+                Arguments.of("master", StandardEntryType.Misc)
+        );
     }
 
-    @Before
-    public void setUp() throws Exception {
-        bsImporter = new BiblioscapeImporter();
-    }
-
-    @Test
-    public void importConvertsToCorrectBibType() throws IOException {
+    @ParameterizedTest
+    @MethodSource("types")
+    void importConvertsToCorrectBibType(String biblioscapeType, EntryType bibtexType) throws IOException {
         String bsInput = "--AU-- Baklouti, F.\n" + "--YP-- 1999\n" + "--KW-- Cells; Rna; Isoforms\n" + "--TI-- Blood\n"
                 + "--RT-- " + biblioscapeType + "\n" + "------";
 
-        List<BibEntry> bibEntries = bsImporter.importDatabase(new BufferedReader(new StringReader(bsInput)))
-                .getDatabase().getEntries();
+        List<BibEntry> bibEntries = new BiblioscapeImporter().importDatabase(new BufferedReader(new StringReader(bsInput)))
+                                                             .getDatabase().getEntries();
 
         BibEntry entry = new BibEntry();
-        entry.setField("author", "Baklouti, F.");
-        entry.setField("keywords", "Cells; Rna; Isoforms");
-        entry.setField("title", "Blood");
-        entry.setField("year", "1999");
-        entry.setType(expectedBibType);
+        entry.setField(StandardField.AUTHOR, "Baklouti, F.");
+        entry.setField(StandardField.KEYWORDS, "Cells; Rna; Isoforms");
+        entry.setField(StandardField.TITLE, "Blood");
+        entry.setField(StandardField.YEAR, "1999");
+        entry.setType(bibtexType);
 
-        Assert.assertEquals(Collections.singletonList(entry), bibEntries);
+        Assertions.assertEquals(Collections.singletonList(entry), bibEntries);
     }
 }

@@ -1,34 +1,37 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import org.junit.Before;
-import org.junit.Test;
+import java.util.stream.Stream;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-/**
- * Tests in addition to the general tests from {@link org.jabref.logic.formatter.FormatterTest}
- */
-public class UnicodeToLatexFormatterTest {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class UnicodeToLatexFormatterTest {
 
     private UnicodeToLatexFormatter formatter;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         formatter = new UnicodeToLatexFormatter();
     }
 
-    @Test
-    public void formatWithoutUnicodeCharactersReturnsSameString() {
-        assertEquals("abc", formatter.format("abc"));
+    private static Stream<Arguments> testCases() {
+        return Stream.of(
+                         Arguments.of("", ""), // empty string input
+                         Arguments.of("abc", "abc"), // non unicode input
+                         Arguments.of("{{\\aa}}{\\\"{a}}{\\\"{o}}", "\u00E5\u00E4\u00F6"), // multiple unicodes input
+                         Arguments.of("", "\u0081"), // high code point unicode, boundary case: cp = 129
+                         Arguments.of("", "\u0080"), // high code point unicode, boundary case: cp = 128 < 129
+                         Arguments.of("M{\\\"{o}}nch", new UnicodeToLatexFormatter().getExampleInput()));
     }
 
-    @Test
-    public void formatMultipleUnicodeCharacters() {
-        assertEquals("{{\\aa}}{\\\"{a}}{\\\"{o}}", formatter.format("\u00E5\u00E4\u00F6"));
+    @ParameterizedTest()
+    @MethodSource("testCases")
+    void testFormat(String expectedResult, String input) {
+        assertEquals(expectedResult, formatter.format(input));
     }
 
-    @Test
-    public void formatExample() {
-        assertEquals("M{\\\"{o}}nch", formatter.format(formatter.getExampleInput()));
-    }
 }

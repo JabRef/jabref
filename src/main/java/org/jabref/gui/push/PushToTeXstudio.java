@@ -1,29 +1,30 @@
 package org.jabref.gui.push;
 
-import javax.swing.Icon;
-
-import org.jabref.gui.IconTheme;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.preferences.PreferencesService;
 
 public class PushToTeXstudio extends AbstractPushToApplication implements PushToApplication {
 
-    @Override
-    public String getApplicationName() {
-        return "TeXstudio";
+    public static final String NAME = "TeXstudio";
+
+    public PushToTeXstudio(DialogService dialogService, PreferencesService preferencesService) {
+        super(dialogService, preferencesService);
     }
 
     @Override
-    public Icon getIcon() {
-        return IconTheme.getImage("texstudio");
+    public String getDisplayName() {
+        return NAME;
+    }
+
+    @Override
+    public JabRefIcon getIcon() {
+        return IconTheme.JabRefIcons.APPLICATION_TEXSTUDIO;
     }
 
     @Override
     protected String[] getCommandLine(String keyString) {
         return new String[] {commandPath, "--insert-cite", String.format("%s{%s}", getCiteCommand(), keyString)};
-    }
-
-    @Override
-    protected void initParameters() {
-        commandPathPreferenceKey = JabRefPreferences.TEXSTUDIO_PATH;
     }
 }

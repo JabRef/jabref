@@ -12,9 +12,8 @@ import org.jabref.logic.importer.fileformat.BibTeXMLImporter;
 import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.CopacImporter;
-import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.fileformat.EndnoteImporter;
-import org.jabref.logic.importer.fileformat.FreeCiteImporter;
+import org.jabref.logic.importer.fileformat.EndnoteXmlImporter;
 import org.jabref.logic.importer.fileformat.InspecImporter;
 import org.jabref.logic.importer.fileformat.IsiImporter;
 import org.jabref.logic.importer.fileformat.MedlineImporter;
@@ -28,10 +27,12 @@ import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
 import org.jabref.logic.importer.fileformat.SilverPlatterImporter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.xmp.XMPPreferences;
+import org.jabref.logic.preferences.TimestampPreferences;
+import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.FileUpdateMonitor;
 
 public class ImportFormatReader {
 
@@ -45,22 +46,22 @@ public class ImportFormatReader {
 
     private ImportFormatPreferences importFormatPreferences;
 
-    public void resetImportFormats(ImportFormatPreferences newImportFormatPreferences, XMPPreferences xmpPreferences) {
+    public void resetImportFormats(ImportFormatPreferences newImportFormatPreferences, XmpPreferences xmpPreferences, FileUpdateMonitor fileMonitor) {
         this.importFormatPreferences = newImportFormatPreferences;
 
         formats.clear();
 
         formats.add(new BiblioscapeImporter());
-        formats.add(new BibtexImporter(importFormatPreferences));
+        formats.add(new BibtexImporter(importFormatPreferences, fileMonitor));
         formats.add(new BibTeXMLImporter());
         formats.add(new CopacImporter());
         formats.add(new EndnoteImporter(importFormatPreferences));
-        formats.add(new FreeCiteImporter(importFormatPreferences));
+        formats.add(new EndnoteXmlImporter(importFormatPreferences));
         formats.add(new InspecImporter());
         formats.add(new IsiImporter());
         formats.add(new MedlineImporter());
         formats.add(new MedlinePlainImporter());
-        formats.add(new ModsImporter());
+        formats.add(new ModsImporter(importFormatPreferences));
         formats.add(new MsBibImporter());
         formats.add(new OvidImporter());
         formats.add(new PdfContentImporter(importFormatPreferences));
@@ -70,9 +71,7 @@ public class ImportFormatReader {
         formats.add(new SilverPlatterImporter());
 
         // Get custom import formats
-        for (CustomImporter importer : importFormatPreferences.getCustomImportList()) {
-            formats.add(importer);
-        }
+        formats.addAll(importFormatPreferences.getCustomImportList());
     }
 
     /**
@@ -156,17 +155,38 @@ public class ImportFormatReader {
         }
     }
 
-    @FunctionalInterface
-    public static interface CheckedFunction<T, R> {
+    /**
+     * Tries to import a file by iterating through the available import filters,
+     * and keeping the import that seems most promising.
+     * <p/>
+     * This method first attempts to read this file as bibtex.
+     *
+     * @throws ImportException if the import fails (for example, if no suitable importer is found)
+     */
+    public UnknownFormatImport importUnknownFormat(Path filePath, TimestampPreferences timestampPreferences, FileUpdateMonitor fileMonitor) throws ImportException {
+        Objects.requireNonNull(filePath);
 
-        R apply(T t) throws IOException;
+        // First, see if it is a BibTeX file:
+        try {
+            ParserResult parserResult = OpenDatabase.loadDatabase(filePath, importFormatPreferences, timestampPreferences, fileMonitor);
+            if (parserResult.getDatabase().hasEntries() || !parserResult.getDatabase().hasNoStrings()) {
+                parserResult.setFile(filePath.toFile());
+                return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, parserResult);
+            }
+        } catch (IOException ignore) {
+            // Ignored
+        }
+
+        UnknownFormatImport unknownFormatImport = importUnknownFormat(importer -> importer.importDatabase(filePath, importFormatPreferences.getEncoding()), importer -> importer.isRecognizedFormat(filePath, importFormatPreferences.getEncoding()));
+        unknownFormatImport.parserResult.setFile(filePath.toFile());
+        return unknownFormatImport;
     }
 
     /**
      * Tries to import entries by iterating through the available import filters,
      * and keeping the import that seems the most promising
      *
-     * @param importDatabase the function to import the entries with a formatter
+     * @param importDatabase     the function to import the entries with a formatter
      * @param isRecognizedFormat the function to check whether the source is in the correct format for an importer
      * @return an UnknownFormatImport with the imported entries and metadata
      * @throws ImportException if the import fails (for example, if no suitable importer is found)
@@ -209,31 +229,10 @@ public class ImportFormatReader {
         throw new ImportException(Localization.lang("Could not find a suitable import format."));
     }
 
-    /**
-     * Tries to import a file by iterating through the available import filters,
-     * and keeping the import that seems most promising.
-     * <p/>
-     * This method first attempts to read this file as bibtex.
-     *
-     * @throws ImportException if the import fails (for example, if no suitable importer is found)
-     */
-    public UnknownFormatImport importUnknownFormat(Path filePath) throws ImportException {
-        Objects.requireNonNull(filePath);
+    @FunctionalInterface
+    public interface CheckedFunction<T, R> {
 
-        // First, see if it is a BibTeX file:
-        try {
-            ParserResult parserResult = OpenDatabase.loadDatabase(filePath.toFile(), importFormatPreferences);
-            if (parserResult.getDatabase().hasEntries() || !parserResult.getDatabase().hasNoStrings()) {
-                parserResult.setFile(filePath.toFile());
-                return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, parserResult);
-            }
-        } catch (IOException ignore) {
-            // Ignored
-        }
-
-        UnknownFormatImport unknownFormatImport = importUnknownFormat(importer -> importer.importDatabase(filePath, importFormatPreferences.getEncoding()), importer -> importer.isRecognizedFormat(filePath, importFormatPreferences.getEncoding()));
-        unknownFormatImport.parserResult.setFile(filePath.toFile());
-        return unknownFormatImport;
+        R apply(T t) throws IOException;
     }
 
     /**
@@ -249,5 +248,4 @@ public class ImportFormatReader {
 
         return importUnknownFormat(importer -> importer.importDatabase(data), importer -> importer.isRecognizedFormat(data));
     }
-
 }

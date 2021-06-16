@@ -1,46 +1,39 @@
 package org.jabref.gui.collab;
 
-import javax.swing.JComponent;
+import javafx.scene.Node;
 
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
-
-import org.jabref.gui.BasePanel;
-import org.jabref.gui.PreviewPanel;
-import org.jabref.gui.customjfx.CustomJFXPanel;
+import org.jabref.gui.Globals;
+import org.jabref.gui.JabRefGUI;
+import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.UndoableInsertEntry;
+import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.IdGenerator;
 
-class EntryAddChangeViewModel extends ChangeViewModel {
+class EntryAddChangeViewModel extends DatabaseChangeViewModel {
 
-    private final BibEntry diskEntry;
-    private final JFXPanel container;
+    private final BibEntry entry;
 
-
-    public EntryAddChangeViewModel(BibEntry diskEntry) {
-        super(Localization.lang("Added entry"));
-        this.diskEntry = diskEntry;
-
-        PreviewPanel previewPanel = new PreviewPanel(null, null);
-        previewPanel.setEntry(diskEntry);
-        container = CustomJFXPanel.wrap(new Scene(previewPanel));
+    public EntryAddChangeViewModel(BibEntry entry) {
+        super();
+        this.name = entry.getCitationKey()
+                         .map(key -> Localization.lang("Added entry") + ": '" + key + '\'')
+                         .orElse(Localization.lang("Added entry"));
+        this.entry = entry;
     }
 
     @Override
-    public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
-        diskEntry.setId(IdGenerator.next());
-        panel.getDatabase().insertEntry(diskEntry);
-        secondary.insertEntry(diskEntry);
-        undoEdit.addEdit(new UndoableInsertEntry(panel.getDatabase(), diskEntry, panel));
-        return true;
+    public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
+        database.getDatabase().insertEntry(entry);
+        undoEdit.addEdit(new UndoableInsertEntries(database.getDatabase(), entry));
     }
 
     @Override
-    public JComponent description() {
-        return container;
+    public Node description() {
+        PreviewViewer previewViewer = new PreviewViewer(new BibDatabaseContext(), JabRefGUI.getMainFrame().getDialogService(), Globals.stateManager);
+        previewViewer.setLayout(Globals.prefs.getPreviewPreferences().getCurrentPreviewStyle());
+        previewViewer.setEntry(entry);
+        return previewViewer;
     }
 }

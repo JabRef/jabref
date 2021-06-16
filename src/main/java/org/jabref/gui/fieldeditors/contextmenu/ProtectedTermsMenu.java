@@ -1,78 +1,110 @@
 package org.jabref.gui.fieldeditors.contextmenu;
 
-import javax.swing.SwingUtilities;
+import java.util.Objects;
+import java.util.Optional;
 
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.TextInputControl;
 
-import org.jabref.Globals;
-import org.jabref.JabRefGUI;
-import org.jabref.gui.protectedterms.NewProtectedTermsFileDialog;
+import org.jabref.gui.Globals;
+import org.jabref.gui.actions.Action;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsList;
 
 class ProtectedTermsMenu extends Menu {
 
-    private static final ProtectTermsFormatter FORMATTER = new ProtectTermsFormatter(Globals.protectedTermsLoader);
-    private final Menu externalFiles;
-    private final TextArea opener;
+    private static final Formatter FORMATTER = new ProtectTermsFormatter(Globals.protectedTermsLoader);
+    private final TextInputControl textInputControl;
+    private final ActionFactory factory = new ActionFactory(Globals.getKeyPrefs());
 
-    public ProtectedTermsMenu(TextArea opener) {
-        super(Localization.lang("Protect terms"));
-        this.opener = opener;
-        MenuItem protectItem = new MenuItem(Localization.lang("Add {} around selected text"));
-        protectItem.setOnAction(event -> {
-            String selectedText = opener.getSelectedText();
-            if ((selectedText != null) && !selectedText.isEmpty()) {
-                opener.replaceSelection("{" + selectedText + "}");
-            }
-        });
+    private final Action protectSelectionActionInformation = new Action() {
+        @Override
+        public String getText() {
+            return Localization.lang("Protect selection");
+        }
 
-        MenuItem formatItem = new MenuItem(Localization.lang("Format field"));
-        formatItem.setOnAction(event -> opener.setText(FORMATTER.format(opener.getText())));
+        @Override
+        public Optional<JabRefIcon> getIcon() {
+            return Optional.of(IconTheme.JabRefIcons.PROTECT_STRING);
+        }
 
-        externalFiles = new Menu(Localization.lang("Add selected text to list"));
-        updateFiles();
+        @Override
+        public String getDescription() {
+            return Localization.lang("Add {} around selected text");
+        }
+    };
 
-        this.getItems().add(protectItem);
-        this.getItems().add(externalFiles);
-        this.getItems().add(new SeparatorMenuItem());
-        this.getItems().add(formatItem);
+    private class ProtectSelectionAction extends SimpleCommand {
+        ProtectSelectionAction() {
+            this.executable.bind(textInputControl.selectedTextProperty().isNotEmpty());
+        }
+
+        @Override
+        public void execute() {
+            String selectedText = textInputControl.getSelectedText();
+            textInputControl.replaceSelection("{" + selectedText + "}");
+        }
     }
 
-    private void updateFiles() {
-        externalFiles.getItems().clear();
-        for (ProtectedTermsList list : Globals.protectedTermsLoader.getProtectedTermsLists()) {
-            if (!list.isInternalList()) {
-                MenuItem fileItem = new MenuItem(list.getDescription());
-                fileItem.setOnAction(event -> {
-                    String selectedText = opener.getSelectedText();
-                    if ((selectedText != null) && !selectedText.isEmpty()) {
-                        list.addProtectedTerm(selectedText);
-                    }
-                });
-                externalFiles.getItems().add(fileItem);
-            }
+    private class FormatFieldAction extends SimpleCommand {
+        FormatFieldAction() {
+            this.executable.bind(textInputControl.textProperty().isNotEmpty());
         }
-        externalFiles.getItems().add(new SeparatorMenuItem());
-        MenuItem addToNewFileItem = new MenuItem(Localization.lang("New") + "...");
-        addToNewFileItem.setOnAction(event -> {
-            NewProtectedTermsFileDialog dialog = new NewProtectedTermsFileDialog(JabRefGUI.getMainFrame(),
-                    Globals.protectedTermsLoader);
 
-            SwingUtilities.invokeLater(() -> {
-                dialog.setVisible(true);
+        @Override
+        public void execute() {
+            textInputControl.setText(FORMATTER.format(textInputControl.getText()));
+        }
+    }
 
-                if (dialog.isOKPressed()) {
-                    // Update preferences with new list
-                    Globals.prefs.setProtectedTermsPreferences(Globals.protectedTermsLoader);
-                    this.updateFiles();
-                }
-            });
-        });
-        externalFiles.getItems().add(addToNewFileItem);
+    private class AddToProtectedTermsAction extends SimpleCommand {
+        ProtectedTermsList list;
+
+        public AddToProtectedTermsAction(ProtectedTermsList list) {
+            Objects.requireNonNull(list);
+
+            this.list = list;
+            this.executable.bind(textInputControl.selectedTextProperty().isNotEmpty());
+        }
+
+        @Override
+        public void execute() {
+            list.addProtectedTerm(textInputControl.getSelectedText());
+        }
+    }
+
+    public ProtectedTermsMenu(final TextInputControl textInputControl) {
+        super(Localization.lang("Protect terms"));
+        this.textInputControl = textInputControl;
+
+        getItems().addAll(factory.createMenuItem(protectSelectionActionInformation, new ProtectSelectionAction()),
+                getExternalFilesMenu(),
+                new SeparatorMenuItem(),
+                factory.createMenuItem(() -> Localization.lang("Format field"), new FormatFieldAction()));
+    }
+
+    private Menu getExternalFilesMenu() {
+        Menu protectedTermsMenu = factory.createSubMenu(() -> Localization.lang("Add selected text to list"));
+
+        Globals.protectedTermsLoader.getProtectedTermsLists().stream()
+                                    .filter(list -> !list.isInternalList())
+                                    .forEach(list -> protectedTermsMenu.getItems().add(
+                                            factory.createMenuItem(list::getDescription, new AddToProtectedTermsAction(list))));
+
+        if (protectedTermsMenu.getItems().isEmpty()) {
+            MenuItem emptyItem = new MenuItem(Localization.lang("No list enabled"));
+            emptyItem.setDisable(true);
+            protectedTermsMenu.getItems().add(emptyItem);
+        }
+
+        return protectedTermsMenu;
     }
 }

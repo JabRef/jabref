@@ -24,9 +24,10 @@ import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,8 +37,10 @@ public class IacrEprintFetcher implements IdBasedFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IacrEprintFetcher.class);
     private static final Pattern DATE_FROM_WEBSITE_AFTER_2000_PATTERN = Pattern.compile("[a-z ]+(\\d{1,2} [A-Za-z][a-z]{2} \\d{4})");
-    private static final DateTimeFormatter DATE_FORMAT_WEBSITE_AFTER_2000 = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.US);
     private static final Pattern DATE_FROM_WEBSITE_BEFORE_2000_PATTERN = Pattern.compile("[A-Za-z ]+? ([A-Za-z][a-z]{2,10} \\d{1,2}(th|st|nd|rd)?, \\d{4})\\.?");
+    private static final Pattern WITHOUT_LETTERS_SPACE = Pattern.compile("[^0-9/]");
+
+    private static final DateTimeFormatter DATE_FORMAT_WEBSITE_AFTER_2000 = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.US);
     private static final DateTimeFormatter DATE_FORMAT_WEBSITE_BEFORE_2000_LONG_MONTHS = DateTimeFormatter.ofPattern("MMMM d['th']['st']['nd']['rd'] yyyy", Locale.US);
     private static final DateTimeFormatter DATE_FORMAT_WEBSITE_BEFORE_2000_SHORT_MONTHS = DateTimeFormatter.ofPattern("MMM d['th']['st']['nd']['rd'] yyyy", Locale.US);
     private static final DateTimeFormatter DATE_FORMAT_BIBTEX = DateTimeFormatter.ISO_LOCAL_DATE;
@@ -54,7 +57,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        String identifierWithoutLettersAndSpaces = identifier.replaceAll("[^0-9/]", " ").trim();
+        String identifierWithoutLettersAndSpaces = WITHOUT_LETTERS_SPACE.matcher(identifier).replaceAll(" ").trim();
 
         if (!IDENTIFIER_PREDICATE.test(identifierWithoutLettersAndSpaces)) {
             throw new FetcherException(Localization.lang("Invalid identifier: '%0'.", identifier));
@@ -77,7 +80,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
         String actualEntry = getRequiredValueBetween("<PRE>", "</PRE>", bibtexCitationHtml);
 
         try {
-            return BibtexParser.singleFromString(actualEntry, prefs);
+            return BibtexParser.singleFromString(actualEntry, prefs, new DummyFileUpdateMonitor());
         } catch (ParseException e) {
             throw new FetcherException(Localization.lang("Entry from %0 could not be parsed.", "IACR"), e);
         }
@@ -86,17 +89,17 @@ public class IacrEprintFetcher implements IdBasedFetcher {
     private void setAdditionalFields(BibEntry entry, String identifier) throws FetcherException {
         String entryUrl = DESCRIPTION_URL_PREFIX + identifier;
         String descriptiveHtml = getHtml(entryUrl);
-        entry.setField(FieldName.ABSTRACT, getAbstract(descriptiveHtml));
+        entry.setField(StandardField.ABSTRACT, getAbstract(descriptiveHtml));
         String dateStringAsInHtml = getRequiredValueBetween("<b>Date: </b>", "<p />", descriptiveHtml);
-        entry.setField(FieldName.DATE, getLatestDate(dateStringAsInHtml));
+        entry.setField(StandardField.DATE, getLatestDate(dateStringAsInHtml));
 
         if (isFromOrAfterYear2000(entry)) {
             String version = getVersion(identifier, descriptiveHtml);
-            entry.setField(FieldName.VERSION, version);
-            entry.setField(FieldName.URL, entryUrl + "/" + version);
+            entry.setField(StandardField.VERSION, version);
+            entry.setField(StandardField.URL, entryUrl + "/" + version);
         } else {
             // No version information for entries before year 2000
-            entry.setField(FieldName.URL, entryUrl);
+            entry.setField(StandardField.URL, entryUrl);
         }
     }
 
@@ -178,7 +181,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
     }
 
     private String getRequiredValueBetween(String from, String to, String haystack) throws FetcherException {
-        String value = StringUtils.substringBetween(haystack, from, to);
+        String value = StringUtil.substringBetween(haystack, from, to);
         if (value == null) {
             throw new FetcherException(Localization.lang("Entry from %0 could not be parsed.", "IACR"));
         } else {
@@ -187,7 +190,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
     }
 
     private boolean isFromOrAfterYear2000(BibEntry entry) throws FetcherException {
-        Optional<String> yearField = entry.getField(FieldName.YEAR);
+        Optional<String> yearField = entry.getField(StandardField.YEAR);
         if (yearField.isPresent()) {
             return Integer.parseInt(yearField.get()) > 2000;
         }

@@ -1,33 +1,41 @@
 package org.jabref.gui.fieldeditors;
 
-import javafx.fxml.FXML;
 import javafx.scene.Parent;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
 import org.jabref.gui.autocompleter.AutoCompletionTextInputBinding;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
+import org.jabref.gui.util.uithreadaware.UiThreadStringProperty;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.model.entry.field.Field;
+import org.jabref.preferences.PreferencesService;
 
 public class PersonsEditor extends HBox implements FieldEditorFX {
 
-    @FXML private final PersonsEditorViewModel viewModel;
+    private final PersonsEditorViewModel viewModel;
+    private final TextInputControl textInput;
+    private final UiThreadStringProperty decoratedStringProperty;
 
-    public PersonsEditor(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, JabRefPreferences preferences, FieldCheckers fieldCheckers) {
-        this.viewModel = new PersonsEditorViewModel(fieldName, suggestionProvider, preferences.getAutoCompletePreferences(), fieldCheckers);
+    public PersonsEditor(final Field field,
+                         final SuggestionProvider<?> suggestionProvider,
+                         final PreferencesService preferences,
+                         final FieldCheckers fieldCheckers,
+                         final boolean isMultiLine) {
+        this.viewModel = new PersonsEditorViewModel(field, suggestionProvider, preferences.getAutoCompletePreferences(), fieldCheckers);
 
-        EditorTextArea textArea = new EditorTextArea();
-        HBox.setHgrow(textArea, Priority.ALWAYS);
-        textArea.textProperty().bindBidirectional(viewModel.textProperty());
-        textArea.addToContextMenu(EditorMenus.getNameMenu(textArea));
-        this.getChildren().add(textArea);
+        textInput = isMultiLine ? new EditorTextArea() : new EditorTextField();
 
-        AutoCompletionTextInputBinding.autoComplete(textArea, viewModel::complete, viewModel.getAutoCompletionConverter(), viewModel.getAutoCompletionStrategy());
+        decoratedStringProperty = new UiThreadStringProperty(viewModel.textProperty());
+        textInput.textProperty().bindBidirectional(decoratedStringProperty);
+        ((ContextMenuAddable) textInput).initContextMenu(EditorMenus.getNameMenu(textInput));
+        this.getChildren().add(textInput);
 
-        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textArea);
+        AutoCompletionTextInputBinding.autoComplete(textInput, viewModel::complete, viewModel.getAutoCompletionConverter(), viewModel.getAutoCompletionStrategy());
+
+        new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textInput);
     }
 
     @Override
@@ -38,5 +46,10 @@ public class PersonsEditor extends HBox implements FieldEditorFX {
     @Override
     public Parent getNode() {
         return this;
+    }
+
+    @Override
+    public void requestFocus() {
+        textInput.requestFocus();
     }
 }

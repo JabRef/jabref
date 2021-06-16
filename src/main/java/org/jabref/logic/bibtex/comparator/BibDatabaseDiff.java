@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.jabref.logic.bibtex.DuplicateCheck;
+import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
 
 public class BibDatabaseDiff {
 
@@ -34,9 +34,9 @@ public class BibDatabaseDiff {
     }
 
     private static EntryComparator getEntryComparator() {
-        EntryComparator comparator = new EntryComparator(false, true, FieldName.TITLE);
-        comparator = new EntryComparator(false, true, FieldName.AUTHOR, comparator);
-        comparator = new EntryComparator(false, true, FieldName.YEAR, comparator);
+        EntryComparator comparator = new EntryComparator(false, true, StandardField.TITLE);
+        comparator = new EntryComparator(false, true, StandardField.AUTHOR, comparator);
+        comparator = new EntryComparator(false, true, StandardField.YEAR, comparator);
         return comparator;
     }
 
@@ -110,7 +110,7 @@ public class BibDatabaseDiff {
                 differences.add(new BibEntryDiff(originalEntry, null));
             }
         }
-        
+
         // Finally, look if there are still untouched entries in the new database. These may have been added.
         for (int i = 0; i < newEntries.size(); i++) {
             if (!used.contains(i)) {

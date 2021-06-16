@@ -1,13 +1,9 @@
 files:
-  - source: /src/main/resources/l10n/Menu_en.properties
-    translation: /src/main/resources/l10n/Menu_%two_letters_code%.properties
-    languages_mapping:
-      two_letters_code:
-        pt-BR: pt_BR
-        id: in
   - source: /src/main/resources/l10n/JabRef_en.properties
     translation: /src/main/resources/l10n/JabRef_%two_letters_code%.properties
     languages_mapping:
       two_letters_code:
         pt-BR: pt_BR
         id: in
+        zh-CN: zh_CN
+        zh-TW: zh_TW

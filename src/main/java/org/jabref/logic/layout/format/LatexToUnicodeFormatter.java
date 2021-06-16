@@ -1,15 +1,15 @@
 package org.jabref.logic.layout.format;
 
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
-import org.jabref.model.cleanup.Formatter;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 /**
  * This formatter converts LaTeX character sequences their equivalent unicode characters,
  * and removes other LaTeX commands without handling them.
  */
-public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
+public class LatexToUnicodeFormatter extends Formatter implements LayoutFormatter {
 
     @Override
     public String getName() {
@@ -35,5 +35,4 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
     public String getExampleInput() {
         return "M{\\\"{o}}nch";
     }
-
 }

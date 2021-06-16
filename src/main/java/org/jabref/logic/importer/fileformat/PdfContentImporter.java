@@ -1,7 +1,6 @@
 package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
@@ -19,25 +18,27 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.OS;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
-import org.jabref.logic.xmp.XMPUtil;
+import org.jabref.logic.xmp.XmpUtilReader;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Strings;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.util.PDFTextStripper;
+import org.apache.pdfbox.text.PDFTextStripper;
 
 /**
  * PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry.
  * <p>
  * Currently, Springer and IEEE formats are supported.
  * <p>
- * Integrating XMP support is future work
  */
 public class PdfContentImporter extends Importer {
 
@@ -46,14 +47,14 @@ public class PdfContentImporter extends Importer {
     // input lines into several lines
     private String[] lines;
     // current index in lines
-    private int i;
+    private int lineIndex;
     private String curString;
     private String year;
-
 
     public PdfContentImporter(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
     }
+
     /**
      * Removes all non-letter characters at the end
      * <p>
@@ -63,7 +64,7 @@ public class PdfContentImporter extends Importer {
      * TODO: Additionally replace multiple subsequent spaces by one space, which will cause a rename of this method
      * </p>
      */
-    private static String removeNonLettersAtEnd(String input) {
+    private String removeNonLettersAtEnd(String input) {
         String result = input.trim();
         if (result.isEmpty()) {
             return result;
@@ -81,7 +82,7 @@ public class PdfContentImporter extends Importer {
         return result;
     }
 
-    private static String streamlineNames(String names) {
+    private String streamlineNames(String names) {
         // TODO: replace with NormalizeNamesFormatter?!
         String res;
         // supported formats:
@@ -177,37 +178,33 @@ public class PdfContentImporter extends Importer {
         return res;
     }
 
-    private static String streamlineTitle(String title) {
+    private String streamlineTitle(String title) {
         return removeNonLettersAtEnd(title);
     }
 
     @Override
-    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
-        Objects.requireNonNull(reader);
-        return false;
+    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
+        return input.readLine().startsWith("%PDF");
     }
 
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
-        throw new UnsupportedOperationException(
-                "PdfContentImporter does not support importDatabase(BufferedReader reader)."
-                        + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
+        throw new UnsupportedOperationException("PdfContentImporter does not support importDatabase(BufferedReader reader)."
+                + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
     }
 
     @Override
     public ParserResult importDatabase(String data) throws IOException {
         Objects.requireNonNull(data);
-        throw new UnsupportedOperationException(
-                "PdfContentImporter does not support importDatabase(String data)."
-                        + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
+        throw new UnsupportedOperationException("PdfContentImporter does not support importDatabase(String data)."
+                + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
     }
 
     @Override
     public ParserResult importDatabase(Path filePath, Charset defaultEncoding) {
         final ArrayList<BibEntry> result = new ArrayList<>(1);
-        try (FileInputStream fileStream = new FileInputStream(filePath.toFile());
-                PDDocument document = XMPUtil.loadWithAutomaticDecryption(fileStream)) {
+        try (PDDocument document = XmpUtilReader.loadWithAutomaticDecryption(filePath)) {
             String firstPageContents = getFirstPageContents(document);
 
             Optional<DOI> doi = DOI.findInText(firstPageContents);
@@ -215,182 +212,211 @@ public class PdfContentImporter extends Importer {
                 ParserResult parserResult = new ParserResult(result);
                 Optional<BibEntry> entry = new DoiFetcher(importFormatPreferences).performSearchById(doi.get().getDOI());
                 entry.ifPresent(parserResult.getDatabase()::insertEntry);
+                entry.ifPresent(bibEntry -> bibEntry.addFile(new LinkedFile("", filePath.toAbsolutePath(), "PDF")));
                 return parserResult;
             }
 
-            // idea: split[] contains the different lines
-            // blocks are separated by empty lines
-            // treat each block
-            //   or do special treatment at authors (which are not broken)
-            //   therefore, we do a line-based and not a block-based splitting
-            // i points to the current line
-            // curString (mostly) contains the current block
-            //   the different lines are joined into one and thereby separated by " "
-            lines = firstPageContents.split(System.lineSeparator());
+            Optional<BibEntry> entry = getEntryFromPDFContent(firstPageContents, OS.NEWLINE);
+            entry.ifPresent(result::add);
+        } catch (EncryptedPdfsNotSupportedException e) {
+            return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
+        } catch (IOException | FetcherException exception) {
+            return ParserResult.fromError(exception);
+        }
 
-            proceedToNextNonEmptyLine();
-            if (i >= lines.length) {
-                // PDF could not be parsed or is empty
-                // return empty list
-                return new ParserResult();
-            }
+        result.forEach(entry -> entry.addFile(new LinkedFile("", filePath.toAbsolutePath(), "PDF")));
+        return new ParserResult(result);
+    }
 
-            // we start at the current line
-            curString = lines[i];
-            // i might get incremented later and curString modified, too
-            i = i + 1;
+    // make this method package visible so we can test it
+    Optional<BibEntry> getEntryFromPDFContent(String firstpageContents, String lineSeparator) {
 
-            String author;
-            String editor = null;
-            String abstractT = null;
-            String keywords = null;
-            String title;
-            String conference = null;
-            String DOI = null;
-            String series = null;
-            String volume = null;
-            String number = null;
-            String pages = null;
-            // year is a class variable as the method extractYear() uses it;
-            String publisher = null;
+        // idea: split[] contains the different lines
+        // blocks are separated by empty lines
+        // treat each block
+        //   or do special treatment at authors (which are not broken)
+        //   therefore, we do a line-based and not a block-based splitting
+        // i points to the current line
+        // curString (mostly) contains the current block
+        //   the different lines are joined into one and thereby separated by " "
 
-            EntryType type = BibtexEntryTypes.INPROCEEDINGS;
-            if (curString.length() > 4) {
-                // special case: possibly conference as first line on the page
-                extractYear();
-                if (curString.contains("Conference")) {
+        String firstpageContentsUnifiedLineBreaks = StringUtil.unifyLineBreaks(firstpageContents, lineSeparator);
+
+        lines = firstpageContentsUnifiedLineBreaks.split(lineSeparator);
+
+        lineIndex = 0; // to prevent array index out of bounds exception on second run we need to reset i to zero
+
+        proceedToNextNonEmptyLine();
+        if (lineIndex >= lines.length) {
+            // PDF could not be parsed or is empty
+            // return empty list
+            return Optional.empty();
+        }
+
+        // we start at the current line
+        curString = lines[lineIndex];
+        // i might get incremented later and curString modified, too
+        lineIndex = lineIndex + 1;
+
+        String author;
+        String editor = null;
+        String abstractT = null;
+        String keywords = null;
+        String title;
+        String conference = null;
+        String DOI = null;
+        String series = null;
+        String volume = null;
+        String number = null;
+        String pages = null;
+        // year is a class variable as the method extractYear() uses it;
+        String publisher = null;
+
+        EntryType type = StandardEntryType.InProceedings;
+        if (curString.length() > 4) {
+            // special case: possibly conference as first line on the page
+            extractYear();
+            if (curString.contains("Conference")) {
+                fillCurStringWithNonEmptyLines();
+                conference = curString;
+                curString = "";
+            } else {
+                // e.g. Copyright (c) 1998 by the Genetics Society of America
+                // future work: get year using RegEx
+                String lower = curString.toLowerCase(Locale.ROOT);
+                if (lower.contains("copyright")) {
                     fillCurStringWithNonEmptyLines();
-                    conference = curString;
+                    publisher = curString;
+                    curString = "";
+                }
+            }
+        }
+
+        // start: title
+        fillCurStringWithNonEmptyLines();
+        title = streamlineTitle(curString);
+        curString = "";
+        // i points to the next non-empty line
+
+        // after title: authors
+        author = null;
+        while ((lineIndex < lines.length) && !"".equals(lines[lineIndex])) {
+            // author names are unlikely to be lines among different lines
+            // treat them line by line
+            curString = streamlineNames(lines[lineIndex]);
+            if (author == null) {
+                author = curString;
+            } else {
+                if ("".equals(curString)) {
+                    // if lines[i] is "and" then "" is returned by streamlineNames -> do nothing
+                } else {
+                    author = author.concat(" and ").concat(curString);
+                }
+            }
+            lineIndex++;
+        }
+        curString = "";
+        lineIndex++;
+
+        // then, abstract and keywords follow
+        while (lineIndex < lines.length) {
+            curString = lines[lineIndex];
+            if ((curString.length() >= "Abstract".length()) && "Abstract".equalsIgnoreCase(curString.substring(0, "Abstract".length()))) {
+                if (curString.length() == "Abstract".length()) {
+                    // only word "abstract" found -- skip line
                     curString = "";
                 } else {
-                    // e.g. Copyright (c) 1998 by the Genetics Society of America
-                    // future work: get year using RegEx
-                    String lower = curString.toLowerCase(Locale.ROOT);
-                    if (lower.contains("copyright")) {
-                        fillCurStringWithNonEmptyLines();
-                        publisher = curString;
-                        curString = "";
-                    }
+                    curString = curString.substring("Abstract".length() + 1).trim().concat(System.lineSeparator());
                 }
-            }
-
-            // start: title
-            fillCurStringWithNonEmptyLines();
-            title = streamlineTitle(curString);
-            curString = "";
-            //i points to the next non-empty line
-
-            // after title: authors
-            author = null;
-            while ((i < lines.length) && !"".equals(lines[i])) {
-                // author names are unlikely to be lines among different lines
-                // treat them line by line
-                curString = streamlineNames(lines[i]);
-                if (author == null) {
-                    author = curString;
-                } else {
-                    if ("".equals(curString)) {
-                        // if lines[i] is "and" then "" is returned by streamlineNames -> do nothing
-                    } else {
-                        author = author.concat(" and ").concat(curString);
-                    }
+                lineIndex++;
+                // fillCurStringWithNonEmptyLines() cannot be used as that uses " " as line separator
+                // whereas we need linebreak as separator
+                while ((lineIndex < lines.length) && !"".equals(lines[lineIndex])) {
+                    curString = curString.concat(lines[lineIndex]).concat(System.lineSeparator());
+                    lineIndex++;
                 }
-                i++;
-            }
-            curString = "";
-            i++;
-
-            // then, abstract and keywords follow
-            while (i < lines.length) {
-                curString = lines[i];
-                if ((curString.length() >= "Abstract".length()) && "Abstract".equalsIgnoreCase(curString.substring(0, "Abstract".length()))) {
-                    if (curString.length() == "Abstract".length()) {
-                        // only word "abstract" found -- skip line
-                        curString = "";
-                    } else {
-                        curString = curString.substring("Abstract".length() + 1).trim().concat(System.lineSeparator());
-                    }
-                    i++;
-                    // fillCurStringWithNonEmptyLines() cannot be used as that uses " " as line separator
-                    // whereas we need linebreak as separator
-                    while ((i < lines.length) && !"".equals(lines[i])) {
-                        curString = curString.concat(lines[i]).concat(System.lineSeparator());
-                        i++;
-                    }
-                    abstractT = curString.trim();
-                    i++;
-                } else if ((curString.length() >= "Keywords".length()) && "Keywords".equalsIgnoreCase(curString.substring(0, "Keywords".length()))) {
-                    if (curString.length() == "Keywords".length()) {
-                        // only word "Keywords" found -- skip line
-                        curString = "";
-                    } else {
-                        curString = curString.substring("Keywords".length() + 1).trim();
-                    }
-                    i++;
-                    fillCurStringWithNonEmptyLines();
-                    keywords = removeNonLettersAtEnd(curString);
+                abstractT = curString.trim();
+                lineIndex++;
+            } else if ((curString.length() >= "Keywords".length()) && "Keywords".equalsIgnoreCase(curString.substring(0, "Keywords".length()))) {
+                if (curString.length() == "Keywords".length()) {
+                    // only word "Keywords" found -- skip line
+                    curString = "";
                 } else {
-                    String lower = curString.toLowerCase(Locale.ROOT);
+                    curString = curString.substring("Keywords".length() + 1).trim();
+                }
+                lineIndex++;
+                fillCurStringWithNonEmptyLines();
+                keywords = removeNonLettersAtEnd(curString);
+            } else {
+                String lower = curString.toLowerCase(Locale.ROOT);
 
-                    int pos = lower.indexOf("technical");
+                int pos = lower.indexOf("technical");
+                if (pos >= 0) {
+                    type = StandardEntryType.TechReport;
+                    pos = curString.trim().lastIndexOf(' ');
                     if (pos >= 0) {
-                        type = BibtexEntryTypes.TECHREPORT;
-                        pos = curString.trim().lastIndexOf(' ');
-                        if (pos >= 0) {
-                            // assumption: last character of curString is NOT ' '
-                            //   otherwise pos+1 leads to an out-of-bounds exception
-                            number = curString.substring(pos + 1);
-                        }
+                        // assumption: last character of curString is NOT ' '
+                        //   otherwise pos+1 leads to an out-of-bounds exception
+                        number = curString.substring(pos + 1);
                     }
-
-                    i++;
-                    proceedToNextNonEmptyLine();
                 }
+
+                lineIndex++;
+                proceedToNextNonEmptyLine();
             }
+        }
 
-            i = lines.length - 1;
+        lineIndex = lines.length - 1;
 
-            // last block: DOI, detailed information
-            // sometimes, this information is in the third last block etc...
-            // therefore, read until the beginning of the file
+        // last block: DOI, detailed information
+        // sometimes, this information is in the third last block etc...
+        // therefore, read until the beginning of the file
 
-            while (i >= 0) {
-                readLastBlock();
-                // i now points to the block before or is -1
-                // curString contains the last block, separated by " "
+        while (lineIndex >= 0) {
+            readLastBlock();
+            // i now points to the block before or is -1
+            // curString contains the last block, separated by " "
 
-                extractYear();
+            extractYear();
 
-                int pos = curString.indexOf("(Eds.)");
-                if ((pos >= 0) && (publisher == null)) {
-                    // looks like a Springer last line
-                    // e.g: A. Persson and J. Stirna (Eds.): PoEM 2009, LNBIP 39, pp. 161-175, 2009.
-                    publisher = "Springer";
-                    editor = streamlineNames(curString.substring(0, pos - 1));
-                    curString = curString.substring(pos + "(Eds.)".length() + 2); //+2 because of ":" after (Eds.) and the subsequent space
-                    String[] springerSplit = curString.split(", ");
-                    if (springerSplit.length >= 4) {
-                        conference = springerSplit[0];
+            int pos = curString.indexOf("(Eds.)");
+            if ((pos >= 0) && (publisher == null)) {
+                // looks like a Springer last line
+                // e.g: A. Persson and J. Stirna (Eds.): PoEM 2009, LNBIP 39, pp. 161-175, 2009.
+                publisher = "Springer";
+                editor = streamlineNames(curString.substring(0, pos - 1));
 
-                        String seriesData = springerSplit[1];
-                        int lastSpace = seriesData.lastIndexOf(' ');
-                        series = seriesData.substring(0, lastSpace);
-                        volume = seriesData.substring(lastSpace + 1);
-
-                        pages = springerSplit[2].substring(4);
-
-                        if (springerSplit[3].length() >= 4) {
-                            year = springerSplit[3].substring(0, 4);
-                        }
-                    }
+                int edslength = "(Eds.)".length();
+                int posWithEditor = pos + edslength + 2; // +2 because of ":" after (Eds.) and the subsequent space
+                if (posWithEditor > curString.length()) {
+                    curString = curString.substring(posWithEditor - 2); // we don't have any spaces after Eds so we substract the 2
                 } else {
-                    if (DOI == null) {
-                        pos = curString.indexOf("DOI");
-                        if (pos < 0) {
-                            pos = curString.indexOf(FieldName.DOI);
-                        }
-                        if (pos >= 0) {
-                            pos += 3;
+                    curString = curString.substring(posWithEditor);
+                }
+                String[] springerSplit = curString.split(", ");
+                if (springerSplit.length >= 4) {
+                    conference = springerSplit[0];
+
+                    String seriesData = springerSplit[1];
+                    int lastSpace = seriesData.lastIndexOf(' ');
+                    series = seriesData.substring(0, lastSpace);
+                    volume = seriesData.substring(lastSpace + 1);
+
+                    pages = springerSplit[2].substring(4);
+
+                    if (springerSplit[3].length() >= 4) {
+                        year = springerSplit[3].substring(0, 4);
+                    }
+                }
+            } else {
+                if (DOI == null) {
+                    pos = curString.indexOf("DOI");
+                    if (pos < 0) {
+                        pos = curString.indexOf(StandardField.DOI.getName());
+                    }
+                    if (pos >= 0) {
+                        pos += 3;
+                        if (curString.length() > pos) {
                             char delimiter = curString.charAt(pos);
                             if ((delimiter == ':') || (delimiter == ' ')) {
                                 pos++;
@@ -403,92 +429,83 @@ public class PdfContentImporter extends Importer {
                             }
                         }
                     }
+                }
 
-                    if ((publisher == null) && curString.contains("IEEE")) {
-                        // IEEE has the conference things at the end
-                        publisher = "IEEE";
+                if ((publisher == null) && curString.contains("IEEE")) {
+                    // IEEE has the conference things at the end
+                    publisher = "IEEE";
 
-                        // year is extracted by extractYear
-                        // otherwise, we could it determine as follows:
-                        // String yearStr = curString.substring(curString.length()-4);
-                        // if (isYear(yearStr)) {
-                        //	year = yearStr;
-                        // }
+                    // year is extracted by extractYear
+                    // otherwise, we could it determine as follows:
+                    // String yearStr = curString.substring(curString.length()-4);
+                    // if (isYear(yearStr)) {
+                    //  year = yearStr;
+                    // }
 
-                        if (conference == null) {
-                            pos = curString.indexOf('$');
+                    if (conference == null) {
+                        pos = curString.indexOf('$');
+                        if (pos > 0) {
+                            // we found the price
+                            // before the price, the ISSN is stated
+                            // skip that
+                            pos -= 2;
+                            while ((pos >= 0) && (curString.charAt(pos) != ' ')) {
+                                pos--;
+                            }
                             if (pos > 0) {
-                                // we found the price
-                                // before the price, the ISSN is stated
-                                // skip that
-                                pos -= 2;
-                                while ((pos >= 0) && (curString.charAt(pos) != ' ')) {
-                                    pos--;
-                                }
-                                if (pos > 0) {
-                                    conference = curString.substring(0, pos);
-                                }
+                                conference = curString.substring(0, pos);
                             }
                         }
                     }
                 }
             }
-
-            BibEntry entry = new BibEntry();
-            entry.setType(type);
-
-            // TODO: institution parsing missing
-
-            if (author != null) {
-                entry.setField(FieldName.AUTHOR, author);
-            }
-            if (editor != null) {
-                entry.setField(FieldName.EDITOR, editor);
-            }
-            if (abstractT != null) {
-                entry.setField(FieldName.ABSTRACT, abstractT);
-            }
-            if (!Strings.isNullOrEmpty(keywords)) {
-                entry.setField(FieldName.KEYWORDS, keywords);
-            }
-            if (title != null) {
-                entry.setField(FieldName.TITLE, title);
-            }
-            if (conference != null) {
-                entry.setField(FieldName.BOOKTITLE, conference);
-            }
-            if (DOI != null) {
-                entry.setField(FieldName.DOI, DOI);
-            }
-            if (series != null) {
-                entry.setField(FieldName.SERIES, series);
-            }
-            if (volume != null) {
-                entry.setField(FieldName.VOLUME, volume);
-            }
-            if (number != null) {
-                entry.setField(FieldName.NUMBER, number);
-            }
-            if (pages != null) {
-                entry.setField(FieldName.PAGES, pages);
-            }
-            if (year != null) {
-                entry.setField(FieldName.YEAR, year);
-            }
-            if (publisher != null) {
-                entry.setField(FieldName.PUBLISHER, publisher);
-            }
-
-            result.add(entry);
-        } catch (EncryptedPdfsNotSupportedException e) {
-            return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
-        } catch (IOException exception) {
-            return ParserResult.fromError(exception);
-        } catch (FetcherException e) {
-            return ParserResult.fromErrorMessage(e.getMessage());
         }
 
-        return new ParserResult(result);
+        BibEntry entry = new BibEntry();
+        entry.setType(type);
+
+        // TODO: institution parsing missing
+
+        if (author != null) {
+            entry.setField(StandardField.AUTHOR, author);
+        }
+        if (editor != null) {
+            entry.setField(StandardField.EDITOR, editor);
+        }
+        if (abstractT != null) {
+            entry.setField(StandardField.ABSTRACT, abstractT);
+        }
+        if (!Strings.isNullOrEmpty(keywords)) {
+            entry.setField(StandardField.KEYWORDS, keywords);
+        }
+        if (title != null) {
+            entry.setField(StandardField.TITLE, title);
+        }
+        if (conference != null) {
+            entry.setField(StandardField.BOOKTITLE, conference);
+        }
+        if (DOI != null) {
+            entry.setField(StandardField.DOI, DOI);
+        }
+        if (series != null) {
+            entry.setField(StandardField.SERIES, series);
+        }
+        if (volume != null) {
+            entry.setField(StandardField.VOLUME, volume);
+        }
+        if (number != null) {
+            entry.setField(StandardField.NUMBER, number);
+        }
+        if (pages != null) {
+            entry.setField(StandardField.PAGES, pages);
+        }
+        if (year != null) {
+            entry.setField(StandardField.YEAR, year);
+        }
+        if (publisher != null) {
+            entry.setField(StandardField.PUBLISHER, publisher);
+        }
+        return Optional.of(entry);
     }
 
     private String getFirstPageContents(PDDocument document) throws IOException {
@@ -516,7 +533,6 @@ public class PdfContentImporter extends Importer {
         if (m.find()) {
             year = curString.substring(m.start(), m.end());
         }
-
     }
 
     /**
@@ -525,8 +541,8 @@ public class PdfContentImporter extends Importer {
      * proceed to next non-empty line
      */
     private void proceedToNextNonEmptyLine() {
-        while ((i < lines.length) && "".equals(lines[i].trim())) {
-            i++;
+        while ((lineIndex < lines.length) && "".equals(lines[lineIndex].trim())) {
+            lineIndex++;
         }
     }
 
@@ -543,16 +559,16 @@ public class PdfContentImporter extends Importer {
     private void fillCurStringWithNonEmptyLines() {
         // ensure that curString does not end with " "
         curString = curString.trim();
-        while ((i < lines.length) && !"".equals(lines[i])) {
-            String curLine = lines[i].trim();
+        while ((lineIndex < lines.length) && !"".equals(lines[lineIndex])) {
+            String curLine = lines[lineIndex].trim();
             if (!"".equals(curLine)) {
                 if (!curString.isEmpty()) {
                     // insert separating space if necessary
                     curString = curString.concat(" ");
                 }
-                curString = curString.concat(lines[i]);
+                curString = curString.concat(lines[lineIndex]);
             }
-            i++;
+            lineIndex++;
         }
 
         proceedToNextNonEmptyLine();
@@ -566,22 +582,22 @@ public class PdfContentImporter extends Importer {
      * invariant before/after: i points to line before the last handled block
      */
     private void readLastBlock() {
-        while ((i >= 0) && "".equals(lines[i].trim())) {
-            i--;
+        while ((lineIndex >= 0) && "".equals(lines[lineIndex].trim())) {
+            lineIndex--;
         }
         // i is now at the end of a block
 
-        int end = i;
+        int end = lineIndex;
 
         // find beginning
-        while ((i >= 0) && !"".equals(lines[i])) {
-            i--;
+        while ((lineIndex >= 0) && !"".equals(lines[lineIndex])) {
+            lineIndex--;
         }
         // i is now the line before the beginning of the block
         // this fulfills the invariant
 
         curString = "";
-        for (int j = i + 1; j <= end; j++) {
+        for (int j = lineIndex + 1; j <= end; j++) {
             curString = curString.concat(lines[j].trim());
             if (j != end) {
                 curString = curString.concat(" ");
@@ -595,8 +611,8 @@ public class PdfContentImporter extends Importer {
     }
 
     @Override
-    public FileType getFileType() {
-        return FileType.PDF_CONTENT;
+    public StandardFileType getFileType() {
+        return StandardFileType.PDF;
     }
 
     @Override

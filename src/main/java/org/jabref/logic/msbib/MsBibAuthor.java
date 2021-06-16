@@ -23,13 +23,11 @@ public class MsBibAuthor {
             this.middleName = sb.toString().trim();
             this.firstName = names[0];
         });
-
     }
 
     public MsBibAuthor(Author author, boolean isCorporate) {
         this(author);
         this.isCorporate = isCorporate;
-
     }
 
     public String getFirstName() {
@@ -48,7 +46,7 @@ public class MsBibAuthor {
     }
 
     public String getLastName() {
-        return author.getLast().orElse(null);
+        return author.getLastOnly();
     }
 
     public String getFirstLast() {
@@ -62,5 +60,4 @@ public class MsBibAuthor {
     public boolean isCorporate() {
         return isCorporate;
     }
-
 }

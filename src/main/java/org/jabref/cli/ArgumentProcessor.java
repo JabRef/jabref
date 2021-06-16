@@ -3,36 +3,37 @@ package org.jabref.cli;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.prefs.BackingStoreException;
 
-import org.jabref.Globals;
-import org.jabref.JabRefException;
-import org.jabref.gui.externalfiles.AutoSetLinks;
-import org.jabref.gui.importer.fetcher.EntryFetcher;
-import org.jabref.gui.importer.fetcher.EntryFetchers;
-import org.jabref.logic.bibtexkeypattern.BibtexKeyGenerator;
+import org.jabref.gui.Globals;
+import org.jabref.gui.externalfiles.AutoSetFileLinksUtil;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.gui.undo.NamedCompound;
+import org.jabref.logic.JabRefException;
+import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
+import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
-import org.jabref.logic.exporter.FileSaveSession;
-import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SavePreferences;
-import org.jabref.logic.exporter.SaveSession;
 import org.jabref.logic.exporter.TemplateExporter;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.OutputPrinter;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.logging.JabRefLogger;
@@ -41,13 +42,13 @@ import org.jabref.logic.search.DatabaseSearcher;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.OS;
-import org.jabref.model.Defaults;
-import org.jabref.model.EntryTypes;
+import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.preferences.SearchPreferences;
 
 import com.google.common.base.Throwables;
@@ -62,7 +63,7 @@ public class ArgumentProcessor {
     private final Mode startupMode;
     private boolean noGUINeeded;
 
-    public ArgumentProcessor(String[] args, Mode startupMode) {
+    public ArgumentProcessor(String[] args, Mode startupMode) throws org.apache.commons.cli.ParseException {
         cli = new JabRefCLI(args);
         this.startupMode = startupMode;
         parserResults = processArguments();
@@ -82,6 +83,19 @@ public class ArgumentProcessor {
         return result;
     }
 
+    private static Optional<ParserResult> importBibtexToOpenBase(String argument) {
+        BibtexParser parser = new BibtexParser(Globals.prefs.getImportFormatPreferences(), new DummyFileUpdateMonitor());
+        try {
+            List<BibEntry> entries = parser.parseEntries(argument);
+            ParserResult result = new ParserResult(entries);
+            result.setToOpenTab();
+            return Optional.of(result);
+        } catch (ParseException e) {
+            System.err.println(Localization.lang("Error occurred when parsing entry") + ": " + e.getLocalizedMessage());
+            return Optional.empty();
+        }
+    }
+
     private static Optional<ParserResult> importFile(String argument) {
         String[] data = argument.split(",");
 
@@ -97,9 +111,9 @@ public class ArgumentProcessor {
             }
         } else {
             if (OS.WINDOWS) {
-                file = Paths.get(address);
+                file = Path.of(address);
             } else {
-                file = Paths.get(address.replace("~", System.getProperty("user.home")));
+                file = Path.of(address.replace("~", System.getProperty("user.home")));
             }
         }
 
@@ -130,7 +144,7 @@ public class ArgumentProcessor {
                 // * means "guess the format":
                 System.out.println(Localization.lang("Importing in unknown format") + ": " + file);
 
-                ImportFormatReader.UnknownFormatImport importResult = Globals.IMPORT_FORMAT_READER.importUnknownFormat(file);
+                ImportFormatReader.UnknownFormatImport importResult = Globals.IMPORT_FORMAT_READER.importUnknownFormat(file, Globals.prefs.getTimestampPreferences(), new DummyFileUpdateMonitor());
 
                 System.out.println(Localization.lang("Format used") + ": " + importResult.format);
                 return Optional.of(importResult.parserResult);
@@ -161,7 +175,7 @@ public class ArgumentProcessor {
         }
 
         if ((startupMode == Mode.INITIAL_START) && cli.isHelp()) {
-            cli.printUsage();
+            JabRefCLI.printUsage();
             noGUINeeded = true;
             return Collections.emptyList();
         }
@@ -193,8 +207,8 @@ public class ArgumentProcessor {
             }
         }
 
-        if (cli.isGenerateBibtexKeys()) {
-            regenerateBibtexKeys(loaded);
+        if (cli.isGenerateCitationKeys()) {
+            regenerateCitationKeys(loaded);
         }
 
         if (cli.isAutomaticallySetFileLinks()) {
@@ -204,12 +218,11 @@ public class ArgumentProcessor {
         if (cli.isFileExport()) {
             if (!loaded.isEmpty()) {
                 exportFile(loaded, cli.getFileExport().split(","));
+                LOGGER.debug("Finished export");
             } else {
                 System.err.println(Localization.lang("The output option depends on a valid import option."));
             }
         }
-
-        LOGGER.debug("Finished export");
 
         if (cli.isPreferencesExport()) {
             try {
@@ -228,46 +241,46 @@ public class ArgumentProcessor {
 
     private boolean exportMatches(List<ParserResult> loaded) {
         String[] data = cli.getExportMatches().split(",");
-        String searchTerm = data[0].replace("\\$", " "); //enables blanks within the search term:
-        //$ stands for a blank
+        String searchTerm = data[0].replace("\\$", " "); // enables blanks within the search term:
+        // $ stands for a blank
         ParserResult pr = loaded.get(loaded.size() - 1);
         BibDatabaseContext databaseContext = pr.getDatabaseContext();
         BibDatabase dataBase = pr.getDatabase();
 
-        SearchPreferences searchPreferences = new SearchPreferences(Globals.prefs);
+        SearchPreferences searchPreferences = Globals.prefs.getSearchPreferences();
         SearchQuery query = new SearchQuery(searchTerm, searchPreferences.isCaseSensitive(),
                 searchPreferences.isRegularExpression());
         List<BibEntry> matches = new DatabaseSearcher(query, dataBase).getMatches();
 
-        //export matches
+        // export matches
         if (!matches.isEmpty()) {
             String formatName;
 
-            //read in the export format, take default format if no format entered
+            // read in the export format, take default format if no format entered
             switch (data.length) {
-            case 3:
-                formatName = data[2];
-                break;
-            case 2:
-                //default exporter: HTML table (with Abstract & BibTeX)
-                formatName = "tablerefsabsbib";
-                break;
-            default:
-                System.err.println(Localization.lang("Output file missing").concat(". \n \t ")
-                        .concat(Localization.lang("Usage")).concat(": ") + JabRefCLI.getExportMatchesSyntax());
-                noGUINeeded = true;
-                return false;
+                case 3:
+                    formatName = data[2];
+                    break;
+                case 2:
+                    // default exporter: HTML table (with Abstract & BibTeX)
+                    formatName = "tablerefsabsbib";
+                    break;
+                default:
+                    System.err.println(Localization.lang("Output file missing").concat(". \n \t ")
+                                                   .concat(Localization.lang("Usage")).concat(": ") + JabRefCLI.getExportMatchesSyntax());
+                    noGUINeeded = true;
+                    return false;
             }
 
-            //export new database
+            // export new database
             Optional<Exporter> exporter = Globals.exportFactory.getExporterByName(formatName);
-            if (!exporter.isPresent()) {
+            if (exporter.isEmpty()) {
                 System.err.println(Localization.lang("Unknown export format") + ": " + formatName);
             } else {
                 // We have an TemplateExporter instance:
                 try {
                     System.out.println(Localization.lang("Exporting") + ": " + data[1]);
-                    exporter.get().export(databaseContext, Paths.get(data[1]),
+                    exporter.get().export(databaseContext, Path.of(data[1]),
                             databaseContext.getMetaData().getEncoding().orElse(Globals.prefs.getDefaultEncoding()),
                             matches);
                 } catch (Exception ex) {
@@ -308,7 +321,7 @@ public class ArgumentProcessor {
                 boolean bibExtension = aLeftOver.toLowerCase(Locale.ENGLISH).endsWith("bib");
                 ParserResult pr = new ParserResult();
                 if (bibExtension) {
-                    pr = OpenDatabase.loadDatabase(aLeftOver, Globals.prefs.getImportFormatPreferences());
+                    pr = OpenDatabase.loadDatabase(aLeftOver, Globals.prefs.getImportFormatPreferences(), Globals.prefs.getTimestampPreferences(), Globals.getFileUpdateMonitor());
                 }
 
                 if (!bibExtension || (pr.isEmpty())) {
@@ -341,6 +354,10 @@ public class ArgumentProcessor {
             importToOpenBase(cli.getImportToOpenBase()).ifPresent(loaded::add);
         }
 
+        if (!cli.isBlank() && cli.isBibtexImport()) {
+            importBibtexToOpenBase(cli.getBibtexImport()).ifPresent(loaded::add);
+        }
+
         return loaded;
     }
 
@@ -355,27 +372,7 @@ public class ArgumentProcessor {
             // write an output, if something could be resolved
             if ((newBase != null) && newBase.hasEntries()) {
                 String subName = StringUtil.getCorrectFileName(data[1], "bib");
-
-                try {
-                    System.out.println(Localization.lang("Saving") + ": " + subName);
-                    SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
-                    BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
-                    Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
-                    SaveSession session = databaseWriter.saveDatabase(new BibDatabaseContext(newBase, defaults), prefs);
-
-                    // Show just a warning message if encoding did not work for all characters:
-                    if (!session.getWriter().couldEncodeAll()) {
-                        System.err.println(Localization.lang("Warning") + ": "
-                                + Localization.lang(
-                                        "The chosen encoding '%0' could not encode the following characters:",
-                                        session.getEncoding().displayName())
-                                + " " + session.getWriter().getProblemCharacters());
-                    }
-                    session.commit(subName);
-                } catch (SaveException ex) {
-                    System.err.println(Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
-                }
-
+                saveDatabase(newBase, subName);
                 notSavedMsg = true;
             }
 
@@ -388,6 +385,27 @@ public class ArgumentProcessor {
         }
     }
 
+    private void saveDatabase(BibDatabase newBase, String subName) {
+        try {
+            System.out.println(Localization.lang("Saving") + ": " + subName);
+            SavePreferences prefs = Globals.prefs.getSavePreferences();
+            AtomicFileWriter fileWriter = new AtomicFileWriter(Path.of(subName), prefs.getEncoding());
+            BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(fileWriter, prefs, Globals.entryTypesManager);
+            databaseWriter.saveDatabase(new BibDatabaseContext(newBase));
+
+            // Show just a warning message if encoding did not work for all characters:
+            if (fileWriter.hasEncodingProblems()) {
+                System.err.println(Localization.lang("Warning") + ": "
+                        + Localization.lang(
+                        "The chosen encoding '%0' could not encode the following characters:",
+                        prefs.getEncoding().displayName())
+                        + " " + fileWriter.getEncodingProblems());
+            }
+        } catch (IOException ex) {
+            System.err.println(Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
+        }
+    }
+
     private void exportFile(List<ParserResult> loaded, String[] data) {
         if (data.length == 1) {
             // This signals that the latest import should be stored in BibTeX
@@ -395,27 +413,7 @@ public class ArgumentProcessor {
             if (!loaded.isEmpty()) {
                 ParserResult pr = loaded.get(loaded.size() - 1);
                 if (!pr.isInvalid()) {
-                    try {
-                        System.out.println(Localization.lang("Saving") + ": " + data[0]);
-                        SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
-                        Defaults defaults = new Defaults(Globals.prefs.getDefaultBibDatabaseMode());
-                        BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(
-                                FileSaveSession::new);
-                        SaveSession session = databaseWriter.saveDatabase(
-                                new BibDatabaseContext(pr.getDatabase(), pr.getMetaData(), defaults), prefs);
-
-                        // Show just a warning message if encoding did not work for all characters:
-                        if (!session.getWriter().couldEncodeAll()) {
-                            System.err.println(Localization.lang("Warning") + ": "
-                                    + Localization.lang(
-                                            "The chosen encoding '%0' could not encode the following characters:",
-                                            session.getEncoding().displayName())
-                                    + " " + session.getWriter().getProblemCharacters());
-                        }
-                        session.commit(data[0]);
-                    } catch (SaveException ex) {
-                        System.err.println(Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
-                    }
+                    saveDatabase(pr.getDatabase(), data[0]);
                 }
             } else {
                 System.err.println(Localization.lang("The output option depends on a valid import option."));
@@ -433,40 +431,39 @@ public class ArgumentProcessor {
                 theFile = theFile.getAbsoluteFile();
             }
             BibDatabaseContext databaseContext = pr.getDatabaseContext();
-            databaseContext.setDatabaseFile(theFile);
+            databaseContext.setDatabasePath(theFile.toPath());
             Globals.prefs.fileDirForDatabase = databaseContext
-                    .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
+                    .getFileDirectories(Globals.prefs.getFilePreferences());
             System.out.println(Localization.lang("Exporting") + ": " + data[0]);
             Optional<Exporter> exporter = Globals.exportFactory.getExporterByName(data[1]);
-            if (!exporter.isPresent()) {
+            if (exporter.isEmpty()) {
                 System.err.println(Localization.lang("Unknown export format") + ": " + data[1]);
             } else {
                 // We have an exporter:
                 try {
-                    exporter.get().export(pr.getDatabaseContext(), Paths.get(data[0]),
+                    exporter.get().export(pr.getDatabaseContext(), Path.of(data[0]),
                             pr.getDatabaseContext().getMetaData().getEncoding()
-                                    .orElse(Globals.prefs.getDefaultEncoding()),
+                              .orElse(Globals.prefs.getDefaultEncoding()),
                             pr.getDatabaseContext().getDatabase().getEntries());
                 } catch (Exception ex) {
                     System.err.println(Localization.lang("Could not export file") + " '" + data[0] + "': "
                             + Throwables.getStackTraceAsString(ex));
                 }
             }
-
         }
     }
 
     private void importPreferences() {
         try {
             Globals.prefs.importPreferences(cli.getPreferencesImport());
-            EntryTypes.loadCustomEntryTypes(Globals.prefs.loadCustomEntryTypes(BibDatabaseMode.BIBTEX),
-                    Globals.prefs.loadCustomEntryTypes(BibDatabaseMode.BIBLATEX));
-            Map<String, TemplateExporter> customExporters = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
-                    Globals.journalAbbreviationLoader);
-            LayoutFormatterPreferences layoutPreferences = Globals.prefs
-                    .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
-            SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
-            Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences);
+            Globals.entryTypesManager.addCustomOrModifiedTypes(Globals.prefs.getBibEntryTypes(BibDatabaseMode.BIBTEX),
+                    Globals.prefs.getBibEntryTypes(BibDatabaseMode.BIBLATEX));
+            List<TemplateExporter> customExporters = Globals.prefs.getCustomExportFormats(Globals.journalAbbreviationRepository);
+            LayoutFormatterPreferences layoutPreferences =
+                    Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationRepository);
+            SavePreferences savePreferences = Globals.prefs.getSavePreferencesForExport();
+            XmpPreferences xmpPreferences = Globals.prefs.getXmpPreferences();
+            Globals.exportFactory = ExporterFactory.create(customExporters, layoutPreferences, savePreferences, xmpPreferences);
         } catch (JabRefException ex) {
             LOGGER.error("Cannot import preferences", ex);
         }
@@ -499,17 +496,22 @@ public class ArgumentProcessor {
         for (ParserResult parserResult : loaded) {
             BibDatabase database = parserResult.getDatabase();
             LOGGER.info(Localization.lang("Automatically setting file links"));
-            AutoSetLinks.autoSetLinks(database.getEntries(), parserResult.getDatabaseContext());
+            AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
+                    parserResult.getDatabaseContext(),
+                    Globals.prefs.getFilePreferences(),
+                    Globals.prefs.getAutoLinkPreferences(),
+                    ExternalFileTypes.getInstance());
+            util.linkAssociatedFiles(database.getEntries(), new NamedCompound(""));
         }
     }
 
-    private void regenerateBibtexKeys(List<ParserResult> loaded) {
+    private void regenerateCitationKeys(List<ParserResult> loaded) {
         for (ParserResult parserResult : loaded) {
             BibDatabase database = parserResult.getDatabase();
 
-            LOGGER.info(Localization.lang("Regenerating BibTeX keys according to metadata"));
+            LOGGER.info(Localization.lang("Regenerating citation keys according to metadata"));
 
-            BibtexKeyGenerator keyGenerator = new BibtexKeyGenerator(parserResult.getDatabaseContext(), Globals.prefs.getBibtexKeyPatternPreferences());
+            CitationKeyGenerator keyGenerator = new CitationKeyGenerator(parserResult.getDatabaseContext(), Globals.prefs.getCitationKeyPatternPreferences());
             for (BibEntry entry : database.getEntries()) {
                 keyGenerator.generateAndSetKey(entry);
             }
@@ -518,16 +520,12 @@ public class ArgumentProcessor {
 
     /**
      * Run an entry fetcher from the command line.
-     * <p>
-     * Note that this only works headlessly if the EntryFetcher does not show any GUI.
      *
-     * @param fetchCommand A string containing both the fetcher to use (id of EntryFetcherExtension minus Fetcher) and
-     *                     the search query, separated by a :
+     * @param fetchCommand A string containing both the name of the fetcher to use and the search query, separated by a :
      * @return A parser result containing the entries fetched or null if an error occurred.
      */
     private Optional<ParserResult> fetch(String fetchCommand) {
-
-        if ((fetchCommand == null) || !fetchCommand.contains(":") || (fetchCommand.split(":").length != 2)) {
+        if ((fetchCommand == null) || !fetchCommand.contains(":")) {
             System.out.println(Localization.lang("Expected syntax for --fetch='<name of fetcher>:<query>'"));
             System.out.println(Localization.lang("The following fetchers are available:"));
             return Optional.empty();
@@ -535,38 +533,36 @@ public class ArgumentProcessor {
 
         String[] split = fetchCommand.split(":");
         String engine = split[0];
-
-        EntryFetchers fetchers = new EntryFetchers(Globals.journalAbbreviationLoader);
-        EntryFetcher fetcher = null;
-        for (EntryFetcher e : fetchers.getEntryFetchers()) {
-            if (engine.equalsIgnoreCase(e.getClass().getSimpleName().replace("Fetcher", ""))) {
-                fetcher = e;
-            }
-        }
-
-        if (fetcher == null) {
-            System.out.println(Localization.lang("Could not find fetcher '%0'", engine));
-            System.out.println(Localization.lang("The following fetchers are available:"));
-
-            for (EntryFetcher e : fetchers.getEntryFetchers()) {
-                System.out.println(
-                        "  " + e.getClass().getSimpleName().replace("Fetcher", "").toLowerCase(Locale.ENGLISH));
-            }
-            return Optional.empty();
-        }
-
         String query = split[1];
-        System.out.println(Localization.lang("Running query '%0' with fetcher '%1'.", query, engine) + " "
-                + Localization.lang("Please wait..."));
-        Collection<BibEntry> result = new ImportInspectionCommandLine().query(query, fetcher);
 
-        if (result.isEmpty()) {
-            System.out.println(
-                    Localization.lang("Query '%0' with fetcher '%1' did not return any results.", query, engine));
+        Set<SearchBasedFetcher> fetchers = WebFetchers.getSearchBasedFetchers(Globals.prefs.getImportFormatPreferences());
+        Optional<SearchBasedFetcher> selectedFetcher = fetchers.stream()
+                                                               .filter(fetcher -> fetcher.getName().equalsIgnoreCase(engine))
+                                                               .findFirst();
+        if (selectedFetcher.isEmpty()) {
+            System.out.println(Localization.lang("Could not find fetcher '%0'", engine));
+
+            System.out.println(Localization.lang("The following fetchers are available:"));
+            fetchers.forEach(fetcher -> System.out.println("  " + fetcher.getName()));
+
             return Optional.empty();
+        } else {
+            System.out.println(Localization.lang("Running query '%0' with fetcher '%1'.", query, engine));
+            System.out.print(Localization.lang("Please wait..."));
+            try {
+                List<BibEntry> matches = selectedFetcher.get().performSearch(query);
+                if (matches.isEmpty()) {
+                    System.out.println("\r" + Localization.lang("No results found."));
+                    return Optional.empty();
+                } else {
+                    System.out.println("\r" + Localization.lang("Found %0 results.", String.valueOf(matches.size())));
+                    return Optional.of(new ParserResult(matches));
+                }
+            } catch (FetcherException e) {
+                LOGGER.error("Error while fetching", e);
+                return Optional.empty();
+            }
         }
-
-        return Optional.of(new ParserResult(result));
     }
 
     public boolean isBlank() {
@@ -580,5 +576,4 @@ public class ArgumentProcessor {
     public enum Mode {
         INITIAL_START, REMOTE_START
     }
-
 }

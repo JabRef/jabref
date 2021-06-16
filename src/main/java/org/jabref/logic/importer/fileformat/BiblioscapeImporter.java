@@ -11,9 +11,12 @@ import java.util.Objects;
 
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on
@@ -29,8 +32,8 @@ public class BiblioscapeImporter extends Importer {
     }
 
     @Override
-    public FileType getFileType() {
-        return FileType.BIBLIOSCAPE;
+    public StandardFileType getFileType() {
+        return StandardFileType.TXT;
     }
 
     @Override
@@ -47,10 +50,9 @@ public class BiblioscapeImporter extends Importer {
 
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
-
         List<BibEntry> bibItems = new ArrayList<>();
         String line;
-        Map<String, String> hm = new HashMap<>();
+        Map<Field, String> hm = new HashMap<>();
         Map<String, StringBuilder> lines = new HashMap<>();
         StringBuilder previousLine = null;
         while ((line = reader.readLine()) != null) {
@@ -70,84 +72,84 @@ public class BiblioscapeImporter extends Importer {
                 // add item
                 for (Map.Entry<String, StringBuilder> entry : lines.entrySet()) {
                     if ("AU".equals(entry.getKey())) {
-                        hm.put(FieldName.AUTHOR, entry.getValue()
-                                .toString());
+                        hm.put(StandardField.AUTHOR, entry.getValue()
+                                                          .toString());
                     } else if ("TI".equals(entry.getKey())) {
                         titleTI = entry.getValue()
-                                .toString();
+                                       .toString();
                     } else if ("ST".equals(entry.getKey())) {
                         titleST = entry.getValue()
-                                .toString();
+                                       .toString();
                     } else if ("YP".equals(entry.getKey())) {
-                        hm.put(FieldName.YEAR, entry
+                        hm.put(StandardField.YEAR, entry
                                 .getValue().toString());
                     } else if ("VL".equals(entry.getKey())) {
-                        hm.put(FieldName.VOLUME, entry
+                        hm.put(StandardField.VOLUME, entry
                                 .getValue().toString());
                     } else if ("NB".equals(entry.getKey())) {
-                        hm.put(FieldName.NUMBER, entry
+                        hm.put(StandardField.NUMBER, entry
                                 .getValue().toString());
                     } else if ("PS".equals(entry.getKey())) {
                         pages[0] = entry.getValue()
-                                .toString();
+                                        .toString();
                     } else if ("PE".equals(entry.getKey())) {
                         pages[1] = entry.getValue()
-                                .toString();
+                                        .toString();
                     } else if ("KW".equals(entry.getKey())) {
-                        hm.put(FieldName.KEYWORDS, entry
+                        hm.put(StandardField.KEYWORDS, entry
                                 .getValue().toString());
                     } else if ("RT".equals(entry.getKey())) {
                         type[0] = entry.getValue()
-                                .toString();
+                                       .toString();
                     } else if ("SB".equals(entry.getKey())) {
                         comments.add("Subject: "
                                 + entry.getValue());
                     } else if ("SA".equals(entry.getKey())) {
                         comments
-                        .add("Secondary Authors: " + entry.getValue());
+                                .add("Secondary Authors: " + entry.getValue());
                     } else if ("NT".equals(entry.getKey())) {
-                        hm.put(FieldName.NOTE, entry
+                        hm.put(StandardField.NOTE, entry
                                 .getValue().toString());
                     } else if ("PB".equals(entry.getKey())) {
-                        hm.put(FieldName.PUBLISHER, entry
+                        hm.put(StandardField.PUBLISHER, entry
                                 .getValue().toString());
                     } else if ("TA".equals(entry.getKey())) {
                         comments
-                        .add("Tertiary Authors: " + entry.getValue());
+                                .add("Tertiary Authors: " + entry.getValue());
                     } else if ("TT".equals(entry.getKey())) {
                         comments
-                        .add("Tertiary Title: " + entry.getValue());
+                                .add("Tertiary Title: " + entry.getValue());
                     } else if ("ED".equals(entry.getKey())) {
-                        hm.put(FieldName.EDITION, entry
+                        hm.put(StandardField.EDITION, entry
                                 .getValue().toString());
                     } else if ("TW".equals(entry.getKey())) {
                         type[1] = entry.getValue()
-                                .toString();
+                                       .toString();
                     } else if ("QA".equals(entry.getKey())) {
                         comments
-                        .add("Quaternary Authors: " + entry.getValue());
+                                .add("Quaternary Authors: " + entry.getValue());
                     } else if ("QT".equals(entry.getKey())) {
                         comments
-                        .add("Quaternary Title: " + entry.getValue());
+                                .add("Quaternary Title: " + entry.getValue());
                     } else if ("IS".equals(entry.getKey())) {
-                        hm.put(FieldName.ISBN, entry
+                        hm.put(StandardField.ISBN, entry
                                 .getValue().toString());
                     } else if ("AB".equals(entry.getKey())) {
-                        hm.put(FieldName.ABSTRACT, entry
+                        hm.put(StandardField.ABSTRACT, entry
                                 .getValue().toString());
                     } else if ("AD".equals(entry.getKey())) {
                         address = entry.getValue()
-                                .toString();
+                                       .toString();
                     } else if ("LG".equals(entry.getKey())) {
-                        hm.put(FieldName.LANGUAGE, entry
+                        hm.put(StandardField.LANGUAGE, entry
                                 .getValue().toString());
                     } else if ("CO".equals(entry.getKey())) {
                         country = entry.getValue()
-                                .toString();
+                                       .toString();
                     } else if ("UR".equals(entry.getKey()) || "AT".equals(entry.getKey())) {
                         String s = entry.getValue().toString().trim();
-                        hm.put(s.startsWith("http://") || s.startsWith("ftp://") ? FieldName.URL
-                                : FieldName.PDF, entry.getValue().toString());
+                        hm.put(s.startsWith("http://") || s.startsWith("ftp://") ? StandardField.URL
+                                : StandardField.PDF, entry.getValue().toString());
                     } else if ("C1".equals(entry.getKey())) {
                         comments.add("Custom1: "
                                 + entry.getValue());
@@ -167,7 +169,7 @@ public class BiblioscapeImporter extends Importer {
                         comments.add("Custom6: "
                                 + entry.getValue());
                     } else if ("DE".equals(entry.getKey())) {
-                        hm.put(FieldName.ANNOTE, entry
+                        hm.put(StandardField.ANNOTE, entry
                                 .getValue().toString());
                     } else if ("CA".equals(entry.getKey())) {
                         comments.add("Categories: "
@@ -175,18 +177,17 @@ public class BiblioscapeImporter extends Importer {
                     } else if ("TH".equals(entry.getKey())) {
                         comments.add("Short Title: "
                                 + entry.getValue());
-                    } else if ("SE".equals(entry.getKey()))
-                    {
-                        hm.put(FieldName.CHAPTER, entry
+                    } else if ("SE".equals(entry.getKey())) {
+                        hm.put(StandardField.CHAPTER, entry
                                 .getValue().toString());
-                        //else if (entry.getKey().equals("AC"))
-                        // hm.put("",entry.getValue().toString());
-                        //else if (entry.getKey().equals("LP"))
-                        // hm.put("",entry.getValue().toString());
+                        // else if (entry.getKey().equals("AC"))
+                        //   hm.put("",entry.getValue().toString());
+                        // else if (entry.getKey().equals("LP"))
+                        //   hm.put("",entry.getValue().toString());
                     }
                 }
 
-                String bibtexType = BibEntry.DEFAULT_TYPE;
+                EntryType bibtexType = BibEntry.DEFAULT_TYPE;
                 // to find type, first check TW, then RT
                 for (int i = 1; (i >= 0) && BibEntry.DEFAULT_TYPE.equals(bibtexType); --i) {
                     if (type[i] == null) {
@@ -194,66 +195,64 @@ public class BiblioscapeImporter extends Importer {
                     }
                     type[i] = type[i].toLowerCase(Locale.ROOT);
                     if (type[i].contains("article")) {
-                        bibtexType = "article";
+                        bibtexType = StandardEntryType.Article;
                     } else if (type[i].contains("journal")) {
-                        bibtexType = "article";
+                        bibtexType = StandardEntryType.Article;
                     } else if (type[i].contains("book section")) {
-                        bibtexType = "inbook";
+                        bibtexType = StandardEntryType.InBook;
                     } else if (type[i].contains("book")) {
-                        bibtexType = "book";
+                        bibtexType = StandardEntryType.Book;
                     } else if (type[i].contains("conference")) {
-                        bibtexType = "inproceedings";
+                        bibtexType = StandardEntryType.InProceedings;
                     } else if (type[i].contains("proceedings")) {
-                        bibtexType = "inproceedings";
+                        bibtexType = StandardEntryType.InProceedings;
                     } else if (type[i].contains("report")) {
-                        bibtexType = "techreport";
+                        bibtexType = StandardEntryType.TechReport;
                     } else if (type[i].contains("thesis")
                             && type[i].contains("master")) {
-                        bibtexType = "mastersthesis";
+                        bibtexType = StandardEntryType.MastersThesis;
                     } else if (type[i].contains("thesis")) {
-                        bibtexType = "phdthesis";
+                        bibtexType = StandardEntryType.PhdThesis;
                     }
                 }
 
                 // depending on bibtexType, decide where to place the titleRT and
                 // titleTI
-                if ("article".equals(bibtexType)) {
+                if (bibtexType.equals(StandardEntryType.Article)) {
                     if (titleST != null) {
-                        hm.put(FieldName.JOURNAL, titleST);
+                        hm.put(StandardField.JOURNAL, titleST);
                     }
                     if (titleTI != null) {
-                        hm.put(FieldName.TITLE, titleTI);
+                        hm.put(StandardField.TITLE, titleTI);
                     }
-                } else if ("inbook".equals(bibtexType)) {
+                } else if (bibtexType.equals(StandardEntryType.InBook)) {
                     if (titleST != null) {
-                        hm.put(FieldName.BOOKTITLE, titleST);
+                        hm.put(StandardField.BOOKTITLE, titleST);
                     }
                     if (titleTI != null) {
-                        hm.put(FieldName.TITLE, titleTI);
+                        hm.put(StandardField.TITLE, titleTI);
                     }
                 } else {
                     if (titleST != null) {
-                        hm.put(FieldName.BOOKTITLE, titleST); // should not
+                        hm.put(StandardField.BOOKTITLE, titleST);
                     }
-                    // happen, I
-                    // think
                     if (titleTI != null) {
-                        hm.put(FieldName.TITLE, titleTI);
+                        hm.put(StandardField.TITLE, titleTI);
                     }
                 }
 
                 // concatenate pages
                 if ((pages[0] != null) || (pages[1] != null)) {
-                    hm.put(FieldName.PAGES, (pages[0] == null ? "" : pages[0]) + (pages[1] == null ? "" : "--" + pages[1]));
+                    hm.put(StandardField.PAGES, (pages[0] == null ? "" : pages[0]) + (pages[1] == null ? "" : "--" + pages[1]));
                 }
 
                 // concatenate address and country
                 if (address != null) {
-                    hm.put(FieldName.ADDRESS, address + (country == null ? "" : ", " + country));
+                    hm.put(StandardField.ADDRESS, address + (country == null ? "" : ", " + country));
                 }
 
                 if (!comments.isEmpty()) { // set comment if present
-                    hm.put(FieldName.COMMENT, String.join(";", comments));
+                    hm.put(StandardField.COMMENT, String.join(";", comments));
                 }
                 BibEntry b = new BibEntry(bibtexType);
                 b.setField(hm);
@@ -281,5 +280,4 @@ public class BiblioscapeImporter extends Importer {
 
         return new ParserResult(bibItems);
     }
-
 }

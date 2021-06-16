@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -15,88 +16,101 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SplitPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 
-import org.jabref.Globals;
-import org.jabref.gui.FXDialogService;
-import org.jabref.gui.GUIGlobals;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.model.EntryTypes;
+import org.jabref.gui.preview.PreviewPanel;
+import org.jabref.gui.util.TaskExecutor;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.EntryType;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.FieldProperty;
-import org.jabref.model.entry.InternalBibtexFields;
+import org.jabref.model.entry.field.Field;
+import org.jabref.preferences.PreferencesService;
 
 /**
  * A single tab displayed in the EntryEditor holding several FieldEditors.
  */
 abstract class FieldsEditorTab extends EntryEditorTab {
-
-    private final Map<String, FieldEditorFX> editors = new LinkedHashMap<>();
+    protected final BibDatabaseContext databaseContext;
+    private final Map<Field, FieldEditorFX> editors = new LinkedHashMap<>();
     private final boolean isCompressed;
     private final SuggestionProviders suggestionProviders;
+    private final DialogService dialogService;
+    private final PreferencesService preferences;
+    private final ExternalFileTypes externalFileTypes;
+    private final TaskExecutor taskExecutor;
+    private final JournalAbbreviationRepository journalAbbreviationRepository;
+    private final StateManager stateManager;
+    private PreviewPanel previewPanel;
+    private final UndoManager undoManager;
+    private Collection<Field> fields = new ArrayList<>();
+    private GridPane gridPane;
 
-    private FieldEditorFX activeField;
-    private final BibDatabaseContext databaseContext;
-    private UndoManager undoManager;
-    private Collection<String> fields;
-
-    public FieldsEditorTab(boolean compressed, BibDatabaseContext databaseContext, SuggestionProviders suggestionProviders, UndoManager undoManager) {
+    public FieldsEditorTab(boolean compressed,
+                           BibDatabaseContext databaseContext,
+                           SuggestionProviders suggestionProviders,
+                           UndoManager undoManager,
+                           DialogService dialogService,
+                           PreferencesService preferences,
+                           StateManager stateManager,
+                           ExternalFileTypes externalFileTypes,
+                           TaskExecutor taskExecutor,
+                           JournalAbbreviationRepository journalAbbreviationRepository) {
         this.isCompressed = compressed;
-        this.databaseContext = databaseContext;
-        this.suggestionProviders = suggestionProviders;
-        this.undoManager = undoManager;
+        this.databaseContext = Objects.requireNonNull(databaseContext);
+        this.suggestionProviders = Objects.requireNonNull(suggestionProviders);
+        this.undoManager = Objects.requireNonNull(undoManager);
+        this.dialogService = Objects.requireNonNull(dialogService);
+        this.preferences = Objects.requireNonNull(preferences);
+        this.externalFileTypes = Objects.requireNonNull(externalFileTypes);
+        this.taskExecutor = Objects.requireNonNull(taskExecutor);
+        this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
+        this.stateManager = stateManager;
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, List<Label> nodes) {
-        gridPane.addColumn(columnIndex, nodes.toArray(new Node[nodes.size()]));
+        gridPane.addColumn(columnIndex, nodes.toArray(new Node[0]));
     }
 
     private static void addColumn(GridPane gridPane, int columnIndex, Stream<Parent> nodes) {
         gridPane.addColumn(columnIndex, nodes.toArray(Node[]::new));
     }
 
-    private String convertToHex(java.awt.Color color) {
-        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
-    }
-
-    private Region setupPanel(BibEntry entry, boolean compressed, SuggestionProviders suggestionProviders, UndoManager undoManager) {
-        editors.clear();
-
-        EntryType entryType = EntryTypes.getTypeOrDefault(entry.getType(), databaseContext.getMode());
-        fields = determineFieldsToShow(entry, entryType);
-
-        List<Label> labels = new ArrayList<>();
-        for (String fieldName : fields) {
-            FieldEditorFX fieldEditor = FieldEditors.getForField(fieldName, Globals.TASK_EXECUTOR, new FXDialogService(),
-                    Globals.journalAbbreviationLoader, Globals.prefs.getJournalAbbreviationPreferences(), Globals.prefs,
-                    databaseContext, entry.getType(),
-                    suggestionProviders, undoManager);
-            fieldEditor.bindToEntry(entry);
-
-            editors.put(fieldName, fieldEditor);
-            /*
-            // TODO: Reenable this
-            if (i == 0) {
-                activeField = fieldEditor;
-            }
-            */
-
-            labels.add(new FieldNameLabel(fieldName));
+    private void setupPanel(BibEntry entry, boolean compressed) {
+        // The preferences might be not initialized in tests -> return immediately
+        // TODO: Replace this ugly workaround by proper injection propagation
+        if (preferences == null) {
+            return;
         }
 
-        GridPane gridPane = new GridPane();
-        gridPane.getStyleClass().add("editorPane");
+        editors.clear();
+        gridPane.getChildren().clear();
+        gridPane.getColumnConstraints().clear();
+        gridPane.getRowConstraints().clear();
+
+        fields = determineFieldsToShow(entry);
+
+        List<Label> labels = new ArrayList<>();
+        for (Field field : fields) {
+            FieldEditorFX fieldEditor = FieldEditors.getForField(field, taskExecutor, dialogService,
+                    journalAbbreviationRepository,
+                    preferences, databaseContext, entry.getType(), suggestionProviders, undoManager);
+            fieldEditor.bindToEntry(entry);
+
+            editors.put(field, fieldEditor);
+            labels.add(new FieldNameLabel(field));
+        }
 
         ColumnConstraints columnExpand = new ColumnConstraints();
         columnExpand.setHgrow(Priority.ALWAYS);
@@ -117,44 +131,26 @@ abstract class FieldsEditorTab extends EntryEditorTab {
 
             setCompressedRowLayout(gridPane, rows);
         } else {
-            rows = fields.size();
-
             addColumn(gridPane, 0, labels);
             addColumn(gridPane, 1, editors.values().stream().map(FieldEditorFX::getNode));
 
             gridPane.getColumnConstraints().addAll(columnDoNotContract, columnExpand);
 
-            setRegularRowLayout(gridPane, rows);
+            setRegularRowLayout(gridPane);
         }
-
-        if (GUIGlobals.currentFont != null) {
-            gridPane.setStyle(
-                    "text-area-background: " + convertToHex(GUIGlobals.validFieldBackgroundColor) + ";"
-                            + "text-area-foreground: " + convertToHex(GUIGlobals.editorTextColor) + ";"
-                            + "text-area-highlight: " + convertToHex(GUIGlobals.activeBackgroundColor) + ";");
-        }
-
-        // Warp everything in a scroll-pane
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.setContent(gridPane);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
-        return scrollPane;
     }
 
-    private void setRegularRowLayout(GridPane gridPane, int rows) {
-        List<RowConstraints> constraints = new ArrayList<>(rows);
-        for (String field : fields) {
+    private void setRegularRowLayout(GridPane gridPane) {
+        double totalWeight = fields.stream()
+                                   .mapToDouble(field -> editors.get(field).getWeight())
+                                   .sum();
+
+        List<RowConstraints> constraints = new ArrayList<>();
+        for (Field field : fields) {
             RowConstraints rowExpand = new RowConstraints();
             rowExpand.setVgrow(Priority.ALWAYS);
             rowExpand.setValignment(VPos.TOP);
-            if (rows == 0) {
-                rowExpand.setPercentHeight(100);
-            } else {
-                rowExpand.setPercentHeight(100 / rows * editors.get(field).getWeight());
-            }
+            rowExpand.setPercentHeight(100 * editors.get(field).getWeight() / totalWeight);
             constraints.add(rowExpand);
         }
         gridPane.getRowConstraints().addAll(constraints);
@@ -167,68 +163,77 @@ abstract class FieldsEditorTab extends EntryEditorTab {
         if (rows == 0) {
             rowExpand.setPercentHeight(100);
         } else {
-            rowExpand.setPercentHeight(100 / rows);
+            rowExpand.setPercentHeight(100 / (double) rows);
         }
         for (int i = 0; i < rows; i++) {
             gridPane.getRowConstraints().add(rowExpand);
         }
     }
 
-    private String getPrompt(String field) {
-
-        Set<FieldProperty> fieldProperties = InternalBibtexFields.getFieldProperties(field);
-        if (fieldProperties.contains(FieldProperty.PERSON_NAMES)) {
-            return String.format("%1$s and %1$s and others", Localization.lang("Firstname Lastname"));
-        } else if (fieldProperties.contains(FieldProperty.DOI)) {
-            return "10.ORGANISATION/ID";
-        } else if (fieldProperties.contains(FieldProperty.DATE)) {
-            return "YYYY-MM-DD";
-        }
-
-        switch (field) {
-            case FieldName.YEAR:
-                return "YYYY";
-            case FieldName.MONTH:
-                return "MM or #mmm#";
-            case FieldName.URL:
-                return "https://";
-        }
-
-        return "";
-    }
-
     /**
      * Focuses the given field.
      */
-    public void requestFocus(String fieldName) {
+    public void requestFocus(Field fieldName) {
         if (editors.containsKey(fieldName)) {
-            activeField = editors.get(fieldName);
-            activeField.requestFocus();
+            editors.get(fieldName).focus();
         }
     }
 
     @Override
     public boolean shouldShow(BibEntry entry) {
-        EntryType entryType = EntryTypes.getTypeOrDefault(entry.getType(), databaseContext.getMode());
-        return !determineFieldsToShow(entry, entryType).isEmpty();
-    }
-
-    @Override
-    public void handleFocus() {
-        if (activeField != null) {
-            activeField.requestFocus();
-        }
+        return !determineFieldsToShow(entry).isEmpty();
     }
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        Region panel = setupPanel(entry, isCompressed, suggestionProviders, undoManager);
-        setContent(panel);
+        initPanel();
+        setupPanel(entry, isCompressed);
+
+        if (previewPanel != null) {
+            previewPanel.setEntry(entry);
+        }
     }
 
-    protected abstract Collection<String> determineFieldsToShow(BibEntry entry, EntryType entryType);
+    @Override
+    protected void nextPreviewStyle() {
+        if (previewPanel != null) {
+            previewPanel.nextPreviewStyle();
+        }
+    }
 
-    public Collection<String> getShownFields() {
+    @Override
+    protected void previousPreviewStyle() {
+        if (previewPanel != null) {
+            previewPanel.previousPreviewStyle();
+        }
+    }
+
+    protected abstract Set<Field> determineFieldsToShow(BibEntry entry);
+
+    public Collection<Field> getShownFields() {
         return fields;
+    }
+
+    private void initPanel() {
+        if (gridPane == null) {
+            gridPane = new GridPane();
+            gridPane.getStyleClass().add("editorPane");
+
+            // Warp everything in a scroll-pane
+            ScrollPane scrollPane = new ScrollPane();
+            scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+            scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+            scrollPane.setContent(gridPane);
+            scrollPane.setFitToWidth(true);
+            scrollPane.setFitToHeight(true);
+
+            SplitPane container = new SplitPane(scrollPane);
+            if (!preferences.getPreviewPreferences().showPreviewAsExtraTab()) {
+                previewPanel = new PreviewPanel(databaseContext, dialogService, externalFileTypes, preferences.getKeyBindingRepository(), preferences, stateManager);
+                container.getItems().add(previewPanel);
+            }
+
+            setContent(container);
+        }
     }
 }

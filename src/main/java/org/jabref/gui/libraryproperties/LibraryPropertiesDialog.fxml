@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel?>
+<?import org.jabref.gui.commonfxcontrols.SaveOrderConfigPanel?>
+<DialogPane minHeight="-Infinity" prefHeight="700.0" prefWidth="800.0"
+            xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.jabref.gui.libraryproperties.LibraryPropertiesDialogView">
+    <content>
+        <ScrollPane fitToHeight="true" fitToWidth="true">
+            <VBox minWidth="-Infinity" spacing="10.0">
+                <padding>
+                    <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+                </padding>
+                <GridPane hgap="10.0" vgap="4.0">
+                    <columnConstraints>
+                        <ColumnConstraints/>
+                        <ColumnConstraints hgrow="ALWAYS"/>
+                        <ColumnConstraints/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints/>
+                        <RowConstraints/>
+                        <RowConstraints/>
+                        <RowConstraints/>
+                        <RowConstraints/>
+                        <RowConstraints/>
+                        <RowConstraints/>
+                    </rowConstraints>
+
+                    <Label styleClass="sectionHeader" text="%General"
+                           GridPane.columnSpan="3" GridPane.rowIndex="0"/>
+                    <Label text="%Library encoding"
+                           GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                    <ComboBox fx:id="encoding" prefWidth="150.0"
+                              GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1"/>
+                    <Label text="%Library mode"
+                           GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                    <ComboBox fx:id="databaseMode" prefWidth="150.0"
+                              GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2"/>
+
+                    <Label styleClass="sectionHeader" text="%Override default file directories"
+                           GridPane.columnSpan="3" GridPane.rowIndex="3"/>
+                    <Label text="%General file directory"
+                           GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                    <TextField fx:id="generalFileDirectory"
+                               GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                    <Button text="%Browse" onAction="#browseGeneralFileDirectory"
+                            GridPane.columnIndex="2" GridPane.rowIndex="4"/>
+
+                    <Label text="%User-specific file directory"
+                           GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+                    <TextField fx:id="userSpecificFileDirectory"
+                               GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+                    <Button text="%Browse" onAction="#browseUserSpecificFileDirectory"
+                            GridPane.columnIndex="2" GridPane.rowIndex="5"/>
+
+                    <Label text="%LaTeX file directory"
+                           GridPane.columnIndex="0" GridPane.rowIndex="6"/>
+                    <TextField fx:id="laTexFileDirectory"
+                               GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+                    <Button text="%Browse" onAction="#browseLatexFileDirectory"
+                            GridPane.columnIndex="2" GridPane.rowIndex="6"/>
+                </GridPane>
+
+                <Label styleClass="sectionHeader" text="%Library protection"/>
+                <CheckBox fx:id="protect"
+                          text="%Refuse to save the library before external changes have been reviewed."/>
+
+                <Label styleClass="sectionHeader" text="%Save sort order"/>
+                <SaveOrderConfigPanel fx:id="saveOrderConfigPanel"/>
+
+                <Label styleClass="sectionHeader" text="%Save actions"/>
+                <FieldFormatterCleanupsPanel fx:id="fieldFormatterCleanupsPanel"/>
+            </VBox>
+        </ScrollPane>
+    </content>
+    <ButtonType fx:constant="CANCEL"/>
+    <ButtonType fx:constant="OK"/>
+</DialogPane>

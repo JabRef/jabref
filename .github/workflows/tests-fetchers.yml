@@ -1,0 +1,53 @@
+name: Fetcher Tests
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/main/java/org/jabref/logic/importer/fetcher/**'
+      - 'src/test/java/org/jabref/logic/importer/fetcher/**'
+      - '.github/workflows/tests-fetchers.yml'
+      - 'build.gradle'
+  pull_request:
+    paths:
+      - 'src/main/java/org/jabref/logic/**'
+      - 'src/test/java/org/jabref/logic/**'
+      - 'src/main/java/org/jabref/model/**'
+      - 'src/test/java/org/jabref/model/**'
+      - '.github/workflows/tests-fetchers.yml'
+      - 'build.gradle'
+  schedule:
+    # run on each Wednesday
+    - cron: '2 3 * * 3'
+
+env:
+  SpringerNatureAPIKey: ${{ secrets.SPRINGERNATUREAPIKEY_FOR_TESTS }}
+  AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey_FOR_TESTS }}
+  IEEEAPIKey: ${{ secrets.IEEEAPIKey_FOR_TESTS }}
+
+jobs:
+  fetchertests:
+    name: Fetcher tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: 14
+          distribution: 'adopt'
+      - uses: actions/cache@v2
+        name: Restore gradle cache
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Run fetcher tests
+        run: ./gradlew fetcherTest
+        env:
+          CI: "true"

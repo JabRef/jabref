@@ -1,52 +1,73 @@
 package org.jabref.logic.util.io;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class FileHistoryTest {
+class FileHistoryTest {
+    private FileHistory history;
 
-    @Test
-    public void testFileHistory() {
-        FileHistory fh = new FileHistory(new ArrayList<>());
-
-        fh.newFile("aa");
-        assertEquals("aa", fh.getFileName(0));
-        fh.newFile("bb");
-        assertEquals("bb", fh.getFileName(0));
-
-        fh.newFile("aa");
-        assertEquals("aa", fh.getFileName(0));
-
-        fh.newFile("cc");
-        assertEquals("cc", fh.getFileName(0));
-        assertEquals("aa", fh.getFileName(1));
-        assertEquals("bb", fh.getFileName(2));
-
-        fh.newFile("dd");
-        assertEquals("dd", fh.getFileName(0));
-        assertEquals("cc", fh.getFileName(1));
-        assertEquals("aa", fh.getFileName(2));
-        fh.newFile("ee");
-        fh.newFile("ff");
-        fh.newFile("gg");
-        fh.newFile("hh");
-        assertEquals("bb", fh.getFileName(7));
-        assertEquals(8, fh.size());
-        fh.newFile("ii");
-        assertEquals("aa", fh.getFileName(7));
-        fh.removeItem("ff");
-        assertEquals(7, fh.size());
-        fh.removeItem("ee");
-        fh.removeItem("dd");
-        fh.removeItem("cc");
-        fh.removeItem("cc");
-        fh.removeItem("aa");
-
-        assertEquals(Arrays.asList("ii", "hh", "gg"), fh.getHistory());
+    @BeforeEach
+    void setUp() {
+        history = new FileHistory(new ArrayList<>());
     }
 
+    @Test
+    void newItemsAreAddedInRightOrder() {
+        history.newFile(Path.of("aa"));
+        history.newFile(Path.of("bb"));
+        assertEquals(Arrays.asList(Path.of("bb"), Path.of("aa")), history.getHistory());
+    }
+
+    @Test
+    void itemsAlreadyInListIsMovedToTop() {
+        history.newFile(Path.of("aa"));
+        history.newFile(Path.of("bb"));
+        history.newFile(Path.of("aa"));
+        assertEquals(Arrays.asList(Path.of("aa"), Path.of("bb")), history.getHistory());
+    }
+
+    @Test
+    void removeItemsLeavesOtherItemsInRightOrder() {
+        history.newFile(Path.of("aa"));
+        history.newFile(Path.of("bb"));
+        history.newFile(Path.of("cc"));
+
+        history.removeItem(Path.of("bb"));
+
+        assertEquals(Arrays.asList(Path.of("cc"), Path.of("aa")), history.getHistory());
+    }
+
+    @Test
+    void sizeTest() {
+        assertEquals(0, history.size());
+        history.newFile(Path.of("aa"));
+        assertEquals(1, history.size());
+        history.newFile(Path.of("bb"));
+        assertEquals(2, history.size());
+    }
+
+    @Test
+    void isEmptyTest() {
+        assertTrue(history.isEmpty());
+        history.newFile(Path.of("aa"));
+        assertFalse(history.isEmpty());
+    }
+
+    @Test
+    void getFileAtTest() {
+        history.newFile(Path.of("aa"));
+        history.newFile(Path.of("bb"));
+        history.newFile(Path.of("cc"));
+        assertEquals(Path.of("bb"), history.getFileAt(1));
+    }
 }
+
+

@@ -1,32 +1,29 @@
 package org.jabref.gui.autocompleter;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 
 public class AutoCompletePreferences {
 
-    private static final String DELIMITER = ";";
-    private boolean shouldAutoComplete;
-    private AutoCompleteFirstNameMode firstNameMode;
-    private boolean onlyCompleteLastFirst;
-    private boolean onlyCompleteFirstLast;
-    private List<String> completeFields;
-    private final JournalAbbreviationPreferences journalAbbreviationPreferences;
-
-    public AutoCompletePreferences(boolean shouldAutoComplete, AutoCompleteFirstNameMode firstNameMode, boolean onlyCompleteLastFirst, boolean onlyCompleteFirstLast, List<String> completeFields, JournalAbbreviationPreferences journalAbbreviationPreferences) {
-        this.shouldAutoComplete = shouldAutoComplete;
-        this.firstNameMode = firstNameMode;
-        this.onlyCompleteLastFirst = onlyCompleteLastFirst;
-        this.onlyCompleteFirstLast = onlyCompleteFirstLast;
-        this.completeFields = completeFields;
-        this.journalAbbreviationPreferences = journalAbbreviationPreferences;
+    public enum NameFormat {
+        LAST_FIRST, FIRST_LAST, BOTH
     }
 
-    public void setShouldAutoComplete(boolean shouldAutoComplete) {
+    private final boolean shouldAutoComplete;
+    private final AutoCompleteFirstNameMode firstNameMode;
+    private final NameFormat nameFormat;
+    private final Set<Field> completeFields;
+    private final JournalAbbreviationPreferences journalAbbreviationPreferences;
+
+    public AutoCompletePreferences(boolean shouldAutoComplete, AutoCompleteFirstNameMode firstNameMode, NameFormat nameFormat, Set<Field> completeFields, JournalAbbreviationPreferences journalAbbreviationPreferences) {
         this.shouldAutoComplete = shouldAutoComplete;
+        this.firstNameMode = firstNameMode;
+        this.nameFormat = nameFormat;
+        this.completeFields = completeFields;
+        this.journalAbbreviationPreferences = journalAbbreviationPreferences;
     }
 
     public boolean shouldAutoComplete() {
@@ -40,44 +37,21 @@ public class AutoCompletePreferences {
         return firstNameMode;
     }
 
-    public void setFirstNameMode(AutoCompleteFirstNameMode firstNameMode) {
-        this.firstNameMode = firstNameMode;
-    }
-
-    public boolean getOnlyCompleteLastFirst() {
-        return onlyCompleteLastFirst;
-    }
-
-    public void setOnlyCompleteLastFirst(boolean onlyCompleteLastFirst) {
-        this.onlyCompleteLastFirst = onlyCompleteLastFirst;
-    }
-
-    public boolean getOnlyCompleteFirstLast() {
-        return onlyCompleteFirstLast;
-    }
-
-    public void setOnlyCompleteFirstLast(boolean onlyCompleteFirstLast) {
-        this.onlyCompleteFirstLast = onlyCompleteFirstLast;
+    public NameFormat getNameFormat() {
+        return nameFormat;
     }
 
     /**
      * Returns the list of fields for which autocomplete is enabled
+     *
      * @return List of field names
      */
-    public List<String> getCompleteFields() {
+    public Set<Field> getCompleteFields() {
         return completeFields;
     }
 
-    public void setCompleteFields(List<String> completeFields) {
-        this.completeFields = completeFields;
-    }
-
-    public void setCompleteNames(String input) {
-        setCompleteFields(Arrays.asList(input.split(DELIMITER)));
-    }
-
     public String getCompleteNamesAsString() {
-        return completeFields.stream().collect(Collectors.joining(DELIMITER));
+        return FieldFactory.serializeFieldsList(completeFields);
     }
 
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {

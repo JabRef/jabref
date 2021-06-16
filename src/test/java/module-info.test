@@ -1,0 +1,29 @@
+--add-modules
+    // Add junit5 testfx module dependency
+    org.testfx.junit5
+--add-reads
+    // Make testfx module visible
+    org.jabref=org.testfx.junit5
+--add-opens
+     javafx.base/com.sun.javafx.beans=net.bytebuddy
+--add-opens
+    // Needed for GUI tests
+    javafx.graphics/com.sun.javafx.application=org.testfx
+--add-opens
+    // Needed for localization tests
+    javafx.fxml/javafx.fxml=org.jabref
+
+--add-modules
+    io.github.classgraph
+
+--add-reads
+    org.jabref=io.github.classgraph
+
+--add-modules
+   org.kordamp.ikonli.core,org.kordamp.ikonli.javafx,org.kordamp.ikonli.materialdesign2
+
+--add-reads
+   org.kordamp.ikonli.IkonHandler=org.jabref.gui.icon.JabRefIkonHandler
+
+--add-reads
+   org.kordamp.ikonli.IkonProvider=org.jabref.gui.icon.JabrefIconProvider

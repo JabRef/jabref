@@ -6,16 +6,17 @@ import java.time.temporal.TemporalAccessor;
 
 import javafx.util.StringConverter;
 
-import org.jabref.gui.autocompleter.AutoCompleteSuggestionProvider;
+import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.model.entry.Date;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.strings.StringUtil;
 
 public class DateEditorViewModel extends AbstractEditorViewModel {
     private final DateTimeFormatter dateFormatter;
 
-    public DateEditorViewModel(String fieldName, AutoCompleteSuggestionProvider<?> suggestionProvider, DateTimeFormatter dateFormatter, FieldCheckers fieldCheckers) {
-        super(fieldName, suggestionProvider, fieldCheckers);
+    public DateEditorViewModel(Field field, SuggestionProvider<?> suggestionProvider, DateTimeFormatter dateFormatter, FieldCheckers fieldCheckers) {
+        super(field, suggestionProvider, fieldCheckers);
         this.dateFormatter = dateFormatter;
     }
 

@@ -2,11 +2,7 @@ package org.jabref.model;
 
 public class TreeNodeTestData {
     /**
-     * Gets the marked node in the following tree:
-     * Root
-     * A
-     * A (= parent)
-     * B (<-- this)
+     * Gets the marked node in the following tree: Root A A (= parent) B (<-- this)
      */
     public static TreeNodeMock getNodeInSimpleTree(TreeNodeMock root) {
         root.addChild(new TreeNodeMock());
@@ -22,21 +18,8 @@ public class TreeNodeTestData {
     }
 
     /**
-     * Gets the marked node in the following tree:
-     * Root
-     * A
-     * A
-     * A (= grand parent)
-     * B
-     * B (= parent)
-     * C (<-- this)
-     * D (= child)
-     * C
-     * C
-     * C
-     * B
-     * B
-     * A
+     * Gets the marked node in the following tree: Root A A A (= grand parent) B B (= parent) C (<-- this) D (= child) C
+     * C C B B A
      */
     public static TreeNodeMock getNodeInComplexTree(TreeNodeMock root) {
         root.addChild(new TreeNodeMock());
@@ -66,12 +49,7 @@ public class TreeNodeTestData {
     }
 
     /**
-     * Gets the marked in the following tree:
-     * Root
-     * A
-     * A
-     * A (<- this)
-     * A
+     * Gets the marked in the following tree: Root A A A (<- this) A
      */
     public static TreeNodeMock getNodeAsChild(TreeNodeMock root) {
         root.addChild(new TreeNodeMock());
@@ -83,7 +61,7 @@ public class TreeNodeTestData {
     }
 
     /**
-     * This is just a dummy class deriving from TreeNode<T> so that we can test the generic class
+     * This is just a dummy class deriving from TreeNode&lt;T> so that we can test the generic class
      */
     public static class TreeNodeMock extends TreeNode<TreeNodeMock> {
 

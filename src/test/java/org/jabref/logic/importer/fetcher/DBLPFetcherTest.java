@@ -3,66 +3,70 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.logic.bibtex.FieldContentParserPreferences;
+import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.FieldName;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Category(FetcherTest.class)
+@FetcherTest
 public class DBLPFetcherTest {
 
     private DBLPFetcher dblpFetcher;
     private BibEntry entry;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getFieldContentParserPreferences())
-                .thenReturn(mock(FieldContentParserPreferences.class));
+        when(importFormatPreferences.getFieldContentFormatterPreferences())
+                .thenReturn(mock(FieldContentFormatterPreferences.class));
         dblpFetcher = new DBLPFetcher(importFormatPreferences);
         entry = new BibEntry();
 
-        entry.setType(BibtexEntryTypes.ARTICLE.getName());
-        entry.setCiteKey("DBLP:journals/stt/GeigerHL16");
-        entry.setField(FieldName.TITLE,
+        entry.setType(StandardEntryType.Article);
+        entry.setCitationKey("DBLP:journals/stt/GeigerHL16");
+        entry.setField(StandardField.TITLE,
                 "Process Engine Benchmarking with Betsy in the Context of {ISO/IEC} Quality Standards");
-        entry.setField(FieldName.AUTHOR, "Matthias Geiger and Simon Harrer and J{\\\"{o}}rg Lenhard");
-        entry.setField(FieldName.JOURNAL, "Softwaretechnik-Trends");
-        entry.setField(FieldName.VOLUME, "36");
-        entry.setField(FieldName.NUMBER, "2");
-        entry.setField(FieldName.YEAR, "2016");
-        entry.setField(FieldName.URL,
+        entry.setField(StandardField.AUTHOR, "Matthias Geiger and Simon Harrer and J{\\\"{o}}rg Lenhard");
+        entry.setField(StandardField.JOURNAL, "Softwaretechnik-Trends");
+        entry.setField(StandardField.VOLUME, "36");
+        entry.setField(StandardField.NUMBER, "2");
+        entry.setField(StandardField.YEAR, "2016");
+        entry.setField(StandardField.URL,
                 "http://pi.informatik.uni-siegen.de/stt/36_2/./03_Technische_Beitraege/ZEUS2016/beitrag_2.pdf");
-        entry.setField("biburl", "http://dblp.org/rec/bib/journals/stt/GeigerHL16");
-        entry.setField("bibsource", "dblp computer science bibliography, http://dblp.org");
-
+        entry.setField(new UnknownField("biburl"), "https://dblp.org/rec/journals/stt/GeigerHL16.bib");
+        entry.setField(new UnknownField("bibsource"), "dblp computer science bibliography, https://dblp.org");
     }
 
     @Test
     public void findSingleEntry() throws FetcherException {
-        String query = "Process Engine Benchmarking with Betsy in the Context of {ISO/IEC} Quality Standards";
+        // In Lucene curly brackets are used for range queries, therefore they have to be escaped using "". See https://lucene.apache.org/core/5_4_0/queryparser/org/apache/lucene/queryparser/classic/package-summary.html
+        String query = "Process Engine Benchmarking with Betsy in the Context of \"{ISO/IEC}\" Quality Standards";
         List<BibEntry> result = dblpFetcher.performSearch(query);
 
-        Assert.assertEquals(Collections.singletonList(entry), result);
+        assertEquals(Collections.singletonList(entry), result);
     }
 
     @Test
     public void findSingleEntryUsingComplexOperators() throws FetcherException {
-        String query = "geiger harrer betsy$ softw.trends"; //-wirtz Negative operators do no longer work,  see issue https://github.com/JabRef/jabref/issues/2890
+        String query = "geiger harrer betsy$ softw.trends"; // -wirtz Negative operators do no longer work,  see issue https://github.com/JabRef/jabref/issues/2890
         List<BibEntry> result = dblpFetcher.performSearch(query);
 
-        Assert.assertEquals(Collections.singletonList(entry), result);
+        assertEquals(Collections.singletonList(entry), result);
     }
 
+    @Test
+    public void findNothing() throws Exception {
+        assertEquals(Collections.emptyList(), dblpFetcher.performSearch(""));
+    }
 }

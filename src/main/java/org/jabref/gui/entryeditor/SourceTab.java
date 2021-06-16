@@ -5,38 +5,54 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.ListChangeListener;
+import javafx.geometry.Point2D;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.InputMethodRequests;
+import javafx.scene.input.KeyEvent;
 
-import org.jabref.gui.IconTheme;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.Globals;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.keyboard.CodeAreaKeyBindings;
+import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
-import org.jabref.logic.bibtex.LatexFieldFormatter;
-import org.jabref.logic.bibtex.LatexFieldFormatterPreferences;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.InternalBibtexFields;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
-import org.controlsfx.control.NotificationPane;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
@@ -45,36 +61,149 @@ import org.slf4j.LoggerFactory;
 public class SourceTab extends EntryEditorTab {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceTab.class);
-    private final LatexFieldFormatterPreferences fieldFormatterPreferences;
+    private final FieldWriterPreferences fieldWriterPreferences;
     private final BibDatabaseMode mode;
-    private final JabRefPreferences preferences;
-    private UndoManager undoManager;
+    private final UndoManager undoManager;
     private final ObjectProperty<ValidationMessage> sourceIsValid = new SimpleObjectProperty<>();
-    private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator(sourceIsValid);
+    private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator();
+    private final ImportFormatPreferences importFormatPreferences;
+    private final FileUpdateMonitor fileMonitor;
+    private final DialogService dialogService;
+    private final StateManager stateManager;
+    private Optional<Pattern> searchHighlightPattern = Optional.empty();
+    private final KeyBindingRepository keyBindingRepository;
+    private CodeArea codeArea;
 
-    public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, LatexFieldFormatterPreferences fieldFormatterPreferences, JabRefPreferences preferences) {
+    private BibEntry previousEntry;
+
+    private class EditAction extends SimpleCommand {
+
+        private final StandardActions command;
+
+        public EditAction(StandardActions command) {
+            this.command = command;
+        }
+
+        @Override
+        public void execute() {
+            switch (command) {
+                case COPY -> codeArea.copy();
+                case CUT -> codeArea.cut();
+                case PASTE -> codeArea.paste();
+                case SELECT_ALL -> codeArea.selectAll();
+            }
+            codeArea.requestFocus();
+        }
+    }
+
+    public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, FieldWriterPreferences fieldWriterPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor, DialogService dialogService, StateManager stateManager, KeyBindingRepository keyBindingRepository) {
         this.mode = bibDatabaseContext.getMode();
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
-        this.setGraphic(IconTheme.JabRefIcon.SOURCE.getGraphicNode());
+        this.setGraphic(IconTheme.JabRefIcons.SOURCE.getGraphicNode());
         this.undoManager = undoManager;
-        this.fieldFormatterPreferences = fieldFormatterPreferences;
-        this.preferences = preferences;
+        this.fieldWriterPreferences = fieldWriterPreferences;
+        this.importFormatPreferences = importFormatPreferences;
+        this.fileMonitor = fileMonitor;
+        this.dialogService = dialogService;
+        this.stateManager = stateManager;
+        this.keyBindingRepository = keyBindingRepository;
+
+        stateManager.activeSearchQueryProperty().addListener((observable, oldValue, newValue) -> {
+            searchHighlightPattern = newValue.flatMap(SearchQuery::getPatternForWords);
+            highlightSearchPattern();
+        });
     }
 
-    private static String getSourceString(BibEntry entry, BibDatabaseMode type, LatexFieldFormatterPreferences fieldFormatterPreferences) throws IOException {
+    private void highlightSearchPattern() {
+        if (searchHighlightPattern.isPresent() && (codeArea != null)) {
+            codeArea.setStyleClass(0, codeArea.getLength(), "text");
+            Matcher matcher = searchHighlightPattern.get().matcher(codeArea.getText());
+            while (matcher.find()) {
+                for (int i = 0; i <= matcher.groupCount(); i++) {
+                    codeArea.setStyleClass(matcher.start(), matcher.end(), "search");
+                }
+            }
+        }
+    }
+
+    private String getSourceString(BibEntry entry, BibDatabaseMode type, FieldWriterPreferences fieldWriterPreferences) throws IOException {
         StringWriter stringWriter = new StringWriter(200);
-        LatexFieldFormatter formatter = LatexFieldFormatter.buildIgnoreHashes(fieldFormatterPreferences);
-        new BibEntryWriter(formatter, false).writeWithoutPrependedNewlines(entry, stringWriter, type);
+        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(fieldWriterPreferences);
+        new BibEntryWriter(fieldWriter, Globals.entryTypesManager).writeWithoutPrependedNewlines(entry, stringWriter, type);
 
         return stringWriter.getBuffer().toString();
     }
 
-    private CodeArea createSourceEditor() {
-        CodeArea codeArea = new CodeArea();
+    /* Work around for different input methods.
+     * https://github.com/FXMisc/RichTextFX/issues/146
+     */
+    private static class InputMethodRequestsObject implements InputMethodRequests {
+
+        @Override
+        public String getSelectedText() {
+            return "";
+        }
+
+        @Override
+        public int getLocationOffset(int x, int y) {
+            return 0;
+        }
+
+        @Override
+        public void cancelLatestCommittedText() {
+            return;
+        }
+
+        @Override
+        public Point2D getTextLocation(int offset) {
+            return new Point2D(0, 0);
+        }
+    }
+
+    private void setupSourceEditor() {
+        codeArea = new CodeArea();
         codeArea.setWrapText(true);
-        codeArea.lookup(".styled-text-area").setStyle("-fx-font-size: " + preferences.getFontSizeFX() + "pt;");
-        return codeArea;
+        codeArea.setInputMethodRequests(new InputMethodRequestsObject());
+        codeArea.setOnInputMethodTextChanged(event -> {
+            String committed = event.getCommitted();
+            if (!committed.isEmpty()) {
+                codeArea.insertText(codeArea.getCaretPosition(), committed);
+            }
+        });
+        codeArea.setId("bibtexSourceCodeArea");
+        codeArea.addEventFilter(KeyEvent.KEY_PRESSED, event -> CodeAreaKeyBindings.call(codeArea, event, keyBindingRepository));
+        codeArea.addEventFilter(KeyEvent.KEY_PRESSED, this::listenForSaveKeybinding);
+
+        ActionFactory factory = new ActionFactory(keyBindingRepository);
+        ContextMenu contextMenu = new ContextMenu();
+        contextMenu.getItems().addAll(
+                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT)),
+                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY)),
+                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE)),
+                factory.createMenuItem(StandardActions.SELECT_ALL, new EditAction(StandardActions.SELECT_ALL))
+        );
+
+        contextMenu.getStyleClass().add("context-menu");
+        codeArea.setContextMenu(contextMenu);
+
+        sourceValidator.addRule(sourceIsValid);
+
+        sourceValidator.getValidationStatus().getMessages().addListener((InvalidationListener) c -> {
+            ValidationStatus sourceValidationStatus = sourceValidator.getValidationStatus();
+            if (!sourceValidationStatus.isValid()) {
+                sourceValidationStatus.getHighestMessage().ifPresent(message ->
+                        dialogService.showErrorDialogAndWait(message.getMessage()));
+            }
+        });
+
+        codeArea.focusedProperty().addListener((obs, oldValue, onFocus) -> {
+            if (!onFocus && (currentEntry != null)) {
+                storeSource(currentEntry, codeArea.textProperty().getValue());
+            }
+        });
+        VirtualizedScrollPane<CodeArea> scrollableCodeArea = new VirtualizedScrollPane<>(codeArea);
+        this.setContent(scrollableCodeArea);
     }
 
     @Override
@@ -82,44 +211,45 @@ public class SourceTab extends EntryEditorTab {
         return true;
     }
 
-    @Override
-    protected void bindToEntry(BibEntry entry) {
-        CodeArea codeArea = createSourceEditor();
-        VirtualizedScrollPane<CodeArea> node = new VirtualizedScrollPane<>(codeArea);
-        NotificationPane notificationPane = new NotificationPane(node);
-        notificationPane.setShowFromTop(false);
-        sourceValidator.getValidationStatus().getMessages().addListener((ListChangeListener<ValidationMessage>) c -> {
-            if (sourceValidator.getValidationStatus().isValid()) {
-                notificationPane.hide();
-            } else {
-                sourceValidator.getValidationStatus().getHighestMessage().ifPresent(validationMessage -> notificationPane.show(validationMessage.getMessage()));
+    private void updateCodeArea() {
+        DefaultTaskExecutor.runAndWaitInJavaFXThread(() -> {
+            if (codeArea == null) {
+                setupSourceEditor();
             }
-        });
-        this.setContent(codeArea);
 
-        // Store source for every change in the source code
-        // and update source code for every change of entry field values
-        BindingsHelper.bindContentBidirectional(entry.getFieldsObservable(), codeArea.textProperty(), this::storeSource, fields -> {
-            DefaultTaskExecutor.runInJavaFXThread(() -> {
-                codeArea.clear();
-                try {
-                    codeArea.appendText(getSourceString(entry, mode, fieldFormatterPreferences));
-                } catch (IOException ex) {
-                    codeArea.setEditable(false);
-                    codeArea.appendText(ex.getMessage() + "\n\n" +
-                            Localization.lang("Correct the entry, and reopen editor to display/edit source."));
-                    LOGGER.debug("Incorrect entry", ex);
-                }
-            });
+            codeArea.clear();
+            try {
+                codeArea.appendText(getSourceString(currentEntry, mode, fieldWriterPreferences));
+                codeArea.setEditable(true);
+                highlightSearchPattern();
+            } catch (IOException ex) {
+                codeArea.setEditable(false);
+                codeArea.appendText(ex.getMessage() + "\n\n" +
+                        Localization.lang("Correct the entry, and reopen editor to display/edit source."));
+                LOGGER.debug("Incorrect entry", ex);
+            }
         });
     }
 
-    private void storeSource(String text) {
-        if (currentEntry == null || text.isEmpty()) {
+    @Override
+    protected void bindToEntry(BibEntry entry) {
+        if ((previousEntry != null) && (codeArea != null)) {
+            storeSource(previousEntry, codeArea.textProperty().getValue());
+        }
+        this.previousEntry = entry;
+
+        updateCodeArea();
+
+        entry.typeProperty().addListener(listener -> updateCodeArea());
+        entry.getFieldsObservable().addListener((InvalidationListener) listener -> updateCodeArea());
+    }
+
+    private void storeSource(BibEntry outOfFocusEntry, String text) {
+        if ((outOfFocusEntry == null) || text.isEmpty()) {
             return;
         }
 
-        BibtexParser bibtexParser = new BibtexParser(preferences.getImportFormatPreferences());
+        BibtexParser bibtexParser = new BibtexParser(importFormatPreferences, fileMonitor);
         try {
             ParserResult parserResult = bibtexParser.parse(new StringReader(text));
             BibDatabase database = parserResult.getDatabase();
@@ -137,47 +267,51 @@ public class SourceTab extends EntryEditorTab {
                 }
             }
 
+            if (parserResult.hasWarnings()) {
+                // put the warning into as exception text -> it will be displayed to the user
+
+                throw new IllegalStateException(parserResult.getErrorMessage());
+            }
+
             NamedCompound compound = new NamedCompound(Localization.lang("source edit"));
             BibEntry newEntry = database.getEntries().get(0);
-            String newKey = newEntry.getCiteKeyOptional().orElse(null);
+            String newKey = newEntry.getCitationKey().orElse(null);
 
             if (newKey != null) {
-                currentEntry.setCiteKey(newKey);
+                outOfFocusEntry.setCitationKey(newKey);
             } else {
-                currentEntry.clearCiteKey();
+                outOfFocusEntry.clearCiteKey();
             }
 
             // First, remove fields that the user has removed.
-            for (Map.Entry<String, String> field : currentEntry.getFieldMap().entrySet()) {
-                String fieldName = field.getKey();
+            for (Map.Entry<Field, String> field : outOfFocusEntry.getFieldMap().entrySet()) {
+                Field fieldName = field.getKey();
                 String fieldValue = field.getValue();
 
-                if (InternalBibtexFields.isDisplayableField(fieldName) && !newEntry.hasField(fieldName)) {
-                    compound.addEdit(
-                            new UndoableFieldChange(currentEntry, fieldName, fieldValue, null));
-                    currentEntry.clearField(fieldName);
+                if (!newEntry.hasField(fieldName)) {
+                    compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, fieldValue, null));
+                    outOfFocusEntry.clearField(fieldName);
                 }
             }
 
             // Then set all fields that have been set by the user.
-            for (Map.Entry<String, String> field : newEntry.getFieldMap().entrySet()) {
-                String fieldName = field.getKey();
-                String oldValue = currentEntry.getField(fieldName).orElse(null);
+            for (Map.Entry<Field, String> field : newEntry.getFieldMap().entrySet()) {
+                Field fieldName = field.getKey();
+                String oldValue = outOfFocusEntry.getField(fieldName).orElse(null);
                 String newValue = field.getValue();
                 if (!Objects.equals(oldValue, newValue)) {
                     // Test if the field is legally set.
-                    new LatexFieldFormatter(preferences.getLatexFieldFormatterPreferences())
-                            .format(newValue, fieldName);
+                    new FieldWriter(fieldWriterPreferences).write(fieldName, newValue);
 
-                    compound.addEdit(new UndoableFieldChange(currentEntry, fieldName, oldValue, newValue));
-                    currentEntry.setField(fieldName, newValue);
+                    compound.addEdit(new UndoableFieldChange(outOfFocusEntry, fieldName, oldValue, newValue));
+                    outOfFocusEntry.setField(fieldName, newValue);
                 }
             }
 
             // See if the user has changed the entry type:
-            if (!Objects.equals(newEntry.getType(), currentEntry.getType())) {
-                compound.addEdit(new UndoableChangeType(currentEntry, currentEntry.getType(), newEntry.getType()));
-                currentEntry.setType(newEntry.getType());
+            if (!Objects.equals(newEntry.getType(), outOfFocusEntry.getType())) {
+                compound.addEdit(new UndoableChangeType(outOfFocusEntry, outOfFocusEntry.getType(), newEntry.getType()));
+                outOfFocusEntry.setType(newEntry.getType());
             }
             compound.end();
             undoManager.addEdit(compound);
@@ -188,4 +322,16 @@ public class SourceTab extends EntryEditorTab {
             LOGGER.debug("Incorrect source", ex);
         }
     }
+
+    private void listenForSaveKeybinding(KeyEvent event) {
+        keyBindingRepository.mapToKeyBinding(event).ifPresent(binding -> {
+
+            switch (binding) {
+                case SAVE_DATABASE, SAVE_ALL, SAVE_DATABASE_AS -> {
+                    storeSource(currentEntry, codeArea.textProperty().getValue());
+                }
+            }
+        });
+    }
+
 }

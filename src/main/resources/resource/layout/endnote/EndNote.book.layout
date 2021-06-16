@@ -1,9 +1,9 @@
 %0 \endnotereftype
 %0 Book
-%A \format[AuthorLastFirst,RemoveBracketsAddComma,AuthorAndsReplacer]{\author}
+%A \format[Authors(LastFirst,FullName,Semicolon,Amp)]{\author}
 %D \year
 %T \format[RemoveLatexCommands]{\title}
-%E \format[AuthorLastFirst,RemoveBracketsAddComma,AuthorAndsReplacer]{\editor}
+%E \format[Authors(LastFirst,FullName,Semicolon,Amp)]{\editor}
 %B \series
 %C \address
 %I \publisher
@@ -11,15 +11,15 @@
 %6
 %N \number
 %P \format[FormatPagesForHTML]{\pages}
-%& 
-%Y 
-%S 
+%&
+%Y
+%S
 %7 \edition
 %8 \month
 %9
-%? 
+%?
 %! \shorttitle
-%Z 
+%Z
 %@ \isbn
 %(
 %)
@@ -32,7 +32,7 @@
 %4 \crossref
 %# \owner
 %$ \key
-%F \bibtexkey
+%F \citationkey
 %K \keywords
 %X \abstract
 %Z \note

@@ -11,7 +11,6 @@ public class ISSN {
 
     private final String issnString;
 
-
     public ISSN(String issnString) {
         this.issnString = Objects.requireNonNull(issnString).trim();
     }

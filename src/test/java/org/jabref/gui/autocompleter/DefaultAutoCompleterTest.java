@@ -4,151 +4,147 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.jabref.gui.autocompleter.AutoCompleterUtil.getRequest;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class DefaultAutoCompleterTest {
+class DefaultAutoCompleterTest {
 
     private WordSuggestionProvider autoCompleter;
+    private BibDatabase database;
 
-    @SuppressWarnings("unused")
-    @Test(expected = NullPointerException.class)
-    public void initAutoCompleterWithNullFieldThrowsException() {
-        new WordSuggestionProvider(null);
-    }
-
-    @Before
-    public void setUp() throws Exception {
-        autoCompleter = new WordSuggestionProvider("field");
+    @BeforeEach
+    void setUp() throws Exception {
+        database = new BibDatabase();
+        autoCompleter = new WordSuggestionProvider(StandardField.TITLE, database);
     }
 
     @Test
-    public void completeWithoutAddingAnythingReturnsNothing() {
-        Collection<String> result = autoCompleter.call(getRequest(("test")));
-        Assert.assertEquals(Collections.emptyList(), result);
+    void initAutoCompleterWithNullFieldThrowsException() {
+        assertThrows(NullPointerException.class, () -> new WordSuggestionProvider(null, database));
     }
 
     @Test
-    public void completeAfterAddingNullReturnsNothing() {
-        autoCompleter.indexEntry(null);
-
-        Collection<String> result = autoCompleter.call(getRequest(("test")));
-        Assert.assertEquals(Collections.emptyList(), result);
+    void completeWithoutAddingAnythingReturnsNothing() {
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("test")));
+        assertEquals(Collections.emptyList(), result);
     }
 
     @Test
-    public void completeAfterAddingEmptyEntryReturnsNothing() {
+    void completeAfterAddingEmptyEntryReturnsNothing() {
         BibEntry entry = new BibEntry();
-        autoCompleter.indexEntry(entry);
+        database.insertEntry(entry);
 
-        Collection<String> result = autoCompleter.call(getRequest(("test")));
-        Assert.assertEquals(Collections.emptyList(), result);
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("test")));
+        assertEquals(Collections.emptyList(), result);
     }
 
     @Test
-    public void completeAfterAddingEntryWithoutFieldReturnsNothing() {
+    void completeAfterAddingEntryWithoutFieldReturnsNothing() {
         BibEntry entry = new BibEntry();
-        entry.setField("title", "testTitle");
-        autoCompleter.indexEntry(entry);
+        entry.setField(StandardField.AUTHOR, "testAuthor");
+        database.insertEntry(entry);
 
-        Collection<String> result = autoCompleter.call(getRequest(("test")));
-        Assert.assertEquals(Collections.emptyList(), result);
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("test")));
+        assertEquals(Collections.emptyList(), result);
     }
 
     @Test
-    public void completeValueReturnsValue() {
+    void completeValueReturnsValue() {
         BibEntry entry = new BibEntry();
-        entry.setField("field", "testValue");
-        autoCompleter.indexEntry(entry);
+        entry.setField(StandardField.TITLE, "testValue");
+        database.insertEntry(entry);
 
-        Collection<String> result = autoCompleter.call(getRequest(("testValue")));
-        Assert.assertEquals(Arrays.asList("testValue"), result);
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("testValue")));
+        assertEquals(Arrays.asList("testValue"), result);
     }
 
     @Test
-    public void completeBeginnigOfValueReturnsValue() {
+    void completeBeginningOfValueReturnsValue() {
         BibEntry entry = new BibEntry();
-        entry.setField("field", "testValue");
-        autoCompleter.indexEntry(entry);
+        entry.setField(StandardField.TITLE, "testValue");
+        database.insertEntry(entry);
 
-        Collection<String> result = autoCompleter.call(getRequest(("test")));
-        Assert.assertEquals(Arrays.asList("testValue"), result);
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("test")));
+        assertEquals(Arrays.asList("testValue"), result);
     }
 
     @Test
-    public void completeLowercaseValueReturnsValue() {
+    void completeLowercaseValueReturnsValue() {
         BibEntry entry = new BibEntry();
-        entry.setField("field", "testValue");
-        autoCompleter.indexEntry(entry);
+        entry.setField(StandardField.TITLE, "testValue");
+        database.insertEntry(entry);
 
-        Collection<String> result = autoCompleter.call(getRequest(("testvalue")));
-        Assert.assertEquals(Arrays.asList("testValue"), result);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void completeNullThrowsException() {
-        BibEntry entry = new BibEntry();
-        entry.setField("field", "testKey");
-        autoCompleter.indexEntry(entry);
-
-        autoCompleter.call(getRequest((null)));
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("testvalue")));
+        assertEquals(Arrays.asList("testValue"), result);
     }
 
     @Test
-    public void completeEmptyStringReturnsNothing() {
+    void completeNullThrowsException() {
         BibEntry entry = new BibEntry();
-        entry.setField("field", "testKey");
-        autoCompleter.indexEntry(entry);
+        entry.setField(StandardField.TITLE, "testKey");
+        database.insertEntry(entry);
 
-        Collection<String> result = autoCompleter.call(getRequest(("")));
-        Assert.assertEquals(Collections.emptyList(), result);
+        assertThrows(NullPointerException.class, () -> autoCompleter.provideSuggestions(getRequest((null))));
     }
 
     @Test
-    public void completeReturnsMultipleResults() {
+    void completeEmptyStringReturnsNothing() {
+        BibEntry entry = new BibEntry();
+        entry.setField(StandardField.TITLE, "testKey");
+        database.insertEntry(entry);
+
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("")));
+        assertEquals(Collections.emptyList(), result);
+    }
+
+    @Test
+    void completeReturnsMultipleResults() {
         BibEntry entryOne = new BibEntry();
-        entryOne.setField("field", "testValueOne");
-        autoCompleter.indexEntry(entryOne);
+        entryOne.setField(StandardField.TITLE, "testValueOne");
+        database.insertEntry(entryOne);
         BibEntry entryTwo = new BibEntry();
-        entryTwo.setField("field", "testValueTwo");
-        autoCompleter.indexEntry(entryTwo);
+        entryTwo.setField(StandardField.TITLE, "testValueTwo");
+        database.insertEntry(entryTwo);
 
-        Collection<String> result = autoCompleter.call(getRequest(("testValue")));
-        Assert.assertEquals(Arrays.asList("testValueOne", "testValueTwo"), result);
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("testValue")));
+        assertEquals(Arrays.asList("testValueOne", "testValueTwo"), result);
     }
 
     @Test
-    public void completeShortStringReturnsValue() {
+    void completeShortStringReturnsValue() {
         BibEntry entry = new BibEntry();
-        entry.setField("field", "val");
-        autoCompleter.indexEntry(entry);
+        entry.setField(StandardField.TITLE, "val");
+        database.insertEntry(entry);
 
-        Collection<String> result = autoCompleter.call(getRequest(("va")));
-        Assert.assertEquals(Collections.singletonList("val"), result);
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("va")));
+        assertEquals(Collections.singletonList("val"), result);
     }
 
     @Test
-    public void completeBeginnigOfSecondWordReturnsWord() {
+    void completeBeginnigOfSecondWordReturnsWord() {
         BibEntry entry = new BibEntry();
-        entry.setField("field", "test value");
-        autoCompleter.indexEntry(entry);
+        entry.setField(StandardField.TITLE, "test value");
+        database.insertEntry(entry);
 
-        Collection<String> result = autoCompleter.call(getRequest(("val")));
-        Assert.assertEquals(Collections.singletonList("value"), result);
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("val")));
+        assertEquals(Collections.singletonList("value"), result);
     }
 
     @Test
-    public void completePartOfWordReturnsValue() {
+    void completePartOfWordReturnsValue() {
         BibEntry entry = new BibEntry();
-        entry.setField("field", "test value");
-        autoCompleter.indexEntry(entry);
+        entry.setField(StandardField.TITLE, "test value");
+        database.insertEntry(entry);
 
-        Collection<String> result = autoCompleter.call(getRequest(("lue")));
-        Assert.assertEquals(Collections.singletonList("value"), result);
+        Collection<String> result = autoCompleter.provideSuggestions(getRequest(("lue")));
+        assertEquals(Collections.singletonList("value"), result);
     }
 }

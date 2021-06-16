@@ -2,10 +2,10 @@ package org.jabref.logic.formatter.bibtexfields;
 
 import java.util.Objects;
 
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.cleanup.Formatter;
 
-public class ClearFormatter implements Formatter {
+public class ClearFormatter extends Formatter {
 
     @Override
     public String getName() {
@@ -32,5 +32,4 @@ public class ClearFormatter implements Formatter {
     public String getExampleInput() {
         return "Obsolete text";
     }
-
 }

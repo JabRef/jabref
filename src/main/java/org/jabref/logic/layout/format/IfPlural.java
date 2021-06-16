@@ -5,18 +5,15 @@ import java.util.List;
 import org.jabref.logic.layout.AbstractParamLayoutFormatter;
 
 /**
- * @author ralmond
- *
  * This formatter takes two arguments and examines the field text.
  * If the field text represents multiple individuals, that is it contains the string "and"
  * then the field text is replaced with the first argument, otherwise it is replaced with the second.
  * For example:
  *
+ * <p>
  * \format[IfPlural(Eds.,Ed.)]{\editor}
- *
+ * <p>
  * Should expand to 'Eds.' if the document has more than one editor and 'Ed.' if it only has one.
- *
- *
  */
 public class IfPlural extends AbstractParamLayoutFormatter {
 
@@ -32,7 +29,6 @@ public class IfPlural extends AbstractParamLayoutFormatter {
         }
         pluralText = parts.get(0);
         singularText = parts.get(1);
-
     }
 
     @Override
@@ -46,5 +42,4 @@ public class IfPlural extends AbstractParamLayoutFormatter {
             return singularText;
         }
     }
-
 }

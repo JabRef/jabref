@@ -1,78 +1,119 @@
 package org.jabref.model.database;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.types.IEEETranEntryType;
+import org.jabref.model.metadata.MetaData;
+import org.jabref.preferences.FilePreferences;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class BibDatabaseContextTest {
+class BibDatabaseContextTest {
 
     private Path currentWorkingDir;
 
-    // Store the minimal preferences for the
-    // BibDatabaseContext.getFileDirectories(File,
-    // FileDirectoryPreferences) incocation:
-    private FileDirectoryPreferences fileDirPrefs;
+    private FilePreferences fileDirPrefs;
 
-    @Rule public ExpectedException thrown = ExpectedException.none();
-
-    @Before
-    public void setUp() {
-        fileDirPrefs = mock(FileDirectoryPreferences.class);
-        currentWorkingDir = Paths.get(System.getProperty("user.dir"));
-        when(fileDirPrefs.isBibLocationAsPrimary()).thenReturn(true);
+    @BeforeEach
+    void setUp() {
+        fileDirPrefs = mock(FilePreferences.class);
+        currentWorkingDir = Path.of(System.getProperty("user.dir"));
+        when(fileDirPrefs.shouldStoreFilesRelativeToBib()).thenReturn(true);
     }
 
     @Test
-    public void getFileDirectoriesWithEmptyDbParent() {
-        BibDatabaseContext dbContext = new BibDatabaseContext();
-        dbContext.setDatabaseFile(Paths.get("biblio.bib").toFile());
-        List<String> fileDirectories = dbContext.getFileDirectories("file", fileDirPrefs);
-        assertEquals(Collections.singletonList(currentWorkingDir.toString()),
-                fileDirectories);
+    void getFileDirectoriesWithEmptyDbParent() {
+        BibDatabaseContext database = new BibDatabaseContext();
+        database.setDatabasePath(Path.of("biblio.bib"));
+        assertEquals(Collections.singletonList(currentWorkingDir),
+                database.getFileDirectories(fileDirPrefs));
     }
 
     @Test
-    public void getFileDirectoriesWithRelativeDbParent() {
-        Path file = Paths.get("relative/subdir").resolve("biblio.bib");
+    void getFileDirectoriesWithRelativeDbParent() {
+        Path file = Path.of("relative/subdir").resolve("biblio.bib");
 
-        BibDatabaseContext dbContext = new BibDatabaseContext();
-        dbContext.setDatabaseFile(file.toFile());
-        List<String> fileDirectories = dbContext.getFileDirectories("file", fileDirPrefs);
-        assertEquals(Collections.singletonList(currentWorkingDir.resolve(file.getParent()).toString()),
-                fileDirectories);
+        BibDatabaseContext database = new BibDatabaseContext();
+        database.setDatabasePath(file);
+        assertEquals(Collections.singletonList(currentWorkingDir.resolve(file.getParent())),
+                database.getFileDirectories(fileDirPrefs));
     }
 
     @Test
-    public void getFileDirectoriesWithRelativeDottedDbParent() {
-        Path file = Paths.get("./relative/subdir").resolve("biblio.bib");
+    void getFileDirectoriesWithRelativeDottedDbParent() {
+        Path file = Path.of("./relative/subdir").resolve("biblio.bib");
 
-        BibDatabaseContext dbContext = new BibDatabaseContext();
-        dbContext.setDatabaseFile(file.toFile());
-        List<String> fileDirectories = dbContext.getFileDirectories("file", fileDirPrefs);
-        assertEquals(Collections.singletonList(currentWorkingDir.resolve(file.getParent()).toString()),
-                fileDirectories);
+        BibDatabaseContext database = new BibDatabaseContext();
+        database.setDatabasePath(file);
+        assertEquals(Collections.singletonList(currentWorkingDir.resolve(file.getParent())),
+                database.getFileDirectories(fileDirPrefs));
     }
 
     @Test
-    public void getFileDirectoriesWithAbsoluteDbParent() {
-        Path file = Paths.get("/absolute/subdir").resolve("biblio.bib");
+    void getFileDirectoriesWithAbsoluteDbParent() {
+        Path file = Path.of("/absolute/subdir").resolve("biblio.bib");
 
-        BibDatabaseContext dbContext = new BibDatabaseContext();
-        dbContext.setDatabaseFile(file.toFile());
-        List<String> fileDirectories = dbContext.getFileDirectories("file", fileDirPrefs);
-        assertEquals(Collections.singletonList(currentWorkingDir.resolve(file.getParent()).toString()),
-                fileDirectories);
+        BibDatabaseContext database = new BibDatabaseContext();
+        database.setDatabasePath(file);
+        assertEquals(Collections.singletonList(currentWorkingDir.resolve(file.getParent())),
+                database.getFileDirectories(fileDirPrefs));
+    }
+
+    @Test
+    void getFileDirectoriesWithRelativeMetadata() {
+        Path file = Path.of("/absolute/subdir").resolve("biblio.bib");
+
+        BibDatabaseContext database = new BibDatabaseContext();
+        database.setDatabasePath(file);
+        database.getMetaData().setDefaultFileDirectory("../Literature");
+        assertEquals(Arrays.asList(currentWorkingDir.resolve(file.getParent()), Path.of("/absolute/Literature").toAbsolutePath()),
+                database.getFileDirectories(fileDirPrefs));
+    }
+
+    @Test
+    void getFileDirectoriesWithMetadata() {
+        Path file = Path.of("/absolute/subdir").resolve("biblio.bib");
+
+        BibDatabaseContext database = new BibDatabaseContext();
+        database.setDatabasePath(file);
+        database.getMetaData().setDefaultFileDirectory("Literature");
+        assertEquals(Arrays.asList(currentWorkingDir.resolve(file.getParent()), Path.of("/absolute/subdir/Literature").toAbsolutePath()),
+                database.getFileDirectories(fileDirPrefs));
+    }
+
+    @Test
+    void testTypeBasedOnDefaultBiblatex() {
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData());
+        assertEquals(BibDatabaseMode.BIBLATEX, bibDatabaseContext.getMode());
+
+        bibDatabaseContext.setMode(BibDatabaseMode.BIBLATEX);
+        assertEquals(BibDatabaseMode.BIBLATEX, bibDatabaseContext.getMode());
+    }
+
+    @Test
+    void testTypeBasedOnDefaultBibtex() {
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData());
+        assertEquals(BibDatabaseMode.BIBLATEX, bibDatabaseContext.getMode());
+
+        bibDatabaseContext.setMode(BibDatabaseMode.BIBTEX);
+        assertEquals(BibDatabaseMode.BIBTEX, bibDatabaseContext.getMode());
+    }
+
+    @Test
+    void testTypeBasedOnInferredModeBiblatex() {
+        BibDatabase db = new BibDatabase();
+        BibEntry e1 = new BibEntry(IEEETranEntryType.Electronic);
+        db.insertEntry(e1);
+
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(db);
+        assertEquals(BibDatabaseMode.BIBLATEX, bibDatabaseContext.getMode());
     }
 }

@@ -10,27 +10,29 @@ import org.jabref.model.strings.StringUtil;
 
 public class PagesChecker implements ValueChecker {
 
-    private static final String PAGES_EXP_BIBTEX = "" + "\\A" // begin String
-            + "\\d+" // number
-            + "(?:" // non-capture group
-            + "\\+|\\-{2}\\d+" // + or --number (range)
-            + ")?" // optional group
-            + "(?:" // non-capture group
-            + "," // comma
-            + "\\d+(?:\\+|\\-{2}\\d+)?" // repeat former pattern
-            + ")*" // repeat group 0,*
-            + "\\z"; // end String
+    private static final String PAGES_EXP_BIBTEX = ""
+            + "\\A"                 // begin String
+            + "("
+            + "[A-Za-z]?\\d*"     // optional prefix and number
+            + "("
+            + "\\+|-{2}"    // separator
+            + "[A-Za-z]?\\d*" // optional prefix and number
+            + ")?"
+            + ",?"                // page range separation
+            + ")*"
+            + "\\z";                // end String
 
-    private static final String PAGES_EXP_BIBLATEX = "" + "\\A" // begin String
-            + "\\d+" // number
-            + "(?:" // non-capture group
-            + "\\+|\\-{1,2}\\d+" // + or --number (range)
-            + ")?" // optional group
-            + "(?:" // non-capture group
-            + "," // comma
-            + "\\d+(?:\\+|\\-{1,2}\\d+)?" // repeat former pattern
-            + ")*" // repeat group 0,*
-            + "\\z"; // end String
+    private static final String PAGES_EXP_BIBLATEX = ""
+            + "\\A"                 // begin String
+            + "("
+            + "[A-Za-z]?\\d*"     // optional prefix and number
+            + "("
+            + "\\+|-{1,2}|\u2013" // separator
+            + "[A-Za-z]?\\d*" // optional prefix and number
+            + ")?"
+            + ",?"                // page range separation
+            + ")*"
+            + "\\z";                // end String
 
     private final Predicate<String> isValidPageNumber;
 

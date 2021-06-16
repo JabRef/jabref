@@ -1,5 +1,8 @@
 package org.jabref.logic.remote;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 /**
  * Place for handling the preferences for the remote communication
  */
@@ -7,7 +10,6 @@ public class RemotePreferences {
 
     private int port;
     private boolean useRemoteServer;
-
 
     public RemotePreferences(int port, boolean useRemoteServer) {
         this.port = port;
@@ -34,4 +36,10 @@ public class RemotePreferences {
         return getPort() != otherPort;
     }
 
+    /**
+     * Gets the IP address where the remote server is listening.
+     */
+    public static InetAddress getIpAddress() throws UnknownHostException {
+        return InetAddress.getByName("localhost");
+    }
 }

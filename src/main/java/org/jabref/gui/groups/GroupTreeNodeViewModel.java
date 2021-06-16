@@ -1,22 +1,12 @@
 package org.jabref.gui.groups;
 
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.swing.Icon;
-import javax.swing.JTree;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoManager;
 
-import org.jabref.gui.IconTheme;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
@@ -31,26 +21,9 @@ import org.jabref.model.groups.SearchGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GroupTreeNodeViewModel implements Transferable, TreeNode {
+public class GroupTreeNodeViewModel {
 
-    public static final DataFlavor FLAVOR;
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupTreeNodeViewModel.class);
-    private static final Icon GROUP_REFINING_ICON = IconTheme.JabRefIcon.GROUP_REFINING.getSmallIcon();
-    private static final Icon GROUP_INCLUDING_ICON = IconTheme.JabRefIcon.GROUP_INCLUDING.getSmallIcon();
-    private static final Icon GROUP_REGULAR_ICON = null;
-    private static final DataFlavor[] FLAVORS;
-
-    static {
-        DataFlavor df = null;
-        try {
-            df = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType
-                    + ";class=" + GroupTreeNode.class.getCanonicalName());
-        } catch (ClassNotFoundException e) {
-            LOGGER.error("Creating DataFlavor failed. This should not happen.", e);
-        }
-        FLAVOR = df;
-        FLAVORS = new DataFlavor[] {GroupTreeNodeViewModel.FLAVOR};
-    }
 
     private final GroupTreeNode node;
 
@@ -66,88 +39,8 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         return sb.toString();
     }
 
-    @Override
-    public DataFlavor[] getTransferDataFlavors() {
-        return GroupTreeNodeViewModel.FLAVORS;
-    }
-
-    @Override
-    public boolean isDataFlavorSupported(DataFlavor someFlavor) {
-        return someFlavor.equals(GroupTreeNodeViewModel.FLAVOR);
-    }
-
-    @Override
-    public Object getTransferData(DataFlavor someFlavor)
-            throws UnsupportedFlavorException, IOException {
-        if (!isDataFlavorSupported(someFlavor)) {
-            throw new UnsupportedFlavorException(someFlavor);
-        }
-        return this;
-    }
-
-    @Override
-    public TreeNode getChildAt(int childIndex) {
-        return node.getChildAt(childIndex).map(GroupTreeNodeViewModel::new).orElse(null);
-    }
-
-    @Override
-    public int getChildCount() {
-        return node.getNumberOfChildren();
-    }
-
-    @Override
-    public TreeNode getParent() {
-        return node.getParent().map(GroupTreeNodeViewModel::new).orElse(null);
-    }
-
-    @Override
-    public int getIndex(TreeNode child) {
-        if (!(child instanceof GroupTreeNodeViewModel)) {
-            return -1;
-        }
-
-        GroupTreeNodeViewModel childViewModel = (GroupTreeNodeViewModel) child;
-        return node.getIndexOfChild(childViewModel.getNode()).orElse(-1);
-    }
-
-    @Override
-    public boolean getAllowsChildren() {
-        return true;
-    }
-
-    @Override
-    public boolean isLeaf() {
-        return node.isLeaf();
-    }
-
-    @Override
-    public Enumeration<GroupTreeNodeViewModel> children() {
-        Iterable<GroupTreeNode> children = node.getChildren();
-        return new Enumeration<GroupTreeNodeViewModel>() {
-
-            @Override
-            public boolean hasMoreElements() {
-                return children.iterator().hasNext();
-            }
-
-            @Override
-            public GroupTreeNodeViewModel nextElement() {
-                return new GroupTreeNodeViewModel(children.iterator().next());
-            }
-        };
-    }
-
     public GroupTreeNode getNode() {
         return node;
-    }
-
-    /** Expand this node and all its children. */
-    public void expandSubtree(JTree tree) {
-        tree.expandPath(this.getTreePath());
-
-        for (GroupTreeNodeViewModel child : getChildren()) {
-            child.expandSubtree(tree);
-        }
     }
 
     public List<GroupTreeNodeViewModel> getChildren() {
@@ -176,11 +69,6 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
             shortDescription = GroupDescriptions.getShortDescriptionAllEntriesGroup();
         }
         return "<html>" + shortDescription + "</html>";
-    }
-
-    public TreePath getTreePath() {
-        List<GroupTreeNode> pathToNode = node.getPathFromRoot();
-        return new TreePath(pathToNode.stream().map(GroupTreeNodeViewModel::new).toArray());
     }
 
     public boolean canAddEntries(List<BibEntry> entries) {
@@ -298,8 +186,10 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         GroupTreeNode newNode = GroupTreeNode.fromGroup(newGroup);
         this.getNode().addChild(newNode);
 
-        UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(this,
-                new GroupTreeNodeViewModel(newNode), UndoableAddOrRemoveGroup.ADD_NODE);
+        UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(
+                this,
+                new GroupTreeNodeViewModel(newNode),
+                UndoableAddOrRemoveGroup.ADD_NODE);
         undoManager.addEdit(undo);
     }
 

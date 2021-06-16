@@ -52,7 +52,7 @@ public class FileAnnotation {
      * @param pageNumber The page of the pdf where the annotation occurs
      */
     public FileAnnotation(final PDAnnotation annotation, final int pageNumber) {
-        this(annotation.getDictionary().getString(COSName.T),
+        this(annotation.getCOSObject().getString(COSName.T),
                 extractModifiedTime(annotation.getModifiedDate()),
                 pageNumber, annotation.getContents(), FileAnnotationType.parse(annotation), Optional.empty());
     }
@@ -66,7 +66,7 @@ public class FileAnnotation {
      * @param linkedFileAnnotation The corresponding note of a marked text area.
      */
     public FileAnnotation(final PDAnnotation annotation, final int pageNumber, FileAnnotation linkedFileAnnotation) {
-        this(annotation.getDictionary().getString(COSName.T), extractModifiedTime(annotation.getModifiedDate()),
+        this(annotation.getCOSObject().getString(COSName.T), extractModifiedTime(annotation.getModifiedDate()),
                 pageNumber, annotation.getContents(), FileAnnotationType.parse(annotation), Optional.of(linkedFileAnnotation));
     }
 

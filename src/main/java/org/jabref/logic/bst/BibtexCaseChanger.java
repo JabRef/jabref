@@ -30,13 +30,13 @@ public final class BibtexCaseChanger {
         // However, we decided against it and will probably do the other way round: https://github.com/JabRef/jabref/pull/215#issuecomment-146981624
 
         // Each word should start with a capital letter
-        //EACH_FIRST_UPPERS('f'),
+        // EACH_FIRST_UPPERS('f'),
 
         // Converts all words to upper case, but converts articles, prepositions, and conjunctions to lower case
         // Capitalizes first and last word
         // Does not change words starting with "{"
         // DIFFERENCE to old CaseChangers.TITLE: last word is NOT capitalized in all cases
-        //TITLE_UPPERS('T');
+        // TITLE_UPPERS('T');
 
         private final char asChar;
 
@@ -47,7 +47,6 @@ public final class BibtexCaseChanger {
         public char asChar() {
             return asChar;
         }
-
 
         /**
          * Convert bstFormat char into ENUM
@@ -70,9 +69,8 @@ public final class BibtexCaseChanger {
     /**
      * Changes case of the given string s
      *
-     * @param s the string to handle
+     * @param s      the string to handle
      * @param format the format
-     * @return
      */
     public static String changeCase(String s, FORMAT_MODE format) {
         return (new BibtexCaseChanger()).doChangeCase(s, format);
@@ -139,7 +137,7 @@ public final class BibtexCaseChanger {
      * special with |colon|s.
      *
      * @param c
-     * @param i the current position. It points to the opening brace
+     * @param start  the current position. It points to the opening brace
      * @param format
      * @return
      */
@@ -188,30 +186,30 @@ public final class BibtexCaseChanger {
         pos += s.length();
 
         switch (format) {
-        case TITLE_LOWERS:
-        case ALL_LOWERS:
-            if ("L O OE AE AA".contains(s)) {
-                sb.append(s.toLowerCase(Locale.ROOT));
-            } else {
-                sb.append(s);
-            }
-            break;
-        case ALL_UPPERS:
-            if ("l o oe ae aa".contains(s)) {
-                sb.append(s.toUpperCase(Locale.ROOT));
-            } else if ("i j ss".contains(s)) {
-                sb.deleteCharAt(sb.length() - 1); // Kill backslash
-                sb.append(s.toUpperCase(Locale.ROOT));
-                while ((pos < c.length) && Character.isWhitespace(c[pos])) {
-                    pos++;
+            case TITLE_LOWERS:
+            case ALL_LOWERS:
+                if ("L O OE AE AA".contains(s)) {
+                    sb.append(s.toLowerCase(Locale.ROOT));
+                } else {
+                    sb.append(s);
                 }
-            } else {
-                sb.append(s);
-            }
-            break;
-        default:
-            LOGGER.info("convertAccented - Unknown format: " + format);
-            break;
+                break;
+            case ALL_UPPERS:
+                if ("l o oe ae aa".contains(s)) {
+                    sb.append(s.toUpperCase(Locale.ROOT));
+                } else if ("i j ss".contains(s)) {
+                    sb.deleteCharAt(sb.length() - 1); // Kill backslash
+                    sb.append(s.toUpperCase(Locale.ROOT));
+                    while ((pos < c.length) && Character.isWhitespace(c[pos])) {
+                        pos++;
+                    }
+                } else {
+                    sb.append(s);
+                }
+                break;
+            default:
+                LOGGER.info("convertAccented - Unknown format: " + format);
+                break;
         }
         return pos;
     }
@@ -219,18 +217,18 @@ public final class BibtexCaseChanger {
     private int convertNonControl(char[] c, int start, StringBuilder sb, FORMAT_MODE format) {
         int pos = start;
         switch (format) {
-        case TITLE_LOWERS:
-        case ALL_LOWERS:
-            sb.append(Character.toLowerCase(c[pos]));
-            pos++;
-            break;
-        case ALL_UPPERS:
-            sb.append(Character.toUpperCase(c[pos]));
-            pos++;
-            break;
-        default:
-            LOGGER.info("convertNonControl - Unknown format: " + format);
-            break;
+            case TITLE_LOWERS:
+            case ALL_LOWERS:
+                sb.append(Character.toLowerCase(c[pos]));
+                pos++;
+                break;
+            case ALL_UPPERS:
+                sb.append(Character.toUpperCase(c[pos]));
+                pos++;
+                break;
+            default:
+                LOGGER.info("convertNonControl - Unknown format: " + format);
+                break;
         }
         return pos;
     }
@@ -238,27 +236,27 @@ public final class BibtexCaseChanger {
     private int convertCharIfBraceLevelIsZero(char[] c, int start, StringBuilder sb, FORMAT_MODE format) {
         int i = start;
         switch (format) {
-        case TITLE_LOWERS:
-            if ((i == 0) || (prevColon && Character.isWhitespace(c[i - 1]))) {
-                sb.append(c[i]);
-            } else {
+            case TITLE_LOWERS:
+                if ((i == 0) || (prevColon && Character.isWhitespace(c[i - 1]))) {
+                    sb.append(c[i]);
+                } else {
+                    sb.append(Character.toLowerCase(c[i]));
+                }
+                if (c[i] == ':') {
+                    prevColon = true;
+                } else if (!Character.isWhitespace(c[i])) {
+                    prevColon = false;
+                }
+                break;
+            case ALL_LOWERS:
                 sb.append(Character.toLowerCase(c[i]));
-            }
-            if (c[i] == ':') {
-                prevColon = true;
-            } else if (!Character.isWhitespace(c[i])) {
-                prevColon = false;
-            }
-            break;
-        case ALL_LOWERS:
-            sb.append(Character.toLowerCase(c[i]));
-            break;
-        case ALL_UPPERS:
-            sb.append(Character.toUpperCase(c[i]));
-            break;
-        default:
-            LOGGER.info("convertCharIfBraceLevelIsZero - Unknown format: " + format);
-            break;
+                break;
+            case ALL_UPPERS:
+                sb.append(Character.toUpperCase(c[i]));
+                break;
+            default:
+                LOGGER.info("convertCharIfBraceLevelIsZero - Unknown format: " + format);
+                break;
         }
         i++;
         return i;
@@ -268,9 +266,10 @@ public final class BibtexCaseChanger {
      * Determine whether there starts a special char at pos (e.g., oe, AE). Return it as string.
      * If nothing found, return Optional.empty()
      *
+     * <p>
      * Also used by BibtexPurify
      *
-     * @param c the current "String"
+     * @param c   the current "String"
      * @param pos the position
      * @return the special LaTeX character or null
      */

@@ -6,6 +6,7 @@ import java.util.List;
 import javafx.scene.paint.Color;
 
 import org.jabref.logic.util.MetadataSerializationConfiguration;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AllEntriesGroup;
 import org.jabref.model.groups.AutomaticGroup;
@@ -16,10 +17,11 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
+import org.jabref.model.groups.TexGroup;
 import org.jabref.model.strings.StringUtil;
 
 public class GroupSerializer {
-    private static String serializeAllEntriesGroup(AllEntriesGroup group) {
+    private static String serializeAllEntriesGroup() {
         return MetadataSerializationConfiguration.ALL_ENTRIES_GROUP_ID;
     }
 
@@ -44,7 +46,7 @@ public class GroupSerializer {
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         sb.append(group.getHierarchicalContext().ordinal());
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
-        sb.append(StringUtil.quote(group.getSearchField(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
+        sb.append(StringUtil.quote(group.getSearchField().getName(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         sb.append(StringUtil.quote(group.getSearchExpression(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
@@ -113,27 +115,44 @@ public class GroupSerializer {
 
     private String serializeGroup(AbstractGroup group) {
         if (group instanceof AllEntriesGroup) {
-            return serializeAllEntriesGroup((AllEntriesGroup)group);
+            return serializeAllEntriesGroup();
         } else if (group instanceof ExplicitGroup) {
-            return serializeExplicitGroup((ExplicitGroup)group);
+            return serializeExplicitGroup((ExplicitGroup) group);
         } else if (group instanceof KeywordGroup) {
-            return serializeKeywordGroup((KeywordGroup)group);
+            return serializeKeywordGroup((KeywordGroup) group);
         } else if (group instanceof SearchGroup) {
-            return serializeSearchGroup((SearchGroup)group);
+            return serializeSearchGroup((SearchGroup) group);
         } else if (group instanceof AutomaticKeywordGroup) {
-            return serializeAutomaticKeywordGroup((AutomaticKeywordGroup)group);
+            return serializeAutomaticKeywordGroup((AutomaticKeywordGroup) group);
         } else if (group instanceof AutomaticPersonsGroup) {
-            return serializeAutomaticPersonsGroup((AutomaticPersonsGroup)group);
+            return serializeAutomaticPersonsGroup((AutomaticPersonsGroup) group);
+        } else if (group instanceof TexGroup) {
+            return serializeTexGroup((TexGroup) group);
         } else {
             throw new UnsupportedOperationException("Don't know how to serialize group" + group.getClass().getName());
         }
+    }
+
+    private String serializeTexGroup(TexGroup group) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(MetadataSerializationConfiguration.TEX_GROUP_ID);
+        sb.append(StringUtil.quote(group.getName(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
+        sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+        sb.append(group.getHierarchicalContext().ordinal());
+        sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+        sb.append(StringUtil.quote(FileUtil.toPortableString(group.getFilePath()), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
+        sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
+
+        appendGroupDetails(sb, group);
+
+        return sb.toString();
     }
 
     private String serializeAutomaticPersonsGroup(AutomaticPersonsGroup group) {
         StringBuilder sb = new StringBuilder();
         sb.append(MetadataSerializationConfiguration.AUTOMATIC_PERSONS_GROUP_ID);
         appendAutomaticGroupDetails(sb, group);
-        sb.append(StringUtil.quote(group.getField(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
+        sb.append(StringUtil.quote(group.getField().getName(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         appendGroupDetails(sb, group);
         return sb.toString();
@@ -150,11 +169,11 @@ public class GroupSerializer {
         StringBuilder sb = new StringBuilder();
         sb.append(MetadataSerializationConfiguration.AUTOMATIC_KEYWORD_GROUP_ID);
         appendAutomaticGroupDetails(sb, group);
-        sb.append(StringUtil.quote(group.getField(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
+        sb.append(StringUtil.quote(group.getField().getName(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
-        sb.append(group.getKeywordDelimiter());
+        sb.append(StringUtil.quote(group.getKeywordDelimiter().toString(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
-        sb.append(group.getKeywordHierarchicalDelimiter());
+        sb.append(StringUtil.quote(group.getKeywordHierarchicalDelimiter().toString(), MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR));
         sb.append(MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR);
         appendGroupDetails(sb, group);
         return sb.toString();

@@ -1,32 +1,24 @@
 package org.jabref.gui.documentviewer;
 
-import java.awt.event.ActionEvent;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.actions.ActionHelper;
+import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.preferences.PreferencesService;
 
-import javax.swing.Action;
-import javax.swing.Icon;
+import com.airhacks.afterburner.injection.Injector;
 
-import javafx.application.Platform;
+import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 
-import org.jabref.gui.IconTheme;
-import org.jabref.gui.actions.MnemonicAwareAction;
-import org.jabref.logic.l10n.Localization;
+public class ShowDocumentViewerAction extends SimpleCommand {
 
-public class ShowDocumentViewerAction extends MnemonicAwareAction {
-
-    public ShowDocumentViewerAction(String title, String tooltip, Icon iconFile) {
-        super(iconFile);
-        putValue(Action.NAME, title);
-        putValue(Action.SHORT_DESCRIPTION, tooltip);
-    }
-
-    public ShowDocumentViewerAction() {
-        this(Localization.menuTitle("Show document viewer"), Localization.lang("Show document viewer"),
-                IconTheme.JabRefIcon.PDF_FILE.getIcon());
+    public ShowDocumentViewerAction(StateManager stateManager, PreferencesService preferences) {
+        this.executable.bind(needsEntriesSelected(stateManager).and(ActionHelper.isFilePresentForSelectedEntry(stateManager, preferences)));
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        Platform.runLater(() -> new DocumentViewerView().show());
+    public void execute() {
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+        dialogService.showCustomDialog(new DocumentViewerView());
     }
-
 }

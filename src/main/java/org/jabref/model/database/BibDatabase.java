@@ -21,16 +21,17 @@ import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.model.database.event.EntryAddedEvent;
-import org.jabref.model.database.event.EntryRemovedEvent;
+import org.jabref.model.database.event.EntriesAddedEvent;
+import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
-import org.jabref.model.entry.FieldName;
-import org.jabref.model.entry.InternalBibtexFields;
 import org.jabref.model.entry.Month;
+import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
-import org.jabref.model.entry.event.EntryEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.eventbus.EventBus;
@@ -39,32 +40,33 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A bibliography database.
+ * A bibliography database. This is the "bib" file (or the library stored in a shared SQL database)
  */
 public class BibDatabase {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabase.class);
     private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
+
     /**
      * State attributes
      */
-    private final ObservableList<BibEntry> entries = FXCollections.synchronizedObservableList(FXCollections.observableArrayList());
-    private final Map<String, BibtexString> bibtexStrings = new ConcurrentHashMap<>();
-    /**
-     * this is kept in sync with the database (upon adding/removing an entry, it is updated as well)
-     */
-    private final DuplicationChecker duplicationChecker = new DuplicationChecker();
-    /**
-     * contains all entry.getID() of the current database
-     */
-    private final Set<String> internalIDs = new HashSet<>();
+    private final ObservableList<BibEntry> entries = FXCollections.synchronizedObservableList(FXCollections.observableArrayList(BibEntry::getObservables));
+    private Map<String, BibtexString> bibtexStrings = new ConcurrentHashMap<>();
+
     private final EventBus eventBus = new EventBus();
+
     private String preamble;
+
     // All file contents below the last entry in the file
     private String epilog = "";
     private String sharedDatabaseID;
 
+    public BibDatabase(List<BibEntry> entries) {
+        this();
+        insertEntries(entries);
+    }
+
     public BibDatabase() {
-        this.eventBus.register(duplicationChecker);
         this.registerListener(new KeyChangeListener(this));
     }
 
@@ -73,7 +75,7 @@ public class BibDatabase {
      * @param database  maybenull The database to use for resolving the text.
      * @return The resolved text or the original text if either the text or the database are null
      * @deprecated use  {@link BibDatabase#resolveForStrings(String)}
-     *
+     * <p>
      * Returns a text with references resolved according to an optionally given database.
      */
     @Deprecated
@@ -112,7 +114,7 @@ public class BibDatabase {
      * Returns whether an entry with the given ID exists (-> entry_type + hashcode).
      */
     public boolean containsEntryWithId(String id) {
-        return internalIDs.contains(id);
+        return entries.stream().anyMatch(entry -> entry.getId().equals(id));
     }
 
     public ObservableList<BibEntry> getEntries() {
@@ -125,21 +127,21 @@ public class BibDatabase {
      *
      * @return set of fieldnames, that are visible
      */
-    public Set<String> getAllVisibleFields() {
-        Set<String> allFields = new TreeSet<>();
+    public Set<Field> getAllVisibleFields() {
+        Set<Field> allFields = new TreeSet<>(Comparator.comparing(Field::getName));
         for (BibEntry e : getEntries()) {
-            allFields.addAll(e.getFieldNames());
+            allFields.addAll(e.getFields());
         }
-        return allFields.stream().filter(field -> !InternalBibtexFields.isInternalField(field))
-                .collect(Collectors.toSet());
+        return allFields.stream().filter(field -> !FieldFactory.isInternalField(field))
+                        .collect(Collectors.toSet());
     }
 
     /**
-     * Returns the entry with the given bibtex key.
+     * Returns the entry with the given citation key.
      */
-    public synchronized Optional<BibEntry> getEntryByKey(String key) {
+    public synchronized Optional<BibEntry> getEntryByCitationKey(String key) {
         for (BibEntry entry : entries) {
-            if (key.equals(entry.getCiteKeyOptional().orElse(null))) {
+            if (key.equals(entry.getCitationKey().orElse(null))) {
                 return Optional.of(entry);
             }
         }
@@ -147,17 +149,16 @@ public class BibDatabase {
     }
 
     /**
-     * Collects entries having the specified BibTeX key and returns these entries as list.
+     * Collects entries having the specified citation key and returns these entries as list.
      * The order of the entries is the order they appear in the database.
      *
-     * @param key
      * @return list of entries that contains the given key
      */
-    public synchronized List<BibEntry> getEntriesByKey(String key) {
+    public synchronized List<BibEntry> getEntriesByCitationKey(String key) {
         List<BibEntry> result = new ArrayList<>();
 
         for (BibEntry entry : entries) {
-            entry.getCiteKeyOptional().ifPresent(entryKey -> {
+            entry.getCitationKey().ifPresent(entryKey -> {
                 if (key.equals(entryKey)) {
                     result.add(entry);
                 }
@@ -167,89 +168,80 @@ public class BibDatabase {
     }
 
     /**
-     * Finds the entry with a specified ID.
+     * Inserts the entry.
      *
-     * @param id
-     * @return The entry that has the given id
+     * @param entry entry to insert
      */
-    public synchronized Optional<BibEntry> getEntryById(String id) {
-        return entries.stream().filter(entry -> entry.getId().equals(id)).findFirst();
+    public synchronized void insertEntry(BibEntry entry) {
+        insertEntry(entry, EntriesEventSource.LOCAL);
     }
 
     /**
-     * Inserts the entry, given that its ID is not already in use.
-     * use Util.createId(...) to make up a unique ID for an entry.
+     * Inserts the entry.
      *
-     * @param entry BibEntry to insert into the database
-     * @return false if the insert was done without a duplicate warning
-     * @throws KeyCollisionException thrown if the entry id ({@link BibEntry#getId()}) is already  present in the database
+     * @param entry       entry to insert
+     * @param eventSource source the event is sent from
      */
-    public synchronized boolean insertEntry(BibEntry entry) throws KeyCollisionException {
-        return insertEntry(entry, EntryEventSource.LOCAL);
-    }
-
-    /**
-     * Inserts the entry, given that its ID is not already in use.
-     * use Util.createId(...) to make up a unique ID for an entry.
-     *
-     * @param entry BibEntry to insert
-     * @param eventSource Source the event is sent from
-     * @return false if the insert was done without a duplicate warning
-     */
-    public synchronized boolean insertEntry(BibEntry entry, EntryEventSource eventSource) throws KeyCollisionException {
+    public synchronized void insertEntry(BibEntry entry, EntriesEventSource eventSource) {
         insertEntries(Collections.singletonList(entry), eventSource);
-        return duplicationChecker.isDuplicateCiteKeyExisting(entry);
     }
 
-    public synchronized void insertEntries(BibEntry... entries) throws KeyCollisionException {
-        insertEntries(Arrays.asList(entries), EntryEventSource.LOCAL);
+    public synchronized void insertEntries(BibEntry... entries) {
+        insertEntries(Arrays.asList(entries), EntriesEventSource.LOCAL);
     }
 
-    public synchronized void insertEntries(List<BibEntry> entries) throws KeyCollisionException {
-        insertEntries(entries, EntryEventSource.LOCAL);
+    public synchronized void insertEntries(List<BibEntry> entries) {
+        insertEntries(entries, EntriesEventSource.LOCAL);
     }
 
-    private synchronized void insertEntries(List<BibEntry> newEntries, EntryEventSource eventSource) throws KeyCollisionException {
+    public synchronized void insertEntries(List<BibEntry> newEntries, EntriesEventSource eventSource) {
         Objects.requireNonNull(newEntries);
-
         for (BibEntry entry : newEntries) {
-            String id = entry.getId();
-            if (containsEntryWithId(id)) {
-                throw new KeyCollisionException("ID is already in use, please choose another");
-            }
-
-            internalIDs.add(id);
             entry.registerListener(this);
-
-            eventBus.post(new EntryAddedEvent(entry, eventSource));
+        }
+        if (newEntries.isEmpty()) {
+            eventBus.post(new EntriesAddedEvent(newEntries, eventSource));
+        } else {
+            eventBus.post(new EntriesAddedEvent(newEntries, newEntries.get(0), eventSource));
         }
         entries.addAll(newEntries);
     }
 
+    public synchronized void removeEntry(BibEntry bibEntry) {
+        removeEntries(Collections.singletonList(bibEntry));
+    }
 
-    /**
-     * Removes the given entry.
-     * The Entry is removed based on the id {@link BibEntry#id}
-     * @param toBeDeleted Entry to delete
-     */
-    public synchronized void removeEntry(BibEntry toBeDeleted) {
-        removeEntry(toBeDeleted, EntryEventSource.LOCAL);
+    public synchronized void removeEntry(BibEntry bibEntry, EntriesEventSource eventSource) {
+        removeEntries(Collections.singletonList(bibEntry), eventSource);
     }
 
     /**
-     * Removes the given entry.
-     * The Entry is removed based on the id {@link BibEntry#id}
+     * Removes the given entries.
+     * The entries removed based on the id {@link BibEntry#getId()}
+     *
+     * @param toBeDeleted Entries to delete
+     */
+    public synchronized void removeEntries(List<BibEntry> toBeDeleted) {
+        removeEntries(toBeDeleted, EntriesEventSource.LOCAL);
+    }
+
+    /**
+     * Removes the given entries.
+     * The entries are removed based on the id {@link BibEntry#getId()}
      *
      * @param toBeDeleted Entry to delete
      * @param eventSource Source the event is sent from
      */
-    public synchronized void removeEntry(BibEntry toBeDeleted, EntryEventSource eventSource) {
+    public synchronized void removeEntries(List<BibEntry> toBeDeleted, EntriesEventSource eventSource) {
         Objects.requireNonNull(toBeDeleted);
 
-        boolean anyRemoved = entries.removeIf(entry -> entry.getId().equals(toBeDeleted.getId()));
+        List<String> ids = new ArrayList<>();
+        for (BibEntry entry : toBeDeleted) {
+            ids.add(entry.getId());
+        }
+        boolean anyRemoved = entries.removeIf(entry -> ids.contains(entry.getId()));
         if (anyRemoved) {
-            internalIDs.remove(toBeDeleted.getId());
-            eventBus.post(new EntryRemovedEvent(toBeDeleted, eventSource));
+            eventBus.post(new EntriesRemovedEvent(toBeDeleted, eventSource));
         }
     }
 
@@ -276,15 +268,27 @@ public class BibDatabase {
      * Inserts a Bibtex String.
      */
     public synchronized void addString(BibtexString string) throws KeyCollisionException {
-        if (hasStringLabel(string.getName())) {
-            throw new KeyCollisionException("A string with that label already exists");
+        String id = string.getId();
+
+        if (hasStringByName(string.getName())) {
+            throw new KeyCollisionException("A string with that label already exists", id);
         }
 
-        if (bibtexStrings.containsKey(string.getId())) {
-            throw new KeyCollisionException("Duplicate BibTeX string id.");
+        if (bibtexStrings.containsKey(id)) {
+            throw new KeyCollisionException("Duplicate BibTeX string id.", id);
         }
 
-        bibtexStrings.put(string.getId(), string);
+        bibtexStrings.put(id, string);
+    }
+
+    /**
+     * Replaces the existing lists of BibTexString with the given one
+     * Duplicates throw KeyCollisionException
+     * @param stringsToAdd The collection of strings to set
+     */
+    public void setStrings(List<BibtexString> stringsToAdd) {
+        bibtexStrings = new ConcurrentHashMap<>();
+        stringsToAdd.forEach(this::addString);
     }
 
     /**
@@ -318,15 +322,10 @@ public class BibDatabase {
     }
 
     /**
-     * Returns the string with the given name.
+     * Returns the string with the given name/label
      */
     public Optional<BibtexString> getStringByName(String name) {
-        for (BibtexString string : getStringValues()) {
-            if (string.getName().equals(name)) {
-                return Optional.of(string);
-            }
-        }
-        return Optional.empty();
+        return getStringValues().stream().filter(string -> string.getName().equals(name)).findFirst();
     }
 
     /**
@@ -355,13 +354,8 @@ public class BibDatabase {
     /**
      * Returns true if a string with the given label already exists.
      */
-    public synchronized boolean hasStringLabel(String label) {
-        for (BibtexString value : bibtexStrings.values()) {
-            if (value.getName().equals(label)) {
-                return true;
-            }
-        }
-        return false;
+    public synchronized boolean hasStringByName(String label) {
+        return bibtexStrings.values().stream().anyMatch(value -> value.getName().equals(label));
     }
 
     /**
@@ -442,7 +436,7 @@ public class BibDatabase {
             resultingEntry = (BibEntry) entry.clone();
         }
 
-        for (Map.Entry<String, String> field : resultingEntry.getFieldMap().entrySet()) {
+        for (Map.Entry<Field, String> field : resultingEntry.getFieldMap().entrySet()) {
             resultingEntry.setField(field.getKey(), this.resolveForStrings(field.getValue()));
         }
         return resultingEntry;
@@ -505,7 +499,7 @@ public class BibDatabase {
                 // We found the next string ref. Append the text
                 // up to it.
                 if (next > 0) {
-                    newRes.append(res.substring(piv, next));
+                    newRes.append(res, piv, next);
                 }
                 int stringEnd = res.indexOf('#', next + 1);
                 if (stringEnd >= 0) {
@@ -517,7 +511,7 @@ public class BibDatabase {
                     if (resolved == null) {
                         // Could not resolve string. Display the #
                         // characters rather than removing them:
-                        newRes.append(res.substring(next, stringEnd + 1));
+                        newRes.append(res, next, stringEnd + 1);
                     } else {
                         // The string was resolved, so we display its meaning only,
                         // stripping the # characters signifying the string label:
@@ -532,7 +526,6 @@ public class BibDatabase {
                     piv = res.length();
                     break;
                 }
-
             }
             if (piv < (res.length() - 1)) {
                 newRes.append(res.substring(piv));
@@ -554,9 +547,9 @@ public class BibDatabase {
      * Registers an listener object (subscriber) to the internal event bus.
      * The following events are posted:
      *
-     *   - {@link EntryAddedEvent}
-     *   - {@link EntryChangedEvent}
-     *   - {@link EntryRemovedEvent}
+     * - {@link EntriesAddedEvent}
+     * - {@link EntryChangedEvent}
+     * - {@link EntriesRemovedEvent}
      *
      * @param listener listener (subscriber) to add
      */
@@ -566,6 +559,7 @@ public class BibDatabase {
 
     /**
      * Unregisters an listener object.
+     *
      * @param listener listener (subscriber) to remove
      */
     public void unregisterListener(Object listener) {
@@ -583,7 +577,7 @@ public class BibDatabase {
     }
 
     public Optional<BibEntry> getReferencedEntry(BibEntry entry) {
-        return entry.getField(FieldName.CROSSREF).flatMap(this::getEntryByKey);
+        return entry.getField(StandardField.CROSSREF).flatMap(this::getEntryByCitationKey);
     }
 
     public Optional<String> getSharedDatabaseID() {
@@ -612,8 +606,20 @@ public class BibDatabase {
         return this.sharedDatabaseID;
     }
 
-    public DuplicationChecker getDuplicationChecker() {
-        return duplicationChecker;
+    /**
+     * Returns the number of occurrences of the given citation key in this database.
+     */
+    public long getNumberOfCitationKeyOccurrences(String key) {
+        return entries.stream()
+                      .flatMap(entry -> entry.getCitationKey().stream())
+                      .filter(key::equals)
+                      .count();
     }
 
+    /**
+     * Checks if there is more than one occurrence of the citation key.
+     */
+    public boolean isDuplicateCitationKeyExisting(String key) {
+        return getNumberOfCitationKeyOccurrences(key) > 1;
+    }
 }

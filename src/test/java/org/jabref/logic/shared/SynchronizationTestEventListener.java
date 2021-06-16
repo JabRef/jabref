@@ -1,6 +1,6 @@
 package org.jabref.logic.shared;
 
-import org.jabref.logic.shared.event.SharedEntryNotPresentEvent;
+import org.jabref.logic.shared.event.SharedEntriesNotPresentEvent;
 import org.jabref.logic.shared.event.UpdateRefusedEvent;
 import org.jabref.testutils.category.DatabaseTest;
 
@@ -9,13 +9,12 @@ import com.google.common.eventbus.Subscribe;
 @DatabaseTest
 public class SynchronizationTestEventListener {
 
-    private SharedEntryNotPresentEvent sharedEntryNotPresentEvent;
+    private SharedEntriesNotPresentEvent sharedEntriesNotPresentEvent;
     private UpdateRefusedEvent updateRefusedEvent;
 
-
     @Subscribe
-    public void listen(SharedEntryNotPresentEvent event) {
-        this.sharedEntryNotPresentEvent = event;
+    public void listen(SharedEntriesNotPresentEvent event) {
+        this.sharedEntriesNotPresentEvent = event;
     }
 
     @Subscribe
@@ -23,8 +22,8 @@ public class SynchronizationTestEventListener {
         this.updateRefusedEvent = event;
     }
 
-    public SharedEntryNotPresentEvent getSharedEntryNotPresentEvent() {
-        return sharedEntryNotPresentEvent;
+    public SharedEntriesNotPresentEvent getSharedEntriesNotPresentEvent() {
+        return sharedEntriesNotPresentEvent;
     }
 
     public UpdateRefusedEvent getUpdateRefusedEvent() {

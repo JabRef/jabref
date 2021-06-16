@@ -2,7 +2,7 @@
 <file xmlns="http://bibtexml.sf.net/">
     <entry id="Mustermann2016">
         <inbook>
-            <bibtexkey>Mustermann2016</bibtexkey>
+            <citationkey>Mustermann2016</citationkey>
         </inbook>
     </entry>
 </file>

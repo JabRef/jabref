@@ -17,7 +17,7 @@ public class BibStringDiff {
     private final BibtexString originalString;
     private final BibtexString newString;
 
-    private BibStringDiff(BibtexString originalString, BibtexString newString) {
+    BibStringDiff(BibtexString originalString, BibtexString newString) {
         this.originalString = originalString;
         this.newString = newString;
     }
@@ -34,7 +34,8 @@ public class BibStringDiff {
 
         // First try to match by string names.
         for (BibtexString original : originalDatabase.getStringValues()) {
-            Optional<BibtexString> match = newDatabase.getStringValues().stream()
+            Optional<BibtexString> match = newDatabase
+                    .getStringValues().stream()
                     .filter(test -> test.getName().equals(original.getName()))
                     .findAny();
             if (match.isPresent()) {
@@ -54,7 +55,8 @@ public class BibStringDiff {
         for (Iterator<BibtexString> iterator = notMatched.iterator(); iterator.hasNext(); ) {
             BibtexString original = iterator.next();
 
-            Optional<BibtexString> match = newDatabase.getStringValues().stream()
+            Optional<BibtexString> match = newDatabase
+                    .getStringValues().stream()
                     .filter(test -> test.getName().equals(original.getName()))
                     .findAny();
             if (match.isPresent()) {
@@ -73,8 +75,8 @@ public class BibStringDiff {
 
         // Finally, see if there are remaining strings in the new database. They must have been added.
         newDatabase.getStringValues().stream()
-                .filter(test -> !used.contains(test))
-                .forEach(newString -> differences.add(new BibStringDiff(null, newString)));
+                   .filter(test -> !used.contains(test))
+                   .forEach(newString -> differences.add(new BibStringDiff(null, newString)));
 
         return differences;
     }
@@ -85,5 +87,23 @@ public class BibStringDiff {
 
     public BibtexString getNewString() {
         return newString;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if ((other == null) || (getClass() != other.getClass())) {
+            return false;
+        }
+
+        BibStringDiff that = (BibStringDiff) other;
+        return Objects.equals(newString, that.newString) && Objects.equals(originalString, that.originalString);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(originalString, newString);
     }
 }

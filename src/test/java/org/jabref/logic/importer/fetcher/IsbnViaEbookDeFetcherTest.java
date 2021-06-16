@@ -5,7 +5,9 @@ import java.util.Optional;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BiblatexEntryTypes;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -21,16 +23,16 @@ public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
     @BeforeEach
     public void setUp() {
         bibEntry = new BibEntry();
-        bibEntry.setType(BiblatexEntryTypes.BOOK);
-        bibEntry.setField("bibtexkey", "9780134685991");
-        bibEntry.setField("title", "Effective Java");
-        bibEntry.setField("publisher", "Addison Wesley");
-        bibEntry.setField("year", "2018");
-        bibEntry.setField("author", "Bloch, Joshua");
-        bibEntry.setField("date", "2018-01-11");
-        bibEntry.setField("ean", "9780134685991");
-        bibEntry.setField("isbn", "0134685997");
-        bibEntry.setField("url", "http://www.ebook.de/de/product/28983211/joshua_bloch_effective_java.html");
+        bibEntry.setType(StandardEntryType.Book);
+        bibEntry.setCitationKey("9780134685991");
+        bibEntry.setField(StandardField.TITLE, "Effective Java");
+        bibEntry.setField(StandardField.PUBLISHER, "Addison Wesley");
+        bibEntry.setField(StandardField.YEAR, "2018");
+        bibEntry.setField(StandardField.AUTHOR, "Bloch, Joshua");
+        bibEntry.setField(StandardField.DATE, "2018-01-01");
+        bibEntry.setField(new UnknownField("ean"), "9780134685991");
+        bibEntry.setField(StandardField.ISBN, "0134685997");
+        bibEntry.setField(StandardField.URL, "https://www.ebook.de/de/product/28983211/joshua_bloch_effective_java.html");
 
         fetcher = new IsbnViaEbookDeFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
@@ -43,12 +45,6 @@ public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
 
     @Test
     @Override
-    public void testHelpPage() {
-        assertEquals("ISBNtoBibTeX", fetcher.getHelpPage().getPageName());
-    }
-
-    @Test
-    @Override
     public void searchByIdSuccessfulWithShortISBN() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0134685997");
         assertEquals(Optional.of(bibEntry), fetchedEntry);
@@ -57,7 +53,7 @@ public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
     @Test
     @Override
     public void searchByIdSuccessfulWithLongISBN() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0134685997");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("9780134685991");
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
@@ -65,25 +61,25 @@ public class IsbnViaEbookDeFetcherTest extends AbstractIsbnFetcherTest {
     @Override
     public void authorsAreCorrectlyFormatted() throws Exception {
         BibEntry bibEntry = new BibEntry();
-        bibEntry.setType(BiblatexEntryTypes.BOOK);
-        bibEntry.setField("bibtexkey", "9783642434730");
-        bibEntry.setField("title", "Fundamentals of Business Process Management");
-        bibEntry.setField("publisher", "Springer Berlin Heidelberg");
-        bibEntry.setField("year", "2015");
-        bibEntry.setField("author", "Dumas, Marlon and Rosa, Marcello La and Mendling, Jan and Reijers, Hajo A.");
-        bibEntry.setField("date", "2015-04-12");
-        bibEntry.setField("ean", "9783642434730");
-        bibEntry.setField("isbn", "3642434738");
-        bibEntry.setField("pagetotal", "428");
-        bibEntry.setField("url", "http://www.ebook.de/de/product/23955263/marlon_dumas_marcello_la_rosa_jan_mendling_hajo_a_reijers_fundamentals_of_business_process_management.html");
+        bibEntry.setType(StandardEntryType.Book);
+        bibEntry.setCitationKey("9783662585856");
+        bibEntry.setField(StandardField.TITLE, "Fundamentals of Business Process Management");
+        bibEntry.setField(StandardField.PUBLISHER, "Springer Berlin Heidelberg");
+        bibEntry.setField(StandardField.YEAR, "2019");
+        bibEntry.setField(StandardField.AUTHOR, "Dumas, Marlon and Rosa, Marcello La and Mendling, Jan and Reijers, Hajo A.");
+        bibEntry.setField(StandardField.DATE, "2019-02-01");
+        bibEntry.setField(StandardField.PAGETOTAL, "560");
+        bibEntry.setField(new UnknownField("ean"), "9783662585856");
+        bibEntry.setField(StandardField.ISBN, "3662585855");
+        bibEntry.setField(StandardField.URL, "https://www.ebook.de/de/product/35805105/marlon_dumas_marcello_la_rosa_jan_mendling_hajo_a_reijers_fundamentals_of_business_process_management.html");
 
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3642434738");
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("3662585855");
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
     /**
-     * This test searches for a valid ISBN. See https://www.amazon.de/dp/3728128155/?tag=jabref-21
-     * However, this ISBN is not available on ebook.de. The fetcher should return nothing rather than throwing an exeption.
+     * This test searches for a valid ISBN. See https://www.amazon.de/dp/3728128155/?tag=jabref-21 However, this ISBN is
+     * not available on ebook.de. The fetcher should return nothing rather than throwing an exception.
      */
     @Test
     public void searchForValidButNotFoundISBN() throws Exception {

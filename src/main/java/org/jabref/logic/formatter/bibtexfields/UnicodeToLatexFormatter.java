@@ -3,15 +3,15 @@ package org.jabref.logic.formatter.bibtexfields;
 import java.util.Map;
 import java.util.Objects;
 
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
-import org.jabref.model.cleanup.Formatter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UnicodeToLatexFormatter implements LayoutFormatter, Formatter {
+public class UnicodeToLatexFormatter extends Formatter implements LayoutFormatter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UnicodeToLatexFormatter.class);
 
@@ -38,7 +38,11 @@ public class UnicodeToLatexFormatter implements LayoutFormatter, Formatter {
                 Integer cpNext = result.codePointAt(i + 1);
                 String code = HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.get(cpNext);
                 if (code == null) {
-                    sb.append((char) cpCurrent);
+                    // skip next index to avoid reading surrogate as a separate char
+                    if (!Character.isBmpCodePoint(cpCurrent)) {
+                        i++;
+                    }
+                    sb.appendCodePoint(cpCurrent);
                 } else {
                     sb.append("{\\").append(code).append('{').append((char) cpCurrent).append("}}");
                     consumed = true;

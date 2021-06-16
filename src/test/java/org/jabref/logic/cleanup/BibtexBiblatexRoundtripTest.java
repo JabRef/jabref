@@ -1,6 +1,9 @@
 package org.jabref.logic.cleanup;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,50 +16,52 @@ class BibtexBiblatexRoundtripTest {
 
     @BeforeEach
     void setUp() {
-        bibtex = new BibEntry("article");
-        bibtex.setField("author", "Frame, J. S. and Robinson, G. de B. and Thrall, R. M.");
-        bibtex.setField("title", "The hook graphs of the symmetric groups");
-        bibtex.setField("journal", "Canadian J. Math.");
-        bibtex.setField("fjournal", "Canadian Journal of Mathematics. Journal Canadien de Math\\'ematiques");
-        bibtex.setField("volume", "6");
-        bibtex.setField("year", "1954");
-        bibtex.setField("pages", "316--324");
-        bibtex.setField("issn", "0008-414X");
-        bibtex.setField("mrclass", "20.0X");
-        bibtex.setField("mrnumber", "0062127");
-        bibtex.setField("mrreviewer", "D. E. Littlewood");
+        bibtex = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Frame, J. S. and Robinson, G. de B. and Thrall, R. M.")
+                .withField(StandardField.TITLE, "The hook graphs of the symmetric groups")
+                .withField(StandardField.JOURNAL, "Canadian J. Math.")
+                .withField(new UnknownField("fjournal"), "Canadian Journal of Mathematics. Journal Canadien de Math\\'ematiques")
+                .withField(StandardField.VOLUME, "6")
+                .withField(StandardField.YEAR, "1954")
+                .withField(StandardField.PAGES, "316--324")
+                .withField(StandardField.ISSN, "0008-414X")
+                .withField(new UnknownField("mrclass"), "20.0X")
+                .withField(StandardField.MR_NUMBER, "0062127")
+                .withField(new UnknownField("mrreviewer"), "D. E. Littlewood");
 
-        biblatex = new BibEntry("article");
-        biblatex.setField("author", "Frame, J. S. and Robinson, G. de B. and Thrall, R. M.");
-        biblatex.setField("title", "The hook graphs of the symmetric groups");
-        biblatex.setField("journaltitle", "Canadian J. Math.");
-        biblatex.setField("fjournal", "Canadian Journal of Mathematics. Journal Canadien de Math\\'ematiques");
-        biblatex.setField("volume", "6");
-        biblatex.setField("date", "1954");
-        biblatex.setField("pages", "316--324");
-        biblatex.setField("issn", "0008-414X");
-        biblatex.setField("mrclass", "20.0X");
-        biblatex.setField("mrnumber", "0062127");
-        biblatex.setField("mrreviewer", "D. E. Littlewood");
+        biblatex = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Frame, J. S. and Robinson, G. de B. and Thrall, R. M.")
+                .withField(StandardField.TITLE, "The hook graphs of the symmetric groups")
+                .withField(StandardField.JOURNALTITLE, "Canadian J. Math.")
+                .withField(new UnknownField("fjournal"), "Canadian Journal of Mathematics. Journal Canadien de Math\\'ematiques")
+                .withField(StandardField.VOLUME, "6")
+                .withField(StandardField.DATE, "1954")
+                .withField(StandardField.PAGES, "316--324")
+                .withField(StandardField.ISSN, "0008-414X")
+                .withField(new UnknownField("mrclass"), "20.0X")
+                .withField(StandardField.MR_NUMBER, "0062127")
+                .withField(new UnknownField("mrreviewer"), "D. E. Littlewood");
     }
 
     @Test
     void roundTripBibtexToBiblatexIsIdentity() {
         BibEntry clone = (BibEntry) bibtex.clone();
+
         new ConvertToBiblatexCleanup().cleanup(clone);
         assertEquals(biblatex, clone);
-        new ConvertToBibtexCleanup().cleanup(clone);
 
+        new ConvertToBibtexCleanup().cleanup(clone);
         assertEquals(bibtex, clone);
     }
 
     @Test
     void roundTripBiblatexToBibtexIsIdentity() {
         BibEntry clone = (BibEntry) biblatex.clone();
+
         new ConvertToBibtexCleanup().cleanup(clone);
         assertEquals(bibtex, clone);
-        new ConvertToBiblatexCleanup().cleanup(clone);
 
+        new ConvertToBiblatexCleanup().cleanup(clone);
         assertEquals(biblatex, clone);
     }
 }

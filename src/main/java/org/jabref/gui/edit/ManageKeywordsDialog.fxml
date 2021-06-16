@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.edit.ManageKeywordsDisplayType?>
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="600.0"
+            xmlns="http://javafx.com/javafx/8.0.172-ea" fx:controller="org.jabref.gui.edit.ManageKeywordsDialog">
+    <fx:define>
+        <ToggleGroup fx:id="displayType"/>
+    </fx:define>
+    <content>
+        <VBox>
+            <TableView fx:id="keywordsTable" editable="true" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="keywordsTableMainColumn" text="%Keywords of selected entries"/>
+                    <TableColumn fx:id="keywordsTableEditColumn" maxWidth="40" minWidth="40.0" prefWidth="40.0"/>
+                    <TableColumn fx:id="keywordsTableDeleteColumn" maxWidth="40" minWidth="40.0" prefWidth="40.0"/>
+                </columns>
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                </columnResizePolicy>
+            </TableView>
+            <RadioButton text="%Display keywords appearing in ALL entries" toggleGroup="$displayType" selected="true">
+                <userData>
+                    <ManageKeywordsDisplayType fx:constant="CONTAINED_IN_ALL_ENTRIES"/>
+                </userData>
+            </RadioButton>
+            <RadioButton text="%Display keywords appearing in ANY entry" toggleGroup="$displayType">
+                <userData>
+                    <ManageKeywordsDisplayType fx:constant="CONTAINED_IN_ANY_ENTRY"/>
+                </userData>
+            </RadioButton>
+        </VBox>
+    </content>
+    <ButtonType fx:constant="CANCEL"/>
+    <ButtonType fx:constant="APPLY"/>
+</DialogPane>

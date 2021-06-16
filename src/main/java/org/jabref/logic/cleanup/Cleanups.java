@@ -1,7 +1,6 @@
 package org.jabref.logic.cleanup;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.formatter.Formatters;
@@ -14,10 +13,10 @@ import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
 import org.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
-import org.jabref.model.cleanup.FieldFormatterCleanup;
-import org.jabref.model.cleanup.FieldFormatterCleanups;
-import org.jabref.model.cleanup.Formatter;
-import org.jabref.model.entry.FieldName;
+import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
+import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
 public class Cleanups {
@@ -25,41 +24,35 @@ public class Cleanups {
     public static final FieldFormatterCleanups DEFAULT_SAVE_ACTIONS;
     public static final FieldFormatterCleanups RECOMMEND_BIBTEX_ACTIONS;
     public static final FieldFormatterCleanups RECOMMEND_BIBLATEX_ACTIONS;
-    public static List<Formatter> availableFormatters;
 
     static {
-        availableFormatters = new ArrayList<>();
-        availableFormatters.addAll(Formatters.ALL);
-
         List<FieldFormatterCleanup> defaultFormatters = new ArrayList<>();
-        defaultFormatters.add(new FieldFormatterCleanup(FieldName.PAGES, new NormalizePagesFormatter()));
-        defaultFormatters.add(new FieldFormatterCleanup(FieldName.DATE, new NormalizeDateFormatter()));
-        defaultFormatters.add(new FieldFormatterCleanup(FieldName.MONTH, new NormalizeMonthFormatter()));
+        defaultFormatters.add(new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()));
+        defaultFormatters.add(new FieldFormatterCleanup(StandardField.DATE, new NormalizeDateFormatter()));
+        defaultFormatters.add(new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()));
+        defaultFormatters.add(new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new ReplaceUnicodeLigaturesFormatter()));
         DEFAULT_SAVE_ACTIONS = new FieldFormatterCleanups(false, defaultFormatters);
 
         List<FieldFormatterCleanup> recommendedBibTeXFormatters = new ArrayList<>();
         recommendedBibTeXFormatters.addAll(defaultFormatters);
-        recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.TITLE, new HtmlToLatexFormatter()));
-        recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.TITLE, new UnicodeToLatexFormatter()));
-        recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.BOOKTITLE, new UnicodeToLatexFormatter()));
-        recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.JOURNAL, new UnicodeToLatexFormatter()));
-        recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.AUTHOR, new UnicodeToLatexFormatter()));
-        recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.EDITOR, new UnicodeToLatexFormatter()));
-        recommendedBibTeXFormatters.add(new FieldFormatterCleanup(FieldName.INTERNAL_ALL_TEXT_FIELDS_FIELD, new OrdinalsToSuperscriptFormatter()));
+        recommendedBibTeXFormatters.add(new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new HtmlToLatexFormatter()));
+        recommendedBibTeXFormatters.add(new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new UnicodeToLatexFormatter()));
+        recommendedBibTeXFormatters.add(new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new OrdinalsToSuperscriptFormatter()));
         RECOMMEND_BIBTEX_ACTIONS = new FieldFormatterCleanups(false, recommendedBibTeXFormatters);
 
         List<FieldFormatterCleanup> recommendedBiblatexFormatters = new ArrayList<>();
         recommendedBiblatexFormatters.addAll(defaultFormatters);
-        recommendedBiblatexFormatters.add(new FieldFormatterCleanup(FieldName.TITLE, new HtmlToUnicodeFormatter()));
-        recommendedBiblatexFormatters.add(new FieldFormatterCleanup(FieldName.INTERNAL_ALL_TEXT_FIELDS_FIELD, new LatexToUnicodeFormatter()));
+        recommendedBiblatexFormatters.add(new FieldFormatterCleanup(StandardField.TITLE, new HtmlToUnicodeFormatter()));
+        recommendedBiblatexFormatters.add(new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new LatexToUnicodeFormatter()));
+        // DO NOT ADD OrdinalsToSuperscriptFormatter here, because this causes issues. See https://github.com/JabRef/jabref/issues/2596.
         RECOMMEND_BIBLATEX_ACTIONS = new FieldFormatterCleanups(false, recommendedBiblatexFormatters);
     }
 
     private Cleanups() {
     }
 
-    public static List<Formatter> getAvailableFormatters() {
-        return Collections.unmodifiableList(availableFormatters);
+    public static List<Formatter> getBuiltInFormatters() {
+        return Formatters.getAll();
     }
 
     public static List<FieldFormatterCleanup> parse(String formatterString) {
@@ -71,7 +64,7 @@ public class Cleanups {
 
         List<FieldFormatterCleanup> actions = new ArrayList<>();
 
-        //read concrete actions
+        // read concrete actions
         int startIndex = 0;
 
         // first remove all newlines for easier parsing
@@ -82,11 +75,11 @@ public class Cleanups {
             while (startIndex < formatterString.length()) {
                 // read the field name
                 int currentIndex = remainingString.indexOf('[');
-                        String fieldKey = remainingString.substring(0, currentIndex);
+                String fieldKey = remainingString.substring(0, currentIndex);
                 int endIndex = remainingString.indexOf(']');
                 startIndex += endIndex + 1;
 
-                //read each formatter
+                // read each formatter
                 int tokenIndex = remainingString.indexOf(',');
                 do {
                     boolean doBreak = false;
@@ -96,7 +89,7 @@ public class Cleanups {
                     }
 
                     String formatterKey = remainingString.substring(currentIndex + 1, tokenIndex);
-                    actions.add(new FieldFormatterCleanup(fieldKey, getFormatterFromString(formatterKey)));
+                    actions.add(new FieldFormatterCleanup(FieldFactory.parseField(fieldKey), getFormatterFromString(formatterKey)));
 
                     remainingString = remainingString.substring(tokenIndex + 1);
                     if (remainingString.startsWith("]") || doBreak) {
@@ -125,11 +118,10 @@ public class Cleanups {
             // return default actions
             return DEFAULT_SAVE_ACTIONS;
         }
-
     }
 
     private static Formatter getFormatterFromString(String formatterName) {
-        for (Formatter formatter : availableFormatters) {
+        for (Formatter formatter : getBuiltInFormatters()) {
             if (formatterName.equals(formatter.getKey())) {
                 return formatter;
             }

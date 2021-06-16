@@ -12,9 +12,6 @@ import org.jabref.model.entry.BibEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author Silberer, Zirn
- */
 public class DatabaseSearcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseSearcher.class);
@@ -38,5 +35,4 @@ public class DatabaseSearcher {
         List<BibEntry> matchEntries = database.getEntries().stream().filter(query::isMatch).collect(Collectors.toList());
         return BibDatabases.purgeEmptyEntries(matchEntries);
     }
-
 }

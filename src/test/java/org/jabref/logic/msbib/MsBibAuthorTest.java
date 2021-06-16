@@ -2,9 +2,9 @@ package org.jabref.logic.msbib;
 
 import org.jabref.model.entry.Author;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MsBibAuthorTest {
 
@@ -45,4 +45,10 @@ public class MsBibAuthorTest {
         assertEquals("Bach", msBibAuthor.getLastName());
     }
 
+    @Test
+    public void testGetVonAndLastName() {
+        Author author = new Author("John", null, "von", "Neumann", null);
+        MsBibAuthor msBibAuthor = new MsBibAuthor(author);
+        assertEquals("von Neumann", msBibAuthor.getLastName());
+    }
 }

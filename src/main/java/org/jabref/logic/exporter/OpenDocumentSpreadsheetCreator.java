@@ -27,7 +27,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -35,26 +36,22 @@ import org.jabref.model.entry.BibEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author alver
- */
 public class OpenDocumentSpreadsheetCreator extends Exporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenDocumentSpreadsheetCreator.class);
-
 
     /**
      * Creates a new instance of OpenOfficeDocumentCreator
      */
     public OpenDocumentSpreadsheetCreator() {
-        super("ods", FileType.ODS.getDescription(), FileType.ODS);
+        super("ods", Localization.lang("OpenDocument spreadsheet"), StandardFileType.ODS);
     }
 
     private static void storeOpenDocumentSpreadsheetFile(Path file, InputStream source) throws IOException {
 
         try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(file)))) {
 
-            //addResourceFile("mimetype", "/resource/ods/mimetype", out);
+            // addResourceFile("mimetype", "/resource/ods/mimetype", out);
             ZipEntry ze = new ZipEntry("mimetype");
             String mime = "application/vnd.oasis.opendocument.spreadsheet";
             ze.setMethod(ZipEntry.STORED);
@@ -69,7 +66,7 @@ public class OpenDocumentSpreadsheetCreator extends Exporter {
             out.closeEntry();
 
             ZipEntry zipEntry = new ZipEntry("content.xml");
-            //zipEntry.setMethod(ZipEntry.DEFLATED);
+            // zipEntry.setMethod(ZipEntry.DEFLATED);
             out.putNextEntry(zipEntry);
             int c;
             while ((c = source.read()) >= 0) {

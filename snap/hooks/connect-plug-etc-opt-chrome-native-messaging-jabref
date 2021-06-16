@@ -1,0 +1,9 @@
+#!/bin/sh
+
+if [ ! -d /etc/opt/chrome/native-messaging-hosts ]; then
+    echo "Missing directory, create it manually then try again:"
+    echo "sudo mkdir -p /etc/opt/chrome/native-messaging-hosts"
+    exit 1
+fi
+
+cp "$SNAP/lib/native-messaging-host/chromium/org.jabref.jabref.json" /etc/opt/chrome/native-messaging-hosts/org.jabref.jabref.json

@@ -1,0 +1,50 @@
+.about-heading {
+    -fx-font-size: 30;
+    -fx-text-fill: -jr-theme;
+}
+
+.about-heading:pressed {
+    -fx-text-fill: -jr-selected;
+}
+
+.top-padding {
+    -fx-padding: 5 0 0 0;
+}
+
+.dev-heading {
+    -fx-font-size: 18;
+    -fx-padding: -10 0 0 0;
+}
+
+.sub-heading {
+    -fx-font-size: 18;
+    -fx-padding: 5px;
+}
+
+.about-top {
+    -fx-padding: 0 5 15 5;
+}
+
+.space {
+    -fx-padding: 0 5 0 5;
+}
+
+.space-after {
+    -fx-padding: 0 5 0 0;
+}
+
+.info-sections {
+    -fx-padding: 5px;
+}
+
+.contrib-section {
+    -fx-padding: 5 5 10 5;
+}
+
+.logo-pane {
+    fx-fill: transparent;
+}
+
+.logo-pane SVGPath {
+    -fx-fill: #4f5f8f;
+}

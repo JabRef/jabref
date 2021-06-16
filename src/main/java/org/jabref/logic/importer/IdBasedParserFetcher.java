@@ -1,7 +1,5 @@
 package org.jabref.logic.importer;
 
-import java.io.BufferedInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -10,10 +8,10 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.model.cleanup.Formatter;
+import org.jabref.logic.cleanup.Formatter;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.strings.StringUtil;
 
-import org.jsoup.helper.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,9 +27,10 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
 
     /**
      * Constructs a URL based on the query.
+     *
      * @param identifier the ID
      */
-    URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException;
+    URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException, FetcherException;
 
     /**
      * Returns the parser used to convert the response to a list of {@link BibEntry}.
@@ -46,9 +45,10 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
      * but not cosmetic issues which may depend on the user's taste (for example, LateX code vs HTML in the abstract).
      *
      * Try to reuse existing {@link Formatter} for the cleanup. For example,
-     * {@code new FieldFormatterCleanup(FieldName.TITLE, new RemoveBracesFormatter()).cleanup(entry);}
+     * {@code new FieldFormatterCleanup(StandardField.TITLE, new RemoveBracesFormatter()).cleanup(entry);}
      *
      * By default, no cleanup is done.
+     *
      * @param entry the entry to be cleaned-up
      */
     default void doPostCleanup(BibEntry entry) {
@@ -61,7 +61,7 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
             return Optional.empty();
         }
 
-        try (InputStream stream = new BufferedInputStream(getURLForID(identifier).openStream())) {
+        try (InputStream stream = getUrlDownload(getUrlForIdentifier(identifier)).asInputStream()) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
             if (fetchedEntries.isEmpty()) {
@@ -81,12 +81,9 @@ public interface IdBasedParserFetcher extends IdBasedFetcher {
             return Optional.of(entry);
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
-        } catch (FileNotFoundException e) {
-            LOGGER.debug("Id not found");
-            return Optional.empty();
         } catch (IOException e) {
-            // TODO: Catch HTTP Response 401 errors and report that user has no rights to access resource
-            throw new FetcherException("An I/O exception occurred", e);
+            // TODO: Catch HTTP Response 401 errors and report that user has no rights to access resource. It might be that there is an UnknownHostException (eutils.ncbi.nlm.nih.gov cannot be resolved).
+            throw new FetcherException("A network error occurred", e);
         } catch (ParseException e) {
             throw new FetcherException("An internal parser error occurred", e);
         }

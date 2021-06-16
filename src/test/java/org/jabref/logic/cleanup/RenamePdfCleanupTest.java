@@ -1,152 +1,119 @@
 package org.jabref.logic.cleanup;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Optional;
 
-import org.jabref.logic.layout.LayoutFormatterPreferences;
-import org.jabref.model.Defaults;
+import org.jabref.logic.bibtex.FileFieldWriter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.FileFieldWriter;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.metadata.FileDirectoryPreferences;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.preferences.FilePreferences;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.mockito.Answers;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class RenamePdfCleanupTest {
+class RenamePdfCleanupTest {
 
-    @Rule public TemporaryFolder testFolder = new TemporaryFolder();
-    private BibDatabaseContext context;
     private BibEntry entry;
 
-    private FileDirectoryPreferences fileDirPrefs;
-    private LayoutFormatterPreferences layoutFormatterPreferences;
+    private FilePreferences filePreferences;
+    private RenamePdfCleanup cleanup;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp(@TempDir Path testFolder) {
+        Path path = testFolder.resolve("test.bib");
         MetaData metaData = new MetaData();
-        context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
-        context.setDatabaseFile(testFolder.newFile("test.bib"));
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData);
+        context.setDatabasePath(path);
 
-        fileDirPrefs = mock(FileDirectoryPreferences.class);
-        when(fileDirPrefs.isBibLocationAsPrimary()).thenReturn(true); //Set Biblocation as Primary Directory, otherwise the tmp folders won't be cleaned up correctly
         entry = new BibEntry();
-        entry.setCiteKey("Toot");
-        layoutFormatterPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        entry.setCitationKey("Toot");
+
+        filePreferences = mock(FilePreferences.class);
+        when(filePreferences.shouldStoreFilesRelativeToBib()).thenReturn(true); // Set Biblocation as Primary Directory, otherwise the tmp folders won't be cleaned up correctly
+        cleanup = new RenamePdfCleanup(false, context, filePreferences);
     }
 
     /**
      * Test for #466
      */
     @Test
-    public void cleanupRenamePdfRenamesFileEvenIfOnlyDifferenceIsCase() throws IOException {
-        String fileNamePattern = "[bibtexkey]";
-        File tempFile = testFolder.newFile("toot.tmp");
-        LinkedFile fileField = new LinkedFile("", tempFile.getAbsolutePath(), "");
-        entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
+    void cleanupRenamePdfRenamesFileEvenIfOnlyDifferenceIsCase(@TempDir Path testFolder) throws IOException {
+        Path path = testFolder.resolve("toot.tmp");
+        Files.createFile(path);
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                mock(LayoutFormatterPreferences.class), fileDirPrefs);
+        LinkedFile fileField = new LinkedFile("", path.toAbsolutePath(), "");
+        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
+
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey]");
         cleanup.cleanup(entry);
 
-        LinkedFile newFileField = new LinkedFile("", "Toot.tmp", "");
-        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
+        LinkedFile newFileField = new LinkedFile("", Path.of("Toot.tmp"), "");
+        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField(StandardField.FILE));
     }
 
     @Test
-    public void cleanupRenamePdfRenamesWithMultipleFiles() throws IOException {
-        String fileNamePattern = "[bibtexkey] - [fulltitle]";
-        File tempFile = testFolder.newFile("Toot.tmp");
+    void cleanupRenamePdfRenamesWithMultipleFiles(@TempDir Path testFolder) throws IOException {
+        Path path = testFolder.resolve("Toot.tmp");
+        Files.createFile(path);
 
-        entry.setField("title", "test title");
-        entry.setField("file", FileFieldWriter.getStringRepresentation(Arrays.asList(new LinkedFile("", "", ""),
-                new LinkedFile("", tempFile.getAbsolutePath(), ""), new LinkedFile("", "", ""))));
+        entry.setField(StandardField.TITLE, "test title");
+        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(
+                Arrays.asList(
+                        new LinkedFile("", Path.of(""), ""),
+                        new LinkedFile("", path.toAbsolutePath(), ""),
+                        new LinkedFile("", Path.of(""), ""))));
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                mock(LayoutFormatterPreferences.class), fileDirPrefs);
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey] - [fulltitle]");
         cleanup.cleanup(entry);
 
-        assertEquals(
-                Optional.of(FileFieldWriter.getStringRepresentation(new LinkedFile("", "Toot - test title.tmp", ""))),
-                entry.getField("file"));
+        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(
+                Arrays.asList(
+                        new LinkedFile("", Path.of(""), ""),
+                        new LinkedFile("", Path.of("Toot - test title.tmp"), ""),
+                        new LinkedFile("", Path.of(""), "")))),
+                entry.getField(StandardField.FILE));
     }
 
     @Test
-    public void cleanupRenamePdfRenamesFileStartingWithBibtexKey() throws IOException {
-        String fileNamePattern = "[bibtexkey] - [fulltitle]";
+    void cleanupRenamePdfRenamesFileStartingWithCitationKey(@TempDir Path testFolder) throws IOException {
+        Path path = testFolder.resolve("Toot.tmp");
+        Files.createFile(path);
 
-        File tempFile = testFolder.newFile("Toot.tmp");
-        LinkedFile fileField = new LinkedFile("", tempFile.getAbsolutePath(), "");
-        entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
-        entry.setField("title", "test title");
+        LinkedFile fileField = new LinkedFile("", path.toAbsolutePath(), "");
+        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
+        entry.setField(StandardField.TITLE, "test title");
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                mock(LayoutFormatterPreferences.class), fileDirPrefs);
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey] - [fulltitle]");
         cleanup.cleanup(entry);
 
-        LinkedFile newFileField = new LinkedFile("", "Toot - test title.tmp", "");
-        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
+        LinkedFile newFileField = new LinkedFile("", Path.of("Toot - test title.tmp"), "");
+        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField(StandardField.FILE));
     }
 
     @Test
-    public void cleanupRenamePdfRenamesFileInSameFolder() throws IOException {
-        String fileNamePattern = "[bibtexkey] - [fulltitle]";
-        testFolder.newFile("Toot.pdf");
-        LinkedFile fileField = new LinkedFile("", "Toot.pdf", "PDF");
-        entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
-        entry.setField("title", "test title");
+    void cleanupRenamePdfRenamesFileInSameFolder(@TempDir Path testFolder) throws IOException {
+        Path path = testFolder.resolve("Toot.pdf");
+        Files.createFile(path);
+        LinkedFile fileField = new LinkedFile("", Path.of("Toot.pdf"), "PDF");
+        entry.setField(StandardField.FILE, FileFieldWriter.getStringRepresentation(fileField));
+        entry.setField(StandardField.TITLE, "test title");
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                layoutFormatterPreferences,
-                fileDirPrefs);
+        when(filePreferences.getFileNamePattern()).thenReturn("[citationkey] - [fulltitle]");
         cleanup.cleanup(entry);
 
-        LinkedFile newFileField = new LinkedFile("", "Toot - test title.pdf", "PDF");
-        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
+        LinkedFile newFileField = new LinkedFile("", Path.of("Toot - test title.pdf"), "PDF");
+        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField(StandardField.FILE));
     }
-
-    @Test
-    public void cleanupSingleField() throws IOException {
-        String fileNamePattern = "[bibtexkey] - [fulltitle]";
-        testFolder.newFile("Toot.pdf");
-        LinkedFile fileField = new LinkedFile("", "Toot.pdf", "PDF");
-        entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
-        entry.setField("title", "test title");
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                layoutFormatterPreferences,
-                fileDirPrefs, fileField);
-
-        cleanup.cleanup(entry);
-
-        LinkedFile newFileField = new LinkedFile("", "Toot - test title.pdf", "PDF");
-        assertEquals(Optional.of(FileFieldWriter.getStringRepresentation(newFileField)), entry.getField("file"));
-
-    }
-
-    @Test
-    public void cleanupGetTargetFilename() throws IOException {
-        String fileNamePattern = "[bibtexkey] - [fulltitle]";
-        testFolder.newFile("Toot.pdf");
-        LinkedFile fileField = new LinkedFile("", "Toot.pdf", "PDF");
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                layoutFormatterPreferences,
-                fileDirPrefs);
-        entry.setField("file", FileFieldWriter.getStringRepresentation(fileField));
-        entry.setField("title", "test title");
-
-        assertEquals("Toot - test title.pdf", cleanup.getTargetFileName(fileField, entry));
-    }
-
 }

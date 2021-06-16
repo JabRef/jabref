@@ -2,50 +2,49 @@ package org.jabref.logic.importer.fileformat;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 
-import org.jabref.logic.util.FileType;
+import org.jabref.logic.util.StandardFileType;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BiblioscapeImporterTest {
 
     private BiblioscapeImporter importer;
 
-
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         importer = new BiblioscapeImporter();
     }
 
     @Test
     public void testGetFormatName() {
-        Assert.assertEquals("Biblioscape", importer.getName());
+        assertEquals("Biblioscape", importer.getName());
     }
 
     @Test
     public void testsGetExtensions() {
-        Assert.assertEquals(FileType.BIBLIOSCAPE, importer.getFileType());
+        assertEquals(StandardFileType.TXT, importer.getFileType());
     }
 
     @Test
     public void testGetDescription() {
-        Assert.assertEquals("Imports a Biblioscape Tag File.\n" +
+        assertEquals("Imports a Biblioscape Tag File.\n" +
                 "Several Biblioscape field types are ignored. Others are only included in the BibTeX field \"comment\".", importer.getDescription());
     }
 
     @Test
     public void testGetCLIID() {
-        Assert.assertEquals("biblioscape", importer.getId());
+        assertEquals("biblioscape", importer.getId());
     }
 
     @Test
     public void testImportEntriesAbortion() throws Throwable {
-        Path file = Paths.get(BiblioscapeImporter.class.getResource("BiblioscapeImporterTestCorrupt.txt").toURI());
-        Assert.assertEquals(Collections.emptyList(),
+        Path file = Path.of(BiblioscapeImporter.class.getResource("BiblioscapeImporterTestCorrupt.txt").toURI());
+        assertEquals(Collections.emptyList(),
                 importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries());
     }
 }

@@ -27,5 +27,4 @@ public class IdGenerator {
         idCounter++;
         return result;
     }
-
 }

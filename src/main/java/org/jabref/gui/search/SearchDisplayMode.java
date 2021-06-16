@@ -30,5 +30,4 @@ public enum SearchDisplayMode {
     public String getToolTipText() {
         return toolTipText.get();
     }
-
 }

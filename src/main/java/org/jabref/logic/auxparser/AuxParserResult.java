@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibtexString;
 
@@ -69,32 +68,16 @@ public class AuxParserResult {
         }
     }
 
-    /**
-     * Prints parsing statistics
-     *
-     * @param includeMissingEntries
-     * @return
-     */
-    public String getInformation(boolean includeMissingEntries) {
-        StringBuilder result = new StringBuilder();
+    public BibDatabase getMasterDatabase() {
+        return masterDatabase;
+    }
 
-        result.append(Localization.lang("keys in library")).append(' ').append(masterDatabase.getEntryCount()).append('\n')
-                .append(Localization.lang("found in AUX file")).append(' ').append(getFoundKeysInAux()).append('\n')
-                .append(Localization.lang("resolved")).append(' ').append(getResolvedKeysCount()).append('\n')
-                .append(Localization.lang("not found")).append(' ').append(getUnresolvedKeysCount()).append('\n')
-                .append(Localization.lang("crossreferenced entries included")).append(' ')
-                .append(crossRefEntriesCount).append(Localization.lang("strings included")).append(' ')
-                .append(insertedStrings).append('\n');
+    public int getNestedAuxCount() {
+        return nestedAuxCount;
+    }
 
-        if (includeMissingEntries && (getUnresolvedKeysCount() > 0)) {
-            for (String entry : unresolvedKeys) {
-                result.append(entry).append('\n');
-            }
-        }
-        if (nestedAuxCount > 0) {
-            result.append(Localization.lang("nested AUX files")).append(' ').append(nestedAuxCount);
-        }
-        return result.toString();
+    public int getInsertedStrings() {
+        return insertedStrings;
     }
 
     public Set<String> getUniqueKeys() {

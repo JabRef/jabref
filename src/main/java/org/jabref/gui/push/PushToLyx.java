@@ -6,75 +6,66 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import javax.swing.Icon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javafx.beans.property.ObjectProperty;
 
-import org.jabref.Globals;
-import org.jabref.JabRefExecutorService;
-import org.jabref.gui.BasePanel;
-import org.jabref.gui.IconTheme;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.JabRefExecutorService;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.metadata.MetaData;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
+import org.jabref.preferences.PushToApplicationPreferences;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PushToLyx extends AbstractPushToApplication implements PushToApplication {
 
+    public static final String NAME = "LyX/Kile";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToLyx.class);
 
-    @Override
-    public String getApplicationName() {
-        return "LyX/Kile";
+    public PushToLyx(DialogService dialogService, PreferencesService preferencesService) {
+        super(dialogService, preferencesService);
     }
 
     @Override
-    public Icon getIcon() {
-        return IconTheme.getImage("lyx");
+    public String getDisplayName() {
+        return NAME;
     }
 
     @Override
-    protected void initParameters() {
-        commandPathPreferenceKey = JabRefPreferences.LYXPIPE;
+    public JabRefIcon getIcon() {
+        return IconTheme.JabRefIcons.APPLICATION_LYX;
     }
 
     @Override
-    public void operationCompleted(BasePanel panel) {
+    public void operationCompleted() {
         if (couldNotConnect) {
-            panel.output(Localization.lang("Error") + ": " +
+            dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
                     Localization.lang("verify that LyX is running and that the lyxpipe is valid")
-                    + ". [" + commandPath + "]");
+                            + ". [" + commandPath + "]");
         } else if (couldNotCall) {
-            panel.output(Localization.lang("Error") + ": " +
-                    Localization.lang("unable to write to") + " " + commandPath +
-                    ".in");
+            dialogService.showErrorDialogAndWait(Localization.lang("unable to write to") + " " + commandPath + ".in");
         } else {
-            super.operationCompleted(panel);
+            super.operationCompleted();
         }
     }
 
     @Override
-    protected void initSettingsPanel() {
-        super.initSettingsPanel();
-        settings = new JPanel();
-        settings.add(new JLabel(Localization.lang("Path to LyX pipe") + ":"));
-        settings.add(path);
+    public PushToApplicationSettings getSettings(PushToApplication application, ObjectProperty<PushToApplicationPreferences> preferences) {
+        return new PushToLyxSettings(application, dialogService, preferencesService, preferences);
     }
 
     @Override
-    public void pushEntries(BibDatabase database, final List<BibEntry> entries, final String keyString,
-            MetaData metaData) {
-
+    public void pushEntries(BibDatabaseContext database, final List<BibEntry> entries, final String keyString) {
         couldNotConnect = false;
         couldNotCall = false;
         notDefined = false;
 
-        initParameters();
-        commandPath = Globals.prefs.get(commandPathPreferenceKey);
+        commandPath = preferencesService.getPushToApplicationPreferences().getPushToApplicationCommandPaths().get(this.getDisplayName());
 
         if ((commandPath == null) || commandPath.trim().isEmpty()) {
             notDefined = true;
@@ -98,13 +89,8 @@ public class PushToLyx extends AbstractPushToApplication implements PushToApplic
 
         JabRefExecutorService.INSTANCE.executeAndWait(() -> {
             try (FileWriter fw = new FileWriter(lyxpipe); BufferedWriter lyxOut = new BufferedWriter(fw)) {
-                String citeStr;
-
-                citeStr = "LYXCMD:sampleclient:citation-insert:" + keyString;
+                String citeStr = "LYXCMD:sampleclient:citation-insert:" + keyString;
                 lyxOut.write(citeStr + "\n");
-
-                lyxOut.close();
-                fw.close();
             } catch (IOException excep) {
                 couldNotCall = true;
                 LOGGER.warn("Problem pushing to LyX/Kile.", excep);

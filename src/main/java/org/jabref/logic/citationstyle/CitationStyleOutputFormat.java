@@ -30,5 +30,4 @@ public enum CitationStyleOutputFormat {
     public String toString() {
         return format;
     }
-
 }

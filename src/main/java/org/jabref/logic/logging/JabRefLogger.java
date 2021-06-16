@@ -26,5 +26,4 @@ public class JabRefLogger {
         loggerConfig.setLevel(Level.DEBUG);
         ctx.updateLoggers();
     }
-
 }

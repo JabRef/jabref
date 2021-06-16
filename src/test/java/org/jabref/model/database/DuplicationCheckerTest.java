@@ -2,110 +2,106 @@ package org.jabref.model.database;
 
 import org.jabref.model.entry.BibEntry;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
-public class DuplicationCheckerTest {
+class DuplicationCheckerTest {
 
     private BibDatabase database;
 
-
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         database = new BibDatabase();
     }
 
     @Test
-    public void addEntry() {
+    void addEntry() {
         BibEntry entry = new BibEntry();
-        entry.setCiteKey("AAA");
+        entry.setCitationKey("AAA");
         database.insertEntry(entry);
-        assertEquals(1, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
+        assertEquals(1, database.getNumberOfCitationKeyOccurrences("AAA"));
     }
 
     @Test
-    public void addAndRemoveEntry() {
+    void addAndRemoveEntry() {
         BibEntry entry = new BibEntry();
-        entry.setCiteKey("AAA");
+        entry.setCitationKey("AAA");
         database.insertEntry(entry);
-        assertEquals(1, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
+        assertEquals(1, database.getNumberOfCitationKeyOccurrences("AAA"));
         database.removeEntry(entry);
-        assertEquals(0, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
+        assertEquals(0, database.getNumberOfCitationKeyOccurrences("AAA"));
     }
 
     @Test
-    public void changeCiteKey() {
+    void changeCiteKey() {
         BibEntry entry = new BibEntry();
-        entry.setCiteKey("AAA");
+        entry.setCitationKey("AAA");
         database.insertEntry(entry);
-        assertEquals(1, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
-        entry.setCiteKey("BBB");
-        assertEquals(0, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
-        assertEquals(1, database.getDuplicationChecker().getNumberOfKeyOccurrences("BBB"));
+        assertEquals(1, database.getNumberOfCitationKeyOccurrences("AAA"));
+        entry.setCitationKey("BBB");
+        assertEquals(0, database.getNumberOfCitationKeyOccurrences("AAA"));
+        assertEquals(1, database.getNumberOfCitationKeyOccurrences("BBB"));
     }
 
-
     @Test
-    public void setCiteKeySameKeyDifferentEntries() {
+    void setCiteKeySameKeyDifferentEntries() {
         BibEntry entry0 = new BibEntry();
-        entry0.setCiteKey("AAA");
+        entry0.setCitationKey("AAA");
         database.insertEntry(entry0);
         BibEntry entry1 = new BibEntry();
-        entry1.setCiteKey("BBB");
+        entry1.setCitationKey("BBB");
         database.insertEntry(entry1);
-        assertEquals(1, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
-        assertEquals(1, database.getDuplicationChecker().getNumberOfKeyOccurrences("BBB"));
+        assertEquals(1, database.getNumberOfCitationKeyOccurrences("AAA"));
+        assertEquals(1, database.getNumberOfCitationKeyOccurrences("BBB"));
 
-        entry1.setCiteKey("AAA");
-        assertEquals(2, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
-        assertEquals(0, database.getDuplicationChecker().getNumberOfKeyOccurrences("BBB"));
+        entry1.setCitationKey("AAA");
+        assertEquals(2, database.getNumberOfCitationKeyOccurrences("AAA"));
+        assertEquals(0, database.getNumberOfCitationKeyOccurrences("BBB"));
     }
 
     @Test
-    public void removeMultipleCiteKeys(){
+    void removeMultipleCiteKeys() {
         BibEntry entry0 = new BibEntry();
-        entry0.setCiteKey("AAA");
+        entry0.setCitationKey("AAA");
         database.insertEntry(entry0);
         BibEntry entry1 = new BibEntry();
-        entry1.setCiteKey("AAA");
+        entry1.setCitationKey("AAA");
         database.insertEntry(entry1);
         BibEntry entry2 = new BibEntry();
-        entry2.setCiteKey("AAA");
+        entry2.setCitationKey("AAA");
         database.insertEntry(entry2);
-        assertEquals(3, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
+        assertEquals(3, database.getNumberOfCitationKeyOccurrences("AAA"));
 
         database.removeEntry(entry2);
-        assertEquals(2, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
+        assertEquals(2, database.getNumberOfCitationKeyOccurrences("AAA"));
 
         database.removeEntry(entry1);
-        assertEquals(1, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
+        assertEquals(1, database.getNumberOfCitationKeyOccurrences("AAA"));
 
         database.removeEntry(entry0);
-        assertEquals(0, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
+        assertEquals(0, database.getNumberOfCitationKeyOccurrences("AAA"));
     }
 
     @Test
-    public void addEmptyCiteKey(){
+    void addEmptyCiteKey() {
         BibEntry entry = new BibEntry();
-        entry.setCiteKey("");
+        entry.setCitationKey("");
         database.insertEntry(entry);
 
-        assertEquals(0, database.getDuplicationChecker().getNumberOfKeyOccurrences(""));
+        assertEquals(0, database.getNumberOfCitationKeyOccurrences(""));
     }
 
     @Test
-    public void removeEmptyCiteKey(){
+    void removeEmptyCiteKey() {
         BibEntry entry = new BibEntry();
-        entry.setCiteKey("AAA");
+        entry.setCitationKey("AAA");
         database.insertEntry(entry);
-        assertEquals(1, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
+        assertEquals(1, database.getNumberOfCitationKeyOccurrences("AAA"));
 
-        entry.setCiteKey("");
+        entry.setCitationKey("");
         database.removeEntry(entry);
-        assertEquals(0, database.getDuplicationChecker().getNumberOfKeyOccurrences("AAA"));
+        assertEquals(0, database.getNumberOfCitationKeyOccurrences("AAA"));
     }
-
 }

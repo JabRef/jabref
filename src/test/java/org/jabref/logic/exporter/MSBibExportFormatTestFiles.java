@@ -6,8 +6,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -16,74 +14,73 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
-import org.xmlunit.builder.Input;
-import org.xmlunit.builder.Input.Builder;
 import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
-import org.xmlunit.matchers.CompareMatcher;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.xmlunit.matchers.CompareMatcher.isSimilarTo;
 
-@RunWith(Parameterized.class)
 public class MSBibExportFormatTestFiles {
 
+    private static Path resourceDir;
     public BibDatabaseContext databaseContext;
     public Charset charset;
-    public Path tempFile;
-    public MSBibExporter msBibExportFormat;
-    public BibtexImporter testImporter;
+    private Path exportedFile;
+    private MSBibExporter exporter;
+    private BibtexImporter testImporter;
 
-    @Parameter
-    public String filename;
-    public Path resourceDir;
-
-    @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
-
-
-    @Parameters(name = "{0}")
-    public static Collection<String> fileNames() throws IOException, URISyntaxException {
-        try (Stream<Path> stream = Files.list(Paths.get(MSBibExportFormatTestFiles.class.getResource("").toURI()))) {
-            return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
-                    .filter(n -> n.startsWith("MsBib")).collect(Collectors.toList());
+    static Stream<String> fileNames() throws IOException, URISyntaxException {
+        // we have to point it to one existing file, otherwise it will return the default class path
+        resourceDir = Path.of(MSBibExportFormatTestFiles.class.getResource("MsBibExportFormatTest1.bib").toURI()).getParent();
+        try (Stream<Path> stream = Files.list(resourceDir)) {
+            return stream.map(n -> n.getFileName().toString())
+                         .filter(n -> n.endsWith(".bib"))
+                         .filter(n -> n.startsWith("MsBib"))
+                         .collect(Collectors.toList())
+                         .stream();
         }
     }
 
-    @Before
-    public void setUp() throws Exception {
-        resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("").toURI());
+    @BeforeEach
+    void setUp(@TempDir Path testFolder) throws Exception {
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
-        msBibExportFormat = new MSBibExporter();
-        tempFile = testFolder.newFile().toPath();
-        testImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        exporter = new MSBibExporter();
+        Path path = testFolder.resolve("ARandomlyNamedFile.tmp");
+        exportedFile = Files.createFile(path);
+        testImporter = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
     }
 
-    @Test
-    public final void testPerformExport() throws IOException, SaveException {
+    @ParameterizedTest(name = "{index} file={0}")
+    @MethodSource("fileNames")
+    void testPerformExport(String filename) throws IOException, SaveException {
         String xmlFileName = filename.replace(".bib", ".xml");
+        Path expectedFile = resourceDir.resolve(xmlFileName);
         Path importFile = resourceDir.resolve(filename);
 
-        List<BibEntry> entries = testImporter.importDatabase(importFile, StandardCharsets.UTF_8).getDatabase()
-                .getEntries();
+        List<BibEntry> entries = testImporter.importDatabase(importFile, StandardCharsets.UTF_8)
+                                             .getDatabase()
+                                             .getEntries();
 
-        msBibExportFormat.export(databaseContext, tempFile, charset, entries);
+        exporter.export(databaseContext, exportedFile, charset, entries);
 
-        Builder control = Input.from(Files.newInputStream(resourceDir.resolve(xmlFileName)));
-        Builder test = Input.from(Files.newInputStream(tempFile));
+        String expected = String.join("\n", Files.readAllLines(expectedFile));
+        String actual = String.join("\n", Files.readAllLines(exportedFile));
 
-        assertThat(test, CompareMatcher.isSimilarTo(control)
-                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
+        // The order of elements changes from Windows to Travis environment somehow
+        // The order does not really matter, so we ignore it.
+        // Source: https://stackoverflow.com/a/16540679/873282
+        assertThat(expected, isSimilarTo(actual)
+                .ignoreWhitespace()
+                .normalizeWhitespace()
+                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)));
     }
 }

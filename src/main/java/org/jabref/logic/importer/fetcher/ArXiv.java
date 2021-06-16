@@ -16,26 +16,29 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.jabref.logic.cleanup.EprintCleanup;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.SearchBasedFetcher;
-import org.jabref.logic.importer.util.OAI2Handler;
+import org.jabref.logic.importer.PagedSearchBasedFetcher;
+import org.jabref.logic.importer.fetcher.transformers.ArXivQueryTransformer;
 import org.jabref.logic.util.io.XMLUtil;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibtexEntryTypes;
-import org.jabref.model.entry.FieldName;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.paging.Page;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -45,18 +48,19 @@ import org.xml.sax.SAXException;
 /**
  * Fetcher for the arXiv.
  *
- * @see <a href="http://arxiv.org/help/api/index">ArXiv API</a> for an overview of the API
- * @see <a href="http://arxiv.org/help/api/user-manual#_calling_the_api">ArXiv API User's Manual</a> for a detailed
+ * @see <a href="https://arxiv.org/help/api/index">ArXiv API</a> for an overview of the API
+ * @see <a href="https://arxiv.org/help/api/user-manual#_calling_the_api">ArXiv API User's Manual</a> for a detailed
  * description on how to use the API
- *
+ * <p>
  * Similar implementions:
  * <a href="https://github.com/nathangrigg/arxiv2bib">arxiv2bib</a> which is <a href="https://arxiv2bibtex.org/">live</a>
  * <a herf="https://gitlab.c3sl.ufpr.br/portalmec/dspace-portalmec/blob/aa209d15082a9870f9daac42c78a35490ce77b52/dspace-api/src/main/java/org/dspace/submit/lookup/ArXivService.java">dspace-portalmec</a>
  */
-public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetcher, IdFetcher<ArXivIdentifier> {
+public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedFetcher, IdFetcher<ArXivIdentifier> {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ArXiv.class);
 
-    private static final String API_URL = "http://export.arxiv.org/api/query";
+    private static final String API_URL = "https://export.arxiv.org/api/query";
 
     private final ImportFormatPreferences importFormatPreferences;
 
@@ -70,20 +74,22 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
 
         try {
             Optional<URL> pdfUrl = searchForEntries(entry).stream()
-                    .map(ArXivEntry::getPdfUrl)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .findFirst();
-
-            if (pdfUrl.isPresent()) {
-                LOGGER.info("Fulltext PDF found @ arXiv.");
-            }
+                                                          .map(ArXivEntry::getPdfUrl)
+                                                          .filter(Optional::isPresent)
+                                                          .map(Optional::get)
+                                                          .findFirst();
+            pdfUrl.ifPresent(url -> LOGGER.info("Fulltext PDF found @ arXiv."));
             return pdfUrl;
         } catch (FetcherException e) {
             LOGGER.warn("arXiv API request failed", e);
         }
 
         return Optional.empty();
+    }
+
+    @Override
+    public TrustLevel getTrustLevel() {
+        return TrustLevel.PREPRINT;
     }
 
     private Optional<ArXivEntry> searchForEntry(String searchQuery) throws FetcherException {
@@ -97,7 +103,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
 
     private Optional<ArXivEntry> searchForEntryById(String id) throws FetcherException {
         Optional<ArXivIdentifier> identifier = ArXivIdentifier.parse(id);
-        if (!identifier.isPresent()) {
+        if (identifier.isEmpty()) {
             return Optional.empty();
         }
 
@@ -109,9 +115,13 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         }
     }
 
-    private List<ArXivEntry> searchForEntries(BibEntry entry) throws FetcherException {
-        // 1. Eprint
-        Optional<String> identifier = entry.getField(FieldName.EPRINT);
+    private List<ArXivEntry> searchForEntries(BibEntry originalEntry) throws FetcherException {
+        // We need to clone the entry, because we modify it by a cleanup job.
+        final BibEntry entry = (BibEntry) originalEntry.clone();
+
+        // 1. Check for Eprint
+        new EprintCleanup().cleanup(entry);
+        Optional<String> identifier = entry.getField(StandardField.EPRINT);
         if (StringUtil.isNotBlank(identifier)) {
             try {
                 // Get pdf of entry with the specified id
@@ -122,26 +132,21 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         }
 
         // 2. DOI and other fields
-        String query;
-
-        Optional<String> doi = entry.getField(FieldName.DOI).flatMap(DOI::parse).map(DOI::getNormalized);
-        if (doi.isPresent()) {
-            // Search for an entry in the ArXiv which is linked to the doi
-            query = "doi:" + doi.get();
-        } else {
-            Optional<String> authorQuery = entry.getField(FieldName.AUTHOR).map(author -> "au:" + author);
-            Optional<String> titleQuery = entry.getField(FieldName.TITLE).map(title -> "ti:" + title);
-            query = OptionalUtil.toList(authorQuery, titleQuery).stream().collect(Collectors.joining("+AND+"));
-        }
-
+        String query = entry.getField(StandardField.DOI)
+             .flatMap(DOI::parse)
+             .map(DOI::getNormalized)
+             .map(doiString -> "doi:" + doiString)
+             .orElseGet(() -> {
+                 Optional<String> authorQuery = entry.getField(StandardField.AUTHOR).map(author -> "au:" + author);
+                 Optional<String> titleQuery = entry.getField(StandardField.TITLE).map(title -> "ti:" + StringUtil.ignoreCurlyBracket(title));
+                 return String.join("+AND+", OptionalUtil.toList(authorQuery, titleQuery));
+             });
         Optional<ArXivEntry> arxivEntry = searchForEntry(query);
-
         if (arxivEntry.isPresent()) {
             // Check if entry is a match
             StringSimilarity match = new StringSimilarity();
             String arxivTitle = arxivEntry.get().title.orElse("");
-            String entryTitle = entry.getField(FieldName.TITLE).orElse("");
-
+            String entryTitle = StringUtil.ignoreCurlyBracket(entry.getField(StandardField.TITLE).orElse(""));
             if (match.isSimilar(arxivTitle, entryTitle)) {
                 return OptionalUtil.toList(arxivEntry);
             }
@@ -150,8 +155,8 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         return Collections.emptyList();
     }
 
-    private List<ArXivEntry> searchForEntries(String searchQuery) throws FetcherException {
-        return queryApi(searchQuery, Collections.emptyList(), 0, 10);
+    private List<ArXivEntry> searchForEntries(String searchQuery, int pageNumber) throws FetcherException {
+        return queryApi(searchQuery, Collections.emptyList(), getPageSize() * pageNumber, getPageSize());
     }
 
     private List<ArXivEntry> queryApi(String searchQuery, List<ArXivIdentifier> ids, int start, int maxResults)
@@ -164,7 +169,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
 
     /**
      * Queries the API.
-     *
+     * <p>
      * If only {@code searchQuery} is given, then the API will return results for each article that matches the query.
      * If only {@code ids} is given, then the API will return results for each article in the list.
      * If both {@code searchQuery} and {@code ids} are given, then the API will return each article in
@@ -217,9 +222,9 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
 
         // Check if the API returned an error
         // In case of an error, only one entry will be returned with the error information. For example:
-        // http://export.arxiv.org/api/query?id_list=0307015
+        // https://export.arxiv.org/api/query?id_list=0307015
         // <entry>
-        //      <id>http://arxiv.org/api/errors#incorrect_id_format_for_0307015</id>
+        //      <id>https://arxiv.org/api/errors#incorrect_id_format_for_0307015</id>
         //      <title>Error</title>
         //      <summary>incorrect id format for 0307015</summary>
         // </entry>
@@ -241,29 +246,48 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
     }
 
     @Override
-    public HelpFile getHelpPage() {
-        return HelpFile.FETCHER_OAI2_ARXIV;
+    public Optional<HelpFile> getHelpPage() {
+        return Optional.of(HelpFile.FETCHER_OAI2_ARXIV);
     }
 
+    /**
+     * Constructs a complex query string using the field prefixes specified at https://arxiv.org/help/api/user-manual
+     *
+     * @param luceneQuery the root node of the lucene query
+     * @return A list of entries matching the complex query
+     */
     @Override
-    public List<BibEntry> performSearch(String query) throws FetcherException {
-        return searchForEntries(query).stream().map(
-                (arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator())).collect(Collectors.toList());
+    public Page<BibEntry> performSearchPaged(QueryNode luceneQuery, int pageNumber) throws FetcherException {
+        ArXivQueryTransformer transformer = new ArXivQueryTransformer();
+        String transformedQuery = transformer.transformLuceneQuery(luceneQuery).orElse("");
+        List<BibEntry> searchResult = searchForEntries(transformedQuery, pageNumber).stream()
+                                                                                    .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
+                                                                                    .collect(Collectors.toList());
+        return new Page<>(transformedQuery, pageNumber, filterYears(searchResult, transformer));
+    }
+
+    private List<BibEntry> filterYears(List<BibEntry> searchResult, ArXivQueryTransformer transformer) {
+        return searchResult.stream()
+                           .filter(entry -> entry.getField(StandardField.DATE).isPresent())
+                           // Filter the date field for year only
+                           .filter(entry -> transformer.getEndYear().isEmpty() || Integer.parseInt(entry.getField(StandardField.DATE).get().substring(0, 4)) <= transformer.getEndYear().get())
+                           .filter(entry -> transformer.getStartYear().isEmpty() || Integer.parseInt(entry.getField(StandardField.DATE).get().substring(0, 4)) >= transformer.getStartYear().get())
+                           .collect(Collectors.toList());
     }
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        return searchForEntryById(identifier).map(
-                (arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()));
+        return searchForEntryById(identifier)
+                .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()));
     }
 
     @Override
     public Optional<ArXivIdentifier> findIdentifier(BibEntry entry) throws FetcherException {
         return searchForEntries(entry).stream()
-                .map(ArXivEntry::getId)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .findFirst();
+                                      .map(ArXivEntry::getId)
+                                      .filter(Optional::isPresent)
+                                      .map(Optional::get)
+                                      .findFirst();
     }
 
     @Override
@@ -284,13 +308,12 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         private final Optional<String> journalReferenceText;
         private final Optional<String> primaryCategory;
 
-
         public ArXivEntry(Node item) {
-            // see http://arxiv.org/help/api/user-manual#_details_of_atom_results_returned
+            // see https://arxiv.org/help/api/user-manual#_details_of_atom_results_returned
 
             // Title of the article
             // The result from the arXiv contains hard line breaks, try to remove them
-            title = XMLUtil.getNodeContent(item, "title").map(OAI2Handler::correctLineBreaks);
+            title = XMLUtil.getNodeContent(item, "title").map(ArXivEntry::correctLineBreaks);
 
             // The url leading to the abstract page
             urlAbstractPage = XMLUtil.getNodeContent(item, "id");
@@ -299,8 +322,8 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             publishedDate = XMLUtil.getNodeContent(item, "published");
 
             // Abstract of the article
-            abstractText = XMLUtil.getNodeContent(item, "summary").map(OAI2Handler::correctLineBreaks)
-                    .map(String::trim);
+            abstractText = XMLUtil.getNodeContent(item, "summary").map(ArXivEntry::correctLineBreaks)
+                                  .map(String::trim);
 
             // Authors of the article
             authorNames = new ArrayList<>();
@@ -339,9 +362,15 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             journalReferenceText = XMLUtil.getNodeContent(item, "arxiv:journal_ref");
 
             // Primary category
-            // Ex: <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+            // Ex: <arxiv:primary_category xmlns:arxiv="https://arxiv.org/schemas/atom" term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
             primaryCategory = XMLUtil.getNode(item, "arxiv:primary_category")
-                    .flatMap(node -> XMLUtil.getAttributeContent(node, "term"));
+                                     .flatMap(node -> XMLUtil.getAttributeContent(node, "term"));
+        }
+
+        public static String correctLineBreaks(String s) {
+            String result = s.replaceAll("\\n(?!\\s*\\n)", " ");
+            result = result.replaceAll("\\s*\\n\\s*", "\n");
+            return result.replaceAll(" {2,}", " ").replaceAll("(^\\s*|\\s+$)", "");
         }
 
         /**
@@ -355,15 +384,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
          * Returns the arXiv identifier
          */
         public Optional<String> getIdString() {
-            // remove leading http://arxiv.org/abs/ from abstract url to get arXiv ID
-            String prefix = "http://arxiv.org/abs/";
-            return urlAbstractPage.map(abstractUrl -> {
-                if (abstractUrl.startsWith(prefix)) {
-                    return abstractUrl.substring(prefix.length());
-                } else {
-                    return abstractUrl;
-                }
-            });
+            return urlAbstractPage.flatMap(ArXivIdentifier::parse).map(ArXivIdentifier::getNormalizedWithoutVersion);
         }
 
         public Optional<ArXivIdentifier> getId() {
@@ -385,20 +406,18 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         }
 
         public BibEntry toBibEntry(Character keywordDelimiter) {
-            BibEntry bibEntry = new BibEntry();
-            bibEntry.setType(BibtexEntryTypes.ARTICLE);
-            bibEntry.setField(FieldName.EPRINTTYPE, "arXiv");
-            bibEntry.setField(FieldName.AUTHOR, String.join(" and ", authorNames));
+            BibEntry bibEntry = new BibEntry(StandardEntryType.Article);
+            bibEntry.setField(StandardField.EPRINTTYPE, "arXiv");
+            bibEntry.setField(StandardField.AUTHOR, String.join(" and ", authorNames));
             bibEntry.addKeywords(categories, keywordDelimiter);
-            getIdString().ifPresent(id -> bibEntry.setField(FieldName.EPRINT, id));
-            title.ifPresent(titleContent -> bibEntry.setField(FieldName.TITLE, titleContent));
-            doi.ifPresent(doiContent -> bibEntry.setField(FieldName.DOI, doiContent));
-            abstractText.ifPresent(abstractContent -> bibEntry.setField(FieldName.ABSTRACT, abstractContent));
-            getDate().ifPresent(date -> bibEntry.setField(FieldName.DATE, date));
-            primaryCategory.ifPresent(category -> bibEntry.setField(FieldName.EPRINTCLASS, category));
-            journalReferenceText.ifPresent(journal -> bibEntry.setField(FieldName.JOURNALTITLE, journal));
-            getPdfUrl().ifPresent(url -> bibEntry
-                    .setFiles(Collections.singletonList(new LinkedFile("online", url, "PDF"))));
+            getIdString().ifPresent(id -> bibEntry.setField(StandardField.EPRINT, id));
+            title.ifPresent(titleContent -> bibEntry.setField(StandardField.TITLE, titleContent));
+            doi.ifPresent(doiContent -> bibEntry.setField(StandardField.DOI, doiContent));
+            abstractText.ifPresent(abstractContent -> bibEntry.setField(StandardField.ABSTRACT, abstractContent));
+            getDate().ifPresent(date -> bibEntry.setField(StandardField.DATE, date));
+            primaryCategory.ifPresent(category -> bibEntry.setField(StandardField.EPRINTCLASS, category));
+            journalReferenceText.ifPresent(journal -> bibEntry.setField(StandardField.JOURNALTITLE, journal));
+            getPdfUrl().ifPresent(url -> bibEntry.setFiles(Collections.singletonList(new LinkedFile(url, "PDF"))));
             return bibEntry;
         }
     }

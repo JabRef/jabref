@@ -1,6 +1,7 @@
 package org.jabref.model.groups;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -20,7 +21,7 @@ import org.jabref.model.search.matchers.MatcherSets;
  */
 public class GroupTreeNode extends TreeNode<GroupTreeNode> {
 
-    private static final String PATH_DELEMITER = " > ";
+    private static final String PATH_DELIMITER = " > ";
     private AbstractGroup group;
 
     /**
@@ -30,7 +31,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
      */
     public GroupTreeNode(AbstractGroup group) {
         super(GroupTreeNode.class);
-        this.group = Objects.requireNonNull(group);
+        setGroup(group, false, false, null);
     }
 
     public static GroupTreeNode fromGroup(AbstractGroup group) {
@@ -58,25 +59,24 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /**
-     * Associates the specified group with this node while also providing the possibility to modify previous matched
-     * entries so that they are now matched by the new group.
+     * Associates the specified group with this node while also providing the possibility to modify previous matched entries so that they are now matched by the new group.
      *
-     * @param newGroup the new group (has to be non-null)
-     * @param shouldKeepPreviousAssignments specifies whether previous matched entries should be added to the new group
+     * @param newGroup                        the new group (has to be non-null)
+     * @param shouldKeepPreviousAssignments   specifies whether previous matched entries should be added to the new group
      * @param shouldRemovePreviousAssignments specifies whether previous matched entries should be removed from the old group
-     * @param entriesInDatabase list of entries in the database
+     * @param entriesInDatabase               list of entries in the database
      */
     public List<FieldChange> setGroup(AbstractGroup newGroup, boolean shouldKeepPreviousAssignments,
                                       boolean shouldRemovePreviousAssignments, List<BibEntry> entriesInDatabase) {
         AbstractGroup oldGroup = getGroup();
-        setGroup(newGroup);
+        group = Objects.requireNonNull(newGroup);
 
         List<FieldChange> changes = new ArrayList<>();
         boolean shouldRemove = shouldRemovePreviousAssignments && (oldGroup instanceof GroupEntryChanger);
         boolean shouldAdd = shouldKeepPreviousAssignments && (newGroup instanceof GroupEntryChanger);
         if (shouldAdd || shouldRemove) {
             List<BibEntry> entriesMatchedByOldGroup = entriesInDatabase.stream().filter(oldGroup::isMatch)
-                    .collect(Collectors.toList());
+                                                                       .collect(Collectors.toList());
             if (shouldRemove) {
                 GroupEntryChanger entryChanger = (GroupEntryChanger) oldGroup;
                 changes.addAll(entryChanger.remove(entriesMatchedByOldGroup));
@@ -91,11 +91,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /**
-     * Creates a {@link SearchMatcher} that matches entries of this group and that takes the hierarchical information
-     * into account. I.e., it finds elements contained in this nodes group,
-     * or the union of those elements in its own group and its
-     * children's groups (recursively), or the intersection of the elements in
-     * its own group and its parent's group (depending on the hierarchical settings stored in the involved groups)
+     * Creates a {@link SearchMatcher} that matches entries of this group and that takes the hierarchical information into account. I.e., it finds elements contained in this nodes group, or the union of those elements in its own group and its children's groups (recursively), or the intersection of the elements in its own group and its parent's group (depending on the hierarchical settings stored in the involved groups)
      */
     public SearchMatcher getSearchMatcher() {
         return getSearchMatcher(group.getHierarchicalContext());
@@ -115,7 +111,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
             }
         } else if ((context == GroupHierarchyType.REFINING) && !isRoot() && (originalContext
                 != GroupHierarchyType.INCLUDING)) {
-            //noinspection OptionalGetWithoutIsPresent
+            // noinspection OptionalGetWithoutIsPresent
             searchRule.addRule(getParent().get().getSearchMatcher(originalContext));
         }
         return searchRule;
@@ -161,6 +157,16 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         return groups;
     }
 
+    /**
+     * Determines all groups in the subtree starting at this node which contain the given entry.
+     */
+    public List<GroupTreeNode> getMatchingGroups(BibEntry entry) {
+        return getMatchingGroups(Collections.singletonList(entry));
+    }
+
+    /**
+     * Determines all groups in the subtree starting at this node which contain at least one of the given entries.
+     */
     public List<GroupTreeNode> getMatchingGroups(List<BibEntry> entries) {
         List<GroupTreeNode> groups = new ArrayList<>();
 
@@ -183,7 +189,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
 
     public List<BibEntry> getEntriesInGroup(List<BibEntry> entries) {
         List<BibEntry> result = new ArrayList<>();
-        for (BibEntry entry: entries) {
+        for (BibEntry entry : entries) {
             if (this.group.contains(entry)) {
                 result.add(entry);
             }
@@ -207,48 +213,45 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /**
-     * Determines the number of entries in the specified list which are matched by this group.
+     * Determines the entries in the specified list which are matched by this group.
+     *
      * @param entries list of entries to be searched
-     * @return number of hits
+     * @return matched entries
      */
-    public int calculateNumberOfMatches(List<BibEntry> entries) {
-        int hits = 0;
+    public List<BibEntry> findMatches(List<BibEntry> entries) {
         SearchMatcher matcher = getSearchMatcher();
-        for (BibEntry entry : entries) {
-            if (matcher.isMatch(entry)) {
-                hits++;
-            }
-        }
-        return hits;
+        return entries.stream()
+                      .filter(matcher::isMatch)
+                      .collect(Collectors.toList());
     }
 
     /**
-     * Determines the number of entries in the specified database which are matched by this group.
+     * Determines the entries in the specified database which are matched by this group.
+     *
      * @param database database to be searched
-     * @return number of hits
+     * @return matched entries
      */
-    public int calculateNumberOfMatches(BibDatabase database) {
-        return calculateNumberOfMatches(database.getEntries());
+    public List<BibEntry> findMatches(BibDatabase database) {
+        return findMatches(database.getEntries());
     }
 
     /**
-     * Returns whether this group matches the specified {@link BibEntry} while taking the hierarchical information
-     * into account.
+     * Returns whether this group matches the specified {@link BibEntry} while taking the hierarchical information into account.
      */
     public boolean matches(BibEntry entry) {
         return getSearchMatcher().isMatch(entry);
     }
 
     /**
-     * Get the path from the root of the tree as a string (every group name is separated by {@link #PATH_DELEMITER}.
-     *
+     * Get the path from the root of the tree as a string (every group name is separated by {@link #PATH_DELIMITER}.
+     * <p>
      * The name of the root is not included.
      */
     public String getPath() {
         return getPathFromRoot().stream()
-                .skip(1) // Skip root
-                .map(GroupTreeNode::getName)
-                .collect(Collectors.joining(PATH_DELEMITER));
+                                .skip(1) // Skip root
+                                .map(GroupTreeNode::getName)
+                                .collect(Collectors.joining(PATH_DELIMITER));
     }
 
     @Override
@@ -259,15 +262,15 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /**
-     * Finds a children using the given path.
-     * Each group name should be separated by {@link #PATH_DELEMITER}.
-     *
+     * Finds a children using the given path. Each group name should be separated by {@link #PATH_DELIMITER}.
+     * <p>
      * The path should be generated using {@link #getPath()}.
      */
     public Optional<GroupTreeNode> getChildByPath(String pathToSource) {
         GroupTreeNode present = this;
-        for (String groupName : pathToSource.split(PATH_DELEMITER)) {
-            Optional<GroupTreeNode> childWithName = present.getChildren().stream()
+        for (String groupName : pathToSource.split(PATH_DELIMITER)) {
+            Optional<GroupTreeNode> childWithName = present
+                    .getChildren().stream()
                     .filter(group -> Objects.equals(group.getName(), groupName))
                     .findFirst();
             if (childWithName.isPresent()) {
@@ -282,11 +285,9 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /**
-     * Adds the specified entries to this group.
-     * If the group does not support explicit adding of entries (i.e., does not implement {@link GroupEntryChanger}),
-     * then no action is performed.
+     * Adds the specified entries to this group. If the group does not support explicit adding of entries (i.e., does not implement {@link GroupEntryChanger}), then no action is performed.
      */
-    public List<FieldChange> addEntriesToGroup(List<BibEntry> entries) {
+    public List<FieldChange> addEntriesToGroup(Collection<BibEntry> entries) {
         if (getGroup() instanceof GroupEntryChanger) {
             return ((GroupEntryChanger) getGroup()).add(entries);
         } else {
@@ -295,8 +296,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     }
 
     /**
-     * Removes the given entries from this group. If the group does not support the explicit removal of entries (i.e.,
-     * does not implement {@link GroupEntryChanger}), then no action is performed.
+     * Removes the given entries from this group. If the group does not support the explicit removal of entries (i.e., does not implement {@link GroupEntryChanger}), then no action is performed.
      */
     public List<FieldChange> removeEntriesFromGroup(List<BibEntry> entries) {
         if (getGroup() instanceof GroupEntryChanger) {

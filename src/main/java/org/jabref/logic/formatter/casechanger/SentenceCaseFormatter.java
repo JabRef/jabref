@@ -1,9 +1,12 @@
 package org.jabref.logic.formatter.casechanger;
 
-import org.jabref.logic.l10n.Localization;
-import org.jabref.model.cleanup.Formatter;
+import java.util.stream.Collectors;
 
-public class SentenceCaseFormatter implements Formatter {
+import org.jabref.logic.cleanup.Formatter;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.model.strings.StringUtil;
+
+public class SentenceCaseFormatter extends Formatter {
 
     @Override
     public String getName() {
@@ -20,11 +23,16 @@ public class SentenceCaseFormatter implements Formatter {
      */
     @Override
     public String format(String input) {
-        Title title = new Title(new LowerCaseFormatter().format(input));
-
-        title.getWords().stream().findFirst().ifPresent(Word::toUpperFirst);
-
-        return title.toString();
+        return StringUtil.getStringAsSentences(input)
+                .stream()
+                .map(new LowerCaseFormatter()::format)
+                .map(Title::new)
+                .map(title -> {
+                    title.getFirstWord().ifPresent(Word::toUpperFirst);
+                    return title;
+                })
+                .map(Object::toString)
+                .collect(Collectors.joining(" "));
     }
 
     @Override
@@ -37,5 +45,4 @@ public class SentenceCaseFormatter implements Formatter {
     public String getExampleInput() {
         return "i have {Aa} DREAM";
     }
-
 }

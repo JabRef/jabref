@@ -1,0 +1,71 @@
+name: jabref
+adopt-info: jabref
+icon: snap/gui/jabref.png
+license: MIT
+summary: Bibliography manager
+description: |
+  JabRef is an open source bibliography reference manager.
+  The native file format used by JabRef is BibTeX, the standard LaTeX bibliography format.
+  To access files in external media (i.e. usb drives) you must run:
+  `snap connect jabref:removable-media`
+grade: stable
+confinement: strict
+base: core18
+architectures:
+  - build-on: amd64
+
+plugs:
+  home:
+  unity7:
+  opengl:
+  network-bind:
+  removable-media:
+  hostfs-mozilla-native-messaging-jabref:
+    interface: system-files
+    write:
+    - /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json
+  etc-opt-chrome-native-messaging-jabref:
+    interface: system-files
+    write:
+    - /etc/opt/chrome/native-messaging-hosts/org.jabref.jabref.json
+  etc-opt-edge-native-messaging-jabref:
+    interface: system-files
+    write:
+      - /etc/opt/edge/native-messaging-hosts/org.jabref.jabref.json
+  etc-chromium-native-messaging-jabref:
+    interface: system-files
+    write:
+    - /etc/chromium/native-messaging-hosts/org.jabref.jabref.json
+
+apps:
+  jabref:
+    command: bin/JabRef
+    extensions: [gnome-3-34]
+  browser-proxy:
+    command: lib/jabrefHost.py
+    extensions: [gnome-3-34]
+
+environment:
+  _JAVA_OPTIONS: "-Duser.home=$SNAP_USER_DATA"
+  GTK_USE_PORTAL: "1"
+
+parts:
+  jabref:
+    plugin: dump
+    source: https://builds.jabref.org/main/JabRef-5.3-portable_linux.tar.gz
+    stage-packages:
+      - x11-utils
+    override-build: |
+      snapcraftctl build
+      snapcraftctl set-version "$(cat $SNAPCRAFT_PART_INSTALL/lib/app/.jpackage.xml | grep "app-version" | cut -d">" -f2 | cut -d"<" -f1)"
+      sed -i 's|/opt/jabref/lib/jabrefHost.py|/snap/bin/jabref.browser-proxy|g' $SNAPCRAFT_PART_INSTALL/lib/native-messaging-host/*/org.jabref.jabref.json
+      sed -i 's/usr\/bin\/env python3/usr\/bin\/python3/g' $SNAPCRAFT_PART_INSTALL/lib/jabrefHost.py
+      rm $SNAPCRAFT_PART_INSTALL/bin/JabRef
+  jabref-launcher:
+    after:
+      - jabref
+    source: snap/local
+    source-type: local
+    plugin: dump
+    organize:
+      JabRef-launcher: bin/JabRef

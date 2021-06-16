@@ -1,61 +1,31 @@
 package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
-import org.jabref.logic.bibtex.BibEntryAssert;
-import org.jabref.model.entry.BibEntry;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
-
-@RunWith(Parameterized.class)
 public class BiblioscapeImporterTestFiles {
 
-    private BiblioscapeImporter bsImporter;
+    private static final String FILE_ENDING = ".txt";
 
-    public Path importFile;
-    public String bibFile;
-
-
-    public BiblioscapeImporterTestFiles(String fileName) throws URISyntaxException {
-        importFile = Paths.get(BiblioscapeImporterTest.class.getResource(fileName + ".txt").toURI());
-        bibFile = fileName + ".bib";
+    private static Stream<String> fileNames() throws IOException {
+        Predicate<String> fileName = name -> name.startsWith("BiblioscapeImporterTest")
+                && name.endsWith(FILE_ENDING) && !name.contains("Corrupt");
+        return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
-    @Before
-    public void setUp() throws Exception {
-        bsImporter = new BiblioscapeImporter();
+    @ParameterizedTest
+    @MethodSource("fileNames")
+    public void testIsRecognizedFormat(String fileName) throws IOException {
+        ImporterTestEngine.testIsRecognizedFormat(new BiblioscapeImporter(), fileName);
     }
 
-    @Parameters(name = "{0}")
-    public static Collection<String> fileNames() {
-        return Arrays.asList("BiblioscapeImporterTestOptionalFields", "BiblioscapeImporterTestComments",
-                "BiblioscapeImporterTestUnknownFields", "BiblioscapeImporterTestKeywords",
-                "BiblioscapeImporterTestJournalArticle", "BiblioscapeImporterTestInbook",
-                "BiblioscapeImporterTestUnknownType", "BiblioscapeImporterTestArticleST");
-    }
-
-    @Test
-    public void testIsRecognizedFormat() throws IOException {
-        Assert.assertTrue(bsImporter.isRecognizedFormat(importFile, StandardCharsets.UTF_8));
-    }
-
-    @Test
-    public void testImportEntries() throws IOException {
-        List<BibEntry> bsEntries = bsImporter.importDatabase(importFile, StandardCharsets.UTF_8).getDatabase()
-                .getEntries();
-        Assert.assertEquals(1, bsEntries.size());
-        BibEntryAssert.assertEquals(BiblioscapeImporterTest.class, bibFile, bsEntries);
+    @ParameterizedTest
+    @MethodSource("fileNames")
+    public void testImportEntries(String fileName) throws Exception {
+        ImporterTestEngine.testImportEntries(new BiblioscapeImporter(), fileName, FILE_ENDING);
     }
 }

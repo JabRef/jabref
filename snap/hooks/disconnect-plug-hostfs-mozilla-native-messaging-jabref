@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if [ ! -f /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json ]; then
+    exit 0
+elif grep --quiet '"path": "/snap' /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json; then
+    rm /var/lib/snapd/hostfs/usr/lib/mozilla/native-messaging-hosts/org.jabref.jabref.json
+fi

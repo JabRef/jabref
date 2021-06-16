@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<mods:modsCollection xmlns="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:ns3="http://www.w3.org/2001/XMLSchema-instance" ns3:schemaLocation="http://www.loc.gov/standards/mods/v3/mods-3-6.xsd">
+<mods:modsCollection xmlns:mods="http://www.loc.gov/mods/v3" xmlns:ns2="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/standards/mods/v3/mods-3-6.xsd">
     <mods:mods ID="test">
         <mods:identifier type="citekey">test</mods:identifier>
         <mods:genre>inbook</mods:genre>
-        <mods:subject>
-            <mods:topic>keyword</mods:topic>
-        </mods:subject>
         <mods:name type="personal">
             <mods:namePart type="family">Mustermann</mods:namePart>
         </mods:name>
+        <mods:subject>
+            <mods:topic>keyword</mods:topic>
+        </mods:subject>
         <mods:originInfo/>
         <mods:relatedItem type="host">
             <mods:part>

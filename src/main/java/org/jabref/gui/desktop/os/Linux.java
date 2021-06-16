@@ -1,24 +1,48 @@
 package org.jabref.gui.desktop.os;
 
+import java.awt.Desktop;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.StringJoiner;
 
+import org.jabref.architecture.AllowedToUseAwt;
+import org.jabref.gui.JabRefExecutorService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.gui.util.StreamGobbler;
 
-import static org.jabref.preferences.JabRefPreferences.ADOBE_ACROBAT_COMMAND;
-import static org.jabref.preferences.JabRefPreferences.USE_PDF_READER;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+@AllowedToUseAwt("Requires AWT to open a file with the native method")
 public class Linux implements NativeDesktop {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Linux.class);
+
+    private void nativeOpenFile(String filePath) {
+        JabRefExecutorService.INSTANCE.execute(() -> {
+            try {
+                File file = new File(filePath);
+                Desktop.getDesktop().open(file);
+                System.out.println("Open file in default application with Desktop integration");
+            } catch (IllegalArgumentException e) {
+                System.out.println("Fail back to xdg-open");
+                try {
+                    String[] cmd = {"xdg-open", filePath};
+                    Runtime.getRuntime().exec(cmd);
+                } catch (Exception e2) {
+                    System.out.println("Open operation not successful: " + e2);
+                }
+            } catch (IOException e) {
+                System.out.println("Native open operation not successful: " + e);
+            }
+        });
+    }
+
     @Override
     public void openFile(String filePath, String fileType) throws IOException {
         Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt(fileType);
@@ -26,11 +50,16 @@ public class Linux implements NativeDesktop {
 
         if (type.isPresent() && !type.get().getOpenWithApplication().isEmpty()) {
             viewer = type.get().getOpenWithApplication();
+            ProcessBuilder processBuilder = new ProcessBuilder(viewer, filePath);
+            Process process = processBuilder.start();
+            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
+            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::debug);
+
+            JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
+            JabRefExecutorService.INSTANCE.execute(streamGobblerError);
         } else {
-            viewer = "xdg-open";
+            nativeOpenFile(filePath);
         }
-        String[] cmdArray = { viewer, filePath };
-        Runtime.getRuntime().exec(cmdArray);
     }
 
     @Override
@@ -39,30 +68,37 @@ public class Linux implements NativeDesktop {
         String[] openWith;
         if ((application != null) && !application.isEmpty()) {
             openWith = application.split(" ");
-        } else {
-            openWith = new String[] {"xdg-open"};
-        }
+            String[] cmdArray = new String[openWith.length + 1];
+            System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
+            cmdArray[cmdArray.length - 1] = filePath;
 
-        String[] cmdArray = new String[openWith.length + 1];
-        System.arraycopy(openWith, 0, cmdArray, 0, openWith.length);
-        cmdArray[cmdArray.length - 1] = filePath;
-        Runtime.getRuntime().exec(cmdArray);
+            ProcessBuilder processBuilder = new ProcessBuilder(cmdArray);
+            Process process = processBuilder.start();
+
+            StreamGobbler streamGobblerInput = new StreamGobbler(process.getInputStream(), LOGGER::debug);
+            StreamGobbler streamGobblerError = new StreamGobbler(process.getErrorStream(), LOGGER::debug);
+
+            JabRefExecutorService.INSTANCE.execute(streamGobblerInput);
+            JabRefExecutorService.INSTANCE.execute(streamGobblerError);
+        } else {
+            nativeOpenFile(filePath);
+        }
     }
 
     @Override
     public void openFolderAndSelectFile(Path filePath) throws IOException {
-        String desktopSession = System.getenv("DESKTOP_SESSION").toLowerCase(Locale.ROOT);
+        String desktopSession = System.getenv("DESKTOP_SESSION");
 
-        String cmd;
+        String cmd = "xdg-open " + filePath.toAbsolutePath().getParent().toString(); // default command
 
-        if (desktopSession.contains("gnome")) {
-            cmd = "nautilus" + filePath.toString().replace(" ", "\\ ");
-        } else if (desktopSession.contains("kde")) {
-            cmd = "dolphin --select " + filePath.toString().replace(" ", "\\ ");
-        } else {
-            cmd = "xdg-open " + filePath.toAbsolutePath().getParent().toString();
+        if (desktopSession != null) {
+            desktopSession = desktopSession.toLowerCase(Locale.ROOT);
+            if (desktopSession.contains("gnome")) {
+                cmd = "nautilus" + filePath.toString().replace(" ", "\\ ");
+            } else if (desktopSession.contains("kde")) {
+                cmd = "dolphin --select " + filePath.toString().replace(" ", "\\ ");
+            }
         }
-
         Runtime.getRuntime().exec(cmd);
     }
 
@@ -73,7 +109,6 @@ public class Linux implements NativeDesktop {
         BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
         String emulatorName = reader.readLine();
-
         if (emulatorName != null) {
             emulatorName = emulatorName.substring(emulatorName.lastIndexOf(File.separator) + 1);
 
@@ -90,29 +125,12 @@ public class Linux implements NativeDesktop {
     }
 
     @Override
-    public void openPdfWithParameters(String filePath, List<String> parameters) throws IOException {
-
-        String application;
-        if (JabRefPreferences.getInstance().get(USE_PDF_READER).equals(JabRefPreferences.getInstance().get(ADOBE_ACROBAT_COMMAND))) {
-            application = "acroread";
-
-            StringJoiner sj = new StringJoiner(" ");
-            sj.add(application);
-            parameters.forEach((param) -> sj.add(param));
-
-            openFileWithApplication(filePath, sj.toString());
-        } else {
-            openFile( filePath, "PDF");
-        }
-    }
-
-    @Override
     public String detectProgramPath(String programName, String directoryName) {
         return programName;
     }
 
     @Override
     public Path getApplicationDirectory() {
-        return Paths.get("/usr/lib/");
+        return Path.of("/usr/lib/");
     }
 }

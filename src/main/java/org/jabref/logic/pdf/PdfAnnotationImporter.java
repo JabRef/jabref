@@ -18,6 +18,7 @@ import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,10 +42,10 @@ public class PdfAnnotationImporter implements AnnotationImporter {
         }
 
         List<FileAnnotation> annotationsList = new LinkedList<>();
-        try (PDDocument document = PDDocument.load(path.toString())) {
-            List pdfPages = document.getDocumentCatalog().getAllPages();
-            for (int pageIndex = 0; pageIndex < pdfPages.size(); pageIndex++) {
-                PDPage page = (PDPage) pdfPages.get(pageIndex);
+        try (PDDocument document = PDDocument.load(path.toFile())) {
+            PDPageTree pdfPages = document.getDocumentCatalog().getPages();
+            for (int pageIndex = 0; pageIndex < pdfPages.getCount(); pageIndex++) {
+                PDPage page = pdfPages.get(pageIndex);
                 for (PDAnnotation annotation : page.getAnnotations()) {
                     if (!isSupportedAnnotationType(annotation)) {
                         continue;
@@ -54,7 +55,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
                         annotationsList.add(createMarkedAnnotations(pageIndex, page, annotation));
                     } else {
                         FileAnnotation fileAnnotation = new FileAnnotation(annotation, pageIndex + 1);
-                        if (fileAnnotation.getContent() != null && !fileAnnotation.getContent().isEmpty()) {
+                        if ((fileAnnotation.getContent() != null) && !fileAnnotation.getContent().isEmpty()) {
                             annotationsList.add(fileAnnotation);
                         }
                     }
@@ -86,19 +87,19 @@ public class PdfAnnotationImporter implements AnnotationImporter {
 
     private FileAnnotation createMarkedAnnotations(int pageIndex, PDPage page, PDAnnotation annotation) {
         FileAnnotation annotationBelongingToMarking = new FileAnnotation(
-                annotation.getDictionary().getString(COSName.T), FileAnnotation.extractModifiedTime(annotation.getModifiedDate()),
+                annotation.getCOSObject().getString(COSName.T), FileAnnotation.extractModifiedTime(annotation.getModifiedDate()),
                 pageIndex + 1, annotation.getContents(), FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT)), Optional.empty());
 
         if (annotationBelongingToMarking.getAnnotationType().isLinkedFileAnnotationType()) {
             try {
-                COSArray boundingBoxes = (COSArray) annotation.getDictionary().getDictionaryObject(COSName.getPDFName("QuadPoints"));
+                COSArray boundingBoxes = (COSArray) annotation.getCOSObject().getDictionaryObject(COSName.getPDFName("QuadPoints"));
                 annotation.setContents(new TextExtractor(page, boundingBoxes).extractMarkedText());
             } catch (IOException e) {
                 annotation.setContents("JabRef: Could not extract any marked text!");
             }
         }
 
-        //Marked text that has a sticky note on it should be linked to the sticky note
+        // Marked text that has a sticky note on it should be linked to the sticky note
         return new FileAnnotation(annotation, pageIndex + 1, annotationBelongingToMarking);
     }
 

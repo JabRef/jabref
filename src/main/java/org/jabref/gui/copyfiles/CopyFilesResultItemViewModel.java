@@ -7,19 +7,20 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIcon;
 
 public class CopyFilesResultItemViewModel {
 
     private final StringProperty file = new SimpleStringProperty("");
-    private final ObjectProperty<MaterialDesignIcon> icon = new SimpleObjectProperty<>(MaterialDesignIcon.ALERT);
+    private final ObjectProperty<JabRefIcon> icon = new SimpleObjectProperty<>(IconTheme.JabRefIcons.WARNING);
     private final StringProperty message = new SimpleStringProperty("");
 
     public CopyFilesResultItemViewModel(Path file, boolean success, String message) {
         this.file.setValue(file.toString());
         this.message.setValue(message);
         if (success) {
-            this.icon.setValue(MaterialDesignIcon.CHECK);
+            this.icon.setValue(IconTheme.JabRefIcons.CHECK);
         }
     }
 
@@ -31,7 +32,7 @@ public class CopyFilesResultItemViewModel {
         return message;
     }
 
-    public ObjectProperty<MaterialDesignIcon> getIcon() {
+    public ObjectProperty<JabRefIcon> getIcon() {
         return icon;
     }
 

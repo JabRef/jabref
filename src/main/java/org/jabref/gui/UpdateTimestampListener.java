@@ -1,7 +1,9 @@
 package org.jabref.gui;
 
+import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.preferences.PreferencesService;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -9,17 +11,19 @@ import com.google.common.eventbus.Subscribe;
  * Updates the timestamp of changed entries if the feature is enabled
  */
 class UpdateTimestampListener {
-    private final JabRefPreferences jabRefPreferences;
+    private final PreferencesService preferencesService;
 
-    UpdateTimestampListener(JabRefPreferences jabRefPreferences) {
-        this.jabRefPreferences = jabRefPreferences;
+    UpdateTimestampListener(PreferencesService preferencesService) {
+        this.preferencesService = preferencesService;
     }
 
     @Subscribe
     public void listen(EntryChangedEvent event) {
-        if (jabRefPreferences.getTimestampPreferences().includeTimestamps()) {
-            event.getBibEntry().setField(jabRefPreferences.getTimestampPreferences().getTimestampField(),
-                    jabRefPreferences.getTimestampPreferences().now());
+        // The event source needs to be checked, since the timestamp is always updated on every change. The cleanup formatter is an exception to that behaviour,
+        // since it just should move the contents from the timestamp field to modificationdate or creationdate.
+        if (preferencesService.getTimestampPreferences().shouldAddModificationDate() && event.getEntriesEventSource() != EntriesEventSource.CLEANUP_TIMESTAMP) {
+            event.getBibEntry().setField(StandardField.MODIFICATIONDATE,
+                    preferencesService.getTimestampPreferences().now());
         }
     }
 }

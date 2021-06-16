@@ -2,16 +2,16 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HTMLCharsTest {
 
     private LayoutFormatter layout;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         layout = new HTMLChars();
     }
@@ -25,6 +25,9 @@ public class HTMLCharsTest {
 
         assertEquals("Réflexions sur le timing de la quantité",
                 layout.format("Réflexions sur le timing de la quantité"));
+
+        assertEquals("%%%", layout.format("\\%\\%\\%"));
+        assertEquals("People remember 10%, 20%…Oh Really?", layout.format("{{People remember 10\\%, 20\\%…Oh Really?}}"));
 
         assertEquals("h&aacute;llo", layout.format("h\\'allo"));
 
@@ -64,7 +67,6 @@ public class HTMLCharsTest {
         assertEquals("<u>hallo</u>", layout.format("\\underline{hallo}"));
         assertEquals("<s>hallo</s>", layout.format("\\sout{hallo}"));
         assertEquals("<tt>hallo</tt>", layout.format("\\texttt{hallo}"));
-
     }
 
     @Test
