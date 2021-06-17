@@ -41,7 +41,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We reintroduced missing default keybindings for new entries. [#7346](https://github.com/JabRef/jabref/issues/7346) [#7439](https://github.com/JabRef/jabref/issues/7439)
 - Lists of available fields are now sorted alphabetically. [#7716](https://github.com/JabRef/jabref/issues/7716)
 - We moved the select/collapse buttons in the unlinked files dialog into a context menu. [#7383](https://github.com/JabRef/jabref/issues/7383)
-- We changed the abbreviation toggle within the JournalEditorViewModel.java to ignore curly braces when matching. [#7773](https://github.com/JabRef/jabref/issues/7773)
+- We fixed an issue where journal abbreviations containing curly braces were not recognized  [#7773](https://github.com/JabRef/jabref/issues/7773)
 
 ### Fixed
 
