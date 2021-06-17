@@ -2,6 +2,7 @@ package org.jabref.cli;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -51,11 +52,10 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileHelper;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.FilePreferences;
 import org.jabref.preferences.SearchPreferences;
 
 import com.google.common.base.Throwables;
@@ -224,7 +224,7 @@ public class ArgumentProcessor {
 
         if (cli.isWriteXMPtoPdf()) {
             if (!loaded.isEmpty()) {
-                writeXMPtoPdf(loaded, cli.getWriteXMPtoPdf(), Globals.prefs);
+                writeXMPtoPdf(loaded, cli.getWriteXMPtoPdf(), Globals.prefs.getDefaultEncoding(), Globals.prefs.getXmpPreferences(), Globals.prefs.getFilePreferences());
             }
         }
 
@@ -252,17 +252,17 @@ public class ArgumentProcessor {
         return loaded;
     }
 
-    private void writeXMPtoPdf(List<ParserResult> loaded, String filesAndCitekeys, JabRefPreferences preferences) {
+    private void writeXMPtoPdf(List<ParserResult> loaded, String filesAndCitekeys, Charset encoding, XmpPreferences xmpPreferences, FilePreferences filePreferences) {
 
         ParserResult pr = loaded.get(loaded.size() - 1);
         BibDatabaseContext databaseContext = pr.getDatabaseContext();
         BibDatabase dataBase = pr.getDatabase();
 
-        XmpPdfExporter xmpPdfExporter = new XmpPdfExporter(preferences.getXmpPreferences());
+        XmpPdfExporter xmpPdfExporter = new XmpPdfExporter(xmpPreferences);
 
         if (filesAndCitekeys.equals("all")) {
             for (BibEntry entry : dataBase.getEntries()) {
-                writeXMPtoPDFsOfEntry(databaseContext, entry, preferences, xmpPdfExporter);
+                writeXMPtoPDFsOfEntry(databaseContext, entry.getCitationKey().orElse("<no cite key defined>"), entry, encoding, filePreferences, xmpPdfExporter);
             }
             return;
         }
@@ -277,86 +277,56 @@ public class ArgumentProcessor {
             }
         }
 
-        writeXMPtoPdfByCitekey(databaseContext, dataBase, citeKeys, preferences, xmpPdfExporter);
-        writeXMPtoPdfByFileNames(databaseContext, dataBase, pdfs, preferences, xmpPdfExporter);
+        writeXMPtoPdfByCitekey(databaseContext, dataBase, citeKeys, encoding, filePreferences, xmpPdfExporter);
+        writeXMPtoPdfByFileNames(databaseContext, dataBase, pdfs, encoding, filePreferences, xmpPdfExporter);
 
     }
 
-    private void writeXMPtoPDFsOfEntry(BibDatabaseContext databaseContext, BibEntry entry, JabRefPreferences preferences, XmpPdfExporter xmpPdfExporter) {
-        boolean writtenToAFile = false;
-
-        for (LinkedFile file : entry.getFiles()) {
-            if (file.getFileType().toLowerCase(Locale.ROOT).equals("pdf")) {
-                Optional<Path> filePath = file.findIn(databaseContext, preferences.getFilePreferences());
-                if (filePath.isEmpty()) {
-                    LOGGER.error(Localization.lang("Skipped - PDF %0 does not exist", filePath.get()));
-                } else {
-                    try {
-                        xmpPdfExporter.export(databaseContext, filePath.get(), preferences.getDefaultEncoding(), Arrays.asList(entry));
-                        writtenToAFile = true;
-                    } catch (Exception e) {
-                        LOGGER.error(Localization.lang("Error writing XMP content: %0", filePath.get()));
-                    }
-                }
+    private void writeXMPtoPDFsOfEntry(BibDatabaseContext databaseContext, String citeKey, BibEntry entry, Charset encoding, FilePreferences filePreferences, XmpPdfExporter xmpPdfExporter) {
+        try {
+            if (xmpPdfExporter.exportToAllFilesOfEntry(databaseContext, encoding, filePreferences, entry, Arrays.asList(entry))) {
+                LOGGER.info(String.format("Successfully written XMP metadata on at least one linked file of %s", citeKey));
+            } else {
+                LOGGER.error(String.format("Cannot write XMP metadata on any linked files of %s. Make sure there is at least one linked file and the path is correct.", citeKey));
             }
-        }
-
-        if (!writtenToAFile) {
-            LOGGER.error(Localization.lang("Skipped - No PDF linked to entry %0", entry.getCitationKey()));
+        } catch (Exception e) {
+            LOGGER.error(String.format("Failed writing XMP metadata on a linked file of %s.", citeKey));
         }
     }
 
-    private void writeXMPtoPdfByCitekey(BibDatabaseContext databaseContext, BibDatabase dataBase, Vector<String> citeKeys, JabRefPreferences preferences, XmpPdfExporter xmpPdfExporter) {
+    private void writeXMPtoPdfByCitekey(BibDatabaseContext databaseContext, BibDatabase dataBase, Vector<String> citeKeys, Charset encoding, FilePreferences filePreferences, XmpPdfExporter xmpPdfExporter) {
         for (String citeKey : citeKeys) {
-            List<BibEntry> bibEntryList = dataBase.getEntriesByCitationKey(citeKey)
+            List<BibEntry> bibEntryList = dataBase.getEntriesByCitationKey(citeKey);
             if (bibEntryList.isEmpty()) {
-                LOGGER.error(Localization.lang("Cannot find %0 in library.", citeKey));
+                LOGGER.error(String.format("Skipped - Cannot find %s in library.", citeKey));
                 continue;
             }
             for (BibEntry entry : bibEntryList) {
-                writeXMPtoPDFsOfEntry(databaseContext, entry.get(), preferences, xmpPdfExporter);
+                writeXMPtoPDFsOfEntry(databaseContext, citeKey, entry, encoding, filePreferences, xmpPdfExporter);
             }
         }
     }
 
-    private void writeXMPtoPdfByFileNames(BibDatabaseContext databaseContext, BibDatabase dataBase, Vector<String> fileNames, JabRefPreferences preferences, XmpPdfExporter xmpPdfExporter) {
-        List<Path> dirs = databaseContext.getFileDirectories(preferences.getFilePreferences());
-        dirs.add(Path.of("").toAbsolutePath());
-
+    private void writeXMPtoPdfByFileNames(BibDatabaseContext databaseContext, BibDatabase dataBase, Vector<String> fileNames, Charset encoding, FilePreferences filePreferences, XmpPdfExporter xmpPdfExporter) {
         for (String fileName : fileNames) {
             Path filePath = Path.of(fileName);
             if (!filePath.isAbsolute()) {
-                Optional<Path> optionalFilePath = FileHelper.find(fileName, dirs);
-                if (!optionalFilePath.isEmpty()) {
-                    filePath = optionalFilePath.get();
-                }
+                filePath = FileHelper.find(fileName, databaseContext.getFileDirectories(filePreferences)).orElse(FileHelper.find(fileName, Arrays.asList(Path.of("").toAbsolutePath())).orElse(filePath));
             }
             if (Files.exists(filePath)) {
-                boolean writtenToAFile = false;
-                for (BibEntry entry : dataBase.getEntries()) {
-                    for (LinkedFile linkedFile : entry.getFiles()) {
-                        if (linkedFile.getFileType().toLowerCase(Locale.ROOT).equals("pdf")) {
-                            Optional<Path> linkedFilePath = linkedFile.findIn(dirs);
-                            try {
-                                if (!linkedFilePath.isEmpty() && Files.isSameFile(linkedFilePath.get(), filePath)) {
-                                    try {
-                                        xmpPdfExporter.export(databaseContext, filePath, preferences.getDefaultEncoding(), Arrays.asList(entry));
-                                        writtenToAFile = true;
-                                    } catch (Exception e) {
-                                        LOGGER.error(Localization.lang("Error writing XMP content: %0", filePath));
-                                    }
-                                }
-                            } catch (IOException e) {
-                                LOGGER.error(Localization.lang("Error opening %0 and %1 for comparison", linkedFile.getLink(), fileName));
-                            }
-                        }
+                try {
+                    if (xmpPdfExporter.exportToFileByPath(databaseContext, dataBase, encoding, filePreferences, filePath)) {
+                        LOGGER.info(String.format("Successfully written XMP metadata of at least one entry to %s", fileName));
+                    } else {
+                        LOGGER.error(String.format("File %s is not linked to any entry in database.", fileName));
                     }
-                }
-                if (!writtenToAFile) {
-                    LOGGER.error(Localization.lang("Skipped - PDF %0 not found in library", fileName));
+                } catch (IOException e) {
+                    LOGGER.error("Error accessing files.", fileName);
+                } catch (Exception e) {
+                    LOGGER.error(String.format("Error writing entry to %s.", fileName));
                 }
             } else {
-                LOGGER.error(Localization.lang("Skipped - PDF %0 does not exist", fileName));
+                LOGGER.error(String.format("Skipped - PDF %s does not exist", fileName));
             }
         }
     }
