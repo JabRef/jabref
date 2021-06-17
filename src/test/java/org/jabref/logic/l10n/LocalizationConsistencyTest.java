@@ -80,22 +80,21 @@ class LocalizationConsistencyTest {
     void keyValueShouldBeEqualForEnglishPropertiesMessages() {
         Properties englishKeys = LocalizationParser.getProperties(String.format("/l10n/%s_%s.properties", "JabRef", "en"));
         for (Map.Entry<Object, Object> entry : englishKeys.entrySet()) {
-            String expectedKeyEqualsKey = String.format("%s=%s", entry.getKey(), entry.getKey());
-            String actualKeyEqualsValue = String.format("%s=%s", entry.getKey(), entry.getValue());
+            String expectedKeyEqualsKey = String.format("%s=%s", entry.getKey(), entry.getKey().toString().replace("\n", "\\n"));
+            String actualKeyEqualsValue = String.format("%s=%s", entry.getKey(), entry.getValue().toString().replace("\n", "\\n"));
             assertEquals(expectedKeyEqualsKey, actualKeyEqualsValue);
         }
     }
 
     @Test
-    void languageKeysShouldNotBeQuotedInFiles() throws IOException {
+    void languageKeysShouldNotContainUnderscoresForSpaces() throws IOException {
         final List<LocalizationEntry> quotedEntries = LocalizationParser
                 .findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.LANG)
                 .stream()
-                .filter(key -> key.getKey().contains("_") && key.getKey().equals(new LocalizationKey(key.getKey()).getPropertiesKey()))
+                .filter(key -> key.getKey().contains("\\_"))
                 .collect(Collectors.toList());
-
         assertEquals(Collections.emptyList(), quotedEntries,
-                "Language keys must not be used quoted in code! Use \"This is a message\" instead of \"This_is_a_message\".\n" +
+                "Language keys must not use underscores for spaces! Use \"This is a message\" instead of \"This_is_a_message\".\n" +
                         "Please correct the following entries:\n" +
                         quotedEntries
                                 .stream()
@@ -104,31 +103,47 @@ class LocalizationConsistencyTest {
     }
 
     @Test
-    void findMissingLocalizationKeys() throws IOException {
-        List<LocalizationEntry> missingKeys = LocalizationParser.find(LocalizationBundleForTest.LANG)
-                                                                .stream()
-                                                                .sorted()
-                                                                .distinct()
-                                                                .collect(Collectors.toList());
+    void languageKeysShouldNotContainHtmlBrAndHtmlP() throws IOException {
+        final List<LocalizationEntry> entriesWithHtml = LocalizationParser
+                .findLocalizationParametersStringsInJavaFiles(LocalizationBundleForTest.LANG)
+                .stream()
+                .filter(key -> key.getKey().contains("<br>") || key.getKey().contains("<p>"))
+                .collect(Collectors.toList());
+        assertEquals(Collections.emptyList(), entriesWithHtml,
+                "Language keys must not contain HTML <br> or <p>. Use \\n for a line break.\n" +
+                        "Please correct the following entries:\n" +
+                        entriesWithHtml
+                                .stream()
+                                .map(key -> String.format("\n%s (%s)\n", key.getKey(), key.getPath()))
+                                .collect(Collectors.toList()));
+    }
 
+    @Test
+    void findMissingLocalizationKeys() throws IOException {
+        List<LocalizationEntry> missingKeys = LocalizationParser.findMissingKeys(LocalizationBundleForTest.LANG)
+                                                                .stream()
+                                                                .collect(Collectors.toList());
         assertEquals(Collections.emptyList(), missingKeys,
-                "DETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE\n" +
-                        "PASTE THESE INTO THE ENGLISH LANGUAGE FILE\n" +
-                        missingKeys.parallelStream()
-                                   .map(key -> String.format("%s=%s", key.getKey(), key.getKey().replaceAll("\\\\ ", " ")))
-                                   .collect(Collectors.joining("\n", "\n", "\n")));
+                missingKeys.stream()
+                           .map(key -> LocalizationKey.fromKey(key.getKey()))
+                           .map(key -> String.format("%s=%s",
+                                   key.getEscapedPropertiesKey(),
+                                   key.getValueForEnglishPropertiesFile()))
+                           .collect(Collectors.joining("\n",
+                                   "\n\nDETECTED LANGUAGE KEYS WHICH ARE NOT IN THE ENGLISH LANGUAGE FILE\n" +
+                                           "PASTE THESE INTO THE ENGLISH LANGUAGE FILE\n\n",
+                                   "\n\n")));
     }
 
     @Test
     void findObsoleteLocalizationKeys() throws IOException {
         Set<String> obsoleteKeys = LocalizationParser.findObsolete(LocalizationBundleForTest.LANG);
-
         assertEquals(Collections.emptySet(), obsoleteKeys,
-                "Obsolete keys found in language properties file: \n" +
-                        obsoleteKeys.stream().collect(Collectors.joining("\n")) +
-                        "\n" +
-                        "1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE\n" +
-                        "2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE\n");
+                obsoleteKeys.stream().collect(Collectors.joining("\n",
+                        "Obsolete keys found in language properties file: \n\n",
+                        "\n\n1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE\n" +
+                                "2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE\n"))
+        );
     }
 
     @Test
