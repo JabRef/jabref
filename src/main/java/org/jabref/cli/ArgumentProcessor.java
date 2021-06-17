@@ -260,7 +260,7 @@ public class ArgumentProcessor {
 
         XmpPdfExporter xmpPdfExporter = new XmpPdfExporter(xmpPreferences);
 
-        if (filesAndCitekeys.equals("all")) {
+        if ("all".equals(filesAndCitekeys)) {
             for (BibEntry entry : dataBase.getEntries()) {
                 writeXMPtoPDFsOfEntry(databaseContext, entry.getCitationKey().orElse("<no cite key defined>"), entry, encoding, filePreferences, xmpPdfExporter);
             }
