@@ -104,12 +104,15 @@ public abstract class Exporter {
      * @throws Exception if the writing fails
      */
     public boolean exportToFileByPath(BibDatabaseContext databaseContext, BibDatabase dataBase, Charset encoding, FilePreferences filePreferences, Path filePath) throws Exception {
+        if (!Files.exists(filePath)) {
+            return false;
+        }
         boolean writtenABibEntry = false;
         for (BibEntry entry : dataBase.getEntries()) {
             for (LinkedFile linkedFile : entry.getFiles()) {
                 if (linkedFile.getFileType().equals(fileType.getName())) {
                     Optional<Path> linkedFilePath = linkedFile.findIn(databaseContext.getFileDirectories(filePreferences));
-                    if (!linkedFilePath.isEmpty() && Files.isSameFile(linkedFilePath.get(), filePath)) {
+                    if (!linkedFilePath.isEmpty() && Files.exists(linkedFilePath.get()) && Files.isSameFile(linkedFilePath.get(), filePath)) {
                         export(databaseContext, filePath, encoding, Arrays.asList((entry)));
                         writtenABibEntry = true;
                     }
