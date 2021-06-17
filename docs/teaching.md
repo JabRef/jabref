@@ -4,10 +4,10 @@ By using JabRef as training object in exercises and labs, students can level-up 
 
 ## Why university instructors should cooperate with us?
 
-* No need to think about software engineering excersies any more: JabRef has them.
+* No need to think about software engineering excesses anymore: JabRef has them.
 * No need to provision infra structure
-* High-quality student educuation due to real-world tooling and real-world code base
-* Sustainability of student works: No more thrown-away solved excercises: They now are incorparted in a real-world product
+* High-quality student education due to real-world tooling and real-world code base
+* Sustainability of student works: No more thrown-away solved exercises: They now are incorporated in a real-world product
 * Visibility of your research groups
 
 ## How to integrate JabRef in your class
@@ -32,7 +32,7 @@ For a near-to-perfect preparation and effect of the course, we ask you to get in
 
 It is also possible to just direct students to our [Contribution Guide](https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md#contributing-guide). The learning effect may be lower as the time of the students has to be spent to a\) learn about JabRef and b\) select an appropriate issue.
 
-Since a huge fraction of software costs is spend on [software maintenance](https://en.wikipedia.org/wiki/Software_maintenance), adding new features also educates in that aspect: perfective maintenance[1](teaching.md#LientzSwanson) is trained. When fixing bugs, corrective maintenance[2](teaching.md#LientzSwanson) is trained.
+Since a huge fraction of software costs is spent on [software maintenance](https://en.wikipedia.org/wiki/Software_maintenance), adding new features also educates in that aspect: perfective maintenance[1](teaching.md#LientzSwanson) is trained. When fixing bugs, corrective maintenance[2](teaching.md#LientzSwanson) is trained.
 
 ## Process for contributions
 
@@ -40,7 +40,7 @@ There is no special process for student contributions. We want to discuss it nev
 
 The process for accepting contributions is as below. The syntax is [BPMN](https://en.wikipedia.org/wiki/Business_Process_Model_and_Notation) modeled using [bpmn.io](https://bpmn.io/).
 
-[![process](.gitbook/assets/contribution-process-reviews%20%282%29%20%282%29%20%282%29%20%281%29.svg)](https://github.com/JabRef/jabref/tree/ed275b62fe7dac57a086e43802e36deb93c63e31/docs/images/contribution-process-reviews.svg)
+[![process](.gitbook/assets/contribution-process-reviews%20%282%29%20%282%29%20%282%29%20%282%29%20%282%29%20%283%29.svg)](https://github.com/JabRef/jabref/tree/ed275b62fe7dac57a086e43802e36deb93c63e31/docs/images/contribution-process-reviews.svg)
 
 In short, the contribution is **reviewed by two JabRef developers**. Typically, they have constructive feedback on their contribution. This means, that the contributors get comments on their contribution enabling them to level-up their coding skill. Incorporating improvements takes time, too. The benefit is two-fold: a\) contributors improve their coding skills and b\) JabRef's code quality improves. All in all, we ask to respect the aims of the JabRef team and to reserve time to incorporate the reviewer's comments.
 
@@ -52,7 +52,7 @@ GitHub describes that in their page [Understanding the GitHub flow](https://guid
 
 Newcomers contributing in the context of a university teaching experience are invited to follow the process described above. In case the capacity of the instructing university allows, we propose a three-step approach. First, the contributors prepare their contribution as usual. Then, they submit the pull request _to a separate repository_. There, the instructor reviews the pull request and provides feedback. This happens in a loop until the instructor shows the green light. Then, the pull request can be submitted to the main JabRef repository. This will help to reduce the load on the JabRef team and improve the quality of the initial pull request.
 
-[![process with instructor](.gitbook/assets/contribution-process-reviews-with-instructor%20%281%29%20%282%29%20%282%29%20%282%29.svg)](https://github.com/JabRef/jabref/tree/ed275b62fe7dac57a086e43802e36deb93c63e31/docs/images/contribution-process-reviews-with-instructor.svg)
+[![process with instructor](.gitbook/assets/contribution-process-reviews-with-instructor%20%281%29%20%282%29%20%282%29%20%282%29%20%282%29%20%282%29%20%283%29.svg)](https://github.com/JabRef/jabref/tree/ed275b62fe7dac57a086e43802e36deb93c63e31/docs/images/contribution-process-reviews-with-instructor.svg)
 
 ## Past courses
 
