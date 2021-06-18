@@ -31,7 +31,7 @@ public final class PdfSearchResults {
     }
 
     private List<SearchResult> getSortedByAlphabet() {
-        //TODO implement sorting
+        // TODO implement sorting
         throw new RuntimeException("Not implemented");
     }
 
