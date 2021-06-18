@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.stream.Stream;
 
 import org.jabref.logic.importer.fileformat.PdfXmpImporter;
@@ -95,7 +96,7 @@ class XmpPdfExporterTest {
      */
     @BeforeEach
     void setUp() throws IOException {
-        xmpPrefereces = new XmpPreferences(false, Collections.emptySet(), ',');
+        xmpPreferences = new XmpPreferences(false, Collections.emptySet(), ',');
 
         encoding = Charset.defaultCharset();
 
