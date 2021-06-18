@@ -69,8 +69,8 @@ class JournalAbbreviationsViewModelMixedAbbreviationsTabTest {
 
     @Test
     void testInitialHasNoFilesAndNoAbbreviations() {
-        assertEquals(0, viewModel.journalFilesProperty().size());
-        assertEquals(0, viewModel.abbreviationsProperty().size());
+        assertEquals(0, viewModel.journalFilesProperty().size(), "Incorrect setup of test. Journal files not set to 0 at setup.");
+        assertEquals(0, viewModel.abbreviationsProperty().size(), "Incorrect setup of test. Abbreviations not set to 0 at setup");
     }
 
     @Test
@@ -96,8 +96,8 @@ class JournalAbbreviationsViewModelMixedAbbreviationsTabTest {
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(emptyTestFile));
         viewModel.addNewFile();
 
-        assertEquals(1, viewModel.journalFilesProperty().size());
-        assertEquals(1, viewModel.abbreviationsProperty().size());
+        assertEquals(1, viewModel.journalFilesProperty().size(), "Incorrect amount of journal files in view model after adding empty test file.");
+        assertEquals(1, viewModel.abbreviationsProperty().size(), "Incorrect amount of abbreviations in view model after adding empty test file.");
     }
 
     @Test
@@ -136,10 +136,10 @@ class JournalAbbreviationsViewModelMixedAbbreviationsTabTest {
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
 
-        assertEquals(1, viewModel.journalFilesProperty().size());
+        assertEquals(1, viewModel.journalFilesProperty().size(), "Incorrect amount of journal files in view model after adding one journal.");
         // our test file has 3 abbreviations and one pseudo abbreviation
-        assertEquals(4, viewModel.abbreviationsProperty().size());
-        assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)));
+        assertEquals(4, viewModel.abbreviationsProperty().size(), "Incorrect amount of abbreviations in view model after adding four entries.");
+        assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)), "Test abbreviation was not correctly added to view model.");
     }
 
     @Test
@@ -148,10 +148,10 @@ class JournalAbbreviationsViewModelMixedAbbreviationsTabTest {
         viewModel.addNewFile();
         viewModel.removeCurrentFile();
 
-        assertEquals(0, viewModel.journalFilesProperty().size());
-        assertEquals(0, viewModel.abbreviationsProperty().size());
-        assertNull(viewModel.currentFileProperty().get());
-        assertNull(viewModel.currentAbbreviationProperty().get());
+        assertEquals(0, viewModel.journalFilesProperty().size(), "Incorrect amount of journal files in view model after adding and removing file.");
+        assertEquals(0, viewModel.abbreviationsProperty().size(), "Incorrect amount of abbreviations in view model after adding and removing file.");
+        assertNull(viewModel.currentFileProperty().get(), "Current file not removed correctly in view model.");
+        assertNull(viewModel.currentAbbreviationProperty().get(), "Current abbreviation not removed correctly in view model.");
     }
 
     @Test
@@ -167,11 +167,11 @@ class JournalAbbreviationsViewModelMixedAbbreviationsTabTest {
         viewModel.currentFileProperty().set(viewModel.journalFilesProperty().get(1));
 
         // size of the list of journal files should be incremented by two
-        assertEquals(2, viewModel.journalFilesProperty().size());
+        assertEquals(2, viewModel.journalFilesProperty().size(), "Incorrect amount of journal files after adding two files.");
         // our second test file has 4 abbreviations
-        assertEquals(5, viewModel.abbreviationsProperty().size());
+        assertEquals(5, viewModel.abbreviationsProperty().size(), "Incorrect amount of abbreviations after adding five entries.");
         // check some abbreviation
-        assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)));
+        assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)), "Abbreviation 1 was not added correctly.");
 
         // simulate add new file button
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(emptyTestFile));
@@ -179,9 +179,9 @@ class JournalAbbreviationsViewModelMixedAbbreviationsTabTest {
         viewModel.currentFileProperty().set(viewModel.journalFilesProperty().get(2));
 
         // size of the list of journal files should be incremented by one
-        assertEquals(3, viewModel.journalFilesProperty().size());
+        assertEquals(3, viewModel.journalFilesProperty().size(), "Incorrect amount of journal files after adding three files");
         // a new file has zero abbreviations
-        assertEquals(1, viewModel.abbreviationsProperty().size());
+        assertEquals(1, viewModel.abbreviationsProperty().size(), "Incorrect amount of abbreviations after adding one entry");
 
         // simulate open file button
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile5EntriesWithDuplicate));
@@ -189,11 +189,11 @@ class JournalAbbreviationsViewModelMixedAbbreviationsTabTest {
         viewModel.currentFileProperty().set(viewModel.journalFilesProperty().get(3));
 
         // size of the list of journal files should be incremented by one
-        assertEquals(4, viewModel.journalFilesProperty().size());
+        assertEquals(4, viewModel.journalFilesProperty().size(), "Incorrect amount of journal files after simulating open file button.");
 
-        assertEquals(5, viewModel.abbreviationsProperty().size());
+        assertEquals(5, viewModel.abbreviationsProperty().size(), "Incorrect amount of abbreviations after simulating open file button.");
         // check some abbreviation
-        assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation2)));
+        assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation2)), "Abbreviation 2 was not added correctly.");
     }
 
     @Test
@@ -227,21 +227,19 @@ class JournalAbbreviationsViewModelMixedAbbreviationsTabTest {
         AbbreviationsFileViewModel test5 = viewModel.journalFilesProperty().get(3);
 
         // test if the last opened file is active, but duplicated entry has been removed
-        assertEquals(5, viewModel.abbreviationsProperty().size());
+        assertEquals(5, viewModel.abbreviationsProperty().size(), "Last opened file is not active or duplicated entry was not removed.");
 
         viewModel.currentFileProperty().set(test1);
 
         // test if the current abbreviations matches with the ones in testFile1Entries
-        assertEquals(2, viewModel.abbreviationsProperty().size());
+        assertEquals(2, viewModel.abbreviationsProperty().size(), "Incorrect amount of abbreviations after setting active testFile1.");
 
         viewModel.currentFileProperty().set(test3);
-        assertEquals(4, viewModel.abbreviationsProperty().size());
-        viewModel.currentFileProperty().set(test1);
-        assertEquals(2, viewModel.abbreviationsProperty().size());
+        assertEquals(4, viewModel.abbreviationsProperty().size(), "Incorrect amount of journals after setting active testFile3.");
         viewModel.currentFileProperty().set(test4);
-        assertEquals(5, viewModel.abbreviationsProperty().size());
+        assertEquals(5, viewModel.abbreviationsProperty().size(), "Incorrect amount of abbreviations after setting active testFile4.");
         viewModel.currentFileProperty().set(test5);
-        assertEquals(5, viewModel.abbreviationsProperty().size());
+        assertEquals(5, viewModel.abbreviationsProperty().size(), "Incorrect amount of abbreviations after setting active testFile5.");
     }
 
     @Test
@@ -254,8 +252,8 @@ class JournalAbbreviationsViewModelMixedAbbreviationsTabTest {
         Abbreviation testAbbreviation = new Abbreviation("YetAnotherEntry", "YAE");
         addAbbrevaition(testAbbreviation);
 
-        assertEquals(6, viewModel.abbreviationsProperty().size());
-        assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)));
+        assertEquals(6, viewModel.abbreviationsProperty().size(), "Incorrect amount of abbreviations after setting active testFile5 and adding YAE entry.");
+        assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)), "YAE abbreviation was not correctly added.");
     }
 
     @Test
@@ -291,16 +289,16 @@ class JournalAbbreviationsViewModelMixedAbbreviationsTabTest {
         Abbreviation testAbbreviation = new Abbreviation("YetAnotherEntry", "YAE");
         editAbbreviation(testAbbreviation);
 
-        assertEquals(5, viewModel.abbreviationsProperty().size());
-        assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)));
+        assertEquals(5, viewModel.abbreviationsProperty().size(), "Incorrect amount of abbreviations after setting active testFile5 and adding YAE abbreviation.");
+        assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)), "YAE abbreviation was not correctly added.");
 
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(emptyTestFile));
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
         editAbbreviation(testAbbreviation);
 
-        assertEquals(1, viewModel.abbreviationsProperty().size());
-        assertFalse(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)));
+        assertEquals(1, viewModel.abbreviationsProperty().size(), "Incorrect amount of abbreviations after setting active emptyTestFile and adding YAE abbreviation.");
+        assertFalse(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)), "Test abbreviation YAE was not edited as expected.");
     }
 
     @Test
@@ -359,9 +357,9 @@ class JournalAbbreviationsViewModelMixedAbbreviationsTabTest {
 
         viewModel.deleteAbbreviation();
 
-        assertEquals(5, viewModel.abbreviationsProperty().size());
+        assertEquals(5, viewModel.abbreviationsProperty().size(), "Previously added abbreviation YAE was not deleted correctly.");
         // check if the previous (the last) element is the current abbreviation
-        assertEquals(viewModel.currentAbbreviationProperty().get(), viewModel.abbreviationsProperty().get(4));
+        assertEquals(viewModel.currentAbbreviationProperty().get(), viewModel.abbreviationsProperty().get(4), "Last element of abbreviation list is not set to current abbreviation.");
     }
 
     @Test

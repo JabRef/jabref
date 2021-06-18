@@ -70,29 +70,29 @@ public class LayoutEntryTest {
     @Test
     public void testParseMethodCalls() {
 
-        assertEquals(1, LayoutEntry.parseMethodsCalls("bla").size());
-        assertEquals("bla", (LayoutEntry.parseMethodsCalls("bla").get(0)).get(0));
+        assertEquals(1, LayoutEntry.parseMethodsCalls("bla").size(), "Parsing of layout entry method calls failed.");
+        assertEquals("bla", (LayoutEntry.parseMethodsCalls("bla").get(0)).get(0), "Parsing of layout entry method calls failed. Input did not match expected output.");
 
-        assertEquals(1, LayoutEntry.parseMethodsCalls("bla,").size());
-        assertEquals("bla", (LayoutEntry.parseMethodsCalls("bla,").get(0)).get(0));
+        assertEquals(1, LayoutEntry.parseMethodsCalls("bla,").size(), "Parsing of layout entry method calls failed. Check for comma behaviour.");
+        assertEquals("bla", (LayoutEntry.parseMethodsCalls("bla,").get(0)).get(0), "Parsing of layout entry method calls failed. Input did not match expected output.");
 
-        assertEquals(1, LayoutEntry.parseMethodsCalls("_bla.bla.blub,").size());
-        assertEquals("_bla.bla.blub", (LayoutEntry.parseMethodsCalls("_bla.bla.blub,").get(0)).get(0));
+        assertEquals(1, LayoutEntry.parseMethodsCalls("_bla.bla.blub,").size(), "Parsing of layout entry method calls failed. Check for special characters.");
+        assertEquals("_bla.bla.blub", (LayoutEntry.parseMethodsCalls("_bla.bla.blub,").get(0)).get(0), "Parsing of layout entry method calls failed. Input did not match expected output. Check for comma behaviour.");
 
-        assertEquals(2, LayoutEntry.parseMethodsCalls("bla,foo").size());
-        assertEquals("bla", (LayoutEntry.parseMethodsCalls("bla,foo").get(0)).get(0));
-        assertEquals("foo", (LayoutEntry.parseMethodsCalls("bla,foo").get(1)).get(0));
+        assertEquals(2, LayoutEntry.parseMethodsCalls("bla,foo").size(), "Parsing of layout entry method calls failed. Not all arguments were parsed correctly.");
+        assertEquals("bla", (LayoutEntry.parseMethodsCalls("bla,foo").get(0)).get(0), "Parsing of layout entry method calls failed. Input did not match expected output. Method calls not separated as expected.");
+        assertEquals("foo", (LayoutEntry.parseMethodsCalls("bla,foo").get(1)).get(0), "Parsing of layout entry method calls failed. Input did not match expected output. Method calls not separated as expected.");
 
-        assertEquals(2, LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").size());
-        assertEquals("bla", (LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0)).get(0));
-        assertEquals("foo", (LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1)).get(0));
-        assertEquals("test", (LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0)).get(1));
-        assertEquals("fark", (LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1)).get(1));
+        assertEquals(2, LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").size(), "Parsing of layout entry method calls failed. Check for escaped characters behaviour.");
+        assertEquals("bla", (LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0)).get(0), "Parsing of layout entry method calls failed. Input did not match expected output. Check for multiple method calls with escaped characters.");
+        assertEquals("foo", (LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1)).get(0), "Parsing of layout entry method calls failed. Input did not match expected output. Check for multiple method calls with escaped characters.");
+        assertEquals("test", (LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(0)).get(1), "Parsing of layout entry method calls failed. Input did not match expected output. Check for multiple method calls with escaped characters.");
+        assertEquals("fark", (LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1)).get(1), "Parsing of layout entry method calls failed. Input did not match expected output. Check for multiple method calls with escaped characters.");
 
-        assertEquals(2, LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").size());
-        assertEquals("bla", (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(0)).get(0));
-        assertEquals("foo", (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(1)).get(0));
-        assertEquals("test", (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(0)).get(1));
-        assertEquals("fark", (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(1)).get(1));
+        assertEquals(2, LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").size(), "Parsing of layout method calls failed. Check for arguments in parentheses.");
+        assertEquals("bla", (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(0)).get(0), "Parsing of layout method calls failed. Input did not match expected output. Check for arguments in parentheses.");
+        assertEquals("foo", (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(1)).get(0), "Parsing of layout method calls failed. Input did not match expected output. Check for arguments in parentheses");
+        assertEquals("test", (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(0)).get(1), "Parsing of layout method calls failed. Input did not match expected output. Check for arguments in parentheses");
+        assertEquals("fark", (LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(1)).get(1), "Parsing of layout method calls failed. Input did not match expected output. Check for arguments in parentheses");
     }
 }

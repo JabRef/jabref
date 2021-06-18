@@ -32,4 +32,9 @@ public class UpperCaseFormatterTest {
         Arguments.of("!", "!")
         );
     }
+
+    @Test
+    public void formatExample() {
+        assertEquals("KDE {Amarok}", formatter.format(formatter.getExampleInput()));
+    }
 }
