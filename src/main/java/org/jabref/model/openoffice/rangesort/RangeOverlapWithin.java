@@ -15,17 +15,15 @@ public class RangeOverlapWithin {
     private RangeOverlapWithin() { }
 
     /**
-     * Report identical, overlapping or touching ranges between
-     * elements of rangeHolders.
+     * Report identical, overlapping or touching ranges between elements of rangeHolders.
      *
-     * For overlapping and touching, only report consecutive ranges
-     * and only with a single sample of otherwise identical ranges.
+     * For overlapping and touching, only report consecutive ranges and only with a single sample of
+     * otherwise identical ranges.
      *
      * @param reportAtMost Limit the number of records returned to atMost.
      *        Zero {@code reportAtMost} means no limit.
      *
-     * @param includeTouching Should the result contain ranges
-     *                        sharing only a boundary?
+     * @param includeTouching Should the result contain ranges sharing only a boundary?
      */
     public static <V extends RangeHolder>
     List<RangeOverlap<V>> findOverlappingRanges(XTextDocument doc,
@@ -43,14 +41,13 @@ public class RangeOverlapWithin {
     /**
      * Report identical, overlapping or touching ranges.
      *
-     * For overlapping and touching, only report consecutive ranges
-     * and only with a single sample of otherwise identical ranges.
+     * For overlapping and touching, only report consecutive ranges and only with a single sample of
+     * otherwise identical ranges.
      *
      * @param atMost Limit the number of records returned to atMost.
      *        Zero {@code atMost} means no limit.
      *
-     * @param includeTouching Should the result contain ranges
-     *                        sharing only a boundary?
+     * @param includeTouching Should the result contain ranges sharing only a boundary?
      */
     public static <V extends RangeHolder>
     List<RangeOverlap<V>> findOverlappingRanges(RangeSort.RangePartitions<V> input,
@@ -64,8 +61,8 @@ public class RangeOverlapWithin {
             if (partition.size() == 0) {
                 continue;
             }
-            XTextRangeCompare cmp = UnoCast.unoQI(XTextRangeCompare.class,
-                                                  partition.get(0).getRange().getText());
+            XTextRangeCompare cmp = UnoCast.cast(XTextRangeCompare.class,
+                                                 partition.get(0).getRange().getText()).get();
 
             for (int i = 0; i < (partition.size() - 1); i++) {
                 V aHolder = partition.get(i);

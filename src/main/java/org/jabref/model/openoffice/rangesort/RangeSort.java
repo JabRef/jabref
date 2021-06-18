@@ -23,7 +23,7 @@ public class RangeSort {
         XTextRangeCompare cmp;
 
         HolderComparatorWithinPartition(XText text) {
-            cmp = UnoCast.unoQI(XTextRangeCompare.class, text);
+            cmp = UnoCast.cast(XTextRangeCompare.class, text).get();
         }
 
         /*
@@ -35,8 +35,7 @@ public class RangeSort {
         }
     }
 
-    public static <V extends RangeHolder>
-    void sortWithinPartition(List<V> rangeHolders) {
+    public static <V extends RangeHolder> void sortWithinPartition(List<V> rangeHolders) {
         if (rangeHolders.isEmpty()) {
             return;
         }
@@ -70,8 +69,7 @@ public class RangeSort {
         }
     }
 
-    public static <V extends RangeHolder>
-    RangePartitions<V> partitionRanges(List<V> holders) {
+    public static <V extends RangeHolder> RangePartitions<V> partitionRanges(List<V> holders) {
         RangePartitions<V> result = new RangePartitions<>();
         for (V holder : holders) {
             result.add(holder);
@@ -79,8 +77,7 @@ public class RangeSort {
         return result;
     }
 
-    public static <V extends RangeHolder>
-    RangePartitions<V> partitionAndSortRanges(List<V> holders) {
+    public static <V extends RangeHolder> RangePartitions<V> partitionAndSortRanges(List<V> holders) {
         RangePartitions<V> result = partitionRanges(holders);
         for (List<V> partition : result.getPartitions()) {
             sortWithinPartition(partition);
