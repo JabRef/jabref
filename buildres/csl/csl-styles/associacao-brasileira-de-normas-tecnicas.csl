@@ -605,7 +605,7 @@ em caixa alta. Utiliza-se antes do nome da conferencia a expressao "In". Segundo
           <!--Local-->
           <text variable="publisher" suffix=", "/>
           <!--Editor-->
-          <text macro="issued"/>
+          <text macro="issued" suffix=". "/>
           <!--Data-->
           <text macro="access"/>
           <!--URL, data do acesso-->
