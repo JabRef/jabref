@@ -253,7 +253,10 @@ public class ArgumentProcessor {
     }
 
     private void writeXMPtoPdf(List<ParserResult> loaded, String filesAndCitekeys, Charset encoding, XmpPreferences xmpPreferences, FilePreferences filePreferences) {
-
+        if (loaded.isEmpty()) {
+            LOGGER.error("The write xmp option depends on a valid import option.");
+            return;
+        }
         ParserResult pr = loaded.get(loaded.size() - 1);
         BibDatabaseContext databaseContext = pr.getDatabaseContext();
         BibDatabase dataBase = pr.getDatabase();
