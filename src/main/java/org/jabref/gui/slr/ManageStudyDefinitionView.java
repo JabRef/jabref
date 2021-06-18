@@ -3,12 +3,14 @@ package org.jabref.gui.slr;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.StringJoiner;
+import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -34,8 +36,8 @@ import org.jabref.preferences.PreferencesService;
 import com.airhacks.afterburner.views.ViewLoader;
 
 /**
- * This class controls the user interface of the study definition management dialog. The UI elements and their layout are
- * defined in the FXML file.
+ * This class controls the user interface of the study definition management dialog. The UI elements and their layout
+ * are defined in the FXML file.
  */
 public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> {
     Path workingDirectory;
@@ -50,16 +52,9 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @FXML private TextField addAuthor;
     @FXML private TextField addResearchQuestion;
     @FXML private TextField addQuery;
-    @FXML private ComboBox<StudyDatabaseItem> databaseSelectorComboBox;
+    @FXML private ComboBox<StudyDatabaseItem> databaseSelector;
     @FXML private TextField studyDirectory;
 
-    private Button saveButton;
-
-    @FXML private Button addAuthorButton;
-    @FXML private Button addResearchQuestionButton;
-    @FXML private Button addQueryButton;
-    @FXML private Button addDatabaseButton;
-    @FXML private Button selectStudyDirectory;
     @FXML private ButtonType saveButtonType;
     @FXML private Label helpIcon;
 
@@ -75,10 +70,10 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @FXML private TableColumn<String, String> queriesColumn;
     @FXML private TableColumn<String, String> queriesActionColumn;
 
-    @FXML private TableView<StudyDatabaseItem> databaseTableView;
-    @FXML private TableColumn<StudyDatabaseItem, String> databaseTableEntry;
-    @FXML private TableColumn<StudyDatabaseItem, Boolean> databaseEnabledTableEntry;
-    @FXML private TableColumn<StudyDatabaseItem, String> removeDatabaseTableEntry;
+    @FXML private TableView<StudyDatabaseItem> databaseTable;
+    @FXML private TableColumn<StudyDatabaseItem, Boolean> databaseEnabledColumn;
+    @FXML private TableColumn<StudyDatabaseItem, String> databaseColumn;
+    @FXML private TableColumn<StudyDatabaseItem, String> databaseActionColumn;
 
     /**
      * This can be used to either create new study objects or edit existing ones.
@@ -97,7 +92,6 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                   .setAsDialogPane(this);
 
         setupSaveButton();
-        setupTable();
     }
 
     private void setupSaveButton() {
@@ -121,15 +115,34 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
     @FXML
     private void initialize() {
         viewModel = new ManageStudyDefinitionViewModel(study, workingDirectory, prefs.getImportFormatPreferences());
-        setHelpTooltip();
-        setKeyPressListenersForInputFields();
-        setDataForListViews();
-        setCellFactories();
-        configureLayout();
-        registerBindings();
+
+        // Listen whether any databases are removed from selection -> Add back to the database selector
+        studyTitle.textProperty().bindBidirectional(viewModel.titleProperty());
+        studyDirectory.textProperty().bindBidirectional(viewModel.getDirectory());
+
+        initAuthorTab();
+        initQuestionsTab();
+        initQueriesTab();
+        initDatabasesTab();
     }
 
-    private void setHelpTooltip() {
+    private void initAuthorTab() {
+        setupCommonPropertiesForTables(addAuthor, this::addAuthor, authorsColumn, authorsActionColumn);
+        setupCellFactories(authorsColumn, authorsActionColumn, viewModel::deleteAuthor);
+        authorTableView.setItems(viewModel.getAuthors());
+    }
+
+    private void initQuestionsTab() {
+        setupCommonPropertiesForTables(addResearchQuestion, this::addResearchQuestion, questionsColumn, questionsActionColumn);
+        setupCellFactories(questionsColumn, questionsActionColumn, viewModel::deleteQuestion);
+        questionTableView.setItems(viewModel.getResearchQuestions());
+    }
+
+    private void initQueriesTab() {
+        setupCommonPropertiesForTables(addQuery, this::addQuery, queriesColumn, queriesActionColumn);
+        setupCellFactories(queriesColumn, queriesActionColumn, viewModel::deleteQuery);
+        queryTableView.setItems(viewModel.getQueries());
+
         // TODO: Keep until PR #7279 is merged
         helpIcon.setTooltip(new Tooltip(new StringJoiner("\n")
                 .add(Localization.lang("Query terms are separated by spaces."))
@@ -139,114 +152,57 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
                 .toString()));
     }
 
-    private void setKeyPressListenersForInputFields() {
-        addAuthor.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                addAuthor();
-            }
-        });
-        addResearchQuestion.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                addResearchQuestion();
-            }
-        });
-        addQuery.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                addQuery();
-            }
-        });
-        databaseSelectorComboBox.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                addDatabase();
-            }
-        });
-    }
-
-    private void setDataForListViews() {
-        authorTableView.setItems(viewModel.getAuthors());
-        questionTableView.setItems(viewModel.getResearchQuestions());
-        queryTableView.setItems(viewModel.getQueries());
-        databaseTableView.setItems(viewModel.getDatabases());
-        databaseSelectorComboBox.setItems(viewModel.getNonSelectedDatabases());
-    }
-
-    private void setupTable() {
-        authorsColumn.setReorderable(false);
-        authorsActionColumn.setReorderable(false);
-        authorsActionColumn.setResizable(false);
-        questionsColumn.setReorderable(false);
-        questionsActionColumn.setReorderable(false);
-        questionsActionColumn.setResizable(false);
-        queriesColumn.setReorderable(false);
-        queriesActionColumn.setReorderable(false);
-        queriesActionColumn.setResizable(false);
-        databaseTableEntry.setReorderable(false);
-        databaseEnabledTableEntry.setResizable(false);
-        databaseEnabledTableEntry.setReorderable(false);
-        removeDatabaseTableEntry.setResizable(false);
-        removeDatabaseTableEntry.setReorderable(false);
-    }
-
-    /**
-     * Configures which cells are used for the different List-/TableViews
-     */
-    private void setCellFactories() {
-        authorsColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-        authorsColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue()));
-        authorsActionColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue()));
-        new ValueTableCellFactory<String, String>()
-                .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withTooltip(name -> Localization.lang("Remove"))
-                .withOnMouseClickedEvent(item -> evt ->
-                        viewModel.deleteAuthor(item))
-                .install(authorsActionColumn);
-
-        questionsColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-        questionsColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue()));
-        questionsActionColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue()));
-        new ValueTableCellFactory<String, String>()
-                .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withTooltip(name -> Localization.lang("Remove"))
-                .withOnMouseClickedEvent(item -> evt ->
-                        viewModel.deleteQuestion(item))
-                .install(questionsActionColumn);
-
-        queriesColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-        queriesColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue()));
-        queriesActionColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue()));
-        new ValueTableCellFactory<String, String>()
-                .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withTooltip(name -> Localization.lang("Remove"))
-                .withOnMouseClickedEvent(item -> evt ->
-                        viewModel.deleteQuery(item))
-                .install(queriesActionColumn);
-
+    private void initDatabasesTab() {
         new ViewModelListCellFactory<StudyDatabaseItem>().withText(StudyDatabaseItem::getName)
-                                      .install(databaseSelectorComboBox);
+                                                         .install(databaseSelector);
+        databaseSelector.setItems(viewModel.getNonSelectedDatabases());
 
-        // databaseTableEntry.setCellFactory(TextFieldTableCell.forTableColumn());
-        databaseTableEntry.setCellValueFactory(param -> param.getValue().nameProperty());
+        setupCommonPropertiesForTables(databaseSelector, this::addDatabase, databaseColumn, databaseActionColumn);
 
-        databaseEnabledTableEntry.setCellValueFactory(param -> param.getValue().enabledProperty());
-        databaseEnabledTableEntry.setCellFactory(CheckBoxTableCell.forTableColumn(databaseEnabledTableEntry));
+        databaseEnabledColumn.setResizable(false);
+        databaseEnabledColumn.setReorderable(false);
+        databaseEnabledColumn.setCellValueFactory(param -> param.getValue().enabledProperty());
+        databaseEnabledColumn.setCellFactory(CheckBoxTableCell.forTableColumn(databaseEnabledColumn));
 
-        removeDatabaseTableEntry.setCellValueFactory(param -> param.getValue().nameProperty());
+        databaseColumn.setCellValueFactory(param -> param.getValue().nameProperty());
+        databaseActionColumn.setCellValueFactory(param -> param.getValue().nameProperty());
         new ValueTableCellFactory<org.jabref.gui.slr.StudyDatabaseItem, String>()
                 .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withTooltip(name -> Localization.lang("Remove"))
                 .withOnMouseClickedEvent(item -> evt ->
                         viewModel.removeDatabase(item))
-                .install(removeDatabaseTableEntry);
+                .install(databaseActionColumn);
+
+        databaseTable.setItems(viewModel.getDatabases());
     }
 
-    private void configureLayout() {
-        databaseTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+    private void setupCommonPropertiesForTables(Node addControl,
+                                                Runnable addAction,
+                                                TableColumn<?, String> contentColumn,
+                                                TableColumn<?, String> actionColumn) {
+        addControl.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                addAction.run();
+            }
+        });
+
+        contentColumn.setReorderable(false);
+        contentColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        actionColumn.setReorderable(false);
+        actionColumn.setResizable(false);
     }
 
-    private void registerBindings() {
-        // Listen whether any databases are removed from selection -> Add back to the database selector
-        studyTitle.textProperty().bindBidirectional(viewModel.titleProperty());
-        studyDirectory.textProperty().bindBidirectional(viewModel.getDirectory());
+    private void setupCellFactories(TableColumn<String, String> contentColumn,
+                                    TableColumn<String, String> actionColumn,
+                                    Consumer<String> removeAction) {
+        contentColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue()));
+        actionColumn.setCellValueFactory(param -> new SimpleStringProperty(param.getValue()));
+        new ValueTableCellFactory<String, String>()
+                .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withTooltip(name -> Localization.lang("Remove"))
+                .withOnMouseClickedEvent(item -> evt ->
+                        removeAction.accept(item))
+                .install(actionColumn);
     }
 
     @FXML
@@ -272,7 +228,7 @@ public class ManageStudyDefinitionView extends BaseDialog<SlrStudyAndDirectory> 
      */
     @FXML
     private void addDatabase() {
-        viewModel.addDatabase(databaseSelectorComboBox.getSelectionModel().getSelectedItem());
+        viewModel.addDatabase(databaseSelector.getSelectionModel().getSelectedItem());
     }
 
     @FXML

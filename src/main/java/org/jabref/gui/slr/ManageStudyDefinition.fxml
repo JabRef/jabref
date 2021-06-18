@@ -43,7 +43,7 @@
                                     <HBox alignment="CENTER_LEFT" spacing="10.0"
                                           GridPane.columnIndex="1" GridPane.rowIndex="1">
                                         <TextField fx:id="addAuthor" HBox.hgrow="ALWAYS"/>
-                                        <Button fx:id="addAuthorButton" onAction="#addAuthor" styleClass="icon-button">
+                                        <Button onAction="#addAuthor" styleClass="icon-button">
                                             <tooltip>
                                                 <Tooltip text="%Add"/>
                                             </tooltip>
@@ -76,7 +76,7 @@
                                       spacing="20.0">
                                     <Label text="%Add Research Question:"/>
                                     <TextField fx:id="addResearchQuestion" HBox.hgrow="ALWAYS"/>
-                                    <Button fx:id="addResearchQuestionButton" onAction="#addResearchQuestion"
+                                    <Button onAction="#addResearchQuestion"
                                             styleClass="icon-button">
                                         <tooltip>
                                             <Tooltip text="%Add"/>
@@ -113,7 +113,7 @@
                                         </graphic>
                                     </Label>
                                     <TextField fx:id="addQuery" HBox.hgrow="ALWAYS"/>
-                                    <Button fx:id="addQueryButton" onAction="#addQuery" styleClass="icon-button">
+                                    <Button onAction="#addQuery" styleClass="icon-button">
                                         <tooltip>
                                             <Tooltip text="%Add"/>
                                         </tooltip>
@@ -143,8 +143,8 @@
                             <VBox spacing="20.0">
                                 <HBox alignment="CENTER_LEFT" spacing="20.0">
                                     <Label text="%Add Database:"/>
-                                    <ComboBox fx:id="databaseSelectorComboBox" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                                    <Button fx:id="addDatabaseButton" onAction="#addDatabase" styleClass="icon-button">
+                                    <ComboBox fx:id="databaseSelector" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                    <Button onAction="#addDatabase" styleClass="icon-button">
                                         <tooltip>
                                             <Tooltip text="%Add"/>
                                         </tooltip>
@@ -154,13 +154,13 @@
                                     </Button>
                                 </HBox>
                                 <HBox alignment="CENTER_LEFT">
-                                    <TableView fx:id="databaseTableView" HBox.hgrow="ALWAYS" editable="true">
+                                    <TableView fx:id="databaseTable" HBox.hgrow="ALWAYS" editable="true">
                                         <columns>
-                                            <TableColumn fx:id="databaseEnabledTableEntry" text="%Enabled"
+                                            <TableColumn fx:id="databaseEnabledColumn" text="%Enabled"
                                                          maxWidth="80.0" prefWidth="80.0" minWidth="80.0"
                                                          reorderable="false" resizable="false"/>
-                                            <TableColumn fx:id="databaseTableEntry" text="%Database"/>
-                                            <TableColumn fx:id="removeDatabaseTableEntry"
+                                            <TableColumn fx:id="databaseColumn" text="%Database"/>
+                                            <TableColumn fx:id="databaseActionColumn"
                                                          maxWidth="30.0" prefWidth="30.0" minWidth="30.0"
                                                          reorderable="false" resizable="false"/>
                                         </columns>
