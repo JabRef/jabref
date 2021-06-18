@@ -21,7 +21,7 @@ import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
-import org.apache.pdfbox.util.PDFTextStripper;
+import org.apache.pdfbox.text.PDFTextStripper;
 
 import static org.jabref.model.pdf.search.SearchFieldConstants.AUTHOR;
 import static org.jabref.model.pdf.search.SearchFieldConstants.CONTENT;
@@ -60,7 +60,7 @@ public final class DocumentReader {
     public List<Document> readLinkedPdfs(BibDatabaseContext databaseContext) {
         List<Document> documents = new LinkedList<>();
         for (LinkedFile pdf : this.entry.getFiles()) {
-            Optional<Path> pdfPath = pdf.findIn(databaseContext, JabRefPreferences.getInstance().getFileDirectoryPreferences());
+            Optional<Path> pdfPath = pdf.findIn(databaseContext, JabRefPreferences.getInstance().getFilePreferences());
             pdfPath.ifPresent(file -> {
                 try {
                     documents.add(readPdfContents(pdfPath.get()));
@@ -124,8 +124,8 @@ public final class DocumentReader {
 
     private void addIdentifiers(Document newDocument) {
         newDocument.add(new StoredField(UID, this.entry.getId()));
-        if (this.entry.getCiteKeyOptional().isPresent()) {
-            newDocument.add(new StringField(KEY, this.entry.getCiteKeyOptional().get(), Field.Store.YES));
+        if (this.entry.getCitationKey().isPresent()) {
+            newDocument.add(new StringField(KEY, this.entry.getCitationKey().get(), Field.Store.YES));
         }
     }
 }

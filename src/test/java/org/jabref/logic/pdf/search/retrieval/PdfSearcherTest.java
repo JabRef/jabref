@@ -1,7 +1,7 @@
 package org.jabref.logic.pdf.search.retrieval;
 
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Collections;
 
 import org.jabref.logic.pdf.search.indexing.PdfIndexer;
@@ -9,14 +9,16 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.pdf.search.PdfSearchResults;
 
 import org.apache.lucene.queryparser.classic.ParseException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -24,7 +26,7 @@ public class PdfSearcherTest {
 
     private PdfSearcher search;
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException {
         search = new PdfSearcher();
 
@@ -32,24 +34,23 @@ public class PdfSearcherTest {
         PdfIndexer indexer = new PdfIndexer();
         BibDatabase database = new BibDatabase();
         BibDatabaseContext context = mock(BibDatabaseContext.class);
-        when(context.getFileDirectoriesAsPaths(Mockito.any())).thenReturn(Collections.singletonList(Paths.get("src/test/resources/pdfs")));
-        BibEntry examplePdf = new BibEntry("article");
+        when(context.getFileDirectories(Mockito.any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs")));
+        BibEntry examplePdf = new BibEntry(StandardEntryType.Article);
         examplePdf.setFiles(Collections.singletonList(new LinkedFile("Example Entry", "example.pdf", "pdf")));
         database.insertEntry(examplePdf);
 
-        BibEntry metaDataEntry = new BibEntry("article");
+        BibEntry metaDataEntry = new BibEntry(StandardEntryType.Article);
         metaDataEntry.setFiles(Collections.singletonList(new LinkedFile("Metadata Entry", "metaData.pdf", "pdf")));
-        metaDataEntry.setCiteKey("MetaData2017");
+        metaDataEntry.setCitationKey("MetaData2017");
         database.insertEntry(metaDataEntry);
 
-        BibEntry exampleThesis = new BibEntry("PHDThesis");
+        BibEntry exampleThesis = new BibEntry(StandardEntryType.PhdThesis);
         exampleThesis.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", "pdf")));
-        exampleThesis.setCiteKey("ExampleThesis");
+        exampleThesis.setCitationKey("ExampleThesis");
         database.insertEntry(exampleThesis);
 
         indexer.createIndex(database, context);
     }
-
 
     @Test
     public void searchForTest() throws IOException, ParseException {
@@ -81,13 +82,13 @@ public class PdfSearcherTest {
         assertEquals(0, result.numSearchResults());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void searchWithNullString() throws IOException {
-        search.search(null, 10);
+        assertThrows(NullPointerException.class, () -> search.search(null, 10));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void searchForZeroResults() throws IOException {
-        search.search("test", 0);
+        assertThrows(IllegalArgumentException.class, () -> search.search("test", 0));
     }
 }

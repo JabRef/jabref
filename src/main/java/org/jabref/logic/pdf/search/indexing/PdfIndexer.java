@@ -1,7 +1,7 @@
 package org.jabref.logic.pdf.search.indexing;
 
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 import javafx.collections.ObservableList;
 
@@ -17,7 +17,6 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.SimpleFSDirectory;
 
-
 /**
  * Indexes the text of PDF files and adds it into the lucene search index.
  */
@@ -29,7 +28,7 @@ public class PdfIndexer {
     private BibDatabase database;
 
     public PdfIndexer() throws IOException {
-        this.directoryToIndex = new SimpleFSDirectory(Paths.get("src/main/resources/luceneIndex"));
+        this.directoryToIndex = new SimpleFSDirectory(Path.of("src/main/resources/luceneIndex"));
     }
 
     public Directory getIndexDirectory() {

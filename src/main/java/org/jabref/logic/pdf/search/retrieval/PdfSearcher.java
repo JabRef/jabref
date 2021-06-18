@@ -1,7 +1,7 @@
 package org.jabref.logic.pdf.search.retrieval;
 
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -30,7 +30,7 @@ public final class PdfSearcher {
     private final Directory indexDirectory;
 
     public PdfSearcher() throws IOException {
-        this.indexDirectory = new SimpleFSDirectory(Paths.get("src/main/resources/luceneIndex"));
+        this.indexDirectory = new SimpleFSDirectory(Path.of("src/main/resources/luceneIndex"));
     }
 
     /**
