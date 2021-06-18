@@ -7,6 +7,10 @@ repositories {
     mavenCentral()
 }
 
+shadowJar {
+	mergeServiceFiles()
+}
+
 dependencies {
     implementation 'org.apache.lucene:lucene-core:8.8.2'
     implementation ('org.apache.lucene:lucene-queryparser:8.8.2') {
