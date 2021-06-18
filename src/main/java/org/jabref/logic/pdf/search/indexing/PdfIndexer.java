@@ -39,11 +39,11 @@ public class PdfIndexer {
      * Adds all PDF files linked to an entry in the database to new Lucene search index. Any previous state of the
      * Lucene search index will be deleted!
      *
-     * @param perserResult a bibtex database to link the pdf files to
+     * @param parserResult a bibtex database to link the pdf files to
      */
-    public void createIndex(ParserResult perserResult) {
-        this.databaseContext = perserResult.getDatabaseContext();
-        this.database = perserResult.getDatabase();
+    public void createIndex(ParserResult parserResult) {
+        this.databaseContext = parserResult.getDatabaseContext();
+        this.database = parserResult.getDatabase();
         try (IndexWriter indexWriter = new IndexWriter(directoryToIndex,
                 new IndexWriterConfig(new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE))) {
             final ObservableList<BibEntry> entries = this.database.getEntries();
