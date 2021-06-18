@@ -27,7 +27,7 @@ class UpdateTimestampListenerTest {
     private final String baseDate = "2000-1-1";
     private final String newDate = "2000-1-2";
 
-  @BeforeEach
+    @BeforeEach
     void setUp() {
         database = new BibDatabase();
         bibEntry = new BibEntry();
