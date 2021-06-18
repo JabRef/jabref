@@ -95,10 +95,7 @@ class XmpPdfExporterTest {
      */
     @BeforeEach
     void setUp() throws IOException {
-        xmpPreferences = mock(XmpPreferences.class);
-        // The code assumes privacy filters to be off
-        when(xmpPreferences.shouldUseXmpPrivacyFilter()).thenReturn(false);
-        when(xmpPreferences.getKeywordSeparator()).thenReturn(',');
+        xmpPrefereces = new XmpPreferences(false, Collections.emptySet(), ',');
 
         encoding = Charset.defaultCharset();
 
