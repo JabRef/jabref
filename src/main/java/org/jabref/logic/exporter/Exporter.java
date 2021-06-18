@@ -78,9 +78,7 @@ public abstract class Exporter {
         for (LinkedFile file : entryToWriteOn.getFiles()) {
             if (file.getFileType().equals(fileType.getName())) {
                 Optional<Path> filePath = file.findIn(databaseContext, filePreferences);
-                if (filePath.isEmpty()) {
-                    continue;
-                } else {
+                if (filePath.isPresent()) {
                     export(databaseContext, filePath.get(), encoding, entriesToWrite);
                     writtenToAFile = true;
                 }
