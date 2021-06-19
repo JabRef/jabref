@@ -3,16 +3,13 @@ package org.jabref.model.openoffice.style;
 import java.util.Optional;
 
 /**
- * This is what we need to produce normalized author-year citation
- * markers.
+ * This is what we need to produce normalized author-year citation markers.
  */
 public interface CitationMarkerNormEntry {
 
     /** Citation key. This is what we usually get from the document.
      *
-     *  Used if getBibEntry() and/or getDatabase() returns
-     *  empty, which indicates failure to lookup in the databases.
-     *
+     *  Used if getLookupResult() returns empty, which indicates failure to lookup in the databases.
      */
     String getCitationKey();
 

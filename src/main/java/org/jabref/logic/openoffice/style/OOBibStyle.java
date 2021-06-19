@@ -517,20 +517,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     /* end_old */
 
     /* begin_old */
-    /**
-     * Format the marker for the in-text citation according to this BIB style. Uniquefier letters are added as
-     * provided by the uniquefiers argument. If successive entries within the citation are uniquefied from each other,
-     * this method will perform a grouping of these entries.
-     *
-     * @param entries       The list of JabRef BibEntry providing the data.
-     * @param database      A map of BibEntry-BibDatabase pairs.
-     * @param inParenthesis Signals whether a parenthesized citation or an in-text citation is wanted.
-     * @param uniquefiers   Strings to add behind the year for each entry in case it's needed to separate similar
-     *                      entries.
-     * @param unlimAuthors  Boolean for each entry. If true, we should not use "et al" formatting regardless
-     *                      of the number of authors. Can be null to indicate that no entries should have unlimited names.
-     * @return The formatted citation.
-     */
     public String getCitationMarker(List<BibEntry> entries, Map<BibEntry, BibDatabase> database, boolean inParenthesis,
                                     String[] uniquefiers, int[] unlimAuthors) {
         // Look for groups of uniquefied entries that should be combined in the output.
@@ -1115,7 +1101,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
         // not null, check size
         if (pageInfos.size() != nCitations) {
-            throw new RuntimeException("normalizePageInfos: pageInfos.size() != nCitations");
+            throw new IllegalArgumentException("normalizePageInfos: pageInfos.size() != nCitations");
         }
 
         // not null, normalize elementwise

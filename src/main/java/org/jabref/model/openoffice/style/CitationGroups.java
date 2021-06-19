@@ -20,8 +20,7 @@ import org.slf4j.LoggerFactory;
 /**
  * CitationGroups : the set of citation groups in the document.
  *
- * This is the main input (as well as output) for creating citation
- * markers and bibliography.
+ * This is the main input (as well as output) for creating citation markers and bibliography.
  *
  */
 public class CitationGroups {
@@ -56,8 +55,7 @@ public class CitationGroups {
     }
 
     /**
-     * For each citation in {@code where}
-     * call {@code fun.accept(new Pair(citation, value));}
+     * For each citation in {@code where} call {@code fun.accept(new Pair(citation, value));}
      */
     public <T> void distributeToCitations(List<CitationPath> where,
                                           Consumer<OOPair<Citation, T>> fun,
@@ -84,21 +82,19 @@ public class CitationGroups {
         if (true) {
             // collect-lookup-distribute
             //
-            // CitationDatabaseLookupResult for the same citation key
-            // is the same object. Until we insert a new citation from the GUI.
+            // CitationDatabaseLookupResult for the same citation key is the same object. Until we
+            // insert a new citation from the GUI.
             CitedKeys cks = getCitedKeysUnordered();
             cks.lookupInDatabases(databases);
             cks.distributeLookupResults(this);
         } else {
             // lookup each citation directly
             //
-            // CitationDatabaseLookupResult for the same citation key
-            // may be a different object: CitedKey.addPath has to use equals,
-            // so CitationDatabaseLookupResult has to override Object.equals,
-            // which depends on BibEntry.equals and BibDatabase.equals
-            // doing the right thing. Seems to work. But what we gained
-            // from avoiding collect-and-distribute may be lost in more
-            // complicated consistency checking in addPath.
+            // CitationDatabaseLookupResult for the same citation key may be a different object:
+            // CitedKey.addPath has to use equals, so CitationDatabaseLookupResult has to override
+            // Object.equals, which depends on BibEntry.equals and BibDatabase.equals doing the
+            // right thing. Seems to work. But what we gained from avoiding collect-and-distribute
+            // may be lost in more complicated consistency checking in addPath.
             //
             for (CitationGroup cg : getCitationGroupsUnordered()) {
                 for (Citation cit : cg.citationsInStorageOrder) {
@@ -117,22 +113,21 @@ public class CitationGroups {
      */
     public List<CitationGroup> getCitationGroupsInGlobalOrder() {
         if (globalOrder.isEmpty()) {
-            throw new RuntimeException("getCitationGroupsInGlobalOrder: not ordered yet");
+            throw new IllegalStateException("getCitationGroupsInGlobalOrder: not ordered yet");
         }
         return OOListUtil.map(globalOrder.get(), cgid -> citationGroupsUnordered.get(cgid));
     }
 
     /**
-     * Impose an order of citation groups by providing the order
-     * of their citation group idendifiers.
+     * Impose an order of citation groups by providing the order of their citation group
+     * idendifiers.
      *
      * Also set indexInGlobalOrder for each citation group.
      */
     public void setGlobalOrder(List<CitationGroupId> globalOrder) {
         Objects.requireNonNull(globalOrder);
         if (globalOrder.size() != numberOfCitationGroups()) {
-            throw new RuntimeException("setGlobalOrder:"
-                                       + " globalOrder.size() != numberOfCitationGroups()");
+            throw new IllegalStateException("setGlobalOrder: globalOrder.size() != numberOfCitationGroups()");
         }
         this.globalOrder = Optional.of(globalOrder);
 
@@ -158,8 +153,8 @@ public class CitationGroups {
     }
 
     /**
-     * Collect citations into a list of cited sources using neither
-     * CitationGroup.globalOrder or Citation.localOrder
+     * Collect citations into a list of cited sources using neither CitationGroup.globalOrder or
+     * Citation.localOrder
      */
     public CitedKeys getCitedKeysUnordered() {
         LinkedHashMap<String, CitedKey> res = new LinkedHashMap<>();
@@ -185,7 +180,7 @@ public class CitationGroups {
     public CitedKeys getCitedKeysSortedInOrderOfAppearance() {
         LinkedHashMap<String, CitedKey> res = new LinkedHashMap<>();
         if (!hasGlobalOrder()) {
-            throw new RuntimeException("getSortedCitedKeys: no globalOrder");
+            throw new IllegalStateException("getSortedCitedKeys: no globalOrder");
         }
         for (CitationGroup cg : getCitationGroupsInGlobalOrder()) {
             for (int i : cg.getLocalOrder()) {
@@ -224,8 +219,8 @@ public class CitationGroups {
 
     public void createNumberedBibliographySortedInOrderOfAppearance() {
         if (!bibliography.isEmpty()) {
-            throw new RuntimeException("createNumberedBibliographySortedInOrderOfAppearance:"
-                                       + " already have a bibliography");
+            throw new IllegalStateException("createNumberedBibliographySortedInOrderOfAppearance:"
+                                            + " already have a bibliography");
         }
         CitedKeys citedKeys = getCitedKeysSortedInOrderOfAppearance();
         citedKeys.numberCitedKeysInCurrentOrder();
@@ -238,8 +233,7 @@ public class CitationGroups {
      */
     public void createPlainBibliographySortedByComparator(Comparator<BibEntry> entryComparator) {
         if (!bibliography.isEmpty()) {
-            throw new RuntimeException("createPlainBibliographySortedByComparator:"
-                                       + " already have a bibliography");
+            throw new IllegalStateException("createPlainBibliographySortedByComparator: already have a bibliography");
         }
         CitedKeys citedKeys = getCitedKeysUnordered();
         citedKeys.sortByComparator(entryComparator);
@@ -251,8 +245,7 @@ public class CitationGroups {
      */
     public void createNumberedBibliographySortedByComparator(Comparator<BibEntry> entryComparator) {
         if (!bibliography.isEmpty()) {
-            throw new RuntimeException("createNumberedBibliographySortedByComparator:"
-                                       + " already have a bibliography");
+            throw new IllegalStateException("createNumberedBibliographySortedByComparator: already have a bibliography");
         }
         CitedKeys citedKeys = getCitedKeysUnordered();
         citedKeys.sortByComparator(entryComparator);
@@ -268,18 +261,6 @@ public class CitationGroups {
     public Optional<CitationGroup> getCitationGroup(CitationGroupId cgid) {
         CitationGroup cg = citationGroupsUnordered.get(cgid);
         return Optional.ofNullable(cg);
-    }
-
-    /**
-     * Call this when the citation group is unquestionably there.
-     */
-    public CitationGroup getCitationGroupOrThrow(CitationGroupId cgid) {
-        CitationGroup cg = citationGroupsUnordered.get(cgid);
-        if (cg == null) {
-            throw new RuntimeException("getCitationGroupOrThrow:"
-                                       + " the requested CitationGroup is not available");
-        }
-        return cg;
     }
 
     /*

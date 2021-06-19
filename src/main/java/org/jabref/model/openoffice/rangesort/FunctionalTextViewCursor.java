@@ -13,23 +13,21 @@ import com.sun.star.text.XTextRange;
 import com.sun.star.text.XTextViewCursor;
 
 /*
- * A problem with XTextViewCursor: if it is not in text, then we get a
- * crippled version that does not support viewCursor.getStart() or
- * viewCursor.gotoRange(range,false), and will throw an exception
- * instead.
+ * A problem with XTextViewCursor: if it is not in text, then we get a crippled version that does
+ * not support viewCursor.getStart() or viewCursor.gotoRange(range,false), and will throw an
+ * exception instead.
  *
- * Here we manipulate the cursor via XSelectionSupplier.getSelection and
- * XSelectionSupplier.select to move it to the text.
+ * Here we manipulate the cursor via XSelectionSupplier.getSelection and XSelectionSupplier.select
+ * to move it to the text.
  *
  * Seems to work when the user selected a frame or image.
  * In these cases restoring the selection works, too.
  *
- * When the cursor is in a comment (referred to as "annotation" in OO
- * API) then initialSelection is null, and select() fails to
- * get a functional viewCursor.
+ * When the cursor is in a comment (referred to as "annotation" in OO API) then initialSelection is
+ * null, and select() fails to get a functional viewCursor.
  *
- * If FunctionalTextViewCursor.get() reports error, we have to ask the
- * user to move the cursor into the text part of the document.
+ * If FunctionalTextViewCursor.get() reports error, we have to ask the user to move the cursor into
+ * the text part of the document.
  *
  * Usage:
  *
@@ -45,19 +43,13 @@ import com.sun.star.text.XTextViewCursor;
  */
 public class FunctionalTextViewCursor {
 
-    /*
-     * The initial position of the cursor or null.
-     */
+    /* The initial position of the cursor or null. */
     private XTextRange initialPosition;
 
-    /*
-     * The initial selection in the document or null.
-     */
+    /* The initial selection in the document or null. */
     private XServiceInfo initialSelection;
 
-    /*
-     * The view cursor, potentially moved from its original location.
-     */
+    /* The view cursor, potentially moved from its original location. */
     private XTextViewCursor viewCursor;
 
     private FunctionalTextViewCursor(XTextRange initialPosition,
@@ -71,12 +63,10 @@ public class FunctionalTextViewCursor {
     /*
      * Get a functional XTextViewCursor or an error message.
      *
-     * The cursor position may differ from the location
-     * provided by the user.
+     * The cursor position may differ from the location provided by the user.
      *
-     * On failure the constructor restores the selection. On success,
-     * the caller may want to call instance.restore() after finished
-     * using the cursor.
+     * On failure the constructor restores the selection. On success, the caller may want to call
+     * instance.restore() after finished using the cursor.
      */
     public static OOResult<FunctionalTextViewCursor, String> get(XTextDocument doc) {
 
@@ -89,9 +79,7 @@ public class FunctionalTextViewCursor {
             try {
                 initialPosition = UnoCursor.createTextCursorByRange(viewCursor);
                 viewCursor.getStart();
-                return OOResult.ok(new FunctionalTextViewCursor(initialPosition,
-                                                              initialSelection,
-                                                              viewCursor));
+                return OOResult.ok(new FunctionalTextViewCursor(initialPosition, initialSelection, viewCursor));
             } catch (com.sun.star.uno.RuntimeException ex) {
                 // bad cursor
                 viewCursor = null;
@@ -100,8 +88,7 @@ public class FunctionalTextViewCursor {
         }
 
         if (initialSelection == null) {
-            String errorMessage = ("Selection is not available:"
-                                   + " cannot provide a functional view cursor");
+            String errorMessage = ("Selection is not available: cannot provide a functional view cursor");
             return OOResult.error(errorMessage);
         } else if (!Arrays.stream(initialSelection.getSupportedServiceNames())
                    .anyMatch("com.sun.star.text.TextRanges"::equals)) {
@@ -149,10 +136,7 @@ public class FunctionalTextViewCursor {
         }
     }
 
-    /*
-     * Restore initial state of viewCursor (possibly by restoring
-     * selection) if possible.
-     */
+    /* Restore initial state of viewCursor (possibly by restoring selection) if possible. */
     public void restore(XTextDocument doc) {
         FunctionalTextViewCursor.restore(doc, initialPosition, initialSelection);
     }
