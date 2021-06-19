@@ -32,7 +32,15 @@
     <category citation-format="note"/>
     <category field="theology"/>
     <summary>Society of Biblical Literature format with full notes and bibliography</summary>
+<<<<<<< HEAD
+<<<<<<< HEAD
     <updated>2021-04-13T15:55:26+00:00</updated>
+=======
+    <updated>2021-05-10T14:27:36+00:00</updated>
+>>>>>>> fcf26b3f77925d7e99e703666dbe3c4b706403ac
+=======
+    <updated>2021-05-10T14:27:36+00:00</updated>
+>>>>>>> dbb93e7d9be410a475814d5ae49aef83ce158191
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en-US">
@@ -684,8 +692,18 @@
                   </if>
                   <else>
                     <group delimiter=" ">
+<<<<<<< HEAD
+<<<<<<< HEAD
                       <label variable="locator" form="short"/>
                       <text variable="locator"/>
+=======
+                        <label variable="locator" form="short"/>
+                        <text variable="locator"/>
+>>>>>>> fcf26b3f77925d7e99e703666dbe3c4b706403ac
+=======
+                        <label variable="locator" form="short"/>
+                        <text variable="locator"/>
+>>>>>>> dbb93e7d9be410a475814d5ae49aef83ce158191
                     </group>
                   </else>
                 </choose>
@@ -938,10 +956,33 @@
       <choose>
         <!-- Support custom citations via the annote variable. For discussion, see https://forums.zotero.org/discussion/comment/317370 -->
         <if variable="annote">
+<<<<<<< HEAD
+<<<<<<< HEAD
           <group delimiter=" ">
             <text variable="annote"/>
             <text macro="point-locators-subsequent"/>
           </group>
+=======
+=======
+>>>>>>> dbb93e7d9be410a475814d5ae49aef83ce158191
+          <choose>
+            <if locator="section">
+              <group delimiter=" ">
+                <text variable="annote"/>
+                <text macro="point-locators-subsequent"/>
+              </group>
+            </if>
+            <else>
+              <group delimiter=", ">
+                <text variable="annote"/>
+                <text macro="point-locators-subsequent"/>
+              </group>
+            </else>
+          </choose>
+<<<<<<< HEAD
+>>>>>>> fcf26b3f77925d7e99e703666dbe3c4b706403ac
+=======
+>>>>>>> dbb93e7d9be410a475814d5ae49aef83ce158191
         </if>
         <!-- Lexicon/Dictionary/Encyclopedia -->
         <else-if type="entry-dictionary entry-encyclopedia" match="any">
