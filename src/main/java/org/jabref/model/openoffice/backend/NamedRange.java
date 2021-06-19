@@ -24,8 +24,8 @@ public interface NamedRange {
         WrappedTargetException;
 
     /**
-     * Cursor for the reference marks as is, not prepared for filling,
-     * but does not need nrCleanFillCursor either.
+     * Cursor for the reference marks as is, not prepared for filling, but does not need
+     * nrCleanFillCursor either.
      */
     public Optional<XTextCursor> nrGetRawCursor(XTextDocument doc)
         throws
@@ -44,8 +44,8 @@ public interface NamedRange {
         CreationException;
 
     /**
-     * Remove brackets, but if the result would become empty, leave
-     * them; if the result would be a single characer, leave the left bracket.
+     * Remove brackets, but if the result would become empty, leave them; if the result would be a
+     * single characer, leave the left bracket.
      *
      */
     public void nrCleanFillCursor(XTextDocument doc)
