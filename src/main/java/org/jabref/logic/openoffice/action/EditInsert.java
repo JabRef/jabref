@@ -43,28 +43,21 @@ public class EditInsert {
      *
      * In the document we store citations by their citation key.
      *
-     * If the citation key is missing, the best we can do is to notify
-     * the user. Or the programmer, that we cannot accept such input.
+     * If the citation key is missing, the best we can do is to notify the user. Or the programmer,
+     * that we cannot accept such input.
      *
      */
     private static String insertEntryGetCitationKey(BibEntry entry) {
         Optional<String> key = entry.getCitationKey();
         if (key.isEmpty()) {
-            throw new RuntimeException("insertEntryGetCitationKey:"
-                                       + " cannot cite entries without citation key");
+            throw new IllegalArgumentException("insertEntryGetCitationKey: cannot cite entries without citation key");
         }
         return key.get();
     }
 
-    /*
+    /**
      * @param cursor Where to insert.
-     *
-     * @param sync If not empty, update citation markers and,
-     *             depending on the embedded options, the
-     *             bibliography.
-     *
-     * @param fcursor If sync.isPresent(), it must provide a
-     *                FunctionalTextViewCursor. Otherwise not used.
+     * @param pageInfo A single pageInfo for a list of entries. This is what we get from the GUI.
      */
     public static void insertCitationGroup(XTextDocument doc,
                                            OOFrontend fr,

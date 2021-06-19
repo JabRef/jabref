@@ -22,15 +22,14 @@ public class UnoReferenceMark {
     /**
      * @throws NoDocumentException If cannot get reference marks
      *
-     * Note: also used by `isDocumentConnectionMissing` to test if
-     * we have a working connection.
+     * Note: also used by `isDocumentConnectionMissing` to test if we have a working connection.
      *
      */
     public static XNameAccess getNameAccess(XTextDocument doc)
         throws
         NoDocumentException {
 
-        XReferenceMarksSupplier supplier = UnoCast.unoQI(XReferenceMarksSupplier.class, doc);
+        XReferenceMarksSupplier supplier = UnoCast.cast(XReferenceMarksSupplier.class, doc).get();
 
         try {
             return supplier.getReferenceMarks();
@@ -60,11 +59,10 @@ public class UnoReferenceMark {
      *
      * Removes both the text and the mark itself.
      */
-    public static void remove(XTextDocument doc, String name)
+    public static void removeIfExists(XTextDocument doc, String name)
         throws
         WrappedTargetException,
-        NoDocumentException,
-        NoSuchElementException {
+        NoDocumentException {
 
         XNameAccess xReferenceMarks = UnoReferenceMark.getNameAccess(doc);
 
@@ -73,7 +71,11 @@ public class UnoReferenceMark {
             if (mark.isEmpty()) {
                 return;
             }
-            doc.getText().removeTextContent(mark.get());
+            try {
+                doc.getText().removeTextContent(mark.get());
+            } catch (NoSuchElementException ex) {
+                // The caller gets what it expects.
+            }
         }
     }
 
@@ -97,37 +99,27 @@ public class UnoReferenceMark {
         NoDocumentException,
         WrappedTargetException {
         return (UnoReferenceMark.getAsTextContent(doc, name)
-                .map(e -> e.getAnchor()));
+                .map(XTextContent::getAnchor));
     }
 
     /**
-     * Insert a new reference mark at the provided cursor
-     * position.
+     * Insert a new reference mark at the provided cursor position.
      *
-     * If {@code absorb} is true, the text in the cursor range will become
-     * the text with gray background.
+     * If {@code absorb} is true, the text in the cursor range will become the text with gray
+     * background.
      *
-     * Note: LibreOffice 6.4.6.2 will create multiple reference marks
-     *       with the same name without error or renaming.
-     *       Its GUI does not allow this,
-     *       but we can create them programmatically.
-     *       In the GUI, clicking on any of those identical names
-     *       will move the cursor to the same mark.
+     * Note: LibreOffice 6.4.6.2 will create multiple reference marks with the same name without
+     *       error or renaming.
+     *       Its GUI does not allow this, but we can create them programmatically.
+     *       In the GUI, clicking on any of those identical names will move the cursor to the same
+     *       mark.
      *
      * @param name     For the reference mark.
-     * @param range    Cursor marking the location or range for
-     *                 the reference mark.
+     * @param range Cursor marking the location or range for the reference mark.
      */
-    public static XNamed create(XTextDocument doc,
-                                String name,
-                                XTextRange range,
-                                boolean absorb)
+    public static XNamed create(XTextDocument doc, String name, XTextRange range, boolean absorb)
         throws
         CreationException {
-        return UnoNamed.insertNamedTextContent(doc,
-                                               "com.sun.star.text.ReferenceMark",
-                                               name,
-                                               range,
-                                               absorb);
+        return UnoNamed.insertNamedTextContent(doc, "com.sun.star.text.ReferenceMark", name, range, absorb);
     }
 }

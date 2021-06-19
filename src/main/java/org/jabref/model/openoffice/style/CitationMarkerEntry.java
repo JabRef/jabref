@@ -5,8 +5,7 @@ import java.util.Optional;
 import org.jabref.model.openoffice.ootext.OOText;
 
 /**
- * This is what we need for createCitationMarker to produce author-year
- * citation markers.
+ * This is what we need for createCitationMarker to produce author-year citation markers.
  */
 public interface CitationMarkerEntry extends CitationMarkerNormEntry {
 
@@ -17,14 +16,13 @@ public interface CitationMarkerEntry extends CitationMarkerNormEntry {
 
     /**
      * pageInfo for this citation, provided by the user.
-     * May be empty, for none.
+     *          May be empty, for none.
      */
     Optional<OOText> getPageInfo();
 
     /**
-     *  @return true if this citation is the first appearance of the
-     *  source cited. Some styles use different limit on the number of
-     *  authors shown in this case.
+     *  @return true if this citation is the first appearance of the source cited. Some styles use
+     *               different limit on the number of authors shown in this case.
      */
     boolean getIsFirstAppearanceOfSource();
 }

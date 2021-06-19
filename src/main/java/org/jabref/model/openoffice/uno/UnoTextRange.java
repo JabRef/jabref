@@ -17,12 +17,12 @@ public class UnoTextRange {
      *  Returns Optional.empty if not in a footnote.
      */
     public static Optional<XTextRange> getFootnoteMarkRange(XTextRange original) {
-        XFootnote footer = UnoCast.unoQI(XFootnote.class, original.getText());
-        if (footer != null) {
+        Optional<XFootnote> footer = UnoCast.cast(XFootnote.class, original.getText());
+        if (footer.isPresent()) {
             // If we are inside a footnote,
             // find the linking footnote marker:
             // The footnote's anchor gives the correct position in the text:
-            return Optional.ofNullable(footer.getAnchor());
+            return Optional.ofNullable(footer.get().getAnchor());
         }
         return Optional.empty();
     }
@@ -46,9 +46,9 @@ public class UnoTextRange {
 
     public static int compareStarts(XTextRange a, XTextRange b) {
         if (!comparables(a, b)) {
-            throw new RuntimeException("compareStarts: got incomparable regions");
+            throw new java.lang.IllegalArgumentException("compareStarts: got incomparable regions");
         }
-        final XTextRangeCompare compare = UnoCast.unoQI(XTextRangeCompare.class, a.getText());
+        final XTextRangeCompare compare = UnoCast.cast(XTextRangeCompare.class, a.getText()).get();
         return compareStartsUnsafe(compare, a, b);
     }
 
@@ -59,9 +59,9 @@ public class UnoTextRange {
      */
     public static int compareEnds(XTextRange a, XTextRange b) {
         if (!comparables(a, b)) {
-            throw new RuntimeException("compareEnds: got incomparable regions");
+            throw new java.lang.IllegalArgumentException("compareEnds: got incomparable regions");
         }
-        final XTextRangeCompare compare = UnoCast.unoQI(XTextRangeCompare.class, a.getText());
+        final XTextRangeCompare compare = UnoCast.cast(XTextRangeCompare.class, a.getText()).get();
         return (-1) * compare.compareRegionEnds(a, b);
     }
 
@@ -78,9 +78,9 @@ public class UnoTextRange {
 
     public static int compareStartsThenEnds(XTextRange a, XTextRange b) {
         if (!comparables(a, b)) {
-            throw new RuntimeException("compareStartsThenEnds: got incomparable regions");
+            throw new java.lang.IllegalArgumentException("compareStartsThenEnds: got incomparable regions");
         }
-        final XTextRangeCompare compare = UnoCast.unoQI(XTextRangeCompare.class, a.getText());
+        final XTextRangeCompare compare = UnoCast.cast(XTextRangeCompare.class, a.getText()).get();
         return compareStartsThenEndsUnsafe(compare, a, b);
     }
 }

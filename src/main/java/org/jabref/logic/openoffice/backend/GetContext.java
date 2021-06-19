@@ -27,8 +27,8 @@ public class GetContext {
      *  @param cursor
      *  @param charBefore Number of characters requested.
      *  @param charAfter  Number of characters requested.
-     *  @param htmlMarkup If true, the text belonging to the
-     *                    reference mark is surrounded by bold html tag.
+     *  @param htmlMarkup If true, the text belonging to the reference mark is surrounded by bold
+     *                    html tag.
      *
      */
     public static String getCursorStringWithContext(XTextCursor cursor,
@@ -46,8 +46,8 @@ public class GetContext {
         for (int i = 0; i < charBefore; i++) {
             try {
                 cursor.goLeft((short) 1, true);
-                // If we are close to charBefore and see a space,
-                // then cut here. Might avoid cutting a word in half.
+                // If we are close to charBefore and see a space, then cut here. Might avoid cutting
+                // a word in half.
                 if ((i >= (charBefore - flex))
                     && Character.isWhitespace(cursor.getString().charAt(0))) {
                     break;

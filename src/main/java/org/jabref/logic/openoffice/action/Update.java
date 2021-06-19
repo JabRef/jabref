@@ -20,13 +20,13 @@ import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
 
-/*
+/**
  * Update document: citation marks and bibliography
  */
 public class Update {
 
-    /*
-     * @return unresolvedKeys
+    /**
+     * @return the list of unresolved citation keys
      */
     private static List<String> updateDocument(XTextDocument doc,
                                                OOFrontend fr,

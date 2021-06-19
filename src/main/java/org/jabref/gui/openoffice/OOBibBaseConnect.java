@@ -72,10 +72,10 @@ class OOBibBaseConnect {
         Object desktop;
         try {
             desktop = sem.createInstanceWithContext("com.sun.star.frame.Desktop", context);
-        } catch (Exception e) {
+        } catch (com.sun.star.uno.Exception e) {
             throw new CreationException(e.getMessage());
         }
-        return UnoCast.unoQI(XDesktop.class, desktop);
+        return UnoCast.cast(XDesktop.class, desktop).get();
     }
 
     private static List<XTextDocument> getTextDocuments(XDesktop desktop)
@@ -90,10 +90,10 @@ class OOBibBaseConnect {
 
         while (compEnum.hasMoreElements()) {
             Object next = compEnum.nextElement();
-            XComponent comp = UnoCast.unoQI(XComponent.class, next);
-            XTextDocument doc = UnoCast.unoQI(XTextDocument.class, comp);
-            if (doc != null) {
-                result.add(doc);
+            XComponent comp = UnoCast.cast(XComponent.class, next).get();
+            Optional<XTextDocument> doc = UnoCast.cast(XTextDocument.class, comp);
+            if (doc.isPresent()) {
+                result.add(doc.get());
             }
         }
         return result;

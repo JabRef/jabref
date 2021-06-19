@@ -112,7 +112,7 @@ public class Citation implements ComparableCitation, CitationMarkerEntry, Citati
     public void setPageInfo(Optional<OOText> v) {
         Optional<OOText> vv = PageInfo.normalizePageInfo(v);
         if (!vv.equals(v)) {
-            throw new RuntimeException("setPageInfo argument is not normalized");
+            throw new IllegalArgumentException("setPageInfo argument is not normalized");
         }
         this.pageInfo = vv;
     }
