@@ -17,7 +17,6 @@ import org.jabref.model.openoffice.rangesort.FunctionalTextViewCursor;
 import org.jabref.model.openoffice.rangesort.RangeOverlap;
 import org.jabref.model.openoffice.rangesort.RangeOverlapBetween;
 import org.jabref.model.openoffice.rangesort.RangeOverlapWithin;
-import org.jabref.model.openoffice.rangesort.RangeSet;
 import org.jabref.model.openoffice.rangesort.RangeSort;
 import org.jabref.model.openoffice.rangesort.RangeSortEntry;
 import org.jabref.model.openoffice.rangesort.RangeSortVisual;
@@ -400,69 +399,35 @@ public class OOFrontend {
         NoDocumentException,
         WrappedTargetException {
 
-        if (false) {
-            // Avoid inserting the same mark twice.
-            RangeSet seen = new RangeSet();
+        // We partition by XText and use a single range from
+        // each partition to get at the corresponding footnotemark range.
 
-            List<RangeForOverlapCheck<CitationGroupId>> result = new ArrayList<>();
+        List<RangeForOverlapCheck<CitationGroupId>> result = new ArrayList<>();
+        RangeSort.RangePartitions<RangeForOverlapCheck<CitationGroupId>> partitions =
+            RangeSort.partitionRanges(citationRanges);
 
-            for (RangeForOverlapCheck<CitationGroupId> citationRange : citationRanges) {
-
-                Optional<XTextRange> footnoteMarkRange = UnoTextRange.getFootnoteMarkRange(citationRange.range);
-
-                if (footnoteMarkRange.isEmpty()) {
-                    // not in footnote
-                    continue;
-                }
-
-                boolean seenContains = seen.contains(footnoteMarkRange.get());
-                if (!seenContains) {
-                    seen.add(footnoteMarkRange.get());
-                    result.add(new RangeForOverlapCheck<>(footnoteMarkRange.get(),
-                                                          citationRange.idWithinKind,
-                                                          RangeForOverlapCheck.FOOTNOTE_MARK_KIND,
-                                                          "FootnoteMark for " + citationRange.format()));
-                }
+        // Each partition corresponds to an XText, and each footnote has a single XText.
+        // (This latter ignores the possibility of XTextContents inserted into footnotes.)
+        // Also: different footnotes cannot share a footnotemark range, we are not creating duplicates.
+        for (List<RangeForOverlapCheck<CitationGroupId>> partition : partitions.getPartitions()) {
+            if (partition.isEmpty()) {
+                continue;
             }
-            return result;
-        } else {
+            RangeForOverlapCheck<CitationGroupId> citationRange = partition.get(0);
 
-            // RangeSet.add involves a few comparisons anf getText, which is probably costly.
-            //
-            // (On the other hand we only insert ranges of footnotes, which probably limits the sizes
-            // of its partitions)
-            //
-            // We can avoid using RangeSet by partitioning only and using a single range from
-            // each partition to get at the corresponding footnotemark range.
+            Optional<XTextRange> footnoteMarkRange = UnoTextRange.getFootnoteMarkRange(citationRange.range);
 
-            List<RangeForOverlapCheck<CitationGroupId>> result = new ArrayList<>();
-            RangeSort.RangePartitions<RangeForOverlapCheck<CitationGroupId>> partitions =
-                RangeSort.partitionRanges(citationRanges);
-
-            // Now it is sufficient to check a single entry from each partition.
-            // Each partition corresponds to an XText, and each footnote has a single XText.
-            // (This latter ignores the possibility of XTextContents inserted into footnotes.)
-            // Also: different footnotes cannot share a footnotemark range, we are not creating duplicates.
-            for (List<RangeForOverlapCheck<CitationGroupId>> partition : partitions.getPartitions()) {
-                if (partition.isEmpty()) {
-                    continue;
-                }
-                RangeForOverlapCheck<CitationGroupId> citationRange = partition.get(0);
-
-                Optional<XTextRange> footnoteMarkRange = UnoTextRange.getFootnoteMarkRange(citationRange.range);
-
-                if (footnoteMarkRange.isEmpty()) {
-                    // not in footnote
-                    continue;
-                }
-
-                result.add(new RangeForOverlapCheck<>(footnoteMarkRange.get(),
-                                                      citationRange.idWithinKind,
-                                                      RangeForOverlapCheck.FOOTNOTE_MARK_KIND,
-                                                      "FootnoteMark for " + citationRange.format()));
+            if (footnoteMarkRange.isEmpty()) {
+                // not in footnote
+                continue;
             }
-            return result;
+
+            result.add(new RangeForOverlapCheck<>(footnoteMarkRange.get(),
+                                                  citationRange.idWithinKind,
+                                                  RangeForOverlapCheck.FOOTNOTE_MARK_KIND,
+                                                  "FootnoteMark for " + citationRange.format()));
         }
+        return result;
     }
 
     static String rangeOverlapsToMessage(List<RangeOverlap<RangeForOverlapCheck<CitationGroupId>>> overlaps) {
