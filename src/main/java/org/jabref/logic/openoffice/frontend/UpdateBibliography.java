@@ -47,7 +47,6 @@ public class UpdateBibliography {
         throws
         NoSuchElementException,
         WrappedTargetException,
-        IllegalArgumentException,
         CreationException,
         PropertyVetoException,
         UnknownPropertyException,
@@ -69,8 +68,7 @@ public class UpdateBibliography {
      */
     private static void createBibTextSection2(XTextDocument doc)
         throws
-        CreationException,
-        IllegalArgumentException {
+        CreationException {
 
         // Always creating at the end of the document.
         // Alternatively, we could receive a cursor.
@@ -89,7 +87,6 @@ public class UpdateBibliography {
     private static void clearBibTextSectionContent2(XTextDocument doc)
         throws
         CreationException,
-        IllegalArgumentException,
         NoDocumentException,
         WrappedTargetException {
 
@@ -124,7 +121,7 @@ public class UpdateBibliography {
         UnknownPropertyException,
         WrappedTargetException {
 
-        XTextRange sectionRange = getBibliographyRange(doc).orElseThrow(RuntimeException::new);
+        XTextRange sectionRange = getBibliographyRange(doc).orElseThrow(IllegalStateException::new);
 
         XTextCursor cursor = doc.getText().createTextCursorByRange(sectionRange);
 
@@ -138,13 +135,13 @@ public class UpdateBibliography {
         cursor.collapseToEnd();
 
         // remove the inital empty paragraph from the section.
-        sectionRange = getBibliographyRange(doc).orElseThrow(RuntimeException::new);
+        sectionRange = getBibliographyRange(doc).orElseThrow(IllegalStateException::new);
         XTextCursor initialParagraph = doc.getText().createTextCursorByRange(sectionRange);
         initialParagraph.collapseToStart();
         initialParagraph.goRight((short) 1, true);
         initialParagraph.setString("");
 
-        UnoBookmark.remove(doc, BIB_SECTION_END_NAME);
+        UnoBookmark.removeIfExists(doc, BIB_SECTION_END_NAME);
         UnoBookmark.create(doc, BIB_SECTION_END_NAME, cursor, true);
 
         cursor.collapseToEnd();

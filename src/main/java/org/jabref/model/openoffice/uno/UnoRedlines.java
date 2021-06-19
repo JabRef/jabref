@@ -1,5 +1,7 @@
 package org.jabref.model.openoffice.uno;
 
+import java.util.Optional;
+
 import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.container.NoSuchElementException;
@@ -16,25 +18,30 @@ public class UnoRedlines {
 
     public static boolean getRecordChanges(XTextDocument doc)
         throws
-        UnknownPropertyException,
         WrappedTargetException {
 
         // https://wiki.openoffice.org/wiki/Documentation/DevGuide/Text/Settings
         // "Properties of com.sun.star.text.TextDocument"
 
-        XPropertySet propertySet = (UnoCast.optUnoQI(XPropertySet.class, doc)
-                                    .orElseThrow(RuntimeException::new));
+        XPropertySet propertySet = UnoCast.cast(XPropertySet.class, doc).get();
 
-        return (boolean) propertySet.getPropertyValue("RecordChanges");
+        try {
+            return (boolean) propertySet.getPropertyValue("RecordChanges");
+        } catch (UnknownPropertyException ex) {
+            throw new java.lang.IllegalStateException("Caught UnknownPropertyException on 'RecordChanges'");
+        }
     }
 
-    private static XRedlinesSupplier getRedlinesSupplier(XTextDocument doc) {
-        return UnoCast.unoQI(XRedlinesSupplier.class, doc);
+    private static Optional<XRedlinesSupplier> getRedlinesSupplier(XTextDocument doc) {
+        return UnoCast.cast(XRedlinesSupplier.class, doc);
     }
 
     public static int countRedlines(XTextDocument doc) {
-        XRedlinesSupplier supplier = getRedlinesSupplier(doc);
-        XEnumerationAccess enumerationAccess = supplier.getRedlines();
+        Optional<XRedlinesSupplier> supplier = getRedlinesSupplier(doc);
+        if (supplier.isEmpty()) {
+            return 0;
+        }
+        XEnumerationAccess enumerationAccess = supplier.get().getRedlines();
         XEnumeration enumeration = enumerationAccess.createEnumeration();
         if (enumeration == null) {
             return 0;

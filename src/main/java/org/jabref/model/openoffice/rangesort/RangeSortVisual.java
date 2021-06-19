@@ -21,11 +21,10 @@ import org.slf4j.LoggerFactory;
  *
  * Requires functional XTextViewCursor.
  *
- * Problem: for multicolumn layout and when viewing pages side-by-side
- *          in LO, the (top-down,left-to-right) order interpreted
- *          as-on-the-screen: an XTextRange at the top of the second
- *          column or second page is sorted before one at the bottom
- *          of the first column of the first page.
+ * Problem: for multicolumn layout and when viewing pages side-by-side in LO, the
+ *          (top-down,left-to-right) order interpreted as-on-the-screen: an XTextRange at the top of
+ *          the second column or second page is sorted before an XTextRange at the bottom of the
+ *          first column of the first page.
  */
 public class RangeSortVisual {
 
@@ -36,8 +35,7 @@ public class RangeSortVisual {
      *
      * Requires a functional {@code XTextViewCursor}.
      *
-     * @return The input, sorted by the elements XTextRange and
-     *          getIndexInPosition.
+     * @return The input, sorted by the elements XTextRange and getIndexInPosition.
      */
     public static <T> List<RangeSortable<T>> visualSort(List<RangeSortable<T>> inputs,
                                                         XTextDocument doc,
@@ -49,12 +47,9 @@ public class RangeSortVisual {
         final int inputSize = inputs.size();
 
         if (UnoScreenRefresh.hasControllersLocked(doc)) {
-            LOGGER.warn("visualSort:"
-                        + " with ControllersLocked, viewCursor.gotoRange"
-                        + " is probably useless");
-            throw new RuntimeException("visualSort:"
-                                       + " with ControllersLocked, viewCursor.gotoRange"
-                                       + " is probably useless");
+            final String msg = "visualSort: with ControllersLocked, viewCursor.gotoRange is probably useless";
+            LOGGER.warn(msg);
+            throw new IllegalStateException(msg);
         }
 
         XTextViewCursor viewCursor = fcursor.getViewCursor();
@@ -62,13 +57,12 @@ public class RangeSortVisual {
         // find coordinates
         List<Point> positions = new ArrayList<>(inputSize);
         for (RangeSortable<T> v : inputs) {
-            positions.add(findPositionOfTextRange(v.getRange(),
-                                                  viewCursor));
+            positions.add(findPositionOfTextRange(v.getRange(), viewCursor));
         }
         fcursor.restore(doc);
 
         if (positions.size() != inputSize) {
-            throw new RuntimeException("visualSort: positions.size() != inputSize");
+            throw new IllegalStateException("visualSort: positions.size() != inputSize");
         }
 
         // order by position
@@ -82,7 +76,7 @@ public class RangeSortVisual {
         Collections.sort(set);
 
         if (set.size() != inputSize) {
-            throw new RuntimeException("visualSort: set.size() != inputSize");
+            throw new IllegalStateException("visualSort: set.size() != inputSize");
         }
 
         // collect ordered result
@@ -92,26 +86,24 @@ public class RangeSortVisual {
         }
 
         if (result.size() != inputSize) {
-            throw new RuntimeException("visualSort: result.size() != inputSize");
+            throw new IllegalStateException("visualSort: result.size() != inputSize");
         }
 
         return result;
     }
 
     /**
-     *  Given a location, return its position: coordinates relative to
-     *  the top left position of the first page of the document.
+     *  Given a location, return its position: coordinates relative to the top left position of the
+     *  first page of the document.
      *
-     * Note: for text layouts with two or more columns, this gives the
-     *       wrong order: top-down/left-to-right does not match
-     *       reading order.
+     * Note: for text layouts with two or more columns, this gives the wrong order:
+     *       top-down/left-to-right does not match reading order.
      *
-     * Note: The "relative to the top left position of the first page"
-     *       is meant "as it appears on the screen".
+     * Note: The "relative to the top left position of the first page" is meant "as it appears on
+     *       the screen".
      *
-     *       In particular: when viewing pages side-by-side, the top
-     *       half of the right page is higher than the lower half of
-     *       the left page. Again, top-down/left-to-right does not
+     *       In particular: when viewing pages side-by-side, the top half of the right page is
+     *       higher than the lower half of the left page. Again, top-down/left-to-right does not
      *       match reading order.
      *
      * @param range  Location.
@@ -126,8 +118,8 @@ public class RangeSortVisual {
     /**
      * A reference mark name paired with its visual position.
      *
-     * Comparison is based on (Y,X,indexInPosition): vertical compared
-     * first, horizontal second, indexInPosition third.
+     * Comparison is based on (Y,X,indexInPosition): vertical compared first, horizontal second,
+     * indexInPosition third.
      *
      * Used for sorting reference marks by their visual positions.
      */

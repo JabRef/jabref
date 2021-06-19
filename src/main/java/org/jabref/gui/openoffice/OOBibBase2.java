@@ -164,7 +164,7 @@ class OOBibBase2 {
 
     OOVoidResult<OOError> collectResults(String title, List<OOVoidResult<OOError>> results) {
         String msg = (results.stream()
-                      .filter(e -> e.isError())
+                      .filter(OOVoidResult<OOError>::isError)
                       .map(e -> e.getError().getLocalizedMessage())
                       .collect(Collectors.joining("\n\n")));
         if (msg.isEmpty()) {
@@ -322,7 +322,7 @@ class OOBibBase2 {
                 }
                 return OOVoidResult.error(new OOError(title, msg));
             }
-        } catch (UnknownPropertyException | WrappedTargetException ex) {
+        } catch (WrappedTargetException ex) {
             String msg = Localization.lang("Error while checking if Writer"
                                            + " is recording changes or has recorded changes.");
             return OOVoidResult.error(new OOError(title, msg, ex));
@@ -372,10 +372,10 @@ class OOBibBase2 {
      * Checks existence and also checks if it is not an internal name.
      */
     private OOVoidResult<OOError> checkStyleExistsInTheDocument(String familyName,
-                                                              String styleName,
-                                                              XTextDocument doc,
-                                                              String labelInJstyleFile,
-                                                              String pathToStyleFile)
+                                                                String styleName,
+                                                                XTextDocument doc,
+                                                                String labelInJstyleFile,
+                                                                String pathToStyleFile)
         throws
         NoSuchElementException,
         WrappedTargetException {
@@ -394,9 +394,9 @@ class OOBibBase2 {
                                   labelInJstyleFile,
                                   styleName);
                 default ->
-                throw new RuntimeException("Expected " + UnoStyle.CHARACTER_STYLES
-                                           + " or " + UnoStyle.PARAGRAPH_STYLES
-                                           + " for familyName");
+                throw new IllegalArgumentException("Expected " + UnoStyle.CHARACTER_STYLES
+                                                   + " or " + UnoStyle.PARAGRAPH_STYLES
+                                                   + " for familyName");
                 }
                 + "\n"
                 + Localization.lang("Please create it in the document or change in the file:")
@@ -419,9 +419,9 @@ class OOBibBase2 {
                                   styleName,
                                   internalName.get());
                 default ->
-                throw new RuntimeException("Expected " + UnoStyle.CHARACTER_STYLES
-                                           + " or " + UnoStyle.PARAGRAPH_STYLES
-                                           + " for familyName");
+                throw new IllegalArgumentException("Expected " + UnoStyle.CHARACTER_STYLES
+                                                   + " or " + UnoStyle.PARAGRAPH_STYLES
+                                                   + " for familyName");
                 }
                 + "\n"
                 + Localization.lang("Please use the latter in the style file below"

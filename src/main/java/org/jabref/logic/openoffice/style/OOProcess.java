@@ -66,12 +66,10 @@ public class OOProcess {
      *  Fill cgs.bibliography and cgs.citationGroupsUnordered//CitationMarker
      *  according to style.
      */
-    public static void produceCitationMarkers(CitationGroups cgs,
-                                              List<BibDatabase> databases,
-                                              OOBibStyle style) {
+    public static void produceCitationMarkers(CitationGroups cgs, List<BibDatabase> databases, OOBibStyle style) {
 
         if (!cgs.hasGlobalOrder()) {
-            throw new RuntimeException("produceCitationMarkers: globalOrder is misssing in cgs");
+            throw new IllegalStateException("produceCitationMarkers: globalOrder is misssing in cgs");
         }
 
         cgs.lookupCitations(databases);

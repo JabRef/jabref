@@ -36,15 +36,14 @@ public class CitationGroup {
      * A name of a reference mark to link to by formatCitedOnPages.
      * May be initially empty, if backend does not use reference marks.
      *
-     * produceCitationMarkers might want fill it to support
-     * cross-references to citation groups from the bibliography.
+     * produceCitationMarkers might want fill it to support cross-references to citation groups from
+     * the bibliography.
      */
     private Optional<String> referenceMarkNameForLinking;
 
     /*
-     * Indices into citations: citations[localOrder[i]] provides ith
-     * citation according to the currently imposed local order for
-     * presentation.
+     * Indices into citations: citations[localOrder[i]] provides ith citation according to the
+     * currently imposed local order for presentation.
      *
      * Initialized to (0..(nCitations-1)) in the constructor.
      */

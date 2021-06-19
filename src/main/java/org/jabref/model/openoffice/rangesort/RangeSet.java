@@ -29,7 +29,12 @@ public class RangeSet {
         return partitions.get(partitionKey).contains(range);
     }
 
-    /* return false if already contained */
+    /*
+     * return false if already contained
+     *
+     * Beware: using UnoTextRange::compareStartsThenEnds as comparator involves range.getText()
+     *         twice on each comparison. This makes it costly to use this class.
+     */
     public boolean add(XTextRange range) {
         TreeSet<XTextRange> partition = partitions.get(range.getText());
         if (partition == null) {

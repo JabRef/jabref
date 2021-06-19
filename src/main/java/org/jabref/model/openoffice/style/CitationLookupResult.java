@@ -23,8 +23,7 @@ public class CitationLookupResult {
      *       Consequently, {@code this.database.equals(that.database)} below
      *       is equivalent to {@code this.database == that.database}.
      *
-     *       Since within each GUI call we use a fixed list of
-     *       databases, it is OK.
+     *       Since within each GUI call we use a fixed list of databases, it is OK.
      */
     @Override
     public boolean equals(Object o) {

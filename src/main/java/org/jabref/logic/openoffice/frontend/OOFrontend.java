@@ -57,9 +57,7 @@ public class OOFrontend {
         NoDocumentException,
         WrappedTargetException {
 
-        // TODO: dataModel should come from looking at the
-        // document and preferences.
-        //
+        // TODO: dataModel should come from looking at the document and preferences.
         this.backend = new Backend52();
 
         // Get the citationGroupNames
@@ -98,24 +96,19 @@ public class OOFrontend {
     }
 
     /**
-     * Creates a list of {@code RangeSortable<CitationGroup>} values for
-     * our {@code CitationGroup} values. Originally designed to be
-     * passed to {@code visualSort}.
+     * Creates a list of {@code RangeSortable<CitationGroup>} values for our {@code CitationGroup}
+     * values. Originally designed to be passed to {@code visualSort}.
      *
-     * The elements of the returned list are actually of type
-     * {@code RangeSortEntry<CitationGroup>}.
+     * The elements of the returned list are actually of type {@code RangeSortEntry<CitationGroup>}.
      *
-     * The result is sorted within {@code XTextRange.getText()}
-     * partitions of the citation groups according to their {@code XTextRange}
-     * (before mapping to footnote marks).
+     * The result is sorted within {@code XTextRange.getText()} partitions of the citation groups
+     * according to their {@code XTextRange} (before mapping to footnote marks).
      *
-     * In the result, RangeSortable.getIndexInPosition() contains
-     * unique indexes within the original partition (not after
-     * mapFootnotesToFootnoteMarks).
+     * In the result, RangeSortable.getIndexInPosition() contains unique indexes within the original
+     * partition (not after mapFootnotesToFootnoteMarks).
      *
-     * @param mapFootnotesToFootnoteMarks If true, replace ranges in
-     *        footnotes with the range of the corresponding footnote
-     *        mark. This is used for numbering the citations.
+     * @param mapFootnotesToFootnoteMarks If true, replace ranges in footnotes with the range of the
+     *        corresponding footnote mark. This is used for numbering the citations.
      *
      */
     private List<RangeSortable<CitationGroup>>
@@ -128,27 +121,24 @@ public class OOFrontend {
         for (CitationGroup cg : citationGroups.getCitationGroupsUnordered()) {
             XTextRange range = (this
                                 .getMarkRange(doc, cg)
-                                .orElseThrow(RuntimeException::new));
+                                .orElseThrow(IllegalStateException::new));
             sortables.add(new RangeSortEntry<>(range, 0, cg));
         }
 
         /*
          *  At this point we are almost ready to return sortables.
          *
-         *  But we may want to number citations in a footnote
-         *  as if it appeared where the footnote mark is.
+         *  But we may want to number citations in a footnote as if it appeared where the footnote
+         *  mark is.
          *
-         *  The following code replaces ranges within footnotes with
-         *  the range for the corresponding footnote mark.
+         *  The following code replaces ranges within footnotes with the range for the corresponding
+         *  footnote mark.
          *
-         *  This brings further ambiguity if we have multiple
-         *  citation groups within the same footnote: for the comparison
-         *  they become indistinguishable. Numbering between them is
-         *  not controlled. Also combineCiteMarkers will see them in
-         *  the wrong order (if we use this comparison), and will not
-         *  be able to merge. To avoid these, we sort textually within
-         *  each .getText() partition and add indexInPosition
-         *  accordingly.
+         *  This brings further ambiguity if we have multiple citation groups within the same
+         *  footnote: for the comparison they become indistinguishable. Numbering between them is
+         *  not controlled. Also combineCiteMarkers will see them in the wrong order (if we use this
+         *  comparison), and will not be able to merge. To avoid these, we sort textually within
+         *  each .getText() partition and add indexInPosition accordingly.
          *
          */
 
@@ -174,53 +164,45 @@ public class OOFrontend {
                     }
                 }
                 result.add(sortable);
-                }
+            }
         }
         return result.stream().map(e -> e).collect(Collectors.toList());
     }
 
     /**
-     *  @param mapFootnotesToFootnoteMarks If true, sort reference
-     *         marks in footnotes as if they appeared at the
-     *         corresponding footnote mark.
+     *  @param mapFootnotesToFootnoteMarks If true, sort reference marks in footnotes as if they
+     *         appeared at the corresponding footnote mark.
      *
      *  @return citation groups sorted by their visual positions.
      *
-     *  Limitation: for two column layout visual (top-down,
-     *        left-right) order does not match the expected (textual)
-     *        order.
+     *  Limitation: for two column layout visual (top-down, left-right) order does not match the
+     *        expected (textual) order.
      *
      */
-    private List<CitationGroup>
-    getVisuallySortedCitationGroups(XTextDocument doc,
-                                    boolean mapFootnotesToFootnoteMarks,
-                                    FunctionalTextViewCursor fcursor)
+    private List<CitationGroup> getVisuallySortedCitationGroups(XTextDocument doc,
+                                                                boolean mapFootnotesToFootnoteMarks,
+                                                                FunctionalTextViewCursor fcursor)
         throws
         WrappedTargetException,
         NoDocumentException,
         JabRefException {
 
-        List<RangeSortable<CitationGroup>> sortables =
-            createVisualSortInput(doc, mapFootnotesToFootnoteMarks);
+        List<RangeSortable<CitationGroup>> sortables = createVisualSortInput(doc, mapFootnotesToFootnoteMarks);
 
-        List<RangeSortable<CitationGroup>> sorted =
-            RangeSortVisual.visualSort(sortables,
-                                       doc,
-                                       fcursor);
+        List<RangeSortable<CitationGroup>> sorted = RangeSortVisual.visualSort(sortables, doc, fcursor);
 
-        List<CitationGroup> result =
-            (sorted.stream().map(e -> e.getContent()).collect(Collectors.toList()));
+        List<CitationGroup> result = (sorted.stream()
+                                      .map(RangeSortable<CitationGroup>::getContent)
+                                      .collect(Collectors.toList()));
 
         return result;
     }
 
     /**
-     * Return citation groups in visual order within (but not across)
-     * XText partitions.
+     * Return citation groups in visual order within (but not across) XText partitions.
      *
-     * This is (1) sufficient for combineCiteMarkers which looks for
-     * consecutive XTextRanges within each XText, (2) not confused by
-     * multicolumn layout or multipage display.
+     * This is (1) sufficient for combineCiteMarkers which looks for consecutive XTextRanges within
+     * each XText, (2) not confused by multicolumn layout or multipage display.
      */
     public List<CitationGroup>
     getCitationGroupsSortedWithinPartitions(XTextDocument doc, boolean mapFootnotesToFootnoteMarks)
@@ -236,19 +218,17 @@ public class OOFrontend {
     }
 
     /**
-     *  Create a citation group for the given citation keys, at the
-     *  end of position.
+     *  Create a citation group for the given citation keys, at the end of position.
      *
-     *  On return {@code position} is collapsed, and is after the
-     *  inserted space, or at the end of the reference mark.
+     *  On return {@code position} is collapsed, and is after the inserted space, or at the end of
+     *  the reference mark.
      *
      * @param citationKeys In storage order
      * @param pageInfos In storage order
      * @param citationType
      * @param position Collapsed to its end.
-     * @param insertSpaceAfter If true, we insert a space after the mark, that
-     *                         carries on format of characters from
-     *                         the original position.
+     * @param insertSpaceAfter If true, we insert a space after the mark, that carries on format of
+     *                         characters from the original position.
      */
     public CitationGroup createCitationGroup(XTextDocument doc,
                                              List<String> citationKeys,
@@ -267,7 +247,7 @@ public class OOFrontend {
 
         Objects.requireNonNull(pageInfos);
         if (pageInfos.size() != citationKeys.size()) {
-            throw new RuntimeException("pageInfos.size != citationKeys.size");
+            throw new IllegalArgumentException("pageInfos.size != citationKeys.size");
         }
         CitationGroup cg = backend.createCitationGroup(doc,
                                                        citationKeys,
@@ -357,8 +337,8 @@ public class OOFrontend {
             new ArrayList<>(citationGroups.numberOfCitationGroups());
 
         for (CitationGroup cg : citationGroups.getCitationGroupsUnordered()) {
-            XTextRange range = this.getMarkRange(doc, cg).orElseThrow(RuntimeException::new);
-            String description = cg.cgid.citationGroupIdAsString(); // cg.cgRangeStorage.nrGetRangeName();
+            XTextRange range = this.getMarkRange(doc, cg).orElseThrow(IllegalStateException::new);
+            String description = cg.cgid.citationGroupIdAsString();
             result.add(new RangeForOverlapCheck<>(range,
                                                   cg.cgid,
                                                   RangeForOverlapCheck.REFERENCE_MARK_KIND,
@@ -404,56 +384,88 @@ public class OOFrontend {
     }
 
     /**
-     * @return A range for each footnote mark where the footnote
-     *         contains at least one citation group.
+     * @return A range for each footnote mark where the footnote contains at least one citation group.
      *
-     *  Purpose: We do not want markers of footnotes containing
-     *  reference marks to overlap with reference
-     *  marks. Overwriting these footnote marks might kill our
-     *  reference marks in the footnote.
+     *  Purpose: We do not want markers of footnotes containing reference marks to overlap with
+     *  reference marks. Overwriting these footnote marks might kill our reference marks in the
+     *  footnote.
      *
-     *  Note: Here we directly communicate to the document, not
-     *        through the backend. This is because mapping ranges to
-     *        footnote marks does not depend on how do we mark or
-     *        structure those ranges.
+     *  Note: Here we directly communicate to the document, not through the backend. This is because
+     *        mapping ranges to footnote marks does not depend on how do we mark or structure those
+     *        ranges.
      */
     public List<RangeForOverlapCheck<CitationGroupId>>
-    footnoteMarkRanges(XTextDocument doc,
-                       List<RangeForOverlapCheck<CitationGroupId>> citationRanges)
+    footnoteMarkRanges(XTextDocument doc, List<RangeForOverlapCheck<CitationGroupId>> citationRanges)
         throws
         NoDocumentException,
         WrappedTargetException {
 
-        // Avoid inserting the same mark twice.
-        // Could use RangeSet if we had that.
-        RangeSet seen = new RangeSet();
+        if (false) {
+            // Avoid inserting the same mark twice.
+            RangeSet seen = new RangeSet();
 
-        List<RangeForOverlapCheck<CitationGroupId>> result = new ArrayList<>();
+            List<RangeForOverlapCheck<CitationGroupId>> result = new ArrayList<>();
 
-        for (RangeForOverlapCheck<CitationGroupId> citationRange : citationRanges) {
+            for (RangeForOverlapCheck<CitationGroupId> citationRange : citationRanges) {
 
-            Optional<XTextRange> footnoteMarkRange =
-                UnoTextRange.getFootnoteMarkRange(citationRange.range);
+                Optional<XTextRange> footnoteMarkRange = UnoTextRange.getFootnoteMarkRange(citationRange.range);
 
-            if (footnoteMarkRange.isEmpty()) {
-                // not in footnote
-                continue;
+                if (footnoteMarkRange.isEmpty()) {
+                    // not in footnote
+                    continue;
+                }
+
+                boolean seenContains = seen.contains(footnoteMarkRange.get());
+                if (!seenContains) {
+                    seen.add(footnoteMarkRange.get());
+                    result.add(new RangeForOverlapCheck<>(footnoteMarkRange.get(),
+                                                          citationRange.idWithinKind,
+                                                          RangeForOverlapCheck.FOOTNOTE_MARK_KIND,
+                                                          "FootnoteMark for " + citationRange.format()));
+                }
             }
+            return result;
+        } else {
 
-            boolean seenContains = seen.contains(footnoteMarkRange.get());
-            if (!seenContains) {
-                seen.add(footnoteMarkRange.get());
+            // RangeSet.add involves a few comparisons anf getText, which is probably costly.
+            //
+            // (On the other hand we only insert ranges of footnotes, which probably limits the sizes
+            // of its partitions)
+            //
+            // We can avoid using RangeSet by partitioning only and using a single range from
+            // each partition to get at the corresponding footnotemark range.
+
+            List<RangeForOverlapCheck<CitationGroupId>> result = new ArrayList<>();
+            RangeSort.RangePartitions<RangeForOverlapCheck<CitationGroupId>> partitions =
+                RangeSort.partitionRanges(citationRanges);
+
+            // Now it is sufficient to check a single entry from each partition.
+            // Each partition corresponds to an XText, and each footnote has a single XText.
+            // (This latter ignores the possibility of XTextContents inserted into footnotes.)
+            // Also: different footnotes cannot share a footnotemark range, we are not creating duplicates.
+            for (List<RangeForOverlapCheck<CitationGroupId>> partition : partitions.getPartitions()) {
+                if (partition.isEmpty()) {
+                    continue;
+                }
+                RangeForOverlapCheck<CitationGroupId> citationRange = partition.get(0);
+
+                Optional<XTextRange> footnoteMarkRange = UnoTextRange.getFootnoteMarkRange(citationRange.range);
+
+                if (footnoteMarkRange.isEmpty()) {
+                    // not in footnote
+                    continue;
+                }
+
                 result.add(new RangeForOverlapCheck<>(footnoteMarkRange.get(),
                                                       citationRange.idWithinKind,
                                                       RangeForOverlapCheck.FOOTNOTE_MARK_KIND,
                                                       "FootnoteMark for " + citationRange.format()));
             }
+            return result;
         }
-        return result;
     }
 
-    static String
-    rangeOverlapsToMessage(List<RangeOverlap<RangeForOverlapCheck<CitationGroupId>>> overlaps) {
+    static String rangeOverlapsToMessage(List<RangeOverlap<RangeForOverlapCheck<CitationGroupId>>> overlaps) {
 
         if (overlaps.size() == 0) {
             return "(*no overlaps*)";
@@ -481,6 +493,7 @@ public class OOFrontend {
      * Check for any overlap between userRanges and protected ranges.
      *
      * Assume userRanges is small (usually 1 elements for checking the cursor)
+     *
      * Returns on first problem found.
      */
     public OOVoidResult<JabRefException>
@@ -500,11 +513,10 @@ public class OOFrontend {
         ranges.addAll(footnoteMarkRanges(doc, citationRanges));
 
         List<RangeOverlap<RangeForOverlapCheck<CitationGroupId>>> overlaps =
-            RangeOverlapBetween.findFirst(
-                doc,
-                userRanges,
-                ranges,
-                requireSeparation);
+            RangeOverlapBetween.findFirst(doc,
+                                          userRanges,
+                                          ranges,
+                                          requireSeparation);
 
         if (overlaps.size() == 0) {
             return OOVoidResult.ok();
@@ -518,11 +530,10 @@ public class OOFrontend {
      * @param reportAtMost Limit number of overlaps reported (0 for no limit)
      *
      */
-    public OOVoidResult<JabRefException>
-    checkRangeOverlaps(XTextDocument doc,
-                       List<RangeForOverlapCheck<CitationGroupId>> userRanges,
-                       boolean requireSeparation,
-                       int reportAtMost)
+    public OOVoidResult<JabRefException> checkRangeOverlaps(XTextDocument doc,
+                                                            List<RangeForOverlapCheck<CitationGroupId>> userRanges,
+                                                            boolean requireSeparation,
+                                                            int reportAtMost)
         throws
         NoDocumentException,
         WrappedTargetException {
@@ -550,33 +561,29 @@ public class OOFrontend {
      *
      * Called from: ManageCitationsDialogViewModel constructor.
      *
-     * @return A list with entries corresponding to citations in the
-     *         text, in arbitrary order (same order as from
-     *         getJabRefReferenceMarkNames).
+     * @return A list with entries corresponding to citations in the text, in arbitrary order (same
+     *         order as from getJabRefReferenceMarkNames).
      *
-     *               Note: visual or alphabetic order could be more
-     *               manageable for the user. We could provide these
-     *               here, but switching between them needs change on
-     *               GUI (adding a toggle or selector).
+     *               Note: visual or alphabetic order could be more manageable for the user. We
+     *               could provide these here, but switching between them needs change on GUI
+     *               (adding a toggle or selector).
      *
-     *               Note: CitationEntry implements Comparable, where
-     *                     compareTo() and equals() are based on refMarkName.
-     *                     The order used in the "Manage citations" dialog
+     *               Note: CitationEntry implements Comparable, where compareTo() and equals() are
+     *                     based on refMarkName.  The order used in the "Manage citations" dialog
      *                     does not seem to use that.
      *
-     *                     The 1st is labeled "Citation" (show citation in bold,
-     *                     and some context around it).
+     *                     The 1st is labeled "Citation" (show citation in bold, and some context
+     *                     around it).
      *
-     *                     The columns can be sorted by clicking on the column title.
-     *                     For the "Citation" column, the sorting is based on the content,
-     *                     (the context before the citation), not on the citation itself.
+     *                     The columns can be sorted by clicking on the column title.  For the
+     *                     "Citation" column, the sorting is based on the content, (the context
+     *                     before the citation), not on the citation itself.
      *
-     *                     In the "Extra information ..." column some visual indication
-     *                     of the editable part could be helpful.
+     *                     In the "Extra information ..." column some visual indication of the
+     *                     editable part could be helpful.
      *
-     *         Wish: selecting an entry (or a button in the line) in
-     *               the GUI could move the cursor in the document to
-     *               the entry.
+     *         Wish: selecting an entry (or a button in the line) in the GUI could move the cursor
+     *               in the document to the entry.
      */
     public List<CitationEntry> getCitationEntries(XTextDocument doc)
         throws
@@ -608,8 +615,7 @@ public class OOFrontend {
         boolean mapFootnotesToFootnoteMarks = true;
         List<CitationGroup> sortedCitationGroups =
             getVisuallySortedCitationGroups(doc, mapFootnotesToFootnoteMarks, fcursor);
-        List<CitationGroupId> sortedCitationGroupIds =
-            OOListUtil.map(sortedCitationGroups, cg -> cg.cgid);
+        List<CitationGroupId> sortedCitationGroupIds = OOListUtil.map(sortedCitationGroups, cg -> cg.cgid);
         citationGroups.setGlobalOrder(sortedCitationGroupIds);
     }
 }

@@ -7,13 +7,14 @@ import java.util.Optional;
 
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
+import com.sun.star.beans.PropertyAttribute;
 import com.sun.star.beans.PropertyExistException;
 import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.beans.XPropertyContainer;
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.beans.XPropertySetInfo;
-import com.sun.star.lang.IllegalArgumentException;
+import com.sun.star.document.XDocumentProperties;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.Any;
@@ -33,7 +34,7 @@ public class UnoUserDefinedProperty {
     private UnoUserDefinedProperty() { }
 
     public static Optional<XPropertyContainer> getPropertyContainer(XTextDocument doc) {
-        return UnoTextDocument.getDocumentProperties(doc).map(e -> e.getUserDefinedProperties());
+        return UnoTextDocument.getDocumentProperties(doc).map(XDocumentProperties::getUserDefinedProperties);
     }
 
     public static List<String> getListOfNames(XTextDocument doc) {
@@ -43,13 +44,12 @@ public class UnoUserDefinedProperty {
     }
 
     /**
-     * @param property Name of a custom document property in the
-     *        current document.
+     * @param property Name of a custom document property in the current document.
      *
      * @return The value of the property or Optional.empty()
      *
-     * These properties are used to store extra data about
-     * individual citation. In particular, the `pageInfo` part.
+     * These properties are used to store extra data about individual citation.
+     * In particular, the `pageInfo` part.
      *
      */
     public static Optional<String> getStringValue(XTextDocument doc, String property)
@@ -58,7 +58,7 @@ public class UnoUserDefinedProperty {
         Optional<XPropertySet> propertySet = (UnoUserDefinedProperty.getPropertyContainer(doc)
                                               .flatMap(UnoProperties::asPropertySet));
         if (propertySet.isEmpty()) {
-            throw new RuntimeException("getting UserDefinedProperties as XPropertySet failed");
+            throw new java.lang.IllegalArgumentException("getting UserDefinedProperties as XPropertySet failed");
         }
         try {
             String v = propertySet.get().getPropertyValue(property).toString();
@@ -69,17 +69,14 @@ public class UnoUserDefinedProperty {
     }
 
     /**
-     * @param property Name of a custom document property in the
-     *        current document. Created if does not exist yet.
+     * @param property Name of a custom document property in the current document.
+     *                 Created if does not exist yet.
      *
      * @param value The value to be stored.
      */
-    public static void createStringProperty(XTextDocument doc, String property, String value)
+    public static void setStringProperty(XTextDocument doc, String property, String value)
         throws
-        NotRemoveableException,
-        PropertyExistException,
         IllegalTypeException,
-        IllegalArgumentException,
         PropertyVetoException,
         WrappedTargetException {
 
@@ -89,12 +86,12 @@ public class UnoUserDefinedProperty {
         Optional<XPropertyContainer> container = UnoUserDefinedProperty.getPropertyContainer(doc);
 
         if (container.isEmpty()) {
-            throw new RuntimeException("UnoUserDefinedProperty.getPropertyContainer failed");
+            throw new java.lang.IllegalArgumentException("UnoUserDefinedProperty.getPropertyContainer failed");
         }
 
         Optional<XPropertySet> propertySet = container.flatMap(UnoProperties::asPropertySet);
         if (propertySet.isEmpty()) {
-            throw new RuntimeException("asPropertySet failed");
+            throw new java.lang.IllegalArgumentException("asPropertySet failed");
         }
 
         XPropertySetInfo propertySetInfo = propertySet.get().getPropertySetInfo();
@@ -108,60 +105,53 @@ public class UnoUserDefinedProperty {
             }
         }
 
-        container.get().addProperty(property,
-                                    com.sun.star.beans.PropertyAttribute.REMOVEABLE,
-                                    new Any(Type.STRING, value));
+        try {
+            container.get().addProperty(property, PropertyAttribute.REMOVEABLE, new Any(Type.STRING, value));
+        } catch (PropertyExistException ex) {
+            throw new java.lang.IllegalStateException("Caught PropertyExistException for property assumed not to exist");
+        }
     }
 
     /**
-     * @param property Name of a custom document property in the
-     *                 current document.
+     * @param property Name of a custom document property in the current document.
      *
      *  Logs warning if does not exist.
      */
     public static void remove(XTextDocument doc, String property)
         throws
-        NotRemoveableException,
-        PropertyExistException,
-        IllegalTypeException,
-        IllegalArgumentException {
+        NotRemoveableException {
 
         Objects.requireNonNull(property);
 
         Optional<XPropertyContainer> container = UnoUserDefinedProperty.getPropertyContainer(doc);
 
         if (container.isEmpty()) {
-            throw new RuntimeException("getUserDefinedPropertiesAsXPropertyContainer failed");
+            throw new java.lang.IllegalArgumentException("getUserDefinedPropertiesAsXPropertyContainer failed");
         }
 
         try {
             container.get().removeProperty(property);
         } catch (UnknownPropertyException ex) {
-            LOGGER.warn(String.format("UnoUserDefinedProperty.remove(%s)"
-                                      + " This property was not there to remove",
+            LOGGER.warn(String.format("UnoUserDefinedProperty.remove(%s) This property was not there to remove",
                                       property));
         }
     }
 
     /**
-     * @param property Name of a custom document property in the
-     *        current document.
+     * @param property Name of a custom document property in the current document.
      *
      * Keep silent if property did not exist.
      */
     public static void removeIfExists(XTextDocument doc, String property)
         throws
-        NotRemoveableException,
-        PropertyExistException,
-        IllegalTypeException,
-        IllegalArgumentException {
+        NotRemoveableException {
 
         Objects.requireNonNull(property);
 
         Optional<XPropertyContainer> container = UnoUserDefinedProperty.getPropertyContainer(doc);
 
         if (container.isEmpty()) {
-            throw new RuntimeException("getUserDefinedPropertiesAsXPropertyContainer failed");
+            throw new java.lang.IllegalArgumentException("getUserDefinedPropertiesAsXPropertyContainer failed");
         }
 
         try {

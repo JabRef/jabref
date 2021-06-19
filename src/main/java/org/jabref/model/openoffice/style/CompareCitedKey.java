@@ -6,8 +6,8 @@ import java.util.Optional;
 import org.jabref.model.entry.BibEntry;
 
 /*
- * Given a Comparator<BibEntry> provide a Comparator<ComparableCitedKey>
- * that also handles unresolved citation keys.
+ * Given a Comparator<BibEntry> provide a Comparator<ComparableCitedKey> that also handles
+ * unresolved citation keys.
  */
 public class CompareCitedKey implements Comparator<ComparableCitedKey> {
 
