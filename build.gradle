@@ -46,8 +46,8 @@ group = "org.jabref"
 version = project.findProperty('projVersion') ?: '100.0.0'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_14
-    targetCompatibility = JavaVersion.VERSION_14
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
 
     // Workaround needed for Eclipse, probably because of https://github.com/gradle/gradle/issues/16922
     // Should be removed as soon as Gradle 7.0.1 is released ( https://github.com/gradle/gradle/issues/16922#issuecomment-828217060 )
