@@ -34,7 +34,7 @@ plugins {
 
     id 'idea'
 
-    id "com.apollographql.apollo" version '2.5.8'
+    id "com.apollographql.apollo" version '2.5.9'
 }
 
 // Enable following for debugging
