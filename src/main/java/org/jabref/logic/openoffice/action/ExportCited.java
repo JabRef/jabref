@@ -41,7 +41,7 @@ public class ExportCited {
      * If a key is not found, it is added to result.unresolvedKeys
      *
      * Cross references (in StandardField.CROSSREF) are followed (not recursively):
-     * if the referenced entry is found, it is included in the result.
+     * If the referenced entry is found, it is included in the result.
      * If it is not found, it is silently ignored.
      */
     public static GenerateDatabaseResult generateDatabase(XTextDocument doc, List<BibDatabase> databases)

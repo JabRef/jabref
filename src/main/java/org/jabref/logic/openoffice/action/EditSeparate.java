@@ -65,7 +65,7 @@ public class EditSeparate {
 
                 XTextRange range1 = (fr
                                      .getMarkRange(doc, cg)
-                                     .orElseThrow(RuntimeException::new));
+                                     .orElseThrow(IllegalStateException::new));
                 XTextCursor textCursor = range1.getText().createTextCursorByRange(range1);
 
                 List<Citation> cits = cg.citationsInStorageOrder;
@@ -82,16 +82,15 @@ public class EditSeparate {
                     boolean insertSpaceAfter = (i != last);
                     Citation cit = cits.get(i);
 
-                    UpdateCitationMarkers.createAndFillCitationGroup(
-                        fr,
-                        doc,
-                        List.of(cit.citationKey),
-                        List.of(cit.getPageInfo()),
-                        cg.citationType,
-                        OOText.fromString(cit.citationKey),
-                        textCursor,
-                        style,
-                        insertSpaceAfter);
+                    UpdateCitationMarkers.createAndFillCitationGroup(fr,
+                                                                     doc,
+                                                                     List.of(cit.citationKey),
+                                                                     List.of(cit.getPageInfo()),
+                                                                     cg.citationType,
+                                                                     OOText.fromString(cit.citationKey),
+                                                                     textCursor,
+                                                                     style,
+                                                                     insertSpaceAfter);
 
                     textCursor.collapseToEnd();
                 }

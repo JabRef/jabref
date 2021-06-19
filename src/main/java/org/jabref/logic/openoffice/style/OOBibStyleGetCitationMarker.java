@@ -65,10 +65,10 @@ class OOBibStyleGetCitationMarker {
      *                   to mark their omission.
      *                   Set to -1 to write out all authors.
      *
-     *                   maxAuthors=0 is pointless, now throws RuntimeException
+     *                   maxAuthors=0 is pointless, now throws IllegalArgumentException
      *                   (Earlier it behaved as maxAuthors=1)
      *
-     *                   maxAuthors less than -1 : throw RuntimeException
+     *                   maxAuthors less than -1 : throw IllegalArgumentException
      *
      * @param andString  For "A, B[ and ]C"
      *
@@ -129,10 +129,10 @@ class OOBibStyleGetCitationMarker {
 
         // To reduce ambiguity, throw on unexpected values of maxAuthors
         if (maxAuthors == 0 && nAuthors != 0) {
-            throw new RuntimeException("maxAuthors = 0 in formatAuthorList");
+            throw new IllegalArgumentException("maxAuthors = 0 in formatAuthorList");
         }
         if (maxAuthors < -1) {
-            throw new RuntimeException("maxAuthors < -1 in formatAuthorList");
+            throw new IllegalArgumentException("maxAuthors < -1 in formatAuthorList");
         }
 
         // emitAllAuthors == false means use "et al."
@@ -724,8 +724,8 @@ class OOBibStyleGetCitationMarker {
 
                 if (uniqueLetterDoesNotMakeUnique &&
                     nonUniqueCitationMarkerHandling.equals(NonUniqueCitationMarker.THROWS)) {
-                    throw new RuntimeException("different citation keys,"
-                                               + " but same normalizedMarker and uniqueLetter");
+                    throw new IllegalArgumentException("different citation keys,"
+                                                       + " but same normalizedMarker and uniqueLetter");
                 }
 
                 final boolean pageInfoInhibitsJoin = (bothPageInfosAreEmpty

@@ -42,6 +42,6 @@ public class PageInfo {
         if (bb.isEmpty()) {
             return +1;
         }
-        return aa.get().asString().compareTo(bb.get().asString());
+        return aa.get().toString().compareTo(bb.get().toString());
     }
 }
