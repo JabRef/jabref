@@ -92,7 +92,7 @@ This section explains how you get the JabRef code onto your machine in a form al
 
 ## Configure your IDE
 
-These steps are very important. They allow you to focus on the content and ensure that the code formatting always goes well. Did you know that [IntelliJ allows for reformatting selected code](https://www.jetbrains.com/help/idea/reformat-and-rearrange-code.html#reformat_code) if you press <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>L</kbd>?
+These steps are very important. They allow you to focus on the content and ensure that the code formatting always goes well. Did you know that [IntelliJ allows for reformatting selected code](https://www.jetbrains.com/help/idea/reformat-and-rearrange-code.html#reformat_code) if you press Ctrl + Alt + L?
 
 ### Configuration of IntelliJ IDEA
 
@@ -104,11 +104,9 @@ To configure IntelliJ IDEA for developing JabRef, you should first ensure that y
 
 After that, you can open `jabref/build.gradle` as a project. It is crucial that Java 16 is used consistently for the JabRef project which includes ensuring the right settings for your project structure, Gradle build, and run configurations.
 
-Ensure you have a Java 16 SDK configured by navigating to **File \| Project Structure \| Platform Settings \| SDKs**. If you don't have one, add a new Java JDK and point it to the location of a JDK 16.
-![Project Settings](../.gitbook/assets/intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
+Ensure you have a Java 16 SDK configured by navigating to **File \| Project Structure \| Platform Settings \| SDKs**. If you don't have one, add a new Java JDK and point it to the location of a JDK 16. ![Project Settings](../.gitbook/assets/intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
 
-Navigate to **File \| Project Structure \| Project** and ensure that the projects' SDK is Java 16
-![Use JDK 15 as project SDK](../.gitbook/assets/intellij-choose-jdk15-project-default.png)
+Navigate to **File \| Project Structure \| Project** and ensure that the projects' SDK is Java 16 ![Use JDK 15 as project SDK](../.gitbook/assets/intellij-choose-jdk15-project-default.png)
 
 Navigate to **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** and select the "Project SDK" as the Gradle JVM at the bottom.
 
@@ -127,7 +125,7 @@ To prepare IntelliJ's build system two additional steps are required:
 
 To have autoformat working properly in the context of line wrapping, "Wrap at right margin" has to be disabled as shown below. Details are found in [IntelliJ issue 240517](https://youtrack.jetbrains.com/issue/IDEA-240517).
 
-![Disable wrapping at right margin to prevent JavaDoc to be wrapped](../.gitbook/assets/intellij-wrap-at-right-margin%20%284%29%20%284%29%20%284%29.png)
+![](../.gitbook/assets/intellij-wrap-at-right-margin%20%284%29%20%284%29%20%284%29%20%281%29.png)
 
 #### Using Gradle from within IntelliJ IDEA
 
@@ -153,22 +151,19 @@ To use IntelliJ IDEA's internal build system when you build JabRef through **Bui
 * In **File \| Settings \| Build, Execution, Deployment \| Build Tools \| Gradle** the setting "Build and run using" and "Test using" is set to "IntelliJ IDEA".
 * Ignore the Gradle project "buildSrc" by clicking the button **Select Project Data To Import** in the Gradle Tool Window and unchecking the folder "buildSrc".
 
-  ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc%20%282%29%20%282%29%20%282%29%20%283%29.png)
+  ![Ignore the Gradle project &quot;buildSrc&quot;](../.gitbook/assets/intellij-gradle-config-ignore-buildSrc%20%282%29%20%282%29%20%282%29%20%283%29%20%283%29%20%286%29%20%284%29.png)
 
 * Add `src-gen` as root:
-
-    1. Right click on the project "jabref".
-    1. Select "Open Module Settings"
-    1. Expand "JabRef"
-    1. Select "main"
-    1. Select tab "Sources"
-    1. Click "+ Add Content Root"
-    1. Select the `src-gen` directory
-    1. Click "OK". When expanding "main", "java" should have been selected as source
-    1. Click "OK" to save the changes
-
+  1. Right click on the project "jabref".
+  2. Select "Open Module Settings"
+  3. Expand "JabRef"
+  4. Select "main"
+  5. Select tab "Sources"
+  6. Click "+ Add Content Root"
+  7. Select the `src-gen` directory
+  8. Click "OK". When expanding "main", "java" should have been selected as source
+  9. Click "OK" to save the changes
 * In case the above step does not work, run with gradle, import gradle project again, and try again.
-
 * Delete `org.jabref.gui.logging.plugins.Log4jPlugins` \(location: `src-gen/main/java/org/jabref/gui/logging/plugins/Log4jPlugins.java`\). Otherwise, you will see following error:
 
   ```text
@@ -185,7 +180,7 @@ Essentially, you now have the best of both worlds: You can run Gradle tasks usin
 
 In case all steps are followed, and there are still issues with `SearchBaseVisitor` \(e.g., `Error:(16, 25) java: package org.jabref.search does not exist`\), you have to delete `src\main\generated\org\jabref\gui\logging\plugins\Log4jPlugins.java`. This is independent of having enabled or disabled Annotation Processing \(see above at "Enable Annotation Processing"\).
 
-~~Note that the above steps might not work on IntelliJ 2020.x.**. You have to keep using gradle for executing tasks. See [IDEA-249391](https://youtrack.jetbrains.com/issue/IDEA-249391) for details.~~
+~~Note that the above steps might not work on IntelliJ 2020.x.\*\*. You have to keep using gradle for executing tasks. See~~ [~~IDEA-249391~~](https://youtrack.jetbrains.com/issue/IDEA-249391) ~~for details.~~
 
 #### Using JabRef's code style
 
@@ -228,7 +223,7 @@ Make sure your Eclipse installation us up to date.
 4. Create a run/debug configuration for the main class `org.jabref.gui.JabRefLauncher` and/or for `org.jabref.gui.JabRefMain` \(both can be used equivalently\)
    * Remark: The run/debug configuration needs to be added by right clicking the class \(e.g. JabRefLauncher or JabRefMain\) otherwise it will not work.
 
-     ![Creating the run/debug configuration by right clicking on the class](../.gitbook/assets/eclipse-create-run-config%20%281%29%20%283%29%20%283%29%20%284%29%20%284%29.png)
+     ![Creating the run/debug configuration by right clicking on the class](../.gitbook/assets/eclipse-create-run-config%20%281%29%20%283%29%20%283%29%20%284%29%20%284%29%20%283%29%20%285%29.png)
 
    * In the tab "Arguments" of the run/debug configuration, enter the following runtime VM arguments:
 
@@ -287,14 +282,13 @@ java.lang.UnsupportedClassVersionError: org/javamodularity/moduleplugin/ModuleSy
 
 ### Issues with generated source files
 
-In rare cases you might encounter problems due to out-dated automatically generated source files. Running `./gradlew clean` deletes these old copies. Do not forget to run at least `./gradlew eclipse` or `./gradlew build` afterwards to regenerate the source files.
-``
+In rare cases you might encounter problems due to out-dated automatically generated source files. Running `./gradlew clean` deletes these old copies. Do not forget to run at least `./gradlew eclipse` or `./gradlew build` afterwards to regenerate the source files. \`\`
 
 ### Issues with `buildSrc`
 
 1. Open the context menu of `buildSrc`.
-1. Select "Load/Unload modules".
-1. Unload `jabRef.buildSrc`.
+2. Select "Load/Unload modules".
+3. Unload `jabRef.buildSrc`.
 
 ### Issues with openjfx libraries in local maven repository
 
