@@ -186,7 +186,15 @@
               </choose>
             </group>
             <group delimiter=": ">
+<<<<<<< HEAD
+<<<<<<< HEAD
               <text variable="volume"/>
+=======
+              <text variable="volume" font-weight="bold"/>
+>>>>>>> fcf26b3f77925d7e99e703666dbe3c4b706403ac
+=======
+              <text variable="volume" font-weight="bold"/>
+>>>>>>> dbb93e7d9be410a475814d5ae49aef83ce158191
               <text variable="page"/>
             </group>
           </group>
