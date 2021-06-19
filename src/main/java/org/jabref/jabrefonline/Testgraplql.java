@@ -2,7 +2,6 @@ package org.jabref.jabrefonline;
 
 import java.util.Optional;
 
-import org.jabref.jabrefonline.GetDocumentByIdQuery;
 import org.jabref.jabrefonline.GetDocumentByIdQuery.Data;
 
 import com.apollographql.apollo.ApolloCall.Callback;
@@ -34,9 +33,8 @@ public class Testgraplql {
             }
 
             @Override
-            public void onFailure(ApolloException arg0) {
-                // TODO Auto-generated method stub
-
+            public void onFailure(ApolloException ex) {
+               LOGGER.error("error", ex);
             }
         });
 
