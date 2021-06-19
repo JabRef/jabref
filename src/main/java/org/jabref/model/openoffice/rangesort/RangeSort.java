@@ -35,6 +35,11 @@ public class RangeSort {
         }
     }
 
+    /*
+     * Sort a list of RangeHolder values known to share the same getText().
+     *
+     * Note: RangeHolder.getRange() is called many times.
+     */
     public static <V extends RangeHolder> void sortWithinPartition(List<V> rangeHolders) {
         if (rangeHolders.isEmpty()) {
             return;
@@ -77,6 +82,9 @@ public class RangeSort {
         return result;
     }
 
+    /*
+     * Note: RangeHolder.getRange() is called many times.
+     */
     public static <V extends RangeHolder> RangePartitions<V> partitionAndSortRanges(List<V> holders) {
         RangePartitions<V> result = partitionRanges(holders);
         for (List<V> partition : result.getPartitions()) {

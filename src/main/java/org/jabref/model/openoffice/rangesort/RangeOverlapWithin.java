@@ -20,6 +20,12 @@ public class RangeOverlapWithin {
      * For overlapping and touching, only report consecutive ranges and only with a single sample of
      * otherwise identical ranges.
      *
+     * @param rangeHolders represent the ranges to be checked.
+     *
+     *        Note: for each rangeHolder, rangeHolder.getRange() is called multiple times.
+     *              To avoid repeated work, they should keep a copy of the range instead of
+     *              getting it each time from the document.
+     *
      * @param reportAtMost Limit the number of records returned to atMost.
      *        Zero {@code reportAtMost} means no limit.
      *
