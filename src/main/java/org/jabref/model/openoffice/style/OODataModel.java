@@ -9,19 +9,15 @@ import org.jabref.model.openoffice.ootext.OOText;
 /**   What is the data stored?   */
 public enum OODataModel {
 
-    /**
-     * JabRef52: pageInfo belongs to CitationGroup, not Citation.
-     */
+    /** JabRef52: pageInfo belongs to CitationGroup, not Citation. */
     JabRef52,
 
-    /**
-     * JabRef53: pageInfo belongs to Citation.
-     */
-    JabRef53;
+    /** JabRef60: pageInfo belongs to Citation. */
+    JabRef60;
 
     /**
      * @param pageInfo Nullable.
-     * @return JabRef53 style pageInfo list with pageInfo in the last slot.
+     * @return JabRef60 style pageInfo list with pageInfo in the last slot.
      */
     public static List<Optional<OOText>> fakePageInfos(String pageInfo, int nCitations) {
         List<Optional<OOText>> pageInfos = new ArrayList<>(nCitations);

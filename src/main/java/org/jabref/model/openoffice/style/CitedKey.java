@@ -11,9 +11,8 @@ import org.jabref.model.openoffice.ootext.OOText;
 /**
  * Cited keys are collected from the citations in citation groups.
  *
- * They contain backreferences to the corresponding citations in
- * {@code where}. This allows the extra information generated using
- * CitedKeys to be distributed back to the in-text citations.
+ * They contain backreferences to the corresponding citations in {@code where}. This allows the
+ * extra information generated using CitedKeys to be distributed back to the in-text citations.
  */
 public class CitedKey implements
                       ComparableCitedKey,
@@ -106,13 +105,13 @@ public class CitedKey implements
 
         // Check consistency
         if (!cit.getLookupResult().equals(this.db)) {
-            throw new RuntimeException("CitedKey.addPath: mismatch on cit.db");
+            throw new IllegalStateException("CitedKey.addPath: mismatch on cit.db");
         }
         if (!cit.getNumber().equals(this.number)) {
-            throw new RuntimeException("CitedKey.addPath: mismatch on cit.number");
+            throw new IllegalStateException("CitedKey.addPath: mismatch on cit.number");
         }
         if (!cit.getUniqueLetter().equals(this.uniqueLetter)) {
-            throw new RuntimeException("CitedKey.addPath: mismatch on cit.uniqueLetter");
+            throw new IllegalStateException("CitedKey.addPath: mismatch on cit.uniqueLetter");
         }
     }
 

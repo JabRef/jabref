@@ -98,14 +98,14 @@ class OOBibStyleTestHelper {
                                             List<Integer> num, int minGroupingCount, boolean inList) {
         if (inList) {
             if (num.size() != 1) {
-                throw new RuntimeException("Numeric label for the bibliography with "
-                                           + String.valueOf(num.size()) + " numbers?");
+                throw new IllegalArgumentException("Numeric label for the bibliography with "
+                                                   + String.valueOf(num.size()) + " numbers?");
             }
             int n = num.get(0);
             CitationMarkerNumericBibEntryImpl x =
                 new CitationMarkerNumericBibEntryImpl("key",
                                                       (n == 0) ? Optional.empty() : Optional.of(n));
-            return style.getNumCitationMarkerForBibliography(x).asString();
+            return style.getNumCitationMarkerForBibliography(x).toString();
         } else {
             List<CitationMarkerNumericEntry> input =
                 num.stream()
@@ -114,7 +114,7 @@ class OOBibStyleTestHelper {
                                                         n,
                                                         Optional.empty()))
                 .collect(Collectors.toList());
-            return style.getNumCitationMarker2(input, minGroupingCount).asString();
+            return style.getNumCitationMarker2(input, minGroupingCount).toString();
         }
     }
 
@@ -131,7 +131,7 @@ class OOBibStyleTestHelper {
                                             CitationMarkerNumericEntry... s) {
         List<CitationMarkerNumericEntry> input = Stream.of(s).collect(Collectors.toList());
         OOText res = style.getNumCitationMarker2(input, minGroupingCount);
-        return res.asString();
+        return res.toString();
     }
 
     /*
@@ -146,8 +146,8 @@ class OOBibStyleTestHelper {
                                                        String uniqueLetterQ,
                                                        String pageInfoQ,
                                                        boolean isFirstAppearanceOfSource) {
-        if (!entry.getCitationKey().isPresent()) {
-            throw new RuntimeException("!entry.getCitationKey().isPresent()");
+        if (entry.getCitationKey().isEmpty()) {
+            throw new IllegalArgumentException("entry.getCitationKey() is empty");
         }
         String citationKey = entry.getCitationKey().get();
         Citation result = new Citation(citationKey);
@@ -194,7 +194,7 @@ class OOBibStyleTestHelper {
         }
         return style.createCitationMarker(citationMarkerEntries,
                                           inParenthesis,
-                                          NonUniqueCitationMarker.THROWS).asString();
+                                          NonUniqueCitationMarker.THROWS).toString();
     }
 
     /*

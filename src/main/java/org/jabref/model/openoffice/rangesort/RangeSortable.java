@@ -9,14 +9,12 @@ public interface RangeSortable<T> extends RangeHolder {
 
     /** The XTextRange
      *
-     *  For citation marks in footnotes this may be the range of the
-     *  footnote mark.
+     *  For citation marks in footnotes this may be the range of the footnote mark.
      */
     public XTextRange getRange();
 
     /**
-     * For citation marks in footnotes this may provide order within
-     * the footnote.
+     * For citation marks in footnotes this may provide order within the footnote.
      */
     public int getIndexInPosition();
 
