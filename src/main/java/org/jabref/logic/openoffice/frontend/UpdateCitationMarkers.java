@@ -102,7 +102,7 @@ public class UpdateCitationMarkers {
             OOText citationText2 = style.decorateCitationMarker(citationText);
             // inject a ZERO_WIDTH_SPACE to hold the initial character format
             final String ZERO_WIDTH_SPACE = "\u200b";
-            citationText2 = OOText.fromString(ZERO_WIDTH_SPACE + citationText2.asString());
+            citationText2 = OOText.fromString(ZERO_WIDTH_SPACE + citationText2.toString());
             OOTextIntoOO.write(doc, cursor, citationText2);
         } else {
             cursor.setString("");
@@ -150,7 +150,7 @@ public class UpdateCitationMarkers {
 
         Objects.requireNonNull(pageInfos);
         if (pageInfos.size() != citationKeys.size()) {
-            throw new RuntimeException("pageInfos.size != citationKeys.size");
+            throw new IllegalArgumentException("pageInfos.size != citationKeys.size");
         }
         CitationGroup cg = fr.createCitationGroup(doc,
                                                   citationKeys,

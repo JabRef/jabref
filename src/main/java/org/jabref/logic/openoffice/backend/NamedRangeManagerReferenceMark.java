@@ -23,11 +23,7 @@ public class NamedRangeManagerReferenceMark implements NamedRangeManager {
                                 boolean withoutBrackets)
         throws
         CreationException {
-        return NamedRangeReferenceMark.create(doc,
-                                              refMarkName,
-                                              position,
-                                              insertSpaceAfter,
-                                              withoutBrackets);
+        return NamedRangeReferenceMark.create(doc, refMarkName, position, insertSpaceAfter, withoutBrackets);
     }
 
     @Override

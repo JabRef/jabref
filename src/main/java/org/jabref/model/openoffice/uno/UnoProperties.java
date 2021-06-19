@@ -26,7 +26,7 @@ public class UnoProperties {
      */
 
     public static Optional<XPropertySet> asPropertySet(XPropertyContainer propertyContainer) {
-        return UnoCast.optUnoQI(XPropertySet.class, propertyContainer);
+        return UnoCast.cast(XPropertySet.class, propertyContainer);
     }
 
     /*

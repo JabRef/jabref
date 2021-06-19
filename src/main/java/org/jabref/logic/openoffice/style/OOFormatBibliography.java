@@ -36,7 +36,7 @@ public class OOFormatBibliography {
 
         OOText title = style.getFormattedBibliographyTitle();
         OOText body = formatBibliographyBody(cgs, bibliography, style, alwaysAddCitedOnPages);
-        return OOText.fromString(title.asString() + body.asString());
+        return OOText.fromString(title.toString() + body.toString());
     }
 
     /**
@@ -51,7 +51,7 @@ public class OOFormatBibliography {
 
         for (CitedKey ck : bibliography.values()) {
             OOText entryText = formatBibliographyEntry(cgs, ck, style, alwaysAddCitedOnPages);
-            stringBuilder.append(entryText.asString());
+            stringBuilder.append(entryText.toString());
         }
 
         return OOText.fromString(stringBuilder.toString());
@@ -68,18 +68,18 @@ public class OOFormatBibliography {
 
         // insert marker "[1]"
         if (style.isNumberEntries()) {
-            sb.append(style.getNumCitationMarkerForBibliography(ck).asString());
+            sb.append(style.getNumCitationMarkerForBibliography(ck).toString());
         } else {
             // !style.isNumberEntries() : emit no prefix
             // Note: We might want [citationKey] prefix for style.isCitationKeyCiteMarkers();
         }
 
         // Add entry body
-        sb.append(formatBibliographyEntryBody(ck, style).asString());
+        sb.append(formatBibliographyEntryBody(ck, style).toString());
 
         // Add "Cited on pages"
         if (ck.getLookupResult().isEmpty() || alwaysAddCitedOnPages) {
-            sb.append(formatCitedOnPages(cgs, ck).asString());
+            sb.append(formatCitedOnPages(cgs, ck).toString());
         }
 
         // Add paragraph
@@ -169,14 +169,17 @@ public class OOFormatBibliography {
         List<CitationGroup> citationGroups = new ArrayList<>();
         for (CitationPath p : ck.getCitationPaths()) {
             CitationGroupId cgid = p.group;
-            CitationGroup cg = cgs.getCitationGroupOrThrow(cgid);
-            citationGroups.add(cg);
+            Optional<CitationGroup> cg = cgs.getCitationGroup(cgid);
+            if (cg.isEmpty()) {
+                throw new IllegalStateException();
+            }
+            citationGroups.add(cg.get());
         }
 
         // sort the citationGroups according to their indexInGlobalOrder
         citationGroups.sort((a, b) -> {
-                Integer aa = a.getIndexInGlobalOrder().orElseThrow(RuntimeException::new);
-                Integer bb = b.getIndexInGlobalOrder().orElseThrow(RuntimeException::new);
+                Integer aa = a.getIndexInGlobalOrder().orElseThrow(IllegalStateException::new);
+                Integer bb = b.getIndexInGlobalOrder().orElseThrow(IllegalStateException::new);
                 return (aa.compareTo(bb));
             });
 
@@ -185,9 +188,9 @@ public class OOFormatBibliography {
             if (i > 0) {
                 sb.append(", ");
             }
-            String markName = cg.getReferenceMarkNameForLinking().orElseThrow(RuntimeException::new);
+            String markName = cg.getReferenceMarkNameForLinking().orElseThrow(IllegalStateException::new);
             OOText xref = OOFormat.formatReferenceToPageNumberOfReferenceMark(markName);
-            sb.append(xref.asString());
+            sb.append(xref.toString());
             i++;
         }
         sb.append(suffix);

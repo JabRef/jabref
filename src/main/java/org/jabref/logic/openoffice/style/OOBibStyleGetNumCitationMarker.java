@@ -91,7 +91,7 @@ class OOBibStyleGetNumCitationMarker {
 
         final int blockSize = block.size();
         if (blockSize == 0) {
-            throw new RuntimeException("The block is empty");
+            throw new IllegalArgumentException("The block is empty");
         }
 
         if (blockSize == 1) {
@@ -117,17 +117,16 @@ class OOBibStyleGetNumCitationMarker {
              */
 
             if (block.stream().anyMatch(x -> x.getPageInfo().isPresent())) {
-                throw new RuntimeException("Found pageInfo in a block with more than one elements");
+                throw new IllegalArgumentException("Found pageInfo in a block with more than one elements");
             }
 
             if (block.stream().anyMatch(x -> x.getNumber().isEmpty())) {
-                throw new RuntimeException("Found unresolved entry"
-                                           + " in a block with more than one elements");
+                throw new IllegalArgumentException("Found unresolved entry in a block with more than one elements");
             }
 
             for (int j = 1; j < blockSize; j++) {
                 if ((block.get(j).getNumber().get() - block.get(j - 1).getNumber().get()) != 1) {
-                    throw new RuntimeException("Numbers are not consecutive");
+                    throw new IllegalArgumentException("Numbers are not consecutive");
                 }
             }
 
@@ -139,7 +138,7 @@ class OOBibStyleGetNumCitationMarker {
                 int first = block.get(0).getNumber().get();
                 int last = block.get(blockSize - 1).getNumber().get();
                 if (last != (first + blockSize - 1)) {
-                    throw new RuntimeException("blockSize and length of num range differ");
+                    throw new IllegalArgumentException("blockSize and length of num range differ");
                 }
 
                 // Emit: "first-last"
@@ -221,7 +220,7 @@ class OOBibStyleGetNumCitationMarker {
 
             final CitationMarkerNumericEntry current = sorted.get(i);
             if (current.getNumber().isPresent() && current.getNumber().get() < 0) {
-                throw new RuntimeException("getNumCitationMarker2: found negative value");
+                throw new IllegalArgumentException("getNumCitationMarker2: found negative number");
             }
 
             if (currentBlock.size() == 0) {
@@ -259,7 +258,7 @@ class OOBibStyleGetNumCitationMarker {
         }
 
         if (nextBlock.size() != 0) {
-            throw new RuntimeException("impossible: (nextBlock.size() != 0) after loop");
+            throw new IllegalStateException("impossible: (nextBlock.size() != 0) after loop");
         }
 
         if (currentBlock.size() > 0) {

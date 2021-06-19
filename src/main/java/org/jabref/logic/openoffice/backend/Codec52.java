@@ -16,7 +16,6 @@ import org.jabref.model.openoffice.uno.NoDocumentException;
  *  How and what is encoded in a mark names.
  *
  *  - pageInfo does not appear here. It is not encoded in the mark name.
- *  - Does not depend on the type of marks (reference mark of bookmark) used.
  */
 class Codec52 {
     private static final String BIB_CITATION = "JR_cite";
@@ -27,7 +26,6 @@ class Codec52 {
 
     /**
      * This is what we get back from parsing a refMarkName.
-     *
      */
     public static class ParsedMarkName {
         /**  "", "0", "1" ... */
@@ -46,9 +44,8 @@ class Codec52 {
         }
     }
 
-    /*
-     * Integer representation was written into the document in
-     * JabRef52, keep it for compatibility.
+    /**
+     * Integer representation was written into the document in JabRef52, keep it for compatibility.
      */
     public static CitationType CitationTypeFromInt(int i) {
         switch (i) {
@@ -59,7 +56,7 @@ class Codec52 {
         case 3:
             return CitationType.INVISIBLE_CIT;
         default:
-            throw new RuntimeException("Invalid CitationType code");
+            throw new IllegalArgumentException("Invalid CitationType code");
         }
     }
 
@@ -72,21 +69,18 @@ class Codec52 {
         case INVISIBLE_CIT:
             return 3;
         default:
-            throw new RuntimeException("Invalid CitationType");
+            throw new IllegalArgumentException("Invalid CitationType");
         }
     }
 
     /**
-     * Produce a reference mark name for JabRef for the given citation
-     * key and citationType that does not yet appear among the reference
-     * marks of the document.
+     * Produce a reference mark name for JabRef for the given citation key and citationType that
+     * does not yet appear among the reference marks of the document.
      *
      * @param bibtexKey The citation key.
-     * @param citationType Encodes the effect of withText and
-     *                     inParenthesis options.
+     * @param citationType Encodes the effect of withText and inParenthesis options.
      *
-     * The first occurrence of bibtexKey gets no serial number, the
-     * second gets 0, the third 1 ...
+     * The first occurrence of bibtexKey gets no serial number, the second gets 0, the third 1 ...
      *
      * Or the first unused in this series, after removals.
      */
@@ -97,10 +91,10 @@ class Codec52 {
         NoDocumentException {
 
         int i = 0;
-        int j = CitationTypeToInt(citationType);
-        String name = BIB_CITATION + '_' + j + '_' + bibtexKey;
+        int citTypeCode = CitationTypeToInt(citationType);
+        String name = BIB_CITATION + '_' + citTypeCode + '_' + bibtexKey;
         while (usedNames.contains(name)) {
-            name = BIB_CITATION + i + '_' + j + '_' + bibtexKey;
+            name = BIB_CITATION + i + '_' + citTypeCode + '_' + bibtexKey;
             i++;
         }
         return name;
@@ -121,8 +115,8 @@ class Codec52 {
 
         List<String> keys = Arrays.asList(citeMatcher.group(3).split(","));
         String i = citeMatcher.group(1);
-        int j = Integer.parseInt(citeMatcher.group(2));
-        CitationType citationType = CitationTypeFromInt(j);
+        int citTypeCode = Integer.parseInt(citeMatcher.group(2));
+        CitationType citationType = CitationTypeFromInt(citTypeCode);
         return (Optional.of(new Codec52.ParsedMarkName(i, citationType, keys)));
     }
 

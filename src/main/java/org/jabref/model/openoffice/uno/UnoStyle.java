@@ -20,26 +20,23 @@ public class UnoStyle {
 
     private UnoStyle() { }
 
-    private static Optional<XStyle> getStyleFromFamily(XTextDocument doc,
-                                                       String familyName,
-                                                       String styleName)
+    private static Optional<XStyle> getStyleFromFamily(XTextDocument doc, String familyName, String styleName)
         throws
         WrappedTargetException {
 
-        XStyleFamiliesSupplier fss = UnoCast.unoQI(XStyleFamiliesSupplier.class, doc);
-        XNameAccess fs = UnoCast.unoQI(XNameAccess.class, fss.getStyleFamilies());
+        XStyleFamiliesSupplier fss = UnoCast.cast(XStyleFamiliesSupplier.class, doc).get();
+        XNameAccess fs = UnoCast.cast(XNameAccess.class, fss.getStyleFamilies()).get();
         XNameContainer xFamily;
         try {
-            xFamily = UnoCast.unoQI(XNameContainer.class, fs.getByName(familyName));
+            xFamily = UnoCast.cast(XNameContainer.class, fs.getByName(familyName)).get();
         } catch (NoSuchElementException ex) {
             String msg = String.format("Style family name '%s' is not recognized", familyName);
-            throw new RuntimeException(msg, ex);
+            throw new java.lang.IllegalArgumentException(msg, ex);
         }
 
         try {
-            Object s = xFamily.getByName(styleName);
-            XStyle xs = (XStyle) UnoCast.unoQI(XStyle.class, s);
-            return Optional.ofNullable(xs);
+            Object style = xFamily.getByName(styleName);
+            return UnoCast.cast(XStyle.class, style);
         } catch (NoSuchElementException ex) {
             return Optional.empty();
         }
@@ -62,7 +59,7 @@ public class UnoStyle {
         throws
         WrappedTargetException {
         return (getStyleFromFamily(doc, familyName, name)
-                .map(e -> e.getName()));
+                .map(XStyle::getName));
     }
 
     public static Optional<String> getInternalNameOfParagraphStyle(XTextDocument doc, String name)

@@ -10,8 +10,7 @@ public class CitationGroupId {
     }
 
     /**
-     * CitationEntry needs some string identifying the group
-     * that it can pass back later.
+     * CitationEntry needs some string identifying the group that it can pass back later.
      */
     public String citationGroupIdAsString() {
         return id;
