@@ -195,7 +195,7 @@ class OOBibStyleTestHelper {
         }
         return style.createCitationMarker(citationMarkerEntries,
                                           inParenthesis,
-                                          nonunique).asString();
+                                          nonunique).toString();
     }
 
     static String getCitationMarker2(OOBibStyle style,

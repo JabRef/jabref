@@ -177,7 +177,7 @@ class OOBibStyleTest {
 
         CitationMarkerNumericEntry e2 = numEntry("key", 1, "pp. 55-56");
         assertEquals(true, e2.getPageInfo().isPresent());
-        assertEquals("pp. 55-56", e2.getPageInfo().get().asString());
+        assertEquals("pp. 55-56", e2.getPageInfo().get().toString());
 
         OOBibStyleTestHelper.testGetNumCitationMarkerExtra(style);
     }
