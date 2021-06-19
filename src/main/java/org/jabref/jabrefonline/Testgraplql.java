@@ -1,4 +1,4 @@
-package org.jabref.jabrefonline.graphql;
+package org.jabref.jabrefonline;
 
 import java.util.Optional;
 
