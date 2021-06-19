@@ -5,6 +5,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -623,5 +624,67 @@ class BibEntryWriterTest {
         // @formatter:on
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void testSerializeAll() throws IOException {
+        BibEntry entry1 = new BibEntry(StandardEntryType.Article);
+        // required fields
+        entry1.setField(StandardField.AUTHOR, "Journal Author");
+        entry1.setField(StandardField.JOURNALTITLE, "Journal of Words");
+        entry1.setField(StandardField.TITLE, "Entry Title");
+        entry1.setField(StandardField.DATE, "2020-11-16");
+
+        // optional fields
+        entry1.setField(StandardField.NUMBER, "1");
+        entry1.setField(StandardField.NOTE, "some note");
+        // unknown fields
+        entry1.setField(StandardField.YEAR, "2019");
+        entry1.setField(StandardField.CHAPTER, "chapter");
+
+        BibEntry entry2 = new BibEntry(StandardEntryType.Book);
+        // required fields
+        entry2.setField(StandardField.AUTHOR, "John Book");
+        entry2.setField(StandardField.BOOKTITLE, "The Big Book of Books");
+        entry2.setField(StandardField.TITLE, "Entry Title");
+        entry2.setField(StandardField.DATE, "2017-12-20");
+
+        // optional fields
+        entry2.setField(StandardField.NUMBER, "1");
+        entry2.setField(StandardField.NOTE, "some note");
+        // unknown fields
+        entry2.setField(StandardField.YEAR, "2020");
+        entry2.setField(StandardField.CHAPTER, "chapter");
+
+        String output = writer.serializeAll(List.of(entry1, entry2), BibDatabaseMode.BIBLATEX);
+
+        // @formatter:off
+        String expected1 = OS.NEWLINE + "@Article{," + OS.NEWLINE +
+                "  author       = {Journal Author}," + OS.NEWLINE +
+                "  date         = {2020-11-16}," + OS.NEWLINE +
+                "  journaltitle = {Journal of Words}," + OS.NEWLINE +
+                "  title        = {Entry Title}," + OS.NEWLINE +
+                "  note         = {some note}," + OS.NEWLINE +
+                "  number       = {1}," + OS.NEWLINE +
+                "  chapter      = {chapter}," + OS.NEWLINE +
+                "  year         = {2019}," + OS.NEWLINE +
+                "}" + OS.NEWLINE;
+        // @formatter:on
+
+        // @formatter:off
+        String expected2 = OS.NEWLINE + "@Book{," + OS.NEWLINE +
+                "  author    = {John Book}," + OS.NEWLINE +
+                "  date      = {2017-12-20}," + OS.NEWLINE +
+                "  title     = {Entry Title}," + OS.NEWLINE +
+                "  chapter   = {chapter}," + OS.NEWLINE +
+                "  note      = {some note}," + OS.NEWLINE +
+                "  number    = {1}," + OS.NEWLINE +
+                "  booktitle = {The Big Book of Books}," + OS.NEWLINE +
+                "  year      = {2020}," + OS.NEWLINE +
+                "}" + OS.NEWLINE;
+        // @formatter:on
+
+        assertEquals(expected1 + expected2, output);
+
     }
 }

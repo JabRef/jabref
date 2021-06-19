@@ -104,7 +104,7 @@
     delimiter-precedes-last="always" font-variant="small-caps"/>
     <label form="short" prefix=" (" suffix=")"/>
     </names>
-    </macro>-->
+  </macro>-->
   <macro name="translator">
     <names variable="translator" delimiter=" ; ">
       <name name-as-sort-order="all" sort-separator=", " initialize-with=". " delimiter=" ; " delimiter-precedes-last="always" font-variant="small-caps"/>
@@ -239,19 +239,10 @@
   </macro>
   <macro name="cite-year">
     <group>
-      <choose>
-        <if type="bill legislation" match="any">
-          <date variable="issued" prefix=" (" suffix=")">
-            <date-part name="year" prefix="idF. v. "/>
-          </date>
-        </if>
-        <else>
-          <date variable="issued" prefix=", ">
-            <date-part name="year"/>
-          </date>
-          <text variable="year-suffix"/>
-        </else>
-      </choose>
+      <date variable="issued">
+        <date-part name="year"/>
+      </date>
+      <text variable="year-suffix"/>
     </group>
   </macro>
   <macro name="bibliography-year">
@@ -277,11 +268,30 @@
       <key variable="issued"/>
     </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
-      <group>
-        <text macro="author-short"/>
-        <text macro="cite-year"/>
-        <text macro="locator"/>
-      </group>
+      <choose>
+        <if type="bill legislation" match="any">
+          <group delimiter=" ">
+            <text macro="author-short"/>
+            <group delimiter=", ">
+              <group>
+                <date variable="issued" prefix=" (" suffix=")">
+                  <date-part name="year" prefix="idF. v. "/>
+                </date>
+                <text variable="year-suffix"/>
+              </group>
+              <text macro="locator"/>
+            </group>
+          </group>
+        </if>
+        <else>
+          <group delimiter=", ">
+            <text macro="author-short"/>
+            <text macro="cite-year"/>
+            <text macro="locator"/>
+          </group>
+          <text variable="year-suffix"/>
+        </else>
+      </choose>
     </layout>
   </citation>
   <bibliography hanging-indent="true" et-al-min="9" et-al-use-first="8">
