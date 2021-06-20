@@ -45,7 +45,7 @@ class GroupTreeViewModelTest {
 
     @Test
     void rootGroupIsSelectedByDefault() {
-        assertEquals(groupTree.rootGroupProperty().get().getGroupNode(), stateManager.getSelectedGroup(databaseContext).get(0), "Root group not selected by default.");
+        assertEquals(groupTree.rootGroupProperty().get().getGroupNode(), stateManager.getSelectedGroup(databaseContext).get(0));
     }
 
     @Test
@@ -58,7 +58,7 @@ class GroupTreeViewModelTest {
         model.addEntriesToGroup(databaseContext.getEntries());
         groupTree.removeGroupsAndSubGroupsFromEntries(model);
 
-        assertEquals(Optional.empty(), entry.getField(StandardField.GROUPS), "Explicit group was not removed from BibEntry.");
+        assertEquals(Optional.empty(), entry.getField(StandardField.GROUPS));
     }
 
     @Test
