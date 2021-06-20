@@ -22,7 +22,6 @@ public class EntryLinkListTest {
     private ParsedEntryLink link;
     private BibEntry source;
     private BibEntry target;
-    private BibEntry entry;
 
     @BeforeEach
     public void before() {
@@ -31,12 +30,11 @@ public class EntryLinkListTest {
         link = links.get(0);
         source = create("source");
         target = create("target");
-        entry = create("entry");
     }
 
     private BibEntry create(String citeKey) {
-        BibEntry entry = new BibEntry();
-        entry.setCitationKey(citeKey);
+        BibEntry entry = new BibEntry()
+                .withCitationKey(citeKey);
         database.insertEntry(entry);
         return entry;
     }
@@ -64,7 +62,7 @@ public class EntryLinkListTest {
 
     @Test
     public void givenBibEntryWhenParsingThenExpectLink() {
-      ParsedEntryLink expected = new ParsedEntryLink(entry);
+      ParsedEntryLink expected = new ParsedEntryLink(new BibEntry().withCitationKey("key"));
       assertFalse(expected.getLinkedEntry().isEmpty());
     }
 
