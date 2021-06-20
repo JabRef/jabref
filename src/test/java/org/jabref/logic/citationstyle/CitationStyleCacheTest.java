@@ -1,6 +1,5 @@
 package org.jabref.logic.citationstyle;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.jabref.model.database.BibDatabase;
