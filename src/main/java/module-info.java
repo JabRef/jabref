@@ -101,7 +101,10 @@ open module org.jabref {
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.dataformat.yaml;
     requires com.fasterxml.jackson.datatype.jsr310;
+
+    // custom module name for the apollo shadow jar under libs
     requires com.customapollo.thirdparty.apollo;
+    // jetbrains annotations, required for apollo
     requires annotations;
 
 }
