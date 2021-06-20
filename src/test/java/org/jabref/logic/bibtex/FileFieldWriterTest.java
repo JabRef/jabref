@@ -5,7 +5,10 @@ import java.nio.file.Path;
 import org.jabref.model.entry.LinkedFile;
 
 import org.junit.jupiter.api.Test;
-
+import java.util.stream.Stream;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -31,12 +34,19 @@ public class FileFieldWriterTest {
         assertNull(FileFieldWriter.quote(null));
     }
 
-    @Test
-    public void testEncodeStringArray() {
-        assertEquals("a:b;c:d", FileFieldWriter.encodeStringArray(new String[][] {{"a", "b"}, {"c", "d"}}), "Encoding of stringArray failed.");
-        assertEquals("a:;c:d", FileFieldWriter.encodeStringArray(new String[][] {{"a", ""}, {"c", "d"}}), "Encoding of stringArray failed. Check empty string case.");
-        assertEquals("a:" + null + ";c:d", FileFieldWriter.encodeStringArray(new String[][] {{"a", null}, {"c", "d"}}), "Encoding of stringArray failed. Check null case.");
-        assertEquals("a:\\:b;c\\;:d", FileFieldWriter.encodeStringArray(new String[][] {{"a", ":b"}, {"c;", "d"}}), "Encoding of stringArray failed. Check escaped character case.");
+    private static Stream<Arguments> getEncodingTestData() {
+        return Stream.of(
+                Arguments.of("a:b;c:d", new String[][] {{"a", "b"}, {"c", "d"}}),
+                Arguments.of("a:;c:d", new String[][] {{"a", ""}, {"c", "d"}}),
+                Arguments.of("a:" + null + ";c:d", new String[][] {{"a", null}, {"c", "d"}}),
+                Arguments.of("a:\\:b;c\\;:d", new String[][] {{"a", ":b"}, {"c;", "d"}})
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("getEncodingTestData")
+    public void testEncodeStringArray(String expected, String[][] values) {
+        assertEquals(expected, FileFieldWriter.encodeStringArray(values));
     }
 
     @Test

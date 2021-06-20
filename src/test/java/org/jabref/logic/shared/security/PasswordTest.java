@@ -10,28 +10,24 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class PasswordTest {
 
-  @Test
-  void passwordAESTest() throws GeneralSecurityException, UnsupportedEncodingException {
-    String phrase = "Password";
+    @Test
+    void passwordAESTest() throws GeneralSecurityException, UnsupportedEncodingException {
+        String phrase = "Password";
+        Password password = new Password(phrase, "someKey");
+        String encryptedPassword = password.encrypt();
+        assertNotEquals(phrase, encryptedPassword);
+    }
 
-    Password password = new Password(phrase, "someKey");
+    @Test
+    void passwordAsCharTest() throws GeneralSecurityException, UnsupportedEncodingException {
+        char[] charPhrase = "Password".toCharArray();
+        Password charPassword = new Password(charPhrase, "someKey");
+        String charEncryptedPassword = charPassword.encrypt();
 
-    String encryptedPassword = password.encrypt();
+        String stringPhrase = "Password";
+        Password stringPassword = new Password(stringPhrase, "someKey");
+        String stringEncryptedPassword = stringPassword.encrypt();
 
-    assertNotEquals(phrase, encryptedPassword);
-  }
-
-  @Test
-  void passwordAsCharTest() throws GeneralSecurityException, UnsupportedEncodingException {
-    char[] charPhrase = "Password".toCharArray();
-    String stringPhrase = "Password";
-
-    Password charPassword = new Password(charPhrase, "someKey");
-    Password stringPassword = new Password(stringPhrase, "someKey");
-
-    String charEncryptedPassword = charPassword.encrypt();
-    String stringEncryptedPassword = stringPassword.encrypt();
-
-    assertEquals(charEncryptedPassword, stringEncryptedPassword);
-  }
+        assertEquals(charEncryptedPassword, stringEncryptedPassword);
+    }
 }

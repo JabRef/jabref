@@ -8,7 +8,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -18,19 +17,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SpecialFieldsToSeparateFieldsTest {
 
-    private BibEntry entry;
-    private BibEntry expectedEntry;
-
-    @BeforeEach
-    void setUp() {
-        entry = new BibEntry();
-        expectedEntry = new BibEntry();
-    }
-
     @ParameterizedTest
     @MethodSource("provideKeywordFieldPairs")
     public void migrateToCorrectField(SpecialField field, String fieldInKeyword, BibEntry expected) {
-        entry = new BibEntry().withField(StandardField.KEYWORDS, fieldInKeyword);
+        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, fieldInKeyword);
 
         new SpecialFieldsToSeparateFields(',').performMigration(new ParserResult(List.of(entry)));
 
@@ -39,40 +29,41 @@ class SpecialFieldsToSeparateFieldsTest {
 
     @Test
     public void noKewordToMigrate() {
-        entry.setField(StandardField.AUTHOR, "JabRef");
-        entry.setField(StandardField.KEYWORDS, "tdd");
-        expectedEntry.setField(StandardField.AUTHOR, "JabRef");
-        expectedEntry.setField(StandardField.KEYWORDS, "tdd");
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "JabRef")
+                                       .withField(StandardField.KEYWORDS, "tdd");
+        BibEntry expected = new BibEntry().withField(StandardField.AUTHOR, "JabRef")
+                                          .withField(StandardField.KEYWORDS, "tdd");
 
         new SpecialFieldsToSeparateFields(',').performMigration(new ParserResult(List.of(entry)));
 
-        assertEquals(expectedEntry, entry);
+        assertEquals(expected, entry);
     }
 
     @Test
     public void migrateMultipleSpecialFields() {
-        entry.setField(StandardField.AUTHOR, "JabRef");
-        entry.setField(StandardField.KEYWORDS, "printed, prio1");
-        expectedEntry.setField(StandardField.AUTHOR, "JabRef");
-        expectedEntry.setField(SpecialField.PRINTED, "printed");
-        expectedEntry.setField(SpecialField.PRIORITY, "prio1");
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "JabRef")
+                                       .withField(StandardField.KEYWORDS, "printed, prio1");
+        BibEntry expected = new BibEntry().withField(StandardField.AUTHOR, "JabRef")
+                                          .withField(SpecialField.PRINTED, "printed")
+                                          .withField(SpecialField.PRIORITY, "prio1");
 
         new SpecialFieldsToSeparateFields(',').performMigration(new ParserResult(List.of(entry)));
 
-        assertEquals(expectedEntry, entry);
+        assertEquals(expected, entry);
     }
 
     @Test
     public void migrateSpecialFieldsMixedWithKeyword() {
-        entry.setField(StandardField.AUTHOR, "JabRef");
-        entry.setField(StandardField.KEYWORDS, "tdd, prio1, SE");
-        expectedEntry.setField(StandardField.AUTHOR, "JabRef");
-        expectedEntry.setField(StandardField.KEYWORDS, "tdd, SE");
-        expectedEntry.setField(SpecialField.PRIORITY, "prio1");
+        BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "JabRef")
+                                       .withField(StandardField.KEYWORDS, "tdd, prio1, SE");
+
+        BibEntry expected = new BibEntry().withField(StandardField.AUTHOR, "JabRef")
+                                          .withField(StandardField.KEYWORDS, "tdd, SE")
+                                          .withField(SpecialField.PRIORITY, "prio1");
 
         new SpecialFieldsToSeparateFields(',').performMigration(new ParserResult(List.of(entry)));
 
-        assertEquals(expectedEntry, entry);
+        assertEquals(expected, entry);
     }
 
     private static Stream<Arguments> provideKeywordFieldPairs() {

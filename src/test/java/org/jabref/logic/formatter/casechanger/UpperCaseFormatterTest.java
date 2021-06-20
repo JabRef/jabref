@@ -24,13 +24,13 @@ public class UpperCaseFormatterTest {
 
     private static Stream<Arguments> upperCaseTests() {
         return Stream.of(
-        Arguments.of("LOWER", "LOWER"),
-        Arguments.of("UPPER", "upper"),
-        Arguments.of("UPPER", "UPPER"),
-        Arguments.of("UPPER {lower}", "upper {lower}"),
-        Arguments.of("UPPER {l}OWER", "upper {l}ower"),
-        Arguments.of("1", "1"),
-        Arguments.of("!", "!")
+                Arguments.of("LOWER", "LOWER"),
+                Arguments.of("UPPER", "upper"),
+                Arguments.of("UPPER", "UPPER"),
+                Arguments.of("UPPER {lower}", "upper {lower}"),
+                Arguments.of("UPPER {l}OWER", "upper {l}ower"),
+                Arguments.of("1", "1"),
+                Arguments.of("!", "!")
         );
     }
 

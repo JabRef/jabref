@@ -22,19 +22,19 @@ class KeyBindingViewModelTest {
   void resetToDefault() {
     // Set new key binding
     KeyBindingRepository keyBindingRepository = new KeyBindingRepository();
-    KeyBindingsTabViewModel model = new KeyBindingsTabViewModel(keyBindingRepository, mock(DialogService.class), mock(PreferencesService.class));
+    KeyBindingsTabViewModel keyBindingsTabViewModel = new KeyBindingsTabViewModel(keyBindingRepository, mock(DialogService.class), mock(PreferencesService.class));
     KeyBinding binding = KeyBinding.ABBREVIATE;
 
     KeyBindingViewModel viewModel = new KeyBindingViewModel(keyBindingRepository, binding, binding.getDefaultKeyBinding());
-    model.selectedKeyBindingProperty().set(Optional.of(viewModel));
+    keyBindingsTabViewModel.selectedKeyBindingProperty().set(Optional.of(viewModel));
 
     KeyEvent shortcutKeyEvent = new KeyEvent(KeyEvent.KEY_PRESSED, "F1", "F1", KeyCode.F1, true, false, false,
             false);
 
     assertFalse(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
 
-    model.setNewBindingForCurrent(shortcutKeyEvent);
-    model.storeSettings();
+    keyBindingsTabViewModel.setNewBindingForCurrent(shortcutKeyEvent);
+    keyBindingsTabViewModel.storeSettings();
 
     assertTrue(keyBindingRepository.checkKeyCombinationEquality(KeyBinding.ABBREVIATE, shortcutKeyEvent));
 

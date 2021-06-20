@@ -21,10 +21,8 @@ class CitationStyleCacheTest {
 
   @Test
   void getCitationForTest() {
-    BibEntry bibEntry = new BibEntry();
-    bibEntry.setCitationKey("test");
-    List<BibEntry> entries = new ArrayList<>();
-    entries.add(0, bibEntry);
+    BibEntry bibEntry = new BibEntry().withCitationKey("test");
+    List<BibEntry> entries = List.of(bibEntry);
     BibDatabase database = new BibDatabase(entries);
     BibDatabaseContext databaseContext = new BibDatabaseContext(database);
     CitationStyleCache csCache = new CitationStyleCache(databaseContext);
