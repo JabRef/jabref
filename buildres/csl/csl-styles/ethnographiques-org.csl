@@ -12,7 +12,11 @@
     <category citation-format="author-date"/>
     <category field="social_science"/>
     <eissn>1961-9162</eissn>
+<<<<<<< HEAD
     <updated>2021-05-28T07:12:35+00:00</updated>
+=======
+    <updated>2021-06-01T16:10:30+00:00</updated>
+>>>>>>> dbb93e7d9be410a475814d5ae49aef83ce158191
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
@@ -39,6 +43,7 @@
     </names>
   </macro>
   <macro name="author-cite">
+<<<<<<< HEAD
     <choose>
       <if variable="author">
         <names variable="author">
@@ -53,6 +58,16 @@
         </names>
       </else-if>
     </choose>
+=======
+    <names variable="author">
+      <name form="short" and="text" delimiter-precedes-last="never" sort-separator=" " font-style="normal"/>
+      <et-al font-style="italic"/>
+      <substitute>
+        <names variable="editor translator"/>
+        <text variable="title"/>
+      </substitute>
+    </names>
+>>>>>>> dbb93e7d9be410a475814d5ae49aef83ce158191
   </macro>
   <macro name="editor">
     <names variable="editor">
@@ -163,9 +178,15 @@
         </choose>
       </if>
       <else-if type="article-journal article-magazine" match="any">
+<<<<<<< HEAD
         <group font-style="normal" delimiter=" ">
           <text macro="volume"/>
           <text macro="issue" prefix="(" suffix=")"/>
+=======
+        <group font-style="normal" delimiter=" " suffix=", ">
+          <text macro="volume"/>
+          <text macro="issue"/>
+>>>>>>> dbb93e7d9be410a475814d5ae49aef83ce158191
         </group>
       </else-if>
     </choose>
@@ -182,8 +203,13 @@
   </macro>
   <macro name="issue">
     <choose>
+<<<<<<< HEAD
       <if is-numeric="issue">
         <text variable="issue"/>
+=======
+      <if is-numeric="volume">
+        <text variable="issue" prefix="(" suffix=")"/>
+>>>>>>> dbb93e7d9be410a475814d5ae49aef83ce158191
       </if>
       <else>
         <text variable="issue"/>

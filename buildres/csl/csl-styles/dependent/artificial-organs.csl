@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" default-locale="en-US">
+  <info>
+    <title>Artificial Organs</title>
+    <id>http://www.zotero.org/styles/artificial-organs</id>
+    <link href="http://www.zotero.org/styles/artificial-organs" rel="self"/>
+    <link href="http://www.zotero.org/styles/vancouver-superscript-only-year" rel="independent-parent"/>
+    <link href="https://onlinelibrary.wiley.com/page/journal/15251594/homepage/forauthors.html" rel="documentation"/>
+    <category citation-format="numeric"/>
+    <category field="medicine"/>
+    <issn>1525-1594</issn>
+    <updated>2021-03-22T05:06:46+00:00</updated>
+    <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+  </info>
+</style>
