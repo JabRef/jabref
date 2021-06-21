@@ -82,6 +82,13 @@ public class WebSearchPane extends SidePaneComponent {
         BindingsHelper.includePseudoClassWhen(query, QUERY_INVALID, viewModel.queryValidationStatus().validProperty().not());
 
         viewModel.queryProperty().bind(query.textProperty());
+        TextField queryValid = new TextField();
+        EasyBind.subscribe(viewModel.queryValidationStatus().validProperty(),
+                valid -> {
+                    if (!valid && viewModel.queryValidationStatus().getHighestMessage().isPresent()) {
+                        queryValid.setText(viewModel.queryValidationStatus().getHighestMessage().get().getMessage());
+                    }
+                });
 
         // Allows to trigger search on pressing enter
         query.setOnKeyPressed(event -> {
@@ -98,7 +105,7 @@ public class WebSearchPane extends SidePaneComponent {
         // Put everything together
         VBox container = new VBox();
         container.setAlignment(Pos.CENTER);
-        container.getChildren().addAll(fetcherContainer, query, search);
+        container.getChildren().addAll(fetcherContainer, query, search, queryValid);
         return container;
     }
 
