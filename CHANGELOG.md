@@ -26,10 +26,12 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added a feature that allows the user to open all linked files of multiple selected entries by "Open file" option. [#6966](https://github.com/JabRef/jabref/issues/6966)
 - We added a keybinding preset for new entries. [#7705](https://github.com/JabRef/jabref/issues/7705)
 - We added a select all button for the library import function. [#7786](https://github.com/JabRef/jabref/issues/7786)
-- We added auto-key-generation progress to the background task list. [#7267](https://github.com/JabRef/jabref/issues/7267)
+- We added a search feature for journal abbreviations. [#7804](https://github.com/JabRef/jabref/pull/7804)
+- We added auto-key-generation progress to the background task list. [#7267](https://github.com/JabRef/jabref/issues/72)
 
 ### Changed
 
+- The export to MS Office XML now exports the author field as `Inventor` if the bibtex entry type is `patent` [#7830](https://github.com/JabRef/jabref/issues/7830)
 - We changed the EndNote importer to import the field `label` to the corresponding bibtex field `endnote-label` [forum#2734](https://discourse.jabref.org/t/importing-endnote-label-field-to-jabref-from-xml-file/2734)
 - The keywords added via "Manage content selectors" are now displayed in alphabetical order. [#3791](https://github.com/JabRef/jabref/issues/3791)
 - We improved the "Find unlinked files" dialog to show import results for each file. [#7209](https://github.com/JabRef/jabref/pull/7209)
@@ -48,6 +50,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - The tooltip of the search field explaining the search is always shown. [#7279](https://github.com/JabRef/jabref/pull/7279)
 - We rewrote the ACM fetcher to adapt to the new interface. [#5804](https://github.com/JabRef/jabref/issues/5804)
 - We moved the select/collapse buttons in the unlinked files dialog into a context menu. [#7383](https://github.com/JabRef/jabref/issues/7383)
+- We fixed an issue where journal abbreviations containing curly braces were not recognized  [#7773](https://github.com/JabRef/jabref/issues/7773)
 
 ### Fixed
 
