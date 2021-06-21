@@ -6,6 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -78,17 +79,15 @@ public class WebSearchPane extends SidePaneComponent {
         TextField query = SearchTextField.create();
         query.getStyleClass().add("searchBar");
 
-        // Weird issue: viewModel.queryValidationStatus().not() does not work...
-        BindingsHelper.includePseudoClassWhen(query, QUERY_INVALID, viewModel.queryValidationStatus().validProperty().not());
-
         viewModel.queryProperty().bind(query.textProperty());
-        TextField queryValid = new TextField();
         EasyBind.subscribe(viewModel.queryValidationStatus().validProperty(),
                 valid -> {
                     if (!valid && viewModel.queryValidationStatus().getHighestMessage().isPresent()) {
-                        queryValid.setText(viewModel.queryValidationStatus().getHighestMessage().get().getMessage());
+                        query.setTooltip(new Tooltip(viewModel.queryValidationStatus().getHighestMessage().get().getMessage()));
+                        query.pseudoClassStateChanged(QUERY_INVALID, true);
                     } else {
-                        queryValid.setText("");
+                        query.setTooltip(null);
+                        query.pseudoClassStateChanged(QUERY_INVALID, false);
                     }
                 });
 
@@ -107,7 +106,7 @@ public class WebSearchPane extends SidePaneComponent {
         // Put everything together
         VBox container = new VBox();
         container.setAlignment(Pos.CENTER);
-        container.getChildren().addAll(fetcherContainer, query, search, queryValid);
+        container.getChildren().addAll(fetcherContainer, query, search);
         return container;
     }
 
