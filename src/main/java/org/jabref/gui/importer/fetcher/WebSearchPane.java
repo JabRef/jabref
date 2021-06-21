@@ -87,6 +87,8 @@ public class WebSearchPane extends SidePaneComponent {
                 valid -> {
                     if (!valid && viewModel.queryValidationStatus().getHighestMessage().isPresent()) {
                         queryValid.setText(viewModel.queryValidationStatus().getHighestMessage().get().getMessage());
+                    } else {
+                        queryValid.setText("");
                     }
                 });
 
