@@ -50,6 +50,6 @@ class FieldChangeTest {
     @Test
     void differentFieldChangeIsNotEqual() {
         FieldChange fcOther = new FieldChange(entryOther, StandardField.DOI, "fooX", "barX");
-        assertEquals(fc, fcOther);
+        assertNotEquals(fc, fcOther);
     }
 }
