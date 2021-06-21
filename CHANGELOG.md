@@ -28,6 +28,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added a select all button for the library import function. [#7786](https://github.com/JabRef/jabref/issues/7786)
 - We added a search feature for journal abbreviations. [#7804](https://github.com/JabRef/jabref/pull/7804)
 - We added auto-key-generation progress to the background task list. [#7267](https://github.com/JabRef/jabref/issues/72)
+- We added the option to write XMP metadata to pdfs from the CLI. [7814](https://github.com/JabRef/jabref/pull/7814)
 
 ### Changed
 
