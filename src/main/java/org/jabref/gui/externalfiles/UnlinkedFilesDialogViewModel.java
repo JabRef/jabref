@@ -48,6 +48,9 @@ import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.jabref.gui.externalfiles.ExternalFilesDateViewModel;
+import org.jabref.gui.externalfiles.DateRange;
+
 public class UnlinkedFilesDialogViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UnlinkedFilesDialogViewModel.class);
@@ -55,6 +58,7 @@ public class UnlinkedFilesDialogViewModel {
     private final ImportHandler importHandler;
     private final StringProperty directoryPath = new SimpleStringProperty("");
     private final ObjectProperty<FileExtensionViewModel> selectedExtension = new SimpleObjectProperty<>();
+    private final ObjectProperty<ExternalFilesDateViewModel> selectedDate = new SimpleObjectProperty<>();
 
     private final ObjectProperty<Optional<FileNodeViewModel>> treeRootProperty = new SimpleObjectProperty<>();
     private final SimpleListProperty<TreeItem<FileNodeViewModel>> checkedFileListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -65,6 +69,8 @@ public class UnlinkedFilesDialogViewModel {
 
     private final ObservableList<ImportFilesResultItemViewModel> resultList = FXCollections.observableArrayList();
     private final ObservableList<FileExtensionViewModel> fileFilterList;
+    private final ObservableList<ExternalFilesDateViewModel> dateFilterList;
+
     private final DialogService dialogService;
     private final PreferencesService preferences;
     private BackgroundTask<FileNodeViewModel> findUnlinkedFilesTask;
@@ -94,6 +100,13 @@ public class UnlinkedFilesDialogViewModel {
                 new FileExtensionViewModel(StandardFileType.BIBTEX_DB, externalFileTypes),
                 new FileExtensionViewModel(StandardFileType.PDF, externalFileTypes));
 
+        this.dateFilterList = FXCollections.observableArrayList(
+            new ExternalFilesDateViewModel(DateRange.ALL_TIME.getDateRange()),
+            new ExternalFilesDateViewModel(DateRange.YEAR.getDateRange()),
+            new ExternalFilesDateViewModel(DateRange.MONTH.getDateRange()),
+            new ExternalFilesDateViewModel(DateRange.WEEK.getDateRange()),
+            new ExternalFilesDateViewModel(DateRange.DAY.getDateRange()));
+            
         Predicate<String> isDirectory = path -> Files.isDirectory(Path.of(path));
         scanDirectoryValidator = new FunctionBasedValidator<>(directoryPath, isDirectory,
                 ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
@@ -104,11 +117,12 @@ public class UnlinkedFilesDialogViewModel {
     public void startSearch() {
         Path directory = this.getSearchDirectory();
         Filter<Path> selectedFileFilter = selectedExtension.getValue().dirFilter();
+        String selectedDateFilter = selectedDate.getValue().getDateRanges();
 
         progressValueProperty.unbind();
         progressTextProperty.unbind();
 
-        findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, bibDatabase, preferences.getFilePreferences())
+        findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, selectedDateFilter, bibDatabase, preferences.getFilePreferences())
                 .onRunning(() -> {
                     progressValueProperty.set(ProgressIndicator.INDETERMINATE_PROGRESS);
                     progressTextProperty.setValue(Localization.lang("Searching file system..."));
@@ -189,6 +203,10 @@ public class UnlinkedFilesDialogViewModel {
         return this.fileFilterList;
     }
 
+    public ObservableList<ExternalFilesDateViewModel> getDateFilters() {
+        return this.dateFilterList;
+    }
+
     public void cancelTasks() {
         if (findUnlinkedFilesTask != null) {
             findUnlinkedFilesTask.cancel();
@@ -232,6 +250,10 @@ public class UnlinkedFilesDialogViewModel {
 
     public ObjectProperty<FileExtensionViewModel> selectedExtensionProperty() {
         return this.selectedExtension;
+    }
+
+    public ObjectProperty<ExternalFilesDateViewModel> selectedDateProperty() {
+        return this.selectedDate;
     }
 
     public StringProperty directoryPathProperty() {
