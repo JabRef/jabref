@@ -79,7 +79,11 @@ public class WebSearchPaneViewModel {
                     } catch (ParseException e) {
                         String element = e.currentToken.image;
                         int position = e.currentToken.beginColumn;
-                        return ValidationMessage.error(Localization.lang("Invalid query element '%0' at position %1", element, position));
+                        if (element == null) {
+                            return ValidationMessage.error(Localization.lang("Invalid query. Check position %0.", position));
+                        } else {
+                            return ValidationMessage.error(Localization.lang("Invalid query element '%0' at position %1", element, position));
+                        }
                     } catch (QueryNodeParseException e) {
                         return ValidationMessage.error("");
                     }

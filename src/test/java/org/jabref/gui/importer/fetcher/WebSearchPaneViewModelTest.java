@@ -29,6 +29,12 @@ class WebSearchPaneViewModelTest {
     }
 
     @Test
+    void queryConsistingOfASingleAndIsNotValid() {
+        viewModel.queryProperty().setValue("AND");
+        assertFalse(viewModel.queryValidationStatus().validProperty().getValue());
+    }
+
+    @Test
     void falseQueryValidationStatus() {
         viewModel.queryProperty().setValue("Miami !Beach AND OR Blue");
         assertFalse(viewModel.queryValidationStatus().validProperty().getValue());
