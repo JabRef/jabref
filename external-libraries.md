@@ -566,9 +566,11 @@ org.apache.logging.log4j:log4j-core:3.0.0-SNAPSHOT
 org.apache.logging.log4j:log4j-jcl:3.0.0-SNAPSHOT
 org.apache.logging.log4j:log4j-plugins:3.0.0-SNAPSHOT
 org.apache.logging.log4j:log4j-slf4j18-impl:3.0.0-SNAPSHOT
-org.apache.lucene:lucene-core:8.8.2
-org.apache.lucene:lucene-queries:8.8.2
-org.apache.lucene:lucene-queryparser:8.8.2
+org.apache.lucene:lucene-core:8.9.0
+org.apache.lucene:lucene-queries:8.9.0
+org.apache.lucene:lucene-queryparser:8.9.0
+org.apache.lucene:lucene-analyzers-common:8.9.0
+org.apache.lucene:lucene-backward-codecs:8.9.0
 org.apache.pdfbox:fontbox:2.0.24
 org.apache.pdfbox:pdfbox:2.0.24
 org.apache.pdfbox:xmpbox:2.0.24
