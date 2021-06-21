@@ -52,6 +52,8 @@
 
                 <Label text="%File type:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
                 <ComboBox fx:id="fileTypeCombo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <Label text="%Last edited:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <ComboBox fx:id="fileDateCombo" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
                 <Button fx:id="scanButton" onAction="#scanFiles" text="%Search"
                         GridPane.columnIndex="2" GridPane.rowIndex="1">
                     <tooltip>
@@ -76,7 +78,7 @@
                                 </columns>
                                 <columnResizePolicy>
                                     <TableView fx:constant="UNCONSTRAINED_RESIZE_POLICY"/>
-                                </columnResizePolicy>
+                                </columnsResizePolicy>
                             </TableView>
                         </TitledPane>
                     </panes>
