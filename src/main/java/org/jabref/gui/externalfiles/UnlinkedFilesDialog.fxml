@@ -78,7 +78,7 @@
                                 </columns>
                                 <columnResizePolicy>
                                     <TableView fx:constant="UNCONSTRAINED_RESIZE_POLICY"/>
-                                </columnsResizePolicy>
+                                </columnResizePolicy>
                             </TableView>
                         </TitledPane>
                     </panes>
