@@ -87,7 +87,7 @@ import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.openoffice.StyleLoader;
+import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
@@ -1049,10 +1049,16 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    private FileLinkPreferences getFileLinkPreferences() {
+    @Override
+    public FileLinkPreferences getFileLinkPreferences() {
         return new FileLinkPreferences(
                 get(MAIN_FILE_DIRECTORY), // REALLY HERE?
                 fileDirForDatabase);
+    }
+
+    @Override
+    public void storeFileDirforDatabase(List<Path> dirs) {
+        this.fileDirForDatabase = dirs;
     }
 
     @Override

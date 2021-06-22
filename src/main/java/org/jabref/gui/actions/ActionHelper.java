@@ -81,6 +81,18 @@ public class ActionHelper {
         return BooleanExpression.booleanExpression(fileIsPresent);
     }
 
+    /**
+     * Check if at least one of the selected entries has linked files
+     * <br>
+     * Used in {@link org.jabref.gui.maintable.OpenExternalFileAction} when multiple entries selected
+     * @param stateManager manager for the state of the GUI
+     * @return a boolean binding
+     */
+    public static BooleanExpression hasLinkedFileForSelectedEntries(StateManager stateManager) {
+        return BooleanExpression.booleanExpression(EasyBind.reduce(stateManager.getSelectedEntries(),
+                entries -> entries.anyMatch(entry -> !entry.getFiles().isEmpty())));
+    }
+
     public static BooleanExpression isOpenMultiDatabase(TabPane tabbedPane) {
         return Bindings.size(tabbedPane.getTabs()).greaterThan(1);
     }

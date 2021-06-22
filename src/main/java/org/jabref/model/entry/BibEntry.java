@@ -991,4 +991,24 @@ public class BibEntry implements Cloneable {
     public Observable[] getObservables() {
         return new Observable[] {fields, type};
     }
+
+    public void addLinkedFile(BibEntry entry, LinkedFile linkedFile, LinkedFile newLinkedFile, List<LinkedFile> linkedFiles) {
+        int oldFileIndex = -1;
+        int i = 0;
+        while ((i < linkedFiles.size()) && (oldFileIndex == -1)) {
+            LinkedFile file = linkedFiles.get(i);
+            // The file type changes as part of download process (see prepareDownloadTask), thus we only compare by link
+            if (file.getLink().equalsIgnoreCase(linkedFile.getLink())) {
+                oldFileIndex = i;
+            }
+            i++;
+        }
+        if (oldFileIndex == -1) {
+            linkedFiles.add(0, newLinkedFile);
+        } else {
+            linkedFiles.set(oldFileIndex, newLinkedFile);
+        }
+        entry.setFiles(linkedFiles);
+    }
+
 }

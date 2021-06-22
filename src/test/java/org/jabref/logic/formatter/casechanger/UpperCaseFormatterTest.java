@@ -1,7 +1,11 @@
 package org.jabref.logic.formatter.casechanger;
 
-import org.junit.jupiter.api.BeforeEach;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -10,20 +14,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class UpperCaseFormatterTest {
 
-    private UpperCaseFormatter formatter;
+    private UpperCaseFormatter formatter = new UpperCaseFormatter();
 
-    @BeforeEach
-    public void setUp() {
-        formatter = new UpperCaseFormatter();
+    @ParameterizedTest
+    @MethodSource("upperCaseTests")
+    public void upperCaseTest(String expectedFormat, String inputFormat) {
+        assertEquals(expectedFormat, formatter.format(inputFormat));
     }
 
-    @Test
-    public void test() {
-        assertEquals("LOWER", formatter.format("LOWER"));
-        assertEquals("UPPER", formatter.format("upper"));
-        assertEquals("UPPER", formatter.format("UPPER"));
-        assertEquals("UPPER {lower}", formatter.format("upper {lower}"));
-        assertEquals("UPPER {l}OWER", formatter.format("upper {l}ower"));
+    private static Stream<Arguments> upperCaseTests() {
+        return Stream.of(
+                Arguments.of("LOWER", "LOWER"),
+                Arguments.of("UPPER", "upper"),
+                Arguments.of("UPPER", "UPPER"),
+                Arguments.of("UPPER {lower}", "upper {lower}"),
+                Arguments.of("UPPER {l}OWER", "upper {l}ower"),
+                Arguments.of("1", "1"),
+                Arguments.of("!", "!")
+        );
     }
 
     @Test

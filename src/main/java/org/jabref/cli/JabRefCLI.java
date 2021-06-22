@@ -147,6 +147,14 @@ public class JabRefCLI {
         return cl.hasOption("automaticallySetFileLinks");
     }
 
+    public boolean isWriteXMPtoPdf() {
+        return cl.hasOption("writeXMPtoPdf");
+    }
+
+    public String getWriteXMPtoPdf() {
+        return cl.getOptionValue("writeXMPtoPdf");
+    }
+
     private static Options getOptions() {
         Options options = new Options();
 
@@ -240,6 +248,14 @@ public class JabRefCLI {
                 .desc(String.format("%s: '%s'", Localization.lang("Reset preferences"), "-d mainFontSize,newline' or '-d all"))
                 .hasArg()
                 .argName("KEY1[,KEY2][,KEYn] | all")
+                .build());
+
+        options.addOption(Option
+                .builder("w")
+                .longOpt("writeXMPtoPdf")
+                .desc(String.format("%s: '%s'", Localization.lang("Write BibTeXEntry as XMP metadata to PDF."), "-w pathToMyOwnPaper.pdf"))
+                .hasArg()
+                .argName("CITEKEY1[,CITEKEY2][,CITEKEYn] | PDF1[,PDF2][,PDFn] | all")
                 .build());
 
         return options;

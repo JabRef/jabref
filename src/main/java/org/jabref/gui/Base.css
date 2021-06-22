@@ -376,6 +376,10 @@
     -fx-fill: white;
 }
 
+.icon-button:disabled {
+    -fx-opacity: 0.4;
+}
+
 .toggle-button:selected {
     -fx-background-color: -jr-icon-background-active;
     -fx-text-fill: -jr-selected;
@@ -1231,4 +1235,8 @@ TextFlow * {
 
 .fontsizeSpinner{
     -fx-pref-width: 5em;
+}
+
+.text-field:invalid {
+    -fx-background-color: rgba(240, 128, 128, 0.5);
 }

@@ -8,13 +8,13 @@ To ensure high code-quality,
 * We follow the principles of [Effective Java](https://www.oreilly.com/library/view/effective-java-3rd/9780134686097/).
 * We use [Design Patterns](https://java-design-patterns.com/patterns/) when applicable.
 * We document our design decisions using the lightweight architectural decision records [MADR](https://adr.github.io/madr/).
-* We review each external pull request by at least two [JabRef Core Developers](../../MAINTAINERS).
+* We review each external pull request by at least two [JabRef Core Developers](https://github.com/JabRef/jabref/blob/main/MAINTAINERS).
 
 Read on about our automated quality checks at [Code Quality](../advanced-reading/code-quality.md).
 
 ## Continuous integration
 
-Since end of 2019, we just use GitHub actions to execute our tests and to creates binaries. The binaries are create using [gradle](https://gradle.org/) and are uploaded to to [https://builds.jabref.org](https://builds.jabref.org). These binaries are created without any checks to have them available as quickly as possible, even if the localization or some fetchers are broken. Deep link: [https://github.com/JabRef/jabref/actions?workflow=Deployment](https://github.com/JabRef/jabref/actions?workflow=Deployment).
+Since end of 2019, we just use GitHub actions to execute our tests and to creates binaries. The binaries are created using [gradle](https://gradle.org/) and are uploaded to [https://builds.jabref.org](https://builds.jabref.org). These binaries are created without any checks to have them available as quickly as possible, even if the localization or some fetchers are broken. Deep link: [https://github.com/JabRef/jabref/actions?workflow=Deployment](https://github.com/JabRef/jabref/actions?workflow=Deployment).
 
 ## Branches
 

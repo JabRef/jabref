@@ -22,6 +22,9 @@
             "pattern": "^http://purl\\.org/net/bibteXMP"
         },
         {
+            "pattern": "^https://www\\.slant\\.co/"
+        },
+        {
             "pattern": "^http://localhost"
         }
     ]

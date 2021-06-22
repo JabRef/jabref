@@ -32,10 +32,12 @@ import org.jabref.logic.importer.fileformat.endnote.Dates;
 import org.jabref.logic.importer.fileformat.endnote.ElectronicResourceNum;
 import org.jabref.logic.importer.fileformat.endnote.Isbn;
 import org.jabref.logic.importer.fileformat.endnote.Keywords;
+import org.jabref.logic.importer.fileformat.endnote.Label;
 import org.jabref.logic.importer.fileformat.endnote.Notes;
 import org.jabref.logic.importer.fileformat.endnote.Number;
 import org.jabref.logic.importer.fileformat.endnote.Pages;
 import org.jabref.logic.importer.fileformat.endnote.PdfUrls;
+import org.jabref.logic.importer.fileformat.endnote.Publisher;
 import org.jabref.logic.importer.fileformat.endnote.Record;
 import org.jabref.logic.importer.fileformat.endnote.RefType;
 import org.jabref.logic.importer.fileformat.endnote.RelatedUrls;
@@ -52,6 +54,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -164,6 +167,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
             case "electronic article" -> IEEETranEntryType.Electronic;
             case "book section" -> StandardEntryType.InBook;
             case "book" -> StandardEntryType.Book;
+            case "report" -> StandardEntryType.Report;
             // case "journal article" -> StandardEntryType.Article;
             default -> StandardEntryType.Article;
         };
@@ -178,7 +182,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         Optional.ofNullable(record.getTitles())
                 .map(Titles::getTitle)
                 .map(Title::getStyle)
-                .map(Style::getContent)
+                .map(this::mergeStyleContents)
                 .ifPresent(value -> entry.setField(StandardField.TITLE, clean(value)));
         Optional.ofNullable(record.getTitles())
                 .map(Titles::getSecondaryTitle)
@@ -222,6 +226,14 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 .map(ElectronicResourceNum::getStyle)
                 .map(Style::getContent)
                 .ifPresent(doi -> entry.setField(StandardField.DOI, doi.trim()));
+        Optional.ofNullable(record.getPublisher())
+                .map(Publisher::getStyle)
+                .map(Style::getContent)
+                .ifPresent(value -> entry.setField(StandardField.PUBLISHER, value));
+        Optional.ofNullable(record.getLabel())
+                .map(Label::getStyle)
+                .map(Style::getContent)
+                .ifPresent(value -> entry.setField(new UnknownField("endnote-label"), value));
 
         return entry;
     }
@@ -259,11 +271,35 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                            .findFirst();
     }
 
+    private String mergeStyleContents(List<Style> styles) {
+        return styles.stream().map(Style::getContent).collect(Collectors.joining());
+    }
+
     private Optional<String> getUrlValue(Url url) {
-        return Optional.ofNullable(url)
-                       .map(Url::getStyle)
-                       .map(Style::getContent)
-                       .map(this::clean);
+        Optional<List<Object>> urlContent = Optional.ofNullable(url).map(Url::getContent);
+        List<Object> list = urlContent.orElse(Collections.emptyList());
+        Optional<String> ret;
+        if (list.size() == 0) {
+            return Optional.empty();
+        } else {
+            boolean isStyleExist = false;
+            int style_index = -1;
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i) instanceof Style) {
+                    isStyleExist = true;
+                    style_index = i;
+                }
+            }
+            if (!isStyleExist) {
+                ret = Optional.ofNullable((String) list.get(0))
+                        .map(this::clean);
+            } else {
+                ret = Optional.ofNullable((Style) list.get(style_index))
+                        .map(Style::getContent)
+                        .map(this::clean);
+            }
+        }
+        return ret;
     }
 
     private List<String> getKeywords(Record record) {
