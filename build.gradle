@@ -294,7 +294,7 @@ processResources {
                 "springerNatureAPIKey": System.getenv('SpringerNatureAPIKey') ? System.getenv('SpringerNatureAPIKey') : '',
                 "astrophysicsDataSystemAPIKey": System.getenv('AstrophysicsDataSystemAPIKey') ? System.getenv('AstrophysicsDataSystemAPIKey') : '',
                 "ieeeAPIKey": System.getenv('IEEEAPIKey') ? System.getenv('IEEEAPIKey') : '',
-                "worldCatAPIKey": System.getenv('worldCatAPIKey') ? System.getenv('worldCatAPIKey') : ''
+                "worldCatAPIKey": System.getenv('worldCatAPIKey') ? System.getenv('worldCatAPIKey') : '',
                 "scienceDirectApiKey": System.getenv('SCIENCEDIRECTAPIKEY') ? System.getenv('SCIENCEDIRECTAPIKEY') : ''
         )
         filteringCharset = 'UTF-8'
