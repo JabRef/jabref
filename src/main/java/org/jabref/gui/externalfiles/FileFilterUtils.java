@@ -6,6 +6,11 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 public class FileFilterUtils {
 
@@ -76,6 +81,41 @@ public class FileFilterUtils {
             default:
                 return true;
 
+        }
+    }
+
+    public List<Path> sortByDateAscending(List<Path> files) {
+        FileFilterUtils utils = new FileFilterUtils();
+        return files.stream()
+                .sorted(Comparator.comparingLong(x -> FileFilterUtils.getFileTime(x)
+                        .atZone(ZoneId.systemDefault())
+                        .toInstant()
+                        .toEpochMilli()))
+                .collect(Collectors.toList());
+    }
+
+    public List<Path> sortByDateDescending(List<Path> files) {
+        FileFilterUtils utils = new FileFilterUtils();
+        return files.stream()
+                .sorted(Comparator.comparingLong(x -> FileFilterUtils.getFileTime(x)
+                        .atZone(ZoneId.systemDefault())
+                        .toInstant()
+                        .toEpochMilli()))
+                .sorted(Comparator.reverseOrder())
+                .collect(Collectors.toList());
+    }
+
+    public static List<Path> sortByDate(List<Path> files, String sortType) {
+        FileFilterUtils fileFilter = new FileFilterUtils();
+        switch(sortType) {
+            case "Default":
+                return files;
+            case "Newest first":
+                return fileFilter.sortByDateAscending(files);
+            case "Olderst first":
+                return fileFilter.sortByDateDescending(files);
+            default:
+                return files;
         }
     }
 }
