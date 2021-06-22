@@ -86,7 +86,6 @@ public class FileFilterUtils {
     }
 
     public List<Path> sortByDateAscending(List<Path> files) {
-        FileFilterUtils utils = new FileFilterUtils();
         return files.stream()
                 .sorted(Comparator.comparingLong(x -> FileFilterUtils.getFileTime(x)
                         .atZone(ZoneId.systemDefault())
@@ -96,7 +95,6 @@ public class FileFilterUtils {
     }
 
     public List<Path> sortByDateDescending(List<Path> files) {
-        FileFilterUtils utils = new FileFilterUtils();
         return files.stream()
                 .sorted(Comparator.comparingLong(x -> FileFilterUtils.getFileTime(x)
                         .atZone(ZoneId.systemDefault())
@@ -112,9 +110,9 @@ public class FileFilterUtils {
             case "Default":
                 return files;
             case "Newest first":
-                return fileFilter.sortByDateAscending(files);
-            case "Olderst first":
                 return fileFilter.sortByDateDescending(files);
+            case "Oldest first":
+                return fileFilter.sortByDateAscending(files);
             default:
                 return files;
         }
