@@ -1,5 +1,7 @@
 package org.jabref.model.openoffice.ootext;
 
+import org.jabref.model.strings.StringUtil;
+
 /**
  * Helper functions to produce some of the markup as understood by OOTextIntoOO.write
  *
@@ -54,7 +56,7 @@ public class OOFormat {
      * Mark {@code ootext} as part of a paragraph with style {@code paraStyle}
      */
     public static OOText paragraph(OOText ootext, String paraStyle) {
-        if (paraStyle == null || "".equals(paraStyle)) {
+        if (StringUtil.isNullOrEmpty(paraStyle)) {
             return paragraph(ootext);
         }
         String startTag = String.format("<p oo:ParaStyleName=\"%s\">", paraStyle);
