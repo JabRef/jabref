@@ -1,11 +1,11 @@
 package org.jabref.gui.externalfiles;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +17,7 @@ import javafx.scene.control.CheckBoxTreeItem;
 
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileNodeViewModel;
+import org.jabref.gui.externalfiles.FileFilterUtils;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.FilePreferences;
@@ -24,7 +25,6 @@ import org.jabref.preferences.FilePreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.jabref.gui.externalfiles.FileFilterUtils;
 
 /**
  * Util class for searching files on the file system which are not linked to a provided {@link BibDatabase}.
@@ -36,13 +36,15 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
     private final Path directory;
     private final Filter<Path> fileFilter;
     private final String dateFilter;
+    private final String sorter;
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
 
-    public UnlinkedFilesCrawler(Path directory, Filter<Path> fileFilter, String dateFilter, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+    public UnlinkedFilesCrawler(Path directory, Filter<Path> fileFilter, String dateFilter, String sorter, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         this.directory = directory;
         this.fileFilter = fileFilter;
         this.dateFilter = dateFilter;
+        this.sorter = sorter;
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
     }
@@ -97,16 +99,16 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
                 parent.getChildren().add(subRoot);
             }
         }
-
         List<Path> filteredFilesByDate = new ArrayList<Path>();
         for (Path path : files) {
             if (FileFilterUtils.filterByDate(path, dateFilter))
                 filteredFilesByDate.add(path);
         }
+        filteredFilesByDate = FileFilterUtils.sortByDate(filteredFilesByDate, sorter);
         parent.setFileCount(filteredFilesByDate.size() + fileCount);
         parent.getChildren().addAll(filteredFilesByDate.stream()
-                                         .map(FileNodeViewModel::new)
-                                         .collect(Collectors.toList()));
+                .map(FileNodeViewModel::new)
+                .collect(Collectors.toList()));
         return parent;
     }
 }
