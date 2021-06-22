@@ -51,6 +51,9 @@ import org.slf4j.LoggerFactory;
 import org.jabref.gui.externalfiles.ExternalFilesDateViewModel;
 import org.jabref.gui.externalfiles.DateRange;
 
+import org.jabref.gui.externalfiles.FileSortViewModel;
+import org.jabref.gui.externalfiles.ExternalFileSorter;
+
 public class UnlinkedFilesDialogViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UnlinkedFilesDialogViewModel.class);
@@ -59,6 +62,7 @@ public class UnlinkedFilesDialogViewModel {
     private final StringProperty directoryPath = new SimpleStringProperty("");
     private final ObjectProperty<FileExtensionViewModel> selectedExtension = new SimpleObjectProperty<>();
     private final ObjectProperty<ExternalFilesDateViewModel> selectedDate = new SimpleObjectProperty<>();
+    private final ObjectProperty<FileSortViewModel> selectedSort = new SimpleObjectProperty<>();
 
     private final ObjectProperty<Optional<FileNodeViewModel>> treeRootProperty = new SimpleObjectProperty<>();
     private final SimpleListProperty<TreeItem<FileNodeViewModel>> checkedFileListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -70,6 +74,7 @@ public class UnlinkedFilesDialogViewModel {
     private final ObservableList<ImportFilesResultItemViewModel> resultList = FXCollections.observableArrayList();
     private final ObservableList<FileExtensionViewModel> fileFilterList;
     private final ObservableList<ExternalFilesDateViewModel> dateFilterList;
+    private final ObservableList<FileSortViewModel> fileSortList;
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
@@ -96,9 +101,9 @@ public class UnlinkedFilesDialogViewModel {
                 stateManager);
 
         this.fileFilterList = FXCollections.observableArrayList(
-                new FileExtensionViewModel(StandardFileType.ANY_FILE, externalFileTypes),
-                new FileExtensionViewModel(StandardFileType.BIBTEX_DB, externalFileTypes),
-                new FileExtensionViewModel(StandardFileType.PDF, externalFileTypes));
+            new FileExtensionViewModel(StandardFileType.ANY_FILE, externalFileTypes),
+            new FileExtensionViewModel(StandardFileType.BIBTEX_DB, externalFileTypes),
+            new FileExtensionViewModel(StandardFileType.PDF, externalFileTypes));
 
         this.dateFilterList = FXCollections.observableArrayList(
             new ExternalFilesDateViewModel(DateRange.ALL_TIME.getDateRange()),
@@ -106,7 +111,12 @@ public class UnlinkedFilesDialogViewModel {
             new ExternalFilesDateViewModel(DateRange.MONTH.getDateRange()),
             new ExternalFilesDateViewModel(DateRange.WEEK.getDateRange()),
             new ExternalFilesDateViewModel(DateRange.DAY.getDateRange()));
-            
+
+        this.fileSortList = FXCollections.observableArrayList(
+            new FileSortViewModel(ExternalFileSorter.DEFAULT.getSorter()),
+            new FileSortViewModel(ExternalFileSorter.DATE_ASCENDING.getSorter()),
+            new FileSortViewModel(ExternalFileSorter.DATE_DESCENDING.getSorter()));
+
         Predicate<String> isDirectory = path -> Files.isDirectory(Path.of(path));
         scanDirectoryValidator = new FunctionBasedValidator<>(directoryPath, isDirectory,
                 ValidationMessage.error(Localization.lang("Please enter a valid file path.")));
@@ -118,11 +128,11 @@ public class UnlinkedFilesDialogViewModel {
         Path directory = this.getSearchDirectory();
         Filter<Path> selectedFileFilter = selectedExtension.getValue().dirFilter();
         String selectedDateFilter = selectedDate.getValue().getDateRanges();
-
+        String selectedSortFilter = selectedSort.getValue().getSorter();
         progressValueProperty.unbind();
         progressTextProperty.unbind();
 
-        findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, selectedDateFilter, bibDatabase, preferences.getFilePreferences())
+        findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, selectedDateFilter, selectedSortFilter, bibDatabase, preferences.getFilePreferences())
                 .onRunning(() -> {
                     progressValueProperty.set(ProgressIndicator.INDETERMINATE_PROGRESS);
                     progressTextProperty.setValue(Localization.lang("Searching file system..."));
@@ -207,6 +217,10 @@ public class UnlinkedFilesDialogViewModel {
         return this.dateFilterList;
     }
 
+    public ObservableList<FileSortViewModel> getSorters() {
+        return this.fileSortList;
+    }
+
     public void cancelTasks() {
         if (findUnlinkedFilesTask != null) {
             findUnlinkedFilesTask.cancel();
@@ -254,6 +268,10 @@ public class UnlinkedFilesDialogViewModel {
 
     public ObjectProperty<ExternalFilesDateViewModel> selectedDateProperty() {
         return this.selectedDate;
+    }
+
+    public ObjectProperty<FileSortViewModel> selectedSortProperty() {
+        return this.selectedSort;
     }
 
     public StringProperty directoryPathProperty() {
