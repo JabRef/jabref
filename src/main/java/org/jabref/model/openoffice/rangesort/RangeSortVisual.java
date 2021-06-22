@@ -3,7 +3,6 @@ package org.jabref.model.openoffice.rangesort;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import org.jabref.model.openoffice.uno.NoDocumentException;
 import org.jabref.model.openoffice.uno.UnoScreenRefresh;
@@ -73,7 +72,7 @@ public class RangeSortVisual {
                                          input.getIndexInPosition(),
                                          input));
         }
-        Collections.sort(set);
+        Collections.sort(set, RangeSortVisual::compareTopToBottomLeftToRight);
 
         if (set.size() != inputSize) {
             throw new IllegalStateException("visualSort: set.size() != inputSize");
@@ -115,6 +114,17 @@ public class RangeSortVisual {
         return cursor.getPosition();
     }
 
+    private static int compareTopToBottomLeftToRight(ComparableMark a, ComparableMark b) {
+
+        if (a.position.Y != b.position.Y) {
+            return a.position.Y - b.position.Y;
+        }
+        if (a.position.X != b.position.X) {
+            return a.position.X - b.position.X;
+        }
+        return a.indexInPosition - b.indexInPosition;
+    }
+    
     /**
      * A reference mark name paired with its visual position.
      *
@@ -123,7 +133,7 @@ public class RangeSortVisual {
      *
      * Used for sorting reference marks by their visual positions.
      */
-    private static class ComparableMark<T> implements Comparable<ComparableMark<T>> {
+    private static class ComparableMark<T> {
 
         private final Point position;
         private final int indexInPosition;
@@ -135,42 +145,10 @@ public class RangeSortVisual {
             this.content = content;
         }
 
-        @Override
-        public int compareTo(ComparableMark other) {
-
-            if (position.Y != other.position.Y) {
-                return position.Y - other.position.Y;
-            }
-            if (position.X != other.position.X) {
-                return position.X - other.position.X;
-            }
-            return indexInPosition - other.indexInPosition;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-
-            if (o instanceof ComparableMark) {
-                ComparableMark other = (ComparableMark) o;
-                return ((this.position.X == other.position.X)
-                        && (this.position.Y == other.position.Y)
-                        && (this.indexInPosition == other.indexInPosition)
-                        && Objects.equals(this.content, other.content));
-            }
-            return false;
-        }
-
         public T getContent() {
             return content;
         }
 
-        @Override
-        public int hashCode() {
-            return Objects.hash(position, indexInPosition, content);
-        }
     }
 
 }
