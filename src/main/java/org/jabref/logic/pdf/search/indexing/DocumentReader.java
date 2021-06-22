@@ -1,6 +1,7 @@
 package org.jabref.logic.pdf.search.indexing;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,6 +28,7 @@ import static org.jabref.model.pdf.search.SearchFieldConstants.AUTHOR;
 import static org.jabref.model.pdf.search.SearchFieldConstants.CONTENT;
 import static org.jabref.model.pdf.search.SearchFieldConstants.KEY;
 import static org.jabref.model.pdf.search.SearchFieldConstants.KEYWORDS;
+import static org.jabref.model.pdf.search.SearchFieldConstants.PATH;
 import static org.jabref.model.pdf.search.SearchFieldConstants.SUBJECT;
 import static org.jabref.model.pdf.search.SearchFieldConstants.TITLE;
 import static org.jabref.model.pdf.search.SearchFieldConstants.UID;
@@ -53,6 +55,23 @@ public final class DocumentReader {
     }
 
     /**
+     * Reads a LinkedFile of a BibEntry and converts it into a Lucene Document which is then returned.
+     *
+     * @return An Optional of a Lucene Document with the (meta)data. Can be empty if there is a problem reading the LinkedFile.
+     */
+    public Optional<Document> readLinkedPdf(BibDatabaseContext databaseContext, LinkedFile pdf) {
+        Optional<Path> pdfPath = pdf.findIn(databaseContext, JabRefPreferences.getInstance().getFilePreferences());
+        if (pdfPath.isPresent()) {
+            try {
+                return Optional.of(readPdfContents(pdf, pdfPath.get()));
+            } catch (IOException e) {
+                LOGGER.info("Could not read pdf file: " + pdf.getLink() + "!", e);
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
      * Reads each LinkedFile of a BibEntry and converts them into Lucene Documents which are then returned.
      *
      * @return A List of Documents with the (meta)data. Can be empty if there is a problem reading the LinkedFile.
@@ -60,34 +79,31 @@ public final class DocumentReader {
     public List<Document> readLinkedPdfs(BibDatabaseContext databaseContext) {
         List<Document> documents = new LinkedList<>();
         for (LinkedFile pdf : this.entry.getFiles()) {
-            Optional<Path> pdfPath = pdf.findIn(databaseContext, JabRefPreferences.getInstance().getFilePreferences());
-            pdfPath.ifPresent(file -> {
-                try {
-                    documents.add(readPdfContents(pdfPath.get()));
-                } catch (IOException e) {
-                    LOGGER.info("Could not read pdf file: " + pdf.getLink() + "!", e);
-                }
+            Optional<Document> document = readLinkedPdf(databaseContext, pdf);
+            document.ifPresent(d -> {
+                documents.add(document.get());
             });
         }
         return documents;
     }
 
-    private Document readPdfContents(Path pdfPath) throws IOException {
-        try (PDDocument pdfDocument = PDDocument.load(pdfPath.toFile())) {
+    private Document readPdfContents(LinkedFile pdf, Path resolvedPdfPath) throws IOException {
+        try (PDDocument pdfDocument = PDDocument.load(resolvedPdfPath.toFile())) {
             Document newDocument = new Document();
             addIdentifiers(newDocument);
             addContentIfNotEmpty(pdfDocument, newDocument);
-            addMetaData(pdfDocument, newDocument);
+            addMetaData(pdfDocument, newDocument, pdf.getLink());
             return newDocument;
         }
     }
 
-    private void addMetaData(PDDocument pdfDocument, Document newDocument) {
+    private void addMetaData(PDDocument pdfDocument, Document newDocument, String path) {
         PDDocumentInformation info = pdfDocument.getDocumentInformation();
         addStringField(newDocument, AUTHOR, info.getAuthor());
         addStringField(newDocument, TITLE, info.getTitle());
         addStringField(newDocument, SUBJECT, info.getSubject());
         addTextField(newDocument, KEYWORDS, info.getKeywords());
+        addTextField(newDocument, PATH, path); // @todo make sure this is the path as it is put in the bib file (not after findIn) to make sure updating works when the library is moved
     }
 
     private void addTextField(Document newDocument, String field, String value) {

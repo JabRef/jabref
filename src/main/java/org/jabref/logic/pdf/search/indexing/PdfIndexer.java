@@ -2,6 +2,7 @@ package org.jabref.logic.pdf.search.indexing;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import javafx.collections.ObservableList;
 
@@ -9,11 +10,15 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.pdf.search.SearchFieldConstants;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.SimpleFSDirectory;
 
@@ -93,6 +98,55 @@ public class PdfIndexer {
     }
 
     /**
+     * Adds a pdf file linked to one entry in the database to an existing (or new) Lucene search index
+     *
+     * @param entry a bibtex entry
+     * @param linkedFile the link to the pdf files
+     */
+    public void addToIndex(BibEntry entry, LinkedFile linkedFile) {
+        try (IndexWriter indexWriter = new IndexWriter(
+                directoryToIndex,
+                new IndexWriterConfig(
+                        new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))
+        ) {
+            if (!entry.getFiles().isEmpty()) {
+                writeToIndex(entry, linkedFile, indexWriter);
+            }
+        } catch (IOException e) {
+            LOGGER.warn("Could not initialize the IndexWriter!", e);
+        }
+    }
+
+    /**
+     * Removes a pdf file linked to one entry in the database from the index
+     * @param entry the entry the file is linked to
+     * @param linkedFile the link to the file to be removed
+     */
+    public void removeFromIndex(BibEntry entry, LinkedFile linkedFile) {
+        try (IndexWriter indexWriter = new IndexWriter(
+                directoryToIndex,
+                new IndexWriterConfig(
+                        new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))
+        ) {
+            if (!entry.getFiles().isEmpty()) {
+                indexWriter.deleteDocuments(new Term(SearchFieldConstants.PATH, linkedFile.getLink()));
+            }
+        } catch (IOException e) {
+            LOGGER.warn("Could not initialize the IndexWriter!", e);
+        }
+    }
+
+    /**
+     * Removes  all files linked to a bib-entry from the index
+     * @param entry the entry documents are linked to
+     */
+    public void removeFromIndex(BibEntry entry) {
+        for (LinkedFile linkedFile : entry.getFiles()) {
+            removeFromIndex(entry, linkedFile);
+        }
+    }
+
+    /**
      * Deletes all entries from the Lucene search index.
      */
     public void flushIndex() {
@@ -106,11 +160,54 @@ public class PdfIndexer {
         }
     }
 
+    /**
+     * Updates the index for the file document
+     * @param entry the entry the document is linked to
+     * @param linkedFile the document
+     */
+    public void updateIndex(BibEntry entry, LinkedFile linkedFile) {
+        try (IndexWriter indexWriter = new IndexWriter(
+                directoryToIndex,
+                new IndexWriterConfig(
+                        new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND))
+        ) {
+            if ("pdf".equals(linkedFile.getFileType())) {
+                Optional<Document> document = new DocumentReader(entry).readLinkedPdf(databaseContext, linkedFile);
+                if (document.isPresent()) {
+                    indexWriter.updateDocument(new Term(SearchFieldConstants.PATH, linkedFile.getLink()), document.get());
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.warn("Could not initialize the IndexWriter!", e);
+        }
+    }
+
+    /**
+     * Updates the index for all files linked to a bib-entry
+     * @param entry the entry documents are linked to
+     */
+    public void updateIndex(BibEntry entry) {
+        for (LinkedFile linkedFile : entry.getFiles()) {
+            updateIndex(entry, linkedFile);
+        }
+    }
+
     private void writeToIndex(BibEntry entry, IndexWriter indexWriter) {
         try {
             indexWriter.addDocuments(new DocumentReader(entry).readLinkedPdfs(this.databaseContext));
         } catch (IOException e) {
             LOGGER.warn("Could not add the documents to the index!", e);
+        }
+    }
+
+    private void writeToIndex(BibEntry entry, LinkedFile linkedFile, IndexWriter indexWriter) {
+        try {
+            Optional<Document> document = new DocumentReader(entry).readLinkedPdf(this.databaseContext, linkedFile);
+            if (document.isPresent()) {
+                indexWriter.addDocument(document.get());
+            }
+        } catch (IOException e) {
+            LOGGER.warn("Could not add the document to the index!", e);
         }
     }
 }
