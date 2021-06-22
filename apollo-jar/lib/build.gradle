@@ -1,3 +1,6 @@
+// The purpose of this package is to generate a fat jar for the Apollo client library in order to solve split package issues.
+// This is a ugly workaround for https://github.com/apollographql/apollo-android/issues/3152.
+
 plugins {
     id 'java-library'
     id 'com.github.johnrengelman.shadow' version '7.0.0'
