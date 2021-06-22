@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FileFilterUtilsTest {
 
-    private FileFilterUtils fileFilterUtils = new FileFilterUtils();
-    private LocalDateTime time = LocalDateTime.now();
+    private final FileFilterUtils fileFilterUtils = new FileFilterUtils();
+    private final LocalDateTime time = LocalDateTime.now();
    
     @Test
     public void isDuringLastDayNegativeTest() {
