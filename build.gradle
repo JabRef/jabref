@@ -387,18 +387,16 @@ task generateJournalAbbreviationList(type: JournalAbbreviationConverter) {
 }
 
 apollo {
-
-  schemaFile.set(file("src/main/java/org/jabref/jabrefonline/graphql/schema.json"))
-  graphqlSourceDirectorySet.srcDir("src/main/java/org/jabref/jabrefonline/graphql/")
-  graphqlSourceDirectorySet.exclude("schema.json")
+  schemaFile = file("src/main/java/org/jabref/jabrefonline/graphql/schema.json")
+  graphqlSourceDirectorySet.srcDir += "src/main/java/org/jabref/jabrefonline/graphql/"
+  graphqlSourceDirectorySet.exclude = ["schema.json"]
   customTypeMapping = [
     "DateTime" : "java.time.LocalDateTime"
   ]
-  generateKotlinModels.set(false)
-  nullableValueType.set("javaOptional")
-  useJavaBeansSemanticNaming.set(true)
-  rootPackageName.set("org.jabref.jabrefonline")
-
+  generateKotlinModels = false
+  nullableValueType = "javaOptional"
+  useJavaBeansSemanticNaming = true
+  rootPackageName = "org.jabref.jabrefonline"
 }
 
 tasks.withType(JavaCompile) {
