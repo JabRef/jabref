@@ -96,11 +96,10 @@ public class FileFilterUtils {
 
     public List<Path> sortByDateDescending(List<Path> files) {
         return files.stream()
-                .sorted(Comparator.comparingLong(x -> FileFilterUtils.getFileTime(x)
+                .sorted(Comparator.comparingLong(x -> - FileFilterUtils.getFileTime(x)
                         .atZone(ZoneId.systemDefault())
                         .toInstant()
                         .toEpochMilli()))
-                .sorted(Comparator.reverseOrder())
                 .collect(Collectors.toList());
     }
 
