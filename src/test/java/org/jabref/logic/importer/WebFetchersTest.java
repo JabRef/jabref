@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
-import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.fetcher.GoogleScholar;
 import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
@@ -56,7 +55,6 @@ class WebFetchersTest {
             expected.remove(IsbnViaOttoBibFetcher.class);
 
             // Remove the following, because they don't work at the moment
-            expected.remove(ACMPortalFetcher.class);
             expected.remove(JstorFetcher.class);
             expected.remove(GoogleScholar.class);
 
@@ -89,7 +87,6 @@ class WebFetchersTest {
             expected.remove(SearchBasedParserFetcher.class);
 
             // Remove the following, because they don't work atm
-            expected.remove(ACMPortalFetcher.class);
             expected.remove(JstorFetcher.class);
             expected.remove(GoogleScholar.class);
 
@@ -112,7 +109,6 @@ class WebFetchersTest {
             Set<Class<?>> expected = new HashSet<>(controlClasses.loadClasses());
 
             // Remove the following, because they don't work atm
-            expected.remove(ACMPortalFetcher.class);
             expected.remove(JstorFetcher.class);
             expected.remove(GoogleScholar.class);
 
@@ -130,7 +126,6 @@ class WebFetchersTest {
 
             expected.remove(IdParserFetcher.class);
             // Remove the following, because they don't work at the moment
-            expected.remove(ACMPortalFetcher.class);
             expected.remove(GoogleScholar.class);
 
             assertEquals(expected, getClasses(idFetchers));

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" et-al-min="6" et-al-use-first="3" page-range-format="minimal" demote-non-dropping-particle="sort-only" default-locale="nl-NL">
   <info>
-    <title>Tijdschrift voor Geneeskunde (Dutch)</title>
-    <title-short>TvG</title-short>
+    <title>Tijdschrift voor Geneeskunde en Gezondheidszorg (Nederlands)</title>
+    <title-short>TvGG</title-short>
     <id>http://www.zotero.org/styles/tijdschrift-voor-geneeskunde</id>
     <link href="http://www.zotero.org/styles/tijdschrift-voor-geneeskunde" rel="self"/>
     <link href="http://www.zotero.org/styles/vancouver" rel="template"/>
-    <link href="https://www.tvg.be/index.php/richtlijnen-auteurs" rel="documentation"/>
+    <link href="https://tvgg.be/nl/artikel-indienen" rel="documentation"/>
     <author>
       <name>Sander Dumont</name>
       <uri>https://www.mendeley.com/profiles/sander-dumont</uri>
@@ -20,18 +20,12 @@
   </info>
   <locale xml:lang="nl-NL">
     <terms>
-      <term name="et-al">et al</term>
-      <term name="and others" form="verb">et al</term>
-      <term name="and others" form="short">et al</term>
-      <term name="and others" form="verb-short">et al</term>
-      <term name="and others" form="symbol">et al</term>
+      <term name="et-al">et al.</term>
     </terms>
   </locale>
   <locale xml:lang="en">
     <date form="text" delimiter=" ">
       <date-part name="year"/>
-      <date-part name="month" form="short" strip-periods="true"/>
-      <date-part name="day"/>
     </date>
     <terms>
       <term name="collection-editor" form="long">
@@ -45,8 +39,6 @@
   </locale>
   <locale xml:lang="fr">
     <date form="text" delimiter=" ">
-      <date-part name="day"/>
-      <date-part name="month" form="short" strip-periods="true"/>
       <date-part name="year"/>
     </date>
   </locale>
@@ -204,8 +196,9 @@
     <choose>
       <if type="article-journal article-magazine article-newspaper review review-book" match="any">
         <group suffix=";" delimiter=" ">
-          <date variable="issued" form="text"/>
-          <text macro="accessed-date"/>
+          <date variable="issued">
+            <date-part name="year"/>
+          </date>
         </group>
       </if>
       <else-if type="bill legislation" match="any">

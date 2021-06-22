@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" default-locale="pl-PL">
-  <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
   <info>
-    <title>Sylwan (Polish)</title>
+    <title>Sylwan (Polski)</title>
     <id>http://www.zotero.org/styles/sylwan</id>
     <link href="http://www.zotero.org/styles/sylwan" rel="self"/>
     <link href="http://www.zotero.org/styles/apa" rel="template"/>
@@ -15,7 +14,7 @@
     <category field="geography"/>
     <category field="botany"/>
     <issn>0039-7660</issn>
-    <updated>2020-04-08T08:53:59+00:00</updated>
+    <updated>2021-03-23T10:46:04+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="container-contributors">
@@ -79,18 +78,18 @@
         <choose>
           <if type="report">
             <text variable="publisher"/>
-            <text variable="title" form="short" font-style="italic"/>
+            <text variable="title" form="short" font-style="normal"/>
           </if>
           <else-if type="legal_case">
-            <text variable="title" font-style="italic"/>
+            <text variable="title" font-style="normal"/>
           </else-if>
           <else-if type="bill book graphic legislation motion_picture song" match="any">
-            <text variable="title" form="short" font-style="italic"/>
+            <text variable="title" form="short" font-style="normal"/>
           </else-if>
           <else-if variable="reviewed-author">
             <choose>
               <if variable="reviewed-title" match="none">
-                <text variable="title" form="short" font-style="italic" prefix="Review of "/>
+                <text variable="title" form="short" font-style="normal" prefix="Review of "/>
               </if>
               <else>
                 <text variable="title" form="short" quotes="true"/>
@@ -119,7 +118,7 @@
           <else>
             <group>
               <text term="retrieved" text-case="capitalize-first" suffix=" "/>
-              <text term="from" suffix=": "/>
+              <text term="from" suffix=" "/>
               <text variable="URL"/>
             </group>
           </else>
@@ -162,7 +161,7 @@
             <text variable="title"/>
           </if>
           <else>
-            <text variable="title" font-style="italic"/>
+            <text variable="title" font-style="normal"/>
           </else>
         </choose>
       </if>
@@ -172,7 +171,7 @@
             <group delimiter=" ">
               <text variable="title"/>
               <group delimiter=", " prefix="[" suffix="]">
-                <text variable="reviewed-title" font-style="italic" prefix="Review of "/>
+                <text variable="reviewed-title" font-style="normal" prefix="Review of "/>
                 <names variable="reviewed-author" delimiter=", ">
                   <label form="verb-short" suffix=" "/>
                   <name and="symbol" initialize-with=". " delimiter=", "/>
@@ -182,7 +181,7 @@
           </if>
           <else>
             <group delimiter=", " prefix="[" suffix="]">
-              <text variable="title" font-style="italic" prefix="Review of "/>
+              <text variable="title" font-style="normal" prefix="Review of "/>
               <names variable="reviewed-author" delimiter=", ">
                 <label form="verb-short" suffix=" "/>
                 <name and="symbol" initialize-with=". " delimiter=", "/>
@@ -326,13 +325,13 @@
               <choose>
                 <if type="speech" match="any">
                   <date variable="issued">
-                    <date-part name="month" form="numeric" prefix=", "/>
+                    <date-part prefix=", " name="month"/>
                   </date>
                 </if>
                 <else-if type="article-journal bill book chapter graphic legal_case legislation motion_picture paper-conference report song dataset" match="none">
                   <date variable="issued">
-                    <date-part name="month" form="numeric" suffix="."/>
-                    <date-part name="day"/>
+                    <date-part prefix=", " name="month"/>
+                    <date-part prefix=" " name="day"/>
                   </date>
                 </else-if>
               </choose>
@@ -412,7 +411,7 @@
         <group prefix=", " delimiter=", ">
           <group>
             <text variable="volume" font-style="normal" font-weight="normal"/>
-            <text variable="issue" prefix="(" suffix=")"/>
+            <text variable="issue" prefix=" (" suffix=")"/>
           </group>
           <text variable="page"/>
         </group>
@@ -506,10 +505,10 @@
   <macro name="container-title">
     <choose>
       <if type="article article-journal article-magazine article-newspaper" match="any">
-        <text variable="container-title" font-style="italic" text-case="title"/>
+        <text variable="container-title" text-case="title" font-style="normal"/>
       </if>
       <else-if type="bill legal_case legislation" match="none">
-        <text variable="container-title" font-style="italic"/>
+        <text variable="container-title" font-style="normal"/>
       </else-if>
     </choose>
   </macro>
@@ -576,10 +575,10 @@
       <key macro="title"/>
     </sort>
     <layout>
-      <group suffix=".">
+      <group font-weight="normal" suffix=".">
         <group delimiter=" ">
-          <text macro="author"/>
-          <text macro="issued"/>
+          <text macro="author" font-weight="bold"/>
+          <text macro="issued" font-weight="bold"/>
           <text macro="title-plus-extra"/>
           <text macro="container"/>
         </group>

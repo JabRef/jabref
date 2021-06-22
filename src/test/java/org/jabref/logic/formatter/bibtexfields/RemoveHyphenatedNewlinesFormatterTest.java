@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RemoveHyphenatedNewlinesFormatterTest {
+
     private RemoveHyphenatedNewlinesFormatter formatter;
 
     @BeforeEach
@@ -18,6 +19,11 @@ public class RemoveHyphenatedNewlinesFormatterTest {
         assertEquals("water", formatter.format("wa-\nter"));
         assertEquals("water", formatter.format("wa-\r\nter"));
         assertEquals("water", formatter.format("wa-\rter"));
+    }
+
+    @Test
+    public void withoutHyphensUnmodified() {
+        assertEquals("water", formatter.format("water"));
     }
 
     @Test

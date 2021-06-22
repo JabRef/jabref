@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="never" default-locale="fr-CA">
   <info>
-    <title>Université de Montréal - APA (French - Canada)</title>
+    <title>Université de Montréal - APA (Français - Canada)</title>
     <title-short>UdeM APA FR</title-short>
     <id>http://www.zotero.org/styles/universite-de-montreal-apa</id>
     <link href="http://www.zotero.org/styles/universite-de-montreal-apa" rel="self"/>
     <link href="http://www.zotero.org/styles/apa" rel="template"/>
-    <link href="https://bib.umontreal.ca/citer/apa" rel="documentation"/>
+    <link href="https://bib.umontreal.ca/citer/styles-bibliographiques/apa" rel="documentation"/>
     <author>
       <name>Florian Martin-Bariteau</name>
       <email>f.martin-bariteau@umontreal.ca</email>
@@ -26,7 +26,7 @@
     <category field="psychology"/>
     <category field="generic-base"/>
     <summary>Adaptation en français canadien des normes de citation de l'APA (7e édition) basée sur le guide des Bibliothèques de l'Université de Montréal.</summary>
-    <updated>2020-07-10T04:04:36+00:00</updated>
+    <updated>2021-04-29T04:50:30+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -154,7 +154,7 @@
       <else>
         <choose>
           <if variable="DOI">
-            <text variable="DOI"/>
+            <text variable="DOI" prefix="https://doi.org/"/>
           </if>
           <else-if type="post">
             <group delimiter=" ">
@@ -408,7 +408,7 @@
           <text variable="page"/>
         </group>
       </else-if>
-      <else-if type="book graphic motion_picture report song chapter paper-conference" match="any">
+      <else-if type="book graphic motion_picture song chapter paper-conference" match="any">
         <group prefix=" (" suffix=")" delimiter="; ">
           <group delimiter=", ">
             <text macro="edition"/>
@@ -577,7 +577,7 @@
       </else>
     </choose>
   </macro>
-  <citation et-al-min="3" et-al-use-first="1" et-al-subsequent-min="2" et-al-subsequent-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true" collapse="year" givenname-disambiguation-rule="primary-name">
+  <citation et-al-min="3" et-al-use-first="1" disambiguate-add-year-suffix="true" disambiguate-add-names="true" disambiguate-add-givenname="true" collapse="year" givenname-disambiguation-rule="primary-name">
     <sort>
       <key macro="author"/>
       <key macro="issued-sort"/>

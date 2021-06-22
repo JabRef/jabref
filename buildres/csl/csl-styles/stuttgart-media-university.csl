@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="note" default-locale="de-DE" version="1.0" demote-non-dropping-particle="sort-only">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="sort-only" default-locale="de-DE">
   <info>
-    <title>Hochschule der Medien Stuttgart (German)</title>
+    <title>Hochschule der Medien Stuttgart (Deutsch)</title>
     <title-short>HdM Stuttgart</title-short>
     <id>http://www.zotero.org/styles/stuttgart-media-university</id>
     <link href="http://www.zotero.org/styles/stuttgart-media-university" rel="self"/>
@@ -166,6 +166,7 @@
         <else>
           <text macro="author-short"/>
           <text macro="year-date" prefix=" (" suffix=")"/>
+          <text macro="point-locators-subsequent" prefix=", "/>
         </else>
       </choose>
     </layout>

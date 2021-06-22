@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" et-al-min="3" et-al-use-first="1" demote-non-dropping-particle="never" default-locale="fr-CA">
   <info>
-    <title>Université du Québec à Montréal (French - Canada)</title>
+    <title>Université du Québec à Montréal (Français - Canada)</title>
     <title-short>UQAM</title-short>
     <id>http://www.zotero.org/styles/universite-du-quebec-a-montreal</id>
     <link href="http://www.zotero.org/styles/universite-du-quebec-a-montreal" rel="self"/>
@@ -953,7 +953,7 @@
       </group>
     </layout>
   </citation>
-  <bibliography et-al-min="8" et-al-use-first="6" et-al-use-last="true" entry-spacing="0" hanging-indent="true">
+  <bibliography et-al-min="8" et-al-use-first="6" et-al-use-last="true" entry-spacing="1" hanging-indent="true">
     <sort>
       <key macro="author"/>
       <key macro="issued-sort" sort="ascending"/>

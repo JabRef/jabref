@@ -58,7 +58,7 @@ jobs:
       if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (steps.update.outputs.updated == 'true' || steps.update.outputs.deleted == 'true'))
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 2.7.1
+        ruby-version: 3.0.0
     - name: but use cache to speed that up
       if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && (steps.update.outputs.updated == 'true' || steps.update.outputs.deleted == 'true'))
       uses: actions/cache@v2
@@ -98,13 +98,10 @@ jobs:
       if: github.event_name == 'workflow_dispatch'
 
     # https://styles-update.zotero.org:8826/ is for Zotero (styles page, API's citation server, client style updates, etc.)
-    # https://styles-update.zotero.org:8827/ is for the Zotero-run instance of https://github.com/citation-style-language/distribution-updater
-    # that performs the updating of the (to-be-deprecated) https://github.com/citation-style-language/styles-distribution/ repo
     - name: ping Zotero servers
       if: github.repository == 'citation-style-language/styles'
       run: |
         curl -H 'Content-Length:' -H "Authorization: $ZOTERO_UPDATE_TOKEN" -F 'payload={"type":"push","branch":"${{ steps.release.outputs.branch }}","status":0,"commit":"'$GITHUB_SHA'"}' https://styles-update.zotero.org:8826/
-        curl -H 'Content-Length:' -H "Authorization: $ZOTERO_UPDATE_TOKEN" -F 'payload={"type":"push","branch":"${{ steps.release.outputs.branch }}","status":0,"commit":"'$GITHUB_SHA'"}' https://styles-update.zotero.org:8827/
 
     - name: Copy workflows to locales repository
       if: github.repository == 'citation-style-language/styles' && steps.update.outputs.workflows == 'true'

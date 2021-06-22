@@ -19,13 +19,13 @@
     <category citation-format="numeric"/>
     <category field="medicine"/>
     <issn>0026-1270</issn>
-    <updated>2020-06-05T09:29:34+00:00</updated>
+    <updated>2021-04-08T14:57:03+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
     <terms>
       <term name="no date" form="long">date unknown</term>
-      <term name="presented at">paper presented at</term>
+      <term name="presented at">presented at</term>
     </terms>
   </locale>
   <macro name="author">
@@ -41,23 +41,33 @@
   <macro name="editor">
     <names variable="editor">
       <name sort-separator=" " initialize-with="" name-as-sort-order="all" delimiter=", " delimiter-precedes-last="always"/>
-      <label form="short" prefix=", " suffix=". "/>
+      <label form="short" prefix=", "/>
     </names>
   </macro>
   <macro name="publisher">
-    <group delimiter="; ">
-      <group delimiter=": ">
-        <text variable="publisher-place"/>
-        <text variable="publisher"/>
-      </group>
-      <text macro="date"/>
-    </group>
+    <choose>
+      <if type="speech" match="any">
+        <group delimiter="; ">
+          <text macro="date"/>
+          <text variable="event-place"/>
+        </group>
+      </if>
+      <else>
+        <group delimiter="; ">
+          <group delimiter=": ">
+            <text variable="publisher-place"/>
+            <text variable="publisher"/>
+          </group>
+          <text macro="date"/>
+        </group>
+      </else>
+    </choose>
   </macro>
   <macro name="date">
     <choose>
       <if variable="issued">
         <choose>
-          <if type="report paper-conference" match="any">
+          <if type="report speech" match="any">
             <date form="text" date-parts="year-month-day" variable="issued"/>
           </if>
           <else>
@@ -129,10 +139,12 @@
               <text macro="publisher"/>
             </group>
           </if>
-          <else-if type="chapter" match="any">
-            <group prefix=" ">
-              <text term="in" suffix=": " text-case="capitalize-first"/>
-              <text macro="editor"/>
+          <else-if type="chapter paper-conference" match="any">
+            <group delimiter=". " prefix=" ">
+              <group delimiter=": ">
+                <text term="in" text-case="capitalize-first"/>
+                <text macro="editor"/>
+              </group>
               <text variable="container-title"/>
               <group delimiter=":">
                 <group delimiter="; ">
@@ -142,11 +154,21 @@
               </group>
             </group>
           </else-if>
-          <else-if type="paper-conference" match="any">
+          <else-if type="speech" match="any">
             <group delimiter="; ">
               <group delimiter=": ">
-                <text term="presented at" text-case="capitalize-first"/>
-                <text variable="container-title"/>
+                <group delimiter=" ">
+                  <choose>
+                    <if variable="genre" match="any">
+                      <text variable="genre" text-case="capitalize-first"/>
+                    </if>
+                    <else>
+                      <text value="Paper"/>
+                    </else>
+                  </choose>
+                  <text term="presented at"/>
+                </group>
+                <text variable="event"/>
               </group>
               <text macro="publisher"/>
             </group>

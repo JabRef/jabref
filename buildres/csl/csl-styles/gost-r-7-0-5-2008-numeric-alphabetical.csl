@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" version="1.0" class="in-text" default-locale="ru-RU">
   <info>
-    <title>Russian GOST R 7.0.5-2008 (numeric, sorted alphabetically, Russian)</title>
+    <title>Russian GOST R 7.0.5-2008 (numeric, sorted alphabetically, Ру́сский)</title>
     <title-short>GOST R 7.0.5-2008 (numeric, sorted alphabetically)</title-short>
     <id>http://www.zotero.org/styles/gost-r-7-0-5-2008-numeric-alphabetical</id>
     <link href="http://www.zotero.org/styles/gost-r-7-0-5-2008-numeric-alphabetical" rel="self"/>
@@ -13,7 +13,7 @@
     <category citation-format="numeric"/>
     <category field="generic-base"/>
     <summary>Russian GOST-2008 style. Book, report, webpage, post-weblog and article chapters edited. Note!!! In articles form of № = Issue (Volume).</summary>
-    <updated>2015-07-01T06:08:18+00:00</updated>
+    <updated>2021-04-23T06:08:18+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="ru">
@@ -131,7 +131,7 @@
             <text variable="page" prefix="C. " suffix="."/>
           </group>
         </else-if>
-        <else-if type="webpage post-weblog">
+        <else-if type="webpage post-weblog" match="any">
           <text macro="title"/>
           <text variable="container-title" prefix=" // "/>
           <text prefix=" " macro="access"/>

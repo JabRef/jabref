@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="note" default-locale="fr-FR" version="1.0" page-range-format="expanded">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" page-range-format="expanded" default-locale="fr-FR">
   <info>
-    <title>Triangle (French)</title>
+    <title>Triangle (Français)</title>
     <id>http://www.zotero.org/styles/triangle</id>
     <link href="http://www.zotero.org/styles/triangle" rel="self"/>
     <link href="http://triangle.ens-lyon.fr/spip.php?article2179" rel="documentation"/>
@@ -20,7 +20,7 @@
     <category field="social_science"/>
     <summary>Derived from Style EHESS-histoire, available at http://www.boiteaoutils.info/2011/06/styles-francais-de-citation-sous-zotero.html
 		First version online in november 2012. Changes made to cover more documents types and to lighten URLS display. Should preferably be used ticking the quoting option (preferences/citer/styles): include URLs addresses in references.</summary>
-    <updated>2016-07-19T04:10:55+00:00</updated>
+    <updated>2021-04-07T01:50:30+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
@@ -239,6 +239,17 @@
           </group>
         </group>
       </if>
+      <else-if type="chapter" match="any">
+        <group delimiter=", " font-style="normal">
+          <date variable="issued">
+            <date-part name="year"/>
+          </date>
+          <group delimiter=" " font-style="normal">
+            <label variable="page" form="short"/>
+            <text variable="page"/>
+          </group>
+        </group>
+      </else-if>
       <else-if type="entry-dictionary entry-encyclopedia" match="any">
         <group delimiter=" " font-style="normal">
           <date variable="issued">
@@ -251,7 +262,7 @@
           </group>
         </group>
       </else-if>
-      <else-if type="article-journal chapter article-newspaper article-magazine" match="any">
+      <else-if type="article-journal article-newspaper article-magazine" match="any">
         <group delimiter=" " font-style="normal">
           <label variable="page" form="short"/>
           <text variable="page"/>
