@@ -99,14 +99,14 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
                 parent.getChildren().add(subRoot);
             }
         }
-        List<Path> filteredFilesByDate = new ArrayList<Path>();
+        List<Path> filteredFiles = new ArrayList<Path>();
         for (Path path : files) {
             if (FileFilterUtils.filterByDate(path, dateFilter))
-                filteredFilesByDate.add(path);
+                filteredFiles.add(path);
         }
-        filteredFilesByDate = FileFilterUtils.sortByDate(filteredFilesByDate, sorter);
-        parent.setFileCount(filteredFilesByDate.size() + fileCount);
-        parent.getChildren().addAll(filteredFilesByDate.stream()
+        filteredFiles = FileFilterUtils.sortByDate(filteredFiles, sorter);
+        parent.setFileCount(filteredFiles.size() + fileCount);
+        parent.getChildren().addAll(filteredFiles.stream()
                 .map(FileNodeViewModel::new)
                 .collect(Collectors.toList()));
         return parent;
