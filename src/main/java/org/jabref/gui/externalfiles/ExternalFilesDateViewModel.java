@@ -1,6 +1,5 @@
 package org.jabref.gui.externalfiles;
 
-
 import java.util.List;
 
 import org.jabref.logic.l10n.Localization;
@@ -24,5 +23,3 @@ public class ExternalFilesDateViewModel {
         return this.dateRange;
     }
 }
-
-

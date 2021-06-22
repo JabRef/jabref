@@ -19,5 +19,4 @@ public class FileSortViewModel {
     public String getSorter() {
         return this.sorter;
     }
-
 }

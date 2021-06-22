@@ -25,7 +25,6 @@ import org.jabref.preferences.FilePreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * Util class for searching files on the file system which are not linked to a provided {@link BibDatabase}.
  */

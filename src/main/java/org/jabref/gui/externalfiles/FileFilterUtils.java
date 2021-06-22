@@ -81,7 +81,6 @@ public class FileFilterUtils {
                 return true;
             default:
                 return true;
-
         }
     }
 
@@ -117,3 +116,4 @@ public class FileFilterUtils {
         }
     }
 }
+

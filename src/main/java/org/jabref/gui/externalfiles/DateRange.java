@@ -15,5 +15,3 @@ public enum DateRange {
 
     public String getDateRange() { return dateRange; } 
 }
-
-

@@ -65,8 +65,7 @@ public class FileNodeViewModel {
             return String.format("%s (%s %s)", path.getFileName(), fileCount,
                     fileCount == 1 ? Localization.lang("file") : Localization.lang("files"));
         }
-        FileTime lastEditedTime = null;
-        return String.format("%s", path.getFileName().toString());
+        return path.getFileName().toString();
     }
 
     /**
