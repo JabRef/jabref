@@ -1,12 +1,6 @@
-mutation addUserDocument{
-  addUserDocumentRaw(document: {
-    type: "article",
-    citationKey: "citeme",
-    fields: [
-      { field: "author", value: "JabRef devs" }
-      { field: "some", value: "random field" }
-    ]
-  }) {
+mutation addUserDocument($document: DocumentRawInput!){
+  addUserDocumentRaw(document: $document)
+  {
     id
   }
 }

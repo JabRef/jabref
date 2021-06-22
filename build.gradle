@@ -3,7 +3,6 @@ import org.gradle.internal.os.OperatingSystem
 import org.jabref.build.JournalAbbreviationConverter
 import org.jabref.build.xjc.XjcPlugin
 import org.jabref.build.xjc.XjcTask
-import com.apollographql.apollo.gradle.internal.DefaultCompilationUnit
 // to update the gradle wrapper, execute
 // ./gradlew wrapper --gradle-version=6.0 --distribution-type=bin
 
@@ -76,7 +75,6 @@ sourceSets {
         java {
             // src-gen reasoning: https://stackoverflow.com/a/64612308/873282
             srcDirs = ["src/main/java", "src-gen/main/java"]
-           // exclude 'lib/apollo-api-jvm-2.5.8.jar'
         }
         resources {
             srcDirs = ["src/main/java", "src/main/resources"]
@@ -400,11 +398,6 @@ apollo {
   nullableValueType.set("javaOptional")
   useJavaBeansSemanticNaming.set(true)
   rootPackageName.set("org.jabref.jabrefonline")
-
-  onCompilationUnit {
-      outputDir.set(file("src-gen/main/java/")) // TODO not working yet
-    // Overwrite some options here for single CompilationUnit if needed
-  }
 
 }
 

@@ -17,9 +17,11 @@ dependencies {
 }
 
 shadowJar {
+    // remove this one as it comes from the kotlin stdlib
     exclude '**/module-info.class'
     mergeServiceFiles()
     archiveBaseName.set("apollo")
+    // we need to rename these packages to avoid split package
     relocate 'org.jetbrains.annotations', 'shadow.jetbrains.annotations'
     relocate 'org.intellij.lang.annotations', 'shadow.intellij.lang.annotations'
 }

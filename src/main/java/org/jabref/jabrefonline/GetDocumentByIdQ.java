@@ -11,9 +11,9 @@ import com.apollographql.apollo.exception.ApolloException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Testgraplql {
+public class GetDocumentByIdQ {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Testgraplql.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GetDocumentByIdQ.class);
 
     void start() {
 
@@ -34,7 +34,7 @@ public class Testgraplql {
 
             @Override
             public void onFailure(ApolloException ex) {
-               LOGGER.error("error", ex);
+                LOGGER.error("error", ex);
             }
         });
 
