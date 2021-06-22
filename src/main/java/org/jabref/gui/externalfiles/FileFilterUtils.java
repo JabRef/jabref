@@ -49,7 +49,7 @@ public class FileFilterUtils {
 
     public boolean isDuringLastMonth(LocalDateTime fileEditTime) {
         LocalDateTime NOW = LocalDateTime.now(ZoneId.systemDefault());
-        if (fileEditTime.isAfter(NOW.minusDays(30))) {
+        if (fileEditTime.isAfter(NOW.minusMonths(1))) {
             return true;
         } else {
             return false;
