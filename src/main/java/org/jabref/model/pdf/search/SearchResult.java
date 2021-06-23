@@ -10,12 +10,12 @@ import static org.jabref.model.pdf.search.SearchFieldConstants.AUTHOR;
 import static org.jabref.model.pdf.search.SearchFieldConstants.CONTENT;
 import static org.jabref.model.pdf.search.SearchFieldConstants.KEY;
 import static org.jabref.model.pdf.search.SearchFieldConstants.KEYWORDS;
+import static org.jabref.model.pdf.search.SearchFieldConstants.PATH;
 import static org.jabref.model.pdf.search.SearchFieldConstants.SUBJECT;
-import static org.jabref.model.pdf.search.SearchFieldConstants.UID;
 
 public final class SearchResult {
 
-    private final String uid;
+    private final String path;
     private final String key;
     private final String content;
     private final String author;
@@ -25,7 +25,7 @@ public final class SearchResult {
     private final float luceneScore;
 
     public SearchResult(IndexSearcher searcher, ScoreDoc scoreDoc) throws IOException {
-        this.uid = getFieldContents(searcher, scoreDoc, UID);
+        this.path = getFieldContents(searcher, scoreDoc, PATH);
         this.key = getFieldContents(searcher, scoreDoc, KEY);
         this.content = getFieldContents(searcher, scoreDoc, CONTENT);
         this.author = getFieldContents(searcher, scoreDoc, AUTHOR);
@@ -42,8 +42,8 @@ public final class SearchResult {
         return indexableField.stringValue();
     }
 
-    public String getUid() {
-        return uid;
+    public String getPath() {
+        return path;
     }
 
     public String getKey() {

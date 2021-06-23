@@ -17,6 +17,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
@@ -124,14 +125,19 @@ import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
+import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.undo.AddUndoableActionEvent;
 import org.jabref.logic.undo.UndoChangeEvent;
 import org.jabref.logic.undo.UndoRedoEvent;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.model.pdf.search.PdfSearchResults;
+import org.jabref.model.pdf.search.SearchResult;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.TelemetryPreferences;
 
@@ -172,6 +178,8 @@ public class JabRefFrame extends BorderPane {
     private PopOver progressViewPopOver;
 
     private final TaskExecutor taskExecutor;
+
+    private IndexingTaskManager indexingTaskManager;
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
@@ -632,6 +640,7 @@ public class JabRefFrame extends BorderPane {
                     libraryTab.textProperty());
             mainStage.titleProperty().bind(windowTitle);
         });
+        initLuceneIndex();
         initShowTrackingNotification();
     }
 
@@ -1160,6 +1169,34 @@ public class JabRefFrame extends BorderPane {
 
     public OpenDatabaseAction getOpenDatabaseAction() {
         return new OpenDatabaseAction(this, prefs, dialogService);
+    }
+
+    private void initLuceneIndex() {
+        try {
+            indexingTaskManager = new IndexingTaskManager(this.taskExecutor, prefs.getFilePreferences());
+            for (BibDatabaseContext openDatabase : openDatabaseList) {
+                indexingTaskManager.updateIndex(openDatabase);
+            }
+            openDatabaseList.addListener(
+                    new ListChangeListener<BibDatabaseContext>() {
+                        public void onChanged(Change<? extends BibDatabaseContext> changedDatabaseContexts) {
+                            while (changedDatabaseContexts.next()) {
+                                if (changedDatabaseContexts.wasAdded()) {
+                                    for (BibDatabaseContext addedContext : changedDatabaseContexts.getAddedSubList()) {
+                                        indexingTaskManager.updateIndex(addedContext);
+                                    }
+                                } else if (changedDatabaseContexts.wasRemoved()) {
+                                    for (BibDatabaseContext removedContext : changedDatabaseContexts.getAddedSubList()) {
+                                        indexingTaskManager.removeFromIndex(removedContext);
+                                    }
+                                }
+                            }
+                        }
+                    }
+            );
+        } catch (IOException e) {
+            LOGGER.error("Cannot read lucene index");
+        }
     }
 
     public SidePaneManager getSidePaneManager() {
