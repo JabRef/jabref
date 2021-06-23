@@ -252,7 +252,7 @@ class JournalAbbreviationsViewModelMixedAbbreviationsTabTest {
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
         Abbreviation testAbbreviation = new Abbreviation("YetAnotherEntry", "YAE");
-        addAbbrevaition(testAbbreviation);
+        addAbbreviation(testAbbreviation);
 
         assertEquals(6, viewModel.abbreviationsProperty().size());
         assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)));
@@ -274,7 +274,7 @@ class JournalAbbreviationsViewModelMixedAbbreviationsTabTest {
         viewModel.addNewFile();
         viewModel.selectLastJournalFile();
         Abbreviation testAbbreviation = new Abbreviation("YetAnotherEntry", "YAE");
-        addAbbrevaition(testAbbreviation);
+        addAbbreviation(testAbbreviation);
         editAbbreviation(testAbbreviation);
 
         assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)));
@@ -345,39 +345,6 @@ class JournalAbbreviationsViewModelMixedAbbreviationsTabTest {
     }
 
     @Test
-    void testDeleteAbbreviationSelectsPreviousOne() {
-        when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile4Entries));
-        viewModel.addNewFile();
-        when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile5EntriesWithDuplicate));
-        viewModel.addNewFile();
-        viewModel.selectLastJournalFile();
-        Abbreviation testAbbreviation = new Abbreviation("YetAnotherEntry", "YAE");
-        addAbbrevaition(testAbbreviation);
-
-        assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)));
-        assertEquals(new AbbreviationViewModel(testAbbreviation), viewModel.currentAbbreviationProperty().get());
-
-        viewModel.deleteAbbreviation();
-
-        assertEquals(5, viewModel.abbreviationsProperty().size());
-        // check if the previous (the last) element is the current abbreviation
-        assertEquals(viewModel.currentAbbreviationProperty().get(), viewModel.abbreviationsProperty().get(4));
-    }
-
-    @Test
-    void testDeleteAbbreviationSelectsNextOne() {
-        when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile1Entries));
-        viewModel.addNewFile();
-        viewModel.selectLastJournalFile();
-        Abbreviation testAbbreviation = new Abbreviation("YetAnotherEntry", "YAE");
-        addAbbrevaition(testAbbreviation);
-        viewModel.currentAbbreviationProperty().set(viewModel.abbreviationsProperty().get(1));
-        viewModel.deleteAbbreviation();
-
-        assertEquals(new AbbreviationViewModel(testAbbreviation), viewModel.currentAbbreviationProperty().get());
-    }
-
-    @Test
     void testSaveAbbreviationsToFilesCreatesNewFilesWithWrittenAbbreviations() throws Exception {
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile4Entries));
         viewModel.addNewFile();
@@ -395,7 +362,7 @@ class JournalAbbreviationsViewModelMixedAbbreviationsTabTest {
         selectLastAbbreviation();
         viewModel.deleteAbbreviation();
         Abbreviation testAbbreviation1 = new Abbreviation("SomeOtherEntry", "SOE");
-        addAbbrevaition(testAbbreviation1);
+        addAbbreviation(testAbbreviation1);
 
         assertEquals(5, viewModel.abbreviationsProperty().size());
         assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation1)));
@@ -435,7 +402,7 @@ class JournalAbbreviationsViewModelMixedAbbreviationsTabTest {
         return file;
     }
 
-    private void addAbbrevaition(Abbreviation testAbbreviation) {
+    private void addAbbreviation(Abbreviation testAbbreviation) {
         viewModel.addAbbreviation(testAbbreviation.getName(), testAbbreviation.getAbbreviation());
     }
 

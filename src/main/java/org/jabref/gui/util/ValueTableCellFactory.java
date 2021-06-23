@@ -3,6 +3,7 @@ package org.jabref.gui.util;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import javafx.beans.binding.BooleanBinding;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
@@ -27,6 +28,7 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
     private Function<T, String> toText;
     private BiFunction<S, T, Node> toGraphic;
     private BiFunction<S, T, EventHandler<? super MouseEvent>> toOnMouseClickedEvent;
+    private Function<T, BooleanBinding> toDisableBinding;
     private BiFunction<S, T, String> toTooltip;
     private Function<T, ContextMenu> contextMenuFactory;
     private BiFunction<S, T, ContextMenu> menuFactory;
@@ -63,6 +65,11 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
 
     public ValueTableCellFactory<S, T> withOnMouseClickedEvent(Function<T, EventHandler<? super MouseEvent>> toOnMouseClickedEvent) {
         this.toOnMouseClickedEvent = (rowItem, value) -> toOnMouseClickedEvent.apply(value);
+        return this;
+    }
+
+    public ValueTableCellFactory<S, T> withDisableBinding(Function<T, BooleanBinding> toDisableProperty) {
+        this.toDisableBinding = toDisableProperty;
         return this;
     }
 
@@ -136,6 +143,10 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                             }
                         }
                     });
+
+                    if (toDisableBinding != null) {
+                        disableProperty().bind(toDisableBinding.apply(item));
+                    }
                 }
             }
         };

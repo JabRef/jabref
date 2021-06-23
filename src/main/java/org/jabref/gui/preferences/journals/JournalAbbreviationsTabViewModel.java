@@ -312,6 +312,17 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         }
     }
 
+    public void removeAbbreviation(AbbreviationViewModel abbreviation) {
+        Objects.requireNonNull(abbreviation);
+
+        if (abbreviation.isPseudoAbbreviation()) {
+            return;
+        }
+
+        abbreviations.remove(abbreviation);
+        shouldWriteLists = true;
+    }
+
     /**
      * Calls the {@link AbbreviationsFileViewModel#writeOrCreate()} method for each file in the journalFiles property
      * which will overwrite the existing files with the content of the abbreviations property of the AbbreviationsFile.
