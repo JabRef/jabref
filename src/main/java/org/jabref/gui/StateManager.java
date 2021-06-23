@@ -1,6 +1,5 @@
 package org.jabref.gui;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -21,9 +20,6 @@ import javafx.scene.Node;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
 import org.jabref.gui.util.OptionalObjectProperty;
-import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
-import org.jabref.logic.pdf.search.indexing.PdfIndexer;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -32,8 +28,6 @@ import org.jabref.model.util.OptionalUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This class manages the GUI-state of JabRef, including:
@@ -48,8 +42,6 @@ import org.apache.commons.logging.LogFactory;
  * </ul>
  */
 public class StateManager {
-
-    private static final Log LOGGER = LogFactory.getLog(PdfIndexer.class);
 
     private final CustomLocalDragboard localDragboard = new CustomLocalDragboard();
     private final ObservableList<BibDatabaseContext> openDatabases = FXCollections.observableArrayList();

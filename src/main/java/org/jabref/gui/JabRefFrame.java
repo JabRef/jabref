@@ -126,18 +126,14 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
-import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.undo.AddUndoableActionEvent;
 import org.jabref.logic.undo.UndoChangeEvent;
 import org.jabref.logic.undo.UndoRedoEvent;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.pdf.search.PdfSearchResults;
-import org.jabref.model.pdf.search.SearchResult;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.TelemetryPreferences;
 
@@ -1178,17 +1174,15 @@ public class JabRefFrame extends BorderPane {
                 indexingTaskManager.updateIndex(openDatabase);
             }
             openDatabaseList.addListener(
-                    new ListChangeListener<BibDatabaseContext>() {
-                        public void onChanged(Change<? extends BibDatabaseContext> changedDatabaseContexts) {
-                            while (changedDatabaseContexts.next()) {
-                                if (changedDatabaseContexts.wasAdded()) {
-                                    for (BibDatabaseContext addedContext : changedDatabaseContexts.getAddedSubList()) {
-                                        indexingTaskManager.updateIndex(addedContext);
-                                    }
-                                } else if (changedDatabaseContexts.wasRemoved()) {
-                                    for (BibDatabaseContext removedContext : changedDatabaseContexts.getAddedSubList()) {
-                                        indexingTaskManager.removeFromIndex(removedContext);
-                                    }
+                    (ListChangeListener<BibDatabaseContext>) changedDatabaseContexts -> {
+                        while (changedDatabaseContexts.next()) {
+                            if (changedDatabaseContexts.wasAdded()) {
+                                for (BibDatabaseContext addedContext : changedDatabaseContexts.getAddedSubList()) {
+                                    indexingTaskManager.updateIndex(addedContext);
+                                }
+                            } else if (changedDatabaseContexts.wasRemoved()) {
+                                for (BibDatabaseContext removedContext : changedDatabaseContexts.getAddedSubList()) {
+                                    indexingTaskManager.removeFromIndex(removedContext);
                                 }
                             }
                         }
