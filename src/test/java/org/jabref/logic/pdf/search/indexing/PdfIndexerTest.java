@@ -10,6 +10,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.preferences.FilePreferences;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -29,7 +30,8 @@ public class PdfIndexerTest {
 
     @BeforeEach
     public void setUp() throws IOException {
-        this.indexer = new PdfIndexer();
+        FilePreferences filePreferences = mock(FilePreferences.class);
+        this.indexer = new PdfIndexer(filePreferences);
         this.database = new BibDatabase();
         when(context.getDatabasePath()).thenReturn(Optional.of(Path.of("src/test/resources/pdfs/")));
 
@@ -145,7 +147,7 @@ public class PdfIndexerTest {
         metadata.setFiles(Collections.singletonList(new LinkedFile("Metadata file", "metaData.pdf", "pdf")));
 
         // when
-        indexer.addToIndex(metadata);
+        indexer.addToIndex(metadata, null);
 
         // then
         try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {

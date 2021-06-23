@@ -31,7 +31,7 @@ public class PdfSearcherTest {
         search = new PdfSearcher();
 
         // given
-        PdfIndexer indexer = new PdfIndexer();
+        PdfIndexer indexer = new PdfIndexer(null);
         BibDatabase database = new BibDatabase();
         BibDatabaseContext context = mock(BibDatabaseContext.class);
         when(context.getFileDirectories(Mockito.any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs")));
