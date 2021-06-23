@@ -6,9 +6,9 @@ import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.Comparator;
 
 public class FileFilterUtils {
 
