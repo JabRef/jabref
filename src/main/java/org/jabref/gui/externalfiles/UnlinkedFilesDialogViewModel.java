@@ -48,7 +48,6 @@ import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class UnlinkedFilesDialogViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UnlinkedFilesDialogViewModel.class);
