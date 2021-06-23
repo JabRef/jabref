@@ -107,12 +107,14 @@ public class GroupDialogViewModel {
     private final PreferencesService preferencesService;
     private final BibDatabaseContext currentDatabase;
     private final AbstractGroup editedGroup;
+    private final GroupDialogHeader groupDialogHeader;
 
-    public GroupDialogViewModel(DialogService dialogService, BibDatabaseContext currentDatabase, PreferencesService preferencesService, AbstractGroup editedGroup) {
+    public GroupDialogViewModel(DialogService dialogService, BibDatabaseContext currentDatabase, PreferencesService preferencesService, AbstractGroup editedGroup, GroupDialogHeader groupDialogHeader) {
         this.dialogService = dialogService;
         this.preferencesService = preferencesService;
         this.currentDatabase = currentDatabase;
         this.editedGroup = editedGroup;
+        this.groupDialogHeader = groupDialogHeader;
 
         setupValidation();
         setValues();
@@ -149,7 +151,11 @@ public class GroupDialogViewModel {
                     }
                     return true;
                 },
-                ValidationMessage.error(Localization.lang("There exists already a group with the same name.")));
+                ValidationMessage.warning(
+                    Localization.lang("There exists already a group with the same name.") + "\n" +
+                    Localization.lang("If you use it, it will inherit all entries from this other group.")
+                )
+        );
 
         keywordRegexValidator = new FunctionBasedValidator<>(
                 keywordGroupSearchTermProperty,
@@ -233,8 +239,6 @@ public class GroupDialogViewModel {
                     }
                 },
                 ValidationMessage.error(Localization.lang("Please provide a valid aux file.")));
-
-        validator.addValidators(nameValidator, sameNameValidator);
 
         typeSearchProperty.addListener((obs, _oldValue, isSelected) -> {
             if (isSelected) {

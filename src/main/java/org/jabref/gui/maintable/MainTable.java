@@ -103,7 +103,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         preferencesService,
                         externalFileTypes,
                         libraryTab.getUndoManager(),
-                        dialogService).createColumns());
+                        dialogService,
+                        stateManager).createColumns());
 
         new ViewModelTableRowFactory<BibEntryTableViewModel>()
                 .withOnMouseClickedEvent((entry, event) -> {
@@ -273,6 +274,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                         break;
                     case CUT:
                         new EditAction(StandardActions.CUT, libraryTab.frame(), Globals.stateManager).execute();
+                        event.consume();
+                        break;
+                    case DELETE_ENTRY:
+                        new EditAction(StandardActions.DELETE_ENTRY, libraryTab.frame(), Globals.stateManager).execute();
                         event.consume();
                         break;
                     default:

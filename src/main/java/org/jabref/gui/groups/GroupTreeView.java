@@ -15,8 +15,10 @@ import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SeparatorMenuItem;
@@ -64,6 +66,7 @@ public class GroupTreeView {
     @FXML private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> numberColumn;
     @FXML private TreeTableColumn<GroupNodeViewModel, GroupNodeViewModel> expansionNodeColumn;
     @FXML private CustomTextField searchField;
+    @FXML private Button addNewGroup;
 
     @Inject private StateManager stateManager;
     @Inject private DialogService dialogService;
@@ -100,6 +103,8 @@ public class GroupTreeView {
             viewModel.filterTextProperty().setValue(searchField.textProperty().getValue());
         });
         searchField.textProperty().addListener((observable, oldValue, newValue) -> searchTask.restart());
+
+        setNewGroupButtonStyle(groupTree);
 
         groupTree.rootProperty().bind(
                 EasyBind.map(viewModel.rootGroupProperty(),
@@ -171,6 +176,7 @@ public class GroupTreeView {
         groupTree.setRowFactory(treeTable -> {
             TreeTableRow<GroupNodeViewModel> row = new TreeTableRow<>();
             row.treeItemProperty().addListener((ov, oldTreeItem, newTreeItem) -> {
+                setNewGroupButtonStyle(treeTable);
                 boolean isRoot = newTreeItem == treeTable.getRoot();
                 row.pseudoClassStateChanged(rootPseudoClass, isRoot);
 
@@ -322,7 +328,9 @@ public class GroupTreeView {
     }
 
     private ContextMenu createContextMenuForGroup(GroupNodeViewModel group) {
+
         ContextMenu menu = new ContextMenu();
+        Menu removeGroup = new Menu(Localization.lang("Remove group"));
 
         MenuItem editGroup = new MenuItem(Localization.lang("Edit group"));
         editGroup.setOnAction(event -> {
@@ -331,33 +339,43 @@ public class GroupTreeView {
             groupTree.refresh();
         });
 
+        MenuItem removeGroupKeepSubgroups = new MenuItem(Localization.lang("Keep subgroups"));
+        removeGroupKeepSubgroups.setOnAction(event -> viewModel.removeGroupKeepSubgroups(group));
+
+        MenuItem removeGroupAndSubgroups = new MenuItem(Localization.lang("Also remove subgroups"));
+        removeGroupAndSubgroups.setOnAction(event -> viewModel.removeGroupAndSubgroups(group));
+
         MenuItem addSubgroup = new MenuItem(Localization.lang("Add subgroup"));
         addSubgroup.setOnAction(event -> {
             menu.hide();
-            viewModel.addNewSubgroup(group);
+            viewModel.addNewSubgroup(group, GroupDialogHeader.SUBGROUP);
         });
-        MenuItem removeGroupAndSubgroups = new MenuItem(Localization.lang("Remove group and subgroups"));
-        removeGroupAndSubgroups.setOnAction(event -> viewModel.removeGroupAndSubgroups(group));
-        MenuItem removeGroupKeepSubgroups = new MenuItem(Localization.lang("Remove group, keep subgroups"));
-        removeGroupKeepSubgroups.setOnAction(event -> viewModel.removeGroupKeepSubgroups(group));
+
         MenuItem removeSubgroups = new MenuItem(Localization.lang("Remove subgroups"));
-        removeSubgroups.setOnAction(event -> viewModel.removeSubgroups(group));
+        removeSubgroups.setOnAction(event -> {
+            viewModel.removeSubgroups(group);
+        });
+
+        MenuItem sortSubgroups = new MenuItem(Localization.lang("Sort subgroups"));
+        sortSubgroups.setOnAction(event -> viewModel.sortAlphabeticallyRecursive(group));
 
         MenuItem addEntries = new MenuItem(Localization.lang("Add selected entries to this group"));
         addEntries.setOnAction(event -> viewModel.addSelectedEntries(group));
+
         MenuItem removeEntries = new MenuItem(Localization.lang("Remove selected entries from this group"));
         removeEntries.setOnAction(event -> viewModel.removeSelectedEntries(group));
 
-        MenuItem sortAlphabetically = new MenuItem(Localization.lang("Sort all subgroups (recursively)"));
-        sortAlphabetically.setOnAction(event -> viewModel.sortAlphabeticallyRecursive(group));
-
         menu.getItems().add(editGroup);
+        removeGroup.getItems().add(removeGroupKeepSubgroups);
+        removeGroup.getItems().add(removeGroupAndSubgroups);
+        menu.getItems().add(removeGroup);
         menu.getItems().add(new SeparatorMenuItem());
-        menu.getItems().addAll(addSubgroup, removeSubgroups, removeGroupAndSubgroups, removeGroupKeepSubgroups);
+        menu.getItems().add(addSubgroup);
+        menu.getItems().add(removeSubgroups);
+        menu.getItems().add(sortSubgroups);
         menu.getItems().add(new SeparatorMenuItem());
-        menu.getItems().addAll(addEntries, removeEntries);
-        menu.getItems().add(new SeparatorMenuItem());
-        menu.getItems().add(sortAlphabetically);
+        menu.getItems().add(addEntries);
+        menu.getItems().add(removeEntries);
 
         // TODO: Disable some actions under certain conditions
         // if (group.canBeEdited()) {
@@ -394,6 +412,19 @@ public class GroupTreeView {
             m.invoke(null, customTextField, customTextField.rightProperty());
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
             LOGGER.error("Failed to decorate text field with clear button", ex);
+        }
+    }
+
+    private void setNewGroupButtonStyle(TreeTableView<GroupNodeViewModel> groupTree) {
+        PseudoClass active = PseudoClass.getPseudoClass("active");
+        PseudoClass inactive = PseudoClass.getPseudoClass("inactive");
+
+        if (groupTree.getRoot() != null) {
+            boolean isActive = groupTree.getExpandedItemCount() <= 10;
+            addNewGroup.pseudoClassStateChanged(active, isActive);
+            addNewGroup.pseudoClassStateChanged(inactive, !isActive);
+        } else {
+            addNewGroup.pseudoClassStateChanged(active, true);
         }
     }
 

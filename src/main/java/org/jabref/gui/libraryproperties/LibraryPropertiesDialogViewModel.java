@@ -2,8 +2,10 @@ package org.jabref.gui.libraryproperties;
 
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -106,9 +108,10 @@ public class LibraryPropertiesDialogViewModel {
             saveInTableOrderProperty.setValue(true);
         }
 
-        Set<Field> fieldNames = FieldFactory.getCommonFields();
+        List<Field> fieldNames = new ArrayList<>(FieldFactory.getCommonFields());
         // allow entrytype field as sort criterion
         fieldNames.add(InternalField.TYPE_HEADER);
+        fieldNames.sort(Comparator.comparing(Field::getDisplayName));
         primarySortFieldsProperty.addAll(fieldNames);
         secondarySortFieldsProperty.addAll(fieldNames);
         tertiarySortFieldsProperty.addAll(fieldNames);
