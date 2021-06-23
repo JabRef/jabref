@@ -1,7 +1,6 @@
 package org.jabref.gui.externalfiles;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.Files;
@@ -17,7 +16,6 @@ import javafx.scene.control.CheckBoxTreeItem;
 
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.FileNodeViewModel;
-import org.jabref.gui.externalfiles.FileFilterUtils;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.FilePreferences;
@@ -100,8 +98,9 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
         }
         List<Path> filteredFiles = new ArrayList<Path>();
         for (Path path : files) {
-            if (FileFilterUtils.filterByDate(path, dateFilter))
+            if (FileFilterUtils.filterByDate(path, dateFilter)) {
                 filteredFiles.add(path);
+            }
         }
         filteredFiles = FileFilterUtils.sortByDate(filteredFiles, sorter);
         parent.setFileCount(filteredFiles.size() + fileCount);

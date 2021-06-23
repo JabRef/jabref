@@ -1,7 +1,5 @@
 package org.jabref.gui.externalfiles;
 
-import org.jabref.gui.externalfiles.ExternalFileSorter;
-
 public class FileSortViewModel {
 
     private final String description;

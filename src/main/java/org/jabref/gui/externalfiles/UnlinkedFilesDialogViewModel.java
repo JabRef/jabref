@@ -48,11 +48,6 @@ import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.jabref.gui.externalfiles.ExternalFilesDateViewModel;
-import org.jabref.gui.externalfiles.DateRange;
-
-import org.jabref.gui.externalfiles.FileSortViewModel;
-import org.jabref.gui.externalfiles.ExternalFileSorter;
 
 public class UnlinkedFilesDialogViewModel {
 

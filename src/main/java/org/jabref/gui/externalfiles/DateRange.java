@@ -13,5 +13,7 @@ public enum DateRange {
        this.dateRange = dateRange;
     }
 
-    public String getDateRange() { return dateRange; } 
+    public String getDateRange() {
+        return dateRange; 
+    } 
 }

@@ -11,5 +11,7 @@ public enum ExternalFileSorter {
         this.sorter = sorter;
     }
 
-    public String getSorter() { return sorter; }
+    public String getSorter() {
+        return sorter;
+    }
 }
