@@ -32,7 +32,7 @@ public class GroupSearchQuery implements SearchMatcher {
     }
 
     private SearchRule getSearchRule() {
-        return SearchRules.getSearchRuleByQuery(query, caseSensitive, regularExpression);
+        return SearchRules.getSearchRuleByQuery(query, caseSensitive, regularExpression, false);
     }
 
     private String getCaseSensitiveDescription() {

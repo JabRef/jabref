@@ -16,7 +16,7 @@ public class GrammarBasedSearchRuleTest {
 
     @Test
     void applyRuleMatchesSingleTermWithRegex() {
-        GrammarBasedSearchRule searchRule = new GrammarBasedSearchRule(true, true);
+        GrammarBasedSearchRule searchRule = new GrammarBasedSearchRule(true, true, false);
 
         String query = "M[a-z]+e";
         assertTrue(searchRule.validateSearchStrings(query));
@@ -25,7 +25,7 @@ public class GrammarBasedSearchRuleTest {
 
     @Test
     void applyRuleDoesNotMatchSingleTermWithRegex() {
-        GrammarBasedSearchRule searchRule = new GrammarBasedSearchRule(true, true);
+        GrammarBasedSearchRule searchRule = new GrammarBasedSearchRule(true, true, false);
 
         String query = "M[0-9]+e";
         assertTrue(searchRule.validateSearchStrings(query));

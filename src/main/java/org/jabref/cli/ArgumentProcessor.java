@@ -249,7 +249,7 @@ public class ArgumentProcessor {
 
         SearchPreferences searchPreferences = Globals.prefs.getSearchPreferences();
         SearchQuery query = new SearchQuery(searchTerm, searchPreferences.isCaseSensitive(),
-                searchPreferences.isRegularExpression());
+                searchPreferences.isRegularExpression(), searchPreferences.isFulltext());
         List<BibEntry> matches = new DatabaseSearcher(query, dataBase).getMatches();
 
         // export matches

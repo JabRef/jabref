@@ -1,13 +1,19 @@
 package org.jabref.model.search.rules;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.pdf.search.PdfSearchResults;
+import org.jabref.model.pdf.search.SearchResult;
 
 /**
  * Search rule for regex-based search.
@@ -15,13 +21,22 @@ import org.jabref.model.entry.field.Field;
 public class RegexBasedSearchRule implements SearchRule {
 
     private final boolean caseSensitive;
+    private final boolean fulltext;
 
-    public RegexBasedSearchRule(boolean caseSensitive) {
+    private String lastQuery;
+    private List<SearchResult> lastSearchResults;
+
+    public RegexBasedSearchRule(boolean caseSensitive, boolean fulltext) {
         this.caseSensitive = caseSensitive;
+        this.fulltext = fulltext;
     }
 
     public boolean isCaseSensitive() {
         return caseSensitive;
+    }
+
+    public boolean isFulltext() {
+        return fulltext;
     }
 
     @Override
@@ -60,5 +75,33 @@ public class RegexBasedSearchRule implements SearchRule {
             }
         }
         return false;
+    }
+
+    @Override
+    public PdfSearchResults getFulltextResults(String query, BibEntry bibEntry) {
+
+        if (!fulltext) {
+            return new PdfSearchResults(List.of());
+        }
+
+        if (!query.equals(this.lastQuery)) {
+            this.lastQuery = query;
+            lastSearchResults = List.of();
+            try {
+                PdfSearcher searcher = new PdfSearcher();
+                PdfSearchResults results = searcher.search(query, 100);
+                lastSearchResults = results.getSortedByScore();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Vector<SearchResult> searchResults = new Vector<>();
+        for (SearchResult searchResult : lastSearchResults) {
+            if (searchResult.isResultFor(bibEntry)) {
+                searchResults.add(searchResult);
+            }
+        }
+        return new PdfSearchResults(searchResults);
     }
 }

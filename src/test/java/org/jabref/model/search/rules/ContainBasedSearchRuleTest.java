@@ -17,10 +17,10 @@ public class ContainBasedSearchRuleTest {
     @Test
     public void testBasicSearchParsing() {
         BibEntry be = makeBibtexEntry();
-        ContainBasedSearchRule bsCaseSensitive = new ContainBasedSearchRule(true);
-        ContainBasedSearchRule bsCaseInsensitive = new ContainBasedSearchRule(false);
-        RegexBasedSearchRule bsCaseSensitiveRegexp = new RegexBasedSearchRule(true);
-        RegexBasedSearchRule bsCaseInsensitiveRegexp = new RegexBasedSearchRule(false);
+        ContainBasedSearchRule bsCaseSensitive = new ContainBasedSearchRule(true, false);
+        ContainBasedSearchRule bsCaseInsensitive = new ContainBasedSearchRule(false, false);
+        RegexBasedSearchRule bsCaseSensitiveRegexp = new RegexBasedSearchRule(true, false);
+        RegexBasedSearchRule bsCaseInsensitiveRegexp = new RegexBasedSearchRule(false, false);
 
         String query = "marine 2001 shields";
 

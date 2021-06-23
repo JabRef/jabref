@@ -2,6 +2,9 @@ package org.jabref.model.pdf.search;
 
 import java.io.IOException;
 
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
+
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
@@ -40,6 +43,15 @@ public final class SearchResult {
             return "";
         }
         return indexableField.stringValue();
+    }
+
+    public boolean isResultFor(BibEntry entry) {
+        for (LinkedFile linkedFile : entry.getFiles()) {
+            if (this.path.equals(linkedFile.getLink())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public String getPath() {

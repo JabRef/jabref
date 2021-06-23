@@ -30,7 +30,7 @@ class GrammarBasedSearchRuleDescriberTest {
     }
 
     private TextFlow createDescription(String query, boolean caseSensitive, boolean regExp) {
-        GrammarBasedSearchRule grammarBasedSearchRule = new GrammarBasedSearchRule(caseSensitive, regExp);
+        GrammarBasedSearchRule grammarBasedSearchRule = new GrammarBasedSearchRule(caseSensitive, regExp, false);
         assertTrue(grammarBasedSearchRule.validateSearchStrings(query));
         GrammarBasedSearchRuleDescriber describer = new GrammarBasedSearchRuleDescriber(caseSensitive, regExp, grammarBasedSearchRule.getTree());
         return describer.getDescription();

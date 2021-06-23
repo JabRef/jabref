@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DatabaseSearcherTest {
 
-    public static final SearchQuery INVALID_SEARCH_QUERY = new SearchQuery("\\asd123{}asdf", true, true);
+    public static final SearchQuery INVALID_SEARCH_QUERY = new SearchQuery("\\asd123{}asdf", true, true, false);
 
     private BibDatabase database;
 
@@ -26,7 +26,7 @@ public class DatabaseSearcherTest {
 
     @Test
     public void testNoMatchesFromEmptyDatabase() {
-        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("whatever", true, true), database).getMatches();
+        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("whatever", true, true, false), database).getMatches();
         assertEquals(Collections.emptyList(), matches);
     }
 
@@ -39,7 +39,7 @@ public class DatabaseSearcherTest {
     @Test
     public void testGetDatabaseFromMatchesDatabaseWithEmptyEntries() {
         database.insertEntry(new BibEntry());
-        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("whatever", true, true), database).getMatches();
+        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("whatever", true, true, false), database).getMatches();
         assertEquals(Collections.emptyList(), matches);
     }
 
@@ -48,7 +48,7 @@ public class DatabaseSearcherTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setField(StandardField.AUTHOR, "harrer");
         database.insertEntry(entry);
-        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("whatever", true, true), database).getMatches();
+        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("whatever", true, true, false), database).getMatches();
         assertEquals(Collections.emptyList(), matches);
     }
 
@@ -57,13 +57,13 @@ public class DatabaseSearcherTest {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.setField(StandardField.AUTHOR, "harrer");
         database.insertEntry(entry);
-        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("harrer", true, true), database).getMatches();
+        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("harrer", true, true, false), database).getMatches();
         assertEquals(Collections.singletonList(entry), matches);
     }
 
     @Test
     public void testNoMatchesFromEmptyDatabaseWithInvalidQuery() {
-        SearchQuery query = new SearchQuery("asdf[", true, true);
+        SearchQuery query = new SearchQuery("asdf[", true, true, false);
 
         DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
 
@@ -76,7 +76,7 @@ public class DatabaseSearcherTest {
         entry.setField(StandardField.AUTHOR, "tonho");
         database.insertEntry(entry);
 
-        SearchQuery query = new SearchQuery("tonho", true, true);
+        SearchQuery query = new SearchQuery("tonho", true, true, false);
         List<BibEntry> matches = new DatabaseSearcher(query, database).getMatches();
 
         assertEquals(Collections.singletonList(entry), matches);
@@ -91,7 +91,7 @@ public class DatabaseSearcherTest {
         entry.setField(StandardField.AUTHOR, "tonho");
         database.insertEntry(entry);
 
-        SearchQuery query = new SearchQuery("tonho", true, true);
+        SearchQuery query = new SearchQuery("tonho", true, true, false);
         DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
 
         assertEquals(Collections.singletonList(entry), databaseSearcher.getMatches());
@@ -103,7 +103,7 @@ public class DatabaseSearcherTest {
         entry.setField(StandardField.AUTHOR, "tonho");
         database.insertEntry(entry);
 
-        SearchQuery query = new SearchQuery("asdf", true, true);
+        SearchQuery query = new SearchQuery("asdf", true, true, false);
         DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
 
         assertEquals(Collections.emptyList(), databaseSearcher.getMatches());
@@ -114,7 +114,7 @@ public class DatabaseSearcherTest {
         BibEntry entry = new BibEntry();
         database.insertEntry(entry);
 
-        SearchQuery query = new SearchQuery("tonho", true, true);
+        SearchQuery query = new SearchQuery("tonho", true, true, false);
         DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
 
         assertEquals(Collections.emptyList(), databaseSearcher.getMatches());
