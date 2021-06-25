@@ -13,15 +13,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.logic.l10n.Localization;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FileNodeViewModel {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileNodeViewModel.class);
     private final Path path;
     private final ObservableList<FileNodeViewModel> children;
     private int fileCount;
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileNodeViewModel.class);
 
     public FileNodeViewModel(Path path) {
         this.path = path;
