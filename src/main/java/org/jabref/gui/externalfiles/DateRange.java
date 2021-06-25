@@ -1,11 +1,13 @@
 package org.jabref.gui.externalfiles;
 
+import org.jabref.logic.l10n.Localization;
+
 public enum DateRange {
-    DAY("Last day"),
-    WEEK("Last week"),
-    MONTH("Last month"),
-    YEAR("Last year"),
-    ALL_TIME("All time");
+    DAY(Localization.lang("Last day")),
+    WEEK(Localization.lang("Last week")),
+    MONTH(Localization.lang("Last month")),
+    YEAR(Localization.lang("Last year")),
+    ALL_TIME(Localization.lang("All time"));
 
     private final String dateRange;
 

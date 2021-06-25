@@ -1,9 +1,11 @@
 package org.jabref.gui.externalfiles;
 
+import org.jabref.logic.l10n.Localization;
+
 public enum ExternalFileSorter {
-    DEFAULT("Default"),
-    DATE_ASCENDING("Newest first"),
-    DATE_DESCENDING("Oldest first");
+    DEFAULT(Localization.lang("Default")),
+    DATE_ASCENDING(Localization.lang("Newest first")),
+    DATE_DESCENDING(Localization.lang("Oldest first"));
 
     private final String sorter;
 
