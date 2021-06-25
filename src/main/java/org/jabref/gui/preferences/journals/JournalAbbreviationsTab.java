@@ -55,8 +55,6 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     @FXML private ComboBox<AbbreviationsFileViewModel> journalFilesBox;
 
     @FXML private Button addAbbreviationButton;
-    @FXML private Button openAbbreviationListButton;
-    @FXML private Button addAbbreviationListButton;
     @FXML private Button removeAbbreviationListButton;
 
     @FXML private CustomTextField searchBox;
@@ -78,20 +76,12 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
         filteredAbbreviations = new FilteredList<>(viewModel.abbreviationsProperty());
 
-        setButtonStyles();
         setUpTable();
         setBindings();
         setAnimations();
 
         searchBox.setPromptText(Localization.lang("Search") + "...");
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
-    }
-
-    private void setButtonStyles() {
-        addAbbreviationListButton.setGraphic(IconTheme.JabRefIcons.ADD_ABBREVIATION_LIST.getGraphicNode());
-        openAbbreviationListButton.setGraphic(IconTheme.JabRefIcons.OPEN_ABBREVIATION_LIST.getGraphicNode());
-        removeAbbreviationListButton.setGraphic(IconTheme.JabRefIcons.REMOVE_ABBREVIATION_LIST.getGraphicNode());
-        addAbbreviationButton.setGraphic(IconTheme.JabRefIcons.ADD_ABBREVIATION.getGraphicNode());
     }
 
     private void setUpTable() {
