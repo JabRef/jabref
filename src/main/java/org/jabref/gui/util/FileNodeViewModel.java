@@ -13,12 +13,15 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.logic.l10n.Localization;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileNodeViewModel {
 
     private final Path path;
     private final ObservableList<FileNodeViewModel> children;
     private int fileCount;
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileNodeViewModel.class);
 
     public FileNodeViewModel(Path path) {
         this.path = path;
@@ -79,7 +82,7 @@ public class FileNodeViewModel {
         try {
             lastEditedTime = Files.getLastModifiedTime(path);
         } catch (IOException e) {
-            System.err.println("Exception Caught");
+            LOGGER.error("Exception Caught", e);
         }
         return String.format("%s (%s: %s)", path.getFileName().toString(), Localization.lang("last edited"), formatDateTime(lastEditedTime));
     }

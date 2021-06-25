@@ -10,14 +10,19 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class FileFilterUtils {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileFilterUtils.class);
+    
     public static LocalDateTime getFileTime(Path path) {
         FileTime lastEditedTime = null;
         try {
             lastEditedTime = Files.getLastModifiedTime(path);
         } catch (IOException e) {
-            System.err.println("Could not retrieve file time");
+            LOGGER.error("Could not retrieve file time", e);
         }
         LocalDateTime localDateTime = lastEditedTime
                 .toInstant()
