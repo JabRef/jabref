@@ -72,7 +72,7 @@ public class FileFilterUtils {
 
     public List<Path> sortByDateAscending(List<Path> files) {
         return files.stream()
-                .sorted(Comparator.comparingLong(x -> FileFilterUtils.getFileTime(x)
+                .sorted(Comparator.comparingLong(file -> FileFilterUtils.getFileTime(file)
                         .atZone(ZoneId.systemDefault())
                         .toInstant()
                         .toEpochMilli()))
@@ -81,7 +81,7 @@ public class FileFilterUtils {
 
     public List<Path> sortByDateDescending(List<Path> files) {
         return files.stream()
-                .sorted(Comparator.comparingLong(x -> -FileFilterUtils.getFileTime(x)
+                .sorted(Comparator.comparingLong(file -> -FileFilterUtils.getFileTime(file)
                         .atZone(ZoneId.systemDefault())
                         .toInstant()
                         .toEpochMilli()))
