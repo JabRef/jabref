@@ -13,8 +13,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.jabref.gui.externalfiles.DateRange;
-
 public class FileFilterUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileFilterUtils.class);
@@ -85,18 +83,15 @@ public class FileFilterUtils {
                 .collect(Collectors.toList());
     }
 
-    public static List<Path> sortByDate(List<Path> files, String sortType) {
+    public static List<Path> sortByDate(List<Path> files, FileSortViewModel sortType) {
         FileFilterUtils fileFilter = new FileFilterUtils();
-        switch (sortType) {
-            case "Default":
-                return files;
-            case "Newest first":
-                return fileFilter.sortByDateDescending(files);
-            case "Oldest first":
-                return fileFilter.sortByDateAscending(files);
-            default:
-                return files;
-        }
+        List<Path> sortedFiles = switch (sortType.getSorter()) {
+            case DEFAULT -> files;
+            case DATE_ASCENDING -> fileFilter.sortByDateDescending(files);
+            case DATE_DESCENDING -> fileFilter.sortByDateAscending(files);
+            default -> files;
+        };
+        return sortedFiles;
     }
 }
 

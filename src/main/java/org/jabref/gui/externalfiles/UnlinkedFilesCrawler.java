@@ -33,11 +33,11 @@ public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
     private final Path directory;
     private final Filter<Path> fileFilter;
     private final ExternalFilesDateViewModel dateFilter;
-    private final String sorter;
+    private final FileSortViewModel sorter;
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
 
-    public UnlinkedFilesCrawler(Path directory, Filter<Path> fileFilter, ExternalFilesDateViewModel dateFilter, String sorter, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
+    public UnlinkedFilesCrawler(Path directory, Filter<Path> fileFilter, ExternalFilesDateViewModel dateFilter, FileSortViewModel sorter, BibDatabaseContext databaseContext, FilePreferences filePreferences) {
         this.directory = directory;
         this.fileFilter = fileFilter;
         this.dateFilter = dateFilter;

@@ -107,9 +107,9 @@ public class UnlinkedFilesDialogViewModel {
             new ExternalFilesDateViewModel(DateRange.DAY));
 
         this.fileSortList = FXCollections.observableArrayList(
-            new FileSortViewModel(ExternalFileSorter.DEFAULT.getSorter()),
-            new FileSortViewModel(ExternalFileSorter.DATE_ASCENDING.getSorter()),
-            new FileSortViewModel(ExternalFileSorter.DATE_DESCENDING.getSorter()));
+            new FileSortViewModel(ExternalFileSorter.DEFAULT),
+            new FileSortViewModel(ExternalFileSorter.DATE_ASCENDING),
+            new FileSortViewModel(ExternalFileSorter.DATE_DESCENDING));
 
         Predicate<String> isDirectory = path -> Files.isDirectory(Path.of(path));
         scanDirectoryValidator = new FunctionBasedValidator<>(directoryPath, isDirectory,
@@ -122,7 +122,7 @@ public class UnlinkedFilesDialogViewModel {
         Path directory = this.getSearchDirectory();
         Filter<Path> selectedFileFilter = selectedExtension.getValue().dirFilter();
         ExternalFilesDateViewModel selectedDateFilter = selectedDate.getValue();
-        String selectedSortFilter = selectedSort.getValue().getSorter();
+        FileSortViewModel selectedSortFilter = selectedSort.getValue();
         progressValueProperty.unbind();
         progressTextProperty.unbind();
 

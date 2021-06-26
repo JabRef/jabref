@@ -2,19 +2,19 @@ package org.jabref.gui.externalfiles;
 
 public class FileSortViewModel {
 
+    private final ExternalFileSorter sorter;
     private final String description;
-    private final String sorter;
 
-    public FileSortViewModel(String sorter) {
-        this.description = sorter;
+    public FileSortViewModel(ExternalFileSorter sorter) {
         this.sorter = sorter;
+        this.description = sorter.getSorter();
     }
 
     public String getDescription() {
         return this.description;
     }
 
-    public String getSorter() {
+    public ExternalFileSorter getSorter() {
         return this.sorter;
     }
 }
