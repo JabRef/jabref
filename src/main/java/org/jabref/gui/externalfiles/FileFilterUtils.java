@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.jabref.gui.externalfiles.DateRange;
+
 public class FileFilterUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileFilterUtils.class);
@@ -51,23 +53,18 @@ public class FileFilterUtils {
         return fileEditTime.isAfter(NOW.minusYears(1));
     }
 
-    public static boolean filterByDate(Path path, String filter) {
+    public static boolean filterByDate(Path path, ExternalFilesDateViewModel filter) {
         FileFilterUtils fileFilter = new FileFilterUtils();
         LocalDateTime fileTime = FileFilterUtils.getFileTime(path);
-        switch (filter) {
-            case "Last day":
-                return fileFilter.isDuringLastDay(fileTime);
-            case "Last week":
-                return fileFilter.isDuringLastWeek(fileTime);
-            case "Last month":
-                return fileFilter.isDuringLastMonth(fileTime);
-            case "Last year":
-                return fileFilter.isDuringLastYear(fileTime);
-            case "All time":
-                return true;
-            default:
-                return true;
-        }
+        boolean isInDateRange = switch (filter.getDateRanges()) {
+            case DAY -> fileFilter.isDuringLastDay(fileTime);
+            case WEEK -> fileFilter.isDuringLastWeek(fileTime);
+            case MONTH -> fileFilter.isDuringLastMonth(fileTime);
+            case YEAR -> fileFilter.isDuringLastYear(fileTime);
+            case ALL_TIME -> true;
+            default -> true;
+        };
+        return isInDateRange;
     }
 
     public List<Path> sortByDateAscending(List<Path> files) {

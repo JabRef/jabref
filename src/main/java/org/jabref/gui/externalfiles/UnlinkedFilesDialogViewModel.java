@@ -100,11 +100,11 @@ public class UnlinkedFilesDialogViewModel {
             new FileExtensionViewModel(StandardFileType.PDF, externalFileTypes));
 
         this.dateFilterList = FXCollections.observableArrayList(
-            new ExternalFilesDateViewModel(DateRange.ALL_TIME.getDateRange()),
-            new ExternalFilesDateViewModel(DateRange.YEAR.getDateRange()),
-            new ExternalFilesDateViewModel(DateRange.MONTH.getDateRange()),
-            new ExternalFilesDateViewModel(DateRange.WEEK.getDateRange()),
-            new ExternalFilesDateViewModel(DateRange.DAY.getDateRange()));
+            new ExternalFilesDateViewModel(DateRange.ALL_TIME),
+            new ExternalFilesDateViewModel(DateRange.YEAR),
+            new ExternalFilesDateViewModel(DateRange.MONTH),
+            new ExternalFilesDateViewModel(DateRange.WEEK),
+            new ExternalFilesDateViewModel(DateRange.DAY));
 
         this.fileSortList = FXCollections.observableArrayList(
             new FileSortViewModel(ExternalFileSorter.DEFAULT.getSorter()),
@@ -121,7 +121,7 @@ public class UnlinkedFilesDialogViewModel {
     public void startSearch() {
         Path directory = this.getSearchDirectory();
         Filter<Path> selectedFileFilter = selectedExtension.getValue().dirFilter();
-        String selectedDateFilter = selectedDate.getValue().getDateRanges();
+        ExternalFilesDateViewModel selectedDateFilter = selectedDate.getValue();
         String selectedSortFilter = selectedSort.getValue().getSorter();
         progressValueProperty.unbind();
         progressTextProperty.unbind();

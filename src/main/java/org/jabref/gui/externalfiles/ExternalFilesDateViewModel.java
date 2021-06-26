@@ -3,10 +3,10 @@ package org.jabref.gui.externalfiles;
 public class ExternalFilesDateViewModel {
 
     private final String description;
-    private final String dateRange;
+    private final DateRange dateRange;
 
-    ExternalFilesDateViewModel(String dateRange) {
-        this.description = dateRange;
+    ExternalFilesDateViewModel(DateRange dateRange) {
+        this.description = dateRange.getDateRange();
         this.dateRange = dateRange;
     }
 
@@ -14,7 +14,7 @@ public class ExternalFilesDateViewModel {
         return this.description;
     }
 
-    public String getDateRanges() {
+    public DateRange getDateRanges() {
         return this.dateRange;
     }
 }
