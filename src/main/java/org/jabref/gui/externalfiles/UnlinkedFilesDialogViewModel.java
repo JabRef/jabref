@@ -101,10 +101,7 @@ public class UnlinkedFilesDialogViewModel {
 
         this.dateFilterList = FXCollections.observableArrayList(DateRange.values());
 
-        this.fileSortList = FXCollections.observableArrayList(
-            ExternalFileSorter.DEFAULT,
-            ExternalFileSorter.DATE_ASCENDING,
-            ExternalFileSorter.DATE_DESCENDING);
+        this.fileSortList = FXCollections.observableArrayList(ExternalFileSorter.values());
 
         Predicate<String> isDirectory = path -> Files.isDirectory(Path.of(path));
         scanDirectoryValidator = new FunctionBasedValidator<>(directoryPath, isDirectory,
