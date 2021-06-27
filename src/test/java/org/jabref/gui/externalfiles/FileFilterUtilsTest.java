@@ -71,6 +71,7 @@ public class FileFilterUtilsTest {
         private List<String> expectedSortByDateDescending = new ArrayList<String>();
         private List<String> wrongOrder = new ArrayList<String>();
 
+        /* Initialize the directory and files used in the sorting tests, and change their last edited dates. */
         @BeforeEach
         public void setUp() throws Exception {
             String dirPath = "src/test/resources/unlinkedFiles";
@@ -88,7 +89,7 @@ public class FileFilterUtilsTest {
             Files.createFile(thirdPath);
             Files.createFile(fourthPath);
 
-            // change the files last edited times
+            // change the files last edited times.
             File firstFile = new File(firstPath.toString());
             File secondFile = new File(secondPath.toString());
             File thirdFile = new File(thirdPath.toString());
@@ -106,11 +107,13 @@ public class FileFilterUtilsTest {
             thirdFile.setLastModified(thirdDate.atZone(zoneId).toEpochSecond());
             fourthFile.setLastModified(fourthDate.atZone(zoneId).toEpochSecond());
     
+            // fill the list to be sorted by the tests.
             files.add(firstPath);
             files.add(secondPath);
             files.add(thirdPath);
             files.add(fourthPath);
     
+            // fill the expected values lists.
             expectedSortByDateAscending.add(thirdPath.toString());
             expectedSortByDateAscending.add(fourthPath.toString());
             expectedSortByDateAscending.add(secondPath.toString());
@@ -127,6 +130,7 @@ public class FileFilterUtilsTest {
             wrongOrder.add(fourthPath.toString());
         }
     
+        /* Delete the files and clear the path lists. */
         @AfterEach
         public void cleanUp() {
             String dirPath = "src/test/resources/unlinkedFiles";
