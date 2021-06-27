@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" delimiter-precedes-et-al="never" initialize-with="." page-range-format="expanded" demote-non-dropping-particle="sort-only" default-locale="fr-FR">
-  <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
   <info>
     <title>Gallia Préhistoire (Français)</title>
     <title-short>GP</title-short>
     <id>http://www.zotero.org/styles/gallia-prehistoire</id>
     <link href="http://www.zotero.org/styles/gallia-prehistoire" rel="self"/>
     <link href="http://www.persee.fr/collection/galip" rel="documentation"/>
-    <link href="https://journals.openedition.org/galliap/430" rel="documentation"/>
-    <link href="http://www.mae.parisnanterre.fr/gallia-prehistoire/" rel="documentation"/>
+    <link href="https://journals.openedition.org/galliap" rel="documentation"/>
+    <link href="https://www.mshmondes.cnrs.fr/gallia-prehistoire" rel="documentation"/>
     <author>
       <name>Thomas Perrin</name>
-      <email>tperrin@univ-tlse2.fr</email>
+      <email>thomas.perrin@cnrs.fr</email>
     </author>
     <author>
       <name>Daphné Mathelier</name>
@@ -24,7 +23,7 @@
     <issn>0016-4127</issn>
     <eissn>2109-9642</eissn>
     <summary>Author-date style for Gallia Préhistoire - Préhistoire de la France dans son contexte européen</summary>
-    <updated>2019-07-05T13:50:24+00:00</updated>
+    <updated>2021-05-24T14:51:22+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
@@ -62,8 +61,7 @@
   </macro>
   <macro name="editor">
     <names variable="editor">
-      <name initialize-with="." name-as-sort-order="all"/>
-      <label form="short"/>
+      <label form="short" prefix=" (" suffix=")"/>
       <substitute>
         <text macro="container-author"/>
       </substitute>
@@ -100,34 +98,25 @@
   </macro>
   <macro name="title">
     <choose>
-      <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
+      <if type="bill book graphic legal_case legislation motion_picture song" match="any">
         <text variable="title" text-case="capitalize-first" font-style="italic"/>
       </if>
-      <else-if type="article article-journal" match="any">
+      <else-if type="article article-journal article-magazine article-newspaper" match="any">
         <group delimiter=", ">
           <text variable="title" text-case="capitalize-first"/>
           <text variable="container-title" text-case="capitalize-first" font-style="italic"/>
         </group>
       </else-if>
-      <else-if type="article-magazine article-newspaper" match="any">
-        <group delimiter=", ">
-          <text variable="title" text-case="capitalize-first" font-style="normal"/>
-          <group font-style="italic" delimiter=" ">
-            <text variable="container-title" text-case="capitalize-first" font-style="italic"/>
-            <date form="text" variable="issued" font-style="italic" prefix="(" suffix=")"/>
-          </group>
-        </group>
-      </else-if>
       <else-if type="thesis report manuscript" match="any">
         <text variable="title" text-case="capitalize-first" font-style="italic" suffix=", "/>
-        <text variable="genre"/>
+        <text variable="genre" suffix=", inédit"/>
       </else-if>
-      <else-if type="entry-dictionary entry-encyclopedia" match="any">
-        <group suffix=", ">
-          <text variable="title" text-case="capitalize-first" quotes="true"/>
+      <else-if type="entry-dictionary entry-encyclopedia chapter paper-conference" match="any">
+        <group>
+          <text variable="title" text-case="capitalize-first" quotes="false"/>
           <text value="in" font-style="italic" prefix=" " suffix=" "/>
           <text macro="editor" suffix=", "/>
-          <text variable="container-title" quotes="true" vertical-align="baseline"/>
+          <text variable="container-title" quotes="false" font-style="italic" vertical-align="baseline"/>
         </group>
       </else-if>
       <else-if type="webpage" match="any">
@@ -163,7 +152,6 @@
           <group delimiter=",">
             <text variable="number-of-volumes"/>
             <text variable="volume"/>
-            <text variable="locator"/>
           </group>
           <text variable="number-of-pages" suffix=" p."/>
         </group>
@@ -171,33 +159,29 @@
       <else-if type="manuscript thesis report" match="any">
         <group>
           <group>
-            <text variable="number-of-volumes" form="short" suffix="&amp;#160;"/>
+            <text variable="number-of-volumes" form="short" suffix=" "/>
             <text term="volume" form="short" suffix=", "/>
           </group>
           <group>
-            <label variable="locator" form="short"/>
-            <text variable="locator" suffix=", "/>
-          </group>
-          <group>
-            <text variable="number-of-pages" prefix="inédit, " suffix="&amp;#160;"/>
+            <text variable="number-of-pages" prefix="inédit, " suffix=" "/>
             <label variable="number-of-pages" form="short"/>
           </group>
           <group>
-            <text variable="page" prefix="inédit, " suffix="&amp;#160;"/>
+            <text variable="page" prefix="inédit, " suffix=" "/>
             <label variable="page" form="short"/>
           </group>
         </group>
       </else-if>
-      <else-if type="chapter entry-dictionary entry-encyclopedia" match="any">
+      <else-if type="chapter entry-dictionary entry-encyclopedia paper-conference" match="any">
         <group delimiter=", ">
           <group>
-            <text term="volume" suffix=".&amp;#160;"/>
+            <text term="volume" suffix=". "/>
             <text variable="number-of-volumes"/>
             <text variable="volume"/>
           </group>
           <group>
             <label variable="page" form="short"/>
-            <text variable="page" prefix="&amp;#160;"/>
+            <text variable="page" prefix=" "/>
           </group>
         </group>
       </else-if>
@@ -206,11 +190,11 @@
           <if match="any" is-numeric="page">
             <group>
               <label variable="page" form="short"/>
-              <text variable="page" prefix="&amp;#160;"/>
+              <text variable="page" prefix=" "/>
             </group>
           </if>
           <else>
-            <text variable="URL" text-decoration="underline"/>
+            <text variable="DOI" prefix="https://doi.org/"/>
           </else>
         </choose>
       </else-if>
@@ -241,16 +225,6 @@
         </choose>
         <text macro="issue" prefix=", "/>
       </if>
-      <else-if type="chapter entry-dictionary entry-encyclopedia" match="any">
-        <group delimiter=", ">
-          <text variable="publisher-place" font-style="italic"/>
-        </group>
-      </else-if>
-      <else-if type="manuscript thesis report" match="any">
-        <group delimiter=", ">
-          <text variable="publisher-place"/>
-        </group>
-      </else-if>
       <else-if type="article-magazine article-newspaper" match="any">
         <group delimiter="">
           <text macro="voljournal"/>
@@ -294,18 +268,18 @@
       </else-if>
     </choose>
     <text term="cited" font-style="italic" prefix=", "/>
-    <text variable="locator" prefix="p.&amp;#160;"/>
+    <text variable="locator" prefix="p. "/>
   </macro>
   <citation and="text" sort-separator=" ; " et-al-min="3" et-al-use-first="1">
     <sort>
       <key variable="issued"/>
     </sort>
-    <layout delimiter="&amp;#160;; " prefix="(" suffix=")">
+    <layout delimiter=" ; " prefix="(" suffix=")">
       <choose>
         <if match="any" position="ibid-with-locator">
           <group>
             <text term="ibid" font-style="italic" suffix="."/>
-            <text variable="locator" prefix="p.&amp;#160;"/>
+            <text variable="locator" prefix="p. "/>
           </group>
         </if>
         <else-if match="any" position="ibid">

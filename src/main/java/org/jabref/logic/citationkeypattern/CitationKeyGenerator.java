@@ -213,7 +213,7 @@ public class CitationKeyGenerator extends BracketedPattern {
             // ":lower":
             if (fieldParts.size() > 1) {
                 // apply modifiers:
-                expandedPattern = applyModifiers(expandedPattern, fieldParts, 1);
+                expandedPattern = applyModifiers(expandedPattern, fieldParts, 1, expandBracketContent(entry));
             }
             return cleanKey(expandedPattern, unwantedCharacters);
         };
