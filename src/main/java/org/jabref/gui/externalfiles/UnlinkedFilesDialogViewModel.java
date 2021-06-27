@@ -99,12 +99,7 @@ public class UnlinkedFilesDialogViewModel {
             new FileExtensionViewModel(StandardFileType.BIBTEX_DB, externalFileTypes),
             new FileExtensionViewModel(StandardFileType.PDF, externalFileTypes));
 
-        this.dateFilterList = FXCollections.observableArrayList(
-            DateRange.ALL_TIME,
-            DateRange.YEAR,
-            DateRange.MONTH,
-            DateRange.WEEK,
-            DateRange.DAY);
+        this.dateFilterList = FXCollections.observableArrayList(DateRange.values());
 
         this.fileSortList = FXCollections.observableArrayList(
             ExternalFileSorter.DEFAULT,
