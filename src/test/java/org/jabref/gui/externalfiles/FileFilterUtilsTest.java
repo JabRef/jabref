@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
@@ -16,15 +17,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class FileFilterUtilsTest {
 
     private final FileFilterUtils fileFilterUtils = new FileFilterUtils();
     private final LocalDateTime time = LocalDateTime.now();
-
-    private List<Path> files = new ArrayList<Path>();
-    private List<String> expectedSortByDateAscending = new ArrayList<String>();
-    private List<String> expectedSortByDateDescending = new ArrayList<String>();
 
     @Test
     public void isDuringLastDayNegativeTest() {
@@ -69,8 +67,13 @@ public class FileFilterUtilsTest {
     @Nested
     class SortingTests {
 
+        private List<Path> files = new ArrayList<Path>();
+        private List<String> expectedSortByDateAscending = new ArrayList<String>();
+        private List<String> expectedSortByDateDescending = new ArrayList<String>();
+        private List<String> wrongOrder = new ArrayList<String>();
+
         @BeforeEach
-        public void setUp() throws Exception {
+        private void setUp() throws Exception {
             String dirPath = "src/test/resources/unlinkedFiles";
 
             Path path = Paths.get(dirPath);
@@ -81,22 +84,23 @@ public class FileFilterUtilsTest {
             Path thirdPath = Paths.get(dirPath.concat("/thirdFile.pdf"));
             Path fourthPath = Paths.get(dirPath.concat("/fourthFile.pdf"));
     
+            Files.createFile(firstPath);
+            Files.createFile(secondPath);
+            Files.createFile(thirdPath);
+            Files.createFile(fourthPath);
+
+            // change the files last edited times
             File firstFile = new File(firstPath.toString());
             File secondFile = new File(secondPath.toString());
             File thirdFile = new File(thirdPath.toString());
             File fourthFile = new File(fourthPath.toString());
     
-            firstFile.createNewFile();
-            secondFile.createNewFile();
-            thirdFile.createNewFile();
-            fourthFile.createNewFile();
-    
             ZoneId zoneId = ZoneId.systemDefault();
     
             LocalDateTime firstDate = LocalDateTime.of(2021, 1, 10, 0, 0, 0, 0);
-            LocalDateTime secondDate = LocalDateTime.of(2021, 1, 5, 0, 0, 0, 0);
-            LocalDateTime thirdDate = LocalDateTime.of(2021, 1, 1, 0, 0, 0, 0);
-            LocalDateTime fourthDate = LocalDateTime.of(2021, 1, 2, 0, 0, 0, 0);
+            LocalDateTime secondDate= LocalDateTime.of(2021, 1, 5, 0, 0, 0, 0);
+            LocalDateTime thirdDate= LocalDateTime.of(2021, 1, 1, 0, 0, 0, 0);
+            LocalDateTime fourthDate= LocalDateTime.of(2021, 1, 2, 0, 0, 0, 0);
     
             firstFile.setLastModified(firstDate.atZone(zoneId).toEpochSecond());
             secondFile.setLastModified(secondDate.atZone(zoneId).toEpochSecond());
@@ -117,10 +121,15 @@ public class FileFilterUtilsTest {
             expectedSortByDateDescending.add(secondPath.toString());
             expectedSortByDateDescending.add(fourthPath.toString());
             expectedSortByDateDescending.add(thirdPath.toString());
-        }
 
+            wrongOrder.add(firstPath.toString());
+            wrongOrder.add(secondPath.toString());
+            wrongOrder.add(thirdPath.toString());
+            wrongOrder.add(fourthPath.toString());
+        }
+    
         @AfterEach
-        public void cleanUp() {
+        private void cleanUp() {
             String dirPath = "src/test/resources/unlinkedFiles";
 
             File firstFile = new File(dirPath.concat("/firstFile.pdf"));
@@ -135,9 +144,9 @@ public class FileFilterUtilsTest {
             fourthFile.delete();
             directory.delete();
         }
-
+    
         @Test
-        public void testSortByDateAscending() throws Exception {
+        public void SortByDateAscendingPositiveTest() throws Exception {
             List<String> actualsList = new ArrayList<String>();
             List<Path> sortedPaths = fileFilterUtils.sortByDateAscending(files);
             String[] expecteds = new String[4];
@@ -149,9 +158,23 @@ public class FileFilterUtilsTest {
             expectedSortByDateAscending.toArray(expecteds);
             assertArrayEquals(actuals, expecteds);
         }
+
+        @Test
+        public void SortByDateAscendingNegativeTest() throws Exception {
+            List<String> actualsList = new ArrayList<String>();
+            List<Path> sortedPaths = fileFilterUtils.sortByDateAscending(files);
+            String[] expecteds = new String[4];
+            String[] actuals = new String[4];
+            for (Path path : sortedPaths) {
+                actualsList.add(path.toString());
+            }
+            actualsList.toArray(actuals);
+            wrongOrder.toArray(expecteds);
+            assertFalse(Arrays.equals(actuals, expecteds));
+        }
     
         @Test
-        public void testSortByDateDescending() {
+        public void SortByDateDescendingPositiveTest() {
             List<String> actualsList = new ArrayList<String>();
             List<Path> sortedPaths = fileFilterUtils.sortByDateDescending(files);
             String[] expecteds = new String[4];
@@ -162,6 +185,20 @@ public class FileFilterUtilsTest {
             actualsList.toArray(actuals);
             expectedSortByDateDescending.toArray(expecteds);
             assertArrayEquals(actuals, expecteds);
+        }
+
+        @Test
+        public void testSortByDateDescendingNegativeTest() throws Exception {
+            List<String> actualsList = new ArrayList<String>();
+            List<Path> sortedPaths = fileFilterUtils.sortByDateDescending(files);
+            String[] expecteds = new String[4];
+            String[] actuals = new String[4];
+            for (Path path : sortedPaths) {
+                actualsList.add(path.toString());
+            }
+            actualsList.toArray(actuals);
+            wrongOrder.toArray(expecteds);
+            assertFalse(Arrays.equals(actuals, expecteds));
         }
     }
 }
