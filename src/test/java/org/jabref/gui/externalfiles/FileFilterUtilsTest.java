@@ -1,14 +1,13 @@
 package org.jabref.gui.externalfiles;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.io.File;
-
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,11 +51,26 @@ public class FileFilterUtilsTest {
         assertEquals(fileFilterUtils.isDuringLastMonth(time.minusMonths(1)), false);
     }
 
+    @Test
+    public void isDuringLastMonthPositiveTest() {
+        assertEquals(fileFilterUtils.isDuringLastMonth(time.minusDays(29).minusHours(23)), true);
+    }
+
+    @Test
+    public void isDuringLastYearNegativeTest() {
+        assertEquals(fileFilterUtils.isDuringLastYear(time.minusYears(1)), false);
+    }
+
+    @Test
+    public void isDuringLastYearPositiveTest() {
+        assertEquals(fileFilterUtils.isDuringLastYear(time.minusMonths(11).minusDays(29).minusHours(23)), true);
+    }
+
     @Nested
     class SortingTests {
 
         @BeforeEach
-        private void setUp() throws Exception {
+        public void setUp() throws Exception {
             String dirPath = "src/test/resources/unlinkedFiles";
 
             Path path = Paths.get(dirPath);
@@ -80,9 +94,9 @@ public class FileFilterUtilsTest {
             ZoneId zoneId = ZoneId.systemDefault();
     
             LocalDateTime firstDate = LocalDateTime.of(2021, 1, 10, 0, 0, 0, 0);
-            LocalDateTime secondDate= LocalDateTime.of(2021, 1, 5, 0, 0, 0, 0);
-            LocalDateTime thirdDate= LocalDateTime.of(2021, 1, 1, 0, 0, 0, 0);
-            LocalDateTime fourthDate= LocalDateTime.of(2021, 1, 2, 0, 0, 0, 0);
+            LocalDateTime secondDate = LocalDateTime.of(2021, 1, 5, 0, 0, 0, 0);
+            LocalDateTime thirdDate = LocalDateTime.of(2021, 1, 1, 0, 0, 0, 0);
+            LocalDateTime fourthDate = LocalDateTime.of(2021, 1, 2, 0, 0, 0, 0);
     
             firstFile.setLastModified(firstDate.atZone(zoneId).toEpochSecond());
             secondFile.setLastModified(secondDate.atZone(zoneId).toEpochSecond());
@@ -104,9 +118,9 @@ public class FileFilterUtilsTest {
             expectedSortByDateDescending.add(fourthPath.toString());
             expectedSortByDateDescending.add(thirdPath.toString());
         }
-    
+
         @AfterEach
-        private void cleanUp() {
+        public void cleanUp() {
             String dirPath = "src/test/resources/unlinkedFiles";
 
             File firstFile = new File(dirPath.concat("/firstFile.pdf"));
@@ -121,7 +135,7 @@ public class FileFilterUtilsTest {
             fourthFile.delete();
             directory.delete();
         }
-    
+
         @Test
         public void testSortByDateAscending() throws Exception {
             List<String> actualsList = new ArrayList<String>();
