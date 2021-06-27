@@ -29,6 +29,7 @@ import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
 import org.jabref.model.study.StudyQuery;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
@@ -52,6 +53,7 @@ class StudyRepository {
     private final Path studyDefinitionFile;
     private final GitHandler gitHandler;
     private final Study study;
+    private final PreferencesService preferencesService;
     private final ImportFormatPreferences importFormatPreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final SavePreferences savePreferences;
@@ -71,7 +73,7 @@ class StudyRepository {
      */
     public StudyRepository(Path pathToRepository,
                            GitHandler gitHandler,
-                           ImportFormatPreferences importFormatPreferences,
+                           PreferencesService preferencesService,
                            FileUpdateMonitor fileUpdateMonitor,
                            SavePreferences savePreferences,
                            TimestampPreferences timestampPreferences,
@@ -83,7 +85,8 @@ class StudyRepository {
         } catch (GitAPIException e) {
             LOGGER.error("Updating repository from remote failed");
         }
-        this.importFormatPreferences = importFormatPreferences;
+        this.preferencesService = preferencesService;
+        this.importFormatPreferences = preferencesService.getImportFormatPreferences();
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.studyDefinitionFile = Path.of(repositoryPath.toString(), STUDY_DEFINITION_FILE_NAME);
         this.savePreferences = savePreferences;
@@ -185,7 +188,7 @@ class StudyRepository {
      */
     private void setUpRepositoryStructure() throws IOException {
         // Cannot use stream here since IOException has to be thrown
-        StudyDatabaseToFetcherConverter converter = new StudyDatabaseToFetcherConverter(this.getActiveLibraryEntries(), importFormatPreferences);
+        StudyDatabaseToFetcherConverter converter = new StudyDatabaseToFetcherConverter(this.getActiveLibraryEntries(), preferencesService);
         for (String query : this.getSearchQueryStrings()) {
             createQueryResultFolder(query);
             converter.getActiveFetchers()

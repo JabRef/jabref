@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.gui.preferences.customization.CustomizationTabViewModel;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
@@ -22,6 +23,7 @@ import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.IEEEQueryTransformer;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.logic.preferences.CustomApiKeyPreferences;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
@@ -29,6 +31,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.preferences.PreferencesService;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
@@ -55,11 +58,15 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
     private static final String IEEE_DOI = "10.1109";
     private static final String BASE_URL = "https://ieeexplore.ieee.org";
     private static final String API_KEY = new BuildInfo().ieeeAPIKey;
+    private static final String TEST_URL_WITHOUT_API_KEY = "https://ieeexploreapi.ieee.org/api/v1/search/articles?max_records=0&apikey=";
 
-    private final ImportFormatPreferences preferences;
+    private final ImportFormatPreferences importFormatPreferences;
+    private final PreferencesService preferencesService;
 
-    public IEEE(ImportFormatPreferences preferences) {
-        this.preferences = Objects.requireNonNull(preferences);
+    public IEEE(PreferencesService preferencesService) {
+        this.preferencesService = Objects.requireNonNull(preferencesService);
+        this.importFormatPreferences = preferencesService.getImportFormatPreferences();
+        CustomizationTabViewModel.registerApiKeyCustom(this.getName(), TEST_URL_WITHOUT_API_KEY);
     }
 
     /**
@@ -205,7 +212,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
                 JSONArray results = jsonObject.getJSONArray("articles");
                 for (int i = 0; i < results.length(); i++) {
                     JSONObject jsonEntry = results.getJSONObject(i);
-                    BibEntry entry = parseJsonRespone(jsonEntry, preferences.getKeywordSeparator());
+                    BibEntry entry = parseJsonRespone(jsonEntry, importFormatPreferences.getKeywordSeparator());
                     entries.add(entry);
                 }
             }
@@ -224,12 +231,26 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
         return Optional.of(HelpFile.FETCHER_IEEEXPLORE);
     }
 
+    /**
+     * Gets IEEE api key, use key if it customized it in the preferences, otherwise use the default
+     *
+     * @return IEEE API Key
+     */
+    private String getApiKey() {
+        String apiKey = API_KEY;
+        CustomApiKeyPreferences apiKeyPreferences = preferencesService.getCustomApiKeyPreferences(getName());
+        if (apiKeyPreferences != null && apiKeyPreferences.shouldUseCustom()) {
+            apiKey = apiKeyPreferences.getCustomApiKey();
+        }
+        return apiKey;
+    }
+
     @Override
     public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
         IEEEQueryTransformer transformer = new IEEEQueryTransformer();
         String transformedQuery = transformer.transformLuceneQuery(luceneQuery).orElse("");
         URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
-        uriBuilder.addParameter("apikey", API_KEY);
+        uriBuilder.addParameter("apikey", getApiKey());
         if (!transformedQuery.isBlank()) {
             uriBuilder.addParameter("querytext", transformedQuery);
         }

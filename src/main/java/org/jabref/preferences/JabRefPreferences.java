@@ -88,6 +88,7 @@ import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.StyleLoader;
+import org.jabref.logic.preferences.CustomApiKeyPreferences;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
@@ -205,6 +206,8 @@ public class JabRefPreferences implements PreferencesService {
 
     public static final String BASE_DOI_URI = "baseDOIURI";
     public static final String USE_CUSTOM_DOI_URI = "useCustomDOIURI";
+    public static final String CUSTOM_API_KEY = "customApiKey";
+    public static final String USE_CUSTOM_API_KEY = "useCustomApiKey";
 
     public static final String USE_OWNER = "useOwner";
     public static final String DEFAULT_OWNER = "defaultOwner";
@@ -1393,6 +1396,42 @@ public class JabRefPreferences implements PreferencesService {
     public void storeDOIPreferences(DOIPreferences preferences) {
         putBoolean(USE_CUSTOM_DOI_URI, preferences.isUseCustom());
         put(BASE_DOI_URI, preferences.getDefaultBaseURI());
+    }
+
+    /**
+     * Gets the CustomAPIKeyPreferences that contains information: the custom API key and whether to use it
+     *
+     * @param name the key name of API key
+     * @return CustomAPIKeyPreferences
+     */
+    @Override
+    public CustomApiKeyPreferences getCustomApiKeyPreferences(String name) {
+        return new CustomApiKeyPreferences(name,
+                getBoolean(USE_CUSTOM_API_KEY + name, false),
+                get(CUSTOM_API_KEY + name, ""));
+    }
+
+    /**
+     * Saves CustomAPIKeyPreferences information: the custom custom API key and whether to use it
+     *
+     * @param preferences CustomApiKeyPreferences
+     */
+    @Override
+    public void storeCustomApiKeyPreferences(CustomApiKeyPreferences preferences) {
+        String keyName = preferences.getName();
+        putBoolean(USE_CUSTOM_API_KEY + keyName, preferences.shouldUseCustom());
+        put(CUSTOM_API_KEY + keyName, preferences.getCustomApiKey());
+    }
+
+    /**
+     * Removes the value associated with the specified custom api key in this preference node, if any.
+     *
+     * @param name the name of custom api key
+     */
+    @Override
+    public void clearCustomApiKeyPreferences(String name) {
+        prefs.remove(USE_CUSTOM_API_KEY + name);
+        prefs.remove(CUSTOM_API_KEY + name);
     }
 
     @Override

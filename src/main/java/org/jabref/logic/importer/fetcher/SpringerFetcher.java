@@ -7,14 +7,17 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.gui.preferences.customization.CustomizationTabViewModel;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.SpringerQueryTransformer;
+import org.jabref.logic.preferences.CustomApiKeyPreferences;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
 import org.jabref.model.entry.BibEntry;
@@ -23,6 +26,7 @@ import org.jabref.model.entry.Month;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.preferences.PreferencesService;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
@@ -40,8 +44,17 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringerFetcher.class);
 
-    private static final String API_URL = "http://api.springernature.com/meta/v1/json";
+    private static final String API_URL = "https://api.springernature.com/meta/v1/json";
     private static final String API_KEY = new BuildInfo().springerNatureAPIKey;
+    // Springer query using the parameter 'q=doi:10.1007/s11276-008-0131-4s=1' will respond faster
+    private static final String TEST_URL_WITHOUT_API_KEY = "https://api.springernature.com/meta/v1/json?q=doi:10.1007/s11276-008-0131-4s=1&p=1&api_key=";
+
+    private final PreferencesService preferences;
+
+    public SpringerFetcher(PreferencesService preferences) {
+        this.preferences = Objects.requireNonNull(preferences);
+        CustomizationTabViewModel.registerApiKeyCustom(this.getName(), TEST_URL_WITHOUT_API_KEY);
+    }
 
     /**
      * Convert a JSONObject obtained from http://api.springer.com/metadata/json to a BibEntry
@@ -160,11 +173,33 @@ public class SpringerFetcher implements PagedSearchBasedParserFetcher {
         return Optional.of(HelpFile.FETCHER_SPRINGER);
     }
 
+    /**
+     * Gets springer api key, use key if it customized it in the preferences, otherwise use the default
+     *
+     * @return Springer API Key
+     */
+    private String getApiKey() {
+        String apiKey = API_KEY;
+        CustomApiKeyPreferences apiKeyPreferences = preferences.getCustomApiKeyPreferences(getName());
+        if (apiKeyPreferences != null && apiKeyPreferences.shouldUseCustom()) {
+            apiKey = apiKeyPreferences.getCustomApiKey();
+        }
+        return apiKey;
+    }
+
+    /**
+     * Gets the query URL
+     *
+     * @param luceneQuery the search query
+     * @param pageNumber  the number of the page indexed from 0
+     * @return URL
+     */
     @Override
     public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
+
         URIBuilder uriBuilder = new URIBuilder(API_URL);
         uriBuilder.addParameter("q", new SpringerQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // Search query
-        uriBuilder.addParameter("api_key", API_KEY); // API key
+        uriBuilder.addParameter("api_key", getApiKey()); // API key
         uriBuilder.addParameter("s", String.valueOf(getPageSize() * pageNumber + 1)); // Start entry, starts indexing at 1
         uriBuilder.addParameter("p", String.valueOf(getPageSize())); // Page size
         return uriBuilder.build().toURL();

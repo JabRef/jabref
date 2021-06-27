@@ -6,10 +6,12 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FulltextFetcher;
+import org.jabref.logic.preferences.CustomApiKeyPreferences;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.preferences.PreferencesService;
 
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
@@ -30,6 +32,27 @@ public class SpringerLink implements FulltextFetcher {
     private static final String API_URL = "https://api.springer.com/meta/v1/json";
     private static final String API_KEY = new BuildInfo().springerNatureAPIKey;
     private static final String CONTENT_HOST = "link.springer.com";
+    private static final String NAME = "Springer";
+
+    private final PreferencesService preferences;
+
+    public SpringerLink(PreferencesService preferences) {
+        this.preferences = Objects.requireNonNull(preferences);
+    }
+
+    /**
+     * Gets springer api key, use key if it customized it in the preferences, otherwise use the default
+     *
+     * @return Springer API Key
+     */
+    private String getApiKey() {
+        String apiKey = API_KEY;
+        CustomApiKeyPreferences apiKeyPreferences = preferences.getCustomApiKeyPreferences(NAME);
+        if (apiKeyPreferences != null && apiKeyPreferences.shouldUseCustom()) {
+            apiKey = apiKeyPreferences.getCustomApiKey();
+        }
+        return apiKey;
+    }
 
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
@@ -44,7 +67,7 @@ public class SpringerLink implements FulltextFetcher {
         // Available in catalog?
         try {
             HttpResponse<JsonNode> jsonResponse = Unirest.get(API_URL)
-                                                         .queryString("api_key", API_KEY)
+                                                         .queryString("api_key", getApiKey())
                                                          .queryString("q", String.format("doi:%s", doi.get().getDOI()))
                                                          .asJson();
             if (jsonResponse.getBody() != null) {
