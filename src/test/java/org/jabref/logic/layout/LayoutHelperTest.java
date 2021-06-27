@@ -3,7 +3,6 @@ package org.jabref.logic.layout;
 import java.io.IOException;
 import java.io.StringReader;
 
-import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
