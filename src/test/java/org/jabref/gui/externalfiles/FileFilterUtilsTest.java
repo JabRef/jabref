@@ -45,7 +45,7 @@ public class FileFilterUtilsTest {
 
     @Test
     public void isDuringLastMonthNegativeTest() {
-        assertEquals(fileFilterUtils.isDuringLastMonth(time.minusMonths(1)), false);
+        assertEquals(fileFilterUtils.isDuringLastMonth(time.minusDays(30)), false);
     }
 
     @Test
@@ -55,12 +55,12 @@ public class FileFilterUtilsTest {
 
     @Test
     public void isDuringLastYearNegativeTest() {
-        assertEquals(fileFilterUtils.isDuringLastYear(time.minusYears(1)), false);
+        assertEquals(fileFilterUtils.isDuringLastYear(time.minusDays(365)), false);
     }
 
     @Test
     public void isDuringLastYearPositiveTest() {
-        assertEquals(fileFilterUtils.isDuringLastYear(time.minusMonths(11).minusDays(29).minusHours(23)), true);
+        assertEquals(fileFilterUtils.isDuringLastYear(time.minusDays(364).minusHours(23)), true);
     }
 
     @Nested

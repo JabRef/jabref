@@ -50,14 +50,14 @@ public class FileFilterUtils {
      * was edited during the last 30 days. */
     public boolean isDuringLastMonth(LocalDateTime fileEditTime) {
         LocalDateTime NOW = LocalDateTime.now(ZoneId.systemDefault());
-        return fileEditTime.isAfter(NOW.minusMonths(1));
+        return fileEditTime.isAfter(NOW.minusDays(30));
     }
 
     /* Returns true if a file with a specific path 
-     * was edited during the last year. */
+     * was edited during the last 365 days. */
     public boolean isDuringLastYear(LocalDateTime fileEditTime) {
         LocalDateTime NOW = LocalDateTime.now(ZoneId.systemDefault());
-        return fileEditTime.isAfter(NOW.minusYears(1));
+        return fileEditTime.isAfter(NOW.minusDays(365));
     }
 
     /* Returns true if a file is edited in the time margin specified by the given filter. */
