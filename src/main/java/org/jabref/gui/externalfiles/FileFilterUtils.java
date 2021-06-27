@@ -70,7 +70,6 @@ public class FileFilterUtils {
             case MONTH -> fileFilter.isDuringLastMonth(fileTime);
             case YEAR -> fileFilter.isDuringLastYear(fileTime);
             case ALL_TIME -> true;
-            default -> true;
         };
         return isInDateRange;
     }
@@ -105,7 +104,6 @@ public class FileFilterUtils {
             case DEFAULT -> files;
             case DATE_ASCENDING -> fileFilter.sortByDateDescending(files);
             case DATE_DESCENDING -> fileFilter.sortByDateAscending(files);
-            default -> files;
         };
         return sortedFiles;
     }
