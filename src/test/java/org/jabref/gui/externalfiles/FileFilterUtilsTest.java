@@ -13,6 +13,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -73,16 +74,12 @@ public class FileFilterUtilsTest {
 
         /* Initialize the directory and files used in the sorting tests, and change their last edited dates. */
         @BeforeEach
-        public void setUp() throws Exception {
-            String dirPath = "src/test/resources/unlinkedFiles";
-
-            Path path = Path.of(dirPath);
-            Files.createDirectory(path);
-    
-            Path firstPath = Path.of(dirPath.concat("/firstFile.pdf"));
-            Path secondPath = Path.of(dirPath.concat("/secondFile.pdf"));
-            Path thirdPath = Path.of(dirPath.concat("/thirdFile.pdf"));
-            Path fourthPath = Path.of(dirPath.concat("/fourthFile.pdf"));
+        public void setUp(@TempDir Path tempDir) throws Exception {
+            
+            Path firstPath = tempDir.resolve("firstFile.pdf");
+            Path secondPath =tempDir.resolve("secondFile.pdf");
+            Path thirdPath = tempDir.resolve("thirdFile.pdf");
+            Path fourthPath = tempDir.resolve("fourthFile.pdf");
     
             Files.createFile(firstPath);
             Files.createFile(secondPath);
@@ -128,24 +125,6 @@ public class FileFilterUtilsTest {
             wrongOrder.add(secondPath.toString());
             wrongOrder.add(thirdPath.toString());
             wrongOrder.add(fourthPath.toString());
-        }
-    
-        /* Delete the files and clear the path lists. */
-        @AfterEach
-        public void cleanUp() {
-            String dirPath = "src/test/resources/unlinkedFiles";
-
-            File firstFile = new File(dirPath.concat("/firstFile.pdf"));
-            File secondFile = new File(dirPath.concat("/secondFile.pdf"));
-            File thirdFile = new File(dirPath.concat("/thirdFile.pdf"));
-            File fourthFile = new File(dirPath.concat("/fourthFile.pdf"));
-            File directory = new File(dirPath);
-    
-            firstFile.delete();
-            secondFile.delete();
-            thirdFile.delete();
-            fourthFile.delete();
-            directory.delete();
         }
     
         @Test
