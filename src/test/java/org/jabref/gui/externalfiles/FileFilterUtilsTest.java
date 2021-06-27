@@ -72,7 +72,7 @@ public class FileFilterUtilsTest {
         private List<String> wrongOrder = new ArrayList<String>();
 
         @BeforeEach
-        private void setUp() throws Exception {
+        public void setUp() throws Exception {
             String dirPath = "src/test/resources/unlinkedFiles";
 
             Path path = Path.of(dirPath);
@@ -97,9 +97,9 @@ public class FileFilterUtilsTest {
             ZoneId zoneId = ZoneId.systemDefault();
     
             LocalDateTime firstDate = LocalDateTime.of(2021, 1, 10, 0, 0, 0, 0);
-            LocalDateTime secondDate= LocalDateTime.of(2021, 1, 5, 0, 0, 0, 0);
-            LocalDateTime thirdDate= LocalDateTime.of(2021, 1, 1, 0, 0, 0, 0);
-            LocalDateTime fourthDate= LocalDateTime.of(2021, 1, 2, 0, 0, 0, 0);
+            LocalDateTime secondDate = LocalDateTime.of(2021, 1, 5, 0, 0, 0, 0);
+            LocalDateTime thirdDate = LocalDateTime.of(2021, 1, 1, 0, 0, 0, 0);
+            LocalDateTime fourthDate = LocalDateTime.of(2021, 1, 2, 0, 0, 0, 0);
     
             firstFile.setLastModified(firstDate.atZone(zoneId).toEpochSecond());
             secondFile.setLastModified(secondDate.atZone(zoneId).toEpochSecond());
@@ -128,7 +128,7 @@ public class FileFilterUtilsTest {
         }
     
         @AfterEach
-        private void cleanUp() {
+        public void cleanUp() {
             String dirPath = "src/test/resources/unlinkedFiles";
 
             File firstFile = new File(dirPath.concat("/firstFile.pdf"));
@@ -145,7 +145,7 @@ public class FileFilterUtilsTest {
         }
     
         @Test
-        public void SortByDateAscendingPositiveTest() throws Exception {
+        public void sortByDateAscendingPositiveTest() {
             List<String> actualsList = new ArrayList<String>();
             List<Path> sortedPaths = fileFilterUtils.sortByDateAscending(files);
             String[] expecteds = new String[4];
@@ -159,7 +159,7 @@ public class FileFilterUtilsTest {
         }
 
         @Test
-        public void SortByDateAscendingNegativeTest() throws Exception {
+        public void sortByDateAscendingNegativeTest() {
             List<String> actualsList = new ArrayList<String>();
             List<Path> sortedPaths = fileFilterUtils.sortByDateAscending(files);
             String[] expecteds = new String[4];
@@ -173,7 +173,7 @@ public class FileFilterUtilsTest {
         }
     
         @Test
-        public void SortByDateDescendingPositiveTest() {
+        public void sortByDateDescendingPositiveTest() {
             List<String> actualsList = new ArrayList<String>();
             List<Path> sortedPaths = fileFilterUtils.sortByDateDescending(files);
             String[] expecteds = new String[4];
@@ -187,7 +187,7 @@ public class FileFilterUtilsTest {
         }
 
         @Test
-        public void testSortByDateDescendingNegativeTest() throws Exception {
+        public void testSortByDateDescendingNegativeTest() {
             List<String> actualsList = new ArrayList<String>();
             List<Path> sortedPaths = fileFilterUtils.sortByDateDescending(files);
             String[] expecteds = new String[4];
