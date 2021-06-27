@@ -209,6 +209,9 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
                     JSONObject jsonEntry = results.getJSONObject(i);
                     BibEntry entry = parseJsonResponse(jsonEntry, preferences.getKeywordSeparator());
                     boolean addEntry;
+                    // In case entry has no year, add it
+                    // In case an entry has a year, check if its in the year range
+                    // The implementation uses some Java 8 Optional magic to implement that
                     if (entry.hasField(StandardField.YEAR)) {
                         addEntry = entry.getField(StandardField.YEAR).filter(year -> {
                             Integer yearAsInteger = Integer.valueOf(year);
