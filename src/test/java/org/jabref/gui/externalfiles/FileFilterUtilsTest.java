@@ -1,15 +1,14 @@
 package org.jabref.gui.externalfiles;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -77,7 +76,7 @@ public class FileFilterUtilsTest {
         public void setUp(@TempDir Path tempDir) throws Exception {
             
             Path firstPath = tempDir.resolve("firstFile.pdf");
-            Path secondPath =tempDir.resolve("secondFile.pdf");
+            Path secondPath = tempDir.resolve("secondFile.pdf");
             Path thirdPath = tempDir.resolve("thirdFile.pdf");
             Path fourthPath = tempDir.resolve("fourthFile.pdf");
     
@@ -87,23 +86,11 @@ public class FileFilterUtilsTest {
             Files.createFile(fourthPath);
 
             // change the files last edited times.
-            File firstFile = new File(firstPath.toString());
-            File secondFile = new File(secondPath.toString());
-            File thirdFile = new File(thirdPath.toString());
-            File fourthFile = new File(fourthPath.toString());
-    
-            ZoneId zoneId = ZoneId.systemDefault();
-    
-            LocalDateTime firstDate = LocalDateTime.of(2021, 1, 10, 0, 0, 0, 0);
-            LocalDateTime secondDate = LocalDateTime.of(2021, 1, 5, 0, 0, 0, 0);
-            LocalDateTime thirdDate = LocalDateTime.of(2021, 1, 1, 0, 0, 0, 0);
-            LocalDateTime fourthDate = LocalDateTime.of(2021, 1, 2, 0, 0, 0, 0);
-    
-            firstFile.setLastModified(firstDate.atZone(zoneId).toEpochSecond());
-            secondFile.setLastModified(secondDate.atZone(zoneId).toEpochSecond());
-            thirdFile.setLastModified(thirdDate.atZone(zoneId).toEpochSecond());
-            fourthFile.setLastModified(fourthDate.atZone(zoneId).toEpochSecond());
-    
+            Files.setLastModifiedTime(firstPath, FileTime.fromMillis(10));
+            Files.setLastModifiedTime(secondPath, FileTime.fromMillis(5));
+            Files.setLastModifiedTime(thirdPath, FileTime.fromMillis(1));
+            Files.setLastModifiedTime(fourthPath, FileTime.fromMillis(2));
+            
             // fill the list to be sorted by the tests.
             files.add(firstPath);
             files.add(secondPath);
