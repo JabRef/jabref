@@ -17,6 +17,7 @@ public class FileFilterUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileFilterUtils.class);
     
+    /* Returns the last edited time of a file as LocalDateTime. */
     public static LocalDateTime getFileTime(Path path) {
         FileTime lastEditedTime = null;
         try {
@@ -31,26 +32,35 @@ public class FileFilterUtils {
         return localDateTime;
     }
 
+    /* Returns true if a file with a specific path 
+     * was edited during the last 24 hours. */
     public boolean isDuringLastDay(LocalDateTime fileEditTime) {
         LocalDateTime NOW = LocalDateTime.now(ZoneId.systemDefault());
         return fileEditTime.isAfter(NOW.minusHours(24));
     }
 
+    /* Returns true if a file with a specific path 
+     * was edited during the last 7 days. */
     public boolean isDuringLastWeek(LocalDateTime fileEditTime) {
         LocalDateTime NOW = LocalDateTime.now(ZoneId.systemDefault());
         return fileEditTime.isAfter(NOW.minusDays(7));
     }
 
+    /* Returns true if a file with a specific path 
+     * was edited during the last 30 days. */
     public boolean isDuringLastMonth(LocalDateTime fileEditTime) {
         LocalDateTime NOW = LocalDateTime.now(ZoneId.systemDefault());
         return fileEditTime.isAfter(NOW.minusMonths(1));
     }
 
+    /* Returns true if a file with a specific path 
+     * was edited during the last year. */
     public boolean isDuringLastYear(LocalDateTime fileEditTime) {
         LocalDateTime NOW = LocalDateTime.now(ZoneId.systemDefault());
         return fileEditTime.isAfter(NOW.minusYears(1));
     }
 
+    /* Returns true if a file is edited in the time margin specified by the given filter. */
     public static boolean filterByDate(Path path, ExternalFilesDateViewModel filter) {
         FileFilterUtils fileFilter = new FileFilterUtils();
         LocalDateTime fileTime = FileFilterUtils.getFileTime(path);
@@ -65,6 +75,8 @@ public class FileFilterUtils {
         return isInDateRange;
     }
 
+    /* Sorts a list of Path objects according to the last edited date 
+     * of their corresponding files, from newest to oldest. */
     public List<Path> sortByDateAscending(List<Path> files) {
         return files.stream()
                 .sorted(Comparator.comparingLong(file -> FileFilterUtils.getFileTime(file)
@@ -74,6 +86,8 @@ public class FileFilterUtils {
                 .collect(Collectors.toList());
     }
 
+    /* Sorts a list of Path objects according to the last edited date 
+     * of their corresponding files, from oldest to newest. */
     public List<Path> sortByDateDescending(List<Path> files) {
         return files.stream()
                 .sorted(Comparator.comparingLong(file -> -FileFilterUtils.getFileTime(file)
@@ -83,6 +97,8 @@ public class FileFilterUtils {
                 .collect(Collectors.toList());
     }
 
+    /* Sorts a list of Path objects according to the last edited date
+     * the order depends on the specified sorter type. */
     public static List<Path> sortByDate(List<Path> files, FileSortViewModel sortType) {
         FileFilterUtils fileFilter = new FileFilterUtils();
         List<Path> sortedFiles = switch (sortType.getSorter()) {
