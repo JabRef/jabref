@@ -55,8 +55,8 @@ public class UnlinkedFilesDialogViewModel {
     private final ImportHandler importHandler;
     private final StringProperty directoryPath = new SimpleStringProperty("");
     private final ObjectProperty<FileExtensionViewModel> selectedExtension = new SimpleObjectProperty<>();
-    private final ObjectProperty<ExternalFilesDateViewModel> selectedDate = new SimpleObjectProperty<>();
-    private final ObjectProperty<FileSortViewModel> selectedSort = new SimpleObjectProperty<>();
+    private final ObjectProperty<DateRange> selectedDate = new SimpleObjectProperty<>();
+    private final ObjectProperty<ExternalFileSorter> selectedSort = new SimpleObjectProperty<>();
 
     private final ObjectProperty<Optional<FileNodeViewModel>> treeRootProperty = new SimpleObjectProperty<>();
     private final SimpleListProperty<TreeItem<FileNodeViewModel>> checkedFileListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -67,8 +67,8 @@ public class UnlinkedFilesDialogViewModel {
 
     private final ObservableList<ImportFilesResultItemViewModel> resultList = FXCollections.observableArrayList();
     private final ObservableList<FileExtensionViewModel> fileFilterList;
-    private final ObservableList<ExternalFilesDateViewModel> dateFilterList;
-    private final ObservableList<FileSortViewModel> fileSortList;
+    private final ObservableList<DateRange> dateFilterList;
+    private final ObservableList<ExternalFileSorter> fileSortList;
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
@@ -100,16 +100,16 @@ public class UnlinkedFilesDialogViewModel {
             new FileExtensionViewModel(StandardFileType.PDF, externalFileTypes));
 
         this.dateFilterList = FXCollections.observableArrayList(
-            new ExternalFilesDateViewModel(DateRange.ALL_TIME),
-            new ExternalFilesDateViewModel(DateRange.YEAR),
-            new ExternalFilesDateViewModel(DateRange.MONTH),
-            new ExternalFilesDateViewModel(DateRange.WEEK),
-            new ExternalFilesDateViewModel(DateRange.DAY));
+            DateRange.ALL_TIME,
+            DateRange.YEAR,
+            DateRange.MONTH,
+            DateRange.WEEK,
+            DateRange.DAY);
 
         this.fileSortList = FXCollections.observableArrayList(
-            new FileSortViewModel(ExternalFileSorter.DEFAULT),
-            new FileSortViewModel(ExternalFileSorter.DATE_ASCENDING),
-            new FileSortViewModel(ExternalFileSorter.DATE_DESCENDING));
+            ExternalFileSorter.DEFAULT,
+            ExternalFileSorter.DATE_ASCENDING,
+            ExternalFileSorter.DATE_DESCENDING);
 
         Predicate<String> isDirectory = path -> Files.isDirectory(Path.of(path));
         scanDirectoryValidator = new FunctionBasedValidator<>(directoryPath, isDirectory,
@@ -121,8 +121,8 @@ public class UnlinkedFilesDialogViewModel {
     public void startSearch() {
         Path directory = this.getSearchDirectory();
         Filter<Path> selectedFileFilter = selectedExtension.getValue().dirFilter();
-        ExternalFilesDateViewModel selectedDateFilter = selectedDate.getValue();
-        FileSortViewModel selectedSortFilter = selectedSort.getValue();
+        DateRange selectedDateFilter = selectedDate.getValue();
+        ExternalFileSorter selectedSortFilter = selectedSort.getValue();
         progressValueProperty.unbind();
         progressTextProperty.unbind();
 
@@ -207,11 +207,11 @@ public class UnlinkedFilesDialogViewModel {
         return this.fileFilterList;
     }
 
-    public ObservableList<ExternalFilesDateViewModel> getDateFilters() {
+    public ObservableList<DateRange> getDateFilters() {
         return this.dateFilterList;
     }
 
-    public ObservableList<FileSortViewModel> getSorters() {
+    public ObservableList<ExternalFileSorter> getSorters() {
         return this.fileSortList;
     }
 
@@ -260,11 +260,11 @@ public class UnlinkedFilesDialogViewModel {
         return this.selectedExtension;
     }
 
-    public ObjectProperty<ExternalFilesDateViewModel> selectedDateProperty() {
+    public ObjectProperty<DateRange> selectedDateProperty() {
         return this.selectedDate;
     }
 
-    public ObjectProperty<FileSortViewModel> selectedSortProperty() {
+    public ObjectProperty<ExternalFileSorter> selectedSortProperty() {
         return this.selectedSort;
     }
 

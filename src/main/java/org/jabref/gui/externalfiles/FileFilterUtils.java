@@ -61,10 +61,10 @@ public class FileFilterUtils {
     }
 
     /* Returns true if a file is edited in the time margin specified by the given filter. */
-    public static boolean filterByDate(Path path, ExternalFilesDateViewModel filter) {
+    public static boolean filterByDate(Path path, DateRange filter) {
         FileFilterUtils fileFilter = new FileFilterUtils();
         LocalDateTime fileTime = FileFilterUtils.getFileTime(path);
-        boolean isInDateRange = switch (filter.getDateRanges()) {
+        boolean isInDateRange = switch (filter) {
             case DAY -> fileFilter.isDuringLastDay(fileTime);
             case WEEK -> fileFilter.isDuringLastWeek(fileTime);
             case MONTH -> fileFilter.isDuringLastMonth(fileTime);
@@ -99,9 +99,9 @@ public class FileFilterUtils {
 
     /* Sorts a list of Path objects according to the last edited date
      * the order depends on the specified sorter type. */
-    public static List<Path> sortByDate(List<Path> files, FileSortViewModel sortType) {
+    public static List<Path> sortByDate(List<Path> files, ExternalFileSorter sortType) {
         FileFilterUtils fileFilter = new FileFilterUtils();
-        List<Path> sortedFiles = switch (sortType.getSorter()) {
+        List<Path> sortedFiles = switch (sortType) {
             case DEFAULT -> files;
             case DATE_ASCENDING -> fileFilter.sortByDateDescending(files);
             case DATE_DESCENDING -> fileFilter.sortByDateAscending(files);
