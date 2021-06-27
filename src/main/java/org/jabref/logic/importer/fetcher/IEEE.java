@@ -208,11 +208,20 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
                 for (int i = 0; i < results.length(); i++) {
                     JSONObject jsonEntry = results.getJSONObject(i);
                     BibEntry entry = parseJsonResponse(jsonEntry, preferences.getKeywordSeparator());
-                    if (entry.getField(StandardField.YEAR).filter(year -> Integer.valueOf(year) >= minYear && Integer.valueOf(year) <= maxYear)
-                             .ifPresentOrElse(e -> entries.add(e),
-                                     ()-> {
+                    boolean addEntry;
+                    if (entry.hasField(StandardField.YEAR)) {
+                        addEntry = entry.getField(StandardField.YEAR).filter(year -> {
+                            Integer yearAsInteger = Integer.valueOf(year);
+                            return
+                                    transformer.getStartYear().map(startYear -> yearAsInteger >= startYear).orElse(true) &&
+                                            transformer.getEndYear().map(endYear -> yearAsInteger <= endYear).orElse(true);
+                        }).map(x -> true).orElse(false);
+                    } else {
+                        addEntry = true;
+                    }
+                    if (addEntry) {
                         entries.add(entry);
-                    });
+                    }
                 }
             }
 
@@ -232,7 +241,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
 
     @Override
     public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
-        // transfomer is stored globally, because we need to filter out the bib entries by the year manually
+        // transformer is stored globally, because we need to filter out the bib entries by the year manually
         // the transformer stores the min and max year
         transformer = new IEEEQueryTransformer();
         String transformedQuery = transformer.transformLuceneQuery(luceneQuery).orElse("");

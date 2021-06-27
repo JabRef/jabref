@@ -11,8 +11,6 @@ public class IEEEQueryTransformer extends YearRangeByFilteringQueryTransformer {
     // Journal is wrapped in quotes by the transformer
     private String journal;
     private String articleNumber;
-    private int startYear = Integer.MAX_VALUE;
-    private int endYear = Integer.MIN_VALUE;
 
     @Override
     protected String getLogicalAndOperator() {
@@ -40,8 +38,9 @@ public class IEEEQueryTransformer extends YearRangeByFilteringQueryTransformer {
     }
 
     @Override
-    protected String handleJournal(String journalTitle) {
-        return handleUnFieldedTerm(journalTitle);
+    protected String handleJournal(String journal) {
+        this.journal = journal;
+        return handleUnFieldedTerm(journal);
     }
 
     @Override
