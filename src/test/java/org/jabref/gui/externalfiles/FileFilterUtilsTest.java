@@ -1,26 +1,22 @@
 package org.jabref.gui.externalfiles;
 
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Date;
-import java.io.IOException;
-import java.text.ParseException;
+import java.util.List;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.io.File;
-import java.io.IOException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FileFilterUtilsTest {
 
@@ -83,10 +79,10 @@ public class FileFilterUtilsTest {
     
             ZoneId zoneId = ZoneId.systemDefault();
     
-            LocalDateTime firstDate = LocalDateTime.of(2021, 1, 10, 0, 0 ,0 ,0);
-            LocalDateTime secondDate= LocalDateTime.of(2021, 1, 5, 0, 0 ,0 ,0);
-            LocalDateTime thirdDate= LocalDateTime.of(2021, 1, 1, 0, 0 ,0 ,0);
-            LocalDateTime fourthDate= LocalDateTime.of(2021, 1, 2, 0, 0 ,0 ,0);
+            LocalDateTime firstDate = LocalDateTime.of(2021, 1, 10, 0, 0, 0, 0);
+            LocalDateTime secondDate= LocalDateTime.of(2021, 1, 5, 0, 0, 0, 0);
+            LocalDateTime thirdDate= LocalDateTime.of(2021, 1, 1, 0, 0, 0, 0);
+            LocalDateTime fourthDate= LocalDateTime.of(2021, 1, 2, 0, 0, 0, 0);
     
             firstFile.setLastModified(firstDate.atZone(zoneId).toEpochSecond());
             secondFile.setLastModified(secondDate.atZone(zoneId).toEpochSecond());
@@ -127,7 +123,7 @@ public class FileFilterUtilsTest {
         }
     
         @Test
-        public void testSortByDateAscending() throws Exception{
+        public void testSortByDateAscending() throws Exception {
             List<String> actualsList = new ArrayList<String>();
             List<Path> sortedPaths = fileFilterUtils.sortByDateAscending(files);
             String[] expecteds = new String[4];
