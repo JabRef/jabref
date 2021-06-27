@@ -3,7 +3,6 @@ package org.jabref.gui.externalfiles;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -76,13 +75,13 @@ public class FileFilterUtilsTest {
         private void setUp() throws Exception {
             String dirPath = "src/test/resources/unlinkedFiles";
 
-            Path path = Paths.get(dirPath);
+            Path path = Path.of(dirPath);
             Files.createDirectory(path);
     
-            Path firstPath = Paths.get(dirPath.concat("/firstFile.pdf"));
-            Path secondPath = Paths.get(dirPath.concat("/secondFile.pdf"));
-            Path thirdPath = Paths.get(dirPath.concat("/thirdFile.pdf"));
-            Path fourthPath = Paths.get(dirPath.concat("/fourthFile.pdf"));
+            Path firstPath = Path.of(dirPath.concat("/firstFile.pdf"));
+            Path secondPath = Path.of(dirPath.concat("/secondFile.pdf"));
+            Path thirdPath = Path.of(dirPath.concat("/thirdFile.pdf"));
+            Path fourthPath = Path.of(dirPath.concat("/fourthFile.pdf"));
     
             Files.createFile(firstPath);
             Files.createFile(secondPath);
