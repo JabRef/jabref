@@ -2,21 +2,22 @@ package org.jabref.gui.externalfiles;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class FileFilterUtilsTest {
 
@@ -116,58 +117,42 @@ public class FileFilterUtilsTest {
     
         @Test
         public void sortByDateAscendingPositiveTest() {
-            List<String> actualsList = new ArrayList<String>();
-            List<Path> sortedPaths = fileFilterUtils.sortByDateAscending(files);
-            String[] expecteds = new String[4];
-            String[] actuals = new String[4];
-            for (Path path : sortedPaths) {
-                actualsList.add(path.toString());
-            }
-            actualsList.toArray(actuals);
-            expectedSortByDateAscending.toArray(expecteds);
-            assertArrayEquals(actuals, expecteds);
+            List<String> sortedPaths = fileFilterUtils
+                .sortByDateAscending(files)
+                .stream()
+                .map(Path::toString)
+                .collect(Collectors.toList());
+            assertEquals(sortedPaths, expectedSortByDateAscending);
         }
 
         @Test
         public void sortByDateAscendingNegativeTest() {
-            List<String> actualsList = new ArrayList<String>();
-            List<Path> sortedPaths = fileFilterUtils.sortByDateAscending(files);
-            String[] expecteds = new String[4];
-            String[] actuals = new String[4];
-            for (Path path : sortedPaths) {
-                actualsList.add(path.toString());
-            }
-            actualsList.toArray(actuals);
-            wrongOrder.toArray(expecteds);
-            assertFalse(Arrays.equals(actuals, expecteds));
+            List<String> sortedPaths = fileFilterUtils
+                .sortByDateAscending(files)
+                .stream()
+                .map(Path::toString)
+                .collect(Collectors.toList());
+            assertNotEquals(sortedPaths, wrongOrder);
         }
     
         @Test
         public void sortByDateDescendingPositiveTest() {
-            List<String> actualsList = new ArrayList<String>();
-            List<Path> sortedPaths = fileFilterUtils.sortByDateDescending(files);
-            String[] expecteds = new String[4];
-            String[] actuals = new String[4];
-            for (Path path : sortedPaths) {
-                actualsList.add(path.toString());
-            }
-            actualsList.toArray(actuals);
-            expectedSortByDateDescending.toArray(expecteds);
-            assertArrayEquals(actuals, expecteds);
+            List<String> sortedPaths = fileFilterUtils
+                .sortByDateDescending(files)
+                .stream()
+                .map(Path::toString)
+                .collect(Collectors.toList());
+            assertEquals(sortedPaths, expectedSortByDateDescending);
         }
 
         @Test
         public void testSortByDateDescendingNegativeTest() {
-            List<String> actualsList = new ArrayList<String>();
-            List<Path> sortedPaths = fileFilterUtils.sortByDateDescending(files);
-            String[] expecteds = new String[4];
-            String[] actuals = new String[4];
-            for (Path path : sortedPaths) {
-                actualsList.add(path.toString());
-            }
-            actualsList.toArray(actuals);
-            wrongOrder.toArray(expecteds);
-            assertFalse(Arrays.equals(actuals, expecteds));
+            List<String> sortedPaths = fileFilterUtils
+                .sortByDateDescending(files)
+                .stream()
+                .map(Path::toString)
+                .collect(Collectors.toList());
+            assertNotEquals(sortedPaths, wrongOrder);
         }
     }
 }
