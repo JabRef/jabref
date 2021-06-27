@@ -9,12 +9,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.transformers.AbstractQueryTransformer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
@@ -33,9 +33,9 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
 
     @BeforeEach
     public void setUp() {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
-        fetcher = new CollectionOfComputerScienceBibliographiesFetcher(importFormatPreferences);
+        PreferencesService preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
+        when(preferencesService.getKeywordDelimiter()).thenReturn(',');
+        fetcher = new CollectionOfComputerScienceBibliographiesFetcher(preferencesService);
     }
 
     @Test

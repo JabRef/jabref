@@ -7,6 +7,7 @@ import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ class DatabaseFileLookupTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        ParserResult result = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor())
+        ParserResult result = new BibtexImporter(mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor())
                 .importDatabase(ImportDataTest.UNLINKED_FILES_TEST_BIB, StandardCharsets.UTF_8);
         database = result.getDatabase();
         entries = database.getEntries();

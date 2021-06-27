@@ -9,12 +9,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import com.google.common.io.Resources;
 import org.apache.xmpbox.XMPMetadata;
@@ -37,8 +37,8 @@ class XmpUtilReaderTest {
      */
     @BeforeEach
     void setUp() {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
+        PreferencesService importFormatPreferences = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
         xmpPreferences = mock(XmpPreferences.class);
         // The code assumes privacy filters to be off
         when(xmpPreferences.shouldUseXmpPrivacyFilter()).thenReturn(false);

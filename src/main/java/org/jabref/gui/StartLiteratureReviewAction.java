@@ -12,7 +12,6 @@ import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.crawler.Crawler;
 import org.jabref.logic.crawler.git.GitHandler;
 import org.jabref.logic.exporter.SavePreferences;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -31,17 +30,15 @@ public class StartLiteratureReviewAction extends SimpleCommand {
     private final Path workingDirectory;
     private final TaskExecutor taskExecutor;
     private final PreferencesService preferencesService;
-    private final ImportFormatPreferences importFormatPreferneces;
     private final SavePreferences savePreferences;
 
-    public StartLiteratureReviewAction(JabRefFrame frame, FileUpdateMonitor fileUpdateMonitor, Path standardWorkingDirectory, TaskExecutor taskExecutor, PreferencesService preferencesService, ImportFormatPreferences importFormatPreferences, SavePreferences savePreferences) {
+    public StartLiteratureReviewAction(JabRefFrame frame, FileUpdateMonitor fileUpdateMonitor, Path standardWorkingDirectory, TaskExecutor taskExecutor, PreferencesService preferencesService, SavePreferences savePreferences) {
         this.frame = frame;
         this.dialogService = frame.getDialogService();
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.workingDirectory = getInitialDirectory(standardWorkingDirectory);
         this.taskExecutor = taskExecutor;
         this.preferencesService = preferencesService;
-        this.importFormatPreferneces = importFormatPreferences;
         this.savePreferences = savePreferences;
     }
 
@@ -58,7 +55,7 @@ public class StartLiteratureReviewAction extends SimpleCommand {
         }
         final Crawler crawler;
         try {
-            crawler = new Crawler(studyDefinitionFile.get(), new GitHandler(studyDefinitionFile.get().getParent()), fileUpdateMonitor, importFormatPreferneces, savePreferences, preferencesService.getTimestampPreferences(), new BibEntryTypesManager());
+            crawler = new Crawler(studyDefinitionFile.get(), new GitHandler(studyDefinitionFile.get().getParent()), fileUpdateMonitor, preferencesService, savePreferences, preferencesService.getTimestampPreferences(), new BibEntryTypesManager());
         } catch (IOException | ParseException | GitAPIException e) {
             LOGGER.error("Error during reading of study definition file.", e);
             dialogService.showErrorDialogAndWait(Localization.lang("Error during reading of study definition file."), e);

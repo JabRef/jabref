@@ -9,13 +9,13 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 public class CollectionOfComputerScienceBibliographiesParser implements Parser {
 
@@ -25,8 +25,8 @@ public class CollectionOfComputerScienceBibliographiesParser implements Parser {
     final BibtexParser bibtexParser;
     final HtmlToUnicodeFormatter htmlToUnicodeFormatter;
 
-    public CollectionOfComputerScienceBibliographiesParser(ImportFormatPreferences importFormatPreferences) {
-        this.bibtexParser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+    public CollectionOfComputerScienceBibliographiesParser(PreferencesService preferencesService) {
+        this.bibtexParser = new BibtexParser(preferencesService, new DummyFileUpdateMonitor());
         this.htmlToUnicodeFormatter = new HtmlToUnicodeFormatter();
     }
 
@@ -34,9 +34,7 @@ public class CollectionOfComputerScienceBibliographiesParser implements Parser {
     public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
         try {
             List<String> links = matchRegexFromInputStreamHtml(inputStream, REGEX_FOR_LINKS);
-            String bibtexDataString = parseBibtexStringsFromLinks(links)
-                    .stream()
-                    .collect(Collectors.joining());
+            String bibtexDataString = String.join("", parseBibtexStringsFromLinks(links));
 
             return bibtexParser.parseEntries(bibtexDataString);
         } catch (IOException e) {
@@ -53,7 +51,7 @@ public class CollectionOfComputerScienceBibliographiesParser implements Parser {
     }
 
     private List<String> parseBibtexStringsFromLinks(List<String> links) throws IOException {
-        List<String> bibtexStringsFromAllLinks = new ArrayList();
+        List<String> bibtexStringsFromAllLinks = new ArrayList<>();
         for (String link : links) {
             try (InputStream inputStream = new URLDownload(link).asInputStream()) {
                 List<String> bibtexStringsFromLink = matchRegexFromInputStreamHtml(inputStream, REGEX_FOR_BIBTEX);

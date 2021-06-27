@@ -27,7 +27,6 @@ import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
@@ -76,7 +75,7 @@ public interface PreferencesService {
 
     void storeFileHistory(FileHistory history);
 
-    FieldContentFormatterPreferences getFieldContentParserPreferences();
+    FieldContentFormatterPreferences getFieldContentFormatterPreferences();
 
     OpenOfficePreferences getOpenOfficePreferences();
 
@@ -91,8 +90,6 @@ public interface PreferencesService {
     void importPreferences(Path file) throws JabRefException;
 
     LayoutFormatterPreferences getLayoutFormatterPreferences(JournalAbbreviationRepository repository);
-
-    ImportFormatPreferences getImportFormatPreferences();
 
     SavePreferences getSavePreferencesForExport();
 

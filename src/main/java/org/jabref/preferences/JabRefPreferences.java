@@ -73,7 +73,6 @@ import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
@@ -2035,19 +2034,6 @@ public class JabRefPreferences implements PreferencesService {
     // File preferences
     //*************************************************************************************************************
 
-    // ToDo: Can this be disbanded?
-    @Override
-    public ImportFormatPreferences getImportFormatPreferences() {
-        return new ImportFormatPreferences(
-                getCustomImportFormats(),
-                getDefaultEncoding(),
-                getKeywordDelimiter(),
-                getCitationKeyPatternPreferences(),
-                getFieldContentParserPreferences(),
-                getXmpPreferences(),
-                getSpecialFieldsPreferences().isKeywordSyncEnabled());
-    }
-
     @Override
     public SavePreferences getSavePreferencesForExport() {
         Boolean saveInOriginalOrder = this.getBoolean(EXPORT_IN_ORIGINAL_ORDER);
@@ -2104,7 +2090,7 @@ public class JabRefPreferences implements PreferencesService {
     }
 
     @Override
-    public FieldContentFormatterPreferences getFieldContentParserPreferences() {
+    public FieldContentFormatterPreferences getFieldContentFormatterPreferences() {
         return new FieldContentFormatterPreferences(
                 getStringList(NON_WRAPPABLE_FIELDS).stream().map(FieldFactory::parseField).collect(Collectors.toList()));
     }
@@ -2114,7 +2100,7 @@ public class JabRefPreferences implements PreferencesService {
         return new FieldWriterPreferences(
                 getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
                 getStringList(DO_NOT_RESOLVE_STRINGS_FOR).stream().map(FieldFactory::parseField).collect(Collectors.toList()),
-                getFieldContentParserPreferences());
+                getFieldContentFormatterPreferences());
     }
 
     @Override

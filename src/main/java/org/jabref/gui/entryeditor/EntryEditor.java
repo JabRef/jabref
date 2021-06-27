@@ -257,7 +257,7 @@ public class EntryEditor extends BorderPane {
                 databaseContext,
                 undoManager,
                 preferencesService.getFieldWriterPreferences(),
-                preferencesService.getImportFormatPreferences(),
+                preferencesService,
                 fileMonitor,
                 dialogService,
                 stateManager,
@@ -352,7 +352,7 @@ public class EntryEditor extends BorderPane {
 
         // Add menu for fetching bibliographic information
         ContextMenu fetcherMenu = new ContextMenu();
-        for (EntryBasedFetcher fetcher : WebFetchers.getEntryBasedFetchers(preferencesService.getImportFormatPreferences())) {
+        for (EntryBasedFetcher fetcher : WebFetchers.getEntryBasedFetchers(preferencesService)) {
             MenuItem fetcherMenuItem = new MenuItem(fetcher.getName());
             fetcherMenuItem.setOnAction(event -> fetchAndMerge(fetcher));
             fetcherMenu.getItems().add(fetcherMenuItem);

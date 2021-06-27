@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 public class EndnoteXmlImporterTestFiles {
 
     private static final String FILE_ENDING = ".xml";
-    private ImportFormatPreferences preferences;
+    private PreferencesService preferences;
 
     private static Stream<String> fileNames() throws IOException {
         Predicate<String> fileName = name -> name.startsWith("EndnoteXmlImporterTest") && name.endsWith(FILE_ENDING);
@@ -30,8 +30,8 @@ public class EndnoteXmlImporterTestFiles {
 
     @BeforeEach
     void setUp() {
-        preferences = mock(ImportFormatPreferences.class);
-        when(preferences.getKeywordSeparator()).thenReturn(';');
+        preferences = mock(PreferencesService.class);
+        when(preferences.getKeywordDelimiter()).thenReturn(';');
     }
 
     @ParameterizedTest

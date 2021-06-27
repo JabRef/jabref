@@ -22,6 +22,7 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,8 +47,8 @@ public class FulltextFetchers {
         return false;
     };
 
-    public FulltextFetchers(ImportFormatPreferences importFormatPreferences) {
-        this(WebFetchers.getFullTextFetchers(importFormatPreferences));
+    public FulltextFetchers(PreferencesService preferencesService) {
+        this(WebFetchers.getFullTextFetchers(preferencesService));
     }
 
     FulltextFetchers(Set<FulltextFetcher> fetcher) {
@@ -59,7 +60,7 @@ public class FulltextFetchers {
         BibEntry clonedEntry = (BibEntry) entry.clone();
         Optional<DOI> doi = clonedEntry.getField(StandardField.DOI).flatMap(DOI::parse);
 
-        if (!doi.isPresent()) {
+        if (doi.isEmpty()) {
             findDoiForEntry(clonedEntry);
         }
 

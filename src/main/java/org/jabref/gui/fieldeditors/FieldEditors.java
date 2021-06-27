@@ -52,7 +52,7 @@ public class FieldEditors {
                 journalAbbreviationRepository,
                 preferences.getGeneralPreferences().shouldAllowIntegerEditionBibtex());
 
-        boolean isMultiLine = FieldFactory.isMultiLineField(field, preferences.getFieldContentParserPreferences().getNonWrappableFields());
+        boolean isMultiLine = FieldFactory.isMultiLineField(field, preferences.getFieldContentFormatterPreferences().getNonWrappableFields());
 
         if (preferences.getTimestampPreferences().getTimestampField().equals(field)) {
             return new DateEditor(field, DateTimeFormatter.ofPattern(preferences.getTimestampPreferences().getTimestampFormat()), suggestionProvider, fieldCheckers);

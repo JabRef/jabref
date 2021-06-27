@@ -9,13 +9,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
@@ -26,15 +26,15 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(GrobidCitationFetcher.class);
 
     private static final String GROBID_URL = "http://grobid.jabref.org:8070";
-    private ImportFormatPreferences importFormatPreferences;
-    private GrobidService grobidService;
+    private final PreferencesService preferencesService;
+    private final GrobidService grobidService;
 
-    public GrobidCitationFetcher(ImportFormatPreferences importFormatPreferences) {
-        this(importFormatPreferences, new GrobidService(GROBID_URL));
+    public GrobidCitationFetcher(PreferencesService preferencesService) {
+        this(preferencesService, new GrobidService(GROBID_URL));
     }
 
-    GrobidCitationFetcher(ImportFormatPreferences importFormatPreferences, GrobidService grobidService) {
-        this.importFormatPreferences = importFormatPreferences;
+    GrobidCitationFetcher(PreferencesService preferencesService, GrobidService grobidService) {
+        this.preferencesService = preferencesService;
         this.grobidService = grobidService;
     }
 
@@ -61,7 +61,7 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     private Optional<BibEntry> parseBibToBibEntry(String bibtexString) {
         try {
             return BibtexParser.singleFromString(bibtexString,
-                    importFormatPreferences, new DummyFileUpdateMonitor());
+                    preferencesService, new DummyFileUpdateMonitor());
         } catch (ParseException e) {
             return Optional.empty();
         }

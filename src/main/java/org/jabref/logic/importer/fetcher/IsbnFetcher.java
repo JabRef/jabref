@@ -9,11 +9,11 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +25,10 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IsbnFetcher.class);
     private static final Pattern NEWLINE_SPACE_PATTERN = Pattern.compile("\\n|\\r\\n|\\s");
-    protected final ImportFormatPreferences importFormatPreferences;
+    protected final PreferencesService preferencesService;
 
-    public IsbnFetcher(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
+    public IsbnFetcher(PreferencesService preferencesService) {
+        this.preferencesService = preferencesService;
     }
 
     @Override
@@ -49,13 +49,13 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
         // remove any newlines and spaces.
         identifier = NEWLINE_SPACE_PATTERN.matcher(identifier).replaceAll("");
 
-        IsbnViaEbookDeFetcher isbnViaEbookDeFetcher = new IsbnViaEbookDeFetcher(importFormatPreferences);
+        IsbnViaEbookDeFetcher isbnViaEbookDeFetcher = new IsbnViaEbookDeFetcher(preferencesService);
         Optional<BibEntry> bibEntry = isbnViaEbookDeFetcher.performSearchById(identifier);
 
         // nothing found at ebook.de: try ottobib
-        if (!bibEntry.isPresent()) {
+        if (bibEntry.isEmpty()) {
             LOGGER.debug("No entry found at ebook.de; trying ottobib");
-            IsbnViaOttoBibFetcher isbnViaOttoBibFetcher = new IsbnViaOttoBibFetcher(importFormatPreferences);
+            IsbnViaOttoBibFetcher isbnViaOttoBibFetcher = new IsbnViaOttoBibFetcher(preferencesService);
             bibEntry = isbnViaOttoBibFetcher.performSearchById(identifier);
         }
 

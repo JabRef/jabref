@@ -23,7 +23,6 @@ import java.util.regex.Pattern;
 import org.jabref.logic.bibtex.FieldContentFormatter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SavePreferences;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
@@ -42,6 +41,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +67,7 @@ public class BibtexParser implements Parser {
     private static final Integer LOOKAHEAD = 64;
     private final FieldContentFormatter fieldContentFormatter;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
-    private final ImportFormatPreferences importFormatPreferences;
+    private final PreferencesService preferencesService;
     private PushbackReader pushbackReader;
     private BibDatabase database;
     private Set<BibEntryType> entryTypes;
@@ -76,9 +76,9 @@ public class BibtexParser implements Parser {
     private ParserResult parserResult;
     private final MetaDataParser metaDataParser;
 
-    public BibtexParser(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
-        this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
-        fieldContentFormatter = new FieldContentFormatter(importFormatPreferences.getFieldContentFormatterPreferences());
+    public BibtexParser(PreferencesService preferencesService, FileUpdateMonitor fileMonitor) {
+        this.preferencesService = Objects.requireNonNull(preferencesService);
+        fieldContentFormatter = new FieldContentFormatter(preferencesService.getFieldContentFormatterPreferences());
         metaDataParser = new MetaDataParser(fileMonitor);
     }
 
@@ -92,8 +92,8 @@ public class BibtexParser implements Parser {
      * @return An Optional&lt;BibEntry>. Optional.empty() if non was found or an error occurred.
      * @throws ParseException
      */
-    public static Optional<BibEntry> singleFromString(String bibtexString, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) throws ParseException {
-        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences, fileMonitor).parseEntries(bibtexString);
+    public static Optional<BibEntry> singleFromString(String bibtexString, PreferencesService preferencesService, FileUpdateMonitor fileMonitor) throws ParseException {
+        Collection<BibEntry> entries = new BibtexParser(preferencesService, fileMonitor).parseEntries(bibtexString);
         if ((entries == null) || entries.isEmpty()) {
             return Optional.empty();
         }
@@ -183,19 +183,17 @@ public class BibtexParser implements Parser {
             // Try to read the entry type
             String entryType = parseTextToken().toLowerCase(Locale.ROOT).trim();
 
-            if ("preamble".equals(entryType)) {
-                database.setPreamble(parsePreamble());
-                // Consume new line which signals end of preamble
-                skipOneNewline();
-                // the preamble is saved verbatim anyways, so the text read so far can be dropped
-                dumpTextReadSoFarToString();
-            } else if ("string".equals(entryType)) {
-                parseBibtexString();
-            } else if ("comment".equals(entryType)) {
-                parseJabRefComment(meta);
-            } else {
-                // Not a comment, preamble, or string. Thus, it is an entry
-                parseAndAddEntry(entryType);
+            switch (entryType) {
+                case "preamble" -> {
+                    database.setPreamble(parsePreamble());
+                    // Consume new line which signals end of preamble
+                    skipOneNewline();
+                    // the preamble is saved verbatim anyways, so the text read so far can be dropped
+                    dumpTextReadSoFarToString();
+                }
+                case "string" -> parseBibtexString();
+                case "comment" -> parseJabRefComment(meta);
+                default -> parseAndAddEntry(entryType); // Not a comment, preamble, or string. Thus, it is an entry
             }
 
             skipWhitespace();
@@ -203,7 +201,7 @@ public class BibtexParser implements Parser {
 
         // Instantiate meta data:
         try {
-            parserResult.setMetaData(metaDataParser.parse(meta, importFormatPreferences.getKeywordSeparator()));
+            parserResult.setMetaData(metaDataParser.parse(meta, preferencesService.getKeywordDelimiter()));
         } catch (ParseException exception) {
             parserResult.addException(exception);
         }
@@ -252,7 +250,7 @@ public class BibtexParser implements Parser {
     }
 
     private void parseJabRefComment(Map<String, String> meta) {
-        StringBuilder buffer = null;
+        StringBuilder buffer;
         try {
             buffer = parseBracketedTextExactly();
         } catch (IOException e) {
@@ -564,7 +562,7 @@ public class BibtexParser implements Parser {
                     entry.setField(field, entry.getField(field).get() + " and " + content);
                 } else if (StandardField.KEYWORDS.equals(field)) {
                     // multiple keywords fields should be combined to one
-                    entry.addKeyword(content, importFormatPreferences.getKeywordSeparator());
+                    entry.addKeyword(content, preferencesService.getKeywordDelimiter());
                 }
             } else {
                 entry.setField(field, content);
@@ -656,10 +654,9 @@ public class BibtexParser implements Parser {
 
         // Restore if possible:
         switch (currentChar) {
-            case '=':
+            case '=' -> {
                 // Get entryfieldname, push it back and take rest as key
-                key = key.reverse();
-
+                key.reverse();
                 boolean matchedAlpha = false;
                 for (int i = 0; i < key.length(); i++) {
                     currentChar = key.charAt(i);
@@ -692,23 +689,16 @@ public class BibtexParser implements Parser {
                                 Localization.lang("Line %0: Found corrupted citation key %1.", String.valueOf(line), key.toString()));
                     }
                 }
-                break;
-
-            case ',':
-                parserResult.addWarning(
-                        Localization.lang("Line %0: Found corrupted citation key %1 (contains whitespaces).", String.valueOf(line), key.toString()));
-                break;
-
-            case '\n':
-                parserResult.addWarning(
-                        Localization.lang("Line %0: Found corrupted citation key %1 (comma missing).", String.valueOf(line), key.toString()));
-                break;
-
-            default:
-
+            }
+            case ',' -> parserResult.addWarning(
+                    Localization.lang("Line %0: Found corrupted citation key %1 (contains whitespaces).", String.valueOf(line), key.toString()));
+            case '\n' -> parserResult.addWarning(
+                    Localization.lang("Line %0: Found corrupted citation key %1 (comma missing).", String.valueOf(line), key.toString()));
+            default -> {
                 // No more lookahead, give up:
                 unreadBuffer(key);
                 return "";
+            }
         }
 
         return removeWhitespaces(key).toString();

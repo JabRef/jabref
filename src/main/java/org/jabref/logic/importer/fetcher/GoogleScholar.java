@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.transformers.ScholarQueryTransformer;
@@ -27,6 +26,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.paging.Page;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -50,11 +50,11 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
 
     private static final int NUM_RESULTS = 10;
 
-    private final ImportFormatPreferences importFormatPreferences;
+    private final PreferencesService preferencesService;
 
-    public GoogleScholar(ImportFormatPreferences importFormatPreferences) {
-        Objects.requireNonNull(importFormatPreferences);
-        this.importFormatPreferences = importFormatPreferences;
+    public GoogleScholar(PreferencesService preferencesService) {
+        Objects.requireNonNull(preferencesService);
+        this.preferencesService = preferencesService;
     }
 
     @Override
@@ -147,7 +147,7 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
 
     private BibEntry downloadEntry(String link) throws IOException, FetcherException {
         String downloadedContent = new URLDownload(link).asString();
-        BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        BibtexParser parser = new BibtexParser(preferencesService, new DummyFileUpdateMonitor());
         ParserResult result = parser.parse(new StringReader(downloadedContent));
         if ((result == null) || (result.getDatabase() == null)) {
             throw new FetcherException("Parsing entries from Google Scholar bib file failed.");

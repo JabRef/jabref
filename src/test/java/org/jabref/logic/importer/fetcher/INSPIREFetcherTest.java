@@ -4,11 +4,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -25,9 +25,9 @@ class INSPIREFetcherTest {
 
     @BeforeEach
     void setUp() {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(mock(FieldContentFormatterPreferences.class));
-        fetcher = new INSPIREFetcher(importFormatPreferences);
+        PreferencesService preferencesService = mock(PreferencesService.class);
+        when(preferencesService.getFieldContentFormatterPreferences()).thenReturn(mock(FieldContentFormatterPreferences.class));
+        fetcher = new INSPIREFetcher(preferencesService);
     }
 
     @Test

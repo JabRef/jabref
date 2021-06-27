@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Test;
@@ -30,8 +30,8 @@ import static org.mockito.Mockito.when;
 @FetcherTest
 public class GrobidCitationFetcherTest {
 
-    static ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-    static GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences);
+    static PreferencesService preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
+    static GrobidCitationFetcher grobidCitationFetcher = new GrobidCitationFetcher(preferencesService);
 
     static String example1 = "Derwing, T. M., Rossiter, M. J., & Munro, M. J. (2002). Teaching native speakers to listen to foreign-accented speech. Journal of Multilingual and Multicultural Development, 23(4), 245-259.";
     static BibEntry example1AsBibEntry = new BibEntry(StandardEntryType.Article).withCitationKey("-1")
@@ -112,7 +112,7 @@ public class GrobidCitationFetcherTest {
     public void performSearchThrowsExceptionInCaseOfConnectionIssues() throws IOException {
         GrobidService grobidServiceMock = mock(GrobidService.class);
         when(grobidServiceMock.processCitation(anyString(), any())).thenThrow(new SocketTimeoutException("Timeout"));
-        grobidCitationFetcher = new GrobidCitationFetcher(importFormatPreferences, grobidServiceMock);
+        grobidCitationFetcher = new GrobidCitationFetcher(preferencesService, grobidServiceMock);
 
         assertThrows(FetcherException.class, () -> {
             grobidCitationFetcher.performSearch("any text");

@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -34,9 +34,9 @@ class ArXivTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherT
 
     @BeforeEach
     void setUp() {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
-        fetcher = new ArXiv(importFormatPreferences);
+        PreferencesService preferencesService = mock(PreferencesService.class);
+        when(preferencesService.getKeywordDelimiter()).thenReturn(',');
+        fetcher = new ArXiv(preferencesService);
         entry = new BibEntry();
         sliceTheoremPaper = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Tobias Diez")

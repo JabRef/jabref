@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,9 +24,9 @@ public class RepecNepImporterTest {
 
     @BeforeEach
     public void setUp() {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
-        testImporter = new RepecNepImporter(importFormatPreferences);
+        PreferencesService preferencesService = mock(PreferencesService.class);
+        when(preferencesService.getKeywordDelimiter()).thenReturn(',');
+        testImporter = new RepecNepImporter(preferencesService);
     }
 
     private static Stream<String> fileNames() throws IOException {

@@ -3,7 +3,6 @@ package org.jabref.logic.database;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
@@ -16,6 +15,7 @@ import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.metadata.ContentSelector;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,12 +25,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class DatabaseMergerTest {
-    private ImportFormatPreferences importFormatPreferences;
+    private PreferencesService preferencesService;
 
     @BeforeEach
     void setUp() {
-        importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
+        preferencesService = mock(PreferencesService.class);
+        when(preferencesService.getKeywordDelimiter()).thenReturn(',');
     }
 
     @Test
@@ -51,7 +51,7 @@ class DatabaseMergerTest {
 
         BibDatabase database = new BibDatabase(List.of(entry1));
         BibDatabase other = new BibDatabase(List.of(entry2, entry3));
-        new DatabaseMerger(importFormatPreferences.getKeywordSeparator()).merge(database, other);
+        new DatabaseMerger(preferencesService.getKeywordDelimiter()).merge(database, other);
 
         assertEquals(2, database.getEntries().size());
         assertEquals(List.of(entry1, entry3), database.getEntries());
@@ -76,8 +76,8 @@ class DatabaseMergerTest {
         source1.addString(sourceString1);
         source2.addString(sourceString2);
 
-        new DatabaseMerger(importFormatPreferences.getKeywordSeparator()).mergeStrings(target, source1);
-        new DatabaseMerger(importFormatPreferences.getKeywordSeparator()).mergeStrings(target, source2);
+        new DatabaseMerger(preferencesService.getKeywordDelimiter()).mergeStrings(target, source1);
+        new DatabaseMerger(preferencesService.getKeywordDelimiter()).mergeStrings(target, source2);
         // Use string representation to compare since the id will not match
         List<String> resultStringsSorted = target.getStringValues()
                                                  .stream()
@@ -105,7 +105,7 @@ class DatabaseMergerTest {
         source.addString(sourceString1);
         source.addString(sourceString2);
 
-        new DatabaseMerger(importFormatPreferences.getKeywordSeparator()).mergeStrings(target, source);
+        new DatabaseMerger(preferencesService.getKeywordDelimiter()).mergeStrings(target, source);
         // Use string representation to compare since the id will not match
         List<String> resultStringsSorted = target.getStringValues()
                                                  .stream()
@@ -130,7 +130,7 @@ class DatabaseMergerTest {
                 List.of(new ContentSelector(StandardField.AUTHOR, List.of("Test Author")),
                         new ContentSelector(StandardField.TITLE, List.of("Test Title")));
 
-        new DatabaseMerger(importFormatPreferences.getKeywordSeparator()).mergeMetaData(target, other, "unknown", List.of());
+        new DatabaseMerger(preferencesService.getKeywordDelimiter()).mergeMetaData(target, other, "unknown", List.of());
 
         // Assert that content selectors are all merged
         assertEquals(expectedContentSelectors, target.getContentSelectorList());
@@ -156,7 +156,7 @@ class DatabaseMergerTest {
                         new ContentSelector(StandardField.TITLE, List.of("Test Title")));
         GroupTreeNode expectedImportedGroupNode = new GroupTreeNode(new ExplicitGroup("Imported unknown", GroupHierarchyType.INDEPENDENT, ';'));
 
-        new DatabaseMerger(importFormatPreferences.getKeywordSeparator()).mergeMetaData(target, other, "unknown", List.of());
+        new DatabaseMerger(preferencesService.getKeywordDelimiter()).mergeMetaData(target, other, "unknown", List.of());
 
         // Assert that groups of other are children of root node of target
         assertEquals(targetRootGroup, target.getGroups().get());

@@ -23,7 +23,6 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedParserFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
@@ -37,6 +36,7 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.paging.Page;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
@@ -53,9 +53,9 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
     private static final String API_EXPORT_URL = "https://api.adsabs.harvard.edu/v1/export/bibtexabs";
 
     private static final String API_KEY = new BuildInfo().astrophysicsDataSystemAPIKey;
-    private final ImportFormatPreferences preferences;
+    private final PreferencesService preferences;
 
-    public AstrophysicsDataSystem(ImportFormatPreferences preferences) {
+    public AstrophysicsDataSystem(PreferencesService preferences) {
         this.preferences = Objects.requireNonNull(preferences);
     }
 

@@ -17,7 +17,6 @@ import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.crawler.git.GitHandler;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.exporter.SavePreferences;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
@@ -30,6 +29,7 @@ import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.study.FetchResult;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,7 +46,7 @@ import static org.mockito.Mockito.when;
 class StudyRepositoryTest {
     private static final String NON_EXISTING_DIRECTORY = "nonExistingTestRepositoryDirectory";
     CitationKeyPatternPreferences citationKeyPatternPreferences;
-    ImportFormatPreferences importFormatPreferences;
+    PreferencesService preferencesService;
     SavePreferences savePreferences;
     TimestampPreferences timestampPreferences;
     BibEntryTypesManager entryTypesManager;
@@ -64,7 +64,7 @@ class StudyRepositoryTest {
     @BeforeEach
     public void setUpMocks() throws Exception {
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
-        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
         timestampPreferences = mock(TimestampPreferences.class);
         citationKeyPatternPreferences = new CitationKeyPatternPreferences(
                 false,
@@ -80,10 +80,12 @@ class StudyRepositoryTest {
         when(savePreferences.getEncoding()).thenReturn(null);
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
         when(savePreferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
-        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
-        when(importFormatPreferences.isKeywordSyncEnabled()).thenReturn(false);
-        when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
+        when(preferencesService.getSavePreferences()).thenReturn(savePreferences);
+        when(preferencesService.getTimestampPreferences()).thenReturn(timestampPreferences);
+        when(preferencesService.getKeywordDelimiter()).thenReturn(',');
+        when(preferencesService.getFieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
+        when(preferencesService.getSpecialFieldsPreferences().isKeywordSyncEnabled()).thenReturn(false);
+        when(preferencesService.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
         when(timestampPreferences.getTimestampField()).then(invocation -> StandardField.TIMESTAMP);
         entryTypesManager = new BibEntryTypesManager();
         getTestStudyRepository();
@@ -93,7 +95,7 @@ class StudyRepositoryTest {
     void providePathToNonExistentRepositoryThrowsException() {
         Path nonExistingRepositoryDirectory = tempRepositoryDirectory.resolve(NON_EXISTING_DIRECTORY);
 
-        assertThrows(IOException.class, () -> new StudyRepository(nonExistingRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, timestampPreferences, entryTypesManager));
+        assertThrows(IOException.class, () -> new StudyRepository(nonExistingRepositoryDirectory, gitHandler, preferencesService, new DummyFileUpdateMonitor(), entryTypesManager));
     }
 
     /**
@@ -141,8 +143,7 @@ class StudyRepositoryTest {
     @Test
     void mergedResultsPersistedCorrectly() throws Exception {
         List<QueryResult> mockResults = getMockResults();
-        List<BibEntry> expected = new ArrayList<>();
-        expected.addAll(getArXivQuantumMockResults());
+        List<BibEntry> expected = new ArrayList<>(getArXivQuantumMockResults());
         expected.add(getSpringerQuantumMockResults().get(1));
         expected.add(getSpringerQuantumMockResults().get(2));
 
@@ -173,7 +174,7 @@ class StudyRepositoryTest {
 
     private StudyRepository getTestStudyRepository() throws Exception {
         setUpTestStudyDefinitionFile();
-        studyRepository = new StudyRepository(tempRepositoryDirectory, gitHandler, importFormatPreferences, new DummyFileUpdateMonitor(), savePreferences, timestampPreferences, entryTypesManager);
+        studyRepository = new StudyRepository(tempRepositoryDirectory, gitHandler, preferencesService, new DummyFileUpdateMonitor(), entryTypesManager);
         return studyRepository;
     }
 
@@ -202,7 +203,7 @@ class StudyRepositoryTest {
 
     private BibDatabase getNonDuplicateBibEntryResult() {
         BibDatabase mockResults = new BibDatabase(getSpringerCloudComputingMockResults());
-        DatabaseMerger merger = new DatabaseMerger(importFormatPreferences.getKeywordSeparator());
+        DatabaseMerger merger = new DatabaseMerger(preferencesService.getKeywordDelimiter());
         merger.merge(mockResults, new BibDatabase(getSpringerQuantumMockResults()));
         merger.merge(mockResults, new BibDatabase(getArXivQuantumMockResults()));
         return mockResults;

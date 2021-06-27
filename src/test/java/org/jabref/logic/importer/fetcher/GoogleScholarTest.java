@@ -8,12 +8,12 @@ import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -33,10 +33,10 @@ class GoogleScholarTest implements SearchBasedFetcherCapabilityTest, PagedSearch
 
     @BeforeEach
     void setUp() {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(
+        PreferencesService preferencesService = mock(PreferencesService.class);
+        when(preferencesService.getFieldContentFormatterPreferences()).thenReturn(
                 mock(FieldContentFormatterPreferences.class));
-        finder = new GoogleScholar(importFormatPreferences);
+        finder = new GoogleScholar(preferencesService);
         entry = new BibEntry();
     }
 

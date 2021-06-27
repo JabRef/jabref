@@ -59,7 +59,7 @@ public class EntryTypeViewModel {
         this.preferencesService = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
-        fetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences()));
+        fetchers.addAll(WebFetchers.getIdBasedFetchers(preferences));
         selectedItemProperty.setValue(getLastSelectedFetcher());
         idFieldValidator = new FunctionBasedValidator<>(idText, StringUtil::isNotBlank, ValidationMessage.error(Localization.lang("Required field \"%0\" is empty.", Localization.lang("ID"))));
     }
@@ -94,7 +94,7 @@ public class EntryTypeViewModel {
 
     private IdBasedFetcher getLastSelectedFetcher() {
         return fetchers.stream().filter(fetcher -> fetcher.getName().equals(preferencesService.getIdBasedFetcherForEntryGenerator()))
-                       .findFirst().orElse(new DoiFetcher(preferencesService.getImportFormatPreferences()));
+                       .findFirst().orElse(new DoiFetcher(preferencesService));
     }
 
     public ListProperty<IdBasedFetcher> fetcherItemsProperty() {

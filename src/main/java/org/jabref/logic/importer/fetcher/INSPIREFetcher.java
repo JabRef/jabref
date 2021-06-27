@@ -10,7 +10,6 @@ import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultLuceneQueryTransformer;
@@ -22,6 +21,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -33,10 +33,10 @@ public class INSPIREFetcher implements SearchBasedParserFetcher {
 
     private static final String INSPIRE_HOST = "https://inspirehep.net/api/literature/";
 
-    private final ImportFormatPreferences importFormatPreferences;
+    private final PreferencesService preferencesService;
 
-    public INSPIREFetcher(ImportFormatPreferences preferences) {
-        this.importFormatPreferences = preferences;
+    public INSPIREFetcher(PreferencesService preferencesService) {
+        this.preferencesService = preferencesService;
     }
 
     @Override
@@ -76,6 +76,6 @@ public class INSPIREFetcher implements SearchBasedParserFetcher {
 
     @Override
     public Parser getParser() {
-        return new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        return new BibtexParser(preferencesService, new DummyFileUpdateMonitor());
     }
 }

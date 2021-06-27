@@ -23,6 +23,7 @@ import org.jabref.logic.importer.fileformat.RisImporter;
 import org.jabref.logic.importer.fileformat.SilverPlatterImporter;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -104,25 +105,25 @@ public class ImporterTest {
         // all classes implementing {@link Importer}
         // sorted alphabetically
 
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
+        PreferencesService preferencesService = mock(PreferencesService.class);
         XmpPreferences xmpPreferences = mock(XmpPreferences.class);
         // @formatter:off
         return Stream.of(
                 new BiblioscapeImporter(),
-                new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor()),
+                new BibtexImporter(preferencesService, new DummyFileUpdateMonitor()),
                 new BibTeXMLImporter(),
                 new CopacImporter(),
-                new EndnoteImporter(importFormatPreferences),
+                new EndnoteImporter(preferencesService),
                 new InspecImporter(),
                 new IsiImporter(),
                 new MedlineImporter(),
                 new MedlinePlainImporter(),
-                new ModsImporter(importFormatPreferences),
+                new ModsImporter(preferencesService),
                 new MsBibImporter(),
                 new OvidImporter(),
-                new PdfContentImporter(importFormatPreferences),
+                new PdfContentImporter(preferencesService),
                 new PdfXmpImporter(xmpPreferences),
-                new RepecNepImporter(importFormatPreferences),
+                new RepecNepImporter(preferencesService),
                 new RisImporter(),
                 new SilverPlatterImporter()
         );

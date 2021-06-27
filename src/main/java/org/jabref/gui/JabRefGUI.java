@@ -111,7 +111,7 @@ public class JabRefGUI {
         Platform.runLater(this::openDatabases);
 
         if (!(Globals.getFileUpdateMonitor().isActive())) {
-            this.getMainFrame().getDialogService()
+            getMainFrame().getDialogService()
                     .showErrorDialogAndWait(Localization.lang("Unable to monitor file changes. Please close files " +
                             "and processes and restart. You may encounter errors if you continue " +
                             "with this session."));
@@ -273,8 +273,7 @@ public class JabRefGUI {
                 BackupUIManager.showRestoreBackupDialog(mainFrame.getDialogService(), dbFile.toPath());
             }
 
-            ParserResult parsedDatabase = OpenDatabase.loadDatabase(fileName,
-                    Globals.prefs.getImportFormatPreferences(), Globals.prefs.getTimestampPreferences(), Globals.getFileUpdateMonitor());
+            ParserResult parsedDatabase = OpenDatabase.loadDatabase(fileName, Globals.prefs, Globals.getFileUpdateMonitor());
 
             if (parsedDatabase.isEmpty()) {
                 LOGGER.error(Localization.lang("Error opening file") + " '" + dbFile.getPath() + "'");

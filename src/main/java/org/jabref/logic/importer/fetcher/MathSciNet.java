@@ -20,7 +20,6 @@ import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.importer.EntryBasedParserFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
@@ -30,6 +29,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -39,10 +39,10 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
  */
 public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFetcher, IdBasedParserFetcher {
 
-    private final ImportFormatPreferences preferences;
+    private final PreferencesService preferencesService;
 
-    public MathSciNet(ImportFormatPreferences preferences) {
-        this.preferences = Objects.requireNonNull(preferences);
+    public MathSciNet(PreferencesService preferencesService) {
+        this.preferencesService = Objects.requireNonNull(preferencesService);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
             String response = new BufferedReader(new InputStreamReader(inputStream)).lines().collect(Collectors.joining(OS.NEWLINE));
 
             List<BibEntry> entries = new ArrayList<>();
-            BibtexParser bibtexParser = new BibtexParser(preferences, new DummyFileUpdateMonitor());
+            BibtexParser bibtexParser = new BibtexParser(preferencesService, new DummyFileUpdateMonitor());
             Pattern pattern = Pattern.compile("<pre>(?s)(.*)</pre>");
             Matcher matcher = pattern.matcher(response);
             while (matcher.find()) {

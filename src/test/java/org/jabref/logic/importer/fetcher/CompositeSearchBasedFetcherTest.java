@@ -10,10 +10,10 @@ import java.util.stream.Stream;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -89,25 +89,25 @@ public class CompositeSearchBasedFetcherTest {
      * @return A stream of Arguments wrapping set of fetchers.
      */
     static Stream<Arguments> performSearchParameters() {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getFieldContentFormatterPreferences())
+        PreferencesService preferencesService = mock(PreferencesService.class);
+        when(preferencesService.getFieldContentFormatterPreferences())
                 .thenReturn(mock(FieldContentFormatterPreferences.class));
         List<Set<SearchBasedFetcher>> fetcherParameters = new ArrayList<>();
         List<SearchBasedFetcher> list = new ArrayList<>();
 
-        list.add(new ArXiv(importFormatPreferences));
-        list.add(new INSPIREFetcher(importFormatPreferences));
+        list.add(new ArXiv(preferencesService));
+        list.add(new INSPIREFetcher(preferencesService));
         list.add(new GvkFetcher());
-        list.add(new AstrophysicsDataSystem(importFormatPreferences));
-        list.add(new MathSciNet(importFormatPreferences));
-        list.add(new ZbMATH(importFormatPreferences));
-        list.add(new GoogleScholar(importFormatPreferences));
-        list.add(new DBLPFetcher(importFormatPreferences));
+        list.add(new AstrophysicsDataSystem(preferencesService));
+        list.add(new MathSciNet(preferencesService));
+        list.add(new ZbMATH(preferencesService));
+        list.add(new GoogleScholar(preferencesService));
+        list.add(new DBLPFetcher(preferencesService));
         list.add(new SpringerFetcher());
         list.add(new CrossRef());
         list.add(new CiteSeer());
-        list.add(new DOAJFetcher(importFormatPreferences));
-        list.add(new IEEE(importFormatPreferences));
+        list.add(new DOAJFetcher(preferencesService));
+        list.add(new IEEE(preferencesService));
         /* Disabled due to an issue regarding comparison: Title fields of the entries that otherwise are equivalent differ
          * due to different JAXBElements.
          */

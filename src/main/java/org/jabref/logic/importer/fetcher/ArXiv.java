@@ -22,7 +22,6 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.IdFetcher;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.fetcher.transformers.ArXivQueryTransformer;
 import org.jabref.logic.util.io.XMLUtil;
@@ -36,6 +35,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.paging.Page;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
+import org.jabref.preferences.PreferencesService;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -62,10 +62,10 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
 
     private static final String API_URL = "https://export.arxiv.org/api/query";
 
-    private final ImportFormatPreferences importFormatPreferences;
+    private final PreferencesService preferencesService;
 
-    public ArXiv(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
+    public ArXiv(PreferencesService preferencesService) {
+        this.preferencesService = preferencesService;
     }
 
     @Override
@@ -261,7 +261,7 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
         ArXivQueryTransformer transformer = new ArXivQueryTransformer();
         String transformedQuery = transformer.transformLuceneQuery(luceneQuery).orElse("");
         List<BibEntry> searchResult = searchForEntries(transformedQuery, pageNumber).stream()
-                                                                                    .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
+                                                                                    .map((arXivEntry) -> arXivEntry.toBibEntry(preferencesService.getKeywordDelimiter()))
                                                                                     .collect(Collectors.toList());
         return new Page<>(transformedQuery, pageNumber, filterYears(searchResult, transformer));
     }
@@ -278,7 +278,7 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         return searchForEntryById(identifier)
-                .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()));
+                .map((arXivEntry) -> arXivEntry.toBibEntry(preferencesService.getKeywordDelimiter()));
     }
 
     @Override

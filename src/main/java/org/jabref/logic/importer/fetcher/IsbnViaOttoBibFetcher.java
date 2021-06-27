@@ -7,13 +7,13 @@ import java.net.URL;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -26,8 +26,8 @@ public class IsbnViaOttoBibFetcher extends AbstractIsbnFetcher {
 
     private static final String BASE_URL = "https://www.ottobib.com/isbn/";
 
-    public IsbnViaOttoBibFetcher(ImportFormatPreferences importFormatPreferences) {
-        super(importFormatPreferences);
+    public IsbnViaOttoBibFetcher(PreferencesService preferencesService) {
+        super(preferencesService);
     }
 
     @Override
@@ -67,11 +67,11 @@ public class IsbnViaOttoBibFetcher extends AbstractIsbnFetcher {
 
         Optional<BibEntry> entry = Optional.empty();
         try {
-            entry = BibtexParser.singleFromString(textArea.text(), importFormatPreferences, new DummyFileUpdateMonitor());
+            entry = BibtexParser.singleFromString(textArea.text(), preferencesService, new DummyFileUpdateMonitor());
         } catch (ParseException e) {
             throw new FetcherException("An internal parser error occurred", e);
         }
-        entry.ifPresent(bibEntry -> doPostCleanup(bibEntry));
+        entry.ifPresent(this::doPostCleanup);
         return entry;
     }
 }

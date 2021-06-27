@@ -31,7 +31,7 @@ public class CrossrefFetcherEvaluator {
     public static void main(String[] args) throws IOException, InterruptedException {
         Globals.prefs = JabRefPreferences.getInstance();
         try (FileReader reader = new FileReader(args[0])) {
-            BibtexParser parser = new BibtexParser(Globals.prefs.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+            BibtexParser parser = new BibtexParser(Globals.prefs, Globals.getFileUpdateMonitor());
             ParserResult result = parser.parse(reader);
             BibDatabase db = result.getDatabase();
 

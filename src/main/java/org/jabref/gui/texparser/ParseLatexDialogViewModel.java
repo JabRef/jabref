@@ -200,7 +200,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         }
 
         TexBibEntriesResolver entriesResolver = new TexBibEntriesResolver(databaseContext.getDatabase(),
-                preferencesService.getImportFormatPreferences(), preferencesService.getTimestampPreferences(), fileMonitor);
+                preferencesService, preferencesService.getTimestampPreferences(), fileMonitor);
 
         BackgroundTask.wrap(() -> entriesResolver.resolve(new DefaultLatexParser().parse(fileList)))
                       .onRunning(() -> searchInProgress.set(true))

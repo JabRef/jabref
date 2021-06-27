@@ -13,7 +13,6 @@ import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DBLPQueryTransformer;
@@ -23,6 +22,7 @@ import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -36,11 +36,11 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
 
     private static final String BASIC_SEARCH_URL = "https://dblp.org/search/publ/api";
 
-    private final ImportFormatPreferences importFormatPreferences;
+    private final PreferencesService preferencesService;
 
-    public DBLPFetcher(ImportFormatPreferences importFormatPreferences) {
-        Objects.requireNonNull(importFormatPreferences);
-        this.importFormatPreferences = importFormatPreferences;
+    public DBLPFetcher(PreferencesService preferencesService) {
+        Objects.requireNonNull(preferencesService);
+        this.preferencesService = preferencesService;
     }
 
     @Override
@@ -57,7 +57,7 @@ public class DBLPFetcher implements SearchBasedParserFetcher {
 
     @Override
     public Parser getParser() {
-        return new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        return new BibtexParser(preferencesService, new DummyFileUpdateMonitor());
     }
 
     @Override

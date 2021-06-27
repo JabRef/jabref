@@ -21,7 +21,6 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
@@ -31,6 +30,7 @@ import org.jabref.logic.importer.fileformat.endnote.Contributors;
 import org.jabref.logic.importer.fileformat.endnote.Dates;
 import org.jabref.logic.importer.fileformat.endnote.ElectronicResourceNum;
 import org.jabref.logic.importer.fileformat.endnote.Isbn;
+import org.jabref.logic.importer.fileformat.endnote.Keyword;
 import org.jabref.logic.importer.fileformat.endnote.Keywords;
 import org.jabref.logic.importer.fileformat.endnote.Label;
 import org.jabref.logic.importer.fileformat.endnote.Notes;
@@ -60,6 +60,7 @@ import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,11 +73,11 @@ import org.slf4j.LoggerFactory;
 public class EndnoteXmlImporter extends Importer implements Parser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EndnoteXmlImporter.class);
-    private final ImportFormatPreferences preferences;
+    private final PreferencesService preferencesService;
     private Unmarshaller unmarshaller;
 
-    public EndnoteXmlImporter(ImportFormatPreferences preferences) {
-        this.preferences = preferences;
+    public EndnoteXmlImporter(PreferencesService preferencesService) {
+        this.preferencesService = preferencesService;
     }
 
     @Override
@@ -212,7 +213,7 @@ public class EndnoteXmlImporter extends Importer implements Parser {
                 .ifPresent(value -> entry.setField(StandardField.NOTE, value.trim()));
         getUrl(record)
                 .ifPresent(value -> entry.setField(StandardField.URL, value));
-        entry.putKeywords(getKeywords(record), preferences.getKeywordSeparator());
+        entry.putKeywords(getKeywords(record), preferencesService.getKeywordDelimiter());
         Optional.ofNullable(record.getAbstract())
                 .map(Abstract::getStyle)
                 .map(Style::getContent)
@@ -308,9 +309,9 @@ public class EndnoteXmlImporter extends Importer implements Parser {
 
             return keywords.getKeyword()
                            .stream()
-                           .map(keyword -> keyword.getStyle())
+                           .map(Keyword::getStyle)
                            .filter(Objects::nonNull)
-                           .map(style->style.getContent())
+                           .map(Style::getContent)
                            .collect(Collectors.toList());
         } else {
             return Collections.emptyList();

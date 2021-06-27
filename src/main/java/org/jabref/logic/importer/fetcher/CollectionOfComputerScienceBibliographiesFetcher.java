@@ -11,7 +11,6 @@ import org.jabref.logic.formatter.bibtexfields.RemoveNewlinesFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveRedundantSpacesFormatter;
 import org.jabref.logic.formatter.bibtexfields.ReplaceTabsBySpaceFormater;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.CollectionOfComputerScienceBibliographiesQueryTransformer;
@@ -20,6 +19,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.preferences.PreferencesService;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -30,8 +30,8 @@ public class CollectionOfComputerScienceBibliographiesFetcher implements SearchB
 
     private final CollectionOfComputerScienceBibliographiesParser parser;
 
-    public CollectionOfComputerScienceBibliographiesFetcher(ImportFormatPreferences importFormatPreferences) {
-        this.parser = new CollectionOfComputerScienceBibliographiesParser(importFormatPreferences);
+    public CollectionOfComputerScienceBibliographiesFetcher(PreferencesService preferencesService) {
+        this.parser = new CollectionOfComputerScienceBibliographiesParser(preferencesService);
     }
 
     @Override

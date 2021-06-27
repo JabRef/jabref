@@ -3,10 +3,10 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +31,7 @@ public class IsbnViaOttoBibFetcherTest extends AbstractIsbnFetcherTest {
         bibEntry.setField(StandardField.ISBN, "9780321356680");
         bibEntry.setField(StandardField.ADDRESS, "Upper Saddle River, NJ");
 
-        fetcher = new IsbnViaOttoBibFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        fetcher = new IsbnViaOttoBibFetcher(mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS));
     }
 
     @Test

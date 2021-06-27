@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.IEEEQueryTransformer;
@@ -29,6 +28,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.preferences.PreferencesService;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
@@ -56,10 +56,10 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
     private static final String BASE_URL = "https://ieeexplore.ieee.org";
     private static final String API_KEY = new BuildInfo().ieeeAPIKey;
 
-    private final ImportFormatPreferences preferences;
+    private final PreferencesService preferencesService;
 
-    public IEEE(ImportFormatPreferences preferences) {
-        this.preferences = Objects.requireNonNull(preferences);
+    public IEEE(PreferencesService preferencesService) {
+        this.preferencesService = Objects.requireNonNull(preferencesService);
     }
 
     /**
@@ -205,7 +205,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
                 JSONArray results = jsonObject.getJSONArray("articles");
                 for (int i = 0; i < results.length(); i++) {
                     JSONObject jsonEntry = results.getJSONObject(i);
-                    BibEntry entry = parseJsonRespone(jsonEntry, preferences.getKeywordSeparator());
+                    BibEntry entry = parseJsonRespone(jsonEntry, preferencesService.getKeywordDelimiter());
                     entries.add(entry);
                 }
             }

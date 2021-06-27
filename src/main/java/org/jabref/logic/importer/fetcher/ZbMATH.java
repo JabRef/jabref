@@ -13,7 +13,6 @@ import org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
 import org.jabref.logic.importer.EntryBasedParserFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.ZbMathQueryTransformer;
@@ -24,6 +23,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
@@ -37,10 +37,10 @@ import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
  */
 public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, EntryBasedParserFetcher {
 
-    private final ImportFormatPreferences preferences;
+    private final PreferencesService preferencesService;
 
-    public ZbMATH(ImportFormatPreferences preferences) {
-        this.preferences = Objects.requireNonNull(preferences);
+    public ZbMATH(PreferencesService preferencesService) {
+        this.preferencesService = Objects.requireNonNull(preferencesService);
     }
 
     @Override
@@ -131,7 +131,7 @@ public class ZbMATH implements SearchBasedParserFetcher, IdBasedParserFetcher, E
 
     @Override
     public Parser getParser() {
-        return new BibtexParser(preferences, new DummyFileUpdateMonitor());
+        return new BibtexParser(preferencesService, new DummyFileUpdateMonitor());
     }
 
     @Override

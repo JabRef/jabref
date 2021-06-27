@@ -9,12 +9,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.BibEntryAssert;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.ModsImporter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
@@ -56,10 +56,10 @@ public class ModsExportFormatTestFiles {
         Path path = testFolder.resolve("ARandomlyNamedFile.tmp");
         Files.createFile(path);
         exportedFile = path.toAbsolutePath();
-        ImportFormatPreferences mock = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        bibtexImporter = new BibtexImporter(mock, new DummyFileUpdateMonitor());
-        Mockito.when(mock.getKeywordSeparator()).thenReturn(',');
-        modsImporter = new ModsImporter(mock);
+        PreferencesService preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
+        bibtexImporter = new BibtexImporter(preferencesService, new DummyFileUpdateMonitor());
+        Mockito.when(preferencesService.getKeywordDelimiter()).thenReturn(',');
+        modsImporter = new ModsImporter(preferencesService);
     }
 
     @ParameterizedTest

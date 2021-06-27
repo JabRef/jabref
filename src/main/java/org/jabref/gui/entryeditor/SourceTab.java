@@ -38,7 +38,6 @@ import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
@@ -49,6 +48,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -66,7 +66,7 @@ public class SourceTab extends EntryEditorTab {
     private final UndoManager undoManager;
     private final ObjectProperty<ValidationMessage> sourceIsValid = new SimpleObjectProperty<>();
     private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator();
-    private final ImportFormatPreferences importFormatPreferences;
+    private final PreferencesService preferencesService;
     private final FileUpdateMonitor fileMonitor;
     private final DialogService dialogService;
     private final StateManager stateManager;
@@ -96,14 +96,21 @@ public class SourceTab extends EntryEditorTab {
         }
     }
 
-    public SourceTab(BibDatabaseContext bibDatabaseContext, CountingUndoManager undoManager, FieldWriterPreferences fieldWriterPreferences, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor, DialogService dialogService, StateManager stateManager, KeyBindingRepository keyBindingRepository) {
+    public SourceTab(BibDatabaseContext bibDatabaseContext,
+                     CountingUndoManager undoManager,
+                     FieldWriterPreferences fieldWriterPreferences,
+                     PreferencesService preferencesService,
+                     FileUpdateMonitor fileMonitor,
+                     DialogService dialogService,
+                     StateManager stateManager,
+                     KeyBindingRepository keyBindingRepository) {
         this.mode = bibDatabaseContext.getMode();
         this.setText(Localization.lang("%0 source", mode.getFormattedName()));
         this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
         this.setGraphic(IconTheme.JabRefIcons.SOURCE.getGraphicNode());
         this.undoManager = undoManager;
         this.fieldWriterPreferences = fieldWriterPreferences;
-        this.importFormatPreferences = importFormatPreferences;
+        this.preferencesService = preferencesService;
         this.fileMonitor = fileMonitor;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
@@ -249,7 +256,7 @@ public class SourceTab extends EntryEditorTab {
             return;
         }
 
-        BibtexParser bibtexParser = new BibtexParser(importFormatPreferences, fileMonitor);
+        BibtexParser bibtexParser = new BibtexParser(preferencesService, fileMonitor);
         try {
             ParserResult parserResult = bibtexParser.parse(new StringReader(text));
             BibDatabase database = parserResult.getDatabase();

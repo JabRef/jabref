@@ -8,11 +8,11 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.exporter.SavePreferences;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 /**
  * This importer exists only to enable `--importToOpen someEntry.bib`
@@ -25,11 +25,11 @@ public class BibtexImporter extends Importer {
     // Signature written at the top of the .bib file in earlier versions.
     private static final String SIGNATURE = "This file was created with JabRef";
 
-    private final ImportFormatPreferences importFormatPreferences;
+    private final PreferencesService preferencesService;
     private final FileUpdateMonitor fileMonitor;
 
-    public BibtexImporter(ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
-        this.importFormatPreferences = importFormatPreferences;
+    public BibtexImporter(PreferencesService preferencesService, FileUpdateMonitor fileMonitor) {
+        this.preferencesService = preferencesService;
         this.fileMonitor = fileMonitor;
     }
 
@@ -55,7 +55,7 @@ public class BibtexImporter extends Importer {
             suppliedEncoding = getSuppliedEncoding(utf8Reader);
         }
         // Now if that did not get us anywhere, we check with the 16 bit encoding:
-        if (!suppliedEncoding.isPresent()) {
+        if (suppliedEncoding.isEmpty()) {
             try (BufferedReader utf16Reader = getUTF16Reader(filePath)) {
                 suppliedEncoding = getSuppliedEncoding(utf16Reader);
             }
@@ -70,7 +70,7 @@ public class BibtexImporter extends Importer {
 
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
-        return new BibtexParser(importFormatPreferences, fileMonitor).parse(reader);
+        return new BibtexParser(preferencesService, fileMonitor).parse(reader);
     }
 
     @Override
@@ -112,7 +112,7 @@ public class BibtexImporter extends Importer {
                 } else if (line.startsWith(SavePreferences.ENCODING_PREFIX)) {
                     // Line starts with "Encoding: ", so the rest of the line should contain the name of the encoding
                     // Except if there is already a @ symbol signaling the starting of a BibEntry
-                    Integer atSymbolIndex = line.indexOf('@');
+                    int atSymbolIndex = line.indexOf('@');
                     String encoding;
                     if (atSymbolIndex > 0) {
                         encoding = line.substring(SavePreferences.ENCODING_PREFIX.length(), atSymbolIndex);

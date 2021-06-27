@@ -4,9 +4,9 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.jabref.logic.importer.FulltextFetcher;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -19,7 +19,7 @@ class FulltextFetcherTest {
 
     @SuppressWarnings("unused")
     private static Set<FulltextFetcher> fetcherProvider() {
-        return WebFetchers.getFullTextFetchers(mock(ImportFormatPreferences.class));
+        return WebFetchers.getFullTextFetchers(mock(PreferencesService.class));
     }
 
     @ParameterizedTest

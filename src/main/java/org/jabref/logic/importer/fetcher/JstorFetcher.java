@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.IdBasedParserFetcher;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
@@ -25,6 +24,7 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
@@ -42,10 +42,10 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
     private static final String CITE_HOST = HOST + "/citation/text/";
     private static final String URL_QUERY_REGEX = "(?<=\\?).*";
 
-    private final ImportFormatPreferences importFormatPreferences;
+    private final PreferencesService preferencesService;
 
-    public JstorFetcher(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
+    public JstorFetcher(PreferencesService preferencesService) {
+        this.preferencesService = preferencesService;
     }
 
     @Override
@@ -79,7 +79,7 @@ public class JstorFetcher implements SearchBasedParserFetcher, FulltextFetcher, 
     @Override
     public Parser getParser() {
         return inputStream -> {
-            BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+            BibtexParser parser = new BibtexParser(preferencesService, new DummyFileUpdateMonitor());
             String text = new BufferedReader(
                     new InputStreamReader(inputStream, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
 

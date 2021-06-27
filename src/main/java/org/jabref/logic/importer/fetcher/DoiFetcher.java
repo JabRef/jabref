@@ -14,7 +14,6 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.importer.util.MediaTypes;
@@ -26,6 +25,7 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
+import org.jabref.preferences.PreferencesService;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
@@ -43,10 +43,10 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DoiFetcher.class);
 
-    private final ImportFormatPreferences preferences;
+    private final PreferencesService preferencesService;
 
-    public DoiFetcher(ImportFormatPreferences preferences) {
-        this.preferences = preferences;
+    public DoiFetcher(PreferencesService preferencesService) {
+        this.preferencesService = preferencesService;
     }
 
     @Override
@@ -79,7 +79,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
                 String bibtexString = download.asString();
 
                 // BibTeX entry
-                fetchedEntry = BibtexParser.singleFromString(bibtexString, preferences, new DummyFileUpdateMonitor());
+                fetchedEntry = BibtexParser.singleFromString(bibtexString, preferencesService, new DummyFileUpdateMonitor());
                 fetchedEntry.ifPresent(this::doPostCleanup);
 
                 // Check if the entry is an APS journal and add the article id as the page count if page field is missing

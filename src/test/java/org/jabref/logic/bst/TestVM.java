@@ -10,11 +10,11 @@ import java.util.Optional;
 
 import org.jabref.logic.bst.VM.BstEntry;
 import org.jabref.logic.bst.VM.StackFunction;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import org.antlr.runtime.RecognitionException;
 import org.junit.jupiter.api.Test;
@@ -613,7 +613,7 @@ public class TestVM {
     }
 
     private static BibEntry bibtexString2BibtexEntry(String s) throws IOException {
-        ParserResult result = new BibtexParser(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor()).parse(new StringReader(s));
+        ParserResult result = new BibtexParser(mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor()).parse(new StringReader(s));
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals(1, c.size());
         return c.iterator().next();

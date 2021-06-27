@@ -8,10 +8,10 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +39,7 @@ public class IacrEprintFetcherTest {
 
     @BeforeEach
     public void setUp() {
-        fetcher = new IacrEprintFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        fetcher = new IacrEprintFetcher(mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS));
 
         abram2017 = new BibEntry();
         abram2017.setType(StandardEntryType.Misc);

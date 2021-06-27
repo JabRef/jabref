@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.StandardFileType;
@@ -17,6 +16,7 @@ import org.jabref.model.entry.Date;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,14 +143,14 @@ public class RepecNepImporter extends Importer {
     private static final Logger LOGGER = LoggerFactory.getLogger(RepecNepImporter.class);
 
     private static final Collection<String> RECOGNIZED_FIELDS = Arrays.asList("Keywords", "JEL", "Date", "URL", "By");
-    private final ImportFormatPreferences importFormatPreferences;
+    private final PreferencesService importFormatPreferences;
     private int line;
     private String lastLine = "";
     private String preLine = "";
     private boolean inOverviewSection;
 
-    public RepecNepImporter(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
+    public RepecNepImporter(PreferencesService preferencesService) {
+        this.importFormatPreferences = preferencesService;
     }
 
     @Override
@@ -334,7 +334,7 @@ public class RepecNepImporter extends Importer {
                 String content = readMultipleLines(in);
                 String[] keywords = content.split("[,;]");
                 be.addKeywords(Arrays.asList(keywords),
-                        importFormatPreferences.getKeywordSeparator());
+                        importFormatPreferences.getKeywordDelimiter());
             } else if ("JEL".equals(keyword)) {
                 // parse JEL field
                 be.setField(new UnknownField("jel"), readMultipleLines(in));

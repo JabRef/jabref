@@ -3,10 +3,10 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +24,7 @@ public class TitleFetcherTest {
 
     @BeforeEach
     public void setUp() {
-        fetcher = new TitleFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        fetcher = new TitleFetcher(mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS));
 
         bibEntryBischof2009 = new BibEntry();
         bibEntryBischof2009.setType(StandardEntryType.InProceedings);

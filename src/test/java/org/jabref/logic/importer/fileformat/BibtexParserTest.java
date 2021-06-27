@@ -19,7 +19,6 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.util.OS;
@@ -47,6 +46,7 @@ import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,15 +63,15 @@ import static org.mockito.Mockito.when;
 
 class BibtexParserTest {
 
-    private ImportFormatPreferences importFormatPreferences;
+    private PreferencesService preferencesService;
     private BibtexParser parser;
     private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
 
     @BeforeEach
     void setUp() {
-        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
-        parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
+        when(preferencesService.getKeywordDelimiter()).thenReturn(',');
+        parser = new BibtexParser(preferencesService, new DummyFileUpdateMonitor());
     }
 
     @Test
@@ -115,7 +115,7 @@ class BibtexParserTest {
     void singleFromStringRecognizesEntry() throws ParseException {
         Optional<BibEntry> parsed = BibtexParser.singleFromString(
                 "@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n" + "  title = {Title A}}\n",
-                importFormatPreferences, fileMonitor);
+                preferencesService, fileMonitor);
 
         BibEntry expected = new BibEntry();
         expected.setType(StandardEntryType.Article);
@@ -131,7 +131,7 @@ class BibtexParserTest {
         Optional<BibEntry> parsed = BibtexParser.singleFromString(
                 "@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n" + "  title = {Title A}}\n"
                         + "@inProceedings{foo," + "  author={Norton Bar}}",
-                importFormatPreferences, fileMonitor);
+                preferencesService, fileMonitor);
 
         assertTrue(parsed.get().getCitationKey().equals(Optional.of("canh05"))
                 || parsed.get().getCitationKey().equals(Optional.of("foo")));
@@ -139,14 +139,14 @@ class BibtexParserTest {
 
     @Test
     void singleFromStringReturnsEmptyFromEmptyString() throws ParseException {
-        Optional<BibEntry> parsed = BibtexParser.singleFromString("", importFormatPreferences, fileMonitor);
+        Optional<BibEntry> parsed = BibtexParser.singleFromString("", preferencesService, fileMonitor);
 
         assertEquals(Optional.empty(), parsed);
     }
 
     @Test
     void singleFromStringReturnsEmptyIfNoEntryRecognized() throws ParseException {
-        Optional<BibEntry> parsed = BibtexParser.singleFromString("@@article@@{{{{{{}", importFormatPreferences, fileMonitor);
+        Optional<BibEntry> parsed = BibtexParser.singleFromString("@@article@@{{{{{{}", preferencesService, fileMonitor);
 
         assertEquals(Optional.empty(), parsed);
     }
@@ -1096,9 +1096,9 @@ class BibtexParserTest {
 
     @Test
     void parsePreservesMultipleSpacesInNonWrappableField() throws IOException {
-        when(importFormatPreferences.getFieldContentFormatterPreferences().getNonWrappableFields())
+        when(preferencesService.getFieldContentFormatterPreferences().getNonWrappableFields())
                 .thenReturn(Collections.singletonList(StandardField.FILE));
-        BibtexParser parser = new BibtexParser(importFormatPreferences, fileMonitor);
+        BibtexParser parser = new BibtexParser(preferencesService, fileMonitor);
         ParserResult result = parser
                 .parse(new StringReader("@article{canh05,file = {ups  sala}}"));
 

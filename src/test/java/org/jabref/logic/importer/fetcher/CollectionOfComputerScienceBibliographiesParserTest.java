@@ -6,8 +6,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.bibtex.BibEntryAssert;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Test;
@@ -36,11 +36,11 @@ public class CollectionOfComputerScienceBibliographiesParserTest {
     }
 
     private void parseXmlAndCheckResults(String xmlName, List<String> resourceNames) throws Exception {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
+        PreferencesService preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
+        when(preferencesService.getKeywordDelimiter()).thenReturn(',');
 
         InputStream is = CollectionOfComputerScienceBibliographiesParserTest.class.getResourceAsStream(xmlName);
-        CollectionOfComputerScienceBibliographiesParser parser = new CollectionOfComputerScienceBibliographiesParser(importFormatPreferences);
+        CollectionOfComputerScienceBibliographiesParser parser = new CollectionOfComputerScienceBibliographiesParser(preferencesService);
         List<BibEntry> entries = parser.parseEntries(is);
         assertNotNull(entries);
         assertEquals(resourceNames.size(), entries.size());

@@ -6,9 +6,9 @@ import java.net.URL;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fileformat.ModsImporter;
+import org.jabref.preferences.PreferencesService;
 
 import org.apache.http.client.utils.URIBuilder;
 
@@ -17,10 +17,10 @@ import org.apache.http.client.utils.URIBuilder;
  */
 public class LibraryOfCongress implements IdBasedParserFetcher {
 
-    private final ImportFormatPreferences importFormatPreferences;
+    private final PreferencesService preferencesService;
 
-    public LibraryOfCongress(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
+    public LibraryOfCongress(PreferencesService preferencesService) {
+        this.preferencesService = preferencesService;
     }
 
     @Override
@@ -36,6 +36,6 @@ public class LibraryOfCongress implements IdBasedParserFetcher {
 
     @Override
     public Parser getParser() {
-        return new ModsImporter(this.importFormatPreferences);
+        return new ModsImporter(this.preferencesService);
     }
 }

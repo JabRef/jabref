@@ -19,7 +19,6 @@ import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import org.jabref.logic.formatter.casechanger.TitleCaseFormatter;
 import org.jabref.logic.formatter.casechanger.UpperCaseFormatter;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
@@ -46,6 +45,7 @@ import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,7 +63,7 @@ class BibtexDatabaseWriterTest {
     private BibDatabase database;
     private MetaData metaData;
     private BibDatabaseContext bibtexContext;
-    private ImportFormatPreferences importFormatPreferences;
+    private PreferencesService preferencesService;
     private final FileUpdateMonitor fileMonitor = new DummyFileUpdateMonitor();
     private SavePreferences preferences;
     private BibEntryTypesManager entryTypesManager;
@@ -81,7 +81,7 @@ class BibtexDatabaseWriterTest {
         database = new BibDatabase();
         metaData = new MetaData();
         bibtexContext = new BibDatabaseContext(database, metaData);
-        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
     }
 
     @Test
@@ -327,7 +327,7 @@ class BibtexDatabaseWriterTest {
     void roundtripWithArticleMonths() throws Exception {
         Path testBibtexFile = Path.of("src/test/resources/testbib/articleWithMonths.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
+        ParserResult result = new BibtexParser(preferencesService, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
 
         when(preferences.getEncoding()).thenReturn(encoding);
         when(preferences.shouldSaveInOriginalOrder()).thenReturn(true);
@@ -341,7 +341,7 @@ class BibtexDatabaseWriterTest {
     void roundtripWithComplexBib() throws Exception {
         Path testBibtexFile = Path.of("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
+        ParserResult result = new BibtexParser(preferencesService, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
 
         when(preferences.getEncoding()).thenReturn(encoding);
         when(preferences.shouldSaveInOriginalOrder()).thenReturn(true);
@@ -355,7 +355,7 @@ class BibtexDatabaseWriterTest {
     void roundtripWithUserComment() throws Exception {
         Path testBibtexFile = Path.of("src/test/resources/testbib/bibWithUserComments.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
+        ParserResult result = new BibtexParser(preferencesService, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
 
         when(preferences.getEncoding()).thenReturn(encoding);
         when(preferences.shouldSaveInOriginalOrder()).thenReturn(true);
@@ -369,7 +369,7 @@ class BibtexDatabaseWriterTest {
     void roundtripWithUserCommentAndEntryChange() throws Exception {
         Path testBibtexFile = Path.of("src/test/resources/testbib/bibWithUserComments.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
+        ParserResult result = new BibtexParser(preferencesService, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
 
         BibEntry entry = result.getDatabase().getEntryByCitationKey("1137631").get();
         entry.setField(StandardField.AUTHOR, "Mr. Author");
@@ -386,7 +386,7 @@ class BibtexDatabaseWriterTest {
     void roundtripWithUserCommentBeforeStringAndChange() throws Exception {
         Path testBibtexFile = Path.of("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
+        ParserResult result = new BibtexParser(preferencesService, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
 
         for (BibtexString string : result.getDatabase().getStringValues()) {
             // Mark them as changed
@@ -406,7 +406,7 @@ class BibtexDatabaseWriterTest {
     void roundtripWithUnknownMetaData() throws Exception {
         Path testBibtexFile = Path.of("src/test/resources/testbib/unknownMetaData.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = new BibtexParser(importFormatPreferences, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
+        ParserResult result = new BibtexParser(preferencesService, fileMonitor).parse(Importer.getReader(testBibtexFile, encoding));
 
         when(preferences.getEncoding()).thenReturn(encoding);
         when(preferences.shouldSaveInOriginalOrder()).thenReturn(true);
@@ -682,7 +682,7 @@ class BibtexDatabaseWriterTest {
         String fileContent = "% Encoding: UTF-8" + OS.NEWLINE + OS.NEWLINE + "@Comment{jabref-meta: selector_journal:Test {\\\\\"U}mlaut;}" + OS.NEWLINE;
         Charset encoding = StandardCharsets.UTF_8;
 
-        ParserResult firstParse = new BibtexParser(importFormatPreferences, fileMonitor).parse(new StringReader(fileContent));
+        ParserResult firstParse = new BibtexParser(preferencesService, fileMonitor).parse(new StringReader(fileContent));
 
         when(preferences.getEncoding()).thenReturn(encoding);
         when(preferences.shouldSaveInOriginalOrder()).thenReturn(true);
@@ -705,8 +705,7 @@ class BibtexDatabaseWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        ParserResult firstParse = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(new StringReader(bibtexEntry));
+        ParserResult firstParse = new BibtexParser(preferencesService, new DummyFileUpdateMonitor()).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = firstParse.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -749,8 +748,7 @@ class BibtexDatabaseWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        ParserResult firstParse = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(new StringReader(bibtexEntry));
+        ParserResult firstParse = new BibtexParser(preferencesService, new DummyFileUpdateMonitor()).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = firstParse.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -781,8 +779,7 @@ class BibtexDatabaseWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        ParserResult firstParse = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(new StringReader(bibtexEntry));
+        ParserResult firstParse = new BibtexParser(preferencesService, new DummyFileUpdateMonitor()).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = firstParse.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 

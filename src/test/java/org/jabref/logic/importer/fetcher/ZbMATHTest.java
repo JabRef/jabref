@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -25,10 +25,10 @@ class ZbMATHTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(
+        PreferencesService preferencesService = mock(PreferencesService.class);
+        when(preferencesService.getFieldContentFormatterPreferences()).thenReturn(
                 mock(FieldContentFormatterPreferences.class));
-        fetcher = new ZbMATH(importFormatPreferences);
+        fetcher = new ZbMATH(preferencesService);
 
         donaldsonEntry = new BibEntry();
         donaldsonEntry.setType(StandardEntryType.Article);

@@ -8,9 +8,9 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.preferences.PreferencesService;
 
 import org.apache.http.client.utils.URIBuilder;
 
@@ -20,8 +20,8 @@ import org.apache.http.client.utils.URIBuilder;
 public class IsbnViaEbookDeFetcher extends AbstractIsbnFetcher {
     private static final String BASE_URL = "http://www.ebook.de/de/tools/isbn2bibtex";
 
-    public IsbnViaEbookDeFetcher(ImportFormatPreferences importFormatPreferences) {
-        super(importFormatPreferences);
+    public IsbnViaEbookDeFetcher(PreferencesService preferencesService) {
+        super(preferencesService);
     }
 
     @Override

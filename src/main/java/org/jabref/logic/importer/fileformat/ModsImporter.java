@@ -20,7 +20,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
@@ -61,6 +60,7 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.EntryTypeFactory;
+import org.jabref.preferences.PreferencesService;
 
 import com.google.common.base.Joiner;
 import org.slf4j.Logger;
@@ -80,8 +80,8 @@ public class ModsImporter extends Importer implements Parser {
 
     private JAXBContext context;
 
-    public ModsImporter(ImportFormatPreferences importFormatPreferences) {
-        keywordSeparator = importFormatPreferences.getKeywordSeparator() + " ";
+    public ModsImporter(PreferencesService preferencesService) {
+        keywordSeparator = preferencesService.getKeywordDelimiter() + " ";
     }
 
     @Override
@@ -180,7 +180,7 @@ public class ModsImporter extends Importer implements Parser {
             nameDefinition.ifPresent(name -> handleAuthorsInNamePart(name, authors, fields));
 
             originInfoDefinition.ifPresent(originInfo -> originInfo
-                    .getPlaceOrPublisherOrDateIssued().stream()
+                    .getPlaceOrPublisherOrDateIssued()
                     .forEach(element -> putPlaceOrPublisherOrDate(fields, element.getName().getLocalPart(),
                             element.getValue())));
 
@@ -222,7 +222,7 @@ public class ModsImporter extends Importer implements Parser {
 
     private void parseIdentifier(Map<Field, String> fields, IdentifierDefinition identifier, BibEntry entry) {
         String type = identifier.getType();
-        if ("citekey".equals(type) && !entry.getCitationKey().isPresent()) {
+        if ("citekey".equals(type) && entry.getCitationKey().isEmpty()) {
             entry.setCitationKey(identifier.getValue());
         } else if (!"local".equals(type) && !"citekey".equals(type)) {
             // put all identifiers (doi, issn, isbn,...) except of local and citekey
@@ -374,8 +374,8 @@ public class ModsImporter extends Importer implements Parser {
 
         List<String> places = new ArrayList<>();
         placeDefinition
-                .ifPresent(place -> place.getPlaceTerm().stream().filter(placeTerm -> placeTerm.getValue() != null)
-                                         .map(PlaceTermDefinition::getValue).forEach(element -> places.add(element)));
+                .ifPresent(place -> place.getPlaceTerm().stream().map(PlaceTermDefinition::getValue)
+                                         .filter(Objects::nonNull).forEach(places::add));
         putIfListIsNotEmpty(fields, places, StandardField.ADDRESS, ", ");
 
         dateDefinition.ifPresent(date -> putDate(fields, elementName, date));
@@ -419,7 +419,7 @@ public class ModsImporter extends Importer implements Parser {
 
     private void putIfListIsNotEmpty(Map<Field, String> fields, List<String> list, Field key, String separator) {
         if (!list.isEmpty()) {
-            fields.put(key, list.stream().collect(Collectors.joining(separator)));
+            fields.put(key, String.join(separator, list));
         }
     }
 

@@ -5,11 +5,11 @@ import java.util.List;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -27,10 +27,10 @@ public class DBLPFetcherTest {
 
     @BeforeEach
     public void setUp() {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getFieldContentFormatterPreferences())
+        PreferencesService preferencesService = mock(PreferencesService.class);
+        when(preferencesService.getFieldContentFormatterPreferences())
                 .thenReturn(mock(FieldContentFormatterPreferences.class));
-        dblpFetcher = new DBLPFetcher(importFormatPreferences);
+        dblpFetcher = new DBLPFetcher(preferencesService);
         entry = new BibEntry();
 
         entry.setType(StandardEntryType.Article);

@@ -61,7 +61,7 @@ public class FetchAndMergeEntry {
         for (Field field : fields) {
             Optional<String> fieldContent = entry.getField(field);
             if (fieldContent.isPresent()) {
-                Optional<IdBasedFetcher> fetcher = WebFetchers.getIdBasedFetcherForField(field, Globals.prefs.getImportFormatPreferences());
+                Optional<IdBasedFetcher> fetcher = WebFetchers.getIdBasedFetcherForField(field, Globals.prefs);
                 if (fetcher.isPresent()) {
                     BackgroundTask.wrap(() -> fetcher.get().performSearchById(fieldContent.get()))
                                   .onSuccess(fetchedEntry -> {

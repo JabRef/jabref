@@ -178,7 +178,7 @@ public class ClipBoardManager {
     }
 
     private List<BibEntry> handleBibTeXData(String entries) {
-        BibtexParser parser = new BibtexParser(preferencesService.getImportFormatPreferences(), Globals.getFileUpdateMonitor());
+        BibtexParser parser = new BibtexParser(preferencesService, Globals.getFileUpdateMonitor());
         try {
             return parser.parseEntries(new ByteArrayInputStream(entries.getBytes(StandardCharsets.UTF_8)));
         } catch (ParseException ex) {
@@ -216,7 +216,7 @@ public class ClipBoardManager {
     private List<BibEntry> fetchByDOI(DOI doi) {
         LOGGER.info("Found DOI in clipboard");
         try {
-            Optional<BibEntry> entry = new DoiFetcher(preferencesService.getImportFormatPreferences()).performSearchById(doi.getDOI());
+            Optional<BibEntry> entry = new DoiFetcher(preferencesService).performSearchById(doi.getDOI());
             return OptionalUtil.toList(entry);
         } catch (FetcherException ex) {
             LOGGER.error("Error while fetching", ex);
@@ -227,7 +227,7 @@ public class ClipBoardManager {
     private List<BibEntry> fetchByArXiv(ArXivIdentifier arXivIdentifier) {
         LOGGER.info("Found arxiv identifier in clipboard");
         try {
-            Optional<BibEntry> entry = new ArXiv(preferencesService.getImportFormatPreferences()).performSearchById(arXivIdentifier.getNormalizedWithoutVersion());
+            Optional<BibEntry> entry = new ArXiv(preferencesService).performSearchById(arXivIdentifier.getNormalizedWithoutVersion());
             return OptionalUtil.toList(entry);
         } catch (FetcherException ex) {
             LOGGER.error("Error while fetching", ex);

@@ -45,7 +45,7 @@ public class BibtexExtractorViewModel {
                                     StateManager stateManager) {
 
         this.dialogService = dialogService;
-        currentCitationfetcher = new GrobidCitationFetcher(preferencesService.getImportFormatPreferences());
+        currentCitationfetcher = new GrobidCitationFetcher(preferencesService);
         this.taskExecutor = taskExecutor;
         this.importHandler = new ImportHandler(
                 bibdatabaseContext,

@@ -6,12 +6,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.preferences.PreferencesService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ class PdfContentImporterTest {
 
     @BeforeEach
     void setUp() {
-        importer = new PdfContentImporter(mock(ImportFormatPreferences.class));
+        importer = new PdfContentImporter(mock(PreferencesService.class));
     }
 
     @Test

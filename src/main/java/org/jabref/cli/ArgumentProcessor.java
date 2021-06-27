@@ -91,7 +91,7 @@ public class ArgumentProcessor {
     }
 
     private static Optional<ParserResult> importBibtexToOpenBase(String argument) {
-        BibtexParser parser = new BibtexParser(Globals.prefs.getImportFormatPreferences(), new DummyFileUpdateMonitor());
+        BibtexParser parser = new BibtexParser(Globals.prefs, new DummyFileUpdateMonitor());
         try {
             List<BibEntry> entries = parser.parseEntries(argument);
             ParserResult result = new ParserResult(entries);
@@ -151,7 +151,7 @@ public class ArgumentProcessor {
                 // * means "guess the format":
                 System.out.println(Localization.lang("Importing in unknown format") + ": " + file);
 
-                ImportFormatReader.UnknownFormatImport importResult = Globals.IMPORT_FORMAT_READER.importUnknownFormat(file, Globals.prefs.getTimestampPreferences(), new DummyFileUpdateMonitor());
+                ImportFormatReader.UnknownFormatImport importResult = Globals.IMPORT_FORMAT_READER.importUnknownFormat(file, new DummyFileUpdateMonitor());
 
                 System.out.println(Localization.lang("Format used") + ": " + importResult.format);
                 return Optional.of(importResult.parserResult);
@@ -416,7 +416,7 @@ public class ArgumentProcessor {
                 boolean bibExtension = aLeftOver.toLowerCase(Locale.ENGLISH).endsWith("bib");
                 ParserResult pr = new ParserResult();
                 if (bibExtension) {
-                    pr = OpenDatabase.loadDatabase(aLeftOver, Globals.prefs.getImportFormatPreferences(), Globals.prefs.getTimestampPreferences(), Globals.getFileUpdateMonitor());
+                    pr = OpenDatabase.loadDatabase(aLeftOver, Globals.prefs, Globals.getFileUpdateMonitor());
                 }
 
                 if (!bibExtension || (pr.isEmpty())) {
@@ -630,7 +630,7 @@ public class ArgumentProcessor {
         String engine = split[0];
         String query = split[1];
 
-        Set<SearchBasedFetcher> fetchers = WebFetchers.getSearchBasedFetchers(Globals.prefs.getImportFormatPreferences());
+        Set<SearchBasedFetcher> fetchers = WebFetchers.getSearchBasedFetchers(Globals.prefs);
         Optional<SearchBasedFetcher> selectedFetcher = fetchers.stream()
                                                                .filter(fetcher -> fetcher.getName().equalsIgnoreCase(engine))
                                                                .findFirst();

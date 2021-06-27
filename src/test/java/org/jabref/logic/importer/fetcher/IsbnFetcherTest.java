@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +29,7 @@ class IsbnFetcherTest {
 
     @BeforeEach
     void setUp() {
-        fetcher = new IsbnFetcher(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
+        fetcher = new IsbnFetcher(mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS));
 
         bibEntry = new BibEntry();
         bibEntry.setType(StandardEntryType.Book);

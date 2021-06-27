@@ -13,7 +13,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
@@ -29,6 +28,7 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.preferences.PreferencesService;
 
 import com.google.common.base.Strings;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -43,7 +43,7 @@ import org.apache.pdfbox.text.PDFTextStripper;
 public class PdfContentImporter extends Importer {
 
     private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
-    private final ImportFormatPreferences importFormatPreferences;
+    private final PreferencesService preferencesService;
     // input lines into several lines
     private String[] lines;
     // current index in lines
@@ -51,8 +51,8 @@ public class PdfContentImporter extends Importer {
     private String curString;
     private String year;
 
-    public PdfContentImporter(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
+    public PdfContentImporter(PreferencesService preferencesService) {
+        this.preferencesService = preferencesService;
     }
 
     /**
@@ -210,7 +210,7 @@ public class PdfContentImporter extends Importer {
             Optional<DOI> doi = DOI.findInText(firstPageContents);
             if (doi.isPresent()) {
                 ParserResult parserResult = new ParserResult(result);
-                Optional<BibEntry> entry = new DoiFetcher(importFormatPreferences).performSearchById(doi.get().getDOI());
+                Optional<BibEntry> entry = new DoiFetcher(preferencesService).performSearchById(doi.get().getDOI());
                 entry.ifPresent(parserResult.getDatabase()::insertEntry);
                 entry.ifPresent(bibEntry -> bibEntry.addFile(new LinkedFile("", filePath.toAbsolutePath(), "PDF")));
                 return parserResult;

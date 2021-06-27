@@ -1,4 +1,4 @@
-package org.jabref.gui.preferences.customization;
+package org.jabref.gui.preferences.importexport;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
@@ -10,12 +10,13 @@ import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class CustomizationTab extends AbstractPreferenceTabView<CustomizationTabViewModel> implements PreferencesTab {
+public class ImportExportTab extends AbstractPreferenceTabView<ImportExportTabViewModel> implements PreferencesTab {
 
+    @FXML private CheckBox generateNewKeyOnImport;
     @FXML private CheckBox useCustomDOI;
     @FXML private TextField useCustomDOIName;
 
-    public CustomizationTab() {
+    public ImportExportTab() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -23,14 +24,16 @@ public class CustomizationTab extends AbstractPreferenceTabView<CustomizationTab
 
     @Override
     public String getTabName() {
-        return Localization.lang("Customization");
+        return Localization.lang("Import and Export");
     }
 
     public void initialize() {
-        this.viewModel = new CustomizationTabViewModel(dialogService, preferencesService);
+        this.viewModel = new ImportExportTabViewModel(preferencesService);
 
         useCustomDOI.selectedProperty().bindBidirectional(viewModel.useCustomDOIProperty());
         useCustomDOIName.textProperty().bindBidirectional(viewModel.useCustomDOINameProperty());
         useCustomDOIName.disableProperty().bind(useCustomDOI.selectedProperty().not());
+
+        generateNewKeyOnImport.selectedProperty().bindBidirectional(viewModel.generateKeyOnImportProperty());
     }
 }

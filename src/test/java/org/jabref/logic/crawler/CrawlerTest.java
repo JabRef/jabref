@@ -10,12 +10,12 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPattern;
 import org.jabref.logic.crawler.git.GitHandler;
 import org.jabref.logic.exporter.SavePreferences;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.metadata.SaveOrderConfig;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import org.eclipse.jgit.api.Git;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 class CrawlerTest {
     @TempDir
     Path tempRepositoryDirectory;
-    ImportFormatPreferences importFormatPreferences;
+    PreferencesService preferencesService;
     SavePreferences savePreferences;
     TimestampPreferences timestampPreferences;
     BibEntryTypesManager entryTypesManager;
@@ -48,7 +48,7 @@ class CrawlerTest {
         Crawler testCrawler = new Crawler(getPathToStudyDefinitionFile(),
                 gitHandler,
                 new DummyFileUpdateMonitor(),
-                importFormatPreferences,
+                preferencesService,
                 savePreferences,
                 timestampPreferences,
                 entryTypesManager
@@ -91,17 +91,19 @@ class CrawlerTest {
                 GlobalCitationKeyPattern.fromPattern("[auth][year]"),
                 ',');
 
-        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        preferencesService = mock(PreferencesService.class, Answers.RETURNS_DEEP_STUBS);
         savePreferences = mock(SavePreferences.class, Answers.RETURNS_DEEP_STUBS);
         timestampPreferences = mock(TimestampPreferences.class);
         when(savePreferences.getSaveOrder()).thenReturn(new SaveOrderConfig());
         when(savePreferences.getEncoding()).thenReturn(null);
         when(savePreferences.takeMetadataSaveOrderInAccount()).thenReturn(true);
         when(savePreferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
-        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
-        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
-        when(importFormatPreferences.isKeywordSyncEnabled()).thenReturn(false);
-        when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
+        when(preferencesService.getSavePreferences()).thenReturn(savePreferences);
+        when(preferencesService.getTimestampPreferences()).thenReturn(timestampPreferences);
+        when(preferencesService.getKeywordDelimiter()).thenReturn(',');
+        when(preferencesService.getFieldContentFormatterPreferences()).thenReturn(new FieldContentFormatterPreferences());
+        when(preferencesService.getSpecialFieldsPreferences().isKeywordSyncEnabled()).thenReturn(false);
+        when(preferencesService.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
         entryTypesManager = new BibEntryTypesManager();
     }
 

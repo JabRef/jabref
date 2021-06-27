@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
 import org.jabref.logic.importer.fetcher.transformers.DefaultLuceneQueryTransformer;
@@ -23,6 +22,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
+import org.jabref.preferences.PreferencesService;
 
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
@@ -41,10 +41,10 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(DOAJFetcher.class);
 
     private static final String SEARCH_URL = "https://doaj.org/api/v1/search/articles/";
-    private final ImportFormatPreferences preferences;
+    private final PreferencesService preferencesService;
 
-    public DOAJFetcher(ImportFormatPreferences preferences) {
-        this.preferences = Objects.requireNonNull(preferences);
+    public DOAJFetcher(PreferencesService preferencesService) {
+        this.preferencesService = Objects.requireNonNull(preferencesService);
     }
 
     /**
@@ -211,7 +211,7 @@ public class DOAJFetcher implements SearchBasedParserFetcher {
                 JSONArray results = jsonObject.getJSONArray("results");
                 for (int i = 0; i < results.length(); i++) {
                     JSONObject bibJsonEntry = results.getJSONObject(i).getJSONObject("bibjson");
-                    BibEntry entry = parseBibJSONtoBibtex(bibJsonEntry, preferences.getKeywordSeparator());
+                    BibEntry entry = parseBibJSONtoBibtex(bibJsonEntry, preferencesService.getKeywordDelimiter());
                     entries.add(entry);
                 }
             }

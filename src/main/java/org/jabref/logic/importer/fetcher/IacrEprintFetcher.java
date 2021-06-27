@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
@@ -27,6 +26,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,10 +49,10 @@ public class IacrEprintFetcher implements IdBasedFetcher {
     private static final String DESCRIPTION_URL_PREFIX = "https://eprint.iacr.org/";
     private static final Charset WEBSITE_CHARSET = StandardCharsets.ISO_8859_1;
 
-    private final ImportFormatPreferences prefs;
+    private final PreferencesService preferencesService;
 
-    public IacrEprintFetcher(ImportFormatPreferences prefs) {
-        this.prefs = prefs;
+    public IacrEprintFetcher(PreferencesService preferencesService) {
+        this.preferencesService = preferencesService;
     }
 
     @Override
@@ -80,7 +80,7 @@ public class IacrEprintFetcher implements IdBasedFetcher {
         String actualEntry = getRequiredValueBetween("<PRE>", "</PRE>", bibtexCitationHtml);
 
         try {
-            return BibtexParser.singleFromString(actualEntry, prefs, new DummyFileUpdateMonitor());
+            return BibtexParser.singleFromString(actualEntry, preferencesService, new DummyFileUpdateMonitor());
         } catch (ParseException e) {
             throw new FetcherException(Localization.lang("Entry from %0 could not be parsed.", "IACR"), e);
         }

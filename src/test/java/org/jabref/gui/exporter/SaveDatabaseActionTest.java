@@ -123,7 +123,7 @@ class SaveDatabaseActionTest {
         when(dbContext.getEntries()).thenReturn(database.getEntries());
         when(preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)).thenReturn(false);
         when(preferences.getDefaultEncoding()).thenReturn(StandardCharsets.UTF_8);
-        when(preferences.getFieldContentParserPreferences()).thenReturn(mock(FieldContentFormatterPreferences.class));
+        when(preferences.getFieldContentFormatterPreferences()).thenReturn(mock(FieldContentFormatterPreferences.class));
         when(preferences.getSavePreferences()).thenReturn(savePreferences);
         when(libraryTab.frame()).thenReturn(jabRefFrame);
         when(libraryTab.getBibDatabaseContext()).thenReturn(dbContext);

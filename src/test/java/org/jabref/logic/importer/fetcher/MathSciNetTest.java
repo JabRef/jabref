@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
@@ -28,10 +28,10 @@ class MathSciNetTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getFieldContentFormatterPreferences()).thenReturn(
+        PreferencesService preferencesService = mock(PreferencesService.class);
+        when(preferencesService.getFieldContentFormatterPreferences()).thenReturn(
                 mock(FieldContentFormatterPreferences.class));
-        fetcher = new MathSciNet(importFormatPreferences);
+        fetcher = new MathSciNet(preferencesService);
 
         ratiuEntry = new BibEntry();
         ratiuEntry.setType(StandardEntryType.Article);

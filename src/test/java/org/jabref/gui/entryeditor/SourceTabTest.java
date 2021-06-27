@@ -15,11 +15,11 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.GUITest;
 
 import org.fxmisc.richtext.CodeArea;
@@ -49,11 +49,11 @@ class SourceTabTest {
         StateManager stateManager = mock(StateManager.class);
         when(stateManager.activeSearchQueryProperty()).thenReturn(OptionalObjectProperty.empty());
         KeyBindingRepository keyBindingRepository = new KeyBindingRepository(Collections.emptyList(), Collections.emptyList());
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
-        when(importFormatPreferences.getFieldContentFormatterPreferences())
+        PreferencesService preferencesService = mock(PreferencesService.class);
+        when(preferencesService.getFieldContentFormatterPreferences())
                 .thenReturn(mock(FieldContentFormatterPreferences.class));
 
-        sourceTab = new SourceTab(new BibDatabaseContext(), new CountingUndoManager(), new FieldWriterPreferences(), importFormatPreferences, new DummyFileUpdateMonitor(), mock(DialogService.class), stateManager, keyBindingRepository);
+        sourceTab = new SourceTab(new BibDatabaseContext(), new CountingUndoManager(), new FieldWriterPreferences(), preferencesService, new DummyFileUpdateMonitor(), mock(DialogService.class), stateManager, keyBindingRepository);
         pane = new TabPane(
                 new Tab("main area", area),
                 new Tab("other tab", new Label("some text")),
