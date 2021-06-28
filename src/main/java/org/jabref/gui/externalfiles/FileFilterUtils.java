@@ -24,6 +24,7 @@ public class FileFilterUtils {
             lastEditedTime = Files.getLastModifiedTime(path);
         } catch (IOException e) {
             LOGGER.error("Could not retrieve file time", e);
+            return LocalDateTime.now();
         }
         LocalDateTime localDateTime = lastEditedTime
                 .toInstant()
