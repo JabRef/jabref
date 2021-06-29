@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
 import org.jabref.model.entry.BibEntry;
@@ -94,12 +95,6 @@ public class ContainBasedSearchRule implements SearchRule {
             }
         }
 
-        Vector<SearchResult> searchResults = new Vector<>();
-        for (SearchResult searchResult : lastSearchResults) {
-            if (searchResult.isResultFor(bibEntry)) {
-                searchResults.add(searchResult);
-            }
-        }
-        return new PdfSearchResults(searchResults);
+        return new PdfSearchResults(lastSearchResults.stream().filter(searchResult -> searchResult.isResultFor(bibEntry)).collect(Collectors.toList()));
     }
 }

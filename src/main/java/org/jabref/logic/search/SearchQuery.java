@@ -1,6 +1,5 @@
 package org.jabref.logic.search;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -10,10 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.pdf.search.PdfSearchResults;
-import org.jabref.model.pdf.search.SearchResult;
 import org.jabref.model.search.SearchMatcher;
 import org.jabref.model.search.rules.ContainBasedSearchRule;
 import org.jabref.model.search.rules.GrammarBasedSearchRule;

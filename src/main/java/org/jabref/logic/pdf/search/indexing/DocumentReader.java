@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -77,14 +78,11 @@ public final class DocumentReader {
      * @return A List of Documents with the (meta)data. Can be empty if there is a problem reading the LinkedFile.
      */
     public List<Document> readLinkedPdfs(BibDatabaseContext databaseContext) {
-        List<Document> documents = new LinkedList<>();
-        for (LinkedFile pdf : this.entry.getFiles()) {
-            Optional<Document> document = readLinkedPdf(databaseContext, pdf);
-            document.ifPresent(d -> {
-                documents.add(document.get());
-            });
-        }
-        return documents;
+        return entry.getFiles().stream()
+                    .map((pdf) -> readLinkedPdf(databaseContext, pdf))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList());
     }
 
     private Document readPdfContents(LinkedFile pdf, Path resolvedPdfPath) throws IOException {

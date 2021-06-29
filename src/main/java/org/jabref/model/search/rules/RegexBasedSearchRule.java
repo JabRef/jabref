@@ -8,6 +8,7 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
 import org.jabref.model.entry.BibEntry;
@@ -95,13 +96,6 @@ public class RegexBasedSearchRule implements SearchRule {
                 e.printStackTrace();
             }
         }
-
-        Vector<SearchResult> searchResults = new Vector<>();
-        for (SearchResult searchResult : lastSearchResults) {
-            if (searchResult.isResultFor(bibEntry)) {
-                searchResults.add(searchResult);
-            }
-        }
-        return new PdfSearchResults(searchResults);
+        return new PdfSearchResults(lastSearchResults.stream().filter(searchResult -> searchResult.isResultFor(bibEntry)).collect(Collectors.toList()));
     }
 }
