@@ -14,7 +14,8 @@ Situation:
 One strategy could be to use a single try-catch around the whole body,
 then showing a message based on the type of exceptions thrown.
 
-**[base case]**
+## [base case]
+
 ```java
 try {
    A a = f();
@@ -101,11 +102,11 @@ We still need to notify the action handler (the caller) about
 failure. Since we have shown the dialog, we do not need to provide a
 message.
 
-### Notify caller with `Optional` result.
+### Notify caller with `Optional` result
 
 With `Optional` we get something like this:
 
-**[dialog in wrap, return Optional]**
+#### [dialog in wrap, return Optional]
 
 ```java
 Optional<A> wrap_f(String title) {
@@ -157,11 +158,11 @@ try {
 }
 ```
 
-### Notify caller with `Result` result.
+### Notify caller with `Result` result
 
 With `Result` we get something like this:
 
-**[dialog in wrap, return OOResult]**
+#### [dialog in wrap, return OOResult]
 
 ```java
 OOResult<A, OOError> wrap_f() {
@@ -221,8 +222,6 @@ try {
 }
 ```
 
-
-
 ### Notify caller by throwing an exception
 
 Or we can throw an exception to notify the caller.
@@ -230,7 +229,7 @@ Or we can throw an exception to notify the caller.
 To simplify code in the caller, I assume we are using an exception
 type not used elsewhere, but shared by all precondition checks.
 
-**[dialog in wrap, PreconditionException]**
+#### [dialog in wrap, PreconditionException]
 
 ```java
 A wrap_f(String title) throws PreconditionException {
@@ -304,7 +303,7 @@ try {
 
 or to reduce passing around the title part:  
 
-**[PreconditionException, dialog in catch]**
+#### [PreconditionException, dialog in catch]
 
 ```java
 A wrap_f() throws PreconditionException {
@@ -343,7 +342,7 @@ try {
 
 or
 
-```
+```java
 try {
    A a = wrap_f();
    B b = wrap_g(a);
@@ -447,7 +446,8 @@ The more promising variants were
   - pro: no repeated `if(){return}` boilerplate
   - pro: title used only once
 
-**[using OOResult]**
+### [using OOResult]
+
 ```java
 final String title = "Could not insert citation";
 
@@ -474,7 +474,8 @@ if (testDialog(title, cursor)) {
 ```
 
 
-**[using PreconditionException, dialog in catch]**
+### [using PreconditionException, dialog in catch]
+
 ```java
 final String title = "Could not insert citation";
 
@@ -491,7 +492,8 @@ try {
 }
 ```
 
-I would suggest using the latter, 
+I would suggest using the latter,
+
 - probably using `OOError` for `PreconditionException`
   - In this case `OOError` being in `gui` becomes an asset: we can be sure
     code in `logic` cannot throw it.

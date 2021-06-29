@@ -40,7 +40,7 @@ Reference marks have some features that make it easy to mess up citations in a d
 (`LO:[key:Ctrl-F8]`, `LO:[View]/[Field shadings]` helps)
 
 - They are **not atomic**:
-  -  the user can edit the content. This will be lost on `[click:Update]`  
+  - the user can edit the content. This will be lost on `[click:Update]`  
   If an `As character` or `To character` anchor is inserted, the corresponding frame or footnote is deleted.
   - by pressing Enter within, the user can break a reference mark into two parts.  
     The second part is now outside the reference mark: `[click:Update]` will leave it as is, and replace the first part
@@ -95,5 +95,3 @@ with a single click.
 to "suspend some notifications to the controllers which are used for display updates."
 
 - `(change)` Now we are using this facility.
-
-

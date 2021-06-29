@@ -75,10 +75,10 @@ Citations can be grouped.
 A group of parenthesized citations share the parentheses around, like this:  
  "(Smith, 2000; Jones 2001)".
 
-   - Examples with pseudocode:
-     - `\citep{Smith2000,Jones2001}` "(Smith, 2000; Jones 2001)"
-     - `\citet{Smith2000,Jones2001}` "Smith (2000); Jones (2001)"
-     - `\citen{Smith2000,Jones2001}` ""
+- Examples with pseudocode:
+  - `\citep{Smith2000,Jones2001}` "(Smith, 2000; Jones 2001)"
+  - `\citet{Smith2000,Jones2001}` "Smith (2000); Jones (2001)"
+  - `\citen{Smith2000,Jones2001}` ""
 
 From the user's point of view, citation groups can be created by
 
@@ -198,7 +198,7 @@ For numbered styles, the citations within a group are sorted again
 during generation of the citation marker, now by the numbers
 themselves. The result of this sorting is not saved, only affects the citation marker.
 
-  - Series of consecutive number are replaced with ranges: for example "[1-5; 11]"
+- Series of consecutive number are replaced with ranges: for example "[1-5; 11]"
 
 ### Order of the citation groups (`globalOrder`)
 
@@ -220,17 +220,16 @@ citation groups](order-of-appearance.md).
     should precede that of "Smith200b".  
     To achieve this, the sources get the letters
     according the order of their first appearance.
-     - This seems to contradict the statement "The bibliography is
-       sorted in (author, year, title) order" above.  
-       It does not. As of JabRef 5.3 both are true.  
-       Consequence: in the references
-       Smith2000b may precede Smith2000a.
-       ([reported](https://github.com/JabRef/jabref/issues/7805))
+    - This seems to contradict the statement "The bibliography is
+      sorted in (author, year, title) order" above.  
+      It does not. As of JabRef 5.3 both are true.  
+      Consequence: in the references
+      Smith2000b may precede Smith2000a.
+      ([reported](https://github.com/JabRef/jabref/issues/7805))
   - Some author-year citation styles prescribe a higher threshold on
     the number of authors for switching to "FirstAuthor et al." form
     (`jstyle:MaxAuthors`) at the first citation of a source
     (`jstyle:MaxAuthorsFirst`)
-
 
 
 # What is stored in a document (JabRef5.2)
@@ -279,7 +278,7 @@ citation groups](order-of-appearance.md).
 
 # How does it interact with the document?
 
-- "stateless"   
+- "stateless"  
   JabRef is only loosely coupled to the document.  
   Between two GUI actions it does not receive any information from LibreOffice.  
   It cannot distinguish between the user changing a single character in the document or rewriting everything.
@@ -296,7 +295,3 @@ citation groups](order-of-appearance.md).
   - citation markers: the content of the reference mark
   - bibliography: the content of the Section (in LibreOffice sense)
     named `"JR_bib"`.
-
-
-
-

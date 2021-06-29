@@ -1,5 +1,5 @@
 
-## Order of appearance of citation groups (`globalOrder`)
+# Order of appearance of citation groups (`globalOrder`)
 
 The order of appearance of citations is decided on
 two levels:
@@ -11,7 +11,7 @@ groups that appear as citation markers in the text (`globalOrder`).
 This page is about the latter: how to decide the order of appearance (numbering sequence) of a set
 of citation markers?
 
-### Conceptually
+## Conceptually
 
 In a continuous text it is easy: take the textual order of citation markers.
 
@@ -29,7 +29,7 @@ Examples:
   we consider it part of the second column?
 
 
-### Technically
+## Technically
 
 
 In LibreOffice, a document has a main text that supports the
@@ -41,7 +41,7 @@ to be inserted.
 
 - Some of these allow text inside with further insertions.
 
-#### Anchors
+### Anchors
 
 - Many, but not all XTextContent types support getting a "technical" insertion point or text range
   through [getAnchor](https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1text_1_1XTextContent.html#ae82a8b42f6b2578549b68b4483a877d3).
@@ -53,7 +53,7 @@ to be inserted.
   - Allowing or requiring the user to insert "logical anchors" for frames and other "floating" parts
     might help to alleviate these problems.
 
-#### Sorting within a `Text`
+### Sorting within a `Text`
 
 The text ranges occupied by the citation markers support the
 [XTextRange](https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1text_1_1XTextRange.html)
@@ -64,7 +64,7 @@ interface.
 may support (optional) the [XTextRangeCompare](https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1text_1_1XTextRangeCompare.html)
 interface, that allows two XTextRange values to be compared if both belong to this `Text`
 
-#### Visual ordering
+### Visual ordering
 
 - The cursor used by the user is available as an
   [XTextViewCursor](https://api.libreoffice.org/docs/idl/ref/interfacecom_1_1sun_1_1star_1_1text_1_1XTextViewCursor.html)
@@ -94,7 +94,7 @@ Consequences of getting these visual coordinates and using them to order the cit
   of the first column of the first page.
 
 
-### JabRef
+## JabRef
 
 Jabref uses the following steps for sorting sorting citation markers (providing `globalOrder`):
 

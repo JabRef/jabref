@@ -6,7 +6,7 @@
 
 On the question of where should we catch exceptions in relation to GUI
 code it was suggested (Jonatan Asketorp
-https://github.com/koppor/jabref/pull/496#discussion_r629695493, "most
+[here](https://github.com/koppor/jabref/pull/496#discussion_r629695493), "most
 of them (all?) should be handled latest in the ViewModel.")  that
 catching them early could help simplifying the higher levels.
 
@@ -48,7 +48,7 @@ message texts needed in `OOBibBase` were moved from `OpenOfficePanel` to `OOErro
 
   - Another set of contructors provide messages for some preconditions.  
     For example `public static OOError noDataBaseIsOpenForCiting()`
-    
+
 Some questions:
 
 - Should we use static data instead of static methods for the precondition-related messages?
@@ -57,12 +57,12 @@ Some questions:
     For static instances this would modify a shared resource unless we create a new copy in `setTitle`.
     However `setTitle` can be called repeatedly on the same object: as we bubble up, we can be more specific
     about the context.
-    
+
 - Should we remove title from `OOError`?
   - pro: we almost always override its original value
   - con: may need to duplicate the title in different files (preconditions for an action in OpenOfficePanel
     and in OOBibBase)
-    
+
 - Should we include `OOError.showErrorDialog` ?  
   - pro: since it was intended *for* error dialogs, it is nice to provide this.
   - con: the reference to `DialogService` forces it to `gui`, thus it cannot be used in `logic` or `model`
@@ -83,7 +83,7 @@ During precondition checking
 3. some test depend on these resources
 
 While concentrating on these and on "do not throw exceptions here"
-... using a https://en.wikipedia.org/wiki/Result_type as a return
+... using a [Result type](https://en.wikipedia.org/wiki/Result_type) as a return
 value from precondition checking code seemed a good fit:
 
 - Instead of throwing an exception, we can return some data describing the problem.
@@ -102,7 +102,7 @@ cases of checked exception types)
 
 In `OOBibBase` I used `OOError` as the unified error type: it can
 store error messages and wrap exceptions. It contains everything we need
-for an error dialog. On the other hand it does not support programmatic 
+for an error dialog. On the other hand it does not support programmatic
 dissection.
 
 ### Implementation
@@ -110,14 +110,14 @@ dissection.
 Unlike `Optional` and `List`,  `Result` (in the sense used here) did not get into
 java standard libraries. There are some implementations of this idea for java on the net:
 
-  * https://github.com/bgerstle/result-java/
-  * https://github.com/MrKloan/result-type
-  * https://gist.github.com/david-bakin/35d55daeeaee1eb71cea
-  * https://www.baeldung.com/vavr-try
+- [bgerstle/result-java](https://github.com/bgerstle/result-java/)
+- [MrKloan/result-type](https://github.com/MrKloan/result-type)
+- [david-bakin](https://gist.github.com/david-bakin/35d55daeeaee1eb71cea)
+- [vavr-try](https://www.baeldung.com/vavr-try)
 
 Generics allow an implementation built around
 
-```
+```java
 class OOResult<R, E> {
     private final Optional<R> result;
     private final Optional<E> error;
@@ -143,7 +143,7 @@ with an assumption that at any time exactly one of `result` and `error` is prese
   `OOResult<Void,E>.ok(null)` would look strange: in this case we need
   `ok()` without arguments.
   
-To solve this problem, I introduced 
+To solve this problem, I introduced
 
 ```java
 class OOVoidResult<E> {
@@ -157,40 +157,40 @@ with methods on the error side similar to those in `OOError<R,E>`, and
 
 ### The relation between `Optional<E>` and `OOVoidResult<E>`
 
-* Both `Optional` and `OOVoidResult` can store 0 or 1 values,
+- Both `Optional` and `OOVoidResult` can store 0 or 1 values,
   in this respect they are equivalent
   
-  * Actually, `OOVoidResult` is just a wrapper around an `Optional`
+  - Actually, `OOVoidResult` is just a wrapper around an `Optional`
 
-* In terms of communication to human readers when used, their
+- In terms of communication to human readers when used, their
   connotation in respect to success and failure is the opposite:
   
-  * `Optional.empty()`  normally suggests failure, `OOVoidResult.ok()` mean success.
-  * `Optional.of(something)` probably means success, `OOVoidResult.error(something)` indicates failure.
-  * `OOVoidResult`  is "the other half"  (the failure branch) of `OOResult`
-    
-    * its content is accessed through `getError`, `mapError`, `ifError`, not `get`, `map`, `ifPresent`
+  - `Optional.empty()`  normally suggests failure, `OOVoidResult.ok()` mean success.
+  - `Optional.of(something)` probably means success, `OOVoidResult.error(something)` indicates failure.
+  - `OOVoidResult`  is "the other half"  (the failure branch) of `OOResult`
+
+    - its content is accessed through `getError`, `mapError`, `ifError`, not `get`, `map`, `ifPresent`
 
 `OOVoidResult` allows
 
-* a clear distinction between success and failure when
+- a clear distinction between success and failure when
   calls to "get" something that might not be available (`Optional`) and
   calls to precondition checking where we can only get reasons for failure
   (`OOVoidResult`)
   appear together.  
   Using `Optional` for both is possible, but is more error-prone.
 
-* it also allows using uniform verbs (`isError`, `getError`,
+- it also allows using uniform verbs (`isError`, `getError`,
   `ifError`, return `OO{Void}Result.error`) for "we have a problem"
   when
   
-  * checking preconditions (`OOVoidResult`) is mixed with
-  * "I need an X" orelse "we have a problem" (`OOResult`)
+  - checking preconditions (`OOVoidResult`) is mixed with
+  - "I need an X" orelse "we have a problem" (`OOResult`)
 
-* at a functions head:
+- at a functions head:
   
-  * `OOVoidResult<String> function()` says: no result, but may get an error message
-  * `Optional<String> function()` says: a `String` result or nothing.
+  - `OOVoidResult<String> function()` says: no result, but may get an error message
+  - `Optional<String> function()` says: a `String` result or nothing.
 
 **Summary**: technically could use `Optional` for both situation, but it would be less precise,
 leaving more room for confusion and bugs. `OOVoidResult` forces use of `getError` instead of `get`,
@@ -228,5 +228,5 @@ if (testDialog(title,
 }
 ```
 
-part several times. 
+part several times.
 

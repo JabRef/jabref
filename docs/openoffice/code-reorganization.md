@@ -44,7 +44,7 @@ Why
   - `rangesort` : ordering objects that have an `XTextRange`, optionally with an extra integer to break ties.
     - `RangeSort.partitionAndSortRanges` : since `XTextRangeCompare` can only compare `XTextRange` values in
       the same `XText`, we partition them accordingly and only sort within each partiion.
-    - `RangeSortable` (interface), `RangeSortEntry` (implements) :   
+    - `RangeSortable` (interface), `RangeSortEntry` (implements) :  
       When we replace `XTextRange` of citation marks in footnotes with the range of the footnote mark,
       multiple citation marks may be mapped to the same location. To preserve the order between these,
       `RangeSortable` allows this order to be indicated by returning appropriate indices from `getIndexInPosition`
@@ -59,7 +59,7 @@ Why
     May change as new backends may need different APIs.
   - `style` : data structures and interfaces used while going from ordered list of citation groups
   to formatted citation markers and bibliography. Does not communicate with the document. Too long to fit here, starting a new section.
- 
+
 ## model/style
 
 At the core,
@@ -112,6 +112,7 @@ This is done in logic, in [`OOProcessAuthorYearMarkers.createUniqueLetters()`](h
 
 The entry point for this processing is: [`OOProcess.produceCitationMarkers`](https://github.com/antalk2/jabref/blob/fed0952cbdaf7a76bcb09b3db5ac48f34f5ca388/src/main/java/org/jabref/logic/openoffice/style/OOProcess.java#L69).  
 It fills
+
 - each `CitationGroup.citationMarker`
 - `CitationGroups.bibliography`
   - From bibliography `OOFormatBibliography.formatBibliography()` creates an `OOText`
@@ -138,7 +139,7 @@ to the rest. Originally it also contains code to format numeric and author-year 
       - `CitationMarkerNumericEntry`
       - `CitationMarkerEntry`
       - `CitationMarkerNumericBibEntry`
-      - `CitationMarkerNormEntry`   
+      - `CitationMarkerNormEntry`  
       describe their expected input entries.
 - [`OOProcess.produceCitationMarkers`](https://github.com/antalk2/jabref/blob/fed0952cbdaf7a76bcb09b3db5ac48f34f5ca388/src/main/java/org/jabref/logic/openoffice/style/OOProcess.java#L69)
 is the main entry point for style application. Calls to specific implementations
@@ -159,7 +160,7 @@ These are currently in `UpdateBibliography`
 - `OOFrontend` : has a `Backend` and `CitationGroups`
   - Its constructor creates a backend, reads data from the document and creates a CitationGroups instance.
   - provides functionality that requires both access to the document and the CitationGroups instance
--  `RangeForOverlapCheck` used in `OOFrontend`
+- `RangeForOverlapCheck` used in `OOFrontend`
 - `UpdateBibliography` : Create, find and update the bibliography in the document using output from
   `produceCitationMarkers()`
 - `UpdateCitationMarkers` create `CitationGroup`, update citation markers using output from
@@ -178,11 +179,10 @@ GUI-independent part of implementations of GUI actions.
   - contains some dialog messages that do not correspond to exceptions
 
 - `OOBibBase2` : most activity was moved out from here to parts discussed above.
-   - connecting / selecting a document moved to `OOBibBaseConnect`
-   - the rest connects higher parts of the GUI to actions in logic
-     - does argument and precondition checking
-     - catches all exceptions
-     - shows error and warning dialogs
-     - adds `enterUndoContext`, `leaveUndoContext` around action code
-
+  - connecting / selecting a document moved to `OOBibBaseConnect`
+  - the rest connects higher parts of the GUI to actions in logic
+    - does argument and precondition checking
+    - catches all exceptions
+    - shows error and warning dialogs
+    - adds `enterUndoContext`, `leaveUndoContext` around action code
 
