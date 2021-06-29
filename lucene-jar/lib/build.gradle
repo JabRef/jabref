@@ -8,7 +8,7 @@ repositories {
 }
 
 shadowJar {
-	mergeServiceFiles()
+    mergeServiceFiles()
 }
 
 dependencies {
