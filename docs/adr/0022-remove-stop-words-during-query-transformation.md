@@ -1,7 +1,4 @@
-# Remove stop words during queriny
-
-* Status: proposed
-* Date: 2021-06-29
+# Remove stop words during query transformation
 
 ## Context and Problem Statement
 
