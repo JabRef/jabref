@@ -14,11 +14,14 @@ import org.jabref.model.strings.StringUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.SimpleFSDirectory;
 
@@ -52,10 +55,12 @@ public final class PdfSearcher {
         try {
             List<SearchResult> resultDocs = new LinkedList<>();
 
-            IndexSearcher searcher = new IndexSearcher(DirectoryReader.open(indexDirectory));
+            IndexReader reader = DirectoryReader.open(indexDirectory);
+            IndexSearcher searcher = new IndexSearcher(reader);
             Query query = new MultiFieldQueryParser(PDF_FIELDS, new EnglishStemAnalyzer()).parse(searchString);
-            for (ScoreDoc scoreDoc : searcher.search(query, maxHits).scoreDocs) {
-                resultDocs.add(new SearchResult(searcher, scoreDoc));
+            TopDocs results = searcher.search(query, maxHits);
+            for (ScoreDoc scoreDoc : results.scoreDocs) {
+                resultDocs.add(new SearchResult(searcher, query, scoreDoc));
             }
             return new PdfSearchResults(resultDocs);
         } catch (ParseException e) {

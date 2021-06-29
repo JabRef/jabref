@@ -37,28 +37,16 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
             return;
         }
         PdfSearchResults searchResults = stateManager.activeSearchQueryProperty().get().get().getRule().getFulltextResults(stateManager.activeSearchQueryProperty().get().get().getQuery(), entry);
-
         StringBuilder content = new StringBuilder("<p>" + Localization.lang("Search results") + " </p>");
 
-        content.append("<table><tr>");
-        content.append("<th>Author</th>");
-        content.append("<th>Key</th>");
-        content.append("<th>Keyword</th>");
-        content.append("<th>Score</th>");
-        content.append("<th>Subject</th>");
-        content.append("<th>Path</th>");
-        content.append("</tr>");
-
         for (SearchResult searchResult : searchResults.getSearchResults()) {
-
-            content.append("<tr>");
-            content.append("<td>" + searchResult.getAuthor() + "</td>");
-            content.append("<td>" + searchResult.getKey() + "</td>");
-            content.append("<td>" + searchResult.getKeyword() + "</td>");
-            content.append("<td>" + searchResult.getLuceneScore() + "</td>");
-            content.append("<td>" + searchResult.getSubject() + "</td>");
-            content.append("<td>" + searchResult.getPath() + "</td>");
-            content.append("</tr>");
+            content.append("<p>Found match in <a href=");
+            content.append(searchResult.getPath());
+            content.append(">");
+            content.append(searchResult.getPath());
+            content.append("</a></p><p>");
+            content.append(searchResult.getHtml());
+            content.append("</p>");
         }
 
         webView.getEngine().loadContent(content.toString());
