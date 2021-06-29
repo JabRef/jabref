@@ -4,6 +4,8 @@ import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
+import org.jabref.model.strings.StringUtil;
+
 import org.apache.lucene.queryparser.flexible.core.nodes.BooleanQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.FieldQueryNode;
 import org.apache.lucene.queryparser.flexible.core.nodes.GroupQueryNode;
@@ -185,20 +187,7 @@ public abstract class AbstractQueryTransformer {
      * Default implementation: just return the term (in quotes if a space is contained)
      */
     protected String handleUnFieldedTerm(String term) {
-        return quoteStringIfSpaceIsContained(term);
-    }
-
-    /**
-     * Encloses the given string with " if there is a space contained
-     *
-     * @return Returns a string
-     */
-    protected String quoteStringIfSpaceIsContained(String string) {
-        if (string.contains(" ")) {
-            return "\"" + string + "\"";
-        } else {
-            return string;
-        }
+        return StringUtil.quoteStringIfSpaceIsContained(term);
     }
 
     protected String createKeyValuePair(String fieldAsString, String term) {
@@ -206,7 +195,7 @@ public abstract class AbstractQueryTransformer {
     }
 
     protected String createKeyValuePair(String fieldAsString, String term, String separator) {
-        return String.format("%s%s%s", fieldAsString, separator, quoteStringIfSpaceIsContained(term));
+        return String.format("%s%s%s", fieldAsString, separator, StringUtil.quoteStringIfSpaceIsContained(term));
     }
 
     /**
