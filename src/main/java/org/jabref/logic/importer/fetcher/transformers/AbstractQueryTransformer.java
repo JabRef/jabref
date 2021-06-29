@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
@@ -98,7 +99,7 @@ public abstract class AbstractQueryTransformer {
                 return s.isEmpty() ? Optional.empty() : Optional.of(s);
             }
             case NO_EXPLICIT_FIELD -> {
-                return Optional.of(handleUnFieldedTerm(term));
+                return handleUnFieldedTerm(term);
             }
             default -> {
                 // Just add unknown fields as default
@@ -186,8 +187,8 @@ public abstract class AbstractQueryTransformer {
      *
      * Default implementation: just return the term (in quotes if a space is contained)
      */
-    protected String handleUnFieldedTerm(String term) {
-        return StringUtil.quoteStringIfSpaceIsContained(term);
+    protected Optional<String> handleUnFieldedTerm(String term) {
+        return Optional.of(StringUtil.quoteStringIfSpaceIsContained(term));
     }
 
     protected String createKeyValuePair(String fieldAsString, String term) {

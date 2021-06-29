@@ -23,6 +23,23 @@ import static org.mockito.Mockito.when;
 @FetcherTest
 class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
+    private final BibEntry IGOR_NEWCOMERS = new BibEntry(StandardEntryType.InProceedings)
+            .withField(StandardField.AUTHOR, "Igor Steinmacher and Tayana Uchoa Conte and Christoph Treude and Marco Aurélio Gerosa")
+            .withField(StandardField.DATE, "14-22 May 2016")
+            .withField(StandardField.YEAR, "2016")
+            .withField(StandardField.EVENTDATE, "14-22 May 2016")
+            .withField(StandardField.EVENTTITLEADDON, "Austin, TX, USA")
+            .withField(StandardField.LOCATION, "Austin, TX, USA")
+            .withField(StandardField.DOI, "10.1145/2884781.2884806")
+            .withField(StandardField.JOURNALTITLE, "2016 IEEE/ACM 38th International Conference on Software Engineering (ICSE)")
+            .withField(StandardField.PAGES, "273--284")
+            .withField(StandardField.ISBN, "978-1-5090-2071-3")
+            .withField(StandardField.ISSN, "1558-1225")
+            .withField(StandardField.PUBLISHER, "IEEE")
+            .withField(StandardField.KEYWORDS, "Portals, Documentation, Computer bugs, Joining processes, Industries, Open source software, Newcomers, Newbies, Novices, Beginners, Open Source Software, Barriers, Obstacles, Onboarding, Joining Process")
+            .withField(StandardField.TITLE, "Overcoming Open Source Project Entry Barriers with a Portal for Newcomers")
+            .withField(StandardField.FILE, ":https\\://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7886910:PDF");
+
     private IEEE fetcher;
     private BibEntry entry;
 
@@ -105,29 +122,19 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
     }
 
     @Test
-    void searchByQueryFindsEntry() throws Exception {
-        BibEntry expected = new BibEntry(StandardEntryType.InProceedings)
-                .withField(StandardField.AUTHOR, "Igor Steinmacher and Tayana Uchoa Conte and Christoph Treude and Marco Aurélio Gerosa")
-                .withField(StandardField.DATE, "14-22 May 2016")
-                .withField(StandardField.YEAR, "2016")
-                .withField(StandardField.EVENTDATE, "14-22 May 2016")
-                .withField(StandardField.EVENTTITLEADDON, "Austin, TX, USA")
-                .withField(StandardField.LOCATION, "Austin, TX, USA")
-                .withField(StandardField.DOI, "10.1145/2884781.2884806")
-                .withField(StandardField.JOURNALTITLE, "2016 IEEE/ACM 38th International Conference on Software Engineering (ICSE)")
-                .withField(StandardField.PAGES, "273--284")
-                .withField(StandardField.ISBN, "978-1-5090-2071-3")
-                .withField(StandardField.ISSN, "1558-1225")
-                .withField(StandardField.PUBLISHER, "IEEE")
-                .withField(StandardField.KEYWORDS, "Portals, Documentation, Computer bugs, Joining processes, Industries, Open source software, Newcomers, Newbies, Novices, Beginners, Open Source Software, Barriers, Obstacles, Onboarding, Joining Process")
-                .withField(StandardField.TITLE, "Overcoming Open Source Project Entry Barriers with a Portal for Newcomers")
-                .withField(StandardField.FILE, ":https\\://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7886910:PDF");
-        // The quotes are important to get the paper found. Without quotes, the fetcher constructs a query making IEEE returning no entry at all.
-        // It seems that IEEE cannot handle more than 6 AND conditions in a query as of 2021-06
+    void searchByPlainQueryFindsEntry() throws Exception {
+        List<BibEntry> fetchedEntries = fetcher.performSearch("Overcoming Open Source Project Entry Barriers with a Portal for Newcomers");
+        // Abstract should not be included in JabRef tests
+        fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
+        assertEquals(Collections.singletonList(IGOR_NEWCOMERS), fetchedEntries);
+    }
+
+    @Test
+    void searchByQuotedQueryFindsEntry() throws Exception {
         List<BibEntry> fetchedEntries = fetcher.performSearch("\"Overcoming Open Source Project Entry Barriers with a Portal for Newcomers\"");
         // Abstract should not be included in JabRef tests
-        fetchedEntries.get(0).clearField(StandardField.ABSTRACT);
-        assertEquals(Collections.singletonList(expected), fetchedEntries);
+        fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
+        assertEquals(Collections.singletonList(IGOR_NEWCOMERS), fetchedEntries);
     }
 
     @Override

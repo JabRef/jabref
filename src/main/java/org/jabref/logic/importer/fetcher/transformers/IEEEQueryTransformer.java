@@ -1,12 +1,21 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import org.jabref.model.strings.StringUtil;
 
 /**
  * Needs to be instantiated for each new query
  */
 public class IEEEQueryTransformer extends YearRangeByFilteringQueryTransformer {
+    /**
+     * Returns words ignored by the engine. Need to be removed when querying for them.
+     * See ADR-0022
+     */
+    private static final List<String> STOP_WORDS = List.of("a", "and", "for", "or", "with");
+
     // These have to be integrated into the IEEE query URL as these are just supported as query parameters
     // Journal is wrapped in quotes by the transformer
     private String journal;
@@ -40,7 +49,7 @@ public class IEEEQueryTransformer extends YearRangeByFilteringQueryTransformer {
     @Override
     protected String handleJournal(String journal) {
         this.journal = journal;
-        return handleUnFieldedTerm(journal);
+        return StringUtil.quoteStringIfSpaceIsContained(journal);
     }
 
     @Override
@@ -56,6 +65,14 @@ public class IEEEQueryTransformer extends YearRangeByFilteringQueryTransformer {
             case "article_number" -> handleArticleNumber(term);
             default -> super.handleOtherField(fieldAsString, term);
         };
+    }
+
+    @Override
+    protected Optional<String> handleUnFieldedTerm(String term) {
+        if (STOP_WORDS.contains(term)) {
+            return Optional.empty();
+        }
+        return super.handleUnFieldedTerm(term);
     }
 
     private Optional<String> handleArticleNumber(String term) {
