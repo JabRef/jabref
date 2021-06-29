@@ -49,7 +49,7 @@ keywords = {prio1, printed, read}
 
 * Good, because does not bloat the BibTeX file. Typically, 50% of the lines are special fields
 * Good, because the user can easily assign a special field. E.g, typing “, prio1” into keywords instead of “\n  priority = {prio1},”
-* Bad, because  they need to be synchronized to fields (because otherwise, the maintable cannot render it)
+* Bad, because they need to be synchronized to fields (because otherwise, the maintable cannot render it)
 * Bad, because keywords are related to the actual content
 * Bad, because some users want to keep publisher keywords
 
@@ -61,7 +61,7 @@ Example:
 jabrefspecial = {prio1, printed, red}
 ```
 
-* Good, because  typing effort
+* Good, because typing effort
 * Bad, because handling in table gets complicated → one field is now multiple columns
 
 ### Special fields as sub-feature of groups

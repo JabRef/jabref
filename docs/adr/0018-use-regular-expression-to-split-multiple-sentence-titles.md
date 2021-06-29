@@ -23,4 +23,3 @@ Chosen option: "Regular expression", because we can use Java internal classes (P
 ### Negative Consequences
 
 * Regular expressions can never cover every case, therefore, splitting may not be accurate for every title
-
