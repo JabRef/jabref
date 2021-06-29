@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
@@ -19,10 +18,8 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.testutils.category.GUITest;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,11 +44,6 @@ public class DuplicateSearchTest {
 
     private DuplicateSearch duplicateSearch;
     private BibEntry entry1;
-
-    @BeforeAll
-    public static void setupGlobals() {
-        Globals.prefs = mock(JabRefPreferences.class);
-    }
 
     @BeforeEach
     void setupDuplicateSearchInstance() {
