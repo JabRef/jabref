@@ -17,7 +17,7 @@
     </author>
     <category citation-format="note"/>
     <category field="social_science"/>
-    <updated>2018-11-20T13:57:58+00:00</updated>
+    <updated>2021-05-26T05:12:14+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="de">
@@ -51,7 +51,7 @@
     <names variable="author" delimiter=";">
       <name delimiter=" / " delimiter-precedes-last="never" initialize-with="." name-as-sort-order="all"/>
       <substitute>
-        <names variable="author"/>
+        <names variable="editor author"/>
         <group delimiter=": ">
           <text term="anonymous" form="short"/>
           <text variable="title"/>
