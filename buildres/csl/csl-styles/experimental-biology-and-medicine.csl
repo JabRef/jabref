@@ -188,6 +188,7 @@
             <group delimiter=": ">
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
               <text variable="volume"/>
 =======
               <text variable="volume" font-weight="bold"/>
@@ -195,6 +196,9 @@
 =======
               <text variable="volume" font-weight="bold"/>
 >>>>>>> dbb93e7d9be410a475814d5ae49aef83ce158191
+=======
+              <text variable="volume" font-weight="bold"/>
+>>>>>>> 04a2d190cbad73582c84bbef9fd7ba9d0b982317
               <text variable="page"/>
             </group>
           </group>
