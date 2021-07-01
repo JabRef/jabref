@@ -171,7 +171,6 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
 
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
-
         if (entry.getFieldOrAlias(StandardField.TITLE).isEmpty() && entry.getFieldOrAlias(StandardField.AUTHOR).isEmpty()) {
             return Collections.emptyList();
         }
@@ -191,10 +190,8 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
      * @return list of bibcodes matching the search request. May be empty
      */
     private List<String> fetchBibcodes(URL url) throws FetcherException {
-
         try {
-            URLDownload download = new URLDownload(url);
-            download.addHeader("Authorization", "Bearer " + API_KEY);
+            URLDownload download = getUrlDownload(url);
             String content = download.asString();
             JSONObject obj = new JSONObject(content);
             JSONArray codes = obj.getJSONObject("response").getJSONArray("docs");
@@ -288,4 +285,12 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
             throw new FetcherException("A network error occurred", e);
         }
     }
+
+    @Override
+    public URLDownload getUrlDownload(URL url) {
+        URLDownload urlDownload = new URLDownload(url);
+        urlDownload.addHeader("Authorization", "Bearer " + API_KEY);
+        return urlDownload;
+    }
+
 }
