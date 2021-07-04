@@ -144,6 +144,7 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
     @Test
     public void searchByQueryFindsEntry() throws Exception {
         List<BibEntry> fetchedEntries = fetcher.performSearch("Diez slice theorem Lie");
+        assertFalse(fetchedEntries.isEmpty());
         assertTrue(fetchedEntries.contains(diezSliceTheoremEntry));
     }
 
@@ -154,8 +155,10 @@ public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
         searchEntry.setField(StandardField.AUTHOR, "Diez");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
+
+        // The list contains more than one element, thus we need to check in two steps and cannot use assertEquals(List.of(diezSliceTheoremEntry, fetchedEntries))
         assertFalse(fetchedEntries.isEmpty());
-        assertEquals(diezSliceTheoremEntry, fetchedEntries.get(0));
+        assertTrue(fetchedEntries.contains(diezSliceTheoremEntry));
     }
 
     @Test
