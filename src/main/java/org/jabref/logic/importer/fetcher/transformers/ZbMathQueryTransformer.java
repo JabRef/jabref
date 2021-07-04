@@ -1,5 +1,7 @@
 package org.jabref.logic.importer.fetcher.transformers;
 
+import java.util.Optional;
+
 public class ZbMathQueryTransformer extends AbstractQueryTransformer {
 
     @Override
@@ -43,7 +45,7 @@ public class ZbMathQueryTransformer extends AbstractQueryTransformer {
     }
 
     @Override
-    protected String handleUnFieldedTerm(String term) {
-        return createKeyValuePair("any", term);
+    protected Optional<String> handleUnFieldedTerm(String term) {
+        return Optional.of(createKeyValuePair("any", term));
     }
 }
