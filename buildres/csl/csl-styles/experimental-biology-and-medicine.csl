@@ -189,6 +189,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
               <text variable="volume"/>
 =======
               <text variable="volume" font-weight="bold"/>
@@ -199,6 +200,9 @@
 =======
               <text variable="volume" font-weight="bold"/>
 >>>>>>> 04a2d190cbad73582c84bbef9fd7ba9d0b982317
+=======
+              <text variable="volume" font-weight="bold"/>
+>>>>>>> a8320457f9f850a5e5c87de9855d476fd12d6573
               <text variable="page"/>
             </group>
           </group>

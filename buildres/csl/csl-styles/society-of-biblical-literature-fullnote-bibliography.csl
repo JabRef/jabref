@@ -35,6 +35,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     <updated>2021-04-13T15:55:26+00:00</updated>
 =======
     <updated>2021-05-10T14:27:36+00:00</updated>
@@ -45,6 +46,9 @@
 =======
     <updated>2021-05-10T14:27:36+00:00</updated>
 >>>>>>> 04a2d190cbad73582c84bbef9fd7ba9d0b982317
+=======
+    <updated>2021-05-10T14:27:36+00:00</updated>
+>>>>>>> a8320457f9f850a5e5c87de9855d476fd12d6573
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en-US">
@@ -699,6 +703,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                       <label variable="locator" form="short"/>
                       <text variable="locator"/>
 =======
@@ -713,6 +718,10 @@
                         <label variable="locator" form="short"/>
                         <text variable="locator"/>
 >>>>>>> 04a2d190cbad73582c84bbef9fd7ba9d0b982317
+=======
+                        <label variable="locator" form="short"/>
+                        <text variable="locator"/>
+>>>>>>> a8320457f9f850a5e5c87de9855d476fd12d6573
                     </group>
                   </else>
                 </choose>
@@ -968,6 +977,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
           <group delimiter=" ">
             <text variable="annote"/>
             <text macro="point-locators-subsequent"/>
@@ -977,6 +987,8 @@
 >>>>>>> dbb93e7d9be410a475814d5ae49aef83ce158191
 =======
 >>>>>>> 04a2d190cbad73582c84bbef9fd7ba9d0b982317
+=======
+>>>>>>> a8320457f9f850a5e5c87de9855d476fd12d6573
           <choose>
             <if locator="section">
               <group delimiter=" ">
@@ -993,11 +1005,14 @@
           </choose>
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> fcf26b3f77925d7e99e703666dbe3c4b706403ac
 =======
 >>>>>>> dbb93e7d9be410a475814d5ae49aef83ce158191
 =======
 >>>>>>> 04a2d190cbad73582c84bbef9fd7ba9d0b982317
+=======
+>>>>>>> a8320457f9f850a5e5c87de9855d476fd12d6573
         </if>
         <!-- Lexicon/Dictionary/Encyclopedia -->
         <else-if type="entry-dictionary entry-encyclopedia" match="any">

@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <<<<<<< HEAD
+<<<<<<< HEAD
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" default-locale="en-GB">
 =======
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" and="text" name-as-sort-order="all" names-delimiter="," demote-non-dropping-particle="sort-only" default-locale="en-GB">
 >>>>>>> 04a2d190cbad73582c84bbef9fd7ba9d0b982317
+=======
+<style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" and="text" name-as-sort-order="all" names-delimiter="," demote-non-dropping-particle="sort-only" default-locale="en-GB">
+>>>>>>> a8320457f9f850a5e5c87de9855d476fd12d6573
   <info>
     <title>Ocean and Coastal Research</title>
     <title-short>OCR</title-short>
@@ -18,6 +22,7 @@
     <category field="science"/>
     <eissn>2675-2824</eissn>
     <summary>Ocean and Coastal Research style -  Harvard</summary>
+<<<<<<< HEAD
 <<<<<<< HEAD
     <updated>2021-04-15T17:54:37+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
@@ -92,6 +97,9 @@
         <text variable="container-title" text-case="title" suffix=","/>
 =======
     <updated>2021-06-19T20:55:01+00:00</updated>
+=======
+    <updated>2021-06-28T00:48:10+00:00</updated>
+>>>>>>> a8320457f9f850a5e5c87de9855d476fd12d6573
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -503,7 +511,10 @@
       <else>
         <text term="no date" form="short"/>
         <text variable="year-suffix" prefix="-"/>
+<<<<<<< HEAD
 >>>>>>> 04a2d190cbad73582c84bbef9fd7ba9d0b982317
+=======
+>>>>>>> a8320457f9f850a5e5c87de9855d476fd12d6573
       </else>
     </choose>
   </macro>
@@ -517,6 +528,7 @@
       </if>
       <else>
 <<<<<<< HEAD
+<<<<<<< HEAD
         <text variable="edition" suffix="."/>
       </else>
     </choose>
@@ -526,6 +538,8 @@
       <key macro="year-date"/>
       <key macro="author-short"/>
 =======
+=======
+>>>>>>> a8320457f9f850a5e5c87de9855d476fd12d6573
         <text variable="edition"/>
       </else>
     </choose>
@@ -704,13 +718,19 @@
   </macro>
   <citation and="text" et-al-min="3" et-al-use-first="1" disambiguate-add-names="true" disambiguate-add-givenname="true" disambiguate-add-year-suffix="true" collapse="year">
     <sort>
+<<<<<<< HEAD
       <key macro="author-short"/>
       <key macro="issued-sort"/>
 >>>>>>> 04a2d190cbad73582c84bbef9fd7ba9d0b982317
+=======
+      <key macro="issued-sort"/>
+      <key macro="author-short"/>
+>>>>>>> a8320457f9f850a5e5c87de9855d476fd12d6573
     </sort>
     <layout prefix="(" suffix=")" delimiter="; ">
       <group delimiter=", ">
         <text macro="author-short"/>
+<<<<<<< HEAD
 <<<<<<< HEAD
         <text macro="year-date"/>
       </group>
@@ -797,12 +817,18 @@
         </choose>
       </group>
 =======
+=======
+>>>>>>> a8320457f9f850a5e5c87de9855d476fd12d6573
         <text macro="issued-year"/>
         <text macro="citation-locator"/>
       </group>
     </layout>
   </citation>
+<<<<<<< HEAD
   <bibliography hanging-indent="true" et-al-min="99" et-al-use-first="98" et-al-use-last="true" entry-spacing="0" line-spacing="2">
+=======
+  <bibliography hanging-indent="true" entry-spacing="0" line-spacing="2">
+>>>>>>> a8320457f9f850a5e5c87de9855d476fd12d6573
     <sort>
       <key macro="author"/>
       <key macro="issued-sort" sort="ascending"/>
@@ -811,7 +837,11 @@
     <layout>
       <group suffix=".">
         <group delimiter=". ">
+<<<<<<< HEAD
           <text macro="author" font-variant="normal"/>
+=======
+          <text macro="author"/>
+>>>>>>> a8320457f9f850a5e5c87de9855d476fd12d6573
           <text macro="issued"/>
           <text macro="title-plus-extra"/>
           <text macro="container"/>
@@ -825,7 +855,10 @@
       </group>
       <text macro="access" prefix=" "/>
       <text macro="original-date" prefix=" "/>
+<<<<<<< HEAD
 >>>>>>> 04a2d190cbad73582c84bbef9fd7ba9d0b982317
+=======
+>>>>>>> a8320457f9f850a5e5c87de9855d476fd12d6573
     </layout>
   </bibliography>
 </style>
