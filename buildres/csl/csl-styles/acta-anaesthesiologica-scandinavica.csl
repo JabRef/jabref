@@ -155,19 +155,10 @@
   </citation>
   <bibliography second-field-align="flush">
     <layout>
-<<<<<<< HEAD
       <group delimiter=". " suffix=". ">
         <text variable="citation-number"/>
-=======
       <text variable="citation-number" suffix=". "/>
       <group delimiter=". " suffix=". ">
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> dbb93e7d9be410a475814d5ae49aef83ce158191
-=======
->>>>>>> 04a2d190cbad73582c84bbef9fd7ba9d0b982317
-=======
->>>>>>> a8320457f9f850a5e5c87de9855d476fd12d6573
         <text macro="author"/>
         <text macro="title"/>
       </group>

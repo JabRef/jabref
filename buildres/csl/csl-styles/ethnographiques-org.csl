@@ -12,19 +12,7 @@
     <category citation-format="author-date"/>
     <category field="social_science"/>
     <eissn>1961-9162</eissn>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    <updated>2021-05-28T07:12:35+00:00</updated>
-=======
     <updated>2021-06-01T16:10:30+00:00</updated>
->>>>>>> dbb93e7d9be410a475814d5ae49aef83ce158191
-=======
-    <updated>2021-06-01T16:10:30+00:00</updated>
->>>>>>> 04a2d190cbad73582c84bbef9fd7ba9d0b982317
-=======
-    <updated>2021-06-01T16:10:30+00:00</updated>
->>>>>>> a8320457f9f850a5e5c87de9855d476fd12d6573
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="fr">
@@ -51,28 +39,6 @@
     </names>
   </macro>
   <macro name="author-cite">
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    <choose>
-      <if variable="author">
-        <names variable="author">
-          <name form="short" and="text" delimiter-precedes-last="never" sort-separator=" " font-style="normal"/>
-          <et-al font-style="italic"/>
-        </names>
-      </if>
-      <else-if variable="editor">
-        <names variable="editor">
-          <name form="short" and="text" name-as-sort-order="all" delimiter-precedes-last="never" sort-separator=" " font-style="normal"/>
-          <et-al font-style="italic"/>
-        </names>
-      </else-if>
-    </choose>
-=======
-=======
->>>>>>> 04a2d190cbad73582c84bbef9fd7ba9d0b982317
-=======
->>>>>>> a8320457f9f850a5e5c87de9855d476fd12d6573
     <names variable="author">
       <name form="short" and="text" delimiter-precedes-last="never" sort-separator=" " font-style="normal"/>
       <et-al font-style="italic"/>
@@ -81,13 +47,6 @@
         <text variable="title"/>
       </substitute>
     </names>
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> dbb93e7d9be410a475814d5ae49aef83ce158191
-=======
->>>>>>> 04a2d190cbad73582c84bbef9fd7ba9d0b982317
-=======
->>>>>>> a8320457f9f850a5e5c87de9855d476fd12d6573
   </macro>
   <macro name="editor">
     <names variable="editor">
@@ -198,27 +157,9 @@
         </choose>
       </if>
       <else-if type="article-journal article-magazine" match="any">
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-        <group font-style="normal" delimiter=" ">
-          <text macro="volume"/>
-          <text macro="issue" prefix="(" suffix=")"/>
-=======
         <group font-style="normal" delimiter=" " suffix=", ">
           <text macro="volume"/>
           <text macro="issue"/>
->>>>>>> dbb93e7d9be410a475814d5ae49aef83ce158191
-=======
-        <group font-style="normal" delimiter=" " suffix=", ">
-          <text macro="volume"/>
-          <text macro="issue"/>
->>>>>>> 04a2d190cbad73582c84bbef9fd7ba9d0b982317
-=======
-        <group font-style="normal" delimiter=" " suffix=", ">
-          <text macro="volume"/>
-          <text macro="issue"/>
->>>>>>> a8320457f9f850a5e5c87de9855d476fd12d6573
         </group>
       </else-if>
     </choose>
@@ -235,23 +176,8 @@
   </macro>
   <macro name="issue">
     <choose>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-      <if is-numeric="issue">
-        <text variable="issue"/>
-=======
       <if is-numeric="volume">
         <text variable="issue" prefix="(" suffix=")"/>
->>>>>>> dbb93e7d9be410a475814d5ae49aef83ce158191
-=======
-      <if is-numeric="volume">
-        <text variable="issue" prefix="(" suffix=")"/>
->>>>>>> 04a2d190cbad73582c84bbef9fd7ba9d0b982317
-=======
-      <if is-numeric="volume">
-        <text variable="issue" prefix="(" suffix=")"/>
->>>>>>> a8320457f9f850a5e5c87de9855d476fd12d6573
       </if>
       <else>
         <text variable="issue"/>
