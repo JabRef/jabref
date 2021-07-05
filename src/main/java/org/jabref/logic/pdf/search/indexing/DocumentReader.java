@@ -2,7 +2,6 @@ package org.jabref.logic.pdf.search.indexing;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -17,7 +16,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -136,7 +134,7 @@ public final class DocumentReader {
     }
 
     private void addIdentifiers(Document newDocument, String path) {
-        newDocument.add(new StoredField(PATH, path));
+        newDocument.add(new StringField(PATH, path, Field.Store.YES));
         if (this.entry.getCitationKey().isPresent()) {
             newDocument.add(new StringField(KEY, this.entry.getCitationKey().get(), Field.Store.YES));
         }
