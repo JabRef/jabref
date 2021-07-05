@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.StandardField;
 
 /**
@@ -22,8 +21,8 @@ public class ExplicitGroup extends WordKeywordGroup {
      */
     private final List<String> legacyEntryKeys = new ArrayList<>();
 
-    public ExplicitGroup(String name, GroupHierarchyType context, Character keywordSeparator, BibDatabaseContext databaseContext) {
-        super(name, context, StandardField.GROUPS, name, true, databaseContext, keywordSeparator, true);
+    public ExplicitGroup(String name, GroupHierarchyType context, Character keywordSeparator) {
+        super(name, context, StandardField.GROUPS, name, true, keywordSeparator, true);
     }
 
     public void addLegacyEntryKey(String key) {
@@ -32,7 +31,7 @@ public class ExplicitGroup extends WordKeywordGroup {
 
     @Override
     public AbstractGroup deepCopy() {
-        ExplicitGroup copy = new ExplicitGroup(getName(), getHierarchicalContext(), keywordSeparator, databaseContext);
+        ExplicitGroup copy = new ExplicitGroup(getName(), getHierarchicalContext(), keywordSeparator);
         copy.legacyEntryKeys.addAll(legacyEntryKeys);
         return copy;
     }

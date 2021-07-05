@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Vector;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.Field;
@@ -45,9 +45,6 @@ public class GrammarBasedSearchRule implements SearchRule {
     private final boolean caseSensitiveSearch;
     private final boolean regExpSearch;
     private final boolean fulltext;
-
-    private String lastQuery;
-    private List<SearchResult> lastSearchResults;
 
     private ParseTree tree;
     private String query;
@@ -109,10 +106,21 @@ public class GrammarBasedSearchRule implements SearchRule {
         parser.setErrorHandler(new BailErrorStrategy()); // ParseCancelationException on parse errors
         tree = parser.start();
         this.query = query;
+
+        if (!fulltext) {
+            return;
+        }
+        try {
+            PdfSearcher searcher = new PdfSearcher();
+            PdfSearchResults results = searcher.search(query, 100);
+            searchResults = results.getSortedByScore();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public boolean applyRule(String query, BibDatabaseContext databaseContext, BibEntry bibEntry) {
+    public boolean applyRule(String query, BibEntry bibEntry) {
         try {
             return new BibtexSearchVisitor(caseSensitiveSearch, regExpSearch, fulltext, bibEntry).visit(tree);
         } catch (Exception e) {
@@ -122,24 +130,14 @@ public class GrammarBasedSearchRule implements SearchRule {
     }
 
     @Override
-    public PdfSearchResults getFulltextResults(String query, BibDatabaseContext databaseContext, BibEntry bibEntry) {
-        if (!fulltext) {
-            return new PdfSearchResults(List.of());
-        }
-
-        if (!query.equals(this.lastQuery)) {
-            this.lastQuery = query;
-            lastSearchResults = List.of();
-            try {
-                PdfSearcher searcher = PdfSearcher.of(databaseContext);
-                PdfSearchResults results = searcher.search(query, 100);
-                lastSearchResults = results.getSortedByScore();
-            } catch (IOException e) {
-                e.printStackTrace();
+    public PdfSearchResults getFulltextResults(String query, BibEntry bibEntry) {
+        Vector<SearchResult> searchResults = new Vector<>();
+        for (SearchResult searchResult : searchResults) {
+            if (searchResult.isResultFor(bibEntry)) {
+                searchResults.add(searchResult);
             }
         }
-
-        return new PdfSearchResults(lastSearchResults.stream().filter(searchResult -> searchResult.isResultFor(bibEntry)).collect(Collectors.toList()));
+        return new PdfSearchResults(searchResults);
     }
 
     @Override
@@ -271,7 +269,7 @@ public class GrammarBasedSearchRule implements SearchRule {
             if (fieldDescriptor.isPresent()) {
                 return comparison(fieldDescriptor.get().getText(), ComparisonOperator.build(context.operator.getText()), right);
             } else {
-                return SearchRules.getSearchRule(caseSensitive, regex, fulltext).applyRule(right, context.databaseContext, entry);
+                return SearchRules.getSearchRule(caseSensitive, regex, fulltext).applyRule(right, entry);
             }
         }
 

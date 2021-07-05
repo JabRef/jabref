@@ -10,6 +10,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.preferences.FilePreferences;
 
 import org.apache.lucene.store.Directory;
 
@@ -18,10 +19,13 @@ import org.apache.lucene.store.Directory;
  */
 public class IndexingTaskManager extends BackgroundTask<Void> {
 
+    PdfIndexer indexer;
     BackgroundTask<Void> runningTask;
     TaskExecutor taskExecutor;
+    FilePreferences filePreferences;
 
-    public IndexingTaskManager(TaskExecutor taskExecutor) throws IOException {
+    public IndexingTaskManager(TaskExecutor taskExecutor, FilePreferences filePreferences) throws IOException {
+        indexer = new PdfIndexer(filePreferences);
         this.taskExecutor = taskExecutor;
         showToUser(true);
         // the task itself is a nop, but it's progress property will be updated by the child-tasks it creates that actually interact with the inex
@@ -60,7 +64,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         });
     }
 
-    public void createIndex(PdfIndexer indexer, ParserResult parserResult) {
+    public void createIndex(ParserResult parserResult) {
         enqueueTask(new BackgroundTask<Void>() {
             @Override
             protected Void call() throws Exception {
@@ -71,7 +75,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         });
     }
 
-    public void createIndex(PdfIndexer indexer, BibDatabase database, BibDatabaseContext context) {
+    public void createIndex(BibDatabase database, BibDatabaseContext context) {
         enqueueTask(new BackgroundTask<Void>() {
             @Override
             protected Void call() throws Exception {
@@ -82,7 +86,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         });
     }
 
-    public void addToIndex(PdfIndexer indexer, BibEntry entry, BibDatabaseContext databaseContext) {
+    public void addToIndex(BibEntry entry, BibDatabaseContext databaseContext) {
         enqueueTask(new BackgroundTask<Void>() {
             @Override
             protected Void call() throws Exception {
@@ -93,7 +97,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         });
     }
 
-    public void addToIndex(PdfIndexer indexer, BibEntry entry, LinkedFile linkedFile, BibDatabaseContext databaseContext) {
+    public void addToIndex(BibEntry entry, LinkedFile linkedFile, BibDatabaseContext databaseContext) {
         enqueueTask(new BackgroundTask<Void>() {
             @Override
             protected Void call() throws Exception {
@@ -104,7 +108,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         });
     }
 
-    public void removeFromIndex(PdfIndexer indexer, BibEntry entry) {
+    public void removeFromIndex(BibEntry entry) {
        enqueueTask(new BackgroundTask<Void>() {
            @Override
            protected Void call() throws Exception {
@@ -115,7 +119,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
        });
     }
 
-    public void removeFromIndex(PdfIndexer indexer, BibEntry entry, LinkedFile linkedFile) {
+    public void removeFromIndex(BibEntry entry, LinkedFile linkedFile) {
         enqueueTask(new BackgroundTask<Void>() {
             @Override
             protected Void call() throws Exception {
@@ -126,7 +130,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         });
     }
 
-    public void removeFromIndex(PdfIndexer indexer, BibDatabaseContext databaseContext) {
+    public void removeFromIndex(BibDatabaseContext databaseContext) {
         enqueueTask(new BackgroundTask<Void>() {
             @Override
             protected Void call() throws Exception {
@@ -142,7 +146,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         });
     }
 
-    public void flushIndex(PdfIndexer indexer) {
+    public void flushIndex() {
         enqueueTask(new BackgroundTask<Void>() {
             @Override
             protected Void call() throws Exception {
@@ -153,7 +157,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         });
     }
 
-    public void updateIndex(PdfIndexer indexer, BibEntry entry, BibDatabaseContext databaseContext) {
+    public void updateIndex(BibEntry entry, BibDatabaseContext databaseContext) {
         enqueueTask(new BackgroundTask<Void>() {
             @Override
             protected Void call() throws Exception {
@@ -164,7 +168,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         });
     }
 
-    public void updateIndex(PdfIndexer indexer, BibEntry entry, LinkedFile linkedFile, BibDatabaseContext databaseContext) {
+    public void updateIndex(BibEntry entry, LinkedFile linkedFile, BibDatabaseContext databaseContext) {
         enqueueTask(new BackgroundTask<Void>() {
             @Override
             protected Void call() throws Exception {
@@ -175,7 +179,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         });
     }
 
-    public void updateIndex(PdfIndexer indexer, BibDatabaseContext databaseContext) {
+    public void updateIndex(BibDatabaseContext databaseContext) {
         enqueueTask(new BackgroundTask<Void>() {
             @Override
             protected Void call() throws Exception {

@@ -2,7 +2,6 @@ package org.jabref.model.search.matchers;
 
 import java.util.Objects;
 
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchMatcher;
 
@@ -22,7 +21,7 @@ public class NotMatcher implements SearchMatcher {
     }
 
     @Override
-    public boolean isMatch(BibDatabaseContext databaseContext, BibEntry entry) {
-        return !otherMatcher.isMatch(databaseContext, entry);
+    public boolean isMatch(BibEntry entry) {
+        return !otherMatcher.isMatch(entry);
     }
 }

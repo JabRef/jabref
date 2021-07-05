@@ -1,12 +1,12 @@
 package org.jabref.logic.pdf.search.retrieval;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
 import org.jabref.logic.pdf.search.indexing.EnglishStemAnalyzer;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
 import org.jabref.model.strings.StringUtil;
@@ -21,6 +21,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.SimpleFSDirectory;
 
@@ -31,12 +32,8 @@ public final class PdfSearcher {
 
     private final Directory indexDirectory;
 
-    private PdfSearcher(Directory indexDirectory) throws IOException {
-        this.indexDirectory = indexDirectory;
-    }
-
-    public static PdfSearcher of(BibDatabaseContext databaseContext) throws IOException {
-        return new PdfSearcher(new SimpleFSDirectory(databaseContext.getFulltextIndexPath()));
+    public PdfSearcher() throws IOException {
+        this.indexDirectory = new SimpleFSDirectory(Path.of("src/main/resources/luceneIndex"));
     }
 
     /**

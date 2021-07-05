@@ -2,7 +2,6 @@ package org.jabref.model.groups;
 
 import java.util.Objects;
 
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 
 /**
@@ -13,8 +12,8 @@ public abstract class KeywordGroup extends AbstractGroup {
     protected final String searchExpression;
     protected final boolean caseSensitive;
 
-    public KeywordGroup(String name, GroupHierarchyType context, Field searchField, String searchExpression, boolean caseSensitive, BibDatabaseContext databaseContext) {
-        super(name, context, databaseContext);
+    public KeywordGroup(String name, GroupHierarchyType context, Field searchField, String searchExpression, boolean caseSensitive) {
+        super(name, context);
         this.caseSensitive = caseSensitive;
         this.searchField = searchField;
         this.searchExpression = searchExpression;

@@ -1,6 +1,5 @@
 package org.jabref.model.search.rules;
 
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchMatcher;
 
@@ -16,7 +15,7 @@ public class MockSearchMatcher implements SearchMatcher {
     }
 
     @Override
-    public boolean isMatch(BibDatabaseContext databaseContext, BibEntry entry) {
+    public boolean isMatch(BibEntry entry) {
         return result;
     }
 }

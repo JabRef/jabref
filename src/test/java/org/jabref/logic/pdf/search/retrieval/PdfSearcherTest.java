@@ -11,7 +11,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.pdf.search.PdfSearchResults;
-import org.jabref.preferences.FilePreferences;
 
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,10 +28,13 @@ public class PdfSearcherTest {
 
     @BeforeEach
     public void setUp() throws IOException {
+        search = new PdfSearcher();
+
+        // given
+        PdfIndexer indexer = new PdfIndexer(null);
         BibDatabase database = new BibDatabase();
         BibDatabaseContext context = mock(BibDatabaseContext.class);
         when(context.getFileDirectories(Mockito.any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs")));
-        when(context.getFulltextIndexPath()).thenReturn(Path.of("src/test/resources/searchIndex"));
         BibEntry examplePdf = new BibEntry(StandardEntryType.Article);
         examplePdf.setFiles(Collections.singletonList(new LinkedFile("Example Entry", "example.pdf", "pdf")));
         database.insertEntry(examplePdf);
@@ -47,11 +49,7 @@ public class PdfSearcherTest {
         exampleThesis.setCitationKey("ExampleThesis");
         database.insertEntry(exampleThesis);
 
-        FilePreferences filePreferences = mock(FilePreferences.class);
-        PdfIndexer indexer = PdfIndexer.of(context, filePreferences);
         indexer.createIndex(database, context);
-        search = PdfSearcher.of(context);
-
     }
 
     @Test

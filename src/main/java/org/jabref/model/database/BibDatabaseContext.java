@@ -9,15 +9,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.preferences.FilePreferences;
-
-import net.harawata.appdirs.AppDirsFactory;
 
 /**
  * Represents everything related to a BIB file. <p> The entries are stored in BibDatabase, the other data in MetaData
@@ -213,13 +210,5 @@ public class BibDatabaseContext {
 
     public List<BibEntry> getEntries() {
         return database.getEntries();
-    }
-
-    public Path getFulltextIndexPath() {
-        Path appData = Path.of(AppDirsFactory.getInstance().getUserDataDir(JabRefFrame.FRAME_TITLE, "0.1a", "org.jabref"));
-        if (this.getDatabasePath().isPresent()) {
-            return appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
-        }
-        return appData.resolve("unsaved");
     }
 }

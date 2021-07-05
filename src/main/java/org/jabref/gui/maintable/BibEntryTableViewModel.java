@@ -73,7 +73,7 @@ public class BibEntryTableViewModel {
         return new UiThreadBinding<>(EasyBind.combine(entry.getFieldBinding(StandardField.GROUPS), database.getMetaData().groupsBinding(),
                 (a, b) ->
                         database.getMetaData().getGroups().map(groupTreeNode ->
-                                groupTreeNode.getMatchingGroups(database, entry).stream()
+                                groupTreeNode.getMatchingGroups(entry).stream()
                                              .map(GroupTreeNode::getGroup)
                                              .filter(Predicate.not(Predicate.isEqual(groupTreeNode.getGroup())))
                                              .collect(Collectors.toList()))

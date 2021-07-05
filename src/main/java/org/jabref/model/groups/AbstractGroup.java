@@ -8,7 +8,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.paint.Color;
 
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchMatcher;
 import org.jabref.model.strings.StringUtil;
@@ -30,12 +29,10 @@ public abstract class AbstractGroup implements SearchMatcher {
     protected boolean isExpanded = true;
     protected Optional<String> description = Optional.empty();
     protected Optional<String> iconName = Optional.empty();
-    protected BibDatabaseContext databaseContext;
 
-    protected AbstractGroup(String name, GroupHierarchyType context, BibDatabaseContext databaseContext) {
+    protected AbstractGroup(String name, GroupHierarchyType context) {
         this.name.setValue(name);
         this.context = Objects.requireNonNull(context);
-        this.databaseContext = databaseContext;
     }
 
     @Override
@@ -124,14 +121,6 @@ public abstract class AbstractGroup implements SearchMatcher {
     }
 
     /**
-     * Returns the database-context this group is related to
-     * @retur the BibDatabaseContext
-     */
-    public BibDatabaseContext getDatabaseContext() {
-        return this.databaseContext;
-    }
-
-    /**
      * Returns this group's name, e.g. for display in a list/tree.
      */
     public final String getName() {
@@ -148,7 +137,7 @@ public abstract class AbstractGroup implements SearchMatcher {
     public abstract boolean contains(BibEntry entry);
 
     @Override
-    public boolean isMatch(BibDatabaseContext databaseContext, BibEntry entry) {
+    public boolean isMatch(BibEntry entry) {
         return contains(entry);
     }
 

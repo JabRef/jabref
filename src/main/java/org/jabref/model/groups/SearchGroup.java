@@ -2,7 +2,6 @@ package org.jabref.model.groups;
 
 import java.util.Objects;
 
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.GroupSearchQuery;
 
@@ -19,8 +18,8 @@ public class SearchGroup extends AbstractGroup {
     private final GroupSearchQuery query;
 
     public SearchGroup(String name, GroupHierarchyType context, String searchExpression, boolean caseSensitive,
-                       boolean isRegEx, BibDatabaseContext databaseContext) {
-        super(name, context, databaseContext);
+                       boolean isRegEx) {
+        super(name, context);
         this.query = new GroupSearchQuery(searchExpression, caseSensitive, isRegEx);
     }
 
@@ -46,14 +45,14 @@ public class SearchGroup extends AbstractGroup {
 
     @Override
     public boolean contains(BibEntry entry) {
-        return query.isMatch(databaseContext, entry);
+        return query.isMatch(entry);
     }
 
     @Override
     public AbstractGroup deepCopy() {
         try {
             return new SearchGroup(getName(), getHierarchicalContext(), getSearchExpression(), isCaseSensitive(),
-                    isRegularExpression(), getDatabaseContext());
+                    isRegularExpression());
         } catch (Throwable t) {
             // this should never happen, because the constructor obviously
             // succeeded in creating _this_ instance!

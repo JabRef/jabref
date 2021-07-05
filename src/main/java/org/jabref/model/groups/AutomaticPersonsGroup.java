@@ -4,7 +4,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
@@ -12,8 +11,8 @@ public class AutomaticPersonsGroup extends AutomaticGroup {
 
     private final Field field;
 
-    public AutomaticPersonsGroup(String name, GroupHierarchyType context, Field field, BibDatabaseContext databaseContext) {
-        super(name, context, databaseContext);
+    public AutomaticPersonsGroup(String name, GroupHierarchyType context, Field field) {
+        super(name, context);
         this.field = field;
     }
 
@@ -36,14 +35,14 @@ public class AutomaticPersonsGroup extends AutomaticGroup {
 
     @Override
     public AbstractGroup deepCopy() {
-        return new AutomaticPersonsGroup(this.name.getValue(), this.context, this.field, databaseContext);
+        return new AutomaticPersonsGroup(this.name.getValue(), this.context, this.field);
     }
 
     @Override
     public Set<GroupTreeNode> createSubgroups(BibEntry entry) {
         return LastNameGroup.getAsLastNamesLatexFree(field, entry)
                             .stream()
-                            .map(lastName -> new LastNameGroup(lastName, GroupHierarchyType.INDEPENDENT, field, lastName, databaseContext))
+                            .map(lastName -> new LastNameGroup(lastName, GroupHierarchyType.INDEPENDENT, field, lastName))
                             .map(GroupTreeNode::new)
                             .collect(Collectors.toSet());
     }
