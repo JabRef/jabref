@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.Author;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
@@ -15,8 +16,8 @@ import org.jabref.model.strings.LatexToUnicodeAdapter;
  * Matches based on a latex free last name in a specified field. The field is parsed as an author list and the last names are resolved of latex.
  */
 public class LastNameGroup extends KeywordGroup {
-    public LastNameGroup(String groupName, GroupHierarchyType context, Field searchField, String lastName) {
-        super(groupName, context, searchField, LatexToUnicodeAdapter.format(lastName), true);
+    public LastNameGroup(String groupName, GroupHierarchyType context, Field searchField, String lastName, BibDatabaseContext databaseContext) {
+        super(groupName, context, searchField, LatexToUnicodeAdapter.format(lastName), true, databaseContext);
     }
 
     static List<String> getAsLastNamesLatexFree(Field field, BibEntry bibEntry) {
@@ -37,6 +38,6 @@ public class LastNameGroup extends KeywordGroup {
 
     @Override
     public AbstractGroup deepCopy() {
-        return new LastNameGroup(getName(), getHierarchicalContext(), getSearchField(), getSearchExpression());
+        return new LastNameGroup(getName(), getHierarchicalContext(), getSearchField(), getSearchExpression(), databaseContext);
     }
 }

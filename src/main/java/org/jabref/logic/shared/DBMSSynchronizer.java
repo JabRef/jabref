@@ -272,7 +272,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         try {
             metaData.setEventPropagation(false);
             MetaDataParser parser = new MetaDataParser(fileMonitor);
-            parser.parse(metaData, dbmsProcessor.getSharedMetaData(), keywordSeparator);
+            parser.parse(metaData, dbmsProcessor.getSharedMetaData(), keywordSeparator, bibDatabaseContext);
             metaData.setEventPropagation(true);
         } catch (ParseException e) {
             LOGGER.error("Parse error", e);

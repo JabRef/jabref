@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
@@ -16,8 +17,8 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
     private final Character keywordHierarchicalDelimiter;
     private final Field field;
 
-    public AutomaticKeywordGroup(String name, GroupHierarchyType context, Field field, Character keywordDelimiter, Character keywordHierarchicalDelimiter) {
-        super(name, context);
+    public AutomaticKeywordGroup(String name, GroupHierarchyType context, Field field, Character keywordDelimiter, Character keywordHierarchicalDelimiter, BibDatabaseContext databaseContext) {
+        super(name, context, databaseContext);
         this.field = field;
         this.keywordDelimiter = keywordDelimiter;
         this.keywordHierarchicalDelimiter = keywordHierarchicalDelimiter;
@@ -37,7 +38,7 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
 
     @Override
     public AbstractGroup deepCopy() {
-        return new AutomaticKeywordGroup(this.name.getValue(), this.context, field, this.keywordDelimiter, keywordHierarchicalDelimiter);
+        return new AutomaticKeywordGroup(this.name.getValue(), this.context, field, this.keywordDelimiter, keywordHierarchicalDelimiter, databaseContext);
     }
 
     @Override
@@ -74,6 +75,7 @@ public class AutomaticKeywordGroup extends AutomaticGroup {
                 field,
                 keywordChain.getPathFromRootAsString(keywordHierarchicalDelimiter),
                 true,
+                databaseContext,
                 keywordDelimiter,
                 true);
         GroupTreeNode root = new GroupTreeNode(rootGroup);

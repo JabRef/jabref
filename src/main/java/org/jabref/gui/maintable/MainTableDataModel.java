@@ -62,13 +62,13 @@ public class MainTableDataModel {
     }
 
     private boolean isMatchedBySearch(Optional<SearchQuery> query, BibEntryTableViewModel entry) {
-        return query.map(matcher -> matcher.isMatch(entry.getEntry()))
+        return query.map(matcher -> matcher.isMatch(bibDatabaseContext, entry.getEntry()))
                     .orElse(true);
     }
 
     private boolean isMatchedByGroup(ObservableList<GroupTreeNode> groups, BibEntryTableViewModel entry) {
         return createGroupMatcher(groups)
-                .map(matcher -> matcher.isMatch(entry.getEntry()))
+                .map(matcher -> matcher.isMatch(bibDatabaseContext, entry.getEntry()))
                 .orElse(true);
     }
 

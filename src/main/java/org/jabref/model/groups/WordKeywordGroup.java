@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.model.FieldChange;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
@@ -28,9 +29,10 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
     private final boolean onlySplitWordsAtSeparator;
 
     public WordKeywordGroup(String name, GroupHierarchyType context, Field searchField,
-                            String searchExpression, boolean caseSensitive, Character keywordSeparator,
+                            String searchExpression, boolean caseSensitive,
+                            BibDatabaseContext databaseContext, Character keywordSeparator,
                             boolean onlySplitWordsAtSeparator) {
-        super(name, context, searchField, searchExpression, caseSensitive);
+        super(name, context, searchField, searchExpression, caseSensitive, databaseContext);
 
         this.keywordSeparator = keywordSeparator;
         this.onlySplitWordsAtSeparator = onlySplitWordsAtSeparator;
@@ -123,7 +125,7 @@ public class WordKeywordGroup extends KeywordGroup implements GroupEntryChanger 
     @Override
     public AbstractGroup deepCopy() {
         return new WordKeywordGroup(getName(), getHierarchicalContext(), searchField, searchExpression,
-                caseSensitive, keywordSeparator, onlySplitWordsAtSeparator);
+                caseSensitive, databaseContext, keywordSeparator, onlySplitWordsAtSeparator);
     }
 
     @Override

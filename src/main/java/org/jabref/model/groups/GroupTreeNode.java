@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.model.FieldChange;
 import org.jabref.model.TreeNode;
-import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchMatcher;
 import org.jabref.model.search.matchers.MatcherSet;
@@ -31,7 +31,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
      */
     public GroupTreeNode(AbstractGroup group) {
         super(GroupTreeNode.class);
-        setGroup(group, false, false, null);
+        setGroup(group, false, false, group.getDatabaseContext(), null);
     }
 
     public static GroupTreeNode fromGroup(AbstractGroup group) {
@@ -51,7 +51,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
      * Associates the specified group with this node.
      *
      * @param newGroup the new group (has to be non-null)
-     * @deprecated use {@link #setGroup(AbstractGroup, boolean, boolean, List)}} instead
+     * @deprecated use {@link #setGroup(AbstractGroup, boolean, boolean, BibDatabaseContext, List)}} instead
      */
     @Deprecated
     public void setGroup(AbstractGroup newGroup) {
@@ -67,7 +67,8 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
      * @param entriesInDatabase               list of entries in the database
      */
     public List<FieldChange> setGroup(AbstractGroup newGroup, boolean shouldKeepPreviousAssignments,
-                                      boolean shouldRemovePreviousAssignments, List<BibEntry> entriesInDatabase) {
+                                      boolean shouldRemovePreviousAssignments, BibDatabaseContext databaseContext,
+                                      List<BibEntry> entriesInDatabase) {
         AbstractGroup oldGroup = getGroup();
         group = Objects.requireNonNull(newGroup);
 
@@ -75,7 +76,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         boolean shouldRemove = shouldRemovePreviousAssignments && (oldGroup instanceof GroupEntryChanger);
         boolean shouldAdd = shouldKeepPreviousAssignments && (newGroup instanceof GroupEntryChanger);
         if (shouldAdd || shouldRemove) {
-            List<BibEntry> entriesMatchedByOldGroup = entriesInDatabase.stream().filter(oldGroup::isMatch)
+            List<BibEntry> entriesMatchedByOldGroup = entriesInDatabase.stream().filter(entry -> oldGroup.isMatch(oldGroup.getDatabaseContext(), entry))
                                                                        .collect(Collectors.toList());
             if (shouldRemove) {
                 GroupEntryChanger entryChanger = (GroupEntryChanger) oldGroup;
@@ -160,20 +161,20 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     /**
      * Determines all groups in the subtree starting at this node which contain the given entry.
      */
-    public List<GroupTreeNode> getMatchingGroups(BibEntry entry) {
-        return getMatchingGroups(Collections.singletonList(entry));
+    public List<GroupTreeNode> getMatchingGroups(BibDatabaseContext databaseContext, BibEntry entry) {
+        return getMatchingGroups(databaseContext, Collections.singletonList(entry));
     }
 
     /**
      * Determines all groups in the subtree starting at this node which contain at least one of the given entries.
      */
-    public List<GroupTreeNode> getMatchingGroups(List<BibEntry> entries) {
+    public List<GroupTreeNode> getMatchingGroups(BibDatabaseContext databaseContext, List<BibEntry> entries) {
         List<GroupTreeNode> groups = new ArrayList<>();
 
         // Add myself if I contain the entries
         SearchMatcher matcher = getSearchMatcher();
         for (BibEntry entry : entries) {
-            if (matcher.isMatch(entry)) {
+            if (matcher.isMatch(databaseContext, entry)) {
                 groups.add(this);
                 break;
             }
@@ -181,7 +182,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
 
         // Traverse children
         for (GroupTreeNode child : getChildren()) {
-            groups.addAll(child.getMatchingGroups(entries));
+            groups.addAll(child.getMatchingGroups(databaseContext, entries));
         }
 
         return groups;
@@ -218,28 +219,28 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
      * @param entries list of entries to be searched
      * @return matched entries
      */
-    public List<BibEntry> findMatches(List<BibEntry> entries) {
+    public List<BibEntry> findMatches(BibDatabaseContext databaseContext, List<BibEntry> entries) {
         SearchMatcher matcher = getSearchMatcher();
         return entries.stream()
-                      .filter(matcher::isMatch)
+                      .filter(entry -> matcher.isMatch(databaseContext, entry))
                       .collect(Collectors.toList());
     }
 
     /**
      * Determines the entries in the specified database which are matched by this group.
      *
-     * @param database database to be searched
+     * @param databaseContext database to be searched
      * @return matched entries
      */
-    public List<BibEntry> findMatches(BibDatabase database) {
-        return findMatches(database.getEntries());
+    public List<BibEntry> findMatches(BibDatabaseContext databaseContext) {
+        return findMatches(databaseContext, databaseContext.getDatabase().getEntries());
     }
 
     /**
      * Returns whether this group matches the specified {@link BibEntry} while taking the hierarchical information into account.
      */
-    public boolean matches(BibEntry entry) {
-        return getSearchMatcher().isMatch(entry);
+    public boolean matches(BibDatabaseContext databaseContext, BibEntry entry) {
+        return getSearchMatcher().isMatch(databaseContext, entry);
     }
 
     /**

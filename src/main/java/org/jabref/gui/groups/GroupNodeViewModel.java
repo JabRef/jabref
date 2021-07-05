@@ -96,7 +96,7 @@ public class GroupNodeViewModel {
         entriesList = databaseContext.getDatabase().getEntries();
         entriesList.addListener(this::onDatabaseChanged);
 
-        EasyObservableList<Boolean> selectedEntriesMatchStatus = EasyBind.map(stateManager.getSelectedEntries(), groupNode::matches);
+        EasyObservableList<Boolean> selectedEntriesMatchStatus = EasyBind.map(stateManager.getSelectedEntries(), entry -> (groupNode.matches(databaseContext, entry)));
         anySelectedEntriesMatched = selectedEntriesMatchStatus.anyMatch(matched -> matched);
         // 'all' returns 'true' for empty streams, so this has to be checked explicitly
         allSelectedEntriesMatched = selectedEntriesMatchStatus.isEmptyBinding().not().and(selectedEntriesMatchStatus.allMatch(matched -> matched));
@@ -107,7 +107,7 @@ public class GroupNodeViewModel {
     }
 
     static GroupNodeViewModel getAllEntriesGroup(BibDatabaseContext newDatabase, StateManager stateManager, TaskExecutor taskExecutor, CustomLocalDragboard localDragBoard, PreferencesService preferencesService) {
-        return new GroupNodeViewModel(newDatabase, stateManager, taskExecutor, DefaultGroupsFactory.getAllEntriesGroup(), localDragBoard, preferencesService);
+        return new GroupNodeViewModel(newDatabase, stateManager, taskExecutor, DefaultGroupsFactory.getAllEntriesGroup(newDatabase), localDragBoard, preferencesService);
     }
 
     private GroupNodeViewModel toViewModel(GroupTreeNode child) {
@@ -229,7 +229,7 @@ public class GroupNodeViewModel {
                 // Nothing to do, as permutation doesn't change matched entries
             } else if (change.wasUpdated()) {
                 for (BibEntry changedEntry : change.getList().subList(change.getFrom(), change.getTo())) {
-                    if (groupNode.matches(changedEntry)) {
+                    if (groupNode.matches(databaseContext, changedEntry)) {
                         if (!matchedEntries.contains(changedEntry)) {
                             matchedEntries.add(changedEntry);
                         }
@@ -242,7 +242,7 @@ public class GroupNodeViewModel {
                     matchedEntries.remove(removedEntry);
                 }
                 for (BibEntry addedEntry : change.getAddedSubList()) {
-                    if (groupNode.matches(addedEntry)) {
+                    if (groupNode.matches(databaseContext, addedEntry)) {
                         if (!matchedEntries.contains(addedEntry)) {
                             matchedEntries.add(addedEntry);
                         }
@@ -269,7 +269,7 @@ public class GroupNodeViewModel {
         // for example, a previously matched entry gets removed -> hits = hits - 1
         if (preferencesService.getDisplayGroupCount()) {
             BackgroundTask
-                    .wrap(() -> groupNode.findMatches(databaseContext.getDatabase()))
+                    .wrap(() -> groupNode.findMatches(databaseContext))
                     .onSuccess(entries -> {
                         matchedEntries.clear();
                         matchedEntries.addAll(entries);

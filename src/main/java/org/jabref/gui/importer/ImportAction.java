@@ -147,7 +147,8 @@ public class ImportAction {
                         result.getMetaData(),
                         parserResult.getMetaData(),
                         importResult.parserResult.getFile().map(File::getName).orElse("unknown"),
-                        parserResult.getDatabase().getEntries());
+                        parserResult.getDatabase().getEntries(),
+                        parserResult.getDatabaseContext());
             }
             // TODO: collect errors into ParserResult, because they are currently ignored (see caller of this method)
         }

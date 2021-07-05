@@ -1,5 +1,6 @@
 package org.jabref.model.search.matchers;
 
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 /**
@@ -8,8 +9,8 @@ import org.jabref.model.entry.BibEntry;
 public class AndMatcher extends MatcherSet {
 
     @Override
-    public boolean isMatch(BibEntry entry) {
+    public boolean isMatch(BibDatabaseContext databaseContext, BibEntry entry) {
         return matchers.stream()
-                       .allMatch(rule -> rule.isMatch(entry));
+                       .allMatch(rule -> rule.isMatch(databaseContext, entry));
     }
 }

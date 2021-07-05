@@ -2,6 +2,7 @@ package org.jabref.model.groups;
 
 import java.util.Objects;
 
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 /**
@@ -9,13 +10,13 @@ import org.jabref.model.entry.BibEntry;
  */
 public class AllEntriesGroup extends AbstractGroup {
 
-    public AllEntriesGroup(String name) {
-        super(name, GroupHierarchyType.INDEPENDENT);
+    public AllEntriesGroup(String name, BibDatabaseContext databaseContext) {
+        super(name, GroupHierarchyType.INDEPENDENT, databaseContext);
     }
 
     @Override
     public AbstractGroup deepCopy() {
-        return new AllEntriesGroup(getName());
+        return new AllEntriesGroup(getName(), databaseContext);
     }
 
     @Override

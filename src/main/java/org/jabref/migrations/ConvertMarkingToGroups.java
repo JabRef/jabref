@@ -38,19 +38,19 @@ public class ConvertMarkingToGroups implements PostOpenMigration {
         Multimap<String, BibEntry> markings = getMarkingWithEntries(entries);
         if (!markings.isEmpty()) {
             GroupTreeNode markingRoot = GroupTreeNode.fromGroup(
-                    new ExplicitGroup(Localization.lang("Markings"), GroupHierarchyType.INCLUDING, ','));
+                    new ExplicitGroup(Localization.lang("Markings"), GroupHierarchyType.INCLUDING, ',', parserResult.getDatabaseContext()));
 
             for (Map.Entry<String, Collection<BibEntry>> marking : markings.asMap().entrySet()) {
                 String markingName = marking.getKey();
                 Collection<BibEntry> markingMatchedEntries = marking.getValue();
 
                 GroupTreeNode markingGroup = markingRoot.addSubgroup(
-                        new ExplicitGroup(markingName, GroupHierarchyType.INCLUDING, ','));
+                        new ExplicitGroup(markingName, GroupHierarchyType.INCLUDING, ',', parserResult.getDatabaseContext()));
                 markingGroup.addEntriesToGroup(markingMatchedEntries);
             }
 
             if (!parserResult.getMetaData().getGroups().isPresent()) {
-                parserResult.getMetaData().setGroups(GroupTreeNode.fromGroup(DefaultGroupsFactory.getAllEntriesGroup()));
+                parserResult.getMetaData().setGroups(GroupTreeNode.fromGroup(DefaultGroupsFactory.getAllEntriesGroup(parserResult.getDatabaseContext())));
             }
             GroupTreeNode root = parserResult.getMetaData().getGroups().get();
             root.addChild(markingRoot, 0);

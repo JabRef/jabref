@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchMatcher;
 import org.jabref.model.search.rules.ContainBasedSearchRule;
@@ -75,8 +76,8 @@ public class SearchQuery implements SearchMatcher {
     }
 
     @Override
-    public boolean isMatch(BibEntry entry) {
-        return rule.applyRule(getQuery(), entry);
+    public boolean isMatch(BibDatabaseContext databaseContext, BibEntry entry) {
+        return rule.applyRule(getQuery(), databaseContext, entry);
     }
 
     public boolean isValid() {

@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.pdf.search.PdfSearchResults;
@@ -56,7 +56,7 @@ public class RegexBasedSearchRule implements SearchRule {
     }
 
     @Override
-    public boolean applyRule(String query, BibEntry bibEntry) {
+    public boolean applyRule(String query, BibDatabaseContext databaseContext, BibEntry bibEntry) {
         Pattern pattern;
 
         try {
@@ -79,7 +79,7 @@ public class RegexBasedSearchRule implements SearchRule {
     }
 
     @Override
-    public PdfSearchResults getFulltextResults(String query, BibEntry bibEntry) {
+    public PdfSearchResults getFulltextResults(String query, BibDatabaseContext databaseContext, BibEntry bibEntry) {
 
         if (!fulltext) {
             return new PdfSearchResults(List.of());
@@ -89,7 +89,7 @@ public class RegexBasedSearchRule implements SearchRule {
             this.lastQuery = query;
             lastSearchResults = List.of();
             try {
-                PdfSearcher searcher = new PdfSearcher();
+                PdfSearcher searcher = PdfSearcher.of(databaseContext);
                 PdfSearchResults results = searcher.search(query, 100);
                 lastSearchResults = results.getSortedByScore();
             } catch (IOException e) {

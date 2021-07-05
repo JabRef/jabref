@@ -2,6 +2,7 @@ package org.jabref.model.search;
 
 import java.util.Objects;
 
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.rules.SearchRule;
 import org.jabref.model.search.rules.SearchRules;
@@ -27,8 +28,8 @@ public class GroupSearchQuery implements SearchMatcher {
     }
 
     @Override
-    public boolean isMatch(BibEntry entry) {
-        return this.getRule().applyRule(query, entry);
+    public boolean isMatch(BibDatabaseContext databaseContext, BibEntry entry) {
+        return this.getRule().applyRule(query, databaseContext, entry);
     }
 
     private SearchRule getSearchRule() {

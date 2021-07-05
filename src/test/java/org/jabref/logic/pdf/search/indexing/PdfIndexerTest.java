@@ -31,9 +31,10 @@ public class PdfIndexerTest {
     @BeforeEach
     public void setUp() throws IOException {
         FilePreferences filePreferences = mock(FilePreferences.class);
-        this.indexer = new PdfIndexer(filePreferences);
         this.database = new BibDatabase();
         when(context.getDatabasePath()).thenReturn(Optional.of(Path.of("src/test/resources/pdfs/")));
+        when(context.getFulltextIndexPath()).thenReturn(Path.of("src/test/resources/searchIndex"));
+        this.indexer = PdfIndexer.of(context, filePreferences);
 
         this.context = mock(BibDatabaseContext.class);
         when(context.getFileDirectories(Mockito.any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs")));

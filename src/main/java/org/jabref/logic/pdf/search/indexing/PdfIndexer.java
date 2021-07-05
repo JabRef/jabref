@@ -1,7 +1,6 @@
 package org.jabref.logic.pdf.search.indexing;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Optional;
 
 import javafx.collections.ObservableList;
@@ -35,9 +34,13 @@ public class PdfIndexer {
 
     private final FilePreferences filePreferences;
 
-    public PdfIndexer(FilePreferences filePreferences) throws IOException {
-        this.directoryToIndex = new SimpleFSDirectory(Path.of("src/main/resources/luceneIndex"));
+    private PdfIndexer(Directory indexDirectory, FilePreferences filePreferences) {
+        this.directoryToIndex = indexDirectory;
         this.filePreferences = filePreferences;
+    }
+
+    public static PdfIndexer of(BibDatabaseContext bibDatabaseContext, FilePreferences filePreferences) throws IOException {
+        return new PdfIndexer(new SimpleFSDirectory(bibDatabaseContext.getFulltextIndexPath()), filePreferences);
     }
 
     public Directory getIndexDirectory() {
@@ -51,17 +54,7 @@ public class PdfIndexer {
      * @param parserResult a bibtex database to link the pdf files to
      */
     public void createIndex(ParserResult parserResult) {
-        this.databaseContext = parserResult.getDatabaseContext();
-        this.database = parserResult.getDatabase();
-        try (IndexWriter indexWriter = new IndexWriter(directoryToIndex,
-                new IndexWriterConfig(new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE))) {
-            final ObservableList<BibEntry> entries = this.database.getEntries();
-
-            entries.stream().filter(entry -> !entry.getFiles().isEmpty()).forEach(entry -> writeToIndex(entry, indexWriter));
-            indexWriter.commit();
-        } catch (IOException e) {
-            LOGGER.warn("Could not initialize the IndexWriter!", e);
-        }
+        createIndex(parserResult.getDatabase(), parserResult.getDatabaseContext());
     }
 
     /**

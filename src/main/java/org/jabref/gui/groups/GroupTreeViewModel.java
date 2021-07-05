@@ -212,6 +212,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                         group,
                         keepPreviousAssignments,
                         removePreviousAssignments,
+                        database,
                         database.getEntries());
                 // stateManager.getEntriesInCurrentDatabase());
 

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
 
@@ -17,9 +17,9 @@ public class DatabaseSearcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseSearcher.class);
     private final SearchQuery query;
 
-    private final BibDatabase database;
+    private final BibDatabaseContext database;
 
-    public DatabaseSearcher(SearchQuery query, BibDatabase database) {
+    public DatabaseSearcher(SearchQuery query, BibDatabaseContext database) {
         this.query = Objects.requireNonNull(query);
         this.database = Objects.requireNonNull(database);
     }
@@ -32,7 +32,7 @@ public class DatabaseSearcher {
             return Collections.emptyList();
         }
 
-        List<BibEntry> matchEntries = database.getEntries().stream().filter(query::isMatch).collect(Collectors.toList());
+        List<BibEntry> matchEntries = database.getEntries().stream().filter(entry -> (query.isMatch(database, entry))).collect(Collectors.toList());
         return BibDatabases.purgeEmptyEntries(matchEntries);
     }
 }

@@ -25,7 +25,7 @@ class GroupChangeViewModel extends DatabaseChangeViewModel {
     @Override
     public void makeChange(BibDatabaseContext database, NamedCompound undoEdit) {
         GroupTreeNode root = database.getMetaData().getGroups().orElseGet(() -> {
-            GroupTreeNode groupTreeNode = new GroupTreeNode(DefaultGroupsFactory.getAllEntriesGroup());
+            GroupTreeNode groupTreeNode = new GroupTreeNode(DefaultGroupsFactory.getAllEntriesGroup(database));
             database.getMetaData().setGroups(groupTreeNode);
             return groupTreeNode;
         });
@@ -36,10 +36,10 @@ class GroupChangeViewModel extends DatabaseChangeViewModel {
         root.removeAllChildren();
         if (changedGroups == null) {
             // I think setting root to null is not possible
-            root.setGroup(DefaultGroupsFactory.getAllEntriesGroup(), false, false, null);
+            root.setGroup(DefaultGroupsFactory.getAllEntriesGroup(database), false, false, database, null);
         } else {
             // change root group, even though it'll be AllEntries anyway
-            root.setGroup(changedGroups.getGroup(), false, false, null);
+            root.setGroup(changedGroups.getGroup(), false, false, database, null);
             for (GroupTreeNode child : changedGroups.getChildren()) {
                 child.copySubtree().moveTo(root);
             }

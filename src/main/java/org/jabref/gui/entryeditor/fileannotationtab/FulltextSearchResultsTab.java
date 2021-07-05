@@ -36,7 +36,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         if (!shouldShow(entry)) {
             return;
         }
-        PdfSearchResults searchResults = stateManager.activeSearchQueryProperty().get().get().getRule().getFulltextResults(stateManager.activeSearchQueryProperty().get().get().getQuery(), entry);
+        PdfSearchResults searchResults = stateManager.activeSearchQueryProperty().get().get().getRule().getFulltextResults(stateManager.activeSearchQueryProperty().get().get().getQuery(), stateManager.getActiveDatabase().get(), entry);
         StringBuilder content = new StringBuilder("<p>" + Localization.lang("Search results") + " </p>");
 
         for (SearchResult searchResult : searchResults.getSearchResults()) {

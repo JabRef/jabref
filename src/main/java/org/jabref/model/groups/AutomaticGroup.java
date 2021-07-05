@@ -4,12 +4,13 @@ import java.util.Set;
 
 import javafx.collections.ObservableList;
 
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.TreeCollector;
 
 public abstract class AutomaticGroup extends AbstractGroup {
-    public AutomaticGroup(String name, GroupHierarchyType context) {
-        super(name, context);
+    public AutomaticGroup(String name, GroupHierarchyType context, BibDatabaseContext databaseContext) {
+        super(name, context, databaseContext);
     }
 
     @Override

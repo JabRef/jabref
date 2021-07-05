@@ -50,7 +50,7 @@ public class DatabaseMerger {
     public synchronized void merge(BibDatabaseContext target, BibDatabaseContext other, String otherFileName) {
         mergeEntries(target.getDatabase(), other.getDatabase());
         mergeStrings(target.getDatabase(), other.getDatabase());
-        mergeMetaData(target.getMetaData(), other.getMetaData(), otherFileName, other.getEntries());
+        mergeMetaData(target.getMetaData(), other.getMetaData(), otherFileName, other.getEntries(), target);
     }
 
     private void mergeEntries(BibDatabase target, BibDatabase other) {
@@ -93,16 +93,16 @@ public class DatabaseMerger {
      * @param other         the metaData to merge into the target
      * @param otherFilename the filename of the other library. Pass "unknown" if not known.
      */
-    public void mergeMetaData(MetaData target, MetaData other, String otherFilename, List<BibEntry> allOtherEntries) {
+    public void mergeMetaData(MetaData target, MetaData other, String otherFilename, List<BibEntry> allOtherEntries, BibDatabaseContext databaseContext) {
         Objects.requireNonNull(other);
         Objects.requireNonNull(otherFilename);
         Objects.requireNonNull(allOtherEntries);
 
-        mergeGroups(target, other, otherFilename, allOtherEntries);
+        mergeGroups(target, other, otherFilename, allOtherEntries, databaseContext);
         mergeContentSelectors(target, other);
     }
 
-    private void mergeGroups(MetaData target, MetaData other, String otherFilename, List<BibEntry> allOtherEntries) {
+    private void mergeGroups(MetaData target, MetaData other, String otherFilename, List<BibEntry> allOtherEntries, BibDatabaseContext databaseContext) {
         // Adds the specified node as a child of the current root. The group contained in <b>newGroups</b> must not be of
         // type AllEntriesGroup, since every tree has exactly one AllEntriesGroup (its root). The <b>newGroups</b> are
         // inserted directly, i.e. they are not deepCopy()'d.
@@ -118,7 +118,8 @@ public class DatabaseMerger {
                     ExplicitGroup group = new ExplicitGroup(
                             "Imported " + newGroupName,
                             GroupHierarchyType.INDEPENDENT,
-                            keywordDelimiter);
+                            keywordDelimiter,
+                            databaseContext);
                     newGroups.setGroup(group);
                     group.add(allOtherEntries);
                 } catch (IllegalArgumentException e) {

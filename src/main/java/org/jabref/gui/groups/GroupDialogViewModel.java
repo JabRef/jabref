@@ -286,7 +286,8 @@ public class GroupDialogViewModel {
                 resultingGroup = new ExplicitGroup(
                         groupName,
                         groupHierarchySelectedProperty.getValue(),
-                        preferencesService.getKeywordDelimiter());
+                        preferencesService.getKeywordDelimiter(),
+                        currentDatabase);
             } else if (typeKeywordsProperty.getValue()) {
                 if (keywordGroupRegexProperty.getValue()) {
                     resultingGroup = new RegexKeywordGroup(
@@ -294,7 +295,8 @@ public class GroupDialogViewModel {
                             groupHierarchySelectedProperty.getValue(),
                             FieldFactory.parseField(keywordGroupSearchFieldProperty.getValue().trim()),
                             keywordGroupSearchTermProperty.getValue().trim(),
-                            keywordGroupCaseSensitiveProperty.getValue());
+                            keywordGroupCaseSensitiveProperty.getValue(),
+                            currentDatabase);
                 } else {
                     resultingGroup = new WordKeywordGroup(
                             groupName,
@@ -302,6 +304,7 @@ public class GroupDialogViewModel {
                             FieldFactory.parseField(keywordGroupSearchFieldProperty.getValue().trim()),
                             keywordGroupSearchTermProperty.getValue().trim(),
                             keywordGroupCaseSensitiveProperty.getValue(),
+                            currentDatabase,
                             preferencesService.getKeywordDelimiter(),
                             false);
                 }
@@ -311,7 +314,7 @@ public class GroupDialogViewModel {
                         groupHierarchySelectedProperty.getValue(),
                         searchGroupSearchTermProperty.getValue().trim(),
                         searchGroupCaseSensitiveProperty.getValue(),
-                        searchGroupRegexProperty.getValue());
+                        searchGroupRegexProperty.getValue(), currentDatabase);
             } else if (typeAutoProperty.getValue()) {
                 if (autoGroupKeywordsOptionProperty.getValue()) {
                     // Set default value for delimiters: ',' for base and '>' for hierarchical
@@ -329,12 +332,14 @@ public class GroupDialogViewModel {
                             groupHierarchySelectedProperty.getValue(),
                             FieldFactory.parseField(autoGroupKeywordsFieldProperty.getValue().trim()),
                             delimiter,
-                            hierarDelimiter);
+                            hierarDelimiter,
+                            currentDatabase);
                 } else {
                     resultingGroup = new AutomaticPersonsGroup(
                             groupName,
                             groupHierarchySelectedProperty.getValue(),
-                            FieldFactory.parseField(autoGroupPersonsFieldProperty.getValue().trim()));
+                            FieldFactory.parseField(autoGroupPersonsFieldProperty.getValue().trim()),
+                            currentDatabase);
                 }
             } else if (typeTexProperty.getValue()) {
                 resultingGroup = TexGroup.create(
@@ -343,7 +348,8 @@ public class GroupDialogViewModel {
                         Path.of(texGroupFilePathProperty.getValue().trim()),
                         new DefaultAuxParser(new BibDatabase()),
                         Globals.getFileUpdateMonitor(),
-                        currentDatabase.getMetaData());
+                        currentDatabase.getMetaData(),
+                        currentDatabase);
             }
 
             if (resultingGroup != null) {

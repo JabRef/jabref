@@ -11,6 +11,7 @@ import java.util.Set;
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.auxparser.AuxParser;
 import org.jabref.logic.auxparser.AuxParserResult;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.util.FileHelper;
@@ -32,8 +33,8 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     private final MetaData metaData;
     private final String user;
 
-    TexGroup(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData, String user) {
-        super(name, context);
+    TexGroup(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData, String user, BibDatabaseContext databaseContext) {
+        super(name, context, databaseContext);
         this.metaData = metaData;
         this.user = user;
         this.filePath = expandPath(Objects.requireNonNull(filePath));
@@ -41,18 +42,18 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
         this.fileMonitor = fileMonitor;
     }
 
-    TexGroup(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData) throws IOException {
-        this(name, context, filePath, auxParser, fileMonitor, metaData, System.getProperty("user.name") + '-' + InetAddress.getLocalHost().getHostName());
+    TexGroup(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData, BibDatabaseContext databaseContext) throws IOException {
+        this(name, context, filePath, auxParser, fileMonitor, metaData, System.getProperty("user.name") + '-' + InetAddress.getLocalHost().getHostName(), databaseContext);
     }
 
-    public static TexGroup create(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData) throws IOException {
-        TexGroup group = new TexGroup(name, context, filePath, auxParser, fileMonitor, metaData);
+    public static TexGroup create(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData, BibDatabaseContext databaseContext) throws IOException {
+        TexGroup group = new TexGroup(name, context, filePath, auxParser, fileMonitor, metaData, databaseContext);
         fileMonitor.addListenerForFile(group.getFilePathResolved(), group);
         return group;
     }
 
-    public static TexGroup createWithoutFileMonitoring(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData) throws IOException {
-        return new TexGroup(name, context, filePath, auxParser, fileMonitor, metaData);
+    public static TexGroup createWithoutFileMonitoring(String name, GroupHierarchyType context, Path filePath, AuxParser auxParser, FileUpdateMonitor fileMonitor, MetaData metaData, BibDatabaseContext databaseContext) throws IOException {
+        return new TexGroup(name, context, filePath, auxParser, fileMonitor, metaData, databaseContext);
     }
 
     public Path getFilePathResolved() {
@@ -77,7 +78,7 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     @Override
     public AbstractGroup deepCopy() {
         try {
-            return new TexGroup(name.getValue(), context, filePath, auxParser, fileMonitor, metaData);
+            return new TexGroup(name.getValue(), context, filePath, auxParser, fileMonitor, metaData, databaseContext);
         } catch (IOException ex) {
             // This should never happen because we were able to monitor the file just fine until now
             LOGGER.error("Problem creating copy of group", ex);

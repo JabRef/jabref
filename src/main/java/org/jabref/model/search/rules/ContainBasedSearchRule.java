@@ -8,6 +8,7 @@ import java.util.Vector;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.pdf.search.PdfSearchResults;
@@ -45,7 +46,7 @@ public class ContainBasedSearchRule implements SearchRule {
     }
 
     @Override
-    public boolean applyRule(String query, BibEntry bibEntry) {
+    public boolean applyRule(String query, BibDatabaseContext databaseContext, BibEntry bibEntry) {
 
         String searchString = query;
         if (!caseSensitive) {
@@ -73,11 +74,15 @@ public class ContainBasedSearchRule implements SearchRule {
             }
         }
 
+        if (getFulltextResults(query, databaseContext, bibEntry).numSearchResults() > 0) {
+            return true;
+        }
+
         return false; // Didn't match all words.
     }
 
     @Override
-    public PdfSearchResults getFulltextResults(String query, BibEntry bibEntry) {
+    public PdfSearchResults getFulltextResults(String query, BibDatabaseContext databaseContext, BibEntry bibEntry) {
 
         if (!fulltext) {
             return new PdfSearchResults(List.of());
@@ -87,7 +92,7 @@ public class ContainBasedSearchRule implements SearchRule {
             this.lastQuery = query;
             lastSearchResults = List.of();
             try {
-                PdfSearcher searcher = new PdfSearcher();
+                PdfSearcher searcher = PdfSearcher.of(databaseContext);
                 PdfSearchResults results = searcher.search(query, 100);
                 lastSearchResults = results.getSortedByScore();
             } catch (IOException e) {

@@ -4,6 +4,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
@@ -14,8 +15,8 @@ public class RegexKeywordGroup extends KeywordGroup {
     private Pattern pattern;
 
     public RegexKeywordGroup(String name, GroupHierarchyType context, Field searchField,
-                             String searchExpression, boolean caseSensitive) {
-        super(name, context, searchField, searchExpression, caseSensitive);
+                             String searchExpression, boolean caseSensitive, BibDatabaseContext databaseContext) {
+        super(name, context, searchField, searchExpression, caseSensitive, databaseContext);
         this.pattern = compilePattern(searchExpression, caseSensitive);
     }
 
@@ -51,7 +52,7 @@ public class RegexKeywordGroup extends KeywordGroup {
     @Override
     public AbstractGroup deepCopy() {
         return new RegexKeywordGroup(getName(), getHierarchicalContext(), searchField, searchExpression,
-                caseSensitive);
+                caseSensitive, databaseContext);
     }
 
     @Override

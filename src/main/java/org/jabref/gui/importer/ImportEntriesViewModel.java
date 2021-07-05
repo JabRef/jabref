@@ -164,7 +164,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         new DatabaseMerger(preferences.getKeywordDelimiter()).mergeMetaData(databaseContext.getMetaData(),
                 parserResult.getMetaData(),
                 parserResult.getFile().map(File::getName).orElse("unknown"),
-                parserResult.getDatabase().getEntries());
+                parserResult.getDatabase().getEntries(),
+                parserResult.getDatabaseContext());
 
         JabRefGUI.getMainFrame().getCurrentLibraryTab().markBaseChanged();
     }

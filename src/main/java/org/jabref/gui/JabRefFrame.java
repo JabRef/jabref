@@ -125,6 +125,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
+import org.jabref.logic.pdf.search.indexing.PdfIndexer;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.undo.AddUndoableActionEvent;
 import org.jabref.logic.undo.UndoChangeEvent;
@@ -1167,20 +1168,20 @@ public class JabRefFrame extends BorderPane {
 
     private void initLuceneIndex() {
         try {
-            indexingTaskManager = new IndexingTaskManager(this.taskExecutor, prefs.getFilePreferences());
+            indexingTaskManager = new IndexingTaskManager(this.taskExecutor);
             for (BibDatabaseContext openDatabase : openDatabaseList) {
-                indexingTaskManager.updateIndex(openDatabase);
+                indexingTaskManager.updateIndex(PdfIndexer.of(openDatabase, prefs.getFilePreferences()), openDatabase);
             }
             openDatabaseList.addListener(
                     (ListChangeListener<BibDatabaseContext>) changedDatabaseContexts -> {
                         while (changedDatabaseContexts.next()) {
                             if (changedDatabaseContexts.wasAdded()) {
                                 for (BibDatabaseContext addedContext : changedDatabaseContexts.getAddedSubList()) {
-                                    indexingTaskManager.updateIndex(addedContext);
-                                }
-                            } else if (changedDatabaseContexts.wasRemoved()) {
-                                for (BibDatabaseContext removedContext : changedDatabaseContexts.getAddedSubList()) {
-                                    indexingTaskManager.removeFromIndex(removedContext);
+                                    try {
+                                        indexingTaskManager.updateIndex(PdfIndexer.of(addedContext, prefs.getFilePreferences()), addedContext);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
                             }
                         }
