@@ -11,6 +11,7 @@ import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.pdf.search.PdfSearchResults;
@@ -26,10 +27,12 @@ public class RegexBasedSearchRule implements SearchRule {
 
     private String lastQuery;
     private List<SearchResult> lastSearchResults;
+    private BibDatabaseContext databaseContext;
 
-    public RegexBasedSearchRule(boolean caseSensitive, boolean fulltext) {
+    public RegexBasedSearchRule(boolean caseSensitive, boolean fulltext, BibDatabaseContext databaseContext) {
         this.caseSensitive = caseSensitive;
         this.fulltext = fulltext;
+        this.databaseContext = databaseContext;
     }
 
     public boolean isCaseSensitive() {
@@ -89,7 +92,7 @@ public class RegexBasedSearchRule implements SearchRule {
             this.lastQuery = query;
             lastSearchResults = List.of();
             try {
-                PdfSearcher searcher = new PdfSearcher();
+                PdfSearcher searcher = PdfSearcher.of(databaseContext);
                 PdfSearchResults results = searcher.search(query, 100);
                 lastSearchResults = results.getSortedByScore();
             } catch (IOException e) {

@@ -311,7 +311,8 @@ public class GroupDialogViewModel {
                         groupHierarchySelectedProperty.getValue(),
                         searchGroupSearchTermProperty.getValue().trim(),
                         searchGroupCaseSensitiveProperty.getValue(),
-                        searchGroupRegexProperty.getValue());
+                        searchGroupRegexProperty.getValue(),
+                        currentDatabase);
             } else if (typeAutoProperty.getValue()) {
                 if (autoGroupKeywordsOptionProperty.getValue()) {
                     // Set default value for delimiters: ',' for base and '>' for hierarchical

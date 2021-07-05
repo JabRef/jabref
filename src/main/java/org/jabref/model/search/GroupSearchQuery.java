@@ -2,6 +2,7 @@ package org.jabref.model.search;
 
 import java.util.Objects;
 
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.rules.SearchRule;
 import org.jabref.model.search.rules.SearchRules;
@@ -12,12 +13,14 @@ public class GroupSearchQuery implements SearchMatcher {
     private final boolean caseSensitive;
     private final boolean regularExpression;
     private final SearchRule rule;
+    private final BibDatabaseContext databaseContext;
 
-    public GroupSearchQuery(String query, boolean caseSensitive, boolean regularExpression) {
+    public GroupSearchQuery(String query, boolean caseSensitive, boolean regularExpression, BibDatabaseContext databaseContext) {
         this.query = Objects.requireNonNull(query);
         this.caseSensitive = caseSensitive;
         this.regularExpression = regularExpression;
         this.rule = Objects.requireNonNull(getSearchRule());
+        this.databaseContext = databaseContext;
     }
 
     @Override
@@ -32,7 +35,7 @@ public class GroupSearchQuery implements SearchMatcher {
     }
 
     private SearchRule getSearchRule() {
-        return SearchRules.getSearchRuleByQuery(query, caseSensitive, regularExpression, false);
+        return SearchRules.getSearchRuleByQuery(query, caseSensitive, regularExpression, false, databaseContext);
     }
 
     private String getCaseSensitiveDescription() {

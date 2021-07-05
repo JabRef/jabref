@@ -203,7 +203,7 @@ public class BibtexParser implements Parser {
 
         // Instantiate meta data:
         try {
-            parserResult.setMetaData(metaDataParser.parse(meta, importFormatPreferences.getKeywordSeparator()));
+            parserResult.setMetaData(metaDataParser.parse(meta, importFormatPreferences.getKeywordSeparator(), parserResult.getDatabaseContext()));
         } catch (ParseException exception) {
             parserResult.addException(exception);
         }

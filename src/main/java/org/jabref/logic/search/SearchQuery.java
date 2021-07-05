@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.SearchMatcher;
 import org.jabref.model.search.rules.ContainBasedSearchRule;
@@ -61,12 +62,12 @@ public class SearchQuery implements SearchMatcher {
     private final boolean fulltext;
     private final SearchRule rule;
 
-    public SearchQuery(String query, boolean caseSensitive, boolean regularExpression, boolean fulltext) {
+    public SearchQuery(String query, boolean caseSensitive, boolean regularExpression, boolean fulltext, BibDatabaseContext databaseContext) {
         this.query = Objects.requireNonNull(query);
         this.caseSensitive = caseSensitive;
         this.regularExpression = regularExpression;
         this.fulltext = fulltext;
-        this.rule = SearchRules.getSearchRuleByQuery(query, caseSensitive, regularExpression, fulltext);
+        this.rule = SearchRules.getSearchRuleByQuery(query, caseSensitive, regularExpression, fulltext, databaseContext);
     }
 
     @Override
