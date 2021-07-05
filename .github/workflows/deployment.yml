@@ -10,6 +10,8 @@ on:
       - 'docs/**'
       - 'src/test/**'
       - 'README.md'
+    tags:
+       - '*'
   pull_request:
     paths-ignore:
       - 'docs/**'
