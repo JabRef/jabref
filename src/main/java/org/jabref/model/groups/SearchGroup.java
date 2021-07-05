@@ -2,11 +2,13 @@ package org.jabref.model.groups;
 
 import java.util.Objects;
 
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.GroupSearchQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.CDATASection;
 
 /**
  * This group matches entries by a complex search pattern, which might include conditions about the values of
@@ -16,11 +18,13 @@ public class SearchGroup extends AbstractGroup {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchGroup.class);
     private final GroupSearchQuery query;
+    private final BibDatabaseContext databaseContext;
 
     public SearchGroup(String name, GroupHierarchyType context, String searchExpression, boolean caseSensitive,
-                       boolean isRegEx) {
+                       boolean isRegEx, BibDatabaseContext databaseContext) {
         super(name, context);
-        this.query = new GroupSearchQuery(searchExpression, caseSensitive, isRegEx);
+        this.query = new GroupSearchQuery(searchExpression, caseSensitive, isRegEx, databaseContext);
+        this.databaseContext = databaseContext;
     }
 
     public String getSearchExpression() {
@@ -52,7 +56,7 @@ public class SearchGroup extends AbstractGroup {
     public AbstractGroup deepCopy() {
         try {
             return new SearchGroup(getName(), getHierarchicalContext(), getSearchExpression(), isCaseSensitive(),
-                    isRegularExpression());
+                    isRegularExpression(), databaseContext);
         } catch (Throwable t) {
             // this should never happen, because the constructor obviously
             // succeeded in creating _this_ instance!

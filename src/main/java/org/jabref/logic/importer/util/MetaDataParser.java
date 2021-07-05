@@ -14,6 +14,7 @@ import java.util.Optional;
 
 import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.importer.ParseException;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.types.EntryType;
@@ -39,14 +40,14 @@ public class MetaDataParser {
     /**
      * Parses the given data map and returns a new resulting {@link MetaData} instance.
      */
-    public MetaData parse(Map<String, String> data, Character keywordSeparator) throws ParseException {
-        return parse(new MetaData(), data, keywordSeparator);
+    public MetaData parse(Map<String, String> data, Character keywordSeparator, BibDatabaseContext databaseContext) throws ParseException {
+        return parse(new MetaData(), data, keywordSeparator, databaseContext);
     }
 
     /**
      * Parses the data map and changes the given {@link MetaData} instance respectively.
      */
-    public MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator) throws ParseException {
+    public MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator, BibDatabaseContext databaseContext) throws ParseException {
         List<String> defaultCiteKeyPattern = new ArrayList<>();
         Map<EntryType, List<String>> nonDefaultCiteKeyPatterns = new HashMap<>();
 
@@ -88,7 +89,7 @@ public class MetaDataParser {
             } else if (entry.getKey().equals(MetaData.SAVE_ORDER_CONFIG)) {
                 metaData.setSaveOrderConfig(SaveOrderConfig.parse(value));
             } else if (entry.getKey().equals(MetaData.GROUPSTREE) || entry.getKey().equals(MetaData.GROUPSTREE_LEGACY)) {
-                metaData.setGroups(GroupsParser.importGroups(value, keywordSeparator, fileMonitor, metaData));
+                metaData.setGroups(GroupsParser.importGroups(value, keywordSeparator, fileMonitor, metaData, databaseContext));
             } else {
                 // Keep meta data items that we do not know in the file
                 metaData.putUnknownMetaDataItem(entry.getKey(), value);

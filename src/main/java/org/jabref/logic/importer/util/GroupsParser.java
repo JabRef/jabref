@@ -12,6 +12,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.MetadataSerializationConfiguration;
 import org.jabref.logic.util.strings.QuotedStringTokenizer;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.groups.AbstractGroup;
@@ -41,7 +42,7 @@ public class GroupsParser {
     private GroupsParser() {
     }
 
-    public static GroupTreeNode importGroups(List<String> orderedData, Character keywordSeparator, FileUpdateMonitor fileMonitor, MetaData metaData)
+    public static GroupTreeNode importGroups(List<String> orderedData, Character keywordSeparator, FileUpdateMonitor fileMonitor, MetaData metaData, BibDatabaseContext databaseContext)
             throws ParseException {
         try {
             GroupTreeNode cursor = null;
@@ -58,7 +59,7 @@ public class GroupsParser {
                     throw new ParseException("Expected \"" + string + "\" to contain whitespace");
                 }
                 int level = Integer.parseInt(string.substring(0, spaceIndex));
-                AbstractGroup group = GroupsParser.fromString(string.substring(spaceIndex + 1), keywordSeparator, fileMonitor, metaData);
+                AbstractGroup group = GroupsParser.fromString(string.substring(spaceIndex + 1), keywordSeparator, fileMonitor, metaData, databaseContext);
                 GroupTreeNode newNode = GroupTreeNode.fromGroup(group);
                 if (cursor == null) {
                     // create new root
@@ -88,7 +89,7 @@ public class GroupsParser {
      * @return New instance of the encoded group.
      * @throws ParseException If an error occurred and a group could not be created, e.g. due to a malformed regular expression.
      */
-    public static AbstractGroup fromString(String s, Character keywordSeparator, FileUpdateMonitor fileMonitor, MetaData metaData)
+    public static AbstractGroup fromString(String s, Character keywordSeparator, FileUpdateMonitor fileMonitor, MetaData metaData, BibDatabaseContext databaseContext)
             throws ParseException {
         if (s.startsWith(MetadataSerializationConfiguration.KEYWORD_GROUP_ID)) {
             return keywordGroupFromString(s, keywordSeparator);
@@ -97,7 +98,7 @@ public class GroupsParser {
             return allEntriesGroupFromString(s);
         }
         if (s.startsWith(MetadataSerializationConfiguration.SEARCH_GROUP_ID)) {
-            return searchGroupFromString(s);
+            return searchGroupFromString(s, databaseContext);
         }
         if (s.startsWith(MetadataSerializationConfiguration.EXPLICIT_GROUP_ID)) {
             return explicitGroupFromString(s, keywordSeparator);
@@ -264,7 +265,7 @@ public class GroupsParser {
      *
      * @param s The String representation obtained from SearchGroup.toString(), or null if incompatible
      */
-    private static AbstractGroup searchGroupFromString(String s) {
+    private static AbstractGroup searchGroupFromString(String s, BibDatabaseContext databaseContext) {
         if (!s.startsWith(MetadataSerializationConfiguration.SEARCH_GROUP_ID)) {
             throw new IllegalArgumentException("SearchGroup cannot be created from \"" + s + "\".");
         }
@@ -279,7 +280,7 @@ public class GroupsParser {
         // version 0 contained 4 additional booleans to specify search
         // fields; these are ignored now, all fields are always searched
         SearchGroup searchGroup = new SearchGroup(name,
-                GroupHierarchyType.getByNumberOrDefault(context), expression, caseSensitive, regExp
+                GroupHierarchyType.getByNumberOrDefault(context), expression, caseSensitive, regExp, databaseContext
         );
         addGroupDetails(tok, searchGroup);
         return searchGroup;

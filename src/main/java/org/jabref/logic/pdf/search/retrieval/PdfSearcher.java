@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.jabref.logic.pdf.search.indexing.EnglishStemAnalyzer;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
 import org.jabref.model.strings.StringUtil;
@@ -32,8 +33,12 @@ public final class PdfSearcher {
 
     private final Directory indexDirectory;
 
-    public PdfSearcher() throws IOException {
-        this.indexDirectory = new SimpleFSDirectory(Path.of("src/main/resources/luceneIndex"));
+    private PdfSearcher(Directory indexDirectory) throws IOException {
+        this.indexDirectory = indexDirectory;
+    }
+
+    public static PdfSearcher of(BibDatabaseContext databaseContext) throws IOException {
+        return new PdfSearcher(new SimpleFSDirectory(databaseContext.getFulltextIndexPath()));
     }
 
     /**
