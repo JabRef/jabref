@@ -1,9 +1,12 @@
 package org.jabref.logic.pdf.search.indexing;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.jabref.model.database.BibDatabaseContext;
@@ -16,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -26,6 +30,7 @@ import static org.jabref.model.pdf.search.SearchFieldConstants.AUTHOR;
 import static org.jabref.model.pdf.search.SearchFieldConstants.CONTENT;
 import static org.jabref.model.pdf.search.SearchFieldConstants.KEY;
 import static org.jabref.model.pdf.search.SearchFieldConstants.KEYWORDS;
+import static org.jabref.model.pdf.search.SearchFieldConstants.MODIFIED;
 import static org.jabref.model.pdf.search.SearchFieldConstants.PATH;
 import static org.jabref.model.pdf.search.SearchFieldConstants.SUBJECT;
 import static org.jabref.model.pdf.search.SearchFieldConstants.TITLE;
@@ -88,17 +93,24 @@ public final class DocumentReader {
             Document newDocument = new Document();
             addIdentifiers(newDocument, pdf.getLink());
             addContentIfNotEmpty(pdfDocument, newDocument);
-            addMetaData(pdfDocument, newDocument);
+            addMetaData(pdfDocument, newDocument, resolvedPdfPath);
             return newDocument;
         }
     }
 
-    private void addMetaData(PDDocument pdfDocument, Document newDocument) {
+    private void addMetaData(PDDocument pdfDocument, Document newDocument, Path resolvedPdfPath) {
         PDDocumentInformation info = pdfDocument.getDocumentInformation();
         addStringField(newDocument, AUTHOR, info.getAuthor());
         addStringField(newDocument, TITLE, info.getTitle());
         addStringField(newDocument, SUBJECT, info.getSubject());
         addTextField(newDocument, KEYWORDS, info.getKeywords());
+
+        try {
+            BasicFileAttributes attributes = Files.readAttributes(resolvedPdfPath, BasicFileAttributes.class);
+            addStringField(newDocument, MODIFIED, String.valueOf(attributes.lastModifiedTime().to(TimeUnit.SECONDS)));
+        } catch (IOException e) {
+            LOGGER.error("Could not read timestamp for " + resolvedPdfPath, e);
+        }
     }
 
     private void addTextField(Document newDocument, String field, String value) {

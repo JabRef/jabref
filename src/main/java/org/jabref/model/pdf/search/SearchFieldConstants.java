@@ -9,6 +9,7 @@ public class SearchFieldConstants {
     public static final String SUBJECT = "subject";
     public static final String KEYWORDS = "keywords";
     public static final String KEY = "key";
+    public static final String MODIFIED = "modified";
 
-    public static final String[] PDF_FIELDS = new String[]{PATH, TITLE, AUTHOR, CONTENT, SUBJECT, KEYWORDS, KEY};
+    public static final String[] PDF_FIELDS = new String[]{PATH, TITLE, AUTHOR, CONTENT, SUBJECT, KEYWORDS, KEY, MODIFIED};
 }

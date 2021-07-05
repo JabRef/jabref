@@ -1170,7 +1170,7 @@ public class JabRefFrame extends BorderPane {
         try {
             indexingTaskManager = new IndexingTaskManager(this.taskExecutor, prefs.getFilePreferences());
             for (BibDatabaseContext openDatabase : openDatabaseList) {
-                indexingTaskManager.updateIndex(PdfIndexer.of(openDatabase, prefs.getFilePreferences()), openDatabase);
+                indexingTaskManager.addToIndex(PdfIndexer.of(openDatabase, prefs.getFilePreferences()), openDatabase);
             }
             openDatabaseList.addListener(
                     (ListChangeListener<BibDatabaseContext>) changedDatabaseContexts -> {
@@ -1178,7 +1178,7 @@ public class JabRefFrame extends BorderPane {
                             if (changedDatabaseContexts.wasAdded()) {
                                 for (BibDatabaseContext addedContext : changedDatabaseContexts.getAddedSubList()) {
                                     try {
-                                        indexingTaskManager.updateIndex(PdfIndexer.of(addedContext, prefs.getFilePreferences()), addedContext);
+                                        indexingTaskManager.addToIndex(PdfIndexer.of(addedContext, prefs.getFilePreferences()), addedContext);
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }

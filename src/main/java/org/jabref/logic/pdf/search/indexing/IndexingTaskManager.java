@@ -84,6 +84,17 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         });
     }
 
+    public void addToIndex(PdfIndexer indexer, BibDatabaseContext databaseContext) {
+        enqueueTask(new BackgroundTask<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                this.updateProgress(-1, 1);
+                indexer.addToIndex(databaseContext);
+                return null;
+            }
+        });
+    }
+
     public void addToIndex(PdfIndexer indexer, BibEntry entry, BibDatabaseContext databaseContext) {
         enqueueTask(new BackgroundTask<Void>() {
             @Override
@@ -150,44 +161,6 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
             protected Void call() throws Exception {
                 this.updateProgress(-1, 1);
                 indexer.flushIndex();
-                return null;
-            }
-        });
-    }
-
-    public void updateIndex(PdfIndexer indexer, BibEntry entry, BibDatabaseContext databaseContext) {
-        enqueueTask(new BackgroundTask<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                this.updateProgress(-1, 1);
-                indexer.updateIndex(entry, databaseContext);
-                return null;
-            }
-        });
-    }
-
-    public void updateIndex(PdfIndexer indexer, BibEntry entry, LinkedFile linkedFile, BibDatabaseContext databaseContext) {
-        enqueueTask(new BackgroundTask<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                this.updateProgress(-1, 1);
-                indexer.updateIndex(entry, linkedFile, databaseContext);
-                return null;
-            }
-        });
-    }
-
-    public void updateIndex(PdfIndexer indexer, BibDatabaseContext databaseContext) {
-        enqueueTask(new BackgroundTask<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                int progressCounter = 0;
-                this.updateProgress(progressCounter, databaseContext.getEntries().size());
-                for (BibEntry entry : databaseContext.getEntries()) {
-                    indexer.updateIndex(entry, databaseContext);
-                    progressCounter++;
-                    this.updateProgress(progressCounter, databaseContext.getEntries().size());
-                }
                 return null;
             }
         });
