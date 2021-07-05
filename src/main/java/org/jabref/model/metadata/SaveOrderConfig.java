@@ -25,12 +25,10 @@ public class SaveOrderConfig {
         setSaveInOriginalOrder();
     }
 
-    public SaveOrderConfig(boolean saveInOriginalOrder, boolean saveInSpecifiedOrder, SortCriterion first, SortCriterion second, SortCriterion third) {
+    public SaveOrderConfig(boolean saveInOriginalOrder, boolean saveInSpecifiedOrder, LinkedList<SortCriterion> sortCriteria) {
         this.saveInOriginalOrder = saveInOriginalOrder;
         this.saveInSpecifiedOrder = saveInSpecifiedOrder;
-        sortCriteria.add(first);
-        sortCriteria.add(second);
-        sortCriteria.add(third);
+        this.sortCriteria.addAll(sortCriteria);
     }
 
     private SaveOrderConfig(List<String> data) {
@@ -79,8 +77,7 @@ public class SaveOrderConfig {
         if (this == o) {
             return true;
         }
-        if (o instanceof SaveOrderConfig) {
-            SaveOrderConfig that = (SaveOrderConfig) o;
+        if (o instanceof SaveOrderConfig that) {
             return Objects.equals(sortCriteria, that.sortCriteria) &&
                     Objects.equals(saveInOriginalOrder, that.saveInOriginalOrder) &&
                     Objects.equals(saveInSpecifiedOrder, that.saveInSpecifiedOrder);

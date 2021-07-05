@@ -4,8 +4,10 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -18,6 +20,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.commonfxcontrols.SortCriterionViewModel;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
@@ -50,16 +53,8 @@ public class LibraryPropertiesDialogViewModel {
     private final BooleanProperty saveInOriginalProperty = new SimpleBooleanProperty();
     private final BooleanProperty saveInTableOrderProperty = new SimpleBooleanProperty();
     private final BooleanProperty saveInSpecifiedOrderProperty = new SimpleBooleanProperty();
-    // ToDo: The single criterions should really be a map or a list.
-    private final ListProperty<Field> primarySortFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ListProperty<Field> secondarySortFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ListProperty<Field> tertiarySortFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final BooleanProperty savePrimaryDescPropertySelected = new SimpleBooleanProperty();
-    private final BooleanProperty saveSecondaryDescPropertySelected = new SimpleBooleanProperty();
-    private final BooleanProperty saveTertiaryDescPropertySelected = new SimpleBooleanProperty();
-    private final ObjectProperty<Field> savePrimarySortSelectedValueProperty = new SimpleObjectProperty<>(null);
-    private final ObjectProperty<Field> saveSecondarySortSelectedValueProperty = new SimpleObjectProperty<>(null);
-    private final ObjectProperty<Field> saveTertiarySortSelectedValueProperty = new SimpleObjectProperty<>(null);
+    private final ListProperty<Field> sortableFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<SortCriterionViewModel> sortCriteriaProperty = new SimpleListProperty<>(FXCollections.observableArrayList(new LinkedList<>()));
 
     // FieldFormatterCleanupsPanel
     private final BooleanProperty cleanupsDisableProperty = new SimpleBooleanProperty();
@@ -78,7 +73,7 @@ public class LibraryPropertiesDialogViewModel {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.initialMetaData = databaseContext.getMetaData();
-        this.initialSaveOrderConfig = initialMetaData.getSaveOrderConfig().orElseGet(preferences::loadExportSaveOrder);
+        this.initialSaveOrderConfig = initialMetaData.getSaveOrderConfig().orElseGet(preferences::getExportSaveOrder);
 
         this.directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(preferences.getWorkingDir()).build();
@@ -112,17 +107,11 @@ public class LibraryPropertiesDialogViewModel {
         // allow entrytype field as sort criterion
         fieldNames.add(InternalField.TYPE_HEADER);
         fieldNames.sort(Comparator.comparing(Field::getDisplayName));
-        primarySortFieldsProperty.addAll(fieldNames);
-        secondarySortFieldsProperty.addAll(fieldNames);
-        tertiarySortFieldsProperty.addAll(fieldNames);
+        sortableFieldsProperty.addAll(fieldNames);
 
-        savePrimarySortSelectedValueProperty.setValue(initialSaveOrderConfig.getSortCriteria().get(0).field);
-        saveSecondarySortSelectedValueProperty.setValue(initialSaveOrderConfig.getSortCriteria().get(1).field);
-        saveTertiarySortSelectedValueProperty.setValue(initialSaveOrderConfig.getSortCriteria().get(2).field);
-
-        savePrimaryDescPropertySelected.setValue(initialSaveOrderConfig.getSortCriteria().get(0).descending);
-        saveSecondaryDescPropertySelected.setValue(initialSaveOrderConfig.getSortCriteria().get(1).descending);
-        saveTertiaryDescPropertySelected.setValue(initialSaveOrderConfig.getSortCriteria().get(2).descending);
+        sortCriteriaProperty.addAll(initialSaveOrderConfig.getSortCriteria().stream()
+                                                          .map(SortCriterionViewModel::new)
+                                                          .collect(Collectors.toList()));
 
         // FieldFormatterCleanupsPanel
 
@@ -186,15 +175,7 @@ public class LibraryPropertiesDialogViewModel {
         SaveOrderConfig newSaveOrderConfig = new SaveOrderConfig(
                 saveInOriginalProperty.getValue(),
                 saveInSpecifiedOrderProperty.getValue(),
-                new SaveOrderConfig.SortCriterion(
-                        savePrimarySortSelectedValueProperty.get(),
-                        savePrimaryDescPropertySelected.getValue()),
-                new SaveOrderConfig.SortCriterion(
-                        saveSecondarySortSelectedValueProperty.get(),
-                        saveSecondaryDescPropertySelected.getValue()),
-                new SaveOrderConfig.SortCriterion(
-                        saveTertiarySortSelectedValueProperty.get(),
-                        saveTertiaryDescPropertySelected.getValue()));
+                new LinkedList<>(sortCriteriaProperty.stream().map(SortCriterionViewModel::getCriterion).toList()));
 
         if (!newSaveOrderConfig.equals(initialSaveOrderConfig)) {
             if (newSaveOrderConfig.equals(SaveOrderConfig.getDefaultSaveOrder())) {
@@ -281,40 +262,12 @@ public class LibraryPropertiesDialogViewModel {
         return saveInSpecifiedOrderProperty;
     }
 
-    public ListProperty<Field> primarySortFieldsProperty() {
-        return primarySortFieldsProperty;
+    public ListProperty<Field> sortableFieldsProperty() {
+        return sortableFieldsProperty;
     }
 
-    public ListProperty<Field> secondarySortFieldsProperty() {
-        return secondarySortFieldsProperty;
-    }
-
-    public ListProperty<Field> tertiarySortFieldsProperty() {
-        return tertiarySortFieldsProperty;
-    }
-
-    public ObjectProperty<Field> savePrimarySortSelectedValueProperty() {
-        return savePrimarySortSelectedValueProperty;
-    }
-
-    public ObjectProperty<Field> saveSecondarySortSelectedValueProperty() {
-        return saveSecondarySortSelectedValueProperty;
-    }
-
-    public ObjectProperty<Field> saveTertiarySortSelectedValueProperty() {
-        return saveTertiarySortSelectedValueProperty;
-    }
-
-    public BooleanProperty savePrimaryDescPropertySelected() {
-        return savePrimaryDescPropertySelected;
-    }
-
-    public BooleanProperty saveSecondaryDescPropertySelected() {
-        return saveSecondaryDescPropertySelected;
-    }
-
-    public BooleanProperty saveTertiaryDescPropertySelected() {
-        return saveTertiaryDescPropertySelected;
+    public ListProperty<SortCriterionViewModel> sortCriteriaProperty() {
+        return sortCriteriaProperty;
     }
 
     // FieldFormatterCleanupsPanel

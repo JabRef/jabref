@@ -48,7 +48,7 @@ public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> impleme
         noWrapFiles.textProperty().bindBidirectional(viewModel.noWrapFilesProperty());
         resolveStringsBibTex.selectedProperty().bindBidirectional(viewModel.resolveStringsBibTexProperty());
         resolveStringsAll.selectedProperty().bindBidirectional(viewModel.resolveStringsAllProperty());
-        resolveStringsExcept.textProperty().bindBidirectional(viewModel.resolvStringsExceptProperty());
+        resolveStringsExcept.textProperty().bindBidirectional(viewModel.resolveStringsExceptProperty());
         resolveStringsExcept.disableProperty().bind(resolveStringsAll.selectedProperty().not());
         new ViewModelListCellFactory<NewLineSeparator>()
                 .withText(NewLineSeparator::getDisplayName)
@@ -60,15 +60,8 @@ public class FileTab extends AbstractPreferenceTabView<FileTabViewModel> impleme
         exportOrderPanel.saveInOriginalProperty().bindBidirectional(viewModel.saveInOriginalProperty());
         exportOrderPanel.saveInTableOrderProperty().bindBidirectional(viewModel.saveInTableOrderProperty());
         exportOrderPanel.saveInSpecifiedOrderProperty().bindBidirectional(viewModel.saveInSpecifiedOrderProperty());
-        exportOrderPanel.primarySortFieldsProperty().bind(viewModel.primarySortFieldsProperty());
-        exportOrderPanel.secondarySortFieldsProperty().bind(viewModel.secondarySortFieldsProperty());
-        exportOrderPanel.tertiarySortFieldsProperty().bind(viewModel.tertiarySortFieldsProperty());
-        exportOrderPanel.savePrimaryDescPropertySelected().bindBidirectional(viewModel.savePrimaryDescPropertySelected());
-        exportOrderPanel.saveSecondaryDescPropertySelected().bindBidirectional(viewModel.saveSecondaryDescPropertySelected());
-        exportOrderPanel.saveTertiaryDescPropertySelected().bindBidirectional(viewModel.saveTertiaryDescPropertySelected());
-        exportOrderPanel.savePrimarySortSelectedValueProperty().bindBidirectional(viewModel.savePrimarySortSelectedValueProperty());
-        exportOrderPanel.saveSecondarySortSelectedValueProperty().bindBidirectional(viewModel.saveSecondarySortSelectedValueProperty());
-        exportOrderPanel.saveTertiarySortSelectedValueProperty().bindBidirectional(viewModel.saveTertiarySortSelectedValueProperty());
+        exportOrderPanel.sortableFieldsProperty().bind(viewModel.sortableFieldsProperty());
+        exportOrderPanel.sortCriteriaProperty().bindBidirectional(viewModel.sortCriteriaProperty());
 
         autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());
 
