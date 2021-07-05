@@ -97,9 +97,8 @@ public class Version {
         HttpURLConnection connection = (HttpURLConnection) new URL(JABREF_GITHUB_RELEASES).openConnection();
         connection.setRequestProperty("Accept-Charset", "UTF-8");
         try (BufferedReader rd = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-
-            List<Version> versions = new ArrayList<>();
             JSONArray objects = new JSONArray(rd.readLine());
+            List<Version> versions = new ArrayList<>(objects.length());
             for (int i = 0; i < objects.length(); i++) {
                 JSONObject jsonObject = objects.getJSONObject(i);
                 Version version = Version.parse(jsonObject.getString("tag_name").replaceFirst("v", ""));
