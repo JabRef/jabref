@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -1339,8 +1340,10 @@ class BibtexParserTest {
 
         Optional<SaveOrderConfig> saveOrderConfig = result.getMetaData().getSaveOrderConfig();
 
-        assertEquals(new SaveOrderConfig(false, true, new SaveOrderConfig.SortCriterion(StandardField.AUTHOR, false),
-                        new SaveOrderConfig.SortCriterion(StandardField.YEAR, true), new SaveOrderConfig.SortCriterion(StandardField.ABSTRACT, false)),
+        assertEquals(new SaveOrderConfig(false, true, new LinkedList<>(List.of(
+                new SaveOrderConfig.SortCriterion(StandardField.AUTHOR, false),
+                new SaveOrderConfig.SortCriterion(StandardField.YEAR, true),
+                new SaveOrderConfig.SortCriterion(StandardField.ABSTRACT, false)))),
                 saveOrderConfig.get());
     }
 

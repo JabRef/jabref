@@ -60,9 +60,7 @@ public class SaveOrderConfigPanel extends VBox {
                         clearCriterionRow(c.getFrom());
                     }
                 } else if (c.wasPermutated()) {
-                    for (int i = c.getFrom(); i < c.getTo(); ++i) {
-                       refreshCriterion(c.getList().get(i), i);
-                    }
+                    swapCriterion(c.getFrom(), c.getTo());
                 }
             }
         });
@@ -96,13 +94,13 @@ public class SaveOrderConfigPanel extends VBox {
         remove.setPrefWidth(20.0);
         remove.setOnAction(event -> removeCriterion(sortCriterionViewModel));
 
-        Button moveUp = new Button("", new JabRefIconView(IconTheme.JabRefIcons.UP));
+        Button moveUp = new Button("", new JabRefIconView(IconTheme.JabRefIcons.LIST_MOVE_UP));
         moveUp.getStyleClass().addAll("icon-button", "narrow");
         moveUp.setPrefHeight(20.0);
         moveUp.setPrefWidth(20.0);
         moveUp.setOnAction(event -> moveCriterionUp(sortCriterionViewModel));
 
-        Button moveDown = new Button("", new JabRefIconView(IconTheme.JabRefIcons.DOWN));
+        Button moveDown = new Button("", new JabRefIconView(IconTheme.JabRefIcons.LIST_MOVE_DOWN));
         moveDown.getStyleClass().addAll("icon-button", "narrow");
         moveDown.setPrefHeight(20.0);
         moveDown.setPrefWidth(20.0);
@@ -127,20 +125,16 @@ public class SaveOrderConfigPanel extends VBox {
                          });
     }
 
-    private void refreshCriterion(SortCriterionViewModel sortCriterionViewModel, int row) {
-        List<Node> criterionRow = sortCriterionList.getChildren().stream()
-                                                   .filter(item -> GridPane.getRowIndex(item) == row)
-                                                   .collect(Collectors.toList());
-        criterionRow.forEach(node -> {
-            if (node instanceof ComboBox<?>) {
-                ComboBox<Field> comboBox = (ComboBox<Field>) node;
-                comboBox.valueProperty().unbind();
-                comboBox.valueProperty().bindBidirectional(sortCriterionViewModel.fieldProperty());
-            } else if (node instanceof CheckBox checkBox) {
-                checkBox.selectedProperty().unbind();
-                checkBox.selectedProperty().bindBidirectional(sortCriterionViewModel.descendingProperty());
-            }
-        });
+    private void swapCriterion(int rowA, int rowB) {
+        List<Node> criterionRowA = sortCriterionList.getChildren().stream()
+                                                    .filter(item -> GridPane.getRowIndex(item) == rowA)
+                                                    .collect(Collectors.toList());
+        List<Node> criterionRowB = sortCriterionList.getChildren().stream()
+                                                    .filter(item -> GridPane.getRowIndex(item) == rowB)
+                                                    .collect(Collectors.toList());
+
+        criterionRowA.forEach(item -> GridPane.setRowIndex(item, rowB));
+        criterionRowB.forEach(item -> GridPane.setRowIndex(item, rowA));
     }
 
     @FXML
