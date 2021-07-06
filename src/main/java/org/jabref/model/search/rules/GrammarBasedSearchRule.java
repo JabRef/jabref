@@ -11,8 +11,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.gui.Globals;
 import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.Field;
@@ -50,7 +50,6 @@ public class GrammarBasedSearchRule implements SearchRule {
     private ParseTree tree;
     private String query;
     private List<SearchResult> searchResults;
-    private BibDatabaseContext databaseContext;
 
     public static class ThrowingErrorListener extends BaseErrorListener {
 
@@ -64,15 +63,14 @@ public class GrammarBasedSearchRule implements SearchRule {
         }
     }
 
-    public GrammarBasedSearchRule(boolean caseSensitiveSearch, boolean regExpSearch, boolean fulltext, BibDatabaseContext databaseContext) throws RecognitionException {
+    public GrammarBasedSearchRule(boolean caseSensitiveSearch, boolean regExpSearch, boolean fulltext) throws RecognitionException {
         this.caseSensitiveSearch = caseSensitiveSearch;
         this.regExpSearch = regExpSearch;
         this.fulltext = fulltext;
-        this.databaseContext = databaseContext;
     }
 
     public static boolean isValid(boolean caseSensitive, boolean regExp, boolean fulltext, String query) {
-        return new GrammarBasedSearchRule(caseSensitive, regExp, fulltext, null).validateSearchStrings(query);
+        return new GrammarBasedSearchRule(caseSensitive, regExp, fulltext).validateSearchStrings(query);
     }
 
     public boolean isCaseSensitiveSearch() {
@@ -114,7 +112,11 @@ public class GrammarBasedSearchRule implements SearchRule {
             return;
         }
         try {
-            PdfSearcher searcher = PdfSearcher.of(databaseContext);
+            if (Globals.stateManager.getActiveDatabase().isEmpty()) {
+                searchResults = new PdfSearchResults().getSearchResults();
+                return;
+            }
+            PdfSearcher searcher = PdfSearcher.of(Globals.stateManager.getActiveDatabase().get());
             PdfSearchResults results = searcher.search(query, 100);
             searchResults = results.getSortedByScore();
         } catch (IOException e) {
@@ -125,7 +127,7 @@ public class GrammarBasedSearchRule implements SearchRule {
     @Override
     public boolean applyRule(String query, BibEntry bibEntry) {
         try {
-            return new BibtexSearchVisitor(caseSensitiveSearch, regExpSearch, fulltext, bibEntry, databaseContext).visit(tree);
+            return new BibtexSearchVisitor(caseSensitiveSearch, regExpSearch, fulltext, bibEntry).visit(tree);
         } catch (Exception e) {
             LOGGER.debug("Search failed", e);
             return false;
@@ -134,13 +136,7 @@ public class GrammarBasedSearchRule implements SearchRule {
 
     @Override
     public PdfSearchResults getFulltextResults(String query, BibEntry bibEntry) {
-        Vector<SearchResult> searchResults = new Vector<>();
-        for (SearchResult searchResult : searchResults) {
-            if (searchResult.isResultFor(bibEntry)) {
-                searchResults.add(searchResult);
-            }
-        }
-        return new PdfSearchResults(searchResults);
+        return new PdfSearchResults(searchResults.stream().filter(searchResult -> searchResult.isResultFor(bibEntry)).collect(Collectors.toList()));
     }
 
     @Override
@@ -244,14 +240,11 @@ public class GrammarBasedSearchRule implements SearchRule {
 
         private final BibEntry entry;
 
-        private final BibDatabaseContext databaseContext;
-
-        public BibtexSearchVisitor(boolean caseSensitive, boolean regex, boolean fulltext, BibEntry bibEntry, BibDatabaseContext databaseContext) {
+        public BibtexSearchVisitor(boolean caseSensitive, boolean regex, boolean fulltext, BibEntry bibEntry) {
             this.caseSensitive = caseSensitive;
             this.regex = regex;
             this.fulltext = fulltext;
             this.entry = bibEntry;
-            this.databaseContext = databaseContext;
         }
 
         public boolean comparison(String field, ComparisonOperator operator, String value) {
@@ -275,7 +268,7 @@ public class GrammarBasedSearchRule implements SearchRule {
             if (fieldDescriptor.isPresent()) {
                 return comparison(fieldDescriptor.get().getText(), ComparisonOperator.build(context.operator.getText()), right);
             } else {
-                return SearchRules.getSearchRule(caseSensitive, regex, fulltext, databaseContext).applyRule(right, entry);
+                return SearchRules.getSearchRule(caseSensitive, regex, fulltext).applyRule(right, entry);
             }
         }
 

@@ -7,8 +7,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import javax.swing.text.html.Option;
-
 import javafx.collections.ObservableList;
 
 import org.jabref.logic.importer.ParserResult;
@@ -33,8 +31,6 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.SimpleFSDirectory;
-
-import static org.jabref.model.pdf.search.SearchFieldConstants.MODIFIED;
 
 /**
  * Indexes the text of PDF files and adds it into the lucene search index.
