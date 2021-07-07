@@ -1,27 +1,20 @@
 package org.jabref.model.pdf.search;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.pdf.search.indexing.EnglishStemAnalyzer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.highlight.Formatter;
-import org.apache.lucene.search.highlight.Fragmenter;
 import org.apache.lucene.search.highlight.Highlighter;
 import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
 import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
-import org.apache.lucene.search.highlight.SimpleSpanFragmenter;
 import org.apache.lucene.search.highlight.TextFragment;
 import org.apache.lucene.search.highlight.TokenSources;
 
@@ -63,7 +56,7 @@ public final class SearchResult {
                 html += "<p>" + frag.toString() + "</p>";
             }
         } catch (InvalidTokenOffsetsException e) {
-            this.html = Localization.lang("Could not fragment search result");
+            this.html = "";
         }
     }
 

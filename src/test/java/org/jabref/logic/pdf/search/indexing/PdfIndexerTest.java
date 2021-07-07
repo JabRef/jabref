@@ -14,6 +14,7 @@ import org.jabref.preferences.FilePreferences;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.store.SimpleFSDirectory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -31,23 +32,14 @@ public class PdfIndexerTest {
     @BeforeEach
     public void setUp() throws IOException {
         FilePreferences filePreferences = mock(FilePreferences.class);
-        this.indexer = new PdfIndexer(filePreferences);
         this.database = new BibDatabase();
-        when(context.getDatabasePath()).thenReturn(Optional.of(Path.of("src/test/resources/pdfs/")));
 
         this.context = mock(BibDatabaseContext.class);
+        when(context.getDatabasePath()).thenReturn(Optional.of(Path.of("src/test/resources/pdfs/")));
         when(context.getFileDirectories(Mockito.any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs")));
-    }
-
-    @Test
-    public void createEmptyIndex() throws IOException {
-        // when
-        indexer.createIndex(database, context);
-
-        // then
-        try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
-            assertEquals(0, reader.numDocs());
-        }
+        when(context.getFulltextIndexPath()).thenReturn(Path.of("src/test/resources/luceneTestIndex"));
+        when(context.getDatabase()).thenReturn(database);
+        this.indexer = PdfIndexer.of(context, filePreferences);
     }
 
     @Test
@@ -61,9 +53,8 @@ public class PdfIndexerTest {
         indexer.createIndex(database, context);
 
         // then
-        try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
+        try (IndexReader reader = DirectoryReader.open(new SimpleFSDirectory(context.getFulltextIndexPath()))) {
             assertEquals(1, reader.numDocs());
-            // assertEquals(1, MultiFields.getFields(reader).size());
         }
     }
 
@@ -79,9 +70,8 @@ public class PdfIndexerTest {
         indexer.createIndex(database, context);
 
         // then
-        try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
+        try (IndexReader reader = DirectoryReader.open(new SimpleFSDirectory(context.getFulltextIndexPath()))) {
             assertEquals(1, reader.numDocs());
-            // assertEquals(2, MultiFields.getFields(reader).size());
         }
     }
 
@@ -97,9 +87,8 @@ public class PdfIndexerTest {
         indexer.createIndex(database, context);
 
         // then
-        try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
+        try (IndexReader reader = DirectoryReader.open(new SimpleFSDirectory(context.getFulltextIndexPath()))) {
             assertEquals(1, reader.numDocs());
-            // assertEquals(5, MultiFields.getFields(reader).size());
         }
     }
 
@@ -113,16 +102,15 @@ public class PdfIndexerTest {
 
         indexer.createIndex(database, context);
         // index actually exists
-        try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
+        try (IndexReader reader = DirectoryReader.open(new SimpleFSDirectory(context.getFulltextIndexPath()))) {
             assertEquals(1, reader.numDocs());
-            // assertEquals(2, MultiFields.getFields(reader).size());
         }
 
         // when
         indexer.flushIndex();
 
         // then
-        try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
+        try (IndexReader reader = DirectoryReader.open(new SimpleFSDirectory(context.getFulltextIndexPath()))) {
             assertEquals(0, reader.numDocs());
         }
     }
@@ -137,9 +125,8 @@ public class PdfIndexerTest {
         indexer.createIndex(database, context);
 
         // index with first entry
-        try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
+        try (IndexReader reader = DirectoryReader.open(new SimpleFSDirectory(context.getFulltextIndexPath()))) {
             assertEquals(1, reader.numDocs());
-            // assertEquals(2, MultiFields.getFields(reader).size());
         }
 
         BibEntry metadata = new BibEntry(StandardEntryType.Article);
@@ -150,7 +137,7 @@ public class PdfIndexerTest {
         indexer.addToIndex(metadata, null);
 
         // then
-        try (IndexReader reader = DirectoryReader.open(indexer.getIndexDirectory())) {
+        try (IndexReader reader = DirectoryReader.open(new SimpleFSDirectory(context.getFulltextIndexPath()))) {
             assertEquals(2, reader.numDocs());
         }
     }

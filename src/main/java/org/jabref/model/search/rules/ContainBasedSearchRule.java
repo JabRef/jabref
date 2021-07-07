@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.Globals;
 import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
 import org.jabref.model.entry.BibEntry;
@@ -17,6 +18,7 @@ import org.jabref.model.pdf.search.SearchResult;
 /**
  * Search rule for contain-based search.
  */
+@AllowedToUseLogic("Because access to the lucene index is needed")
 public class ContainBasedSearchRule implements SearchRule {
 
     private final boolean caseSensitive;

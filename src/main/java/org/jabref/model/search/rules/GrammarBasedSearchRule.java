@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.Globals;
 import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
 import org.jabref.model.entry.BibEntry;
@@ -39,6 +40,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * This class implements the "Advanced Search Mode" described in the help
  */
+@AllowedToUseLogic("Because access to the lucene index is needed")
 public class GrammarBasedSearchRule implements SearchRule {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GrammarBasedSearchRule.class);

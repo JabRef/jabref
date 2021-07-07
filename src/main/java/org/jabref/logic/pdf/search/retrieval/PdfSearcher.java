@@ -1,12 +1,11 @@
 package org.jabref.logic.pdf.search.retrieval;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.logic.pdf.search.indexing.EnglishStemAnalyzer;
+import org.jabref.model.pdf.search.EnglishStemAnalyzer;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
@@ -22,7 +21,6 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.SimpleFSDirectory;
 

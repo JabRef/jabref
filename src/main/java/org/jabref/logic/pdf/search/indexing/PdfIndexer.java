@@ -14,6 +14,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.pdf.search.EnglishStemAnalyzer;
 import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.preferences.FilePreferences;
 
@@ -74,6 +75,14 @@ public class PdfIndexer {
         this.database = database;
         final ObservableList<BibEntry> entries = this.database.getEntries();
 
+        // Create new index by creating IndexWriter but not writing anything.
+        try {
+            IndexWriter indexWriter = new IndexWriter(directoryToIndex, new IndexWriterConfig(new EnglishStemAnalyzer()).setOpenMode(IndexWriterConfig.OpenMode.CREATE));
+            indexWriter.close();
+        } catch (IOException e) {
+            LOGGER.warn("Could not create new Index!", e);
+        }
+        // Re-use existing facilities for writing the actual entries
         entries.stream().filter(entry -> !entry.getFiles().isEmpty()).forEach(entry -> writeToIndex(entry));
     }
 
