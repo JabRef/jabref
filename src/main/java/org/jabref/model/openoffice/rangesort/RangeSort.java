@@ -12,21 +12,29 @@ import org.jabref.model.openoffice.uno.UnoTextRange;
 import com.sun.star.text.XText;
 import com.sun.star.text.XTextRangeCompare;
 
+/**
+ * RangeSort provides sorting based on XTextRangeCompare, which only provides comparison
+ * between XTextRange values within the same XText.
+ */
 public class RangeSort {
 
-    /*
-     * Sort within a partition
+    /**
+     * Compare two RangeHolders (using RangeHolder.getRange()) within an XText.
+     *
+     * Note: since we only look at the ranges, this comparison is generally not consistent with
+     * `equals` on the RangeHolders. Probably should not be used for key comparison in
+     * TreeMap&lt;RangeHolder&gt; or Set&lt;RangeHolder&gt;
+     *
      */
-
     public static class HolderComparatorWithinPartition implements Comparator<RangeHolder> {
 
-        XTextRangeCompare cmp;
+        private final XTextRangeCompare cmp;
 
         HolderComparatorWithinPartition(XText text) {
             cmp = UnoCast.cast(XTextRangeCompare.class, text).get();
         }
 
-        /*
+        /**
          * Assumes a and b belong to the same XText as cmp.
          */
         @Override
@@ -35,7 +43,7 @@ public class RangeSort {
         }
     }
 
-    /*
+    /**
      * Sort a list of RangeHolder values known to share the same getText().
      *
      * Note: RangeHolder.getRange() is called many times.
@@ -48,10 +56,9 @@ public class RangeSort {
         rangeHolders.sort(new HolderComparatorWithinPartition(text));
     }
 
-    /*
-     * Partitioning
+    /**
+     * Represent a partitioning of RangeHolders by XText
      */
-
     public static class RangePartitions<V extends RangeHolder> {
         private final Map<XText, List<V>> partitions;
 
@@ -61,11 +68,7 @@ public class RangeSort {
 
         public void add(V holder) {
             XText partitionKey = holder.getRange().getText();
-            List<V> partition = partitions.get(partitionKey);
-            if (partition == null) {
-                partition = new ArrayList<>();
-                partitions.put(partitionKey, partition);
-            }
+            List<V> partition = partitions.computeIfAbsent(partitionKey, _key -> new ArrayList<>());
             partition.add(holder);
         }
 
@@ -74,6 +77,9 @@ public class RangeSort {
         }
     }
 
+    /**
+     *  Partition RangeHolders by the corresponding XText.
+     */
     public static <V extends RangeHolder> RangePartitions<V> partitionRanges(List<V> holders) {
         RangePartitions<V> result = new RangePartitions<>();
         for (V holder : holders) {
@@ -82,7 +88,7 @@ public class RangeSort {
         return result;
     }
 
-    /*
+    /**
      * Note: RangeHolder.getRange() is called many times.
      */
     public static <V extends RangeHolder> RangePartitions<V> partitionAndSortRanges(List<V> holders) {

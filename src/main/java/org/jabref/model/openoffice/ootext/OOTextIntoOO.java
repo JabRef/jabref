@@ -17,6 +17,7 @@ import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.openoffice.uno.UnoCast;
 import org.jabref.model.openoffice.uno.UnoCrossRef;
 import org.jabref.model.openoffice.util.OOPair;
+import org.jabref.model.strings.StringUtil;
 
 import com.sun.star.awt.FontSlant;
 import com.sun.star.awt.FontStrikeout;
@@ -181,7 +182,7 @@ public class OOTextIntoOO {
             String endTagName = m.group(1);
             String startTagName = m.group(2);
             String attributeListPart = m.group(3);
-            boolean isStartTag = (endTagName == null) || "".equals(endTagName);
+            boolean isStartTag = StringUtil.isNullOrEmpty(endTagName);
             String tagName = isStartTag ? startTagName : endTagName;
             Objects.requireNonNull(tagName);
 
@@ -231,7 +232,7 @@ public class OOTextIntoOO {
                     switch (key) {
                     case "oo:ParaStyleName":
                         // <p oo:ParaStyleName="Standard">
-                        if (value != null && !value.equals("")) {
+                        if (!StringUtil.isNullOrEmpty(value)) {
                             if (setParagraphStyle(cursor, value)) {
                                 // Presumably tested already:
                                 LOGGER.debug(String.format("oo:ParaStyleName=\"%s\" failed", value));
@@ -689,7 +690,7 @@ public class OOTextIntoOO {
     // CharStyleName
     private static List<OOPair<String, Object>> setCharStyleName(String value) {
         List<OOPair<String, Object>> settings = new ArrayList<>();
-        if (value != null && value != "") {
+        if (!StringUtil.isNullOrEmpty(value)) {
             settings.add(new OOPair<>(CHAR_STYLE_NAME, value));
         } else {
             LOGGER.warn("setCharStyleName: received null or empty value");
@@ -708,7 +709,7 @@ public class OOTextIntoOO {
      * Locale from string encoding: language, language-country or language-country-variant
      */
     private static List<OOPair<String, Object>> setCharLocale(String value) {
-        if (value == null || "".equals(value)) {
+        if (StringUtil.isNullOrEmpty(value)) {
             throw new java.lang.IllegalArgumentException("setCharLocale \"\" or null");
         }
         String[] parts = value.split("-");
