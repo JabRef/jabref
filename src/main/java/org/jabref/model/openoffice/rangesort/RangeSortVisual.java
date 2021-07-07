@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.jabref.model.openoffice.uno.NoDocumentException;
 import org.jabref.model.openoffice.uno.UnoScreenRefresh;
 
 import com.sun.star.awt.Point;
-import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
 import com.sun.star.text.XTextViewCursor;
@@ -38,10 +36,7 @@ public class RangeSortVisual {
      */
     public static <T> List<RangeSortable<T>> visualSort(List<RangeSortable<T>> inputs,
                                                         XTextDocument doc,
-                                                        FunctionalTextViewCursor fcursor)
-        throws
-        WrappedTargetException,
-        NoDocumentException {
+                                                        FunctionalTextViewCursor fcursor) {
 
         final int inputSize = inputs.size();
 
@@ -60,27 +55,19 @@ public class RangeSortVisual {
         }
         fcursor.restore(doc);
 
-        if (positions.size() != inputSize) {
-            throw new IllegalStateException("visualSort: positions.size() != inputSize");
-        }
-
         // order by position
-        ArrayList<ComparableMark<RangeSortable<T>>> set = new ArrayList<>(inputSize);
+        ArrayList<ComparableMark<RangeSortable<T>>> comparableMarks = new ArrayList<>(inputSize);
         for (int i = 0; i < inputSize; i++) {
             RangeSortable<T> input = inputs.get(i);
-            set.add(new ComparableMark<>(positions.get(i),
+            comparableMarks.add(new ComparableMark<>(positions.get(i),
                                          input.getIndexInPosition(),
                                          input));
         }
-        Collections.sort(set, RangeSortVisual::compareTopToBottomLeftToRight);
-
-        if (set.size() != inputSize) {
-            throw new IllegalStateException("visualSort: set.size() != inputSize");
-        }
+        Collections.sort(comparableMarks, RangeSortVisual::compareTopToBottomLeftToRight);
 
         // collect ordered result
-        List<RangeSortable<T>> result = new ArrayList<>(set.size());
-        for (ComparableMark<RangeSortable<T>> mark : set) {
+        List<RangeSortable<T>> result = new ArrayList<>(comparableMarks.size());
+        for (ComparableMark<RangeSortable<T>> mark : comparableMarks) {
             result.add(mark.getContent());
         }
 
