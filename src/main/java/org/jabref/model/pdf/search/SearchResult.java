@@ -2,7 +2,6 @@ package org.jabref.model.pdf.search;
 
 import java.io.IOException;
 
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
