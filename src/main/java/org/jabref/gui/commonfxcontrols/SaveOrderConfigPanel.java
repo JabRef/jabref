@@ -53,7 +53,7 @@ public class SaveOrderConfigPanel extends VBox {
             while (c.next()) {
                 if (c.wasAdded()) {
                     for (SortCriterionViewModel vm : c.getAddedSubList()) {
-                        createCriterionRow();
+                        createCriterionRow(vm, c.getTo());
                     }
                 } else if (c.wasRemoved()) {
                     for (SortCriterionViewModel vm : c.getRemoved()) {
@@ -66,7 +66,7 @@ public class SaveOrderConfigPanel extends VBox {
         });
     }
 
-    private void createCriterionRow() {
+    private void createCriterionRow(SortCriterionViewModel viewModel, int row) {
         int row = sortCriterionList.getRowCount(); // Add the new criteria at the bottom of the list
 
         Label label = new Label(String.valueOf(row + 1));
