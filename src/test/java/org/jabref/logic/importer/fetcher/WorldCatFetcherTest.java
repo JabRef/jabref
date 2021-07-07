@@ -15,9 +15,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @FetcherTest
-public class WorldcatFetcherTest {
+public class WorldCatFetcherTest {
 
-    private WorldcatFetcher fetcher;
+    private WorldCatFetcher fetcher;
 
     @BeforeEach
     public void setUp() {

@@ -23,10 +23,10 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-public class WorldcatImporter extends Importer {
+public class WorldCatImporter extends Importer {
 
-    private static final String DESCRIPTION = "Importer for Worldcat Open Search XML format";
-    private static final String NAME = "WorldcatImporter";
+    private static final String DESCRIPTION = "Importer for WorldCat Open Search XML format";
+    private static final String NAME = "WorldCatImporter";
 
     /**
      * Parse the reader to an xml document

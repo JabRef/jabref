@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class WorldcatImporterTest {
 
-    WorldcatImporter importer;
+    WorldCatImporter importer;
 
     private String getFilePath(String filename) throws IOException {
         Predicate<String> filePredicate = name -> name.startsWith(filename) && name.endsWith(".xml");
@@ -45,7 +45,7 @@ public class WorldcatImporterTest {
 
     @BeforeEach
     public void setUp() {
-        importer = new WorldcatImporter();
+        importer = new WorldCatImporter();
 
     }
 
