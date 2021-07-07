@@ -78,7 +78,6 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new GroupsTab(),
                 new EntryEditorTab(),
                 new CustomizationTab(),
-                new FetcherTab(),
                 new CustomEditorFieldsTab(),
                 new CitationKeyPatternTab(),
                 new LinkedFilesTab(),
