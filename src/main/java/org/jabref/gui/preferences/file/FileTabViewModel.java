@@ -68,12 +68,10 @@ public class FileTabViewModel implements PreferenceTabViewModel {
 
         alwaysReformatBibProperty.setValue(initialImportExportPreferences.shouldAlwaysReformatOnSave());
 
-        if (initialExportOrder.saveInOriginalOrder()) {
-            saveInOriginalProperty.setValue(true);
-        } else if (initialExportOrder.saveInSpecifiedOrder()) {
-            saveInSpecifiedOrderProperty.setValue(true);
-        } else {
-            saveInTableOrderProperty.setValue(true);
+        switch (initialExportOrder.getOrderType()) {
+            case SPECIFIED -> saveInSpecifiedOrderProperty.setValue(true);
+            case ORIGINAL -> saveInOriginalProperty.setValue(true);
+            case TABLE -> saveInTableOrderProperty.setValue(true);
         }
 
         List<Field> fieldNames = new ArrayList<>(FieldFactory.getCommonFields());
@@ -104,13 +102,14 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         preferences.storeImportExportPreferences(newImportExportPreferences);
 
         SaveOrderConfig newSaveOrderConfig = new SaveOrderConfig(
-                saveInOriginalProperty.getValue(),
-                saveInSpecifiedOrderProperty.getValue(),
+                SaveOrderConfig.OrderType.fromBooleans(saveInSpecifiedOrderProperty.getValue(), saveInTableOrderProperty.getValue()),
                 new LinkedList<>(sortCriteriaProperty.stream().map(SortCriterionViewModel::getCriterion).toList()));
         preferences.storeExportSaveOrder(newSaveOrderConfig);
 
         preferences.storeShouldAutosave(autosaveLocalLibraries.getValue());
     }
+
+
 
     // General
 

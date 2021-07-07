@@ -53,21 +53,28 @@ public class SaveOrderConfigPanel extends VBox {
             while (c.next()) {
                 if (c.wasAdded()) {
                     for (SortCriterionViewModel vm : c.getAddedSubList()) {
-                        createCriterionRow(vm, c.getTo());
+                        createCriterionRow(vm, c.getFrom() + c.getAddedSubList().indexOf(vm));
                     }
                 } else if (c.wasRemoved()) {
                     for (SortCriterionViewModel vm : c.getRemoved()) {
                         clearCriterionRow(c.getFrom());
                     }
-                } else if (c.wasPermutated()) {
-                    swapCriterion(c.getFrom(), c.getTo());
                 }
             }
         });
     }
 
-    private void createCriterionRow(SortCriterionViewModel viewModel, int row) {
-        int row = sortCriterionList.getRowCount(); // Add the new criteria at the bottom of the list
+    private void createCriterionRow(SortCriterionViewModel criterionViewModel, int row) {
+        // int row = sortCriterionList.getRowCount(); // Add the new criteria at the bottom of the list
+
+        sortCriterionList.getChildren().stream()
+                         .filter(item -> GridPane.getRowIndex(item) >= row)
+                         .forEach(item -> {
+                             GridPane.setRowIndex(item, GridPane.getRowIndex(item) + 1);
+                             if (item instanceof Label label) {
+                                 label.setText(String.valueOf(GridPane.getRowIndex(item) + 1));
+                             }
+                         });
 
         Label label = new Label(String.valueOf(row + 1));
         sortCriterionList.add(label, 0, row);
@@ -79,32 +86,31 @@ public class SaveOrderConfigPanel extends VBox {
                 .install(field);
         field.setConverter(FieldsUtil.fieldStringConverter);
         field.itemsProperty().bindBidirectional(viewModel.sortableFieldsProperty());
-        field.valueProperty().bindBidirectional(viewModel.sortCriteriaProperty().get(row).fieldProperty());
+        field.valueProperty().bindBidirectional(criterionViewModel.fieldProperty());
         sortCriterionList.add(field, 1, row);
         GridPane.getHgrow(field);
 
         CheckBox descending = new CheckBox(Localization.lang("Descending"));
-        descending.selectedProperty().bindBidirectional(viewModel.sortCriteriaProperty().get(row).descendingProperty());
+        descending.selectedProperty().bindBidirectional(criterionViewModel.descendingProperty());
         sortCriterionList.add(descending, 2, row);
 
-        SortCriterionViewModel sortCriterionViewModel = viewModel.sortCriteriaProperty().get(row);
         Button remove = new Button("", new JabRefIconView(IconTheme.JabRefIcons.REMOVE_NOBOX));
         remove.getStyleClass().addAll("icon-button", "narrow");
         remove.setPrefHeight(20.0);
         remove.setPrefWidth(20.0);
-        remove.setOnAction(event -> removeCriterion(sortCriterionViewModel));
+        remove.setOnAction(event -> removeCriterion(criterionViewModel));
 
         Button moveUp = new Button("", new JabRefIconView(IconTheme.JabRefIcons.LIST_MOVE_UP));
         moveUp.getStyleClass().addAll("icon-button", "narrow");
         moveUp.setPrefHeight(20.0);
         moveUp.setPrefWidth(20.0);
-        moveUp.setOnAction(event -> moveCriterionUp(sortCriterionViewModel));
+        moveUp.setOnAction(event -> moveCriterionUp(criterionViewModel));
 
         Button moveDown = new Button("", new JabRefIconView(IconTheme.JabRefIcons.LIST_MOVE_DOWN));
         moveDown.getStyleClass().addAll("icon-button", "narrow");
         moveDown.setPrefHeight(20.0);
         moveDown.setPrefWidth(20.0);
-        moveDown.setOnAction(event -> moveCriterionDown(sortCriterionViewModel));
+        moveDown.setOnAction(event -> moveCriterionDown(criterionViewModel));
 
         sortCriterionList.add(new HBox(moveUp, moveDown, remove), 3, row);
     }
@@ -123,18 +129,6 @@ public class SaveOrderConfigPanel extends VBox {
                                  label.setText(String.valueOf(GridPane.getRowIndex(item) + 1));
                              }
                          });
-    }
-
-    private void swapCriterion(int rowA, int rowB) {
-        List<Node> criterionRowA = sortCriterionList.getChildren().stream()
-                                                    .filter(item -> GridPane.getRowIndex(item) == rowA)
-                                                    .collect(Collectors.toList());
-        List<Node> criterionRowB = sortCriterionList.getChildren().stream()
-                                                    .filter(item -> GridPane.getRowIndex(item) == rowB)
-                                                    .collect(Collectors.toList());
-
-        criterionRowA.forEach(item -> GridPane.setRowIndex(item, rowB));
-        criterionRowB.forEach(item -> GridPane.setRowIndex(item, rowA));
     }
 
     @FXML

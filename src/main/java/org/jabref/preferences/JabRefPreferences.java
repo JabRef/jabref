@@ -2021,16 +2021,15 @@ public class JabRefPreferences implements PreferencesService {
         ));
 
         return new SaveOrderConfig(
-                getBoolean(EXPORT_IN_ORIGINAL_ORDER),
-                getBoolean(EXPORT_IN_SPECIFIED_ORDER),
+                SaveOrderConfig.OrderType.fromBooleans(getBoolean(EXPORT_IN_SPECIFIED_ORDER), getBoolean(EXPORT_IN_ORIGINAL_ORDER)),
                 sortCriteria
         );
     }
 
     @Override
     public void storeExportSaveOrder(SaveOrderConfig config) {
-        putBoolean(EXPORT_IN_ORIGINAL_ORDER, config.saveInOriginalOrder());
-        putBoolean(EXPORT_IN_SPECIFIED_ORDER, config.saveInSpecifiedOrder());
+        putBoolean(EXPORT_IN_ORIGINAL_ORDER, config.getOrderType() == SaveOrderConfig.OrderType.ORIGINAL);
+        putBoolean(EXPORT_IN_SPECIFIED_ORDER, config.getOrderType() == SaveOrderConfig.OrderType.SPECIFIED);
 
         put(EXPORT_PRIMARY_SORT_FIELD, config.getSortCriteria().get(0).field.getName());
         put(EXPORT_SECONDARY_SORT_FIELD, config.getSortCriteria().get(1).field.getName());

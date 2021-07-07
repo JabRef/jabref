@@ -95,20 +95,16 @@ public class LibraryPropertiesDialogViewModel {
 
         // SaveOrderConfigPanel
 
-        if (initialSaveOrderConfig.saveInOriginalOrder()) {
-            saveInOriginalProperty.setValue(true);
-        } else if (initialSaveOrderConfig.saveInSpecifiedOrder()) {
-            saveInSpecifiedOrderProperty.setValue(true);
-        } else {
-            saveInTableOrderProperty.setValue(true);
+        switch (initialSaveOrderConfig.getOrderType()) {
+            case SPECIFIED -> saveInSpecifiedOrderProperty.setValue(true);
+            case ORIGINAL -> saveInOriginalProperty.setValue(true);
+            case TABLE -> saveInTableOrderProperty.setValue(true);
         }
 
         List<Field> fieldNames = new ArrayList<>(FieldFactory.getCommonFields());
-        // allow entrytype field as sort criterion
-        fieldNames.add(InternalField.TYPE_HEADER);
+        fieldNames.add(InternalField.TYPE_HEADER); // allow entrytype field as sort criterion
         fieldNames.sort(Comparator.comparing(Field::getDisplayName));
         sortableFieldsProperty.addAll(fieldNames);
-
         sortCriteriaProperty.addAll(initialSaveOrderConfig.getSortCriteria().stream()
                                                           .map(SortCriterionViewModel::new)
                                                           .collect(Collectors.toList()));
@@ -173,8 +169,7 @@ public class LibraryPropertiesDialogViewModel {
         }
 
         SaveOrderConfig newSaveOrderConfig = new SaveOrderConfig(
-                saveInOriginalProperty.getValue(),
-                saveInSpecifiedOrderProperty.getValue(),
+                SaveOrderConfig.OrderType.fromBooleans(saveInSpecifiedOrderProperty.getValue(), saveInOriginalProperty.getValue()),
                 new LinkedList<>(sortCriteriaProperty.stream().map(SortCriterionViewModel::getCriterion).toList()));
 
         if (!newSaveOrderConfig.equals(initialSaveOrderConfig)) {
