@@ -17,7 +17,7 @@ public class OOText {
         this.data = data;
     }
 
-    /* null input is passed through */
+    /** @return null for null input, otherwise the argument wrapped into a new OOText */
     public static OOText fromString(String string) {
         if (string == null) {
             return null;
@@ -25,7 +25,7 @@ public class OOText {
         return new OOText(string);
     }
 
-    /* null input is passed through */
+    /** @return null for null input, otherwise the string inside the argument */
     public static String toString(OOText ootext) {
         if (ootext == null) {
             return null;
@@ -38,7 +38,6 @@ public class OOText {
         return data;
     }
 
-    /* Object.equals */
     @Override
     public boolean equals(Object object) {
 
