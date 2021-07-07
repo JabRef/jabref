@@ -123,6 +123,7 @@ import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
 import org.jabref.logic.pdf.search.indexing.PdfIndexer;
@@ -132,7 +133,10 @@ import org.jabref.logic.undo.UndoChangeEvent;
 import org.jabref.logic.undo.UndoRedoEvent;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.TelemetryPreferences;
@@ -1166,27 +1170,87 @@ public class JabRefFrame extends BorderPane {
         return new OpenDatabaseAction(this, prefs, dialogService);
     }
 
+    private void listenForNewDatabases() {
+        openDatabaseList.addListener(
+                (ListChangeListener<BibDatabaseContext>) changedDatabaseContexts -> {
+                    while (changedDatabaseContexts.next()) {
+                        if (changedDatabaseContexts.wasAdded()) {
+                            for (BibDatabaseContext addedContext : changedDatabaseContexts.getAddedSubList()) {
+                                try {
+                                    indexingTaskManager.addToIndex(PdfIndexer.of(addedContext, prefs.getFilePreferences()), addedContext);
+                                } catch (IOException e) {
+                                    LOGGER.warn("I/O error when writing lucene index", e);
+                                }
+                                listenForChangedListOfEntries(addedContext);
+                            }
+                        }
+                    }
+                }
+        );
+    }
+
+    private void listenForChangedListOfEntries(BibDatabaseContext databaseContext) {
+        databaseContext.getDatabase().getEntries().addListener(new ListChangeListener<BibEntry>() {
+            @Override
+            public void onChanged(Change<? extends BibEntry> changedBibEntry) {
+                while (changedBibEntry.next()) {
+                    if (changedBibEntry.wasAdded()) {
+                        for (BibEntry bibEntry : changedBibEntry.getAddedSubList()) {
+                            try {
+                                indexingTaskManager.addToIndex(PdfIndexer.of(databaseContext, prefs.getFilePreferences()), bibEntry, databaseContext);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                LOGGER.warn("I/O error when writing lucene index", e);
+                            }
+                            listenForChangedListOfFiles(bibEntry, databaseContext);
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    private void listenForChangedListOfFiles(BibEntry entryToListenOn, BibDatabaseContext databaseContext) {
+        entryToListenOn.getFieldBinding(StandardField.FILE).addListener(new ChangeListener<Optional<String>>() {
+            @Override
+            public void changed(ObservableValue<? extends Optional<String>> observable, Optional<String> oldValue, Optional<String> newValue) {
+                if (newValue.isEmpty() && oldValue.isEmpty()) {
+                    return;
+                }
+                if (newValue.isEmpty()) {
+                    // remove all
+                    return;
+                }
+                if (oldValue.isEmpty()) {
+                    // add all
+                    return;
+                }
+                List<LinkedFile> oldFileList = FileFieldParser.parse(oldValue.get());
+                List<LinkedFile> newFileList = FileFieldParser.parse(newValue.get());
+
+                List<LinkedFile> addedFiles = new ArrayList<>(newFileList);
+                addedFiles.remove(oldFileList);
+                List<LinkedFile> removedFiles = new ArrayList<>(oldFileList);
+                addedFiles.remove(newFileList);
+
+                try {
+                    indexingTaskManager.addToIndex(PdfIndexer.of(databaseContext, prefs.getFilePreferences()), entryToListenOn, addedFiles, databaseContext);
+                    indexingTaskManager.removeFromIndex(PdfIndexer.of(databaseContext, prefs.getFilePreferences()), entryToListenOn, removedFiles);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    LOGGER.warn("I/O error when writing lucene index", e);
+                }
+            }
+        });
+    }
+
     private void initLuceneIndex() {
         try {
             indexingTaskManager = new IndexingTaskManager(this.taskExecutor, prefs.getFilePreferences());
             for (BibDatabaseContext openDatabase : openDatabaseList) {
                 indexingTaskManager.addToIndex(PdfIndexer.of(openDatabase, prefs.getFilePreferences()), openDatabase);
             }
-            openDatabaseList.addListener(
-                    (ListChangeListener<BibDatabaseContext>) changedDatabaseContexts -> {
-                        while (changedDatabaseContexts.next()) {
-                            if (changedDatabaseContexts.wasAdded()) {
-                                for (BibDatabaseContext addedContext : changedDatabaseContexts.getAddedSubList()) {
-                                    try {
-                                        indexingTaskManager.addToIndex(PdfIndexer.of(addedContext, prefs.getFilePreferences()), addedContext);
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-                        }
-                    }
-            );
+            listenForNewDatabases();
         } catch (IOException e) {
             LOGGER.error("Cannot read lucene index");
         }

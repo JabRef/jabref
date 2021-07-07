@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -96,9 +97,20 @@ public class PdfIndexer {
      * Adds all the pdf files linked to one entry in the database to an existing (or new) Lucene search index
      *
      * @param entry a bibtex entry to link the pdf files to
+     * @param databaseContext the associated BibDatabaseContext
      */
     public void addToIndex(BibEntry entry, BibDatabaseContext databaseContext) {
-        for (LinkedFile linkedFile : entry.getFiles()) {
+        addToIndex(entry, entry.getFiles(), databaseContext);
+    }
+
+    /**
+     * Adds a list of pdf files linked to one entry in the database to an existing (or new) Lucene search index
+     *
+     * @param entry a bibtex entry to link the pdf files to
+     * @param databaseContext the associated BibDatabaseContext
+     */
+    public void addToIndex(BibEntry entry, List<LinkedFile> linkedFiles, BibDatabaseContext databaseContext) {
+        for (LinkedFile linkedFile : linkedFiles) {
             addToIndex(entry, linkedFile, databaseContext);
         }
     }
@@ -143,7 +155,15 @@ public class PdfIndexer {
      * @param entry the entry documents are linked to
      */
     public void removeFromIndex(BibEntry entry) {
-        for (LinkedFile linkedFile : entry.getFiles()) {
+        removeFromIndex(entry, entry.getFiles());
+    }
+
+    /**
+     * Removes a list of files linked to a bib-entry from the index
+     * @param entry the entry documents are linked to
+     */
+    public void removeFromIndex(BibEntry entry, List<LinkedFile> linkedFiles) {
+        for (LinkedFile linkedFile : linkedFiles) {
             removeFromIndex(entry, linkedFile);
         }
     }

@@ -1,6 +1,7 @@
 package org.jabref.logic.pdf.search.indexing;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
@@ -106,12 +107,34 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         });
     }
 
+    public void addToIndex(PdfIndexer indexer, BibEntry entry, List<LinkedFile> linkedFiles, BibDatabaseContext databaseContext) {
+        enqueueTask(new BackgroundTask<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                this.updateProgress(-1, 1);
+                indexer.addToIndex(entry, linkedFiles, databaseContext);
+                return null;
+            }
+        });
+    }
+
     public void addToIndex(PdfIndexer indexer, BibEntry entry, LinkedFile linkedFile, BibDatabaseContext databaseContext) {
         enqueueTask(new BackgroundTask<Void>() {
             @Override
             protected Void call() throws Exception {
                 this.updateProgress(-1, 1);
                 indexer.addToIndex(entry, linkedFile, databaseContext);
+                return null;
+            }
+        });
+    }
+
+    public void removeFromIndex(PdfIndexer indexer, BibEntry entry, List<LinkedFile> linkedFiles) {
+        enqueueTask(new BackgroundTask<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                this.updateProgress(-1, 1);
+                indexer.removeFromIndex(entry, linkedFiles);
                 return null;
             }
         });
