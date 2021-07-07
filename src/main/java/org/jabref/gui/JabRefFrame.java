@@ -107,6 +107,7 @@ import org.jabref.gui.preview.CopyCitationAction;
 import org.jabref.gui.push.PushToApplicationAction;
 import org.jabref.gui.push.PushToApplicationsManager;
 import org.jabref.gui.search.GlobalSearchBar;
+import org.jabref.gui.search.RebuildFulltextSearchIndexAction;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.shared.PullChangesFromSharedAction;
 import org.jabref.gui.specialfields.SpecialFieldMenuItemFactory;
@@ -577,6 +578,8 @@ public class JabRefFrame extends BorderPane {
         tabbedPane = new TabPane();
         tabbedPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
 
+        indexingTaskManager = new IndexingTaskManager(this.taskExecutor, prefs.getFilePreferences());
+
         initLayout();
         initKeyBindings();
         initDragAndDrop();
@@ -824,12 +827,17 @@ public class JabRefFrame extends BorderPane {
                 new SeparatorMenuItem(),
 
                 factory.createMenuItem(StandardActions.SEND_AS_EMAIL, new SendAsEMailAction(dialogService, prefs, stateManager)),
-                pushToApplicationMenuItem
+                pushToApplicationMenuItem,
                 // Disabled until PR #7126 can be merged
                 // new SeparatorMenuItem(),
                 // factory.createMenuItem(StandardActions.START_SYSTEMATIC_LITERATURE_REVIEW,
                 //        new StartLiteratureReviewAction(this, Globals.getFileUpdateMonitor(), prefs.getWorkingDir(),
                 //                taskExecutor, prefs, prefs.getImportFormatPreferences(), prefs.getSavePreferences()))
+
+                new SeparatorMenuItem(),
+
+                factory.createMenuItem(StandardActions.REBUILD_FULLTEXT_SEARCH_INDEX, new RebuildFulltextSearchIndexAction(stateManager, dialogService, indexingTaskManager, prefs.getFilePreferences()))
+
         );
 
         SidePaneComponent webSearch = sidePaneManager.getComponent(SidePaneType.WEB_SEARCH);
@@ -1246,7 +1254,6 @@ public class JabRefFrame extends BorderPane {
 
     private void initLuceneIndex() {
         try {
-            indexingTaskManager = new IndexingTaskManager(this.taskExecutor, prefs.getFilePreferences());
             for (BibDatabaseContext openDatabase : openDatabaseList) {
                 indexingTaskManager.addToIndex(PdfIndexer.of(openDatabase, prefs.getFilePreferences()), openDatabase);
             }

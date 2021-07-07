@@ -1,6 +1,5 @@
 package org.jabref.logic.pdf.search.indexing;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.jabref.gui.util.BackgroundTask;
@@ -24,7 +23,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
     TaskExecutor taskExecutor;
     FilePreferences filePreferences;
 
-    public IndexingTaskManager(TaskExecutor taskExecutor, FilePreferences filePreferences) throws IOException {
+    public IndexingTaskManager(TaskExecutor taskExecutor, FilePreferences filePreferences) {
         this.taskExecutor = taskExecutor;
         showToUser(true);
         // the task itself is a nop, but it's progress property will be updated by the child-tasks it creates that actually interact with the inex
