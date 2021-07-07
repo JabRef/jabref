@@ -73,8 +73,8 @@ public class OOFormat {
     /**
      * Format an OO cross-reference showing the target's page number as label to a reference mark.
      */
-    public static OOText formatReferenceToPageNumberOfReferenceMark(String referencMarkName) {
-        String string = String.format("<oo:referenceToPageNumberOfReferenceMark target=\"%s\">", referencMarkName);
+    public static OOText formatReferenceToPageNumberOfReferenceMark(String referenceMarkName) {
+        String string = String.format("<oo:referenceToPageNumberOfReferenceMark target=\"%s\">", referenceMarkName);
         return OOText.fromString(string);
     }
  }
