@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
@@ -10,8 +11,8 @@ import org.jabref.testutils.category.FetcherTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @FetcherTest
 public class WorldcatFetcherTest {
@@ -29,14 +30,12 @@ public class WorldcatFetcherTest {
         // Mashing keyboard. Verified on https://platform.worldcat.org/api-explorer/apis/wcapi/Bib/OpenSearch
         entry.setField(StandardField.TITLE, "ASDhbsdfnm");
         List<BibEntry> list = fetcher.performSearch(entry);
-        assertTrue(list.isEmpty());
+        assertEquals(Collections.emptyList(), list);
     }
 
     @Test
     public void testPerformSearchForExistingTitle() throws FetcherException {
-        BibEntry entry = new BibEntry();
-        // Example "The very best of Glenn Miller". Verified on same link as above
-        entry.setField(StandardField.TITLE, "The very best of Glenn");
+        BibEntry entry = new BibEntry().withField(StandardField.TITLE, "Markdown architectural decision records: Format and tool support");
         List<BibEntry> list = fetcher.performSearch(entry);
         assertFalse(list.isEmpty());
     }

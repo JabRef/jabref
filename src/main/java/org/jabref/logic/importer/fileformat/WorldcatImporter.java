@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -29,6 +30,7 @@ public class WorldcatImporter extends Importer {
 
     /**
      * Parse the reader to an xml document
+     *
      * @param s the reader to be parsed
      * @return XML document representing the content of s
      * @throws IllegalArgumentException if s is badly formated or other exception occurs during parsing
@@ -59,49 +61,43 @@ public class WorldcatImporter extends Importer {
     }
 
     /**
-     * Get the element of a tag in an XML element. Picks the first element
-     * with this tag
+     * Gets the text content of the given element. If the element was not found, an empty Optional is returned;
+     *
      * @param xml the element do search trough
      * @param tag the tag to find
-     * @return the tag element
-     * @throws NullPointerException if there is no element by this tag
      */
-    private Element getElementByTag(Element xml, String tag) throws NullPointerException {
+    private Optional<String> getElementContent(Element xml, String tag) {
         NodeList nl = xml.getElementsByTagName(tag);
-        return (Element) nl.item(0);
+        if (nl == null) {
+            return Optional.empty();
+        }
+        if (nl.getLength() == 0) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(nl.item(0).getTextContent());
     }
 
     /**
      * Parse the xml entry to a bib entry
+     *
      * @param xmlEntry the XML element from open search
      * @return the correspoinding bibentry
      */
     private BibEntry xmlEntryToBibEntry(Element xmlEntry) {
-        String authors = getElementByTag(xmlEntry, "dc:creator").getTextContent();
+        BibEntry result = new BibEntry();
 
-        String title = getElementByTag(xmlEntry, "dc:title").getTextContent();
+        getElementContent(xmlEntry, "dc:creator").ifPresent(content -> result.setField(StandardField.AUTHOR, content));
+        getElementContent(xmlEntry, "dc:title").ifPresent(content -> result.setField(StandardField.TITLE, content));
+        getElementContent(xmlEntry, "dc:date").ifPresent(content -> result.setField(StandardField.YEAR, content));
+        getElementContent(xmlEntry, "dc:publisher").ifPresent(content -> result.setField(StandardField.PUBLISHER, content));
+        getElementContent(xmlEntry, "dc:recordIdentifier").ifPresent(content -> result.setField(StandardField.URL, "http://worldcat.org/oclc/" + content));
 
-        String oclcNr = getElementByTag(xmlEntry, "oclcterms:recordIdentifie").getTextContent();
-        String url = "http://worldcat.org/oclc/" + oclcNr;
-
-        String date = getElementByTag(xmlEntry, "dc:date").getTextContent();
-
-        String publisher = getElementByTag(xmlEntry, "dc:publisher").getTextContent();
-
-        BibEntry entry = new BibEntry();
-
-        entry.setField(StandardField.AUTHOR, authors);
-        entry.setField(StandardField.TITLE, title);
-        entry.setField(StandardField.URL, url);
-        entry.setField(StandardField.YEAR, date);
-        entry.setField(StandardField.JOURNAL, publisher);
-
-        return entry;
+        return result;
     }
 
     /**
-     * Parse an XML documents with open search entries to a parserResult of
-     * the bibentries
+     * Parse an XML documents with open search entries to a parserResult of the bibentries
+     *
      * @param doc the main XML document from open search
      * @return the ParserResult containing the BibEntries collection
      */
@@ -139,5 +135,4 @@ public class WorldcatImporter extends Importer {
     public String getDescription() {
         return DESCRIPTION;
     }
-
 }
