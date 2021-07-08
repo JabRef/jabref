@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import javafx.collections.ObservableList;
 
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -200,7 +201,7 @@ public class PdfIndexer {
      * @param linkedFile the file to write to the index
      */
     private void writeToIndex(BibEntry entry, LinkedFile linkedFile) {
-        if (!"pdf".equals(linkedFile.getFileType())) {
+        if (!StandardFileType.PDF.getName().equals(linkedFile.getFileType())) {
             return;
         }
         Optional<Path> resolvedPath = linkedFile.findIn(databaseContext, filePreferences);
