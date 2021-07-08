@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
      
 ### Added
 
+- We added a fulltext search feature. [#2838](https://github.com/JabRef/jabref/pull/2838)
+
 ### Changed
 
 ### Fixed
