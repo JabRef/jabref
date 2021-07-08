@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 
 import org.jabref.logic.pdf.search.indexing.PdfIndexer;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -37,16 +38,16 @@ public class PdfSearcherTest {
         when(context.getFulltextIndexPath()).thenReturn(Path.of("src/test/resources/luceneTestIndex"));
         when(context.getDatabase()).thenReturn(database);
         BibEntry examplePdf = new BibEntry(StandardEntryType.Article);
-        examplePdf.setFiles(Collections.singletonList(new LinkedFile("Example Entry", "example.pdf", "pdf")));
+        examplePdf.setFiles(Collections.singletonList(new LinkedFile("Example Entry", "example.pdf", StandardFileType.PDF.getName())));
         database.insertEntry(examplePdf);
 
         BibEntry metaDataEntry = new BibEntry(StandardEntryType.Article);
-        metaDataEntry.setFiles(Collections.singletonList(new LinkedFile("Metadata Entry", "metaData.pdf", "pdf")));
+        metaDataEntry.setFiles(Collections.singletonList(new LinkedFile("Metadata Entry", "metaData.pdf", StandardFileType.PDF.getName())));
         metaDataEntry.setCitationKey("MetaData2017");
         database.insertEntry(metaDataEntry);
 
         BibEntry exampleThesis = new BibEntry(StandardEntryType.PhdThesis);
-        exampleThesis.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", "pdf")));
+        exampleThesis.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
         exampleThesis.setCitationKey("ExampleThesis");
         database.insertEntry(exampleThesis);
 

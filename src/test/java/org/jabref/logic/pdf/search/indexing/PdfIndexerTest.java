@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Optional;
 
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -46,7 +47,7 @@ public class PdfIndexerTest {
     public void exampleThesisIndex() throws IOException {
         // given
         BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
-        entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", "pdf")));
+        entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
         database.insertEntry(entry);
 
         // when
@@ -63,7 +64,7 @@ public class PdfIndexerTest {
         // given
         BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
         entry.setCitationKey("Example2017");
-        entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", "pdf")));
+        entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
         database.insertEntry(entry);
 
         // when
@@ -79,7 +80,7 @@ public class PdfIndexerTest {
     public void metaDataIndex() throws IOException {
         // given
         BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "metaData.pdf", "pdf")));
+        entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "metaData.pdf", StandardFileType.PDF.getName())));
 
         database.insertEntry(entry);
 
@@ -97,7 +98,7 @@ public class PdfIndexerTest {
         // given
         BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
         entry.setCitationKey("Example2017");
-        entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", "pdf")));
+        entry.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
         database.insertEntry(entry);
 
         indexer.createIndex(database, context);
@@ -120,7 +121,7 @@ public class PdfIndexerTest {
         // given
         BibEntry exampleThesis = new BibEntry(StandardEntryType.PhdThesis);
         exampleThesis.setCitationKey("ExampleThesis2017");
-        exampleThesis.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", "pdf")));
+        exampleThesis.setFiles(Collections.singletonList(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
         database.insertEntry(exampleThesis);
         indexer.createIndex(database, context);
 
@@ -131,7 +132,7 @@ public class PdfIndexerTest {
 
         BibEntry metadata = new BibEntry(StandardEntryType.Article);
         metadata.setCitationKey("MetaData2017");
-        metadata.setFiles(Collections.singletonList(new LinkedFile("Metadata file", "metaData.pdf", "pdf")));
+        metadata.setFiles(Collections.singletonList(new LinkedFile("Metadata file", "metaData.pdf", StandardFileType.PDF.getName())));
 
         // when
         indexer.addToIndex(metadata, null);
