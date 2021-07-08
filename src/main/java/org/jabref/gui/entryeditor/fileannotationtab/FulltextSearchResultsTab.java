@@ -4,6 +4,7 @@ import javafx.scene.web.WebView;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.EntryEditorTab;
+import org.jabref.gui.util.Theme;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.pdf.search.PdfSearchResults;
@@ -15,10 +16,11 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
     private final WebView webView;
 
-    public FulltextSearchResultsTab(StateManager stateManager) {
+    public FulltextSearchResultsTab(StateManager stateManager, Theme theme) {
         this.stateManager = stateManager;
         webView = new WebView();
-        webView.getEngine().loadContent("<p>" + Localization.lang("Search results") + " </p>");
+        setTheme(theme);
+        webView.getEngine().loadContent(wrapHTML("<p>" + Localization.lang("Search results") + "</p>"));
         setContent(webView);
         setText(Localization.lang("Search results"));
     }
@@ -49,6 +51,14 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
             content.append("</p>");
         }
 
-        webView.getEngine().loadContent(content.toString());
+        webView.getEngine().loadContent(wrapHTML(content.toString()));
+    }
+
+    private String wrapHTML(String content) {
+        return "<html><body id=\"previewBody\"><div id=\"content\">" + content + "</div></body></html>";
+    }
+
+    public void setTheme(Theme theme) {
+        theme.getAdditionalStylesheet().ifPresent(location -> webView.getEngine().setUserStyleSheetLocation(location));
     }
 }
