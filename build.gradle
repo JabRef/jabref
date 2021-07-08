@@ -46,8 +46,8 @@ group = "org.jabref"
 version = project.findProperty('projVersion') ?: '100.0.0'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_14
-    targetCompatibility = JavaVersion.VERSION_14
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
 
     // Workaround needed for Eclipse, probably because of https://github.com/gradle/gradle/issues/16922
     // Should be removed as soon as Gradle 7.0.1 is released ( https://github.com/gradle/gradle/issues/16922#issuecomment-828217060 )
@@ -178,7 +178,7 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.13.1'
     implementation 'com.konghq:unirest-java:3.11.11'
 
-    implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
+    implementation 'org.slf4j:slf4j-api:2.0.0-alpha2'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '3.0.0-SNAPSHOT'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j18-impl', version: '3.0.0-SNAPSHOT'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-plugins', version: '3.0.0-SNAPSHOT'
@@ -205,26 +205,26 @@ dependencies {
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.62.2'
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.62.2'
 
-	implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
+    implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
-    testImplementation 'io.github.classgraph:classgraph:4.8.108'
+    testImplementation 'io.github.classgraph:classgraph:4.8.109'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.7.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.7.2'
 
-    testImplementation 'net.bytebuddy:byte-buddy-parent:1.11.5'
+    testImplementation 'net.bytebuddy:byte-buddy-parent:1.11.6'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '3.0.0-SNAPSHOT'
     testRuntimeOnly group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '3.0.0-SNAPSHOT'
-    testImplementation 'org.mockito:mockito-core:3.11.1'
+    testImplementation 'org.mockito:mockito-core:3.11.2'
     testImplementation 'org.xmlunit:xmlunit-core:2.8.2'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.8.2'
-    testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.19.0'
-    testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.19.0'
+    testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:0.20.0'
+    testImplementation 'com.tngtech.archunit:archunit-junit5-api:0.20.0'
     testImplementation "org.testfx:testfx-core:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.testfx:testfx-junit5:4.0.17-alpha-SNAPSHOT"
     testImplementation "org.hamcrest:hamcrest-library:2.2"
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:8.43'
+    checkstyle 'com.puppycrawl.tools:checkstyle:8.44'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '2.3.3'
 }
 
