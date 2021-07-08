@@ -36,7 +36,7 @@ public class RegexBasedSearchRule implements SearchRule {
         this.caseSensitive = caseSensitive;
         this.fulltext = fulltext;
 
-        databaseContext = Globals.stateManager.getActiveDatabase().get();
+        databaseContext = Globals.stateManager.getActiveDatabase().orElse(null);
     }
 
     public boolean isCaseSensitive() {
@@ -88,7 +88,7 @@ public class RegexBasedSearchRule implements SearchRule {
     @Override
     public PdfSearchResults getFulltextResults(String query, BibEntry bibEntry) {
 
-        if (!fulltext) {
+        if (!fulltext || databaseContext == null) {
             return new PdfSearchResults(List.of());
         }
 

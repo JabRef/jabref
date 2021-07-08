@@ -72,7 +72,7 @@ public class GrammarBasedSearchRule implements SearchRule {
         this.regExpSearch = regExpSearch;
         this.fulltext = fulltext;
 
-        databaseContext = Globals.stateManager.getActiveDatabase().get();
+        databaseContext = Globals.stateManager.getActiveDatabase().orElse(null);
     }
 
     public static boolean isValid(boolean caseSensitive, boolean regExp, boolean fulltext, String query) {
@@ -114,7 +114,7 @@ public class GrammarBasedSearchRule implements SearchRule {
         tree = parser.start();
         this.query = query;
 
-        if (!fulltext) {
+        if (!fulltext || databaseContext == null) {
             return;
         }
         try {

@@ -36,7 +36,7 @@ public class ContainBasedSearchRule implements SearchRule {
         this.lastQuery = "";
         lastSearchResults = new Vector<>();
 
-        databaseContext = Globals.stateManager.getActiveDatabase().get();
+        databaseContext = Globals.stateManager.getActiveDatabase().orElse(null);
     }
 
     public boolean isCaseSensitive() {
@@ -87,7 +87,7 @@ public class ContainBasedSearchRule implements SearchRule {
     @Override
     public PdfSearchResults getFulltextResults(String query, BibEntry bibEntry) {
 
-        if (!fulltext) {
+        if (!fulltext || databaseContext == null) {
             return new PdfSearchResults(List.of());
         }
 
