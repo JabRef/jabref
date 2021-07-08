@@ -93,14 +93,14 @@ public class Benchmarks {
     @Benchmark
     public List<BibEntry> search() {
         // FIXME: Reuse SearchWorker here
-        SearchQuery searchQuery = new SearchQuery("Journal Title 500", false, false);
+        SearchQuery searchQuery = new SearchQuery("Journal Title 500", false, false, false);
         return database.getEntries().stream().filter(searchQuery::isMatch).collect(Collectors.toList());
     }
 
     @Benchmark
     public List<BibEntry> parallelSearch() {
         // FIXME: Reuse SearchWorker here
-        SearchQuery searchQuery = new SearchQuery("Journal Title 500", false, false);
+        SearchQuery searchQuery = new SearchQuery("Journal Title 500", false, false, false);
         return database.getEntries().parallelStream().filter(searchQuery::isMatch).collect(Collectors.toList());
     }
 
