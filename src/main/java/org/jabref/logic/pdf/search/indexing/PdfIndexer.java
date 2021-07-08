@@ -200,6 +200,9 @@ public class PdfIndexer {
      * @param linkedFile the file to write to the index
      */
     private void writeToIndex(BibEntry entry, LinkedFile linkedFile) {
+        if (!"pdf".equals(linkedFile.getFileType())) {
+            return;
+        }
         Optional<Path> resolvedPath = linkedFile.findIn(databaseContext, filePreferences);
         if (resolvedPath.isEmpty()) {
             LOGGER.warn("Could not find " + linkedFile.getLink());

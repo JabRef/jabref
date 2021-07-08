@@ -16,7 +16,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
@@ -124,20 +123,14 @@ import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.WebFetchers;
-import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.pdf.search.indexing.IndexingTaskManager;
-import org.jabref.logic.pdf.search.indexing.PdfIndexer;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.undo.AddUndoableActionEvent;
 import org.jabref.logic.undo.UndoChangeEvent;
 import org.jabref.logic.undo.UndoRedoEvent;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.SpecialField;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.preferences.PreferencesService;
 import org.jabref.preferences.TelemetryPreferences;
@@ -179,8 +172,6 @@ public class JabRefFrame extends BorderPane {
     private PopOver progressViewPopOver;
 
     private final TaskExecutor taskExecutor;
-
-    private IndexingTaskManager indexingTaskManager;
 
     public JabRefFrame(Stage mainStage) {
         this.mainStage = mainStage;
@@ -578,8 +569,6 @@ public class JabRefFrame extends BorderPane {
         tabbedPane = new TabPane();
         tabbedPane.setTabDragPolicy(TabPane.TabDragPolicy.REORDER);
 
-        indexingTaskManager = new IndexingTaskManager(this.taskExecutor, prefs.getFilePreferences());
-
         initLayout();
         initKeyBindings();
         initDragAndDrop();
@@ -643,7 +632,6 @@ public class JabRefFrame extends BorderPane {
                     libraryTab.textProperty());
             mainStage.titleProperty().bind(windowTitle);
         });
-        initLuceneIndex();
         initShowTrackingNotification();
     }
 
@@ -836,7 +824,7 @@ public class JabRefFrame extends BorderPane {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.REBUILD_FULLTEXT_SEARCH_INDEX, new RebuildFulltextSearchIndexAction(stateManager, dialogService, indexingTaskManager, prefs.getFilePreferences()))
+                factory.createMenuItem(StandardActions.REBUILD_FULLTEXT_SEARCH_INDEX, new RebuildFulltextSearchIndexAction(stateManager, this::getCurrentLibraryTab, dialogService, prefs.getFilePreferences()))
 
         );
 
@@ -1176,91 +1164,6 @@ public class JabRefFrame extends BorderPane {
 
     public OpenDatabaseAction getOpenDatabaseAction() {
         return new OpenDatabaseAction(this, prefs, dialogService);
-    }
-
-    private void listenForNewDatabases() {
-        openDatabaseList.addListener(
-                (ListChangeListener<BibDatabaseContext>) changedDatabaseContexts -> {
-                    while (changedDatabaseContexts.next()) {
-                        if (changedDatabaseContexts.wasAdded()) {
-                            for (BibDatabaseContext addedContext : changedDatabaseContexts.getAddedSubList()) {
-                                try {
-                                    indexingTaskManager.addToIndex(PdfIndexer.of(addedContext, prefs.getFilePreferences()), addedContext);
-                                } catch (IOException e) {
-                                    LOGGER.warn("I/O error when writing lucene index", e);
-                                }
-                                listenForChangedListOfEntries(addedContext);
-                            }
-                        }
-                    }
-                }
-        );
-    }
-
-    private void listenForChangedListOfEntries(BibDatabaseContext databaseContext) {
-        databaseContext.getDatabase().getEntries().addListener(new ListChangeListener<BibEntry>() {
-            @Override
-            public void onChanged(Change<? extends BibEntry> changedBibEntry) {
-                while (changedBibEntry.next()) {
-                    if (changedBibEntry.wasAdded()) {
-                        for (BibEntry bibEntry : changedBibEntry.getAddedSubList()) {
-                            try {
-                                indexingTaskManager.addToIndex(PdfIndexer.of(databaseContext, prefs.getFilePreferences()), bibEntry, databaseContext);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                                LOGGER.warn("I/O error when writing lucene index", e);
-                            }
-                            listenForChangedListOfFiles(bibEntry, databaseContext);
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    private void listenForChangedListOfFiles(BibEntry entryToListenOn, BibDatabaseContext databaseContext) {
-        entryToListenOn.getFieldBinding(StandardField.FILE).addListener(new ChangeListener<Optional<String>>() {
-            @Override
-            public void changed(ObservableValue<? extends Optional<String>> observable, Optional<String> oldValue, Optional<String> newValue) {
-                if (newValue.isEmpty() && oldValue.isEmpty()) {
-                    return;
-                }
-                if (newValue.isEmpty()) {
-                    // remove all
-                    return;
-                }
-                if (oldValue.isEmpty()) {
-                    // add all
-                    return;
-                }
-                List<LinkedFile> oldFileList = FileFieldParser.parse(oldValue.get());
-                List<LinkedFile> newFileList = FileFieldParser.parse(newValue.get());
-
-                List<LinkedFile> addedFiles = new ArrayList<>(newFileList);
-                addedFiles.remove(oldFileList);
-                List<LinkedFile> removedFiles = new ArrayList<>(oldFileList);
-                addedFiles.remove(newFileList);
-
-                try {
-                    indexingTaskManager.addToIndex(PdfIndexer.of(databaseContext, prefs.getFilePreferences()), entryToListenOn, addedFiles, databaseContext);
-                    indexingTaskManager.removeFromIndex(PdfIndexer.of(databaseContext, prefs.getFilePreferences()), entryToListenOn, removedFiles);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    LOGGER.warn("I/O error when writing lucene index", e);
-                }
-            }
-        });
-    }
-
-    private void initLuceneIndex() {
-        try {
-            for (BibDatabaseContext openDatabase : openDatabaseList) {
-                indexingTaskManager.addToIndex(PdfIndexer.of(openDatabase, prefs.getFilePreferences()), openDatabase);
-            }
-            listenForNewDatabases();
-        } catch (IOException e) {
-            LOGGER.error("Cannot read lucene index");
-        }
     }
 
     public SidePaneManager getSidePaneManager() {

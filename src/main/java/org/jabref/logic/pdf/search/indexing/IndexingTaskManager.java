@@ -10,7 +10,6 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.preferences.FilePreferences;
 
 import org.apache.lucene.store.Directory;
 
@@ -21,9 +20,8 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
 
     BackgroundTask<Void> runningTask;
     TaskExecutor taskExecutor;
-    FilePreferences filePreferences;
 
-    public IndexingTaskManager(TaskExecutor taskExecutor, FilePreferences filePreferences) {
+    public IndexingTaskManager(TaskExecutor taskExecutor) {
         this.taskExecutor = taskExecutor;
         showToUser(true);
         // the task itself is a nop, but it's progress property will be updated by the child-tasks it creates that actually interact with the inex

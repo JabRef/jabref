@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.util.BackgroundTask;
@@ -18,18 +19,18 @@ import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 public class RebuildFulltextSearchIndexAction extends SimpleCommand {
 
     private final StateManager stateManager;
+    private final GetCurrentLibraryTab currentLibraryTab;
     private final DialogService dialogService;
-    private final IndexingTaskManager indexingTaskManager;
     private final FilePreferences filePreferences;
 
     private BibDatabaseContext databaseContext;
 
     private boolean shouldContinue = true;
 
-    public RebuildFulltextSearchIndexAction(StateManager stateManager, DialogService dialogService, IndexingTaskManager indexingTaskManager, FilePreferences filePreferences) {
+    public RebuildFulltextSearchIndexAction(StateManager stateManager, GetCurrentLibraryTab currentLibraryTab, DialogService dialogService, FilePreferences filePreferences) {
         this.stateManager = stateManager;
+        this.currentLibraryTab = currentLibraryTab;
         this.dialogService = dialogService;
-        this.indexingTaskManager = indexingTaskManager;
         this.filePreferences = filePreferences;
 
         this.executable.bind(needsDatabase(stateManager));
@@ -63,9 +64,13 @@ public class RebuildFulltextSearchIndexAction extends SimpleCommand {
             return;
         }
         try {
-            indexingTaskManager.createIndex(PdfIndexer.of(databaseContext, filePreferences), databaseContext.getDatabase(), databaseContext);
+            currentLibraryTab.get().getIndexingTaskManager().createIndex(PdfIndexer.of(databaseContext, filePreferences), databaseContext.getDatabase(), databaseContext);
         } catch (IOException e) {
             dialogService.notify(Localization.lang("Failed to access fulltext search index"));
         }
+    }
+
+    public interface GetCurrentLibraryTab {
+        LibraryTab get();
     }
 }
