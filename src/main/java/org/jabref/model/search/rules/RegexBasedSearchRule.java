@@ -82,7 +82,7 @@ public class RegexBasedSearchRule implements SearchRule {
                 }
             }
         }
-        return false;
+        return getFulltextResults(query, bibEntry).numSearchResults() > 0;
     }
 
     @Override

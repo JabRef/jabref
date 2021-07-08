@@ -132,7 +132,7 @@ public class GrammarBasedSearchRule implements SearchRule {
             return new BibtexSearchVisitor(caseSensitiveSearch, regExpSearch, fulltext, bibEntry).visit(tree);
         } catch (Exception e) {
             LOGGER.debug("Search failed", e);
-            return false;
+            return getFulltextResults(query, bibEntry).numSearchResults() > 0;
         }
     }
 

@@ -81,7 +81,7 @@ public class ContainBasedSearchRule implements SearchRule {
             }
         }
 
-        return false; // Didn't match all words.
+        return getFulltextResults(query, bibEntry).numSearchResults() > 0; // Didn't match all words.
     }
 
     @Override
