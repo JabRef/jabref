@@ -268,7 +268,7 @@ public class EntryEditor extends BorderPane {
         // LaTeX citations tab
         entryEditorTabs.add(new LatexCitationsTab(databaseContext, preferencesService, taskExecutor, dialogService));
 
-        entryEditorTabs.add(new FulltextSearchResultsTab(stateManager, preferencesService.getTheme()));
+        entryEditorTabs.add(new FulltextSearchResultsTab(stateManager, preferencesService.getTheme(), preferencesService.getFilePreferences()));
 
         return entryEditorTabs;
     }

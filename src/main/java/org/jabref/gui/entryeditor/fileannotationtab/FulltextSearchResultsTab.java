@@ -1,27 +1,35 @@
 package org.jabref.gui.entryeditor.fileannotationtab;
 
+import java.nio.file.Path;
+
 import javafx.scene.web.WebView;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.EntryEditorTab;
+import org.jabref.gui.util.OpenHyperlinksInExternalBrowser;
 import org.jabref.gui.util.Theme;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
+import org.jabref.preferences.FilePreferences;
 
 public class FulltextSearchResultsTab extends EntryEditorTab {
 
     private final StateManager stateManager;
+    private final FilePreferences filePreferences;
 
     private final WebView webView;
 
-    public FulltextSearchResultsTab(StateManager stateManager, Theme theme) {
+    public FulltextSearchResultsTab(StateManager stateManager, Theme theme, FilePreferences filePreferences) {
         this.stateManager = stateManager;
+        this.filePreferences = filePreferences;
         webView = new WebView();
         setTheme(theme);
         webView.getEngine().loadContent(wrapHTML("<p>" + Localization.lang("Search results") + "</p>"));
         setContent(webView);
+        webView.getEngine().getLoadWorker().stateProperty().addListener(new OpenHyperlinksInExternalBrowser(webView));
         setText(Localization.lang("Search results"));
     }
 
@@ -43,7 +51,9 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
         for (SearchResult searchResult : searchResults.getSearchResults()) {
             content.append("<p>Found match in <a href=");
-            content.append(searchResult.getPath());
+            LinkedFile linkedFile = new LinkedFile("just for link", Path.of(searchResult.getPath()), "pdf");
+            Path resolvedPath = linkedFile.findIn(stateManager.getActiveDatabase().get(), filePreferences).orElse(Path.of(searchResult.getPath()));
+            content.append(resolvedPath.toAbsolutePath().toString());
             content.append(">");
             content.append(searchResult.getPath());
             content.append("</a></p><p>");
