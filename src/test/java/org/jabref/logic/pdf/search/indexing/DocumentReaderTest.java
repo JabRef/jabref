@@ -9,8 +9,6 @@ import java.util.Optional;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.preferences.FilePreferences;
 
 import org.apache.lucene.document.Document;
@@ -19,8 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -50,85 +46,5 @@ public class DocumentReaderTest {
 
         // then
         assertEquals(Collections.emptyList(), emptyDocumentList);
-    }
-
-    @Test
-    public void noLinkedFiles() throws IOException {
-        BibEntry entry = new BibEntry();
-        assertThrows(IllegalStateException.class, () -> new DocumentReader(entry, filePreferences));
-    }
-
-    @Test
-    public void exampleTest() throws IOException {
-        // given
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.setCitationKey("Example2017");
-        entry.setFiles(Collections.singletonList(new LinkedFile("Example", "example.pdf", "pdf")));
-        // when
-        List<Document> documents = new DocumentReader(entry, filePreferences).readLinkedPdfs(databaseContext);
-
-        // then
-        assertEquals(1, documents.size());
-
-        Document doc = documents.get(0);
-        assertEquals("Example2017", doc.get(SearchFieldConstants.KEY));
-        assertFalse(doc.get(SearchFieldConstants.CONTENT).isEmpty());
-    }
-
-    @Test
-    public void thesisExampleTest() throws IOException {
-        // given
-        BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
-        entry.setCitationKey("ThesisExample2017");
-        entry.setFiles(Collections.singletonList(new LinkedFile("Example thesis", "thesis-example.pdf", "pdf")));
-
-        // when
-        List<Document> documents = new DocumentReader(entry, filePreferences).readLinkedPdfs(databaseContext);
-
-        // then
-        assertEquals(1, documents.size());
-
-        Document doc = documents.get(0);
-        assertEquals("ThesisExample2017", doc.get(SearchFieldConstants.KEY));
-        assertFalse(doc.get(SearchFieldConstants.CONTENT).isEmpty());
-    }
-
-    @Test
-    public void minimalTest() throws IOException {
-        // given
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.setCitationKey("Minimal2017");
-        entry.setFiles(Collections.singletonList(new LinkedFile("Example thesis", "minimal.pdf", "pdf")));
-
-        // when
-        List<Document> documents = new DocumentReader(entry, filePreferences).readLinkedPdfs(databaseContext);
-
-        // then
-        assertEquals(1, documents.size());
-
-        Document doc = documents.get(0);
-        assertEquals("Minimal2017", doc.get(SearchFieldConstants.KEY));
-        assertEquals("Hello World\n1\n", doc.get(SearchFieldConstants.CONTENT));
-    }
-
-    @Test
-    public void metaDataTest() throws IOException {
-        // given
-        BibEntry entry = new BibEntry();
-        entry.setCitationKey("MetaData2017");
-        entry.setFiles(Collections.singletonList(new LinkedFile("Minimal", "metaData.pdf", "pdf")));
-
-        // when
-        List<Document> documents = new DocumentReader(entry, filePreferences).readLinkedPdfs(databaseContext);
-
-        // then
-        assertEquals(1, documents.size());
-
-        Document doc = documents.get(0);
-        assertEquals("MetaData2017", doc.get(SearchFieldConstants.KEY));
-        assertEquals("Test\n", doc.get(SearchFieldConstants.CONTENT));
-        assertEquals("Author Name", doc.get(SearchFieldConstants.AUTHOR));
-        assertEquals("A Subject", doc.get(SearchFieldConstants.SUBJECT));
-        assertEquals("Test, Whatever, Metadata, JabRef", doc.get(SearchFieldConstants.KEYWORDS));
     }
 }
