@@ -15,6 +15,7 @@ import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.preferences.FilePreferences;
 
 import net.harawata.appdirs.AppDirsFactory;
@@ -216,7 +217,7 @@ public class BibDatabaseContext {
     }
 
     public Path getFulltextIndexPath() {
-        Path appData = Path.of(AppDirsFactory.getInstance().getUserDataDir(JabRefFrame.FRAME_TITLE, "0.1a", "org.jabref"));
+        Path appData = Path.of(AppDirsFactory.getInstance().getUserDataDir(JabRefFrame.FRAME_TITLE, SearchFieldConstants.VERSION, "org.jabref"));
         if (getDatabasePath().isPresent()) {
             return appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
         }

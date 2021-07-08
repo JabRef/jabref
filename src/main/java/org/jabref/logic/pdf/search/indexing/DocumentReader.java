@@ -22,17 +22,11 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDDocumentInformation;
 import org.apache.pdfbox.text.PDFTextStripper;
 
-import static org.jabref.model.pdf.search.SearchFieldConstants.AUTHOR;
 import static org.jabref.model.pdf.search.SearchFieldConstants.CONTENT;
-import static org.jabref.model.pdf.search.SearchFieldConstants.KEY;
-import static org.jabref.model.pdf.search.SearchFieldConstants.KEYWORDS;
 import static org.jabref.model.pdf.search.SearchFieldConstants.MODIFIED;
 import static org.jabref.model.pdf.search.SearchFieldConstants.PATH;
-import static org.jabref.model.pdf.search.SearchFieldConstants.SUBJECT;
-import static org.jabref.model.pdf.search.SearchFieldConstants.TITLE;
 
 /**
  * Utility class for reading the data from LinkedFiles of a BibEntry for Lucene.
@@ -98,12 +92,6 @@ public final class DocumentReader {
     }
 
     private void addMetaData(PDDocument pdfDocument, Document newDocument, Path resolvedPdfPath) {
-        PDDocumentInformation info = pdfDocument.getDocumentInformation();
-        addStringField(newDocument, AUTHOR, info.getAuthor());
-        addStringField(newDocument, TITLE, info.getTitle());
-        addStringField(newDocument, SUBJECT, info.getSubject());
-        addTextField(newDocument, KEYWORDS, info.getKeywords());
-
         try {
             BasicFileAttributes attributes = Files.readAttributes(resolvedPdfPath, BasicFileAttributes.class);
             addStringField(newDocument, MODIFIED, String.valueOf(attributes.lastModifiedTime().to(TimeUnit.SECONDS)));
@@ -146,8 +134,5 @@ public final class DocumentReader {
 
     private void addIdentifiers(Document newDocument, String path) {
         newDocument.add(new StringField(PATH, path, Field.Store.YES));
-        if (this.entry.getCitationKey().isPresent()) {
-            newDocument.add(new StringField(KEY, this.entry.getCitationKey().get(), Field.Store.YES));
-        }
     }
 }

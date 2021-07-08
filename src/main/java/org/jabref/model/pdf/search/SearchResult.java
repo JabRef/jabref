@@ -17,32 +17,23 @@ import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.search.highlight.TextFragment;
 import org.apache.lucene.search.highlight.TokenSources;
 
-import static org.jabref.model.pdf.search.SearchFieldConstants.AUTHOR;
 import static org.jabref.model.pdf.search.SearchFieldConstants.CONTENT;
-import static org.jabref.model.pdf.search.SearchFieldConstants.KEY;
-import static org.jabref.model.pdf.search.SearchFieldConstants.KEYWORDS;
+import static org.jabref.model.pdf.search.SearchFieldConstants.MODIFIED;
 import static org.jabref.model.pdf.search.SearchFieldConstants.PATH;
-import static org.jabref.model.pdf.search.SearchFieldConstants.SUBJECT;
 
 public final class SearchResult {
 
     private final String path;
-    private final String key;
     private final String content;
-    private final String author;
-    private final String subject;
-    private final String keyword;
+    private final long modified;
 
     private final float luceneScore;
     private String html;
 
     public SearchResult(IndexSearcher searcher, Query query, ScoreDoc scoreDoc) throws IOException {
         this.path = getFieldContents(searcher, scoreDoc, PATH);
-        this.key = getFieldContents(searcher, scoreDoc, KEY);
         this.content = getFieldContents(searcher, scoreDoc, CONTENT);
-        this.author = getFieldContents(searcher, scoreDoc, AUTHOR);
-        this.subject = getFieldContents(searcher, scoreDoc, SUBJECT);
-        this.keyword = getFieldContents(searcher, scoreDoc, KEYWORDS);
+        this.modified = Long.valueOf(getFieldContents(searcher, scoreDoc, MODIFIED));
         this.luceneScore = scoreDoc.score;
 
         TokenStream stream = TokenSources.getTokenStream(CONTENT, content, new EnglishStemAnalyzer());
@@ -80,24 +71,12 @@ public final class SearchResult {
         return path;
     }
 
-    public String getKey() {
-        return key;
-    }
-
     public String getContent() {
         return content;
     }
 
-    public String getAuthor() {
-        return author;
-    }
-
-    public String getSubject() {
-        return subject;
-    }
-
-    public String getKeyword() {
-        return keyword;
+    public long getModified() {
+        return modified;
     }
 
     public float getLuceneScore() {
