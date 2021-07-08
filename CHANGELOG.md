@@ -8,7 +8,7 @@ In case, there is no issue present, the pull request implementing the feature is
 Note that this project **does not** adhere to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-     
+
 ### Added
 
 - We added a fulltext search feature. [#2838](https://github.com/JabRef/jabref/pull/2838)
