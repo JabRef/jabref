@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.Globals;
 import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.pdf.search.PdfSearchResults;
@@ -29,9 +30,13 @@ public class RegexBasedSearchRule implements SearchRule {
     private String lastQuery;
     private List<SearchResult> lastSearchResults;
 
+    private final BibDatabaseContext databaseContext;
+
     public RegexBasedSearchRule(boolean caseSensitive, boolean fulltext) {
         this.caseSensitive = caseSensitive;
         this.fulltext = fulltext;
+
+        databaseContext = Globals.stateManager.getActiveDatabase().get();
     }
 
     public boolean isCaseSensitive() {
@@ -91,11 +96,7 @@ public class RegexBasedSearchRule implements SearchRule {
             this.lastQuery = query;
             lastSearchResults = List.of();
             try {
-                if (Globals.stateManager.getActiveDatabase().isEmpty()) {
-                    lastSearchResults = new PdfSearchResults().getSearchResults();
-                    return new PdfSearchResults(lastSearchResults);
-                }
-                PdfSearcher searcher = PdfSearcher.of(Globals.stateManager.getActiveDatabase().get());
+                PdfSearcher searcher = PdfSearcher.of(databaseContext);
                 PdfSearchResults results = searcher.search(query, 100);
                 lastSearchResults = results.getSortedByScore();
             } catch (IOException e) {

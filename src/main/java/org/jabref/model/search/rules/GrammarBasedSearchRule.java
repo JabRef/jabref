@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.Globals;
 import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.field.Field;
@@ -52,6 +53,8 @@ public class GrammarBasedSearchRule implements SearchRule {
     private String query;
     private List<SearchResult> searchResults;
 
+    private final BibDatabaseContext databaseContext;
+
     public static class ThrowingErrorListener extends BaseErrorListener {
 
         public static final ThrowingErrorListener INSTANCE = new ThrowingErrorListener();
@@ -68,6 +71,8 @@ public class GrammarBasedSearchRule implements SearchRule {
         this.caseSensitiveSearch = caseSensitiveSearch;
         this.regExpSearch = regExpSearch;
         this.fulltext = fulltext;
+
+        databaseContext = Globals.stateManager.getActiveDatabase().get();
     }
 
     public static boolean isValid(boolean caseSensitive, boolean regExp, boolean fulltext, String query) {
@@ -113,11 +118,7 @@ public class GrammarBasedSearchRule implements SearchRule {
             return;
         }
         try {
-            if (Globals.stateManager.getActiveDatabase().isEmpty()) {
-                searchResults = new PdfSearchResults().getSearchResults();
-                return;
-            }
-            PdfSearcher searcher = PdfSearcher.of(Globals.stateManager.getActiveDatabase().get());
+            PdfSearcher searcher = PdfSearcher.of(databaseContext);
             PdfSearchResults results = searcher.search(query, 100);
             searchResults = results.getSortedByScore();
         } catch (IOException e) {
