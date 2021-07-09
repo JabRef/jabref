@@ -82,7 +82,7 @@ public class PdfIndexer {
             LOGGER.warn("Could not create new Index!", e);
         }
         // Re-use existing facilities for writing the actual entries
-        entries.stream().filter(entry -> !entry.getFiles().isEmpty()).forEach(entry -> writeToIndex(entry));
+        entries.stream().filter(entry -> !entry.getFiles().isEmpty()).forEach(this::writeToIndex);
     }
 
     public void addToIndex(BibDatabaseContext databaseContext) {
