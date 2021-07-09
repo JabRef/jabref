@@ -1,7 +1,6 @@
 package org.jabref.model.openoffice.rangesort;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.model.openoffice.uno.UnoScreenRefresh;
@@ -27,6 +26,10 @@ public class RangeSortVisual {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RangeSortVisual.class);
 
+    private RangeSortVisual() {
+        /**/
+    }
+
     /**
      * Sort the input {@code inputs} visually.
      *
@@ -38,8 +41,6 @@ public class RangeSortVisual {
                                                         XTextDocument doc,
                                                         FunctionalTextViewCursor fcursor) {
 
-        final int inputSize = inputs.size();
-
         if (UnoScreenRefresh.hasControllersLocked(doc)) {
             final String msg = "visualSort: with ControllersLocked, viewCursor.gotoRange is probably useless";
             LOGGER.warn(msg);
@@ -47,6 +48,8 @@ public class RangeSortVisual {
         }
 
         XTextViewCursor viewCursor = fcursor.getViewCursor();
+
+        final int inputSize = inputs.size();
 
         // find coordinates
         List<Point> positions = new ArrayList<>(inputSize);
@@ -63,7 +66,7 @@ public class RangeSortVisual {
                                          input.getIndexInPosition(),
                                          input));
         }
-        Collections.sort(comparableMarks, RangeSortVisual::compareTopToBottomLeftToRight);
+        comparableMarks.sort(RangeSortVisual::compareTopToBottomLeftToRight);
 
         // collect ordered result
         List<RangeSortable<T>> result = new ArrayList<>(comparableMarks.size());
@@ -101,7 +104,7 @@ public class RangeSortVisual {
         return cursor.getPosition();
     }
 
-    private static int compareTopToBottomLeftToRight(ComparableMark a, ComparableMark b) {
+    private static <T> int compareTopToBottomLeftToRight(ComparableMark<T> a, ComparableMark<T> b) {
 
         if (a.position.Y != b.position.Y) {
             return a.position.Y - b.position.Y;
@@ -111,7 +114,7 @@ public class RangeSortVisual {
         }
         return a.indexInPosition - b.indexInPosition;
     }
-    
+
     /**
      * A reference mark name paired with its visual position.
      *
