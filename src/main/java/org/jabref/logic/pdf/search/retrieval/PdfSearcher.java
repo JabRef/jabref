@@ -31,7 +31,7 @@ public final class PdfSearcher {
 
     private final Directory indexDirectory;
 
-    private PdfSearcher(Directory indexDirectory) throws IOException {
+    private PdfSearcher(Directory indexDirectory) {
         this.indexDirectory = indexDirectory;
     }
 
