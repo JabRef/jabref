@@ -174,7 +174,6 @@ public class PdfIndexer {
         config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
         try (IndexWriter deleter = new IndexWriter(directoryToIndex, config)) {
             // Do nothing. Index is deleted.
-            return;
         } catch (IOException e) {
             LOGGER.warn("The IndexWriter could not be initialized", e);
         }
