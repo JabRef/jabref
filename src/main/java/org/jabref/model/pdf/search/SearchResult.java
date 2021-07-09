@@ -33,7 +33,7 @@ public final class SearchResult {
     public SearchResult(IndexSearcher searcher, Query query, ScoreDoc scoreDoc) throws IOException {
         this.path = getFieldContents(searcher, scoreDoc, PATH);
         this.content = getFieldContents(searcher, scoreDoc, CONTENT);
-        this.modified = Long.valueOf(getFieldContents(searcher, scoreDoc, MODIFIED));
+        this.modified = Long.parseLong(getFieldContents(searcher, scoreDoc, MODIFIED));
         this.luceneScore = scoreDoc.score;
 
         TokenStream stream = TokenSources.getTokenStream(CONTENT, content, new EnglishStemAnalyzer());
