@@ -31,7 +31,7 @@ public class RangeOverlapBetween {
 
         List<RangeOverlap<V>> result = new ArrayList<>();
 
-        if (fewHolders.size() == 0) {
+        if (fewHolders.isEmpty()) {
             return result;
         }
 

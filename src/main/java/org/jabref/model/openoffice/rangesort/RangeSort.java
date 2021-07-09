@@ -18,20 +18,25 @@ import com.sun.star.text.XTextRangeCompare;
  */
 public class RangeSort {
 
+    private RangeSort() {
+        /**/
+    }
+
     /**
      * Compare two RangeHolders (using RangeHolder.getRange()) within an XText.
      *
      * Note: since we only look at the ranges, this comparison is generally not consistent with
      * `equals` on the RangeHolders. Probably should not be used for key comparison in
-     * TreeMap&lt;RangeHolder&gt; or Set&lt;RangeHolder&gt;
+     * {@code TreeMap<RangeHolder>} or {@code Set<RangeHolder>}
      *
      */
-    public static class HolderComparatorWithinPartition implements Comparator<RangeHolder> {
+    private static class HolderComparatorWithinPartition implements Comparator<RangeHolder> {
 
         private final XTextRangeCompare cmp;
 
         HolderComparatorWithinPartition(XText text) {
-            cmp = UnoCast.cast(XTextRangeCompare.class, text).get();
+            cmp = (UnoCast.cast(XTextRangeCompare.class, text)
+                   .orElseThrow(java.lang.IllegalArgumentException::new));
         }
 
         /**
@@ -68,7 +73,7 @@ public class RangeSort {
 
         public void add(V holder) {
             XText partitionKey = holder.getRange().getText();
-            List<V> partition = partitions.computeIfAbsent(partitionKey, _key -> new ArrayList<>());
+            List<V> partition = partitions.computeIfAbsent(partitionKey, unused -> new ArrayList<>());
             partition.add(holder);
         }
 
