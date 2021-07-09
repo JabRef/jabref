@@ -11,8 +11,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
-import org.apache.lucene.store.Directory;
-
 /**
  * Wrapper around {@link PdfIndexer} to execute all operations in the background.
  */
@@ -35,10 +33,6 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         // update index to make sure it is up to date
         this.updateProgress(1, 1);
         return null;
-    }
-
-    public Directory getIndexDirectory() {
-        return this.getIndexDirectory();
     }
 
     private void enqueueTask(BackgroundTask<Void> task) {
