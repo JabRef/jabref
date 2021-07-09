@@ -11,6 +11,10 @@ import org.jabref.model.strings.StringUtil;
  */
 public class OOFormat {
 
+    private OOFormat() {
+        /* */
+    }
+
     /**
      * Mark {@code ootext} as using a character locale known to OO.
      *
