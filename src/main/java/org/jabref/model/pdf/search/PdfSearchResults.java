@@ -18,15 +18,7 @@ public final class PdfSearchResults {
 
     public List<SearchResult> getSortedByScore() {
         List<SearchResult> sortedList = new ArrayList<>(searchResults);
-        sortedList.sort((searchResult, t1) -> {
-            if (searchResult.getLuceneScore() < t1.getLuceneScore()) {
-                return -1;
-            }
-            if (searchResult.getLuceneScore() > t1.getLuceneScore()) {
-                return 1;
-            }
-            return 0;
-        });
+        sortedList.sort((searchResult, t1) -> Float.compare(searchResult.getLuceneScore(), t1.getLuceneScore()));
         return Collections.unmodifiableList(sortedList);
     }
 
