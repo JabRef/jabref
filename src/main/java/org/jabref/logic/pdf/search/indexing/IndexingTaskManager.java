@@ -22,7 +22,7 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
     public IndexingTaskManager(TaskExecutor taskExecutor) {
         this.taskExecutor = taskExecutor;
         showToUser(true);
-        // the task itself is a nop, but it's progress property will be updated by the child-tasks it creates that actually interact with the inex
+        // the task itself is a nop, but it's progress property will be updated by the child-tasks it creates that actually interact with the index
         this.updateProgress(1, 1);
         this.titleProperty().set(Localization.lang("Indexing pdf files"));
         this.executeWith(taskExecutor);
