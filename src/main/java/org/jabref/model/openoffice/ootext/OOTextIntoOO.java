@@ -112,29 +112,29 @@ public class OOTextIntoOO {
      *
      * - new tags:
      *
-     *   - &lt;span lang="zxx"&gt;
+     *   - {@code <span lang="zxx">}
      *     - earlier was applied from code
      *
-     *   - &lt;span oo:CharStyleName="CharStylename"&gt;
+     *   - {@code <span oo:CharStyleName="CharStylename">}
      *     - earlier was applied from code, for "CitationCharacterFormat"
      *
-     *   - &lt;p&gt; start new paragraph
+     *   - {@code <p>} start new paragraph
      *     - earlier was applied from code
      *
-     *   - &lt;p oo:ParaStyleName="ParStyleName"&gt; : start new paragraph and apply ParStyleName
+     *   - {@code <p oo:ParaStyleName="ParStyleName">} : start new paragraph and apply ParStyleName
      *     - earlier was applied from code
      *
-     *   - &lt;tt&gt;
+     *   - {@code <tt>}
      *     - earlier: known, but ignored
-     *     - now: equivalent to &lt;span oo:CharStyleName="Example"&gt;
-     *   - &lt;oo:referenceToPageNumberOfReferenceMark&gt; (self-closing)
+     *     - now: equivalent to {@code <span oo:CharStyleName="Example">}
+     *   - {@code <oo:referenceToPageNumberOfReferenceMark>} (self-closing)
      *
      * - closing tags try to properly restore state (in particular, the "not directly set" state)
      *   instead of dictating an "off" state. This makes a difference when the value inherited from
      *   another level (for example the paragraph) is not the "off" state.
      *
      *   An example: a style with
-     *   ReferenceParagraphFormat="JR_bibentry"
+     *   {@code ReferenceParagraphFormat="JR_bibentry"}
      *   Assume JR_bibentry in LibreOffice is a paragraph style that prescribes "bold" font.
      *   LAYOUT only prescribes bold around year.
      *   Which parts of the bibliography entries should come out as bold?
@@ -147,7 +147,6 @@ public class OOTextIntoOO {
      */
     public static void write(XTextDocument doc, XTextCursor position, OOText ootext)
         throws
-        PropertyVetoException,
         WrappedTargetException,
         CreationException {
 
@@ -168,20 +167,19 @@ public class OOTextIntoOO {
 
         // We need to extract formatting. Use a simple regexp search iteration:
         int piv = 0;
-        Matcher m = HTML_TAG.matcher(lText);
-        while (m.find()) {
+        Matcher tagMatcher = HTML_TAG.matcher(lText);
+        while (tagMatcher.find()) {
 
-            String currentSubstring = lText.substring(piv, m.start());
+            String currentSubstring = lText.substring(piv, tagMatcher.start());
             if (!currentSubstring.isEmpty()) {
                 cursor.setString(currentSubstring);
             }
             formatStack.apply(cursor);
             cursor.collapseToEnd();
 
-            String fullTag = m.group();
-            String endTagName = m.group(1);
-            String startTagName = m.group(2);
-            String attributeListPart = m.group(3);
+            String endTagName = tagMatcher.group(1);
+            String startTagName = tagMatcher.group(2);
+            String attributeListPart = tagMatcher.group(3);
             boolean isStartTag = StringUtil.isNullOrEmpty(endTagName);
             String tagName = isStartTag ? startTagName : endTagName;
             Objects.requireNonNull(tagName);
@@ -232,13 +230,13 @@ public class OOTextIntoOO {
                     switch (key) {
                     case "oo:ParaStyleName":
                         // <p oo:ParaStyleName="Standard">
-                        if (!StringUtil.isNullOrEmpty(value)) {
+                        if (StringUtil.isNullOrEmpty(value)) {
+                            LOGGER.debug(String.format("oo:ParaStyleName inherited"));
+                        } else {
                             if (setParagraphStyle(cursor, value)) {
                                 // Presumably tested already:
                                 LOGGER.debug(String.format("oo:ParaStyleName=\"%s\" failed", value));
                             }
-                        } else {
-                            LOGGER.debug(String.format("oo:ParaStyleName inherited"));
                         }
                         break;
                     default:
@@ -283,7 +281,7 @@ public class OOTextIntoOO {
                         break;
                     case "style":
                         // HTML-style small-caps
-                        if (value.equals("font-variant: small-caps")) {
+                        if ("font-variant: small-caps".equals(value)) {
                             settings.addAll(setCharCaseMap(CaseMap.SMALLCAPS));
                             break;
                         }
@@ -317,9 +315,12 @@ public class OOTextIntoOO {
                                               currentSubstring));
                 }
                 break;
+            default:
+                LOGGER.warn(String.format("ignoring unknown tag '<%s>'", tagName));
+                break;
             }
 
-            piv = m.end();
+            piv = tagMatcher.end();
         }
 
         if (piv < lText.length()) {
@@ -396,7 +397,7 @@ public class OOTextIntoOO {
                     continue;
                 }
             } catch (UnknownPropertyException ex) {
-                throw new java.lang.IllegalStateException("Unexpected UnknownPropertyException");
+                throw new IllegalStateException("Unexpected UnknownPropertyException", ex);
             }
             if (knownToFail.contains(p.Name)) {
                 continue;
@@ -511,11 +512,11 @@ public class OOTextIntoOO {
              * Get the initial state of the properties and add the first layer.
              */
             XMultiPropertyStates mpss = UnoCast.cast(XMultiPropertyStates.class, cursor).get();
-            PropertyState[] propertyStates = null;
+            PropertyState[] propertyStates;
             try {
                 propertyStates = mpss.getPropertyStates(goodNames);
             } catch (UnknownPropertyException ex) {
-                throw new java.lang.IllegalStateException("Caught unexpected UnknownPropertyException");
+                throw new IllegalStateException("Caught unexpected UnknownPropertyException", ex);
             }
 
             XMultiPropertySet mps = UnoCast.cast(XMultiPropertySet.class, cursor).get();
@@ -546,13 +547,13 @@ public class OOTextIntoOO {
             ArrayList<Optional<Object>> newLayer = new ArrayList<>(oldLayer);
             for (OOPair<String, Object> pair : settings) {
                 String name = pair.a;
-                Integer i = goodNameToIndex.get(name);
-                if (i == null) {
+                Integer index = goodNameToIndex.get(name);
+                if (index == null) {
                     LOGGER.warn(String.format("pushLayer: '%s' is not in goodNameToIndex", name));
                     continue;
                 }
                 Object newValue = pair.b;
-                newLayer.set(i, Optional.ofNullable(newValue));
+                newLayer.set(index, Optional.ofNullable(newValue));
             }
             layers.push(newLayer);
         }
@@ -592,8 +593,8 @@ public class OOTextIntoOO {
                     }
                 }
                 // namesArray must be alphabetically sorted.
-                String[] namesArray = names.toArray(new String[names.size()]);
-                String[] delNamesArray = delNames.toArray(new String[delNames.size()]);
+                String[] namesArray = names.toArray(new String[0]);
+                String[] delNamesArray = delNames.toArray(new String[0]);
                 mpss.setPropertiesToDefault(delNamesArray);
                 mps.setPropertyValues(namesArray, values.toArray());
             } catch (UnknownPropertyException ex) {
@@ -608,10 +609,9 @@ public class OOTextIntoOO {
         // Relative CharEscapement needs to know current values.
         Optional<Object> getPropertyValue(String name) {
             if (goodNameToIndex.containsKey(name)) {
-                int i = goodNameToIndex.get(name);
+                int index = goodNameToIndex.get(name);
                 ArrayList<Optional<Object>> topLayer = layers.peek();
-                Optional<Object> value = topLayer.get(i);
-                return value;
+                return topLayer.get(index);
             }
             return Optional.empty();
         }
@@ -620,15 +620,15 @@ public class OOTextIntoOO {
     /**
      * Parse HTML-like attributes to a list of (name,value) pairs.
      */
-    private static List<OOPair<String, String>> parseAttributes(String s) {
+    private static List<OOPair<String, String>> parseAttributes(String attributes) {
         List<OOPair<String, String>> res = new ArrayList<>();
-        if (s == null) {
+        if (attributes == null) {
             return res;
         }
-        Matcher m = ATTRIBUTE_PATTERN.matcher(s);
-        while (m.find()) {
-            String key = m.group(1);
-            String value = m.group(2);
+        Matcher attributeMatcher = ATTRIBUTE_PATTERN.matcher(attributes);
+        while (attributeMatcher.find()) {
+            String key = attributeMatcher.group(1);
+            String value = attributeMatcher.group(2);
             res.add(new OOPair<String, String>(key, value));
         }
         return res;
@@ -690,10 +690,10 @@ public class OOTextIntoOO {
     // CharStyleName
     private static List<OOPair<String, Object>> setCharStyleName(String value) {
         List<OOPair<String, Object>> settings = new ArrayList<>();
-        if (!StringUtil.isNullOrEmpty(value)) {
-            settings.add(new OOPair<>(CHAR_STYLE_NAME, value));
-        } else {
+        if (StringUtil.isNullOrEmpty(value)) {
             LOGGER.warn("setCharStyleName: received null or empty value");
+        } else {
+            settings.add(new OOPair<>(CHAR_STYLE_NAME, value));
         }
         return settings;
     }
