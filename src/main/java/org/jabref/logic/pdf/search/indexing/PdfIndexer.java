@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 import javafx.collections.ObservableList;
 
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -43,7 +42,6 @@ public class PdfIndexer {
 
     private final Directory directoryToIndex;
     private BibDatabaseContext databaseContext;
-    private BibDatabase database;
 
     private final FilePreferences filePreferences;
 
@@ -74,8 +72,7 @@ public class PdfIndexer {
      */
     public void createIndex(BibDatabase database, BibDatabaseContext context) {
         this.databaseContext = context;
-        this.database = database;
-        final ObservableList<BibEntry> entries = this.database.getEntries();
+        final ObservableList<BibEntry> entries = database.getEntries();
 
         // Create new index by creating IndexWriter but not writing anything.
         try {
@@ -201,9 +198,6 @@ public class PdfIndexer {
      * @param linkedFile the file to write to the index
      */
     private void writeToIndex(BibEntry entry, LinkedFile linkedFile) {
-        if (!StandardFileType.PDF.getName().equals(linkedFile.getFileType())) {
-            return;
-        }
         Optional<Path> resolvedPath = linkedFile.findIn(databaseContext, filePreferences);
         if (resolvedPath.isEmpty()) {
             LOGGER.warn("Could not find " + linkedFile.getLink());
