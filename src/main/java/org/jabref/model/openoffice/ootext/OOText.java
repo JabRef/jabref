@@ -49,9 +49,9 @@ public class OOText {
             return false;
         }
 
-        OOText c = (OOText) object;
+        OOText other = (OOText) object;
 
-        return data.equals(c.data);
+        return data.equals(other.data);
     }
 
     @Override
