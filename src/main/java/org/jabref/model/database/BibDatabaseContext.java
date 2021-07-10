@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.LibraryTab;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.util.CoarseChangeFilter;
@@ -19,6 +20,8 @@ import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.preferences.FilePreferences;
 
 import net.harawata.appdirs.AppDirsFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents everything related to a BIB file. <p> The entries are stored in BibDatabase, the other data in MetaData
@@ -26,6 +29,8 @@ import net.harawata.appdirs.AppDirsFactory;
  */
 @AllowedToUseLogic("because it needs access to shared database features")
 public class BibDatabaseContext {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
     private final BibDatabase database;
     private MetaData metaData;
@@ -218,6 +223,7 @@ public class BibDatabaseContext {
 
     public Path getFulltextIndexPath() {
         Path appData = Path.of(AppDirsFactory.getInstance().getUserDataDir(JabRefFrame.FRAME_TITLE, SearchFieldConstants.VERSION, "org.jabref"));
+        LOGGER.info("Index path for {} is {}", getDatabasePath().get().toString(), appData.toString());
         if (getDatabasePath().isPresent()) {
             return appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
         }
