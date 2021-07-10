@@ -13,7 +13,7 @@ public final class PdfSearchResults {
     }
 
     public PdfSearchResults() {
-        this.searchResults = Collections.unmodifiableList(Collections.emptyList());
+        this.searchResults = Collections.emptyList();
     }
 
     public List<SearchResult> getSortedByScore() {
