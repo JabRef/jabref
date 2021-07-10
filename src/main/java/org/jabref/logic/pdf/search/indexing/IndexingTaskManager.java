@@ -16,7 +16,7 @@ import org.jabref.model.entry.LinkedFile;
  */
 public class IndexingTaskManager extends BackgroundTask<Void> {
 
-    BackgroundTask<Void> runningTask;
+    BackgroundTask<Void> lastTaskInQueue;
     TaskExecutor taskExecutor;
 
     public IndexingTaskManager(TaskExecutor taskExecutor) {
@@ -37,20 +37,20 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
 
     private void enqueueTask(BackgroundTask<Void> task) {
         // @todo is this any good? Is there a better way?
-        if (runningTask == null) {
+        if (lastTaskInQueue == null) {
             task.executeWith(taskExecutor);
             this.progressProperty().bind(task.progressProperty());
         } else {
-            runningTask.onFinished(() -> {
+            lastTaskInQueue.onFinished(() -> {
                 task.executeWith(taskExecutor);
                 this.progressProperty().bind(task.progressProperty());
             });
         }
-        runningTask = task;
-        runningTask.onFinished(() -> {
+        lastTaskInQueue = task;
+        lastTaskInQueue.onFinished(() -> {
             this.progressProperty().unbind();
             this.updateProgress(1, 1);
-            runningTask = null;
+            lastTaskInQueue = null;
         });
     }
 
