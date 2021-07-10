@@ -97,7 +97,7 @@ public class RegexBasedSearchRule implements SearchRule {
             lastSearchResults = List.of();
             try {
                 PdfSearcher searcher = PdfSearcher.of(databaseContext);
-                PdfSearchResults results = searcher.search(query, 100);
+                PdfSearchResults results = searcher.search(query, 5);
                 lastSearchResults = results.getSortedByScore();
             } catch (IOException e) {
                 e.printStackTrace();
