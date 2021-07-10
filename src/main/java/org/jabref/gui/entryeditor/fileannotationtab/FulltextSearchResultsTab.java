@@ -47,16 +47,23 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
             return;
         }
         PdfSearchResults searchResults = stateManager.activeSearchQueryProperty().get().get().getRule().getFulltextResults(stateManager.activeSearchQueryProperty().get().get().getQuery(), entry);
-        StringBuilder content = new StringBuilder("<p>" + Localization.lang("Search results") + " </p>");
+        StringBuilder content = new StringBuilder();
+
+        content.append("<p>");
+        if (searchResults.numSearchResults() == 0) {
+            content.append(Localization.lang("No search matches."));
+        } else {
+            content.append(Localization.lang("Search results"));
+        }
+        content.append("</p>");
 
         for (SearchResult searchResult : searchResults.getSearchResults()) {
-            content.append("<p>Found match in <a href=");
+            content.append("<p>");
             LinkedFile linkedFile = new LinkedFile("just for link", Path.of(searchResult.getPath()), "pdf");
             Path resolvedPath = linkedFile.findIn(stateManager.getActiveDatabase().get(), filePreferences).orElse(Path.of(searchResult.getPath()));
-            content.append(resolvedPath.toAbsolutePath().toString());
-            content.append(">");
-            content.append(searchResult.getPath());
-            content.append("</a></p><p>");
+            String link = "<a href=" + resolvedPath.toAbsolutePath().toString() + ">" + searchResult.getPath() + "</a>";
+            content.append(Localization.lang("Found match in %0", link));
+            content.append("</p><p>");
             content.append(searchResult.getHtml());
             content.append("</p>");
         }
