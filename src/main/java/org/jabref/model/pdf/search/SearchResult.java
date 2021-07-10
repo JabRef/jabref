@@ -36,7 +36,8 @@ public final class SearchResult {
         this.modified = Long.parseLong(getFieldContents(searcher, scoreDoc, MODIFIED));
         this.luceneScore = scoreDoc.score;
 
-        TokenStream stream = TokenSources.getTokenStream(CONTENT, content, new EnglishStemAnalyzer());
+        TokenStream stream = new EnglishStemAnalyzer().tokenStream(CONTENT, content);
+
         Highlighter highlighter = new Highlighter(new SimpleHTMLFormatter(), new QueryScorer(query));
         try {
 

@@ -15,7 +15,7 @@ import org.jabref.preferences.FilePreferences;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.store.SimpleFSDirectory;
+import org.apache.lucene.store.NIOFSDirectory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -54,7 +54,7 @@ public class PdfIndexerTest {
         indexer.createIndex(database, context);
 
         // then
-        try (IndexReader reader = DirectoryReader.open(new SimpleFSDirectory(context.getFulltextIndexPath()))) {
+        try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
             assertEquals(1, reader.numDocs());
         }
     }
@@ -71,7 +71,7 @@ public class PdfIndexerTest {
         indexer.createIndex(database, context);
 
         // then
-        try (IndexReader reader = DirectoryReader.open(new SimpleFSDirectory(context.getFulltextIndexPath()))) {
+        try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
             assertEquals(1, reader.numDocs());
         }
     }
@@ -88,7 +88,7 @@ public class PdfIndexerTest {
         indexer.createIndex(database, context);
 
         // then
-        try (IndexReader reader = DirectoryReader.open(new SimpleFSDirectory(context.getFulltextIndexPath()))) {
+        try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
             assertEquals(1, reader.numDocs());
         }
     }
@@ -103,7 +103,7 @@ public class PdfIndexerTest {
 
         indexer.createIndex(database, context);
         // index actually exists
-        try (IndexReader reader = DirectoryReader.open(new SimpleFSDirectory(context.getFulltextIndexPath()))) {
+        try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
             assertEquals(1, reader.numDocs());
         }
 
@@ -111,7 +111,7 @@ public class PdfIndexerTest {
         indexer.flushIndex();
 
         // then
-        try (IndexReader reader = DirectoryReader.open(new SimpleFSDirectory(context.getFulltextIndexPath()))) {
+        try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
             assertEquals(0, reader.numDocs());
         }
     }
@@ -126,7 +126,7 @@ public class PdfIndexerTest {
         indexer.createIndex(database, context);
 
         // index with first entry
-        try (IndexReader reader = DirectoryReader.open(new SimpleFSDirectory(context.getFulltextIndexPath()))) {
+        try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
             assertEquals(1, reader.numDocs());
         }
 
@@ -138,7 +138,7 @@ public class PdfIndexerTest {
         indexer.addToIndex(metadata, null);
 
         // then
-        try (IndexReader reader = DirectoryReader.open(new SimpleFSDirectory(context.getFulltextIndexPath()))) {
+        try (IndexReader reader = DirectoryReader.open(new NIOFSDirectory(context.getFulltextIndexPath()))) {
             assertEquals(2, reader.numDocs());
         }
     }

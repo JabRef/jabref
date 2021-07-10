@@ -21,7 +21,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.SimpleFSDirectory;
+import org.apache.lucene.store.NIOFSDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +38,7 @@ public final class PdfSearcher {
     }
 
     public static PdfSearcher of(BibDatabaseContext databaseContext) throws IOException {
-        return new PdfSearcher(new SimpleFSDirectory(databaseContext.getFulltextIndexPath()));
+        return new PdfSearcher(new NIOFSDirectory(databaseContext.getFulltextIndexPath()));
     }
 
     /**
