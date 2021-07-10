@@ -5,14 +5,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.gui.LibraryTab;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.pdf.search.EnglishStemAnalyzer;
 import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
 import org.jabref.model.strings.StringUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
@@ -23,11 +22,14 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.SimpleFSDirectory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.jabref.model.pdf.search.SearchFieldConstants.PDF_FIELDS;
 
 public final class PdfSearcher {
-    private static final Log LOGGER = LogFactory.getLog(PdfSearcher.class);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
     private final Directory indexDirectory;
 

@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import javafx.collections.ObservableList;
 
+import org.jabref.gui.LibraryTab;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -19,8 +20,6 @@ import org.jabref.model.pdf.search.EnglishStemAnalyzer;
 import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.preferences.FilePreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexNotFoundException;
@@ -33,12 +32,15 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.SimpleFSDirectory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Indexes the text of PDF files and adds it into the lucene search index.
  */
 public class PdfIndexer {
-    private static final Log LOGGER = LogFactory.getLog(PdfIndexer.class);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
     private final Directory directoryToIndex;
     private BibDatabaseContext databaseContext;

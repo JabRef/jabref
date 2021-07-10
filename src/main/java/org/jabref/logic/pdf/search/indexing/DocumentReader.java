@@ -9,20 +9,21 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.jabref.gui.LibraryTab;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.FilePreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.jabref.model.pdf.search.SearchFieldConstants.CONTENT;
 import static org.jabref.model.pdf.search.SearchFieldConstants.MODIFIED;
@@ -32,7 +33,8 @@ import static org.jabref.model.pdf.search.SearchFieldConstants.PATH;
  * Utility class for reading the data from LinkedFiles of a BibEntry for Lucene.
  */
 public final class DocumentReader {
-    private static final Log LOGGER = LogFactory.getLog(DocumentReader.class);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
     private final BibEntry entry;
     private final FilePreferences filePreferences;
@@ -62,7 +64,7 @@ public final class DocumentReader {
             try {
                 return Optional.of(readPdfContents(pdf, pdfPath.get()));
             } catch (IOException e) {
-                LOGGER.error(String.format("Could not read pdf file {}!", pdf.getLink()), e);
+                LOGGER.error("Could not read pdf file {}!", pdf.getLink(), e);
             }
         }
         return Optional.empty();
@@ -128,7 +130,7 @@ public final class DocumentReader {
                 newDocument.add(new TextField(CONTENT, pdfContent, Field.Store.YES));
             }
         } catch (IOException e) {
-            LOGGER.info("Could not read contents of PDF document " + pdfDocument.toString(), e);
+            LOGGER.info("Could not read contents of PDF document \"{}\"", pdfDocument.toString(), e);
         }
     }
 
