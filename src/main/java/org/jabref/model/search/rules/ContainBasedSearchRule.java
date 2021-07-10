@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.Globals;
+import org.jabref.gui.LibraryTab;
 import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -16,11 +17,16 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Search rule for contain-based search.
  */
 @AllowedToUseLogic("Because access to the lucene index is needed")
 public class ContainBasedSearchRule implements SearchRule {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
     private final boolean caseSensitive;
     private final boolean fulltext;
@@ -99,7 +105,7 @@ public class ContainBasedSearchRule implements SearchRule {
                 PdfSearchResults results = searcher.search(query, 5);
                 lastSearchResults = results.getSortedByScore();
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("Could not retrieve search results!", e);
             }
         }
 

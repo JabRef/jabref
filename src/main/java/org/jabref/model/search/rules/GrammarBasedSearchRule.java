@@ -122,7 +122,7 @@ public class GrammarBasedSearchRule implements SearchRule {
             PdfSearchResults results = searcher.search(query, 5);
             searchResults = results.getSortedByScore();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Could not retrieve search results!", e);
         }
     }
 

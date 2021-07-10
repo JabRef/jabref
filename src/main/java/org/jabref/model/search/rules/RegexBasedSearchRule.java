@@ -18,11 +18,16 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Search rule for regex-based search.
  */
 @AllowedToUseLogic("Because access to the lucene index is needed")
 public class RegexBasedSearchRule implements SearchRule {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GrammarBasedSearchRule.class);
 
     private final boolean caseSensitive;
     private final boolean fulltext;
@@ -100,7 +105,7 @@ public class RegexBasedSearchRule implements SearchRule {
                 PdfSearchResults results = searcher.search(query, 5);
                 lastSearchResults = results.getSortedByScore();
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("Could not retrieve search results!", e);
             }
         }
         return new PdfSearchResults(lastSearchResults.stream().filter(searchResult -> searchResult.isResultFor(bibEntry)).collect(Collectors.toList()));
