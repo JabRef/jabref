@@ -56,6 +56,7 @@ public class CopyMoreAction extends SimpleCommand {
             case COPY_CITE_KEY -> copyCiteKey();
             case COPY_KEY_AND_TITLE -> copyKeyAndTitle();
             case COPY_KEY_AND_LINK -> copyKeyAndLink();
+            case COPY_DOI -> copyDOI();
             default -> LOGGER.info("Unknown copy command.");
         }
     }
@@ -110,6 +111,33 @@ public class CopyMoreAction extends SimpleCommand {
         } else {
             dialogService.notify(Localization.lang("Warning: %0 out of %1 entries have undefined citation key.",
                     Integer.toString(entries.size() - keys.size()), Integer.toString(entries.size())));
+        }
+    }
+
+    private void copyDOI() {
+        List<BibEntry> entries = stateManager.getSelectedEntries();
+
+        // Collect all non-null DOIs.
+        List<String> DOIs = entries.stream()
+                                   .filter(entry -> entry.getDOI().isPresent())
+                                   .map(entry -> entry.getDOI().get().getDOI())
+                                   .collect(Collectors.toList());
+
+        if (DOIs.isEmpty()) {
+            dialogService.notify(Localization.lang("None of the selected entries have DOIs."));
+            return;
+        }
+
+        final String copiedDOIs = String.join(",", DOIs);
+        clipBoardManager.setContent(copiedDOIs);
+
+        if (DOIs.size() == entries.size()) {
+            // All entries had DOIs.
+            dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
+                    JabRefDialogService.shortenDialogMessage(copiedDOIs)));
+        } else {
+            dialogService.notify(Localization.lang("Warning: %0 out of %1 entries have undefined DOIs.",
+                    Integer.toString(entries.size() - DOIs.size()), Integer.toString(entries.size())));
         }
     }
 
