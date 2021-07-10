@@ -60,12 +60,7 @@ public final class SearchResult {
     }
 
     public boolean isResultFor(BibEntry entry) {
-        for (LinkedFile linkedFile : entry.getFiles()) {
-            if (this.path.equals(linkedFile.getLink())) {
-                return true;
-            }
-        }
-        return false;
+        return entry.getFiles().stream().anyMatch(linkedFile -> path.equals(linkedFile.getLink()));
     }
 
     public String getPath() {
