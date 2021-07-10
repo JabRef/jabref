@@ -13,12 +13,12 @@ import java.util.stream.Collectors;
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.Globals;
 import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
-import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
+import org.jabref.model.search.rules.SearchRules.SearchFlags;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
