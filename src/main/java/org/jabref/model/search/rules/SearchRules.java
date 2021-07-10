@@ -1,5 +1,6 @@
 package org.jabref.model.search.rules;
 
+import java.util.EnumSet;
 import java.util.regex.Pattern;
 
 public class SearchRules {
@@ -12,18 +13,18 @@ public class SearchRules {
     /**
      * Returns the appropriate search rule that fits best to the given parameter.
      */
-    public static SearchRule getSearchRuleByQuery(String query, boolean caseSensitive, boolean regex, boolean fulltext) {
+    public static SearchRule getSearchRuleByQuery(String query, EnumSet<SearchFlags> searchFlags) {
         if (isSimpleQuery(query)) {
-            return new ContainBasedSearchRule(caseSensitive, fulltext);
+            return new ContainBasedSearchRule(searchFlags);
         }
 
         // this searches specified fields if specified,
         // and all fields otherwise
-        SearchRule searchExpression = new GrammarBasedSearchRule(caseSensitive, regex, fulltext);
+        SearchRule searchExpression = new GrammarBasedSearchRule(searchFlags);
         if (searchExpression.validateSearchStrings(query)) {
             return searchExpression;
         } else {
-            return getSearchRule(caseSensitive, regex, fulltext);
+            return getSearchRule(searchFlags);
         }
     }
 
@@ -31,11 +32,15 @@ public class SearchRules {
         return SIMPLE_EXPRESSION.matcher(query).matches();
     }
 
-    static SearchRule getSearchRule(boolean caseSensitive, boolean regex, boolean fulltext) {
-        if (regex) {
-            return new RegexBasedSearchRule(caseSensitive, fulltext);
+    static SearchRule getSearchRule(EnumSet<SearchFlags> searchFlags) {
+        if (searchFlags.contains(SearchFlags.REGULAR_EXPRESSION)) {
+            return new RegexBasedSearchRule(searchFlags);
         } else {
-            return new ContainBasedSearchRule(caseSensitive, fulltext);
+            return new ContainBasedSearchRule(searchFlags);
         }
+    }
+
+    public enum SearchFlags {
+        CASE_SENSITIVE, REGULAR_EXPRESSION, FULLTEXT;
     }
 }

@@ -1,6 +1,7 @@
 package org.jabref.model.search.rules;
 
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.Globals;
 import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
+import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -29,38 +31,32 @@ public class RegexBasedSearchRule implements SearchRule {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GrammarBasedSearchRule.class);
 
-    private final boolean caseSensitive;
-    private final boolean fulltext;
+    private final EnumSet<SearchFlags> searchFlags;
 
     private String lastQuery;
     private List<SearchResult> lastSearchResults;
 
     private final BibDatabaseContext databaseContext;
 
-    public RegexBasedSearchRule(boolean caseSensitive, boolean fulltext) {
-        this.caseSensitive = caseSensitive;
-        this.fulltext = fulltext;
+    public RegexBasedSearchRule(EnumSet<SearchFlags> searchFlags) {
+        this.searchFlags = searchFlags;
 
         databaseContext = Globals.stateManager.getActiveDatabase().orElse(null);
     }
 
-    public boolean isCaseSensitive() {
-        return caseSensitive;
-    }
-
-    public boolean isFulltext() {
-        return fulltext;
+    public EnumSet<SearchFlags> getSearchFlags() {
+        return searchFlags;
     }
 
     @Override
     public boolean validateSearchStrings(String query) {
         String searchString = query;
-        if (!caseSensitive) {
+        if (!searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
             searchString = searchString.toLowerCase(Locale.ROOT);
         }
 
         try {
-            Pattern.compile(searchString, caseSensitive ? 0 : Pattern.CASE_INSENSITIVE);
+            Pattern.compile(searchString, searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE) ? 0 : Pattern.CASE_INSENSITIVE);
         } catch (PatternSyntaxException ex) {
             return false;
         }
@@ -72,7 +68,7 @@ public class RegexBasedSearchRule implements SearchRule {
         Pattern pattern;
 
         try {
-            pattern = Pattern.compile(query, caseSensitive ? 0 : Pattern.CASE_INSENSITIVE);
+            pattern = Pattern.compile(query, searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE) ? 0 : Pattern.CASE_INSENSITIVE);
         } catch (PatternSyntaxException ex) {
             return false;
         }
@@ -93,7 +89,7 @@ public class RegexBasedSearchRule implements SearchRule {
     @Override
     public PdfSearchResults getFulltextResults(String query, BibEntry bibEntry) {
 
-        if (!fulltext || databaseContext == null) {
+        if (!searchFlags.contains(SearchRules.SearchFlags.FULLTEXT) || databaseContext == null) {
             return new PdfSearchResults(List.of());
         }
 

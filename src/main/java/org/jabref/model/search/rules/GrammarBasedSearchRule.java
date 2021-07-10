@@ -1,6 +1,7 @@
 package org.jabref.model.search.rules;
 
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.Globals;
 import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
+import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
@@ -45,9 +47,7 @@ public class GrammarBasedSearchRule implements SearchRule {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GrammarBasedSearchRule.class);
 
-    private final boolean caseSensitiveSearch;
-    private final boolean regExpSearch;
-    private final boolean fulltext;
+    private final EnumSet<SearchFlags> searchFlags;
 
     private ParseTree tree;
     private String query;
@@ -67,28 +67,13 @@ public class GrammarBasedSearchRule implements SearchRule {
         }
     }
 
-    public GrammarBasedSearchRule(boolean caseSensitiveSearch, boolean regExpSearch, boolean fulltext) throws RecognitionException {
-        this.caseSensitiveSearch = caseSensitiveSearch;
-        this.regExpSearch = regExpSearch;
-        this.fulltext = fulltext;
-
+    public GrammarBasedSearchRule(EnumSet<SearchFlags> searchFlags) throws RecognitionException {
+        this.searchFlags = searchFlags;
         databaseContext = Globals.stateManager.getActiveDatabase().orElse(null);
     }
 
-    public static boolean isValid(boolean caseSensitive, boolean regExp, boolean fulltext, String query) {
-        return new GrammarBasedSearchRule(caseSensitive, regExp, fulltext).validateSearchStrings(query);
-    }
-
-    public boolean isCaseSensitiveSearch() {
-        return this.caseSensitiveSearch;
-    }
-
-    public boolean isRegExpSearch() {
-        return this.regExpSearch;
-    }
-
-    public boolean isFUlltextSearch() {
-        return this.fulltext;
+    public static boolean isValid(EnumSet<SearchFlags> searchFlags, String query) {
+        return new GrammarBasedSearchRule(searchFlags).validateSearchStrings(query);
     }
 
     public ParseTree getTree() {
@@ -114,7 +99,7 @@ public class GrammarBasedSearchRule implements SearchRule {
         tree = parser.start();
         this.query = query;
 
-        if (!fulltext || databaseContext == null) {
+        if (!searchFlags.contains(SearchRules.SearchFlags.FULLTEXT) || databaseContext == null) {
             return;
         }
         try {
@@ -129,7 +114,7 @@ public class GrammarBasedSearchRule implements SearchRule {
     @Override
     public boolean applyRule(String query, BibEntry bibEntry) {
         try {
-            return new BibtexSearchVisitor(caseSensitiveSearch, regExpSearch, fulltext, bibEntry).visit(tree);
+            return new BibtexSearchVisitor(searchFlags, bibEntry).visit(tree);
         } catch (Exception e) {
             LOGGER.debug("Search failed", e);
             return getFulltextResults(query, bibEntry).numSearchResults() > 0;
@@ -152,6 +137,10 @@ public class GrammarBasedSearchRule implements SearchRule {
         }
     }
 
+    public EnumSet<SearchFlags> getSearchFlags() {
+        return searchFlags;
+    }
+
     public enum ComparisonOperator {
         EXACT, CONTAINS, DOES_NOT_CONTAIN;
 
@@ -172,12 +161,12 @@ public class GrammarBasedSearchRule implements SearchRule {
         private final Pattern fieldPattern;
         private final Pattern valuePattern;
 
-        public Comparator(String field, String value, ComparisonOperator operator, boolean caseSensitive, boolean regex) {
+        public Comparator(String field, String value, ComparisonOperator operator, EnumSet<SearchFlags> searchFlags) {
             this.operator = operator;
 
-            int option = caseSensitive ? 0 : Pattern.CASE_INSENSITIVE;
-            this.fieldPattern = Pattern.compile(regex ? field : "\\Q" + field + "\\E", option);
-            this.valuePattern = Pattern.compile(regex ? value : "\\Q" + value + "\\E", option);
+            int option = searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE) ? 0 : Pattern.CASE_INSENSITIVE;
+            this.fieldPattern = Pattern.compile(searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION) ? field : "\\Q" + field + "\\E", option);
+            this.valuePattern = Pattern.compile(searchFlags.contains(SearchRules.SearchFlags.REGULAR_EXPRESSION) ? value : "\\Q" + value + "\\E", option);
         }
 
         public boolean compare(BibEntry entry) {
@@ -236,21 +225,17 @@ public class GrammarBasedSearchRule implements SearchRule {
      */
     static class BibtexSearchVisitor extends SearchBaseVisitor<Boolean> {
 
-        private final boolean caseSensitive;
-        private final boolean regex;
-        private final boolean fulltext;
+        private final EnumSet<SearchFlags> searchFlags;
 
         private final BibEntry entry;
 
-        public BibtexSearchVisitor(boolean caseSensitive, boolean regex, boolean fulltext, BibEntry bibEntry) {
-            this.caseSensitive = caseSensitive;
-            this.regex = regex;
-            this.fulltext = fulltext;
+        public BibtexSearchVisitor(EnumSet<SearchFlags> searchFlags, BibEntry bibEntry) {
+            this.searchFlags = searchFlags;
             this.entry = bibEntry;
         }
 
         public boolean comparison(String field, ComparisonOperator operator, String value) {
-            return new Comparator(field, value, operator, caseSensitive, regex).compare(entry);
+            return new Comparator(field, value, operator, searchFlags).compare(entry);
         }
 
         @Override
@@ -270,7 +255,7 @@ public class GrammarBasedSearchRule implements SearchRule {
             if (fieldDescriptor.isPresent()) {
                 return comparison(fieldDescriptor.get().getText(), ComparisonOperator.build(context.operator.getText()), right);
             } else {
-                return SearchRules.getSearchRule(caseSensitive, regex, fulltext).applyRule(right, entry);
+                return SearchRules.getSearchRule(searchFlags).applyRule(right, entry);
             }
         }
 

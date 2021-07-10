@@ -3,7 +3,6 @@ package org.jabref.model.pdf.search;
 import java.io.IOException;
 
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.LinkedFile;
 
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.index.IndexableField;
@@ -15,7 +14,6 @@ import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
 import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.search.highlight.TextFragment;
-import org.apache.lucene.search.highlight.TokenSources;
 
 import static org.jabref.model.pdf.search.SearchFieldConstants.CONTENT;
 import static org.jabref.model.pdf.search.SearchFieldConstants.MODIFIED;

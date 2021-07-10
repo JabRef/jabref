@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -30,6 +31,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
@@ -48,6 +50,7 @@ import org.jabref.model.groups.SearchGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.search.rules.SearchRules;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.preferences.PreferencesService;
 
@@ -80,8 +83,7 @@ public class GroupDialogViewModel {
     private final BooleanProperty keywordGroupRegexProperty = new SimpleBooleanProperty();
 
     private final StringProperty searchGroupSearchTermProperty = new SimpleStringProperty("");
-    private final BooleanProperty searchGroupCaseSensitiveProperty = new SimpleBooleanProperty();
-    private final BooleanProperty searchGroupRegexProperty = new SimpleBooleanProperty();
+    private final ObjectProperty<EnumSet<SearchFlags>> searchFlagsProperty = new SimpleObjectProperty<>();
 
     private final BooleanProperty autoGroupKeywordsOptionProperty = new SimpleBooleanProperty();
     private final StringProperty autoGroupKeywordsFieldProperty = new SimpleStringProperty("");
@@ -197,7 +199,7 @@ public class GroupDialogViewModel {
         searchRegexValidator = new FunctionBasedValidator<>(
                 searchGroupSearchTermProperty,
                 input -> {
-                    if (!searchGroupRegexProperty.getValue()) {
+                    if (!searchFlagsProperty.getValue().contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
                         return true;
                     }
 
@@ -310,8 +312,7 @@ public class GroupDialogViewModel {
                         groupName,
                         groupHierarchySelectedProperty.getValue(),
                         searchGroupSearchTermProperty.getValue().trim(),
-                        searchGroupCaseSensitiveProperty.getValue(),
-                        searchGroupRegexProperty.getValue());
+                        searchFlagsProperty.getValue());
             } else if (typeAutoProperty.getValue()) {
                 if (autoGroupKeywordsOptionProperty.getValue()) {
                     // Set default value for delimiters: ',' for base and '>' for hierarchical
@@ -396,8 +397,7 @@ public class GroupDialogViewModel {
 
                 SearchGroup group = (SearchGroup) editedGroup;
                 searchGroupSearchTermProperty.setValue(group.getSearchExpression());
-                searchGroupCaseSensitiveProperty.setValue(group.isCaseSensitive());
-                searchGroupRegexProperty.setValue(group.isRegularExpression());
+                searchFlagsProperty.setValue(group.getSearchFlags());
             } else if (editedGroup.getClass() == ExplicitGroup.class) {
                 typeExplicitProperty.setValue(true);
             } else if (editedGroup instanceof AutomaticGroup) {
@@ -548,12 +548,8 @@ public class GroupDialogViewModel {
         return searchGroupSearchTermProperty;
     }
 
-    public BooleanProperty searchGroupCaseSensitiveProperty() {
-        return searchGroupCaseSensitiveProperty;
-    }
-
-    public BooleanProperty searchGroupRegexProperty() {
-        return searchGroupRegexProperty;
+    public ObjectProperty<EnumSet<SearchFlags>> searchFlagsProperty() {
+        return searchFlagsProperty;
     }
 
     public BooleanProperty autoGroupKeywordsOptionProperty() {

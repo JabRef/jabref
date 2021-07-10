@@ -13,6 +13,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.pdf.search.PdfSearchResults;
 import org.jabref.model.pdf.search.SearchResult;
+import org.jabref.model.search.rules.SearchRules;
 import org.jabref.preferences.FilePreferences;
 
 public class FulltextSearchResultsTab extends EntryEditorTab {
@@ -37,7 +38,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     public boolean shouldShow(BibEntry entry) {
         return this.stateManager.activeSearchQueryProperty().isPresent().get() &&
                 this.stateManager.activeSearchQueryProperty().get().isPresent() &&
-                this.stateManager.activeSearchQueryProperty().get().get().isFulltext() &&
+                this.stateManager.activeSearchQueryProperty().get().get().getSearchFlags().contains(SearchRules.SearchFlags.FULLTEXT) &&
                 this.stateManager.activeSearchQueryProperty().get().get().getQuery().length() > 0;
     }
 

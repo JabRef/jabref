@@ -1,6 +1,7 @@
 package org.jabref.model.search.rules;
 
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -11,6 +12,7 @@ import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.gui.Globals;
 import org.jabref.gui.LibraryTab;
 import org.jabref.logic.pdf.search.retrieval.PdfSearcher;
+import org.jabref.model.search.rules.SearchRules.SearchFlags;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -28,29 +30,19 @@ public class ContainBasedSearchRule implements SearchRule {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
-    private final boolean caseSensitive;
-    private final boolean fulltext;
+    private final EnumSet<SearchFlags> searchFlags;
 
     private String lastQuery;
     private List<SearchResult> lastSearchResults;
 
     private final BibDatabaseContext databaseContext;
 
-    public ContainBasedSearchRule(boolean caseSensitive, boolean fulltext) {
-        this.caseSensitive = caseSensitive;
-        this.fulltext = fulltext;
+    public ContainBasedSearchRule(EnumSet<SearchFlags> searchFlags) {
+        this.searchFlags = searchFlags;
         this.lastQuery = "";
         lastSearchResults = new Vector<>();
 
         databaseContext = Globals.stateManager.getActiveDatabase().orElse(null);
-    }
-
-    public boolean isCaseSensitive() {
-        return caseSensitive;
-    }
-
-    public boolean isFulltext() {
-        return fulltext;
     }
 
     @Override
@@ -62,7 +54,7 @@ public class ContainBasedSearchRule implements SearchRule {
     public boolean applyRule(String query, BibEntry bibEntry) {
 
         String searchString = query;
-        if (!caseSensitive) {
+        if (!searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
             searchString = searchString.toLowerCase(Locale.ROOT);
         }
 
@@ -70,7 +62,7 @@ public class ContainBasedSearchRule implements SearchRule {
 
         for (Field fieldKey : bibEntry.getFields()) {
             String formattedFieldContent = bibEntry.getLatexFreeField(fieldKey).get();
-            if (!caseSensitive) {
+            if (!searchFlags.contains(SearchRules.SearchFlags.CASE_SENSITIVE)) {
                 formattedFieldContent = formattedFieldContent.toLowerCase(Locale.ROOT);
             }
 
@@ -93,7 +85,7 @@ public class ContainBasedSearchRule implements SearchRule {
     @Override
     public PdfSearchResults getFulltextResults(String query, BibEntry bibEntry) {
 
-        if (!fulltext || databaseContext == null) {
+        if (!searchFlags.contains(SearchRules.SearchFlags.FULLTEXT) || databaseContext == null) {
             return new PdfSearchResults(List.of());
         }
 
@@ -110,5 +102,9 @@ public class ContainBasedSearchRule implements SearchRule {
         }
 
         return new PdfSearchResults(lastSearchResults.stream().filter(searchResult -> searchResult.isResultFor(bibEntry)).collect(Collectors.toList()));
+    }
+
+    public EnumSet<SearchFlags> getSearchFlags() {
+        return searchFlags;
     }
 }

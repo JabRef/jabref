@@ -265,7 +265,7 @@ public class GlobalSearchBar extends HBox {
             return;
         }
 
-        SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), searchPreferences.isCaseSensitive(), searchPreferences.isRegularExpression(), searchPreferences.isFulltext());
+        SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), searchPreferences.getSearchFlags());
         if (!searchQuery.isValid()) {
             informUserAboutInvalidSearchQuery();
             return;
