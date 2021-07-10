@@ -342,6 +342,8 @@ public class LibraryTab extends Tab {
             textProperty().setValue(tabTitle.toString());
             setTooltip(new Tooltip(toolTipText.toString()));
         });
+
+        indexingTaskManager.updateDatabaseName(tabTitle.toString());
     }
 
     private List<String> collectAllDatabasePaths() {

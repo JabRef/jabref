@@ -1,6 +1,8 @@
 package org.jabref.logic.pdf.search.indexing;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
@@ -16,7 +18,7 @@ import org.jabref.model.entry.LinkedFile;
  */
 public class IndexingTaskManager extends BackgroundTask<Void> {
 
-    BackgroundTask<Void> lastTaskInQueue;
+    Queue<BackgroundTask<Void>> taskQueue = new LinkedList<>();
     TaskExecutor taskExecutor;
 
     public IndexingTaskManager(TaskExecutor taskExecutor) {
@@ -36,22 +38,21 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
     }
 
     private void enqueueTask(BackgroundTask<Void> task) {
-        // @todo is this any good? Is there a better way?
-        if (lastTaskInQueue == null) {
-            task.executeWith(taskExecutor);
-            this.progressProperty().bind(task.progressProperty());
-        } else {
-            lastTaskInQueue.onFinished(() -> {
-                task.executeWith(taskExecutor);
-                this.progressProperty().bind(task.progressProperty());
-            });
-        }
-        lastTaskInQueue = task;
-        lastTaskInQueue.onFinished(() -> {
+        task.onFinished(() -> {
             this.progressProperty().unbind();
             this.updateProgress(1, 1);
-            lastTaskInQueue = null;
+            taskQueue.poll(); // This is the task that just finished
+            if (!taskQueue.isEmpty()) {
+                BackgroundTask<Void> nextTask = taskQueue.poll();
+                nextTask.executeWith(taskExecutor);
+                this.progressProperty().bind(nextTask.progressProperty());
+            }
         });
+        taskQueue.add(task);
+        if (taskQueue.size() == 1) {
+            task.executeWith(taskExecutor);
+            this.progressProperty().bind(task.progressProperty());
+        }
     }
 
     public void createIndex(PdfIndexer indexer, ParserResult parserResult) {
@@ -178,5 +179,9 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
                 return null;
             }
         });
+    }
+
+    public void updateDatabaseName(String name) {
+        this.updateMessage(name);
     }
 }
