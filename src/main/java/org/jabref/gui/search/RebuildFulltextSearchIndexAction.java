@@ -13,9 +13,14 @@ import org.jabref.logic.pdf.search.indexing.PdfIndexer;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.preferences.FilePreferences;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
 public class RebuildFulltextSearchIndexAction extends SimpleCommand {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
     private final StateManager stateManager;
     private final GetCurrentLibraryTab currentLibraryTab;
@@ -66,6 +71,7 @@ public class RebuildFulltextSearchIndexAction extends SimpleCommand {
             currentLibraryTab.get().getIndexingTaskManager().createIndex(PdfIndexer.of(databaseContext, filePreferences), databaseContext.getDatabase(), databaseContext);
         } catch (IOException e) {
             dialogService.notify(Localization.lang("Failed to access fulltext search index"));
+            LOGGER.error("Failed to access fulltext search index", e);
         }
     }
 
