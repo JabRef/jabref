@@ -32,11 +32,11 @@ public class RangeSortEntry<T> implements RangeSortable<T> {
         return content;
     }
 
-    public void setRange(XTextRange r) {
-        range = r;
+    public void setRange(XTextRange range) {
+        this.range = range;
     }
 
-    public void setIndexInPosition(int i) {
-        indexInPosition = i;
+    public void setIndexInPosition(int indexInPosition) {
+        this.indexInPosition = indexInPosition;
     }
 }

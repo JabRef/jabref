@@ -1,15 +1,11 @@
 package org.jabref.model.openoffice.rangesort;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
-import org.jabref.model.openoffice.uno.NoDocumentException;
 import org.jabref.model.openoffice.uno.UnoScreenRefresh;
 
 import com.sun.star.awt.Point;
-import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.text.XTextRange;
 import com.sun.star.text.XTextViewCursor;
@@ -30,6 +26,10 @@ public class RangeSortVisual {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RangeSortVisual.class);
 
+    private RangeSortVisual() {
+        /**/
+    }
+
     /**
      * Sort the input {@code inputs} visually.
      *
@@ -39,12 +39,7 @@ public class RangeSortVisual {
      */
     public static <T> List<RangeSortable<T>> visualSort(List<RangeSortable<T>> inputs,
                                                         XTextDocument doc,
-                                                        FunctionalTextViewCursor fcursor)
-        throws
-        WrappedTargetException,
-        NoDocumentException {
-
-        final int inputSize = inputs.size();
+                                                        FunctionalTextViewCursor fcursor) {
 
         if (UnoScreenRefresh.hasControllersLocked(doc)) {
             final String msg = "visualSort: with ControllersLocked, viewCursor.gotoRange is probably useless";
@@ -54,6 +49,8 @@ public class RangeSortVisual {
 
         XTextViewCursor viewCursor = fcursor.getViewCursor();
 
+        final int inputSize = inputs.size();
+
         // find coordinates
         List<Point> positions = new ArrayList<>(inputSize);
         for (RangeSortable<T> v : inputs) {
@@ -61,27 +58,19 @@ public class RangeSortVisual {
         }
         fcursor.restore(doc);
 
-        if (positions.size() != inputSize) {
-            throw new IllegalStateException("visualSort: positions.size() != inputSize");
-        }
-
         // order by position
-        ArrayList<ComparableMark<RangeSortable<T>>> set = new ArrayList<>(inputSize);
+        ArrayList<ComparableMark<RangeSortable<T>>> comparableMarks = new ArrayList<>(inputSize);
         for (int i = 0; i < inputSize; i++) {
             RangeSortable<T> input = inputs.get(i);
-            set.add(new ComparableMark<>(positions.get(i),
+            comparableMarks.add(new ComparableMark<>(positions.get(i),
                                          input.getIndexInPosition(),
                                          input));
         }
-        Collections.sort(set);
-
-        if (set.size() != inputSize) {
-            throw new IllegalStateException("visualSort: set.size() != inputSize");
-        }
+        comparableMarks.sort(RangeSortVisual::compareTopToBottomLeftToRight);
 
         // collect ordered result
-        List<RangeSortable<T>> result = new ArrayList<>(set.size());
-        for (ComparableMark<RangeSortable<T>> mark : set) {
+        List<RangeSortable<T>> result = new ArrayList<>(comparableMarks.size());
+        for (ComparableMark<RangeSortable<T>> mark : comparableMarks) {
             result.add(mark.getContent());
         }
 
@@ -115,6 +104,17 @@ public class RangeSortVisual {
         return cursor.getPosition();
     }
 
+    private static <T> int compareTopToBottomLeftToRight(ComparableMark<T> a, ComparableMark<T> b) {
+
+        if (a.position.Y != b.position.Y) {
+            return a.position.Y - b.position.Y;
+        }
+        if (a.position.X != b.position.X) {
+            return a.position.X - b.position.X;
+        }
+        return a.indexInPosition - b.indexInPosition;
+    }
+
     /**
      * A reference mark name paired with its visual position.
      *
@@ -123,7 +123,7 @@ public class RangeSortVisual {
      *
      * Used for sorting reference marks by their visual positions.
      */
-    private static class ComparableMark<T> implements Comparable<ComparableMark<T>> {
+    private static class ComparableMark<T> {
 
         private final Point position;
         private final int indexInPosition;
@@ -135,42 +135,10 @@ public class RangeSortVisual {
             this.content = content;
         }
 
-        @Override
-        public int compareTo(ComparableMark other) {
-
-            if (position.Y != other.position.Y) {
-                return position.Y - other.position.Y;
-            }
-            if (position.X != other.position.X) {
-                return position.X - other.position.X;
-            }
-            return indexInPosition - other.indexInPosition;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-
-            if (o instanceof ComparableMark) {
-                ComparableMark other = (ComparableMark) o;
-                return ((this.position.X == other.position.X)
-                        && (this.position.Y == other.position.Y)
-                        && (this.indexInPosition == other.indexInPosition)
-                        && Objects.equals(this.content, other.content));
-            }
-            return false;
-        }
-
         public T getContent() {
             return content;
         }
 
-        @Override
-        public int hashCode() {
-            return Objects.hash(position, indexInPosition, content);
-        }
     }
 
 }

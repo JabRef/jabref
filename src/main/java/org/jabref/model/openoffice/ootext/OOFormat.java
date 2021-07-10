@@ -1,5 +1,7 @@
 package org.jabref.model.openoffice.ootext;
 
+import org.jabref.model.strings.StringUtil;
+
 /**
  * Helper functions to produce some of the markup as understood by OOTextIntoOO.write
  *
@@ -8,6 +10,10 @@ package org.jabref.model.openoffice.ootext;
  * bibliography.
  */
 public class OOFormat {
+
+    private OOFormat() {
+        /* */
+    }
 
     /**
      * Mark {@code ootext} as using a character locale known to OO.
@@ -54,7 +60,7 @@ public class OOFormat {
      * Mark {@code ootext} as part of a paragraph with style {@code paraStyle}
      */
     public static OOText paragraph(OOText ootext, String paraStyle) {
-        if (paraStyle == null || "".equals(paraStyle)) {
+        if (StringUtil.isNullOrEmpty(paraStyle)) {
             return paragraph(ootext);
         }
         String startTag = String.format("<p oo:ParaStyleName=\"%s\">", paraStyle);
@@ -71,8 +77,8 @@ public class OOFormat {
     /**
      * Format an OO cross-reference showing the target's page number as label to a reference mark.
      */
-    public static OOText formatReferenceToPageNumberOfReferenceMark(String referencMarkName) {
-        String string = String.format("<oo:referenceToPageNumberOfReferenceMark target=\"%s\">", referencMarkName);
+    public static OOText formatReferenceToPageNumberOfReferenceMark(String referenceMarkName) {
+        String string = String.format("<oo:referenceToPageNumberOfReferenceMark target=\"%s\">", referenceMarkName);
         return OOText.fromString(string);
     }
  }

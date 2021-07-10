@@ -39,9 +39,7 @@ public class RangeOverlapWithin {
 
         RangeSort.RangePartitions<V> partitions = RangeSort.partitionAndSortRanges(rangeHolders);
 
-        List<RangeOverlap<V>> overlaps = findOverlappingRanges(partitions, reportAtMost, includeTouching);
-
-        return overlaps;
+        return findOverlappingRanges(partitions, reportAtMost, includeTouching);
     }
 
     /**
@@ -64,7 +62,7 @@ public class RangeOverlapWithin {
         List<RangeOverlap<V>> result = new ArrayList<>();
 
         for (List<V> partition : input.getPartitions()) {
-            if (partition.size() == 0) {
+            if (partition.isEmpty()) {
                 continue;
             }
             XTextRangeCompare cmp = UnoCast.cast(XTextRangeCompare.class,
