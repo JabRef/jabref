@@ -17,6 +17,7 @@ import org.jabref.preferences.FilePreferences;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,13 +30,13 @@ public class PdfSearcherTest {
     private PdfSearcher search;
 
     @BeforeEach
-    public void setUp() throws IOException {
+    public void setUp(@TempDir Path indexDir) throws IOException {
         FilePreferences filePreferences = mock(FilePreferences.class);
         // given
         BibDatabase database = new BibDatabase();
         BibDatabaseContext context = mock(BibDatabaseContext.class);
         when(context.getFileDirectories(Mockito.any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs")));
-        when(context.getFulltextIndexPath()).thenReturn(Path.of("src/test/resources/luceneTestIndex"));
+        when(context.getFulltextIndexPath()).thenReturn(indexDir);
         when(context.getDatabase()).thenReturn(database);
         BibEntry examplePdf = new BibEntry(StandardEntryType.Article);
         examplePdf.setFiles(Collections.singletonList(new LinkedFile("Example Entry", "example.pdf", StandardFileType.PDF.getName())));

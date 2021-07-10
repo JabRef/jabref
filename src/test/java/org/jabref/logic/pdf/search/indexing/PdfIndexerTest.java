@@ -18,6 +18,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.store.NIOFSDirectory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,14 +32,14 @@ public class PdfIndexerTest {
     private BibDatabaseContext context = mock(BibDatabaseContext.class);
 
     @BeforeEach
-    public void setUp() throws IOException {
+    public void setUp(@TempDir Path indexDir) throws IOException {
         FilePreferences filePreferences = mock(FilePreferences.class);
         this.database = new BibDatabase();
 
         this.context = mock(BibDatabaseContext.class);
         when(context.getDatabasePath()).thenReturn(Optional.of(Path.of("src/test/resources/pdfs/")));
         when(context.getFileDirectories(Mockito.any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs")));
-        when(context.getFulltextIndexPath()).thenReturn(Path.of("src/test/resources/luceneTestIndex"));
+        when(context.getFulltextIndexPath()).thenReturn(indexDir);
         when(context.getDatabase()).thenReturn(database);
         this.indexer = PdfIndexer.of(context, filePreferences);
     }
