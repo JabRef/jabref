@@ -62,7 +62,7 @@ public final class DocumentReader {
             try {
                 return Optional.of(readPdfContents(pdf, pdfPath.get()));
             } catch (IOException e) {
-                LOGGER.info("Could not read pdf file: " + pdf.getLink() + "!", e);
+                LOGGER.info("Could not read pdf file {}!", pdf.getLink(), e);
             }
         }
         return Optional.empty();

@@ -906,7 +906,6 @@ public class LibraryTab extends Tab {
                     indexingTaskManager.addToIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), fieldChangedEvent.getBibEntry(), addedFiles, bibDatabaseContext);
                     indexingTaskManager.removeFromIndex(PdfIndexer.of(bibDatabaseContext, preferencesService.getFilePreferences()), fieldChangedEvent.getBibEntry(), removedFiles);
                 } catch (IOException e) {
-                    e.printStackTrace();
                     LOGGER.warn("I/O error when writing lucene index", e);
                 }
             }

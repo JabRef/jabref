@@ -212,7 +212,7 @@ public class PdfIndexer {
                 // If a document was found, check if is less current than the one in the FS
                 if (topDocs.scoreDocs.length > 0) {
                     Document doc = reader.document(topDocs.scoreDocs[0].doc);
-                    long indexModificationTime = Long.valueOf(doc.getField(SearchFieldConstants.MODIFIED).stringValue());
+                    long indexModificationTime = Long.parseLong(doc.getField(SearchFieldConstants.MODIFIED).stringValue());
 
                     BasicFileAttributes attributes = Files.readAttributes(resolvedPath.get(), BasicFileAttributes.class);
 
