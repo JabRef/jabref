@@ -1,6 +1,12 @@
 package org.jabref.gui;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.Authenticator;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Comparator;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -21,9 +27,11 @@ import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
+import net.harawata.appdirs.AppDirsFactory;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +66,8 @@ public class JabRefMain extends Application {
             Globals.startBackgroundTasks();
 
             applyPreferences(preferences);
+
+            clearOldSearchIndices();
 
             try {
                 // Process arguments
@@ -138,5 +148,26 @@ public class JabRefMain extends Application {
         if (proxyPreferences.isUseProxy() && proxyPreferences.isUseAuthentication()) {
             Authenticator.setDefault(new ProxyAuthenticator());
         }
+    }
+
+    private static void clearOldSearchIndices() {
+        Path appData = Path.of(AppDirsFactory.getInstance().getUserDataDir(JabRefFrame.FRAME_TITLE, null, "org.jabref"));
+        Path currentIndexPath = Path.of(AppDirsFactory.getInstance().getUserDataDir(JabRefFrame.FRAME_TITLE, SearchFieldConstants.VERSION, "org.jabref"));
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(appData)) {
+            for (Path path : stream) {
+                if (Files.isDirectory(path) && !path.equals(currentIndexPath)) {
+                    LOGGER.info("Deleting out-of-date fulltext search index at {}.", path);
+                    Files.walk(path)
+                         .sorted(Comparator.reverseOrder())
+                         .map(Path::toFile)
+                         .forEach(File::delete);
+
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.error("Could not access app-directory at {}", appData);
+        }
+
     }
 }
