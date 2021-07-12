@@ -51,9 +51,16 @@ public class SaveOrderConfigPanel extends VBox {
 
         viewModel.sortCriteriaProperty().addListener((ListChangeListener<SortCriterionViewModel>) c -> {
             while (c.next()) {
-                if (c.wasAdded()) {
+                if (c.wasReplaced()) {
+                    refreshBindings(viewModel.sortCriteriaProperty().get(c.getFrom()),c.getFrom());
+
+                    /* for (SortCriterionViewModel vm : c.getList()) {
+                        refreshBindings(vm, c.getList().indexOf(vm));
+                    } */
+                } else if (c.wasAdded()) {
                     for (SortCriterionViewModel vm : c.getAddedSubList()) {
-                        createCriterionRow(vm, c.getFrom() + c.getAddedSubList().indexOf(vm));
+                        int row = c.getFrom() + c.getAddedSubList().indexOf(vm);
+                        createCriterionRow(vm, row);
                     }
                 } else if (c.wasRemoved()) {
                     for (SortCriterionViewModel vm : c.getRemoved()) {
@@ -64,9 +71,31 @@ public class SaveOrderConfigPanel extends VBox {
         });
     }
 
-    private void createCriterionRow(SortCriterionViewModel criterionViewModel, int row) {
-        // int row = sortCriterionList.getRowCount(); // Add the new criteria at the bottom of the list
+    private void refreshBindings(SortCriterionViewModel criterionViewModel, int row) {
+        for (Node node : sortCriterionList.getChildren()) {
+            if (GridPane.getRowIndex(node) == row) {
+                if (GridPane.getColumnIndex(node) == 1) {
+                    @SuppressWarnings("unchecked") ComboBox<Field> comboBox = (ComboBox<Field>) node;
+                    if (comboBox.valueProperty().isBound()) {
+                        comboBox.valueProperty().unbind();
+                    }
+                    comboBox.valueProperty().bindBidirectional(criterionViewModel.fieldProperty());
+                } else if (GridPane.getColumnIndex(node) == 2) {
+                    CheckBox checkBox = (CheckBox) node;
+                    if (checkBox.selectedProperty().isBound()) {
+                        checkBox.selectedProperty().unbind();
+                    }
+                    checkBox.selectedProperty().bindBidirectional(criterionViewModel.descendingProperty());
+                } else if (GridPane.getColumnIndex(node) == 3) {
+                    HBox hBox = (HBox) node;
+                    hBox.getChildren().clear();
+                    hBox.getChildren().addAll(createRowButtons(criterionViewModel));
+                }
+            }
+        }
+    }
 
+    private void createCriterionRow(SortCriterionViewModel criterionViewModel, int row) {
         sortCriterionList.getChildren().stream()
                          .filter(item -> GridPane.getRowIndex(item) >= row)
                          .forEach(item -> {
@@ -94,6 +123,12 @@ public class SaveOrderConfigPanel extends VBox {
         descending.selectedProperty().bindBidirectional(criterionViewModel.descendingProperty());
         sortCriterionList.add(descending, 2, row);
 
+        HBox hBox = new HBox();
+        hBox.getChildren().addAll(createRowButtons(criterionViewModel));
+        sortCriterionList.add(hBox, 3, row);
+    }
+
+    private List<Node> createRowButtons(SortCriterionViewModel criterionViewModel) {
         Button remove = new Button("", new JabRefIconView(IconTheme.JabRefIcons.REMOVE_NOBOX));
         remove.getStyleClass().addAll("icon-button", "narrow");
         remove.setPrefHeight(20.0);
@@ -112,7 +147,7 @@ public class SaveOrderConfigPanel extends VBox {
         moveDown.setPrefWidth(20.0);
         moveDown.setOnAction(event -> moveCriterionDown(criterionViewModel));
 
-        sortCriterionList.add(new HBox(moveUp, moveDown, remove), 3, row);
+        return List.of(moveUp, moveDown, remove);
     }
 
     private void clearCriterionRow(int row) {
