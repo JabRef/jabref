@@ -17,6 +17,10 @@ class OOBibStyleGetNumCitationMarker {
      */
     public final static int UNRESOLVED_ENTRY_NUMBER = 0;
 
+    private OOBibStyleGetNumCitationMarker() {
+        /**/
+    }
+
     /**
      * Defines sort order for CitationMarkerNumericEntry.
      */
@@ -223,7 +227,7 @@ class OOBibStyleGetNumCitationMarker {
                 throw new IllegalArgumentException("getNumCitationMarker2: found negative number");
             }
 
-            if (currentBlock.size() == 0) {
+            if (currentBlock.isEmpty()) {
                 currentBlock.add(current);
             } else {
                 CitationMarkerNumericEntry prev = currentBlock.get(currentBlock.size() - 1);
