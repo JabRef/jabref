@@ -3,6 +3,8 @@ package org.jabref.logic.journals;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AbbreviationTest {
 
@@ -100,5 +102,13 @@ class AbbreviationTest {
     void testDefaultAndShortestUniqueAbbreviationsAreSame() {
         Abbreviation abbreviation = new Abbreviation("Long Name", "L N");
         assertEquals(abbreviation.getAbbreviation(), abbreviation.getShortestUniqueAbbreviation());
+    }
+
+    @Test
+    void testEquals() {
+      Abbreviation abbreviation = new Abbreviation("Long Name", "L N", "LN");
+      Abbreviation otherAbbreviation = new Abbreviation("Long Name", "L N", "LN");
+      assertTrue(abbreviation.equals(otherAbbreviation));
+      assertFalse(abbreviation.equals("String"));
     }
 }
