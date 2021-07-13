@@ -26,14 +26,14 @@ public class CitationLookupResult {
      *       Since within each GUI call we use a fixed list of databases, it is OK.
      */
     @Override
-    public boolean equals(Object o) {
-        if (o == this) {
+    public boolean equals(Object otherObject) {
+        if (otherObject == this) {
             return true;
         }
-        if (!(o instanceof CitationLookupResult)) {
+        if (!(otherObject instanceof CitationLookupResult)) {
             return false;
         }
-        CitationLookupResult that = (CitationLookupResult) o;
+        CitationLookupResult that = (CitationLookupResult) otherObject;
         return this.entry.equals(that.entry) && this.database.equals(that.database);
     }
 

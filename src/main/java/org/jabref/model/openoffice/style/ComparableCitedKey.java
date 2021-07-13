@@ -9,8 +9,8 @@ import org.jabref.model.entry.BibEntry;
  */
 public interface ComparableCitedKey {
 
-    public String getCitationKey();
+    String getCitationKey();
 
-    public Optional<BibEntry> getBibEntry();
+    Optional<BibEntry> getBibEntry();
 }
 
