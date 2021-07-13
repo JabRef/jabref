@@ -9,7 +9,7 @@ public class GroupDiff {
     private final GroupTreeNode originalGroupRoot;
     private final GroupTreeNode newGroupRoot;
 
-    private GroupDiff(GroupTreeNode originalGroupRoot, GroupTreeNode newGroupRoot) {
+    GroupDiff(GroupTreeNode originalGroupRoot, GroupTreeNode newGroupRoot) {
         this.originalGroupRoot = originalGroupRoot;
         this.newGroupRoot = newGroupRoot;
     }

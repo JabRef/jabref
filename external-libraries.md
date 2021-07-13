@@ -14,7 +14,7 @@ Below, there is a howto to generate the content at "Sorted list of runtime depen
 We follow the [SPDX license identifiers](https://spdx.org/licenses/).
 In case you add a library, please use these identifiers.
 For instance, "BSD" is not exact enough, there are numerous variants out there: BSD-2-Clause, BSD-3-Clause-No-Nuclear-Warranty, ...
-Note that the SPDX license identifiers are different from the ones used by debian. See https://wiki.debian.org/Proposals/CopyrightFormat for more information.
+Note that the SPDX license identifiers are different from the ones used by debian. See <https://wiki.debian.org/Proposals/CopyrightFormat> for more information.
 
 ## bst files
 
@@ -41,6 +41,13 @@ Note:    It is important to include v1.5.54 or later as v1.5.54 is the first ver
 ## Libraries
 
 (Sorted alphabetically by Id)
+
+```yaml
+Id:      com.fasterxml.jackson
+Project: Jackson Project
+URL:     https://github.com/FasterXML/jackson
+License: Apache-2.0
+```
 
 ```yaml
 Id:      com.github.tomtung
@@ -83,12 +90,6 @@ Id:      com.googlecode.javaewah:JavaEWAH
 Project: JavaEWAH
 URL:     https://github.com/lemire/javaewah
 License: Apache-2.0
-```
-
-```yaml
-Id:      com.ibm.icu:icu4j
-Project: International Components for Unicode for Java (ICU4J)
-URL:     https://wiki.eclipse.org/ICU4J
 ```
 
 ```yaml
@@ -172,20 +173,6 @@ License: Apache-2.0
 Id:      commons-logging:commons-logging
 Project: Apache Commons Logging
 URL:     http://commons.apache.org/logging/
-License: Apache-2.0
-```
-
-```yaml
-Id:      de.jensd:fontawesomefx-commons
-Project: FontAwesomeFX Commons
-URL:     https://bitbucket.org/Jerady/fontawesomefx
-License: Apache-2.0
-```
-
-```yaml
-Id:      de.jensd:fontawesomefx-materialdesignfont
-Project: FontAwesomeFX Material Design Font
-URL:     https://bitbucket.org/Jerady/fontawesomefx
 License: Apache-2.0
 ```
 
@@ -414,6 +401,13 @@ License: MIT
 ```
 
 ```yaml
+Id:      org.kordamp.ikonli
+Project: Ikonli
+URL:     https://kordamp.org/ikonli/
+License: Apache-2.0
+```
+
+```yaml
 Id:      org.mariadb.jdbc:mariadb-java-client
 Project: MariaDB Java Client
 URL:     https://mariadb.com/kb/en/library/about-mariadb-connector-j/
@@ -484,31 +478,36 @@ License: MPL-2.0 AND Apache-2.0
 ```
 
 ```yaml
-Id:      org.ow2.asm:asm
-Project: ASM
-URL:     https://asm.ow2.io/
-License: BSD-3-Clause
+Id:      org.yaml:snakeyaml
+Project: SnakeYAML
+URL:     https://bitbucket.org/asomov/snakeyaml-engine/src/master/
+License: Apache-2.0
 ```
 
 ## Sorted list of runtime dependencies output by gradle
 
-1. `gradlew dependencies > build\reports\project\dependencies.txt`
-2. Manually edit depedencies.txt to contain the tree of "compileClasspath" and "implementation" only
-3. `sed 's/^.* //' < build/reports/project/dependencies.txt | sort | uniq > build/dependencies-for-external-libraries.txt`
+1. `gradlew dependencies > build\dependencies.txt`
+2. Manually edit depedencies.txt to contain the tree of "compileClasspath" and "implementation" only. Otherwise, libraries such as "Apache Commons Lang 3" are missed.
+3. (on WSL) `sed 's/[^a-z]*//' < build/dependencies.txt | sort | uniq > build/dependencies-for-external-libraries.txt`
 
 ```text
+com.fasterxml.jackson.core:jackson-annotations:2.12.3
+com.fasterxml.jackson.core:jackson-core:2.12.3
+com.fasterxml.jackson.core:jackson-databind:2.12.3
+com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.12.3
+com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.3
+com.fasterxml.jackson:jackson-bom:2.12.3
 com.github.tomtung:latex2unicode_2.12:0.2.6
 com.google.code.gson:gson:2.8.6
-com.google.errorprone:error_prone_annotations:2.3.4
+com.google.errorprone:error_prone_annotations:2.5.1
 com.google.guava:failureaccess:1.0.1
-com.google.guava:guava:30.1-jre
+com.google.guava:guava:30.1.1-jre
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava
 com.google.j2objc:j2objc-annotations:1.3
 com.googlecode.javaewah:JavaEWAH:1.1.7
 com.h2database:h2-mvstore:1.4.200
-com.ibm.icu:icu4j:62.1
 com.jfoenix:jfoenix:9.0.10
-com.konghq:unirest-java:3.11.06
+com.konghq:unirest-java:3.11.11
 com.microsoft.azure:applicationinsights-core:2.4.1
 com.microsoft.azure:applicationinsights-logging-log4j2:2.4.1
 com.oracle.ojdbc:ojdbc10:19.3.0.0
@@ -519,7 +518,7 @@ com.oracle.ojdbc:simplefan:19.3.0.0
 com.oracle.ojdbc:ucp:19.3.0.0
 com.sun.istack:istack-commons-runtime:3.0.8
 com.sun.xml.fastinfoset:FastInfoset:1.2.16
-com.tobiasdiez:easybind:2.1.0
+com.tobiasdiez:easybind:2.2
 com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.62.2
 com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.62.2
 com.vladsch.flexmark:flexmark-util-ast:0.62.2
@@ -538,21 +537,20 @@ com.vladsch.flexmark:flexmark:0.62.2
 commons-cli:commons-cli:1.4
 commons-codec:commons-codec:1.11
 commons-logging:commons-logging:1.2
-de.jensd:fontawesomefx-commons:11.0
-de.jensd:fontawesomefx-materialdesignfont:1.7.22-11
 de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT
 de.saxsys:mvvmfx:1.8.0
-de.undercouch:citeproc-java:2.1.0-SNAPSHOT
+de.undercouch:citeproc-java:3.0.0-alpha.1
 eu.lestard:doc-annotations:0.2
 info.debatty:java-string-similarity:2.0.0
-io.github.java-diff-utils:java-diff-utils:4.9
+io.github.java-diff-utils:java-diff-utils:4.10
 jakarta.activation:jakarta.activation-api:1.2.1
 jakarta.annotation:jakarta.annotation-api:1.3.5
 jakarta.xml.bind:jakarta.xml.bind-api:2.3.2
 net.jcip:jcip-annotations:1.0
 net.jodah:typetools:0.6.1
 org.antlr:antlr-runtime:3.5.2
-org.antlr:antlr4-runtime:4.9
+org.antlr:antlr4-runtime:4.7.2 -> 4.9.2
+org.antlr:antlr4-runtime:4.9.2
 org.apache.commons:commons-csv:1.8
 org.apache.commons:commons-lang3:3.9
 org.apache.commons:commons-text:1.8
@@ -566,49 +564,47 @@ org.apache.logging.log4j:log4j-core:3.0.0-SNAPSHOT
 org.apache.logging.log4j:log4j-jcl:3.0.0-SNAPSHOT
 org.apache.logging.log4j:log4j-plugins:3.0.0-SNAPSHOT
 org.apache.logging.log4j:log4j-slf4j18-impl:3.0.0-SNAPSHOT
-org.apache.lucene:lucene-core:8.7.0
-org.apache.lucene:lucene-queries:8.7.0
-org.apache.lucene:lucene-queryparser:8.7.0
-org.apache.pdfbox:fontbox:2.0.22
-org.apache.pdfbox:pdfbox:2.0.22
-org.apache.pdfbox:xmpbox:2.0.22
-org.apache.tika:tika-core:1.25
-org.bouncycastle:bcprov-jdk15on:1.67
-org.checkerframework:checker-qual:3.5.0
-org.controlsfx:controlsfx:11.0.3
-org.eclipse.jgit:org.eclipse.jgit:5.10.0.202012080955-r
-org.fxmisc.flowless:flowless:0.6.2
-org.fxmisc.richtext:richtextfx:0.10.4
+org.apache.lucene:lucene-core:8.9.0
+org.apache.lucene:lucene-queries:8.9.0
+org.apache.lucene:lucene-queryparser:8.9.0
+org.apache.pdfbox:fontbox:2.0.24
+org.apache.pdfbox:pdfbox:2.0.24
+org.apache.pdfbox:xmpbox:2.0.24
+org.apache.tika:tika-core:1.26
+org.bouncycastle:bcprov-jdk15on:1.69
+org.checkerframework:checker-qual:3.8.0
+org.controlsfx:controlsfx:11.1.0
+org.eclipse.jgit:org.eclipse.jgit:5.12.0.202106070339-r
+org.fxmisc.flowless:flowless:0.6.3
+org.fxmisc.richtext:richtextfx:0.10.6
 org.fxmisc.undo:undofx:2.1.0
 org.fxmisc.wellbehaved:wellbehavedfx:0.3.3
 org.glassfish.hk2.external:jakarta.inject:2.6.1
 org.glassfish.jaxb:jaxb-runtime:2.3.2
 org.glassfish.jaxb:txw2:2.3.2
-org.graalvm.js:js:19.2.1
-org.graalvm.regex:regex:19.2.1
-org.graalvm.sdk:graal-sdk:19.2.1
-org.graalvm.truffle:truffle-api:19.2.1
 org.jbibtex:jbibtex:1.0.17
 org.jetbrains:annotations:15.0
 org.jsoup:jsoup:1.13.1
 org.jvnet.staxex:stax-ex:1.8.1
-org.libreoffice:libreoffice:7.0.3
-org.libreoffice:unoloader:7.0.4
-org.mariadb.jdbc:mariadb-java-client:2.7.1
-org.openjfx:javafx-base:15
-org.openjfx:javafx-controls:15
-org.openjfx:javafx-fxml:15
-org.openjfx:javafx-graphics:15
-org.openjfx:javafx-media:15
-org.openjfx:javafx-swing:15
-org.openjfx:javafx-web:15
-org.ow2.asm:asm-analysis:6.2.1
-org.ow2.asm:asm-commons:6.2.1
-org.ow2.asm:asm-tree:6.2.1
-org.ow2.asm:asm-util:6.2.1
-org.ow2.asm:asm:6.2.1
-org.postgresql:postgresql:42.2.18
+org.kordamp.ikonli:ikonli-core:12.2.0
+org.kordamp.ikonli:ikonli-javafx:12.2.0
+org.kordamp.ikonli:ikonli-materialdesign2-pack:12.2.0
+org.libreoffice:libreoffice:7.1.4
+org.libreoffice:unoloader:7.1.4
+org.mariadb.jdbc:mariadb-java-client:2.7.3
+org.openjfx:javafx-base:16
+org.openjfx:javafx-controls:16
+org.openjfx:javafx-fxml:16
+org.openjfx:javafx-graphics:16
+org.openjfx:javafx-media:16
+org.openjfx:javafx-swing:16
+org.openjfx:javafx-web:16
+org.postgresql:postgresql:42.2.22
 org.reactfx:reactfx:2.0-M5
 org.scala-lang:scala-library:2.12.8
+org.slf4j:slf4j-api:1.7.12 -> 2.0.0-alpha1
+org.slf4j:slf4j-api:1.7.30 -> 2.0.0-alpha1
+org.slf4j:slf4j-api:1.8.0-beta4 -> 2.0.0-alpha1
 org.slf4j:slf4j-api:2.0.0-alpha1
+org.yaml:snakeyaml:1.27
 ```

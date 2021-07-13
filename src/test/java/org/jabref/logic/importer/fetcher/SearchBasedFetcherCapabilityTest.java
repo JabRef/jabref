@@ -93,6 +93,7 @@ interface SearchBasedFetcherCapabilityTest {
 
         assertFalse(result.isEmpty());
         result.forEach(bibEntry -> {
+            assertTrue(bibEntry.hasField(StandardField.JOURNAL));
             String journal = bibEntry.getField(StandardField.JOURNAL).orElse("");
             assertTrue(journal.contains(getTestJournal().replace("\"", "")));
         });
