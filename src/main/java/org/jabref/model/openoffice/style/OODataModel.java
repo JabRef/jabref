@@ -26,8 +26,8 @@ public enum OODataModel {
         }
         if (pageInfo != null) {
             final int last = nCitations - 1;
-            Optional<OOText> pi = Optional.ofNullable(OOText.fromString(pageInfo));
-            pageInfos.set(last, PageInfo.normalizePageInfo(pi));
+            Optional<OOText> optionalPageInfo = Optional.ofNullable(OOText.fromString(pageInfo));
+            pageInfos.set(last, PageInfo.normalizePageInfo(optionalPageInfo));
         }
         return pageInfos;
     }
