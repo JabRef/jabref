@@ -121,8 +121,8 @@ public class CitationGroup {
      * indexInGlobalOrder
      */
 
-    public void setIndexInGlobalOrder(Optional<Integer> i) {
-        this.indexInGlobalOrder = i;
+    public void setIndexInGlobalOrder(Optional<Integer> indexInGlobalOrder) {
+        this.indexInGlobalOrder = indexInGlobalOrder;
     }
 
     public Optional<Integer> getIndexInGlobalOrder() {
