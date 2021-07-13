@@ -4,7 +4,7 @@
     <title>PAIN</title>
     <id>http://www.zotero.org/styles/pain</id>
     <link href="http://www.zotero.org/styles/pain" rel="self"/>
-    <link href="http://www.elsevier.com/journals/pain/0304-3959/guide-for-authors" rel="documentation"/>
+    <link href="https://edmgr.ovid.com/pain/accounts/Clinical%20Basic%20Science%20Research%20Reports_PAIN.pdf" rel="documentation"/>
     <author>
       <name>Sebastian Karcher</name>
     </author>
@@ -13,7 +13,7 @@
     <issn>0304-3959</issn>
     <eissn>1872-6623</eissn>
     <summary>Style for the Elsevier Journal PAIN - modified, alphabetical Vancouver</summary>
-    <updated>2018-09-26T19:28:25+00:00</updated>
+    <updated>2021-06-25T19:28:25+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <macro name="editor">
@@ -116,8 +116,6 @@
               <text macro="publisher"/>
               <text macro="year-date"/>
             </group>
-            <text variable="page"/>
-            <label variable="page" form="short"/>
           </group>
         </if>
         <else-if type="chapter paper-conference" match="any">
