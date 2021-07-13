@@ -27,11 +27,11 @@ public class CitedKey implements
     private Optional<String> uniqueLetter; // For AuthorYear citation styles.
     private Optional<OOText> normCitMarker;  // For AuthorYear citation styles.
 
-    CitedKey(String citationKey, CitationPath p, Citation cit) {
+    CitedKey(String citationKey, CitationPath path, Citation cit) {
 
         this.citationKey = citationKey;
         this.where = new ArrayList<>(); // remember order
-        this.where.add(p);
+        this.where.add(path);
 
         // synchronized with Citation
         this.db = cit.getLookupResult();
@@ -100,8 +100,8 @@ public class CitedKey implements
     /**
      * Appends to end of {@code where}
      */
-    void addPath(CitationPath p, Citation cit) {
-        this.where.add(p);
+    void addPath(CitationPath path, Citation cit) {
+        this.where.add(path);
 
         // Check consistency
         if (!cit.getLookupResult().equals(this.db)) {

@@ -24,18 +24,16 @@ public class CompareCitedKey implements Comparator<ComparableCitedKey> {
         Optional<BibEntry> bBibEntry = b.getBibEntry();
         final int mul = unresolvedComesFirst ? (+1) : (-1);
 
-        int res = 0;
         if (aBibEntry.isEmpty() && bBibEntry.isEmpty()) {
             // Both are unresolved: compare them by citation key.
-            res = a.getCitationKey().compareTo(b.getCitationKey());
+            return a.getCitationKey().compareTo(b.getCitationKey());
         } else if (aBibEntry.isEmpty()) {
             return -mul;
         } else if (bBibEntry.isEmpty()) {
             return mul;
         } else {
             // Proper comparison of entries
-            res = entryComparator.compare(aBibEntry.get(), bBibEntry.get());
+            return entryComparator.compare(aBibEntry.get(), bBibEntry.get());
         }
-        return res;
     }
 }
