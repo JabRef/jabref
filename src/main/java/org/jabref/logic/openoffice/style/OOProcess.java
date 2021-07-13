@@ -1,6 +1,5 @@
 package org.jabref.logic.openoffice.style;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -11,37 +10,26 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.openoffice.style.CitationGroups;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class OOProcess {
 
     static final Comparator<BibEntry> AUTHOR_YEAR_TITLE_COMPARATOR = makeAuthorYearTitleComparator();
     static final Comparator<BibEntry> YEAR_AUTHOR_TITLE_COMPARATOR = makeYearAuthorTitleComparator();
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OOProcess.class);
+    private OOProcess() {
+        /**/
+    }
 
     private static Comparator<BibEntry> makeAuthorYearTitleComparator() {
-        FieldComparator a = new FieldComparator(StandardField.AUTHOR);
-        FieldComparator y = new FieldComparator(StandardField.YEAR);
-        FieldComparator t = new FieldComparator(StandardField.TITLE);
-
-        List<Comparator<BibEntry>> ayt = new ArrayList<>(3);
-        ayt.add(a);
-        ayt.add(y);
-        ayt.add(t);
+        List<Comparator<BibEntry>> ayt = List.of(new FieldComparator(StandardField.AUTHOR),
+                                                 new FieldComparator(StandardField.YEAR),
+                                                 new FieldComparator(StandardField.TITLE));
         return new FieldComparatorStack<>(ayt);
     }
 
     private static Comparator<BibEntry> makeYearAuthorTitleComparator() {
-        FieldComparator y = new FieldComparator(StandardField.YEAR);
-        FieldComparator a = new FieldComparator(StandardField.AUTHOR);
-        FieldComparator t = new FieldComparator(StandardField.TITLE);
-
-        List<Comparator<BibEntry>> yat = new ArrayList<>(3);
-        yat.add(y);
-        yat.add(a);
-        yat.add(t);
+        List<Comparator<BibEntry>> yat = List.of(new FieldComparator(StandardField.YEAR),
+                                                 new FieldComparator(StandardField.AUTHOR),
+                                                 new FieldComparator(StandardField.TITLE));
         return new FieldComparatorStack<>(yat);
     }
 
