@@ -22,6 +22,10 @@ import org.jabref.model.strings.StringUtil;
 
 class OOBibStyleGetCitationMarker {
 
+    private OOBibStyleGetCitationMarker() {
+        /**/
+    }
+
     /**
      * Look up the nth author and return the "proper" last name for
      * citation markers.
@@ -29,23 +33,23 @@ class OOBibStyleGetCitationMarker {
      * Note: "proper" in the sense that it includes the "von" part
      *        of the name (followed by a space) if there is one.
      *
-     * @param al     The author list.
+     * @param authorList     The author list.
      * @param number The number of the author to return.
      * @return The author name, or an empty String if inapplicable.
      */
-    private static String getAuthorLastName(AuthorList al, int number) {
+    private static String getAuthorLastName(AuthorList authorList, int number) {
         StringBuilder sb = new StringBuilder();
 
-        if (al.getNumberOfAuthors() > number) {
-            Author a = al.getAuthor(number);
+        if (authorList.getNumberOfAuthors() > number) {
+            Author author = authorList.getAuthor(number);
             // "von " if von exists
-            Optional<String> von = a.getVon();
+            Optional<String> von = author.getVon();
             if (von.isPresent() && !von.get().isEmpty()) {
                 sb.append(von.get());
                 sb.append(' ');
             }
             // last name if it exists
-            sb.append(a.getLast().orElse(""));
+            sb.append(author.getLast().orElse(""));
         }
 
         return sb.toString();
@@ -306,23 +310,23 @@ class OOBibStyleGetCitationMarker {
     }
 
     /**
-     * How many authors would be emitted for ce, considering
-     * style and ce.getIsFirstAppearanceOfSource()
+     * How many authors would be emitted for entry, considering
+     * style and entry.getIsFirstAppearanceOfSource()
      *
-     * If ce is unresolved, return 0.
+     * If entry is unresolved, return 0.
      */
-    private static int calculateNAuthorsToEmit(OOBibStyle style, CitationMarkerEntry ce) {
+    private static int calculateNAuthorsToEmit(OOBibStyle style, CitationMarkerEntry entry) {
 
-        int maxAuthors = (ce.getIsFirstAppearanceOfSource()
-                          ? style.getMaxAuthorsFirst()
-                          : style.getMaxAuthors());
-
-        if (ce.getLookupResult().isEmpty()) {
+        if (entry.getLookupResult().isEmpty()) {
             // unresolved
             return 0;
         }
 
-        AuthorList authorList = getAuthorList(style, ce.getLookupResult().get());
+        int maxAuthors = (entry.getIsFirstAppearanceOfSource()
+                          ? style.getMaxAuthorsFirst()
+                          : style.getMaxAuthors());
+
+        AuthorList authorList = getAuthorList(style, entry.getLookupResult().get());
         int nAuthors = authorList.getNumberOfAuthors();
 
         if (maxAuthors == -1) {
@@ -342,21 +346,21 @@ class OOBibStyleGetCitationMarker {
      *                ignores isFirstAppearanceOfSource (always
      *                style.getMaxAuthors, not getMaxAuthorsFirst)
      *
-     * @param ces   The list of CitationMarkerEntry values to process.
+     * @param entries   The list of CitationMarkerEntry values to process.
      *
      *              Here we do not check for duplicate entries: those
      *              are handled by {@code getCitationMarker} by
      *              omitting them from the list.
      *
      *              Unresolved citations recognized by
-     *              ce.getBibEntry() and/or
-     *              ce.getDatabase() returning empty, and
+     *              entry.getBibEntry() and/or
+     *              entry.getDatabase() returning empty, and
      *              emitted as "Unresolved${citationKey}".
      *
      *              Neither uniqueLetter nor pageInfo are emitted
      *              for unresolved citations.
      *
-     * @param startsNewGroup Should have the same length as {@code ces}, and
+     * @param startsNewGroup Should have the same length as {@code entries}, and
      *               contain true for entries starting a new group,
      *               false for those that only add a uniqueLetter to
      *               the grouped presentation.
@@ -370,7 +374,7 @@ class OOBibStyleGetCitationMarker {
      */
     private static OOText getAuthorYearParenthesisMarker2(OOBibStyle style,
                                                           AuthorYearMarkerPurpose purpose,
-                                                          List<CitationMarkerEntry> ces,
+                                                          List<CitationMarkerEntry> entries,
                                                           boolean[] startsNewGroup,
                                                           Optional<Integer> maxAuthorsOverride) {
 
@@ -409,14 +413,14 @@ class OOBibStyleGetCitationMarker {
             sb.append(startBrace); // shared parenthesis
         }
 
-        for (int j = 0; j < ces.size(); j++) {
-            CitationMarkerEntry ce = ces.get(j);
+        for (int j = 0; j < entries.size(); j++) {
+            CitationMarkerEntry entry = entries.get(j);
             boolean startingNewGroup = startsNewGroup[j];
-            boolean endingAGroup = (j + 1 == ces.size()) || startsNewGroup[j + 1];
+            boolean endingAGroup = (j + 1 == entries.size()) || startsNewGroup[j + 1];
 
             if (!startingNewGroup) {
                 // Just add our uniqueLetter
-                String uniqueLetter = ce.getUniqueLetter().orElse(null);
+                String uniqueLetter = entry.getUniqueLetter().orElse(null);
                 if (uniqueLetter != null) {
                     sb.append(uniquefierSeparator);
                     sb.append(uniqueLetter);
@@ -436,26 +440,26 @@ class OOBibStyleGetCitationMarker {
             StringBuilder pageInfoPart = new StringBuilder("");
             if (purpose != AuthorYearMarkerPurpose.NORMALIZED) {
                 Optional<OOText> pageInfo =
-                    PageInfo.normalizePageInfo(ce.getPageInfo());
+                    PageInfo.normalizePageInfo(entry.getPageInfo());
                 if (pageInfo.isPresent()) {
                     pageInfoPart.append(pageInfoSeparator);
                     pageInfoPart.append(OOText.toString(pageInfo.get()));
                 }
             }
 
-            final boolean isUnresolved = ce.getLookupResult().isEmpty();
+            final boolean isUnresolved = entry.getLookupResult().isEmpty();
             if (isUnresolved) {
-                sb.append(String.format("Unresolved(%s)", ce.getCitationKey()));
+                sb.append(String.format("Unresolved(%s)", entry.getCitationKey()));
                 if (purpose != AuthorYearMarkerPurpose.NORMALIZED) {
                     sb.append(pageInfoPart);
                 }
             } else {
 
-                CitationLookupResult db = ce.getLookupResult().get();
+                CitationLookupResult db = entry.getLookupResult().get();
 
                 int maxAuthors = (purpose == AuthorYearMarkerPurpose.NORMALIZED
                                   ? style.getMaxAuthors()
-                                  : calculateNAuthorsToEmit(style, ce));
+                                  : calculateNAuthorsToEmit(style, entry));
 
                 if (maxAuthorsOverride.isPresent()) {
                     maxAuthors = maxAuthorsOverride.get();
@@ -476,7 +480,7 @@ class OOBibStyleGetCitationMarker {
                 }
 
                 if (purpose != AuthorYearMarkerPurpose.NORMALIZED) {
-                    String uniqueLetter = ce.getUniqueLetter().orElse(null);
+                    String uniqueLetter = entry.getUniqueLetter().orElse(null);
                     if (uniqueLetter != null) {
                         sb.append(uniqueLetter);
                     }
@@ -547,10 +551,10 @@ class OOBibStyleGetCitationMarker {
                                               CitationMarkerNormEntry cne,
                                               Optional<Integer> maxAuthorsOverride) {
         boolean[] startsNewGroup = {true};
-        CitationMarkerEntry ce = new CitationMarkerNormEntryWrap(cne);
+        CitationMarkerEntry entry = new CitationMarkerNormEntryWrap(cne);
         return getAuthorYearParenthesisMarker2(style,
                                                AuthorYearMarkerPurpose.NORMALIZED,
-                                               Collections.singletonList(ce),
+                                               Collections.singletonList(entry),
                                                startsNewGroup,
                                                maxAuthorsOverride);
     }
@@ -630,8 +634,8 @@ class OOBibStyleGetCitationMarker {
         int[] nAuthorsToEmit = new int[nEntries];
         int[] nAuthorsToEmitRevised = new int[nEntries];
         for (int i = 0; i < nEntries; i++) {
-            CitationMarkerEntry ce = citationMarkerEntries.get(i);
-            int n = calculateNAuthorsToEmit(style, ce);
+            CitationMarkerEntry entry = citationMarkerEntries.get(i);
+            int n = calculateNAuthorsToEmit(style, entry);
             nAuthorsToEmit[i] = n;
             nAuthorsToEmitRevised[i] = n;
         }

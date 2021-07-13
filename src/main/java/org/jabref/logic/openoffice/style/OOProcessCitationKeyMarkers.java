@@ -9,6 +9,11 @@ import org.jabref.model.openoffice.style.CitationGroups;
 import org.jabref.model.openoffice.util.OOListUtil;
 
 class OOProcessCitationKeyMarkers {
+
+    private OOProcessCitationKeyMarkers() {
+        /**/
+    }
+
     /**
      *  Produce citation markers for the case when the citation
      *  markers are the citation keys themselves, separated by commas.
