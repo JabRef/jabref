@@ -79,29 +79,28 @@ public class CitationGroups {
         /*
          * It is not clear which of the two solutions below is better.
          */
-        if (true) {
-            // collect-lookup-distribute
-            //
-            // CitationDatabaseLookupResult for the same citation key is the same object. Until we
-            // insert a new citation from the GUI.
-            CitedKeys cks = getCitedKeysUnordered();
-            cks.lookupInDatabases(databases);
-            cks.distributeLookupResults(this);
-        } else {
-            // lookup each citation directly
-            //
-            // CitationDatabaseLookupResult for the same citation key may be a different object:
-            // CitedKey.addPath has to use equals, so CitationDatabaseLookupResult has to override
-            // Object.equals, which depends on BibEntry.equals and BibDatabase.equals doing the
-            // right thing. Seems to work. But what we gained from avoiding collect-and-distribute
-            // may be lost in more complicated consistency checking in addPath.
-            //
-            for (CitationGroup cg : getCitationGroupsUnordered()) {
-                for (Citation cit : cg.citationsInStorageOrder) {
-                    cit.lookupInDatabases(databases);
-                }
-            }
-        }
+
+        // (1) collect-lookup-distribute
+        //
+        // CitationDatabaseLookupResult for the same citation key is the same object. Until we
+        // insert a new citation from the GUI.
+        CitedKeys cks = getCitedKeysUnordered();
+        cks.lookupInDatabases(databases);
+        cks.distributeLookupResults(this);
+
+        // (2) lookup each citation directly
+        //
+        // CitationDatabaseLookupResult for the same citation key may be a different object:
+        // CitedKey.addPath has to use equals, so CitationDatabaseLookupResult has to override
+        // Object.equals, which depends on BibEntry.equals and BibDatabase.equals doing the
+        // right thing. Seems to work. But what we gained from avoiding collect-and-distribute
+        // may be lost in more complicated consistency checking in addPath.
+        //
+        ///            for (CitationGroup cg : getCitationGroupsUnordered()) {
+        ///                for (Citation cit : cg.citationsInStorageOrder) {
+        ///                    cit.lookupInDatabases(databases);
+        ///                }
+        ///            }
     }
 
     public List<CitationGroup> getCitationGroupsUnordered() {
@@ -162,11 +161,11 @@ public class CitationGroups {
             int storageIndexInGroup = 0;
             for (Citation cit : cg.citationsInStorageOrder) {
                 String key = cit.citationKey;
-                CitationPath p = new CitationPath(cg.cgid, storageIndexInGroup);
+                CitationPath path = new CitationPath(cg.cgid, storageIndexInGroup);
                 if (res.containsKey(key)) {
-                    res.get(key).addPath(p, cit);
+                    res.get(key).addPath(path, cit);
                 } else {
-                    res.put(key, new CitedKey(key, p, cit));
+                    res.put(key, new CitedKey(key, path, cit));
                 }
                 storageIndexInGroup++;
             }
@@ -178,19 +177,19 @@ public class CitationGroups {
      * CitedKeys created iterating citations in (globalOrder,localOrder)
      */
     public CitedKeys getCitedKeysSortedInOrderOfAppearance() {
-        LinkedHashMap<String, CitedKey> res = new LinkedHashMap<>();
         if (!hasGlobalOrder()) {
             throw new IllegalStateException("getSortedCitedKeys: no globalOrder");
         }
+        LinkedHashMap<String, CitedKey> res = new LinkedHashMap<>();
         for (CitationGroup cg : getCitationGroupsInGlobalOrder()) {
             for (int i : cg.getLocalOrder()) {
                 Citation cit = cg.citationsInStorageOrder.get(i);
                 String citationKey = cit.citationKey;
-                CitationPath p = new CitationPath(cg.cgid, i);
+                CitationPath path = new CitationPath(cg.cgid, i);
                 if (res.containsKey(citationKey)) {
-                    res.get(citationKey).addPath(p, cit);
+                    res.get(citationKey).addPath(path, cit);
                 } else {
-                    res.put(citationKey, new CitedKey(citationKey, p, cit));
+                    res.put(citationKey, new CitedKey(citationKey, path, cit));
                 }
             }
         }
