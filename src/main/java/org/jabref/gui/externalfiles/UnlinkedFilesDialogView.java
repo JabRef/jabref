@@ -54,6 +54,8 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
 
     @FXML private TextField directoryPathField;
     @FXML private ComboBox<FileExtensionViewModel> fileTypeCombo;
+    @FXML private ComboBox<DateRange> fileDateCombo;
+    @FXML private ComboBox<ExternalFileSorter> fileSortCombo;
     @FXML private CheckTreeView<FileNodeViewModel> unlinkedFilesList;
     @FXML private Button scanButton;
     @FXML private Button exportButton;
@@ -141,11 +143,23 @@ public class UnlinkedFilesDialogView extends BaseDialog<Void> {
         fileTypeCombo.setItems(viewModel.getFileFilters());
         fileTypeCombo.valueProperty().bindBidirectional(viewModel.selectedExtensionProperty());
         fileTypeCombo.getSelectionModel().selectFirst();
+        new ViewModelListCellFactory<DateRange>()
+            .withText(DateRange::getDateRange)
+            .install(fileDateCombo);
+        fileDateCombo.setItems(viewModel.getDateFilters());
+        fileDateCombo.valueProperty().bindBidirectional(viewModel.selectedDateProperty());
+        fileDateCombo.getSelectionModel().selectFirst();
+        new ViewModelListCellFactory<ExternalFileSorter>()
+                .withText(ExternalFileSorter::getSorter)
+                .install(fileSortCombo);
+        fileSortCombo.setItems(viewModel.getSorters());
+        fileSortCombo.valueProperty().bindBidirectional(viewModel.selectedSortProperty());
+        fileSortCombo.getSelectionModel().selectFirst();
     }
 
     private void initUnlinkedFilesList() {
         new ViewModelTreeCellFactory<FileNodeViewModel>()
-                .withText(FileNodeViewModel::getDisplayText)
+                .withText(FileNodeViewModel::getDisplayTextWithEditDate)
                 .install(unlinkedFilesList);
 
         unlinkedFilesList.maxHeightProperty().bind(((Control) filePane.contentProperty().get()).heightProperty());
