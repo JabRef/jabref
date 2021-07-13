@@ -93,8 +93,8 @@ public class Citation implements ComparableCitation, CitationMarkerEntry, Citati
         return number;
     }
 
-    public void setNumber(Optional<Integer> n) {
-        number = n;
+    public void setNumber(Optional<Integer> number) {
+        this.number = number;
     }
 
     public int getNumberOrThrow() {
@@ -109,12 +109,12 @@ public class Citation implements ComparableCitation, CitationMarkerEntry, Citati
         this.uniqueLetter = uniqueLetter;
     }
 
-    public void setPageInfo(Optional<OOText> v) {
-        Optional<OOText> vv = PageInfo.normalizePageInfo(v);
-        if (!vv.equals(v)) {
+    public void setPageInfo(Optional<OOText> pageInfo) {
+        Optional<OOText> normalizedPageInfo = PageInfo.normalizePageInfo(pageInfo);
+        if (!normalizedPageInfo.equals(pageInfo)) {
             throw new IllegalArgumentException("setPageInfo argument is not normalized");
         }
-        this.pageInfo = vv;
+        this.pageInfo = normalizedPageInfo;
     }
 
     public void setIsFirstAppearanceOfSource(boolean value) {
@@ -124,19 +124,19 @@ public class Citation implements ComparableCitation, CitationMarkerEntry, Citati
     /*
      * Setters for CitationGroups.distribute()
      */
-    public static void setLookupResult(OOPair<Citation, Optional<CitationLookupResult>> x) {
-        Citation cit = x.a;
-        cit.db = x.b;
+    public static void setLookupResult(OOPair<Citation, Optional<CitationLookupResult>> pair) {
+        Citation cit = pair.a;
+        cit.db = pair.b;
     }
 
-    public static void setNumber(OOPair<Citation, Optional<Integer>> x) {
-        Citation cit = x.a;
-        cit.number = x.b;
+    public static void setNumber(OOPair<Citation, Optional<Integer>> pair) {
+        Citation cit = pair.a;
+        cit.number = pair.b;
     }
 
-    public static void setUniqueLetter(OOPair<Citation, Optional<String>> x) {
-        Citation cit = x.a;
-        cit.uniqueLetter = x.b;
+    public static void setUniqueLetter(OOPair<Citation, Optional<String>> pair) {
+        Citation cit = pair.a;
+        cit.uniqueLetter = pair.b;
     }
 
 }
