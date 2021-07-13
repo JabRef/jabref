@@ -21,6 +21,10 @@ import org.jabref.model.openoffice.util.OOListUtil;
 
 class OOProcessAuthorYearMarkers {
 
+    private OOProcessAuthorYearMarkers() {
+        /**/
+    }
+
     /**
      *  Fills {@code sortedCitedKeys//normCitMarker}
      */
