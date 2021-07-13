@@ -13,15 +13,16 @@ public class PageInfo {
     /*
      * pageInfo normalization
      */
-    public static Optional<OOText> normalizePageInfo(Optional<OOText> o) {
-        if (o == null || o.isEmpty() || "".equals(OOText.toString(o.get()))) {
+    public static Optional<OOText> normalizePageInfo(Optional<OOText> optionalText) {
+        if (optionalText == null || optionalText.isEmpty() || "".equals(OOText.toString(optionalText.get()))) {
             return Optional.empty();
         }
-        String s = OOText.toString(o.get());
-        if (s.trim().equals("")) {
+        String str = OOText.toString(optionalText.get());
+        String trimmed = str.trim();
+        if (trimmed.equals("")) {
             return Optional.empty();
         }
-        return Optional.of(OOText.fromString(s.trim()));
+        return Optional.of(OOText.fromString(trimmed));
     }
 
     /**
