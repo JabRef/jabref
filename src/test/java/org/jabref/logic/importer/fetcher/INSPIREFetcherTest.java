@@ -33,15 +33,15 @@ class INSPIREFetcherTest {
     @Test
     void searchByQueryFindsEntry() throws Exception {
         BibEntry master = new BibEntry(StandardEntryType.MastersThesis)
-                .withCitationKey("Diez:2014ppa")
+                .withCitationKey("Diez:2013fdp")
                 .withField(StandardField.AUTHOR, "Diez, Tobias")
-                .withField(StandardField.TITLE, "Slice theorem for Fr\\'echet group actions and covariant symplectic field theory")
+                .withField(StandardField.TITLE, "Slice theorem for Fréchet group actions and covariant symplectic field theory")
                 .withField(StandardField.SCHOOL, "Leipzig U.")
                 .withField(StandardField.YEAR, "2013")
                 .withField(StandardField.EPRINT, "1405.2249")
                 .withField(StandardField.ARCHIVEPREFIX, "arXiv")
                 .withField(StandardField.PRIMARYCLASS, "math-ph");
-        List<BibEntry> fetchedEntries = fetcher.performSearch("Fr\\´echet group actions field");
+        List<BibEntry> fetchedEntries = fetcher.performSearch("Fréchet group actions field");
         assertEquals(Collections.singletonList(master), fetchedEntries);
     }
 

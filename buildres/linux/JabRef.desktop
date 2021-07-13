@@ -9,4 +9,4 @@ Type=Application
 DESKTOP_MIMES
 Categories=DEPLOY_BUNDLE_CATEGORY
 Keywords=bibtex;biblatex;latex;bibliography
-StartupWMClass=org.jabref.gui.JabRefMain
+StartupWMClass=jabref
