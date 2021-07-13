@@ -6,8 +6,8 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
-import org.jabref.logic.crawler.git.GitHandler;
 import org.jabref.logic.exporter.SavePreferences;
+import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.preferences.TimestampPreferences;
@@ -30,7 +30,7 @@ class StudyDatabaseToFetcherConverterTest {
     SavePreferences savePreferences;
     TimestampPreferences timestampPreferences;
     BibEntryTypesManager entryTypesManager;
-    GitHandler gitHandler;
+    SlrGitHandler gitHandler;
     @TempDir
     Path tempRepositoryDirectory;
 
@@ -47,7 +47,7 @@ class StudyDatabaseToFetcherConverterTest {
         when(importFormatPreferences.isKeywordSyncEnabled()).thenReturn(false);
         when(importFormatPreferences.getEncoding()).thenReturn(StandardCharsets.UTF_8);
         entryTypesManager = new BibEntryTypesManager();
-        gitHandler = mock(GitHandler.class, Answers.RETURNS_DEFAULTS);
+        gitHandler = mock(SlrGitHandler.class, Answers.RETURNS_DEFAULTS);
     }
 
     @Test

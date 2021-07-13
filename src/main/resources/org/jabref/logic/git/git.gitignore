@@ -1,0 +1,4 @@
+### JabRef ###
+# JabRef database specific files for persistence, not relevant to persist
+*.sav
+*.bak
