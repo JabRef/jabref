@@ -56,7 +56,7 @@ public class CopyMoreAction extends SimpleCommand {
             case COPY_CITE_KEY -> copyCiteKey();
             case COPY_KEY_AND_TITLE -> copyKeyAndTitle();
             case COPY_KEY_AND_LINK -> copyKeyAndLink();
-            case COPY_DOI -> copyDOI();
+            case COPY_DOI -> copyDoi();
             default -> LOGGER.info("Unknown copy command.");
         }
     }
@@ -114,30 +114,30 @@ public class CopyMoreAction extends SimpleCommand {
         }
     }
 
-    private void copyDOI() {
+    private void copyDoi() {
         List<BibEntry> entries = stateManager.getSelectedEntries();
 
         // Collect all non-null DOIs.
-        List<String> DOIs = entries.stream()
+        List<String> dois = entries.stream()
                                    .filter(entry -> entry.getDOI().isPresent())
                                    .map(entry -> entry.getDOI().get().getDOI())
                                    .collect(Collectors.toList());
 
-        if (DOIs.isEmpty()) {
+        if (dois.isEmpty()) {
             dialogService.notify(Localization.lang("None of the selected entries have DOIs."));
             return;
         }
 
-        final String copiedDOIs = String.join(",", DOIs);
-        clipBoardManager.setContent(copiedDOIs);
+        final String copiedDois = String.join(",", dois);
+        clipBoardManager.setContent(copiedDois);
 
-        if (DOIs.size() == entries.size()) {
+        if (dois.size() == entries.size()) {
             // All entries had DOIs.
             dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
-                    JabRefDialogService.shortenDialogMessage(copiedDOIs)));
+                    JabRefDialogService.shortenDialogMessage(copiedDois)));
         } else {
             dialogService.notify(Localization.lang("Warning: %0 out of %1 entries have undefined DOIs.",
-                    Integer.toString(entries.size() - DOIs.size()), Integer.toString(entries.size())));
+                    Integer.toString(entries.size() - dois.size()), Integer.toString(entries.size())));
         }
     }
 
