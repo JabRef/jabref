@@ -83,6 +83,12 @@ public class PdfSearcherTest {
     }
 
     @Test
+    public void searchForAnnotation() throws IOException, ParseException {
+        PdfSearchResults result = search.search("annotation", 10);
+        assertEquals(2, result.numSearchResults());
+    }
+
+    @Test
     public void searchForEmptyString() throws IOException {
         PdfSearchResults result = search.search("", 10);
         assertEquals(0, result.numSearchResults());

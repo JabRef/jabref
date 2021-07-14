@@ -21,10 +21,13 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.interactive.annotation.AnnotationFilter;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.jabref.model.pdf.search.SearchFieldConstants.ANNOTATIONS;
 import static org.jabref.model.pdf.search.SearchFieldConstants.CONTENT;
 import static org.jabref.model.pdf.search.SearchFieldConstants.MODIFIED;
 import static org.jabref.model.pdf.search.SearchFieldConstants.PATH;
@@ -122,6 +125,20 @@ public final class DocumentReader {
             if (StringUtil.isNotBlank(pdfContent)) {
                 newDocument.add(new TextField(CONTENT, pdfContent, Field.Store.YES));
             }
+            pdfDocument.getPages().forEach(page -> {
+                try {
+                    for (PDAnnotation annotation : page.getAnnotations( annotation -> {
+                        if (annotation.getContents() == null) {
+                            return false;
+                        }
+                        return annotation.getSubtype().equals("Text") || annotation.getSubtype().equals("Highlight");
+                    })) {
+                        newDocument.add(new TextField(ANNOTATIONS, annotation.getContents(), Field.Store.YES));
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
         } catch (IOException e) {
             LOGGER.info("Could not read contents of PDF document \"{}\"", pdfDocument.toString(), e);
         }
