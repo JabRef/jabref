@@ -201,14 +201,6 @@ public class BibDatabaseContext {
         this.location = DatabaseLocation.SHARED;
     }
 
-    @Override
-    public String toString() {
-        return "BibDatabaseContext{" +
-                "path=" + path +
-                ", location=" + location +
-                '}';
-    }
-
     public void convertToLocalDatabase() {
         if (Objects.nonNull(dbmsListener) && (location == DatabaseLocation.SHARED)) {
             dbmsListener.unregisterListener(dbmsSynchronizer);
@@ -228,10 +220,21 @@ public class BibDatabaseContext {
 
     public Path getFulltextIndexPath() {
         Path appData = getSearchIndexBasePath();
-        LOGGER.info("Index path for {} is {}", getDatabasePath().get().toString(), appData.toString());
+        LOGGER.info("Index path for {} is {}", getDatabasePath().get(), appData.toString());
         if (getDatabasePath().isPresent()) {
             return appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
         }
         return appData.resolve("unsaved");
+    }
+
+    @Override
+    public String toString() {
+        return "BibDatabaseContext{" +
+                "metaData=" + metaData +
+                ", mode=" + getMode() +
+                ", databasePath=" + getDatabasePath() +
+                ", biblatexMode=" + isBiblatexMode() +
+                ", fulltextIndexPath=" + getFulltextIndexPath() +
+                '}';
     }
 }
