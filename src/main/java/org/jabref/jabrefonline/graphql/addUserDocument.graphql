@@ -1,0 +1,6 @@
+mutation addUserDocument($document: DocumentRawInput!){
+  addUserDocumentRaw(document: $document)
+  {
+    id
+  }
+}

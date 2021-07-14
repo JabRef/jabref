@@ -3,7 +3,6 @@ import org.gradle.internal.os.OperatingSystem
 import org.jabref.build.JournalAbbreviationConverter
 import org.jabref.build.xjc.XjcPlugin
 import org.jabref.build.xjc.XjcTask
-
 // to update the gradle wrapper, execute
 // ./gradlew wrapper --gradle-version=6.0 --distribution-type=bin
 
@@ -33,6 +32,8 @@ plugins {
     id 'project-report'
 
     id 'idea'
+
+    id "com.apollographql.apollo" version '2.5.9'
 }
 
 // Enable following for debugging
@@ -383,6 +384,19 @@ task generateJournalAbbreviationList(type: JournalAbbreviationConverter) {
     inputDir = file("build/journals")
 
     outputDir = file("src/main/resources/journals")
+}
+
+apollo {
+  schemaFile = file("src/main/java/org/jabref/jabrefonline/graphql/schema.json")
+  graphqlSourceDirectorySet.srcDirs += "src/main/java/org/jabref/jabrefonline/graphql/"
+  graphqlSourceDirectorySet.excludes = ["schema.json"]
+  customTypeMapping = [
+    "DateTime" : "java.time.LocalDateTime"
+  ]
+  generateKotlinModels = false
+  nullableValueType = "javaOptional"
+  useJavaBeansSemanticNaming = true
+  rootPackageName = "org.jabref.jabrefonline"
 }
 
 tasks.withType(JavaCompile) {
