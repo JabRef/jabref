@@ -21,7 +21,6 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.interactive.annotation.AnnotationFilter;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
@@ -127,7 +126,7 @@ public final class DocumentReader {
             }
             pdfDocument.getPages().forEach(page -> {
                 try {
-                    for (PDAnnotation annotation : page.getAnnotations( annotation -> {
+                    for (PDAnnotation annotation : page.getAnnotations(annotation -> {
                         if (annotation.getContents() == null) {
                             return false;
                         }

@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.LibraryTab;
-import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
