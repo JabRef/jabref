@@ -310,7 +310,7 @@ License: Apache-2.0
 ```
 
 ```yaml
-Id:      org.apache.lucene:lucene-ueryparser
+Id:      org.apache.lucene:lucene-queryparser
 Project: Apache Lucene
 URL:     https://lucene.apache.org/
 License: Apache-2.0
@@ -567,6 +567,9 @@ org.apache.logging.log4j:log4j-slf4j18-impl:3.0.0-SNAPSHOT
 org.apache.lucene:lucene-core:8.9.0
 org.apache.lucene:lucene-queries:8.9.0
 org.apache.lucene:lucene-queryparser:8.9.0
+org.apache.lucene:lucene-analyzers-common:8.9.0
+org.apache.lucene:lucene-backward-codecs:8.9.0
+org.apache.lucene:lucene-highlighter:8.9.0
 org.apache.pdfbox:fontbox:2.0.24
 org.apache.pdfbox:pdfbox:2.0.24
 org.apache.pdfbox:xmpbox:2.0.24

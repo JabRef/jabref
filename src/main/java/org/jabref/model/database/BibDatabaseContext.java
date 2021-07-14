@@ -9,12 +9,18 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
+import org.jabref.gui.LibraryTab;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.util.CoarseChangeFilter;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.metadata.MetaData;
+import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.preferences.FilePreferences;
+
+import net.harawata.appdirs.AppDirsFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents everything related to a BIB file. <p> The entries are stored in BibDatabase, the other data in MetaData
@@ -22,6 +28,10 @@ import org.jabref.preferences.FilePreferences;
  */
 @AllowedToUseLogic("because it needs access to shared database features")
 public class BibDatabaseContext {
+
+    public static final String SEARCH_INDEX_BASE_PATH = "JabRef";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
     private final BibDatabase database;
     private MetaData metaData;
@@ -191,14 +201,6 @@ public class BibDatabaseContext {
         this.location = DatabaseLocation.SHARED;
     }
 
-    @Override
-    public String toString() {
-        return "BibDatabaseContext{" +
-                "path=" + path +
-                ", location=" + location +
-                '}';
-    }
-
     public void convertToLocalDatabase() {
         if (Objects.nonNull(dbmsListener) && (location == DatabaseLocation.SHARED)) {
             dbmsListener.unregisterListener(dbmsSynchronizer);
@@ -210,5 +212,29 @@ public class BibDatabaseContext {
 
     public List<BibEntry> getEntries() {
         return database.getEntries();
+    }
+
+    public static Path getFulltextIndexBasePath() {
+        return Path.of(AppDirsFactory.getInstance().getUserDataDir(SEARCH_INDEX_BASE_PATH, SearchFieldConstants.VERSION, "org.jabref"));
+    }
+
+    public Path getFulltextIndexPath() {
+        Path appData = getFulltextIndexBasePath();
+        LOGGER.info("Index path for {} is {}", getDatabasePath().get(), appData.toString());
+        if (getDatabasePath().isPresent()) {
+            return appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
+        }
+        return appData.resolve("unsaved");
+    }
+
+    @Override
+    public String toString() {
+        return "BibDatabaseContext{" +
+                "metaData=" + metaData +
+                ", mode=" + getMode() +
+                ", databasePath=" + getDatabasePath() +
+                ", biblatexMode=" + isBiblatexMode() +
+                ", fulltextIndexPath=" + getFulltextIndexPath() +
+                '}';
     }
 }

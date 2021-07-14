@@ -142,10 +142,6 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.9.2'
     implementation 'org.antlr:antlr4-runtime:4.9.2'
 
-    implementation (group: 'org.apache.lucene', name: 'lucene-queryparser', version: '8.9.0') {
-        exclude group: 'org.apache.lucene', module: 'lucene-sandbox'
-    }
-
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.12.0.202106070339-r'
 
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.12.4'
@@ -208,6 +204,8 @@ dependencies {
     implementation 'com.vladsch.flexmark:flexmark:0.62.2'
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.62.2'
     implementation 'com.vladsch.flexmark:flexmark-ext-gfm-tasklist:0.62.2'
+
+    implementation group: 'net.harawata', name: 'appdirs', version: '1.2.1'
 
     testImplementation 'io.github.classgraph:classgraph:4.8.110'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
