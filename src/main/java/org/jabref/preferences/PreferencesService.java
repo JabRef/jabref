@@ -17,7 +17,6 @@ import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableNameFormatPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
-import org.jabref.gui.util.Theme;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.bibtex.FieldWriterPreferences;
@@ -250,10 +249,6 @@ public interface PreferencesService {
     //*************************************************************************************************************
     // AppearancePreferences
     //*************************************************************************************************************
-
-    Theme getTheme();
-
-    void updateTheme();
 
     AppearancePreferences getAppearancePreferences();
 

@@ -11,8 +11,9 @@ import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
+import org.jabref.gui.theme.Theme;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.FileDialogConfiguration;
-import org.jabref.gui.util.Theme;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.strings.StringUtil;
@@ -30,8 +31,6 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
     public static SpinnerValueFactory<Integer> fontSizeValueFactory =
             new SpinnerValueFactory.IntegerSpinnerValueFactory(9, Integer.MAX_VALUE);
 
-    private static final String EMBEDDED_DARK_THEME_CSS = "Dark.css";
-
     private final BooleanProperty fontOverrideProperty = new SimpleBooleanProperty();
     private final StringProperty fontSizeProperty = new SimpleStringProperty();
     private final BooleanProperty themeLightProperty = new SimpleBooleanProperty();
@@ -41,6 +40,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final PreferencesService preferences;
+    private final ThemeManager themeManager;
     private final AppearancePreferences initialAppearancePreferences;
 
     private final Validator fontSizeValidator;
@@ -48,9 +48,10 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
 
     private final List<String> restartWarnings = new ArrayList<>();
 
-    public AppearanceTabViewModel(DialogService dialogService, PreferencesService preferences) {
+    public AppearanceTabViewModel(DialogService dialogService, PreferencesService preferences, ThemeManager themeManager) {
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.themeManager = themeManager;
         this.initialAppearancePreferences = preferences.getAppearancePreferences();
 
         fontSizeValidator = new FunctionBasedValidator<>(
@@ -82,11 +83,11 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
         fontSizeProperty.setValue(String.valueOf(initialAppearancePreferences.getMainFontSize()));
 
         Theme currentTheme = initialAppearancePreferences.getTheme();
-        if (currentTheme.getType() == Theme.Type.LIGHT) {
+        if (currentTheme.getType() == Theme.Type.DEFAULT) {
             themeLightProperty.setValue(true);
             themeDarkProperty.setValue(false);
             themeCustomProperty.setValue(false);
-        } else if (currentTheme.getType() == Theme.Type.DARK) {
+        } else if (currentTheme.getType() == Theme.Type.EMBEDDED) {
             themeLightProperty.setValue(false);
             themeDarkProperty.setValue(true);
             themeCustomProperty.setValue(false);
@@ -94,7 +95,7 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
             themeLightProperty.setValue(false);
             themeDarkProperty.setValue(false);
             themeCustomProperty.setValue(true);
-            customPathToThemeProperty.setValue(currentTheme.getCssPathString());
+            customPathToThemeProperty.setValue(currentTheme.getName());
         }
     }
 
@@ -104,33 +105,20 @@ public class AppearanceTabViewModel implements PreferenceTabViewModel {
             restartWarnings.add(Localization.lang("Override font settings"));
         }
 
-        int newFontSize = Integer.parseInt(fontSizeProperty.getValue());
-        if (initialAppearancePreferences.getMainFontSize() != newFontSize) {
-            restartWarnings.add(Localization.lang("Override font size"));
+        Theme newTheme = Theme.light(); // default;
+        if (themeDarkProperty.getValue()) {
+            newTheme = Theme.dark();
+        } else if (themeCustomProperty.getValue()) {
+            newTheme = Theme.custom(customPathToThemeProperty.getValue());
         }
 
-        Theme newTheme = initialAppearancePreferences.getTheme();
-        if (themeLightProperty.getValue() && initialAppearancePreferences.getTheme().getType() != Theme.Type.LIGHT) {
-            restartWarnings.add(Localization.lang("Theme changed to light theme."));
-            newTheme = new Theme("", preferences);
-        } else if (themeDarkProperty.getValue() && initialAppearancePreferences.getTheme().getType() != Theme.Type.DARK) {
-            restartWarnings.add(Localization.lang("Theme changed to dark theme."));
-            newTheme = new Theme(EMBEDDED_DARK_THEME_CSS, preferences);
-        } else if (themeCustomProperty.getValue() &&
-                (!initialAppearancePreferences.getTheme().getCssPathString()
-                                              .equalsIgnoreCase(customPathToThemeProperty.getValue())
-                        || initialAppearancePreferences.getTheme().getType() != Theme.Type.CUSTOM)) {
-            restartWarnings.add(Localization.lang("Theme changed to a custom theme:") + " "
-                    + customPathToThemeProperty().getValue());
-            newTheme = new Theme(customPathToThemeProperty.getValue(), preferences);
-        }
-
-        preferences.storeAppearancePreference(new AppearancePreferences(
+        AppearancePreferences newAppearancePreferences = new AppearancePreferences(
                 fontOverrideProperty.getValue(),
-                newFontSize,
-                newTheme));
+                Integer.parseInt(fontSizeProperty.getValue()),
+                newTheme);
 
-        preferences.updateTheme();
+        preferences.storeAppearancePreference(newAppearancePreferences);
+        themeManager.updateTheme();
     }
 
     public ValidationStatus fontSizeValidationStatus() {

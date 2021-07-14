@@ -42,7 +42,7 @@ public class BaseDialog<T> extends Dialog<T> implements org.jabref.gui.Dialog<T>
 
         EasyBind.wrapNullable(dialogPaneProperty())
                 .mapObservable(Node::sceneProperty)
-                .subscribeToValues(scene -> Globals.prefs.getTheme().installCss(scene));
+                .subscribeToValues(scene -> Globals.getThemeManager().installCss(scene));
     }
 
     private Optional<Button> getDefaultButton() {

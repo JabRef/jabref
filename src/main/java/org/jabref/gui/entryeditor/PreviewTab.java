@@ -5,6 +5,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preview.PreviewPanel;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -15,6 +16,7 @@ public class PreviewTab extends EntryEditorTab {
     private final BibDatabaseContext databaseContext;
     private final PreferencesService preferences;
     private final StateManager stateManager;
+    private final ThemeManager themeManager;
     private final ExternalFileTypes externalFileTypes;
     private PreviewPanel previewPanel;
 
@@ -22,11 +24,13 @@ public class PreviewTab extends EntryEditorTab {
                       DialogService dialogService,
                       PreferencesService preferences,
                       StateManager stateManager,
+                      ThemeManager themeManager,
                       ExternalFileTypes externalFileTypes) {
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.stateManager = stateManager;
+        this.themeManager = themeManager;
         this.externalFileTypes = externalFileTypes;
 
         setGraphic(IconTheme.JabRefIcons.TOGGLE_ENTRY_PREVIEW.getGraphicNode());
@@ -55,7 +59,7 @@ public class PreviewTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         if (previewPanel == null) {
-            previewPanel = new PreviewPanel(databaseContext, dialogService, externalFileTypes, preferences.getKeyBindingRepository(), preferences, stateManager);
+            previewPanel = new PreviewPanel(databaseContext, dialogService, externalFileTypes, preferences.getKeyBindingRepository(), preferences, stateManager, themeManager);
             setContent(previewPanel);
         }
 

@@ -2,6 +2,8 @@ package org.jabref.gui.preferences.appearance;
 
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -14,6 +16,7 @@ import javafx.util.converter.IntegerStringConverter;
 
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.l10n.Localization;
 
@@ -28,6 +31,8 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
     @FXML private RadioButton themeDark;
     @FXML private RadioButton customTheme;
     @FXML private TextField customThemePath;
+
+    @Inject private ThemeManager themeManager;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -53,7 +58,7 @@ public class AppearanceTab extends AbstractPreferenceTabView<AppearanceTabViewMo
     }
 
     public void initialize() {
-        this.viewModel = new AppearanceTabViewModel(dialogService, preferencesService);
+        this.viewModel = new AppearanceTabViewModel(dialogService, preferencesService, themeManager);
 
         fontOverride.selectedProperty().bindBidirectional(viewModel.fontOverrideProperty());
 

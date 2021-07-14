@@ -10,6 +10,7 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.WatchServiceUnavailableException;
@@ -34,13 +35,13 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
     private final Multimap<Path, FileUpdateListener> listeners = ArrayListMultimap.create(20, 4);
     private volatile WatchService watcher;
     private final AtomicBoolean notShutdown = new AtomicBoolean(true);
-    private Optional<JabRefException> filesystemMonitorFailure;
+    private final AtomicReference<Optional<JabRefException>> filesystemMonitorFailure = new AtomicReference<>(Optional.empty());
 
     @Override
     public void run() {
         try (WatchService watcher = FileSystems.getDefault().newWatchService()) {
             this.watcher = watcher;
-            filesystemMonitorFailure = Optional.empty();
+            filesystemMonitorFailure.set(Optional.empty());
 
             while (notShutdown.get()) {
                 WatchKey key;
@@ -68,15 +69,16 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
                 Thread.yield();
             }
         } catch (IOException e) {
-            filesystemMonitorFailure = Optional.of(new WatchServiceUnavailableException(e.getMessage(),
-                                                                                        e.getLocalizedMessage(), e.getCause()));
-            LOGGER.warn(filesystemMonitorFailure.get().getLocalizedMessage(), e);
+            JabRefException exception = new WatchServiceUnavailableException(
+                    e.getMessage(), e.getLocalizedMessage(), e.getCause());
+            filesystemMonitorFailure.set(Optional.of(exception));
+            LOGGER.warn(exception.getLocalizedMessage(), e);
         }
     }
 
     @Override
     public boolean isActive() {
-        return filesystemMonitorFailure.isEmpty();
+        return filesystemMonitorFailure.get().isEmpty();
     }
 
     private void notifyAboutChange(Path path) {
@@ -90,6 +92,8 @@ public class DefaultFileUpdateMonitor implements Runnable, FileUpdateMonitor {
             Path directory = file.toAbsolutePath().getParent();
             directory.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY);
             listeners.put(file, listener);
+        } else {
+            LOGGER.warn("Not adding listener {} to file {} because the file update monitor isn't active", listener, file);
         }
     }
 
