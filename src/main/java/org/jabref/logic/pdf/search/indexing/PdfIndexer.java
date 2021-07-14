@@ -60,16 +60,6 @@ public class PdfIndexer {
      * Adds all PDF files linked to an entry in the database to new Lucene search index. Any previous state of the
      * Lucene search index will be deleted!
      *
-     * @param parserResult a bibtex database to link the pdf files to
-     */
-    public void createIndex(ParserResult parserResult) {
-        createIndex(parserResult.getDatabase(), parserResult.getDatabaseContext());
-    }
-
-    /**
-     * Adds all PDF files linked to an entry in the database to new Lucene search index. Any previous state of the
-     * Lucene search index will be deleted!
-     *
      * @param database a bibtex database to link the pdf files to
      */
     public void createIndex(BibDatabase database, BibDatabaseContext context) {

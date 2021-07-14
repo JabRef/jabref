@@ -6,7 +6,6 @@ import java.util.Queue;
 
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -55,17 +54,6 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         }
     }
 
-    public void createIndex(PdfIndexer indexer, ParserResult parserResult) {
-        enqueueTask(new BackgroundTask<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                this.updateProgress(-1, 1);
-                indexer.createIndex(parserResult);
-                return null;
-            }
-        });
-    }
-
     public void createIndex(PdfIndexer indexer, BibDatabase database, BibDatabaseContext context) {
         enqueueTask(new BackgroundTask<Void>() {
             @Override
@@ -110,17 +98,6 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
         });
     }
 
-    public void addToIndex(PdfIndexer indexer, BibEntry entry, LinkedFile linkedFile, BibDatabaseContext databaseContext) {
-        enqueueTask(new BackgroundTask<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                this.updateProgress(-1, 1);
-                indexer.addToIndex(entry, linkedFile, databaseContext);
-                return null;
-            }
-        });
-    }
-
     public void removeFromIndex(PdfIndexer indexer, BibEntry entry, List<LinkedFile> linkedFiles) {
         enqueueTask(new BackgroundTask<Void>() {
             @Override
@@ -141,44 +118,6 @@ public class IndexingTaskManager extends BackgroundTask<Void> {
                return null;
            }
        });
-    }
-
-    public void removeFromIndex(PdfIndexer indexer, BibEntry entry, LinkedFile linkedFile) {
-        enqueueTask(new BackgroundTask<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                this.updateProgress(-1, 1);
-                indexer.removeFromIndex(entry, linkedFile);
-                return null;
-            }
-        });
-    }
-
-    public void removeFromIndex(PdfIndexer indexer, BibDatabaseContext databaseContext) {
-        enqueueTask(new BackgroundTask<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                int progressCounter = 0;
-                this.updateProgress(progressCounter, databaseContext.getEntries().size());
-                for (BibEntry entry : databaseContext.getEntries()) {
-                    indexer.removeFromIndex(entry);
-                    progressCounter++;
-                    this.updateProgress(progressCounter, databaseContext.getEntries().size());
-                }
-                return null;
-            }
-        });
-    }
-
-    public void flushIndex(PdfIndexer indexer) {
-        enqueueTask(new BackgroundTask<Void>() {
-            @Override
-            protected Void call() throws Exception {
-                this.updateProgress(-1, 1);
-                indexer.flushIndex();
-                return null;
-            }
-        });
     }
 
     public void updateDatabaseName(String name) {

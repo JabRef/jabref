@@ -22,11 +22,6 @@ public final class PdfSearchResults {
         return Collections.unmodifiableList(sortedList);
     }
 
-    private List<SearchResult> getSortedByAlphabet() {
-        // TODO implement sorting
-        throw new RuntimeException("Not implemented");
-    }
-
     public List<SearchResult> getSearchResults() {
         return this.searchResults;
     }
