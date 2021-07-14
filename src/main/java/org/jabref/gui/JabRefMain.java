@@ -26,6 +26,7 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
 import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.preferences.JabRefPreferences;
@@ -151,8 +152,8 @@ public class JabRefMain extends Application {
     }
 
     private static void clearOldSearchIndices() {
-        Path appData = Path.of(AppDirsFactory.getInstance().getUserDataDir("JabRef", null, "org.jabref"));
-        Path currentIndexPath = Path.of(AppDirsFactory.getInstance().getUserDataDir("JabRef", SearchFieldConstants.VERSION, "org.jabref"));
+        Path currentIndexPath = BibDatabaseContext.getSearchIndexBasePath();
+        Path appData = currentIndexPath.getParent();
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(appData)) {
             for (Path path : stream) {

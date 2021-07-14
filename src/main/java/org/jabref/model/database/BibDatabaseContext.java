@@ -29,6 +29,8 @@ import org.slf4j.LoggerFactory;
 @AllowedToUseLogic("because it needs access to shared database features")
 public class BibDatabaseContext {
 
+    public static final String SEARCH_INDEX_BASE_PATH = "JabRef";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
 
     private final BibDatabase database;
@@ -220,8 +222,12 @@ public class BibDatabaseContext {
         return database.getEntries();
     }
 
+    public static Path getSearchIndexBasePath() {
+        return Path.of(AppDirsFactory.getInstance().getUserDataDir(SEARCH_INDEX_BASE_PATH, SearchFieldConstants.VERSION, "org.jabref"));
+    }
+
     public Path getFulltextIndexPath() {
-        Path appData = Path.of(AppDirsFactory.getInstance().getUserDataDir("JabRef", SearchFieldConstants.VERSION, "org.jabref"));
+        Path appData = getSearchIndexBasePath();
         LOGGER.info("Index path for {} is {}", getDatabasePath().get().toString(), appData.toString());
         if (getDatabasePath().isPresent()) {
             return appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
