@@ -88,25 +88,18 @@ public final class DocumentReader {
             Document newDocument = new Document();
             addIdentifiers(newDocument, pdf.getLink());
             addContentIfNotEmpty(pdfDocument, newDocument);
-            addMetaData(pdfDocument, newDocument, resolvedPdfPath);
+            addMetaData(newDocument, resolvedPdfPath);
             return newDocument;
         }
     }
 
-    private void addMetaData(PDDocument pdfDocument, Document newDocument, Path resolvedPdfPath) {
+    private void addMetaData(Document newDocument, Path resolvedPdfPath) {
         try {
             BasicFileAttributes attributes = Files.readAttributes(resolvedPdfPath, BasicFileAttributes.class);
             addStringField(newDocument, MODIFIED, String.valueOf(attributes.lastModifiedTime().to(TimeUnit.SECONDS)));
         } catch (IOException e) {
             LOGGER.error("Could not read timestamp for {}", resolvedPdfPath, e);
         }
-    }
-
-    private void addTextField(Document newDocument, String field, String value) {
-        if (!isValidField(value)) {
-            return;
-        }
-        newDocument.add(new TextField(field, value, Field.Store.YES));
     }
 
     private void addStringField(Document newDocument, String field, String value) {
