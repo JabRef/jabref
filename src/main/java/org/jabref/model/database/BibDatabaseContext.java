@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.LibraryTab;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseSynchronizer;
