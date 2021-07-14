@@ -222,7 +222,7 @@ public class BibDatabaseContext {
     }
 
     public Path getFulltextIndexPath() {
-        Path appData = Path.of(AppDirsFactory.getInstance().getUserDataDir(JabRefFrame.FRAME_TITLE, SearchFieldConstants.VERSION, "org.jabref"));
+        Path appData = Path.of(AppDirsFactory.getInstance().getUserDataDir("JabRef", SearchFieldConstants.VERSION, "org.jabref"));
         LOGGER.info("Index path for {} is {}", getDatabasePath().get().toString(), appData.toString());
         if (getDatabasePath().isPresent()) {
             return appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));

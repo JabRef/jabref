@@ -151,8 +151,8 @@ public class JabRefMain extends Application {
     }
 
     private static void clearOldSearchIndices() {
-        Path appData = Path.of(AppDirsFactory.getInstance().getUserDataDir(JabRefFrame.FRAME_TITLE, null, "org.jabref"));
-        Path currentIndexPath = Path.of(AppDirsFactory.getInstance().getUserDataDir(JabRefFrame.FRAME_TITLE, SearchFieldConstants.VERSION, "org.jabref"));
+        Path appData = Path.of(AppDirsFactory.getInstance().getUserDataDir("JabRef", null, "org.jabref"));
+        Path currentIndexPath = Path.of(AppDirsFactory.getInstance().getUserDataDir("JabRef", SearchFieldConstants.VERSION, "org.jabref"));
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(appData)) {
             for (Path path : stream) {
