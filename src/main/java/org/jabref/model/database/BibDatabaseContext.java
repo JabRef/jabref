@@ -214,12 +214,12 @@ public class BibDatabaseContext {
         return database.getEntries();
     }
 
-    public static Path getSearchIndexBasePath() {
+    public static Path getFulltextIndexBasePath() {
         return Path.of(AppDirsFactory.getInstance().getUserDataDir(SEARCH_INDEX_BASE_PATH, SearchFieldConstants.VERSION, "org.jabref"));
     }
 
     public Path getFulltextIndexPath() {
-        Path appData = getSearchIndexBasePath();
+        Path appData = getFulltextIndexBasePath();
         LOGGER.info("Index path for {} is {}", getDatabasePath().get(), appData.toString());
         if (getDatabasePath().isPresent()) {
             return appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));

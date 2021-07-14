@@ -28,11 +28,9 @@ import org.jabref.logic.util.OS;
 import org.jabref.migrations.PreferencesMigrations;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.pdf.search.SearchFieldConstants;
 import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
-import net.harawata.appdirs.AppDirsFactory;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -152,7 +150,7 @@ public class JabRefMain extends Application {
     }
 
     private static void clearOldSearchIndices() {
-        Path currentIndexPath = BibDatabaseContext.getSearchIndexBasePath();
+        Path currentIndexPath = BibDatabaseContext.getFulltextIndexBasePath();
         Path appData = currentIndexPath.getParent();
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(appData)) {
