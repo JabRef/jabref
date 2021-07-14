@@ -124,7 +124,7 @@ JabRef uses the logging facade [SLF4j](https://www.slf4j.org/). All log messages
 * Obtaining a logger for a class:
 
   ```java
-  private static final Log LOGGER = LogFactory.getLog(<ClassName>.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(<ClassName>.class);
   ```
 
 * If the logging event is caused by an exception, please add the exception to the log message as:
