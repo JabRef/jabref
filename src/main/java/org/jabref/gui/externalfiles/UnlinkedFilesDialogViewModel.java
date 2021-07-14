@@ -55,6 +55,8 @@ public class UnlinkedFilesDialogViewModel {
     private final ImportHandler importHandler;
     private final StringProperty directoryPath = new SimpleStringProperty("");
     private final ObjectProperty<FileExtensionViewModel> selectedExtension = new SimpleObjectProperty<>();
+    private final ObjectProperty<DateRange> selectedDate = new SimpleObjectProperty<>();
+    private final ObjectProperty<ExternalFileSorter> selectedSort = new SimpleObjectProperty<>();
 
     private final ObjectProperty<Optional<FileNodeViewModel>> treeRootProperty = new SimpleObjectProperty<>();
     private final SimpleListProperty<TreeItem<FileNodeViewModel>> checkedFileListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -65,6 +67,9 @@ public class UnlinkedFilesDialogViewModel {
 
     private final ObservableList<ImportFilesResultItemViewModel> resultList = FXCollections.observableArrayList();
     private final ObservableList<FileExtensionViewModel> fileFilterList;
+    private final ObservableList<DateRange> dateFilterList;
+    private final ObservableList<ExternalFileSorter> fileSortList;
+
     private final DialogService dialogService;
     private final PreferencesService preferences;
     private BackgroundTask<FileNodeViewModel> findUnlinkedFilesTask;
@@ -90,9 +95,13 @@ public class UnlinkedFilesDialogViewModel {
                 stateManager);
 
         this.fileFilterList = FXCollections.observableArrayList(
-                new FileExtensionViewModel(StandardFileType.ANY_FILE, externalFileTypes),
-                new FileExtensionViewModel(StandardFileType.BIBTEX_DB, externalFileTypes),
-                new FileExtensionViewModel(StandardFileType.PDF, externalFileTypes));
+            new FileExtensionViewModel(StandardFileType.ANY_FILE, externalFileTypes),
+            new FileExtensionViewModel(StandardFileType.BIBTEX_DB, externalFileTypes),
+            new FileExtensionViewModel(StandardFileType.PDF, externalFileTypes));
+
+        this.dateFilterList = FXCollections.observableArrayList(DateRange.values());
+
+        this.fileSortList = FXCollections.observableArrayList(ExternalFileSorter.values());
 
         Predicate<String> isDirectory = path -> Files.isDirectory(Path.of(path));
         scanDirectoryValidator = new FunctionBasedValidator<>(directoryPath, isDirectory,
@@ -104,11 +113,12 @@ public class UnlinkedFilesDialogViewModel {
     public void startSearch() {
         Path directory = this.getSearchDirectory();
         Filter<Path> selectedFileFilter = selectedExtension.getValue().dirFilter();
-
+        DateRange selectedDateFilter = selectedDate.getValue();
+        ExternalFileSorter selectedSortFilter = selectedSort.getValue();
         progressValueProperty.unbind();
         progressTextProperty.unbind();
 
-        findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, bibDatabase, preferences.getFilePreferences())
+        findUnlinkedFilesTask = new UnlinkedFilesCrawler(directory, selectedFileFilter, selectedDateFilter, selectedSortFilter, bibDatabase, preferences.getFilePreferences())
                 .onRunning(() -> {
                     progressValueProperty.set(ProgressIndicator.INDETERMINATE_PROGRESS);
                     progressTextProperty.setValue(Localization.lang("Searching file system..."));
@@ -189,6 +199,14 @@ public class UnlinkedFilesDialogViewModel {
         return this.fileFilterList;
     }
 
+    public ObservableList<DateRange> getDateFilters() {
+        return this.dateFilterList;
+    }
+
+    public ObservableList<ExternalFileSorter> getSorters() {
+        return this.fileSortList;
+    }
+
     public void cancelTasks() {
         if (findUnlinkedFilesTask != null) {
             findUnlinkedFilesTask.cancel();
@@ -232,6 +250,14 @@ public class UnlinkedFilesDialogViewModel {
 
     public ObjectProperty<FileExtensionViewModel> selectedExtensionProperty() {
         return this.selectedExtension;
+    }
+
+    public ObjectProperty<DateRange> selectedDateProperty() {
+        return this.selectedDate;
+    }
+
+    public ObjectProperty<ExternalFileSorter> selectedSortProperty() {
+        return this.selectedSort;
     }
 
     public StringProperty directoryPathProperty() {
