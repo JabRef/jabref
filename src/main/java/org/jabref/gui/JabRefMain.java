@@ -168,6 +168,5 @@ public class JabRefMain extends Application {
         } catch (IOException e) {
             LOGGER.error("Could not access app-directory at {}", appData, e);
         }
-
     }
 }

@@ -98,7 +98,7 @@ public final class DocumentReader {
             BasicFileAttributes attributes = Files.readAttributes(resolvedPdfPath, BasicFileAttributes.class);
             addStringField(newDocument, MODIFIED, String.valueOf(attributes.lastModifiedTime().to(TimeUnit.SECONDS)));
         } catch (IOException e) {
-            LOGGER.error("Could not read timestamp for " + resolvedPdfPath, e);
+            LOGGER.error("Could not read timestamp for {}", resolvedPdfPath, e);
         }
     }
 

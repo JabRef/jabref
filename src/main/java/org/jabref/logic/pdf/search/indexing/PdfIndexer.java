@@ -201,7 +201,7 @@ public class PdfIndexer {
     private void writeToIndex(BibEntry entry, LinkedFile linkedFile) {
         Optional<Path> resolvedPath = linkedFile.findIn(databaseContext, filePreferences);
         if (resolvedPath.isEmpty()) {
-            LOGGER.warn("Could not find " + linkedFile.getLink());
+            LOGGER.warn("Could not find {}", linkedFile.getLink());
             return;
         }
         try {
