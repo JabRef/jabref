@@ -310,6 +310,7 @@ public class IconTheme {
         FETCH_FULLTEXT(MaterialDesignS.SEARCH_WEB),
         FETCH_BY_IDENTIFIER(MaterialDesignC.CLIPBOARD_ARROW_DOWN),
         TOGGLE_ABBREVIATION(MaterialDesignF.FORMAT_ALIGN_CENTER),
+        VIEW_JOURNAL_STATISTICS(MaterialDesignC.CHART_BAR),
         NEW_FILE(MaterialDesignP.PLUS),
         DOWNLOAD(MaterialDesignD.DOWNLOAD),
         OWNER(MaterialDesignA.ACCOUNT),

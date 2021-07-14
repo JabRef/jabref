@@ -2,6 +2,8 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.Optional;
 
+import javafx.scene.control.Button;
+
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -34,5 +36,11 @@ public class JournalEditorViewModel extends AbstractEditorViewModel {
                 // panel.getUndoManager().addEdit(new UndoableFieldChange(entry, editor.getName(), text, nextAbbreviation));
             }
         }
+    }
+
+    public void getJournalStatistics(Button journalStatisticsButton) {
+        JournalEditorPopOver popOver = new JournalEditorPopOver();
+        popOver.openPopOver(journalStatisticsButton);
+
     }
 }
