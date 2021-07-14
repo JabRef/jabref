@@ -27,6 +27,7 @@ public final class BuildInfo {
     public final String astrophysicsDataSystemAPIKey;
     public final String ieeeAPIKey;
     public final String scienceDirectApiKey;
+    public final String worldCatAPIKey;
     public final String minRequiredJavaVersion;
     public final boolean allowJava9;
 
@@ -55,6 +56,7 @@ public final class BuildInfo {
         astrophysicsDataSystemAPIKey = BuildInfo.getValue(properties, "astrophysicsDataSystemAPIKey", "tAhPRKADc6cC26mZUnAoBt3MAjCvKbuCZsB4lI3c");
         ieeeAPIKey = BuildInfo.getValue(properties, "ieeeAPIKey", "5jv3wyt4tt2bwcwv7jjk7pc3");
         scienceDirectApiKey = BuildInfo.getValue(properties, "scienceDirectApiKey", "fb82f2e692b3c72dafe5f4f1fa0ac00b");
+        worldCatAPIKey = BuildInfo.getValue(properties, "worldCatAPIKey", "");
         minRequiredJavaVersion = properties.getProperty("minRequiredJavaVersion", "1.8");
         allowJava9 = "true".equals(properties.getProperty("allowJava9", "true"));
     }

@@ -130,6 +130,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We added some symbols and keybindings to the context menu in the entry editor. [#7268](https://github.com/JabRef/jabref/pull/7268)
 - We added keybindings for setting and clearing the read status. [#7264](https://github.com/JabRef/jabref/issues/7264)
 - We added two new fields to track the creation and most recent modification date and time for each entry. [koppor#130](https://github.com/koppor/jabref/issues/130)
+- We added a fetcher for [WorldCat](https://www.worldcat.org/). [#1065](https://github.com/JabRef/jabref/issues/1065) [#2581](https://github.com/JabRef/jabref/issues/2581)
 - We added a feature that allows the user to copy highlighted text in the preview window. [#6962](https://github.com/JabRef/jabref/issues/6962)
 - We added a feature that allows you to create new BibEntry via paste arxivId [#2292](https://github.com/JabRef/jabref/issues/2292)
 - We added support for conducting automated and systematic literature search across libraries and git support for persistence [#369](https://github.com/koppor/jabref/issues/369)

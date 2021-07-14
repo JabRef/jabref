@@ -27,6 +27,7 @@ import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.CleanupPreset;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
+import org.jabref.logic.importer.FetcherApiPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.importsettings.ImportSettingsPreferences;
@@ -302,6 +303,10 @@ public interface PreferencesService {
     ImportSettingsPreferences getImportSettingsPreferences();
 
     void storeImportSettingsPreferences(ImportSettingsPreferences preferences);
+
+    FetcherApiPreferences getApiKeyPreferences();
+
+    void storeApiKeyPreferences(FetcherApiPreferences preferences);
 
     //*************************************************************************************************************
     // Preview preferences

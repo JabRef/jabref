@@ -1,0 +1,38 @@
+<entries>
+    <entry>
+        <dc:date>1994</dc:date>
+        <dc:description>Reading between the texts : Benjamin Thomas's Abraham Lincoln and Stephen Oates's With malice towards none / Robert Bray--"A horse chestnut is not a chestnut horse" : a refutation of Bray, Davis, MacGregor, and Wollan--Stephen B. Oates.</dc:description>
+        <dc:format>2 volumes ; 23 cm.</dc:format>
+        <dc:language xsi:type="http://purl.org/dc/terms/ISO639-2">eng</dc:language>
+        <dc:publisher>McFarland</dc:publisher>
+        <dc:relation>Bray, Robert. Reading between the texts : Benjamin Thomas's Abraham Lincoln and Stephen Oates's With malice toward none.</dc:relation>
+        <dc:relation>Oates, Stephen B. Horse chestnut is not a chestnut horse : a refutation of Bray, Davis, MacGregor, and Wollan.</dc:relation>
+        <dc:relation>Journal of information ethics, v. 3 no. 1-2</dc:relation>
+        <dc:subject xsi:type="http://purl.org/dc/terms/LCSH">Oates, Stephen B. With malice toward none.</dc:subject>
+        <dc:subject xsi:type="http://purl.org/dc/terms/LCSH">Thomas, Benjamin Platt, 1902-1956. Abraham Lincoln.</dc:subject>
+        <dc:subject xsi:type="http://purl.org/dc/terms/LCSH">Plagiarism--United States.</dc:subject>
+        <dc:title>Plagiarism.</dc:title>
+        <dc:type>Text</dc:type>
+        <oclcterms:recordCreationDate xsi:type="http://purl.org/oclc/terms/marc008date">950303</oclcterms:recordCreationDate>
+        <oclcterms:recordIdentifier>32079910</oclcterms:recordIdentifier>
+    </entry>
+    <entry>
+        <dc:contributor>Virgin records international.</dc:contributor>
+        <dc:contributor>Virgin France.</dc:contributor>
+        <dc:contributor>Virgin Schallplatten Gmbh.</dc:contributor>
+        <dc:creator>Sparks.</dc:creator>
+        <dc:date>1997 (P)</dc:date>
+        <dc:description>Texte des chansons.</dc:description>
+        <dc:description>Munchen 40 : prod. Virgin Schallplatten GmbH, P 1997.</dc:description>
+        <dc:description>Notice en anglais / Keaton-Welles, Amelia.</dc:description>
+        <dc:format>1 disque compact + 1 brochure ([20] p.) : ill. en coul. ; 12 cm</dc:format>
+        <dc:language xsi:type="http://purl.org/dc/terms/ISO639-2">eng</dc:language>
+        <dc:publisher>Virgin records international </dc:publisher>
+        <dc:publisher>Distrib. Virgin France</dc:publisher>
+        <dc:relation xsi:type="http://purl.org/dc/terms/URI">http://catalogue.bnf.fr/ark:/12148/cb383781119</dc:relation>
+        <dc:title>Plagiarism</dc:title>
+        <dc:type>Sound</dc:type>
+        <oclcterms:recordCreationDate xsi:type="http://purl.org/oclc/terms/marc008date">971008</oclcterms:recordCreationDate>
+        <oclcterms:recordIdentifier>659047837</oclcterms:recordIdentifier>
+    </entry>
+</entries>

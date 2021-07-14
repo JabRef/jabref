@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.icon.JabRefIconView?>
+<fx:root spacing="10.0" type="VBox" prefWidth="650.0"
+         xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+         fx:controller="org.jabref.gui.preferences.fetcher.FetcherTab">
+
+    <Label styleClass="titleHeader" text="%Fetcher API keys"/>
+
+    <Label text="Use custom API keys"/>
+    <GridPane hgap="10.0" vgap="4.0">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="30.0"/>
+            <ColumnConstraints hgrow="SOMETIMES"/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="10.0" />
+            <RowConstraints minHeight="10.0" />
+        </rowConstraints>
+        <CheckBox fx:id="useWorldcatKey" text="%WorldCat" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <TextField fx:id="worldcatKey" disable="${!useWorldcatKey.selected}"
+                   GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+        <HBox alignment="BASELINE_LEFT" spacing="4.0" onMouseClicked="#openWorldcatWebpage"
+              GridPane.rowIndex="1" GridPane.columnIndex="1">
+            <Button styleClass="icon-button,narrow" onAction="#openWorldcatWebpage" text="%Request a key on the WorldCat platform."
+                    prefHeight="15.0" GridPane.columnIndex="2">
+                <graphic>
+                    <JabRefIconView glyph="LINK_VARIANT"/>
+                </graphic>
+            </Button>
+        </HBox>
+    </GridPane>
+</fx:root>

@@ -73,6 +73,7 @@ import org.jabref.logic.cleanup.Cleanups;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.exporter.SavePreferences;
 import org.jabref.logic.exporter.TemplateExporter;
+import org.jabref.logic.importer.FetcherApiPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fileformat.CustomImporter;
@@ -273,6 +274,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String CLEANUP_FORMATTERS = "CleanUpFormatters";
     public static final String IMPORT_FILENAMEPATTERN = "importFileNamePattern";
     public static final String IMPORT_FILEDIRPATTERN = "importFileDirPattern";
+    public static final String IMPORT_API_WORLDCAT = "importAPIWorldcat";
     public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
@@ -647,6 +649,8 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(IMPORT_FILEDIRPATTERN, "");
         // Download files by default
         defaults.put(DOWNLOAD_LINKED_FILES, true);
+
+        defaults.put(IMPORT_API_WORLDCAT, "");
 
         String defaultExpression = "**/.*[citationkey].*\\\\.[extension]";
         defaults.put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
@@ -2341,6 +2345,16 @@ public class JabRefPreferences implements PreferencesService {
             remove(CUSTOM_EXPORT_FORMAT + i);
             i++;
         }
+    }
+
+    @Override
+    public FetcherApiPreferences getApiKeyPreferences() {
+        return new FetcherApiPreferences(get(IMPORT_API_WORLDCAT));
+    }
+
+    @Override
+    public void storeApiKeyPreferences(FetcherApiPreferences preferences) {
+        put(IMPORT_API_WORLDCAT, preferences.getWorldcatKey());
     }
 
     //*************************************************************************************************************

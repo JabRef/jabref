@@ -9,9 +9,10 @@ Fetchers are the implementation of the [search using online services](https://do
 | [SAO/NASA Astrophysics Data System](https://docs.jabref.org/collect/import-using-online-bibliographic-database#sao-nasa-astrophysics-data-system) | [ADS UI](https://ui.adsabs.harvard.edu/user/settings/token) | `AstrophysicsDataSystemAPIKey` | 5000 calls/day |
 | [ScienceDirect](https://www.sciencedirect.com/) |  | `ScienceDirectApiKey` |  |
 | [Springer Nature](https://docs.jabref.org/collect/import-using-online-bibliographic-database#springer) | [Springer Nature API Portal](https://dev.springernature.com/) | `SpringerNatureAPIKey` | 5000 calls/day |
+| [WorldCat](https://www.worldcat.org/) | [OCLC Developer Network](https://www.oclc.org/developer/develop/authentication/how-to-request-a-wskey.en.html) | `worldCatAPIKey` | \(none\) | 
 | [Zentralblatt Math](https://www.zbmath.org/) | \(none\) | \(none\) | Depending on the current network |
 
-"Depending on the current network" means that it depends whether your request is routed through a network having paid access. For instance, some universities have subscriptions to MathSciNet.
+"Depending on the current network" means that it depends on whether your request is routed through a network having paid access. For instance, some universities have subscriptions to MathSciNet.
 
 On Windows, you have to log-off and log-on to let IntelliJ know about the environment variable change. Execute the gradle task "processResources" in the group "others" within IntelliJ to ensure the values have been correctly written. Now, the fetcher tests should run without issues.
 
