@@ -539,7 +539,7 @@ commons-codec:commons-codec:1.11
 commons-logging:commons-logging:1.2
 de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT
 de.saxsys:mvvmfx:1.8.0
-de.undercouch:citeproc-java:3.0.0-alpha.1
+de.undercouch:citeproc-java:3.0.0-alpha.2
 eu.lestard:doc-annotations:0.2
 info.debatty:java-string-similarity:2.0.0
 io.github.java-diff-utils:java-diff-utils:4.10
