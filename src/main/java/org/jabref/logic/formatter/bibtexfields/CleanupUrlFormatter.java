@@ -8,15 +8,11 @@ import java.util.regex.Pattern;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Cleanup URL link
  */
 public class CleanupUrlFormatter extends Formatter {
 
-    private static final Log LOGGER = LogFactory.getLog(CleanupUrlFormatter.class);
     // This regexp find "url=" or "to=" parameter in full link and get text after them
     private static final Pattern PATTERN_URL = Pattern.compile("(?:url|to)=([^&]*)");
 

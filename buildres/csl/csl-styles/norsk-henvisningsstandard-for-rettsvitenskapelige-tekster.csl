@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="display-and-sort" page-range-format="expanded" default-locale="nb-NO">
+<style xmlns="http://purl.org/net/xbiblio/csl" class="note" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="expanded" default-locale="nb-NO">
   <info>
     <title>Norsk henvisningsstandard for rettsvitenskapelige tekster (Norsk - Bokmål)</title>
     <title-short>Norsk rettsvitenskap</title-short>
@@ -18,7 +18,7 @@
     <category citation-format="note"/>
     <category field="law"/>
     <summary>Norwegian legal citation style based on "Veiledning for henvisninger i juridiske tekster" (February 2019).</summary>
-    <updated>2021-06-08T10:53:00+00:00</updated>
+    <updated>2021-07-01T15:10:00+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="nb-NO">
@@ -28,16 +28,18 @@
       <term name="translator" form="verb-short">overs.</term>
       <term name="translator" form="short">overs.</term>
       <term name="editortranslator" form="verb-short">red. og overs.</term>
-      <term name="editortranslator" form="verb">Redigert og oversatt av</term>
+      <term name="editortranslator" form="verb">redigert og oversatt av</term>
       <term name="translator" form="short">overs.</term>
       <term name="and others">et al.</term>
       <term name="open-quote">«</term>
       <term name="close-quote">»</term>
-      <term name="accessed">sitert</term>
+      <term name="accessed">lest</term>
       <term name="no date">udatert</term>
       <term name="edition">utgave</term>
       <term name="edition" form="short">utg.</term>
       <term name="volume">bind</term>
+      <term name="page">side</term>
+      <term name="page" form="short">s.</term>
     </terms>
   </locale>
   <macro name="type-sorting">
@@ -76,15 +78,16 @@
       <name et-al-min="4" et-al-use-first="1" delimiter-precedes-last="never" name-as-sort-order="first" and="text"/>
       <et-al term="and others"/>
       <substitute>
-        <names variable="editor"/>
+        <text macro="editor"/>
       </substitute>
     </names>
   </macro>
   <macro name="editor">
     <names variable="editor">
       <name et-al-min="4" et-al-use-first="1" delimiter-precedes-last="never" and="text"/>
+      <et-al term="and others"/>
+      <label prefix=" (" suffix=")" form="short"/>
     </names>
-    <text prefix=" (" suffix=")" term="editor" form="short"/>
   </macro>
   <macro name="title-short">
     <choose>
@@ -94,9 +97,6 @@
       <else-if type="legislation">
         <text variable="title-short"/>
       </else-if>
-      <else-if type="legal_case">
-        <text variable="title"/>
-      </else-if>
       <else>
         <text font-style="italic" variable="title-short"/>
       </else>
@@ -104,10 +104,13 @@
   </macro>
   <macro name="title">
     <choose>
-      <if type="chapter article-journal article-newspaper article-magazine" match="any">
+      <if type="chapter article-journal article-newspaper article-magazine post-weblog" match="any">
         <text quotes="true" variable="title"/>
       </if>
-      <else-if type="legal_case legislation" match="any">
+      <else-if type="legislation">
+        <text variable="container-title"/>
+        <text prefix=" " suffix=" " macro="issued-full-date"/>
+        <text prefix="nr. " suffix=" " variable="volume"/>
         <text variable="title"/>
       </else-if>
       <else>
@@ -159,23 +162,14 @@
     </choose>
   </macro>
   <macro name="accessed-date">
-    <choose>
-      <if type="personal_communication">
-        <text variable="genre" prefix=", " suffix=", "/>
-        <date variable="issued">
-          <date-part name="day" form="numeric" suffix=". "/>
-          <date-part name="month" form="long" suffix=" "/>
-          <date-part name="year"/>
-        </date>
-      </if>
-      <else>
-        <date variable="accessed" prefix=" [Sitert " suffix="]">
-          <date-part name="day" form="numeric" suffix=". "/>
-          <date-part name="month" form="long" suffix=" "/>
-          <date-part name="year"/>
-        </date>
-      </else>
-    </choose>
+    <group prefix=" (" suffix=")">
+      <text term="accessed"/>
+      <date variable="accessed" prefix=" ">
+        <date-part name="day" form="numeric" suffix=". "/>
+        <date-part name="month" form="long" suffix=" "/>
+        <date-part name="year"/>
+      </date>
+    </group>
   </macro>
   <macro name="locator">
     <choose>
@@ -186,7 +180,7 @@
         </group>
       </if>
       <else-if locator="section paragraph" match="any">
-        <text variable="locator" prefix=" § "/>
+        <text variable="locator" prefix=" §&#160;"/>
       </else-if>
       <else>
         <group delimiter=" ">
@@ -209,12 +203,40 @@
     </choose>
   </macro>
   <macro name="DOI">
+    <text prefix=". DOI: https://doi.org/" variable="DOI"/>
+  </macro>
+  <macro name="nor-case">
     <choose>
-      <if variable="DOI" match="none">
-        <text prefix=", " variable="URL"/>
+      <if variable="container-title" match="any">
+        <text variable="container-title"/>
+        <text prefix=" " variable="volume"/>
+        <text prefix=" " suffix=" " term="page" form="short"/>
+        <text variable="page"/>
+        <text prefix=" (" suffix=")" variable="title-short"/>
       </if>
+      <else-if variable="number" match="any">
+        <text variable="number"/>
+        <text prefix=" (" suffix=")" variable="title-short"/>
+      </else-if>
       <else>
-        <text prefix=". DOI: https://doi.org/" variable="DOI"/>
+        <text suffix="s dom av " macro="author-full"/>
+        <text macro="issued-full-date"/>
+        <text prefix=" (" suffix=")" variable="title-short"/>
+      </else>
+    </choose>
+  </macro>
+  <macro name="nor-legislation">
+    <choose>
+      <if position="first">
+        <text macro="title"/>
+        <text prefix=" (" suffix=")" variable="title-short"/>
+      </if>
+      <else-if variable="title-short" match="any">
+        <text macro="title-short"/>
+      </else-if>
+      <else>
+        <text variable="container-title"/>
+        <text prefix=" " variable="title"/>
       </else>
     </choose>
   </macro>
@@ -224,18 +246,18 @@
       <key macro="title-short"/>
       <key macro="issued"/>
     </sort>
-    <layout delimiter=", ">
+    <layout delimiter="; ">
       <group delimiter=" ">
         <choose>
-          <if type="book thesis chapter article-journal article-newspaper article-magazine personal_communication" match="any">
+          <if type="book thesis chapter article-journal article-newspaper article-magazine post-weblog personal_communication" match="any">
             <text macro="author-short"/>
             <text macro="issued"/>
           </if>
           <else-if type="legal_case">
-            <text macro="title"/>
+            <text macro="nor-case"/>
           </else-if>
           <else-if type="legislation">
-            <text macro="title-short"/>
+            <text macro="nor-legislation"/>
           </else-if>
           <else-if type="report">
             <text macro="author-short"/>
@@ -261,28 +283,30 @@
         <if type="article-journal">
           <group suffix=".">
             <text macro="author-full"/>
-            <text prefix=". " macro="title"/>
+            <text prefix=", " macro="title"/>
             <text prefix=" " font-style="italic" variable="container-title"/>
             <text prefix=" " macro="issued"/>
-            <text prefix=" s. " variable="page"/>
+            <text prefix=" " suffix=" " term="page" form="short"/>
+            <text variable="page"/>
             <text macro="DOI"/>
             <text prefix=" " macro="retrieved-from"/>
           </group>
         </if>
-        <else-if type="article-newspaper article-magazine" match="any">
+        <else-if type="article-newspaper article-magazine post-weblog" match="any">
           <group suffix=".">
             <text macro="author-full"/>
-            <text prefix=". " macro="issued"/>
-            <text prefix=" " macro="title"/>
+            <text prefix=", " macro="title"/>
             <text prefix=", " font-style="italic" variable="container-title"/>
             <choose>
-              <if variable="URL" match="none">
+              <if variable="issued" match="any">
                 <text prefix=", " macro="issued-full-date"/>
               </if>
-              <else>
+            </choose>
+            <choose>
+              <if variable="URL" match="any">
                 <text prefix=", " variable="URL"/>
                 <text macro="accessed-date"/>
-              </else>
+              </if>
             </choose>
           </group>
         </else-if>
@@ -294,32 +318,39 @@
             <text macro="edition-short"/>
             <text prefix=", " variable="publisher"/>
             <text prefix=" " macro="issued-no-parenthesis"/>
+            <text macro="DOI"/>
           </group>
         </else-if>
         <else-if type="chapter paper-conference" match="any">
           <group suffix=".">
             <text macro="author-full"/>
-            <text prefix=". " macro="title"/>
+            <text prefix=", " macro="title"/>
             <text prefix=" i " font-style="italic" variable="container-title"/>
             <text prefix=", " macro="editor"/>
             <text macro="volume"/>
             <text macro="edition-short"/>
             <text prefix=", " variable="publisher"/>
             <text prefix=" " macro="issued-no-parenthesis"/>
-            <text prefix=", " variable="URL"/>
-            <text prefix=" " macro="accessed-date"/>
+            <choose>
+              <if variable="DOI" match="any">
+                <text prefix=". DOI: https://doi.org/" variable="DOI"/>
+              </if>
+              <else-if variable="URL" match="any">
+                <text prefix=", " variable="URL"/>
+                <text macro="accessed-date"/>
+              </else-if>
+            </choose>
           </group>
         </else-if>
         <else-if type="legislation bill" match="any">
-          <text macro="issued-no-parenthesis"/>
           <text macro="title"/>
         </else-if>
         <else-if type="legal_case">
-          <text macro="title"/>
+          <text macro="nor-case"/>
         </else-if>
         <else-if type="personal_communication">
           <text macro="author-full"/>
-          <text macro="accessed-date"/>
+          <text prefix=" " macro="issued"/>
         </else-if>
         <else>
           <text variable="title"/>
