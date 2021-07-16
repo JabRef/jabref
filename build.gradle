@@ -49,6 +49,9 @@ java {
     sourceCompatibility = JavaVersion.VERSION_16
     targetCompatibility = JavaVersion.VERSION_16
 
+    toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+    }
     // Workaround needed for Eclipse, probably because of https://github.com/gradle/gradle/issues/16922
     // Should be removed as soon as Gradle 7.0.1 is released ( https://github.com/gradle/gradle/issues/16922#issuecomment-828217060 )
     modularity.inferModulePath.set(false)
@@ -569,6 +572,12 @@ jlink {
     addOptions('--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages')
     launcher {
         name = 'JabRef'
+        if (OperatingSystem.current().isMacOsX()) {
+                    jvmArgs = [
+                        '-Dsun.java2d.metal=true'
+                    ]
+        }
+
     }
 
     addOptions("--bind-services")
