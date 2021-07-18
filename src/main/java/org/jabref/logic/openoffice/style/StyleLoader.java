@@ -61,19 +61,19 @@ public class StyleLoader {
         try {
             OOBibStyle newStyle = new OOBibStyle(new File(filename), layoutFormatterPreferences, encoding);
             if (externalStyles.contains(newStyle)) {
-                LOGGER.info("External style file " + filename + " already existing.");
+                LOGGER.info("External style file {} already existing.", filename);
             } else if (newStyle.isValid()) {
                 externalStyles.add(newStyle);
                 storeExternalStyles();
                 return true;
             } else {
-                LOGGER.error(String.format("Style with filename %s is invalid", filename));
+                LOGGER.error("Style with filename {} is invalid", filename);
             }
         } catch (FileNotFoundException e) {
             // The file couldn't be found... should we tell anyone?
-            LOGGER.info("Cannot find external style file " + filename, e);
+            LOGGER.info("Cannot find external style file {}", filename, e);
         } catch (IOException e) {
-            LOGGER.info("Problem reading external style file " + filename, e);
+            LOGGER.info("Problem reading external style file {}", filename, e);
         }
         return false;
     }
@@ -88,7 +88,7 @@ public class StyleLoader {
                 if (style.isValid()) { // Problem!
                     externalStyles.add(style);
                 } else {
-                    LOGGER.error(String.format("Style with filename %s is invalid", filename));
+                    LOGGER.error("Style with filename {} is invalid", filename);
                 }
             } catch (FileNotFoundException e) {
                 // The file couldn't be found... should we tell anyone?
@@ -105,7 +105,7 @@ public class StyleLoader {
             try {
                 internalStyles.add(new OOBibStyle(filename, layoutFormatterPreferences));
             } catch (IOException e) {
-                LOGGER.info("Problem reading internal style file " + filename, e);
+                LOGGER.info("Problem reading internal style file {}", filename, e);
             }
         }
     }
