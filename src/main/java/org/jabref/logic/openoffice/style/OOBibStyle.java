@@ -42,8 +42,6 @@ import org.jabref.model.openoffice.style.CitationMarkerNormEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNumericBibEntry;
 import org.jabref.model.openoffice.style.CitationMarkerNumericEntry;
 import org.jabref.model.openoffice.style.NonUniqueCitationMarker;
-import org.jabref.model.openoffice.style.PageInfo;
-import org.jabref.model.openoffice.util.OOListUtil;
 import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
@@ -1080,34 +1078,6 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return OOBibStyleGetNumCitationMarker.getNumCitationMarkerForBibliography(this, entry);
     }
 
-    /**
-     *  Make sure that (1) we have exactly one entry for each
-     *  citation, (2) each entry is either Optional.empty or its content is not empty when trimmed.
-     *
-     *  As a special case: pageInfos may be null. In this case
-     *  the result is a list filled with Optional.empty() values.
-     */
-    static List<Optional<OOText>>
-    normalizePageInfos(List<Optional<OOText>> pageInfos, int nCitations) {
-
-        // translate null to all-empty
-        if (pageInfos == null) {
-            List<Optional<OOText>> res = new ArrayList<>(nCitations);
-            for (int i = 0; i < nCitations; i++) {
-                res.add(Optional.empty());
-            }
-            return res;
-        }
-
-        // not null, check size
-        if (pageInfos.size() != nCitations) {
-            throw new IllegalArgumentException("normalizePageInfos: pageInfos.size() != nCitations");
-        }
-
-        // not null, normalize elementwise
-        return OOListUtil.map(pageInfos, PageInfo::normalizePageInfo);
-    }
-
     public OOText getNormalizedCitationMarker(CitationMarkerNormEntry ce) {
         return OOBibStyleGetCitationMarker.getNormalizedCitationMarker(this, ce, Optional.empty());
     }
@@ -1270,9 +1240,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
     /* As getAuthorLastSeparator, for in-text citation. */
     protected String getAuthorLastSeparatorInTextWithFallBack() {
-        String value1 = getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR_IN_TEXT);
-        String value2 = getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR);
-        return Objects.requireNonNullElse(value1, value2);
+        String preferred = getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR_IN_TEXT);
+        String fallback  = getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR);
+        return Objects.requireNonNullElse(preferred, fallback);
     }
 
     protected String getPageInfoSeparator() {
