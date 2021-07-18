@@ -24,6 +24,11 @@ public class CitationLookupResult {
      *       is equivalent to {@code this.database == that.database}.
      *
      *       Since within each GUI call we use a fixed list of databases, it is OK.
+     *
+     *  CitationLookupResult.equals is used in CitedKey.addPath to check the added Citation
+     *  refers to the same source as the others. As long as we look up each citation key
+     *  only once (in CitationGroups.lookupCitations), the default implementation for equals
+     *  would be sufficient (and could also omit hashCode below).
      */
     @Override
     public boolean equals(Object otherObject) {
@@ -34,15 +39,11 @@ public class CitationLookupResult {
             return false;
         }
         CitationLookupResult that = (CitationLookupResult) otherObject;
-        return this.entry.equals(that.entry) && this.database.equals(that.database);
+        return Objects.equals(this.entry, that.entry) && Objects.equals(this.database, that.database);
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + entry.hashCode();
-        result = prime * result + database.hashCode();
-        return result;
+        return Objects.hash(entry, database);
     }
 }
