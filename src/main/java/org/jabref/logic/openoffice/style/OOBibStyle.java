@@ -1241,7 +1241,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     /* As getAuthorLastSeparator, for in-text citation. */
     protected String getAuthorLastSeparatorInTextWithFallBack() {
         String preferred = getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR_IN_TEXT);
-        String fallback  = getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR);
+        String fallback = getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR);
         return Objects.requireNonNullElse(preferred, fallback);
     }
 
