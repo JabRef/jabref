@@ -63,9 +63,8 @@ public class UpdateCitationMarkers {
             Optional<OOText> marker = cg.getCitationMarker();
 
             if (!marker.isPresent()) {
-                String msg = String.format("applyNewCitationMarkers: no marker for %s",
-                                           cg.cgid.citationGroupIdAsString());
-                LOGGER.warn(msg);
+                LOGGER.warn("applyNewCitationMarkers: no marker for {}",
+                            cg.cgid.citationGroupIdAsString());
                 continue;
             }
 
