@@ -52,9 +52,7 @@ public class CitedKey implements
 
     @Override
     public Optional<BibEntry> getBibEntry() {
-        return (db.isPresent()
-                ? Optional.of(db.get().entry)
-                : Optional.empty());
+        return db.map(e -> e.entry);
     }
 
     /*
