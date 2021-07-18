@@ -60,7 +60,7 @@
 
     -jr-icon-background: transparent;
     -jr-icon-background-active: #0001;
-    -jr-icon-background-armed: #0002;
+    -jr-icon-background-armed: #0002
 
     /* Colors for messages and errors */
     -jr-info: -jr-light-green;
@@ -269,7 +269,7 @@
     -fx-bounds-type: logical_vertical_center;
 
     /* The base color of icons should always be the same as the text. */
-    -fx-fill: -fx-text-base-color;
+    -fx-fill: derive(-fx-color, -5%);
 }
 
 .tooltip {

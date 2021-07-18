@@ -117,3 +117,7 @@
     -fx-fill: derive(-jr-search-text, 80%);
     -fx-text-fill: derive(-jr-search-text, 80%);
 }
+.button {
+    -fx-background-color: #6b727a;
+    -fx-border-color: transparent;
+}
