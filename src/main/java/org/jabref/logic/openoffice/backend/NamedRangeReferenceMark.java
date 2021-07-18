@@ -198,8 +198,7 @@ class NamedRangeReferenceMark implements NamedRange {
         Optional<XTextContent> markAsTextContent = UnoReferenceMark.getAsTextContent(doc, name);
 
         if (markAsTextContent.isEmpty()) {
-            String msg = String.format("nrGetRawCursor: markAsTextContent(%s).isEmpty()", name);
-            LOGGER.warn(msg);
+            LOGGER.warn("nrGetRawCursor: markAsTextContent({}).isEmpty()", name);
         }
 
         full = UnoCursor.getTextCursorOfTextContentAnchor(markAsTextContent.get());
@@ -338,7 +337,7 @@ class NamedRangeReferenceMark implements NamedRange {
                 alpha.goRight(leftLength, true);
                 LOGGER.debug("nrGetFillCursor: alpha(7) covers '{}', should be '{}'", alpha.getString(), left);
                 omega.goLeft(rightLength, true);
-                LOGGER.debug("nrGetFillCursor: omega(8) covers '%s', should be '%s'%n", omega.getString(), right);
+                LOGGER.debug("nrGetFillCursor: omega(8) covers '{}', should be '{}'", omega.getString(), right);
             }
         }
 
