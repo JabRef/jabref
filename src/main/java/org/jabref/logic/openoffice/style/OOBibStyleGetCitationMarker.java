@@ -503,6 +503,9 @@ class OOBibStyleGetCitationMarker {
         return OOText.fromString(sb.toString());
     }
 
+    /**
+     * Add / override methods for the purpose of creating a normalized citation marker.
+     */
     private static class CitationMarkerNormEntryWrap implements CitationMarkerEntry {
 
         CitationMarkerNormEntry inner;
@@ -538,7 +541,7 @@ class OOBibStyleGetCitationMarker {
     }
 
     /**
-     * @param cne          A citation to process.
+     * @param normEntry          A citation to process.
      *
      * @return A normalized citation marker for deciding which
      *         citations need uniqueLetters.
@@ -548,10 +551,10 @@ class OOBibStyleGetCitationMarker {
      * Note: now includes some markup.
      */
     static OOText getNormalizedCitationMarker(OOBibStyle style,
-                                              CitationMarkerNormEntry cne,
+                                              CitationMarkerNormEntry normEntry,
                                               Optional<Integer> maxAuthorsOverride) {
         boolean[] startsNewGroup = {true};
-        CitationMarkerEntry entry = new CitationMarkerNormEntryWrap(cne);
+        CitationMarkerEntry entry = new CitationMarkerNormEntryWrap(normEntry);
         return getAuthorYearParenthesisMarker2(style,
                                                AuthorYearMarkerPurpose.NORMALIZED,
                                                Collections.singletonList(entry),
@@ -566,10 +569,10 @@ class OOBibStyleGetCitationMarker {
 
         List<OOText> normalizedMarkers = new ArrayList<>(citationMarkerEntries.size());
         for (CitationMarkerEntry citationMarkerEntry : citationMarkerEntries) {
-            OOText nm = getNormalizedCitationMarker(style,
-                                                             citationMarkerEntry,
-                                                             maxAuthorsOverride);
-            normalizedMarkers.add(nm);
+            OOText normalized = getNormalizedCitationMarker(style,
+                                                            citationMarkerEntry,
+                                                            maxAuthorsOverride);
+            normalizedMarkers.add(normalized);
         }
         return normalizedMarkers;
     }
