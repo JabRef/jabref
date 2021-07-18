@@ -63,17 +63,10 @@ class OOProcessAuthorYearMarkers {
             String normCitMarker = OOText.toString(citedKey.getNormalizedCitationMarker().get());
             String citationKey = citedKey.citationKey;
 
-            if (!normCitMarkerToClachingKeys.containsKey(normCitMarker)) {
-                // Found new normCitMarker
-                List<String> clashingKeys = new ArrayList<>(1);
-                normCitMarkerToClachingKeys.put(normCitMarker, clashingKeys);
+            List<String> clashingKeys = normCitMarkerToClachingKeys.putIfAbsent(normCitMarker, new ArrayList<>(1));
+            if (!clashingKeys.contains(citationKey)) {
+                // First appearance of citationKey, add to list.
                 clashingKeys.add(citationKey);
-            } else {
-                List<String> clashingKeys = normCitMarkerToClachingKeys.get(normCitMarker);
-                if (!clashingKeys.contains(citationKey)) {
-                    // First appearance of citationKey, add to list.
-                    clashingKeys.add(citationKey);
-                }
             }
         }
 
