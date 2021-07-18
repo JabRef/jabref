@@ -1019,36 +1019,36 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         return citProperties;
     }
 
-    protected void addJournal(String s) {
-        journals.add(s);
+    protected void addJournal(String journalName) {
+        journals.add(journalName);
     }
 
-    protected void setLocalCopy(String s) {
-        localCopy = s;
+    protected void setLocalCopy(String contentsOfJstyleFile) {
+        localCopy = contentsOfJstyleFile;
     }
 
-    protected void setName(String s) {
-        name = s;
+    protected void setName(String nameOfTheStyle) {
+        name = nameOfTheStyle;
     }
 
     protected boolean getIsDefaultLayoutPresent() {
         return isDefaultLayoutPresent;
     }
 
-    protected void setIsDefaultLayoutPresent(boolean b) {
-        isDefaultLayoutPresent = b;
+    protected void setIsDefaultLayoutPresent(boolean isPresent) {
+        isDefaultLayoutPresent = isPresent;
     }
 
-    protected void setValid(boolean b) {
-        valid = b;
+    protected void setValid(boolean isValid) {
+        valid = isValid;
     }
 
     protected LayoutFormatterPreferences getPrefs() {
         return prefs;
     }
 
-    protected void setDefaultBibLayout(Layout l) {
-        defaultBibLayout = l;
+    protected void setDefaultBibLayout(Layout layout) {
+        defaultBibLayout = layout;
     }
 
     /**
@@ -1270,9 +1270,9 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
     /* As getAuthorLastSeparator, for in-text citation. */
     protected String getAuthorLastSeparatorInTextWithFallBack() {
-        String a = getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR_IN_TEXT);
-        String b = getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR);
-        return Objects.requireNonNullElse(a, b);
+        String value1 = getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR_IN_TEXT);
+        String value2 = getStringCitProperty(OOBibStyle.AUTHOR_LAST_SEPARATOR);
+        return Objects.requireNonNullElse(value1, value2);
     }
 
     protected String getPageInfoSeparator() {
