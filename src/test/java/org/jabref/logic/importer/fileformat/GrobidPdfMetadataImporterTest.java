@@ -60,7 +60,7 @@ public class GrobidPdfMetadataImporterTest {
 
     @Test
     public void testIsRecognizedFormatReject() throws IOException, URISyntaxException {
-        Path file = Path.of(PdfXmpImporterTest.class.getResource("BibtexImporter.examples.bib").toURI());
+        Path file = Path.of(GrobidPdfMetadataImporterTest.class.getResource("BibtexImporter.examples.bib").toURI());
         assertFalse(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
     }
 
