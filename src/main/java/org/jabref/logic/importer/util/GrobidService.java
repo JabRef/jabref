@@ -3,9 +3,17 @@ package org.jabref.logic.importer.util;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
+import java.util.List;
 
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 /**
  * Implements an API to a GROBID server, as described at
@@ -18,6 +26,8 @@ import org.jabref.logic.net.URLDownload;
  * Each method corresponds to a GROBID service request. Only the ones already used are already implemented.
  */
 public class GrobidService {
+
+    public static String HTTP_REQUEST_BOUNDARY = "---------------------------JabRefRequest";
 
     public enum ConsolidateCitations {
         NO(0), WITH_METADATA(1), WITH_DOI_ONLY(2);
@@ -58,5 +68,53 @@ public class GrobidService {
         }
 
         return httpResponse;
+    }
+
+    public List<BibEntry> processPDF(Path filePath, ImportFormatPreferences importFormatPreferences) throws IOException, ParseException {
+        URLDownload urlDownload = new URLDownload(grobidServerURL
+                + "/api/processHeaderDocument"); // shall we use processFulltextDocument?
+        urlDownload.setConnectTimeout(Duration.ofSeconds(150));
+        urlDownload.addHeader("Accept", MediaTypes.APPLICATION_BIBTEX);
+        urlDownload.addHeader("Content-Type", "multipart/form-data; boundary=" + HTTP_REQUEST_BOUNDARY);
+        urlDownload.setPostData(readPdf(filePath));
+        String httpResponse = urlDownload.asString();
+
+        if (httpResponse == null || httpResponse.equals("@misc{-1,\n  author = {}\n}\n")) { // This filters empty BibTeX entries
+            throw new IOException("The GROBID server response does not contain anything.");
+        }
+
+        BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
+        return parser.parseEntries(httpResponse);
+    }
+
+    private byte[] readPdf(Path filePath) throws IOException {
+        StringBuilder preFile = new StringBuilder();
+        preFile.append("--");
+        preFile.append(HTTP_REQUEST_BOUNDARY);
+        preFile.append("\r\n");
+        preFile.append("Content-Disposition: form-data; name=\"consolidateHeader\"\r\n\r\n1\r\n--");
+        preFile.append(HTTP_REQUEST_BOUNDARY);
+        preFile.append("\r\n");
+        preFile.append("Content-Disposition: form-data; name=\"input\"; filename=\"");
+        preFile.append(filePath.getFileName().toString());
+        preFile.append("\"\r\nContent-Type: application/pdf\r\n\r\n");
+        byte[] preFileBytes = preFile.toString().getBytes();
+
+        byte[] fileContent = Files.readAllBytes(filePath);
+
+        StringBuilder postFile = new StringBuilder();
+        postFile.append("\r\n--");
+        postFile.append(HTTP_REQUEST_BOUNDARY);
+        postFile.append("\r\n");
+        postFile.append("Content-Disposition: form-data; name=\"input\"\r\n\r\n\r\n--");
+        postFile.append(HTTP_REQUEST_BOUNDARY);
+        postFile.append("--\r\n");
+        byte[] postFileBytes = postFile.toString().getBytes();
+
+        byte[] post = new byte[preFileBytes.length + fileContent.length + postFileBytes.length];
+        System.arraycopy(preFileBytes, 0, post, 0, preFileBytes.length);
+        System.arraycopy(fileContent, 0, post, preFileBytes.length, fileContent.length);
+        System.arraycopy(postFileBytes, 0, post, preFileBytes.length + fileContent.length, postFileBytes.length);
+        return post;
     }
 }
