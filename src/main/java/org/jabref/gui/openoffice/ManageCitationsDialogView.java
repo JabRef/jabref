@@ -19,16 +19,13 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.strings.StringUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import com.sun.star.beans.UnknownPropertyException;
-import com.sun.star.container.NoSuchElementException;
-import com.sun.star.lang.WrappedTargetException;
 
 public class ManageCitationsDialogView extends BaseDialog<Void> {
 
     private static final String HTML_BOLD_END_TAG = "</b>";
     private static final String HTML_BOLD_START_TAG = "<b>";
 
-    private final OOBibBase ooBase;
+    private final OOBibBase2 ooBase;
 
     @FXML private TableView<CitationEntryViewModel> citationsTableView;
     @FXML private TableColumn<CitationEntryViewModel, String> citation;
@@ -38,7 +35,7 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
 
     private ManageCitationsDialogViewModel viewModel;
 
-    public ManageCitationsDialogView(OOBibBase ooBase) {
+    public ManageCitationsDialogView(OOBibBase2 ooBase) {
         this.ooBase = ooBase;
 
         ViewLoader.view(this)
@@ -56,7 +53,7 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
     }
 
     @FXML
-    private void initialize() throws NoSuchElementException, WrappedTargetException, UnknownPropertyException {
+    private void initialize() {
 
         viewModel = new ManageCitationsDialogViewModel(ooBase, dialogService);
 
@@ -89,5 +86,12 @@ public class ManageCitationsDialogView extends BaseDialog<Void> {
 
         FlowPane flow = new FlowPane(startText, inBetweenText, endText);
         return flow;
+    }
+
+    public boolean isOkToShowThisDialog() {
+        if (viewModel == null || viewModel.failedToGetCitationEntries) {
+            return false;
+        }
+        return true;
     }
 }
