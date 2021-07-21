@@ -12,6 +12,7 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.ColumnConstraints;
@@ -185,11 +186,20 @@ public class MultiMergeEntries extends GridPane {
         public void addValue(int columnIndex, String value) {
             ToggleButton cellButton = new ToggleButton(value);
             cellButton.setWrapText(true);
-            cellButton.setToggleGroup(toggleGroup);
             optionsGrid.add(cellButton, columnIndex, rowIndex);
             if (toggleGroup.getSelectedToggle() == null) {
                 cellButton.setSelected(true);
             }
+            for (Toggle otherToggle : toggleGroup.getToggles()) {
+                if (otherToggle instanceof ToggleButton) {
+                    ToggleButton otherToggleButton = (ToggleButton) otherToggle;
+                    if (otherToggleButton.getText().equals(value)) {
+                        cellButton.selectedProperty().bindBidirectional(otherToggleButton.selectedProperty());
+                        return;
+                    }
+                }
+            }
+            cellButton.setToggleGroup(toggleGroup);
         }
     }
 }
