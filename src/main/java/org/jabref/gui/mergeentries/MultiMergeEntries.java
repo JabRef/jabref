@@ -128,6 +128,9 @@ public class MultiMergeEntries extends GridPane {
             cellButton.setWrapText(true);
             cellButton.setToggleGroup(toggleGroup);
             add(cellButton, columnIndex, rowIndex);
+            if (toggleGroup.getSelectedToggle() == null) {
+                cellButton.setSelected(true);
+            }
         }
     }
 }
