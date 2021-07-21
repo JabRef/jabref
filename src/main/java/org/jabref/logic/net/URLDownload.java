@@ -69,7 +69,7 @@ public class URLDownload {
 
     private final URL source;
     private final Map<String, String> parameters = new HashMap<>();
-    private String postData = "";
+    private byte[] postData = null;
     private Duration connectTimeout = DEFAULT_CONNECT_TIMEOUT;
 
     /**
@@ -223,6 +223,12 @@ public class URLDownload {
 
     public void setPostData(String postData) {
         if (postData != null) {
+            this.postData = postData.getBytes();
+        }
+    }
+
+    public void setPostData(byte[] postData) {
+        if (postData != null) {
             this.postData = postData;
         }
     }
@@ -339,10 +345,10 @@ public class URLDownload {
         for (Entry<String, String> entry : this.parameters.entrySet()) {
             connection.setRequestProperty(entry.getKey(), entry.getValue());
         }
-        if (!this.postData.isEmpty()) {
+        if (this.postData != null) {
             connection.setDoOutput(true);
             try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
-                wr.writeBytes(this.postData);
+                wr.write(this.postData);
             }
         }
 
