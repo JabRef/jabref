@@ -12,6 +12,7 @@ import org.jabref.preferences.FilePreferences;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -74,7 +75,8 @@ class BibDatabaseContextTest {
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
         database.getMetaData().setDefaultFileDirectory("../Literature");
-        assertEquals(Arrays.asList(currentWorkingDir.resolve(file.getParent()), Path.of("/absolute/Literature").toAbsolutePath()),
+        assertEquals(Arrays.asList(currentWorkingDir.resolve(file.getParent()),
+                Path.of("/absolute/Literature").toAbsolutePath()),
                 database.getFileDirectories(fileDirPrefs));
     }
 
@@ -85,7 +87,8 @@ class BibDatabaseContextTest {
         BibDatabaseContext database = new BibDatabaseContext();
         database.setDatabasePath(file);
         database.getMetaData().setDefaultFileDirectory("Literature");
-        assertEquals(Arrays.asList(currentWorkingDir.resolve(file.getParent()), Path.of("/absolute/subdir/Literature").toAbsolutePath()),
+        assertEquals(Arrays.asList(currentWorkingDir.resolve(file.getParent()),
+                Path.of("/absolute/subdir/Literature").toAbsolutePath()),
                 database.getFileDirectories(fileDirPrefs));
     }
 
@@ -115,5 +118,30 @@ class BibDatabaseContextTest {
 
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(db);
         assertEquals(BibDatabaseMode.BIBLATEX, bibDatabaseContext.getMode());
+    }
+
+    @Test
+    void testGetFullTextIndexPathWhenPathIsNull() {
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
+        bibDatabaseContext.setDatabasePath(null);
+
+        Path expectedPath = BibDatabaseContext.getFulltextIndexBasePath().resolve("unsaved");
+        Path actualPath = bibDatabaseContext.getFulltextIndexPath();
+
+        assertEquals(expectedPath, actualPath);
+    }
+
+    @Test
+    void testGetFullTextIndexPathWhenPathIsNotNull() {
+        Path existingPath = Path.of("some_path.bib");
+
+        BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
+        bibDatabaseContext.setDatabasePath(existingPath);
+
+        Path expectedPath =
+                BibDatabaseContext.getFulltextIndexBasePath().resolve(String.valueOf(existingPath.hashCode()));
+        Path actualPath = bibDatabaseContext.getFulltextIndexPath();
+
+        assertEquals(expectedPath, actualPath);
     }
 }
