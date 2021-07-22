@@ -108,12 +108,17 @@ public class BibEntryTableViewModel {
     }
 
     public ObservableValue<String> getFields(OrFields fields) {
+        ObservableValue<String> value = fieldValues.get(fields);
+        if (value != null) {
+            return value;
+        }
+
         ArrayList<Observable> observables = new ArrayList<>(List.of(entry.getObservables()));
         Optional<BibEntry> referenced = fieldValueFormatter.getValue().getReferencedEntry(entry);
         referenced.ifPresent(bibEntry -> observables.addAll(List.of(bibEntry.getObservables())));
         observables.add(fieldValueFormatter);
 
-        ObservableValue<String> value = Bindings.createStringBinding(() ->
+        value = Bindings.createStringBinding(() ->
                         fieldValueFormatter.getValue().formatFieldsValues(fields, entry),
                 observables.toArray(Observable[]::new));
         fieldValues.put(fields, value);
