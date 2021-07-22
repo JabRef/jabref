@@ -17,6 +17,7 @@ import javafx.beans.value.ObservableValue;
 import org.jabref.gui.specialfields.SpecialFieldValueViewModel;
 import org.jabref.gui.util.uithreadaware.UiThreadBinding;
 import org.jabref.logic.importer.util.FileFieldParser;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -39,10 +40,12 @@ public class BibEntryTableViewModel {
     private final EasyBinding<List<LinkedFile>> linkedFiles;
     private final EasyBinding<Map<Field, String>> linkedIdentifiers;
     private final Binding<List<AbstractGroup>> matchedGroups;
+    private final BibDatabase bibDatabase;
 
     public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
         this.entry = entry;
         this.fieldValueFormatter = fieldValueFormatter;
+        this.bibDatabase = bibDatabaseContext.getDatabase();
 
         this.linkedFiles = getField(StandardField.FILE).map(FileFieldParser::parse).orElse(Collections.emptyList());
         this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);
@@ -114,7 +117,7 @@ public class BibEntryTableViewModel {
         }
 
         ArrayList<Observable> observables = new ArrayList<>(List.of(entry.getObservables()));
-        Optional<BibEntry> referenced = fieldValueFormatter.getValue().getReferencedEntry(entry);
+        Optional<BibEntry> referenced = bibDatabase.getReferencedEntry(entry);
         referenced.ifPresent(bibEntry -> observables.addAll(List.of(bibEntry.getObservables())));
         observables.add(fieldValueFormatter);
 
