@@ -39,7 +39,7 @@ public class BibDatabaseContext {
     /**
      * The path where this database was last saved to.
      */
-    private Optional<Path> path;
+    private Path path;
 
     private DatabaseSynchronizer dbmsSynchronizer;
     private CoarseChangeFilter dbmsListener;
@@ -57,7 +57,6 @@ public class BibDatabaseContext {
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
         this.location = DatabaseLocation.LOCAL;
-        this.path = Optional.empty();
     }
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData, Path path) {
@@ -67,7 +66,7 @@ public class BibDatabaseContext {
     public BibDatabaseContext(BibDatabase database, MetaData metaData, Path path, DatabaseLocation location) {
         this(database, metaData);
         Objects.requireNonNull(location);
-        this.path = Optional.ofNullable(path);
+        this.path = path;
 
         if (location == DatabaseLocation.LOCAL) {
             convertToLocalDatabase();
@@ -83,7 +82,7 @@ public class BibDatabaseContext {
     }
 
     public void setDatabasePath(Path file) {
-        this.path = Optional.ofNullable(file);
+        this.path = file;
     }
 
     /**
@@ -92,11 +91,11 @@ public class BibDatabaseContext {
      * @return Optional of the relevant Path, or Optional.empty() if none is defined.
      */
     public Optional<Path> getDatabasePath() {
-        return path;
+        return Optional.ofNullable(path);
     }
 
     public void clearDatabasePath() {
-        this.path = Optional.empty();
+        this.path = null;
     }
 
     public BibDatabase getDatabase() {
@@ -220,10 +219,12 @@ public class BibDatabaseContext {
 
     public Path getFulltextIndexPath() {
         Path appData = getFulltextIndexBasePath();
-        LOGGER.info("Index path for {} is {}", getDatabasePath().get(), appData.toString());
+
         if (getDatabasePath().isPresent()) {
+            LOGGER.info("Index path for {} is {}", getDatabasePath().get(), appData.toString());
             return appData.resolve(String.valueOf(this.getDatabasePath().get().hashCode()));
         }
+
         return appData.resolve("unsaved");
     }
 
