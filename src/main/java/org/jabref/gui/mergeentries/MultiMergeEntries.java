@@ -10,6 +10,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
@@ -23,10 +24,14 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 
+import org.jabref.gui.util.BackgroundTask;
+import org.jabref.gui.util.DefaultTaskExecutor;
+import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
@@ -36,6 +41,7 @@ import org.jabref.model.entry.field.FieldFactory;
 public class MultiMergeEntries extends SplitPane {
 
     private final FieldContentFormatterPreferences fieldContentFormatterPreferences;
+    private final TaskExecutor taskExecutor;
     private HashMap<Field, FieldRow> fieldRows = new HashMap<>();
 
     private VBox labelColumn;
@@ -52,8 +58,9 @@ public class MultiMergeEntries extends SplitPane {
     private GridPane optionsGrid;
     private VBox fieldEditor;
 
-    public MultiMergeEntries(FieldContentFormatterPreferences fieldContentFormatterPreferences) {
+    public MultiMergeEntries(FieldContentFormatterPreferences fieldContentFormatterPreferences, TaskExecutor taskExecutor) {
         this.fieldContentFormatterPreferences = fieldContentFormatterPreferences;
+        this.taskExecutor = taskExecutor;
         init();
     }
 
@@ -100,17 +107,47 @@ public class MultiMergeEntries extends SplitPane {
     }
 
     public void addEntry(String title, BibEntry entry) {
-        int column = addColumn(title);
+        Button sourceButton = new Button(title);
+        int column = addColumn(sourceButton);
+        sourceButton.setOnAction(event -> optionsGrid.getChildrenUnmodifiable().stream().filter(node -> GridPane.getColumnIndex(node) == column).filter(node -> node instanceof ToggleButton).forEach(toggleButton -> ((ToggleButton) toggleButton).setSelected(true)));
 
-        for (Map.Entry<Field, String> fieldEntry : entry.getFieldMap().entrySet()) {
+        writeBibEntryToColumn(entry, column);
+    }
+
+    public void addEntry(String title, Supplier<Optional<BibEntry>> entrySupplier) {
+        HBox header = new HBox();
+        Button sourceButton = new Button(title);
+        ProgressIndicator loadingIndicator = new ProgressIndicator(-1);
+        header.getChildren().addAll(sourceButton, loadingIndicator);
+        HBox.setHgrow(sourceButton, Priority.ALWAYS);
+        sourceButton.setMaxWidth(Double.MAX_VALUE);
+        HBox.setHgrow(loadingIndicator, Priority.NEVER);
+        int column = addColumn(header);
+        sourceButton.setOnAction(event -> optionsGrid.getChildrenUnmodifiable().stream().filter(node -> GridPane.getColumnIndex(node) == column).filter(node -> node instanceof ToggleButton).forEach(toggleButton -> ((ToggleButton) toggleButton).setSelected(true)));
+        sourceButton.setDisable(true);
+        loadingIndicator.prefHeightProperty().bind(sourceButton.heightProperty());
+        loadingIndicator.setMinHeight(Control.USE_PREF_SIZE);
+        loadingIndicator.setMaxHeight(Control.USE_PREF_SIZE);
+
+        BackgroundTask.wrap(() -> {
+            Optional<BibEntry> entry = entrySupplier.get();
+            DefaultTaskExecutor.runInJavaFXThread(() -> {
+                if (entry.isPresent()) {
+                    sourceButton.setDisable(false);
+                    writeBibEntryToColumn(entry.get(), column);
+                }
+                header.getChildren().remove(loadingIndicator);
+            });
+        }).executeWith(taskExecutor);
+    }
+
+    private void writeBibEntryToColumn(BibEntry bibEntry, int column) {
+        for (Map.Entry<Field, String> fieldEntry : bibEntry.getFieldMap().entrySet()) {
             if (!fieldRows.containsKey(fieldEntry.getKey())) {
                 addField(fieldEntry.getKey());
             }
             fieldRows.get(fieldEntry.getKey()).addValue(column, fieldEntry.getValue());
         }
-    }
-
-    public void addEntry(String title, Supplier<Optional<BibEntry>> entrySupplier) {
     }
 
     public BibEntry getMergeEntry() {
@@ -121,19 +158,17 @@ public class MultiMergeEntries extends SplitPane {
         return mergedEntry;
     }
 
-    private int addColumn(String name) {
+    private int addColumn(Region header) {
         int columnIndex = supplierHeader.getChildren().size();
-        Button sourceButton = new Button(name);
-        sourceButton.setOnAction(event -> optionsGrid.getChildrenUnmodifiable().stream().filter(node -> GridPane.getColumnIndex(node) == columnIndex).filter(node -> node instanceof ToggleButton).forEach(toggleButton -> ((ToggleButton) toggleButton).setSelected(true)));
-        HBox.setHgrow(sourceButton, Priority.ALWAYS);
-        supplierHeader.getChildren().add(sourceButton);
-        sourceButton.setMinWidth(250);
+        HBox.setHgrow(header, Priority.ALWAYS);
+        supplierHeader.getChildren().add(header);
+        header.setMinWidth(250);
 
         optionsGrid.add(new Label(), columnIndex, 0);
         ColumnConstraints constraint = new ColumnConstraints();
         constraint.setMinWidth(Control.USE_PREF_SIZE);
         constraint.setMaxWidth(Control.USE_PREF_SIZE);
-        constraint.prefWidthProperty().bind(sourceButton.widthProperty());
+        constraint.prefWidthProperty().bind(header.widthProperty());
         optionsGrid.getColumnConstraints().add(constraint);
 
         return columnIndex;
