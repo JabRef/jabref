@@ -18,6 +18,7 @@ import javafx.scene.control.TextInputControl;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -79,9 +80,18 @@ public class MultiMergeEntries extends SplitPane {
         leftScrollPane.vvalueProperty().bindBidirectional(centerScrollPane.vvalueProperty());
         rightScrollPane.vvalueProperty().bindBidirectional(centerScrollPane.vvalueProperty());
 
-        labelColumn.getChildren().addAll(new Label(Localization.lang("Supplier:")), leftScrollPane);
+        Label supplierHeaderLabel = new Label(Localization.lang("Supplier"));
+        Label entryHeaderLabel = new Label(Localization.lang("Entry"));
+        supplierHeaderLabel.prefHeightProperty().bind(supplierHeader.heightProperty());
+        supplierHeaderLabel.setMinHeight(Control.USE_PREF_SIZE);
+        supplierHeaderLabel.setMaxHeight(Control.USE_PREF_SIZE);
+        entryHeaderLabel.prefHeightProperty().bind(supplierHeader.heightProperty());
+        entryHeaderLabel.setMinHeight(Control.USE_PREF_SIZE);
+        entryHeaderLabel.setMaxHeight(Control.USE_PREF_SIZE);
+
+        labelColumn.getChildren().addAll(supplierHeaderLabel, leftScrollPane);
         optionsColumn.getChildren().addAll(topScrollPane, centerScrollPane);
-        entryColumn.getChildren().addAll(new Label(Localization.lang("Entry:")), rightScrollPane);
+        entryColumn.getChildren().addAll(entryHeaderLabel, rightScrollPane);
 
         setResizableWithParent(labelColumn, false);
         setDividerPositions(0.1, 0.6, 0.3);
@@ -195,6 +205,9 @@ public class MultiMergeEntries extends SplitPane {
         public void addValue(int columnIndex, String value) {
             ToggleButton cellButton = new ToggleButton(value);
             cellButton.setWrapText(true);
+            Tooltip buttonTooltip = new Tooltip(value);
+            buttonTooltip.setWrapText(true);
+            cellButton.setTooltip(buttonTooltip);
             optionsGrid.add(cellButton, columnIndex, rowIndex);
             if (toggleGroup.getSelectedToggle() == null) {
                 cellButton.setSelected(true);
