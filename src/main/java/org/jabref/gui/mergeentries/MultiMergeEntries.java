@@ -12,6 +12,8 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
@@ -22,12 +24,15 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 
+import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 
 public class MultiMergeEntries extends GridPane {
 
+    private final FieldContentFormatterPreferences fieldContentFormatterPreferences;
     private HashMap<Field, FieldRow> fieldRows = new HashMap<>();
 
     private ScrollPane topScrollPane;
@@ -44,7 +49,8 @@ public class MultiMergeEntries extends GridPane {
     private ColumnConstraints centerColumnConstraints = new ColumnConstraints();
     private ColumnConstraints rightColumnConstraints = new ColumnConstraints();
 
-    public MultiMergeEntries() {
+    public MultiMergeEntries(FieldContentFormatterPreferences fieldContentFormatterPreferences) {
+        this.fieldContentFormatterPreferences = fieldContentFormatterPreferences;
         init();
     }
 
@@ -105,7 +111,7 @@ public class MultiMergeEntries extends GridPane {
     public BibEntry getMergeEntry() {
         BibEntry mergedEntry = new BibEntry();
         for (Map.Entry<Field, FieldRow> fieldRowEntry : fieldRows.entrySet()) {
-            mergedEntry.setField(fieldRowEntry.getKey(), ((TextArea) fieldEditor.getChildren().get(fieldRowEntry.getValue().rowIndex)).getText());
+            mergedEntry.setField(fieldRowEntry.getKey(), ((TextInputControl) fieldEditor.getChildren().get(fieldRowEntry.getValue().rowIndex)).getText());
         }
         return mergedEntry;
     }
@@ -129,8 +135,14 @@ public class MultiMergeEntries extends GridPane {
     }
 
     public void addField(Field field) {
-        TextArea fieldEditorCell = new TextArea();
-        fieldEditorCell.setWrapText(true);
+        boolean isMultiLine = FieldFactory.isMultiLineField(field, fieldContentFormatterPreferences.getNonWrappableFields());
+        TextInputControl fieldEditorCell = null;
+        if (isMultiLine) {
+            fieldEditorCell = new TextArea();
+            ((TextArea) fieldEditorCell).setWrapText(true);
+        } else {
+            fieldEditorCell = new TextField();
+        }
         VBox.setVgrow(fieldEditorCell, Priority.ALWAYS);
         FieldRow newRow = new FieldRow(fieldHeader.getChildren().size(), fieldEditorCell);
         fieldRows.put(field, newRow);
@@ -154,9 +166,9 @@ public class MultiMergeEntries extends GridPane {
     private class FieldRow {
         public int rowIndex;
         public ToggleGroup toggleGroup = new ToggleGroup();
-        public TextArea entryEditorField;
+        public TextInputControl entryEditorField;
 
-        public FieldRow(int rowIndex, TextArea entryEditorField) {
+        public FieldRow(int rowIndex, TextInputControl entryEditorField) {
             this.rowIndex = rowIndex;
             this.entryEditorField = entryEditorField;
 
