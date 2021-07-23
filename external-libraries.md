@@ -310,7 +310,7 @@ License: Apache-2.0
 ```
 
 ```yaml
-Id:      org.apache.lucene:lucene-ueryparser
+Id:      org.apache.lucene:lucene-queryparser
 Project: Apache Lucene
 URL:     https://lucene.apache.org/
 License: Apache-2.0
@@ -539,7 +539,7 @@ commons-codec:commons-codec:1.11
 commons-logging:commons-logging:1.2
 de.saxsys:mvvmfx-validation:1.9.0-SNAPSHOT
 de.saxsys:mvvmfx:1.8.0
-de.undercouch:citeproc-java:3.0.0-alpha.1
+de.undercouch:citeproc-java:3.0.0-alpha.2
 eu.lestard:doc-annotations:0.2
 info.debatty:java-string-similarity:2.0.0
 io.github.java-diff-utils:java-diff-utils:4.10
@@ -567,6 +567,9 @@ org.apache.logging.log4j:log4j-slf4j18-impl:3.0.0-SNAPSHOT
 org.apache.lucene:lucene-core:8.9.0
 org.apache.lucene:lucene-queries:8.9.0
 org.apache.lucene:lucene-queryparser:8.9.0
+org.apache.lucene:lucene-analyzers-common:8.9.0
+org.apache.lucene:lucene-backward-codecs:8.9.0
+org.apache.lucene:lucene-highlighter:8.9.0
 org.apache.pdfbox:fontbox:2.0.24
 org.apache.pdfbox:pdfbox:2.0.24
 org.apache.pdfbox:xmpbox:2.0.24
