@@ -498,10 +498,11 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writeSaveOrderConfig() throws Exception {
-        SaveOrderConfig saveOrderConfig = new SaveOrderConfig(false, true, new LinkedList<>(List.of(
-                new SaveOrderConfig.SortCriterion(StandardField.AUTHOR, false),
-                new SaveOrderConfig.SortCriterion(StandardField.YEAR, true),
-                new SaveOrderConfig.SortCriterion(StandardField.ABSTRACT, false))));
+        SaveOrderConfig saveOrderConfig = new SaveOrderConfig(SaveOrderConfig.OrderType.SPECIFIED,
+                new LinkedList<>(List.of(
+                        new SaveOrderConfig.SortCriterion(StandardField.AUTHOR, false),
+                        new SaveOrderConfig.SortCriterion(StandardField.YEAR, true),
+                        new SaveOrderConfig.SortCriterion(StandardField.ABSTRACT, false))));
         metaData.setSaveOrderConfig(saveOrderConfig);
 
         databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList());
@@ -560,10 +561,11 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void writeEntriesSorted() throws Exception {
-        SaveOrderConfig saveOrderConfig = new SaveOrderConfig(false, true, new LinkedList<>(List.of(
-                new SaveOrderConfig.SortCriterion(StandardField.AUTHOR, false),
-                new SaveOrderConfig.SortCriterion(StandardField.YEAR, true),
-                new SaveOrderConfig.SortCriterion(StandardField.ABSTRACT, false))));
+        SaveOrderConfig saveOrderConfig = new SaveOrderConfig(SaveOrderConfig.OrderType.SPECIFIED,
+                new LinkedList<>(List.of(
+                        new SaveOrderConfig.SortCriterion(StandardField.AUTHOR, false),
+                        new SaveOrderConfig.SortCriterion(StandardField.YEAR, true),
+                        new SaveOrderConfig.SortCriterion(StandardField.ABSTRACT, false))));
         metaData.setSaveOrderConfig(saveOrderConfig);
 
         BibEntry firstEntry = new BibEntry();
