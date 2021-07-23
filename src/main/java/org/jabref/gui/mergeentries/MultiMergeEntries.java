@@ -25,6 +25,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.l10n.Localization;
@@ -207,6 +208,8 @@ public class MultiMergeEntries extends SplitPane {
             cellButton.setWrapText(true);
             Tooltip buttonTooltip = new Tooltip(value);
             buttonTooltip.setWrapText(true);
+            buttonTooltip.prefWidthProperty().bind(cellButton.widthProperty());
+            buttonTooltip.setTextAlignment(TextAlignment.LEFT);
             cellButton.setTooltip(buttonTooltip);
             optionsGrid.add(cellButton, columnIndex, rowIndex);
             if (toggleGroup.getSelectedToggle() == null) {
