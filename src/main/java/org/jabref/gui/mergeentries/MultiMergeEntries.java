@@ -11,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
@@ -30,10 +31,14 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
-public class MultiMergeEntries extends GridPane {
+public class MultiMergeEntries extends SplitPane {
 
     private final FieldContentFormatterPreferences fieldContentFormatterPreferences;
     private HashMap<Field, FieldRow> fieldRows = new HashMap<>();
+
+    private VBox labelColumn;
+    private VBox optionsColumn;
+    private VBox entryColumn;
 
     private ScrollPane topScrollPane;
     private ScrollPane leftScrollPane;
@@ -45,16 +50,16 @@ public class MultiMergeEntries extends GridPane {
     private GridPane optionsGrid;
     private VBox fieldEditor;
 
-    private ColumnConstraints leftColumnConstraints = new ColumnConstraints();
-    private ColumnConstraints centerColumnConstraints = new ColumnConstraints();
-    private ColumnConstraints rightColumnConstraints = new ColumnConstraints();
-
     public MultiMergeEntries(FieldContentFormatterPreferences fieldContentFormatterPreferences) {
         this.fieldContentFormatterPreferences = fieldContentFormatterPreferences;
         init();
     }
 
     private void init() {
+
+        labelColumn = new VBox();
+        optionsColumn = new VBox();
+        entryColumn = new VBox();
 
         supplierHeader = new HBox();
         fieldHeader = new VBox();
@@ -70,28 +75,17 @@ public class MultiMergeEntries extends GridPane {
         leftScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         leftScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         centerScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-
-        add(new Label(Localization.lang("Supplier:")), 0, 0);
-        add(topScrollPane, 1, 0);
-        add(new Label(Localization.lang("Entry:")), 2, 0);
-        add(leftScrollPane, 0, 1);
-        add(centerScrollPane, 1, 1);
-        add(rightScrollPane, 2, 1);
-
         topScrollPane.hvalueProperty().bindBidirectional(centerScrollPane.hvalueProperty());
         leftScrollPane.vvalueProperty().bindBidirectional(centerScrollPane.vvalueProperty());
         rightScrollPane.vvalueProperty().bindBidirectional(centerScrollPane.vvalueProperty());
 
-        leftColumnConstraints.setMinWidth(200);
-        centerColumnConstraints.setMinWidth(750);
-        rightColumnConstraints.setMinWidth(250);
-        getColumnConstraints().addAll(leftColumnConstraints, centerColumnConstraints, rightColumnConstraints);
+        labelColumn.getChildren().addAll(new Label(Localization.lang("Supplier:")), leftScrollPane);
+        optionsColumn.getChildren().addAll(topScrollPane, centerScrollPane);
+        entryColumn.getChildren().addAll(new Label(Localization.lang("Entry:")), rightScrollPane);
 
-        RowConstraints topRowConstraints = new RowConstraints();
-        RowConstraints bottomRowConstraints = new RowConstraints();
-        topRowConstraints.setPercentHeight(0.05);
-        bottomRowConstraints.setPercentHeight(0.95);
-        getRowConstraints().addAll(topRowConstraints, bottomRowConstraints);
+        setResizableWithParent(labelColumn, false);
+        setDividerPositions(0.1, 0.6, 0.3);
+        getItems().addAll(labelColumn, optionsColumn, entryColumn);
     }
 
     public void addEntry(String title, BibEntry entry) {
@@ -119,7 +113,7 @@ public class MultiMergeEntries extends GridPane {
     private int addColumn(String name) {
         int columnIndex = supplierHeader.getChildren().size();
         Button sourceButton = new Button(name);
-        sourceButton.setOnAction(event -> optionsGrid.getChildrenUnmodifiable().stream().filter(node -> getColumnIndex(node) == columnIndex).filter(node -> node instanceof ToggleButton).forEach(toggleButton -> ((ToggleButton) toggleButton).setSelected(true)));
+        sourceButton.setOnAction(event -> optionsGrid.getChildrenUnmodifiable().stream().filter(node -> GridPane.getColumnIndex(node) == columnIndex).filter(node -> node instanceof ToggleButton).forEach(toggleButton -> ((ToggleButton) toggleButton).setSelected(true)));
         HBox.setHgrow(sourceButton, Priority.ALWAYS);
         supplierHeader.getChildren().add(sourceButton);
         sourceButton.setMinWidth(250);
@@ -171,6 +165,9 @@ public class MultiMergeEntries extends GridPane {
         public FieldRow(int rowIndex, TextInputControl entryEditorField) {
             this.rowIndex = rowIndex;
             this.entryEditorField = entryEditorField;
+            entryEditorField.prefWidthProperty().bind(rightScrollPane.widthProperty());
+            entryEditorField.setMinWidth(Control.USE_PREF_SIZE);
+            entryEditorField.setMaxWidth(Control.USE_PREF_SIZE);
 
             ChangeListener textChangeListener = new ChangeListener() {
                 @Override
