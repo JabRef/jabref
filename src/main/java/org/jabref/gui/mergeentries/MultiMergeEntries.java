@@ -33,14 +33,24 @@ import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
+import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MultiMergeEntries extends SplitPane {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MultiMergeEntries.class);
+
     private final FieldContentFormatterPreferences fieldContentFormatterPreferences;
+    private final ImportFormatPreferences importFormatPreferences;
     private final TaskExecutor taskExecutor;
     private HashMap<Field, FieldRow> fieldRows = new HashMap<>();
 
@@ -58,8 +68,9 @@ public class MultiMergeEntries extends SplitPane {
     private GridPane optionsGrid;
     private VBox fieldEditor;
 
-    public MultiMergeEntries(FieldContentFormatterPreferences fieldContentFormatterPreferences, TaskExecutor taskExecutor) {
+    public MultiMergeEntries(FieldContentFormatterPreferences fieldContentFormatterPreferences, ImportFormatPreferences importFormatPreferences, TaskExecutor taskExecutor) {
         this.fieldContentFormatterPreferences = fieldContentFormatterPreferences;
+        this.importFormatPreferences = importFormatPreferences;
         this.taskExecutor = taskExecutor;
         init();
     }
@@ -109,8 +120,7 @@ public class MultiMergeEntries extends SplitPane {
     public void addEntry(String title, BibEntry entry) {
         Button sourceButton = new Button(title);
         int column = addColumn(sourceButton);
-        sourceButton.setOnAction(event -> optionsGrid.getChildrenUnmodifiable().stream().filter(node -> GridPane.getColumnIndex(node) == column).filter(node -> node instanceof ToggleButton).forEach(toggleButton -> ((ToggleButton) toggleButton).setSelected(true)));
-
+        setupSourceButtonAction(sourceButton, column);
         writeBibEntryToColumn(entry, column);
     }
 
@@ -123,7 +133,7 @@ public class MultiMergeEntries extends SplitPane {
         sourceButton.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(loadingIndicator, Priority.NEVER);
         int column = addColumn(header);
-        sourceButton.setOnAction(event -> optionsGrid.getChildrenUnmodifiable().stream().filter(node -> GridPane.getColumnIndex(node) == column).filter(node -> node instanceof ToggleButton).forEach(toggleButton -> ((ToggleButton) toggleButton).setSelected(true)));
+        setupSourceButtonAction(sourceButton, column);
         sourceButton.setDisable(true);
         loadingIndicator.prefHeightProperty().bind(sourceButton.heightProperty());
         loadingIndicator.setMinHeight(Control.USE_PREF_SIZE);
@@ -139,6 +149,15 @@ public class MultiMergeEntries extends SplitPane {
                 header.getChildren().remove(loadingIndicator);
             });
         }).executeWith(taskExecutor);
+    }
+
+    private void setupSourceButtonAction(Button sourceButton, int column) {
+        sourceButton.setOnAction(event -> optionsGrid.getChildrenUnmodifiable().stream()
+                                                     .filter(node -> GridPane.getColumnIndex(node) == column)
+                                                     .filter(node -> node instanceof HBox)
+                                                     .forEach(hbox -> ((HBox) hbox).getChildrenUnmodifiable().stream()
+                                                                                   .filter(node -> node instanceof ToggleButton)
+                                                                                   .forEach(toggleButton -> ((ToggleButton) toggleButton).setSelected(true))));
     }
 
     private void writeBibEntryToColumn(BibEntry bibEntry, int column) {
@@ -184,7 +203,7 @@ public class MultiMergeEntries extends SplitPane {
             fieldEditorCell = new TextField();
         }
         VBox.setVgrow(fieldEditorCell, Priority.ALWAYS);
-        FieldRow newRow = new FieldRow(fieldHeader.getChildren().size(), fieldEditorCell);
+        FieldRow newRow = new FieldRow(fieldHeader.getChildren().size(), fieldEditorCell, field);
         fieldRows.put(field, newRow);
         Label fieldHeaderLabel = new Label(field.getDisplayName());
         fieldHeaderLabel.prefHeightProperty().bind(fieldEditorCell.heightProperty());
@@ -208,9 +227,12 @@ public class MultiMergeEntries extends SplitPane {
         public ToggleGroup toggleGroup = new ToggleGroup();
         public TextInputControl entryEditorField;
 
-        public FieldRow(int rowIndex, TextInputControl entryEditorField) {
+        private Field field;
+
+        public FieldRow(int rowIndex, TextInputControl entryEditorField, Field field) {
             this.rowIndex = rowIndex;
             this.entryEditorField = entryEditorField;
+            this.field = field;
             entryEditorField.prefWidthProperty().bind(rightScrollPane.widthProperty());
             entryEditorField.setMinWidth(Control.USE_PREF_SIZE);
             entryEditorField.setMaxWidth(Control.USE_PREF_SIZE);
@@ -239,14 +261,17 @@ public class MultiMergeEntries extends SplitPane {
         }
 
         public void addValue(int columnIndex, String value) {
+            HBox cell = new HBox();
             ToggleButton cellButton = new ToggleButton(value);
+            cell.getChildren().add(cellButton);
+            HBox.setHgrow(cellButton, Priority.ALWAYS);
             cellButton.setWrapText(true);
             Tooltip buttonTooltip = new Tooltip(value);
             buttonTooltip.setWrapText(true);
             buttonTooltip.prefWidthProperty().bind(cellButton.widthProperty());
             buttonTooltip.setTextAlignment(TextAlignment.LEFT);
             cellButton.setTooltip(buttonTooltip);
-            optionsGrid.add(cellButton, columnIndex, rowIndex);
+            optionsGrid.add(cell, columnIndex, rowIndex);
             if (toggleGroup.getSelectedToggle() == null) {
                 cellButton.setSelected(true);
             }
@@ -260,6 +285,23 @@ public class MultiMergeEntries extends SplitPane {
                 }
             }
             cellButton.setToggleGroup(toggleGroup);
+
+            if (field.equals(StandardField.DOI)) {
+                Button doiButton = new Button(Localization.lang("Lookup"));
+                cell.getChildren().add(doiButton);
+                doiButton.setOnAction(event -> {
+                    DoiFetcher doiFetcher = new DoiFetcher(importFormatPreferences);
+                    doiButton.setDisable(true);
+                    addEntry(Localization.lang("From DOI"), () -> {
+                        try {
+                            return doiFetcher.performSearchById(value);
+                        } catch (FetcherException e) {
+                            LOGGER.warn("Failed to fetch BibEntry for DOI {}", value, e);
+                            return Optional.empty();
+                        }
+                    });
+                });
+            }
         }
     }
 }

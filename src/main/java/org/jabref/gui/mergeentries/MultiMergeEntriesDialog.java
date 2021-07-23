@@ -9,6 +9,7 @@ import javafx.scene.control.ButtonType;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
@@ -16,8 +17,8 @@ public class MultiMergeEntriesDialog extends BaseDialog<BibEntry> {
 
     private final MultiMergeEntries multiMergeEntries;
 
-    public MultiMergeEntriesDialog(FieldContentFormatterPreferences fieldContentFormatterPreferences, TaskExecutor taskExecutor) {
-        multiMergeEntries = new MultiMergeEntries(fieldContentFormatterPreferences, taskExecutor);
+    public MultiMergeEntriesDialog(FieldContentFormatterPreferences fieldContentFormatterPreferences, ImportFormatPreferences importFormatPreferences, TaskExecutor taskExecutor) {
+        multiMergeEntries = new MultiMergeEntries(fieldContentFormatterPreferences, importFormatPreferences, taskExecutor);
 
         init();
     }
