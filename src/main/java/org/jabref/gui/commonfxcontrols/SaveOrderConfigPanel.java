@@ -52,11 +52,8 @@ public class SaveOrderConfigPanel extends VBox {
         viewModel.sortCriteriaProperty().addListener((ListChangeListener<SortCriterionViewModel>) c -> {
             while (c.next()) {
                 if (c.wasReplaced()) {
-                    refreshBindings(viewModel.sortCriteriaProperty().get(c.getFrom()),c.getFrom());
-
-                    /* for (SortCriterionViewModel vm : c.getList()) {
-                        refreshBindings(vm, c.getList().indexOf(vm));
-                    } */
+                        clearCriterionRow(c.getFrom());
+                        createCriterionRow(c.getAddedSubList().get(0), c.getFrom());
                 } else if (c.wasAdded()) {
                     for (SortCriterionViewModel vm : c.getAddedSubList()) {
                         int row = c.getFrom() + c.getAddedSubList().indexOf(vm);
@@ -69,30 +66,6 @@ public class SaveOrderConfigPanel extends VBox {
                 }
             }
         });
-    }
-
-    private void refreshBindings(SortCriterionViewModel criterionViewModel, int row) {
-        for (Node node : sortCriterionList.getChildren()) {
-            if (GridPane.getRowIndex(node) == row) {
-                if (GridPane.getColumnIndex(node) == 1) {
-                    @SuppressWarnings("unchecked") ComboBox<Field> comboBox = (ComboBox<Field>) node;
-                    if (comboBox.valueProperty().isBound()) {
-                        comboBox.valueProperty().unbind();
-                    }
-                    comboBox.valueProperty().bindBidirectional(criterionViewModel.fieldProperty());
-                } else if (GridPane.getColumnIndex(node) == 2) {
-                    CheckBox checkBox = (CheckBox) node;
-                    if (checkBox.selectedProperty().isBound()) {
-                        checkBox.selectedProperty().unbind();
-                    }
-                    checkBox.selectedProperty().bindBidirectional(criterionViewModel.descendingProperty());
-                } else if (GridPane.getColumnIndex(node) == 3) {
-                    HBox hBox = (HBox) node;
-                    hBox.getChildren().clear();
-                    hBox.getChildren().addAll(createRowButtons(criterionViewModel));
-                }
-            }
-        }
     }
 
     private void createCriterionRow(SortCriterionViewModel criterionViewModel, int row) {
