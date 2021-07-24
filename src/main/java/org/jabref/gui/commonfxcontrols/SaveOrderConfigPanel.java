@@ -49,19 +49,19 @@ public class SaveOrderConfigPanel extends VBox {
         exportInTableOrder.selectedProperty().bindBidirectional(viewModel.saveInTableOrderProperty());
         exportInSpecifiedOrder.selectedProperty().bindBidirectional(viewModel.saveInSpecifiedOrderProperty());
 
-        viewModel.sortCriteriaProperty().addListener((ListChangeListener<SortCriterionViewModel>) c -> {
-            while (c.next()) {
-                if (c.wasReplaced()) {
-                        clearCriterionRow(c.getFrom());
-                        createCriterionRow(c.getAddedSubList().get(0), c.getFrom());
-                } else if (c.wasAdded()) {
-                    for (SortCriterionViewModel vm : c.getAddedSubList()) {
-                        int row = c.getFrom() + c.getAddedSubList().indexOf(vm);
-                        createCriterionRow(vm, row);
+        viewModel.sortCriteriaProperty().addListener((ListChangeListener<SortCriterionViewModel>) change -> {
+            while (change.next()) {
+                if (change.wasReplaced()) {
+                        clearCriterionRow(change.getFrom());
+                        createCriterionRow(change.getAddedSubList().get(0), change.getFrom());
+                } else if (change.wasAdded()) {
+                    for (SortCriterionViewModel criterionViewModel : change.getAddedSubList()) {
+                        int row = change.getFrom() + change.getAddedSubList().indexOf(criterionViewModel);
+                        createCriterionRow(criterionViewModel, row);
                     }
-                } else if (c.wasRemoved()) {
-                    for (SortCriterionViewModel vm : c.getRemoved()) {
-                        clearCriterionRow(c.getFrom());
+                } else if (change.wasRemoved()) {
+                    for (SortCriterionViewModel criterionViewModel : change.getRemoved()) {
+                        clearCriterionRow(change.getFrom());
                     }
                 }
             }

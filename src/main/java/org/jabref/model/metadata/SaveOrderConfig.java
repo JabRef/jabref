@@ -70,8 +70,14 @@ public class SaveOrderConfig {
         try {
             this.orderType = OrderType.valueOf(data.get(0));
         } catch (IllegalArgumentException ex) {
-            LOGGER.warn("Could not parse sort order: " + data.get(0));
-            this.orderType = OrderType.ORIGINAL;
+            if (data.size() > 1 && data.size() % 2 == 1) {
+                LOGGER.warn("Could not parse sort order: {} - trying to parse the sort criteria", data.get(0));
+                this.orderType = OrderType.SPECIFIED;
+            } else {
+                LOGGER.warn("Could not parse sort order: {}", data.get(0));
+                this.orderType = OrderType.ORIGINAL;
+                return;
+            }
         }
 
         for (int index = 1; index < data.size(); index = index + 2) {

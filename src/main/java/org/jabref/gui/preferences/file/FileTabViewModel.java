@@ -37,9 +37,9 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty alwaysReformatBibProperty = new SimpleBooleanProperty();
 
     // SaveOrderConfigPanel
-    private final BooleanProperty saveInOriginalProperty = new SimpleBooleanProperty();
-    private final BooleanProperty saveInTableOrderProperty = new SimpleBooleanProperty();
-    private final BooleanProperty saveInSpecifiedOrderProperty = new SimpleBooleanProperty();
+    private final BooleanProperty exportInOriginalProperty = new SimpleBooleanProperty();
+    private final BooleanProperty exportInTableOrderProperty = new SimpleBooleanProperty();
+    private final BooleanProperty exportInSpecifiedOrderProperty = new SimpleBooleanProperty();
     private final ListProperty<Field> sortableFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<SortCriterionViewModel> sortCriteriaProperty = new SimpleListProperty<>(FXCollections.observableArrayList(new LinkedList<>()));
 
@@ -69,9 +69,9 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         alwaysReformatBibProperty.setValue(initialImportExportPreferences.shouldAlwaysReformatOnSave());
 
         switch (initialExportOrder.getOrderType()) {
-            case SPECIFIED -> saveInSpecifiedOrderProperty.setValue(true);
-            case ORIGINAL -> saveInOriginalProperty.setValue(true);
-            case TABLE -> saveInTableOrderProperty.setValue(true);
+            case SPECIFIED -> exportInSpecifiedOrderProperty.setValue(true);
+            case ORIGINAL -> exportInOriginalProperty.setValue(true);
+            case TABLE -> exportInTableOrderProperty.setValue(true);
         }
 
         List<Field> fieldNames = new ArrayList<>(FieldFactory.getCommonFields());
@@ -102,7 +102,7 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         preferences.storeImportExportPreferences(newImportExportPreferences);
 
         SaveOrderConfig newSaveOrderConfig = new SaveOrderConfig(
-                SaveOrderConfig.OrderType.fromBooleans(saveInSpecifiedOrderProperty.getValue(), saveInTableOrderProperty.getValue()),
+                SaveOrderConfig.OrderType.fromBooleans(exportInSpecifiedOrderProperty.getValue(), exportInTableOrderProperty.getValue()),
                 new LinkedList<>(sortCriteriaProperty.stream().map(SortCriterionViewModel::getCriterion).toList()));
         preferences.storeExportSaveOrder(newSaveOrderConfig);
 
@@ -151,15 +151,15 @@ public class FileTabViewModel implements PreferenceTabViewModel {
     // SaveOrderConfigPanel
 
     public BooleanProperty saveInOriginalProperty() {
-        return saveInOriginalProperty;
+        return exportInOriginalProperty;
     }
 
     public BooleanProperty saveInTableOrderProperty() {
-        return saveInTableOrderProperty;
+        return exportInTableOrderProperty;
     }
 
     public BooleanProperty saveInSpecifiedOrderProperty() {
-        return saveInSpecifiedOrderProperty;
+        return exportInSpecifiedOrderProperty;
     }
 
     public ListProperty<Field> sortableFieldsProperty() {
