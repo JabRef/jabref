@@ -109,8 +109,6 @@ public class FileTabViewModel implements PreferenceTabViewModel {
         preferences.storeShouldAutosave(autosaveLocalLibraries.getValue());
     }
 
-
-
     // General
 
     public BooleanProperty openLastStartupProperty() {
