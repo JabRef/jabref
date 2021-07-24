@@ -62,14 +62,18 @@ public class Citation implements ComparableCitation, CitationMarkerEntry, Citati
                 : Optional.empty());
     }
 
+    public static Optional<CitationLookupResult> lookup(BibDatabase database, String key) {
+        return (database
+                .getEntryByCitationKey(key)
+                .map(bibEntry -> new CitationLookupResult(bibEntry, database)));
+    }
+
     public static Optional<CitationLookupResult> lookup(List<BibDatabase> databases, String key) {
-        for (BibDatabase database : databases) {
-            Optional<BibEntry> entry = database.getEntryByCitationKey(key);
-            if (entry.isPresent()) {
-                return Optional.of(new CitationLookupResult(entry.get(), database));
-            }
-        }
-        return Optional.empty();
+        return (databases.stream()
+                .map(database -> Citation.lookup(database, key))
+                .filter(Optional::isPresent)
+                .findFirst()
+                .orElse(Optional.empty()));
     }
 
     public void lookupInDatabases(List<BibDatabase> databases) {
