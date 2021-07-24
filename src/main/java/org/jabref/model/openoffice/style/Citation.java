@@ -72,8 +72,8 @@ public class Citation implements ComparableCitation, CitationMarkerEntry, Citati
         return (databases.stream()
                 .map(database -> Citation.lookup(database, key))
                 .filter(Optional::isPresent)
-                .findFirst()
-                .orElse(Optional.empty()));
+                .map(Optional::get)
+                .findFirst());
     }
 
     public void lookupInDatabases(List<BibDatabase> databases) {
