@@ -27,11 +27,15 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
+import org.jabref.gui.util.component.DiffHighlightingTextPane;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -219,6 +223,7 @@ public class MultiMergeEntries extends SplitPane {
         constraint.setMinHeight(Control.USE_PREF_SIZE);
         constraint.setMaxHeight(Control.USE_PREF_SIZE);
         constraint.prefHeightProperty().bind(fieldEditorCell.heightProperty());
+
         optionsGrid.getRowConstraints().add(constraint);
     }
 
@@ -262,7 +267,12 @@ public class MultiMergeEntries extends SplitPane {
 
         public void addValue(int columnIndex, String value) {
             HBox cell = new HBox();
-            ToggleButton cellButton = new ToggleButton(value);
+            ToggleButton cellButton = new ToggleButton();
+            TextFlow buttonText = new DiffHighlightingTextPane();
+            buttonText.getChildren().add(new Text(value));
+            // Label buttonText = new Label(value);
+            // buttonText.setWrapText(true);
+            cellButton.setGraphic(buttonText);
             cell.getChildren().add(cellButton);
             HBox.setHgrow(cellButton, Priority.ALWAYS);
             cellButton.setWrapText(true);
@@ -285,6 +295,13 @@ public class MultiMergeEntries extends SplitPane {
                 }
             }
             cellButton.setToggleGroup(toggleGroup);
+
+            entryEditorField.textProperty().addListener(new ChangeListener<String>() {
+                @Override
+                public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                    // cellButton.setText
+                }
+            });
 
             if (field.equals(StandardField.DOI)) {
                 Button doiButton = new Button(Localization.lang("Lookup"));
