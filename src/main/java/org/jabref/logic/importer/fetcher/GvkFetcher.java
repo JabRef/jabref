@@ -11,7 +11,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
-import org.jabref.logic.importer.fetcher.transformators.GVKQueryTransformer;
+import org.jabref.logic.importer.fetcher.transformers.GVKQueryTransformer;
 import org.jabref.logic.importer.fileformat.GvkParser;
 
 import org.apache.http.client.utils.URIBuilder;

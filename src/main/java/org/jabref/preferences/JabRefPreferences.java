@@ -87,7 +87,7 @@ import org.jabref.logic.layout.format.FileLinkPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
-import org.jabref.logic.openoffice.StyleLoader;
+import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.preferences.DOIPreferences;
 import org.jabref.logic.preferences.OwnerPreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
@@ -236,6 +236,7 @@ public class JabRefPreferences implements PreferencesService {
     public static final String SEARCH_DISPLAY_MODE = "searchDisplayMode";
     public static final String SEARCH_CASE_SENSITIVE = "caseSensitiveSearch";
     public static final String SEARCH_REG_EXP = "regExpSearch";
+    public static final String SEARCH_FULLTEXT = "fulltextSearch";
 
     public static final String GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
 
@@ -438,6 +439,7 @@ public class JabRefPreferences implements PreferencesService {
         defaults.put(SEARCH_DISPLAY_MODE, SearchDisplayMode.FILTER.toString());
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
+        defaults.put(SEARCH_FULLTEXT, Boolean.TRUE);
 
         defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
 
@@ -1049,10 +1051,16 @@ public class JabRefPreferences implements PreferencesService {
         }
     }
 
-    private FileLinkPreferences getFileLinkPreferences() {
+    @Override
+    public FileLinkPreferences getFileLinkPreferences() {
         return new FileLinkPreferences(
                 get(MAIN_FILE_DIRECTORY), // REALLY HERE?
                 fileDirForDatabase);
+    }
+
+    @Override
+    public void storeFileDirforDatabase(List<Path> dirs) {
+        this.fileDirForDatabase = dirs;
     }
 
     @Override
@@ -2526,7 +2534,8 @@ public class JabRefPreferences implements PreferencesService {
         return new SearchPreferences(
                 searchDisplayMode,
                 getBoolean(SEARCH_CASE_SENSITIVE),
-                getBoolean(SEARCH_REG_EXP));
+                getBoolean(SEARCH_REG_EXP),
+                getBoolean(SEARCH_FULLTEXT));
     }
 
     @Override
@@ -2534,6 +2543,7 @@ public class JabRefPreferences implements PreferencesService {
         put(SEARCH_DISPLAY_MODE, Objects.requireNonNull(preferences.getSearchDisplayMode()).toString());
         putBoolean(SEARCH_CASE_SENSITIVE, preferences.isCaseSensitive());
         putBoolean(SEARCH_REG_EXP, preferences.isRegularExpression());
+        putBoolean(SEARCH_FULLTEXT, preferences.isFulltext());
     }
 
     //*************************************************************************************************************

@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.icon.JabRefIconView?>
+<DialogPane xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.jabref.gui.slr.ManageStudyDefinitionView">
+    <content>
+        <BorderPane>
+            <center>
+                <TabPane tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+                    <Tab text="%Authors and Title">
+                        <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="slr-tab">
+                            <VBox spacing="20.0">
+                                <GridPane hgap="10.0" vgap="4.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="20.0"/>
+                                        <ColumnConstraints hgrow="SOMETIMES"/>
+                                    </columnConstraints>
+                                    <rowConstraints>
+                                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                                    </rowConstraints>
+                                    <Label text="%Study Title:"/>
+                                    <TextField fx:id="studyTitle" HBox.hgrow="ALWAYS" GridPane.columnIndex="1"/>
+                                    <Label text="%Add Author:" GridPane.rowIndex="1"/>
+                                    <HBox alignment="CENTER_LEFT" spacing="10.0"
+                                          GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                        <TextField fx:id="addAuthor" HBox.hgrow="ALWAYS"/>
+                                        <Button onAction="#addAuthor" styleClass="icon-button">
+                                            <tooltip>
+                                                <Tooltip text="%Add"/>
+                                            </tooltip>
+                                            <graphic>
+                                                <JabRefIconView glyph="ADD_ARTICLE"/>
+                                            </graphic>
+                                        </Button>
+                                    </HBox>
+                                </GridPane>
+                                <HBox alignment="CENTER_LEFT">
+                                    <TableView fx:id="authorTableView" HBox.hgrow="ALWAYS">
+                                        <columns>
+                                            <TableColumn fx:id="authorsColumn" text="%Author"/>
+                                            <TableColumn fx:id="authorsActionColumn"
+                                                         maxWidth="30.0" prefWidth="30.0" minWidth="30.0"
+                                                         reorderable="false" resizable="false"/>
+                                        </columns>
+                                        <columnResizePolicy>
+                                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                        </columnResizePolicy>
+                                    </TableView>
+                                </HBox>
+                            </VBox>
+                        </ScrollPane>
+                    </Tab>
+                    <Tab text="%Research Questions">
+                        <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="slr-tab">
+                            <VBox spacing="20.0">
+                                <HBox alignment="CENTER_LEFT"
+                                      spacing="20.0">
+                                    <Label text="%Add Research Question:"/>
+                                    <TextField fx:id="addResearchQuestion" HBox.hgrow="ALWAYS"/>
+                                    <Button onAction="#addResearchQuestion"
+                                            styleClass="icon-button">
+                                        <tooltip>
+                                            <Tooltip text="%Add"/>
+                                        </tooltip>
+                                        <graphic>
+                                            <JabRefIconView glyph="ADD_ARTICLE"/>
+                                        </graphic>
+                                    </Button>
+                                </HBox>
+                                <HBox alignment="CENTER_LEFT">
+                                    <TableView fx:id="questionTableView" HBox.hgrow="ALWAYS">
+                                        <columns>
+                                            <TableColumn fx:id="questionsColumn" text="%Question"/>
+                                            <TableColumn fx:id="questionsActionColumn"
+                                                         maxWidth="30.0" prefWidth="30.0" minWidth="30.0"
+                                                         reorderable="false" resizable="false"/>
+                                        </columns>
+                                        <columnResizePolicy>
+                                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                        </columnResizePolicy>
+                                    </TableView>
+                                </HBox>
+                            </VBox>
+                        </ScrollPane>
+                    </Tab>
+                    <Tab text="%Queries">
+                        <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="slr-tab">
+                            <VBox spacing="20.0">
+                                <HBox alignment="CENTER_LEFT" spacing="20.0">
+                                    <Label text="%Add Query:"/>
+                                    <Label fx:id="helpIcon">
+                                        <graphic>
+                                            <JabRefIconView glyph="HELP"/>
+                                        </graphic>
+                                    </Label>
+                                    <TextField fx:id="addQuery" HBox.hgrow="ALWAYS"/>
+                                    <Button onAction="#addQuery" styleClass="icon-button">
+                                        <tooltip>
+                                            <Tooltip text="%Add"/>
+                                        </tooltip>
+                                        <graphic>
+                                            <JabRefIconView glyph="ADD_ARTICLE"/>
+                                        </graphic>
+                                    </Button>
+                                </HBox>
+                                <HBox alignment="CENTER_LEFT">
+                                    <TableView fx:id="queryTableView" HBox.hgrow="ALWAYS">
+                                        <columns>
+                                            <TableColumn fx:id="queriesColumn" text="%Query"/>
+                                            <TableColumn fx:id="queriesActionColumn"
+                                                         maxWidth="30.0" prefWidth="30.0" minWidth="30.0"
+                                                         reorderable="false" resizable="false"/>
+                                        </columns>
+                                        <columnResizePolicy>
+                                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                        </columnResizePolicy>
+                                    </TableView>
+                                </HBox>
+                            </VBox>
+                        </ScrollPane>
+                    </Tab>
+                    <Tab text="%Databases">
+                        <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="slr-tab">
+                            <VBox spacing="20.0">
+                                <HBox alignment="CENTER_LEFT" spacing="20.0">
+                                    <Label text="%Add Database:"/>
+                                    <ComboBox fx:id="databaseSelector" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                    <Button onAction="#addDatabase" styleClass="icon-button">
+                                        <tooltip>
+                                            <Tooltip text="%Add"/>
+                                        </tooltip>
+                                        <graphic>
+                                            <JabRefIconView glyph="ADD_ARTICLE"/>
+                                        </graphic>
+                                    </Button>
+                                </HBox>
+                                <HBox alignment="CENTER_LEFT">
+                                    <TableView fx:id="databaseTable" HBox.hgrow="ALWAYS" editable="true">
+                                        <columns>
+                                            <TableColumn fx:id="databaseEnabledColumn" text="%Enabled"
+                                                         maxWidth="80.0" prefWidth="80.0" minWidth="80.0"
+                                                         reorderable="false" resizable="false"/>
+                                            <TableColumn fx:id="databaseColumn" text="%Database"/>
+                                            <TableColumn fx:id="databaseActionColumn"
+                                                         maxWidth="30.0" prefWidth="30.0" minWidth="30.0"
+                                                         reorderable="false" resizable="false"/>
+                                        </columns>
+                                        <columnResizePolicy>
+                                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                        </columnResizePolicy>
+                                    </TableView>
+                                </HBox>
+                            </VBox>
+                        </ScrollPane>
+                    </Tab>
+                    <Tab text="%Finalize">
+                        <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="slr-tab">
+                            <VBox spacing="20.0">
+                                <HBox alignment="CENTER_LEFT" spacing="20.0">
+                                    <Label text="%Select the study directory:"/>
+                                    <TextField fx:id="studyDirectory" disable="true" editable="false"
+                                               focusTraversable="false" HBox.hgrow="ALWAYS"/>
+                                    <Button fx:id="selectStudyDirectory" onAction="#selectStudyDirectory"
+                                            styleClass="icon-button">
+                                        <tooltip>
+                                            <Tooltip text="%Select directory"/>
+                                        </tooltip>
+                                        <graphic>
+                                            <JabRefIconView glyph="FILE"/>
+                                        </graphic>
+                                    </Button>
+                                </HBox>
+                            </VBox>
+                        </ScrollPane>
+                    </Tab>
+                </TabPane>
+            </center>
+        </BorderPane>
+    </content>
+    <ButtonType fx:id="saveButtonType" buttonData="FINISH" text="%Start survey"/>
+    <ButtonType buttonData="CANCEL_CLOSE" text="%Cancel"/>
+</DialogPane>

@@ -4,10 +4,11 @@ Fetchers are the implementation of the [search using online services](https://do
 
 | Service | Key Source | Environment Variable | Rate Limit |
 | :--- | :--- | :--- | :--- |
-| [IEEEXplore](https://docs.jabref.org/collect/import-using-online-bibliographic-database/ieeexplore) | [IEEE Xplore API portal](https://developer.ieee.org/) | `IEEEAPIKey` | 200 calls/day |
+| [IEEEXplore](https://docs.jabref.org/collect/import-using-online-bibliographic-database#ieeexplore) | [IEEE Xplore API portal](https://developer.ieee.org/) | `IEEEAPIKey` | 200 calls/day |
 | [MathSciNet](http://www.ams.org/mathscinet) | \(none\) | \(none\) | Depending on the current network |
-| [SAO/NASA Astrophysics Data System](https://docs.jabref.org/collect/import-using-online-bibliographic-database/ads) | [ADS UI](https://ui.adsabs.harvard.edu/user/settings/token) | `AstrophysicsDataSystemAPIKey` | 5000 calls/day |
-| [Springer Nature](https://docs.jabref.org/collect/import-using-online-bibliographic-database/springer) | [Springer Nature API Portal](https://dev.springernature.com/) | `SpringerNatureAPIKey` | 5000 calls/day |
+| [SAO/NASA Astrophysics Data System](https://docs.jabref.org/collect/import-using-online-bibliographic-database#sao-nasa-astrophysics-data-system) | [ADS UI](https://ui.adsabs.harvard.edu/user/settings/token) | `AstrophysicsDataSystemAPIKey` | 5000 calls/day |
+| [ScienceDirect](https://www.sciencedirect.com/) |  | `ScienceDirectApiKey` |  |
+| [Springer Nature](https://docs.jabref.org/collect/import-using-online-bibliographic-database#springer) | [Springer Nature API Portal](https://dev.springernature.com/) | `SpringerNatureAPIKey` | 5000 calls/day |
 | [Zentralblatt Math](https://www.zbmath.org/) | \(none\) | \(none\) | Depending on the current network |
 
 "Depending on the current network" means that it depends whether your request is routed through a network having paid access. For instance, some universities have subscriptions to MathSciNet.

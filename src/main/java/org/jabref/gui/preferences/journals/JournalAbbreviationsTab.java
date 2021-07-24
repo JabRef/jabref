@@ -2,6 +2,16 @@ package org.jabref.gui.preferences.journals;
 
 import javax.inject.Inject;
 
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.transformation.FilteredList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -10,16 +20,20 @@ import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.paint.Color;
+import javafx.util.Duration;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
+import org.jabref.gui.util.ColorUtil;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import org.controlsfx.control.textfield.CustomTextField;
 
 /**
  * This class controls the user interface of the journal abbreviations dialog. The UI elements and their layout are
@@ -33,6 +47,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     @FXML private TableColumn<AbbreviationViewModel, String> journalTableNameColumn;
     @FXML private TableColumn<AbbreviationViewModel, String> journalTableAbbreviationColumn;
     @FXML private TableColumn<AbbreviationViewModel, String> journalTableShortestUniqueAbbreviationColumn;
+    private FilteredList<AbbreviationViewModel> filteredAbbreviations;
     @FXML private ComboBox<AbbreviationsFileViewModel> journalFilesBox;
     @FXML private Button addAbbreviationButton;
     @FXML private Button removeAbbreviationButton;
@@ -40,8 +55,14 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     @FXML private Button addAbbreviationListButton;
     @FXML private Button removeAbbreviationListButton;
 
+    @FXML private CustomTextField searchBox;
+
     @Inject private TaskExecutor taskExecutor;
     @Inject private JournalAbbreviationRepository abbreviationRepository;
+
+    private Timeline invalidateSearch;
+    private ObjectProperty<Color> flashingColor;
+    private StringProperty flashingColorStringProperty;
 
     public JournalAbbreviationsTab() {
         ViewLoader.view(this)
@@ -53,9 +74,15 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     private void initialize() {
         viewModel = new JournalAbbreviationsTabViewModel(preferencesService, dialogService, taskExecutor, abbreviationRepository);
 
+        filteredAbbreviations = new FilteredList<>(viewModel.abbreviationsProperty());
+
         setButtonStyles();
         setUpTable();
         setBindings();
+        setAnimations();
+
+        searchBox.setPromptText(Localization.lang("Search") + "...");
+        searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
     }
 
     private void setButtonStyles() {
@@ -78,7 +105,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     }
 
     private void setBindings() {
-        journalAbbreviationsTable.itemsProperty().bindBidirectional(viewModel.abbreviationsProperty());
+        journalAbbreviationsTable.setItems(filteredAbbreviations);
 
         EasyBind.subscribe(journalAbbreviationsTable.getSelectionModel().selectedItemProperty(), newValue ->
                 viewModel.currentAbbreviationProperty().set(newValue));
@@ -98,6 +125,27 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
         loadingLabel.visibleProperty().bind(viewModel.isLoadingProperty());
         progressIndicator.visibleProperty().bind(viewModel.isLoadingProperty());
+
+        searchBox.textProperty().addListener((observable, previousText, searchTerm) -> {
+            filteredAbbreviations.setPredicate(abbreviation -> searchTerm.isEmpty() ? true : abbreviation.containsCaseIndependent(searchTerm));
+        });
+    }
+
+    private void setAnimations() {
+        flashingColor = new SimpleObjectProperty<>(Color.TRANSPARENT);
+        flashingColorStringProperty = createFlashingColorStringProperty(flashingColor);
+        searchBox.styleProperty().bind(
+                new SimpleStringProperty("-fx-control-inner-background: ").concat(flashingColorStringProperty).concat(";")
+        );
+        invalidateSearch = new Timeline(
+                new KeyFrame(Duration.seconds(0), new KeyValue(flashingColor, Color.TRANSPARENT, Interpolator.LINEAR)),
+                new KeyFrame(Duration.seconds(0.25), new KeyValue(flashingColor, Color.RED, Interpolator.LINEAR)),
+                new KeyFrame(Duration.seconds(0.25), new KeyValue(searchBox.textProperty(), "", Interpolator.DISCRETE)),
+                new KeyFrame(Duration.seconds(0.25), (ActionEvent event) -> {
+                    addAbbreviationActions();
+                }),
+                new KeyFrame(Duration.seconds(0.5), new KeyValue(flashingColor, Color.TRANSPARENT, Interpolator.LINEAR))
+        );
     }
 
     @FXML
@@ -117,9 +165,28 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
     @FXML
     private void addAbbreviation() {
+        if (!searchBox.getText().isEmpty()) {
+            invalidateSearch.play();
+        } else {
+            addAbbreviationActions();
+        }
+    }
+
+    private void addAbbreviationActions() {
         viewModel.addAbbreviation();
         selectNewAbbreviation();
         editAbbreviation();
+    }
+
+    private static StringProperty createFlashingColorStringProperty(final ObjectProperty<Color> flashingColor) {
+        final StringProperty flashingColorStringProperty = new SimpleStringProperty();
+        setColorStringFromColor(flashingColorStringProperty, flashingColor);
+        flashingColor.addListener((observable, oldValue, newValue) -> setColorStringFromColor(flashingColorStringProperty, flashingColor));
+        return flashingColorStringProperty;
+    }
+
+    private static void setColorStringFromColor(StringProperty colorStringProperty, ObjectProperty<Color> color) {
+        colorStringProperty.set(ColorUtil.toRGBACode(color.get()));
     }
 
     @FXML
@@ -138,7 +205,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         int lastRow = viewModel.abbreviationsCountProperty().get() - 1;
         journalAbbreviationsTable.scrollTo(lastRow);
         journalAbbreviationsTable.getSelectionModel().select(lastRow);
-        journalAbbreviationsTable.getFocusModel().focus(lastRow);
+        journalAbbreviationsTable.getFocusModel().focus(lastRow, journalTableNameColumn);
     }
 
     @Override

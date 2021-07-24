@@ -19,7 +19,7 @@
     <category citation-format="numeric"/>
     <category field="medicine"/>
     <issn>0026-1270</issn>
-    <updated>2020-06-05T09:29:34+00:00</updated>
+    <updated>2021-04-08T14:57:03+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en">
@@ -41,7 +41,7 @@
   <macro name="editor">
     <names variable="editor">
       <name sort-separator=" " initialize-with="" name-as-sort-order="all" delimiter=", " delimiter-precedes-last="always"/>
-      <label form="short" prefix=", " suffix=". "/>
+      <label form="short" prefix=", "/>
     </names>
   </macro>
   <macro name="publisher">
@@ -140,9 +140,11 @@
             </group>
           </if>
           <else-if type="chapter paper-conference" match="any">
-            <group prefix=" ">
-              <text term="in" suffix=": " text-case="capitalize-first"/>
-              <text macro="editor"/>
+            <group delimiter=". " prefix=" ">
+              <group delimiter=": ">
+                <text term="in" text-case="capitalize-first"/>
+                <text macro="editor"/>
+              </group>
               <text variable="container-title"/>
               <group delimiter=":">
                 <group delimiter="; ">

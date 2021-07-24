@@ -188,7 +188,7 @@ public class MassSetFieldsDialog extends BaseDialog<Void> {
         renameTextField = new TextField();
         renameTextField.disableProperty().bind(renameRadioButton.selectedProperty().not());
 
-        overwriteCheckBox = new CheckBox("Overwrite existing field values");
+        overwriteCheckBox = new CheckBox(Localization.lang("Overwrite existing field values"));
 
         GridPane main = new GridPane();
         main.add(new Label(Localization.lang("Field name")), 0, 0);

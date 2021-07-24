@@ -24,10 +24,15 @@
     <contributor>
       <name>Tyler Mykkanen</name>
     </contributor>
+    <contributor>
+      <name>J. David Stark</name>
+      <email>david@jdavidstark.com</email>
+      <uri>https://www.jdavidstark.com/</uri>
+    </contributor>
     <category citation-format="note"/>
     <category field="theology"/>
     <summary>Society of Biblical Literature format with full notes and bibliography</summary>
-    <updated>2018-02-01T14:42:46+00:00</updated>
+    <updated>2021-05-10T14:27:36+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale xml:lang="en-US">
@@ -669,10 +674,21 @@
                   <text term="volume" form="short"/>
                   <number variable="volume" form="numeric"/>
                 </group>
-                <group delimiter=" ">
-                  <label variable="locator" form="short"/>
-                  <text variable="locator"/>
-                </group>
+                <!-- When section-based citations are used, SBL prefers no space following the section symbol(s). E.g., https://sblhs2.com/2017/04/20/citing-reference-works-7-greek-language-tools/ -->
+                <choose>
+                  <if locator="section">
+                    <group>
+                      <label variable="locator" form="short"/>
+                      <text variable="locator"/>
+                    </group>
+                  </if>
+                  <else>
+                    <group delimiter=" ">
+                        <label variable="locator" form="short"/>
+                        <text variable="locator"/>
+                    </group>
+                  </else>
+                </choose>
               </group>
             </if>
           </choose>
@@ -920,8 +936,25 @@
   <citation et-al-min="4" et-al-use-first="1" disambiguate-add-names="true">
     <layout suffix="." delimiter="; ">
       <choose>
+        <!-- Support custom citations via the annote variable. For discussion, see https://forums.zotero.org/discussion/comment/317370 -->
+        <if variable="annote">
+          <choose>
+            <if locator="section">
+              <group delimiter=" ">
+                <text variable="annote"/>
+                <text macro="point-locators-subsequent"/>
+              </group>
+            </if>
+            <else>
+              <group delimiter=", ">
+                <text variable="annote"/>
+                <text macro="point-locators-subsequent"/>
+              </group>
+            </else>
+          </choose>
+        </if>
         <!-- Lexicon/Dictionary/Encyclopedia -->
-        <if type="entry-dictionary entry-encyclopedia" match="any">
+        <else-if type="entry-dictionary entry-encyclopedia" match="any">
           <choose>
             <if match="none" variable="author">
               <!-- Unsigned Lexicon/Dictionary/Encyclopedia -->
@@ -932,7 +965,7 @@
               <text macro="signed-dictionary-note"/>
             </else>
           </choose>
-        </if>
+        </else-if>
         <!-- Not Lexicon/Dictionary/Encyclopedia -->
         <else-if position="subsequent">
           <group delimiter=", ">

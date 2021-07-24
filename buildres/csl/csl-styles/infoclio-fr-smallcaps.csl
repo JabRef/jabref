@@ -69,7 +69,7 @@
       </choose>
     </layout>
   </citation>
-  <bibliography>
+  <bibliography hanging-indent="true">
     <sort>
       <key macro="creator" names-min="3" names-use-first="3"/>
       <key variable="issued" sort="descending"/>
@@ -360,7 +360,7 @@
   </macro>
   <macro name="alt-publisher">
     <choose>
-      <if type="book chapter thesis report paper-conference entry-dictionary entry-encyclopedia" match="none">
+      <if type="song motion_picture broadcast" match="any">
         <!--
              label for songs,
              distributor for films,

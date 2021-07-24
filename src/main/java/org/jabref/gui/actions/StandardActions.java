@@ -30,6 +30,7 @@ public enum StandardActions implements Action {
     DELETE(Localization.lang("Delete"), IconTheme.JabRefIcons.DELETE_ENTRY),
     DELETE_ENTRY(Localization.lang("Delete Entry"), IconTheme.JabRefIcons.DELETE_ENTRY, KeyBinding.DELETE_ENTRY),
     SEND_AS_EMAIL(Localization.lang("Send as email"), IconTheme.JabRefIcons.EMAIL),
+    REBUILD_FULLTEXT_SEARCH_INDEX(Localization.lang("Rebuild fulltext search index"), IconTheme.JabRefIcons.FILE),
     OPEN_EXTERNAL_FILE(Localization.lang("Open file"), IconTheme.JabRefIcons.FILE, KeyBinding.OPEN_FILE),
     OPEN_URL(Localization.lang("Open URL or DOI"), IconTheme.JabRefIcons.WWW, KeyBinding.OPEN_URL_OR_DOI),
     SEARCH_SHORTSCIENCE(Localization.lang("Search ShortScience")),
@@ -88,7 +89,8 @@ public enum StandardActions implements Action {
     PARSE_LATEX(Localization.lang("Search for citations in LaTeX files..."), IconTheme.JabRefIcons.LATEX_CITATIONS),
     NEW_SUB_LIBRARY_FROM_AUX(Localization.lang("New sublibrary based on AUX file") + "...", Localization.lang("New BibTeX sublibrary") + Localization.lang("This feature generates a new library based on which entries are needed in an existing LaTeX document."), IconTheme.JabRefIcons.NEW),
     WRITE_XMP(Localization.lang("Write XMP metadata to PDFs"), Localization.lang("Will write XMP metadata to the PDFs linked from selected entries."), KeyBinding.WRITE_XMP),
-    START_SYSTEMATIC_LITERATURE_REVIEW(Localization.lang("Start systematic literature review")),
+    START_NEW_STUDY(Localization.lang("Start new systematic literature review")),
+    SEARCH_FOR_EXISTING_STUDY(Localization.lang("Perform search for existing systematic literature review")),
     OPEN_DATABASE_FOLDER(Localization.lang("Reveal in file explorer")),
     OPEN_FOLDER(Localization.lang("Open folder"), Localization.lang("Open folder"), IconTheme.JabRefIcons.FOLDER, KeyBinding.OPEN_FOLDER),
     OPEN_FILE(Localization.lang("Open file"), Localization.lang("Open file"), IconTheme.JabRefIcons.FILE, KeyBinding.OPEN_FILE),
@@ -118,6 +120,10 @@ public enum StandardActions implements Action {
     NEXT_PREVIEW_STYLE(Localization.lang("Next preview style"), KeyBinding.NEXT_PREVIEW_LAYOUT),
     PREVIOUS_PREVIEW_STYLE(Localization.lang("Previous preview style"), KeyBinding.PREVIOUS_PREVIEW_LAYOUT),
     SELECT_ALL(Localization.lang("Select all"), KeyBinding.SELECT_ALL),
+    UNSELECT_ALL(Localization.lang("Unselect all")),
+
+    EXPAND_ALL(Localization.lang("Expand all")),
+    COLLAPSE_ALL(Localization.lang("Collapse all")),
 
     NEW_ENTRY(Localization.lang("New entry"), IconTheme.JabRefIcons.ADD_ENTRY, KeyBinding.NEW_ENTRY),
     NEW_ARTICLE(Localization.lang("New article"), IconTheme.JabRefIcons.ADD_ARTICLE),

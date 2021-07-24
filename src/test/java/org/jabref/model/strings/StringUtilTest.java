@@ -4,8 +4,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -346,5 +350,20 @@ class StringUtilTest {
         assertEquals("Hello world", StringUtil.capitalizeFirst("Hello World"));
         assertEquals("A", StringUtil.capitalizeFirst("a"));
         assertEquals("Aa", StringUtil.capitalizeFirst("AA"));
+    }
+
+    private static Stream<Arguments> getQuoteStringIfSpaceIsContainedData() {
+        return Stream.of(
+                Arguments.of("", ""),
+                Arguments.of("\" \"", " "),
+                Arguments.of("world", "world"),
+                Arguments.of("\"hello world\"", "hello world")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("getQuoteStringIfSpaceIsContainedData")
+    void testGuoteStringIfSpaceIsContained(String expected, String source) {
+        assertEquals(expected, StringUtil.quoteStringIfSpaceIsContained(source));
     }
 }

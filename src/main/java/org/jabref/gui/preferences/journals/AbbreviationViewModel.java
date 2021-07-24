@@ -1,5 +1,6 @@
 package org.jabref.gui.preferences.journals;
 
+import java.util.Locale;
 import java.util.Objects;
 
 import javafx.beans.property.BooleanProperty;
@@ -93,5 +94,12 @@ public class AbbreviationViewModel {
     @Override
     public int hashCode() {
         return Objects.hash(getName(), isPseudoAbbreviation());
+    }
+
+    public boolean containsCaseIndependent(String searchTerm) {
+        searchTerm = searchTerm.toLowerCase(Locale.ROOT);
+        return this.abbreviation.get().toLowerCase(Locale.ROOT).contains(searchTerm) ||
+                this.name.get().toLowerCase(Locale.ROOT).contains(searchTerm) ||
+                this.shortestUniqueAbbreviation.get().toLowerCase(Locale.ROOT).contains(searchTerm);
     }
 }

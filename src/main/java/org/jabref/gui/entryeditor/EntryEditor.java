@@ -31,6 +31,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeySingleAction;
 import org.jabref.gui.entryeditor.fileannotationtab.FileAnnotationTab;
+import org.jabref.gui.entryeditor.fileannotationtab.FulltextSearchResultsTab;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.help.HelpAction;
@@ -189,7 +190,7 @@ public class EntryEditor extends BorderPane {
                         event.consume();
                         break;
                     case CLOSE:
-                    case CLOSE_ENTRY:
+                    case EDIT_ENTRY:
                         close();
                         event.consume();
                         break;
@@ -266,6 +267,8 @@ public class EntryEditor extends BorderPane {
 
         // LaTeX citations tab
         entryEditorTabs.add(new LatexCitationsTab(databaseContext, preferencesService, taskExecutor, dialogService));
+
+        entryEditorTabs.add(new FulltextSearchResultsTab(stateManager, preferencesService.getTheme(), preferencesService.getFilePreferences()));
 
         return entryEditorTabs;
     }

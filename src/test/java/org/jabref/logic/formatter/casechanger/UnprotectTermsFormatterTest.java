@@ -3,6 +3,7 @@ package org.jabref.logic.formatter.casechanger;
 import java.io.IOException;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -14,10 +15,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class UnprotectTermsFormatterTest {
 
-    private UnprotectTermsFormatter formatter = new UnprotectTermsFormatter();
+    private UnprotectTermsFormatter formatter;
+
+    @BeforeEach
+    public void setUp() {
+        formatter = new UnprotectTermsFormatter();
+    }
 
     private static Stream<Arguments> terms() throws IOException {
         return Stream.of(
+                Arguments.of("", ""),
                 Arguments.of("VLSI", "{VLSI}"),
                 Arguments.of("VLsI", "VLsI"),
                 Arguments.of("VLSI", "VLSI"),
