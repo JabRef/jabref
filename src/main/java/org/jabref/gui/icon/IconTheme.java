@@ -279,6 +279,7 @@ public class IconTheme {
         ERROR(MaterialDesignA.ALERT_CIRCLE),
         CASE_SENSITIVE(MaterialDesignA.ALPHABETICAL),
         REG_EX(MaterialDesignR.REGEX),
+        FULLTEXT(MaterialDesignF.FILE_EYE),
         CONSOLE(MaterialDesignC.CONSOLE),
         FORUM(MaterialDesignF.FORUM),
         FACEBOOK(MaterialDesignF.FACEBOOK),
