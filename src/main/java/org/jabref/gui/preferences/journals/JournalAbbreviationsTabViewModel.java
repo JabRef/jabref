@@ -2,7 +2,6 @@ package org.jabref.gui.preferences.journals;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -38,18 +37,23 @@ import org.slf4j.LoggerFactory;
 public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel {
 
     private final Logger logger = LoggerFactory.getLogger(JournalAbbreviationsTabViewModel.class);
+
     private final SimpleListProperty<AbbreviationsFileViewModel> journalFiles = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final SimpleListProperty<AbbreviationViewModel> abbreviations = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final SimpleIntegerProperty abbreviationsCount = new SimpleIntegerProperty();
+
     private final SimpleObjectProperty<AbbreviationsFileViewModel> currentFile = new SimpleObjectProperty<>();
     private final SimpleObjectProperty<AbbreviationViewModel> currentAbbreviation = new SimpleObjectProperty<>();
+
     private final SimpleBooleanProperty isFileRemovable = new SimpleBooleanProperty();
     private final SimpleBooleanProperty isLoading = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty isEditableAndRemovable = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty isAbbreviationEditableAndRemovable = new SimpleBooleanProperty(false);
+
     private final PreferencesService preferences;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
+
     private final JournalAbbreviationPreferences abbreviationsPreferences;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private boolean shouldWriteLists;
@@ -339,37 +343,32 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     }
 
     /**
-     * This method stores all file paths of the files in the journalFiles property to the global JabRef preferences.
-     * Pseudo abbreviation files will not be stored.
-     */
-    private void saveExternalFilesList() {
-        List<String> extFiles = new ArrayList<>();
-        journalFiles.stream()
-                    .filter(file -> !file.isBuiltInListProperty().get())
-                    .forEach(file -> file.getAbsolutePath().ifPresent(path -> extFiles.add(path.toAbsolutePath().toString())));
-        abbreviationsPreferences.setExternalJournalLists(extFiles);
-    }
-
-    /**
      * This method first saves all external files to its internal list, then writes all abbreviations to their files and
-     * finally updates the abbreviations auto complete. It basically calls {@link #saveExternalFilesList()}, {@link
-     * #saveJournalAbbreviationFiles() }}.
+     * finally updates the abbreviations auto complete.
      */
     @Override
     public void storeSettings() {
-        BackgroundTask.wrap(() -> {
-            saveExternalFilesList();
+        BackgroundTask
+                .wrap(() -> {
+                    List<String> journalStringList = journalFiles.stream()
+                                                                 .filter(path -> !path.isBuiltInListProperty().get())
+                                                                 .filter(path -> path.getAbsolutePath().isPresent())
+                                                                 .map(path -> path.getAbsolutePath().get().toAbsolutePath().toString())
+                                                                 .collect(Collectors.toList());
 
-            if (shouldWriteLists) {
-                saveJournalAbbreviationFiles();
-                shouldWriteLists = false;
-            }
+                    preferences.storeJournalAbbreviationPreferences(new JournalAbbreviationPreferences(
+                            journalStringList,
+                            abbreviationsPreferences.getDefaultEncoding()
+                    ));
 
-            preferences.storeJournalAbbreviationPreferences(abbreviationsPreferences);
-        }).executeWith(taskExecutor);
-
-        // Update journal abbreviation repository
-        Globals.journalAbbreviationRepository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
+                    if (shouldWriteLists) {
+                        saveJournalAbbreviationFiles();
+                        shouldWriteLists = false;
+                    }
+                })
+                .onSuccess((success) -> Globals.journalAbbreviationRepository =
+                        JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences()))
+                .executeWith(taskExecutor);
     }
 
     public SimpleBooleanProperty isLoadingProperty() {

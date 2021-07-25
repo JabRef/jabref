@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -47,19 +46,19 @@ class JournalAbbreviationsViewModelMixedAbbreviationsTabTest {
     private Path testFile3Entries;
     private Path testFile4Entries;
     private Path testFile5EntriesWithDuplicate;
-    private JournalAbbreviationPreferences abbreviationPreferences;
+    private PreferencesService preferencesService;
     private final JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadBuiltInRepository();
     private DialogService dialogService;
 
     @BeforeEach
     void setUpViewModel(@TempDir Path tempFolder) throws Exception {
-        abbreviationPreferences = mock(JournalAbbreviationPreferences.class);
-        PreferencesService preferences = mock(PreferencesService.class);
-        when(preferences.getJournalAbbreviationPreferences()).thenReturn(abbreviationPreferences);
+        JournalAbbreviationPreferences abbreviationPreferences = mock(JournalAbbreviationPreferences.class);
+        preferencesService = mock(PreferencesService.class);
+        when(preferencesService.getJournalAbbreviationPreferences()).thenReturn(abbreviationPreferences);
 
         dialogService = mock(DialogService.class);
         TaskExecutor taskExecutor = new CurrentThreadTaskExecutor();
-        viewModel = new JournalAbbreviationsTabViewModel(preferences, dialogService, taskExecutor, repository);
+        viewModel = new JournalAbbreviationsTabViewModel(preferencesService, dialogService, taskExecutor, repository);
         emptyTestFile = createTestFile(tempFolder, "emptyTestFile.csv", "");
         testFile1Entries = createTestFile(tempFolder, "testFile1Entries.csv", "Test Entry;TE" + NEWLINE + "");
         testFile3Entries = createTestFile(tempFolder, "testFile3Entries.csv", "Abbreviations;Abb;A" + NEWLINE + "Test Entry;TE" + NEWLINE + "MoreEntries;ME;M" + NEWLINE + "");
@@ -87,7 +86,6 @@ class JournalAbbreviationsViewModelMixedAbbreviationsTabTest {
         viewModel.createFileObjects();
         viewModel.selectLastJournalFile();
 
-        // should result in 4 real abbreviations and one pseudo abbreviation
         assertEquals(4, viewModel.abbreviationsProperty().size());
     }
 
@@ -137,7 +135,6 @@ class JournalAbbreviationsViewModelMixedAbbreviationsTabTest {
         viewModel.selectLastJournalFile();
 
         assertEquals(1, viewModel.journalFilesProperty().size());
-        // our test file has 3 abbreviations and one pseudo abbreviation
         assertEquals(3, viewModel.abbreviationsProperty().size());
         assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)));
     }
@@ -390,10 +387,7 @@ class JournalAbbreviationsViewModelMixedAbbreviationsTabTest {
     @Test
     void testSaveExternalFilesListToPreferences() {
         addFourTestFileToViewModelAndPreferences();
-        List<String> expected = Stream.of(testFile1Entries, testFile3Entries, testFile4Entries, testFile5EntriesWithDuplicate)
-                                      .map(Path::toString)
-                                      .collect(Collectors.toList());
-        verify(abbreviationPreferences).setExternalJournalLists(expected);
+        verify(preferencesService).storeJournalAbbreviationPreferences(any());
     }
 
     private Path createTestFile(Path folder, String name, String content) throws Exception {
