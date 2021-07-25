@@ -98,7 +98,8 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         new ValueTableCellFactory<AbbreviationViewModel, String>()
                 .withGraphic(name -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withTooltip(name -> Localization.lang("Remove journal '%0'", name))
-                .withDisableBinding(item -> viewModel.isEditableAndRemovableProperty().not())
+                .withDisableExpression(item -> viewModel.isEditableAndRemovableProperty().not())
+                .withVisibleExpression(item -> viewModel.isEditableAndRemovableProperty())
                 .withOnMouseClickedEvent(item -> evt ->
                         viewModel.removeAbbreviation(journalAbbreviationsTable.getFocusModel().getFocusedItem()))
                 .install(actionsColumn);

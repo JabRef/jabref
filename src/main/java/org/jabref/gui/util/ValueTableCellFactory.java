@@ -3,7 +3,7 @@ package org.jabref.gui.util;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.BooleanExpression;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
@@ -28,7 +28,8 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
     private Function<T, String> toText;
     private BiFunction<S, T, Node> toGraphic;
     private BiFunction<S, T, EventHandler<? super MouseEvent>> toOnMouseClickedEvent;
-    private Function<T, BooleanBinding> toDisableBinding;
+    private Function<T, BooleanExpression> toDisableBinding;
+    private Function<T, BooleanExpression> toVisibleBinding;
     private BiFunction<S, T, String> toTooltip;
     private Function<T, ContextMenu> contextMenuFactory;
     private BiFunction<S, T, ContextMenu> menuFactory;
@@ -68,8 +69,13 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
         return this;
     }
 
-    public ValueTableCellFactory<S, T> withDisableBinding(Function<T, BooleanBinding> toDisableProperty) {
-        this.toDisableBinding = toDisableProperty;
+    public ValueTableCellFactory<S, T> withDisableExpression(Function<T, BooleanExpression> toDisableBinding) {
+        this.toDisableBinding = toDisableBinding;
+        return this;
+    }
+
+    public ValueTableCellFactory<S, T> withVisibleExpression(Function<T, BooleanExpression> toVisibleBinding) {
+        this.toVisibleBinding = toVisibleBinding;
         return this;
     }
 
@@ -146,6 +152,10 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
 
                     if (toDisableBinding != null) {
                         disableProperty().bind(toDisableBinding.apply(item));
+                    }
+
+                    if (toVisibleBinding != null) {
+                        visibleProperty().bind(toVisibleBinding.apply(item));
                     }
                 }
             }
