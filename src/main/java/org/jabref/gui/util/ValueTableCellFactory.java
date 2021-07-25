@@ -28,8 +28,8 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
     private Function<T, String> toText;
     private BiFunction<S, T, Node> toGraphic;
     private BiFunction<S, T, EventHandler<? super MouseEvent>> toOnMouseClickedEvent;
-    private Function<T, BooleanExpression> toDisableBinding;
-    private Function<T, BooleanExpression> toVisibleBinding;
+    private Function<T, BooleanExpression> toDisableExpression;
+    private Function<T, BooleanExpression> toVisibleExpression;
     private BiFunction<S, T, String> toTooltip;
     private Function<T, ContextMenu> contextMenuFactory;
     private BiFunction<S, T, ContextMenu> menuFactory;
@@ -70,12 +70,12 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
     }
 
     public ValueTableCellFactory<S, T> withDisableExpression(Function<T, BooleanExpression> toDisableBinding) {
-        this.toDisableBinding = toDisableBinding;
+        this.toDisableExpression = toDisableBinding;
         return this;
     }
 
     public ValueTableCellFactory<S, T> withVisibleExpression(Function<T, BooleanExpression> toVisibleBinding) {
-        this.toVisibleBinding = toVisibleBinding;
+        this.toVisibleExpression = toVisibleBinding;
         return this;
     }
 
@@ -150,12 +150,12 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                         }
                     });
 
-                    if (toDisableBinding != null) {
-                        disableProperty().bind(toDisableBinding.apply(item));
+                    if (toDisableExpression != null) {
+                        disableProperty().bind(toDisableExpression.apply(item));
                     }
 
-                    if (toVisibleBinding != null) {
-                        visibleProperty().bind(toVisibleBinding.apply(item));
+                    if (toVisibleExpression != null) {
+                        visibleProperty().bind(toVisibleExpression.apply(item));
                     }
                 }
             }
