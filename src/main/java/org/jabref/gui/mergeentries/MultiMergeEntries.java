@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
@@ -27,15 +28,13 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
 
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.DefaultTaskExecutor;
 import org.jabref.gui.util.TaskExecutor;
-import org.jabref.gui.util.component.DiffHighlightingTextPane;
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -197,8 +196,15 @@ public class MultiMergeEntries extends SplitPane {
         return columnIndex;
     }
 
+    private boolean isMultilineField(Field field) {
+        if (field.equals(StandardField.DOI)) {
+            return false;
+        }
+        return FieldFactory.isMultiLineField(field, fieldContentFormatterPreferences.getNonWrappableFields());
+    }
+
     public void addField(Field field) {
-        boolean isMultiLine = FieldFactory.isMultiLineField(field, fieldContentFormatterPreferences.getNonWrappableFields());
+        boolean isMultiLine = isMultilineField(field);
         TextInputControl fieldEditorCell = null;
         if (isMultiLine) {
             fieldEditorCell = new TextArea();
@@ -256,7 +262,11 @@ public class MultiMergeEntries extends SplitPane {
                     (observable, oldValue, newValue) -> {
                         if (observable != null && newValue != null && newValue.isSelected()) {
                             ToggleButton toggle = (ToggleButton) observable.getValue();
-                            entryEditorField.setText(toggle.getText());
+                            if (toggle.getGraphic() instanceof DiffHighlightingEllipsingTextFlow) {
+                                entryEditorField.setText(((DiffHighlightingEllipsingTextFlow) toggle.getGraphic()).getFullText());
+                            } else {
+                                entryEditorField.setText(toggle.getText());
+                            }
                             entryEditorField.textProperty().addListener(textChangeListener);
                         } else {
                             entryEditorField.textProperty().removeListener(textChangeListener);
@@ -266,22 +276,34 @@ public class MultiMergeEntries extends SplitPane {
         }
 
         public void addValue(int columnIndex, String value) {
-            HBox cell = new HBox();
+            boolean isMultiLine = isMultilineField(field);
             ToggleButton cellButton = new ToggleButton();
-            TextFlow buttonText = new DiffHighlightingTextPane();
-            buttonText.getChildren().add(new Text(value));
-            // Label buttonText = new Label(value);
-            // buttonText.setWrapText(true);
-            cellButton.setGraphic(buttonText);
-            cell.getChildren().add(cellButton);
+            HBox cell = new HBox();
+            cell.prefWidthProperty().bind(((Region) supplierHeader.getChildren().get(columnIndex)).widthProperty());
+            cell.setMinWidth(Control.USE_PREF_SIZE);
+            cell.setMaxWidth(Control.USE_PREF_SIZE);
+            cell.setSpacing(0);
+            // cell.setBorder(new Bor);
+            if (isMultiLine) {
+                DiffHighlightingEllipsingTextFlow buttonText = new DiffHighlightingEllipsingTextFlow(value);
+                buttonText.getChildren().add(new Text(value));
+                // buttonText.maxWidthProperty().bind(((Region) supplierHeader.getChildren().get(columnIndex)).widthProperty());
+                // buttonText.maxHeightProperty().bind(entryEditorField.heightProperty());
+                buttonText.maxWidthProperty().bind(cellButton.widthProperty());
+                buttonText.maxHeightProperty().bind(cellButton.heightProperty());
+                cellButton.setGraphic(buttonText);
+                Tooltip buttonTooltip = new Tooltip(value);
+                buttonTooltip.setWrapText(true);
+                buttonTooltip.prefWidthProperty().bind(cellButton.widthProperty());
+                buttonTooltip.setTextAlignment(TextAlignment.LEFT);
+                cellButton.setTooltip(buttonTooltip);
+            } else {
+                cellButton.setText(value);
+            }
             HBox.setHgrow(cellButton, Priority.ALWAYS);
-            cellButton.setWrapText(true);
-            Tooltip buttonTooltip = new Tooltip(value);
-            buttonTooltip.setWrapText(true);
-            buttonTooltip.prefWidthProperty().bind(cellButton.widthProperty());
-            buttonTooltip.setTextAlignment(TextAlignment.LEFT);
-            cellButton.setTooltip(buttonTooltip);
+            cell.getChildren().add(cellButton);
             optionsGrid.add(cell, columnIndex, rowIndex);
+
             if (toggleGroup.getSelectedToggle() == null) {
                 cellButton.setSelected(true);
             }
@@ -299,12 +321,13 @@ public class MultiMergeEntries extends SplitPane {
             entryEditorField.textProperty().addListener(new ChangeListener<String>() {
                 @Override
                 public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                    // cellButton.setText
+                    // highlight text
                 }
             });
 
             if (field.equals(StandardField.DOI)) {
                 Button doiButton = IconTheme.JabRefIcons.LOOKUP_IDENTIFIER.asButton();
+                HBox.setHgrow(doiButton, Priority.NEVER);
                 cell.getChildren().add(doiButton);
                 doiButton.setOnAction(event -> {
                     DoiFetcher doiFetcher = new DoiFetcher(importFormatPreferences);
