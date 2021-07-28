@@ -30,8 +30,6 @@ import org.jsoup.Jsoup;
  */
 public class GrobidService {
 
-    public static String HTTP_REQUEST_BOUNDARY = "---------------------------JabRefRequest";
-
     public enum ConsolidateCitations {
         NO(0), WITH_METADATA(1), WITH_DOI_ONLY(2);
         private int code;
