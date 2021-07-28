@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.Importer;
@@ -12,6 +13,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.util.FileHelper;
 
 /**
  * Wraps the GrobidService function to be used as an Importer.
@@ -75,12 +77,11 @@ public class GrobidPdfMetadataImporter extends Importer {
     @Override
     public boolean isRecognizedFormat(Path filePath, Charset defaultEncoding) throws IOException {
         Objects.requireNonNull(filePath);
-        String[] splittedFileName = filePath.getFileName().toString().split("\\.");
-        if (splittedFileName.length <= 1) {
+        Optional<String> extension = FileHelper.getFileExtension(filePath);
+        if (extension.isEmpty()) {
             return false;
         }
-        String extension = splittedFileName[splittedFileName.length - 1];
-        return getFileType().getExtensions().contains(extension);
+        return getFileType().getExtensions().contains(extension.get());
     }
 
     @Override
