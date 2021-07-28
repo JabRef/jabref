@@ -304,7 +304,7 @@ public class MultiMergeEntries extends SplitPane {
             });
 
             if (field.equals(StandardField.DOI)) {
-                Button doiButton = new Button(Localization.lang("Lookup"));
+                Button doiButton = IconTheme.JabRefIcons.LOOKUP_IDENTIFIER.asButton();
                 cell.getChildren().add(doiButton);
                 doiButton.setOnAction(event -> {
                     DoiFetcher doiFetcher = new DoiFetcher(importFormatPreferences);
