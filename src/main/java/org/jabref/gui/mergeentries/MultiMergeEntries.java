@@ -114,6 +114,13 @@ public class MultiMergeEntries extends SplitPane {
         optionsColumn.getChildren().addAll(topScrollPane, centerScrollPane);
         entryColumn.getChildren().addAll(entryHeaderLabel, rightScrollPane);
 
+        VBox.setVgrow(supplierHeaderLabel, Priority.NEVER);
+        VBox.setVgrow(leftScrollPane, Priority.ALWAYS);
+        VBox.setVgrow(topScrollPane, Priority.NEVER);
+        VBox.setVgrow(centerScrollPane, Priority.ALWAYS);
+        VBox.setVgrow(entryHeaderLabel, Priority.NEVER);
+        VBox.setVgrow(rightScrollPane, Priority.ALWAYS);
+
         setResizableWithParent(labelColumn, false);
         setDividerPositions(0.1, 0.6, 0.3);
         getItems().addAll(labelColumn, optionsColumn, entryColumn);
