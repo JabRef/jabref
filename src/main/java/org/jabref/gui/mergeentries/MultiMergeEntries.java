@@ -7,7 +7,6 @@ import java.util.function.Supplier;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
@@ -175,7 +174,10 @@ public class MultiMergeEntries extends SplitPane {
     public BibEntry getMergeEntry() {
         BibEntry mergedEntry = new BibEntry();
         for (Map.Entry<Field, FieldRow> fieldRowEntry : fieldRows.entrySet()) {
-            mergedEntry.setField(fieldRowEntry.getKey(), ((TextInputControl) fieldEditor.getChildren().get(fieldRowEntry.getValue().rowIndex)).getText());
+            String fieldValue = ((TextInputControl) fieldEditor.getChildren().get(fieldRowEntry.getValue().rowIndex)).getText();
+            if (fieldValue != null) {
+                mergedEntry.setField(fieldRowEntry.getKey(), fieldValue);
+            }
         }
         return mergedEntry;
     }
