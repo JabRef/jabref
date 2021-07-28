@@ -3,6 +3,7 @@ package org.jabref.logic.importer;
 import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 
 /**
  * Searches web resources for citing related articles based on a {@link BibEntry}.
@@ -20,6 +21,14 @@ public interface CitationFetcher {
 
         SearchType(String label) {
             this.label = label;
+        }
+
+        public StandardField toStandardField() {
+            if (this == SearchType.CITING) {
+                return StandardField.CITING;
+            } else {
+                return StandardField.CITED_BY;
+            }
         }
     }
 

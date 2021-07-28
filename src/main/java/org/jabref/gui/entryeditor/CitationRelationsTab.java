@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -57,11 +58,12 @@ import org.slf4j.LoggerFactory;
  */
 public class CitationRelationsTab extends EntryEditorTab {
 
-    // Tasks
+    private static final Logger LOGGER = LoggerFactory.getLogger(CitationRelationsTab.class);
+
+    // Tasks used to implement asynchronous fetching of related articles
     private static BackgroundTask<List<BibEntry>> citingTask;
     private static BackgroundTask<List<BibEntry>> citedByTask;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CitationRelationsTab.class);
     private final EntryEditorPreferences preferences;
     private final DialogService dialogService;
     private final BibDatabaseContext databaseContext;
@@ -72,15 +74,15 @@ public class CitationRelationsTab extends EntryEditorTab {
     private final LibraryTab libraryTab;
 
     /**
-     * Class to hold a BibEntry and a boolean value whether it's already in the current database or not.
+     * Class to hold a BibEntry and a boolean value whether it is already in the current database or not.
      */
     public static class CitationRelationItem {
         private final BibEntry entry;
-        private final boolean local;
+        private final boolean isLocal;
 
-        public CitationRelationItem(BibEntry entry, boolean local) {
+        public CitationRelationItem(BibEntry entry, boolean isLocal) {
             this.entry = entry;
-            this.local = local;
+            this.isLocal = isLocal;
         }
 
         public BibEntry getEntry() {
@@ -88,7 +90,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         }
 
         public boolean isLocal() {
-            return local;
+            return isLocal;
         }
     }
 
@@ -170,7 +172,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         Button refreshCitedByButton = IconTheme.JabRefIcons.REFRESH.asButton();
         refreshCitedByButton.setTooltip(new Tooltip(Localization.lang("Restart search")));
         styleTopBarNode(refreshCitedByButton, 15.0);
-        // Create abort Buttons for both sides
+
+        // Create abort buttons for both sides
         Button abortCitingButton = IconTheme.JabRefIcons.CLOSE.asButton();
         abortCitingButton.getGraphic().resize(30, 30);
         abortCitingButton.setTooltip(new Tooltip(Localization.lang("Cancel search")));
@@ -187,7 +190,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         citedByProgress.setMaxSize(25, 25);
         styleTopBarNode(citedByProgress, 50.0);
 
-        // Create Import Buttons for both sides
+        // Create import buttons for both sides
         Button importCitingButton = IconTheme.JabRefIcons.ADD_ENTRY.asButton();
         importCitingButton.setTooltip(new Tooltip(Localization.lang("Add selected entries to database")));
         styleTopBarNode(importCitingButton, 50.0);
@@ -305,7 +308,7 @@ public class CitationRelationsTab extends EntryEditorTab {
      * Determines if tab should be shown according to preferences
      *
      * @param entry Currently selected BibEntry
-     * @return boolean if tab should be shown
+     * @return whether tab should be shown
      */
     @Override
     public boolean shouldShow(BibEntry entry) {
@@ -339,7 +342,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             listView.getItems().clear();
 
             // Perform search in background and deal with success or failure
-            List<BibEntry> localList = runOfflineTask(entry, searchType.equals(CitationFetcher.SearchType.CITING) ? StandardField.CITING : StandardField.CITEDBY);
+            List<BibEntry> localList = runOfflineTask(entry, searchType.toStandardField());
             if (!localList.isEmpty()) {
                 observableList.addAll(localList.stream().map(localEntry -> new CitationRelationItem(localEntry, true)).collect(Collectors.toList()));
             }
@@ -363,15 +366,15 @@ public class CitationRelationsTab extends EntryEditorTab {
             }
 
             task.onRunning(() -> {
-                setVisibility(true, abort, progress);
-                setVisibility(false, refreshButton, importButton);
-                abort.setOnMouseClicked(event -> {
-                    task.cancel();
-                    setVisibility(false, abort, progress, importButton);
-                    dialogService.notify(Localization.lang("Search aborted!"));
-                    refreshButton.setVisible(true);
-                });
-            })
+                    setVisibility(true, abort, progress);
+                    setVisibility(false, refreshButton, importButton);
+                    abort.setOnMouseClicked(event -> {
+                        task.cancel();
+                        setVisibility(false, abort, progress, importButton);
+                        dialogService.notify(Localization.lang("Search aborted!"));
+                        refreshButton.setVisible(true);
+                    });
+                })
                 .onSuccess(fetchedList -> {
                     setVisibility(false, abort, progress);
                     if (!fetchedList.isEmpty()) {
@@ -396,7 +399,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                 })
                 .executeWith(Globals.TASK_EXECUTOR);
         } else {
-            dialogService.notify(Localization.lang("DOI required, Please add DOI to entry before searching."));
+            dialogService.notify(Localization.lang("A DOI is required. Please add a DOI to the entry before searching."));
         }
     }
 
@@ -415,25 +418,26 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     /**
-     * Performs a local lookup of Fields in StandardField.CITING/CITEDBY
+     * Performs a local lookup of fields in StandardField.CITING/CITED_BY
      *
      * @param entry Current Entry Context
      * @param field The StandardField to work with
      */
     List<BibEntry> runOfflineTask(BibEntry entry, StandardField field) {
         List<String> keys = getFilteredKeys(entry, field);
-        List<BibEntry> list = new ArrayList<>();
-        LOGGER.debug("Current Keys/DOI in {}: {}", field.getName(), keys.toString());
-        for (String key : keys) {
-            Optional<BibEntry> toAdd = getEntryByDOI(key);
-            toAdd.ifPresent(list::add);
-        }
-        return list;
+        LOGGER.atDebug()
+              .addArgument(() -> field.getName())
+              .addArgument(() -> keys.toString())
+              .log("Current keys/DOI in {}: {}");
+        return keys.stream()
+                   .map(key -> getEntryByDOI(key))
+                   .flatMap(Optional::stream)
+                   .collect(Collectors.toList());
     }
 
     /**
-     * Filters an Observable List for Entries, that are already in the operator Field of the Entry.
-     * If the entry is no duplicate, it also add the current entry to the negative operator of the entry in the List
+     * Filters an observable list for entries that are already in the operator field of the entry.
+     * If the entry is no duplicate, it also added the current entry to the negative operator of the entry in the list
      *
      * @param newEntries The List to Filter
      * @param operator   StandardField.CITING/CITED
@@ -443,17 +447,17 @@ public class CitationRelationsTab extends EntryEditorTab {
         StandardField field;
         StandardField nField;
         if (operator.equals(CitationFetcher.SearchType.CITED_BY)) {
-            field = StandardField.CITEDBY;
+            field = StandardField.CITED_BY;
             nField = StandardField.CITING;
         } else {
             field = StandardField.CITING;
-            nField = StandardField.CITEDBY;
+            nField = StandardField.CITED_BY;
         }
-        List<String> currentKeys = getFilteredKeys(entry, field); // Current existant Enty.DOIs in Field
+        List<String> currentKeys = getFilteredKeys(entry, field); // Current existent entry.DOIs in Field
         for (BibEntry b : newEntries) {
             Optional<String> key = b.getField(StandardField.DOI);
             Optional<String> entryKey = entry.getField(StandardField.DOI);
-            if (key.isPresent() && entryKey.isPresent()) { // Just Proceed if doi is present
+            if (key.isPresent() && entryKey.isPresent()) { // Just proceed if doi is present
                 String doi = key.get();
                 String entryDoi = entryKey.get();
                 if (!currentKeys.contains(doi) && getEntryByDOI(doi).isEmpty()) { // if its not in the already referenced keys and not in the database = new Article
@@ -475,62 +479,60 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     /**
-     * Reads the CITING or CITED field, extracts the CitationKeys, checks whether the according entry still exists
-     * in Database, set the new existing keys and return them
+     * Reads the CITING or CITED_BY field, extracts the CitationKeys, checks whether the according entry still exists
+     * in database, set the new existing keys and return them
      *
-     * @param entry    The Current selected Entry
-     * @param operator StandardField.CITING/CITED
+     * @param entry    The currently selected entry
+     * @param operator StandardField.CITING/CITED_BY
      * @return A List Containing the keys in the "operator"  field, theirs relations are in the Database
      */
     List<String> getFilteredKeys(BibEntry entry, StandardField operator) {
         Optional<String> citingS = entry.getField(operator);
         if (citingS.isEmpty()) {
-            LOGGER.debug("{}: {} is empty!", entry.getField(StandardField.TITLE).orElse("no title"), operator.getName());
-            return new ArrayList<>();
+            LOGGER.atDebug()
+                  .addArgument(() -> entry.getCitationKey().orElse("no key"))
+                  .addArgument(() -> operator.getName())
+                  .log("{}: {} is empty!");
+            return Collections.emptyList();
         }
-        ArrayList<String> keys = new ArrayList<>(Arrays.asList(citingS.get().split(",")));
-        filterNonExisting(keys);
+
+        Arrays.asList(citingS.get().split(",")).stream()
+              .filter(key -> getEntryByDOI(doi).isEmpty());
+
+        ArrayList<String> keys = new ArrayList<>();
+        // filterNonExisting(keys);
         entry.setField(operator, String.join(",", keys));
         LOGGER.debug("{}: {}: {}", entry.getField(StandardField.TITLE).orElse("no title"), operator.getName(), String.join(",", keys));
         return keys;
     }
 
     /**
-     * Filters a given ArrayList of DOIs, whether they are in the Database
-     *
-     * @param toFilter The Arraylist to filter
-     */
-    void filterNonExisting(ArrayList<String> toFilter) {
-        toFilter.removeIf(doi -> getEntryByDOI(doi).isEmpty());
-    }
-
-    /**
-     * Returns the BibEntry in the Database with the given DOI, or null if no such Entry exists
+     * Returns the Entry in the database with the given DOI, or null if no such entry exists
      *
      * @param doi doi TO LOOK for
      * @return null or found Entry
      */
     Optional<BibEntry> getEntryByDOI(String doi) {
         return databaseContext.getEntries().stream().
-                filter(entry -> doi.equals(entry.getField(StandardField.DOI).orElse(""))).findFirst();
+                              filter(entry -> doi.equals(entry.getField(StandardField.DOI).orElse(""))).findFirst();
     }
 
     /**
-     * Returns a String Containing the DOIs of a List of Entries. Ignores Entries with no DOI
+     * Returns a String containing the DOIs of a list of entries. Ignores entries with no DOI.
      *
-     * @param entries The List of BibEntries to serialize
-     * @return A Comma Separated List of CitationKeys(of the given List of Entries)
+     * @param entries The list of BibEntries to serialize
+     * @return A comma separated list of CitationKeys (of the given list of entries)
      */
     static String serialize(List<BibEntry> entries) {
         return entries.stream()
-                         .map(bibEntry -> bibEntry.getField(StandardField.DOI))
-                         .filter(Optional::isPresent)
-                         .map(Optional::get)
-                         .collect(Collectors.joining(","));
+                      .map(bibEntry -> bibEntry.getField(StandardField.DOI))
+                      .filter(Optional::isPresent)
+                      .map(Optional::get)
+                      .collect(Collectors.joining(","));
     }
 
     /**
-     * Function to import selected Entries to the Database. Also Writes the Entries to Import to the CITING/CITED Field
+     * Function to import selected entries to the database. Also writes the entries to import to the CITING/CITED field
      *
      * @param entriesToImport entries to import
      */
@@ -547,7 +549,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                 stateManager);
         importHandler.importEntries(entries);
         if (searchType.equals(CitationFetcher.SearchType.CITED_BY)) {
-            entry.setField(StandardField.CITEDBY, serialize(entries));
+            entry.setField(StandardField.CITED_BY, serialize(entries));
         } else {
             entry.setField(StandardField.CITING, serialize(entries));
         }

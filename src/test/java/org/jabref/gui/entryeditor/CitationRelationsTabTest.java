@@ -20,7 +20,7 @@ public class CitationRelationsTabTest {
     void setup() {
         bibEntry = new BibEntry().withField(StandardField.DOI, "10.1007/s11616-005-0142-4")
                                  .withField(StandardField.CITING, "test")
-                                 .withField(StandardField.CITEDBY, "test");
+                                 .withField(StandardField.CITED_BY, "test");
         bList = new ArrayList<>();
         bList.add(new BibEntry());
         bList.add(bibEntry);
@@ -66,6 +66,6 @@ public class CitationRelationsTabTest {
      */
     @Test
     void citedByFieldExists() {
-        assertTrue(bibEntry.hasField(StandardField.CITEDBY));
+        assertTrue(bibEntry.hasField(StandardField.CITED_BY));
     }
 }

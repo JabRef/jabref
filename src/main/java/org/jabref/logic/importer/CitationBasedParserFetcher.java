@@ -88,10 +88,7 @@ public interface CitationBasedParserFetcher extends CitationFetcher {
         entries.add(entry);
         try (InputStream stream = new BufferedInputStream(getURLForEntries(entries, searchType).openStream())) {
             List<BibEntry> fetchedEntries = getParser(searchType).parseEntries(stream);
-
-            // Post-cleanup
             fetchedEntries.forEach(this::doPostCleanup);
-
             return fetchedEntries;
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
