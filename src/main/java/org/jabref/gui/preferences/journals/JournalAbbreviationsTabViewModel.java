@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel {
 
-    private final Logger logger = LoggerFactory.getLogger(JournalAbbreviationsTabViewModel.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationsTabViewModel.class);
 
     private final SimpleListProperty<AbbreviationsFileViewModel> journalFiles = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final SimpleListProperty<AbbreviationViewModel> abbreviations = new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -184,7 +184,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
             try {
                 abbreviationsFile.readAbbreviations();
             } catch (IOException e) {
-                logger.debug(e.getLocalizedMessage());
+                LOGGER.debug(e.getLocalizedMessage());
             }
         }
         journalFiles.add(abbreviationsFile);
@@ -337,7 +337,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
             try {
                 file.writeOrCreate();
             } catch (IOException e) {
-                logger.debug(e.getLocalizedMessage());
+                LOGGER.debug(e.getLocalizedMessage());
             }
         });
     }
@@ -368,6 +368,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                 })
                 .onSuccess((success) -> Globals.journalAbbreviationRepository =
                         JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences()))
+                .onFailure(exception -> LOGGER.error("Failed to store journal preferences.", exception))
                 .executeWith(taskExecutor);
     }
 

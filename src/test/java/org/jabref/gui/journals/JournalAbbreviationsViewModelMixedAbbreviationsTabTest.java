@@ -75,17 +75,16 @@ class JournalAbbreviationsViewModelMixedAbbreviationsTabTest {
     @Test
     void testInitialWithSavedFilesIncrementsFilesCounter() {
         addFourTestFileToViewModelAndPreferences();
-        viewModel.createFileObjects();
-
         assertEquals(4, viewModel.journalFilesProperty().size());
     }
 
     @Test
     void testRemoveDuplicatesWhenReadingFiles() {
         addFourTestFileToViewModelAndPreferences();
-        viewModel.createFileObjects();
+        addFourTestFileToViewModelAndPreferences();
         viewModel.selectLastJournalFile();
 
+        assertEquals(4, viewModel.journalFilesProperty().size());
         assertEquals(4, viewModel.abbreviationsProperty().size());
     }
 
