@@ -539,7 +539,6 @@ public class CitationRelationsTab extends EntryEditorTab {
         citedByTask.cancel();
         List<BibEntry> entries = entriesToImport.stream().map(CitationRelationItem::getEntry).collect(Collectors.toList());
         ImportHandler importHandler = new ImportHandler(
-                dialogService,
                 databaseContext,
                 ExternalFileTypes.getInstance(),
                 preferencesService,
