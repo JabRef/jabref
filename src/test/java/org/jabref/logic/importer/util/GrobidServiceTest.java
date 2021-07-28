@@ -1,25 +1,38 @@
 package org.jabref.logic.importer.util;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.util.List;
 
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.fileformat.GrobidPdfMetadataImporterTest;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @FetcherTest
 public class GrobidServiceTest {
 
     private static GrobidService grobidService;
+    private static ImportFormatPreferences importFormatPreferences;
 
     @BeforeAll
     public static void setup() {
         grobidService = new GrobidService("http://grobid.jabref.org:8070");
+        importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
     }
 
     @Test
@@ -49,6 +62,13 @@ public class GrobidServiceTest {
     @Test
     public void processInvalidCitationTest() {
         assertThrows(IOException.class, () -> grobidService.processCitation("iiiiiiiiiiiiiiiiiiiiiiii", GrobidService.ConsolidateCitations.WITH_METADATA));
+    }
+
+    @Test
+    public void processPdfTest() throws IOException, ParseException, URISyntaxException {
+        Path file = Path.of(GrobidPdfMetadataImporterTest.class.getResource("LNCS-minimal.pdf").toURI());
+        List<BibEntry> response = grobidService.processPDF(file, importFormatPreferences);
+        assertEquals(1, response.size());
     }
 
 }
