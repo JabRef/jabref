@@ -59,7 +59,7 @@ public interface CitationBasedParserFetcher extends CitationFetcher {
     @Override
     default List<BibEntry> searchCitedBy(BibEntry entry) throws FetcherException {
         Objects.requireNonNull(entry);
-        return performSearch(entry, SearchType.CITEDBY);
+        return performSearch(entry, SearchType.CITED_BY);
     }
 
     @Override

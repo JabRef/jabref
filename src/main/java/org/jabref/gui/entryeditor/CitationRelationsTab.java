@@ -205,7 +205,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         citedByVBox.getChildren().addAll(citedByHBox, citedByListView);
 
         refreshCitingButton.setOnMouseClicked(event -> searchForRelations(entry, citingListView, abortCitingButton, refreshCitingButton, CitationFetcher.SearchType.CITING, importCitingButton, citingProgress));
-        refreshCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, citedByListView, abortCitedButton, refreshCitedByButton, CitationFetcher.SearchType.CITEDBY, importCitedByButton, citedByProgress));
+        refreshCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, citedByListView, abortCitedButton, refreshCitedByButton, CitationFetcher.SearchType.CITED_BY, importCitedByButton, citedByProgress));
 
         // Create SplitPane to hold all nodes above
         SplitPane container = new SplitPane(citedByVBox, citingVBox);
@@ -214,7 +214,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         styleFetchedListView(citedByListView);
 
         searchForRelations(entry, citingListView, abortCitingButton, refreshCitingButton, CitationFetcher.SearchType.CITING, importCitingButton, citingProgress);
-        searchForRelations(entry, citedByListView, abortCitedButton, refreshCitedByButton, CitationFetcher.SearchType.CITEDBY, importCitedByButton, citedByProgress);
+        searchForRelations(entry, citedByListView, abortCitedButton, refreshCitedByButton, CitationFetcher.SearchType.CITED_BY, importCitedByButton, citedByProgress);
 
         return container;
     }
@@ -347,7 +347,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
             if (citingTask != null && !citingTask.isCanceled() && searchType.equals(CitationFetcher.SearchType.CITING)) {
                 citingTask.cancel();
-            } else if (citedByTask != null && !citedByTask.isCanceled() && searchType.equals(CitationFetcher.SearchType.CITEDBY)) {
+            } else if (citedByTask != null && !citedByTask.isCanceled() && searchType.equals(CitationFetcher.SearchType.CITED_BY)) {
                 citedByTask.cancel();
             }
 
@@ -442,7 +442,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     void filterDifference(List<BibEntry> newEntries, ObservableList<CitationRelationItem> observableList, CitationFetcher.SearchType operator, BibEntry entry) {
         StandardField field;
         StandardField nField;
-        if (operator.equals(CitationFetcher.SearchType.CITEDBY)) {
+        if (operator.equals(CitationFetcher.SearchType.CITED_BY)) {
             field = StandardField.CITEDBY;
             nField = StandardField.CITING;
         } else {
@@ -546,7 +546,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                 undoManager,
                 stateManager);
         importHandler.importEntries(entries);
-        if (searchType.equals(CitationFetcher.SearchType.CITEDBY)) {
+        if (searchType.equals(CitationFetcher.SearchType.CITED_BY)) {
             entry.setField(StandardField.CITEDBY, serialize(entries));
         } else {
             entry.setField(StandardField.CITING, serialize(entries));

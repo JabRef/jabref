@@ -14,7 +14,7 @@ public interface CitationFetcher {
      */
     enum SearchType {
         CITING("reference"),
-        CITEDBY("citation");
+        CITED_BY("citation");
 
         public final String label;
 

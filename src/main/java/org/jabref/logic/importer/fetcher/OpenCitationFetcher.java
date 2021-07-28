@@ -1,16 +1,16 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.StringJoiner;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.CitationBasedParserFetcher;
 import org.jabref.logic.importer.FetcherException;
@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class to fetch for an articles citation relations on opencitations.net's API
+ * Class to fetch for an articles' citation relations on opencitations.net's API
  */
 public class OpenCitationFetcher implements CitationBasedParserFetcher {
 
@@ -36,16 +36,15 @@ public class OpenCitationFetcher implements CitationBasedParserFetcher {
     private static final String BASIC_URL = "https://opencitations.net/index/api/v1/metadata/";
 
     public OpenCitationFetcher() {
-
     }
 
     @Override
     public URL getURLForEntries(List<BibEntry> entries, SearchType searchType) throws URISyntaxException, MalformedURLException {
-        StringJoiner stringJoiner = new StringJoiner("__");
-        for (BibEntry entry : entries) {
-            entry.getField(StandardField.DOI).ifPresent(stringJoiner::add);
-        }
-        URIBuilder builder = new URIBuilder(BASIC_URL + stringJoiner.toString());
+        String bibPart = entries.stream()
+                                .map(entry -> entry.getField(StandardField.DOI))
+                                .flatMap(Optional::stream)
+                                .collect(Collectors.joining("__"));
+        URIBuilder builder = new URIBuilder(BASIC_URL + bibPart);
         return builder.build().toURL();
     }
 
@@ -66,12 +65,11 @@ public class OpenCitationFetcher implements CitationBasedParserFetcher {
                 if (items[0].isEmpty()) {
                     return entries;
                 }
-                List<BibEntry> onlyDois = new ArrayList<>();
-                for (String doi : items) {
-                    onlyDois.add(new BibEntry().withField(StandardField.DOI, doi));
-                }
-
+                List<BibEntry> onlyDois = Arrays.stream(items)
+                                                .map(doi -> new BibEntry().withField(StandardField.DOI, doi))
+                                                .collect(Collectors.toList());
                 try {
+                    // prepare parallel download of citations
                     List<List<BibEntry>> partitions = Lists.partition(onlyDois, onlyDois.size() > 15 ? 10 : 2);
                     for (List<BibEntry> partList : partitions) {
                         URLDownload download = new URLDownload(getURLForEntries(partList, searchType));
@@ -84,6 +82,7 @@ public class OpenCitationFetcher implements CitationBasedParserFetcher {
                         }
                     }
                 } catch (IOException | URISyntaxException e) {
+                    LOGGER.debug("Exception during fetching of citations", e);
                     return entries;
                 }
                 return entries;
@@ -95,16 +94,11 @@ public class OpenCitationFetcher implements CitationBasedParserFetcher {
              * @return JSONArray parsed
              */
             private JSONArray parseJSONArray(InputStream inputStream) {
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-                StringBuilder stringBuilder = new StringBuilder();
                 try {
-                    int cp;
-                    while ((cp = bufferedReader.read()) != -1) {
-                        stringBuilder.append((char) cp);
-                    }
-                    String jsonText = stringBuilder.toString();
+                    String jsonText = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
                     return new JSONArray(jsonText);
                 } catch (IOException e) {
+                    LOGGER.error("Error while converting input stream to JSONArray", e);
                     return new JSONArray();
                 }
             }
@@ -113,13 +107,17 @@ public class OpenCitationFetcher implements CitationBasedParserFetcher {
 
     @Override
     public List<BibEntry> searchCitedBy(BibEntry entry) throws FetcherException {
-        LOGGER.debug("Search: {}", "Articles citing " + entry.getField(StandardField.DOI).orElse("'No DOI found'"));
-        return performSearch(entry, SearchType.CITEDBY);
+        LOGGER.atDebug()
+              .addArgument(() -> "Articles citing " + entry.getField(StandardField.DOI).orElse("'No DOI found'"))
+              .log("Search: {}");
+        return performSearch(entry, SearchType.CITED_BY);
     }
 
     @Override
     public List<BibEntry> searchCiting(BibEntry entry) throws FetcherException {
-        LOGGER.debug("Search: {}", "Articles cited by " + entry.getField(StandardField.DOI).orElse("'No DOI found'"));
+        LOGGER.atDebug()
+              .addArgument(() -> "Articles citing " + entry.getField(StandardField.DOI).orElse("'No DOI found'"))
+              .log("Search: {}");
         return performSearch(entry, SearchType.CITING);
     }
 
@@ -130,7 +128,9 @@ public class OpenCitationFetcher implements CitationBasedParserFetcher {
      * @return BibEntry created
      */
     private BibEntry createNewEntry(JSONObject jsonObject) {
-        LOGGER.debug("Paper found: {}", jsonObject.getString("doi"));
+        LOGGER.atDebug()
+              .addArgument(() -> jsonObject.getString("doi"))
+              .log("Paper found: {}");
         return new BibEntry()
                 .withField(StandardField.TITLE, jsonObject.getString("title"))
                 .withField(StandardField.AUTHOR, jsonObject.getString("author"))
