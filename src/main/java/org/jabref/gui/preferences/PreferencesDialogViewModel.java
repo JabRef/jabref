@@ -12,7 +12,29 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefFrame;
+import org.jabref.gui.preferences.appearance.AppearanceTab;
+import org.jabref.gui.preferences.citationkeypattern.CitationKeyPatternTab;
+import org.jabref.gui.preferences.customization.CustomizationTab;
+import org.jabref.gui.preferences.entryeditor.EntryEditorTab;
+import org.jabref.gui.preferences.entryeditortabs.CustomEditorFieldsTab;
+import org.jabref.gui.preferences.exporter.ExportCustomizationTab;
+import org.jabref.gui.preferences.external.ExternalTab;
+import org.jabref.gui.preferences.file.FileTab;
+import org.jabref.gui.preferences.general.GeneralTab;
+import org.jabref.gui.preferences.groups.GroupsTab;
+import org.jabref.gui.preferences.importer.ImportCustomizationTab;
+import org.jabref.gui.preferences.importer.ImportSettingsTab;
+import org.jabref.gui.preferences.journals.JournalAbbreviationsTab;
+import org.jabref.gui.preferences.keybindings.KeyBindingsTab;
+import org.jabref.gui.preferences.linkedfiles.LinkedFilesTab;
+import org.jabref.gui.preferences.nameformatter.NameFormatterTab;
+import org.jabref.gui.preferences.network.NetworkTab;
+import org.jabref.gui.preferences.preview.PreviewTab;
+import org.jabref.gui.preferences.protectedterms.ProtectedTermsTab;
+import org.jabref.gui.preferences.table.TableTab;
+import org.jabref.gui.preferences.xmp.XmpPrivacyTab;
 import org.jabref.gui.push.PushToApplicationsManager;
+import org.jabref.gui.push.PushToEmacs;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.exporter.ExporterFactory;
@@ -23,8 +45,8 @@ import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.preferences.ExternalApplicationsPreferences;
-import org.jabref.preferences.JabRefPreferences;
-import org.jabref.preferences.JabRefPreferencesFilter;
+import org.jabref.preferences.PreferencesFilter;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,29 +56,37 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(PreferencesDialogViewModel.class);
 
     private final DialogService dialogService;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
     private final ObservableList<PreferencesTab> preferenceTabs;
     private final JabRefFrame frame;
 
-    public PreferencesDialogViewModel(DialogService dialogService, JabRefFrame frame) {
+    public PreferencesDialogViewModel(DialogService dialogService, PreferencesService preferences, JabRefFrame frame) {
         this.dialogService = dialogService;
-        this.preferences = Globals.prefs;
+        this.preferences = preferences;
         this.frame = frame;
 
         preferenceTabs = FXCollections.observableArrayList(
-                new GeneralTabView(preferences),
-                new FileTabView(preferences),
-                new TableTabView(preferences),
-                new PreviewTabView(preferences),
-                new ExternalTabView(preferences, frame.getPushToApplicationsManager()),
-                new GroupsTabView(preferences),
-                new EntryEditorTabView(preferences),
-                new CitationKeyPatternTabView(preferences),
-                new LinkedFilesTabView(preferences),
-                new NameFormatterTabView(preferences),
-                new XmpPrivacyTabView(preferences),
-                new NetworkTabView(preferences),
-                new AppearanceTabView(preferences)
+                new GeneralTab(),
+                new KeyBindingsTab(),
+                new FileTab(),
+                new TableTab(),
+                new PreviewTab(),
+                new ProtectedTermsTab(),
+                new ExternalTab(frame.getPushToApplicationsManager()),
+                new JournalAbbreviationsTab(),
+                new GroupsTab(),
+                new EntryEditorTab(),
+                new CustomizationTab(),
+                new CustomEditorFieldsTab(),
+                new CitationKeyPatternTab(),
+                new LinkedFilesTab(),
+                new NameFormatterTab(),
+                new ImportSettingsTab(),
+                new ImportCustomizationTab(),
+                new ExportCustomizationTab(),
+                new XmpPrivacyTab(),
+                new NetworkTab(),
+                new AppearanceTab()
         );
     }
 
@@ -70,18 +100,19 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 .withDefaultExtension(StandardFileType.XML)
                 .withInitialDirectory(preferences.getLastPreferencesExportPath()).build();
 
-        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> {
-            try {
-                preferences.importPreferences(file);
-                updateAfterPreferenceChanges();
+        dialogService.showFileOpenDialog(fileDialogConfiguration)
+                     .ifPresent(file -> {
+                         try {
+                             preferences.importPreferences(file);
+                             updateAfterPreferenceChanges();
 
-                dialogService.showWarningDialogAndWait(Localization.lang("Import preferences"),
-                        Localization.lang("You must restart JabRef for this to come into effect."));
-            } catch (JabRefException ex) {
-                LOGGER.error("Error while importing preferences", ex);
-                dialogService.showErrorDialogAndWait(Localization.lang("Import preferences"), ex);
-            }
-        });
+                             dialogService.showWarningDialogAndWait(Localization.lang("Import preferences"),
+                                     Localization.lang("You must restart JabRef for this to come into effect."));
+                         } catch (JabRefException ex) {
+                             LOGGER.error("Error while importing preferences", ex);
+                             dialogService.showErrorDialogAndWait(Localization.lang("Import preferences"), ex);
+                         }
+                     });
     }
 
     public void exportPreferences() {
@@ -105,7 +136,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     }
 
     public void showPreferences() {
-        new PreferencesFilterDialog(new JabRefPreferencesFilter(preferences)).showAndWait();
+        dialogService.showCustomDialogAndWait(new PreferencesFilterDialog(new PreferencesFilter(preferences)));
     }
 
     public void resetPreferences() {
@@ -130,7 +161,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     }
 
     /**
-     * Reloads the JabRefPreferences into the UI
+     * Reloads the preferences into the UI
      */
     private void updateAfterPreferenceChanges() {
         // Reload internal preferences cache
@@ -148,7 +179,8 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
 
         ExternalApplicationsPreferences externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
         PushToApplicationsManager manager = frame.getPushToApplicationsManager();
-        manager.updateApplicationAction(manager.getApplicationByName(externalApplicationsPreferences.getPushToApplicationName()));
+        manager.updateApplicationAction(manager.getApplicationByName(externalApplicationsPreferences.getPushToApplicationName())
+                                               .orElse(new PushToEmacs(dialogService, preferences)));
 
         frame.getLibraryTabs().forEach(panel -> panel.getMainTable().getTableModel().refresh());
     }
@@ -195,7 +227,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
     }
 
     /**
-     * Inserts the JabRefPreferences-values into the the Properties of the ViewModel
+     * Inserts the preference values into the the Properties of the ViewModel
      */
     public void setValues() {
         for (PreferencesTab preferencesTab : preferenceTabs) {

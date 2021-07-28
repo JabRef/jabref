@@ -6,4 +6,7 @@
 
 <suppressions>
     <suppress checks="[a-zA-Z0-9]*" files="[\\/]generated[\\/]" />
+    <suppress checks="[a-zA-Z0-9]*" files="[\\/]src-gen[\\/]" />
+    <!-- We ignore this file because it's a modification of the original java code https://github.com/openjdk/jfx/blob/jfx15/modules/javafx.controls/src/main/java/javafx/scene/control/skin/TitledPaneSkin.java -->
+    <suppress checks="[a-zA-Z0-9]*" files="CustomTitledPaneSkin.java" />
 </suppressions>

@@ -91,9 +91,9 @@ public class FromAuxDialog extends BaseDialog<Void> {
     @FXML
     private void browseButtonClicked() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                                                                                               .addExtensionFilter(StandardFileType.AUX)
-                                                                                               .withDefaultExtension(StandardFileType.AUX)
-                                                                                               .withInitialDirectory(preferences.getWorkingDir()).build();
+                .addExtensionFilter(StandardFileType.AUX)
+                .withDefaultExtension(StandardFileType.AUX)
+                .withInitialDirectory(preferences.getWorkingDir()).build();
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file -> auxFileField.setText(file.toAbsolutePath().toString()));
     }
 }

@@ -3,6 +3,7 @@ package org.jabref.gui.exporter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
@@ -34,7 +35,7 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.ChangePropagation;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,14 +53,14 @@ public class SaveDatabaseAction {
     private final LibraryTab libraryTab;
     private final JabRefFrame frame;
     private final DialogService dialogService;
-    private final JabRefPreferences preferences;
+    private final PreferencesService preferences;
     private final BibEntryTypesManager entryTypesManager;
 
     public enum SaveDatabaseMode {
         SILENT, NORMAL
     }
 
-    public SaveDatabaseAction(LibraryTab libraryTab, JabRefPreferences preferences, BibEntryTypesManager entryTypesManager) {
+    public SaveDatabaseAction(LibraryTab libraryTab, PreferencesService preferences, BibEntryTypesManager entryTypesManager) {
         this.libraryTab = libraryTab;
         this.frame = libraryTab.frame();
         this.dialogService = frame.getDialogService();
@@ -157,10 +158,23 @@ public class SaveDatabaseAction {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(StandardFileType.BIBTEX_DB)
                 .withDefaultExtension(StandardFileType.BIBTEX_DB)
-                .withInitialDirectory(preferences.get(JabRefPreferences.WORKING_DIRECTORY))
+                .withInitialDirectory(preferences.getWorkingDir())
                 .build();
         Optional<Path> selectedPath = dialogService.showFileSaveDialog(fileDialogConfiguration);
-        selectedPath.ifPresent(path -> preferences.setWorkingDir(path.getParent()));
+        selectedPath.ifPresent(path -> preferences.setWorkingDirectory(path.getParent()));
+        if (selectedPath.isPresent()) {
+            Path savePath = selectedPath.get();
+            // Workaround for linux systems not adding file extension
+            if (!(savePath.getFileName().toString().toLowerCase().endsWith(".bib"))) {
+                savePath = Path.of(savePath.toString() + ".bib");
+                if (!Files.notExists(savePath)) {
+                    if (!dialogService.showConfirmationDialogAndWait(Localization.lang("Overwrite file"), Localization.lang("'%0' exists. Overwrite file?", savePath.getFileName()))) {
+                        return Optional.empty();
+                    }
+                }
+                selectedPath = Optional.of(savePath);
+            }
+        }
         return selectedPath;
     }
 
@@ -266,7 +280,7 @@ public class SaveDatabaseAction {
     private boolean readyForAutosave(BibDatabaseContext context) {
         return ((context.getLocation() == DatabaseLocation.SHARED) ||
                 ((context.getLocation() == DatabaseLocation.LOCAL)
-                        && preferences.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE)))
+                        && preferences.shouldAutosave()))
                 &&
                 context.getDatabasePath().isPresent();
     }

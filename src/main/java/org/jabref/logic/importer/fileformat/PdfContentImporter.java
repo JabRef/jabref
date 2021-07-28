@@ -220,10 +220,8 @@ public class PdfContentImporter extends Importer {
             entry.ifPresent(result::add);
         } catch (EncryptedPdfsNotSupportedException e) {
             return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
-        } catch (IOException exception) {
+        } catch (IOException | FetcherException exception) {
             return ParserResult.fromError(exception);
-        } catch (FetcherException e) {
-            return ParserResult.fromErrorMessage(e.getMessage());
         }
 
         result.forEach(entry -> entry.addFile(new LinkedFile("", filePath.toAbsolutePath(), "PDF")));
@@ -418,15 +416,17 @@ public class PdfContentImporter extends Importer {
                     }
                     if (pos >= 0) {
                         pos += 3;
-                        char delimiter = curString.charAt(pos);
-                        if ((delimiter == ':') || (delimiter == ' ')) {
-                            pos++;
-                        }
-                        int nextSpace = curString.indexOf(' ', pos);
-                        if (nextSpace > 0) {
-                            DOI = curString.substring(pos, nextSpace);
-                        } else {
-                            DOI = curString.substring(pos);
+                        if (curString.length() > pos) {
+                            char delimiter = curString.charAt(pos);
+                            if ((delimiter == ':') || (delimiter == ' ')) {
+                                pos++;
+                            }
+                            int nextSpace = curString.indexOf(' ', pos);
+                            if (nextSpace > 0) {
+                                DOI = curString.substring(pos, nextSpace);
+                            } else {
+                                DOI = curString.substring(pos);
+                            }
                         }
                     }
                 }

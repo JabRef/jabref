@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
 import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.desktop.os.DefaultDesktop;
@@ -19,6 +20,7 @@ import org.jabref.gui.desktop.os.OSX;
 import org.jabref.gui.desktop.os.Windows;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
+import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.OS;
 import org.jabref.model.database.BibDatabaseContext;
@@ -27,7 +29,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.Eprint;
 import org.jabref.model.util.FileHelper;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,6 +110,19 @@ public class JabRefDesktop {
         openBrowser(link);
     }
 
+    public static void openCustomDoi(String link, PreferencesService preferences, DialogService dialogService) {
+        IdentifierParser.parse(StandardField.DOI, link)
+                        .map(identifier -> (DOI) identifier)
+                        .flatMap(doi -> doi.getExternalURIWithCustomBase(preferences.getDOIPreferences().getDefaultBaseURI()))
+                        .ifPresent(uri -> {
+                            try {
+                                JabRefDesktop.openBrowser(uri);
+                            } catch (IOException e) {
+                                dialogService.showErrorDialogAndWait(Localization.lang("Unable to open link."), e);
+                            }
+                        });
+    }
+
     /**
      * Open an external file, attempting to use the correct viewer for it.
      *
@@ -157,19 +172,19 @@ public class JabRefDesktop {
      * Opens a file browser of the folder of the given file. If possible, the file is selected
      *
      * @param fileLink the location of the file
-     * @throws IOException
+     * @throws IOException if the default file browser cannot be opened
      */
     public static void openFolderAndSelectFile(Path fileLink) throws IOException {
         if (fileLink == null) {
             return;
         }
-        boolean usingDefault = Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_FILE_BROWSER_APPLICATION);
 
-        if (usingDefault) {
+        boolean useCustomFileBrowser = Globals.prefs.getExternalApplicationsPreferences().useCustomFileBrowser();
+        if (!useCustomFileBrowser) {
             NATIVE_DESKTOP.openFolderAndSelectFile(fileLink);
         } else {
             String absolutePath = fileLink.toAbsolutePath().getParent().toString();
-            String command = Globals.prefs.get(JabRefPreferences.FILE_BROWSER_COMMAND);
+            String command = Globals.prefs.getExternalApplicationsPreferences().getCustomFileBrowserCommand();
             if (!command.isEmpty()) {
                 command = command.replaceAll("\\s+", " "); // normalize white spaces
 
@@ -204,16 +219,15 @@ public class JabRefDesktop {
     }
 
     /**
-     * Opens the url with the users standard Browser.
-     * If that fails a popup will be shown to instruct the user to open the link manually
-     * and the link gets copied to the clipboard
+     * Opens the url with the users standard Browser. If that fails a popup will be shown to instruct the user to open the link manually and the link gets copied to the clipboard
+     *
      * @param url the URL to open
      */
     public static void openBrowserShowPopup(String url) {
         try {
             openBrowser(url);
         } catch (IOException exception) {
-            Globals.clipboardManager.setContent(url);
+            Globals.getClipboardManager().setContent(url);
             LOGGER.error("Could not open browser", exception);
             String couldNotOpenBrowser = Localization.lang("Could not open browser.");
             String openManually = Localization.lang("Please open %0 manually.", url);
@@ -236,12 +250,12 @@ public class JabRefDesktop {
         }
 
         String absolutePath = file.toPath().toAbsolutePath().getParent().toString();
-        boolean usingDefault = Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION);
 
-        if (usingDefault) {
+        boolean useCustomTerminal = Globals.prefs.getExternalApplicationsPreferences().useCustomTerminal();
+        if (!useCustomTerminal) {
             NATIVE_DESKTOP.openConsole(absolutePath);
         } else {
-            String command = Globals.prefs.get(JabRefPreferences.CONSOLE_COMMAND);
+            String command = Globals.prefs.getExternalApplicationsPreferences().getCustomTerminalCommand();
             command = command.trim();
 
             if (!command.isEmpty()) {

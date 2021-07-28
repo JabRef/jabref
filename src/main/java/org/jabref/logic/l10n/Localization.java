@@ -1,10 +1,12 @@
 package org.jabref.logic.l10n;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Objects;
 import java.util.Optional;
@@ -48,13 +50,15 @@ public class Localization {
      * @param params Replacement strings for parameters %0, %1, etc.
      * @return The message with replaced parameters
      */
-    public static String lang(String key, String... params) {
+    public static String lang(String key, Object... params) {
         if (localizedMessages == null) {
             // I'm logging this because it should never happen
-            LOGGER.error("Messages are not initialized before accessing key: " + key);
+            LOGGER.error("Messages are not initialized before accessing key: {}", key);
             setLanguage(Language.ENGLISH);
         }
-        return lookup(localizedMessages, key, params);
+        var stringParams = Arrays.stream(params).map(Object::toString).toArray(String[]::new);
+
+        return lookup(localizedMessages, key, stringParams);
     }
 
     /**
@@ -67,7 +71,7 @@ public class Localization {
         Optional<Locale> knownLanguage = Language.convertToSupportedLocale(language);
         final Locale defaultLocale = Locale.getDefault();
         if (knownLanguage.isEmpty()) {
-            LOGGER.warn("Language " + language + " is not supported by JabRef (Default:" + defaultLocale + ")");
+            LOGGER.warn("Language {} is not supported by JabRef (Default: {})", language, defaultLocale);
             setLanguage(Language.ENGLISH);
             return;
         }
@@ -115,17 +119,18 @@ public class Localization {
     }
 
     /**
-     * Helper function to create a HashMap from the key/value pairs of a bundle.
+     * Helper function to create a Map from the key/value pairs of a bundle.
      *
      * @param baseBundle JabRef language bundle with keys and values for translations.
      * @return Lookup map for the baseBundle.
      */
-    private static HashMap<String, String> createLookupMap(ResourceBundle baseBundle) {
+    private static Map<String, String> createLookupMap(ResourceBundle baseBundle) {
         final ArrayList<String> baseKeys = Collections.list(baseBundle.getKeys());
         return new HashMap<>(baseKeys.stream().collect(
                 Collectors.toMap(
-                        key -> new LocalizationKey(key).getTranslationValue(),
-                        key -> new LocalizationKey(baseBundle.getString(key)).getTranslationValue())
+                        // not required to unescape content, because that is already done by the ResourceBundle itself
+                        key -> key,
+                        key -> baseBundle.getString(key))
         ));
     }
 
@@ -143,7 +148,7 @@ public class Localization {
 
         String translation = bundle.containsKey(key) ? bundle.getString(key) : "";
         if (translation.isEmpty()) {
-            LOGGER.warn("Warning: could not get translation for \"" + key + "\" for locale " + Locale.getDefault());
+            LOGGER.warn("Warning: could not get translation for \"{}\" for locale {}", key, Locale.getDefault());
             translation = key;
         }
         return new LocalizationKeyParams(translation, params).replacePlaceholders();
@@ -154,9 +159,9 @@ public class Localization {
      */
     private static class LocalizationBundle extends ResourceBundle {
 
-        private final HashMap<String, String> lookup;
+        private final Map<String, String> lookup;
 
-        LocalizationBundle(HashMap<String, String> lookupMap) {
+        LocalizationBundle(Map<String, String> lookupMap) {
             lookup = lookupMap;
         }
 

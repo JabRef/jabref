@@ -12,13 +12,14 @@ jobs:
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v2
         with:
-          ref: master
+          ref: main
           persist-credentials: false
           fetch-depth: 0
       - name: Set up JDK
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
-          java-version: 14
+          java-version: 16
+          distribution: 'adopt'
       - uses: actions/cache@v1
         name: Restore gradle wrapper
         with:
@@ -43,14 +44,15 @@ jobs:
           mkdir -p $GITHUB_WORKSPACE/build/journals
           cp * $GITHUB_WORKSPACE/build/journals/
 
+          # ensure that the .java classes are the most recent ones
+          cp $GITHUB_WORKSPACE/src/main/java/org/jabref/logic/journals/* $GITHUB_WORKSPACE/buildSrc/src/copied/java/org/jabref/logic/journals
+
           # create .mv file
           cd $GITHUB_WORKSPACE
           ./gradlew generateJournalAbbreviationList
-
-          # git commit
-          git config user.email "jabrefmail+webfeedback@gmail.com"
-          git config user.name "JabRef refresh journal lists [bot]"
-          git add . && git commit -m"Update journalList.mv"
-      - uses: ad-m/github-push-action@master
+      - uses: peter-evans/create-pull-request@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: update-journallist
+          title: "[Bot] Update Journal abbrev list"
+          commit-message: Update journal abbrev list

@@ -1,8 +1,4 @@
-#!/usr/bin/python3 -u
-
-# Note that running python with the `-u` flag is required on Windows,
-# in order to ensure that stdin and stdout are opened in binary, rather
-# than text, mode.
+#!/usr/bin/env python3
 
 import json
 import logging
@@ -15,17 +11,24 @@ import subprocess
 import sys
 from pathlib import Path
 
-# We assume that this python script is located in "jabref/lib" while the executable is "jabref/bin/JabRef"
+# Try a set of possible launchers to execute JabRef
 script_dir = Path(__file__).resolve().parent.parent
 relpath_path = script_dir / "bin/JabRef"
 lowercase_path = shutil.which("jabref")
 uppercase_path = shutil.which("JabRef")
+
+# Relative path used in the portable install
 if relpath_path.exists():
     JABREF_PATH = relpath_path
+# Lowercase launcher used in deb/rpm/snap packages
 elif lowercase_path is not None and os.path.exists(lowercase_path):
     JABREF_PATH = Path(lowercase_path)
+# Uppercase launcher used in Arch AUR package
 elif uppercase_path is not None and os.path.exists(uppercase_path):
     JABREF_PATH = Path(uppercase_path)
+# FLatpak support
+elif subprocess.run(["flatpak", "info", "org.jabref.jabref"], capture_output=True).returncode == 0:
+    JABREF_PATH = "flatpak run org.jabref.jabref"
 else:
     logging.error("Could not determine JABREF_PATH")
     sys.exit(-1)
@@ -70,7 +73,7 @@ def send_message(message):
 
 def add_jabref_entry(data):
     """Send string via cli as literal to preserve special characters"""
-    cmd = [str(JABREF_PATH), "--importBibtex", r"{}".format(data)]
+    cmd = str(JABREF_PATH).split() + ["--importBibtex", r"{}".format(data)]
     logging.info("Try to execute command {}".format(cmd))
     try:
         response = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
@@ -90,7 +93,7 @@ except Exception as e:
 logging.info(str(message))
 
 if "status" in message and message["status"] == "validate":
-    cmd = [str(JABREF_PATH), "--version"]
+    cmd = str(JABREF_PATH).split() + ["--version"]
     try:
         response = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as exc:

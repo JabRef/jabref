@@ -135,6 +135,7 @@ public enum StandardField implements Field {
     YEAR("year", FieldProperty.NUMERIC),
     YEARFILED("yearfiled"),
     MR_NUMBER("mrnumber"),
+    ZBL_NUMBER("zbl"),
     XDATA("xdata", FieldProperty.MULTIPLE_ENTRY_LINK),
     XREF("xref", FieldProperty.SINGLE_ENTRY_LINK),
 
@@ -143,7 +144,10 @@ public enum StandardField implements Field {
     CITEDBY("citedBy"),
     GROUPS("groups"),
     OWNER("owner"),
-    TIMESTAMP("timestamp", FieldProperty.DATE);
+    TIMESTAMP("timestamp", FieldProperty.DATE),
+    CREATIONDATE("creationdate", FieldProperty.DATE),
+    MODIFICATIONDATE("modificationdate", FieldProperty.DATE);
+
 
     private final String name;
     private final String displayName;

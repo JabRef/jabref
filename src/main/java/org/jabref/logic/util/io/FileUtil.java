@@ -70,6 +70,13 @@ public class FileUtil {
     }
 
     /**
+     * Returns the name part of a file name (i.e., everything in front of last ".").
+     */
+    public static String getBaseName(Path fileNameWithExtension) {
+        return getBaseName(fileNameWithExtension.getFileName().toString());
+    }
+
+    /**
      * Returns a valid filename for most operating systems.
      * <p>
      * Currently, only the length is restricted to 255 chars, see MAXIMUM_FILE_NAME_LENGTH.
@@ -344,5 +351,15 @@ public class FileUtil {
      */
     public static boolean isBibFile(Path file) {
         return getFileExtension(file).filter(type -> "bib".equals(type)).isPresent();
+    }
+
+    /**
+     * Test if the file is a bib file by simply checking the extension to be ".bib"
+     *
+     * @param file The file to check
+     * @return True if file extension is ".bib", false otherwise
+     */
+    public static boolean isPDFFile(Path file) {
+        return getFileExtension(file).filter(type -> "pdf".equals(type)).isPresent();
     }
 }

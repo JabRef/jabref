@@ -62,6 +62,23 @@
     color: #7d8591; /* -fx-mid-text-color*/
 }
 
+.custom-color-dialog {
+    -fx-background-color: -fx-control-inner-background;
+}
+
+.table-row-cell: odd{
+    -fx-background-color:#272b38;
+}
+
+.table-row-cell: even{
+    -fx-background-color: #212330;
+}
+
+.table-row-cell:hover,
+.tree-table-row-cell:hover {
+    -fx-background-color: -jr-hover;
+}
+
 .table-view .groupColumnBackground {
     -fx-stroke: -jr-gray-3;
 }
@@ -80,7 +97,7 @@
 }
 
 .numberColumn > .hits:any-selected {
-    -fx-background-color: derive(-jr-gray-3, 70%);
+    -fx-background-color: derive(-jr-gray-3, 25%);
 }
 
 .numberColumn > .hits:all-selected {

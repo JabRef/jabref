@@ -18,29 +18,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.6.0
+        uses: styfle/cancel-workflow-action@0.9.0
         with:
           access_token: ${{ github.token }}
       - name: Checkout source
         uses: actions/checkout@v2
       - name: Set up JDK
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
-          java-version: 14
-      - uses: actions/cache@v1
-        name: Restore gradle cache
+          java-version: 16
+          distribution: 'adopt'
+      - name: Restore gradle cache
+        uses: actions/cache@v2
         with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle7-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
-            ${{ runner.OS }}-gradle-${{ env.cache-name }}-
-            ${{ runner.OS }}-gradle-
-            ${{ runner.OS }}-
-      - uses: actions/cache@v1
-        name: Restore gradle wrapper
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+            ${{ runner.os }}-gradle7-
       - name: Run check style reporter
         uses: nikitasavinov/checkstyle-action@master
         with:
@@ -60,23 +56,19 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v2
       - name: Set up JDK
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
-          java-version: 14
-      - uses: actions/cache@v1
-        name: Restore gradle chache
+          java-version: 16
+          distribution: 'adopt'
+      - uses: actions/cache@v2
+        name: Restore gradle cache
         with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle7-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
-            ${{ runner.OS }}-gradle-${{ env.cache-name }}-
-            ${{ runner.OS }}-gradle-
-            ${{ runner.OS }}-
-      - uses: actions/cache@v1
-        name: Restore gradle wrapper
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+            ${{ runner.os }}-gradle7-
       - name: Run tests
         run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest
         env:
@@ -104,23 +96,19 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v2
       - name: Set up JDK
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
-          java-version: 14
-      - uses: actions/cache@v1
-        name: Restore gradle chache
+          java-version: 16
+          distribution: 'adopt'
+      - name: Restore gradle cache
+        uses: actions/cache@v2
         with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle7-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
-            ${{ runner.OS }}-gradle-${{ env.cache-name }}-
-            ${{ runner.OS }}-gradle-
-            ${{ runner.OS }}-
-      - uses: actions/cache@v1
-        name: Restore gradle wrapper
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+            ${{ runner.os }}-gradle7-
       - name: Run tests on PostgreSQL
         run: ./gradlew databaseTest --rerun-tasks
         env:
@@ -150,23 +138,19 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v2
       - name: Set up JDK
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
-          java-version: 14
-      - uses: actions/cache@v1
-        name: Restore gradle chache
+          java-version: 16
+          distribution: 'adopt'
+      - uses: actions/cache@v2
+        name: Restore gradle cache
         with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle7-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
-            ${{ runner.OS }}-gradle-${{ env.cache-name }}-
-            ${{ runner.OS }}-gradle-
-            ${{ runner.OS }}-
-      - uses: actions/cache@v1
-        name: Restore gradle wrapper
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+            ${{ runner.os }}-gradle7-
       - name: Run GUI tests
         run: xvfb-run --auto-servernum ./gradlew guiTest
         env:
@@ -200,23 +184,19 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v2
       - name: Set up JDK
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
-          java-version: 14
-      - uses: actions/cache@v1
-        name: Restore gradle chache
+          java-version: 16
+          distribution: 'adopt'
+      - name: Restore gradle cache
+        uses: actions/cache@v2
         with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle7-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
-            ${{ runner.OS }}-gradle-${{ env.cache-name }}-
-            ${{ runner.OS }}-gradle-
-            ${{ runner.OS }}-
-      - uses: actions/cache@v1
-        name: Restore gradle wrapper
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+            ${{ runner.os }}-gradle7-
       - name: Update test coverage metrics
         if: ${{ steps.checksecrets.outputs.secretspresent }}
         run: xvfb-run --auto-servernum ./gradlew jacocoTestReport && bash <(curl -s https://codecov.io/bash);
@@ -232,35 +212,3 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: gradle/wrapper-validation-action@v1
-  checkauthors:
-    name: "Validate AUTHORS"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          # full checkout needed for authors generation
-          fetch-depth: 0
-      - name: "All authors of this PR listed in AUTHORS"
-        id: authors_check
-        shell: bash
-        run: |
-          git config user.name "JabRef Author Checker [bot]"
-          git config user.email "noreply@jabref.org"
-          ./scripts/generate-authors.sh
-          set +o pipefail
-          added=$(git diff HEAD --no-ext-diff --unified=0 -a --no-prefix | egrep "^\+[^+]" | sed "s/^\+//")
-          if [ -z "$added" ]; then
-            echo "No authors added"
-            exit 0
-          fi
-          echo "Authors found in this PR not listed in the AUTHORS file."
-          echo
-          echo "The JabRef maintainers will add the following name to the AUTHORS file"
-          echo
-          echo -e "$added"
-          echo
-          echo "In case you want to use a different one, please comment here and adjust your name in your git configuration for future commits"
-          echo
-          echo "Just adding yourself into the AUHTORS file does not help as it is overwritten by our script ./scripts/generate-authors."
-          echo "Read more on the AUTHORS file at found at https://github.com/JabRef/jabref/blob/master/CONTRIBUTING.md#author-credits"
-          exit 1

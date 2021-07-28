@@ -16,6 +16,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.jabref.logic.cleanup.EprintCleanup;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
@@ -23,6 +24,7 @@ import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.IdFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
+import org.jabref.logic.importer.fetcher.transformers.ArXivQueryTransformer;
 import org.jabref.logic.util.io.XMLUtil;
 import org.jabref.logic.util.strings.StringSimilarity;
 import org.jabref.model.entry.BibEntry;
@@ -36,6 +38,7 @@ import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -76,7 +79,6 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
                                                           .map(Optional::get)
                                                           .findFirst();
             pdfUrl.ifPresent(url -> LOGGER.info("Fulltext PDF found @ arXiv."));
-
             return pdfUrl;
         } catch (FetcherException e) {
             LOGGER.warn("arXiv API request failed", e);
@@ -113,8 +115,12 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
         }
     }
 
-    private List<ArXivEntry> searchForEntries(BibEntry entry) throws FetcherException {
-        // 1. Eprint
+    private List<ArXivEntry> searchForEntries(BibEntry originalEntry) throws FetcherException {
+        // We need to clone the entry, because we modify it by a cleanup job.
+        final BibEntry entry = (BibEntry) originalEntry.clone();
+
+        // 1. Check for Eprint
+        new EprintCleanup().cleanup(entry);
         Optional<String> identifier = entry.getField(StandardField.EPRINT);
         if (StringUtil.isNotBlank(identifier)) {
             try {
@@ -126,26 +132,21 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
         }
 
         // 2. DOI and other fields
-        String query;
-
-        Optional<String> doi = entry.getField(StandardField.DOI).flatMap(DOI::parse).map(DOI::getNormalized);
-        if (doi.isPresent()) {
-            // Search for an entry in the ArXiv which is linked to the doi
-            query = "doi:" + doi.get();
-        } else {
-            Optional<String> authorQuery = entry.getField(StandardField.AUTHOR).map(author -> "au:" + author);
-            Optional<String> titleQuery = entry.getField(StandardField.TITLE).map(title -> "ti:" + title);
-            query = OptionalUtil.toList(authorQuery, titleQuery).stream().collect(Collectors.joining("+AND+"));
-        }
-
+        String query = entry.getField(StandardField.DOI)
+             .flatMap(DOI::parse)
+             .map(DOI::getNormalized)
+             .map(doiString -> "doi:" + doiString)
+             .orElseGet(() -> {
+                 Optional<String> authorQuery = entry.getField(StandardField.AUTHOR).map(author -> "au:" + author);
+                 Optional<String> titleQuery = entry.getField(StandardField.TITLE).map(title -> "ti:" + StringUtil.ignoreCurlyBracket(title));
+                 return String.join("+AND+", OptionalUtil.toList(authorQuery, titleQuery));
+             });
         Optional<ArXivEntry> arxivEntry = searchForEntry(query);
-
         if (arxivEntry.isPresent()) {
             // Check if entry is a match
             StringSimilarity match = new StringSimilarity();
             String arxivTitle = arxivEntry.get().title.orElse("");
-            String entryTitle = entry.getField(StandardField.TITLE).orElse("");
-
+            String entryTitle = StringUtil.ignoreCurlyBracket(entry.getField(StandardField.TITLE).orElse(""));
             if (match.isSimilar(arxivTitle, entryTitle)) {
                 return OptionalUtil.toList(arxivEntry);
             }
@@ -168,7 +169,7 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
 
     /**
      * Queries the API.
-     *
+     * <p>
      * If only {@code searchQuery} is given, then the API will return results for each article that matches the query.
      * If only {@code ids} is given, then the API will return results for each article in the list.
      * If both {@code searchQuery} and {@code ids} are given, then the API will return each article in
@@ -252,25 +253,26 @@ public class ArXiv implements FulltextFetcher, PagedSearchBasedFetcher, IdBasedF
     /**
      * Constructs a complex query string using the field prefixes specified at https://arxiv.org/help/api/user-manual
      *
-     * @param complexSearchQuery the search query defining all fielded search parameters
+     * @param luceneQuery the root node of the lucene query
      * @return A list of entries matching the complex query
      */
     @Override
-    public Page<BibEntry> performSearchPaged(ComplexSearchQuery complexSearchQuery, int pageNumber) throws FetcherException {
-        List<String> searchTerms = new ArrayList<>();
-        complexSearchQuery.getAuthors().forEach(author -> searchTerms.add("au:" + author));
-        complexSearchQuery.getTitlePhrases().forEach(title -> searchTerms.add("ti:" + title));
-        complexSearchQuery.getAbstractPhrases().forEach(abstr -> searchTerms.add("abs:" + abstr));
-        complexSearchQuery.getJournal().ifPresent(journal -> searchTerms.add("jr:" + journal));
-        // Since ArXiv API does not support year search, we ignore the year related terms
-        complexSearchQuery.getToYear().ifPresent(year -> searchTerms.add(year.toString()));
-        searchTerms.addAll(complexSearchQuery.getDefaultFieldPhrases());
-        String complexQueryString = String.join(" AND ", searchTerms);
+    public Page<BibEntry> performSearchPaged(QueryNode luceneQuery, int pageNumber) throws FetcherException {
+        ArXivQueryTransformer transformer = new ArXivQueryTransformer();
+        String transformedQuery = transformer.transformLuceneQuery(luceneQuery).orElse("");
+        List<BibEntry> searchResult = searchForEntries(transformedQuery, pageNumber).stream()
+                                                                                    .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
+                                                                                    .collect(Collectors.toList());
+        return new Page<>(transformedQuery, pageNumber, filterYears(searchResult, transformer));
+    }
 
-        List<BibEntry> searchResult = searchForEntries(complexQueryString, pageNumber).stream()
-                                                                                      .map((arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()))
-                                                                                      .collect(Collectors.toList());
-        return new Page<>(complexQueryString, pageNumber, searchResult);
+    private List<BibEntry> filterYears(List<BibEntry> searchResult, ArXivQueryTransformer transformer) {
+        return searchResult.stream()
+                           .filter(entry -> entry.getField(StandardField.DATE).isPresent())
+                           // Filter the date field for year only
+                           .filter(entry -> transformer.getEndYear().isEmpty() || Integer.parseInt(entry.getField(StandardField.DATE).get().substring(0, 4)) <= transformer.getEndYear().get())
+                           .filter(entry -> transformer.getStartYear().isEmpty() || Integer.parseInt(entry.getField(StandardField.DATE).get().substring(0, 4)) >= transformer.getStartYear().get())
+                           .collect(Collectors.toList());
     }
 
     @Override

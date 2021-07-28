@@ -6,6 +6,8 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.util.Version;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.preferences.MrDlibPreferences;
+import org.jabref.preferences.PreferencesService;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +15,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @FetcherTest
 public class MrDLibFetcherTest {
@@ -21,7 +25,15 @@ public class MrDLibFetcherTest {
 
     @BeforeEach
     public void setUp() {
-        fetcher = new MrDLibFetcher("", Version.parse(""));
+        PreferencesService preferencesService = mock(PreferencesService.class);
+        MrDlibPreferences mrDlibPreferences = new MrDlibPreferences(
+                true,
+                false,
+                false,
+                false);
+        when(preferencesService.getMrDlibPreferences()).thenReturn(mrDlibPreferences);
+
+        fetcher = new MrDLibFetcher("", Version.parse(""), preferencesService);
     }
 
     @Test

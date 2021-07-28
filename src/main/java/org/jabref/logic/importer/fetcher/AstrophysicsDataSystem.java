@@ -27,6 +27,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
+import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.BuildInfo;
@@ -41,6 +42,7 @@ import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONException;
 import kong.unirest.json.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 /**
  * Fetches data from the SAO/NASA Astrophysics Data System (https://ui.adsabs.harvard.edu/)
@@ -79,13 +81,13 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
     }
 
     /**
-     * @param query query string, matching the apache solr format
+     * @param luceneQuery query string, matching the apache solr format
      * @return URL which points to a search request for given query
      */
     @Override
-    public URL getURLForQuery(String query, int pageNumber) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder builder = new URIBuilder(API_SEARCH_URL);
-        builder.addParameter("q", query);
+        builder.addParameter("q", new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse(""));
         builder.addParameter("fl", "bibcode");
         builder.addParameter("rows", String.valueOf(getPageSize()));
         builder.addParameter("start", String.valueOf(getPageSize() * pageNumber));
@@ -169,7 +171,6 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
 
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
-
         if (entry.getFieldOrAlias(StandardField.TITLE).isEmpty() && entry.getFieldOrAlias(StandardField.AUTHOR).isEmpty()) {
             return Collections.emptyList();
         }
@@ -189,10 +190,8 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
      * @return list of bibcodes matching the search request. May be empty
      */
     private List<String> fetchBibcodes(URL url) throws FetcherException {
-
         try {
-            URLDownload download = new URLDownload(url);
-            download.addHeader("Authorization", "Bearer " + API_KEY);
+            URLDownload download = getUrlDownload(url);
             String content = download.asString();
             JSONObject obj = new JSONObject(content);
             JSONArray codes = obj.getJSONObject("response").getJSONArray("docs");
@@ -274,16 +273,41 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, PagedSearch
     }
 
     @Override
-    public Page<BibEntry> performSearchPaged(ComplexSearchQuery complexSearchQuery, int pageNumber) throws FetcherException {
+    public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
+        URL urlForQuery;
         try {
-            // This is currently just interpreting the complex query as a default string query
-            List<String> bibcodes = fetchBibcodes(getComplexQueryURL(complexSearchQuery, pageNumber));
-            Collection<BibEntry> results = performSearchByIds(bibcodes);
-            return new Page<>(complexSearchQuery.toString(), pageNumber, results);
+            urlForQuery = getURLForQuery(luceneQuery);
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
         } catch (IOException e) {
             throw new FetcherException("A network error occurred", e);
         }
+        List<String> bibCodes = fetchBibcodes(urlForQuery);
+        List<BibEntry> results = performSearchByIds(bibCodes);
+        return results;
     }
+
+    @Override
+    public Page<BibEntry> performSearchPaged(QueryNode luceneQuery, int pageNumber) throws FetcherException {
+        URL urlForQuery;
+        try {
+            urlForQuery = getURLForQuery(luceneQuery, pageNumber);
+        } catch (URISyntaxException e) {
+            throw new FetcherException("Search URI is malformed", e);
+        } catch (IOException e) {
+            throw new FetcherException("A network error occurred", e);
+        }
+        // This is currently just interpreting the complex query as a default string query
+        List<String> bibCodes = fetchBibcodes(urlForQuery);
+        Collection<BibEntry> results = performSearchByIds(bibCodes);
+        return new Page<>(luceneQuery.toString(), pageNumber, results);
+    }
+
+    @Override
+    public URLDownload getUrlDownload(URL url) {
+        URLDownload urlDownload = new URLDownload(url);
+        urlDownload.addHeader("Authorization", "Bearer " + API_KEY);
+        return urlDownload;
+    }
+
 }

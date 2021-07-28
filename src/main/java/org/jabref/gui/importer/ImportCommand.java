@@ -17,7 +17,7 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.FileFilterConverter;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
@@ -29,13 +29,15 @@ public class ImportCommand extends SimpleCommand {
     private final JabRefFrame frame;
     private final boolean openInNew;
     private final DialogService dialogService;
+    private final PreferencesService preferences;
 
     /**
      * @param openInNew Indicate whether the entries should import into a new database or into the currently open one.
      */
-    public ImportCommand(JabRefFrame frame, boolean openInNew, StateManager stateManager) {
+    public ImportCommand(JabRefFrame frame, boolean openInNew, PreferencesService preferences, StateManager stateManager) {
         this.frame = frame;
         this.openInNew = openInNew;
+        this.preferences = preferences;
 
         if (!openInNew) {
             this.executable.bind(needsDatabase(stateManager));
@@ -52,7 +54,7 @@ public class ImportCommand extends SimpleCommand {
                 .addExtensionFilter(FileFilterConverter.ANY_FILE)
                 .addExtensionFilter(FileFilterConverter.forAllImporters(importers))
                 .addExtensionFilter(FileFilterConverter.importerToExtensionFilter(importers))
-                .withInitialDirectory(Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY))
+                .withInitialDirectory(preferences.getImportExportPreferences().getImportWorkingDirectory())
                 .build();
         dialogService.showFileOpenDialog(fileDialogConfiguration)
                      .ifPresent(path -> doImport(path, importers, fileDialogConfiguration.getSelectedExtensionFilter()));
@@ -66,9 +68,9 @@ public class ImportCommand extends SimpleCommand {
             return;
         }
         Optional<Importer> format = FileFilterConverter.getImporter(selectedExtensionFilter, importers);
-        ImportAction importMenu = new ImportAction(frame, openInNew, format.orElse(null));
+        ImportAction importMenu = new ImportAction(frame, openInNew, format.orElse(null), preferences);
         importMenu.automatedImport(Collections.singletonList(file.toString()));
         // Set last working dir for import
-        Globals.prefs.put(JabRefPreferences.IMPORT_WORKING_DIRECTORY, file.getParent().toString());
+        preferences.storeImportExportPreferences(preferences.getImportExportPreferences().withImportWorkingDirectory(file.getParent()));
     }
 }

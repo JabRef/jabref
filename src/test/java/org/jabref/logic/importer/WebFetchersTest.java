@@ -6,11 +6,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.bibtex.FieldContentFormatterPreferences;
-import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
+import org.jabref.logic.importer.fetcher.GoogleScholar;
 import org.jabref.logic.importer.fetcher.GrobidCitationFetcher;
 import org.jabref.logic.importer.fetcher.IsbnViaEbookDeFetcher;
 import org.jabref.logic.importer.fetcher.IsbnViaOttoBibFetcher;
+import org.jabref.logic.importer.fetcher.JstorFetcher;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 
 import io.github.classgraph.ClassGraph;
@@ -51,8 +52,9 @@ class WebFetchersTest {
             expected.remove(IsbnViaEbookDeFetcher.class);
             expected.remove(IsbnViaOttoBibFetcher.class);
 
-            // Remove ACM, because it doesn't work currently
-            expected.remove(ACMPortalFetcher.class);
+            // Remove the following, because they don't work at the moment
+            expected.remove(JstorFetcher.class);
+            expected.remove(GoogleScholar.class);
 
             assertEquals(expected, getClasses(idFetchers));
         }
@@ -82,8 +84,9 @@ class WebFetchersTest {
             // Remove interfaces
             expected.remove(SearchBasedParserFetcher.class);
 
-            // Remove ACM, because it doesn't work currently
-            expected.remove(ACMPortalFetcher.class);
+            // Remove the following, because they don't work atm
+            expected.remove(JstorFetcher.class);
+            expected.remove(GoogleScholar.class);
 
             expected.remove(PagedSearchBasedParserFetcher.class);
             expected.remove(PagedSearchBasedFetcher.class);
@@ -102,6 +105,11 @@ class WebFetchersTest {
         try (ScanResult scanResult = classGraph.scan()) {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(FulltextFetcher.class.getCanonicalName());
             Set<Class<?>> expected = new HashSet<>(controlClasses.loadClasses());
+
+            // Remove the following, because they don't work atm
+            expected.remove(JstorFetcher.class);
+            expected.remove(GoogleScholar.class);
+
             assertEquals(expected, getClasses(fullTextFetchers));
         }
     }
@@ -115,6 +123,9 @@ class WebFetchersTest {
             Set<Class<?>> expected = new HashSet<>(controlClasses.loadClasses());
 
             expected.remove(IdParserFetcher.class);
+            // Remove the following, because they don't work at the moment
+            expected.remove(GoogleScholar.class);
+
             assertEquals(expected, getClasses(idFetchers));
         }
     }

@@ -57,11 +57,11 @@ Many times there is a need to provide an object on many locations simultaneously
 
 ### Main principle
 
-`EventBus` represents a communication line between multiple components. Objects can be passed through the bus and reach the listening method of another object which is registered on that `EventBus` instance. Hence the passed object is available as a parameter in the listening method.
+`EventBus` represents a communication line between multiple components. Objects can be passed through the bus and reach the listening method of another object which is registered on that `EventBus` instance. Hence, the passed object is available as a parameter in the listening method.
 
 ### Register to the `EventBus`
 
-Any listening method has to be annotated with `@Subscribe` keyword and must have only one accepting parameter. Furthermore the object which contains such listening method\(s\) has to be registered using the `register(Object)` method provided by `EventBus`. The listening methods can be overloaded by using different parameter types.
+Any listening method has to be annotated with `@Subscribe` keyword and must have only one accepting parameter. Furthermore, the object which contains such listening method\(s\) has to be registered using the `register(Object)` method provided by `EventBus`. The listening methods can be overloaded by using different parameter types.
 
 ### Posting an object
 
@@ -124,7 +124,7 @@ JabRef uses the logging facade [SLF4j](https://www.slf4j.org/). All log messages
 * Obtaining a logger for a class:
 
   ```java
-  private static final Log LOGGER = LogFactory.getLog(<ClassName>.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(<ClassName>.class);
   ```
 
 * If the logging event is caused by an exception, please add the exception to the log message as:
@@ -173,14 +173,24 @@ General hints:
 The tests check whether translation strings appear correctly in the resource bundles.
 
 1. Add new `Localization.lang("KEY")` to Java file. Run the `LocalizationConsistencyTest`under \(src/test/org.jabref.logic.
-\)
+
+   \)
+
 2. Tests fail. In the test output a snippet is generated which must be added to the English translation file.
 3. Add snippet to English translation file located at `src/main/resources/l10n/JabRef_en.properties`
 4. Please do not add translations for other languages directly in the properties. They will be overwritten by [Crowdin](https://crowdin.com/project/jabref)
 
+## Adding a new Language
+
+1. Add the new Language to the Language enum in [https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/l10n/Language.java](https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/l10n/Language.java)
+2. Create an empty &lt;locale code&gt;.properties file
+3. Configure the new language in [Crowdin](https://crowdin.com/project/jabref)
+
+If the language is a variant of a language `zh_CN` or `pt_BR` it is necessary to add a language mapping for Crowdin to the crowdin.yml file in the root. Of course the properties file also has to be named according to the language code and locale.
+
 ## Cleanup and Formatters
 
-We try to build a cleanup mechanism based on formatters. The idea is that we can register these actions in arbitrary places, e.g., onSave, onImport, onExport, cleanup, etc. and apply them to different fields. The formatters themself are independent of any logic and therefore easy to test.
+We try to build a cleanup mechanism based on formatters. The idea is that we can register these actions in arbitrary places, e.g., onSave, onImport, onExport, cleanup, etc. and apply them to different fields. The formatters themselves are independent of any logic and therefore easy to test.
 
 Example: [NormalizePagesFormatter](https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/formatter/bibtexfields/NormalizePagesFormatter.java)
 
@@ -211,13 +221,15 @@ Optional<Path> file = FileHelper.expandFilename(database, fileText, preferences.
 
 ## How to work with Preferences
 
-`model` and `logic` must not know JabRefPreferences. See `ProxyPreferences` for encapsulated preferences and [https://github.com/JabRef/jabref/pull/658](https://github.com/JabRef/jabref/pull/658) for a detailed discussion.
+`model` and `logic` must not know `JabRefPreferences`. See `ProxyPreferences` for encapsulated preferences and [https://github.com/JabRef/jabref/pull/658](https://github.com/JabRef/jabref/pull/658) for a detailed discussion.
 
 See [https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/preferences/TimestampPreferences.java](https://github.com/JabRef/jabref/blob/master/src/main/java/org/jabref/logic/preferences/TimestampPreferences.java) \(via [https://github.com/JabRef/jabref/pull/3092](https://github.com/JabRef/jabref/pull/3092)\) for the current way how to deal with preferences.
 
 Defaults should go into the model package. See [Comments in this Commit](https://github.com/JabRef/jabref/commit/2f553e6557bddf7753b618b0f4edcaa6e873f719#commitcomment-15779484)
 
 ## Test Cases
+
+### General hints on tests
 
 Imagine you want to test the method `format(String value)` in the class `BracesFormatter` which removes double braces in a given string.
 
@@ -291,9 +303,12 @@ Or even better, try to mock the preferences and insert them via dependency injec
 @Test
 public void getTypeReturnsBibLatexArticleInBibLatexMode() {
      // Mock preferences
-     JabrefPreferences mockedPrefs = mock(JabrefPreferences.class);
+     PreferencesService mockedPrefs = mock(PreferencesService.class);
+     GeneralPreferences mockedGeneralPrefs = mock(GeneralPReferences.class);
      // Switch to BibLatex mode
-     when(mockedPrefs.getBoolean("BiblatexMode")).thenReturn(true);
+     when(mockedPrefs.getGeneralPrefs()).thenReturn(mockedGeneralPrefs);
+     when(mockedGeneralPrefs.getDefaultBibDatabaseMode())
+        .thenReturn(BibDatabaseMode.BIBLATEX);
 
      // Now test
      EntryTypes biblatexentrytypes = new EntryTypes(mockedPrefs);
@@ -302,6 +317,21 @@ public void getTypeReturnsBibLatexArticleInBibLatexMode() {
 ```
 
 To test that a preferences migration works successfully, use the mockito method `verify`. See `PreferencesMigrationsTest` for an example.
+
+### Background on Java testing
+
+In JabRef, we mainly rely to basic JUnit tests to increase code coverage. There are other ways to test:
+
+| Type | Techniques | Tool \(Java\) | Kind of tests | Used In JabRef |
+| :--- | :--- | :--- | :--- | :--- |
+| Functional | Dynamics, black box, positive and negative | [JUnit-QuickCheck](https://github.com/pholser/junit-quickcheck) | Random data generation | No, not intended, because other test kinds seem more helpful. |
+| Functional | Dynamics, black box, positive and negative | [GraphWalker](https://graphwalker.github.io/) | Model-based | No, because the BibDatabase doesn't need to be tests |
+| Functional | Dynamics, black box, positive and negative | [TestFX](https://github.com/TestFX/TestFX) | GUI Tests | Yes |
+| Functional | Dynamics, white box, negative | [PIT](https://pitest.org/) | Mutation | No |
+| Functional | Dynamics, white box, positive and negative | [Mockito](https://site.mockito.org/) | Mocking | Yes |
+| Non-functional | Dynamics, black box, positive and negative | [JETM](http://jetm.void.fm/), [Apache JMeter](https://jmeter.apache.org/) | Performance \(performance testing vs load testing respectively\) | No |
+| Structural | Static, white box | [CheckStyle](https://checkstyle.sourceforge.io/) | Constient formatting of the source code | Yes |
+| Structural | Dynamics, white box | [SpotBugs](https://spotbugs.github.io/) | Reocurreing bugs \(based on experience of other projects\) | No |
 
 ## UI
 
@@ -383,5 +413,19 @@ All radio buttons that should be grouped together need to have a ToggleGroup def
                 <TextField fx:id="pageInfo"/>
             </children>
 </VBox>
+```
+
+### JavaFX Dialogs
+
+All dialogs should be displayed to the user via `DialogService` interface methods. `DialogService` provides methods to display various dialogs \(including custom ones\) to the user. It also ensures the displayed dialog opens on the correct window via `initOwner()` \(for cases where the user has multiple screens\). The following code snippet demonstrates how a custom dialog is displayed to the user:
+
+```java
+dialogService.showCustomDialog(new DocumentViewerView());
+```
+
+If an instance of `DialogService` is unavailable within current class/scope in which the dialog needs to be displayed, `DialogService` can be instantiated via the code snippet shown as follows:
+
+```java
+DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
 ```
 

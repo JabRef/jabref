@@ -377,7 +377,7 @@ class CitationKeyGeneratorTest {
                 .withField(StandardField.CROSSREF, "entry2");
         BibEntry entry2 = new BibEntry()
                 .withCitationKey("entry2")
-                .withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University}}");
+                .withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
@@ -403,7 +403,7 @@ class CitationKeyGeneratorTest {
                 .withField(StandardField.CROSSREF, "entry2");
         BibEntry entry2 = new BibEntry()
                 .withCitationKey("entry2")
-                .withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University, Department of Electrical Engineering}}");
+                .withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University, Department of Electrical Engineering}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
@@ -449,7 +449,7 @@ class CitationKeyGeneratorTest {
                 .withField(StandardField.CROSSREF, "entry2");
         BibEntry entry2 = new BibEntry()
                 .withCitationKey("entry2")
-                .withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University, School of Computer Engineering}}");
+                .withField(StandardField.AUTHOR, "{Link{\\\"{o}}ping University, School of Computer Engineering}");
         database.insertEntry(entry1);
         database.insertEntry(entry2);
 
@@ -739,7 +739,6 @@ class CitationKeyGeneratorTest {
 
     @Test
     void testLastPage() {
-
         assertEquals("27", CitationKeyGenerator.lastPage("7--27"));
         assertEquals("27", CitationKeyGenerator.lastPage("--27"));
         assertEquals("", CitationKeyGenerator.lastPage(""));
@@ -747,6 +746,8 @@ class CitationKeyGeneratorTest {
         assertEquals("97", CitationKeyGenerator.lastPage("7,41,73--97"));
         assertEquals("97", CitationKeyGenerator.lastPage("7,41,97--73"));
         assertEquals("43", CitationKeyGenerator.lastPage("43+"));
+        assertEquals("0", CitationKeyGenerator.lastPage("00--0"));
+        assertEquals("1", CitationKeyGenerator.lastPage("1--1"));
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -1125,5 +1126,12 @@ class CitationKeyGeneratorTest {
         BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Wickedness Managing");
         assertEquals("WickednessManaging",
                 new CitationKeyGenerator(keyPattern, new BibDatabase(), patternPreferences).generateKey(bibEntry));
+    }
+
+    @Test
+    void generateKeyWithFallbackField() {
+        BibEntry bibEntry = new BibEntry().withField(StandardField.YEAR, "2021");
+
+        assertEquals("2021", generateKey(bibEntry, "[title:([EPRINT:([YEAR])])]"));
     }
 }

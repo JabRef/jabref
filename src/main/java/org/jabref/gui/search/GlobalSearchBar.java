@@ -80,9 +80,10 @@ public class GlobalSearchBar extends HBox {
     private final CustomTextField searchField = SearchTextField.create();
     private final ToggleButton caseSensitiveButton;
     private final ToggleButton regularExpressionButton;
+    private final ToggleButton fulltextButton;
     // private final Button searchModeButton;
+    private final Tooltip searchFieldTooltip = new Tooltip();
     private final Label currentResults = new Label("");
-    private final Tooltip tooltip = new Tooltip();
 
     private final StateManager stateManager;
     private final PreferencesService preferencesService;
@@ -101,9 +102,9 @@ public class GlobalSearchBar extends HBox {
         // fits the standard "found x entries"-message thus hinders the searchbar to jump around while searching if the frame width is too small
         currentResults.setPrefWidth(150);
 
-        tooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        tooltip.setMaxHeight(10);
-        searchField.setTooltip(null);
+        searchField.setTooltip(searchFieldTooltip);
+        searchFieldTooltip.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        searchFieldTooltip.setMaxHeight(10);
         updateHintVisibility();
 
         KeyBindingRepository keyBindingRepository = Globals.getKeyPrefs();
@@ -123,12 +124,14 @@ public class GlobalSearchBar extends HBox {
 
         regularExpressionButton = IconTheme.JabRefIcons.REG_EX.asToggleButton();
         caseSensitiveButton = IconTheme.JabRefIcons.CASE_SENSITIVE.asToggleButton();
+        fulltextButton = IconTheme.JabRefIcons.FULLTEXT.asToggleButton();
         // searchModeButton = new Button();
         initSearchModifierButtons();
 
         BooleanBinding focusedOrActive = searchField.focusedProperty()
                                                     .or(regularExpressionButton.focusedProperty())
                                                     .or(caseSensitiveButton.focusedProperty())
+                                                    .or(fulltextButton.focusedProperty())
                                                     .or(searchField.textProperty()
                                                                    .isNotEmpty());
 
@@ -136,8 +139,10 @@ public class GlobalSearchBar extends HBox {
         regularExpressionButton.visibleProperty().bind(focusedOrActive);
         caseSensitiveButton.visibleProperty().unbind();
         caseSensitiveButton.visibleProperty().bind(focusedOrActive);
+        fulltextButton.visibleProperty().unbind();
+        fulltextButton.visibleProperty().bind(focusedOrActive);
 
-        StackPane modifierButtons = new StackPane(new HBox(regularExpressionButton, caseSensitiveButton));
+        StackPane modifierButtons = new StackPane(new HBox(regularExpressionButton, caseSensitiveButton, fulltextButton));
         modifierButtons.setAlignment(Pos.CENTER);
         searchField.setRight(new HBox(searchField.getRight(), modifierButtons));
         searchField.getStyleClass().add("search-field");
@@ -179,14 +184,7 @@ public class GlobalSearchBar extends HBox {
     private void initSearchModifierButtons() {
         regularExpressionButton.setSelected(searchPreferences.isRegularExpression());
         regularExpressionButton.setTooltip(new Tooltip(Localization.lang("regular expression")));
-        regularExpressionButton.setCursor(Cursor.DEFAULT);
-        regularExpressionButton.setMinHeight(28);
-        regularExpressionButton.setMaxHeight(28);
-        regularExpressionButton.setMinWidth(28);
-        regularExpressionButton.setMaxWidth(28);
-        regularExpressionButton.setPadding(new Insets(1.0));
-        regularExpressionButton.managedProperty().bind(searchField.editableProperty());
-        regularExpressionButton.visibleProperty().bind(searchField.editableProperty());
+        initSearchModifierButton(regularExpressionButton);
         regularExpressionButton.setOnAction(event -> {
             searchPreferences = searchPreferences.withRegularExpression(regularExpressionButton.isSelected());
             preferencesService.storeSearchPreferences(searchPreferences);
@@ -195,16 +193,18 @@ public class GlobalSearchBar extends HBox {
 
         caseSensitiveButton.setSelected(searchPreferences.isCaseSensitive());
         caseSensitiveButton.setTooltip(new Tooltip(Localization.lang("Case sensitive")));
-        caseSensitiveButton.setCursor(Cursor.DEFAULT);
-        caseSensitiveButton.setMinHeight(28);
-        caseSensitiveButton.setMaxHeight(28);
-        caseSensitiveButton.setMinWidth(28);
-        caseSensitiveButton.setMaxWidth(28);
-        caseSensitiveButton.setPadding(new Insets(1.0));
-        caseSensitiveButton.managedProperty().bind(searchField.editableProperty());
-        caseSensitiveButton.visibleProperty().bind(searchField.editableProperty());
+        initSearchModifierButton(caseSensitiveButton);
         caseSensitiveButton.setOnAction(event -> {
             searchPreferences = searchPreferences.withCaseSensitive(caseSensitiveButton.isSelected());
+            preferencesService.storeSearchPreferences(searchPreferences);
+            performSearch();
+        });
+
+        fulltextButton.setSelected(searchPreferences.isFulltext());
+        fulltextButton.setTooltip(new Tooltip(Localization.lang("Fulltext search")));
+        initSearchModifierButton(fulltextButton);
+        fulltextButton.setOnAction(event -> {
+            searchPreferences = searchPreferences.withFulltext(fulltextButton.isSelected());
             preferencesService.storeSearchPreferences(searchPreferences);
             performSearch();
         });
@@ -227,6 +227,17 @@ public class GlobalSearchBar extends HBox {
         }); */
     }
 
+    private void initSearchModifierButton(ToggleButton searchButton) {
+        searchButton.setCursor(Cursor.DEFAULT);
+        searchButton.setMinHeight(28);
+        searchButton.setMaxHeight(28);
+        searchButton.setMinWidth(28);
+        searchButton.setMaxWidth(28);
+        searchButton.setPadding(new Insets(1.0));
+        searchButton.managedProperty().bind(searchField.editableProperty());
+        searchButton.visibleProperty().bind(searchField.editableProperty());
+    }
+
     /**
      * Focuses the search field if it is not focused.
      */
@@ -243,7 +254,7 @@ public class GlobalSearchBar extends HBox {
         // An empty search field should cause the search to be cleared.
         if (searchField.getText().isEmpty()) {
             currentResults.setText("");
-            setHintTooltip(null);
+            setSearchFieldHintTooltip(null);
             stateManager.clearSearchQuery();
             return;
         }
@@ -254,7 +265,7 @@ public class GlobalSearchBar extends HBox {
             return;
         }
 
-        SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), searchPreferences.isCaseSensitive(), searchPreferences.isRegularExpression());
+        SearchQuery searchQuery = new SearchQuery(this.searchField.getText(), searchPreferences.getSearchFlags());
         if (!searchQuery.isValid()) {
             informUserAboutInvalidSearchQuery();
             return;
@@ -324,34 +335,28 @@ public class GlobalSearchBar extends HBox {
             // searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getIcon());
         }
 
-        setHintTooltip(description);
+        setSearchFieldHintTooltip(description);
     }
 
-    private void setHintTooltip(TextFlow description) {
+    private void setSearchFieldHintTooltip(TextFlow description) {
         if (preferencesService.getGeneralPreferences().shouldShowAdvancedHints()) {
-            String genericDescription = Localization.lang("Hint: To search specific fields only, enter for example:<p><tt>author=smith and title=electrical</tt>");
-            genericDescription = genericDescription.replace("<p>", "\n");
-            List<Text> genericDescriptionTexts = TooltipTextUtil.formatToTexts(genericDescription, new TooltipTextUtil.TextReplacement("<tt>author=smith and title=electrical</tt>", "author=smith and title=electrical", TooltipTextUtil.TextType.MONOSPACED));
+            String genericDescription = Localization.lang("Hint:\n\nTo search all fields for <b>Smith</b>, enter:\n<tt>smith</tt>\n\nTo search the field <b>author</b> for <b>Smith</b> and the field <b>title</b> for <b>electrical</b>, enter:\n<tt>author=Smith and title=electrical</tt>");
+            List<Text> genericDescriptionTexts = TooltipTextUtil.createTextsFromHtml(genericDescription);
 
-            if (description != null) {
-                description.getChildren().add(new Text("\n\n"));
-                description.getChildren().addAll(genericDescriptionTexts);
-                tooltip.setGraphic(description);
-            } else {
+            if (description == null) {
                 TextFlow emptyHintTooltip = new TextFlow();
                 emptyHintTooltip.getChildren().setAll(genericDescriptionTexts);
-                tooltip.setGraphic(emptyHintTooltip);
+                searchFieldTooltip.setGraphic(emptyHintTooltip);
+            } else {
+                description.getChildren().add(new Text("\n\n"));
+                description.getChildren().addAll(genericDescriptionTexts);
+                searchFieldTooltip.setGraphic(description);
             }
         }
     }
 
     public void updateHintVisibility() {
-        if (preferencesService.getGeneralPreferences().shouldShowAdvancedHints()) {
-            searchField.setTooltip(tooltip);
-        } else {
-            searchField.setTooltip(null);
-        }
-        setHintTooltip(null);
+        setSearchFieldHintTooltip(null);
     }
 
     public void setSearchTerm(String searchTerm) {

@@ -73,7 +73,7 @@ public class EntryEditorPreferences {
         return shouldShowLatexCitationsTab;
     }
 
-    public boolean isEnableValidation() {
+    public boolean shouldEnableValidation() {
         return enableValidation;
     }
 

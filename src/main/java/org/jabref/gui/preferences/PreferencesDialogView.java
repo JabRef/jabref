@@ -17,6 +17,7 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.TaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.preferences.PreferencesService;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -35,6 +36,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     @FXML private ButtonType saveButton;
 
     @Inject private DialogService dialogService;
+    @Inject private PreferencesService preferencesService;
     @Inject private TaskExecutor taskExecutor;
 
     private final JabRefFrame frame;
@@ -50,6 +52,8 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
         ControlHelper.setAction(saveButton, getDialogPane(), event -> savePreferencesAndCloseDialog());
 
+        this.getDialogPane().setStyle("-fx-font-size: " + preferencesService.getAppearancePreferences().getMainFontSize() + "pt;");
+
         // ToDo: After conversion of all tabs to mvvm, rework interface and make validSettings bindable
         // Button btnSave = (Button) this.getDialogPane().lookupButton(saveButton);
         // btnSave.disableProperty().bind(viewModel.validSettings().validProperty().not());
@@ -61,7 +65,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
 
     @FXML
     private void initialize() {
-        viewModel = new PreferencesDialogViewModel(dialogService, frame);
+        viewModel = new PreferencesDialogViewModel(dialogService, preferencesService, frame);
 
         preferenceTabList.itemsProperty().setValue(viewModel.getPreferenceTabs());
 
@@ -80,6 +84,8 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
                 preferencesContainer.setContent(null);
             } else {
                 preferencesContainer.setContent(tab.getBuilder());
+                ((AbstractPreferenceTabView<?>) tab).prefWidthProperty().bind(preferencesContainer.widthProperty());
+                ((AbstractPreferenceTabView<?>) tab).getStyleClass().add("preferencesTab");
             }
         });
 

@@ -8,11 +8,11 @@ import java.util.List;
 
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.specialfields.SpecialFieldsUtils;
+import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.migrations.ConvertLegacyExplicitGroups;
 import org.jabref.migrations.ConvertMarkingToGroups;
 import org.jabref.migrations.PostOpenMigration;
-import org.jabref.model.entry.BibEntry;
+import org.jabref.migrations.SpecialFieldsToSeparateFields;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.slf4j.Logger;
@@ -30,10 +30,10 @@ public class OpenDatabase {
      *
      * @param name Name of the BIB-file to open
      * @return ParserResult which never is null
-     * @deprecated use {@link #loadDatabase(Path, ImportFormatPreferences, FileUpdateMonitor)} instead
+     * @deprecated use {@link #loadDatabase(Path, ImportFormatPreferences, TimestampPreferences, FileUpdateMonitor)} instead
      */
     @Deprecated
-    public static ParserResult loadDatabase(String name, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor) {
+    public static ParserResult loadDatabase(String name, ImportFormatPreferences importFormatPreferences, TimestampPreferences timestampPreferences, FileUpdateMonitor fileMonitor) {
         LOGGER.debug("Opening: " + name);
         Path file = Path.of(name);
 
@@ -46,7 +46,7 @@ public class OpenDatabase {
         }
 
         try {
-            return OpenDatabase.loadDatabase(file, importFormatPreferences, fileMonitor);
+            return OpenDatabase.loadDatabase(file, importFormatPreferences, timestampPreferences, fileMonitor);
         } catch (IOException ex) {
             ParserResult pr = ParserResult.fromError(ex);
             pr.setFile(file.toFile());
@@ -58,27 +58,21 @@ public class OpenDatabase {
     /**
      * Opens a new database.
      */
-    public static ParserResult loadDatabase(Path fileToOpen, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor)
+    public static ParserResult loadDatabase(Path fileToOpen, ImportFormatPreferences importFormatPreferences, TimestampPreferences timestampPreferences, FileUpdateMonitor fileMonitor)
             throws IOException {
         ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(fileToOpen,
                 importFormatPreferences.getEncoding());
 
-        if (importFormatPreferences.isKeywordSyncEnabled()) {
-            for (BibEntry entry : result.getDatabase().getEntries()) {
-                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, importFormatPreferences.getKeywordSeparator());
-            }
-            LOGGER.debug("Synchronized special fields based on keywords");
-        }
-
-        performLoadDatabaseMigrations(result);
+        performLoadDatabaseMigrations(result, timestampPreferences, importFormatPreferences.getKeywordSeparator());
 
         return result;
     }
 
-    private static void performLoadDatabaseMigrations(ParserResult parserResult) {
+    private static void performLoadDatabaseMigrations(ParserResult parserResult, TimestampPreferences timestampPreferences, Character keywordDelimited) {
         List<PostOpenMigration> postOpenMigrations = Arrays.asList(
                 new ConvertLegacyExplicitGroups(),
-                new ConvertMarkingToGroups()
+                new ConvertMarkingToGroups(),
+                new SpecialFieldsToSeparateFields(keywordDelimited)
         );
 
         for (PostOpenMigration migration : postOpenMigrations) {

@@ -140,7 +140,6 @@ The view consists a FXML file `MyDialog.fxml` which defines the structure and th
 
 * [curated list of awesome JavaFX frameworks, libraries, books and etc...](https://github.com/mhrimaz/AwesomeJavaFX)
 * [ControlsFX](http://fxexperience.com/controlsfx/features/) amazing collection of controls
-* [jIconFont](http://jiconfont.github.io/googlematerialdesignicons) or [fontawesomefx](https://bitbucket.org/Jerady/fontawesomefx/)
 * [Undo manager](https://github.com/FXMisc/UndoFX)
 * [Docking manager](https://github.com/alexbodogit/AnchorFX) [or](https://github.com/RobertBColton/DockFX)
 * [additional bindings](https://github.com/lestard/advanced-bindings) or [EasyBind](https://github.com/TomasMikula/EasyBind)
@@ -149,9 +148,9 @@ The view consists a FXML file `MyDialog.fxml` which defines the structure and th
 * [mvvm framework](https://github.com/sialcasa/mvvmFX/wiki)
 * [CSS Reference](http://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html)
 * [JFoenix](https://github.com/jfoenixadmin/JFoenix) Material Designs look & feel
-* [FontAwesomeFX](https://bitbucket.org/Jerady/fontawesomefx/overview): supports different icon fonts
-* [JavaFX Documentation project](https://fxdocs.github.io/docs/index.html): Collected information on javafx in a central place
+* [JavaFX Documentation project](https://fxdocs.github.io/docs/html5/index.html): Collected information on JavaFX in a central place
 * [FXExperience](http://fxexperience.com/) JavaFX Links of the week
+* [Foojay](https://foojay.io/) Java and JavaFX tutorials
 
 ## Features missing in JavaFX
 

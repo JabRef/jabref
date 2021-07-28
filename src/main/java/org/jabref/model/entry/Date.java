@@ -4,15 +4,42 @@ import java.time.LocalDate;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
 public class Date {
+
+    private static final DateTimeFormatter NORMALIZED_DATE_FORMATTER = DateTimeFormatter.ofPattern("uuuu[-MM][-dd]");
+    private static final DateTimeFormatter SIMPLE_DATE_FORMATS;
+    static {
+        List<String> formatStrings = Arrays.asList(
+                "uuuu-M-d",     // covers 2009-1-15
+                "uuuu-M",       // covers 2009-11
+                "d-M-uuuu",     // covers 15-1-2012
+                "M-uuuu",       // covers 1-2012
+                "M/uuuu",       // covers 9/2015 and 09/2015
+                "M/uu",         // covers 9/15
+                "MMMM d, uuuu", // covers September 1, 2015
+                "MMMM, uuuu",   // covers September, 2015
+                "d.M.uuuu",     // covers 15.1.2015
+                "uuuu.M.d",     // covers 2015.1.15
+                "uuuu",         // covers 2015
+                "MMM, uuuu");   // covers Jan, 2020
+
+        SIMPLE_DATE_FORMATS = formatStrings.stream()
+                                           .map(DateTimeFormatter::ofPattern)
+                                           .reduce(new DateTimeFormatterBuilder(),
+                                                   DateTimeFormatterBuilder::appendOptional,
+                                                   (builder, formatterBuilder) -> builder.append(formatterBuilder.toFormatter()))
+                                           .toFormatter(Locale.US);
+    }
 
     private final TemporalAccessor date;
 
@@ -32,42 +59,19 @@ public class Date {
         this.date = date;
     }
 
-    /**
-     * Try to parse the following formats
-     *  - "M/y" (covers 9/15, 9/2015, and 09/2015)
-     *  - "MMMM (dd), yyyy" (covers September 1, 2015 and September, 2015)
-     *  - "yyyy-MM-dd" (covers 2009-1-15)
-     *  - "dd-MM-yyyy" (covers 15-1-2009)
-     *  - "d.M.uuuu" (covers 15.1.2015)
-     *  - "uuuu.M.d" (covers 2015.1.15)
-     *  - "MMM, uuuu" (covers Jan, 2020)
-     * The code is essentially taken from http://stackoverflow.com/questions/4024544/how-to-parse-dates-in-multiple-formats-using-simpledateformat.
-     */
     public static Optional<Date> parse(String dateString) {
         Objects.requireNonNull(dateString);
-        List<String> formatStrings = Arrays.asList(
-                "uuuu-M-d",
-                "uuuu-M",
-                "d-M-uuuu",
-                "M-uuuu",
-                "M/uu",
-                "M/uuuu",
-                "MMMM d, uuuu",
-                "MMMM, uuuu",
-                "d.M.uuuu",
-                "uuuu.M.d", "uuuu",
-                "MMM, uuuu");
 
-        for (String formatString : formatStrings) {
-            try {
-                TemporalAccessor parsedDate = DateTimeFormatter.ofPattern(formatString).parse(dateString);
-                return Optional.of(new Date(parsedDate));
-            } catch (DateTimeParseException ignored) {
-                // Ignored
-            }
+        if (dateString.isEmpty()) {
+            return Optional.empty();
         }
 
-        return Optional.empty();
+        try {
+            TemporalAccessor parsedDate = SIMPLE_DATE_FORMATS.parse(dateString);
+            return Optional.of(new Date(parsedDate));
+        } catch (DateTimeParseException ignored) {
+            return Optional.empty();
+        }
     }
 
     public static Optional<Date> parse(Optional<String> yearValue, Optional<String> monthValue,
@@ -103,8 +107,7 @@ public class Date {
     }
 
     public String getNormalized() {
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("uuuu[-MM][-dd]");
-        return dateFormatter.format(date);
+        return NORMALIZED_DATE_FORMATTER.format(date);
     }
 
     public Optional<Integer> getYear() {

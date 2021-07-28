@@ -194,7 +194,7 @@
     <xs:element name="title">
         <xs:complexType>
             <xs:sequence>
-                <xs:element minOccurs="0" ref="style"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="style"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -668,7 +668,7 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="url">
-        <xs:complexType>
+        <xs:complexType mixed="true">
             <xs:sequence>
                 <xs:element minOccurs="0" ref="style"/>
             </xs:sequence>

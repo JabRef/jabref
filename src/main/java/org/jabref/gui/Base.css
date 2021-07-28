@@ -376,6 +376,10 @@
     -fx-fill: white;
 }
 
+.icon-button:disabled {
+    -fx-opacity: 0.4;
+}
+
 .toggle-button:selected {
     -fx-background-color: -jr-icon-background-active;
     -fx-text-fill: -jr-selected;
@@ -427,8 +431,11 @@
 }
 
 .check-box > .box > .mark {
-    -fx-background-color: -fx-control-inner-background;
     -fx-padding: 0.2em 0.2em 0.2em 0.2em;
+}
+
+.check-box:selected > .box > .mark {
+    -fx-background-color: -fx-control-inner-background;
     -fx-shape: "M6.61 11.89L3.5 8.78 2.44 9.84 6.61 14l8.95-8.95L14.5 4z";
     -fx-stroke-width: 5;
 }
@@ -639,6 +646,14 @@
     -fx-background-color: -jr-warn;
 }
 
+.file-row-text{
+    -fx-fill: -jr-search-text;
+}
+
+.file-row-text:opacity{
+    -fx-fill: derive(-jr-search-text, 70%);
+}
+
 .combo-box-base {
     -fx-background-color: -fx-outer-border, -fx-control-inner-background;
     -fx-background-insets: 0, 1;
@@ -685,6 +700,31 @@
     -fx-background-color: transparent;
     -fx-background-insets: 0, 0;
     -fx-padding: 0;
+}
+
+.accordion .titled-pane  {
+   -fx-skin: "org.jabref.gui.util.CustomTitledPaneSkin";
+   -fx-arrow-side: right;
+}
+
+.accordion .titled-pane .title {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-insets: 5 5 5 5;
+}
+
+.accordion .titled-pane > *.content {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+/*
+ * The arrow button has some right padding that's added
+ * by "modena.css". This simply puts the padding on the
+ * left since the arrow is positioned on the right.
+ */
+.titled-pane > .title > .arrow-button {
+    -fx-padding: 0.0em 0.0em 0.0em 0.583em;
 }
 
 .text-input {
@@ -1189,6 +1229,14 @@ TextFlow * {
 
 }
 
-.mainTable-header{
+.mainTable-header {
     -fx-fill: -fx-mid-text-color;
+}
+
+.fontsizeSpinner{
+    -fx-pref-width: 5em;
+}
+
+.text-field:invalid {
+    -fx-background-color: rgba(240, 128, 128, 0.5);
 }

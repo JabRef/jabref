@@ -17,14 +17,14 @@ Here, we collect some helpful git hints
 * [https://github.com/RichardLitt/docs/blob/master/amending-a-commit-guide.md](https://github.com/RichardLitt/docs/blob/master/amending-a-commit-guide.md)
 * awesome hints and tools regarding git: [https://github.com/dictcp/awesome-git](https://github.com/dictcp/awesome-git)
 
-### Rebase everything as one commit on master
+### Rebase everything as one commit on main
 
 * Precondition: `JabRef/jabref` is [configured as upstream](https://help.github.com/articles/configuring-a-remote-for-a-fork/).
 * Fetch recent commits and prune non-existing branches: `git fetch upstream --prune`
-* Merge recent commits: `git merge upstream/master`
+* Merge recent commits: `git merge upstream/main`
 * If there are conflicts, resolve them
-* Reset index to upstream/master: `git reset upstream/master`
-* Review the changes and create a new commit using git gui: `git gui&`
+* Reset index to upstream/main: `git reset upstream/main`
+* Review the changes and create a new commit using git gui: `git gui`
 * Do a force push: `git push -f origin`
 
 See also: [https://help.github.com/articles/syncing-a-fork/](https://help.github.com/articles/syncing-a-fork/)
@@ -66,7 +66,7 @@ Then, each weak do `choco upgrade all` to ensure all tooling is uptodate.
 
 ### Tools for working with XMP
 
-* Validate XMP: [http://www.pdflib.com/knowledge-base/xmp-metadata/free-xmp-validator/](http://www.pdflib.com/knowledge-base/xmp-metadata/free-xmp-validator/)
+* Validate XMP: [https://www.pdflib.com/pdf-knowledge-base/xmp/free-xmp-validator/](https://www.pdflib.com/pdf-knowledge-base/xmp/free-xmp-validator/)
 
 ### Some useful keyboard shortcuts
 

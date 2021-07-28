@@ -1,8 +1,5 @@
 package org.jabref.gui.preview;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Base64;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -19,7 +16,6 @@ import javafx.scene.web.WebView;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.Globals;
-import org.jabref.gui.JabRefFrame;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BackgroundTask;
 import org.jabref.gui.util.TaskExecutor;
@@ -30,7 +26,6 @@ import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.logic.search.SearchQuery;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +38,26 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewViewer.class);
 
+    // https://stackoverflow.com/questions/5669448/get-selected-texts-html-in-div/5670825#5670825
+    private static final String JS_GET_SELECTION_HTML_SCRIPT = "function getSelectionHtml() {" +
+                                                               "    var html = \"\";" +
+                                                               "    if (typeof window.getSelection != \"undefined\") {" +
+                                                               "        var sel = window.getSelection();" +
+                                                               "        if (sel.rangeCount) {" +
+                                                               "            var container = document.createElement(\"div\");" +
+                                                               "            for (var i = 0, len = sel.rangeCount; i < len; ++i) {" +
+                                                               "                container.appendChild(sel.getRangeAt(i).cloneContents());" +
+                                                               "            }" +
+                                                               "            html = container.innerHTML;" +
+                                                               "        }" +
+                                                               "    } else if (typeof document.selection != \"undefined\") {" +
+                                                               "        if (document.selection.type == \"Text\") {" +
+                                                               "            html = document.selection.createRange().htmlText;" +
+                                                               "        }" +
+                                                               "    }" +
+                                                               "    return html;" +
+                                                               "};" +
+                                                               "getSelectionHtml();";
     private static final String JS_HIGHLIGHT_FUNCTION =
             "<head>" +
                     "   <meta charset=\"UTF-8\">" +
@@ -75,7 +90,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private static final String JS_UNMARK_WITH_CALLBACK = "" +
             "var markInstance = new Mark(document.getElementById(\"content\"));" +
             "markInstance.unmark(%s);";
-    private static final Pattern UNESCAPED_FORWARD_SLASH = Pattern.compile("\"(?<!\\\\\\\\)/\"");
+    private static final Pattern UNESCAPED_FORWARD_SLASH = Pattern.compile("(?<!\\\\)/");
 
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
@@ -104,7 +119,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     public PreviewViewer(BibDatabaseContext database, DialogService dialogService, StateManager stateManager) {
         this.database = Objects.requireNonNull(database);
         this.dialogService = dialogService;
-        this.clipBoardManager = Globals.clipboardManager;
+        this.clipBoardManager = Globals.getClipboardManager();
 
         setFitToHeight(true);
         setFitToWidth(true);
@@ -126,22 +141,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     public void setTheme(Theme theme) {
-        if (theme.getType() == Theme.Type.DARK) {
-            // We need to load the css file manually, due to a bug in the jdk
-            // https://bugs.openjdk.java.net/browse/JDK-8240969
-            // TODO: Remove this workaround as soon as openjfx 16 is released
-            URL url = JabRefFrame.class.getResource(theme.getPath().getFileName().toString());
-            String dataUrl = "data:text/css;charset=utf-8;base64," +
-                    Base64.getEncoder().encodeToString(StringUtil.getResourceFileAsString(url).getBytes());
-
-            previewView.getEngine().setUserStyleSheetLocation(dataUrl);
-        } else if (theme.getType() != Theme.Type.LIGHT) {
-            try {
-                previewView.getEngine().setUserStyleSheetLocation(theme.getPath().toUri().toURL().toExternalForm());
-            } catch (MalformedURLException ex) {
-                LOGGER.error("Cannot set custom theme, invalid url", ex);
-            }
-        }
+        theme.getAdditionalStylesheet().ifPresent(location -> previewView.getEngine().setUserStyleSheetLocation(location));
     }
 
     private void highlightSearchPattern() {
@@ -244,12 +244,24 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         clipBoardManager.setContent(content);
     }
 
+    public void copySelectionToClipBoard() {
+        ClipboardContent content = new ClipboardContent();
+        content.putString(getSelectionTextContent());
+        content.putHtml(getSelectionHtmlContent());
+
+        clipBoardManager.setContent(content);
+    }
+
     @Override
     public void invalidated(Observable observable) {
         update();
     }
 
-    public String getSelectionHtmlContent() {
+    public String getSelectionTextContent() {
         return (String) previewView.getEngine().executeScript("window.getSelection().toString()");
+    }
+
+    public String getSelectionHtmlContent() {
+        return (String) previewView.getEngine().executeScript(JS_GET_SELECTION_HTML_SCRIPT);
     }
 }

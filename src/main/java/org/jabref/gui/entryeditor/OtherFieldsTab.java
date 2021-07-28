@@ -12,6 +12,7 @@ import javax.swing.undo.UndoManager;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.icon.IconTheme;
@@ -26,7 +27,7 @@ import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 public class OtherFieldsTab extends FieldsEditorTab {
 
@@ -37,7 +38,8 @@ public class OtherFieldsTab extends FieldsEditorTab {
                           SuggestionProviders suggestionProviders,
                           UndoManager undoManager,
                           DialogService dialogService,
-                          JabRefPreferences preferences,
+                          PreferencesService preferences,
+                          StateManager stateManager,
                           BibEntryTypesManager entryTypesManager,
                           ExternalFileTypes externalFileTypes,
                           TaskExecutor taskExecutor,
@@ -47,7 +49,8 @@ public class OtherFieldsTab extends FieldsEditorTab {
                 suggestionProviders,
                 undoManager,
                 dialogService,
-                preferences, // ToDo: Still uses JabRefPreferences instead of PreferencesService
+                preferences,
+                stateManager,
                 externalFileTypes,
                 taskExecutor,
                 journalAbbreviationRepository);

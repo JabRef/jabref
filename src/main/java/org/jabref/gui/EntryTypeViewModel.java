@@ -25,7 +25,7 @@ import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.preferences.JabRefPreferences;
+import org.jabref.preferences.PreferencesService;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -38,7 +38,7 @@ public class EntryTypeViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntryTypeViewModel.class);
 
-    private final JabRefPreferences prefs;
+    private final PreferencesService preferencesService;
     private final BooleanProperty searchingProperty = new SimpleBooleanProperty();
     private final BooleanProperty searchSuccesfulProperty = new SimpleBooleanProperty();
     private final ObjectProperty<IdBasedFetcher> selectedItemProperty = new SimpleObjectProperty<>();
@@ -51,9 +51,12 @@ public class EntryTypeViewModel {
     private final Validator idFieldValidator;
     private final StateManager stateManager;
 
-    public EntryTypeViewModel(JabRefPreferences preferences, LibraryTab libraryTab, DialogService dialogService, StateManager stateManager) {
+    public EntryTypeViewModel(PreferencesService preferences,
+                              LibraryTab libraryTab,
+                              DialogService dialogService,
+                              StateManager stateManager) {
         this.libraryTab = libraryTab;
-        this.prefs = preferences;
+        this.preferencesService = preferences;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         fetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences()));
@@ -86,12 +89,12 @@ public class EntryTypeViewModel {
     }
 
     public void storeSelectedFetcher() {
-        prefs.setIdBasedFetcherForEntryGenerator(selectedItemProperty.getValue().getName());
+        preferencesService.storeIdBasedFetcherForEntryGenerator(selectedItemProperty.getValue().getName());
     }
 
     private IdBasedFetcher getLastSelectedFetcher() {
-        return fetchers.stream().filter(fetcher -> fetcher.getName().equals(prefs.getIdBasedFetcherForEntryGenerator()))
-                       .findFirst().orElse(new DoiFetcher(prefs.getImportFormatPreferences()));
+        return fetchers.stream().filter(fetcher -> fetcher.getName().equals(preferencesService.getIdBasedFetcherForEntryGenerator()))
+                       .findFirst().orElse(new DoiFetcher(preferencesService.getImportFormatPreferences()));
     }
 
     public ListProperty<IdBasedFetcher> fetcherItemsProperty() {
@@ -152,7 +155,7 @@ public class EntryTypeViewModel {
                 Optional<BibEntry> duplicate = new DuplicateCheck(Globals.entryTypesManager).containsDuplicate(libraryTab.getDatabase(), entry, libraryTab.getBibDatabaseContext().getMode());
                 if ((duplicate.isPresent())) {
                     DuplicateResolverDialog dialog = new DuplicateResolverDialog(entry, duplicate.get(), DuplicateResolverDialog.DuplicateResolverType.IMPORT_CHECK, libraryTab.getBibDatabaseContext(), stateManager);
-                    switch (dialog.showAndWait().orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK)) {
+                    switch (dialogService.showCustomDialogAndWait(dialog).orElse(DuplicateResolverDialog.DuplicateResolverResult.BREAK)) {
                         case KEEP_LEFT:
                             libraryTab.getDatabase().removeEntry(duplicate.get());
                             libraryTab.getDatabase().insertEntry(entry);
@@ -170,7 +173,7 @@ public class EntryTypeViewModel {
                     }
                 } else {
                     // Regenerate CiteKey of imported BibEntry
-                    new CitationKeyGenerator(libraryTab.getBibDatabaseContext(), prefs.getCitationKeyPatternPreferences()).generateAndSetKey(entry);
+                    new CitationKeyGenerator(libraryTab.getBibDatabaseContext(), preferencesService.getCitationKeyPatternPreferences()).generateAndSetKey(entry);
                     libraryTab.insertEntry(entry);
                 }
                 searchSuccesfulProperty.set(true);

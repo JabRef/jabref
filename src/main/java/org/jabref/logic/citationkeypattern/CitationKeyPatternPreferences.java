@@ -9,7 +9,7 @@ public class CitationKeyPatternPreferences {
     }
 
     private final boolean shouldAvoidOverwriteCiteKey;
-    private final boolean shouldWarnBeforeOverwriteCiteKey;
+    private boolean shouldWarnBeforeOverwriteCiteKey;
     private final boolean shouldGenerateCiteKeysBeforeSaving;
     private final KeySuffix keySuffix;
     private final String keyPatternRegex;
@@ -45,6 +45,11 @@ public class CitationKeyPatternPreferences {
 
     public boolean shouldWarnBeforeOverwriteCiteKey() {
         return shouldWarnBeforeOverwriteCiteKey;
+    }
+
+    public CitationKeyPatternPreferences withWarnBeforeOverwriteCiteKey(boolean shouldAvoidOverwriteCiteKey) {
+        this.shouldWarnBeforeOverwriteCiteKey = shouldAvoidOverwriteCiteKey;
+        return this;
     }
 
     public boolean shouldGenerateCiteKeysBeforeSaving() {

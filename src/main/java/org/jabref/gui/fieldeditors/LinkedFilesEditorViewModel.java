@@ -38,7 +38,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.util.FileHelper;
-import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
 public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
@@ -56,7 +55,7 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                                       BibDatabaseContext databaseContext,
                                       TaskExecutor taskExecutor,
                                       FieldCheckers fieldCheckers,
-                                      JabRefPreferences preferences) {
+                                      PreferencesService preferences) {
 
         super(field, suggestionProvider, fieldCheckers);
 
@@ -114,10 +113,6 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
 
     public boolean isFulltextLookupInProgress() {
         return fulltextLookupInProgress.get();
-    }
-
-    public BooleanProperty fulltextLookupInProgressProperty() {
-        return fulltextLookupInProgress;
     }
 
     private List<LinkedFileViewModel> parseToFileViewModel(String stringValue) {

@@ -64,24 +64,24 @@ class SaveDatabaseActionTest {
 
     @Test
     public void saveAsShouldSetWorkingDirectory() {
-        when(preferences.get(JabRefPreferences.WORKING_DIRECTORY)).thenReturn(TEST_BIBTEX_LIBRARY_LOCATION);
+        when(preferences.getWorkingDir()).thenReturn(Path.of(TEST_BIBTEX_LIBRARY_LOCATION));
         when(dialogService.showFileSaveDialog(any(FileDialogConfiguration.class))).thenReturn(Optional.of(file));
         doReturn(true).when(saveDatabaseAction).saveAs(any());
 
         saveDatabaseAction.saveAs();
 
-        verify(preferences, times(1)).setWorkingDir(file.getParent());
+        verify(preferences, times(1)).setWorkingDirectory(file.getParent());
     }
 
     @Test
     public void saveAsShouldNotSetWorkingDirectoryIfNotSelected() {
-        when(preferences.get(JabRefPreferences.WORKING_DIRECTORY)).thenReturn(TEST_BIBTEX_LIBRARY_LOCATION);
+        when(preferences.getWorkingDir()).thenReturn(Path.of(TEST_BIBTEX_LIBRARY_LOCATION));
         when(dialogService.showFileSaveDialog(any(FileDialogConfiguration.class))).thenReturn(Optional.empty());
         doReturn(false).when(saveDatabaseAction).saveAs(any());
 
         saveDatabaseAction.saveAs();
 
-        verify(preferences, times(0)).setWorkingDir(file.getParent());
+        verify(preferences, times(0)).setWorkingDirectory(file.getParent());
     }
 
     @Test

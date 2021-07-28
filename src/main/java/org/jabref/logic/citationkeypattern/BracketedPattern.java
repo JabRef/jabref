@@ -1,5 +1,7 @@
 package org.jabref.logic.citationkeypattern;
 
+import java.math.BigInteger;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,6 +33,7 @@ import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.LatexToUnicodeAdapter;
+import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,17 +58,22 @@ public class BracketedPattern {
     private static final int MAX_ALPHA_AUTHORS = 4;
 
     /**
+     * Matches everything that is not a unicode decimal digit.
+     */
+    private static final Pattern NOT_DECIMAL_DIGIT = Pattern.compile("\\P{Nd}");
+    /**
      * Matches everything that is not an uppercase ASCII letter. The intended use is to remove all lowercase letters
      */
     private static final Pattern NOT_CAPITAL_CHARACTER = Pattern.compile("[^A-Z]");
     /**
-     * Matches with "({[A-Z]}+)", which should be used to abbreviate the name of an institution
+     * Matches uppercase english letters between "({" and "})", which should be used to abbreviate the name of an institution
      */
-    private static final Pattern ABBREVIATIONS = Pattern.compile(".*\\(\\{[A-Z]+}\\).*");
+    private static final Pattern INLINE_ABBREVIATION = Pattern.compile("(?<=\\(\\{)[A-Z]+(?=}\\))");
     /**
      * Matches with "dep"/"dip", case insensitive
      */
     private static final Pattern DEPARTMENTS = Pattern.compile("^d[ei]p.*", Pattern.CASE_INSENSITIVE);
+    private static final Pattern WHITESPACE = Pattern.compile("\\p{javaWhitespace}");
 
     private enum Institution {
         SCHOOL,
@@ -74,9 +82,9 @@ public class BracketedPattern {
         TECHNOLOGY;
 
         /**
-         * Matches "uni" at the start of a string or after a space, case insensitive
+         * Matches "uni" followed by "v" or "b", at the start of a string or after a space, case insensitive
          */
-        private static final Pattern UNIVERSITIES = Pattern.compile("^uni.*", Pattern.CASE_INSENSITIVE);
+        private static final Pattern UNIVERSITIES = Pattern.compile("^uni(v|b|$).*", Pattern.CASE_INSENSITIVE);
         /**
          * Matches with "tech", case insensitive
          */
@@ -184,7 +192,7 @@ public class BracketedPattern {
      * @param database         The {@link BibDatabase} for field resolving. May be null.
      * @return a function accepting a bracketed expression and returning the result of expanding it
      */
-    private static Function<String, String> expandBracketContent(Character keywordDelimiter, BibEntry entry, BibDatabase database) {
+    public static Function<String, String> expandBracketContent(Character keywordDelimiter, BibEntry entry, BibDatabase database) {
         return (String bracket) -> {
             String expandedPattern;
             List<String> fieldParts = parseFieldAndModifiers(bracket);
@@ -193,7 +201,7 @@ public class BracketedPattern {
             expandedPattern = getFieldValue(entry, fieldParts.get(0), keywordDelimiter, database);
             if (fieldParts.size() > 1) {
                 // apply modifiers:
-                expandedPattern = applyModifiers(expandedPattern, fieldParts, 1);
+                expandedPattern = applyModifiers(expandedPattern, fieldParts, 1, expandBracketContent(keywordDelimiter, entry, database));
             }
             return expandedPattern;
         };
@@ -235,7 +243,8 @@ public class BracketedPattern {
     }
 
     /**
-     * Returns the content enclosed between brackets, including enclosed quotes, and excluding the enclosing brackets.
+     * Returns the content enclosed between brackets, including enclosed quotes, and excluding the paired enclosing brackets.
+     * There may be brackets in it.
      * Intended to be used by {@link BracketedPattern#expandBrackets(String, Character, BibEntry, BibDatabase)} when a [
      * is encountered, and has been consumed, by the {@code StringTokenizer}.
      *
@@ -246,13 +255,25 @@ public class BracketedPattern {
     private static String contentBetweenBrackets(StringTokenizer tokenizer, final String pattern) {
         StringBuilder bracketContent = new StringBuilder();
         boolean foundClosingBracket = false;
-        // make sure to read until the next ']'
+        int subBrackets = 0;
+        // make sure to read until the paired ']'
         while (tokenizer.hasMoreTokens() && !foundClosingBracket) {
             String token = tokenizer.nextToken();
             // If the beginning of a quote is found, append the content
             switch (token) {
                 case "\"" -> appendQuote(bracketContent, tokenizer);
-                case "]" -> foundClosingBracket = true;
+                case "]" -> {
+                    if (subBrackets == 0) {
+                        foundClosingBracket = true;
+                    } else {
+                        subBrackets--;
+                        bracketContent.append(token);
+                    }
+                }
+                case "[" -> {
+                    subBrackets++;
+                    bracketContent.append(token);
+                }
                 default -> bracketContent.append(token);
             }
         }
@@ -418,7 +439,7 @@ public class BracketedPattern {
             } else if ("shorttitleINI".equals(pattern)) {
                 return keepLettersAndDigitsOnly(
                         applyModifiers(getTitleWordsWithSpaces(3, entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")),
-                                Collections.singletonList("abbr"), 0));
+                                Collections.singletonList("abbr"), 0, Function.identity()));
             } else if ("veryshorttitle".equals(pattern)) {
                 return getTitleWords(1,
                         removeSmallWords(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")));
@@ -488,34 +509,34 @@ public class BracketedPattern {
      * @return an {@link AuthorList} consisting of authors and institution keys with resolved latex.
      */
     private static AuthorList createAuthorList(String unparsedAuthors) {
-        AuthorList authorList = new AuthorList();
-        for (Author author : AuthorList.parse(unparsedAuthors).getAuthors()) {
-            // If the author is an institution, use an institution key instead of the full name
-            String lastName = author.getLast()
-                                    .map(LatexToUnicodeAdapter::format)
-                                    .map(isInstitution(author) ?
-                                            BracketedPattern::generateInstitutionKey : Function.identity())
-                                    .orElse(null);
-            authorList.addAuthor(
-                    author.getFirst().map(LatexToUnicodeAdapter::format).orElse(null),
-                    author.getFirstAbbr().map(LatexToUnicodeAdapter::format).orElse(null),
-                    author.getVon().map(LatexToUnicodeAdapter::format).orElse(null),
-                    lastName,
-                    author.getJr().map(LatexToUnicodeAdapter::format).orElse(null)
-            );
-        }
-        return authorList;
+        return AuthorList.parse(unparsedAuthors).getAuthors().stream()
+                         .map((author) -> {
+                             // If the author is an institution, use an institution key instead of the full name
+                             String lastName = author.getLast()
+                                                     .map(lastPart -> isInstitution(author) ?
+                                                             generateInstitutionKey(lastPart) :
+                                                             LatexToUnicodeAdapter.format(lastPart))
+                                                     .orElse(null);
+                             return new Author(
+                                     author.getFirst().map(LatexToUnicodeAdapter::format).orElse(null),
+                                     author.getFirstAbbr().map(LatexToUnicodeAdapter::format).orElse(null),
+                                     author.getVon().map(LatexToUnicodeAdapter::format).orElse(null),
+                                     lastName,
+                                     author.getJr().map(LatexToUnicodeAdapter::format).orElse(null));
+                         })
+                         .collect(AuthorList.collect());
     }
 
     /**
-     * Checks if an author is an institution by verifying that only the last name is present.
+     * Checks if an author is an institution which can get a citation key from {@link #generateInstitutionKey(String)}.
      *
      * @param author the checked author
-     * @return true if only the last name is present
+     * @return true if only the last name is present and it contains at least one whitespace character.
      */
     private static boolean isInstitution(Author author) {
         return author.getFirst().isEmpty() && author.getFirstAbbr().isEmpty() && author.getJr().isEmpty()
-                && author.getVon().isEmpty() && author.getLast().isPresent();
+                && author.getVon().isEmpty() && author.getLast().isPresent()
+                && WHITESPACE.matcher(author.getLast().get()).find();
     }
 
     /**
@@ -524,9 +545,10 @@ public class BracketedPattern {
      * @param label  The generated label.
      * @param parts  String array containing the modifiers.
      * @param offset The number of initial items in the modifiers array to skip.
+     * @param expandBracketContent a function to expand the content in the parentheses.
      * @return The modified label.
      */
-    static String applyModifiers(final String label, final List<String> parts, final int offset) {
+    static String applyModifiers(final String label, final List<String> parts, final int offset, Function<String, String> expandBracketContent) {
         String resultingLabel = label;
         for (int j = offset; j < parts.size(); j++) {
             String modifier = parts.get(j);
@@ -549,7 +571,7 @@ public class BracketedPattern {
                 } else if (!modifier.isEmpty() && (modifier.length() >= 2) && (modifier.charAt(0) == '(') && modifier.endsWith(")")) {
                     // Alternate text modifier in parentheses. Should be inserted if the label is empty
                     if (label.isEmpty() && (modifier.length() > 2)) {
-                        resultingLabel = modifier.substring(1, modifier.length() - 1);
+                        resultingLabel = expandBrackets(modifier.substring(1, modifier.length() - 1), expandBracketContent);
                     }
                 } else {
                     LOGGER.warn("Key generator warning: unknown modifier '{}'.", modifier);
@@ -658,52 +680,31 @@ public class BracketedPattern {
     }
 
     public static String removeSmallWords(String title) {
-        StringJoiner stringJoiner = new StringJoiner(" ");
         String formattedTitle = formatTitle(title);
 
         try (Scanner titleScanner = new Scanner(formattedTitle)) {
-            mainl:
-            while (titleScanner.hasNext()) {
-                String word = titleScanner.next();
-
-                for (String smallWord : Word.SMALLER_WORDS) {
-                    if (word.equalsIgnoreCase(smallWord)) {
-                        continue mainl;
-                    }
-                }
-
-                stringJoiner.add(word);
-            }
+            return titleScanner.tokens()
+                               .filter(Predicate.not(
+                                       Word::isSmallerWord))
+                               .collect(Collectors.joining(" "));
         }
-
-        return stringJoiner.toString();
     }
 
     private static String getTitleWordsWithSpaces(int number, String title) {
-        StringJoiner stringJoiner = new StringJoiner(" ");
         String formattedTitle = formatTitle(title);
-        int words = 0;
 
         try (Scanner titleScanner = new Scanner(formattedTitle)) {
-            while (titleScanner.hasNext() && (words < number)) {
-                String word = titleScanner.next();
-
-                stringJoiner.add(word);
-                words++;
-            }
+            return titleScanner.tokens()
+                               .limit(number)
+                               .collect(Collectors.joining(" "));
         }
-
-        return stringJoiner.toString();
     }
 
     private static String keepLettersAndDigitsOnly(String in) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < in.length(); i++) {
-            if (Character.isLetterOrDigit(in.charAt(i))) {
-                stringBuilder.append(in.charAt(i));
-            }
-        }
-        return stringBuilder.toString();
+        return in.codePoints()
+                 .filter(Character::isLetterOrDigit)
+                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                 .toString();
     }
 
     /**
@@ -1037,19 +1038,12 @@ public class BracketedPattern {
         // FIXME: incorrectly exracts the first page when pages are
         // specified with ellipse, e.g. "213-6", which should stand
         // for "213-216". S.G.
-        final String[] splitPages = pages.split("\\D+");
-        int result = Integer.MAX_VALUE;
-        for (String n : splitPages) {
-            if (n.matches("\\d+")) {
-                result = Math.min(Integer.parseInt(n), result);
-            }
-        }
-
-        if (result == Integer.MAX_VALUE) {
-            return "";
-        } else {
-            return String.valueOf(result);
-        }
+        return NOT_DECIMAL_DIGIT.splitAsStream(pages)
+                                .filter(Predicate.not(String::isBlank))
+                                .map(BigInteger::new)
+                                .min(BigInteger::compareTo)
+                                .map(BigInteger::toString)
+                                .orElse("");
     }
 
     /**
@@ -1075,19 +1069,12 @@ public class BracketedPattern {
      * @throws NullPointerException if pages is null.
      */
     public static String lastPage(String pages) {
-        final String[] splitPages = pages.split("\\D+");
-        int result = Integer.MIN_VALUE;
-        for (String n : splitPages) {
-            if (n.matches("\\d+")) {
-                result = Math.max(Integer.parseInt(n), result);
-            }
-        }
-
-        if (result == Integer.MIN_VALUE) {
-            return "";
-        } else {
-            return String.valueOf(result);
-        }
+        return NOT_DECIMAL_DIGIT.splitAsStream(pages)
+                                .filter(Predicate.not(String::isBlank))
+                                .map(BigInteger::new)
+                                .max(BigInteger::compareTo)
+                                .map(BigInteger::toString)
+                                .orElse("");
     }
 
     /**
@@ -1129,51 +1116,6 @@ public class BracketedPattern {
         }
         parts.add(current.toString());
         return parts;
-    }
-
-    /**
-     * Will remove diacritics from the content.
-     * <ul>
-     * <li>Replaces umlaut: \"x with xe, e.g. \"o -> oe, \"u -> ue, etc.</li>
-     * <li>Removes all other diacritics: \?x -> x, e.g. \'a -> a, etc.</li>
-     * </ul>
-     *
-     * @param content The content.
-     * @return The content without diacritics.
-     */
-    private static String removeDiacritics(String content) {
-        if (content.isEmpty()) {
-            return content;
-        }
-
-        String result = content;
-        // Replace umlaut with '?e'
-        result = result.replaceAll("\\{\\\\\"([a-zA-Z])\\}", "$1e");
-        result = result.replaceAll("\\\\\"\\{([a-zA-Z])\\}", "$1e");
-        result = result.replaceAll("\\\\\"([a-zA-Z])", "$1e");
-        // Remove diacritics
-        result = result.replaceAll("\\{\\\\.([a-zA-Z])\\}", "$1");
-        result = result.replaceAll("\\\\.\\{([a-zA-Z])\\}", "$1");
-        result = result.replaceAll("\\\\.([a-zA-Z])", "$1");
-        return result;
-    }
-
-    /**
-     * Unifies umlauts.
-     * <ul>
-     * <li>Replaces: $\ddot{\mathrm{X}}$ (an alternative umlaut) with: {\"X}</li>
-     * <li>Replaces: \?{X} and \?X with {\?X}, where ? is a diacritic symbol</li>
-     * </ul>
-     *
-     * @param content The content.
-     * @return The content with unified diacritics.
-     */
-    private static String unifyDiacritics(String content) {
-        return content.replaceAll(
-                "\\$\\\\ddot\\{\\\\mathrm\\{([^\\}])\\}\\}\\$",
-                "{\\\"$1}").replaceAll(
-                "(\\\\[^\\-a-zA-Z])\\{?([a-zA-Z])\\}?",
-                "{$1$2}");
     }
 
     /**
@@ -1248,15 +1190,20 @@ public class BracketedPattern {
             return "";
         }
 
-        String result = content;
-        result = unifyDiacritics(result);
-        result = result.replaceAll("^\\{", "").replaceAll("}$", "");
-        Matcher matcher = ABBREVIATIONS.matcher(result);
-        if (matcher.matches()) {
-            return matcher.group(1);
+        Matcher matcher = INLINE_ABBREVIATION.matcher(content);
+        if (matcher.find()) {
+            return LatexToUnicodeAdapter.format(matcher.group());
         }
 
-        result = removeDiacritics(result);
+        Optional<String> unicodeFormattedName = LatexToUnicodeAdapter.parse(content);
+        if (unicodeFormattedName.isEmpty()) {
+            LOGGER.warn("{} could not be converted to unicode. This can result in an incorrect or missing institute citation key", content);
+        }
+        String result = unicodeFormattedName.orElse(Normalizer.normalize(content, Normalizer.Form.NFC));
+
+        // Special characters can't be allowed past this point because the citation key generator might replace them with multiple mixed-case characters
+        result = StringUtil.replaceSpecialCharacters(result);
+
         String[] institutionNameTokens = result.split(",");
 
         // Key parts
@@ -1335,7 +1282,6 @@ public class BracketedPattern {
      * institution keyword and has an uppercase first letter, except univ/tech key word.
      *
      * @param word to check
-     * @return
      */
     private static boolean noOtherInstitutionKeyWord(String word) {
         return !DEPARTMENTS.matcher(word).matches()

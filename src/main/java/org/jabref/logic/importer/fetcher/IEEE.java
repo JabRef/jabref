@@ -15,10 +15,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.help.HelpFile;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
+import org.jabref.logic.importer.fetcher.transformers.IEEEQueryTransformer;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.OS;
@@ -31,6 +33,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import kong.unirest.json.JSONArray;
 import kong.unirest.json.JSONObject;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +58,8 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
 
     private final ImportFormatPreferences preferences;
 
+    private IEEEQueryTransformer transformer;
+
     public IEEE(ImportFormatPreferences preferences) {
         this.preferences = Objects.requireNonNull(preferences);
     }
@@ -62,7 +67,7 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
     /**
      * @implNote <a href="https://developer.ieee.org/docs/read/Metadata_API_responses">documentation</a>
      */
-    private static BibEntry parseJsonRespone(JSONObject jsonEntry, Character keywordSeparator) {
+    private static BibEntry parseJsonResponse(JSONObject jsonEntry, Character keywordSeparator) {
         BibEntry entry = new BibEntry();
 
         switch (jsonEntry.optString("content_type")) {
@@ -202,8 +207,24 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
                 JSONArray results = jsonObject.getJSONArray("articles");
                 for (int i = 0; i < results.length(); i++) {
                     JSONObject jsonEntry = results.getJSONObject(i);
-                    BibEntry entry = parseJsonRespone(jsonEntry, preferences.getKeywordSeparator());
-                    entries.add(entry);
+                    BibEntry entry = parseJsonResponse(jsonEntry, preferences.getKeywordSeparator());
+                    boolean addEntry;
+                    // In case entry has no year, add it
+                    // In case an entry has a year, check if its in the year range
+                    // The implementation uses some Java 8 Optional magic to implement that
+                    if (entry.hasField(StandardField.YEAR)) {
+                        addEntry = entry.getField(StandardField.YEAR).filter(year -> {
+                            Integer yearAsInteger = Integer.valueOf(year);
+                            return
+                                    transformer.getStartYear().map(startYear -> yearAsInteger >= startYear).orElse(true) &&
+                                            transformer.getEndYear().map(endYear -> yearAsInteger <= endYear).orElse(true);
+                        }).map(x -> true).orElse(false);
+                    } else {
+                        addEntry = true;
+                    }
+                    if (addEntry) {
+                        entries.add(entry);
+                    }
                 }
             }
 
@@ -222,48 +243,35 @@ public class IEEE implements FulltextFetcher, PagedSearchBasedParserFetcher {
     }
 
     @Override
-    public URL getURLForQuery(String query, int pageNumber) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(QueryNode luceneQuery, int pageNumber) throws URISyntaxException, MalformedURLException, FetcherException {
+        // transformer is stored globally, because we need to filter out the bib entries by the year manually
+        // the transformer stores the min and max year
+        transformer = new IEEEQueryTransformer();
+        String transformedQuery = transformer.transformLuceneQuery(luceneQuery).orElse("");
         URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
         uriBuilder.addParameter("apikey", API_KEY);
-        uriBuilder.addParameter("querytext", query);
+        if (!transformedQuery.isBlank()) {
+            uriBuilder.addParameter("querytext", transformedQuery);
+        }
         uriBuilder.addParameter("max_records", String.valueOf(getPageSize()));
+        // Currently not working as part of the query string
+        if (transformer.getJournal().isPresent()) {
+            uriBuilder.addParameter("publication_title", transformer.getJournal().get());
+        }
+        if (transformer.getStartYear().isPresent()) {
+            uriBuilder.addParameter("start_year", String.valueOf(transformer.getStartYear().get()));
+        }
+        if (transformer.getEndYear().isPresent()) {
+            uriBuilder.addParameter("end_year", String.valueOf(transformer.getEndYear().get()));
+        }
+        if (transformer.getArticleNumber().isPresent()) {
+            uriBuilder.addParameter("article_number", transformer.getArticleNumber().get());
+        }
         // Starts to index at 1 for the first entry
         uriBuilder.addParameter("start_record", String.valueOf(getPageSize() * pageNumber) + 1);
 
         URLDownload.bypassSSLVerification();
 
-        return uriBuilder.build().toURL();
-    }
-
-    @Override
-    public URL getComplexQueryURL(ComplexSearchQuery complexSearchQuery, int pageNumber) throws URISyntaxException, MalformedURLException {
-        URIBuilder uriBuilder = new URIBuilder("https://ieeexploreapi.ieee.org/api/v1/search/articles");
-        uriBuilder.addParameter("apikey", API_KEY);
-        uriBuilder.addParameter("max_records", String.valueOf(getPageSize()));
-        // Starts to index at 1 for the first entry
-        uriBuilder.addParameter("start_record", String.valueOf(getPageSize() * pageNumber) + 1);
-
-        if (!complexSearchQuery.getDefaultFieldPhrases().isEmpty()) {
-            uriBuilder.addParameter("querytext", String.join(" AND ", complexSearchQuery.getDefaultFieldPhrases()));
-        }
-        if (!complexSearchQuery.getAuthors().isEmpty()) {
-            uriBuilder.addParameter("author", String.join(" AND ", complexSearchQuery.getAuthors()));
-        }
-        if (!complexSearchQuery.getAbstractPhrases().isEmpty()) {
-            uriBuilder.addParameter("abstract", String.join(" AND ", complexSearchQuery.getAbstractPhrases()));
-        }
-        if (!complexSearchQuery.getTitlePhrases().isEmpty()) {
-            uriBuilder.addParameter("article_title", String.join(" AND ", complexSearchQuery.getTitlePhrases()));
-        }
-        complexSearchQuery.getJournal().ifPresent(journalTitle -> uriBuilder.addParameter("publication_title", journalTitle));
-        complexSearchQuery.getFromYear().map(String::valueOf).ifPresent(year -> uriBuilder.addParameter("start_year", year));
-        complexSearchQuery.getToYear().map(String::valueOf).ifPresent(year -> uriBuilder.addParameter("end_year", year));
-        complexSearchQuery.getSingleYear().map(String::valueOf).ifPresent(year -> {
-            uriBuilder.addParameter("start_year", year);
-            uriBuilder.addParameter("end_year", year);
-        });
-
-        URLDownload.bypassSSLVerification();
         return uriBuilder.build().toURL();
     }
 }

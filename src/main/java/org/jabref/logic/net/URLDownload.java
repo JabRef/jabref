@@ -36,6 +36,7 @@ import java.util.Map.Entry;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
@@ -129,6 +130,20 @@ public class URLDownload {
             HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
         } catch (Exception e) {
             LOGGER.error("A problem occurred when bypassing SSL verification", e);
+        }
+    }
+
+    /**
+     *
+     * @param socketFactory trust manager
+     * @param verifier host verifier
+     */
+    public static void setSSLVerification(SSLSocketFactory socketFactory, HostnameVerifier verifier) {
+        try {
+            HttpsURLConnection.setDefaultSSLSocketFactory(socketFactory);
+            HttpsURLConnection.setDefaultHostnameVerifier(verifier);
+        } catch (Exception e) {
+            LOGGER.error("A problem occurred when reset SSL verification", e);
         }
     }
 
@@ -290,11 +305,12 @@ public class URLDownload {
 
         // Take everything after the last '/' as name + extension
         String fileNameWithExtension = sourcePath.substring(sourcePath.lastIndexOf('/') + 1);
-        String fileName = FileUtil.getBaseName(fileNameWithExtension);
+        String fileName = "jabref-" + FileUtil.getBaseName(fileNameWithExtension);
         String extension = "." + FileHelper.getFileExtension(fileNameWithExtension).orElse("tmp");
 
         // Create temporary file and download to it
         Path file = Files.createTempFile(fileName, extension);
+        file.toFile().deleteOnExit();
         toFile(file);
 
         return file;

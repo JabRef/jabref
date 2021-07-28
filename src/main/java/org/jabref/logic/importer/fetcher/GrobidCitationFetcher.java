@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +44,7 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
      *
      * @return A BibTeX string if extraction is successful
      */
-    private Optional<String> parseUsingGrobid(String plainText) {
+    private Optional<String> parseUsingGrobid(String plainText) throws RuntimeException {
         try {
             return Optional.of(grobidService.processCitation(plainText, GrobidService.ConsolidateCitations.WITH_METADATA));
         } catch (SocketTimeoutException e) {
@@ -52,7 +54,7 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
         } catch (IOException e) {
             String msg = "Could not process citation. " + e.getMessage();
             LOGGER.debug(msg, e);
-            throw new RuntimeException(msg, e);
+            return Optional.empty();
         }
     }
 
@@ -66,30 +68,33 @@ public class GrobidCitationFetcher implements SearchBasedFetcher {
     }
 
     @Override
-    public List<BibEntry> performSearch(ComplexSearchQuery complexSearchQuery) throws FetcherException {
-        List<BibEntry> bibEntries = null;
-        // This just treats the complex query like a normal string query until it it implemented correctly
-        String query = complexSearchQuery.toString();
-        try {
-            bibEntries = Arrays
-                    .stream(query.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
-                    .map(String::trim)
-                    .filter(str -> !str.isBlank())
-                    .map(this::parseUsingGrobid)
-                    .flatMap(Optional::stream)
-                    .map(this::parseBibToBibEntry)
-                    .flatMap(Optional::stream)
-                    .collect(Collectors.toList());
-        } catch (RuntimeException e) {
-            // un-wrap the wrapped exceptions
-            throw new FetcherException(e.getMessage(), e.getCause());
-        }
-        return bibEntries;
-    }
-
-    @Override
     public String getName() {
         return "GROBID";
     }
 
+    @Override
+    public List<BibEntry> performSearch(String searchQuery) throws FetcherException {
+        List<BibEntry> collect;
+        try {
+            collect = Arrays.stream(searchQuery.split("\\r\\r+|\\n\\n+|\\r\\n(\\r\\n)+"))
+                            .map(String::trim)
+                            .filter(str -> !str.isBlank())
+                            .map(this::parseUsingGrobid)
+                            .flatMap(Optional::stream)
+                            .map(this::parseBibToBibEntry)
+                            .flatMap(Optional::stream)
+                            .collect(Collectors.toList());
+        } catch (RuntimeException e) {
+            throw new FetcherException(e.getMessage(), e.getCause());
+        }
+        return collect;
+    }
+
+    /**
+     * Not used
+     */
+    @Override
+    public List<BibEntry> performSearch(QueryNode luceneQuery) throws FetcherException {
+        return Collections.emptyList();
+    }
 }

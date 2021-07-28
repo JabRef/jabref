@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
 import javax.xml.transform.TransformerException;
 
 import javafx.beans.Observable;
@@ -230,7 +233,10 @@ public class LinkedFileViewModel extends AbstractViewModel {
     public void askForNameAndRename() {
         String oldFile = this.linkedFile.getLink();
         Path oldFilePath = Path.of(oldFile);
-        Optional<String> askedFileName = dialogService.showInputDialogWithDefaultAndWait(Localization.lang("Rename file"), Localization.lang("New Filename"), oldFilePath.getFileName().toString());
+        Optional<String> askedFileName = dialogService.showInputDialogWithDefaultAndWait(
+                Localization.lang("Rename file"),
+                Localization.lang("New Filename"),
+                oldFilePath.getFileName().toString());
         askedFileName.ifPresent(this::renameFileToName);
     }
 
@@ -314,14 +320,14 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     /**
-     * Compares suggested filepath of current linkedFile with existing filepath.
+     * Compares suggested directory of current linkedFile with existing filepath directory.
      *
      * @return true if suggested filepath is same as existing filepath.
      */
     public boolean isGeneratedPathSameAsOriginal() {
         Optional<Path> newDir = databaseContext.getFirstExistingFileDir(filePreferences);
 
-        Optional<Path> currentDir = linkedFile.findIn(databaseContext, filePreferences);
+        Optional<Path> currentDir = linkedFile.findIn(databaseContext, filePreferences).map(Path::getParent);
 
         BiPredicate<Path, Path> equality = (fileA, fileB) -> {
             try {
@@ -378,9 +384,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
     }
 
     public void edit() {
-        LinkedFileEditDialogView dialog = new LinkedFileEditDialogView(this.linkedFile);
-
-        Optional<LinkedFile> editedFile = dialog.showAndWait();
+        Optional<LinkedFile> editedFile = dialogService.showCustomDialogAndWait(new LinkedFileEditDialogView(this.linkedFile));
         editedFile.ifPresent(file -> {
             this.linkedFile.setLink(file.getLink());
             this.linkedFile.setDescription(file.getDescription());
@@ -424,27 +428,32 @@ public class LinkedFileViewModel extends AbstractViewModel {
             }
 
             URLDownload urlDownload = new URLDownload(linkedFile.getLink());
+            if (!checkSSLHandshake(urlDownload)) {
+                return;
+            }
+
             BackgroundTask<Path> downloadTask = prepareDownloadTask(targetDirectory.get(), urlDownload);
             downloadTask.onSuccess(destination -> {
-                LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectories(filePreferences), externalFileTypes);
+                boolean isDuplicate = false;
+                try {
+                    isDuplicate = FileNameUniqueness.isDuplicatedFile(targetDirectory.get(), destination.getFileName(), dialogService);
+                } catch (IOException e) {
+                    LOGGER.error("FileNameUniqueness.isDuplicatedFile failed", e);
+                    return;
+                }
 
-                List<LinkedFile> linkedFiles = entry.getFiles();
-                int oldFileIndex = -1;
-                int i = 0;
-                while (i < linkedFiles.size() && oldFileIndex == -1) {
-                    LinkedFile file = linkedFiles.get(i);
-                    // The file type changes as part of download process (see prepareDownloadTask), thus we only compare by link
-                    if (file.getLink().equalsIgnoreCase(linkedFile.getLink())) {
-                        oldFileIndex = i;
+                if (!isDuplicate) {
+                    LinkedFile newLinkedFile = LinkedFilesEditorViewModel.fromFile(destination, databaseContext.getFileDirectories(filePreferences), externalFileTypes);
+                    List<LinkedFile> linkedFiles = entry.getFiles();
+
+                    entry.addLinkedFile(entry, linkedFile, newLinkedFile, linkedFiles);
+
+                    // Notify in bar when the file type is HTML.
+                    if (newLinkedFile.getFileType().equals(StandardExternalFileType.URL.getName())) {
+                        dialogService.notify(Localization.lang("Downloaded website as an HTML file."));
+                        LOGGER.debug("Downloaded website {} as an HTML file at {}", linkedFile.getLink(), destination);
                     }
-                    i++;
                 }
-                if (oldFileIndex == -1) {
-                    linkedFiles.add(0, newLinkedFile);
-                } else {
-                    linkedFiles.set(oldFileIndex, newLinkedFile);
-                }
-                entry.setFiles(linkedFiles);
             });
             downloadProgress.bind(downloadTask.workDonePercentageProperty());
             downloadTask.titleProperty().set(Localization.lang("Downloading"));
@@ -457,7 +466,28 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
     }
 
+    public boolean checkSSLHandshake(URLDownload urlDownload) {
+        try {
+            urlDownload.canBeReached();
+        } catch (kong.unirest.UnirestException ex) {
+            if (ex.getCause() instanceof javax.net.ssl.SSLHandshakeException) {
+                if (dialogService.showConfirmationDialogAndWait(Localization.lang("Download file"),
+                        Localization.lang("Unable to find valid certification path to requested target(%0), download anyway?",
+                                urlDownload.getSource().toString()))) {
+                    URLDownload.bypassSSLVerification();
+                    return true;
+                } else {
+                    dialogService.notify(Localization.lang("Download operation canceled."));
+                }
+            }
+            return false;
+        }
+        return true;
+    }
+
     public BackgroundTask<Path> prepareDownloadTask(Path targetDirectory, URLDownload urlDownload) {
+        SSLSocketFactory defaultSSLSocketFactory = HttpsURLConnection.getDefaultSSLSocketFactory();
+        HostnameVerifier defaultHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
         BackgroundTask<Path> downloadTask = BackgroundTask
                 .wrap(() -> {
                     Optional<ExternalFileType> suggestedType = inferFileType(urlDownload);
@@ -470,6 +500,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
                     return targetDirectory.resolve(fulltextDir).resolve(suggestedName);
                 })
                 .then(destination -> new FileDownloadTask(urlDownload.getSource(), destination))
+                .onFinished(() -> URLDownload.setSSLVerification(defaultSSLSocketFactory, defaultHostnameVerifier))
                 .onFailure(exception -> dialogService.showErrorDialogAndWait("Download failed", exception));
         return downloadTask;
     }

@@ -1,6 +1,6 @@
 # How to test
 
-For details on unit testing see <https://devdocs.jabref.org/getting-into-the-code/code-howtos#test-cases>.
+For details on unit testing see [https://devdocs.jabref.org/getting-into-the-code/code-howtos\#test-cases](https://devdocs.jabref.org/getting-into-the-code/code-howtos#test-cases).
 
 ## Database tests
 
@@ -8,7 +8,7 @@ For details on unit testing see <https://devdocs.jabref.org/getting-into-the-cod
 
 To quickly host a local PostgreSQL database, execute following statement:
 
-```terminal
+```text
 docker run -d -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=postgres -p 5432:5432 --name db postgres:10 postgres -c log_statement=all
 ```
 
@@ -20,7 +20,7 @@ Then, all DBMS Tests \(annotated with `@org.jabref.testutils.category.DatabaseTe
 
 A MySQL DBMS can be started using following command:
 
-```terminal
+```text
 docker run -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=jabref -p 3800:3307 mysql:8.0 --port=3307
 ```
 
