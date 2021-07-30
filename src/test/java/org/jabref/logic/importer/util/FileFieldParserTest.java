@@ -147,7 +147,7 @@ class FileFieldParserTest {
                 // url as file
                 Arguments.of(
                              Collections.singletonList(new LinkedFile("", new URL("http://ceur-ws.org/Vol-438"), "URL")),
-                             ":http\\:/ceur-ws.org/Vol-438:URL"
+                             ":http\\://ceur-ws.org/Vol-438:URL"
                 )
         );
     }
